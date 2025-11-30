@@ -5,9 +5,12 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <SDL3/SDL.h>
+#include <vulkan/vulkan.h>
+#include <slang.h>
 
 #include <stdio.h>
 
+#include <c_base.h>
 #include <c_types.h>
 #include <c_math.h>
 
@@ -23,23 +26,25 @@ struct vertex_t
     vec4_t position;
 };
 
+global_variable bool8 g_running;
+
 string_t 
 c_read_file(char *path)
 {
     string_t result;
 
     FILE *file_handle = fopen(path, "rb");
-    Expect(file_handle != null);
+    Expect(file_handle != null, "Could not read file: '%s'...\n", path);
 
     fseek(file_handle, 0, SEEK_END);
     u32 file_size = ftell(file_handle);
     fseek(file_handle, 0, SEEK_SET);
 
-    Expect(file_size > 0);
+    Expect(file_size > 0, "File size is 0...\n");
 
     result.count = file_size;
     result.data  = (byte*)AllocSize(sizeof(byte) * file_size);
-    Expect(result.data);
+    Expect(result.data, "Failed to malloc data...\n");
 
     fread(result.data, 
           sizeof(byte), 
@@ -58,78 +63,72 @@ main(void)
         SDL_Window *window = SDL_CreateWindow("Window", 1280, 720, SDL_WINDOW_BORDERLESS);
         if(window)
         {
-            SDL_GPUDevice *device = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, true, null);
-            Expect(device);
+            SDL_GPUDevice *device = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV|
+                                                        SDL_GPU_SHADERFORMAT_DXIL|
+                                                        SDL_GPU_SHADERFORMAT_MSL,
+                                                        true,
+                                                        null);
+            Expect(device, "Failed to create GPU device...\n");
+            Expect(SDL_ClaimWindowForGPUDevice(device, window), 
+                   "Error, Failure to apply GPUDevice to that of the SDL Window: '%s'...\n", SDL_GetError());
 
-            Expect(SDL_ClaimWindowForGPUDevice(device, window));
-
-            string_t vertex_shader_code   = c_read_file("../code/shaders/test_vert.spv");
-            string_t fragment_shader_code = c_read_file("../code/shaders/test_frag.spv");
-
-            SDL_GPUShaderCreateInfo v_shader_info = {};
-            v_shader_info.code_size  = vertex_shader_code.count;
-            v_shader_info.code       = vertex_shader_code.data;
-            v_shader_info.entrypoint = "vertex_main";
-            v_shader_info.format     = SDL_GPU_SHADERFORMAT_SPIRV;
-            v_shader_info.stage      = SDL_GPU_SHADERSTAGE_VERTEX;
-
-            SDL_GPUShaderCreateInfo f_shader_info = {};
-            f_shader_info.code_size  = fragment_shader_code.count;
-            f_shader_info.code       = fragment_shader_code.data;
-            f_shader_info.entrypoint = "fragment_main";
-            f_shader_info.format     = SDL_GPU_SHADERFORMAT_SPIRV;
-            f_shader_info.stage      = SDL_GPU_SHADERSTAGE_FRAGMENT;
-
-            SDL_GPUShader *v_shader = SDL_CreateGPUShader(device, &v_shader_info);
-            SDL_GPUShader *f_shader = SDL_CreateGPUShader(device, &f_shader_info);
-
-            Expect(v_shader);
-            Expect(f_shader);
-            
-            SDL_GPUBufferCreateInfo v_buffer_info = {};
-            v_buffer_info.usage = SDL_GPU_BUFFERUSAGE_VERTEX;
-            v_buffer_info.size  = sizeof(vertex_t) * MAX_VERTICES;
-            SDL_GPUBuffer *vertex_buffer = SDL_CreateGPUBuffer(device, &v_buffer_info);
-            Expect(vertex_buffer);
-
-            SDL_GPUColorTargetDescription first_color_target = {
-                .format = SDL_GetGPUSwapchainTextureFormat(device, window),
+            string_t v_shader_spirv = c_read_file("../code/shaders/test_vert.spv");
+            string_t f_shader_spirv = c_read_file("../code/shaders/test_frag.spv");
+            SDL_GPUShaderCreateInfo v_shader_create_info = {
+                .code_size  = v_shader_spirv.count,
+                .code       = v_shader_spirv.data,
+                .entrypoint = "main",
+                .format     = SDL_GPU_SHADERFORMAT_SPIRV,
+                .stage      = SDL_GPU_SHADERSTAGE_VERTEX,
             };
 
-            SDL_GPUVertexBufferDescription vertex_buffer_desc = {};
-            vertex_buffer_desc.slot = 0;
-            vertex_buffer_desc.pitch = sizeof(vertex_t);
-            vertex_buffer_desc.input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX;
-            vertex_buffer_desc.instance_step_rate = 0;
-
-            SDL_GPUVertexAttribute vertex_attributes[1] = {};
-            vertex_attributes[0].location = 0;
-            vertex_attributes[0].buffer_slot = 0;
-            vertex_attributes[0].format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4;
-            vertex_attributes[0].offset = 0;
-
-
-            SDL_GPUVertexInputState vertex_input_state = {};
-            vertex_input_state.vertex_buffer_descriptions = &vertex_buffer_desc;
-            vertex_input_state.num_vertex_buffers = 1;
-            vertex_input_state.vertex_attributes = vertex_attributes;
-            vertex_input_state.num_vertex_attributes = 1;
-
-            SDL_GPUGraphicsPipelineCreateInfo pipeline_info = {
-                .vertex_shader      = v_shader,
-                .fragment_shader    = f_shader,
-                .vertex_input_state = vertex_input_state,
-                .primitive_type  = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
-                .target_info = {
-                    .color_target_descriptions = &first_color_target,
-                    .num_color_targets = 1,
-                },
+            SDL_GPUShaderCreateInfo f_shader_create_info = {
+                .code_size  = f_shader_spirv.count,
+                .code       = f_shader_spirv.data,
+                .entrypoint = "main",
+                .format     = SDL_GPU_SHADERFORMAT_SPIRV,
+                .stage      = SDL_GPU_SHADERSTAGE_FRAGMENT,
             };
 
-            pipeline_info.rasterizer_state.fill_mode = SDL_GPU_FILLMODE_FILL;
-            SDL_GPUGraphicsPipeline *pipeline = SDL_CreateGPUGraphicsPipeline(device, &pipeline_info);
-            printf("Error: '%s'...\n", SDL_GetError());
-            Expect(pipeline);
+
+            SDL_GPUShader *vertex_shader = SDL_CreateGPUShader(device,   &v_shader_create_info);
+            SDL_GPUShader *fragment_shader = SDL_CreateGPUShader(device, &f_shader_create_info);
+
+            Expect(vertex_shader, "%s...\n",   SDL_GetError());
+            Expect(fragment_shader, "%s...\n", SDL_GetError());
+
+            g_running = true;
+            while(g_running)
+            {
+                SDL_Event event;
+                while(SDL_PollEvent(&event))
+                {
+                    switch(event.type)
+                    {
+                        case SDL_EVENT_QUIT:
+                        {
+                            g_running = false;
+                        }break;
+                    }
+                }
+                SDL_GPUCommandBuffer *buffer = SDL_AcquireGPUCommandBuffer(device);
+
+                SDL_GPUTexture *texture = null;
+                SDL_WaitAndAcquireGPUSwapchainTexture(buffer, window, &texture, null, null);
+
+                SDL_GPUColorTargetInfo colorTargetInfo = {
+                    .texture = texture,
+                    .clear_color = {0.0f, 0.0f, 1.0f, 1.0f}, 
+                    .load_op = SDL_GPU_LOADOP_CLEAR, 
+                    .store_op = SDL_GPU_STOREOP_STORE, 
+                    .cycle = true, 
+                };
+
+                SDL_GPURenderPass *renderPass = SDL_BeginGPURenderPass(buffer, &colorTargetInfo, 1, NULL);
+                SDL_EndGPURenderPass(renderPass);
+
+                SDL_SubmitGPUCommandBuffer(buffer);
+            }
         }
         else
         {

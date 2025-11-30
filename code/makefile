@@ -70,7 +70,7 @@ BUILD_DIR = ../build
 # --------------------------------------------
 # Set The Inputs
 # --------------------------------------------
-COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL/include/
+COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL/include/ -I../run_tree/deps/SDL_shadercross/include/
 
 # Find all .cpp files in the source directory
 ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
@@ -85,7 +85,7 @@ GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
-GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL/lib/ -lSDL3
+GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL/lib/ -lSDL3 
 
 # --------------------------------------------
 # Set the Outputs

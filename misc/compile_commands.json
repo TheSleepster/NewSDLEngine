@@ -27,13 +27,14 @@
       "-I../code/",
       "-I../run_tree/deps/",
       "-I../run_tree/deps/SDL/include/",
+      "-I../run_tree/deps/SDL_shadercross/include/",
       "-c",
       "-o",
       "../build/main.o",
       "../code/main.cpp"
     ],
-    "directory": "/home/justin/personal/projects/c++stuff/CSDLEngine2/code",
-    "file": "/home/justin/personal/projects/c++stuff/CSDLEngine2/code/main.cpp",
-    "output": "/home/justin/personal/projects/c++stuff/CSDLEngine2/build/main.o"
+    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
+    "file": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code/main.cpp",
+    "output": "/home/justin/personal/projects/c++stuff/NewSDLEngine/build/main.o"
   }
 ]
