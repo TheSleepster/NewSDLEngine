@@ -58,11 +58,27 @@ c_read_file(char *path)
 int
 main(void)
 {
+    s32 compiled_version = SDL_VERSION;  
+    s32 linked_version   = SDL_GetVersion();  
+
+    SDL_Log("Compiled with SDL version %d.%d.%d ...\n",
+            SDL_VERSIONNUM_MAJOR(compiled_version),
+            SDL_VERSIONNUM_MINOR(compiled_version),
+            SDL_VERSIONNUM_MICRO(compiled_version));
+
+    SDL_Log("Linked against SDL version %d.%d.%d.\n",
+            SDL_VERSIONNUM_MAJOR(linked_version),
+            SDL_VERSIONNUM_MINOR(linked_version),
+            SDL_VERSIONNUM_MICRO(linked_version));
+
     if(SDL_Init(SDL_INIT_VIDEO))
     {
         SDL_Window *window = SDL_CreateWindow("Window", 1280, 720, SDL_WINDOW_BORDERLESS);
         if(window)
         {
+            SDL_PropertiesID props = SDL_CreateProperties();
+            SDL_SetBooleanProperty(props, SDL_PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN, true);
+
             SDL_GPUDevice *device = SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV|
                                                         SDL_GPU_SHADERFORMAT_DXIL|
                                                         SDL_GPU_SHADERFORMAT_MSL,
@@ -73,7 +89,6 @@ main(void)
                    "Error, Failure to apply GPUDevice to that of the SDL Window: '%s'...\n", SDL_GetError());
 
             string_t v_shader_spirv = c_read_file("../code/shaders/test_vert.spv");
-            string_t f_shader_spirv = c_read_file("../code/shaders/test_frag.spv");
             SDL_GPUShaderCreateInfo v_shader_create_info = {
                 .code_size  = v_shader_spirv.count,
                 .code       = v_shader_spirv.data,
@@ -82,6 +97,7 @@ main(void)
                 .stage      = SDL_GPU_SHADERSTAGE_VERTEX,
             };
 
+            string_t f_shader_spirv = c_read_file("../code/shaders/test_frag.spv");
             SDL_GPUShaderCreateInfo f_shader_create_info = {
                 .code_size  = f_shader_spirv.count,
                 .code       = f_shader_spirv.data,
