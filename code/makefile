@@ -70,13 +70,13 @@ BUILD_DIR = ../build
 # --------------------------------------------
 # Set The Inputs
 # --------------------------------------------
-COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL/include/ -I../run_tree/deps/SDL_shadercross/include/
+COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/
 
 # Find all .cpp files in the source directory
 ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 
 # Filter out platform-specific files
-GAME_SRCS = $(filter-out $(EXCLUDE_PATTERNS),$(ALL_SRCS))
+GAME_SRCS  = $(filter-out $(EXCLUDE_PATTERNS),$(ALL_SRCS))
 
 # Convert source paths to object paths in build directory
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
@@ -85,19 +85,33 @@ GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
-GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL/lib/ -lSDL3 
+GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps
+
 
 # --------------------------------------------
 # Set the Outputs
 # --------------------------------------------
-GAME_OUT = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
+GAME_OUT   = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
 
 # --------------------------------------------
 # Create The Build Instructions
 # --------------------------------------------
-.PHONY: all game_out clean
+.PHONY: all game_out tests clean
 
-all: game_out
+all: game_out tests
+
+# Each test executable depends on one test source
+TESTS_SRC := $(wildcard ../code/tests/*.cpp)
+TESTS_OUT := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
+
+# The "tests" target depends on all test executables
+tests: $(TESTS_OUT)
+
+# Compile each test source file directly into an executable
+$(BUILD_DIR)/test_%$(EXE_EXT): ../code/tests/%.cpp | $(BUILD_DIR)
+	@echo [TEST] $@
+	@$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
 
 # Create build directory
 $(BUILD_DIR):
@@ -115,6 +129,7 @@ $(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 
 # Include dependency files (if they exist)
 -include $(GAME_DEPS)
+#-include $(patsubst ../code/tests/%.cpp,../build/test_%.d,$(TESTS_SRC))
 
 clean:
 	-rm -rf $(BUILD_DIR)

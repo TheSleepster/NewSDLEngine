@@ -129,6 +129,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include <string.h>
 
 ///////////////////////////////////
 // NOTE(Sleepster): HELPER MACROS 
@@ -155,9 +156,6 @@
 #define MemoryCopyStruct(dest, source) (MemoryCopy((dest), (source), Min(sizeof(*(dest), sizeof(*(source))))))
 
 #define InvalidCodePath Assert(false)
-
-// NOTE(Sleepster): Linux Kernel compile time assert! It unfortunately only tells you if the the condition fails... not how it fails... Unlucky!
-#define StaticAssert(condition) ((void)sizeof(char[2*!!(condition) - 1]))
 
 #define Align4(value) ((value  + 3)  & ~3)
 #define Align8(value) ((value  + 7)  & ~7)
@@ -190,13 +188,27 @@ global_variable float64 machine_epsilon_f64 = 2.220446e-16;
 
 typedef void void_func(void);
 
+#ifdef ASSERT_ENABLED
 #define AssertBreak       (*(char*)0 = 0)
-#define Expect(cond, ...) if(!(cond)) { AssertBreak; fprintf(stderr, ##__VA_ARGS__); }
+
+#define StaticAssert(cond, msg) static_assert(cond, msg) 
+#define Expect(cond, ...) if(!(cond)) { fprintf(stderr, ##__VA_ARGS__); AssertBreak; }
 #define Assert(cond)      if(!(cond)) { AssertBreak; }
+#else
+#define StaticAssert(cond, msg)
+#define Expect(cond, ...)
+#define Assert(cond)
+#endif
 
 #define Alloc(type)             (type*)malloc(sizeof(type))
 #define AllocArray(type, count) (type*)malloc(sizeof(type) * count)
 #define AllocSize(size)                malloc(size)
+
+#define TypeOf(type)          __typeof__(type)
+
+// NOTE(Sleepster): C++
+#include <type_traits>
+#define TypesCompatible(A, B) std::is_same_v<decltype(A), decltype(B)>
 
 
 #endif // C_BASE_H
