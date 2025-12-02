@@ -1,0 +1,16 @@
+# Compiled object files and executables
+*.o
+*.out
+*.exe
+*.bin
+*.dll
+*.so
+*.dylib
+*.wad
+*.d
+*.ilk
+*.pdb
+*.vs
+*.sln
+*.idf
+*.rdi
