@@ -18,5 +18,10 @@ target:
 {
   executable: "../build/test_dynarray.exe"
   working_directory: "../build/"
+}
+target:
+{
+  executable: "../build/test_networking.exe"
+  working_directory: "../build/"
   enabled: 0
 }
