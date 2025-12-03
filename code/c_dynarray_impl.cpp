@@ -9,6 +9,7 @@
 
 #include <c_dynarray.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void*
 _dynarray_create_impl(u32 element_size)

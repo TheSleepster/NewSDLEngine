@@ -9,8 +9,8 @@ DEBUG_BULD ?=
 # --------------------------------------------
 ifeq ($(OS),Windows_NT)
     OS_DEFINE = -DOS_WINDOWS=1
-    PLATFORM_LIBS = -lopengl32 -luser32 -lgdi32 -lwinmm -lshell32 -lole32 -luuid -lversion -ladvapi32 -lsetupapi -lcfgmgr32 -loleaut32 -limm32
-    LDFLAGS = -Wl,/IGNORE:4099 -Wl,/STACK:314572800 -Wl,/NODEFAULTLIB:LIBCMT 
+    PLATFORM_LIBS = -lopengl32 -luser32 -lgdi32 -lwinmm -lshell32 -lole32 -luuid -lversion -ladvapi32 -lsetupapi -lcfgmgr32 -loleaut32 -limm32 -lWs2_32
+    LDFLAGS = -Wl,/IGNORE:4099 -Wl,/STACK:314572800 -Wl
     EXE_EXT = .exe
     DLL_EXT = .dll
     LIB_EXT = .lib
@@ -85,7 +85,7 @@ GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
-GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps
+GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -lSDL3-Static
 
 
 # --------------------------------------------

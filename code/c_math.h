@@ -86,6 +86,9 @@
 #define ClampTop(A, B) (Min(A, B))
 #define ClampBot(A, B) (Max(A, B))
 
+#define Min(A, B) (((A) < (B)) ? (A) : (B))
+#define Max(A, B) (((A) > (B)) ? (A) : (B)) 
+
 #define Square(x) ((x) * (x))
 
 /*===========================================

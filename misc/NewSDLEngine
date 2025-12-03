@@ -1,0 +1,22 @@
+// raddbg 0.9.22 project file
+
+recent_file: path: "W:/NewSDLEngine/code/main.cpp"
+recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/string/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/string/amd64/strcmp.asm"
+recent_file: path: "../code/main.cpp"
+breakpoint:
+{
+  source_location: "../code/main.cpp:54:1"
+  hit_count: 0
+}
+target:
+{
+  executable: "../build/game_debug.exe"
+  working_directory: "../run_tree/res"
+  enabled: 1
+}
+target:
+{
+  executable: "../build/test_dynarray.exe"
+  working_directory: "../build/"
+  enabled: 0
+}

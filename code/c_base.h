@@ -126,16 +126,8 @@
 # define ASSERT_ENABLED
 #endif
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdarg.h>
-#include <string.h>
-
 ///////////////////////////////////
 // NOTE(Sleepster): HELPER MACROS 
-#define Min(a, b) (((a) > (b)) ? (b) : (a))
-#define Max(a, b) (((a) < (b)) ? (b) : (a))
-
 #define Statement(x)                 do{x}while(0)
 
 #define GlueHelper(A, B)             A##B
@@ -192,7 +184,7 @@ typedef void void_func(void);
 #define AssertBreak       (*(char*)0 = 0)
 
 #define StaticAssert(cond, msg) static_assert(cond, msg) 
-#define Expect(cond, ...) if(!(cond)) { fprintf(stderr, ##__VA_ARGS__); AssertBreak; }
+#define Expect(cond, ...) if(!(cond)) { fprintf(stderr, "FILE: [%s], LINE: '%d':\t", __FILE__, __LINE__); fprintf(stderr, ##__VA_ARGS__); AssertBreak; }
 #define Assert(cond)      if(!(cond)) { AssertBreak; }
 #else
 #define StaticAssert(cond, msg)
