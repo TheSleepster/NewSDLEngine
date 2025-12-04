@@ -13,19 +13,6 @@
 
 #include <c_dynarray.h>
 
-#if OS_WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#define NO_MIN_MAX
-#include <windows.h>
-
-#undef errno
-#define errno WSAGetLastError()
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#error "window only..."
-#endif
-
 typedef struct packet
 {
     u32 type;
@@ -106,29 +93,6 @@ main(int argc, char **argv)
     state->window_size = vec2(1920, 1080);
     if(SDL_Init(SDL_INIT_VIDEO))
     {
-        WSADATA wsaData;
-        if(WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) 
-        {
-            fprintf(stderr, "WSAStartup failed.\n");
-        }
-
-        if(LOBYTE(wsaData.wVersion) != 2 ||
-           HIBYTE(wsaData.wVersion) != 2)
-        {
-            fprintf(stderr,"Version 2.2 of Winsock not available.\n");
-            WSACleanup();
-        }
-
-        if(argc >= 2)
-        {
-            if(strcmp(argv[1], "--client") == 0)
-            {
-            }
-            else if(strcmp(argv[1], "--host") == 0)
-            {
-            }
-        }
-
         if(SDL_CreateWindowAndRenderer("Game", 
                                        (u32)state->window_size.x,
                                        (u32)state->window_size.y, 

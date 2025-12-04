@@ -8,7 +8,6 @@
 #include <c_types.h>
 
 #include <c_dynarray.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 void*

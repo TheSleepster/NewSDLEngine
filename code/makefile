@@ -18,7 +18,7 @@ ifeq ($(OS),Windows_NT)
     DEV_NULL = NUL
     PIC_FLAG =
     MKDIR = if not exist "$(subst /,\,$1)" mkdir "$(subst /,\,$1)"
-    EXCLUDE_PATTERNS = %_linux.cpp %_mac.cpp
+    EXCLUDE_PATTERNS = %_linux.cpp %_mac.cpp %_android.cpp
     PDB_SUFFIX := $(shell powershell -Command "[guid]::NewGuid().ToString('N').Substring(0,8)")
     PDB_LDFLAG = -Wl /PDB:../build/game_$(BUILD_TYPE)_$(PDB_SUFFIX).pdb 
 
@@ -41,12 +41,12 @@ else
         OS_DEFINE = -DOS_LINUX=1
         PLATFORM_LIBS = -lX11 -lGL -lm
         DEV_NULL = /dev/null
-        EXCLUDE_PATTERNS = %_windows.cpp %_mac.cpp
+        EXCLUDE_PATTERNS = %_windows.cpp %_mac.cpp %_android.cpp
     else ifeq ($(UNAME_S),Darwin)
         OS_DEFINE = -DOS_MAC=1
         PLATFORM_LIBS = -framework Cocoa -framework OpenGL -lm
         DEV_NULL = /dev/null
-        EXCLUDE_PATTERNS = %_windows.cpp %_linux.cpp
+        EXCLUDE_PATTERNS = %_windows.cpp %_linux.cpp %_android.cpp
     endif
 endif
 
@@ -74,8 +74,7 @@ BUILD_DIR = ../build
 COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/
 
 ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
-GAME_SRCS  = $(filter-out $(EXCLUDE_PATTERNS),$(ALL_SRCS))
-
+GAME_SRCS  = $(filter-out $(SRC_DIR)/os_%,$(ALL_SRCS))
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
@@ -95,16 +94,19 @@ GAME_OUT   = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
 
 all: game_out tests
 
+# Each test executable depends on one test source
 TESTS_SRC := $(wildcard ../code/tests/*.cpp)
 TESTS_OUT := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
 
 tests: $(TESTS_OUT)
 
+# Compile each test source file directly into an executable
 $(BUILD_DIR)/test_%$(EXE_EXT): ../code/tests/%.cpp | $(BUILD_DIR)
 	@echo [TEST] $@
 	@$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
 
+# Create build directory
 $(BUILD_DIR):
 	$(call MKDIR,$(BUILD_DIR))
 
@@ -118,6 +120,7 @@ $(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 	@echo Compiling: $< ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) -MMD -MP -c $< -o $@
 
+# Include dependency files (if they exist)
 -include $(GAME_DEPS)
 -include $(patsubst ../code/tests/%.cpp,../build/test_%.d,$(TESTS_SRC))
 

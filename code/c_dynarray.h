@@ -7,10 +7,11 @@
    ======================================================================== */
 
 #define C_DYNARRAY_H
+#include <stdio.h>
+#include <string.h>
+
 #include <c_base.h>
 #include <c_types.h>
-
-#include <stdio.h>
 
 typedef struct dynarray_header 
 {
