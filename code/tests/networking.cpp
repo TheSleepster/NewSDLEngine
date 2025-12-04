@@ -77,7 +77,7 @@ client(char *ip_addr, char *port)
     s32 sent = send(data.socket_id, (const char*)message.data, (s32)message.count, 0);
     Expect(sent != -1, "Failed to send bytes down network pipe: '%d'...\n", errno);
 
-    closesocket(data.socket_id);
+    Expect(closesocket(data.socket_id), "Failed to close socket, '%d'...\n", errno);
 }
 
 internal void

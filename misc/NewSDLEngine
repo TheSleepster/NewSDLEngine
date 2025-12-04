@@ -12,7 +12,14 @@ target:
 {
   executable: "../build/game_debug.exe"
   working_directory: "../run_tree/res"
+  arguments: "--host"
+}
+target:
+{
+  executable: "../build/game_debug.exe"
+  working_directory: "../run_tree/res"
   enabled: 1
+  arguments: "--client 127.0.0.1"
 }
 target:
 {
@@ -23,5 +30,9 @@ target:
 {
   executable: "../build/test_networking.exe"
   working_directory: "../build/"
-  enabled: 0
+}
+breakpoint:
+{
+  source_location: "W:/NewSDLEngine/code/main.cpp:124:1"
+  hit_count: 1
 }

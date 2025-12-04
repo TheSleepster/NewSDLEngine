@@ -41,6 +41,7 @@ else
         OS_DEFINE = -DOS_LINUX=1
         PLATFORM_LIBS = -lX11 -lGL -lm
         DEV_NULL = /dev/null
+        EXCLUDE_PATTERNS = %_windows.cpp %_mac.cpp
     else ifeq ($(UNAME_S),Darwin)
         OS_DEFINE = -DOS_MAC=1
         PLATFORM_LIBS = -framework Cocoa -framework OpenGL -lm
@@ -72,16 +73,10 @@ BUILD_DIR = ../build
 # --------------------------------------------
 COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/
 
-# Find all .cpp files in the source directory
 ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
-
-# Filter out platform-specific files
 GAME_SRCS  = $(filter-out $(EXCLUDE_PATTERNS),$(ALL_SRCS))
 
-# Convert source paths to object paths in build directory
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
-
-# Dependency files
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
@@ -100,20 +95,16 @@ GAME_OUT   = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
 
 all: game_out tests
 
-# Each test executable depends on one test source
 TESTS_SRC := $(wildcard ../code/tests/*.cpp)
 TESTS_OUT := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
 
-# The "tests" target depends on all test executables
 tests: $(TESTS_OUT)
 
-# Compile each test source file directly into an executable
 $(BUILD_DIR)/test_%$(EXE_EXT): ../code/tests/%.cpp | $(BUILD_DIR)
 	@echo [TEST] $@
 	@$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
 
-# Create build directory
 $(BUILD_DIR):
 	$(call MKDIR,$(BUILD_DIR))
 
@@ -127,9 +118,8 @@ $(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 	@echo Compiling: $< ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) -MMD -MP -c $< -o $@
 
-# Include dependency files (if they exist)
 -include $(GAME_DEPS)
-#-include $(patsubst ../code/tests/%.cpp,../build/test_%.d,$(TESTS_SRC))
+-include $(patsubst ../code/tests/%.cpp,../build/test_%.d,$(TESTS_SRC))
 
 clean:
 	-rm -rf $(BUILD_DIR)

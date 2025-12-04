@@ -13,19 +13,91 @@
 
 #include <c_dynarray.h>
 
+#if OS_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#define NO_MIN_MAX
+#include <windows.h>
+
+#undef errno
+#define errno WSAGetLastError()
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#error "window only..."
+#endif
+
+typedef struct packet
+{
+    u32 type;
+    u32 sequence_ID;
+    struct payload {
+        u32   size;
+        void *data;
+    };
+}packet_t;
+
+enum entity_flags
+{
+    EF_Valid    = 1ul << 0,
+    EF_Alive    = 1ul << 1,
+    EF_Gravitic = 1ul << 2,
+    EF_Actor    = 1ul << 3,
+    EF_Static   = 1ul << 4,
+    EF_IsGround = 1ul << 5,
+};
+
+struct entity_t
+{
+    u32    e_flags;
+    vec2_t last_position;
+    vec2_t position;
+    vec2_t velocity;
+};
+
+struct entity_manager_t
+{
+    entity_t entities[1000];
+    u32      active_entities;
+};
+
 struct game_state_t
 {
-    SDL_Window   *window;
-    SDL_Renderer *renderer;
-    vec2_t        window_size;
+    SDL_Window      *window;
+    SDL_Renderer    *renderer;
+    vec2_t           window_size;
 
-    vec2_t        input_axis;
-    vec2_t        player_velocity;
-    vec2_t        player_position;
-    vec2_t        player_last_p;
+    vec2_t           input_axis;
+    entity_manager_t entity_manager;
+
+    entity_t        *player;
 };
 
 global_variable bool8 g_running = false;
+
+entity_t* 
+entity_create(game_state_t *state)
+{
+    entity_t *new_entity = null;
+
+    for(u32 entity_index = 0;
+        entity_index < 1000;
+        ++entity_index)
+    {
+        entity_t *entity = state->entity_manager.entities + entity_index;
+        if(!(entity->e_flags & EF_Valid))
+        {
+            new_entity = entity;
+            break;
+        }
+    }
+    Assert(new_entity);
+
+    ZeroStruct(*new_entity);
+    new_entity->e_flags = EF_Valid;
+
+    ++state->entity_manager.active_entities;
+    return(new_entity);
+}
 
 int
 main(int argc, char **argv)
@@ -34,6 +106,29 @@ main(int argc, char **argv)
     state->window_size = vec2(1920, 1080);
     if(SDL_Init(SDL_INIT_VIDEO))
     {
+        WSADATA wsaData;
+        if(WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) 
+        {
+            fprintf(stderr, "WSAStartup failed.\n");
+        }
+
+        if(LOBYTE(wsaData.wVersion) != 2 ||
+           HIBYTE(wsaData.wVersion) != 2)
+        {
+            fprintf(stderr,"Version 2.2 of Winsock not available.\n");
+            WSACleanup();
+        }
+
+        if(argc >= 2)
+        {
+            if(strcmp(argv[1], "--client") == 0)
+            {
+            }
+            else if(strcmp(argv[1], "--host") == 0)
+            {
+            }
+        }
+
         if(SDL_CreateWindowAndRenderer("Game", 
                                        (u32)state->window_size.x,
                                        (u32)state->window_size.y, 
@@ -47,10 +142,12 @@ main(int argc, char **argv)
             u64 delta_tsc       = 0;
 
             float32 delta_time    = 0;
-            float32 delta_time_ms = 0;
+            //float32 delta_time_ms = 0;
 
             float64 dt_accumulator = 0.0f;
             float32 tick_rate = 1.0f / 60.0f;
+
+            state->player = entity_create(state);
 
             g_running = true;
             while(g_running)
@@ -86,20 +183,21 @@ main(int argc, char **argv)
                     state->input_axis.x =  1.0f;
                 }
 
-                dt_accumulator += delta_time;
                 if(delta_time >= (tick_rate * 2.0f))
                 {
                     delta_time = tick_rate * 2.0f;
                 }
 
+                dt_accumulator += delta_time;
                 while(dt_accumulator >= tick_rate)
                 {
-                    state->player_last_p = state->player_position;
-                    state->player_velocity.x = (state->input_axis.x * (200.5f * tick_rate));
-                    state->player_velocity.y = (state->input_axis.y * (200.5f * tick_rate));
+                    state->player->last_position = state->player->position;
 
-                    state->player_position = vec2_add(state->player_position, state->player_velocity);
-                    state->player_velocity = vec2(0.0f, 0.0f);
+                    state->player->velocity.x = (state->input_axis.x * (200.5f * tick_rate));
+                    state->player->velocity.y = (state->input_axis.y * (200.5f * tick_rate));
+
+                    state->player->position = vec2_add(state->player->position, state->player->velocity);
+                    state->player->velocity = vec2(0.0f, 0.0f);
 
                     dt_accumulator -= tick_rate;
                 }
@@ -109,12 +207,12 @@ main(int argc, char **argv)
                 SDL_RenderClear(state->renderer);
                 
                 SDL_SetRenderDrawColor(state->renderer, 255, 0, 0, 255);
-                vec2_t lerped_pos = vec2_lerp(state->player_last_p, state->player_position, alpha);
+                vec2_t lerped_pos = vec2_lerp(state->player->last_position, state->player->position, alpha);
                 SDL_FRect rect = {
                     .x = lerped_pos.x,
                     .y = lerped_pos.y,
-                    .w = 20,
-                    .h = 20
+                    .w = 60,
+                    .h = 60
                 };
                 SDL_RenderFillRect(state->renderer, &rect);
                 SDL_RenderPresent(state->renderer);
@@ -124,9 +222,9 @@ main(int argc, char **argv)
                 last_tsc    = current_tsc;
 
                 delta_time    = (float32)(((float64)delta_tsc) / (float64)perf_count_freq);
-                delta_time_ms = delta_time * 1000.0f;
 
-                printf("delta time: '%.02f'...\n", delta_time_ms);
+                //delta_time_ms = delta_time * 1000.0f;
+                //printf("delta time: '%.02f'...\n", delta_time_ms);
             }
         }
         else
