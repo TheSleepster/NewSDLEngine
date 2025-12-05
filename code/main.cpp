@@ -10,89 +10,210 @@
 #include <c_base.h>
 #include <c_math.h>
 #include <c_string.h>
-
 #include <c_dynarray.h>
+#include <c_threadpool.h>
 
-typedef struct packet
-{
-    u32 type;
-    u32 sequence_ID;
-    struct payload {
-        u32   size;
-        void *data;
-    };
-}packet_t;
+#include <g_game_state.h>
+#include <g_entity.h>
 
-enum entity_flags
-{
-    EF_Valid    = 1ul << 0,
-    EF_Alive    = 1ul << 1,
-    EF_Gravitic = 1ul << 2,
-    EF_Actor    = 1ul << 3,
-    EF_Static   = 1ul << 4,
-    EF_IsGround = 1ul << 5,
-};
+#if OS_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#define NO_MIN_MAX
+#include <windows.h>
 
-struct entity_t
-{
-    u32    e_flags;
-    vec2_t last_position;
-    vec2_t position;
-    vec2_t velocity;
-};
+#undef errno
+#define errno WSAGetLastError()
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
-struct entity_manager_t
-{
-    entity_t entities[1000];
-    u32      active_entities;
-};
-
-struct game_state_t
-{
-    SDL_Window      *window;
-    SDL_Renderer    *renderer;
-    vec2_t           window_size;
-
-    vec2_t           input_axis;
-    entity_manager_t entity_manager;
-
-    entity_t        *player;
-};
+#define SOCKET int
+#else
+#error "window only..."
+#endif
 
 global_variable bool8 g_running = false;
 
-entity_t* 
-entity_create(game_state_t *state)
+enum packet_type_t
 {
-    entity_t *new_entity = null;
+    PT_Invalid,
+    PT_Connect,
+    PT_ConnectAccepted,
+    PT_Disconnect,
+    PT_Input,
+    PT_Count,
+};
 
-    for(u32 entity_index = 0;
-        entity_index < 1000;
-        ++entity_index)
+#define PACKET_MAGIC_VALUE(a, b, c, d) (((u32)(a) << 0) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
+constexpr u32 cv_packet_magic_value = PACKET_MAGIC_VALUE('P', 'A', 'C', 'K');
+
+struct packet_t
+{
+    u32 magic_value = cv_packet_magic_value;
+    u32 type;
+    union 
     {
-        entity_t *entity = state->entity_manager.entities + entity_index;
-        if(!(entity->e_flags & EF_Valid))
+        void *data;
+        u32   size;
+    }payload;
+};
+
+bool8
+s_nt_socket_api_init(void)
+{
+    bool8 result = true;
+    WSADATA wsaData;
+    if(WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) 
+    {
+        fprintf(stderr, "WSAStartup failed.\n");
+        result = false;
+    }
+
+    if(LOBYTE(wsaData.wVersion) != 2 ||
+        HIBYTE(wsaData.wVersion) != 2)
+    {
+        fprintf(stderr,"Version 2.2 of Winsock not available.\n");
+        WSACleanup();
+        result = false;
+    }
+
+    return(result);
+}
+
+void
+s_nt_init_client_data(game_state_t *state, char *host_ip)
+{    
+    state->socket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (state->socket == INVALID_SOCKET) 
+    {
+        fprintf(stderr, "Socket creation failed: '%d'\n", errno);
+    }
+
+    u_long mode = 1;
+    ioctlsocket(state->socket, FIONBIO, &mode);
+
+    if(state->is_host)
+    {     
+        struct sockaddr_in bind_addr = {0};
+        bind_addr.sin_family = AF_INET;
+        bind_addr.sin_addr.s_addr = INADDR_ANY;
+        bind_addr.sin_port = htons(6969);
+        if(bind(state->socket, (struct sockaddr*)&bind_addr, sizeof(bind_addr)) < 0) 
         {
-            new_entity = entity;
+            fprintf(stderr, "Failed to bind the socket... Error: '%d'...\n", errno);
+        }
+
+        printf("[HOST]: Listening on port %d\n", 6969);
+    }
+    else
+    {
+        state->host_address_data.sin_family = AF_INET;
+        state->host_address_data.sin_port   = htons(6969);
+        inet_pton(AF_INET, host_ip, &state->host_address_data.sin_addr);
+
+        packet_t packet = {};
+        packet.type = PT_Connect;
+        sendto(state->socket, 
+               (char*)&packet, 
+               sizeof(packet_t), 
+               0,
+               (struct sockaddr*)&state->host_address_data, 
+               sizeof(state->host_address_data));
+
+        printf("[CLIENT]: Connecting to %s:%d\n", host_ip, 6969);
+    }
+}
+
+void
+s_nt_client_check_packets(game_state_t *state) 
+{
+    packet_t packet;
+    struct sockaddr_in from;
+    socklen_t sock_addr_size = sizeof(from);
+
+    for(;;)
+    {
+        int bytes = recvfrom(state->socket, 
+                             (char*)&packet, 
+                             sizeof(packet_t), 0,
+                             (struct sockaddr*)&from, 
+                             &sock_addr_size);
+        if(bytes > 0) 
+        {
+            if(packet.magic_value == cv_packet_magic_value)
+            {
+                switch(packet.type) 
+                {
+                    case PT_Connect: 
+                    {
+                        Assert(state->is_host);
+                        client_data_t *client = state->clients + state->connected_client_count;
+                        client->ID = state->connected_client_count;
+                        client->address   =  from;
+                        client->addr_len  =  sock_addr_size;
+                        client->connected = true;
+
+                        state->connected_client_count += 1;
+
+                        packet_t response;
+                        response.magic_value = cv_packet_magic_value;
+                        response.type        = PT_ConnectAccepted;
+
+                        sendto(state->socket, 
+                               (char*)&response, 
+                               sizeof(packet_t), 
+                               0, 
+                               (struct sockaddr*)&from, 
+                               sock_addr_size);
+
+                        printf("[HOST]: Client %d connected\n", client->ID);
+                    }break;
+                    case PT_ConnectAccepted:
+                    {
+                        Assert(!state->is_host);
+                        printf("[CLIENT]: Connected...\n");
+                    }break;
+                    default: 
+                    {
+                        InvalidCodePath;
+                    }break;
+                }
+            }
+        }
+        else
+        {
             break;
         }
     }
-    Assert(new_entity);
-
-    ZeroStruct(*new_entity);
-    new_entity->e_flags = EF_Valid;
-
-    ++state->entity_manager.active_entities;
-    return(new_entity);
 }
 
 int
 main(int argc, char **argv)
 {
     game_state_t *state = Alloc(game_state_t);
-    state->window_size = vec2(1920, 1080);
+    state->window_size = vec2(600, 600);
     if(SDL_Init(SDL_INIT_VIDEO))
     {
+        bool8 result = s_nt_socket_api_init();
+        Expect(result, "Failure to init the Windows Socket API...\n");
+        if(argc >= 2)
+        {
+            if(strcmp(argv[1], "--client") == 0)
+            {
+                if(argc < 3) 
+                {
+                    fprintf(stderr, "Please pass the ip to connect too...\n");
+                    exit(0);
+                }
+                char *host_ip = argv[2];
+                s_nt_init_client_data(state, host_ip);
+            }
+            else if(strcmp(argv[1], "--host") == 0)
+            {
+                state->is_host = true;
+                s_nt_init_client_data(state, null);
+            }
+        }
+
         if(SDL_CreateWindowAndRenderer("Game", 
                                        (u32)state->window_size.x,
                                        (u32)state->window_size.y, 
@@ -116,6 +237,8 @@ main(int argc, char **argv)
             g_running = true;
             while(g_running)
             {
+                s_nt_client_check_packets(state);
+
                 state->input_axis = {};
 
                 SDL_Event event;
@@ -155,6 +278,9 @@ main(int argc, char **argv)
                 dt_accumulator += delta_time;
                 while(dt_accumulator >= tick_rate)
                 {
+                    // TODO(Sleepster): If we have any input packets form the host, reconcile here...
+                    // TODO(Sleepster): Send out input packet...
+                     
                     state->player->last_position = state->player->position;
 
                     state->player->velocity.x = (state->input_axis.x * (200.5f * tick_rate));
@@ -164,6 +290,7 @@ main(int argc, char **argv)
                     state->player->velocity = vec2(0.0f, 0.0f);
 
                     dt_accumulator -= tick_rate;
+
                 }
                 float32 alpha = (dt_accumulator / tick_rate);
 

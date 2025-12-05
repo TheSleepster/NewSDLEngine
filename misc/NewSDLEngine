@@ -1,38 +1,54 @@
 // raddbg 0.9.22 project file
 
+recent_file: path: "../code/main.cpp"
+recent_file: path: "../code/tests/threadpool.cpp"
+recent_file: path: "../../../../../../Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt/stdio.h"
+recent_file: path: "../code/c_threadpool.cpp"
+recent_file: path: "W:/NewSDLEngine/code/tests/threadpool.cpp"
+recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/stdio/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/stdio/output.cpp"
+recent_file: path: "W:/NewSDLEngine/code/c_threadpool.cpp"
+recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/heap/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/heap/free_base.cpp"
+recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/string/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/string/strnlen.cpp"
 recent_file: path: "W:/NewSDLEngine/code/main.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/string/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/string/amd64/strcmp.asm"
-recent_file: path: "../code/main.cpp"
 breakpoint:
 {
   source_location: "../code/main.cpp:54:1"
   hit_count: 0
+  enabled: 0
 }
 target:
 {
   executable: "../build/game_debug.exe"
   working_directory: "../run_tree/res"
   arguments: "--host"
+  enabled: 0
 }
 target:
 {
   executable: "../build/game_debug.exe"
   working_directory: "../run_tree/res"
-  enabled: 1
   arguments: "--client 127.0.0.1"
+  enabled: 1
 }
 target:
 {
   executable: "../build/test_dynarray.exe"
-  working_directory: "../build/"
+  working_directory: "../build"
 }
 target:
 {
   executable: "../build/test_networking.exe"
+  working_directory: "../build"
+}
+target:
+{
+  executable: "../build/test_threadpool.exe"
   working_directory: "../build/"
+  enabled: 0
 }
 breakpoint:
 {
-  source_location: "W:/NewSDLEngine/code/main.cpp:124:1"
-  hit_count: 1
+  source_location: "W:/NewSDLEngine/code/tests/threadpool.cpp:58:1"
+  hit_count: 0
 }
