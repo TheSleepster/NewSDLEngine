@@ -1,7 +1,6 @@
 // raddbg 0.9.22 project file
 
 recent_file: path: "../code/main.cpp"
-recent_file: path: "../code/g_entity.cpp"
 recent_file: path: "../code/tests/threadpool.cpp"
 recent_file: path: "../../../../../../Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt/stdio.h"
 recent_file: path: "../code/c_threadpool.cpp"
@@ -17,14 +16,14 @@ target:
   executable: "../build/game_debug.exe"
   working_directory: "../run_tree/res"
   arguments: "--host"
-  enabled: 1
+  enabled: 0
 }
 target:
 {
   executable: "../build/game_debug.exe"
   working_directory: "../run_tree/res"
   arguments: "--client 127.0.0.1"
-  enabled: 0
+  enabled: 1
 }
 target:
 {
@@ -39,7 +38,7 @@ target:
 target:
 {
   executable: "../build/test_threadpool.exe"
-  working_directory: "../build"
+  working_directory: "../build/"
   enabled: 0
 }
 breakpoint:

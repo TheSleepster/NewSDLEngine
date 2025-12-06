@@ -189,19 +189,20 @@ s_nt_client_check_packets(game_state_t *state)
                         Assert(!state->is_host);
 
                         client_data_t *host_data = state->clients;
+                        host_data->ID        = 0;
                         host_data->address   = from;
                         host_data->addr_len  = sock_addr_size;
                         host_data->connected = true;
 
                         host_data->player                  = entity_create(state);
-                        host_data->player->owner_client_id = state->connected_client_count;
+                        host_data->player->owner_client_id = host_data->ID;
                         host_data->player->e_type          = ET_Player;
 
                         state->connected_client_count += 1;
+                        state->client_id               = state->connected_client_count;
 
-                        state->client_id = state->connected_client_count;
                         client_data_t *client_data = state->clients + state->connected_client_count;
-                        client_data->ID = state->connected_client_count; 
+                        client_data->ID            = state->connected_client_count; 
 
                         client_data->player                  = entity_create(state); 
                         client_data->player->e_type          = ET_Player;
@@ -212,9 +213,15 @@ s_nt_client_check_packets(game_state_t *state)
                     }break;
                     case PT_InputData:
                     {
-                        client_data_t *client = state->clients + ((packet.client_id));
+                        client_data_t *client = state->clients + packet.client_id;
                         client->input_data_buffer[client->input_data_head] = packet.payload.input_data;
                         client->input_data_head = (client->input_data_head + 1) % MAX_BUFFERED_INPUTS;
+
+                        vec2_t input_axis = packet.payload.input_data.input_axis; 
+                        if(input_axis.x != 0.0f)
+                        {
+                            printf("Input axis: '%.02f', '%.02f'...\n", input_axis.x, input_axis.y);
+                        }
                     }break;
                     default: 
                     {
@@ -231,43 +238,65 @@ s_nt_client_check_packets(game_state_t *state)
 }
 
 void
-s_nt_send_state_update(game_state_t *state)
+s_nt_client_send_packets(game_state_t *state)
 {
-    for(u32 client_index = 0;
-        client_index < state->connected_client_count;
-        ++client_index)
-    {
-        client_data_t *client = state->clients + client_index;
+    client_data_t *host = state->clients;
+    client_data_t *our_client = state->clients + state->client_id;
 
-        packet_t packet = {};
-        packet.client_id = client->ID;
+    // NOTE(Sleepster): If we're NOT the host, send our own input data to the host
+    if(state->client_id != 0)
+    {
+        packet_t packet  = {};
+        packet.client_id = state->client_id;
         packet.type      = PT_InputData;
-        packet.payload.input_data = client->input_data_buffer[client->input_data_tail];
 
-        client->input_data_tail = (client->input_data_tail + 1) % MAX_BUFFERED_INPUTS;
-        sendto(state->socket, 
-               (char*)&packet, 
-               sizeof(packet_t), 
-               0, 
-               (struct sockaddr*)&client->address, 
-               client->addr_len);
-    }
-}
-
-void
-s_nt_update_client_inputs(game_state_t *state)
-{
-    for(u32 client_index = 0;
-        client_index < state->connected_client_count;
-        ++client_index)
-    {
-        client_data_t *client = state->clients + client_index;
-        for(u32 input_packet_index = client->input_data_head;
-            input_packet_index < client->input_data_tail;
-            input_packet_index = (input_packet_index + 1) % MAX_BUFFERED_INPUTS)
+        if(our_client->input_data_tail != our_client->input_data_head)
         {
-            input_data_t *input_data  = client->input_data_buffer + input_packet_index;
-            entity_simulate_player(client->player, input_data, gcv_tick_rate);
+            // NOTE(Sleepster): DO NOT increment tail here... we need to use this "packet" later. 
+            input_data_t input_data   = our_client->input_data_buffer[our_client->input_data_tail];
+            packet.payload.input_data = input_data;
+
+            sendto(state->socket,
+                   (char*)&packet,
+                   sizeof(packet_t),
+                   0,
+                   (struct sockaddr*)&host->address,
+                   host->addr_len);
+        }
+    }
+
+    // NOTE(Sleepster): If we're the host, echo packets from all clients to all OTHER clients
+    if(state->client_id == 0)
+    {
+        for(u32 connected_clients = 0; 
+            connected_clients < state->connected_client_count; 
+            ++connected_clients)
+        {
+            client_data_t *source_client = state->clients + connected_clients;
+            
+            if(source_client->input_data_tail != source_client->input_data_head)
+            {
+                packet_t echo_packet  = {};
+                echo_packet.client_id = connected_clients;
+                echo_packet.type      = PT_InputData;
+                echo_packet.payload.input_data = source_client->input_data_buffer[source_client->input_data_tail];
+
+                for(u32 other_client_index = 0; 
+                    other_client_index < state->connected_client_count; 
+                    ++other_client_index)
+                {
+                    if(other_client_index != connected_clients)
+                    {
+                        client_data_t *dest_client = state->clients + other_client_index;
+                        sendto(state->socket,
+                               (char*)&echo_packet,
+                               sizeof(packet_t),
+                               0,
+                               (struct sockaddr*)&dest_client->address,
+                               dest_client->addr_len);
+                    }
+                }
+            }
         }
     }
 }
@@ -322,8 +351,6 @@ main(int argc, char **argv)
             g_running = true;
             while(g_running)
             {
-                s_nt_client_check_packets(state);
-
                 state->input_axis = {};
 
                 SDL_Event event;
@@ -360,28 +387,41 @@ main(int argc, char **argv)
                     delta_time = gcv_tick_rate * 2.0f;
                 }
 
-                input_data_t input_data = {.input_axis = state->input_axis};
-
-                client_data_t *client = state->clients + state->client_id;
-                client->input_data_buffer[client->input_data_head] = input_data;
-                client->input_data_tail = (client->input_data_head + 1) % MAX_BUFFERED_INPUTS;
-
                 dt_accumulator += delta_time;
                 while(dt_accumulator >= gcv_tick_rate)
                 {
+                    client_data_t *client   = state->clients + state->client_id;
+                    input_data_t input_data = {.input_axis = state->input_axis};
+
+                    client->input_data_buffer[client->input_data_head] = input_data;
+                    client->input_data_head = (client->input_data_head + 1) % MAX_BUFFERED_INPUTS;
+
                     // TODO(Sleepster): If we have any input packets form the host, reconcile here... 
                     // If we are the host update the client's players...
-                    s_nt_update_client_inputs(state);
+                    s_nt_client_send_packets(state);
+                    s_nt_client_check_packets(state);
 
                     for(u32 entity_index = 0;
                         entity_index < state->entity_manager.active_entities;
                         ++entity_index)
                     {
-                        //entity_t *entity = state->entity_manager.entities + entity_index;
+                        entity_t *entity = state->entity_manager.entities + entity_index;
+                        switch(entity->e_type)
+                        {
+                            case ET_Player:
+                            {
+                                client_data_t *entity_client = state->clients + entity->owner_client_id;
+                                while(entity_client->input_data_tail != entity_client->input_data_head)
+                                {
+                                    input_data_t *input_data = entity_client->input_data_buffer + entity_client->input_data_tail;
+                                    entity_client->input_data_tail = (entity_client->input_data_tail + 1) % MAX_BUFFERED_INPUTS;
+                                    entity_simulate_player(entity, input_data, gcv_tick_rate);
+                                }
+                            }break;
+                        }
                     }
                     
                     // TODO(Sleepster): Send out input packets from both the host and the other clients.
-                    s_nt_send_state_update(state);
                     dt_accumulator -= gcv_tick_rate;
                 }
                 float32 alpha = (dt_accumulator / gcv_tick_rate);
