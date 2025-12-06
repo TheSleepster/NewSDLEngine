@@ -33,13 +33,15 @@
 
 global_variable bool8 g_running = false;
 
+constexpr float32 gcv_tick_rate = 1.0f / 60.0f;
+
 enum packet_type_t
 {
     PT_Invalid,
     PT_Connect,
     PT_ConnectAccepted,
     PT_Disconnect,
-    PT_Input,
+    PT_InputData,
     PT_Count,
 };
 
@@ -48,12 +50,12 @@ constexpr u32 cv_packet_magic_value = PACKET_MAGIC_VALUE('P', 'A', 'C', 'K');
 
 struct packet_t
 {
-    u32 magic_value = cv_packet_magic_value;
+    u32 magic_value = htonl(cv_packet_magic_value);
     u32 type;
+    u32 client_id;
     union 
     {
-        void *data;
-        u32   size;
+        input_data_t input_data;
     }payload;
 };
 
@@ -102,6 +104,15 @@ s_nt_init_client_data(game_state_t *state, char *host_ip)
             fprintf(stderr, "Failed to bind the socket... Error: '%d'...\n", errno);
         }
 
+        client_data_t *client = state->clients + state->connected_client_count;
+        client->ID            = state->connected_client_count;
+
+        client->ID     = state->connected_client_count;
+        client->player = entity_create(state);
+        client->player->e_type = ET_Player;
+        client->player->owner_client_id = client->ID; 
+
+        state->connected_client_count += 1;
         printf("[HOST]: Listening on port %d\n", 6969);
     }
     else
@@ -111,7 +122,7 @@ s_nt_init_client_data(game_state_t *state, char *host_ip)
         inet_pton(AF_INET, host_ip, &state->host_address_data.sin_addr);
 
         packet_t packet = {};
-        packet.type = PT_Connect;
+        packet.type     = PT_Connect;
         sendto(state->socket, 
                (char*)&packet, 
                sizeof(packet_t), 
@@ -139,25 +150,30 @@ s_nt_client_check_packets(game_state_t *state)
                              &sock_addr_size);
         if(bytes > 0) 
         {
-            if(packet.magic_value == cv_packet_magic_value)
+            if(packet.magic_value == htonl(cv_packet_magic_value))
             {
                 switch(packet.type) 
                 {
                     case PT_Connect: 
                     {
                         Assert(state->is_host);
+                        Assert(state->connected_client_count < 4);
+
                         client_data_t *client = state->clients + state->connected_client_count;
-                        client->ID = state->connected_client_count;
-                        client->address   =  from;
-                        client->addr_len  =  sock_addr_size;
+                        client->ID        = state->connected_client_count;
+                        client->address   = from;
+                        client->addr_len  = sock_addr_size;
                         client->connected = true;
 
-                        state->connected_client_count += 1;
+                        client->player                  = entity_create(state);
+                        client->player->owner_client_id = client->ID;
+                        client->player->e_type          = ET_Player;
 
                         packet_t response;
-                        response.magic_value = cv_packet_magic_value;
-                        response.type        = PT_ConnectAccepted;
+                        response.type      = PT_ConnectAccepted;
+                        response.client_id = htonl(client->ID);
 
+                        state->connected_client_count += 1;
                         sendto(state->socket, 
                                (char*)&response, 
                                sizeof(packet_t), 
@@ -166,11 +182,39 @@ s_nt_client_check_packets(game_state_t *state)
                                sock_addr_size);
 
                         printf("[HOST]: Client %d connected\n", client->ID);
+
                     }break;
                     case PT_ConnectAccepted:
                     {
                         Assert(!state->is_host);
-                        printf("[CLIENT]: Connected...\n");
+
+                        client_data_t *host_data = state->clients;
+                        host_data->address   = from;
+                        host_data->addr_len  = sock_addr_size;
+                        host_data->connected = true;
+
+                        host_data->player                  = entity_create(state);
+                        host_data->player->owner_client_id = state->connected_client_count;
+                        host_data->player->e_type          = ET_Player;
+
+                        state->connected_client_count += 1;
+
+                        state->client_id = state->connected_client_count;
+                        client_data_t *client_data = state->clients + state->connected_client_count;
+                        client_data->ID = state->connected_client_count; 
+
+                        client_data->player                  = entity_create(state); 
+                        client_data->player->e_type          = ET_Player;
+                        client_data->player->owner_client_id = state->client_id;
+
+                        state->connected_client_count += 1;
+                        printf("[CLIENT]: ID '%d' Connected...\n", state->client_id);
+                    }break;
+                    case PT_InputData:
+                    {
+                        client_data_t *client = state->clients + ((packet.client_id));
+                        client->input_data_buffer[client->input_data_head] = packet.payload.input_data;
+                        client->input_data_head = (client->input_data_head + 1) % MAX_BUFFERED_INPUTS;
                     }break;
                     default: 
                     {
@@ -186,10 +230,54 @@ s_nt_client_check_packets(game_state_t *state)
     }
 }
 
+void
+s_nt_send_state_update(game_state_t *state)
+{
+    for(u32 client_index = 0;
+        client_index < state->connected_client_count;
+        ++client_index)
+    {
+        client_data_t *client = state->clients + client_index;
+
+        packet_t packet = {};
+        packet.client_id = client->ID;
+        packet.type      = PT_InputData;
+        packet.payload.input_data = client->input_data_buffer[client->input_data_tail];
+
+        client->input_data_tail = (client->input_data_tail + 1) % MAX_BUFFERED_INPUTS;
+        sendto(state->socket, 
+               (char*)&packet, 
+               sizeof(packet_t), 
+               0, 
+               (struct sockaddr*)&client->address, 
+               client->addr_len);
+    }
+}
+
+void
+s_nt_update_client_inputs(game_state_t *state)
+{
+    for(u32 client_index = 0;
+        client_index < state->connected_client_count;
+        ++client_index)
+    {
+        client_data_t *client = state->clients + client_index;
+        for(u32 input_packet_index = client->input_data_head;
+            input_packet_index < client->input_data_tail;
+            input_packet_index = (input_packet_index + 1) % MAX_BUFFERED_INPUTS)
+        {
+            input_data_t *input_data  = client->input_data_buffer + input_packet_index;
+            entity_simulate_player(client->player, input_data, gcv_tick_rate);
+        }
+    }
+}
+
 int
 main(int argc, char **argv)
 {
     game_state_t *state = Alloc(game_state_t);
+    ZeroStruct(*state);
+
     state->window_size = vec2(600, 600);
     if(SDL_Init(SDL_INIT_VIDEO))
     {
@@ -199,6 +287,7 @@ main(int argc, char **argv)
         {
             if(strcmp(argv[1], "--client") == 0)
             {
+                state->is_host = false;
                 if(argc < 3) 
                 {
                     fprintf(stderr, "Please pass the ip to connect too...\n");
@@ -228,11 +317,7 @@ main(int argc, char **argv)
 
             float32 delta_time    = 0;
             //float32 delta_time_ms = 0;
-
             float64 dt_accumulator = 0.0f;
-            float32 tick_rate = 1.0f / 60.0f;
-
-            state->player = entity_create(state);
 
             g_running = true;
             while(g_running)
@@ -270,42 +355,56 @@ main(int argc, char **argv)
                     state->input_axis.x =  1.0f;
                 }
 
-                if(delta_time >= (tick_rate * 2.0f))
+                if(delta_time >= (gcv_tick_rate * 2.0f))
                 {
-                    delta_time = tick_rate * 2.0f;
+                    delta_time = gcv_tick_rate * 2.0f;
                 }
+
+                input_data_t input_data = {.input_axis = state->input_axis};
+
+                client_data_t *client = state->clients + state->client_id;
+                client->input_data_buffer[client->input_data_head] = input_data;
+                client->input_data_tail = (client->input_data_head + 1) % MAX_BUFFERED_INPUTS;
 
                 dt_accumulator += delta_time;
-                while(dt_accumulator >= tick_rate)
+                while(dt_accumulator >= gcv_tick_rate)
                 {
-                    // TODO(Sleepster): If we have any input packets form the host, reconcile here...
-                    // TODO(Sleepster): Send out input packet...
-                     
-                    state->player->last_position = state->player->position;
+                    // TODO(Sleepster): If we have any input packets form the host, reconcile here... 
+                    // If we are the host update the client's players...
+                    s_nt_update_client_inputs(state);
 
-                    state->player->velocity.x = (state->input_axis.x * (200.5f * tick_rate));
-                    state->player->velocity.y = (state->input_axis.y * (200.5f * tick_rate));
-
-                    state->player->position = vec2_add(state->player->position, state->player->velocity);
-                    state->player->velocity = vec2(0.0f, 0.0f);
-
-                    dt_accumulator -= tick_rate;
-
+                    for(u32 entity_index = 0;
+                        entity_index < state->entity_manager.active_entities;
+                        ++entity_index)
+                    {
+                        //entity_t *entity = state->entity_manager.entities + entity_index;
+                    }
+                    
+                    // TODO(Sleepster): Send out input packets from both the host and the other clients.
+                    s_nt_send_state_update(state);
+                    dt_accumulator -= gcv_tick_rate;
                 }
-                float32 alpha = (dt_accumulator / tick_rate);
+                float32 alpha = (dt_accumulator / gcv_tick_rate);
 
                 SDL_SetRenderDrawColor(state->renderer, 1, 0, 0, 0);
                 SDL_RenderClear(state->renderer);
                 
-                SDL_SetRenderDrawColor(state->renderer, 255, 0, 0, 255);
-                vec2_t lerped_pos = vec2_lerp(state->player->last_position, state->player->position, alpha);
-                SDL_FRect rect = {
-                    .x = lerped_pos.x,
-                    .y = lerped_pos.y,
-                    .w = 60,
-                    .h = 60
-                };
-                SDL_RenderFillRect(state->renderer, &rect);
+                for(u32 entity_index = 0;
+                    entity_index < state->entity_manager.active_entities;
+                    ++entity_index)
+                {
+                    entity_t *entity = state->entity_manager.entities + entity_index;
+                    SDL_SetRenderDrawColor(state->renderer, 255, 0, 0, 255);
+                    vec2_t lerped_pos = vec2_lerp(entity->last_position, entity->position, alpha);
+                    SDL_FRect rect = {
+                        .x = lerped_pos.x,
+                        .y = lerped_pos.y,
+                        .w = 60,
+                        .h = 60
+                    };
+                    SDL_RenderFillRect(state->renderer, &rect);
+                }
+
                 SDL_RenderPresent(state->renderer);
 
                 current_tsc = SDL_GetPerformanceCounter();
