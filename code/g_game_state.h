@@ -41,7 +41,7 @@ struct client_data_t
 {
     u32                ID;
     bool32             connected;
-    struct sockaddr_in address;
+    sockaddr_storage   address;
     socklen_t          addr_len;
 
     entity_t          *player;
