@@ -1,5 +1,8 @@
 // raddbg 0.9.22 project file
 
+recent_file: path: "../code/tests/memory_arena.cpp"
+recent_file: path: "../code/c_memory_arena.cpp"
+recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/startup/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/startup/abort.cpp"
 recent_file: path: "../code/main.cpp"
 recent_file: path: "../code/g_entity.cpp"
 recent_file: path: "../code/tests/threadpool.cpp"
@@ -17,14 +20,12 @@ target:
   executable: "../build/game_debug.exe"
   working_directory: "../run_tree/res"
   arguments: "--host 7777 "
-  enabled: 1
 }
 target:
 {
   executable: "../build/game_debug.exe"
   working_directory: "../run_tree/res"
   arguments: "--client 127.0.0.1"
-  enabled: 0
 }
 target:
 {
@@ -40,10 +41,15 @@ target:
 {
   executable: "../build/test_threadpool.exe"
   working_directory: "../build"
-  enabled: 0
 }
 breakpoint:
 {
   source_location: "W:/NewSDLEngine/code/tests/threadpool.cpp:58:1"
   hit_count: 0
+}
+target:
+{
+  executable: "../build/test_memory_arena.exe"
+  working_directory: "../build/"
+  enabled: 1
 }

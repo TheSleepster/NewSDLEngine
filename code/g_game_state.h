@@ -9,6 +9,8 @@
 #define G_GAME_STATE_H
 #include <SDL3/SDL.h>
 
+#include <sokol/sokol_gfx.h>
+
 #include <c_base.h>
 #include <c_types.h>
 #include <c_math.h>
@@ -53,7 +55,6 @@ struct client_data_t
 struct game_state_t
 {
     SDL_Window        *window;
-    SDL_Renderer      *renderer;
     vec2_t             window_size;
 
     vec2_t             input_axis;

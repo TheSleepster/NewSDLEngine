@@ -53,7 +53,7 @@ endif
 # --------------------------------------------
 # Build Flags
 # --------------------------------------------
-PROJECT_COMMON_COMPILER_FLAGS = -std=c++20 -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated
+PROJECT_COMMON_COMPILER_FLAGS = -std=c++20 -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator
 
 BUILD_TYPE ?= debug
 ifeq ($(DEBUG_BUILD),1)
@@ -71,7 +71,7 @@ BUILD_DIR = ../build
 # --------------------------------------------
 # Set The Inputs
 # --------------------------------------------
-COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/
+COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/Freetype/include/
 
 ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 GAME_SRCS  = $(filter-out $(SRC_DIR)/os_%,$(ALL_SRCS))

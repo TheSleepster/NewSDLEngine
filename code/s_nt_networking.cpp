@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 bool8
-s_nt_socket_api_init(void)
+s_nt_socket_api_init(game_state_t *state, int argc, char **argv)
 {
     bool8 result = true;
 #if OS_WINDOWS
@@ -26,7 +26,35 @@ s_nt_socket_api_init(void)
         WSACleanup();
         result = false;
     }
+    Expect(result, "Failure to init the Windows Socket API...\n");
 #endif
+    if(argc >= 2)
+    {
+        if(strcmp(argv[1], "--client") == 0)
+        {
+            state->is_host = false;
+            if(argc < 4) 
+            {
+                fprintf(stderr, "Please pass the ip and port to connect too...\n");
+                exit(0);
+            }
+            char *host_ip = argv[2];
+            u32   port    = atoi(argv[3]);
+            s_nt_init_client_data(state, host_ip, port);
+        }
+        else if(strcmp(argv[1], "--host") == 0)
+        {
+            if(argc < 3)
+            {
+                fprintf(stderr, "Please pass the port to listen too");
+                exit(0);
+            }
+
+            u32 port = atoi(argv[2]);
+            state->is_host = true;
+            s_nt_init_client_data(state, null, port);
+        }
+    }
 
     return(result);
 }
@@ -102,6 +130,7 @@ s_nt_client_check_packets(game_state_t *state)
         {
             if(packet.magic_value == htonl(cv_packet_magic_value))
             {
+                Assert(packet.client_id <= 4);
                 switch(packet.type) 
                 {
                     case PT_Connect: 
