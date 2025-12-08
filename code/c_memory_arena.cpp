@@ -17,6 +17,7 @@ c_arena_create(u64 block_size)
     result.used           = 0;
     result.block_size     = block_size;
     result.block_counter += 1;
+    result.is_initialized = true;
 
     return(result);
 }
@@ -73,13 +74,14 @@ c_arena_push_size(memory_arena_t *arena, u64 push_size)
 }
 
 byte*
-c_bootstap_structure(u32 structure_size, u32 offset_to_arena, u64 block_size)
+c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 block_size)
 {
+    Assert(structure_size < block_size);
     byte *result = null;
-    memory_arena_t bootstrap = c_arena_create(block_size);
 
     structure_size = Align16(structure_size);
-    result = (byte*)c_arena_push_size(&bootstrap, structure_size + block_size);
+    memory_arena_t bootstrap = c_arena_create(block_size);
+    result                   = (byte*)c_arena_push_size(&bootstrap, structure_size);
     Assert(result);
 
     *(memory_arena_t*)(result + offset_to_arena) = bootstrap;
@@ -122,7 +124,7 @@ c_arena_reset(memory_arena_t *arena)
 }
 
 inline scratch_arena_t
-c_begin_temporary_memeory(memory_arena_t *arena)
+c_arena_begin_temporary_memeory(memory_arena_t *arena)
 {
     scratch_arena_t result;
     result.parent = arena;
@@ -135,7 +137,7 @@ c_begin_temporary_memeory(memory_arena_t *arena)
 }
 
 inline void
-c_end_temporary_memory(scratch_arena_t *scratch_arena)
+c_arena_end_temporary_memory(scratch_arena_t *scratch_arena)
 {
     memory_arena_t *parent = scratch_arena->parent;
     Assert(parent->scratch_arena_count > 0);

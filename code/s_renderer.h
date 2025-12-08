@@ -29,6 +29,24 @@ struct vertex_t
 };
 #pragma pack(pop)
 
+struct render_quad_t
+{
+    union 
+    {
+        vertex_t vertices[4];
+        struct 
+        {
+            vertex_t bottom_left;
+            vertex_t top_left;
+            vertex_t top_right;
+            vertex_t bottom_right;
+        };
+    };
+
+    vec2_t position;
+    vec2_t size;
+    vec4_t color;
+};
 
 struct render_group_t
 {
@@ -39,6 +57,15 @@ struct render_state_t
     sg_pipeline    pipeline;
     sg_bindings    bindings;
     sg_pass_action pass_action;
+
+    mat4_t         projection_matrix;
+    mat4_t         view_matrix;
+
+    vertex_t      *vertex_buffer;
+    u32            vertex_count;
+
+    render_quad_t *quad_buffer;
+    u32            quad_count;
 };
 
 void s_init_renderer(render_state_t *render_state, game_state_t *state);

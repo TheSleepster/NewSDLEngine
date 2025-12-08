@@ -1,12 +1,17 @@
 @vs vertex
-layout(location=0) in vec4 vPosition;
-layout(location=1) in vec4 vColor;
+layout(location = 0) in vec4 vPosition;
+layout(location = 1) in vec4 vColor;
+
+layout(binding = 0) uniform VSParams {
+    mat4 uProjectionMatrix;
+    mat4 uViewMatrix;
+};
 
 out vec4 vOutColor;
 
 void main() 
 {
-    gl_Position = vPosition;
+    gl_Position = uProjectionMatrix * uViewMatrix * vPosition;
     vOutColor   = vColor;
 }
 @end
