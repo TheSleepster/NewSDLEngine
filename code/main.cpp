@@ -15,19 +15,13 @@
 #include <c_log.h>
 #include <c_globals.h>
 
+#include <p_platform_data.h>
+
 #include <s_nt_networking.h>
 #include <s_input_manager.h>
 #include <s_renderer.h>
 #include <g_game_state.h>
 #include <g_entity.h>
-
-#if OS_WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#define NO_MIN_MAX
-#include <windows.h>
-#else
-#error "window only..."
-#endif
 
 void
 c_process_window_events(SDL_Window *window, input_manager_t *input_manager)

@@ -24,6 +24,26 @@
 #include <c_file_watcher.cpp>
 #include <c_zone_allocator.cpp>
 
+#if OS_LINUX
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#include <sys/mman.h>
+#include <netdb.h>
+#include <sys/stat.h>
+#include <sys/inotify.h>
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h> 
+#include <unistd.h>
+#include <dlfcn.h>
+#include <string.h> 
+#include <poll.h>
+
+#endif
+
 
 /* NOTE(Sleepster): Client to server
  * - [ ] When we create a server we'll use the server owner's ipv6 address and have them bind to port '27015'
@@ -37,7 +57,7 @@ struct network_data_t
 };
 #define MAX_CLIENTS (10)
 
-internal network_data_t 
+internal_api network_data_t 
 init_network_data(char *ip_addr, char *port, bool8 client)
 {
     network_data_t result = {};
@@ -64,7 +84,7 @@ init_network_data(char *ip_addr, char *port, bool8 client)
     return(result);
 }
 
-internal void
+internal_api void
 client(char *ip_addr, char *port)
 {
     network_data_t data = init_network_data(ip_addr, port, true);
@@ -80,7 +100,7 @@ client(char *ip_addr, char *port)
     Expect(closesocket(data.socket_id), "Failed to close socket, '%d'...\n", errno);
 }
 
-internal void
+internal_api void
 server()
 {
     network_data_t data = init_network_data(null, "27015", false);
@@ -113,6 +133,7 @@ server()
 int
 main(int argc, char **argv)
 {
+#if OS_WINDOWS
     WSADATA wsaData;
     if(WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) 
     {
@@ -125,6 +146,7 @@ main(int argc, char **argv)
         fprintf(stderr,"Version 2.2 of Winsock not available.\n");
         WSACleanup();
     }
+#endif
 
     if(argc >= 2)
     {

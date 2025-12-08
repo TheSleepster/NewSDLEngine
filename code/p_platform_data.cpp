@@ -9,7 +9,7 @@
 #if OS_WINDOWS
     #include <sys_win32.cpp>
 #elif OS_LINUX
-    #error "not included"
+    #include <sys_linux.cpp>
 #elif OS_MAC
     #error "lmao really?"
 #endif

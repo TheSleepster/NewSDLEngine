@@ -7,6 +7,10 @@
    ======================================================================== */
 
 #define C_ZONE_ALLOCATOR_H
+#if OS_LINUX
+#include <SDL3/SDL.h>
+#endif
+
 #include <c_base.h>
 #include <c_types.h>
 #include <c_synchronization.h>

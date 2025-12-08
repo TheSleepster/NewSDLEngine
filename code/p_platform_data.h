@@ -12,7 +12,7 @@
 #if OS_WINDOWS
     #include <sys_win32.h>
 #elif OS_LINUX
-    #error "not included"
+    #include <sys_linux.h>
 #elif OS_MAC
     #error "lmao really?"
 #endif

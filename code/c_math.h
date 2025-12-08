@@ -95,7 +95,7 @@
   ============= FLOAT32 FUNCTIONS ===========
   ===========================================*/
 
-internal inline float32
+internal_api inline float32
 f32_lerp(float32 A, float32 B, float32 T)
 {
     float32 result;
@@ -104,7 +104,7 @@ f32_lerp(float32 A, float32 B, float32 T)
     return(result);
 }
 
-internal inline float32
+internal_api inline float32
 f32_unlerp(float32 A, float32 B, float32 X)
 {
     float32 result = 0.0f;
@@ -116,13 +116,13 @@ f32_unlerp(float32 A, float32 B, float32 X)
     return(result);
 }
 
-internal inline bool8
+internal_api inline bool8
 f32_equals(float32 A, float32 B, float32 tolerance)
 {
     return(fabs(A - B) <= tolerance);
 }
 
-internal inline void
+internal_api inline void
 f32_approach(float32 *value, float32 target, float32 rate, float32 delta_t)
 {
     *value += (float32)((target - *value) * (1.0 - pow(2.0f, -rate * delta_t)));
@@ -132,20 +132,20 @@ f32_approach(float32 *value, float32 target, float32 rate, float32 delta_t)
     }
 }
 
-internal inline float32
+internal_api inline float32
 f32_ease_out_quad(float32 x)
 {
     return(1 - (1 - x) * (1 - x));
 }
 
-internal inline float32
+internal_api inline float32
 f32_sin_breathe_normalized(float32 time, float32 modifier, float32 min, float32 max)
 {
     float32 sinevalue = (sinf(modifier * 2 * PI32 * time) + 1.0f) / 2.0f;
     return(min + (max - min) * sinevalue);
 }
 
-internal inline float32
+internal_api inline float32
 f32_sin_breathe(float32 time, float32 modifier)
 {
     return(sinf(time * modifier));
@@ -156,7 +156,7 @@ f32_sin_breathe(float32 time, float32 modifier)
 #include <typeinfo>
 
 // -std=c++20 
-internal inline auto 
+internal_api inline auto 
 lerp(auto A, auto B)
 {
     return(A + B);
@@ -416,7 +416,7 @@ typedef struct ivec2
   ================= VECTOR 2 ================
   ===========================================*/
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2(float32 A, float32 B)
 {
     vec2_t result;
@@ -426,14 +426,14 @@ vec2(float32 A, float32 B)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_zero()
 {
     vec2_t result = {};
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_create(float32 A)
 {
     vec2_t result = {};
@@ -443,7 +443,7 @@ vec2_create(float32 A)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec2_expand_vec3(vec2_t A, float32 B)
 {
     vec3_t result;
@@ -454,7 +454,7 @@ vec2_expand_vec3(vec2_t A, float32 B)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_cast(ivec2_t A)
 {
     vec2_t result;
@@ -464,7 +464,7 @@ vec2_cast(ivec2_t A)
    return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec2_expand_vec4(vec2_t A, float32 B, float32 C)
 {
     vec4_t result;
@@ -476,7 +476,7 @@ vec2_expand_vec4(vec2_t A, float32 B, float32 C)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_scale(vec2_t A, float32 B)
 {
     vec2_t result;
@@ -486,7 +486,7 @@ vec2_scale(vec2_t A, float32 B)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_multiply(vec2_t A, vec2_t B)
 {
     vec2_t result;
@@ -496,7 +496,7 @@ vec2_multiply(vec2_t A, vec2_t B)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_add(vec2_t A, vec2_t B)
 {
     vec2_t result;
@@ -506,7 +506,7 @@ vec2_add(vec2_t A, vec2_t B)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_subtract(vec2_t A, vec2_t B)
 {
     vec2_t result;
@@ -516,7 +516,7 @@ vec2_subtract(vec2_t A, vec2_t B)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_reduce(vec2_t A, float32 B)
 {
     vec2_t result;
@@ -527,7 +527,7 @@ vec2_reduce(vec2_t A, float32 B)
 }
 
 // NOTE(Sleepster): "Should be magnitude" bla bla bla don't care 
-internal inline float32
+internal_api inline float32
 vec2_length(vec2_t A)
 {
     float32 result = 0.0f;
@@ -536,7 +536,7 @@ vec2_length(vec2_t A)
     return(result);
 }
 
-internal inline float32
+internal_api inline float32
 vec2_length_squared(vec2_t A)
 {
     float32 result = 0.0f;
@@ -545,7 +545,7 @@ vec2_length_squared(vec2_t A)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_normalize(vec2_t A)
 {
     vec2_t result = {};
@@ -560,7 +560,7 @@ vec2_normalize(vec2_t A)
     return(result);
 }
 
-internal inline float32
+internal_api inline float32
 vec2_dot(vec2_t A, vec2_t B)
 {
     float32 result;
@@ -569,7 +569,7 @@ vec2_dot(vec2_t A, vec2_t B)
     return(result);
 }
 
-internal inline float32
+internal_api inline float32
 vec2_cross(vec2_t A, vec2_t B)
 {
     float32 result;
@@ -578,7 +578,7 @@ vec2_cross(vec2_t A, vec2_t B)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_transform(mat2_t A, vec2_t B)
 {
     vec2_t result;
@@ -588,7 +588,7 @@ vec2_transform(mat2_t A, vec2_t B)
     return(result);
 }
 
-internal inline void
+internal_api inline void
 vec2_approach(vec2_t *value, vec2_t target, vec2_t rate, float32 delta_t)
 {
     f32_approach(&value->x, target.x, rate.x, delta_t);
@@ -596,7 +596,7 @@ vec2_approach(vec2_t *value, vec2_t target, vec2_t rate, float32 delta_t)
 }
 
 #ifndef SL_MATH_USE_DEGREES
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_rotate(vec2_t A, float32 rotation)
 {
     vec2_t result;
@@ -612,7 +612,7 @@ vec2_rotate(vec2_t A, float32 rotation)
 
 #else
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_rotate(vec2_t A, float32 rotation)
 {
     vec2_t result;
@@ -627,7 +627,7 @@ vec2_rotate(vec2_t A, float32 rotation)
 }
 #endif
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_lerp(vec2_t A, vec2_t B, real32 time)
 {
     vec2_t result;
@@ -637,7 +637,7 @@ vec2_lerp(vec2_t A, vec2_t B, real32 time)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 vec2_unlerp(vec2_t A, vec2_t B, vec2_t X)
 {
     vec2_t result;
@@ -647,7 +647,7 @@ vec2_unlerp(vec2_t A, vec2_t B, vec2_t X)
     return(result);
 }
 
-internal inline vec2_t 
+internal_api inline vec2_t 
 vec2_negate(vec2_t A)
 {
     vec2_t result;
@@ -756,7 +756,7 @@ operator/=(vec2_t A, vec2_t B)
   ================= VECTOR 3 ================
   ===========================================*/
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3(float32 A, float32 B, float32 C)
 {
     vec3_t result;
@@ -767,14 +767,14 @@ vec3(float32 A, float32 B, float32 C)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_zero()
 {
     vec3_t result = {};
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_create(float32 A)
 {
     vec3_t result;
@@ -785,7 +785,7 @@ vec3_create(float32 A)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_cast(ivec3_t A)
 {
     vec3_t result;
@@ -796,7 +796,7 @@ vec3_cast(ivec3_t A)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_multiply(vec3_t A, vec3_t B)
 {
     vec3_t result;
@@ -807,7 +807,7 @@ vec3_multiply(vec3_t A, vec3_t B)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_subtract(vec3_t A, vec3_t B)
 {
     vec3_t result;
@@ -818,7 +818,7 @@ vec3_subtract(vec3_t A, vec3_t B)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_add(vec3_t A, vec3_t B)
 {
     vec3_t result;
@@ -829,7 +829,7 @@ vec3_add(vec3_t A, vec3_t B)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_scale(vec3_t A, float32 B)
 {
     vec3_t result;
@@ -840,7 +840,7 @@ vec3_scale(vec3_t A, float32 B)
     return(result);
 }
 
-internal inline float32
+internal_api inline float32
 vec3_length(vec3_t A)
 {
     float32 result;
@@ -849,7 +849,7 @@ vec3_length(vec3_t A)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_normalize(vec3_t A)
 {
     vec3_t result;
@@ -862,7 +862,7 @@ vec3_normalize(vec3_t A)
     return(result);
 }
 
-internal inline float32
+internal_api inline float32
 vec3_dot(vec3_t A, vec3_t B)
 {
     float32 result;
@@ -871,7 +871,7 @@ vec3_dot(vec3_t A, vec3_t B)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_cross(vec3_t A, vec3_t B)
 {
     vec3_t result;
@@ -882,7 +882,7 @@ vec3_cross(vec3_t A, vec3_t B)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_transform(vec3_t A, mat3_t B)
 {
     vec3_t result;
@@ -893,7 +893,7 @@ vec3_transform(vec3_t A, mat3_t B)
     return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec3_expand_vec4(vec3_t A, float32 B)
 {
     vec4_t result;
@@ -907,7 +907,7 @@ vec3_expand_vec4(vec3_t A, float32 B)
 
 
 #ifndef SL_MATH_USE_DEGREES
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_rotate(vec3_t A, vec3_t axis, float32 rotation)
 {
     vec3_t result;
@@ -929,7 +929,7 @@ vec3_rotate(vec3_t A, vec3_t axis, float32 rotation)
 
 #else
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_rotate(vec3_t A, vec3_t axis, float32 rotation)
 {
     vec3_t result;
@@ -950,7 +950,7 @@ vec3_rotate(vec3_t A, vec3_t axis, float32 rotation)
 }
 #endif
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_lerp(vec3_t A, vec3_t B, real32 time)
 {
     vec3_t result;
@@ -961,7 +961,7 @@ vec3_lerp(vec3_t A, vec3_t B, real32 time)
     return(result);
 }
 
-internal inline vec3_t
+internal_api inline vec3_t
 vec3_unlerp(vec3_t A, vec3_t B, vec3_t X)
 {
     vec3_t result;
@@ -1077,7 +1077,7 @@ operator/=(vec3_t A, vec3_t B)
 /*===========================================
   ================= VECTOR 4 ================
   ===========================================*/
-internal inline vec4_t
+internal_api inline vec4_t
 vec4(float32 A, float32 B, float32 C, float32 D)
 {
     vec4_t result;
@@ -1086,14 +1086,14 @@ vec4(float32 A, float32 B, float32 C, float32 D)
     return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec4_zero()
 {
     vec4_t result = {};
     return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec4_create(float32 A)
 {
     vec4_t result;
@@ -1104,7 +1104,7 @@ vec4_create(float32 A)
     return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec4_scale(vec4_t A, float32 B)
 {
     vec4_t result;
@@ -1115,7 +1115,7 @@ vec4_scale(vec4_t A, float32 B)
     return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec4_multiply(vec4_t A, vec4_t B)
 {
     vec4_t result;
@@ -1124,7 +1124,7 @@ vec4_multiply(vec4_t A, vec4_t B)
     return(result);
 }
 
-internal inline float32
+internal_api inline float32
 vec4_length(vec4_t A)
 {
     float32 result;
@@ -1133,7 +1133,7 @@ vec4_length(vec4_t A)
     return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec4_normalize(vec4_t A)
 {
     vec4_t result;
@@ -1144,7 +1144,7 @@ vec4_normalize(vec4_t A)
     return(result);
 }
 
-internal inline float32
+internal_api inline float32
 vec4_dot(vec4_t A, vec4_t B)
 {
     float32 result;
@@ -1153,7 +1153,7 @@ vec4_dot(vec4_t A, vec4_t B)
     return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec4_transform(mat4_t A, vec4_t B)
 {
     vec4_t result = {};
@@ -1171,7 +1171,7 @@ vec4_transform(mat4_t A, vec4_t B)
     return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec4_lerp(vec4_t A, vec4_t B, real32 time)
 {
     vec4_t result;
@@ -1183,7 +1183,7 @@ vec4_lerp(vec4_t A, vec4_t B, real32 time)
     return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec4_unlerp(vec4_t A, vec4_t B, vec4_t X)
 {
     vec4_t result;
@@ -1200,14 +1200,14 @@ vec4_unlerp(vec4_t A, vec4_t B, vec4_t X)
 /*===========================================
   ================ IVECTOR 2 ================
   ===========================================*/
-internal inline ivec2_t
+internal_api inline ivec2_t
 ivec2()
 {
     ivec2_t result = {};
     return(result);
 }
 
-internal ivec2_t
+internal_api ivec2_t
 ivec2_create(s32 A)
 {
     ivec2_t result;
@@ -1217,7 +1217,7 @@ ivec2_create(s32 A)
     return(result);
 }
 
-internal ivec2_t
+internal_api ivec2_t
 ivec2_create_int32(s32 A, s32 B)
 {
     ivec2_t result;
@@ -1227,7 +1227,7 @@ ivec2_create_int32(s32 A, s32 B)
     return(result);
 }
 
-internal inline ivec3_t
+internal_api inline ivec3_t
 ivec2_expand_ivec3(ivec2_t A, s32 B)
 {
     ivec3_t result;
@@ -1238,7 +1238,7 @@ ivec2_expand_ivec3(ivec2_t A, s32 B)
     return(result);
 }
 
-internal inline ivec4_t
+internal_api inline ivec4_t
 ivec2_expand_ivec4(ivec2_t A, s32 B, s32 C)
 {
     ivec4_t result;
@@ -1250,7 +1250,7 @@ ivec2_expand_ivec4(ivec2_t A, s32 B, s32 C)
     return(result);
 }
 
-internal inline ivec2_t
+internal_api inline ivec2_t
 ivec2_cast(vec2_t A)
 {
     ivec2_t result;
@@ -1260,7 +1260,7 @@ ivec2_cast(vec2_t A)
     return(result);
 }
 
-internal inline ivec2_t
+internal_api inline ivec2_t
 ivec2_multiply(ivec2_t A, ivec2_t B)
 {
     ivec2_t result;
@@ -1273,14 +1273,14 @@ ivec2_multiply(ivec2_t A, ivec2_t B)
 /*===========================================
   ================ IVECTOR 3 ================
   ===========================================*/
-internal inline ivec3_t
+internal_api inline ivec3_t
 ivec3()
 {
     ivec3_t result = {};
     return(result);
 }
 
-internal ivec3_t
+internal_api ivec3_t
 ivec3_create(s32 A)
 {
     ivec3_t result;
@@ -1291,7 +1291,7 @@ ivec3_create(s32 A)
     return(result);
 }
 
-internal ivec3_t
+internal_api ivec3_t
 ivec3_create_int32(s32 A, s32 B, s32 C)
 {
     ivec3_t result;
@@ -1302,7 +1302,7 @@ ivec3_create_int32(s32 A, s32 B, s32 C)
     return(result);
 }
 
-internal inline ivec3_t
+internal_api inline ivec3_t
 ivec3_cast(vec3_t A)
 {
     ivec3_t result;
@@ -1313,7 +1313,7 @@ ivec3_cast(vec3_t A)
     return(result);
 }
 
-internal inline ivec3_t
+internal_api inline ivec3_t
 ivec3_multiply(ivec3_t A, ivec3_t B)
 {
     ivec3_t result;
@@ -1328,14 +1328,14 @@ ivec3_multiply(ivec3_t A, ivec3_t B)
 /*===========================================
   ================ IVECTOR 4 ================
   ===========================================*/
-internal inline ivec4_t
+internal_api inline ivec4_t
 ivec4()
 {
     ivec4_t result = {};
     return(result);
 }
 
-internal inline ivec4_t
+internal_api inline ivec4_t
 ivec4_create(s32 A)
 {
     ivec4_t result;
@@ -1344,7 +1344,7 @@ ivec4_create(s32 A)
     return(result);
 }
 
-internal inline ivec4_t
+internal_api inline ivec4_t
 ivec4_create_int32(s32 A, s32 B, s32 C, s32 D)
 {
     ivec4_t result;
@@ -1353,7 +1353,7 @@ ivec4_create_int32(s32 A, s32 B, s32 C, s32 D)
     return(result);
 }
 
-internal inline vec4_t
+internal_api inline vec4_t
 vec4_cast(ivec4_t A)
 {
     vec4_t result;
@@ -1365,7 +1365,7 @@ vec4_cast(ivec4_t A)
     return(result);
 }
 
-internal inline ivec4_t
+internal_api inline ivec4_t
 ivec4_cast(vec4_t A)
 {
     ivec4_t result;
@@ -1377,7 +1377,7 @@ ivec4_cast(vec4_t A)
     return(result);
 }
 
-internal inline ivec4_t
+internal_api inline ivec4_t
 ivec4_multiply(ivec4_t A, ivec4_t B)
 {
     ivec4_t result;
@@ -1395,7 +1395,7 @@ ivec4_multiply(ivec4_t A, ivec4_t B)
   ================ MATRIX 2 =================
   ===========================================*/
 
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_identity(void)
 {
     mat2_t result = {};
@@ -1405,7 +1405,7 @@ mat2_identity(void)
     return(result);
 }
 
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_set_identity(float32 value)
 {
     mat2_t result = {};
@@ -1415,7 +1415,7 @@ mat2_set_identity(float32 value)
     return(result);
 }
 
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_transpose(mat2_t A)
 {
     mat2_t result = {};
@@ -1425,7 +1425,7 @@ mat2_transpose(mat2_t A)
     return(result);
 }
 
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_add(mat2_t A, mat2_t B)
 {
     mat2_t result;
@@ -1438,7 +1438,7 @@ mat2_add(mat2_t A, mat2_t B)
     return(result);
 }
 
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_subtract(mat2_t A, mat2_t B)
 {
     mat2_t result;
@@ -1451,7 +1451,7 @@ mat2_subtract(mat2_t A, mat2_t B)
     return(result);
 }
 
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_multiply(mat2_t A, mat2_t B)
 {
     mat2_t result;
@@ -1464,7 +1464,7 @@ mat2_multiply(mat2_t A, mat2_t B)
     return(result);
 }
 
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_divide(mat2_t A, mat2_t B)
 {
     mat2_t result;
@@ -1477,7 +1477,7 @@ mat2_divide(mat2_t A, mat2_t B)
     return(result);
 }
 
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_reduce(mat2_t A, vec2_t B)
 {
     mat2_t result;
@@ -1490,7 +1490,7 @@ mat2_reduce(mat2_t A, vec2_t B)
     return(result);
 }
 
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_scale(mat2_t A, vec2_t B)
 {
     mat2_t result;
@@ -1504,7 +1504,7 @@ mat2_scale(mat2_t A, vec2_t B)
 }
 
 #ifndef SL_MATH_USE_DEGREES
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_rotate(mat2_t A, float32 B)
 {
     mat2_t result;
@@ -1524,7 +1524,7 @@ mat2_rotate(mat2_t A, float32 B)
 
 #else
 
-internal inline mat2_t
+internal_api inline mat2_t
 mat2_rotate(mat2_t A, float32 B)
 {
     mat2_t result;
@@ -1543,7 +1543,7 @@ mat2_rotate(mat2_t A, float32 B)
 }
 #endif
 
-internal inline float32
+internal_api inline float32
 mat2_determinant(mat2_t A)
 {
     float32 result;
@@ -1552,7 +1552,7 @@ mat2_determinant(mat2_t A)
     return(result);
 }
 
-internal inline mat2_t 
+internal_api inline mat2_t 
 mat2_inverse(mat2_t A)
 {
     mat2_t result;
@@ -1571,7 +1571,7 @@ mat2_inverse(mat2_t A)
   ================ MATRIX 3 =================
   ===========================================*/
 
-internal inline mat3_t
+internal_api inline mat3_t
 mat3_identity(void)
 {
     mat3_t result = {};
@@ -1582,7 +1582,7 @@ mat3_identity(void)
     return(result);
 }
 
-internal inline mat3_t
+internal_api inline mat3_t
 mat3_set_identity(float32 value)
 {
     mat3_t result = {};
@@ -1593,7 +1593,7 @@ mat3_set_identity(float32 value)
     return(result);
 }
 
-internal inline mat3_t
+internal_api inline mat3_t
 mat3_add(mat3_t A, mat3_t B)
 {
     mat3_t result;
@@ -1612,7 +1612,7 @@ mat3_add(mat3_t A, mat3_t B)
     return(result);
 }
 
-internal inline mat3_t
+internal_api inline mat3_t
 mat3_subtract(mat3_t A, mat3_t B)
 {
     mat3_t result;
@@ -1631,7 +1631,7 @@ mat3_subtract(mat3_t A, mat3_t B)
     return(result);
 }
 
-internal mat3_t
+internal_api mat3_t
 mat3_multiply(mat3_t A, mat3_t B)
 {
     mat3_t result;
@@ -1650,7 +1650,7 @@ mat3_multiply(mat3_t A, mat3_t B)
     return(result);
 }
 
-internal mat3_t
+internal_api mat3_t
 mat3_divide(mat3_t A, mat3_t B)
 {
     mat3_t result;
@@ -1669,7 +1669,7 @@ mat3_divide(mat3_t A, mat3_t B)
     return(result);
 }
 
-internal mat3_t
+internal_api mat3_t
 mat3_reduce(mat3_t A, float32 B)
 {
     mat3_t result;
@@ -1688,7 +1688,7 @@ mat3_reduce(mat3_t A, float32 B)
     return(result);
 }
 
-internal mat3_t
+internal_api mat3_t
 mat3_make_translation(vec3_t translation)
 {
     mat3_t result = mat3_identity();
@@ -1699,13 +1699,13 @@ mat3_make_translation(vec3_t translation)
     return(result);
 }
 
-internal inline mat3_t
+internal_api inline mat3_t
 mat3_translate(mat3_t A, vec3_t translation)
 {
     return(mat3_multiply(A, mat3_make_translation(translation)));
 }
 
-internal inline mat3_t
+internal_api inline mat3_t
 mat3_make_scale(vec3_t scale)
 {
     mat3_t result = {};
@@ -1716,13 +1716,13 @@ mat3_make_scale(vec3_t scale)
     return(result);
 }
 
-internal inline mat3_t
+internal_api inline mat3_t
 mat3_scale(mat3_t A, vec3_t scale)
 {
     return(mat3_multiply(A, mat3_make_scale(scale)));
 }
 
-internal mat3_t
+internal_api mat3_t
 mat3_make_rotation(vec3_t axis, float32 rotation)
 {
     mat3_t result = mat3_identity();
@@ -1748,13 +1748,13 @@ mat3_make_rotation(vec3_t axis, float32 rotation)
     return(result);
 }
 
-internal inline mat3_t
+internal_api inline mat3_t
 mat3_rotate(mat3_t A, vec3_t axis, float32 rotation)
 {
     return(mat3_multiply(A, mat3_make_rotation(axis, rotation)));
 }
 
-internal inline mat3_t
+internal_api inline mat3_t
 mat3_transpose(mat3_t A)
 {
     mat3_t result = A;
@@ -1768,7 +1768,7 @@ mat3_transpose(mat3_t A)
     return(result);
 }
 
-internal inline mat3_t
+internal_api inline mat3_t
 mat3_invert(mat3_t A)
 {
     mat3_t result;
@@ -1784,7 +1784,7 @@ mat3_invert(mat3_t A)
     return(mat3_transpose(result));
 }
 
-internal inline float32 
+internal_api inline float32 
 mat3_determinant(mat3_t A)
 {
     float32 result;
@@ -1799,7 +1799,7 @@ mat3_determinant(mat3_t A)
     return(result);
 }
 
-internal inline float32 
+internal_api inline float32 
 mat3_inverse_determinant(mat3_t A)
 {
     return(1.0f / mat3_determinant(A));
@@ -1810,7 +1810,7 @@ mat3_inverse_determinant(mat3_t A)
   ================ MATRIX 4 =================
   ===========================================*/
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_identity(void)
 {
     mat4_t result = {};
@@ -1822,7 +1822,7 @@ mat4_identity(void)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_set_identity(float32 value)
 {
     mat4_t result = {};
@@ -1834,7 +1834,7 @@ mat4_set_identity(float32 value)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_add(mat4_t A, mat4_t B)
 {
     mat4_t result;
@@ -1846,7 +1846,7 @@ mat4_add(mat4_t A, mat4_t B)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_subtract(mat4_t A, mat4_t B)
 {
     mat4_t result;
@@ -1858,7 +1858,7 @@ mat4_subtract(mat4_t A, mat4_t B)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_multiply(mat4_t A, mat4_t B)
 {
     mat4_t result;
@@ -1872,7 +1872,7 @@ mat4_multiply(mat4_t A, mat4_t B)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_divide(mat4_t A, mat4_t B)
 {
     mat4_t result;
@@ -1885,7 +1885,7 @@ mat4_divide(mat4_t A, mat4_t B)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_reduce(mat4_t A, float32 B)
 {
     mat4_t result;
@@ -1899,7 +1899,7 @@ mat4_reduce(mat4_t A, float32 B)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_make_translation(vec3_t translation)
 {
     mat4_t result = mat4_identity();
@@ -1910,13 +1910,13 @@ mat4_make_translation(vec3_t translation)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_translate(mat4_t A, vec3_t B)
 {
     return(mat4_multiply(A, mat4_make_translation(B)));
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_make_scale(vec3_t scale)
 {
     mat4_t result = mat4_identity();
@@ -1927,13 +1927,13 @@ mat4_make_scale(vec3_t scale)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_scale(mat4_t A, vec3_t B)
 {
     return(mat4_multiply(A, mat4_make_scale(B)));
 }
 
-internal mat4_t
+internal_api mat4_t
 mat4_make_rotation(vec3_t axis, float32 rotation)
 {
     mat4_t result = mat4_identity();
@@ -1959,13 +1959,13 @@ mat4_make_rotation(vec3_t axis, float32 rotation)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_rotate(mat4_t A, vec3_t axis, float32 rotation)
 {
     return(mat4_multiply(A, mat4_make_rotation(axis, rotation)));
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_transpose(mat4_t A)
 {
     mat4_t result = A;
@@ -1974,7 +1974,7 @@ mat4_transpose(mat4_t A)
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_invert(mat4_t A)
 {
     mat4_t result;
@@ -2000,7 +2000,7 @@ mat4_invert(mat4_t A)
     return(mat4_transpose(result));
 }
 
-internal inline float32
+internal_api inline float32
 mat4_determinant(mat4_t A)
 {
     float32 result = 0.0f;
@@ -2016,7 +2016,7 @@ mat4_determinant(mat4_t A)
     return(result);
 }
 
-internal inline float32
+internal_api inline float32
 mat4_inverse_determinant(mat4_t A)
 {
     return(1.0f / mat4_determinant(A));
@@ -2027,7 +2027,7 @@ mat4_inverse_determinant(mat4_t A)
   ===========================================*/
 
 // NOTE(Sleepster): Near and far plane are -1 - 1 OpenGL standard.
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_RHGL_ortho(float32 left,
                 float32 right,
                 float32 bottom,
@@ -2050,7 +2050,7 @@ mat4_RHGL_ortho(float32 left,
 }
 
 // NOTE(Sleepster): Near and far plane are 0 - 1 DirectX standard.
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_RHDX_ortho(float32 left,
                 float32 right,
                 float32 bottom,
@@ -2073,7 +2073,7 @@ mat4_RHDX_ortho(float32 left,
 }
 
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_LHGL_ortho(float32 left,
                 float32 right,
                 float32 bottom,
@@ -2087,7 +2087,7 @@ mat4_LHGL_ortho(float32 left,
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_LHDX_ortho(float32 left,
                 float32 right,
                 float32 bottom,
@@ -2101,7 +2101,7 @@ mat4_LHDX_ortho(float32 left,
     return(result);
 }
 
-internal inline mat4_t
+internal_api inline mat4_t
 mat4_inverse_ortho(mat4_t orthographic_projection)
 {
     mat4_t result = mat4_identity();
@@ -2129,7 +2129,7 @@ typedef struct rectangle2
     vec2_t half_size;
 }rectangle2_t;
 
-internal rectangle2_t
+internal_api rectangle2_t
 rect2_create(vec2_t position, vec2_t size)
 {
     rectangle2_t result;
@@ -2141,7 +2141,7 @@ rect2_create(vec2_t position, vec2_t size)
     return(result);
 }
 
-internal void 
+internal_api void 
 rect2_shift_by(rectangle2_t *rect, vec2_t shift)
 {
     rect->min    = vec2_add(rect->min, shift);
@@ -2149,7 +2149,7 @@ rect2_shift_by(rectangle2_t *rect, vec2_t shift)
     rect->center = vec2_add(rect->center, shift);
 }
 
-internal vec2_t
+internal_api vec2_t
 rect2_get_size(rectangle2_t rect)
 {
     vec2_t result = vec2_scale(rect.half_size, 2.0f);
@@ -2157,27 +2157,27 @@ rect2_get_size(rectangle2_t rect)
     return(result);
 }
 
-internal inline vec2_t
+internal_api inline vec2_t
 rect2_get_position(rectangle2_t rect)
 {
     return(rect.min);
 }
 
-internal bool8
+internal_api bool8
 rect2_vec2_SAT(rectangle2_t rect, vec2_t point)
 {
     return (point.x >= rect.min.x && point.x <= rect.max.x && 
             point.y >= rect.min.y && point.y <= rect.max.y);
 }
 
-internal bool8
+internal_api bool8
 rect2_AABB_SAT(rectangle2_t A, rectangle2_t B)
 {
     return (A.min.x <= B.max.x && A.max.x >= B.min.x &&
             A.min.y <= B.max.y && A.max.y >= B.min.y);
 }
 
-internal rectangle2_t 
+internal_api rectangle2_t 
 rect2_minkowski_sum(rectangle2_t A, rectangle2_t B)
 {
     rectangle2_t result;
@@ -2190,7 +2190,7 @@ rect2_minkowski_sum(rectangle2_t A, rectangle2_t B)
     return(result);
 }
 
-internal rectangle2_t
+internal_api rectangle2_t
 rect2_minkowski_difference(rectangle2_t A, rectangle2_t B)
 {
     rectangle2_t result;
@@ -2211,7 +2211,7 @@ typedef struct raytest
     vec2_t  normal;
 }raytest_t;
 
-internal raytest_t 
+internal_api raytest_t 
 rect2_ray_test(vec2_t position, vec2_t magnitude, rectangle2_t bounding_box) 
 {
     raytest_t result = {};
@@ -2263,7 +2263,7 @@ rect2_ray_test(vec2_t position, vec2_t magnitude, rectangle2_t bounding_box)
     return(result);
 }
 
-internal raytest_t 
+internal_api raytest_t 
 rect2_sweep_test(rectangle2_t moving_rect, vec2_t velocity, rectangle2_t static_rect)
 {
     raytest_t result;
@@ -2278,7 +2278,7 @@ rect2_sweep_test(rectangle2_t moving_rect, vec2_t velocity, rectangle2_t static_
     return(result);
 }
 
-internal vec2_t
+internal_api vec2_t
 rect2_get_vector_depth(rectangle2_t rect)
 {
     vec2_t result;

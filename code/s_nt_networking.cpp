@@ -28,6 +28,7 @@ s_nt_socket_api_init(game_state_t *state, int argc, char **argv)
     }
     Expect(result, "Failure to init the Windows Socket API...\n");
 #endif
+
     if(argc >= 2)
     {
         if(strcmp(argv[1], "--client") == 0)
@@ -68,8 +69,12 @@ s_nt_init_client_data(game_state_t *state, char *host_ip, u32 port)
         fprintf(stderr, "Socket creation failed: '%d'\n", errno);
     }
 
+#if OS_WINDOWS
     u_long mode = 1;
     ioctlsocket(state->socket, FIONBIO, &mode);
+#else 
+    fcntl(state->socket, F_SETFL, O_NONBLOCK);
+#endif
 
     if(state->is_host)
     {     

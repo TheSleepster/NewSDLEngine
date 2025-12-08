@@ -10,6 +10,7 @@
 #include <c_base.h>
 #include <c_types.h>
 
+#include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
 

@@ -1,1 +1,1 @@
-compiledb -o../misc/compile_commands.json make -k -j12 SILENT=@ DEBUG_BUILD=1
+compiledb -o../misc/compile_commands.json make -k -j8 SILENT=@ DEBUG_BUILD=1

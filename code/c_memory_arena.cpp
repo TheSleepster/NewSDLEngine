@@ -22,7 +22,7 @@ c_arena_create(u64 block_size)
     return(result);
 }
 
-internal memory_arena_footer_t*
+internal_api memory_arena_footer_t*
 c_arena_get_footer(memory_arena_t *arena)
 {
     memory_arena_footer_t *result;

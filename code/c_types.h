@@ -37,7 +37,7 @@ typedef double          real64;
 
 #define global_variable static
 #define local_persist   static
-#define internal        static
+#define internal_api    static
 
 #define null            NULL
 

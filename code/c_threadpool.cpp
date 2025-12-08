@@ -11,7 +11,7 @@
 #include <c_threadpool.h>
 #include <p_platform_data.h>
 
-DWORD WINAPI ThreadProc(void *lpParameter);
+PLATFORM_THREAD_PROC(ThreadProc);
 
 bool8
 c_threadpool_perform_next_task(threadpool_queue_t *queue)
@@ -132,11 +132,9 @@ c_threadpool_flush_task_queues(threadpool_t *threadpool)
     c_threadpool_flush_queue(&threadpool->low_priority_queue);
 }
 
-#if OS_WINDOWS
-DWORD WINAPI 
-ThreadProc(void *lpParameter)
+PLATFORM_THREAD_PROC(ThreadProc)
 {
-    threadpool_t *pool = (threadpool_t*)lpParameter;
+    threadpool_t *pool = (threadpool_t*)user_data;
     for(;;)
     {
         if(!c_threadpool_perform_next_task(&pool->high_priority_queue))
@@ -149,6 +147,3 @@ ThreadProc(void *lpParameter)
     }
     return(0);
 }
-#else
-#error "thread proc not valid...\n"
-#endif
