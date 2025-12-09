@@ -71,13 +71,14 @@ BUILD_DIR = ../build
 COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/Freetype/include/
 
 ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+
 # Exclude both os_% and sys_% files
 GAME_SRCS  = $(filter-out $(SRC_DIR)/os_% $(SRC_DIR)/sys_%,$(ALL_SRCS))
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
-GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -lSDL3-Static
+GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -lSDL3-Static -lFreetype
 EXCLUDE_PATTERNS = sys_%
 
 

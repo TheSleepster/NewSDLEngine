@@ -171,6 +171,8 @@ main(int argc, char **argv)
             s_renderer_draw_frame(state, render_state);
             SDL_GL_SwapWindow(state->window);
 
+            gc_reset_temporary_data();
+
             current_tsc = SDL_GetPerformanceCounter();
             delta_tsc   = current_tsc - last_tsc;
             last_tsc    = current_tsc;
