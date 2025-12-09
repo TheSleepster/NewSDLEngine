@@ -61,5 +61,5 @@ typedef PLATFORM_THREAD_PROC(thread_proc_t);
 
 int sys_work_queue_entry_proc(void *lpParam);
 
-#endif // OS_LINXU_H
+#endif // SYS_LINUX_H
 

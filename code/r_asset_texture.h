@@ -7,6 +7,8 @@
    ======================================================================== */
 
 #define R_ASSET_TEXTURE_H
+#include <sokol/sokol_gfx.h>
+
 #include <c_types.h>
 #include <c_log.h>
 #include <c_memory_arena.h>
@@ -58,7 +60,7 @@ typedef struct texture_view
     bool8         is_in_atlas;
     
     u32           viewID;
-    u32           GPU_textureID;
+    sg_image     *texture;
 
     // NOTE(Sleepster): Pointers so that if the uv-location of the texture ever 
     // changes, the changes are immediately reflected for each view created for this
@@ -66,6 +68,13 @@ typedef struct texture_view
     vec2_t       *uv_min;
     vec2_t       *uv_max;
 }texture_view_t;
+
+
+struct texture_data_t
+{
+    sg_sampler sampler;
+    sg_image   image;
+};
 
 typedef struct texture2D
 {
@@ -77,7 +86,8 @@ typedef struct texture2D
 
     bool8           has_AA;
     filter_type_t   filter_type;
-    u32             GPU_textureID;
+
+    texture_data_t  texture_data;
 }texture2D_t;
 
 /*=============================================
@@ -87,6 +97,7 @@ texture_view_t  s_asset_texture_view_generate(asset_manager_t *asset_manager, as
 texture2D_t     s_asset_texture_create(asset_manager_t  *asset_manager, zone_allocator_t *zone, s32 width, s32 height, bitmap_format_t format, bool8 has_AA, filter_type_t filtering);
 texture2D_t     s_asset_texture_and_view_create(asset_manager_t  *asset_manager, zone_allocator_t *zone, s32 width, s32 height, bitmap_format_t format, bool8 has_AA, filter_type_t filtering);
 void            s_asset_texture_load_data(asset_manager_t *asset_manager, asset_handle_t *handle);
+void            s_asset_texture_load_data(asset_manager_t *asset_manager, asset_handle_t handle);
 asset_handle_t  s_asset_texture_get(asset_manager_t *asset_manager, string_t asset_key);
 void            s_asset_texture_destroy_data(asset_manager_t *asset_manager, asset_handle_t handle);
 void            s_asset_texture_view_destroy(asset_manager_t *asset_manager, asset_handle_t handle);

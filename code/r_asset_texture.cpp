@@ -13,6 +13,8 @@
 #include <s_asset_manager.h>
 #include <r_asset_texture.h>
 
+#include <s_renderer.h>
+
 bitmap_t
 s_asset_bitmap_create(zone_allocator_t *zone, s32 width, s32 height, bitmap_format_t format)
 {
@@ -33,7 +35,7 @@ s_asset_texture_view_generate(asset_manager_t *asset_manager, asset_slot_t *vali
 {
     texture_view_t new_view = {}; 
     new_view.is_valid       = true;
-    new_view.GPU_textureID  = 0; 
+    new_view.texture        = null;
     new_view.uv_min         = &texture_data->uv_min;
     new_view.uv_max         = &texture_data->uv_max;
 
@@ -74,56 +76,20 @@ s_asset_texture_and_view_create(asset_manager_t  *asset_manager,
     return(result);
 }
 
-// TODO(Sleepster): Make this actually work 
 void
-s_asset_texture_load_data(asset_manager_t *asset_manager, asset_handle_t *handle)
+s_asset_texture_load_data(asset_manager_t *asset_manager, asset_handle_t handle)
 {
-    
-    
-    Assert(handle->type == AT_BITMAP);
-    asset_slot_t *slot_data = handle->asset_slot;
-    
-    if(slot_data->slot_state == ASS_UNLOADED || slot_data->slot_state == ASS_RELOADING)
+    Assert(handle.type == AT_BITMAP);
+    asset_slot *asset_slot = handle.asset_slot;
+    if((asset_slot->slot_state != ASS_LOADED) && (asset_slot->slot_state != ASS_QUEUED))
     {
-#if 0
-        s_asset_load_data_from_asset_file_or_path(asset_manager,
-                                                  &handle->asset_slot->texture.bitmap.data, 
-                                                  asset_manager->texture_catalog.texture_allocator,
-                                                  slot_data,
-                                                  ZA_TAG_CACHE,
-                                                  slot_data->slot_state == ASS_RELOADING ? true : false);
-        at_atlas_handler_update_entry(asset_manager, &asset_manager->texture_catalog.primary_handler, *handle);
-#endif
+        c_asset_manager_start_load_task(asset_manager, asset_slot, asset_manager->texture_catalog.texture_allocator);
+        asset_slot->slot_state = ASS_QUEUED;
     }
 
-    // TODO(Sleepster): As of right now, this condition will never be met if you 
-    // call this function a single time. It will just stop here, never actually loading the data
-    // and adding it to the atlas handler's array. Fix this IMMEDIATELY.
-    if(c_string_is_valid(slot_data->texture.bitmap.data) &&
-       slot_data->slot_state == ASS_LOADED)
+    if(asset_slot->slot_state == ASS_LOADED)
     {
-        stbi_set_flip_vertically_on_load(1);
-        u8 *data = stbi_load_from_memory(slot_data->texture.bitmap.data.data,
-                                         slot_data->texture.bitmap.data.count,
-                                        &slot_data->texture.bitmap.width,
-                                        &slot_data->texture.bitmap.height,
-                                        &slot_data->texture.bitmap.channels,
-                                         BMF_RGBA32);
-
-        s32 data_length = strlen((char *)data);
-        slot_data->texture.bitmap.decompressed_data.data  = data;
-        slot_data->texture.bitmap.decompressed_data.count = data_length;
-        slot_data->texture.bitmap.format = BMF_RGBA32;
-        slot_data->texture.bitmap.stride = 32;
-        if(!handle->texture.is_in_atlas)
-        {
-            //at_atlas_handler_add_texture(asset_manager, &asset_manager->texture_catalog.primary_handler, *handle);
-        }
-        //r_texture_make_gpu(&slot_data->texture, false, TAAFT_NEAREST);
-    }
-    else
-    {
-        // TODO(Sleepster): Set the default texture stuff 
+        r_texture_upload(&asset_slot->texture, false, TAAFT_NEAREST);
     }
 }
 
@@ -153,7 +119,7 @@ s_asset_texture_get(asset_manager_t *asset_manager, string_t asset_key)
             result.texture     = new_view;
         }
 
-        s_asset_texture_load_data(asset_manager, &result);
+        s_asset_texture_load_data(asset_manager, result);
     }
     else
     {

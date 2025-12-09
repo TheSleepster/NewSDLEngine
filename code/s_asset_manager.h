@@ -137,6 +137,8 @@ typedef struct asset_manager
     threadpool_t      threadpool;
     memory_arena_t    manager_arena;
 
+    zone_allocator_t *task_allocator;
+
     struct 
     {
         zone_allocator_t *texture_allocator;
@@ -171,6 +173,8 @@ typedef struct asset_manager
 }asset_manager_t;
 
 void s_asset_manager_init(asset_manager_t *asset_manager);
+void c_asset_manager_start_load_task(asset_manager_t *asset_manager, asset_slot_t *asset_slot, zone_allocator_t *zone);
+void s_asset_manager_async_load_asset_data(void *user_data);
 
 #endif // S_ASSET_MANAGER_H
 

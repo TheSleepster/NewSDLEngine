@@ -1,1 +1,1 @@
-bear --output "../misc/compile_commands.json" -- make -j8 -B -k SILENT=@ DEBUG_BUILD=1
+compiledb -o../misc/compile_commands.json make -j8 -k SILENT=@ DEBUG_BUILD=1

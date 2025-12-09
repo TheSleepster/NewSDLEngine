@@ -44,6 +44,47 @@ r_create_draw_quad(render_state_t *render_state, vec2_t position, vec2_t size, v
 }
 
 void
+r_texture_upload(texture2D_t *texture, bool8 has_AA, filter_type_t filter_type)
+{
+    sg_filter filtering;
+    switch(filter_type)
+    {
+        case TAAFT_LINEAR:
+        {
+            filtering = SG_FILTER_LINEAR;
+        }break;
+        case TAAFT_NEAREST:
+        {
+            filtering = SG_FILTER_NEAREST;
+        }break;
+        default: {filtering = SG_FILTER_NEAREST; InvalidCodePath;}break;
+    }
+
+    if(has_AA)
+    {
+        log_warning("We do not support AA right now... Ignoring\n");
+    }
+
+    sg_sampler_desc sampler_desc = {
+        .min_filter = filtering,
+        .mag_filter = filtering,
+        .wrap_u     = SG_WRAP_CLAMP_TO_EDGE,
+        .wrap_v     = SG_WRAP_CLAMP_TO_EDGE
+    };
+
+    sg_image_desc image_desc = {
+        .render_target = false,
+        .width         = texture->bitmap.width,
+        .height        = texture->bitmap.height,
+        .pixel_format  = SG_PIXELFORMAT_RGBA8,
+        .sample_count  = 1
+    };
+        
+    texture->texture_data.image   = sg_make_image(&image_desc);
+    texture->texture_data.sampler = sg_make_sampler(&sampler_desc);
+}
+
+void
 s_init_renderer(render_state_t *render_state, game_state_t *state)
 {
     // NOTE(Sleepster): OpenGL 4.3 Init 
@@ -130,26 +171,6 @@ s_init_renderer(render_state_t *render_state, game_state_t *state)
             };
             render_state->bindings.index_buffer = sg_make_buffer(&index_buffer_desc);
             free(index_buffer);
-        }
-
-        // NOTE(Sleepster): Samplers Init
-        {
-            sg_sampler_desc n_sampler_desc = {
-                .min_filter = SG_FILTER_NEAREST,
-                .mag_filter = SG_FILTER_NEAREST,
-                .wrap_u     = SG_WRAP_CLAMP_TO_EDGE,
-                .wrap_v     = SG_WRAP_CLAMP_TO_EDGE
-            };
-
-            sg_sampler_desc l_sampler_desc = {
-                .min_filter = SG_FILTER_LINEAR,
-                .mag_filter = SG_FILTER_LINEAR,
-                .wrap_u     = SG_WRAP_CLAMP_TO_EDGE,
-                .wrap_v     = SG_WRAP_CLAMP_TO_EDGE
-            };
-
-            render_state->nearest_sampler = sg_make_sampler(&n_sampler_desc);
-            render_state->linear_sampler  = sg_make_sampler(&l_sampler_desc);
         }
 
         sg_shader shader = sg_make_shader(test_shader_desc(sg_query_backend()));

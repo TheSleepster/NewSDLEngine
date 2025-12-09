@@ -593,15 +593,26 @@ sys_mutex_free(sys_mutex_t *mutex)
 }
 
 bool8
-sys_mutex_lock(sys_mutex_t *mutex)
+sys_mutex_lock(sys_mutex_t *mutex, bool8 should_block)
 {
     Assert(mutex);
-
     bool8 result = false;
     
-    DWORD value = WaitForSingleObject(mutex->handle, INFINITE);
-    if(value == WAIT_OBJECT_0)
+    if(!should_block)
     {
+        DWORD value = WaitForSingleObject(mutex->handle, INFINITE);
+        while(value == WAIT_OBJECT_0)
+        {
+            result = true;
+        }
+    }
+    else
+    {
+        DWORD value = 0xBEEF;
+        while(value != WAIT_OBJECT_0)
+        {
+            value = WaitForSingleObject(mutex->handle, INFINITE);
+        }
         result = true;
     }
 

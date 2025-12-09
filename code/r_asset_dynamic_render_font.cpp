@@ -234,13 +234,12 @@ s_asset_font_load_data(memory_arena_t *arena, asset_manager_t *asset_manager, as
     Assert(handle.asset_slot);
     Assert(handle.type == AT_FONT);
 
-#if 0
-    s_asset_load_data_from_asset_file_or_path(asset_manager,
-                                             &handle.font->loaded_data,
-                                              asset_manager->font_catalog.font_allocator,
-                                              handle.asset_slot,
-                                              ZA_TAG_CACHE); 
-#endif
+    asset_slot_t *asset_slot = handle.asset_slot;
+    if((asset_slot->slot_state != ASS_LOADED) && (asset_slot->slot_state != ASS_QUEUED))
+    {
+        c_asset_manager_start_load_task(asset_manager, asset_slot, asset_manager->font_catalog.font_allocator);
+        asset_slot->slot_state = ASS_QUEUED;
+    }
 }
 
 inline bool8

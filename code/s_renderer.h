@@ -15,6 +15,8 @@
 #include <c_globals.h>
 #include <c_math.h>
 
+#include <r_asset_texture.h>
+
 #include <g_game_state.h>
 
 constexpr u32 MAX_QUADS    = 2500;
@@ -48,18 +50,11 @@ struct render_quad_t
     vec4_t color;
 };
 
-struct render_group_t
-{
-};
-
 struct render_state_t
 {
     sg_pipeline    pipeline;
     sg_bindings    bindings;
     sg_pass_action pass_action;
-
-    sg_sampler     linear_sampler;
-    sg_sampler     nearest_sampler;
 
     mat4_t         projection_matrix;
     mat4_t         view_matrix;
@@ -73,5 +68,7 @@ struct render_state_t
 
 void s_init_renderer(render_state_t *render_state, game_state_t *state);
 void s_renderer_draw_frame(game_state_t *state, render_state_t *render_state);
+void r_texture_upload(texture2D_t *texture, bool8 has_AA, filter_type_t filter_type);
+
 #endif // s_RENDERER_H
 

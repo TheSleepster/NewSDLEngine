@@ -23,7 +23,7 @@
 #include <g_game_state.h>
 #include <g_entity.h>
 
-void
+internal_api void
 c_process_window_events(SDL_Window *window, input_manager_t *input_manager)
 {
     SDL_Event event;

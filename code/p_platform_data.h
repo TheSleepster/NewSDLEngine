@@ -80,7 +80,7 @@ void            sys_thread_wait(sys_semaphore_t *semaphore, u64 wait_duration_ms
 bool8           sys_thread_close_handle(sys_thread_t *thread_data);
 sys_mutex_t     sys_mutex_create();
 void            sys_mutex_free(sys_mutex_t *mutex);
-bool8           sys_mutex_lock(sys_mutex_t *mutex);
+bool8           sys_mutex_lock(sys_mutex_t *mutex, bool8 should_block);
 bool8           sys_mutex_unlock(sys_mutex_t *mutex);
 
 #endif // P_PLATFORM_DATA_H
