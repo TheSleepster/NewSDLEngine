@@ -46,120 +46,153 @@ r_create_draw_quad(render_state_t *render_state, vec2_t position, vec2_t size, v
 void
 s_init_renderer(render_state_t *render_state, game_state_t *state)
 {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-    state->window = SDL_CreateWindow("Game", 
-                                     (u32)state->window_size.x,
-                                     (u32)state->window_size.y, 
-                                     SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL);
-    if(!state->window)
+    // NOTE(Sleepster): OpenGL 4.3 Init 
     {
-        log_error("Failure to create SDL_Window... error: '%s'...\n", SDL_GetError());
-        exit(0);
-    }
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    SDL_GLContext context = SDL_GL_CreateContext(state->window);
-    if(!SDL_GL_MakeCurrent(state->window, context))
-    {
-        log_error("Failure to create SDL_Context... error: '%s'...\n", SDL_GetError());
-        exit(0);
-    }
-
-    sg_desc sokol_desc = {
-        .logger = {
-            .func = slog_func
-        },
-        .environment = {
-            .defaults = {
-                .color_format = SG_PIXELFORMAT_RGBA8,
-                .depth_format = SG_PIXELFORMAT_DEPTH_STENCIL,
-                .sample_count = 1
-            },
-        },
-    };
-    sg_setup(&sokol_desc);
-
-    sg_buffer_desc vertex_buffer_desc = {
-        .type  = SG_BUFFERTYPE_VERTEXBUFFER,
-        .usage = SG_USAGE_STREAM,
-        .data  = {
-            .ptr  = null,
-            .size = sizeof(vertex_t) * MAX_VERTICES 
+        state->window = SDL_CreateWindow("Game", 
+                                         (u32)state->window_size.x,
+                                         (u32)state->window_size.y, 
+                                         SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL);
+        if(!state->window)
+        {
+            log_error("Failure to create SDL_Window... error: '%s'...\n", SDL_GetError());
+            exit(0);
         }
-    };
-    render_state->bindings.vertex_buffers[0] = sg_make_buffer(&vertex_buffer_desc);
 
-    u32 *index_buffer = AllocArray(u32, MAX_INDICES);
-    u32  index_offset = 0;
-    for(u32 index = 0;
-        index < MAX_INDICES;
-        index += 6)
-    {
-        // 0 1 2 0 2 3
-        index_buffer[index + 0] = index_offset + 0;
-        index_buffer[index + 1] = index_offset + 1;
-        index_buffer[index + 2] = index_offset + 2;
-        index_buffer[index + 3] = index_offset + 0;
-        index_buffer[index + 4] = index_offset + 2;
-        index_buffer[index + 5] = index_offset + 3;
-
-        index_offset += 4;
-    }
-    
-    sg_buffer_desc index_buffer_desc = {
-        .type  = SG_BUFFERTYPE_INDEXBUFFER,
-        .usage = SG_USAGE_IMMUTABLE,
-        .data = {
-            .ptr  = index_buffer,
-            .size = sizeof(u32) * MAX_INDICES
+        SDL_GLContext context = SDL_GL_CreateContext(state->window);
+        if(!SDL_GL_MakeCurrent(state->window, context))
+        {
+            log_error("Failure to create SDL_Context... error: '%s'...\n", SDL_GetError());
+            exit(0);
         }
-    };
-    render_state->bindings.index_buffer = sg_make_buffer(&index_buffer_desc);
+    }
 
-    sg_shader shader = sg_make_shader(test_shader_desc(sg_query_backend()));
-    sg_pipeline_desc pipeline_desc = (sg_pipeline_desc){
-        .shader = shader,
-        .layout = {
-            .attrs = {
-                [ATTR_test_vPosition] = {
-                    .offset = offsetof(vertex_t, v_position),
-                    .format = SG_VERTEXFORMAT_FLOAT4
+    // NOTE(Sleepster): Sokol Init 
+    {
+        // NOTE(Sleepster): Sokol "context" Setup 
+        {
+            sg_desc sokol_desc = {
+                .logger = {
+                    .func = slog_func
                 },
-                [ATTR_test_vColor] = {
-                    .offset = offsetof(vertex_t, v_color),
-                    .format = SG_VERTEXFORMAT_FLOAT4
-                }
-            }
-        },
-        .depth  = {
-            .compare       = SG_COMPAREFUNC_GREATER,
-            .write_enabled = true,
-        },
-        .colors[0] = {
-            .blend = {
-                .enabled = true,
-            },
-        },
-        .index_type = SG_INDEXTYPE_UINT32
-    };
-
-    render_state->pipeline = sg_make_pipeline(&pipeline_desc);
-
-    render_state->pass_action = (sg_pass_action) {
-        .colors[0] = {
-            .load_action = SG_LOADACTION_CLEAR, 
-            .clear_value = { 0.1f, 0.1f, 0.1f, 1.0f }
-        },
-        .depth = {
-            .load_action  = SG_LOADACTION_CLEAR,
-            .store_action = SG_STOREACTION_STORE,
-            .clear_value = 0.0f,
+                .environment = {
+                    .defaults = {
+                        .color_format = SG_PIXELFORMAT_RGBA8,
+                        .depth_format = SG_PIXELFORMAT_DEPTH_STENCIL,
+                        .sample_count = 1
+                    },
+                },
+            };
+            sg_setup(&sokol_desc);
         }
-    };
+
+        // NOTE(Sleepster): Vertex and Index buffers 
+        {
+            sg_buffer_desc vertex_buffer_desc = {
+                .type  = SG_BUFFERTYPE_VERTEXBUFFER,
+                .usage = SG_USAGE_STREAM,
+                .data  = {
+                    .ptr  = null,
+                    .size = sizeof(vertex_t) * MAX_VERTICES 
+                }
+            };
+            render_state->bindings.vertex_buffers[0] = sg_make_buffer(&vertex_buffer_desc);
+
+            u32 *index_buffer = AllocArray(u32, MAX_INDICES);
+            u32  index_offset = 0;
+            for(u32 index = 0;
+                index < MAX_INDICES;
+                index += 6)
+            {
+                // 0 1 2 0 2 3
+                index_buffer[index + 0] = index_offset + 0;
+                index_buffer[index + 1] = index_offset + 1;
+                index_buffer[index + 2] = index_offset + 2;
+                index_buffer[index + 3] = index_offset + 0;
+                index_buffer[index + 4] = index_offset + 2;
+                index_buffer[index + 5] = index_offset + 3;
+
+                index_offset += 4;
+            }
+
+            sg_buffer_desc index_buffer_desc = {
+                .type  = SG_BUFFERTYPE_INDEXBUFFER,
+                .usage = SG_USAGE_IMMUTABLE,
+                .data = {
+                    .ptr  = index_buffer,
+                    .size = sizeof(u32) * MAX_INDICES
+                }
+            };
+            render_state->bindings.index_buffer = sg_make_buffer(&index_buffer_desc);
+            free(index_buffer);
+        }
+
+        // NOTE(Sleepster): Samplers Init
+        {
+            sg_sampler_desc n_sampler_desc = {
+                .min_filter = SG_FILTER_NEAREST,
+                .mag_filter = SG_FILTER_NEAREST,
+                .wrap_u     = SG_WRAP_CLAMP_TO_EDGE,
+                .wrap_v     = SG_WRAP_CLAMP_TO_EDGE
+            };
+
+            sg_sampler_desc l_sampler_desc = {
+                .min_filter = SG_FILTER_LINEAR,
+                .mag_filter = SG_FILTER_LINEAR,
+                .wrap_u     = SG_WRAP_CLAMP_TO_EDGE,
+                .wrap_v     = SG_WRAP_CLAMP_TO_EDGE
+            };
+
+            render_state->nearest_sampler = sg_make_sampler(&n_sampler_desc);
+            render_state->linear_sampler  = sg_make_sampler(&l_sampler_desc);
+        }
+
+        sg_shader shader = sg_make_shader(test_shader_desc(sg_query_backend()));
+        sg_pipeline_desc pipeline_desc = (sg_pipeline_desc){
+            .shader = shader,
+            .layout = {
+                .attrs = {
+                    [ATTR_test_vPosition] = {
+                        .offset = offsetof(vertex_t, v_position),
+                        .format = SG_VERTEXFORMAT_FLOAT4
+                    },
+                    [ATTR_test_vColor] = {
+                        .offset = offsetof(vertex_t, v_color),
+                        .format = SG_VERTEXFORMAT_FLOAT4
+                    }
+                }
+            },
+            .depth  = {
+                .compare       = SG_COMPAREFUNC_GREATER,
+                .write_enabled = true,
+            },
+            .colors[0] = {
+                .blend = {
+                    .enabled = true,
+                },
+            },
+            .index_type = SG_INDEXTYPE_UINT32
+        };
+
+        render_state->pipeline = sg_make_pipeline(&pipeline_desc);
+
+        render_state->pass_action = (sg_pass_action) {
+            .colors[0] = {
+                .load_action = SG_LOADACTION_CLEAR, 
+                .clear_value = { 0.1f, 0.1f, 0.1f, 1.0f }
+            },
+            .depth = {
+                .load_action  = SG_LOADACTION_CLEAR,
+                .store_action = SG_STOREACTION_STORE,
+                .clear_value  = 0.0f,
+            }
+        };
+    }
 
     render_state->vertex_buffer = AllocArray(vertex_t, MAX_VERTICES);
     render_state->vertex_count  = 0;
@@ -187,9 +220,9 @@ s_renderer_draw_frame(game_state_t *state, render_state_t *render_state)
 
     render_state->view_matrix       = mat4_identity();
     render_state->projection_matrix = mat4_RHGL_ortho(window_width  * -0.5f, 
-                                                      window_width  * 0.5f,
+                                                      window_width  *  0.5f,
                                                       window_height * -0.5f, 
-                                                      window_height * 0.5f,
+                                                      window_height *  0.5f,
                                                       -1.0f, 
                                                       1.0f);
     
@@ -234,6 +267,8 @@ s_renderer_draw_frame(game_state_t *state, render_state_t *render_state)
         },
     };
     sg_begin_pass(&pass_data);
+    sg_apply_viewport(0, 0, window_width, window_height, false);
+
     sg_apply_pipeline(render_state->pipeline);
     sg_apply_bindings(&render_state->bindings);
 

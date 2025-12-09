@@ -18,7 +18,6 @@ ifeq ($(OS),Windows_NT)
     DEV_NULL = NUL
     PIC_FLAG =
     MKDIR = if not exist "$(subst /,\,$1)" mkdir "$(subst /,\,$1)"
-    EXCLUDE_PATTERNS = %_linux.cpp %_mac.cpp %_android.cpp
     PDB_SUFFIX := $(shell powershell -Command "[guid]::NewGuid().ToString('N').Substring(0,8)")
     PDB_LDFLAG = -Wl /PDB:../build/game_$(BUILD_TYPE)_$(PDB_SUFFIX).pdb 
 
@@ -41,12 +40,10 @@ else
         OS_DEFINE = -DOS_LINUX=1
         PLATFORM_LIBS = -lX11 -lGL -lm
         DEV_NULL = /dev/null
-        EXCLUDE_PATTERNS = %_windows.cpp %_mac.cpp %_android.cpp
     else ifeq ($(UNAME_S),Darwin)
         OS_DEFINE = -DOS_MAC=1
         PLATFORM_LIBS = -framework Cocoa -framework OpenGL -lm
         DEV_NULL = /dev/null
-        EXCLUDE_PATTERNS = %_windows.cpp %_linux.cpp %_android.cpp
     endif
 endif
 
@@ -74,12 +71,14 @@ BUILD_DIR = ../build
 COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/Freetype/include/
 
 ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
-GAME_SRCS  = $(filter-out $(SRC_DIR)/os_%,$(ALL_SRCS))
+# Exclude both os_% and sys_% files
+GAME_SRCS  = $(filter-out $(SRC_DIR)/os_% $(SRC_DIR)/sys_%,$(ALL_SRCS))
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
 GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -lSDL3-Static
+EXCLUDE_PATTERNS = sys_%
 
 
 # --------------------------------------------

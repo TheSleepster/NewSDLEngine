@@ -8,29 +8,15 @@
 
 #define G_GAME_STATE_H
 #include <SDL3/SDL.h>
-
 #include <sokol/sokol_gfx.h>
 
 #include <c_base.h>
 #include <c_types.h>
 #include <c_math.h>
 
+#include <p_platform_data.h>
+
 #include <g_entity.h>
-
-#if OS_WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#define NO_MIN_MAX
-#include <windows.h>
-
-#undef errno
-#define errno WSAGetLastError()
-#include <winsock2.h>
-#include <ws2tcpip.h>
-
-#define SOCKET int
-#else
-#error "window only..."
-#endif
 
 struct input_data_t
 {

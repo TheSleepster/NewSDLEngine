@@ -11,9 +11,7 @@
 #include <c_base.h>
 #include <c_types.h>
 
-#define WIN32_LEAN_AND_MEAN
-#define NO_MIN_MAX
-#include <windows.h>
+#include <p_platform_data.h>
 
 #define MAX_QUEUE_ENTRIES (10000)
 typedef void threadpool_callback_t(void *user_data);
@@ -47,9 +45,9 @@ struct threadpool_queue_t
 
 struct threadpool_t
 {
-    HANDLE semaphore;
-    u32    threads_awake;
-    u32    max_threads;
+    sys_semaphore_t semaphore;
+    u32             threads_awake;
+    u32             max_threads;
     
     threadpool_queue_t high_priority_queue;
     threadpool_queue_t low_priority_queue;

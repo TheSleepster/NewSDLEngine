@@ -9,7 +9,6 @@
 #define C_MEMORY_ARENA_H
 #include <c_base.h>
 #include <c_types.h>
-#include <c_math.h>
 
 struct memory_arena_footer_t
 {

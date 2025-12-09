@@ -145,7 +145,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
     }
 }
 
-internal void
+void
 s_im_reset_controller_states(input_manager_t *input_manager)
 {
     for(u32 controller_index = 0;
@@ -202,7 +202,7 @@ s_im_init_input_manager(input_manager_t *input_manager)
     input_manager->primary_controller_index = 0;
 }
 
-internal void
+void
 s_im_initialize_keyboard_controller(input_manager_t *input_manager, s32 index)
 {
     input_controller_t *controller = input_manager->controllers + index;
@@ -214,7 +214,7 @@ s_im_initialize_keyboard_controller(input_manager_t *input_manager, s32 index)
 }
 
 
-internal input_controller_t *
+input_controller_t *
 s_im_get_primary_controller(input_manager_t *input_manager)
 {
     input_controller_t *result = null;
@@ -223,7 +223,7 @@ s_im_get_primary_controller(input_manager_t *input_manager)
     return(result);
 }
 
-internal input_controller_t *
+input_controller_t *
 s_im_get_controller_at_index(input_manager_t *input_manager, s32 index)
 {
     Assert(index < MAX_INPUT_CONTROLLERS);
@@ -234,7 +234,7 @@ s_im_get_controller_at_index(input_manager_t *input_manager, s32 index)
     return(result);
 }
 
-internal input_controller_t *
+input_controller_t *
 s_im_get_active_controller(input_manager_t *input_manager)
 {
     input_controller_t *result = null;
@@ -246,7 +246,7 @@ s_im_get_active_controller(input_manager_t *input_manager)
   =============== KEYBOARD INPUT ===============
   ==============================================*/
 
-internal vec2_t
+vec2_t
 s_im_transform_mouse_data(input_controller_t *controller,
                                      mat4_t             view_matrix,
                                      mat4_t             projection_matrix)
@@ -267,7 +267,7 @@ s_im_transform_mouse_data(input_controller_t *controller,
     return(result);
 }
 
-internal bool8
+bool8
 s_im_is_keyboard_key_pressed(input_controller_t *controller, s32 key_index)
 {
     Assert(controller->type == IM_CONTROLLER_KEYBOARD);
@@ -279,7 +279,7 @@ s_im_is_keyboard_key_pressed(input_controller_t *controller, s32 key_index)
     return(result);
 }
 
-internal bool8
+bool8
 s_im_is_keyboard_key_down(input_controller_t *controller, s32 key_index)
 {
     Assert(controller->type == IM_CONTROLLER_KEYBOARD);
@@ -291,7 +291,7 @@ s_im_is_keyboard_key_down(input_controller_t *controller, s32 key_index)
     return(result);
 }
 
-internal bool8
+bool8
 s_im_is_keyboard_key_released(input_controller_t *controller, s32 key_index)
 {
     Assert(controller->type == IM_CONTROLLER_KEYBOARD);
@@ -303,7 +303,7 @@ s_im_is_keyboard_key_released(input_controller_t *controller, s32 key_index)
     return(result);
 }
 
-internal void 
+void 
 s_im_consume_keyboard_key_press(input_controller_t *controller, s32 key_index)
 {
     Assert(controller->type == IM_CONTROLLER_KEYBOARD);
@@ -313,7 +313,7 @@ s_im_consume_keyboard_key_press(input_controller_t *controller, s32 key_index)
     button->half_transition_counter = 0;
 }
 
-internal void 
+void 
 s_im_consume_keyboard_key_down(input_controller_t *controller, s32 key_index)
 {
     Assert(controller->type == IM_CONTROLLER_KEYBOARD);
@@ -323,7 +323,7 @@ s_im_consume_keyboard_key_down(input_controller_t *controller, s32 key_index)
     button->half_transition_counter = 0;
 }
 
-internal void 
+void 
 s_im_consume_keyboard_key_release(input_controller_t *controller, s32 key_index)
 {
     Assert(controller->type == IM_CONTROLLER_KEYBOARD);
@@ -333,7 +333,7 @@ s_im_consume_keyboard_key_release(input_controller_t *controller, s32 key_index)
     button->half_transition_counter = 0;
 }
 
-internal bool8
+bool8
 s_im_is_shift_key_down(input_controller_t *controller)
 {
     bool8 result = false;
@@ -342,7 +342,7 @@ s_im_is_shift_key_down(input_controller_t *controller)
     return(result);
 }
 
-internal bool8
+bool8
 s_im_is_control_key_down(input_controller_t *controller)
 {
     bool8 result = false;
@@ -351,7 +351,7 @@ s_im_is_control_key_down(input_controller_t *controller)
     return(result);
 }
 
-internal bool8
+bool8
 s_im_is_alt_key_down(input_controller_t *controller)
 {
     bool8 result = false;
@@ -360,7 +360,7 @@ s_im_is_alt_key_down(input_controller_t *controller)
     return(result);
 }
 
-internal inline action_button_t*
+inline action_button_t*
 s_im_get_key_state(input_controller_t *controller, s32 key_index)
 {
     action_button_t *button = controller->keyboard.input + key_index;
@@ -371,7 +371,7 @@ s_im_get_key_state(input_controller_t *controller, s32 key_index)
   =============== GAMEPAD INPUT ===============
   =============================================*/
 
-internal bool8
+bool8
 s_im_is_gamepad_button_pressed(input_controller_t *controller, s32 button_index)
 {
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
@@ -383,7 +383,7 @@ s_im_is_gamepad_button_pressed(input_controller_t *controller, s32 button_index)
     return(result);
 }
 
-internal bool8
+bool8
 s_im_is_gamepad_button_down(input_controller_t *controller, s32 button_index)
 {
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
@@ -395,7 +395,7 @@ s_im_is_gamepad_button_down(input_controller_t *controller, s32 button_index)
     return(result);
 }
 
-internal bool8
+bool8
 s_im_is_gamepad_button_released(input_controller_t *controller, s32 button_index)
 {
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
@@ -407,7 +407,7 @@ s_im_is_gamepad_button_released(input_controller_t *controller, s32 button_index
     return(result);
 }
 
-internal void 
+void 
 s_im_consume_gamepad_button_press(input_controller_t *controller, s32 button_index)
 {
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
@@ -417,7 +417,7 @@ s_im_consume_gamepad_button_press(input_controller_t *controller, s32 button_ind
     button->half_transition_counter = 0;
 }
 
-internal void 
+void 
 s_im_consume_gamepad_button_down(input_controller_t *controller, s32 button_index)
 {
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
@@ -427,7 +427,7 @@ s_im_consume_gamepad_button_down(input_controller_t *controller, s32 button_inde
     button->half_transition_counter = 0;
 }
 
-internal void 
+void 
 s_im_consume_gamepad_button_release(input_controller_t *controller, s32 button_index)
 {
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
@@ -437,7 +437,7 @@ s_im_consume_gamepad_button_release(input_controller_t *controller, s32 button_i
     button->half_transition_counter = 0;
 }
 
-internal inline action_button_t*
+inline action_button_t*
 s_im_get_button_state(input_controller_t *controller, s32 button_index)
 {
     action_button_t *button = controller->gamepad.digital_buttons + button_index;
@@ -448,7 +448,7 @@ s_im_get_button_state(input_controller_t *controller, s32 button_index)
   =============== GAME ACTION API ===============
   ===============================================*/
 
-internal void
+void
 s_game_action_create(input_manager_t *input_manager, 
                      string_t         name, 
                      u32              first_binding, 

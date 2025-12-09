@@ -67,6 +67,8 @@ main(int argc, char **argv)
     state->window_size = vec2(600, 600);
     if(SDL_Init(SDL_INIT_VIDEO))
     {
+        gc_setup();
+
         s_nt_socket_api_init(state, argc, argv);
         s_init_renderer(render_state, state);
 

@@ -4,6 +4,8 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#include <SDL3/SDL.h>
+
 #include <c_types.h>
 #include <c_base.h>
 #include <c_math.h>
@@ -11,18 +13,16 @@
 
 #include <c_dynarray.h>
 
-#if OS_WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#define NO_MIN_MAX
-#include <windows.h>
+#include <p_platform_data.h>
+#include <p_platform_data.cpp>
 
-#undef errno
-#define errno WSAGetLastError()
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#error "window only..."
-#endif
+#include <c_string.cpp>
+#include <c_dynarray_impl.cpp>
+#include <c_globals.cpp>
+#include <c_memory_arena.cpp>
+#include <c_file_api.cpp>
+#include <c_file_watcher.cpp>
+#include <c_zone_allocator.cpp>
 
 
 /* NOTE(Sleepster): Client to server

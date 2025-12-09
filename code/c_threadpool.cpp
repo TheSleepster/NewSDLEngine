@@ -9,10 +9,7 @@
 #include <c_types.h>
 
 #include <c_threadpool.h>
-
-#define WIN32_LEAN_AND_MEAN
-#define NO_MIN_MAX
-#include <windows.h>
+#include <p_platform_data.h>
 
 DWORD WINAPI ThreadProc(void *lpParameter);
 
@@ -51,19 +48,22 @@ c_threadpool_perform_next_task(threadpool_queue_t *queue)
 void
 c_threadpool_init(threadpool_t *pool) 
 {
-    SYSTEM_INFO info = {};
-    GetSystemInfo(&info);
+#if OS_WINDOWS
+    SetProcessDPIAware();
+    timeBeginPeriod(1);
+#endif
+
+    u32 num_processors = sys_get_cpu_count();
 
     ZeroStruct(*pool);
-    pool->semaphore   = CreateSemaphoreEx(null, 0, info.dwNumberOfProcessors, null, 0, SEMAPHORE_ALL_ACCESS);
-    pool->max_threads = info.dwNumberOfProcessors;
+    pool->semaphore   = sys_semaphore_create(0, num_processors);
+    pool->max_threads = num_processors;
 
     for(u32 thread_index = 0;
-        thread_index < info.dwNumberOfProcessors;
+        thread_index < num_processors;
         ++thread_index)
     {
-        HANDLE thread = CreateThread(0, 0, ThreadProc, pool, 0, null);
-        CloseHandle(thread);
+        sys_thread_create(ThreadProc, pool, true);
     }
 }
 
@@ -102,7 +102,7 @@ c_threadpool_add_task(threadpool_t *threadpool, void *user_data, threadpool_call
         entry->callback  = callback;
 
         AtomicIncrement32(&queue->completion_goal);
-        ReleaseSemaphore(threadpool->semaphore, 1, 0);
+        sys_semaphore_release(&threadpool->semaphore, 1);
     }
     else
     {
@@ -132,6 +132,7 @@ c_threadpool_flush_task_queues(threadpool_t *threadpool)
     c_threadpool_flush_queue(&threadpool->low_priority_queue);
 }
 
+#if OS_WINDOWS
 DWORD WINAPI 
 ThreadProc(void *lpParameter)
 {
@@ -142,9 +143,12 @@ ThreadProc(void *lpParameter)
         {
             if(!c_threadpool_perform_next_task(&pool->low_priority_queue))
             {
-                WaitForSingleObjectEx(pool->semaphore, INFINITE, false);
+                sys_semaphore_wait(&pool->semaphore, 0);
             }
         }
     }
     return(0);
 }
+#else
+#error "thread proc not valid...\n"
+#endif

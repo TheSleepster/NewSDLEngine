@@ -22,7 +22,7 @@ c_arena_create(u64 block_size)
     return(result);
 }
 
-internal inline memory_arena_footer_t*
+internal memory_arena_footer_t*
 c_arena_get_footer(memory_arena_t *arena)
 {
     memory_arena_footer_t *result;
@@ -88,7 +88,7 @@ c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 
     return(result);
 }
 
-inline void
+void
 c_arena_clear_block(memory_arena_t *arena)
 {
     memset(arena->base, 0, arena->used);    
@@ -110,7 +110,7 @@ c_arena_free_last_block(memory_arena_t *arena)
     arena->block_counter -= 1;
 }
 
-inline void
+void
 c_arena_reset(memory_arena_t *arena)
 {
     while(arena->block_counter > 1)
@@ -123,7 +123,7 @@ c_arena_reset(memory_arena_t *arena)
     arena->used = 0;
 }
 
-inline scratch_arena_t
+scratch_arena_t
 c_arena_begin_temporary_memeory(memory_arena_t *arena)
 {
     scratch_arena_t result;
@@ -136,7 +136,7 @@ c_arena_begin_temporary_memeory(memory_arena_t *arena)
     return(result);
 }
 
-inline void
+void
 c_arena_end_temporary_memory(scratch_arena_t *scratch_arena)
 {
     memory_arena_t *parent = scratch_arena->parent;

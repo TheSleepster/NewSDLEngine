@@ -11,10 +11,10 @@
 
 #include <c_base.h>
 #include <c_types.h>
-#include <c_math.h>
 #include <c_string.h>
 #include <c_dynarray.h>
 #include <c_log.h>
+#include <c_math.h>
 
 extern vec2_t g_window_size;
 

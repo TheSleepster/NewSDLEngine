@@ -11,9 +11,9 @@
 
 #include <c_types.h>
 #include <c_base.h>
-#include <c_math.h>
 #include <c_log.h>
 #include <c_globals.h>
+#include <c_math.h>
 
 #include <g_game_state.h>
 
@@ -57,6 +57,9 @@ struct render_state_t
     sg_pipeline    pipeline;
     sg_bindings    bindings;
     sg_pass_action pass_action;
+
+    sg_sampler     linear_sampler;
+    sg_sampler     nearest_sampler;
 
     mat4_t         projection_matrix;
     mat4_t         view_matrix;

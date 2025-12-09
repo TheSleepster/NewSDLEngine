@@ -38,9 +38,16 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
 #define _dynarray_header(d_array_ptr) \
     ((dynarray_header_t*)(d_array_ptr ? ((byte*)(d_array_ptr) - sizeof(dynarray_header_t)) : null))
 
-#define c_dynarray_create(type) ({\
+#define c_dynarray_create(type) ({              \
     (type*)_dynarray_create_impl(sizeof(type)); \
  })
+
+#define c_dynarray_destroy(d_array) ({        \
+    _dynarray_destroy_impl((void**)&d_array); \
+    d_array = null;                           \
+                                              \
+    d_array;                                  \
+})
 
 #define c_dynarray_reserve(d_array, to_reserve) ({                                                                                     \
     TypeOf(d_array)   *p_array = &(d_array);                                                                                           \

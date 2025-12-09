@@ -9,8 +9,8 @@
 #define G_ENTITY_H
 #include <c_types.h>
 #include <c_base.h>
-#include <c_math.h>
 #include <c_string.h>
+#include <c_math.h>
 
 constexpr u32 cv_host_client_id = 100;
 

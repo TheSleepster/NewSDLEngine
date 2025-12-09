@@ -1,8 +1,13 @@
 // raddbg 0.9.22 project file
 
+recent_file: path: "W:/NewSDLEngine/run_tree/deps/sokol/sokol_gfx.h"
+recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/startup/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/startup/abort.cpp"
+recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/startup/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/startup/assert.cpp"
+recent_file: path: "W:/NewSDLEngine/code/s_renderer.cpp"
+recent_file: path: "../code/s_renderer.cpp"
+recent_file: path: "../run_tree/deps/sokol/sokol_gfx.h"
 recent_file: path: "../code/tests/memory_arena.cpp"
 recent_file: path: "../code/c_memory_arena.cpp"
-recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/startup/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/startup/abort.cpp"
 recent_file: path: "../code/main.cpp"
 recent_file: path: "../code/g_entity.cpp"
 recent_file: path: "../code/tests/threadpool.cpp"
@@ -20,6 +25,7 @@ target:
   executable: "../build/game_debug.exe"
   working_directory: "../run_tree/res"
   arguments: "--host 7777 "
+  enabled: 1
 }
 target:
 {
@@ -51,5 +57,5 @@ target:
 {
   executable: "../build/test_memory_arena.exe"
   working_directory: "../build/"
-  enabled: 1
+  enabled: 0
 }
