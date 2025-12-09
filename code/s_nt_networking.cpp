@@ -79,9 +79,9 @@ s_nt_init_client_data(game_state_t *state, char *host_ip, u32 port)
     if(state->is_host)
     {     
         struct sockaddr_in bind_addr = {0};
-        bind_addr.sin_family = AF_INET;
+        bind_addr.sin_family      = AF_INET;
         bind_addr.sin_addr.s_addr = INADDR_ANY;
-        bind_addr.sin_port = htons(port);
+        bind_addr.sin_port        = htons(port);
         if(bind(state->socket, (struct sockaddr*)&bind_addr, sizeof(bind_addr)) < 0) 
         {
             fprintf(stderr, "Failed to bind the socket... Error: '%d'...\n", errno);
