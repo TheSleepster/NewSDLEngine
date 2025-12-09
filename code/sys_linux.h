@@ -28,7 +28,7 @@
 #include <poll.h>
 
 #define INVALID_SOCKET      (-1)
-#define INVLAID_FILE_HANDLE (-1)
+#define INVALID_FILE_HANDLE (-1)
 
 #define closesocket(socket) close(socket)
 
