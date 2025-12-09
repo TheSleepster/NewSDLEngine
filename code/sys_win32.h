@@ -19,6 +19,7 @@
 #define errno WSAGetLastError()
 #define SOCKET int
 
+#define INVALID_FILE_HANDLE (null)
 
 #include <c_types.h>
 #include <c_string.h>

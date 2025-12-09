@@ -7,6 +7,7 @@
 #include <c_intrinsics.h>
 #include <c_base.h>
 #include <c_types.h>
+#include <c_math.h>
 
 #include <c_threadpool.h>
 #include <c_threadpool.cpp>

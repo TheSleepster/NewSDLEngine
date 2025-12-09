@@ -67,7 +67,7 @@ c_file_read(string_t filepath, u32 bytes_to_read, u32 file_offset)
     string_t result = {};
 
     file_t file = sys_file_open(filepath, false, false, false);
-    if(file.handle > 0)
+    if(file.handle != INVALID_FILE_HANDLE)
     {
         bytes_to_read = c_file_get_read_size(&file, bytes_to_read, file_offset);
         u8 *data      = (u8 *)sys_allocate_memory(sizeof(u8) * bytes_to_read);
@@ -87,7 +87,7 @@ c_file_read_arena(memory_arena_t *arena, string_t filepath, u32 bytes_to_read, u
     string_t result = {};
     
     file_t file = sys_file_open(filepath, false, false, false);
-    if(file.handle > 0)
+    if(file.handle != INVALID_FILE_HANDLE)
     {
         bytes_to_read = c_file_get_read_size(&file, bytes_to_read, file_offset);
         u8 *data      = (byte*)c_arena_push_size(arena, sizeof(u8) * bytes_to_read);
@@ -107,7 +107,7 @@ c_file_read_za(zone_allocator_t *zone, string_t filepath, u32 bytes_to_read, u32
     string_t result = {};
     
     file_t file = sys_file_open(filepath, false, false, false);
-    if(file.handle > 0)
+    if(file.handle != INVALID_FILE_HANDLE)
     {
         bytes_to_read = c_file_get_read_size(&file, bytes_to_read, file_offset);
         u8 *data      = c_za_alloc(zone, sizeof(u8) * bytes_to_read, tag);
@@ -127,7 +127,7 @@ c_file_open_and_write(string_t filepath, void *data, s64 bytes_to_write, bool8 o
     bool8 result = false;
     
     file_t file = sys_file_open(filepath, true, overwrite, false);
-    if(file.handle > 0)
+    if(file.handle != INVALID_FILE_HANDLE)
     {
         sys_file_write(&file, data, bytes_to_write);
         result = true;
@@ -154,7 +154,7 @@ c_file_get_size(string_t filepath)
     s64 result = 0;
     
     file_t file = sys_file_open(filepath, false, false, false);
-    if(file.handle > 0)
+    if(file.handle != INVALID_FILE_HANDLE)
     {
         result = sys_file_get_size(&file);
         sys_file_close(&file);

@@ -27,8 +27,11 @@
 #include <string.h> 
 #include <poll.h>
 
-#define INVALID_SOCKET (-1)
+#define INVALID_SOCKET      (-1)
+#define INVLAID_FILE_HANDLE (-1)
+
 #define closesocket(socket) close(socket)
+
 
 typedef int sys_handle_t;
 
