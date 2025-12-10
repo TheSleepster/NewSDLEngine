@@ -18,7 +18,7 @@ gc_setup()
     global_context = c_arena_bootstrap_allocate_struct(global_context_t, context_arena, MB(100));
     Assert(global_context != null);
     
-    global_context->temporary_arena = c_arena_create(MB(10));
+    global_context->temporary_arena = c_arena_create(MB(200));
 }
 
 void

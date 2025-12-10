@@ -413,7 +413,13 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
                     visit_file_data->is_directory = true;
                     if(visit_file_data->recursive)
                     {
-                        c_dynarray_push(directories, visit_file_data->fullname);
+                        byte *data = (byte*)c_arena_push_array(&global_context->temporary_arena, byte, visit_file_data->fullname.count);
+                        memcpy(data, visit_file_data->fullname.data, visit_file_data->fullname.count);
+                        data[visit_file_data->fullname.count] = '\0';
+
+                        string_t data_string = {.data = data, .count = visit_file_data->fullname.count};
+                            
+                        c_dynarray_push(directories, data_string);
                     }
                 }
             }

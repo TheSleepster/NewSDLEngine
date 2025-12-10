@@ -5,6 +5,7 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <c_memory_arena.h>
+#include <p_platform_data.h>
 #include <string.h>
 
 memory_arena_t
@@ -13,7 +14,7 @@ c_arena_create(u64 block_size)
     memory_arena_t result = {};
 
     block_size            = Align16(block_size);
-    result.base           = (byte*)malloc(block_size);
+    result.base           = (byte*)sys_allocate_memory(block_size);
     result.used           = 0;
     result.block_size     = block_size;
     result.block_counter += 1;
@@ -31,14 +32,15 @@ c_arena_get_footer(memory_arena_t *arena)
     return(result);
 }
 
-void*
-c_arena_push_size(memory_arena_t *arena, u64 push_size)
+byte*
+c_arena_push_size(memory_arena_t *arena, u64 size_init)
 {
-    Assert(arena->is_initialized);
-    void *result = null;
+    Assert(arena->is_initialized == true);
+    
+    byte *result = null;
 
-    push_size = Align16(push_size);
-    if((arena->used + push_size) >= arena->block_size)
+    u64 size = Align16(size_init);
+    if((arena->used + size) >= arena->block_size)
     {
         if(arena->block_size == 0)
         {
@@ -46,30 +48,28 @@ c_arena_push_size(memory_arena_t *arena, u64 push_size)
         }
 
         memory_arena_footer_t footer;
-        footer.last_base       = arena->base;
-        footer.last_block_size = arena->block_size;
+        footer.last_base       = (u8 *)arena->base;
         footer.last_used       = arena->used;
+        footer.last_block_size = arena->block_size;
 
-        push_size += sizeof(memory_arena_footer_t);
-        u64 new_block_size = push_size > arena->block_size + sizeof(memory_arena_footer_t) ? push_size : arena->block_size;
+        size += sizeof(memory_arena_footer_t);
+        u64 new_block_size = size > (arena->block_size + sizeof(memory_arena_footer_t)) ? size : arena->block_size;
 
         arena->block_size = new_block_size - sizeof(memory_arena_footer_t);
-        arena->base       = (byte*)malloc(new_block_size);
+        arena->base       = (byte *)sys_allocate_memory(new_block_size);
         arena->used       = 0;
-
         arena->block_counter += 1;
 
-        memory_arena_footer_t *arena_footer = c_arena_get_footer(arena); 
+        memory_arena_footer_t *arena_footer = c_arena_get_footer(arena);
         *arena_footer = footer;
     }
-
+    Assert((arena->used + size) <= arena->block_size);
     Assert(arena->base != null);
-    Assert(arena->used + push_size <= arena->block_size);
 
-    u64 offset_ptr = arena->used + push_size;
-    result         = arena->base + offset_ptr;
+    u8 *offset_ptr = ((u8*)arena->base + arena->used);
+    result = offset_ptr;
+    arena->used += size;
 
-    arena->used += push_size;
     return(result);
 }
 
@@ -99,6 +99,7 @@ void
 c_arena_free_last_block(memory_arena_t *arena)
 {
     u8 *block_to_free  = (u8*)arena->base;
+    u64 free_size      = arena->block_size;
 
     memory_arena_footer_t *footer = c_arena_get_footer(arena);
     arena->base       = footer->last_base;
@@ -106,7 +107,7 @@ c_arena_free_last_block(memory_arena_t *arena)
     arena->block_size = footer->last_block_size;
     arena->block_size = footer->last_block_size;
 
-    free(block_to_free);
+    sys_free_memory(block_to_free, free_size);
     arena->block_counter -= 1;
 }
 

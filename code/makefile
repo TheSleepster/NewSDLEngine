@@ -1,8 +1,8 @@
 CXX = clang++
 CC  = clang
 
-SILENT     ?=
-DEBUG_BULD ?=
+SILENT      ?=
+DEBUG_BUILD ?=
 
 # --------------------------------------------
 # Project OS settings
@@ -72,8 +72,8 @@ COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include
 
 ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 
-# Exclude both os_% and sys_% files
-GAME_SRCS  = $(filter-out $(SRC_DIR)/os_% $(SRC_DIR)/sys_%,$(ALL_SRCS))
+# Exclude sys_ files
+GAME_SRCS  = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
@@ -81,6 +81,12 @@ GAME_INCLUDES           = $(COMMON_INCLUDES)
 GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -lSDL3-Static -lfreetype
 EXCLUDE_PATTERNS = sys_%
 
+# Each test executable depends on one test source
+TESTS_SRC := $(wildcard ../code/tests/*.cpp)
+TESTS_OUT := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
+
+ASSET_FILE_PACKER_SRC := ../code/asset_file_packer/asset_file_packer.cpp
+ASSET_FILE_PACKER_OUT  = $(BUILD_DIR)/asset_file_packer$(EXE_EXT)
 
 # --------------------------------------------
 # Set the Outputs
@@ -90,14 +96,19 @@ GAME_OUT   = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
 # --------------------------------------------
 # Create The Build Instructions
 # --------------------------------------------
-.PHONY: all game_out tests clean
+.PHONY: all game_out asset_file_packer tests clean
 
-all: game_out tests
+all: game_out asset_file_packer tests
 
-# Each test executable depends on one test source
-TESTS_SRC := $(wildcard ../code/tests/*.cpp)
-TESTS_OUT := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
+# -------------------------------------------------------------------------
+# Create Build Directory 
+# -------------------------------------------------------------------------
+$(BUILD_DIR):
+	$(call MKDIR,$(BUILD_DIR))
 
+# -------------------------------------------------------------------------
+# Unit Tests
+# -------------------------------------------------------------------------
 tests: $(TESTS_OUT)
 
 # Compile each test source file directly into an executable
@@ -106,10 +117,18 @@ $(BUILD_DIR)/test_%$(EXE_EXT): ../code/tests/%.cpp | $(BUILD_DIR)
 	@$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
 
-# Create build directory
-$(BUILD_DIR):
-	$(call MKDIR,$(BUILD_DIR))
+# -------------------------------------------------------------------------
+# Asset file builder
+# -------------------------------------------------------------------------
+asset_file_packer: $(ASSET_FILE_PACKER_OUT)
 
+$(ASSET_FILE_PACKER_OUT): $(ASSET_FILE_PACKER_SRC) | ../build
+	@echo [Asset File Packer] $@
+	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) $< $(GAME_EXTERNAL_LIBRARIES) -o $@ -MMD -MF ../build/asset_file_packer.d
+
+# -------------------------------------------------------------------------
+# Game build 
+# -------------------------------------------------------------------------
 game_out: $(GAME_OUT)
 
 $(GAME_OUT): $(GAME_OBJS) | $(BUILD_DIR)
@@ -120,9 +139,12 @@ $(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 	@echo Compiling: $< ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) -MMD -MP -c $< -o $@
 
-# Include dependency files (if they exist)
+# -------------------------------------------------------------------------
+# Dependencies 
+# -------------------------------------------------------------------------
 -include $(GAME_DEPS)
 -include $(patsubst ../code/tests/%.cpp,../build/test_%.d,$(TESTS_SRC))
+-include ../build/asset_file_packer.d
 
 clean:
 	-rm -rf $(BUILD_DIR)

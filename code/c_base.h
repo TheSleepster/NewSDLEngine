@@ -198,9 +198,9 @@ typedef void void_func(void);
 
 #define TypeOf(type)          __typeof__(type)
 
-#define KB(x) ((x) * 1000.0f)
-#define MB(x) ((x) * 1000.0f * 1000.0f)
-#define GB(x) ((x) * 1000.0f * 1000.0f)
+#define KB(x) ((u64)(x) * 1024ULL)
+#define MB(x) (KB((x))  * 1024ULL)
+#define GB(x) (MB((x))  * 1024ULL)
 
 // NOTE(Sleepster): C++
 #include <type_traits>

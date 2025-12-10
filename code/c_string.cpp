@@ -66,12 +66,13 @@ c_string_concat(memory_arena_t *arena, string_t A, string_t B)
 {
     string_t result;
     result.count = A.count + B.count;
-    result.data  = (byte*)c_arena_push_size(arena, result.count * sizeof(byte));
+    result.data  = (byte*)c_arena_push_size(arena, (result.count + 1) * sizeof(byte));
     Assert(result.data != null);
 
-    memcpy(result.data,           A.data, A.count);
-    memcpy(result.data + A.count, B.data, B.count);
+    MemoryCopy(result.data,           A.data, A.count);
+    MemoryCopy(result.data + A.count, B.data, B.count);
 
+    result.data[result.count] = '\0';
     return(result);
 }
 
@@ -79,11 +80,14 @@ string_t
 c_string_make_copy(memory_arena_t *arena, string_t string)
 {
     string_t result;
-    result.data = (byte*)c_arena_push_size(arena, string.count * sizeof(byte));
+    result.data = (byte*)c_arena_push_array(arena, byte, string.count);
     if(result.data)
     {
         result.count = string.count;
-        memcpy(result.data, string.data, string.count * sizeof(byte));
+        Assert(string.data);
+        Assert(result.data);
+
+        memcpy(result.data, string.data, string.count);
     }
     else
     {
@@ -186,7 +190,7 @@ string_t
 c_string_get_file_ext_from_path(string_t filepath)
 {
     string_t result = {};
-    s32 ext_start = c_string_find_first_char_from_right(filepath, '.');
+    s32 ext_start = c_string_find_first_char_from_left(filepath, '.');
     if(ext_start != -1)
     {
         result = c_string_substring(filepath, ext_start, filepath.count);
