@@ -26,10 +26,10 @@ hash_table_t
 c_hash_table_create_ma(memory_arena_t *arena, u32 max_entries, usize value_size)
 {
     hash_table_t result;
-    
     void *memory = c_arena_push_size(arena, max_entries * value_size);
     result       = c_hash_table_create_(memory, max_entries, value_size);
 
+    result.is_initialized = true;
     return(result);
 }
 
@@ -40,6 +40,7 @@ c_hash_table_create_za(zone_allocator_t *zone, u32 max_entries, usize value_size
     
     void *memory = c_za_alloc(zone, max_entries * value_size, tag);
     result       = c_hash_table_create_(memory, max_entries, value_size);
+    result.is_initialized = true;
 
     return(result);
 }
@@ -48,10 +49,11 @@ inline hash_table_t
 c_hash_table_create_(void *memory, u32 max_entries, usize value_size)
 {
     hash_table_t result;
-    result.entries       = (hash_table_entry_t *)memory;
-    result.max_entries   = max_entries;
-    result.value_size    = value_size;
-    result.entry_counter = 0;
+    result.is_initialized = true;
+    result.entries        = (hash_table_entry_t *)memory;
+    result.max_entries    = max_entries;
+    result.value_size     = value_size;
+    result.entry_counter  = 0;
 
     return(result);
 }
@@ -67,7 +69,7 @@ c_hash_create_key_index(hash_table_t *table, void *key, usize key_size)
 }
 
 void
-c_hash_insert_kv_pair_(hash_table_t *table, string_t key, void *value, usize value_size)
+c_hash_insert_pair_(hash_table_t *table, string_t key, void *value, usize value_size)
 {
     u64 hash_index = c_hash_create_key_index(table, key.data, key.count);
     Assert(hash_index >= 0);

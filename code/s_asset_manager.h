@@ -109,11 +109,10 @@ typedef struct asset_handle
     asset_slot_t *asset_slot;
     union
     {
-        // TODO(Sleepster): Isn't this REALLLLLLY redudant if we just have a 
-        // pointer to the asset_slot??? 
-        texture_view_t         texture;
+        texture_view_t        *texture;
         dynamic_render_font_t *font;
         //loaded_sound_t      *sound;
+        //render_shader_t     *shader;
     };
 }asset_handle_t;
 
@@ -132,6 +131,18 @@ typedef struct playing_sound
     struct playing_sound *next;
 }playing_sound_t;
 
+typedef struct atlas_packer
+{
+    asset_handle_t           texture_atlas;
+    asset_slot_t             atlas_slot;
+    DynArray(asset_handle_t) textures_to_pack;
+
+    u32                      atlas_cursor_x;
+    u32                      atlas_cursor_y;
+    u32                      largest_width;
+    u32                      largest_height;
+}atlas_packer_t;
+
 typedef struct asset_manager
 {
     threadpool_t      threadpool;
@@ -139,12 +150,18 @@ typedef struct asset_manager
 
     zone_allocator_t *task_allocator;
 
+    string_t          asset_file_data;
+    file_t            asset_file_handle;
+
     struct 
     {
-        zone_allocator_t *texture_allocator;
+        zone_allocator_t        *texture_allocator;
+        u32                      global_view_ID;
 
-        hash_table_t      texture_hash;
-        texture_view_t    null_texture;
+        hash_table_t             texture_hash;
+        texture_view_t           null_texture;
+
+        atlas_packer_t           primary_packer;
     }texture_catalog;
     struct 
     {
@@ -172,9 +189,13 @@ typedef struct asset_manager
 #endif
 }asset_manager_t;
 
-void s_asset_manager_init(asset_manager_t *asset_manager);
+void s_asset_manager_init(asset_manager_t *asset_manager, string_t packed_asset_filepath);
 void c_asset_manager_start_load_task(asset_manager_t *asset_manager, asset_slot_t *asset_slot, zone_allocator_t *zone);
 void s_asset_manager_async_load_asset_data(void *user_data);
+
+void s_asset_packer_init(asset_manager_t *asset_manager, atlas_packer_t *packer, zone_allocator_t *zone);
+void s_asset_packer_add_texture(atlas_packer_t *packer, asset_handle_t texture);
+void s_atlas_packer_pack_textures(asset_manager_t *asset_manager, atlas_packer_t *packer);
 
 #endif // S_ASSET_MANAGER_H
 

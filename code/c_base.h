@@ -184,7 +184,7 @@ typedef void void_func(void);
 #define AssertBreak       (*(char*)0 = 0)
 
 #define StaticAssert(cond, msg) static_assert(cond, msg) 
-#define Expect(cond, ...) if(!(cond)) { fprintf(stderr, "FILE: [%s], LINE: '%d':\t", __FILE__, __LINE__); fprintf(stderr, ##__VA_ARGS__); AssertBreak; }
+#define Expect(cond, ...) if(!(cond)) { fprintf(stderr, "FILE: [%s], LINE: '%d':\t", __FILE__, __LINE__); fprintf(stderr, ##__VA_ARGS__); getchar(); AssertBreak;}
 #define Assert(cond)      if(!(cond)) { AssertBreak; }
 #else
 #define StaticAssert(cond, msg)

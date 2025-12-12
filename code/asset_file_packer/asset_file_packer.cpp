@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <asset_file_packer/asset_file_packer.h>
+
 #include <c_base.h>
 #include <c_types.h>
 #include <c_math.h>
@@ -35,62 +37,6 @@
 #include <c_hash_table.cpp>
 #include <c_file_watcher.cpp>
 #include <p_platform_data.cpp>
-
-#define ASSET_FILE_MAGIC_VALUE(a, b, c, d) (((u32)(a) << 0) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
-#define ASSET_FILE_VERSION 1UL
-
-#pragma pack(push, 1)
-typedef struct asset_file_header
-{
-    u32 magic_value;
-    u32 version;
-    u32 flags;
-    u32 offset_to_table_of_contents;
-}asset_file_header_t;
-
-StaticAssert(sizeof(asset_file_header_t) == 16, "Asset File Packer's Header is not 16 byte aligned...\n");
-
-typedef struct asset_file_table_of_contents
-{
-    u32 magic_value;
-    u32 reserved0;
-
-    s64 entry_count;
-    u64 reserved[6];
-}asset_file_table_of_contents_t;
-
-typedef struct asset_package_entry
-{
-    string_t     name;
-    string_t     filepath;
-    string_t     entry_data;
-    u32          ID;
-    u32          file_ID;
-    asset_type_t type;
-
-    u64          data_offset_from_start_of_file;
-}asset_package_entry_t;
-#pragma pack(pop)
-
-typedef struct packer_state
-{
-    string_t              resource_dir_path;
-    string_t              output_dir;
-    string_t              packed_file_name;
-    string_t              file_extension;
-
-    memory_arena_t        packer_arena;
-    file_t                asset_file_handle;
-
-    string_builder_t      header;
-    string_builder_t      data;
-    string_builder_t      table_of_contents;
-
-    asset_package_entry_t entries[4096];
-    u32                   next_entry_to_write;
-    u32                   next_entry_ID;
-    u32                   entry_count;
-}packer_state_t;
 
 global_variable packer_state_t packer_state;
 
@@ -245,8 +191,8 @@ main(int argc, char **argv)
     packer_state.packer_arena      = c_arena_create(GB(16));
 
     packer_state.packed_file_name  = STR("asset_data");
-    packer_state.resource_dir_path = STR("../run_tree/res");
-    packer_state.output_dir        = STR("../run_tree/res");
+    packer_state.resource_dir_path = STR("../res");
+    packer_state.output_dir        = STR("../res");
     packer_state.file_extension    = STR(".wad");
 
     c_string_builder_init(&packer_state.header,            MB(500));

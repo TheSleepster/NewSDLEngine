@@ -60,7 +60,8 @@ typedef struct texture_view
     bool8         is_in_atlas;
     
     u32           viewID;
-    sg_image     *texture;
+    sg_view       view;
+    sg_filter     filter_type;
 
     // NOTE(Sleepster): Pointers so that if the uv-location of the texture ever 
     // changes, the changes are immediately reflected for each view created for this
@@ -68,13 +69,6 @@ typedef struct texture_view
     vec2_t       *uv_min;
     vec2_t       *uv_max;
 }texture_view_t;
-
-
-struct texture_data_t
-{
-    sg_sampler sampler;
-    sg_image   image;
-};
 
 typedef struct texture2D
 {
@@ -87,7 +81,8 @@ typedef struct texture2D
     bool8           has_AA;
     filter_type_t   filter_type;
 
-    texture_data_t  texture_data;
+    sg_image        image;
+    bool8           is_uploaded;
 }texture2D_t;
 
 /*=============================================

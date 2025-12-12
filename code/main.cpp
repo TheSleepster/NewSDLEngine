@@ -19,6 +19,7 @@
 
 #include <s_nt_networking.h>
 #include <s_input_manager.h>
+#include <s_asset_manager.h>
 #include <s_renderer.h>
 #include <g_game_state.h>
 #include <g_entity.h>
@@ -58,13 +59,21 @@ main(int argc, char **argv)
     render_state_t *render_state = Alloc(render_state_t);
     ZeroStruct(*render_state);
 
+    asset_manager_t *asset_manager = Alloc(asset_manager_t);
+    ZeroStruct(*render_state);
+
     state->window_size = vec2(600, 600);
     if(SDL_Init(SDL_INIT_VIDEO))
     {
         gc_setup();
 
         s_nt_socket_api_init(state, argc, argv);
-        s_init_renderer(render_state, state);
+        s_init_renderer(render_state, asset_manager, state);
+        s_asset_manager_init(asset_manager, STR("asset_data.wad"));
+
+        input_manager_t input_manager = {};
+        s_im_init_input_manager(&input_manager);
+        input_controller_t *game_controller = s_im_get_primary_controller(&input_manager);
 
         u64 perf_count_freq = SDL_GetPerformanceFrequency();
         u64 last_tsc        = SDL_GetPerformanceCounter();
@@ -74,10 +83,6 @@ main(int argc, char **argv)
         float32 delta_time    = 0;
         //float32 delta_time_ms = 0;
         float64 dt_accumulator = 0.0f;
-
-        input_manager_t input_manager = {};
-        s_im_init_input_manager(&input_manager);
-        input_controller_t *game_controller = s_im_get_primary_controller(&input_manager);
 
         g_running = true;
         while(g_running)
@@ -168,7 +173,7 @@ main(int argc, char **argv)
 
             SDL_RenderPresent(state->renderer);
 #endif
-            s_renderer_draw_frame(state, render_state);
+            s_renderer_draw_frame(state, asset_manager, render_state);
             SDL_GL_SwapWindow(state->window);
 
             gc_reset_temporary_data();

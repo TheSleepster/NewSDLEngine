@@ -13,9 +13,6 @@
 #include <c_memory_arena.h>
 #include <c_zone_allocator.h>
 
-
-typedef struct zone_allocator zone_allocator_t;
-
 // NOTE(Sleepster): The key is simply a string because at the end of the day a string is just a byte array anyway... 
 typedef struct hash_table_entry
 {
@@ -25,6 +22,7 @@ typedef struct hash_table_entry
 
 typedef struct hash_table
 {
+    bool8               is_initialized;
     hash_table_entry_t *entries;
     u32                 max_entries;
 
@@ -37,18 +35,18 @@ typedef struct hash_table
 ////////////////////
 const u64 default_fnv_hash_value = 14695981039346656037ULL;
 
-       u64          c_fnv_hash_value(u8 *data, usize element_size, u64 hash_value);
-       hash_table_t c_hash_table_create_ma(memory_arena_t *arena, u32 max_entries, usize value_size);
-       hash_table_t c_hash_table_create_za(zone_allocator_t *zone, u32 max_entries, usize value_size, za_allocation_tag_t tag);
-inline hash_table_t c_hash_table_create_(void *memory, u32 max_entries, usize value_size);
-       void         c_hash_insert_kv_pair_(hash_table_t *table, string_t key, void *value, usize value_size);
-       void*        c_hash_get_value(hash_table_t *table, string_t key);
+u64          c_fnv_hash_value(u8 *data, usize element_size, u64 hash_value);
+hash_table_t c_hash_table_create_ma(memory_arena_t *arena, u32 max_entries, usize value_size);
+hash_table_t c_hash_table_create_za(zone_allocator_t *zone, u32 max_entries, usize value_size, za_allocation_tag_t tag);
+hash_table_t c_hash_table_create_(void *memory, u32 max_entries, usize value_size);
+void         c_hash_insert_pair_(hash_table_t *table, string_t key, void *value, usize value_size);
+void*        c_hash_get_value(hash_table_t *table, string_t key);
 
 // NOTE(Sleepster): This feels stupid...
-       void*        c_hash_get_value_from_raw_index(hash_table_t *table, s32 index);
+void*        c_hash_get_value_from_raw_index(hash_table_t *table, s32 index);
 
 #define c_hash_table_create(memory, max_entries, data_type) c_hash_table_create_(memory, max_entries, sizeof(data_type))
-#define c_hash_insert_kv_pair(table, key, value)            c_hash_insert_kv_pair_(table, key, (void*)value, sizeof(value))
+#define c_hash_insert_pair(table, key, value)               c_hash_insert_pair_(table, key, (void*)value, sizeof(*value))
 
 #endif // C_HASH_TABLE_H
 

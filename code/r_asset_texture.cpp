@@ -24,8 +24,10 @@ s_asset_bitmap_create(zone_allocator_t *zone, s32 width, s32 height, bitmap_form
     result.channels   = format;
     result.stride     = 8 * format;
     result.format     = format;
-    result.data.count = width * height * format;
-    result.data.data  = c_za_alloc(zone, result.data.count, ZA_TAG_TEXTURE);
+
+    result.decompressed_data.count = width * height * format;
+    result.decompressed_data.data  = c_za_alloc(zone, result.decompressed_data.count, ZA_TAG_TEXTURE);
+    ZeroMemory(result.decompressed_data.data, result.decompressed_data.count);
 
     return(result);
 }
@@ -35,9 +37,9 @@ s_asset_texture_view_generate(asset_manager_t *asset_manager, asset_slot_t *vali
 {
     texture_view_t new_view = {}; 
     new_view.is_valid       = true;
-    new_view.texture        = null;
     new_view.uv_min         = &texture_data->uv_min;
     new_view.uv_max         = &texture_data->uv_max;
+    new_view.viewID         =  asset_manager->texture_catalog.global_view_ID;
 
     return(new_view);
 }
@@ -83,13 +85,16 @@ s_asset_texture_load_data(asset_manager_t *asset_manager, asset_handle_t handle)
     asset_slot *asset_slot = handle.asset_slot;
     if((asset_slot->slot_state != ASS_LOADED) && (asset_slot->slot_state != ASS_QUEUED))
     {
+        asset_slot->texture.image     = sg_alloc_image();
+        asset_slot->texture.view.view = sg_alloc_view();
+
         c_asset_manager_start_load_task(asset_manager, asset_slot, asset_manager->texture_catalog.texture_allocator);
         asset_slot->slot_state = ASS_QUEUED;
     }
 
-    if(asset_slot->slot_state == ASS_LOADED)
+    if(asset_slot->slot_state == ASS_LOADED && !asset_slot->texture.is_uploaded)
     {
-        r_texture_upload(&asset_slot->texture, false, TAAFT_NEAREST);
+        r_texture_upload(&asset_slot->texture, false, false, TAAFT_NEAREST);
     }
 }
 
@@ -109,14 +114,14 @@ s_asset_texture_get(asset_manager_t *asset_manager, string_t asset_key)
         if(texture_data->view.is_valid)
         {
             // valid view
-            result.texture = texture_data->view;
+            result.texture = &texture_data->view;
         }
         else
         {
             // generate a new view 
             texture_view_t new_view = s_asset_texture_view_generate(asset_manager, valid_slot, texture_data);
-            texture_data->view = new_view;
-            result.texture     = new_view;
+            texture_data->view =  new_view;
+            result.texture     = &texture_data->view;
         }
 
         s_asset_texture_load_data(asset_manager, result);
@@ -125,7 +130,7 @@ s_asset_texture_get(asset_manager_t *asset_manager, string_t asset_key)
     {
         log_warning("Invalid texture key: '%s', could not find a texture with that name in our packaging system...\n", asset_key.data);
         result.is_valid = false;
-        result.texture  = asset_manager->texture_catalog.null_texture;
+        result.texture  = &asset_manager->texture_catalog.null_texture;
     }
 
     return(result);
@@ -149,7 +154,7 @@ s_asset_texture_destroy_data(asset_manager_t *asset_manager, asset_handle_t hand
     c_za_free(asset_manager->texture_catalog.texture_allocator, bitmap_data->data.data);
 
     free(handle.asset_slot->texture.bitmap.decompressed_data.data);
-    handle.asset_slot->texture.bitmap.decompressed_data.data = null;
+    handle.asset_slot->texture.bitmap.decompressed_data.data  = null;
     handle.asset_slot->texture.bitmap.decompressed_data.count = 0;
 
     handle.asset_slot->texture.bitmap.data.count = 0;
@@ -162,6 +167,6 @@ s_asset_texture_destroy_data(asset_manager_t *asset_manager, asset_handle_t hand
 void
 s_asset_texture_view_destroy(asset_manager_t *asset_manager, asset_handle_t handle)
 {
-    handle.texture.is_valid = false;
-    memset(&handle.texture, 0, sizeof(texture_view_t));
+    handle.texture->is_valid = false;
+    memset(handle.texture, 0, sizeof(texture_view_t));
 }

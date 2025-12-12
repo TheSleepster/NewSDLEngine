@@ -218,7 +218,7 @@ s_asset_font_get_utf8_glyph(asset_manager_t               *asset_manager,
             {
                 s_font_copy_glyph_data_to_page_bitmap(asset_manager, &varient->parent->font_arena, valid_page, glyph);
             }
-            c_hash_insert_kv_pair(&valid_page->glyph_lookup, glyph->hash_key, glyph);
+            c_hash_insert_pair(&valid_page->glyph_lookup, glyph->hash_key, glyph);
             result = glyph;
 
             valid_page->bitmap_dirty = true;

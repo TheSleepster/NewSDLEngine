@@ -140,4 +140,8 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
     memcpy(B_data, A_data, (header->size * sizeof(*A)) + sizeof(dynarray_header_t)); \
 })
 
+#define c_dynarray_for(d_array, iterator)                                   \
+dynarray_header_t *header = (dynarray_header_t *)_dynarray_header(d_array); \
+for(u32 iterator = 0; iterator < header->size; ++iterator)
+
 #endif // C_DYNARRAY_H
