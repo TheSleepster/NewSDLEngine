@@ -14,10 +14,7 @@
 #include <c_math.h>
 #include <c_dynarray.h>
 #include <c_hash_table.h>
-
 #include <s_renderer.h>
-
-#include <sokol/sokol_gfx.h>
 
 enum render_group_flags_t 
 {
@@ -29,12 +26,14 @@ struct render_group_geometry_buffer_t
 {
     u32              geometry_type;
 
+
     render_quad_t   *quad_buffer;
     u32              quad_count;
 
     render_line_t   *line_buffer;
     u32              line_count;
 
+    u32              main_vertex_buffer_offset;
     vertex_t        *vertex_buffer;
     u32              vertex_count;
 
@@ -56,6 +55,12 @@ struct render_group_t
     render_group_render_desc_t     desc;
     render_group_geometry_buffer_t first_buffer;
 };
+
+render_group_geometry_buffer_t* r_render_group_get_buffer(render_state_t *render_state, render_group_t *render_group);
+void                            r_renderpass_begin(render_state_t *render_state);
+void                            r_renderpass_end(render_state_t *render_state);
+void                            r_render_group_to_output(render_state_t *render_state, render_group_t *render_group);
+void                            r_renderpass_update_render_buffers(render_state_t *render_state);
 
 #endif // R_RENDER_GROUP_H
 

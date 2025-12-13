@@ -55,10 +55,11 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
     Expect(header, "D_array header is invalid for macro reserve()...\n");                                                              \
     if(header->capacity < to_reserve) {                                                                                                \
         *p_array = (TypeOf(d_array))_dynarray_grow_impl((void**)p_array, sizeof(*d_array), header->capacity * DYNARRAY_GROWTH_FACTOR); \
-        header = _dynarray_header(*p_array);                                                                                           \
+        header   = _dynarray_header(*p_array);                                                                                         \
+        header->capacity = to_reserve;                                                                                                 \
     }                                                                                                                                  \
                                                                                                                                        \
-    p_array;                                                                                                                           \
+    *p_array;                                                                                                                          \
 })
 
 #define c_dynarray_add_element(d_array, element, index) ({                                                                             \
@@ -130,8 +131,8 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
     Expect(A, "First argument to c_dynarray_copy is invalid...\n")                   \
     dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(A);             \
     if(!B) {                                                                         \
-        B =  c_dynarray_create(TypeOf(*A));                                          \
-        B = *c_dynarray_reserve(B, header->capacity);                                \
+        B = c_dynarray_create(TypeOf(*A));                                           \
+        B = c_dynarray_reserve(B, header->capacity);                                 \
     }                                                                                \
     Expect(B, "Second argument is still invalid...\n");                              \
     Expect(header != null, "Invalid d_array header...\n");                           \

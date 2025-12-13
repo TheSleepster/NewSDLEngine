@@ -14,47 +14,8 @@
 #include <sokol/sokol_log.h>
 
 #include <r_asset_texture.h>
-
+#include <r_render_group.h>
 #include <shaders/test.glsl.h>
-
-render_quad_t*
-r_create_draw_quad(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, asset_handle_t handle)
-{
-    render_quad_t *result = render_state->quad_buffer + render_state->quad_count++;
-
-    result->position = position;
-    result->size     = size;
-    result->color    = color;
-
-    float32 top    = position.y + size.y;
-    float32 left   = position.x;
-    float32 bottom = position.y;
-    float32 right  = position.x + size.x;
-
-    result->bottom_left.v_position  = vec4(left, bottom,  0.0f, 1.0f);
-    result->top_left.v_position     = vec4(left, top,     0.0f, 1.0f);
-    result->top_right.v_position    = vec4(right, top,    0.0f, 1.0f);
-    result->bottom_right.v_position = vec4(right, bottom, 0.0f, 1.0f);
-
-    top    = handle.texture->uv_max->y;
-    left   = handle.texture->uv_min->x;
-    bottom = handle.texture->uv_min->y;
-    right  = handle.texture->uv_max->x;
-
-    result->bottom_left.v_texcoords  = vec2(left,  bottom);
-    result->top_left.v_texcoords     = vec2(left,  top);
-    result->top_right.v_texcoords    = vec2(right, top);
-    result->bottom_right.v_texcoords = vec2(right, bottom);
-
-    for(u32 index = 0;
-        index < 4;
-        ++index)
-    {
-        result->vertices[index].v_color = color;
-    }
-
-    return(result);
-}
 
 // TODO(Sleepster): sg_compare_func
 void
@@ -116,6 +77,7 @@ r_reset_pipeline_render_state(render_state_t *render_state)
 
     render_state->draw_frame.active_render_layer = 16;
     render_state->draw_frame.active_camera       = &render_state->default_camera;
+    render_state->draw_frame.active_shader       = &render_state->default_shader;
 }
 
 render_pipeline_data_t*
@@ -160,7 +122,7 @@ r_get_or_create_pipeline(render_state_t          *render_state,
                         .format       = SG_VERTEXFORMAT_FLOAT4
                     },
                     [1] = {
-                        .buffer_index  = 0,
+                .buffer_index  = 0,
                         .offset        = offsetof(vertex_t, v_color),
                         .format        = SG_VERTEXFORMAT_FLOAT4
                     },
@@ -190,13 +152,10 @@ r_get_or_create_pipeline(render_state_t          *render_state,
             .index_type     = SG_INDEXTYPE_UINT32,
             .cull_mode      = SG_CULLMODE_BACK,
         };
-        new_pipeline_data.ID = render_state->global_pipeline_ID;
-
         new_pipeline_data.pipeline = sg_make_pipeline(&new_pipeline_data.desc);
-        c_dynarray_push(render_state->pipelines, new_pipeline_data);
 
-        result = render_state->pipelines + render_state->global_pipeline_ID;
-        render_state->global_pipeline_ID += 1;
+        c_dynarray_push(render_state->pipelines, new_pipeline_data);
+        result = render_state->pipelines + render_state->created_pipeline_count++;
     }
 
     return(result);
@@ -274,9 +233,9 @@ s_init_renderer(render_state_t *render_state, asset_manager_t *asset_manager, ga
             sg_buffer_desc vertex_buffer_desc = {
                 .size = sizeof(vertex_t) * MAX_VERTICES,
                 .usage = {
-                    .vertex_buffer = true,
-                    .immutable     = false,
-                    .stream_update = true,
+                    .vertex_buffer  = true,
+                    .immutable      = false,
+                    .dynamic_update = true,
                 },
             };
             render_state->bindings.vertex_buffers[0] = sg_make_buffer(&vertex_buffer_desc);
@@ -361,6 +320,10 @@ s_init_renderer(render_state_t *render_state, asset_manager_t *asset_manager, ga
         };
     }
 
+
+    render_state->pipelines = c_dynarray_create(render_pipeline_data_t);
+    render_state->pipelines = c_dynarray_reserve(render_state->pipelines, 50);
+
     render_state->renderer_arena   = c_arena_create(MB(100));
     render_state->draw_frame_arena = c_arena_create(MB(100));
 
@@ -377,30 +340,35 @@ void
 r_test_render(render_state_t *render_state, asset_manager_t *asset_manager)
 {
     asset_handle_t texture_handle = s_asset_texture_get(asset_manager, STR("outline"));
-    r_reset_pipeline_render_state(render_state);
+    asset_handle_t other_texture  = s_asset_texture_get(asset_manager, STR("player"));
+    
+    render_state->draw_frame.active_texture      = render_state->default_texture;
+    render_state->draw_frame.active_render_layer = 10;
+    r_renderpass_begin(render_state);
+    r_draw_rect(render_state, vec2(0.0, 0.0), vec2(200, 200), {1, 1, 1, 1});
+    r_renderpass_end(render_state);
 
-#if 0
-    render_state->draw_frame.active_render_layer = 10
-    render_state->draw_frmae.active_camera       = &game_state->character_camera;
-    render_state->draw_frame.active_shader       = &game_state->character_shader;
-    r_begin_renderpass(render_state);
+    render_state->draw_frame.active_texture = texture_handle;
+    r_renderpass_begin(render_state);
+    r_draw_rect(render_state, vec2(-200.0, 0.0), vec2(200, 200), {1, 1, 1, 1});
+    r_draw_rect(render_state, vec2( 0.0,   100.0), vec2(200, 200), {1, 1, 1, 1});
+    r_renderpass_end(render_state);
 
-    r_draw_quad(render_state);
-
-    r_end_renderpass();
-#endif
-    r_create_draw_quad(render_state, vec2(0.0, 0.0), vec2(200, 200), vec4(1.0, 0.0f, 0.0f, 1.0f), texture_handle);
+    render_state->draw_frame.active_texture      = other_texture;
+    render_state->draw_frame.active_render_layer = 9;
+    render_state->draw_frame.pipeline_state.blending = true;
+    r_renderpass_begin(render_state);
+    r_draw_rect(render_state, vec2(100.0,  100.0), vec2(200, 200), {1, 1, 1, 1});
+    r_renderpass_end(render_state);
+    //r_create_draw_quad(render_state, vec2(0.0, 0.0), vec2(200, 200), vec4(1.0, 0.0f, 0.0f, 1.0f), texture_handle);
 }
 
 void
 s_renderer_draw_frame(game_state_t *state, asset_manager_t *asset_manager, render_state_t *render_state)
 {
+    render_state->default_texture = s_asset_texture_get(asset_manager, STR("null_sprite"));
     asset_handle_t texture_handle = s_asset_texture_get(asset_manager, STR("outline"));
-    if(!texture_handle.texture->is_in_atlas && texture_handle.asset_slot->slot_state == ASS_LOADED)
-    {
-        s_asset_packer_add_texture(&asset_manager->texture_catalog.primary_packer, texture_handle);
-        s_atlas_packer_pack_textures(asset_manager, &asset_manager->texture_catalog.primary_packer);
-    }
+    s_atlas_packer_pack_textures(asset_manager, &asset_manager->texture_catalog.primary_packer);
 
     render_state->bindings.views[VIEW_uTexture]   = texture_handle.texture->view;
     render_state->bindings.samplers[SMP_uSampler] = render_state->nearest_filter_sampler;
@@ -409,38 +377,26 @@ s_renderer_draw_frame(game_state_t *state, asset_manager_t *asset_manager, rende
     s32 window_height;
     SDL_GetWindowSize(state->window, &window_width, &window_height);
 
+    render_state->draw_frame.main_vertex_buffer = c_arena_push_array(&render_state->draw_frame_arena, 
+                                                                      vertex_t, 
+                                                                      render_state->draw_frame.total_vertex_count);
+    Assert(render_state->draw_frame.main_vertex_buffer);
+
     r_test_render(render_state, asset_manager);
+    r_renderpass_update_render_buffers(render_state);
 
-    render_state->view_matrix       = mat4_identity();
-    render_state->projection_matrix = mat4_RHGL_ortho(window_width  * -0.5f, 
-                                                      window_width  *  0.5f,
-                                                      window_height * -0.5f, 
-                                                      window_height *  0.5f,
-                                                      -1.0f, 
-                                                      1.0f);
-    
-    for(u32 quad_index = 0;
-        quad_index < render_state->quad_count;
-        ++quad_index)
-    {
-        render_quad_t *quad = render_state->quad_buffer + quad_index;
-        if(quad)
-        {
-            vertex_t *vertex_buffer_ptr = render_state->vertex_buffer + render_state->vertex_count; 
-
-            vertex_t *bottom_left  = vertex_buffer_ptr + 0;
-            vertex_t *top_left     = vertex_buffer_ptr + 1;
-            vertex_t *top_right    = vertex_buffer_ptr + 2;
-            vertex_t *bottom_right = vertex_buffer_ptr + 3;
-
-            *bottom_left  = quad->bottom_left;
-            *top_left     = quad->top_left;
-            *top_right    = quad->top_right;
-            *bottom_right = quad->bottom_right;
-
-            render_state->vertex_count += 4;
-        }
-    }
+    mat4_t view_matrix       = mat4_identity();
+    mat4_t projection_matrix = mat4_RHGL_ortho(window_width  * -0.5f, 
+                                               window_width  *  0.5f,
+                                               window_height * -0.5f, 
+                                               window_height *  0.5f,
+                                               -1.0f, 
+                                               1.0f); 
+    render_state->default_camera = {
+        .view_matrix            = view_matrix,
+        .projection_matrix      = projection_matrix,
+        .view_projection_matrix = mat4_multiply(view_matrix, projection_matrix)
+    };
 
     sg_pass renderpass_desc = {
         .action = render_state->pass_action,
@@ -452,29 +408,30 @@ s_renderer_draw_frame(game_state_t *state, asset_manager_t *asset_manager, rende
     };
     sg_begin_pass(&renderpass_desc);
 
+    Assert(render_state->draw_frame.used_render_group_count > 0);
+    Assert(render_state->draw_frame.total_vertex_count > 0);
 
     sg_range vertex_buffer_range = {
-        .ptr  = render_state->vertex_buffer,
-        .size = render_state->vertex_count * sizeof(vertex_t)
+        .ptr  = render_state->draw_frame.main_vertex_buffer,
+        .size = render_state->draw_frame.total_vertex_count * sizeof(vertex_t)
     };
     sg_update_buffer(render_state->bindings.vertex_buffers[0], vertex_buffer_range);
-    sg_apply_pipeline(render_state->pipeline);
-    sg_apply_bindings(render_state->bindings);
 
-    VSParams_t matrices = {};
-    memcpy(matrices.uProjectionMatrix, render_state->projection_matrix.values, sizeof(float32) * 16);
-    memcpy(matrices.uViewMatrix,       render_state->view_matrix.values,       sizeof(float32) * 16);
+    for(u32 render_group_index = 0;
+        render_group_index < render_state->draw_frame.used_render_group_count;
+        ++render_group_index)
+    {
+        u32 ID = render_state->draw_frame.used_render_groups[render_group_index];
+        render_group_t *render_group = render_state->render_groups + ID;
 
-    sg_range matrix_range = {
-        .ptr  = &matrices,
-        .size = sizeof(VSParams_t)
-    };
-    sg_apply_uniforms(UB_VSParams, matrix_range);
-
-    sg_draw(0, 6, 1);
+        r_render_group_to_output(render_state, render_group);
+    }
     sg_end_pass();
-
     sg_commit();
-    render_state->quad_count   = 0;
-    render_state->vertex_count = 0;
+
+    render_state->draw_frame.used_render_group_count = 0;
+    render_state->draw_frame.total_vertex_count      = 0;
+    c_arena_reset(&render_state->draw_frame_arena);
+    ZeroMemory(render_state->draw_frame.used_render_groups,
+               sizeof(u32) * render_state->draw_frame.used_render_group_count);
 }

@@ -39,7 +39,7 @@ s_asset_texture_view_generate(asset_manager_t *asset_manager, asset_slot_t *vali
     new_view.is_valid       = true;
     new_view.uv_min         = &texture_data->uv_min;
     new_view.uv_max         = &texture_data->uv_max;
-    new_view.viewID         =  asset_manager->texture_catalog.global_view_ID;
+    new_view.viewID         =  asset_manager->texture_catalog.global_view_ID++;
 
     return(new_view);
 }
@@ -95,6 +95,7 @@ s_asset_texture_load_data(asset_manager_t *asset_manager, asset_handle_t handle)
     if(asset_slot->slot_state == ASS_LOADED && !asset_slot->texture.is_uploaded)
     {
         r_texture_upload(&asset_slot->texture, false, false, TAAFT_NEAREST);
+        s_asset_packer_add_texture(&asset_manager->texture_catalog.primary_packer, handle);
     }
 }
 

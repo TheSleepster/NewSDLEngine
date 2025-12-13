@@ -31,7 +31,12 @@ out vec4 vOutFragColor;
 
 void main() 
 {
-    vOutFragColor = texelFetch(sampler2D(uTexture, uSampler), ivec2(vOutTexCoords), 0);
+    vec4 TextureColor = texelFetch(sampler2D(uTexture, uSampler), ivec2(vOutTexCoords), 0);
+    if(TextureColor.a < 0.05)
+    {
+        discard;
+    }
+    vOutFragColor = TextureColor * vOutColor;
 }
 @end
 

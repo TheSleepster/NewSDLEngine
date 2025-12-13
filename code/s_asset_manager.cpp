@@ -112,6 +112,7 @@ s_asset_manager_init(asset_manager_t *asset_manager, string_t packed_asset_filep
     asset_manager->font_catalog.font_hash      = c_hash_table_create_ma(&asset_manager->manager_arena, 
                                                                               MANAGER_HASH_TABLE_SIZE, 
                                                                               sizeof(asset_slot_t));
+    stbi_set_flip_vertically_on_load(1);
     FT_Error error = FT_Init_FreeType(&asset_manager->font_catalog.font_lib);
     if(error != 0)
     {
@@ -182,8 +183,8 @@ s_asset_manager_async_load_asset_data(void *user_data)
                                                                        &bitmap->height,
                                                                        &bitmap->channels,
                                                                        BMF_RGBA32);
-                bitmap->decompressed_data.count = strlen((char *)bitmap->decompressed_data.data);
-                bitmap->format = BMF_RGBA32;
+                bitmap->format = (bitmap_format_t)bitmap->channels;
+                bitmap->decompressed_data.count = bitmap->format * (bitmap->width * bitmap->height);
                 bitmap->stride = 32;
             }break;
             case AT_FONT:
@@ -228,6 +229,10 @@ s_asset_packer_add_texture(atlas_packer_t *packer, asset_handle_t texture)
     c_dynarray_push(packer->textures_to_pack, texture);
 }
 
+// TODO(Sleepster): In this function, when we update the texture's view data and image data
+// we're creating a huge leak because we're allocating the textures and views using sokol, but never
+// freeing them. So when we reassign them, the original view is just lost to the abyss... 
+// This is obviously not great... TOO BAD!
 void
 s_atlas_packer_pack_textures(asset_manager_t *asset_manager, atlas_packer_t *packer)
 {
@@ -235,9 +240,8 @@ s_atlas_packer_pack_textures(asset_manager_t *asset_manager, atlas_packer_t *pac
     c_dynarray_for(packer->textures_to_pack, texture_index) 
     {
         asset_handle_t *handle = packer->textures_to_pack + texture_index;
-        if(handle->texture->is_in_atlas) 
+        if(handle->texture->is_in_atlas || (handle->asset_slot->slot_state != ASS_LOADED)) 
         {
-            log_warning("Texture has been added to this atlas already...\n");
             continue;
         }
 
