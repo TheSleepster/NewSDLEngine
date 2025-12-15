@@ -6,8 +6,8 @@
    ======================================================================== */
 #include <c_base.h>
 #include <c_types.h>
-
 #include <c_dynarray.h>
+
 #include <stdlib.h>
 
 void*
@@ -22,7 +22,8 @@ _dynarray_create_impl(u32 element_size)
     dynarray_header_t *header = (dynarray_header_t*)result;
     result = (byte*)result + sizeof(dynarray_header_t);
 
-    header->capacity = DYNARRAY_INITIAL_SIZE;
+    header->header_id = DYNARRAY_HEADER_DEBUG_NUMBER;
+    header->capacity  = DYNARRAY_INITIAL_SIZE;
 
     return(result);
 }
@@ -30,14 +31,24 @@ _dynarray_create_impl(u32 element_size)
 void*
 _dynarray_grow_impl(void **array, u32 element_size, u32 new_capacity)
 {
+    Expect(array != null, "Array is invalid...\n");
+
+    dynarray_header_t *header = _dynarray_header(*array); 
+
+    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_NUMBER, "Header ID is invalid...\n");
     Expect(new_capacity > DYNARRAY_INITIAL_SIZE, "new capacity is <= Initial\n");
     void *result = null;
     result = (byte*)*array - sizeof(dynarray_header_t);
+    
+    u64 old_size = header->capacity * element_size;
+    u64 new_size = new_capacity     * element_size;
 
     result = realloc(result, (element_size * new_capacity) + sizeof(dynarray_header_t));
+    memset((byte*)result + sizeof(dynarray_header_t) + old_size, 0, new_size - old_size);
+
     result = (byte*)result + sizeof(dynarray_header_t);
 
-    dynarray_header_t *header = _dynarray_header(result);
+    header = _dynarray_header(result); 
     header->capacity = new_capacity;
 
     return(result);
@@ -46,6 +57,11 @@ _dynarray_grow_impl(void **array, u32 element_size, u32 new_capacity)
 void
 _dynarray_destroy_impl(void **array)
 {
+    Expect(array != null, "Array is invalid...\n");
+
+    dynarray_header_t *header = _dynarray_header(*array); 
+    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_NUMBER, "Header ID is invalid...\n");
+
     void *array_data = (byte *)*array - sizeof(dynarray_header_t);
     free(array_data);
 
@@ -55,6 +71,11 @@ _dynarray_destroy_impl(void **array)
 void
 _dynarray_insert_impl(void **array, void *element, u32 element_size, u32 index)
 {
+    Expect(array != null, "Array is invalid...\n");
+
+    dynarray_header_t *header = _dynarray_header(*array); 
+    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_NUMBER, "Header ID is invalid...\n");
+
     byte *index_data = (byte*)*array + (element_size * index);
     memcpy(index_data, element, element_size);
 }
@@ -62,10 +83,13 @@ _dynarray_insert_impl(void **array, void *element, u32 element_size, u32 index)
 void
 _dynarray_remove_impl(void **array, u32 element_size, u32 index)
 {
-    byte *array_data          = (byte*)*array;
-    dynarray_header_t *header = (dynarray_header_t*)((byte*)*array - sizeof(dynarray_header_t));
+    Expect(array != null, "Array header is invalid...\n");
 
+    dynarray_header_t *header = _dynarray_header(*array); 
+    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_NUMBER, "Header ID is invalid...\n");
     Expect(index <= header->size, "Index is > to that of the header->size");
+
+    byte *array_data = (byte*)*array;
     if(index < header->size - 1) 
     {
         byte *to   = array_data + (element_size * index);

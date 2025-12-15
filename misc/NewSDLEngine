@@ -1,16 +1,18 @@
 // raddbg 0.9.22 project file
 
-recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/startup/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/startup/abort.cpp"
-recent_file: path: "../code/s_renderer.cpp"
-recent_file: path: "../code/r_asset_texture.cpp"
-recent_file: path: "../code/s_asset_manager.cpp"
 recent_file: path: "../run_tree/deps/sokol/sokol_gfx.h"
 recent_file: path: "../code/r_render_group.cpp"
-recent_file: path: "../code/tests/dynarray.cpp"
-recent_file: path: "../code/r_render_interface.cpp"
+recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/startup/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/startup/abort.cpp"
 recent_file: path: "../code/main.cpp"
-recent_file: path: "../run_tree/deps/sokol/sokol_log.h"
+recent_file: path: "../code/s_renderer.cpp"
+recent_file: path: "../code/r_render_interface.cpp"
+recent_file: path: "../code/r_asset_dynamic_render_font.cpp"
+recent_file: path: "../code/c_math.h"
+recent_file: path: "../code/r_asset_texture.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/startup/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/startup/assert.cpp"
+recent_file: path: "../run_tree/deps/sokol/sokol_log.h"
+recent_file: path: "../code/s_asset_manager.cpp"
+recent_file: path: "../code/tests/dynarray.cpp"
 recent_file: path: "W:/NewSDLEngine/code/r_render_group.cpp"
 recent_file: path: "../code/c_hash_table.cpp"
 recent_file: path: "W:/NewSDLEngine/code/s_asset_manager.cpp"
@@ -84,9 +86,4 @@ target:
   executable: "../build/asset_file_packer.exe"
   working_directory: "../run_tree/res"
   enabled: 0
-}
-watch_pin:
-{
-  expression: "*render_group.desc"
-  source_location: "../code/r_render_group.cpp:178:1"
 }

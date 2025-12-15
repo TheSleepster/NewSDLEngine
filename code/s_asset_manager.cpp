@@ -9,11 +9,8 @@
 #include <s_asset_manager.h>
 #include <c_hash_table.h>
 #include <p_platform_data.h>
-#include <s_renderer.h>
 
 #include <asset_file_packer/asset_file_packer.h>
-
-#define TEXTURE_ATLAS_SIZE (2048)
 
 void
 s_asset_manager_read_asset_file_entries(asset_manager_t                *asset_manager,
@@ -87,7 +84,7 @@ s_asset_manager_read_asset_file_entries(asset_manager_t                *asset_ma
                 InvalidCodePath;
             }break;
         }
-        log_info("ASSET: '%s' READ FROM FILE...\n", slot_data->filename.data);
+        log_trace("ASSET: '%s' READ FROM FILE...\n", slot_data->filename.data);
     }
 }
 
@@ -176,9 +173,9 @@ s_asset_manager_async_load_asset_data(void *user_data)
             case AT_BITMAP:
             {
                 bitmap_t *bitmap = &slot->texture.bitmap;
-                bitmap->data = c_file_read_za(zone, filepath, READ_ENTIRE_FILE, 0, ZA_TAG_STATIC);
-                bitmap->decompressed_data.data = stbi_load_from_memory(bitmap->data.data,
-                                                                       bitmap->data.count,
+                bitmap->decompressed_data      = c_file_read_za(zone, filepath, READ_ENTIRE_FILE, 0, ZA_TAG_STATIC);
+                bitmap->decompressed_data.data = stbi_load_from_memory(bitmap->decompressed_data.data,
+                                                                       bitmap->decompressed_data.count,
                                                                        &bitmap->width,
                                                                        &bitmap->height,
                                                                        &bitmap->channels,
@@ -215,9 +212,6 @@ s_asset_packer_init(asset_manager_t *asset_manager, atlas_packer_t *packer, zone
                                                                                 BMF_RGBA32, 
                                                                                 false, 
                                                                                 TAAFT_NEAREST);
-    packer->atlas_slot.texture.image     = sg_alloc_image();
-    packer->atlas_slot.texture.view.view = sg_alloc_view();
-    r_texture_upload(&packer->texture_atlas.asset_slot->texture, true, false, TAAFT_NEAREST);
 }
 
 void
@@ -279,10 +273,8 @@ s_atlas_packer_pack_textures(asset_manager_t *asset_manager, atlas_packer_t *pac
                                    packer->atlas_cursor_y + bitmap_data->height);
 
             texture->view.is_in_atlas =  true;
-            texture->view.view        =  packer->texture_atlas.asset_slot->texture.view.view;
             texture->view.uv_min      = &texture->uv_min;
             texture->view.uv_max      = &texture->uv_max;
-
 
             packer->atlas_cursor_x += bitmap_data->width;
             packer->atlas_cursor_y += bitmap_data->height;
@@ -306,12 +298,5 @@ s_atlas_packer_pack_textures(asset_manager_t *asset_manager, atlas_packer_t *pac
         }
     }
 
-    sg_image_data image_data = {
-        .mip_levels[0] = {
-            .ptr  = atlas_bitmap->decompressed_data.data,
-            .size = atlas_bitmap->decompressed_data.count
-        },
-    };
-    sg_update_image(packer->texture_atlas.asset_slot->texture.image, &image_data);
     c_dynarray_clear(packer->textures_to_pack);
 }

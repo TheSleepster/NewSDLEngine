@@ -22,8 +22,6 @@ main(void)
     test_elements = c_dynarray_create(u32);
     test_elements = c_dynarray_reserve(test_elements, 50);
 
-    dynarray_header_t *header = _dynarray_header(test_elements); 
-
     printf("testing pushing and auto creation...\n");
     for(u32 index = 0;
         index < ITERATIONS;

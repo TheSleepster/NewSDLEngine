@@ -8,7 +8,6 @@
 
 #define G_GAME_STATE_H
 #include <SDL3/SDL.h>
-#include <sokol/sokol_gfx.h>
 
 #include <c_base.h>
 #include <c_types.h>

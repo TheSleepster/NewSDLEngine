@@ -14,15 +14,18 @@
 #include <c_threadpool.h>
 #include <c_log.h>
 #include <c_globals.h>
+#include <r_vulkan.h>
 
 #include <p_platform_data.h>
 
 #include <s_nt_networking.h>
 #include <s_input_manager.h>
 #include <s_asset_manager.h>
-#include <s_renderer.h>
 #include <g_game_state.h>
 #include <g_entity.h>
+
+struct render_context_t;
+void r_renderer_init(render_context_t *render_context);
 
 internal_api void
 c_process_window_events(SDL_Window *window, input_manager_t *input_manager)
@@ -56,20 +59,24 @@ main(int argc, char **argv)
     game_state_t *state = Alloc(game_state_t);
     ZeroStruct(*state);
 
-    render_state_t *render_state = Alloc(render_state_t);
-    ZeroStruct(*render_state);
-
-    asset_manager_t *asset_manager = Alloc(asset_manager_t);
-    ZeroStruct(*render_state);
+    render_context_t *render_context = Alloc(render_context_t);
 
     state->window_size = vec2(600, 600);
     if(SDL_Init(SDL_INIT_VIDEO))
     {
-        gc_setup();
+        state->window = SDL_CreateWindow("Vulkan...", 
+                                         800,
+                                         800, 
+                                         SDL_WINDOW_VULKAN|SDL_WINDOW_FULLSCREEN);
+        if(state->window == null)
+        {
+            log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
+        }
 
+        r_renderer_init(render_context);
+
+        gc_setup();
         s_nt_socket_api_init(state, argc, argv);
-        s_init_renderer(render_state, asset_manager, state);
-        s_asset_manager_init(asset_manager, STR("asset_data.wad"));
 
         input_manager_t input_manager = {};
         s_im_init_input_manager(&input_manager);
@@ -151,31 +158,7 @@ main(int argc, char **argv)
             }
 #if 0
             float32 alpha = (dt_accumulator / gcv_tick_rate);
-
-            SDL_SetRenderDrawColor(state->renderer, 1, 0, 0, 0);
-            SDL_RenderClear(state->renderer);
-
-            for(u32 entity_index = 0;
-                entity_index < state->entity_manager.active_entities;
-                ++entity_index)
-            {
-                entity_t *entity = state->entity_manager.entities + entity_index;
-                SDL_SetRenderDrawColor(state->renderer, 255, 0, 0, 255);
-                vec2_t lerped_pos = vec2_lerp(entity->last_position, entity->position, alpha);
-                SDL_FRect rect = {
-                    .x = lerped_pos.x,
-                    .y = lerped_pos.y,
-                    .w = 60,
-                    .h = 60
-                };
-                SDL_RenderFillRect(state->renderer, &rect);
-            }
-
-            SDL_RenderPresent(state->renderer);
 #endif
-            s_renderer_draw_frame(state, asset_manager, render_state);
-            SDL_GL_SwapWindow(state->window);
-
             gc_reset_temporary_data();
 
             current_tsc = SDL_GetPerformanceCounter();
@@ -193,3 +176,4 @@ main(int argc, char **argv)
         Assert(false);
     }
 }
+

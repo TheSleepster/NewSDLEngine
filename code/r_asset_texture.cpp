@@ -13,8 +13,6 @@
 #include <s_asset_manager.h>
 #include <r_asset_texture.h>
 
-#include <s_renderer.h>
-
 bitmap_t
 s_asset_bitmap_create(zone_allocator_t *zone, s32 width, s32 height, bitmap_format_t format)
 {
@@ -85,16 +83,12 @@ s_asset_texture_load_data(asset_manager_t *asset_manager, asset_handle_t handle)
     asset_slot *asset_slot = handle.asset_slot;
     if((asset_slot->slot_state != ASS_LOADED) && (asset_slot->slot_state != ASS_QUEUED))
     {
-        asset_slot->texture.image     = sg_alloc_image();
-        asset_slot->texture.view.view = sg_alloc_view();
-
         c_asset_manager_start_load_task(asset_manager, asset_slot, asset_manager->texture_catalog.texture_allocator);
         asset_slot->slot_state = ASS_QUEUED;
     }
 
     if(asset_slot->slot_state == ASS_LOADED && !asset_slot->texture.is_uploaded)
     {
-        r_texture_upload(&asset_slot->texture, false, false, TAAFT_NEAREST);
         s_asset_packer_add_texture(&asset_manager->texture_catalog.primary_packer, handle);
     }
 }
@@ -152,16 +146,15 @@ s_asset_texture_destroy_data(asset_manager_t *asset_manager, asset_handle_t hand
     bitmap_t *bitmap_data = &handle.asset_slot->texture.bitmap;
 
     c_za_DEBUG_validate_block_list(asset_manager->texture_catalog.texture_allocator);
-    c_za_free(asset_manager->texture_catalog.texture_allocator, bitmap_data->data.data);
+    c_za_free(asset_manager->texture_catalog.texture_allocator, bitmap_data->decompressed_data.data);
 
-    free(handle.asset_slot->texture.bitmap.decompressed_data.data);
-    handle.asset_slot->texture.bitmap.decompressed_data.data  = null;
+    free(handle.asset_slot->texture.bitmap.compressed_data.data);
+    handle.asset_slot->texture.bitmap.compressed_data.data  = null;
+    handle.asset_slot->texture.bitmap.compressed_data.count = 0;
+
     handle.asset_slot->texture.bitmap.decompressed_data.count = 0;
+    handle.asset_slot->texture.bitmap.decompressed_data.data  = null;
 
-    handle.asset_slot->texture.bitmap.data.count = 0;
-    handle.asset_slot->texture.bitmap.data.data  = null;
-
-    bitmap_data->data.count = 0;
     handle.asset_slot->slot_state = ASS_UNLOADED;
 }
 

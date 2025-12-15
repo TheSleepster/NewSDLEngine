@@ -7,8 +7,6 @@
    ======================================================================== */
 
 #define R_ASSET_TEXTURE_H
-#include <sokol/sokol_gfx.h>
-
 #include <c_types.h>
 #include <c_log.h>
 #include <c_memory_arena.h>
@@ -42,7 +40,7 @@ typedef struct bitmap
     s32             stride;
     
     // NOTE(Sleepster): byte arrays essentially. 
-    string_t        data;
+    string_t        compressed_data;
     string_t        decompressed_data;
 }bitmap_t;
 
@@ -60,8 +58,6 @@ typedef struct texture_view
     bool8         is_in_atlas;
     
     u32           viewID;
-    sg_view       view;
-    sg_filter     filter_type;
 
     // NOTE(Sleepster): Pointers so that if the uv-location of the texture ever 
     // changes, the changes are immediately reflected for each view created for this
@@ -81,7 +77,6 @@ typedef struct texture2D
     bool8           has_AA;
     filter_type_t   filter_type;
 
-    sg_image        image;
     bool8           is_uploaded;
 }texture2D_t;
 

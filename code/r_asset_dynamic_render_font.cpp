@@ -58,7 +58,7 @@ s_font_atlas_find_next_free_line(dynamic_render_font_page_t *page, s32 glyph_wid
 {
     vec2_t result;
     s32 desired_x = page->bitmap_cursor_x + glyph_width;
-    if(desired_x > page->font_atlas.bitmap.width)
+    if(desired_x > page->atlas_texture->bitmap.width)
     {
         page->bitmap_cursor_x  = 0;
         page->bitmap_cursor_y += page->owner_varient->max_ascender;
@@ -81,18 +81,17 @@ s_font_copy_glyph_data_to_page_bitmap(asset_manager_t            *asset_manager,
 {
     if(!page->bitmap_valid)
     {
-        page->font_atlas.bitmap.format     = BMF_RGBA32;
-        page->font_atlas.bitmap.channels   = 4;
-        page->font_atlas.bitmap.width      = 4096;
-        page->font_atlas.bitmap.height     = 4096;
-        page->font_atlas.bitmap.stride     = 32;
-        page->font_atlas.bitmap.data.data  = (byte*)c_arena_push_size(arena, (4096 * 4096 * 4) * sizeof(u8));
-        page->font_atlas.bitmap.data.count = (4096 * 4096 * 4) * sizeof(u8);
-        page->font_atlas.uv_min            = vec2(0.0, 0.0);
-        page->font_atlas.uv_max            = vec2(1.0, 1.0);
-        page->font_atlas.has_AA            = false;
-        page->font_atlas.filter_type       = TAAFT_NEAREST;
-        page->font_atlas.view              = s_asset_texture_view_generate(asset_manager, null, &page->font_atlas);
+        texture2D_t *font_atlas = &page->atlas_handle->asset_slot->texture;
+        font_atlas->bitmap.format     = BMF_RGBA32;
+        font_atlas->bitmap.channels   = 4;
+        font_atlas->bitmap.width      = 4096;
+        font_atlas->bitmap.height     = 4096;
+        font_atlas->bitmap.stride     = 32;
+        font_atlas->uv_min            = vec2(0.0, 0.0);
+        font_atlas->uv_max            = vec2(1.0, 1.0);
+        font_atlas->has_AA            = false;
+        font_atlas->filter_type       = TAAFT_NEAREST;
+        font_atlas->view              = s_asset_texture_view_generate(asset_manager, null, font_atlas);
         
         page->bitmap_valid = true;
     }
@@ -109,11 +108,11 @@ s_font_copy_glyph_data_to_page_bitmap(asset_manager_t            *asset_manager,
 
     glyph->glyph_render_size = vec2(glyph_width, row_height);
     vec2_t bitmap_offset     = s_font_atlas_find_next_free_line(page, glyph_width, row_height);
-    glyph->atlas_offset      = vec2((float32)bitmap_offset.x / (float32)page->font_atlas.bitmap.width,
-                                    (float32)bitmap_offset.y / (float32)page->font_atlas.bitmap.height);
+    glyph->atlas_offset      = vec2((float32)bitmap_offset.x / (float32)page->atlas_texture->bitmap.width,
+                                    (float32)bitmap_offset.y / (float32)page->atlas_texture->bitmap.height);
 
-    glyph->glyph_size = vec2((float32)glyph_width / (float32)page->font_atlas.bitmap.width,
-                             (float32)row_height  / (float32)page->font_atlas.bitmap.height);
+    glyph->glyph_size = vec2((float32)glyph_width / (float32)page->atlas_texture->bitmap.width,
+                             (float32)row_height  / (float32)page->atlas_texture->bitmap.height);
     
     for(s32 row = 0;
         row < row_height;
@@ -124,7 +123,7 @@ s_font_copy_glyph_data_to_page_bitmap(asset_manager_t            *asset_manager,
             ++column)
         {
             u8  source = font_face->glyph->bitmap.buffer[(row_height - 1 - row) * font_face->glyph->bitmap.pitch + column];
-            u8 *dest   = (u8 *)page->font_atlas.bitmap.data.data + (((u32)bitmap_offset.y + row) * page->font_atlas.bitmap.width + ((u32)bitmap_offset.x + column)) * 4;
+            u8 *dest   = (byte*)page->atlas_texture->bitmap.decompressed_data.data + (((u32)bitmap_offset.y + row) * page->atlas_texture->bitmap.width + ((u32)bitmap_offset.x + column)) * 4;
 
             dest[0] = source;
             dest[1] = source;
@@ -132,8 +131,32 @@ s_font_copy_glyph_data_to_page_bitmap(asset_manager_t            *asset_manager,
             dest[3] = source;
         }
     }
-    
     page->bitmap_cursor_x += font_face->glyph->bitmap.width;
+}
+
+dynamic_render_font_page_t*
+s_asset_font_create_new_font_page(asset_manager_t *asset_manager, dynamic_render_font_varient_t *varient)
+{
+    dynamic_render_font_page_t *result = c_arena_push_struct(&varient->parent->font_arena, dynamic_render_font_page_t);
+    result->glyph_lookup             = c_hash_table_create_ma(&varient->parent->font_arena, 1000, sizeof(font_glyph_t));
+    result->atlas_handle             = c_arena_push_struct(&varient->parent->font_arena, asset_handle_t);
+    result->atlas_handle->is_valid   = true;
+    result->atlas_handle->asset_slot = c_arena_push_struct(&varient->parent->font_arena, asset_slot_t);
+    result->atlas_handle->asset_slot->slot_state = ASS_LOADED;
+    result->atlas_handle->asset_slot->asset_type = AT_BITMAP;
+    result->atlas_handle->asset_slot->texture = s_asset_texture_and_view_create(asset_manager, 
+                                                                                asset_manager->font_catalog.font_allocator, 
+                                                                                TEXTURE_ATLAS_SIZE, 
+                                                                                TEXTURE_ATLAS_SIZE, 
+                                                                                BMF_RGBA32, 
+                                                                                true, 
+                                                                                TAAFT_LINEAR);
+    result->atlas_handle->texture = &result->atlas_handle->asset_slot->texture.view;
+    result->atlas_texture = &result->atlas_handle->asset_slot->texture;
+    result->owner_varient =  varient;
+    result->next_page     =  null;
+
+    return(result);
 }
 
 font_glyph_t*
@@ -177,13 +200,7 @@ s_asset_font_get_utf8_glyph(asset_manager_t               *asset_manager,
             
             if(!valid_page)
             {
-                dynamic_render_font_page_t *new_page = null;
-                last_page->next_page = c_arena_push_struct(&varient->parent->font_arena, dynamic_render_font_page_t);
-
-                last_page->next_page->glyph_lookup   = c_hash_table_create_ma(&varient->parent->font_arena, 1000, sizeof(font_glyph_t));
-                last_page->next_page->next_page      = null;
-                last_page->next_page->owner_varient  = varient;
-
+                dynamic_render_font_page_t *new_page = s_asset_font_create_new_font_page(asset_manager, varient);
                 last_page->next_page = new_page;
             }
 
@@ -219,9 +236,8 @@ s_asset_font_get_utf8_glyph(asset_manager_t               *asset_manager,
                 s_font_copy_glyph_data_to_page_bitmap(asset_manager, &varient->parent->font_arena, valid_page, glyph);
             }
             c_hash_insert_pair(&valid_page->glyph_lookup, glyph->hash_key, glyph);
+            glyph->owner_page->bitmap_dirty = true;
             result = glyph;
-
-            valid_page->bitmap_dirty = true;
         }
     }
     
@@ -284,11 +300,7 @@ s_asset_font_create_at_size(asset_manager_t *asset_manager, asset_handle_t handl
             result = c_arena_push_struct(&font->font_arena, dynamic_render_font_varient_t);
 
             result->parent     = font;
-            result->first_page = c_arena_push_struct(&font->font_arena, dynamic_render_font_page_t);
-        
-            result->first_page->glyph_lookup  = c_hash_table_create_ma(&result->parent->font_arena, 1000, sizeof(font_glyph_t));
-            result->first_page->owner_varient = result;
-            result->first_page->next_page     = null;
+            result->first_page = s_asset_font_create_new_font_page(asset_manager, result);
 
             error = FT_Set_Pixel_Sizes(font->font_face, 0, size);
             Assert(!error);
@@ -357,11 +369,7 @@ s_asset_font_get_at_size(asset_manager_t *asset_manager, asset_handle_t handle, 
     dynamic_render_font_varient_t *result = null;
     
     dynamic_render_font_t *font = handle.font;
-
-    dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(font->pixel_sizes);
-    for(u32 pixel_size = 0;
-        pixel_size < header->size;
-        ++pixel_size)
+    c_dynarray_for(font->pixel_sizes, pixel_size)
     {
         dynamic_render_font_varient_t *varient = c_dynarray_get_at_index(font->pixel_sizes, pixel_size);
         if(size == varient->pixel_size)

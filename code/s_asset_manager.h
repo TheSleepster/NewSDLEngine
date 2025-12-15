@@ -7,8 +7,6 @@
    ======================================================================== */
 
 #define S_ASSET_MANAGER_H
-#include <sokol/sokol_gfx.h>
-
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -25,7 +23,9 @@
 
 #define MANAGER_HASH_TABLE_SIZE 1024
 #define MAX_TEXTURE_VIEWS       1024
+#define TEXTURE_ATLAS_SIZE      (2048)
 
+struct render_state_t;
 typedef struct asset_file_table_of_contents asset_file_table_of_contents_t;
 
 #if 0
@@ -83,7 +83,6 @@ typedef struct asset_slot
     union
     {
         texture2D_t           texture;
-        sg_shader             shader;
         //loaded_sound_t        loaded_sound;
         dynamic_render_font_t render_font;
     };
@@ -190,11 +189,13 @@ typedef struct asset_manager
 }asset_manager_t;
 
 void s_asset_manager_init(asset_manager_t *asset_manager, string_t packed_asset_filepath);
+void s_asset_manager_init(asset_manager_t *asset_manager, string_t packed_asset_filepath);
 void c_asset_manager_start_load_task(asset_manager_t *asset_manager, asset_slot_t *asset_slot, zone_allocator_t *zone);
 void s_asset_manager_async_load_asset_data(void *user_data);
 
 void s_asset_packer_init(asset_manager_t *asset_manager, atlas_packer_t *packer, zone_allocator_t *zone);
 void s_asset_packer_add_texture(atlas_packer_t *packer, asset_handle_t texture);
+void s_asset_packer_init(asset_manager_t *asset_manager, atlas_packer_t *packer, zone_allocator_t *zone);
 void s_atlas_packer_pack_textures(asset_manager_t *asset_manager, atlas_packer_t *packer);
 
 #endif // S_ASSET_MANAGER_H

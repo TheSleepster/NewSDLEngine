@@ -13,12 +13,14 @@
 #include <c_base.h>
 #include <c_types.h>
 
+#define DYNARRAY_HEADER_DEBUG_NUMBER (0xC0FFEEul)
+
 typedef struct dynarray_header 
 {
     u32   flags;
     u32   size;
     u32   capacity;
-    u32   _reserved;
+    u32   header_id;
 }dynarray_header_t;
 
 StaticAssert(sizeof(dynarray_header_t) % 16 == 0, "Dynamic Array header must be 16 byte aligned");
@@ -49,17 +51,17 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
     d_array;                                  \
 })
 
-#define c_dynarray_reserve(d_array, to_reserve) ({                                                                                     \
-    TypeOf(d_array)   *p_array = &(d_array);                                                                                           \
-    dynarray_header_t *header  = (dynarray_header_t *)_dynarray_header(d_array);                                                       \
-    Expect(header, "D_array header is invalid for macro reserve()...\n");                                                              \
-    if(header->capacity < to_reserve) {                                                                                                \
-        *p_array = (TypeOf(d_array))_dynarray_grow_impl((void**)p_array, sizeof(*d_array), header->capacity * DYNARRAY_GROWTH_FACTOR); \
-        header   = _dynarray_header(*p_array);                                                                                         \
-        header->capacity = to_reserve;                                                                                                 \
-    }                                                                                                                                  \
-                                                                                                                                       \
-    *p_array;                                                                                                                          \
+#define c_dynarray_reserve(d_array, to_reserve) ({                                                        \
+    TypeOf(d_array)   *p_array = &(d_array);                                                              \
+    dynarray_header_t *header  = (dynarray_header_t *)_dynarray_header(d_array);                          \
+    Expect(header, "D_array header is invalid for macro reserve()...\n");                                 \
+    if(header->capacity < to_reserve) {                                                                   \
+        u32 new_capacity = Max(header->capacity * 2, to_reserve);                                         \
+        *p_array = (TypeOf(d_array))_dynarray_grow_impl((void**)p_array, sizeof(*d_array), new_capacity); \
+        header   = _dynarray_header(*p_array);                                                            \
+    }                                                                                                     \
+                                                                                                          \
+    *p_array;                                                                                             \
 })
 
 #define c_dynarray_add_element(d_array, element, index) ({                                                                             \
@@ -101,12 +103,12 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
     p_first;                                                                     \
 })
 
-#define c_dynarray_pop(d_array) ({                                                     \
-        dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(d_array);     \
-        Expect(header, "DArray header is invalid...\n");                               \
-        TypeOf(*(d_array)) r_value = c_dynarray_remove_element(d_array, header->size); \
-                                                                                       \
-        r_value;                                                                       \
+#define c_dynarray_pop(d_array) ({                                                         \
+        dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(d_array);         \
+        Expect(header, "DArray header is invalid...\n");                                   \
+        TypeOf(*(d_array)) r_value = c_dynarray_remove_element(d_array, header->size - 1); \
+                                                                                           \
+        r_value;                                                                           \
     })
 
 #define c_dynarray_get_at_index(d_array, index) ({                             \
@@ -143,6 +145,6 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
 
 #define c_dynarray_for(d_array, iterator)                                   \
 dynarray_header_t *header = (dynarray_header_t *)_dynarray_header(d_array); \
-for(u32 iterator = 0; iterator < header->size; ++iterator)
+if(header) for(u32 iterator = 0; iterator < header->size; ++iterator)
 
 #endif // C_DYNARRAY_H

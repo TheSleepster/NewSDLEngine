@@ -70,7 +70,7 @@ typedef struct dynamic_render_font
     
     memory_arena_t                           font_arena;
     string_t                                 loaded_data;
-
+    
     DynArray(dynamic_render_font_varient_t*) pixel_sizes;
 }dynamic_render_font_t;
 
@@ -81,7 +81,8 @@ typedef struct dynamic_render_font_page
     bool8                            bitmap_dirty;
 
     hash_table_t                     glyph_lookup;
-    texture2D_t                      font_atlas;
+    asset_handle_t                  *atlas_handle;
+    texture2D_t                     *atlas_texture;
 
     s32                              bitmap_cursor_x;
     s32                              bitmap_cursor_y;

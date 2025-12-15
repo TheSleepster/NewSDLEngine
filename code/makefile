@@ -50,14 +50,14 @@ endif
 # --------------------------------------------
 # Build Flags
 # --------------------------------------------
-PROJECT_COMMON_COMPILER_FLAGS = -std=c++20 -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator
+PROJECT_COMMON_COMPILER_FLAGS = -std=c++20 -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -fsanitize=address
 
 BUILD_TYPE ?= debug
-ifeq ($(DEBUG_BUILD),1)
-    BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FLAGS)
-else
-    BUILD_COMPILER_FLAGS = -O3 $(PROJECT_COMMON_COMPILER_FLAGS)
-endif
+BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FLAGS)
+# ifeq ($(DEBUG_BUILD),1)
+# else
+#     BUILD_COMPILER_FLAGS = -O3 $(PROJECT_COMMON_COMPILER_FLAGS)
+# endif
 
 # --------------------------------------------
 # Directories
@@ -78,7 +78,7 @@ GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
-GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -lSDL3-Static -lfreetype
+GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -lSDL3-Static -lfreetype -lvulkan
 EXCLUDE_PATTERNS = sys_%
 
 # Each test executable depends on one test source
