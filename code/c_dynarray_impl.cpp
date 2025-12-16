@@ -22,7 +22,7 @@ _dynarray_create_impl(u32 element_size)
     dynarray_header_t *header = (dynarray_header_t*)result;
     result = (byte*)result + sizeof(dynarray_header_t);
 
-    header->header_id = DYNARRAY_HEADER_DEBUG_NUMBER;
+    header->header_id = DYNARRAY_HEADER_DEBUG_ID;
     header->capacity  = DYNARRAY_INITIAL_SIZE;
 
     return(result);
@@ -35,7 +35,7 @@ _dynarray_grow_impl(void **array, u32 element_size, u32 new_capacity)
 
     dynarray_header_t *header = _dynarray_header(*array); 
 
-    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_NUMBER, "Header ID is invalid...\n");
+    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
     Expect(new_capacity > DYNARRAY_INITIAL_SIZE, "new capacity is <= Initial\n");
     void *result = null;
     result = (byte*)*array - sizeof(dynarray_header_t);
@@ -60,7 +60,7 @@ _dynarray_destroy_impl(void **array)
     Expect(array != null, "Array is invalid...\n");
 
     dynarray_header_t *header = _dynarray_header(*array); 
-    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_NUMBER, "Header ID is invalid...\n");
+    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
 
     void *array_data = (byte *)*array - sizeof(dynarray_header_t);
     free(array_data);
@@ -74,7 +74,7 @@ _dynarray_insert_impl(void **array, void *element, u32 element_size, u32 index)
     Expect(array != null, "Array is invalid...\n");
 
     dynarray_header_t *header = _dynarray_header(*array); 
-    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_NUMBER, "Header ID is invalid...\n");
+    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
 
     byte *index_data = (byte*)*array + (element_size * index);
     memcpy(index_data, element, element_size);
@@ -86,7 +86,7 @@ _dynarray_remove_impl(void **array, u32 element_size, u32 index)
     Expect(array != null, "Array header is invalid...\n");
 
     dynarray_header_t *header = _dynarray_header(*array); 
-    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_NUMBER, "Header ID is invalid...\n");
+    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
     Expect(index <= header->size, "Index is > to that of the header->size");
 
     byte *array_data = (byte*)*array;

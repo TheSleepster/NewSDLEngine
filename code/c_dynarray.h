@@ -13,7 +13,7 @@
 #include <c_base.h>
 #include <c_types.h>
 
-#define DYNARRAY_HEADER_DEBUG_NUMBER (0xC0FFEEul)
+#define DYNARRAY_HEADER_DEBUG_ID (0xC0FFEE)
 
 typedef struct dynarray_header 
 {

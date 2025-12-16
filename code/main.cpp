@@ -25,7 +25,7 @@
 #include <g_entity.h>
 
 struct render_context_t;
-void r_renderer_init(render_context_t *render_context);
+void r_renderer_init(vulkan_render_context_t *render_context);
 
 internal_api void
 c_process_window_events(SDL_Window *window, input_manager_t *input_manager)
@@ -59,7 +59,8 @@ main(int argc, char **argv)
     game_state_t *state = Alloc(game_state_t);
     ZeroStruct(*state);
 
-    render_context_t *render_context = Alloc(render_context_t);
+    vulkan_render_context_t *render_context = Alloc(vulkan_render_context_t);
+    ZeroStruct(*render_context);
 
     state->window_size = vec2(600, 600);
     if(SDL_Init(SDL_INIT_VIDEO))
@@ -73,6 +74,7 @@ main(int argc, char **argv)
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
         }
 
+        render_context->window = state->window;
         r_renderer_init(render_context);
 
         gc_setup();
