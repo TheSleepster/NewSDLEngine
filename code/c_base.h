@@ -185,18 +185,37 @@ typedef void void_func(void);
 
 #define StaticAssert(cond, msg) static_assert(cond, msg) 
 #define Expect(cond, ...) if(!(cond)) { fprintf(stderr, "FILE: [%s], LINE: '%d':\t", __FILE__, __LINE__); fprintf(stderr, ##__VA_ARGS__); getchar(); AssertBreak;}
-#define Assert(cond)      if(!(cond)) { AssertBreak; }
+#define Assert(cond)      if(!(cond)) { AssertBreak; getchar(); }
 #else
 #define StaticAssert(cond, msg)
 #define Expect(cond, ...)
 #define Assert(cond)
 #endif
 
-#define Alloc(type)             (type*)malloc(sizeof(type))
-#define AllocArray(type, count) (type*)malloc(sizeof(type) * count)
-#define AllocSize(size)                malloc(size)
+// NOTE(Sleepster): By default virtual memory pages are zeroed for you. 
+// Why malloc doesn't do this is beyond me. Probably has to do with speed...
+#define TypeOf(type) __typeof__(type)
 
-#define TypeOf(type)          __typeof__(type)
+#define Alloc(type) ({                    \
+    void *_result = malloc(sizeof(type)); \
+    ZeroMemory(_result, sizeof(type));    \
+                                          \
+    (type*)_result;                       \
+})
+
+#define AllocArray(type, count) ({                \
+    void *_result = malloc(sizeof(type) * count); \
+    ZeroMemory(_result, sizeof(type) * count);    \
+                                                  \
+    (type*)_result;                               \
+})
+
+#define AllocSize(size) ({        \
+    void *_result = malloc(size); \
+    ZeroMemory(_result, size);    \
+                                  \
+    _result;                      \
+})
 
 #define KB(x) ((u64)(x) * 1024ULL)
 #define MB(x) (KB((x))  * 1024ULL)

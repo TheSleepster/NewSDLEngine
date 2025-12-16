@@ -73,6 +73,8 @@ typedef struct vulkan_rendering_device
     VkQueue                  transfer_queue;
     VkQueue                  compute_queue;
 
+    VkCommandPool            graphics_command_pool;
+
     VkDevice                 logical_device;
 }vulkan_rendering_device_t; 
 
@@ -127,6 +129,9 @@ typedef struct vulkan_command_buffer_data
 {
     VkCommandBuffer               handle;
     vulkan_command_buffer_state_t state;
+
+    bool8                         is_primary_buffer;
+    bool8                         is_single_use;
 }vulkan_command_buffer_data_t;
 
 //////////////////////////////////
@@ -135,8 +140,9 @@ typedef struct vulkan_command_buffer_data
 
 typedef enum vulkan_renderpass_state
 {
+    // NOTE(Sleepster): Not allocated 
     VKRPS_INVALID,
-    VKRPS_NOT_ALLOCATED,
+
     VKRPS_RECORDING,
     VKRPS_WITHIN_RENDERPASS,
     VKRPS_RECORDING_ENDED,
@@ -164,24 +170,29 @@ typedef struct vulkan_renderpass_data
 
 typedef struct vulkan_render_context
 {
-    SDL_Window               *window;
-    u32                       window_width;
-    u32                       window_height;
+    SDL_Window                   *window;
+    u32                           window_width;
+    u32                           window_height;
         
-    VkInstance                instance;
-    VkAllocationCallbacks    *allocators;
+    VkInstance                    instance;
+    VkAllocationCallbacks        *allocators;
 
-    VkSurfaceKHR              render_surface;
-    vulkan_rendering_device_t rendering_device;
+    VkSurfaceKHR                  render_surface;
+    vulkan_rendering_device_t     rendering_device;
 
-    vulkan_swapchain_data_t   swapchain;
-    u32                       current_image_index;
-    u32                       current_frame_index;
-    u32                       framebuffer_width;
-    u32                       framebuffer_height;
-    bool8                     recreating_swapchain;
+    vulkan_swapchain_data_t       swapchain;
+    u32                           current_image_index;
+    u32                           current_frame_index;
+    u32                           framebuffer_width;
+    u32                           framebuffer_height;
+    bool8                         recreating_swapchain;
 
-    vulkan_renderpass_data_t  main_renderpass;
+    VkSemaphore                  *frame_semaphores;
+    VkFence                      *frame_fences;
+
+    vulkan_command_buffer_data_t *graphics_command_buffers;
+
+    vulkan_renderpass_data_t      main_renderpass;
 
     VkDebugUtilsMessengerEXT debug_callback;
 }vulkan_render_context_t;

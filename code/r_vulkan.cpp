@@ -169,6 +169,156 @@ r_vulkan_image_create(vulkan_render_context_t *render_context,
 }
 
 ////////////////////////////
+// VULKAN COMMAND BUFFER 
+////////////////////////////
+
+vulkan_command_buffer_data_t
+r_vulkan_command_buffer_acquire(vulkan_render_context_t *render_context,
+                                VkCommandPool            command_pool,
+                                bool8                    is_primary_buffer)
+{
+    vulkan_command_buffer_data_t result = {};
+    result.is_primary_buffer = is_primary_buffer;
+
+    VkCommandBufferAllocateInfo command_buffer_allocate_info = {
+        .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .commandPool        = command_pool,
+        .commandBufferCount = 1,
+        .level              = is_primary_buffer ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY
+    };
+    // NOTE(Sleepster): This RETURNS the command buffer, so I don't think this is needed... 
+    VkAssert(vkAllocateCommandBuffers(render_context->rendering_device.logical_device, 
+                                     &command_buffer_allocate_info, 
+                                     &result.handle));
+    result.state = VKCBS_READY;
+
+    return(result);
+}
+
+void
+r_vulkan_command_buffer_release(vulkan_render_context_t      *render_context,
+                                vulkan_command_buffer_data_t *command_buffer,
+                                VkCommandPool                 command_pool)
+{
+    Assert(command_buffer->handle);
+    Assert(command_buffer->state != VKCBS_INVALID);
+
+    vkFreeCommandBuffers(render_context->rendering_device.logical_device, 
+                         command_pool, 
+                         1, 
+                         &command_buffer->handle);
+    command_buffer->handle = null;
+    command_buffer->state  = VKCBS_INVALID;
+}
+
+void
+r_vulkan_command_buffer_begin(vulkan_command_buffer_data_t *command_buffer, 
+                              bool8                         single_use, 
+                              bool8                         renderpass_continue, 
+                              bool8                         simultaneous_usage)
+{
+    Assert(command_buffer->state == VKCBS_READY);
+
+    // NOTE(Sleepster): 
+    // https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkCommandBufferUsageFlagBits.html 
+    u32 begin_flags = 0;
+    if(single_use)
+    {
+        begin_flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    }
+    if(renderpass_continue)
+    {
+        begin_flags |= VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+    }
+    if(simultaneous_usage)
+    {
+        begin_flags |= VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+    }
+
+    VkCommandBufferBeginInfo begin_info = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        .flags = begin_flags
+    };
+
+    VkAssert(vkBeginCommandBuffer(command_buffer->handle, &begin_info));
+    command_buffer->state = VKCBS_RECORDING;
+}
+
+void 
+r_vulkan_command_buffer_end(vulkan_command_buffer_data_t *command_buffer)
+{
+    Assert(command_buffer->state == VKCBS_RECORDING || 
+           command_buffer->state == VKCBS_WITHIN_RENDERPASS);
+
+    vkEndCommandBuffer(command_buffer->handle);
+    command_buffer->state = VKCBS_RECORDING_ENDED;
+}
+
+void
+r_vulkan_command_buffer_submit(vulkan_command_buffer_data_t *command_buffer)
+{
+    Assert(command_buffer->state == VKCBS_RECORDING_ENDED);
+    command_buffer->state = VKCBS_SUBMITTED;
+}
+
+void
+r_vulkan_command_buffer_reset(vulkan_command_buffer_data_t *command_buffer)
+{
+    command_buffer->state = VKCBS_READY;
+}
+
+vulkan_command_buffer_data_t
+r_vulkan_command_buffer_initialize_scratch_buffer(vulkan_render_context_t *render_context, 
+                                                  VkCommandPool            command_pool)
+{
+    vulkan_command_buffer_data_t result;
+    result = r_vulkan_command_buffer_acquire(render_context, command_pool, true);
+    r_vulkan_command_buffer_begin(&result, true, false, false);
+
+    return(result);
+}
+
+void
+r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *render_context,
+                                                vulkan_command_buffer_data_t *command_buffer,
+                                                VkCommandPool                 command_pool,
+                                                VkQueue                       queue)
+{
+    r_vulkan_command_buffer_end(command_buffer);
+    VkSubmitInfo submit_info = {
+        .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .commandBufferCount = 1,
+        .pCommandBuffers    = &command_buffer->handle
+    };
+
+    // TODO(Sleepster): No fence???
+    VkAssert(vkQueueSubmit(queue, 1, &submit_info, 0));
+
+    // NOTE(Sleepster): Hack since we aren't using a fence... 
+    VkAssert(vkQueueWaitIdle(queue));
+    r_vulkan_command_buffer_release(render_context, command_buffer, command_pool);
+}
+
+void
+r_vulkan_initialize_graphics_command_buffers(vulkan_render_context_t *render_context)
+{
+    render_context->graphics_command_buffers = AllocArray(vulkan_command_buffer_data_t, 
+                                                          render_context->swapchain.max_frames_in_flight);
+    Assert(render_context->graphics_command_buffers);
+    for(u32 frame_index = 0;
+        frame_index < render_context->swapchain.max_frames_in_flight;
+        ++frame_index)
+    {
+        vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + frame_index; 
+        Assert(!command_buffer->handle);
+        
+        *command_buffer = r_vulkan_command_buffer_acquire(render_context, 
+                                                          render_context->rendering_device.graphics_command_pool, 
+                                                          true);
+    }
+}
+
+////////////////////////////
 // VULKAN RENDERPASS 
 ////////////////////////////
 
@@ -181,6 +331,9 @@ r_vulkan_renderpass_create(vulkan_render_context_t *render_context,
                            u32                      stencil_value)
 {
     vulkan_renderpass_data_t result = {};
+    result.clear_color   = clear_color;
+    result.depth_clear   = clear_depth;
+    result.stencil_clear = stencil_value;
 
     VkSubpassDescription primary_subpass = {};
     primary_subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -773,6 +926,7 @@ r_vulkan_physical_device_is_supported(vulkan_render_context_t                   
             {
                 device_avaliable_extensions = AllocArray(VkExtensionProperties, device_avaliable_extension_counter);
             }
+            VkAssert(vkEnumerateDeviceExtensionProperties(device, 0, &device_avaliable_extension_counter, device_avaliable_extensions));
 
             for(u32 extension_index = 0;
                 extension_index < ArrayCount(requirements->required_extensions);
@@ -1131,14 +1285,26 @@ r_renderer_init(vulkan_render_context_t *render_context)
                                &render_context->rendering_device.logical_device));
         log_info("Logical device created...\n");
 
-#if 0
+        // TODO(Sleepster): Shouldn't we be using the queue at index 2 here for one of these? 
         vkGetDeviceQueue(render_context->rendering_device.logical_device, render_context->rendering_device.graphics_queue_family_index, 0, &render_context->rendering_device.graphics_queue);
-        vkGetDeviceQueue(render_context->rendering_device.logical_device, render_context->rendering_device.present_queue_family_index,  1, &render_context->rendering_device.present_queue);
+        vkGetDeviceQueue(render_context->rendering_device.logical_device, render_context->rendering_device.present_queue_family_index,  0, &render_context->rendering_device.present_queue);
         vkGetDeviceQueue(render_context->rendering_device.logical_device, render_context->rendering_device.transfer_queue_family_index, 0, &render_context->rendering_device.transfer_queue);
         vkGetDeviceQueue(render_context->rendering_device.logical_device, render_context->rendering_device.compute_queue_family_index,  0, &render_context->rendering_device.compute_queue);
 
         log_info("Device Queues gathered...\n");
-#endif
+
+        // NOTE(Sleepster): For the flags:
+        // https://vkdoc.net/man/VkCommandPoolCreateFlagBits
+        VkCommandPoolCreateInfo command_pool_info = {
+            .sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+            .queueFamilyIndex = render_context->rendering_device.graphics_queue_family_index,
+            .flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT
+        };
+        VkAssert(vkCreateCommandPool(render_context->rendering_device.logical_device, 
+                                    &command_pool_info, 
+                                     render_context->allocators, 
+                                    &render_context->rendering_device.graphics_command_pool));
+        log_info("Device Command Pools created...\n");
     }
     render_context->swapchain       = r_vulkan_swapchain_create(render_context, render_context->window_width, render_context->window_height, true, null);
     render_context->main_renderpass = r_vulkan_renderpass_create(render_context, 
@@ -1147,6 +1313,8 @@ r_renderer_init(vulkan_render_context_t *render_context)
                                                                  {0.3, 0.2, 0.4, 1.0}, 
                                                                  0.0f, 
                                                                  0);
+    r_vulkan_initialize_graphics_command_buffers(render_context);
+    log_info("Command buffers initialized...\n");
 
     log_info("Vulkan context initialized...\n");
 }

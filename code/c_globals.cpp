@@ -7,6 +7,8 @@
 #include <c_globals.h>
 #include <c_math.h>
 
+#include <stdio.h>
+
 vec2_t g_window_size = {};
 bool8 g_running      = false;
 
