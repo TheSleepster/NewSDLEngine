@@ -79,60 +79,14 @@ typedef struct vulkan_rendering_device
 }vulkan_rendering_device_t; 
 
 //////////////////////////////////
-// VULKAN IMAGE STUFF 
+// VULKAN FENCES 
 //////////////////////////////////
 
-typedef struct vulkan_image_data
+typedef struct vulkan_fence
 {
-    VkImage        handle;
-    VkDeviceMemory memory;
-    VkFormat       format;
-
-    VkImageView    view;
-
-    u32            width;
-    u32            height;
-}vulkan_image_data_t;
-
-typedef struct vulkan_swapchain_data
-{
-    VkSwapchainKHR      handle;
-    VkSurfaceFormatKHR  image_format;
-    VkPresentModeKHR    present_mode;
-    vulkan_image_data_t depth_attachment;
-    bool32              has_depth_attachment;
-
-    u32                max_frames_in_flight;
-    u32                image_count;
-
-    VkImage           *images;
-    VkImageView       *views;
-}vulkan_swapchain_data_t;
-
-//////////////////////////////////
-// VULKAN COMMAND BUFFER STUFF 
-//////////////////////////////////
-
-typedef enum vulkan_command_buffer_state
-{
-    VKCBS_INVALID,
-    VKCBS_NOT_ALLOCATED,
-    VKCBS_READY,
-    VKCBS_RECORDING,
-    VKCBS_WITHIN_RENDERPASS,
-    VKCBS_RECORDING_ENDED,
-    VKCBS_SUBMITTED,
-    VKCBS_COUNT,
-}vulkan_command_buffer_state_t;
-
-typedef struct vulkan_command_buffer_data
-{
-    VkCommandBuffer               handle;
-    vulkan_command_buffer_state_t state;
-
-    bool8                         is_primary_buffer;
-    bool8                         is_single_use;
-}vulkan_command_buffer_data_t;
+    VkFence handle;
+    bool8   signaled;
+}vulkan_fence_t;
 
 //////////////////////////////////
 // VULKAN RENDERPASS STUFF 
@@ -163,6 +117,81 @@ typedef struct vulkan_renderpass_data
     vulkan_renderpass_state_t renderpass_state;
 }vulkan_renderpass_data_t;
 
+//////////////////////////////////
+// VULKAN FRAMEBUFFER STUFF 
+//////////////////////////////////
+
+typedef struct vulkan_framebuffer_data
+{
+    VkFramebuffer             handle;
+    vulkan_renderpass_data_t *renderpass;
+
+    VkImageView              *attachments;
+    u32                       attachment_count;
+}vulkan_framebuffer_data_t;
+
+//////////////////////////////////
+// VULKAN IMAGE STUFF 
+//////////////////////////////////
+
+typedef struct vulkan_image_data
+{
+    VkImage        handle;
+    VkDeviceMemory memory;
+    VkFormat       format;
+
+    VkImageView    view;
+
+    u32            width;
+    u32            height;
+}vulkan_image_data_t;
+
+//////////////////////////////////
+// VULKAN SWAPCHAIN 
+//////////////////////////////////
+
+typedef struct vulkan_swapchain_data
+{
+    bool8                      is_valid;
+
+    VkSwapchainKHR             handle;
+    VkSurfaceFormatKHR         image_format;
+    VkPresentModeKHR           present_mode;
+    vulkan_image_data_t        depth_attachment;
+    bool32                     has_depth_attachment;
+
+    u32                        max_frames_in_flight;
+    u32                        image_count;
+
+    vulkan_framebuffer_data_t *framebuffers;
+    VkImage                   *images;
+    VkImageView               *views;
+}vulkan_swapchain_data_t;
+
+//////////////////////////////////
+// VULKAN COMMAND BUFFER STUFF 
+//////////////////////////////////
+
+typedef enum vulkan_command_buffer_state
+{
+    VKCBS_INVALID,
+    VKCBS_NOT_ALLOCATED,
+    VKCBS_READY,
+    VKCBS_RECORDING,
+    VKCBS_WITHIN_RENDERPASS,
+    VKCBS_RECORDING_ENDED,
+    VKCBS_SUBMITTED,
+    VKCBS_COUNT,
+}vulkan_command_buffer_state_t;
+
+typedef struct vulkan_command_buffer_data
+{
+    VkCommandBuffer               handle;
+    vulkan_command_buffer_state_t state;
+
+    bool8                         is_primary_buffer;
+    bool8                         is_single_use;
+}vulkan_command_buffer_data_t;
 
 //////////////////////////////////
 // VULKAN RENDER CONTEXT 
@@ -183,12 +212,22 @@ typedef struct vulkan_render_context
     vulkan_swapchain_data_t       swapchain;
     u32                           current_image_index;
     u32                           current_frame_index;
+
     u32                           framebuffer_width;
     u32                           framebuffer_height;
+    u32                           cached_framebuffer_width;
+    u32                           cached_framebuffer_height;
+
+    u32                           current_framebuffer_size_generation;
+    u32                           last_framebuffer_size_generation;
     bool8                         recreating_swapchain;
 
-    VkSemaphore                  *frame_semaphores;
-    VkFence                      *frame_fences;
+    // NOTE(Sleepster): Semaphores are for GPU -> GPU signaling
+    //                  Fences are for CPU -> GPU operation ordering 
+    VkSemaphore                  *queue_finished_semaphores;
+    VkSemaphore                  *image_avaliable_semaphores;
+    vulkan_fence_t               *image_fences;
+    vulkan_fence_t              **frame_fences;
 
     vulkan_command_buffer_data_t *graphics_command_buffers;
 
@@ -201,6 +240,7 @@ void  r_renderer_init(vulkan_render_context_t *render_context);
 void  r_vulkan_physical_device_get_swapchain_support_info(vulkan_render_context_t *context, VkPhysicalDevice device, vulkan_physical_device_swapchain_support_info_t *swapchain_info);
 bool8 r_vulkan_physical_device_detect_depth_format(vulkan_physical_device_t *device);
 
-s32  r_vulkan_find_memory_index(vulkan_render_context_t *render_context, u32 type_filter, u32 property_flags);
+s32   r_vulkan_find_memory_index(vulkan_render_context_t *render_context, u32 type_filter, u32 property_flags);
+bool8 r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context);
 #endif // R_VULKAN_H
 

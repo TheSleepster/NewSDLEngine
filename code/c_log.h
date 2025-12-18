@@ -23,7 +23,7 @@ typedef enum debug_log_level
     SL_LOG_FATAL
 }debug_log_level_t;
 
-#define Log(log_level, message, ...) _log(log_level, message, __FILE__, __LINE__, ##__VA_ARGS__)
+#define Log(log_level, message, ...) _log(log_level, message, __FUNCTION__, __FILE__, __LINE__, ##__VA_ARGS__)
 
 #define log_trace(message, ...)    Log(SL_LOG_TRACE,   message, ##__VA_ARGS__)
 #define log_info(message, ...)     Log(SL_LOG_INFO,    message, ##__VA_ARGS__)
@@ -32,16 +32,20 @@ typedef enum debug_log_level
 #define log_fatal(message, ...)    Log(SL_LOG_FATAL,   message, ##__VA_ARGS__)
 
 inline void
-_log(debug_log_level_t log_level, const char *message, char *file, s32 line, ...)
+_log(debug_log_level_t log_level, 
+     const char       *message, 
+     const char       *function, 
+     const char       *file, 
+     s32               line, ...)
 {
     const char *info_strings[] = {"[TRACE]: ", "[INFO]: ", "[WARNING]:", "[NON-FATAL ERROR]: ", "[FATAL ERROR]: "};
     const char *color_schemes[]  =
     {
-        "\033[36m",          // LOG_TRACE:   Teal
-        "\033[32m",          // LOG_INFO:    Green
-        "\033[33m",          // LOG_WARNING: Yellow
-        "\033[31m",          // LOG_ERROR:   Red
-        "\033[41m\033[30m"   // LOG_FATAL:   Red background, Black text
+        "\033[36m",                // LOG_TRACE:   Teal
+        "\033[32m",                // LOG_INFO:    Green
+        "\033[33m",                // LOG_WARNING: Yellow
+        "\033[31m",                // LOG_ERROR:   Red
+        "\033[1m\033[101m\033[30m" // LOG_FATAL:   Bold, bright red bg, true black text
     };
     bool8 is_error = (log_level > 1);
 
@@ -58,17 +62,27 @@ _log(debug_log_level_t log_level, const char *message, char *file, s32 line, ...
 
     if(is_error)
     {
-        sprintf(out_buffer, "%s%s[File: %s, Line %d] %s\033[0m\n", color_schemes[log_level], info_strings[log_level], file, line, buffer);
+        sprintf(out_buffer, 
+                "%s%s[File: %s, Line: %d, Function: %s]: %s\033[0m\n", 
+                color_schemes[log_level], 
+                info_strings[log_level], 
+                file, 
+                line, 
+                function, 
+                buffer);
     }
     else
     {
-        sprintf(out_buffer, "%s%s%s\033[0m", color_schemes[log_level], info_strings[log_level], buffer);
+        sprintf(out_buffer, 
+                "%s%s%s\033[0m", 
+                color_schemes[log_level], 
+                info_strings[log_level], 
+                buffer);
     }
 
     if(is_error) fprintf(stderr, "%s", out_buffer);
     else         fprintf(stdout, "%s", out_buffer);
 }
-
 
 #endif // C_LOG_H
 

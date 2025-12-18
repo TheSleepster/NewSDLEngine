@@ -106,7 +106,7 @@ bool8             c_file_close(file_t *file);
 bool8             c_file_copy(string_t old_path, string_t new_path);
 
 // NOTE(Sleepster): These belong to the 'bytes_to_read' parameter of c_file_read_*... 
-#define READ_ENTIRE_FILE (MAX_U32)
+#define READ_ENTIRE_FILE (U32_MAX)
 #define READ_TO_END      (0)
 
 u32               c_file_get_read_size(file_t *file, u32 bytes_to_read, u32 file_offset);

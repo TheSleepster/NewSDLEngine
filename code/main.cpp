@@ -25,10 +25,13 @@
 #include <g_entity.h>
 
 struct render_context_t;
-void r_renderer_init(vulkan_render_context_t *render_context);
+void r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size);
+void r_vulkan_on_resize(vulkan_render_context_t *render_context, vec2_t new_window_size);
+bool8 r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time);
+bool8 r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time);
 
 internal_api void
-c_process_window_events(SDL_Window *window, input_manager_t *input_manager)
+c_process_window_events(SDL_Window *window, vulkan_render_context_t *render_context, input_manager_t *input_manager)
 {
     SDL_Event event;
     while(SDL_PollEvent(&event))
@@ -48,6 +51,8 @@ c_process_window_events(SDL_Window *window, input_manager_t *input_manager)
 
                 g_window_size.x = (float32)window_x;
                 g_window_size.y = (float32)window_y;
+
+                r_vulkan_on_resize(render_context, g_window_size);
             }break;
         }
     }
@@ -66,16 +71,16 @@ main(int argc, char **argv)
     if(SDL_Init(SDL_INIT_VIDEO))
     {
         state->window = SDL_CreateWindow("Vulkan...", 
-                                         800,
-                                         800, 
-                                         SDL_WINDOW_VULKAN|SDL_WINDOW_FULLSCREEN);
+                                         state->window_size.x,
+                                         state->window_size.y, 
+                                         SDL_WINDOW_VULKAN|SDL_WINDOW_RESIZABLE);
         if(state->window == null)
         {
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
         }
 
         render_context->window = state->window;
-        r_renderer_init(render_context);
+        r_renderer_init(render_context, state->window_size);
 
         gc_setup();
         s_nt_socket_api_init(state, argc, argv);
@@ -97,7 +102,7 @@ main(int argc, char **argv)
         while(g_running)
         {
             s_im_reset_controller_states(&input_manager);
-            c_process_window_events(state->window, &input_manager);
+            c_process_window_events(state->window, render_context, &input_manager);
 
             state->input_axis = {};
             if(s_im_is_keyboard_key_down(game_controller, SDL_SCANCODE_W))
@@ -157,6 +162,10 @@ main(int argc, char **argv)
                 }
 
                 dt_accumulator -= gcv_tick_rate;
+            }
+            if(r_vulkan_begin_frame(render_context, gcv_tick_rate))
+            {
+                r_vulkan_end_frame(render_context, gcv_tick_rate);
             }
 #if 0
             float32 alpha = (dt_accumulator / gcv_tick_rate);

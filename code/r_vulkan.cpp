@@ -46,7 +46,306 @@ Vk_debug_log_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      message_severi
             log_trace(callback_data->pMessage);
         }break;
     }
-return VK_FALSE;
+    return VK_FALSE;
+}
+
+/////////////////////////
+// VULKAN UTILITIES
+/////////////////////////
+
+const char* 
+r_vulkan_result_string(VkResult result, bool8 get_extended) 
+{
+    // From: https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkResult.html
+    // Success Codes
+    switch (result) {
+        default:
+        case VK_SUCCESS:
+            return !get_extended ? "VK_SUCCESS" : "VK_SUCCESS Command successfully completed";
+        case VK_NOT_READY:
+            return !get_extended ? "VK_NOT_READY" : "VK_NOT_READY A fence or query has not yet completed";
+        case VK_TIMEOUT:
+            return !get_extended ? "VK_TIMEOUT" : "VK_TIMEOUT A wait operation has not completed in the specified time";
+        case VK_EVENT_SET:
+            return !get_extended ? "VK_EVENT_SET" : "VK_EVENT_SET An event is signaled";
+        case VK_EVENT_RESET:
+            return !get_extended ? "VK_EVENT_RESET" : "VK_EVENT_RESET An event is unsignaled";
+        case VK_INCOMPLETE:
+            return !get_extended ? "VK_INCOMPLETE" : "VK_INCOMPLETE A return array was too small for the result";
+        case VK_SUBOPTIMAL_KHR:
+            return !get_extended ? "VK_SUBOPTIMAL_KHR" : "VK_SUBOPTIMAL_KHR A swapchain no longer matches the surface properties exactly, but can still be used to present to the surface successfully.";
+        case VK_THREAD_IDLE_KHR:
+            return !get_extended ? "VK_THREAD_IDLE_KHR" : "VK_THREAD_IDLE_KHR A deferred operation is not complete but there is currently no work for this thread to do at the time of this call.";
+        case VK_THREAD_DONE_KHR:
+            return !get_extended ? "VK_THREAD_DONE_KHR" : "VK_THREAD_DONE_KHR A deferred operation is not complete but there is no work remaining to assign to additional threads.";
+        case VK_OPERATION_DEFERRED_KHR:
+            return !get_extended ? "VK_OPERATION_DEFERRED_KHR" : "VK_OPERATION_DEFERRED_KHR A deferred operation was requested and at least some of the work was deferred.";
+        case VK_OPERATION_NOT_DEFERRED_KHR:
+            return !get_extended ? "VK_OPERATION_NOT_DEFERRED_KHR" : "VK_OPERATION_NOT_DEFERRED_KHR A deferred operation was requested and no operations were deferred.";
+        case VK_PIPELINE_COMPILE_REQUIRED_EXT:
+            return !get_extended ? "VK_PIPELINE_COMPILE_REQUIRED_EXT" : "VK_PIPELINE_COMPILE_REQUIRED_EXT A requested pipeline creation would have required compilation, but the application requested compilation to not be performed.";
+
+        // Error codes
+        case VK_ERROR_OUT_OF_HOST_MEMORY:
+            return !get_extended ? "VK_ERROR_OUT_OF_HOST_MEMORY" : "VK_ERROR_OUT_OF_HOST_MEMORY A host memory allocation has failed.";
+        case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+            return !get_extended ? "VK_ERROR_OUT_OF_DEVICE_MEMORY" : "VK_ERROR_OUT_OF_DEVICE_MEMORY A device memory allocation has failed.";
+        case VK_ERROR_INITIALIZATION_FAILED:
+            return !get_extended ? "VK_ERROR_INITIALIZATION_FAILED" : "VK_ERROR_INITIALIZATION_FAILED Initialization of an object could not be completed for implementation-specific reasons.";
+        case VK_ERROR_DEVICE_LOST:
+            return !get_extended ? "VK_ERROR_DEVICE_LOST" : "VK_ERROR_DEVICE_LOST The logical or physical device has been lost. See Lost Device";
+        case VK_ERROR_MEMORY_MAP_FAILED:
+            return !get_extended ? "VK_ERROR_MEMORY_MAP_FAILED" : "VK_ERROR_MEMORY_MAP_FAILED Mapping of a memory object has failed.";
+        case VK_ERROR_LAYER_NOT_PRESENT:
+            return !get_extended ? "VK_ERROR_LAYER_NOT_PRESENT" : "VK_ERROR_LAYER_NOT_PRESENT A requested layer is not present or could not be loaded.";
+        case VK_ERROR_EXTENSION_NOT_PRESENT:
+            return !get_extended ? "VK_ERROR_EXTENSION_NOT_PRESENT" : "VK_ERROR_EXTENSION_NOT_PRESENT A requested extension is not supported.";
+        case VK_ERROR_FEATURE_NOT_PRESENT:
+            return !get_extended ? "VK_ERROR_FEATURE_NOT_PRESENT" : "VK_ERROR_FEATURE_NOT_PRESENT A requested feature is not supported.";
+        case VK_ERROR_INCOMPATIBLE_DRIVER:
+            return !get_extended ? "VK_ERROR_INCOMPATIBLE_DRIVER" : "VK_ERROR_INCOMPATIBLE_DRIVER The requested version of Vulkan is not supported by the driver or is otherwise incompatible for implementation-specific reasons.";
+        case VK_ERROR_TOO_MANY_OBJECTS:
+            return !get_extended ? "VK_ERROR_TOO_MANY_OBJECTS" : "VK_ERROR_TOO_MANY_OBJECTS Too many objects of the type have already been created.";
+        case VK_ERROR_FORMAT_NOT_SUPPORTED:
+            return !get_extended ? "VK_ERROR_FORMAT_NOT_SUPPORTED" : "VK_ERROR_FORMAT_NOT_SUPPORTED A requested format is not supported on this device.";
+        case VK_ERROR_FRAGMENTED_POOL:
+            return !get_extended ? "VK_ERROR_FRAGMENTED_POOL" : "VK_ERROR_FRAGMENTED_POOL A pool allocation has failed due to fragmentation of the pool’s memory. This must only be returned if no attempt to allocate host or device memory was made to accommodate the new allocation. This should be returned in preference to VK_ERROR_OUT_OF_POOL_MEMORY, but only if the implementation is certain that the pool allocation failure was due to fragmentation.";
+        case VK_ERROR_SURFACE_LOST_KHR:
+            return !get_extended ? "VK_ERROR_SURFACE_LOST_KHR" : "VK_ERROR_SURFACE_LOST_KHR A surface is no longer available.";
+        case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR:
+            return !get_extended ? "VK_ERROR_NATIVE_WINDOW_IN_USE_KHR" : "VK_ERROR_NATIVE_WINDOW_IN_USE_KHR The requested window is already in use by Vulkan or another API in a manner which prevents it from being used again.";
+        case VK_ERROR_OUT_OF_DATE_KHR:
+            return !get_extended ? "VK_ERROR_OUT_OF_DATE_KHR" : "VK_ERROR_OUT_OF_DATE_KHR A surface has changed in such a way that it is no longer compatible with the swapchain, and further presentation requests using the swapchain will fail. Applications must query the new surface properties and recreate their swapchain if they wish to continue presenting to the surface.";
+        case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR:
+            return !get_extended ? "VK_ERROR_INCOMPATIBLE_DISPLAY_KHR" : "VK_ERROR_INCOMPATIBLE_DISPLAY_KHR The display used by a swapchain does not use the same presentable image layout, or is incompatible in a way that prevents sharing an image.";
+        case VK_ERROR_INVALID_SHADER_NV:
+            return !get_extended ? "VK_ERROR_INVALID_SHADER_NV" : "VK_ERROR_INVALID_SHADER_NV One or more shaders failed to compile or link. More details are reported back to the application via VK_EXT_debug_report if enabled.";
+        case VK_ERROR_OUT_OF_POOL_MEMORY:
+            return !get_extended ? "VK_ERROR_OUT_OF_POOL_MEMORY" : "VK_ERROR_OUT_OF_POOL_MEMORY A pool memory allocation has failed. This must only be returned if no attempt to allocate host or device memory was made to accommodate the new allocation. If the failure was definitely due to fragmentation of the pool, VK_ERROR_FRAGMENTED_POOL should be returned instead.";
+        case VK_ERROR_INVALID_EXTERNAL_HANDLE:
+            return !get_extended ? "VK_ERROR_INVALID_EXTERNAL_HANDLE" : "VK_ERROR_INVALID_EXTERNAL_HANDLE An external handle is not a valid handle of the specified type.";
+        case VK_ERROR_FRAGMENTATION:
+            return !get_extended ? "VK_ERROR_FRAGMENTATION" : "VK_ERROR_FRAGMENTATION A descriptor pool creation has failed due to fragmentation.";
+        case VK_ERROR_INVALID_DEVICE_ADDRESS_EXT:
+            return !get_extended ? "VK_ERROR_INVALID_DEVICE_ADDRESS_EXT" : "VK_ERROR_INVALID_DEVICE_ADDRESS_EXT A buffer creation failed because the requested address is not available.";
+        // NOTE: Same as above
+        //case VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS:
+        //    return !get_extended ? "VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS" :"VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS A buffer creation or memory allocation failed because the requested address is not available. A shader group handle assignment failed because the requested shader group handle information is no longer valid.";
+        case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT:
+            return !get_extended ? "VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT" : "VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT An operation on a swapchain created with VK_FULL_SCREEN_EXCLUSIVE_APPLICATION_CONTROLLED_EXT failed as it did not have exlusive full-screen access. This may occur due to implementation-dependent reasons, outside of the application’s control.";
+        case VK_ERROR_UNKNOWN:
+            return !get_extended ? "VK_ERROR_UNKNOWN" : "VK_ERROR_UNKNOWN An unknown error has occurred; either the application has provided invalid input, or an implementation failure has occurred.";
+    }
+}
+
+bool8 
+r_vulkan_result_is_success(VkResult result) 
+{
+    // From: https://www.khronos.org/registry/vulkan/specs/1.2-extensions/man/html/VkResult.html
+    switch (result) 
+    {
+        // Success Codes
+        default:
+        case VK_SUCCESS:
+        case VK_NOT_READY:
+        case VK_TIMEOUT:
+        case VK_EVENT_SET:
+        case VK_EVENT_RESET:
+        case VK_INCOMPLETE:
+        case VK_SUBOPTIMAL_KHR:
+        case VK_THREAD_IDLE_KHR:
+        case VK_THREAD_DONE_KHR:
+        case VK_OPERATION_DEFERRED_KHR:
+        case VK_OPERATION_NOT_DEFERRED_KHR:
+        case VK_PIPELINE_COMPILE_REQUIRED_EXT:
+            return true;
+
+        // Error codes
+        case VK_ERROR_OUT_OF_HOST_MEMORY:
+        case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+        case VK_ERROR_INITIALIZATION_FAILED:
+        case VK_ERROR_DEVICE_LOST:
+        case VK_ERROR_MEMORY_MAP_FAILED:
+        case VK_ERROR_LAYER_NOT_PRESENT:
+        case VK_ERROR_EXTENSION_NOT_PRESENT:
+        case VK_ERROR_FEATURE_NOT_PRESENT:
+        case VK_ERROR_INCOMPATIBLE_DRIVER:
+        case VK_ERROR_TOO_MANY_OBJECTS:
+        case VK_ERROR_FORMAT_NOT_SUPPORTED:
+        case VK_ERROR_FRAGMENTED_POOL:
+        case VK_ERROR_SURFACE_LOST_KHR:
+        case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR:
+        case VK_ERROR_OUT_OF_DATE_KHR:
+        case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR:
+        case VK_ERROR_INVALID_SHADER_NV:
+        case VK_ERROR_OUT_OF_POOL_MEMORY:
+        case VK_ERROR_INVALID_EXTERNAL_HANDLE:
+        case VK_ERROR_FRAGMENTATION:
+        case VK_ERROR_INVALID_DEVICE_ADDRESS_EXT:
+
+        // NOTE: Same as above
+        //case VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS:
+        case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT:
+        case VK_ERROR_UNKNOWN:
+            return false; 
+    }
+}
+
+////////////////////////////
+// VULKAN FRAMEBUFFERS 
+////////////////////////////
+
+vulkan_framebuffer_data_t
+r_vulkan_framebuffer_create(vulkan_render_context_t  *render_context,
+                            vulkan_renderpass_data_t *renderpass,
+                            u32                       width,
+                            u32                       height,
+                            u32                       attachment_count,
+                            VkImageView              *attachments)
+{
+    log_trace("Framebuffer size is: '%d'... %d...\n",
+              width, height);
+
+    vulkan_framebuffer_data_t result = {};
+    // TODO(Sleepster): This is gross... but it ensures that if the 
+    // attachments pointer goes out of scope we don't just explode
+    result.renderpass       = renderpass;
+    result.attachment_count = attachment_count;
+    result.attachments      = AllocArray(VkImageView, attachment_count);
+    memcpy(result.attachments, attachments, sizeof(VkImageView) * attachment_count);
+
+    VkFramebufferCreateInfo framebuffer_create_info = {
+        .sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+        .renderPass      = renderpass->handle,
+        .attachmentCount = attachment_count,
+        .pAttachments    = result.attachments,
+        .width           = width,
+        .height          = height,
+        .layers          = 1
+    };
+    VkAssert(vkCreateFramebuffer(render_context->rendering_device.logical_device, 
+                                &framebuffer_create_info, 
+                                 render_context->allocators, 
+                                &result.handle));
+
+    return(result);
+}
+
+void
+r_vulkan_framebuffer_destroy(vulkan_render_context_t   *render_context,
+                             vulkan_framebuffer_data_t *framebuffer)
+{
+    vkDestroyFramebuffer(render_context->rendering_device.logical_device,
+                         framebuffer->handle,
+                         render_context->allocators);
+    if(framebuffer->attachments)
+    {
+        free(framebuffer->attachments);
+        framebuffer->attachments = 0;
+    }
+
+    framebuffer->handle           = null;
+    framebuffer->renderpass       = null;
+    framebuffer->attachment_count = 0;
+}
+
+////////////////////////////
+// VULKAN FENCES 
+////////////////////////////
+
+vulkan_fence_t 
+r_vulkan_fence_create(vulkan_render_context_t *render_context,
+                      bool8                    start_signaled)
+{
+    vulkan_fence_t result = {};
+    result.signaled = start_signaled;
+
+    VkFenceCreateInfo fence_create_info = {
+        .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+        .flags = start_signaled ? VK_FENCE_CREATE_SIGNALED_BIT : (u32)0 
+    };
+
+    VkAssert(vkCreateFence(render_context->rendering_device.logical_device, 
+                 &fence_create_info, 
+                  render_context->allocators,
+                 &result.handle));
+
+    return(result);
+}
+
+void
+r_vulkan_fence_destroy(vulkan_render_context_t *render_context,
+                       vulkan_fence_t          *fence)
+{
+    Assert(fence->handle);
+
+    vkDestroyFence(render_context->rendering_device.logical_device,
+                   fence->handle,
+                   render_context->allocators);
+    fence->handle   = null;
+    fence->signaled = false;
+}
+
+bool8
+r_vulkan_fence_wait(vulkan_render_context_t  *render_context,
+                    vulkan_fence_t           *fence,
+                    u64                       timeout_ns)
+{
+    bool8 result = true;
+    if(!fence->signaled)
+    {
+        VkResult wait_result = vkWaitForFences(render_context->rendering_device.logical_device,
+                                               1,
+                                              &fence->handle,
+                                               true,
+                                               timeout_ns);
+        switch(wait_result)
+        {
+            case VK_SUCCESS:
+            {
+                fence->signaled = true;
+
+                return(result);
+            }break;
+            case VK_TIMEOUT:
+            {
+                log_warning("Timed out waiting for fence with wait time of: '%llu'...\n", timeout_ns);
+            }break;
+            case VK_ERROR_DEVICE_LOST:
+            {
+                log_fatal("We have lost the device... VK_ERROR_DEVICE_LOST\n");
+            }break;
+            case VK_ERROR_OUT_OF_HOST_MEMORY:
+            {
+                log_fatal("We have run out of host memory...\n");
+            }break;
+            case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+            {
+                log_fatal("We have run out of device memory...\n");
+            }
+            default:
+            {
+                log_fatal("An unknown error has occurred...\n");
+            }break;
+        }
+    }
+
+    return(result);
+}
+
+void 
+r_vulkan_fence_reset(vulkan_render_context_t *render_context,
+                     vulkan_fence            *fence)
+{
+    if(fence->signaled)
+    {
+        VkAssert(vkResetFences(render_context->rendering_device.logical_device, 1, &fence->handle));
+        fence->signaled = false;
+    }
+    else
+    {
+        log_warning("Resetting a fence that is unsignaled...\n");
+    }
 }
 
 ////////////////////////////
@@ -95,6 +394,9 @@ r_vulkan_image_destroy(vulkan_render_context_t *render_context,
                      image_data->memory, 
                      render_context->allocators);
         image_data->memory = 0;
+
+
+        log_info("Freeing GPU memory for image...\n");
     }
     if(image_data->handle)
     {
@@ -118,6 +420,9 @@ r_vulkan_image_create(vulkan_render_context_t *render_context,
                       u32                      mip_levels,
                       bool32                   create_view)
 {
+    Assert(width < 4096);
+    log_info("Creating image: %ux%u, format=%d\n", width, height, format);
+ 
     vulkan_image_data_t result = {};
     result.width  = width;
     result.height = height;
@@ -158,8 +463,19 @@ r_vulkan_image_create(vulkan_render_context_t *render_context,
         .allocationSize  = memory_requirements.size,
         .memoryTypeIndex = (u32)memory_index
     };
-    VkAssert(vkAllocateMemory(render_context->rendering_device.logical_device, &memory_allocation_info, render_context->allocators, &result.memory));
-    VkAssert(vkBindImageMemory(render_context->rendering_device.logical_device, result.handle, result.memory, 0)); // final parameter is an offset
+    VkResult code = vkAllocateMemory(render_context->rendering_device.logical_device, &memory_allocation_info, render_context->allocators, &result.memory);
+    if(code != VK_SUCCESS)
+    {
+        log_fatal("Failure to allocate image memory: '%s'...\n", r_vulkan_result_string(code, true));
+        Assert(false);
+    }
+    code = vkBindImageMemory(render_context->rendering_device.logical_device, result.handle, result.memory, 0); // final parameter is an offset
+    if(code != VK_SUCCESS)
+    {
+        log_fatal("Failure to allocate image memory: '%s'...\n", r_vulkan_result_string(code, true));
+        Assert(false);
+    }
+
     if(create_view)       
     {
         result.view = r_vulkan_image_view_create(render_context, format, &result, view_aspect_flags);
@@ -302,15 +618,12 @@ r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *re
 void
 r_vulkan_initialize_graphics_command_buffers(vulkan_render_context_t *render_context)
 {
-    render_context->graphics_command_buffers = AllocArray(vulkan_command_buffer_data_t, 
-                                                          render_context->swapchain.max_frames_in_flight);
     Assert(render_context->graphics_command_buffers);
     for(u32 frame_index = 0;
-        frame_index < render_context->swapchain.max_frames_in_flight;
+        frame_index < render_context->swapchain.image_count;
         ++frame_index)
     {
         vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + frame_index; 
-        Assert(!command_buffer->handle);
         
         *command_buffer = r_vulkan_command_buffer_acquire(render_context, 
                                                           render_context->rendering_device.graphics_command_pool, 
@@ -330,10 +643,14 @@ r_vulkan_renderpass_create(vulkan_render_context_t *render_context,
                            float32                  clear_depth, 
                            u32                      stencil_value)
 {
+    log_trace("renderpass size is: '%d'... '%d'...\n", size.x, size.y);
+
     vulkan_renderpass_data_t result = {};
     result.clear_color   = clear_color;
     result.depth_clear   = clear_depth;
     result.stencil_clear = stencil_value;
+    result.size          = size;
+    result.offset        = offset;
 
     VkSubpassDescription primary_subpass = {};
     primary_subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -496,6 +813,9 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
                           bool8                    wants_depth_buffer,
                           vulkan_swapchain_data_t *old_swapchain)
 {
+    Assert(image_width < 4096);
+    log_trace("renderpass size is: '%d'... %d...\n", image_width, image_height);
+
     vulkan_swapchain_data_t result = {};
     VkExtent2D swapchain_extent = {image_width, image_height};
         
@@ -545,16 +865,11 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
     r_vulkan_physical_device_get_swapchain_support_info(render_context, 
                                                         device_data->physical_device.handle,
                                                        &device_data->physical_device.swapchain_support_info);
-    if(device_data->physical_device.swapchain_support_info.surface_capabilities.currentExtent.width != MAX_U32)
+    if(device_data->physical_device.swapchain_support_info.surface_capabilities.currentExtent.width != U32_MAX)
     {
         swapchain_extent = device_data->physical_device.swapchain_support_info.surface_capabilities.currentExtent;
     }
-
-    VkExtent2D min_extent = device_data->physical_device.swapchain_support_info.surface_capabilities.minImageExtent;
-    VkExtent2D max_extent = device_data->physical_device.swapchain_support_info.surface_capabilities.maxImageExtent;
-
-    swapchain_extent.width  = Clamp(swapchain_extent.width,  min_extent.width,  max_extent.width); 
-    swapchain_extent.height = Clamp(swapchain_extent.height, min_extent.height, max_extent.height); 
+    //VkExtent2D max_extent = device_data->physical_device.swapchain_support_info.surface_capabilities.maxImageExtent;
 
     u32 swapchain_image_count = device_data->physical_device.swapchain_support_info.surface_capabilities.minImageCount + 1;
     if(device_data->physical_device.swapchain_support_info.surface_capabilities.maxImageCount > 0 && 
@@ -651,8 +966,12 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
                                                         true);
         result.has_depth_attachment = true;
     }
-    log_info("Swapchain Created...\n");
+    result.is_valid = true;
 
+    // TODO(Sleepster): This is disgusting again, but we'll change it once this works.
+    result.framebuffers = AllocArray(vulkan_framebuffer_data_t, result.image_count);
+
+    log_info("Swapchain Created...\n");
     return(result);
 }
 
@@ -673,8 +992,17 @@ r_vulkan_swapchain_destroy(vulkan_render_context_t *render_context,
                            swapchain->views[view_index], 
                            render_context->allocators);
     }
+    free(swapchain->framebuffers);
+    free(swapchain->views);
+    free(swapchain->images);
 
     vkDestroySwapchainKHR(render_context->rendering_device.logical_device, swapchain->handle, render_context->allocators);
+    swapchain->is_valid     = false;
+    swapchain->handle       = null;
+    swapchain->framebuffers = null;
+    swapchain->views        = null;
+    swapchain->images       = null;
+
     log_info("Swapchain destroyed...\n");
 }
 
@@ -683,13 +1011,17 @@ r_vulkan_swapchain_recreate(vulkan_render_context_t *render_context,
                             u32                      image_width, 
                             u32                      image_height)
 {
+    log_trace("swapchain recreate size is: '%d'... '%d'...\n", image_width, image_height);
     vulkan_swapchain_data_t result;
+
+    // TODO(Sleepster): Let this reuse the swapchain if possible
+    r_vulkan_swapchain_destroy(render_context, &render_context->swapchain);
+
     result = r_vulkan_swapchain_create(render_context, 
                                        image_width, 
                                        image_height, 
                                        true, 
-                                      &render_context->swapchain);
-
+                                       null);
     log_info("Swapchain Recreated...\n");
     return(result);
 }
@@ -754,6 +1086,8 @@ r_vulkan_swapchain_present(vulkan_render_context_t *render_context,
         log_fatal("Failure to present the swapchain image...\n");
         Assert(false);
     }
+
+    render_context->current_frame_index = (render_context->current_frame_index + 1) % swapchain->max_frames_in_flight;
 }
 
 ////////////////////////////
@@ -965,6 +1299,299 @@ r_vulkan_physical_device_is_supported(vulkan_render_context_t                   
 // VULKAN RENDERER CORE 
 ////////////////////////////
 
+void
+r_vulkan_on_resize(vulkan_render_context_t *render_context, vec2_t new_window_size)
+{
+    render_context->cached_framebuffer_width  = new_window_size.x;
+    render_context->cached_framebuffer_height = new_window_size.y;
+
+    render_context->current_framebuffer_size_generation++;
+}
+
+bool8
+r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time)
+{
+    bool8 result = false;
+    vulkan_rendering_device_t *device = &render_context->rendering_device;
+
+    if(render_context->recreating_swapchain)
+    {
+        VkResult wait_result = vkDeviceWaitIdle(device->logical_device);
+        if(!r_vulkan_result_is_success(wait_result))
+        {
+            log_error("Begin frame failed on VkDeviceWaitIdle(): '%s'...\n", 
+                      r_vulkan_result_string(wait_result, true));
+        }
+        log_info("Recreating swapchain... Can't begin...\n");
+        result = false;
+
+        goto begin_frame_return;
+    }
+    else
+    {
+        result = true;
+        if(render_context->current_framebuffer_size_generation != 
+           render_context->last_framebuffer_size_generation)
+        {
+            VkResult wait_result = vkDeviceWaitIdle(device->logical_device);
+            if(!r_vulkan_result_is_success(wait_result))
+            {
+                log_error("Begin frame failed on VkDeviceWaitIdle(): '%s'...\n", 
+                          r_vulkan_result_string(wait_result, true));
+                result = false;
+
+                goto begin_frame_return;
+            }
+
+            Assert(render_context->swapchain.is_valid);
+            r_vulkan_rebuild_swapchain(render_context);
+            if(!render_context->swapchain.is_valid)
+            {
+                result = false;
+                log_error("Swapchain recreation is invalid...\n");
+
+                goto begin_frame_return;
+            }
+        }
+
+        bool8 waited = r_vulkan_fence_wait(render_context, 
+                                           render_context->image_fences + render_context->current_frame_index, 
+                                           U64_MAX);
+        if(!waited)
+        {
+            log_warning("Frame fence wait has failed...\n");
+            result = false;
+
+            goto begin_frame_return;
+        }
+
+        render_context->current_image_index = r_vulkan_swapchain_get_next_image_index(render_context,
+                                                                                     &render_context->swapchain,
+                                                                                      U64_MAX,
+                                                                                      render_context->image_avaliable_semaphores[render_context->current_frame_index],
+                                                                                      null);
+        if(render_context->current_frame_index == INVALID_SWAPCHAIN_IMAGE_INDEX)
+        {
+            result = false;
+            log_error("We have failed to gather a valid swapchain image...\n");
+
+            goto begin_frame_return;
+        }
+
+        vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + render_context->current_image_index; 
+        Assert(command_buffer);
+
+        r_vulkan_command_buffer_reset(command_buffer);
+        r_vulkan_command_buffer_begin(command_buffer, false, false, false);
+
+        // NOTE(Sleepster): This might be a problem in the future... 
+        // We do this to keep this in line with how OpenGL does things.
+        VkViewport viewport_data = {
+            .x        = 0.0f,
+            .y        =  (float32)render_context->framebuffer_height,
+            .width    =  (float32)render_context->framebuffer_width,
+            .height   = -(float32)render_context->framebuffer_height,
+            .minDepth = 0.0f,
+            .maxDepth = 1.0f
+        };
+
+        VkRect2D scissor_data = {
+            .offset = {
+                .x = 0,
+                .y = 0,
+            },
+            .extent = {
+                .width  = render_context->framebuffer_width,
+                .height = render_context->framebuffer_height,
+            }
+        };
+
+        vkCmdSetViewport(command_buffer->handle, 0, 1, &viewport_data);
+        vkCmdSetScissor(command_buffer->handle,  0, 1, &scissor_data);
+
+        render_context->main_renderpass.size.x = (float32)render_context->framebuffer_width;
+        render_context->main_renderpass.size.y = (float32)render_context->framebuffer_height;
+
+        r_vulkan_renderpass_begin(render_context, 
+                                 &render_context->main_renderpass, 
+                                  command_buffer, 
+                                  render_context->swapchain.framebuffers[render_context->current_image_index].handle);
+    }
+
+begin_frame_return:
+    return(result);
+}
+
+bool8
+r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time)
+{
+    bool8 result = true;
+
+    vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + render_context->current_image_index; 
+    r_vulkan_renderpass_end(render_context, command_buffer, 
+                           &render_context->main_renderpass);
+    r_vulkan_command_buffer_end(command_buffer);
+
+    // NOTE(Sleepster): Blocking... just syncing to make sure we aren't writing too fast 
+    if(render_context->frame_fences[render_context->current_image_index] != VK_NULL_HANDLE)
+    {
+        r_vulkan_fence_wait(render_context, 
+                            render_context->image_fences + render_context->current_image_index,
+                            U64_MAX);
+    }
+
+    render_context->frame_fences[render_context->current_image_index] = &render_context->image_fences[render_context->current_frame_index];
+    r_vulkan_fence_reset(render_context, render_context->image_fences + render_context->current_frame_index);
+
+    VkPipelineStageFlags stage_flags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    VkSubmitInfo submit_info = {
+        .sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+
+        // NOTE(Sleepster): Command buffer()s that will be run 
+        .commandBufferCount   = 1,
+        .pCommandBuffers      = &command_buffer->handle,
+
+        // NOTE(Sleepster): The Semaphore(s) that signal when the queue is finished executing the commands
+        .signalSemaphoreCount = 1,
+        .pSignalSemaphores    = render_context->queue_finished_semaphores + render_context->current_image_index,
+
+        // NOTE(Sleepster): The Semaphore(s) that ensures the operation cannot begin until the image is avaliable 
+        .waitSemaphoreCount   = 1,
+        .pWaitSemaphores      = render_context->image_avaliable_semaphores + render_context->current_frame_index,
+
+        .pWaitDstStageMask    = stage_flags
+    };
+
+    VkResult submit_result = vkQueueSubmit(render_context->rendering_device.graphics_queue, 
+                                           1, 
+                                          &submit_info, 
+                                           render_context->image_fences[render_context->current_frame_index].handle);
+    if(submit_result != VK_SUCCESS)
+    {
+        log_error("vkQueueSubmit has failed with result: '%s'...\n", r_vulkan_result_string(submit_result, true));
+        result = false;
+    }
+    else
+    {
+        r_vulkan_command_buffer_submit(command_buffer);
+        
+        r_vulkan_swapchain_present(render_context, 
+                                  &render_context->swapchain,
+                                   render_context->rendering_device.graphics_queue,
+                                   render_context->rendering_device.present_queue,
+                                   render_context->queue_finished_semaphores[render_context->current_image_index],
+                                   render_context->current_image_index);
+    }
+
+    return(result);
+}
+
+void
+r_vulkan_regenerate_framebuffers(vulkan_render_context_t  *render_context,
+                                 vulkan_swapchain_data_t  *swapchain,
+                                 vulkan_renderpass_data_t *renderpass)
+{
+    for(u32 image_index = 0;
+        image_index < swapchain->image_count;
+        ++image_index)
+    {
+        // TODO(Sleepster): Make this configurable 
+        u32 attachment_count = 2;
+        VkImageView attachments[] = {
+            swapchain->views[image_index],
+            swapchain->depth_attachment.view
+        };
+
+        swapchain->framebuffers[image_index] = r_vulkan_framebuffer_create(render_context,
+                                                                           renderpass,
+                                                                           render_context->framebuffer_width,
+                                                                           render_context->framebuffer_height,
+                                                                           attachment_count,
+                                                                           attachments);
+    }
+}
+
+bool8
+r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context)
+{
+    bool8 result = true;
+    if(!render_context->recreating_swapchain)
+    {
+        if((render_context->framebuffer_width != 0) && (render_context->framebuffer_height != 0))
+        {
+            render_context->recreating_swapchain = true;
+            vkDeviceWaitIdle(render_context->rendering_device.logical_device);
+
+            for(u32 frame_index = 0;
+                frame_index < render_context->swapchain.image_count;
+                ++frame_index)
+            {
+                render_context->frame_fences[frame_index] = null;
+            }
+
+            r_vulkan_physical_device_get_swapchain_support_info(render_context, 
+                                                                render_context->rendering_device.physical_device.handle, 
+                                                               &render_context->rendering_device.physical_device.swapchain_support_info);
+            r_vulkan_physical_device_detect_depth_format(&render_context->rendering_device.physical_device);
+
+            render_context->swapchain = r_vulkan_swapchain_recreate(render_context, 
+                                                                    render_context->cached_framebuffer_width,
+                                                                    render_context->cached_framebuffer_height);
+
+            render_context->framebuffer_width         = render_context->cached_framebuffer_width;
+            render_context->framebuffer_height        = render_context->cached_framebuffer_height;
+            render_context->main_renderpass.size.x    = render_context->framebuffer_width;
+            render_context->main_renderpass.size.y    = render_context->framebuffer_height;
+            render_context->cached_framebuffer_width  = 0;
+            render_context->cached_framebuffer_height = 0;
+
+            // NOTE(Sleepster): We are creating a framebuffer and a command buffer for EACH OF THE SWAPCHAIN INDICES
+            // regardless of if they are a part of our "frames in flight"
+            render_context->last_framebuffer_size_generation = render_context->current_framebuffer_size_generation;
+            for(u32 command_buffer_index = 0;
+                command_buffer_index < render_context->swapchain.image_count;
+                ++command_buffer_index)
+            {
+                vulkan_command_buffer_data_t *graphics_command_buffer = render_context->graphics_command_buffers + command_buffer_index;
+                r_vulkan_command_buffer_release(render_context, graphics_command_buffer, render_context->rendering_device.graphics_command_pool);
+            }
+
+            for(u32 framebuffer_index = 0;
+                framebuffer_index < render_context->swapchain.image_count;
+                ++framebuffer_index)
+            {
+                vulkan_framebuffer_data_t *framebuffer = render_context->swapchain.framebuffers + framebuffer_index;
+                r_vulkan_framebuffer_destroy(render_context, framebuffer);
+            }
+
+            render_context->main_renderpass.offset.x = 0;
+            render_context->main_renderpass.offset.y = 0;
+            render_context->main_renderpass.size.x   = render_context->framebuffer_width;
+            render_context->main_renderpass.size.y   = render_context->framebuffer_height;
+
+            //render_context->swapchain.framebuffers = AllocArray(vulkan_framebuffer_data_t, render_context->swapchain.max_frames_in_flight);
+            r_vulkan_regenerate_framebuffers(render_context, 
+                                            &render_context->swapchain, 
+                                            &render_context->main_renderpass);
+            r_vulkan_initialize_graphics_command_buffers(render_context);
+
+            render_context->recreating_swapchain = false;
+        }
+        else
+        {
+            log_warning("Not recreating the swapchain when the window is < 1 in size... X: '%d, Y: '%d'\n", 
+                        render_context->framebuffer_width, render_context->framebuffer_height);
+            result = false;
+        }
+    }
+    else
+    {
+        log_warning("Not trying to rebuild the swapchain whilst it is already being created...\n");
+        result = false;
+    }
+    return(result);
+}
+
 s32 
 r_vulkan_find_memory_index(vulkan_render_context_t *render_context,
                            u32                      type_filter, 
@@ -996,8 +1623,13 @@ r_vulkan_find_memory_index(vulkan_render_context_t *render_context,
 }
 
 void
-r_renderer_init(vulkan_render_context_t *render_context)
+r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
 {
+    render_context->framebuffer_width  = window_size.x;
+    render_context->framebuffer_height = window_size.y;
+    render_context->window_width  = 0;
+    render_context->window_height = 0;
+
 	VkApplicationInfo app_info = {};
 	app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	app_info.pApplicationName   = null;
@@ -1064,6 +1696,7 @@ r_renderer_init(vulkan_render_context_t *render_context)
     instance_info.enabledExtensionCount   = platform_extension_count;
     instance_info.ppEnabledLayerNames     = validation_layers;
     instance_info.enabledLayerCount       = 1;
+    instance_info.pApplicationInfo        = &app_info;
 
     VkAssert(vkCreateInstance(&instance_info, render_context->allocators, &render_context->instance));
     log_info("Vulkan Instance Created..\n");
@@ -1306,15 +1939,47 @@ r_renderer_init(vulkan_render_context_t *render_context)
                                     &render_context->rendering_device.graphics_command_pool));
         log_info("Device Command Pools created...\n");
     }
-    render_context->swapchain       = r_vulkan_swapchain_create(render_context, render_context->window_width, render_context->window_height, true, null);
+    render_context->swapchain       = r_vulkan_swapchain_create(render_context, render_context->framebuffer_width, render_context->framebuffer_height, true, null);
     render_context->main_renderpass = r_vulkan_renderpass_create(render_context, 
                                                                  {0, 0}, 
-                                                                 {(float32)render_context->window_height, (float32)render_context->window_height}, 
+                                                                 {(float32)render_context->framebuffer_width, (float32)render_context->framebuffer_height}, 
                                                                  {0.3, 0.2, 0.4, 1.0}, 
                                                                  0.0f, 
                                                                  0);
+    render_context->swapchain.framebuffers = AllocArray(vulkan_framebuffer_data_t, render_context->swapchain.image_count);
+    r_vulkan_regenerate_framebuffers(render_context,
+                                    &render_context->swapchain,
+                                    &render_context->main_renderpass);
+    log_info("Framebuffers created...\n");
+
+    render_context->graphics_command_buffers = AllocArray(vulkan_command_buffer_data_t, 
+                                                          render_context->swapchain.image_count);
     r_vulkan_initialize_graphics_command_buffers(render_context);
     log_info("Command buffers initialized...\n");
+
+    render_context->queue_finished_semaphores  = AllocArray(VkSemaphore,     render_context->swapchain.image_count);
+    render_context->image_avaliable_semaphores = AllocArray(VkSemaphore,     render_context->swapchain.image_count);
+    render_context->image_fences               = AllocArray(vulkan_fence_t,  render_context->swapchain.image_count);
+    render_context->frame_fences               = AllocArray(vulkan_fence_t*, render_context->swapchain.image_count);
+    for(u32 image_index = 0;
+        image_index < render_context->swapchain.image_count;
+        ++image_index)
+    {
+        VkSemaphoreCreateInfo semaphore_create_info = {
+            .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
+        };
+        vkCreateSemaphore(render_context->rendering_device.logical_device, 
+                         &semaphore_create_info, 
+                          render_context->allocators, 
+                         &render_context->queue_finished_semaphores[image_index]);
+
+        vkCreateSemaphore(render_context->rendering_device.logical_device, 
+                         &semaphore_create_info, 
+                          render_context->allocators, 
+                         &render_context->image_avaliable_semaphores[image_index]);
+
+        render_context->image_fences[image_index] = r_vulkan_fence_create(render_context, true);
+    }
 
     log_info("Vulkan context initialized...\n");
 }

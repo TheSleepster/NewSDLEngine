@@ -155,25 +155,25 @@
 
 #include "c_types.h"
 
-global_variable s8  MIN_S8  = (s8) 0x80;
-global_variable s16 MIN_S16 = (s16)0x8000;
-global_variable s32 MIN_S32 = (s32)0x80000000;
-global_variable s64 MIN_S64 = (s64)0x8000000000000000llu;
+global_variable s8  S8_MIN  = (s8) 0x80;
+global_variable s16 S16_MIN = (s16)0x8000;
+global_variable s32 S32_MIN = (s32)0x80000000;
+global_variable s64 S64_MIN = (s64)0x8000000000000000llu;
 
-global_variable s8  MAX_S8  = (s8) 0x7f;
-global_variable s16 MAX_S16 = (s16)0x7ffff;
-global_variable s32 MAX_S32 = (s32)0x7ffffffff;
-global_variable s64 MAX_S64 = (s64)0x7fffffffffffffffllu;
+global_variable s8  S8_MAX  = (s8) 0x7f;
+global_variable s16 S16_MAX = (s16)0x7ffff;
+global_variable s32 S32_MAX = (s32)0x7ffffffff;
+global_variable s64 S64_MAX = (s64)0x7fffffffffffffffllu;
 
-global_variable u8  MIN_U8  = (u8) 0x80;
-global_variable u16 MIN_U16 = (u16)0x8000;
-global_variable u32 MIN_U32 = (u32)0x80000000;
-global_variable u64 MIN_U64 = (u64)0x8000000000000000llu;
+global_variable u8  U8_MIN  = (u8) 0x00;
+global_variable u16 U16_MIN = (u16)0x0000;
+global_variable u32 U32_MIN = (u32)0x00000000;
+global_variable u64 U64_MIN = (u64)0x0000000000000000llu;
 
-global_variable u8  MAX_U8  = (u8) 0x7f;
-global_variable u16 MAX_U16 = (u16)0x7ffff;
-global_variable u32 MAX_U32 = (u32)0x7fffffff;
-global_variable u64 MAX_U64 = (u64)0x7fffffffffffffffllu;
+global_variable u8  U8_MAX  = (u8) 0xff;
+global_variable u16 U16_MAX = (u16)0xfffff;
+global_variable u32 U32_MAX = (u32)0xffffffff;
+global_variable u64 U64_MAX = (u64)0xFFFFFFFFllu;
 
 global_variable float32 machine_epsilon_f32 = 1.1920929e-7f;
 global_variable float64 machine_epsilon_f64 = 2.220446e-16;
