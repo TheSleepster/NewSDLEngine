@@ -73,7 +73,7 @@ BUILD_DIR = ../build
 # --------------------------------------------
 # Set The Inputs
 # --------------------------------------------
-COMMON_INCLUDES = -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/Freetype/include/
+COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/Freetype/include/
 
 ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 
@@ -83,7 +83,7 @@ GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
-GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -lSDL3-Static -lfreetype -lvulkan
+GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -lSDL3-Static -lfreetype -lvulkan
 EXCLUDE_PATTERNS = sys_%
 
 # Each test executable depends on one test source

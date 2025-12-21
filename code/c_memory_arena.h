@@ -43,6 +43,7 @@ struct scratch_arena_t
 #define c_arena_bootstrap_allocate_struct(type, member, allocation_size) (type*)(c_arena_bootstrap_allocate_struct_(sizeof(type), IntFromPtr(OffsetOf(type, member)), allocation_size))
 
 memory_arena_t c_arena_create(u64 block_size);
+void           c_arena_destroy(memory_arena_t *arena);
 byte*          c_arena_push_size(memory_arena_t *arena, u64 push_size);
 byte*          c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 block_size);
 void           c_arena_clear_block(memory_arena_t *arena);

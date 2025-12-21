@@ -4,6 +4,8 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#include <c_base.h>
+
 #include <c_memory_arena.h>
 #include <p_platform_data.h>
 #include <string.h>
@@ -21,6 +23,15 @@ c_arena_create(u64 block_size)
     result.is_initialized = true;
 
     return(result);
+}
+
+void
+c_arena_destroy(memory_arena_t *arena)
+{
+    c_arena_reset(arena);
+    sys_free_memory(arena->base, arena->block_size);
+
+    ZeroStruct(*arena);
 }
 
 internal_api memory_arena_footer_t*
@@ -125,7 +136,7 @@ c_arena_reset(memory_arena_t *arena)
 }
 
 scratch_arena_t
-c_arena_begin_temporary_memeory(memory_arena_t *arena)
+c_arena_begin_temporary_memory(memory_arena_t *arena)
 {
     scratch_arena_t result;
     result.parent = arena;

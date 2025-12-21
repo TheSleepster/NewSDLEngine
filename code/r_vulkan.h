@@ -12,6 +12,7 @@
 #include <vulkan/vulkan.h>
 
 #include <c_types.h>
+#include <c_memory_arena.h>
 #include <c_math.h>
 
 #define VkAssert(result) Statement(Assert(result == VK_SUCCESS))
@@ -153,6 +154,7 @@ typedef struct vulkan_image_data
 typedef struct vulkan_swapchain_data
 {
     bool8                      is_valid;
+    memory_arena_t             arena;
 
     VkSwapchainKHR             handle;
     VkSurfaceFormatKHR         image_format;

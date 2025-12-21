@@ -38,7 +38,7 @@ main(void)
     {
         Assert(arena.block_counter == 1);
 
-        scratch_arena_t scratch = c_arena_begin_temporary_memeory(&arena);
+        scratch_arena_t scratch = c_arena_begin_temporary_memory(&arena);
         void *data = c_arena_push_size(&arena, MB(400));
         (void)data;
         c_arena_end_temporary_memory(&scratch);

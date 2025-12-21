@@ -643,7 +643,7 @@ r_vulkan_renderpass_create(vulkan_render_context_t *render_context,
                            float32                  clear_depth, 
                            u32                      stencil_value)
 {
-    log_trace("renderpass size is: '%d'... '%d'...\n", size.x, size.y);
+    log_trace("renderpass size is: '%.02f'... '%.02f'...\n", size.x, size.y);
 
     vulkan_renderpass_data_t result = {};
     result.clear_color   = clear_color;
@@ -817,6 +817,8 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
     log_trace("renderpass size is: '%d'... %d...\n", image_width, image_height);
 
     vulkan_swapchain_data_t result = {};
+    result.arena = c_arena_create(MB(10));
+
     VkExtent2D swapchain_extent = {image_width, image_height};
         
     // NOTE(Sleepster): Triple buffering. 
@@ -919,8 +921,9 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
 
     result.image_count = 0;
     VkAssert(vkGetSwapchainImagesKHR(device_data->logical_device, result.handle, &result.image_count, null));
-    result.images = AllocArray(VkImage,     result.image_count);
-    result.views  = AllocArray(VkImageView, result.image_count);
+    result.images       = c_arena_push_array(&result.arena, VkImage,     result.image_count);
+    result.views        = c_arena_push_array(&result.arena, VkImageView, result.image_count);
+    result.framebuffers = c_arena_push_array(&result.arena, vulkan_framebuffer_data_t, result.image_count);
     VkAssert(vkGetSwapchainImagesKHR(device_data->logical_device, result.handle, &result.image_count, result.images));
 
     for(u32 view_index = 0;
@@ -968,9 +971,6 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
     }
     result.is_valid = true;
 
-    // TODO(Sleepster): This is disgusting again, but we'll change it once this works.
-    result.framebuffers = AllocArray(vulkan_framebuffer_data_t, result.image_count);
-
     log_info("Swapchain Created...\n");
     return(result);
 }
@@ -992,9 +992,7 @@ r_vulkan_swapchain_destroy(vulkan_render_context_t *render_context,
                            swapchain->views[view_index], 
                            render_context->allocators);
     }
-    free(swapchain->framebuffers);
-    free(swapchain->views);
-    free(swapchain->images);
+    c_arena_destroy(&swapchain->arena);
 
     vkDestroySwapchainKHR(render_context->rendering_device.logical_device, swapchain->handle, render_context->allocators);
     swapchain->is_valid     = false;
@@ -1569,7 +1567,6 @@ r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context)
             render_context->main_renderpass.size.x   = render_context->framebuffer_width;
             render_context->main_renderpass.size.y   = render_context->framebuffer_height;
 
-            //render_context->swapchain.framebuffers = AllocArray(vulkan_framebuffer_data_t, render_context->swapchain.max_frames_in_flight);
             r_vulkan_regenerate_framebuffers(render_context, 
                                             &render_context->swapchain, 
                                             &render_context->main_renderpass);
@@ -1946,7 +1943,6 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
                                                                  {0.3, 0.2, 0.4, 1.0}, 
                                                                  0.0f, 
                                                                  0);
-    render_context->swapchain.framebuffers = AllocArray(vulkan_framebuffer_data_t, render_context->swapchain.image_count);
     r_vulkan_regenerate_framebuffers(render_context,
                                     &render_context->swapchain,
                                     &render_context->main_renderpass);
