@@ -16,6 +16,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.h>
+#include <slang.h>
 
 #include <r_vulkan.h>
 
@@ -522,7 +523,7 @@ r_vulkan_command_buffer_release(vulkan_render_context_t      *render_context,
     vkFreeCommandBuffers(render_context->rendering_device.logical_device, 
                          command_pool, 
                          1, 
-                         &command_buffer->handle);
+                        &command_buffer->handle);
     command_buffer->handle = null;
     command_buffer->state  = VKCBS_INVALID;
 }
@@ -1185,8 +1186,6 @@ r_vulkan_physical_device_is_supported(vulkan_render_context_t                   
     VkQueueFamilyProperties *queue_family_data = (VkQueueFamilyProperties*)malloc(sizeof(VkQueueFamilyProperties) * queue_family_counter);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_counter, queue_family_data);
 
-    log_info("GRAPHICS | PRESENT | COMPUTE | TRANSFER | DEVICE NAME\n");
-
     u8 minimum_transfer_score = 255;
     for(u32 queue_family_index = 0;
         queue_family_index < queue_family_counter;
@@ -1224,6 +1223,7 @@ r_vulkan_physical_device_is_supported(vulkan_render_context_t                   
         }
     }
 
+    log_info("GRAPHICS | PRESENT | COMPUTE | TRANSFER | DEVICE NAME\n");
     log_info("   %d     |    %d    |    %d    |     %d    | %s\n",
              device_queue_info->graphics_queue_family_index, device_queue_info->present_queue_family_index,
              device_queue_info->compute_queue_family_index,  device_queue_info->transfer_queue_family_index,
@@ -1701,11 +1701,11 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     // NOTE(Sleepster): DEBUG LAYERS 
     {
         u32 debug_log_severity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT|
-        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
+                                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
 
         u32 debug_message_types = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT|
-        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT|
-        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
+                                  VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT|
+                                  VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
 
         VkDebugUtilsMessengerCreateInfoEXT vulkan_debug_info = {};
         vulkan_debug_info.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -1843,6 +1843,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         {
             log_fatal("No compatible physical GPU device was found...\n");
         }
+        free(physical_devices);
 
         log_info("Physical device created successfully...\n");
     }

@@ -201,6 +201,8 @@ typedef struct vulkan_command_buffer_data
 
 typedef struct vulkan_render_context
 {
+    memory_arena_t                arena;
+
     SDL_Window                   *window;
     u32                           window_width;
     u32                           window_height;
