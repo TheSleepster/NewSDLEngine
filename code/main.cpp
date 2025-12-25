@@ -8,6 +8,8 @@
 
 #include <c_types.h>
 #include <c_base.h>
+
+#define MATH_IMPLEMENTATION
 #include <c_math.h>
 #include <c_string.h>
 #include <c_dynarray.h>

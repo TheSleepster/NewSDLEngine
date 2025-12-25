@@ -22,12 +22,12 @@
 // VULKAN PHYSICAL DEVICE STUFF 
 //////////////////////////////////
 
-#define MAX_VULKAN_FORMATS (128)
+#define MAX_VALID_VULKAN_FORMATS (128)
 typedef struct vulkan_physical_device_swapchain_support_info
 {
     VkSurfaceCapabilitiesKHR surface_capabilities;
-    VkSurfaceFormatKHR       valid_surface_formats[MAX_VULKAN_FORMATS];
-    VkPresentModeKHR         valid_present_modes[MAX_VULKAN_FORMATS];
+    VkSurfaceFormatKHR       valid_surface_formats[MAX_VALID_VULKAN_FORMATS];
+    VkPresentModeKHR         valid_present_modes[MAX_VALID_VULKAN_FORMATS];
 
     u32                      valid_surface_format_count;
     u32                      valid_present_mode_count;

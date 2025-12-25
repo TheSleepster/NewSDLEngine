@@ -1,5 +1,5 @@
 #if !defined(C_MATH_H)
-/* ========================================================================
+/* ====================================================================
    $File: c_math.h $
    $Date: Mon, 30 Jun 25: 02:32PM $
    $Revision: $
@@ -70,7 +70,13 @@
 
 #include <c_types.h>
 
-#define PI32 3.14159265359f
+#ifdef MATH_IMPLEMENTATION
+    #define MATH_API
+#else 
+    #define MATH_API extern
+#endif
+
+#define PI32 3.14159265358f
 #define PI64 3.14159265358979323846
 
 #define TAU32 ((PI32) * 2)
@@ -92,94 +98,9 @@
 #define Square(x) ((x) * (x))
 
 /*===========================================
-  ============= FLOAT32 FUNCTIONS ===========
-  ===========================================*/
-
-inline float32 f32_lerp(float32 A, float32 B, float32 T);
-inline float32 f32_unlerp(float32 A, float32 B, float32 X);
-inline bool8   f32_equals(float32 A, float32 B, float32 tolerance);
-inline void    f32_approach(float32 *value, float32 target, float32 rate, float32 delta_t);
-inline float32 f32_ease_out_quad(float32 x);
-inline float32 f32_sin_breathe_normalized(float32 time, float32 modifier, float32 min, float32 max);
-inline float32 f32_sin_breathe(float32 time, float32 modifier);
-
-float32
-f32_lerp(float32 A, float32 B, float32 T)
-{
-    float32 result;
-    result = A + (B - A) * T;
-
-    return(result);
-}
-
-float32
-f32_unlerp(float32 A, float32 B, float32 X)
-{
-    float32 result = 0.0f;
-    if(A != B)
-    {
-        result = (X - A) / (B - A);
-    }
-
-    return(result);
-}
-
-bool8
-f32_equals(float32 A, float32 B, float32 tolerance)
-{
-    return(fabs(A - B) <= tolerance);
-}
-
-inline void
-f32_approach(float32 *value, float32 target, float32 rate, float32 delta_t)
-{
-    *value += (float32)((target - *value) * (1.0 - pow(2.0f, -rate * delta_t)));
-    if(f32_equals(*value, target, 0.01f))
-    {
-        *value = target;
-    }
-}
-
-inline float32
-f32_ease_out_quad(float32 x)
-{
-    return(1 - (1 - x) * (1 - x));
-}
-
-inline float32
-f32_sin_breathe_normalized(float32 time, float32 modifier, float32 min, float32 max)
-{
-    float32 sinevalue = (sinf(modifier * 2 * PI32 * time) + 1.0f) / 2.0f;
-    return(min + (max - min) * sinevalue);
-}
-
-inline float32
-f32_sin_breathe(float32 time, float32 modifier)
-{
-    return(sinf(time * modifier));
-}
-
-#if 0
-#ifdef __cplusplus
-#include <typeinfo>
-
-// -std=c++20 
-inline auto 
-lerp(auto A, auto B)
-{
-    return(A + B);
-}
-
-#endif
-#endif
-
-/*===========================================
-  ============= FLOAT64 FUNCTIONS ===========
-  ===========================================*/
-
-/*===========================================
   =============== FLOAT VECTORS =============
   ===========================================*/
+
 typedef struct vec2
 {
     union
@@ -246,6 +167,78 @@ typedef struct vec4
         __m128 SSE;
     };
 }vec4_t;
+
+
+/*===========================================
+  ============= INTEGER VECTORS =============
+  ===========================================*/
+typedef struct ivec4
+{
+    union
+    {
+        s32 elements[4];
+        struct
+        {
+            s32 x;
+            s32 y;
+            s32 z;
+            s32 w;
+        };
+
+        struct
+        {
+            s32 xy[2];
+            s32 wz[2];
+        };
+
+        struct
+        {
+            s32 xyz[3];
+            s32 z_;
+        };
+
+        __m128i SSE;
+    };
+}ivec4_t;
+
+typedef struct ivec3
+{
+    union
+    {
+        s32 elements[3];
+        struct
+        {
+            s32 x;
+            s32 y;
+            s32 z;
+        };
+
+        struct
+        {
+            s32 xy[2];
+            s32 z_1;
+        };
+    };
+}ivec3_t;
+
+typedef struct ivec2
+{
+    union
+    {
+        s32 elements[2];
+        struct
+        {
+            s32 x;
+            s32 y;
+        };
+
+        struct
+        {
+            s32 width;
+            s32 height;
+        };
+    };
+}ivec2_t;
 
 /*===========================================
   ============== FLOAT MATRICES =============
@@ -337,80 +330,33 @@ typedef struct mat2
     }; 
 }mat2_t;
 
+/*==============================================
+  ================= RECTANGLES =================
+  ==============================================*/
+
+typedef struct rectangle2
+{
+    vec2_t min;
+    vec2_t max;
+    vec2_t center;
+    vec2_t half_size;
+}rectangle2_t;
+
+typedef struct raytest 
+{
+    bool32  hit;
+    float32 time;
+    vec2_t  position;
+    vec2_t  normal;
+}raytest_t;
+
 /*===========================================
-  ============= INTEGER VECTORS =============
+  ============= DECLARATIONS ================
   ===========================================*/
-typedef struct ivec4
-{
-    union
-    {
-        s32 elements[4];
-        struct
-        {
-            s32 x;
-            s32 y;
-            s32 z;
-            s32 w;
-        };
 
-        struct
-        {
-            s32 xy[2];
-            s32 wz[2];
-        };
-
-        struct
-        {
-            s32 xyz[3];
-            s32 z_;
-        };
-
-        __m128i SSE;
-    };
-}ivec4_t;
-
-typedef struct ivec3
-{
-    union
-    {
-        s32 elements[3];
-        struct
-        {
-            s32 x;
-            s32 y;
-            s32 z;
-        };
-
-        struct
-        {
-            s32 xy[2];
-            s32 z_1;
-        };
-    };
-}ivec3_t;
-
-typedef struct ivec2
-{
-    union
-    {
-        s32 elements[2];
-        struct
-        {
-            s32 x;
-            s32 y;
-        };
-
-        struct
-        {
-            s32 width;
-            s32 height;
-        };
-    };
-}ivec2_t;
-
-#define NULL_VECTOR2 (vec2())
-#define NULL_VECTOR3 (vec3())
-#define NULL_VECTOR4 (vec4())
+#define NULL_VECTOR2 (vec2_zero())
+#define NULL_VECTOR3 (vec3_zero())
+#define NULL_VECTOR4 (vec4_zero())
 
 #define NULL_IVECTOR2 (ivec2())
 #define NULL_IVECTOR3 (ivec3())
@@ -420,11 +366,310 @@ typedef struct ivec2
 #define NULL_MATRIX3 (mat3_identity())
 #define NULL_MATRIX2 (mat2_identity())
 
+#ifdef __cplusplus
+extern "C" 
+{
+#endif
+
+/*===========================================
+  ================== FLOAT32 ================
+  ===========================================*/
+
+MATH_API float32 f32_lerp(float32 A, float32 B, float32 T);
+MATH_API float32 f32_unlerp(float32 A, float32 B, float32 X);
+MATH_API bool8   f32_equals(float32 A, float32 B, float32 tolerance);
+MATH_API void    f32_approach(float32 *value, float32 target, float32 rate, float32 delta_t);
+MATH_API float32 f32_ease_out_quad(float32 x);
+MATH_API float32 f32_sin_breathe_normalized(float32 time, float32 modifier, float32 min, float32 max);
+MATH_API float32 f32_sin_breathe(float32 time, float32 modifier);
+
 /*===========================================
   ================= VECTOR 2 ================
   ===========================================*/
 
-inline vec2_t
+MATH_API vec2_t  vec2(float32 A, float32 B);
+MATH_API vec2_t  vec2_zero();
+MATH_API vec2_t  vec2_create(float32 A);
+MATH_API vec3_t  vec2_expand_vec3(vec2_t A, float32 B);
+MATH_API vec2_t  vec2_cast(ivec2_t A);
+MATH_API vec4_t  vec2_expand_vec4(vec2_t A, float32 B, float32 C);
+MATH_API vec2_t  vec2_scale(vec2_t A, float32 B);
+MATH_API vec2_t  vec2_multiply(vec2_t A, vec2_t B);
+MATH_API vec2_t  vec2_add(vec2_t A, vec2_t B);
+MATH_API vec2_t  vec2_subtract(vec2_t A, vec2_t B);
+MATH_API vec2_t  vec2_reduce(vec2_t A, float32 B);
+MATH_API vec2_t  vec2_normalize(vec2_t A);
+MATH_API vec2_t  vec2_transform(mat2_t A, vec2_t B);
+MATH_API float32 vec2_length(vec2_t A);
+MATH_API float32 vec2_length_squared(vec2_t A);
+MATH_API float32 vec2_dot(vec2_t A, vec2_t B);
+MATH_API float32 vec2_cross(vec2_t A, vec2_t B);
+MATH_API void    vec2_approach(vec2_t *value, vec2_t target, vec2_t rate, float32 delta_t);
+MATH_API vec2_t  vec2_rotate(vec2_t A, float32 rotation);
+MATH_API vec2_t  vec2_lerp(vec2_t A, vec2_t B, real32 time);
+MATH_API vec2_t  vec2_unlerp(vec2_t A, vec2_t B, vec2_t X);
+MATH_API vec2_t  vec2_negate(vec2_t A);
+
+/*===========================================
+  ================= VECTOR 3 ================
+  ===========================================*/
+
+MATH_API vec3_t  vec3(float32 A, float32 B, float32 C);
+MATH_API vec3_t  vec3_zero();
+MATH_API vec3_t  vec3_create(float32 A);
+MATH_API vec3_t  vec3_cast(ivec3_t A);
+MATH_API vec3_t  vec3_multiply(vec3_t A, vec3_t B);
+MATH_API vec3_t  vec3_subtract(vec3_t A, vec3_t B);
+MATH_API vec3_t  vec3_add(vec3_t A, vec3_t B);
+MATH_API vec3_t  vec3_scale(vec3_t A, float32 B);
+MATH_API vec3_t  vec3_normalize(vec3_t A);
+MATH_API vec3_t  vec3_cross(vec3_t A, vec3_t B);
+MATH_API vec3_t  vec3_transform(vec3_t A, mat3_t B);
+MATH_API vec4_t  vec3_expand_vec4(vec3_t A, float32 B);
+MATH_API vec3_t  vec3_rotate(vec3_t A, vec3_t axis, float32 rotation);
+MATH_API vec3_t  vec3_lerp(vec3_t A, vec3_t B, real32 time);
+MATH_API vec3_t  vec3_unlerp(vec3_t A, vec3_t B, vec3_t X);
+MATH_API float32 vec3_length(vec3_t A);
+MATH_API float32 vec3_dot(vec3_t A, vec3_t B);
+
+/*===========================================
+  ================= VECTOR 4 ================
+  ===========================================*/
+
+MATH_API vec4_t  vec4(float32 A, float32 B, float32 C, float32 D);
+MATH_API vec4_t  vec4_zero();
+MATH_API vec4_t  vec4_create(float32 A);
+MATH_API vec4_t  vec4_scale(vec4_t A, float32 B);
+MATH_API vec4_t  vec4_multiply(vec4_t A, vec4_t B);
+MATH_API vec4_t  vec4_normalize(vec4_t A);
+MATH_API vec4_t  vec4_transform(mat4_t A, vec4_t B);
+MATH_API vec4_t  vec4_lerp(vec4_t A, vec4_t B, real32 time);
+MATH_API vec4_t  vec4_unlerp(vec4_t A, vec4_t B, vec4_t X);
+MATH_API vec4_t  vec4_cast(ivec4_t A);
+MATH_API float32 vec4_length(vec4_t A);
+MATH_API float32 vec4_dot(vec4_t A, vec4_t B);
+
+/*===========================================
+  ================ IVECTOR 2 ================
+  ===========================================*/
+
+MATH_API ivec2_t ivec2();
+MATH_API ivec2_t ivec2_create(s32 A);
+MATH_API ivec2_t ivec2_create_int32(s32 A, s32 B);
+MATH_API ivec3_t ivec2_expand_ivec3(ivec2_t A, s32 B);
+MATH_API ivec4_t ivec2_expand_ivec4(ivec2_t A, s32 B, s32 C);
+MATH_API ivec2_t ivec2_cast(vec2_t A);
+MATH_API ivec2_t ivec2_multiply(ivec2_t A, ivec2_t B);
+
+/*===========================================
+  ================ IVECTOR 3 ================
+  ===========================================*/
+
+MATH_API ivec3_t ivec3();
+MATH_API ivec3_t ivec3_create(s32 A);
+MATH_API ivec3_t ivec3_create_int32(s32 A, s32 B, s32 C);
+MATH_API ivec3_t ivec3_cast(vec3_t A);
+MATH_API ivec3_t ivec3_multiply(ivec3_t A, ivec3_t B);
+
+/*===========================================
+  ================ IVECTOR 4 ================
+  ===========================================*/
+
+MATH_API ivec4_t ivec4();
+MATH_API ivec4_t ivec4_create(s32 A);
+MATH_API ivec4_t ivec4_create_int32(s32 A, s32 B, s32 C, s32 D);
+MATH_API ivec4_t ivec4_cast(vec4_t A);
+MATH_API ivec4_t ivec4_multiply(ivec4_t A, ivec4_t B);
+
+/*===========================================
+  =========== MATRIX 2 FUNCTIONS ============
+  ===========================================*/
+
+MATH_API mat2_t  mat2_identity(void);
+MATH_API mat2_t  mat2_set_identity(float32 value);
+MATH_API mat2_t  mat2_transpose(mat2_t A);
+MATH_API mat2_t  mat2_add(mat2_t A, mat2_t B);
+MATH_API mat2_t  mat2_subtract(mat2_t A, mat2_t B);
+MATH_API mat2_t  mat2_multiply(mat2_t A, mat2_t B);
+MATH_API mat2_t  mat2_divide(mat2_t A, mat2_t B);
+MATH_API mat2_t  mat2_reduce(mat2_t A, vec2_t B);
+MATH_API mat2_t  mat2_scale(mat2_t A, vec2_t B);
+MATH_API mat2_t  mat2_rotate(mat2_t A, float32 B);
+MATH_API mat2_t  mat2_inverse(mat2_t A);
+MATH_API float32 mat2_determinant(mat2_t A);
+
+/*===========================================
+  =========== MATRIX 3 FUNCTIONS ============
+  ===========================================*/
+
+MATH_API mat3_t  mat3_identity(void);
+MATH_API mat3_t  mat3_set_identity(float32 value);
+MATH_API mat3_t  mat3_add(mat3_t A, mat3_t B);
+MATH_API mat3_t  mat3_subtract(mat3_t A, mat3_t B);
+MATH_API mat3_t  mat3_multiply(mat3_t A, mat3_t B);
+MATH_API mat3_t  mat3_divide(mat3_t A, mat3_t B);
+MATH_API mat3_t  mat3_reduce(mat3_t A, float32 B);
+MATH_API mat3_t  mat3_make_translation(vec3_t translation);
+MATH_API mat3_t  mat3_translate(mat3_t A, vec3_t translation);
+MATH_API mat3_t  mat3_make_scale(vec3_t scale);
+MATH_API mat3_t  mat3_scale(mat3_t A, vec3_t scale);
+MATH_API mat3_t  mat3_make_rotation(vec3_t axis, float32 rotation);
+MATH_API mat3_t  mat3_rotate(mat3_t A, vec3_t axis, float32 rotation);
+MATH_API mat3_t  mat3_transpose(mat3_t A);
+MATH_API mat3_t  mat3_invert(mat3_t A);
+MATH_API float32 mat3_determinant(mat3_t A);
+MATH_API float32 mat3_inverse_determinant(mat3_t A);
+
+/*===========================================
+  =========== MATRIX 4 FUNCTIONS ============
+  ===========================================*/
+
+MATH_API mat4_t  mat4_identity(void);
+MATH_API mat4_t  mat4_set_identity(float32 value);
+MATH_API mat4_t  mat4_add(mat4_t A, mat4_t B);
+MATH_API mat4_t  mat4_subtract(mat4_t A, mat4_t B);
+MATH_API mat4_t  mat4_multiply(mat4_t A, mat4_t B);
+MATH_API mat4_t  mat4_divide(mat4_t A, mat4_t B);
+MATH_API mat4_t  mat4_reduce(mat4_t A, float32 B);
+MATH_API mat4_t  mat4_make_translation(vec3_t translation);
+MATH_API mat4_t  mat4_translate(mat4_t A, vec3_t B);
+MATH_API mat4_t  mat4_make_scale(vec3_t scale);
+MATH_API mat4_t  mat4_scale(mat4_t A, vec3_t B);
+MATH_API mat4_t  mat4_make_rotation(vec3_t axis, float32 rotation);
+MATH_API mat4_t  mat4_rotate(mat4_t A, vec3_t axis, float32 rotation);
+MATH_API mat4_t  mat4_transpose(mat4_t A);
+MATH_API mat4_t  mat4_invert(mat4_t A);
+MATH_API float32 mat4_determinant(mat4_t A);
+MATH_API float32 mat4_inverse_determinant(mat4_t A);
+
+/*===========================================
+  =========== GRAPHICS TRANSFORMS ===========
+  ===========================================*/
+MATH_API mat4_t
+mat4_RHGL_ortho(float32 left,
+                float32 right,
+                float32 bottom,
+                float32 top,
+                float32 near,
+                float32 far);
+
+MATH_API mat4_t
+mat4_LHGL_ortho(float32 left,
+                float32 right,
+                float32 bottom,
+                float32 top,
+                float32 near,
+                float32 far);
+
+MATH_API mat4_t
+mat4_RHDX_ortho(float32 left,
+                float32 right,
+                float32 bottom,
+                float32 top,
+                float32 near,
+                float32 far);
+
+MATH_API mat4_t
+mat4_LHDX_ortho(float32 left,
+                float32 right,
+                float32 bottom,
+                float32 top,
+                float32 near,
+                float32 far);
+
+MATH_API mat4_t mat4_inverse_ortho(mat4_t orthographic_projection);
+
+/*==============================================
+  ================= RECTANGLES =================
+  ==============================================*/
+
+MATH_API rectangle2_t rect2_create(vec2_t position, vec2_t size);
+MATH_API rectangle2_t rect2_minkowski_sum(rectangle2_t A, rectangle2_t B);
+MATH_API rectangle2_t rect2_minkowski_difference(rectangle2_t A, rectangle2_t B);
+MATH_API void         rect2_shift_by(rectangle2_t *rect, vec2_t shift);
+MATH_API vec2_t       rect2_get_size(rectangle2_t rect);
+MATH_API vec2_t       rect2_get_position(rectangle2_t rect);
+MATH_API bool8        rect2_vec2_SAT(rectangle2_t rect, vec2_t point);
+MATH_API bool8        rect2_AABB_SAT(rectangle2_t A, rectangle2_t B);
+MATH_API raytest_t    rect2_ray_test(vec2_t position, vec2_t magnitude, rectangle2_t bounding_box) ;
+MATH_API raytest_t    rect2_sweep_test(rectangle2_t moving_rect, vec2_t velocity, rectangle2_t static_rect);
+MATH_API vec2_t       rect2_get_vector_depth(rectangle2_t rect);
+
+
+/*===========================================
+  ============== DEFINITIONS ================
+  ===========================================*/
+
+/*===========================================
+  ============= FLOAT32 FUNCTIONS ===========
+  ===========================================*/
+
+#ifdef MATH_IMPLEMENTATION
+
+MATH_API float32
+f32_lerp(float32 A, float32 B, float32 T)
+{
+    float32 result;
+    result = A + (B - A) * T;
+
+    return(result);
+}
+
+MATH_API float32
+f32_unlerp(float32 A, float32 B, float32 X)
+{
+    float32 result = 0.0f;
+    if(A != B)
+    {
+        result = (X - A) / (B - A);
+    }
+
+    return(result);
+}
+
+MATH_API bool8
+f32_equals(float32 A, float32 B, float32 tolerance)
+{
+    return(fabs(A - B) <= tolerance);
+}
+
+MATH_API void
+f32_approach(float32 *value, float32 target, float32 rate, float32 delta_t)
+{
+    *value += (float32)((target - *value) * (1.0 - pow(2.0f, -rate * delta_t)));
+    if(f32_equals(*value, target, 0.01f))
+    {
+        *value = target;
+    }
+}
+
+MATH_API float32
+f32_ease_out_quad(float32 x)
+{
+    return(1 - (1 - x) * (1 - x));
+}
+
+MATH_API float32
+f32_sin_breathe_normalized(float32 time, float32 modifier, float32 min, float32 max)
+{
+    float32 sinevalue = (sinf(modifier * 2 * PI32 * time) + 1.0f) / 2.0f;
+    return(min + (max - min) * sinevalue);
+}
+
+MATH_API float32
+f32_sin_breathe(float32 time, float32 modifier)
+{
+    return(sinf(time * modifier));
+}
+
+/*===========================================
+  ============= FLOAT64 FUNCTIONS ===========
+  ===========================================*/
+
+/*=====================================================
+  ================= VECTOR 2 FUNCTIONS ================
+  =====================================================*/
+MATH_API vec2_t
 vec2(float32 A, float32 B)
 {
     vec2_t result;
@@ -434,14 +679,14 @@ vec2(float32 A, float32 B)
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_zero()
 {
     vec2_t result = {};
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_create(float32 A)
 {
     vec2_t result = {};
@@ -451,7 +696,7 @@ vec2_create(float32 A)
     return(result);
 }
 
-inline vec3_t
+MATH_API vec3_t
 vec2_expand_vec3(vec2_t A, float32 B)
 {
     vec3_t result;
@@ -462,7 +707,7 @@ vec2_expand_vec3(vec2_t A, float32 B)
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_cast(ivec2_t A)
 {
     vec2_t result;
@@ -472,7 +717,7 @@ vec2_cast(ivec2_t A)
    return(result);
 }
 
-inline vec4_t
+MATH_API vec4_t
 vec2_expand_vec4(vec2_t A, float32 B, float32 C)
 {
     vec4_t result;
@@ -484,7 +729,7 @@ vec2_expand_vec4(vec2_t A, float32 B, float32 C)
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_scale(vec2_t A, float32 B)
 {
     vec2_t result;
@@ -494,7 +739,7 @@ vec2_scale(vec2_t A, float32 B)
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_multiply(vec2_t A, vec2_t B)
 {
     vec2_t result;
@@ -504,7 +749,7 @@ vec2_multiply(vec2_t A, vec2_t B)
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_add(vec2_t A, vec2_t B)
 {
     vec2_t result;
@@ -514,7 +759,7 @@ vec2_add(vec2_t A, vec2_t B)
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_subtract(vec2_t A, vec2_t B)
 {
     vec2_t result;
@@ -524,7 +769,7 @@ vec2_subtract(vec2_t A, vec2_t B)
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_reduce(vec2_t A, float32 B)
 {
     vec2_t result;
@@ -535,7 +780,7 @@ vec2_reduce(vec2_t A, float32 B)
 }
 
 // NOTE(Sleepster): "Should be magnitude" bla bla bla don't care 
-inline float32
+MATH_API float32
 vec2_length(vec2_t A)
 {
     float32 result = 0.0f;
@@ -544,7 +789,7 @@ vec2_length(vec2_t A)
     return(result);
 }
 
-inline float32
+MATH_API float32
 vec2_length_squared(vec2_t A)
 {
     float32 result = 0.0f;
@@ -553,7 +798,7 @@ vec2_length_squared(vec2_t A)
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_normalize(vec2_t A)
 {
     vec2_t result = {};
@@ -568,7 +813,7 @@ vec2_normalize(vec2_t A)
     return(result);
 }
 
-inline float32
+MATH_API float32
 vec2_dot(vec2_t A, vec2_t B)
 {
     float32 result;
@@ -577,7 +822,7 @@ vec2_dot(vec2_t A, vec2_t B)
     return(result);
 }
 
-inline float32
+MATH_API float32
 vec2_cross(vec2_t A, vec2_t B)
 {
     float32 result;
@@ -586,7 +831,7 @@ vec2_cross(vec2_t A, vec2_t B)
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_transform(mat2_t A, vec2_t B)
 {
     vec2_t result;
@@ -596,7 +841,7 @@ vec2_transform(mat2_t A, vec2_t B)
     return(result);
 }
 
-inline void
+MATH_API void
 vec2_approach(vec2_t *value, vec2_t target, vec2_t rate, float32 delta_t)
 {
     f32_approach(&value->x, target.x, rate.x, delta_t);
@@ -604,7 +849,7 @@ vec2_approach(vec2_t *value, vec2_t target, vec2_t rate, float32 delta_t)
 }
 
 #ifndef SL_MATH_USE_DEGREES
-inline vec2_t
+MATH_API vec2_t
 vec2_rotate(vec2_t A, float32 rotation)
 {
     vec2_t result;
@@ -620,7 +865,7 @@ vec2_rotate(vec2_t A, float32 rotation)
 
 #else
 
-inline vec2_t
+MATH_API vec2_t
 vec2_rotate(vec2_t A, float32 rotation)
 {
     vec2_t result;
@@ -635,7 +880,7 @@ vec2_rotate(vec2_t A, float32 rotation)
 }
 #endif
 
-inline vec2_t
+MATH_API vec2_t
 vec2_lerp(vec2_t A, vec2_t B, real32 time)
 {
     vec2_t result;
@@ -645,7 +890,7 @@ vec2_lerp(vec2_t A, vec2_t B, real32 time)
     return(result);
 }
 
-inline vec2_t
+MATH_API vec2_t
 vec2_unlerp(vec2_t A, vec2_t B, vec2_t X)
 {
     vec2_t result;
@@ -655,7 +900,7 @@ vec2_unlerp(vec2_t A, vec2_t B, vec2_t X)
     return(result);
 }
 
-inline vec2_t 
+MATH_API vec2_t 
 vec2_negate(vec2_t A)
 {
     vec2_t result;
@@ -666,8 +911,1455 @@ vec2_negate(vec2_t A)
     return(result);
 }
 
+/*=====================================================
+  ================= VECTOR 3 FUNCTIONS ================
+  =====================================================*/
+
+MATH_API vec3_t
+vec3(float32 A, float32 B, float32 C)
+{
+    vec3_t result;
+    result.x = A;
+    result.y = B;
+    result.z = C;
+
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_zero()
+{
+    vec3_t result = {};
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_create(float32 A)
+{
+    vec3_t result;
+    result.x = A;
+    result.y = A;
+    result.z = A;
+
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_cast(ivec3_t A)
+{
+    vec3_t result;
+    result.x = (float32)A.x;
+    result.y = (float32)A.y;
+    result.z = (float32)A.z;
+
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_multiply(vec3_t A, vec3_t B)
+{
+    vec3_t result;
+    result.x = A.x * B.x;
+    result.y = A.y * B.y;
+    result.z = A.z * B.z;
+
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_subtract(vec3_t A, vec3_t B)
+{
+    vec3_t result;
+    result.x = A.x - B.x;
+    result.y = A.y - B.y;
+    result.z = A.z - B.z;
+
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_add(vec3_t A, vec3_t B)
+{
+    vec3_t result;
+    result.x = A.x + B.x;
+    result.y = A.y + B.y;
+    result.z = A.z + B.z;
+
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_scale(vec3_t A, float32 B)
+{
+    vec3_t result;
+    result.x = A.x * B;
+    result.y = A.y * B;
+    result.z = A.z * B;
+
+    return(result);
+}
+
+MATH_API float32
+vec3_length(vec3_t A)
+{
+    float32 result;
+    result = sqrt(Square(A.x) + Square(A.y) + Square(A.z));
+
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_normalize(vec3_t A)
+{
+    vec3_t result;
+    
+    float32 magnitude = vec3_length(A);
+    result.x = A.x / magnitude;
+    result.y = A.y / magnitude;
+    result.z = A.z / magnitude;
+
+    return(result);
+}
+
+MATH_API float32
+vec3_dot(vec3_t A, vec3_t B)
+{
+    float32 result;
+    result = (A.x * B.x) + (A.y * B.y) + (A.z * B.z);
+
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_cross(vec3_t A, vec3_t B)
+{
+    vec3_t result;
+    result.x = (A.y * B.z) - (A.z * B.y);
+    result.y = (A.z * B.x) - (A.x * B.z);
+    result.z = (A.x * B.y) - (A.y * B.x);
+
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_transform(vec3_t A, mat3_t B)
+{
+    vec3_t result;
+    result.x = (B._00 * A.x) + (B._01 * A.y) + (B._02 * A.z);
+    result.y = (B._10 * A.x) + (B._11 * A.y) + (B._12 * A.z);
+    result.z = (B._20 * A.x) + (B._21 * A.y) + (B._22 * A.z);
+
+    return(result);
+}
+
+MATH_API vec4_t
+vec3_expand_vec4(vec3_t A, float32 B)
+{
+    vec4_t result;
+    result.x = A.x;
+    result.y = A.y;
+    result.z = A.z;
+    result.w = B;
+
+    return(result);
+}
+
+
+#ifndef SL_MATH_USE_DEGREES
+MATH_API vec3_t
+vec3_rotate(vec3_t A, vec3_t axis, float32 rotation)
+{
+    vec3_t result;
+
+    float32 cos_angle  = cosf(-rotation);
+    float32 sin_angle  = sinf(-rotation);
+
+    float32 axis_dot   = vec3_dot(axis, A);
+    vec3_t  axis_cross = vec3_cross(axis, A);
+
+    float32 k          = axis_dot * (1.0f - cos_angle);
+
+    result.x = (A.x * cos_angle) + (axis_cross.x * sin_angle) + (axis.x * k);
+    result.y = (A.y * cos_angle) + (axis_cross.y * sin_angle) + (axis.y * k);
+    result.z = (A.z * cos_angle) + (axis_cross.z * sin_angle) + (axis.z * k);
+
+    return(result);
+}
+
+#else
+
+MATH_API vec3_t
+vec3_rotate(vec3_t A, vec3_t axis, float32 rotation)
+{
+    vec3_t result;
+
+    float32 cos_angle  = cosf(deg_to_rad(-rotation));
+    float32 sin_angle  = sinf(deg_to_rad(-rotation));
+
+    float32 axis_dot   = vec3_dot(axis, A);
+    vec3_t  axis_cross = vec3_cross(axis, A);
+
+    float32 k          = axis_dot * (1.0f - cos_angle);
+
+    result.x = (A.x * cos_angle) + (axis_cross.x * sin_angle) + (axis.x * k);
+    result.y = (A.y * cos_angle) + (axis_cross.y * sin_angle) + (axis.y * k);
+    result.z = (A.z * cos_angle) + (axis_cross.z * sin_angle) + (axis.z * k);
+
+    return(result);
+}
+#endif
+
+MATH_API vec3_t
+vec3_lerp(vec3_t A, vec3_t B, real32 time)
+{
+    vec3_t result;
+    result.x = f32_lerp(A.x, B.x, time);
+    result.y = f32_lerp(A.y, B.y, time);
+    result.z = f32_lerp(A.z, B.z, time);
+
+    return(result);
+}
+
+MATH_API vec3_t
+vec3_unlerp(vec3_t A, vec3_t B, vec3_t X)
+{
+    vec3_t result;
+    result.x = f32_unlerp(A.x, B.x, X.x);
+    result.y = f32_unlerp(A.y, B.y, X.y);
+    result.z = f32_unlerp(A.z, B.z, X.z);
+
+    return(result);
+}
+
+
+/*=====================================================
+  ================= VECTOR 4 FUNCTIONS ================
+  =====================================================*/
+
+MATH_API vec4_t
+vec4(float32 A, float32 B, float32 C, float32 D)
+{
+    vec4_t result;
+    result.SSE = _mm_setr_ps(A, B, C, D);
+
+    return(result);
+}
+
+MATH_API vec4_t
+vec4_zero()
+{
+    vec4_t result = {};
+    return(result);
+}
+
+MATH_API vec4_t
+vec4_create(float32 A)
+{
+    vec4_t result;
+    // TODO(Sleepster): Perhaps make this a 32 bit -> 128bit SIMD function???
+    // (128bit load)
+    result.SSE = _mm_set_ps1(A);
+
+    return(result);
+}
+
+MATH_API vec4_t
+vec4_scale(vec4_t A, float32 B)
+{
+    vec4_t result;
+
+    __m128 B_vector = _mm_set_ps1(B);
+    result.SSE      = _mm_mul_ps(A.SSE, B_vector);
+
+    return(result);
+}
+
+MATH_API vec4_t
+vec4_multiply(vec4_t A, vec4_t B)
+{
+    vec4_t result;
+    result.SSE = _mm_mul_ps(A.SSE, B.SSE);
+
+    return(result);
+}
+
+MATH_API float32
+vec4_length(vec4_t A)
+{
+    float32 result;
+    result = sqrt(Square(A.x) + Square(A.y) + Square(A.z) + Square(A.w));
+
+    return(result);
+}
+
+MATH_API vec4_t
+vec4_normalize(vec4_t A)
+{
+    vec4_t result;
+    float32 magnitude     = vec4_length(A);
+    __m128  magnitude_reg = _mm_set_ps1(magnitude);
+
+    result.SSE = _mm_div_ps(A.SSE, magnitude_reg);
+    return(result);
+}
+
+MATH_API float32
+vec4_dot(vec4_t A, vec4_t B)
+{
+    float32 result;
+    result = (A.x * B.x) + (A.y * B.y) + (A.z * B.z) + (A.w * B.w);
+
+    return(result);
+}
+
+MATH_API vec4_t
+vec4_transform(mat4_t A, vec4_t B)
+{
+    vec4_t result = {};
+
+    result.SSE = _mm_mul_ps(_mm_shuffle_ps(B.SSE, B.SSE, 0x00), A.columns[0].SSE);
+    result.SSE = _mm_add_ps(result.SSE, _mm_mul_ps(_mm_shuffle_ps(B.SSE, B.SSE, 0x55), A.columns[1].SSE));
+    result.SSE = _mm_add_ps(result.SSE, _mm_mul_ps(_mm_shuffle_ps(B.SSE, B.SSE, 0xaa), A.columns[2].SSE));
+    result.SSE = _mm_add_ps(result.SSE, _mm_mul_ps(_mm_shuffle_ps(B.SSE, B.SSE, 0xff), A.columns[3].SSE));
+
+    /* result.x = (A._00 * B.x) + (A._01 * B.x) + (A._02 * B.x) + (A._03 * B.x); */
+    /* result.y = (A._10 * B.y) + (A._11 * B.y) + (A._12 * B.y) + (A._13 * B.y); */
+    /* result.z = (A._20 * B.z) + (A._21 * B.z) + (A._22 * B.z) + (A._23 * B.z); */
+    /* result.w = (A._30 * B.w) + (A._31 * B.w) + (A._32 * B.w) + (A._33 * B.w); */
+    
+    return(result);
+}
+
+MATH_API vec4_t
+vec4_lerp(vec4_t A, vec4_t B, real32 time)
+{
+    vec4_t result;
+    result.x = f32_lerp(A.x, B.x, time);
+    result.y = f32_lerp(A.y, B.y, time);
+    result.z = f32_lerp(A.z, B.z, time);
+    result.w = f32_lerp(A.w, B.w, time);
+
+    return(result);
+}
+
+MATH_API vec4_t
+vec4_unlerp(vec4_t A, vec4_t B, vec4_t X)
+{
+    vec4_t result;
+    result.x = f32_unlerp(A.x, B.x, X.x);
+    result.y = f32_unlerp(A.y, B.y, X.y);
+    result.z = f32_unlerp(A.z, B.z, X.z);
+    result.w = f32_unlerp(A.w, B.w, X.w);
+
+    return(result);
+}
+
+/*===========================================
+  ========== IVECTOR 2 FUNCTIONS ============
+  ===========================================*/
+
+MATH_API ivec2_t
+ivec2()
+{
+    ivec2_t result = {};
+    return(result);
+}
+
+MATH_API ivec2_t
+ivec2_create(s32 A)
+{
+    ivec2_t result;
+    result.x = A;
+    result.y = A;
+
+    return(result);
+}
+
+MATH_API ivec2_t
+ivec2_create_int32(s32 A, s32 B)
+{
+    ivec2_t result;
+    result.x = A;
+    result.y = B;
+
+    return(result);
+}
+
+MATH_API ivec3_t
+ivec2_expand_ivec3(ivec2_t A, s32 B)
+{
+    ivec3_t result;
+    result.x = A.x;
+    result.y = A.y;
+    result.z = B;
+
+    return(result);
+}
+
+MATH_API ivec4_t
+ivec2_expand_ivec4(ivec2_t A, s32 B, s32 C)
+{
+    ivec4_t result;
+    result.x = A.x;
+    result.y = A.y;
+    result.z = B;
+    result.w = C;
+
+    return(result);
+}
+
+MATH_API ivec2_t
+ivec2_cast(vec2_t A)
+{
+    ivec2_t result;
+    result.x = (s32)A.x;
+    result.y = (s32)A.y;
+
+    return(result);
+}
+
+MATH_API ivec2_t
+ivec2_multiply(ivec2_t A, ivec2_t B)
+{
+    ivec2_t result;
+    result.x = A.x * B.x;
+    result.y = A.y * B.y;
+
+    return(result);
+}
+
+/*===========================================
+  ========== IVECTOR 3 FUNCTIONS ============
+  ===========================================*/
+MATH_API ivec3_t
+ivec3()
+{
+    ivec3_t result = {};
+    return(result);
+}
+
+MATH_API ivec3_t
+ivec3_create(s32 A)
+{
+    ivec3_t result;
+    result.x = A;
+    result.y = A;
+    result.z = A;
+
+    return(result);
+}
+
+MATH_API ivec3_t
+ivec3_create_int32(s32 A, s32 B, s32 C)
+{
+    ivec3_t result;
+    result.x = A;
+    result.y = B;
+    result.z = C;
+
+    return(result);
+}
+
+MATH_API ivec3_t
+ivec3_cast(vec3_t A)
+{
+    ivec3_t result;
+    result.x = (s32) A.x;
+    result.y = (s32) A.y;
+    result.z = (s32) A.z;
+
+    return(result);
+}
+
+MATH_API ivec3_t
+ivec3_multiply(ivec3_t A, ivec3_t B)
+{
+    ivec3_t result;
+    result.x = A.x * B.x;
+    result.y = A.y * B.y;
+    result.z = A.z * B.z;
+
+    return(result);
+}
+
+
+/*===========================================
+  ========== IVECTOR 4 FUNCTIONS ============
+  ===========================================*/
+MATH_API ivec4_t
+ivec4()
+{
+    ivec4_t result = {};
+    return(result);
+}
+
+MATH_API ivec4_t
+ivec4_create(s32 A)
+{
+    ivec4_t result;
+    result.SSE = _mm_set1_epi32(A);
+
+    return(result);
+}
+
+MATH_API ivec4_t
+ivec4_create_int32(s32 A, s32 B, s32 C, s32 D)
+{
+    ivec4_t result;
+    result.SSE = _mm_set_epi32(A, B, C, D);
+
+    return(result);
+}
+
+MATH_API vec4_t
+vec4_cast(ivec4_t A)
+{
+    vec4_t result;
+    result.x = (float32)A.x;
+    result.y = (float32)A.y;
+    result.z = (float32)A.z;
+    result.w = (float32)A.w;
+
+    return(result);
+}
+
+MATH_API ivec4_t
+ivec4_cast(vec4_t A)
+{
+    ivec4_t result;
+    result.x = (s32)A.x;
+    result.y = (s32)A.y;
+    result.z = (s32)A.z;
+    result.w = (s32)A.w;
+
+    return(result);
+}
+
+MATH_API ivec4_t
+ivec4_multiply(ivec4_t A, ivec4_t B)
+{
+    ivec4_t result;
+    
+    result.x = A.x * B.x;
+    result.y = A.y * B.y;
+    result.z = A.z * B.z;
+    result.w = A.w * B.w;
+
+    return(result);
+}
+
+/*===========================================
+  ================ MATRIX 2 =================
+  ===========================================*/
+
+MATH_API mat2_t
+mat2_identity(void)
+{
+    mat2_t result = {};
+    result._00 = 1.0f;
+    result._11 = 1.0f;
+
+    return(result);
+}
+
+MATH_API mat2_t
+mat2_set_identity(float32 value)
+{
+    mat2_t result = {};
+    result._00 = value;
+    result._11 = value;
+
+    return(result);
+}
+
+MATH_API mat2_t
+mat2_transpose(mat2_t A)
+{
+    mat2_t result = {};
+    result._01 = A._10;
+    result._10 = A._01;
+
+    return(result);
+}
+
+MATH_API mat2_t
+mat2_add(mat2_t A, mat2_t B)
+{
+    mat2_t result;
+
+    result._00 = A._00 + B._00;
+    result._10 = A._10 + B._10;
+    result._01 = A._01 + B._01;
+    result._11 = A._11 + B._11;
+
+    return(result);
+}
+
+MATH_API mat2_t
+mat2_subtract(mat2_t A, mat2_t B)
+{
+    mat2_t result;
+
+    result._00 = A._00 - B._00;
+    result._10 = A._10 - B._10;
+    result._01 = A._01 - B._01;
+    result._11 = A._11 - B._11;
+
+    return(result);
+}
+
+MATH_API mat2_t
+mat2_multiply(mat2_t A, mat2_t B)
+{
+    mat2_t result;
+
+    result._00 = A._00 * B._00;
+    result._10 = A._10 * B._10;
+    result._01 = A._01 * B._01;
+    result._11 = A._11 * B._11;
+
+    return(result);
+}
+
+MATH_API mat2_t
+mat2_divide(mat2_t A, mat2_t B)
+{
+    mat2_t result;
+
+    result._00 = A._00 / B._00;
+    result._10 = A._10 / B._10;
+    result._01 = A._01 / B._01;
+    result._11 = A._11 / B._11;
+
+    return(result);
+}
+
+MATH_API mat2_t
+mat2_reduce(mat2_t A, vec2_t B)
+{
+    mat2_t result;
+    result._00 = A._00 / B.x;
+    result._01 = A._10 / B.x;
+
+    result._10 = A._00 / B.y;
+    result._11 = A._01 / B.y;
+
+    return(result);
+}
+
+MATH_API mat2_t
+mat2_scale(mat2_t A, vec2_t B)
+{
+    mat2_t result;
+    result._00 = A._00 * B.x;
+    result._01 = A._10 * B.x;
+
+    result._10 = A._00 * B.y;
+    result._11 = A._01 * B.y;
+
+    return(result);
+}
+
+#ifndef SL_MATH_USE_DEGREES
+MATH_API mat2_t
+mat2_rotate(mat2_t A, float32 B)
+{
+    mat2_t result;
+    float32 cos_angle = cosf(-B);
+    float32 sin_angle = sinf(-B);
+
+    mat2_t rotation_matrix;
+    rotation_matrix._00 =  cos_angle;
+    rotation_matrix._01 = -sin_angle;
+    rotation_matrix._10 =  sin_angle;
+    rotation_matrix._11 =  cos_angle;
+    
+    result = mat2_multiply(A, rotation_matrix);
+
+    return(result);
+}
+
+#else
+
+MATH_API mat2_t
+mat2_rotate(mat2_t A, float32 B)
+{
+    mat2_t result;
+    float32 cos_angle = cosf(deg_to_rad(-B));
+    float32 sin_angle = sinf(deg_to_rad(-B));
+
+    mat2_t rotation_matrix;
+    rotation_matrix._00 =  cos_angle;
+    rotation_matrix._01 = -sin_angle;
+    rotation_matrix._10 =  sin_angle;
+    rotation_matrix._11 =  cos_angle;
+    
+    result = mat2_mul_mat2(A, rotation_matrix);
+
+    return(result);
+}
+#endif
+
+MATH_API float32
+mat2_determinant(mat2_t A)
+{
+    float32 result;
+    result = (A.elements[0][0] * A.elements[0][1]) - (A.elements[0][1] * A.elements[1][0]);
+
+    return(result);
+}
+
+MATH_API mat2_t 
+mat2_inverse(mat2_t A)
+{
+    mat2_t result;
+    float32 inverse_determinate = 1.0f / mat2_determinant(A);
+
+    result.elements[0][0] = inverse_determinate * +A.elements[1][1];
+    result.elements[1][1] = inverse_determinate * +A.elements[0][0];
+    result.elements[0][1] = inverse_determinate * -A.elements[0][1];
+    result.elements[1][0] = inverse_determinate * -A.elements[1][0];
+
+    return(result);
+}
+
+
+/*===========================================
+  ================ MATRIX 3 =================
+  ===========================================*/
+
+MATH_API mat3_t
+mat3_identity(void)
+{
+    mat3_t result = {};
+    result._00 = 1.0f;
+    result._11 = 1.0f;
+    result._22 = 1.0f;
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_set_identity(float32 value)
+{
+    mat3_t result = {};
+    result._00 = value;
+    result._11 = value;
+    result._22 = value;
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_add(mat3_t A, mat3_t B)
+{
+    mat3_t result;
+    result._00 = A._00 + B._00;
+    result._01 = A._01 + B._01;
+    result._02 = A._02 + B._02;
+
+    result._10 = A._10 + B._10;
+    result._11 = A._11 + B._11;
+    result._12 = A._12 + B._12;
+
+    result._20 = A._20 + B._20;
+    result._21 = A._21 + B._21;
+    result._22 = A._22 + B._22;
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_subtract(mat3_t A, mat3_t B)
+{
+    mat3_t result;
+    result._00 = A._00 - B._00;
+    result._01 = A._01 - B._01;
+    result._02 = A._02 - B._02;
+
+    result._10 = A._10 - B._10;
+    result._11 = A._11 - B._11;
+    result._12 = A._12 - B._12;
+
+    result._20 = A._20 - B._20;
+    result._21 = A._21 - B._21;
+    result._22 = A._22 - B._22;
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_multiply(mat3_t A, mat3_t B)
+{
+    mat3_t result;
+    result._00 = A._00 * B._00;
+    result._01 = A._01 * B._01;
+    result._02 = A._02 * B._02;
+
+    result._10 = A._10 * B._10;
+    result._11 = A._11 * B._11;
+    result._12 = A._12 * B._12;
+
+    result._20 = A._20 * B._20;
+    result._21 = A._21 * B._21;
+    result._22 = A._22 * B._22;
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_divide(mat3_t A, mat3_t B)
+{
+    mat3_t result;
+    result._00 = A._00 / B._00;
+    result._01 = A._01 / B._01;
+    result._02 = A._02 / B._02;
+
+    result._10 = A._10 / B._10;
+    result._11 = A._11 / B._11;
+    result._12 = A._12 / B._12;
+
+    result._20 = A._20 / B._20;
+    result._21 = A._21 / B._21;
+    result._22 = A._22 / B._22;
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_reduce(mat3_t A, float32 B)
+{
+    mat3_t result;
+    result._00 = A._00 / B;
+    result._01 = A._01 / B;
+    result._02 = A._02 / B;
+
+    result._10 = A._10 / B;
+    result._11 = A._11 / B;
+    result._12 = A._12 / B;
+
+    result._20 = A._20 / B;
+    result._21 = A._21 / B;
+    result._22 = A._22 / B;
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_make_translation(vec3_t translation)
+{
+    mat3_t result = mat3_identity();
+    result.elements[0][0] = translation.x;
+    result.elements[1][1] = translation.y;
+    result.elements[2][2] = translation.z;
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_translate(mat3_t A, vec3_t translation)
+{
+    return(mat3_multiply(A, mat3_make_translation(translation)));
+}
+
+MATH_API mat3_t
+mat3_make_scale(vec3_t scale)
+{
+    mat3_t result = {};
+    result.elements[0][0] = scale.x;
+    result.elements[1][1] = scale.y;
+    result.elements[2][2] = scale.z;
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_scale(mat3_t A, vec3_t scale)
+{
+    return(mat3_multiply(A, mat3_make_scale(scale)));
+}
+
+MATH_API mat3_t
+mat3_make_rotation(vec3_t axis, float32 rotation)
+{
+    mat3_t result = mat3_identity();
+
+    axis = vec3_normalize(axis);
+
+    float32 sin_theta = sinf(-rotation);
+    float32 cos_theta = sinf(-rotation);
+    float32 cos_value = 1.0f - cos_theta;
+
+    result.elements[0][0] = (axis.x * axis.x * cos_value) + cos_theta;
+    result.elements[0][1] = (axis.x * axis.y * cos_value) + (axis.z * sin_theta);
+    result.elements[0][2] = (axis.x * axis.z * cos_value) - (axis.y * sin_theta);
+
+    result.elements[1][0] = (axis.y * axis.x * cos_value) - (axis.z * sin_theta);
+    result.elements[1][1] = (axis.y * axis.y * cos_value) + cos_theta;
+    result.elements[1][2] = (axis.y * axis.z * cos_value) + (axis.x * sin_theta);
+
+    result.elements[2][0] = (axis.z * axis.x * cos_value) + (axis.y * sin_theta);
+    result.elements[2][1] = (axis.z * axis.y * cos_value) - (axis.x * sin_theta);
+    result.elements[2][2] = (axis.z * axis.z * cos_value) + cos_theta;
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_rotate(mat3_t A, vec3_t axis, float32 rotation)
+{
+    return(mat3_multiply(A, mat3_make_rotation(axis, rotation)));
+}
+
+MATH_API mat3_t
+mat3_transpose(mat3_t A)
+{
+    mat3_t result = A;
+    result.elements[0][1] = A.elements[1][0];
+    result.elements[0][2] = A.elements[2][0];
+    result.elements[1][0] = A.elements[0][1];
+    result.elements[1][2] = A.elements[2][1];
+    result.elements[2][1] = A.elements[1][2];
+    result.elements[2][0] = A.elements[0][2];
+
+    return(result);
+}
+
+MATH_API mat3_t
+mat3_invert(mat3_t A)
+{
+    mat3_t result;
+    result.columns[0] = vec3_cross(A.columns[1], A.columns[2]);
+    result.columns[1] = vec3_cross(A.columns[2], A.columns[0]);
+    result.columns[2] = vec3_cross(A.columns[0], A.columns[1]);
+
+    float inverse_determinant = 1.0f / vec3_dot(result.columns[2], A.columns[2]);
+    result.columns[0] = vec3_scale(result.columns[0], inverse_determinant);
+    result.columns[1] = vec3_scale(result.columns[1], inverse_determinant);
+    result.columns[2] = vec3_scale(result.columns[2], inverse_determinant);
+
+    return(mat3_transpose(result));
+}
+
+MATH_API float32 
+mat3_determinant(mat3_t A)
+{
+    float32 result;
+
+    mat3_t cross;
+    cross.columns[0] = vec3_cross(A.columns[1], A.columns[2]);
+    cross.columns[1] = vec3_cross(A.columns[2], A.columns[0]);
+    cross.columns[2] = vec3_cross(A.columns[0], A.columns[1]);
+
+    result = vec3_dot(cross.columns[2], A.columns[2]);
+
+    return(result);
+}
+
+MATH_API float32 
+mat3_inverse_determinant(mat3_t A)
+{
+    return(1.0f / mat3_determinant(A));
+}
+
+
+/*===========================================
+  ================ MATRIX 4 =================
+  ===========================================*/
+
+MATH_API mat4_t
+mat4_identity(void)
+{
+    mat4_t result = {};
+    result._00 = 1.0f;
+    result._11 = 1.0f;
+    result._22 = 1.0f;
+    result._33 = 1.0f;
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_set_identity(float32 value)
+{
+    mat4_t result = {};
+    result._00 = value;
+    result._11 = value;
+    result._22 = value;
+    result._33 = value;
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_add(mat4_t A, mat4_t B)
+{
+    mat4_t result;
+    result.columns[0].SSE = _mm_add_ps(A.columns[0].SSE, B.columns[0].SSE);
+    result.columns[1].SSE = _mm_add_ps(A.columns[1].SSE, B.columns[1].SSE);
+    result.columns[2].SSE = _mm_add_ps(A.columns[2].SSE, B.columns[2].SSE);
+    result.columns[3].SSE = _mm_add_ps(A.columns[3].SSE, B.columns[3].SSE);
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_subtract(mat4_t A, mat4_t B)
+{
+    mat4_t result;
+    result.columns[0].SSE = _mm_sub_ps(A.columns[0].SSE, B.columns[0].SSE);
+    result.columns[1].SSE = _mm_sub_ps(A.columns[1].SSE, B.columns[1].SSE);
+    result.columns[2].SSE = _mm_sub_ps(A.columns[2].SSE, B.columns[2].SSE);
+    result.columns[3].SSE = _mm_sub_ps(A.columns[3].SSE, B.columns[3].SSE);
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_multiply(mat4_t A, mat4_t B)
+{
+    mat4_t result;
+
+    // TODO(Sleepster): Optimize this... 
+    result.columns[0] = vec4_transform(A, B.columns[0]);
+    result.columns[1] = vec4_transform(A, B.columns[1]);
+    result.columns[2] = vec4_transform(A, B.columns[2]);
+    result.columns[3] = vec4_transform(A, B.columns[3]);
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_divide(mat4_t A, mat4_t B)
+{
+    mat4_t result;
+    
+    result.columns[0].SSE = _mm_div_ps(A.columns[0].SSE, B.columns[0].SSE);
+    result.columns[1].SSE = _mm_div_ps(A.columns[1].SSE, B.columns[1].SSE);
+    result.columns[2].SSE = _mm_div_ps(A.columns[2].SSE, B.columns[2].SSE);
+    result.columns[3].SSE = _mm_div_ps(A.columns[3].SSE, B.columns[3].SSE);
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_reduce(mat4_t A, float32 B)
+{
+    mat4_t result;
+    __m128 scaler_vector = _mm_set_ps1(B);
+
+    result.columns[0].SSE = _mm_div_ps(A.columns[0].SSE, scaler_vector);
+    result.columns[1].SSE = _mm_div_ps(A.columns[1].SSE, scaler_vector);
+    result.columns[2].SSE = _mm_div_ps(A.columns[2].SSE, scaler_vector);
+    result.columns[3].SSE = _mm_div_ps(A.columns[3].SSE, scaler_vector);
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_make_translation(vec3_t translation)
+{
+    mat4_t result = mat4_identity();
+    result.elements[3][0] = translation.x;
+    result.elements[3][1] = translation.y;
+    result.elements[3][2] = translation.z;
+    
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_translate(mat4_t A, vec3_t B)
+{
+    return(mat4_multiply(A, mat4_make_translation(B)));
+}
+
+MATH_API mat4_t
+mat4_make_scale(vec3_t scale)
+{
+    mat4_t result = mat4_identity();
+    result.elements[0][0] = scale.x;
+    result.elements[1][1] = scale.y;
+    result.elements[2][2] = scale.z;
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_scale(mat4_t A, vec3_t B)
+{
+    return(mat4_multiply(A, mat4_make_scale(B)));
+}
+
+MATH_API mat4_t
+mat4_make_rotation(vec3_t axis, float32 rotation)
+{
+    mat4_t result = mat4_identity();
+
+    axis = vec3_normalize(axis);
+
+    float32 sin_theta = sinf(-rotation);
+    float32 cos_theta = sinf(-rotation);
+    float32 cos_value = 1.0f - cos_theta;
+
+    result.elements[0][0] = (axis.x * axis.x * cos_value) + cos_theta;
+    result.elements[0][1] = (axis.x * axis.y * cos_value) + (axis.z * sin_theta);
+    result.elements[0][2] = (axis.x * axis.z * cos_value) - (axis.y * sin_theta);
+
+    result.elements[1][0] = (axis.y * axis.x * cos_value) - (axis.z * sin_theta);
+    result.elements[1][1] = (axis.y * axis.y * cos_value) + cos_theta;
+    result.elements[1][2] = (axis.y * axis.z * cos_value) + (axis.x * sin_theta);
+
+    result.elements[2][0] = (axis.z * axis.x * cos_value) + (axis.y * sin_theta);
+    result.elements[2][1] = (axis.z * axis.y * cos_value) - (axis.x * sin_theta);
+    result.elements[2][2] = (axis.z * axis.z * cos_value) + cos_theta;
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_rotate(mat4_t A, vec3_t axis, float32 rotation)
+{
+    return(mat4_multiply(A, mat4_make_rotation(axis, rotation)));
+}
+
+MATH_API mat4_t
+mat4_transpose(mat4_t A)
+{
+    mat4_t result = A;
+    _MM_TRANSPOSE4_PS(result.columns[0].SSE, result.columns[1].SSE, result.columns[2].SSE, result.columns[3].SSE);
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_invert(mat4_t A)
+{
+    mat4_t result;
+
+    vec3_t column_cross01 = vec3_cross(A.columns[0].xyz, A.columns[1].xyz);
+    vec3_t column_cross23 = vec3_cross(A.columns[2].xyz, A.columns[3].xyz);
+
+    vec3_t quat_scale10 = vec3_subtract(vec3_scale(A.columns[0].xyz, A.columns[1].w), vec3_scale(A.columns[1].xyz, A.columns[0].w)); 
+    vec3_t quat_scale23 = vec3_subtract(vec3_scale(A.columns[2].xyz, A.columns[3].w), vec3_scale(A.columns[3].xyz, A.columns[2].w));
+
+    float32 inverse_determinant = 1.0f / (vec3_dot(column_cross01, quat_scale23) + vec3_dot(column_cross23, quat_scale10));
+
+    column_cross01 = vec3_scale(column_cross01, inverse_determinant);
+    column_cross23 = vec3_scale(column_cross23, inverse_determinant);
+    quat_scale10   = vec3_scale(quat_scale10, inverse_determinant);
+    quat_scale23   = vec3_scale(quat_scale23, inverse_determinant);
+
+    result.columns[0] = vec3_expand_vec4(vec3_add(vec3_cross(A.columns[1].xyz, quat_scale23), vec3_scale(column_cross23, A.columns[1].w)), -vec3_dot(A.columns[1].xyz, column_cross23));
+    result.columns[1] = vec3_expand_vec4(vec3_subtract(vec3_cross(quat_scale23, A.columns[0].xyz), vec3_scale(column_cross23, A.columns[0].w)), +vec3_dot(A.columns[0].xyz, column_cross23));
+    result.columns[2] = vec3_expand_vec4(vec3_add(vec3_cross(A.columns[3].xyz, quat_scale10), vec3_scale(column_cross01, A.columns[3].w)), -vec3_dot(A.columns[3].xyz, column_cross01));
+    result.columns[3] = vec3_expand_vec4(vec3_subtract(vec3_cross(quat_scale10, A.columns[2].xyz), vec3_scale(column_cross01, A.columns[2].w)), +vec3_dot(A.columns[2].xyz, column_cross01));
+    
+    return(mat4_transpose(result));
+}
+
+MATH_API float32
+mat4_determinant(mat4_t A)
+{
+    float32 result = 0.0f;
+
+    vec3_t column_cross01 = vec3_cross(A.columns[0].xyz, A.columns[1].xyz);
+    vec3_t column_cross23 = vec3_cross(A.columns[2].xyz, A.columns[3].xyz);
+
+    vec3_t quat_scale10 = vec3_subtract(vec3_scale(A.columns[0].xyz, A.columns[1].w), vec3_scale(A.columns[1].xyz, A.columns[0].w));
+    vec3_t quat_scale23 = vec3_subtract(vec3_scale(A.columns[2].xyz, A.columns[3].w), vec3_scale(A.columns[3].xyz, A.columns[2].w));
+
+    result = vec3_dot(column_cross01, quat_scale23) + vec3_dot(column_cross23, quat_scale10);
+    
+    return(result);
+}
+
+MATH_API float32
+mat4_inverse_determinant(mat4_t A)
+{
+    return(1.0f / mat4_determinant(A));
+}
+
+/*===========================================
+  =========== GRAPHICS TRANSFORMS ===========
+  ===========================================*/
+
+// NOTE(Sleepster): Near and far plane are -1 - 1 OpenGL standard.
+MATH_API mat4_t
+mat4_RHGL_ortho(float32 left,
+                float32 right,
+                float32 bottom,
+                float32 top,
+                float32 near,
+                float32 far)
+{
+    mat4_t result = mat4_identity();
+
+    result.elements[0][0] = 2.0f / (right - left);
+    result.elements[1][1] = 2.0f / (top - bottom);
+    result.elements[2][2] = 2.0f / (near - far);
+    result.elements[3][3] = 1.0f;
+
+    result.elements[3][0] = (left + right) / (left - right);
+    result.elements[3][1] = (bottom + top) / (bottom - top);
+    result.elements[3][2] = (near + far) / (near - far);
+
+    return(result);
+}
+
+// NOTE(Sleepster): Near and far plane are 0 - 1 DirectX standard.
+MATH_API mat4_t
+mat4_RHDX_ortho(float32 left,
+                float32 right,
+                float32 bottom,
+                float32 top,
+                float32 near,
+                float32 far)
+{
+    mat4_t result = mat4_identity();
+
+    result.elements[0][0] = 2.0f / (right - left);
+    result.elements[1][1] = 2.0f / (top - bottom);
+    result.elements[2][2] = 2.0f / (near - far);
+    result.elements[3][3] = 1.0f;
+
+    result.elements[3][0] = (left + right) / (left - right);
+    result.elements[3][1] = (bottom + top) / (bottom - top);
+    result.elements[3][2] = (near + far) / (near - far);
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_LHGL_ortho(float32 left,
+                float32 right,
+                float32 bottom,
+                float32 top,
+                float32 near,
+                float32 far)
+{
+    mat4_t result = mat4_RHGL_ortho(left, right, bottom, top, near, far);
+    result.elements[2][2] = -result.elements[2][2];
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_LHDX_ortho(float32 left,
+                float32 right,
+                float32 bottom,
+                float32 top,
+                float32 near,
+                float32 far)
+{
+    mat4_t result = mat4_RHDX_ortho(left, right, bottom, top, near, far);
+    result.elements[2][2] = -result.elements[2][2];
+
+    return(result);
+}
+
+MATH_API mat4_t
+mat4_inverse_ortho(mat4_t orthographic_projection)
+{
+    mat4_t result = mat4_identity();
+    result.elements[0][0] = 1.0f / orthographic_projection.elements[0][0];
+    result.elements[1][1] = 1.0f / orthographic_projection.elements[1][1];
+    result.elements[2][2] = 1.0f / orthographic_projection.elements[2][2];
+    result.elements[3][3] = 1.0f;
+
+    result.elements[3][0] = -orthographic_projection.elements[3][0] * result.elements[0][0];
+    result.elements[3][1] = -orthographic_projection.elements[3][1] * result.elements[1][1];
+    result.elements[3][2] = -orthographic_projection.elements[3][2] * result.elements[2][2];
+
+    return(result);
+}
+
+/*==============================================
+  ================= RECTANGLES =================
+  ==============================================*/
+
+MATH_API rectangle2_t
+rect2_create(vec2_t position, vec2_t size)
+{
+    rectangle2_t result;
+    result.min       = position;
+    result.max       = vec2_add(position, size);
+    result.half_size = vec2_scale(size, 0.5f);
+    result.center    = vec2_add(position, result.half_size);
+
+    return(result);
+}
+
+MATH_API void 
+rect2_shift_by(rectangle2_t *rect, vec2_t shift)
+{
+    rect->min    = vec2_add(rect->min, shift);
+    rect->max    = vec2_add(rect->max, shift);
+    rect->center = vec2_add(rect->center, shift);
+}
+
+MATH_API vec2_t
+rect2_get_size(rectangle2_t rect)
+{
+    vec2_t result = vec2_scale(rect.half_size, 2.0f);
+
+    return(result);
+}
+
+MATH_API vec2_t
+rect2_get_position(rectangle2_t rect)
+{
+    return(rect.min);
+}
+
+MATH_API bool8
+rect2_vec2_SAT(rectangle2_t rect, vec2_t point)
+{
+    return (point.x >= rect.min.x && point.x <= rect.max.x && 
+            point.y >= rect.min.y && point.y <= rect.max.y);
+}
+
+MATH_API bool8
+rect2_AABB_SAT(rectangle2_t A, rectangle2_t B)
+{
+    return (A.min.x <= B.max.x && A.max.x >= B.min.x &&
+            A.min.y <= B.max.y && A.max.y >= B.min.y);
+}
+
+MATH_API rectangle2_t 
+rect2_minkowski_sum(rectangle2_t A, rectangle2_t B)
+{
+    rectangle2_t result;
+
+    result.min       = vec2_add(A.min, B.min);
+    result.max       = vec2_add(A.max, B.max);
+    result.half_size = vec2_scale(vec2_subtract(result.max, result.min), 0.5f);
+    result.center    = vec2_add(result.min, result.half_size);
+
+    return(result);
+}
+
+MATH_API rectangle2_t
+rect2_minkowski_difference(rectangle2_t A, rectangle2_t B)
+{
+    rectangle2_t result;
+
+    result.min       = vec2_subtract(A.min, B.max);
+    result.max       = vec2_subtract(A.max, B.min);
+    result.half_size = vec2_scale(vec2_subtract(result.max, result.min), 0.5f);
+    result.center    = vec2_add(result.min, result.half_size);
+
+    return(result);
+}
+
+MATH_API raytest_t 
+rect2_ray_test(vec2_t position, vec2_t magnitude, rectangle2_t bounding_box) 
+{
+    raytest_t result = {};
+
+    float32 last_entry = -INFINITY;
+    float32 first_exit =  INFINITY;
+
+    for(u32 axis = 0;
+        axis < 2;
+        ++axis)
+    {
+        if(magnitude.elements[axis] != 0.0f)
+        {
+            float32 time0 = (bounding_box.min.elements[axis] - position.elements[axis]) / magnitude.elements[axis];
+            float32 time1 = (bounding_box.max.elements[axis] - position.elements[axis]) / magnitude.elements[axis];
+
+            last_entry = Max(last_entry, Min(time0, time1));
+            first_exit = Min(first_exit, Max(time0, time1));
+        }
+        else if(position.elements[axis] <= bounding_box.min.elements[axis] || 
+                position.elements[axis] >= bounding_box.max.elements[axis])
+        {
+            return(result);
+        }
+    }
+
+    if(first_exit > last_entry && first_exit > 0.0f && last_entry < 1.0f)
+    {
+        result.hit      = true;
+        result.time     = last_entry;
+        result.position = vec2(position.x + (magnitude.x * last_entry),
+                               position.y + (magnitude.y * last_entry));
+
+        float32 dcenter_x = result.position.x - bounding_box.center.x;
+        float32 dcenter_y = result.position.y - bounding_box.center.y;
+
+        float32 overlap_x = bounding_box.half_size.x - Abs(dcenter_x);
+        float32 overlap_y = bounding_box.half_size.y - Abs(dcenter_y);
+        if(overlap_x < overlap_y)
+        {
+            result.normal.x = (dcenter_x > 0) - (dcenter_x < 0);
+        }
+        else
+        {
+            result.normal.y = (dcenter_y > 0) - (dcenter_y < 0);
+        }
+    }
+
+    return(result);
+}
+
+MATH_API raytest_t 
+rect2_sweep_test(rectangle2_t moving_rect, vec2_t velocity, rectangle2_t static_rect)
+{
+    raytest_t result;
+    rectangle2_t expanded_box;
+    expanded_box.min       = vec2_subtract(static_rect.min, moving_rect.half_size);
+    expanded_box.max       = vec2_add(static_rect.max, moving_rect.half_size);
+    expanded_box.center    = vec2_scale(vec2_add(expanded_box.min, expanded_box.max), 0.5f);
+    expanded_box.half_size = vec2_scale(vec2_subtract(expanded_box.max, expanded_box.min), 0.5f);
+
+    result = rect2_ray_test(moving_rect.center, velocity, expanded_box);
+
+    return(result);
+}
+
+MATH_API vec2_t
+rect2_get_vector_depth(rectangle2_t rect)
+{
+    vec2_t result;
+
+    float32 min_distance = Abs(rect.min.x);
+    result.x = rect.min.x;
+    result.y = 0.0f;
+
+    if (Abs(rect.max.x) < min_distance)
+    {
+        min_distance = Abs(rect.max.x);
+        result.x = rect.max.x;
+        result.y = 0.0f;
+    }
+
+    if (Abs(rect.min.y) < min_distance)
+    {
+        min_distance = Abs(rect.min.y);
+        result.x = 0.0f;
+        result.y = rect.min.y;
+    }
+
+    if (Abs(rect.max.y) < min_distance)
+    {
+        result.x = 0.0f;
+        result.y = rect.max.y;
+    }
+
+    return result;
+}
+#endif // MATH_IMPLEMENTATION
 
 #ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+
+/*===========================================
+  ================= VECTOR 2 ================
+  ===========================================*/
 
 inline vec2_t 
 operator+(vec2_t A, vec2_t B)
@@ -757,231 +2449,9 @@ operator/=(vec2_t A, vec2_t B)
     return(result);
 }
 
-#endif
-
-
 /*===========================================
   ================= VECTOR 3 ================
   ===========================================*/
-
-inline vec3_t
-vec3(float32 A, float32 B, float32 C)
-{
-    vec3_t result;
-    result.x = A;
-    result.y = B;
-    result.z = C;
-
-    return(result);
-}
-
-inline vec3_t
-vec3_zero()
-{
-    vec3_t result = {};
-    return(result);
-}
-
-inline vec3_t
-vec3_create(float32 A)
-{
-    vec3_t result;
-    result.x = A;
-    result.y = A;
-    result.z = A;
-
-    return(result);
-}
-
-inline vec3_t
-vec3_cast(ivec3_t A)
-{
-    vec3_t result;
-    result.x = (float32)A.x;
-    result.y = (float32)A.y;
-    result.z = (float32)A.z;
-
-    return(result);
-}
-
-inline vec3_t
-vec3_multiply(vec3_t A, vec3_t B)
-{
-    vec3_t result;
-    result.x = A.x * B.x;
-    result.y = A.y * B.y;
-    result.z = A.z * B.z;
-
-    return(result);
-}
-
-inline vec3_t
-vec3_subtract(vec3_t A, vec3_t B)
-{
-    vec3_t result;
-    result.x = A.x - B.x;
-    result.y = A.y - B.y;
-    result.z = A.z - B.z;
-
-    return(result);
-}
-
-inline vec3_t
-vec3_add(vec3_t A, vec3_t B)
-{
-    vec3_t result;
-    result.x = A.x + B.x;
-    result.y = A.y + B.y;
-    result.z = A.z + B.z;
-
-    return(result);
-}
-
-inline vec3_t
-vec3_scale(vec3_t A, float32 B)
-{
-    vec3_t result;
-    result.x = A.x * B;
-    result.y = A.y * B;
-    result.z = A.z * B;
-
-    return(result);
-}
-
-inline float32
-vec3_length(vec3_t A)
-{
-    float32 result;
-    result = sqrt(Square(A.x) + Square(A.y) + Square(A.z));
-
-    return(result);
-}
-
-inline vec3_t
-vec3_normalize(vec3_t A)
-{
-    vec3_t result;
-    
-    float32 magnitude = vec3_length(A);
-    result.x = A.x / magnitude;
-    result.y = A.y / magnitude;
-    result.z = A.z / magnitude;
-
-    return(result);
-}
-
-inline float32
-vec3_dot(vec3_t A, vec3_t B)
-{
-    float32 result;
-    result = (A.x * B.x) + (A.y * B.y) + (A.z * B.z);
-
-    return(result);
-}
-
-inline vec3_t
-vec3_cross(vec3_t A, vec3_t B)
-{
-    vec3_t result;
-    result.x = (A.y * B.z) - (A.z * B.y);
-    result.y = (A.z * B.x) - (A.x * B.z);
-    result.z = (A.x * B.y) - (A.y * B.x);
-
-    return(result);
-}
-
-inline vec3_t
-vec3_transform(vec3_t A, mat3_t B)
-{
-    vec3_t result;
-    result.x = (B._00 * A.x) + (B._01 * A.y) + (B._02 * A.z);
-    result.y = (B._10 * A.x) + (B._11 * A.y) + (B._12 * A.z);
-    result.z = (B._20 * A.x) + (B._21 * A.y) + (B._22 * A.z);
-
-    return(result);
-}
-
-inline vec4_t
-vec3_expand_vec4(vec3_t A, float32 B)
-{
-    vec4_t result;
-    result.x = A.x;
-    result.y = A.y;
-    result.z = A.z;
-    result.w = B;
-
-    return(result);
-}
-
-
-#ifndef SL_MATH_USE_DEGREES
-inline vec3_t
-vec3_rotate(vec3_t A, vec3_t axis, float32 rotation)
-{
-    vec3_t result;
-
-    float32 cos_angle  = cosf(-rotation);
-    float32 sin_angle  = sinf(-rotation);
-
-    float32 axis_dot   = vec3_dot(axis, A);
-    vec3_t  axis_cross = vec3_cross(axis, A);
-
-    float32 k          = axis_dot * (1.0f - cos_angle);
-
-    result.x = (A.x * cos_angle) + (axis_cross.x * sin_angle) + (axis.x * k);
-    result.y = (A.y * cos_angle) + (axis_cross.y * sin_angle) + (axis.y * k);
-    result.z = (A.z * cos_angle) + (axis_cross.z * sin_angle) + (axis.z * k);
-
-    return(result);
-}
-
-#else
-
-inline vec3_t
-vec3_rotate(vec3_t A, vec3_t axis, float32 rotation)
-{
-    vec3_t result;
-
-    float32 cos_angle  = cosf(deg_to_rad(-rotation));
-    float32 sin_angle  = sinf(deg_to_rad(-rotation));
-
-    float32 axis_dot   = vec3_dot(axis, A);
-    vec3_t  axis_cross = vec3_cross(axis, A);
-
-    float32 k          = axis_dot * (1.0f - cos_angle);
-
-    result.x = (A.x * cos_angle) + (axis_cross.x * sin_angle) + (axis.x * k);
-    result.y = (A.y * cos_angle) + (axis_cross.y * sin_angle) + (axis.y * k);
-    result.z = (A.z * cos_angle) + (axis_cross.z * sin_angle) + (axis.z * k);
-
-    return(result);
-}
-#endif
-
-inline vec3_t
-vec3_lerp(vec3_t A, vec3_t B, real32 time)
-{
-    vec3_t result;
-    result.x = f32_lerp(A.x, B.x, time);
-    result.y = f32_lerp(A.y, B.y, time);
-    result.z = f32_lerp(A.z, B.z, time);
-
-    return(result);
-}
-
-inline vec3_t
-vec3_unlerp(vec3_t A, vec3_t B, vec3_t X)
-{
-    vec3_t result;
-    result.x = f32_unlerp(A.x, B.x, X.x);
-    result.y = f32_unlerp(A.y, B.y, X.y);
-    result.z = f32_unlerp(A.z, B.z, X.z);
-
-    return(result);
-}
-
-
-#ifdef __cplusplus
 
 inline vec3_t 
 operator+(vec3_t A, vec3_t B)
@@ -1079,1242 +2549,5 @@ operator/=(vec3_t A, vec3_t B)
     return(result);
 }
 
-#endif
-
-
-/*===========================================
-  ================= VECTOR 4 ================
-  ===========================================*/
-inline vec4_t
-vec4(float32 A, float32 B, float32 C, float32 D)
-{
-    vec4_t result;
-    result.SSE = _mm_setr_ps(A, B, C, D);
-
-    return(result);
-}
-
-inline vec4_t
-vec4_zero()
-{
-    vec4_t result = {};
-    return(result);
-}
-
-inline vec4_t
-vec4_create(float32 A)
-{
-    vec4_t result;
-    // TODO(Sleepster): Perhaps make this a 32 bit -> 128bit SIMD function???
-    // (128bit load)
-    result.SSE = _mm_set_ps1(A);
-
-    return(result);
-}
-
-inline vec4_t
-vec4_scale(vec4_t A, float32 B)
-{
-    vec4_t result;
-
-    __m128 B_vector = _mm_set_ps1(B);
-    result.SSE      = _mm_mul_ps(A.SSE, B_vector);
-
-    return(result);
-}
-
-inline vec4_t
-vec4_multiply(vec4_t A, vec4_t B)
-{
-    vec4_t result;
-    result.SSE = _mm_mul_ps(A.SSE, B.SSE);
-
-    return(result);
-}
-
-inline float32
-vec4_length(vec4_t A)
-{
-    float32 result;
-    result = sqrt(Square(A.x) + Square(A.y) + Square(A.z) + Square(A.w));
-
-    return(result);
-}
-
-inline vec4_t
-vec4_normalize(vec4_t A)
-{
-    vec4_t result;
-    float32 magnitude     = vec4_length(A);
-    __m128  magnitude_reg = _mm_set_ps1(magnitude);
-
-    result.SSE = _mm_div_ps(A.SSE, magnitude_reg);
-    return(result);
-}
-
-inline float32
-vec4_dot(vec4_t A, vec4_t B)
-{
-    float32 result;
-    result = (A.x * B.x) + (A.y * B.y) + (A.z * B.z) + (A.w * B.w);
-
-    return(result);
-}
-
-inline vec4_t
-vec4_transform(mat4_t A, vec4_t B)
-{
-    vec4_t result = {};
-
-    result.SSE = _mm_mul_ps(_mm_shuffle_ps(B.SSE, B.SSE, 0x00), A.columns[0].SSE);
-    result.SSE = _mm_add_ps(result.SSE, _mm_mul_ps(_mm_shuffle_ps(B.SSE, B.SSE, 0x55), A.columns[1].SSE));
-    result.SSE = _mm_add_ps(result.SSE, _mm_mul_ps(_mm_shuffle_ps(B.SSE, B.SSE, 0xaa), A.columns[2].SSE));
-    result.SSE = _mm_add_ps(result.SSE, _mm_mul_ps(_mm_shuffle_ps(B.SSE, B.SSE, 0xff), A.columns[3].SSE));
-
-    /* result.x = (A._00 * B.x) + (A._01 * B.x) + (A._02 * B.x) + (A._03 * B.x); */
-    /* result.y = (A._10 * B.y) + (A._11 * B.y) + (A._12 * B.y) + (A._13 * B.y); */
-    /* result.z = (A._20 * B.z) + (A._21 * B.z) + (A._22 * B.z) + (A._23 * B.z); */
-    /* result.w = (A._30 * B.w) + (A._31 * B.w) + (A._32 * B.w) + (A._33 * B.w); */
-    
-    return(result);
-}
-
-inline vec4_t
-vec4_lerp(vec4_t A, vec4_t B, real32 time)
-{
-    vec4_t result;
-    result.x = f32_lerp(A.x, B.x, time);
-    result.y = f32_lerp(A.y, B.y, time);
-    result.z = f32_lerp(A.z, B.z, time);
-    result.w = f32_lerp(A.w, B.w, time);
-
-    return(result);
-}
-
-inline vec4_t
-vec4_unlerp(vec4_t A, vec4_t B, vec4_t X)
-{
-    vec4_t result;
-    result.x = f32_unlerp(A.x, B.x, X.x);
-    result.y = f32_unlerp(A.y, B.y, X.y);
-    result.z = f32_unlerp(A.z, B.z, X.z);
-    result.w = f32_unlerp(A.w, B.w, X.w);
-
-    return(result);
-}
-
-
-
-/*===========================================
-  ================ IVECTOR 2 ================
-  ===========================================*/
-inline ivec2_t
-ivec2()
-{
-    ivec2_t result = {};
-    return(result);
-}
-
-inline ivec2_t
-ivec2_create(s32 A)
-{
-    ivec2_t result;
-    result.x = A;
-    result.y = A;
-
-    return(result);
-}
-
-inline ivec2_t
-ivec2_create_int32(s32 A, s32 B)
-{
-    ivec2_t result;
-    result.x = A;
-    result.y = B;
-
-    return(result);
-}
-
-inline ivec3_t
-ivec2_expand_ivec3(ivec2_t A, s32 B)
-{
-    ivec3_t result;
-    result.x = A.x;
-    result.y = A.y;
-    result.z = B;
-
-    return(result);
-}
-
-inline ivec4_t
-ivec2_expand_ivec4(ivec2_t A, s32 B, s32 C)
-{
-    ivec4_t result;
-    result.x = A.x;
-    result.y = A.y;
-    result.z = B;
-    result.w = C;
-
-    return(result);
-}
-
-inline ivec2_t
-ivec2_cast(vec2_t A)
-{
-    ivec2_t result;
-    result.x = (s32)A.x;
-    result.y = (s32)A.y;
-
-    return(result);
-}
-
-inline ivec2_t
-ivec2_multiply(ivec2_t A, ivec2_t B)
-{
-    ivec2_t result;
-    result.x = A.x * B.x;
-    result.y = A.y * B.y;
-
-    return(result);
-}
-
-/*===========================================
-  ================ IVECTOR 3 ================
-  ===========================================*/
-inline ivec3_t
-ivec3()
-{
-    ivec3_t result = {};
-    return(result);
-}
-
-inline ivec3_t
-ivec3_create(s32 A)
-{
-    ivec3_t result;
-    result.x = A;
-    result.y = A;
-    result.z = A;
-
-    return(result);
-}
-
-inline ivec3_t
-ivec3_create_int32(s32 A, s32 B, s32 C)
-{
-    ivec3_t result;
-    result.x = A;
-    result.y = B;
-    result.z = C;
-
-    return(result);
-}
-
-inline ivec3_t
-ivec3_cast(vec3_t A)
-{
-    ivec3_t result;
-    result.x = (s32) A.x;
-    result.y = (s32) A.y;
-    result.z = (s32) A.z;
-
-    return(result);
-}
-
-inline ivec3_t
-ivec3_multiply(ivec3_t A, ivec3_t B)
-{
-    ivec3_t result;
-    result.x = A.x * B.x;
-    result.y = A.y * B.y;
-    result.z = A.z * B.z;
-
-    return(result);
-}
-
-
-/*===========================================
-  ================ IVECTOR 4 ================
-  ===========================================*/
-inline ivec4_t
-ivec4()
-{
-    ivec4_t result = {};
-    return(result);
-}
-
-inline ivec4_t
-ivec4_create(s32 A)
-{
-    ivec4_t result;
-    result.SSE = _mm_set1_epi32(A);
-
-    return(result);
-}
-
-inline ivec4_t
-ivec4_create_int32(s32 A, s32 B, s32 C, s32 D)
-{
-    ivec4_t result;
-    result.SSE = _mm_set_epi32(A, B, C, D);
-
-    return(result);
-}
-
-inline vec4_t
-vec4_cast(ivec4_t A)
-{
-    vec4_t result;
-    result.x = (float32)A.x;
-    result.y = (float32)A.y;
-    result.z = (float32)A.z;
-    result.w = (float32)A.w;
-
-    return(result);
-}
-
-inline ivec4_t
-ivec4_cast(vec4_t A)
-{
-    ivec4_t result;
-    result.x = (s32)A.x;
-    result.y = (s32)A.y;
-    result.z = (s32)A.z;
-    result.w = (s32)A.w;
-
-    return(result);
-}
-
-inline ivec4_t
-ivec4_multiply(ivec4_t A, ivec4_t B)
-{
-    ivec4_t result;
-    
-    result.x = A.x * B.x;
-    result.y = A.y * B.y;
-    result.z = A.z * B.z;
-    result.w = A.w * B.w;
-
-    return(result);
-}
-
-
-/*===========================================
-  ================ MATRIX 2 =================
-  ===========================================*/
-
-inline mat2_t
-mat2_identity(void)
-{
-    mat2_t result = {};
-    result._00 = 1.0f;
-    result._11 = 1.0f;
-
-    return(result);
-}
-
-inline mat2_t
-mat2_set_identity(float32 value)
-{
-    mat2_t result = {};
-    result._00 = value;
-    result._11 = value;
-
-    return(result);
-}
-
-inline mat2_t
-mat2_transpose(mat2_t A)
-{
-    mat2_t result = {};
-    result._01 = A._10;
-    result._10 = A._01;
-
-    return(result);
-}
-
-inline mat2_t
-mat2_add(mat2_t A, mat2_t B)
-{
-    mat2_t result;
-
-    result._00 = A._00 + B._00;
-    result._10 = A._10 + B._10;
-    result._01 = A._01 + B._01;
-    result._11 = A._11 + B._11;
-
-    return(result);
-}
-
-inline mat2_t
-mat2_subtract(mat2_t A, mat2_t B)
-{
-    mat2_t result;
-
-    result._00 = A._00 - B._00;
-    result._10 = A._10 - B._10;
-    result._01 = A._01 - B._01;
-    result._11 = A._11 - B._11;
-
-    return(result);
-}
-
-inline mat2_t
-mat2_multiply(mat2_t A, mat2_t B)
-{
-    mat2_t result;
-
-    result._00 = A._00 * B._00;
-    result._10 = A._10 * B._10;
-    result._01 = A._01 * B._01;
-    result._11 = A._11 * B._11;
-
-    return(result);
-}
-
-inline mat2_t
-mat2_divide(mat2_t A, mat2_t B)
-{
-    mat2_t result;
-
-    result._00 = A._00 / B._00;
-    result._10 = A._10 / B._10;
-    result._01 = A._01 / B._01;
-    result._11 = A._11 / B._11;
-
-    return(result);
-}
-
-inline mat2_t
-mat2_reduce(mat2_t A, vec2_t B)
-{
-    mat2_t result;
-    result._00 = A._00 / B.x;
-    result._01 = A._10 / B.x;
-
-    result._10 = A._00 / B.y;
-    result._11 = A._01 / B.y;
-
-    return(result);
-}
-
-inline mat2_t
-mat2_scale(mat2_t A, vec2_t B)
-{
-    mat2_t result;
-    result._00 = A._00 * B.x;
-    result._01 = A._10 * B.x;
-
-    result._10 = A._00 * B.y;
-    result._11 = A._01 * B.y;
-
-    return(result);
-}
-
-#ifndef SL_MATH_USE_DEGREES
-inline mat2_t
-mat2_rotate(mat2_t A, float32 B)
-{
-    mat2_t result;
-    float32 cos_angle = cosf(-B);
-    float32 sin_angle = sinf(-B);
-
-    mat2_t rotation_matrix;
-    rotation_matrix._00 =  cos_angle;
-    rotation_matrix._01 = -sin_angle;
-    rotation_matrix._10 =  sin_angle;
-    rotation_matrix._11 =  cos_angle;
-    
-    result = mat2_multiply(A, rotation_matrix);
-
-    return(result);
-}
-
-#else
-
-inline mat2_t
-mat2_rotate(mat2_t A, float32 B)
-{
-    mat2_t result;
-    float32 cos_angle = cosf(deg_to_rad(-B));
-    float32 sin_angle = sinf(deg_to_rad(-B));
-
-    mat2_t rotation_matrix;
-    rotation_matrix._00 =  cos_angle;
-    rotation_matrix._01 = -sin_angle;
-    rotation_matrix._10 =  sin_angle;
-    rotation_matrix._11 =  cos_angle;
-    
-    result = mat2_mul_mat2(A, rotation_matrix);
-
-    return(result);
-}
-#endif
-
-inline float32
-mat2_determinant(mat2_t A)
-{
-    float32 result;
-    result = (A.elements[0][0] * A.elements[0][1]) - (A.elements[0][1] * A.elements[1][0]);
-
-    return(result);
-}
-
-inline mat2_t 
-mat2_inverse(mat2_t A)
-{
-    mat2_t result;
-    float32 inverse_determinate = 1.0f / mat2_determinant(A);
-
-    result.elements[0][0] = inverse_determinate * +A.elements[1][1];
-    result.elements[1][1] = inverse_determinate * +A.elements[0][0];
-    result.elements[0][1] = inverse_determinate * -A.elements[0][1];
-    result.elements[1][0] = inverse_determinate * -A.elements[1][0];
-
-    return(result);
-}
-
-
-/*===========================================
-  ================ MATRIX 3 =================
-  ===========================================*/
-
-inline mat3_t
-mat3_identity(void)
-{
-    mat3_t result = {};
-    result._00 = 1.0f;
-    result._11 = 1.0f;
-    result._22 = 1.0f;
-
-    return(result);
-}
-
-inline mat3_t
-mat3_set_identity(float32 value)
-{
-    mat3_t result = {};
-    result._00 = value;
-    result._11 = value;
-    result._22 = value;
-
-    return(result);
-}
-
-inline mat3_t
-mat3_add(mat3_t A, mat3_t B)
-{
-    mat3_t result;
-    result._00 = A._00 + B._00;
-    result._01 = A._01 + B._01;
-    result._02 = A._02 + B._02;
-
-    result._10 = A._10 + B._10;
-    result._11 = A._11 + B._11;
-    result._12 = A._12 + B._12;
-
-    result._20 = A._20 + B._20;
-    result._21 = A._21 + B._21;
-    result._22 = A._22 + B._22;
-
-    return(result);
-}
-
-inline mat3_t
-mat3_subtract(mat3_t A, mat3_t B)
-{
-    mat3_t result;
-    result._00 = A._00 - B._00;
-    result._01 = A._01 - B._01;
-    result._02 = A._02 - B._02;
-
-    result._10 = A._10 - B._10;
-    result._11 = A._11 - B._11;
-    result._12 = A._12 - B._12;
-
-    result._20 = A._20 - B._20;
-    result._21 = A._21 - B._21;
-    result._22 = A._22 - B._22;
-
-    return(result);
-}
-
-inline mat3_t
-mat3_multiply(mat3_t A, mat3_t B)
-{
-    mat3_t result;
-    result._00 = A._00 * B._00;
-    result._01 = A._01 * B._01;
-    result._02 = A._02 * B._02;
-
-    result._10 = A._10 * B._10;
-    result._11 = A._11 * B._11;
-    result._12 = A._12 * B._12;
-
-    result._20 = A._20 * B._20;
-    result._21 = A._21 * B._21;
-    result._22 = A._22 * B._22;
-
-    return(result);
-}
-
-inline mat3_t
-mat3_divide(mat3_t A, mat3_t B)
-{
-    mat3_t result;
-    result._00 = A._00 / B._00;
-    result._01 = A._01 / B._01;
-    result._02 = A._02 / B._02;
-
-    result._10 = A._10 / B._10;
-    result._11 = A._11 / B._11;
-    result._12 = A._12 / B._12;
-
-    result._20 = A._20 / B._20;
-    result._21 = A._21 / B._21;
-    result._22 = A._22 / B._22;
-
-    return(result);
-}
-
-inline mat3_t
-mat3_reduce(mat3_t A, float32 B)
-{
-    mat3_t result;
-    result._00 = A._00 / B;
-    result._01 = A._01 / B;
-    result._02 = A._02 / B;
-
-    result._10 = A._10 / B;
-    result._11 = A._11 / B;
-    result._12 = A._12 / B;
-
-    result._20 = A._20 / B;
-    result._21 = A._21 / B;
-    result._22 = A._22 / B;
-
-    return(result);
-}
-
-inline mat3_t
-mat3_make_translation(vec3_t translation)
-{
-    mat3_t result = mat3_identity();
-    result.elements[0][0] = translation.x;
-    result.elements[1][1] = translation.y;
-    result.elements[2][2] = translation.z;
-
-    return(result);
-}
-
-inline mat3_t
-mat3_translate(mat3_t A, vec3_t translation)
-{
-    return(mat3_multiply(A, mat3_make_translation(translation)));
-}
-
-inline mat3_t
-mat3_make_scale(vec3_t scale)
-{
-    mat3_t result = {};
-    result.elements[0][0] = scale.x;
-    result.elements[1][1] = scale.y;
-    result.elements[2][2] = scale.z;
-
-    return(result);
-}
-
-inline mat3_t
-mat3_scale(mat3_t A, vec3_t scale)
-{
-    return(mat3_multiply(A, mat3_make_scale(scale)));
-}
-
-inline mat3_t
-mat3_make_rotation(vec3_t axis, float32 rotation)
-{
-    mat3_t result = mat3_identity();
-
-    axis = vec3_normalize(axis);
-
-    float32 sin_theta = sinf(-rotation);
-    float32 cos_theta = sinf(-rotation);
-    float32 cos_value = 1.0f - cos_theta;
-
-    result.elements[0][0] = (axis.x * axis.x * cos_value) + cos_theta;
-    result.elements[0][1] = (axis.x * axis.y * cos_value) + (axis.z * sin_theta);
-    result.elements[0][2] = (axis.x * axis.z * cos_value) - (axis.y * sin_theta);
-
-    result.elements[1][0] = (axis.y * axis.x * cos_value) - (axis.z * sin_theta);
-    result.elements[1][1] = (axis.y * axis.y * cos_value) + cos_theta;
-    result.elements[1][2] = (axis.y * axis.z * cos_value) + (axis.x * sin_theta);
-
-    result.elements[2][0] = (axis.z * axis.x * cos_value) + (axis.y * sin_theta);
-    result.elements[2][1] = (axis.z * axis.y * cos_value) - (axis.x * sin_theta);
-    result.elements[2][2] = (axis.z * axis.z * cos_value) + cos_theta;
-
-    return(result);
-}
-
-inline mat3_t
-mat3_rotate(mat3_t A, vec3_t axis, float32 rotation)
-{
-    return(mat3_multiply(A, mat3_make_rotation(axis, rotation)));
-}
-
-inline mat3_t
-mat3_transpose(mat3_t A)
-{
-    mat3_t result = A;
-    result.elements[0][1] = A.elements[1][0];
-    result.elements[0][2] = A.elements[2][0];
-    result.elements[1][0] = A.elements[0][1];
-    result.elements[1][2] = A.elements[2][1];
-    result.elements[2][1] = A.elements[1][2];
-    result.elements[2][0] = A.elements[0][2];
-
-    return(result);
-}
-
-inline mat3_t
-mat3_invert(mat3_t A)
-{
-    mat3_t result;
-    result.columns[0] = vec3_cross(A.columns[1], A.columns[2]);
-    result.columns[1] = vec3_cross(A.columns[2], A.columns[0]);
-    result.columns[2] = vec3_cross(A.columns[0], A.columns[1]);
-
-    float inverse_determinant = 1.0f / vec3_dot(result.columns[2], A.columns[2]);
-    result.columns[0] = vec3_scale(result.columns[0], inverse_determinant);
-    result.columns[1] = vec3_scale(result.columns[1], inverse_determinant);
-    result.columns[2] = vec3_scale(result.columns[2], inverse_determinant);
-
-    return(mat3_transpose(result));
-}
-
-inline float32 
-mat3_determinant(mat3_t A)
-{
-    float32 result;
-
-    mat3_t cross;
-    cross.columns[0] = vec3_cross(A.columns[1], A.columns[2]);
-    cross.columns[1] = vec3_cross(A.columns[2], A.columns[0]);
-    cross.columns[2] = vec3_cross(A.columns[0], A.columns[1]);
-
-    result = vec3_dot(cross.columns[2], A.columns[2]);
-
-    return(result);
-}
-
-inline float32 
-mat3_inverse_determinant(mat3_t A)
-{
-    return(1.0f / mat3_determinant(A));
-}
-
-
-/*===========================================
-  ================ MATRIX 4 =================
-  ===========================================*/
-
-inline mat4_t
-mat4_identity(void)
-{
-    mat4_t result = {};
-    result._00 = 1.0f;
-    result._11 = 1.0f;
-    result._22 = 1.0f;
-    result._33 = 1.0f;
-
-    return(result);
-}
-
-inline mat4_t
-mat4_set_identity(float32 value)
-{
-    mat4_t result = {};
-    result._00 = value;
-    result._11 = value;
-    result._22 = value;
-    result._33 = value;
-
-    return(result);
-}
-
-inline mat4_t
-mat4_add(mat4_t A, mat4_t B)
-{
-    mat4_t result;
-    result.columns[0].SSE = _mm_add_ps(A.columns[0].SSE, B.columns[0].SSE);
-    result.columns[1].SSE = _mm_add_ps(A.columns[1].SSE, B.columns[1].SSE);
-    result.columns[2].SSE = _mm_add_ps(A.columns[2].SSE, B.columns[2].SSE);
-    result.columns[3].SSE = _mm_add_ps(A.columns[3].SSE, B.columns[3].SSE);
-
-    return(result);
-}
-
-inline mat4_t
-mat4_subtract(mat4_t A, mat4_t B)
-{
-    mat4_t result;
-    result.columns[0].SSE = _mm_sub_ps(A.columns[0].SSE, B.columns[0].SSE);
-    result.columns[1].SSE = _mm_sub_ps(A.columns[1].SSE, B.columns[1].SSE);
-    result.columns[2].SSE = _mm_sub_ps(A.columns[2].SSE, B.columns[2].SSE);
-    result.columns[3].SSE = _mm_sub_ps(A.columns[3].SSE, B.columns[3].SSE);
-
-    return(result);
-}
-
-inline mat4_t
-mat4_multiply(mat4_t A, mat4_t B)
-{
-    mat4_t result;
-
-    // TODO(Sleepster): Optimize this... 
-    result.columns[0] = vec4_transform(A, B.columns[0]);
-    result.columns[1] = vec4_transform(A, B.columns[1]);
-    result.columns[2] = vec4_transform(A, B.columns[2]);
-    result.columns[3] = vec4_transform(A, B.columns[3]);
-
-    return(result);
-}
-
-inline mat4_t
-mat4_divide(mat4_t A, mat4_t B)
-{
-    mat4_t result;
-    
-    result.columns[0].SSE = _mm_div_ps(A.columns[0].SSE, B.columns[0].SSE);
-    result.columns[1].SSE = _mm_div_ps(A.columns[1].SSE, B.columns[1].SSE);
-    result.columns[2].SSE = _mm_div_ps(A.columns[2].SSE, B.columns[2].SSE);
-    result.columns[3].SSE = _mm_div_ps(A.columns[3].SSE, B.columns[3].SSE);
-
-    return(result);
-}
-
-inline mat4_t
-mat4_reduce(mat4_t A, float32 B)
-{
-    mat4_t result;
-    __m128 scaler_vector = _mm_set_ps1(B);
-
-    result.columns[0].SSE = _mm_div_ps(A.columns[0].SSE, scaler_vector);
-    result.columns[1].SSE = _mm_div_ps(A.columns[1].SSE, scaler_vector);
-    result.columns[2].SSE = _mm_div_ps(A.columns[2].SSE, scaler_vector);
-    result.columns[3].SSE = _mm_div_ps(A.columns[3].SSE, scaler_vector);
-
-    return(result);
-}
-
-inline mat4_t
-mat4_make_translation(vec3_t translation)
-{
-    mat4_t result = mat4_identity();
-    result.elements[3][0] = translation.x;
-    result.elements[3][1] = translation.y;
-    result.elements[3][2] = translation.z;
-    
-    return(result);
-}
-
-inline mat4_t
-mat4_translate(mat4_t A, vec3_t B)
-{
-    return(mat4_multiply(A, mat4_make_translation(B)));
-}
-
-inline mat4_t
-mat4_make_scale(vec3_t scale)
-{
-    mat4_t result = mat4_identity();
-    result.elements[0][0] = scale.x;
-    result.elements[1][1] = scale.y;
-    result.elements[2][2] = scale.z;
-
-    return(result);
-}
-
-inline mat4_t
-mat4_scale(mat4_t A, vec3_t B)
-{
-    return(mat4_multiply(A, mat4_make_scale(B)));
-}
-
-inline mat4_t
-mat4_make_rotation(vec3_t axis, float32 rotation)
-{
-    mat4_t result = mat4_identity();
-
-    axis = vec3_normalize(axis);
-
-    float32 sin_theta = sinf(-rotation);
-    float32 cos_theta = sinf(-rotation);
-    float32 cos_value = 1.0f - cos_theta;
-
-    result.elements[0][0] = (axis.x * axis.x * cos_value) + cos_theta;
-    result.elements[0][1] = (axis.x * axis.y * cos_value) + (axis.z * sin_theta);
-    result.elements[0][2] = (axis.x * axis.z * cos_value) - (axis.y * sin_theta);
-
-    result.elements[1][0] = (axis.y * axis.x * cos_value) - (axis.z * sin_theta);
-    result.elements[1][1] = (axis.y * axis.y * cos_value) + cos_theta;
-    result.elements[1][2] = (axis.y * axis.z * cos_value) + (axis.x * sin_theta);
-
-    result.elements[2][0] = (axis.z * axis.x * cos_value) + (axis.y * sin_theta);
-    result.elements[2][1] = (axis.z * axis.y * cos_value) - (axis.x * sin_theta);
-    result.elements[2][2] = (axis.z * axis.z * cos_value) + cos_theta;
-
-    return(result);
-}
-
-inline mat4_t
-mat4_rotate(mat4_t A, vec3_t axis, float32 rotation)
-{
-    return(mat4_multiply(A, mat4_make_rotation(axis, rotation)));
-}
-
-inline mat4_t
-mat4_transpose(mat4_t A)
-{
-    mat4_t result = A;
-    _MM_TRANSPOSE4_PS(result.columns[0].SSE, result.columns[1].SSE, result.columns[2].SSE, result.columns[3].SSE);
-
-    return(result);
-}
-
-inline mat4_t
-mat4_invert(mat4_t A)
-{
-    mat4_t result;
-
-    vec3_t column_cross01 = vec3_cross(A.columns[0].xyz, A.columns[1].xyz);
-    vec3_t column_cross23 = vec3_cross(A.columns[2].xyz, A.columns[3].xyz);
-
-    vec3_t quat_scale10 = vec3_subtract(vec3_scale(A.columns[0].xyz, A.columns[1].w), vec3_scale(A.columns[1].xyz, A.columns[0].w)); 
-    vec3_t quat_scale23 = vec3_subtract(vec3_scale(A.columns[2].xyz, A.columns[3].w), vec3_scale(A.columns[3].xyz, A.columns[2].w));
-
-    float32 inverse_determinant = 1.0f / (vec3_dot(column_cross01, quat_scale23) + vec3_dot(column_cross23, quat_scale10));
-
-    column_cross01 = vec3_scale(column_cross01, inverse_determinant);
-    column_cross23 = vec3_scale(column_cross23, inverse_determinant);
-    quat_scale10   = vec3_scale(quat_scale10, inverse_determinant);
-    quat_scale23   = vec3_scale(quat_scale23, inverse_determinant);
-
-    result.columns[0] = vec3_expand_vec4(vec3_add(vec3_cross(A.columns[1].xyz, quat_scale23), vec3_scale(column_cross23, A.columns[1].w)), -vec3_dot(A.columns[1].xyz, column_cross23));
-    result.columns[1] = vec3_expand_vec4(vec3_subtract(vec3_cross(quat_scale23, A.columns[0].xyz), vec3_scale(column_cross23, A.columns[0].w)), +vec3_dot(A.columns[0].xyz, column_cross23));
-    result.columns[2] = vec3_expand_vec4(vec3_add(vec3_cross(A.columns[3].xyz, quat_scale10), vec3_scale(column_cross01, A.columns[3].w)), -vec3_dot(A.columns[3].xyz, column_cross01));
-    result.columns[3] = vec3_expand_vec4(vec3_subtract(vec3_cross(quat_scale10, A.columns[2].xyz), vec3_scale(column_cross01, A.columns[2].w)), +vec3_dot(A.columns[2].xyz, column_cross01));
-    
-    return(mat4_transpose(result));
-}
-
-inline float32
-mat4_determinant(mat4_t A)
-{
-    float32 result = 0.0f;
-
-    vec3_t column_cross01 = vec3_cross(A.columns[0].xyz, A.columns[1].xyz);
-    vec3_t column_cross23 = vec3_cross(A.columns[2].xyz, A.columns[3].xyz);
-
-    vec3_t quat_scale10 = vec3_subtract(vec3_scale(A.columns[0].xyz, A.columns[1].w), vec3_scale(A.columns[1].xyz, A.columns[0].w));
-    vec3_t quat_scale23 = vec3_subtract(vec3_scale(A.columns[2].xyz, A.columns[3].w), vec3_scale(A.columns[3].xyz, A.columns[2].w));
-
-    result = vec3_dot(column_cross01, quat_scale23) + vec3_dot(column_cross23, quat_scale10);
-    
-    return(result);
-}
-
-inline float32
-mat4_inverse_determinant(mat4_t A)
-{
-    return(1.0f / mat4_determinant(A));
-}
-
-/*===========================================
-  =========== GRAPHICS TRANSFORMS ===========
-  ===========================================*/
-
-// NOTE(Sleepster): Near and far plane are -1 - 1 OpenGL standard.
-inline mat4_t
-mat4_RHGL_ortho(float32 left,
-                float32 right,
-                float32 bottom,
-                float32 top,
-                float32 near,
-                float32 far)
-{
-    mat4_t result = mat4_identity();
-
-    result.elements[0][0] = 2.0f / (right - left);
-    result.elements[1][1] = 2.0f / (top - bottom);
-    result.elements[2][2] = 2.0f / (near - far);
-    result.elements[3][3] = 1.0f;
-
-    result.elements[3][0] = (left + right) / (left - right);
-    result.elements[3][1] = (bottom + top) / (bottom - top);
-    result.elements[3][2] = (near + far) / (near - far);
-
-    return(result);
-}
-
-// NOTE(Sleepster): Near and far plane are 0 - 1 DirectX standard.
-inline mat4_t
-mat4_RHDX_ortho(float32 left,
-                float32 right,
-                float32 bottom,
-                float32 top,
-                float32 near,
-                float32 far)
-{
-    mat4_t result = mat4_identity();
-
-    result.elements[0][0] = 2.0f / (right - left);
-    result.elements[1][1] = 2.0f / (top - bottom);
-    result.elements[2][2] = 2.0f / (near - far);
-    result.elements[3][3] = 1.0f;
-
-    result.elements[3][0] = (left + right) / (left - right);
-    result.elements[3][1] = (bottom + top) / (bottom - top);
-    result.elements[3][2] = (near + far) / (near - far);
-
-    return(result);
-}
-
-
-inline mat4_t
-mat4_LHGL_ortho(float32 left,
-                float32 right,
-                float32 bottom,
-                float32 top,
-                float32 near,
-                float32 far)
-{
-    mat4_t result = mat4_RHGL_ortho(left, right, bottom, top, near, far);
-    result.elements[2][2] = -result.elements[2][2];
-
-    return(result);
-}
-
-inline mat4_t
-mat4_LHDX_ortho(float32 left,
-                float32 right,
-                float32 bottom,
-                float32 top,
-                float32 near,
-                float32 far)
-{
-    mat4_t result = mat4_RHDX_ortho(left, right, bottom, top, near, far);
-    result.elements[2][2] = -result.elements[2][2];
-
-    return(result);
-}
-
-inline mat4_t
-mat4_inverse_ortho(mat4_t orthographic_projection)
-{
-    mat4_t result = mat4_identity();
-    result.elements[0][0] = 1.0f / orthographic_projection.elements[0][0];
-    result.elements[1][1] = 1.0f / orthographic_projection.elements[1][1];
-    result.elements[2][2] = 1.0f / orthographic_projection.elements[2][2];
-    result.elements[3][3] = 1.0f;
-
-    result.elements[3][0] = -orthographic_projection.elements[3][0] * result.elements[0][0];
-    result.elements[3][1] = -orthographic_projection.elements[3][1] * result.elements[1][1];
-    result.elements[3][2] = -orthographic_projection.elements[3][2] * result.elements[2][2];
-
-    return(result);
-}
-
-/*==============================================
-  ================= RECTANGLES =================
-  ==============================================*/
-
-typedef struct rectangle2
-{
-    vec2_t min;
-    vec2_t max;
-    vec2_t center;
-    vec2_t half_size;
-}rectangle2_t;
-
-inline rectangle2_t
-rect2_create(vec2_t position, vec2_t size)
-{
-    rectangle2_t result;
-    result.min       = position;
-    result.max       = vec2_add(position, size);
-    result.half_size = vec2_scale(size, 0.5f);
-    result.center    = vec2_add(position, result.half_size);
-
-    return(result);
-}
-
-inline void 
-rect2_shift_by(rectangle2_t *rect, vec2_t shift)
-{
-    rect->min    = vec2_add(rect->min, shift);
-    rect->max    = vec2_add(rect->max, shift);
-    rect->center = vec2_add(rect->center, shift);
-}
-
-inline vec2_t
-rect2_get_size(rectangle2_t rect)
-{
-    vec2_t result = vec2_scale(rect.half_size, 2.0f);
-
-    return(result);
-}
-
-inline vec2_t
-rect2_get_position(rectangle2_t rect)
-{
-    return(rect.min);
-}
-
-inline bool8
-rect2_vec2_SAT(rectangle2_t rect, vec2_t point)
-{
-    return (point.x >= rect.min.x && point.x <= rect.max.x && 
-            point.y >= rect.min.y && point.y <= rect.max.y);
-}
-
-inline bool8
-rect2_AABB_SAT(rectangle2_t A, rectangle2_t B)
-{
-    return (A.min.x <= B.max.x && A.max.x >= B.min.x &&
-            A.min.y <= B.max.y && A.max.y >= B.min.y);
-}
-
-inline rectangle2_t 
-rect2_minkowski_sum(rectangle2_t A, rectangle2_t B)
-{
-    rectangle2_t result;
-
-    result.min       = vec2_add(A.min, B.min);
-    result.max       = vec2_add(A.max, B.max);
-    result.half_size = vec2_scale(vec2_subtract(result.max, result.min), 0.5f);
-    result.center    = vec2_add(result.min, result.half_size);
-
-    return(result);
-}
-
-inline rectangle2_t
-rect2_minkowski_difference(rectangle2_t A, rectangle2_t B)
-{
-    rectangle2_t result;
-
-    result.min       = vec2_subtract(A.min, B.max);
-    result.max       = vec2_subtract(A.max, B.min);
-    result.half_size = vec2_scale(vec2_subtract(result.max, result.min), 0.5f);
-    result.center    = vec2_add(result.min, result.half_size);
-
-    return(result);
-}
-
-typedef struct raytest 
-{
-    bool32  hit;
-    float32 time;
-    vec2_t  position;
-    vec2_t  normal;
-}raytest_t;
-
-inline raytest_t 
-rect2_ray_test(vec2_t position, vec2_t magnitude, rectangle2_t bounding_box) 
-{
-    raytest_t result = {};
-
-    float32 last_entry = -INFINITY;
-    float32 first_exit =  INFINITY;
-
-    for(u32 axis = 0;
-        axis < 2;
-        ++axis)
-    {
-        if(magnitude.elements[axis] != 0.0f)
-        {
-            float32 time0 = (bounding_box.min.elements[axis] - position.elements[axis]) / magnitude.elements[axis];
-            float32 time1 = (bounding_box.max.elements[axis] - position.elements[axis]) / magnitude.elements[axis];
-
-            last_entry = Max(last_entry, Min(time0, time1));
-            first_exit = Min(first_exit, Max(time0, time1));
-        }
-        else if(position.elements[axis] <= bounding_box.min.elements[axis] || 
-                position.elements[axis] >= bounding_box.max.elements[axis])
-        {
-            return(result);
-        }
-    }
-
-    if(first_exit > last_entry && first_exit > 0.0f && last_entry < 1.0f)
-    {
-        result.hit      = true;
-        result.time     = last_entry;
-        result.position = vec2(position.x + (magnitude.x * last_entry),
-                               position.y + (magnitude.y * last_entry));
-
-        float32 dcenter_x = result.position.x - bounding_box.center.x;
-        float32 dcenter_y = result.position.y - bounding_box.center.y;
-
-        float32 overlap_x = bounding_box.half_size.x - Abs(dcenter_x);
-        float32 overlap_y = bounding_box.half_size.y - Abs(dcenter_y);
-        if(overlap_x < overlap_y)
-        {
-            result.normal.x = (dcenter_x > 0) - (dcenter_x < 0);
-        }
-        else
-        {
-            result.normal.y = (dcenter_y > 0) - (dcenter_y < 0);
-        }
-    }
-
-    return(result);
-}
-
-inline raytest_t 
-rect2_sweep_test(rectangle2_t moving_rect, vec2_t velocity, rectangle2_t static_rect)
-{
-    raytest_t result;
-    rectangle2_t expanded_box;
-    expanded_box.min       = vec2_subtract(static_rect.min, moving_rect.half_size);
-    expanded_box.max       = vec2_add(static_rect.max, moving_rect.half_size);
-    expanded_box.center    = vec2_scale(vec2_add(expanded_box.min, expanded_box.max), 0.5f);
-    expanded_box.half_size = vec2_scale(vec2_subtract(expanded_box.max, expanded_box.min), 0.5f);
-
-    result = rect2_ray_test(moving_rect.center, velocity, expanded_box);
-
-    return(result);
-}
-
-inline vec2_t
-rect2_get_vector_depth(rectangle2_t rect)
-{
-    vec2_t result;
-
-    float32 min_distance = Abs(rect.min.x);
-    result.x = rect.min.x;
-    result.y = 0.0f;
-
-    if (Abs(rect.max.x) < min_distance)
-    {
-        min_distance = Abs(rect.max.x);
-        result.x = rect.max.x;
-        result.y = 0.0f;
-    }
-
-    if (Abs(rect.min.y) < min_distance)
-    {
-        min_distance = Abs(rect.min.y);
-        result.x = 0.0f;
-        result.y = rect.min.y;
-    }
-
-    if (Abs(rect.max.y) < min_distance)
-    {
-        result.x = 0.0f;
-        result.y = rect.max.y;
-    }
-
-    return result;
-}
-#endif
+#endif // __cplusplus
+#endif // c_math.h

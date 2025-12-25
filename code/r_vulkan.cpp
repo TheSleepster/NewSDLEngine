@@ -203,12 +203,10 @@ r_vulkan_framebuffer_create(vulkan_render_context_t  *render_context,
                             u32                       attachment_count,
                             VkImageView              *attachments)
 {
-    log_trace("Framebuffer size is: '%d'... %d...\n",
-              width, height);
+    log_trace("Framebuffer size is: '%d'... %d...\n", width, height);
 
+    // NOTE(Sleepster): We're making a copy of the attachment data so that if it ceases to exist, we don't explode. 
     vulkan_framebuffer_data_t result = {};
-    // TODO(Sleepster): This is gross... but it ensures that if the 
-    // attachments pointer goes out of scope we don't just explode
     result.renderpass       = renderpass;
     result.attachment_count = attachment_count;
     result.attachments      = c_arena_push_array(&swapchain->arena, VkImageView, attachment_count);
