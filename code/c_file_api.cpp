@@ -5,6 +5,8 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <c_file_api.h>
+#include <c_string.h>
+
 #include <c_globals.h>
 #include <p_platform_data.h>
 
@@ -12,7 +14,12 @@
 file_t
 c_file_open(string_t filepath, bool8 create)
 {
-    return(sys_file_open(filepath, create, false, false));
+    file_t result = sys_file_open(filepath, create, false, false);
+    result.file_size            = c_file_get_size(&result);
+    result.current_read_offset  = 0;
+    result.current_write_offset = 0;
+
+    return(result);
 }
 
 bool8 
@@ -35,90 +42,100 @@ c_file_copy(string_t old_path, string_t new_path)
     return(result);
 }
 
-u32
-c_file_get_read_size(file_t *file, u32 bytes_to_read, u32 file_offset)
+string_t
+c_file_read(file_t             *file_data, 
+            u32                 bytes_to_read, 
+            u32                 offset, 
+            memory_arena_t     *arena, 
+            zone_allocator_t   *zone, 
+            za_allocation_tag_t tag,
+            bool8               create)
 {
-    u32 result = 0;
-
-    u32 file_size = sys_file_get_size(file);
-    if(bytes_to_read == U32_MAX)
+    string_t result;
+    void *data = null;
+    if(arena)
     {
-        // read the whole file
-        result = file_size;
+        data = c_arena_push_size(arena, bytes_to_read);
     }
-    else if(bytes_to_read == 0)
+    else if(zone)
     {
-        // read what's left of the file from the offset
-        result = file_size - file_offset;
+        data = c_za_alloc(zone, bytes_to_read, tag);
     }
     else
     {
-        // read the amount desired from the file
-        result = bytes_to_read;
+        data = AllocArray(byte, bytes_to_read);
     }
+    Assert(data != null);
+
+    result.data  = (byte*)data;
+    result.count = bytes_to_read;
+    sys_file_read(file_data, result.data, result.count, file_data->current_read_offset); 
+    file_data->current_read_offset += bytes_to_read;
+        
+    return(result);
+}
+
+string_t 
+c_file_read_from_offset(file_t             *file_data, 
+                        u32                 bytes_to_read, 
+                        u32                 offset, 
+                        memory_arena_t     *arena, 
+                        zone_allocator_t   *zone, 
+                        za_allocation_tag_t tag)
+{
+    string_t result;
+    result = c_file_read(file_data, bytes_to_read, offset, arena, zone, tag, false);
+    Assert(result.data != null);
 
     return(result);
 }
 
-// TODO(Sleepster): These should all call back to one routine and have the other memory methods call to this single call... this is stupid... 
-string_t
-c_file_read(string_t filepath, u32 bytes_to_read, u32 file_offset)
+string_t 
+c_file_read_to_end(file_t             *file_data, 
+                   u32                 offset, 
+                   memory_arena_t     *arena, 
+                   zone_allocator_t   *zone, 
+                   za_allocation_tag_t tag)
 {
-    string_t result = {};
+    string_t result;
 
-    file_t file = sys_file_open(filepath, false, false, false);
-    if(file.handle != INVALID_FILE_HANDLE)
-    {
-        bytes_to_read = c_file_get_read_size(&file, bytes_to_read, file_offset);
-        u8 *data      = (u8 *)sys_allocate_memory(sizeof(u8) * bytes_to_read);
+    u32 bytes_to_read = file_data->file_size - offset;
+    result = c_file_read(file_data, bytes_to_read, offset, arena, zone, tag);
+    Assert(result.data != null);
 
-        sys_file_read(&file, data, file_offset, bytes_to_read);
-        sys_file_close(&file);
-
-        result.data  = data;
-        result.count = bytes_to_read;
-    }
     return(result);
 }
 
+
 string_t
-c_file_read_arena(memory_arena_t *arena, string_t filepath, u32 bytes_to_read, u32 file_offset)
+c_file_read_entirety(string_t            filepath, 
+                     memory_arena_t     *arena, 
+                     zone_allocator_t   *zone, 
+                     za_allocation_tag_t tag)
 {
-    string_t result = {};
-    
-    file_t file = sys_file_open(filepath, false, false, false);
-    if(file.handle != INVALID_FILE_HANDLE)
+    string_t result;
+    file_t file_data = c_file_open(filepath, false);
+    Assert(file_data.handle != INVALID_FILE_HANDLE);
+
+    s64 file_size    = c_file_get_size(&file_data);
+    printf("file_size is: '%ld'...\n", file_size);
+    result = c_file_read(&file_data, file_size, 0, arena, zone, tag, true);
+    if(result.data == null)
     {
-        bytes_to_read = c_file_get_read_size(&file, bytes_to_read, file_offset);
-        u8 *data      = (byte*)c_arena_push_size(arena, sizeof(u8) * bytes_to_read);
-
-        sys_file_read(&file, data, file_offset, bytes_to_read);
-        sys_file_close(&file);
-
-        result.data  = data;
-        result.count = bytes_to_read;
+        log_error("Failure to read file: '%s'...\n", C_STR(filepath));
     }
+    c_file_close(&file_data);
+
     return(result);
 }
 
-string_t
-c_file_read_za(zone_allocator_t *zone, string_t filepath, u32 bytes_to_read, u32 file_offset, za_allocation_tag_t tag)
+bool8 
+c_file_write(file_t *file, void *data, s64 bytes_to_write)
 {
-    string_t result = {};
-    
-    file_t file = sys_file_open(filepath, false, false, false);
-    if(file.handle != INVALID_FILE_HANDLE)
-    {
-        bytes_to_read = c_file_get_read_size(&file, bytes_to_read, file_offset);
-        u8 *data      = c_za_alloc(zone, sizeof(u8) * bytes_to_read, tag);
+    bool8 success = sys_file_write(file, data, bytes_to_write);
+    file->current_write_offset += bytes_to_write;
 
-        sys_file_read(&file, data, file_offset, bytes_to_read);
-        sys_file_close(&file);
-
-        result.data  = data;
-        result.count = bytes_to_read;
-    }
-    return(result);
+    return(success);
 }
 
 bool8 
@@ -129,42 +146,33 @@ c_file_open_and_write(string_t filepath, void *data, s64 bytes_to_write, bool8 o
     file_t file = sys_file_open(filepath, true, overwrite, false);
     if(file.handle != INVALID_FILE_HANDLE)
     {
-        sys_file_write(&file, data, bytes_to_write);
-        result = true;
+        result = c_file_write(&file, data, bytes_to_write);
     }
 
     return(result);
-}
-
-bool8 
-c_file_write(file_t *file, void *data, s64 bytes_to_write)
-{
-    return(sys_file_write(file, data, bytes_to_write));
 }
 
 bool8 
 c_file_write_string(file_t *file, string_t data)
 {
-    return(c_file_write(file, data.data, data.count));
+    bool8 result = c_file_write(file, data.data, data.count);
+    return(result);
 }
 
 s64
-c_file_get_size(string_t filepath)
+c_file_get_size(file_t *file_data)
 {
+    Assert(file_data->handle != INVALID_FILE_HANDLE);
     s64 result = 0;
-    
-    file_t file = sys_file_open(filepath, false, false, false);
-    if(file.handle != INVALID_FILE_HANDLE)
-    {
-        result = sys_file_get_size(&file);
-        sys_file_close(&file);
-    }
 
+    printf("file name: '%s'...\n", C_STR(file_data->filepath));
+
+    result = sys_file_get_size(file_data);
     return(result);
 }
 
 file_data_t
-c_file_get_data(string_t filepath)
+c_file_get_file_system_info(string_t filepath)
 {
     return(sys_file_get_modtime_and_size(filepath));
 }
@@ -231,6 +239,7 @@ c_file_ext_string_to_enum(string_t file_extension)
 /////////////////
 // DIRECTORY
 ////////////////
+
 visit_file_data_t
 c_directory_create_visit_data(visit_files_pfn_t *function, bool8 recursive, void *user_data)
 {

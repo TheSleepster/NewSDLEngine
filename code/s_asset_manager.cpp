@@ -118,18 +118,21 @@ s_asset_manager_init(asset_manager_t *asset_manager, string_t packed_asset_filep
 
     // NOTE(Sleepster): Read asset file data
     {
+        // TODO(Sleepster): This is messy, but doesn't matter since we just aren't going to do this soon 
         asset_manager->asset_file_handle = c_file_open(packed_asset_filepath, false);
-        asset_manager->asset_file_data   = c_file_read(packed_asset_filepath, sizeof(asset_file_header_t), 0);
+        asset_manager->asset_file_data   = c_file_read_entirety(packed_asset_filepath);
 
         asset_file_header_t *header = (asset_file_header_t *)asset_manager->asset_file_data.data;
         Assert(header->magic_value == ASSET_FILE_MAGIC_VALUE('W', 'A', 'D', ' '));
 
-        string_t table_data = c_file_read(packed_asset_filepath, sizeof(asset_file_table_of_contents_t), header->offset_to_table_of_contents);
+        string_t table_data = c_file_read(&asset_manager->asset_file_handle, sizeof(asset_file_table_of_contents_t), header->offset_to_table_of_contents);
         asset_file_table_of_contents_t *table_of_contents = (asset_file_table_of_contents_t *)table_data.data; 
         Assert(table_of_contents->magic_value == ASSET_FILE_MAGIC_VALUE('t', 'o', 'c', 'd'));
 
         u32 first_entry_offset = header->offset_to_table_of_contents + sizeof(asset_file_table_of_contents_t);
-        string_t entry_data    = c_file_read(packed_asset_filepath, READ_TO_END, first_entry_offset);
+        string_t entry_data    = c_file_read(&asset_manager->asset_file_handle, 
+                                             asset_manager->asset_file_handle.file_size - asset_manager->asset_file_handle.current_read_offset, 
+                                             first_entry_offset);
 
         s_asset_manager_read_asset_file_entries(asset_manager, entry_data, table_of_contents);
     }
@@ -173,7 +176,7 @@ s_asset_manager_async_load_asset_data(void *user_data)
             case AT_BITMAP:
             {
                 bitmap_t *bitmap = &slot->texture.bitmap;
-                bitmap->decompressed_data      = c_file_read_za(zone, filepath, READ_ENTIRE_FILE, 0, ZA_TAG_STATIC);
+                bitmap->decompressed_data      = c_file_read_entirety(filepath, null, zone, ZA_TAG_STATIC);
                 bitmap->decompressed_data.data = stbi_load_from_memory(bitmap->decompressed_data.data,
                                                                        bitmap->decompressed_data.count,
                                                                        &bitmap->width,
@@ -187,7 +190,7 @@ s_asset_manager_async_load_asset_data(void *user_data)
             case AT_FONT:
             {
                 dynamic_render_font_t *font = &slot->render_font;
-                font->loaded_data = c_file_read_za(zone, filepath, READ_ENTIRE_FILE, 0, ZA_TAG_STATIC);
+                font->loaded_data = c_file_read_entirety(filepath, null, zone, ZA_TAG_STATIC);
             }break;
             case AT_SOUND:
             {

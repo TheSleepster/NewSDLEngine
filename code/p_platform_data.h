@@ -41,7 +41,7 @@ file_t        sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrit
 bool8         sys_file_close(file_t *file_data);
 bool8         sys_file_copy(string_t old_path, string_t new_path);
 s64           sys_file_get_size(file_t *file_data);
-bool8         sys_file_read(file_t *file_data, void *memory, u32 file_offset, u32 bytes_to_read);
+bool8         sys_file_read(file_t *file_data, void *memory, u32 bytes_to_read, u32 file_offset);
 bool8         sys_file_write(file_t *file_data, void *memory, usize bytes_to_write);
 
 mapped_file_t sys_file_map(string_t filepath);

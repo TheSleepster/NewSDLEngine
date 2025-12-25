@@ -21,7 +21,7 @@
 
 // TODO(Sleepster): THREAD SAFE OVERLAPPING IO 
 
-// NOTE(Sleepster): This is stupid... but C doens't make this easier. 
+// NOTE(Sleepster): This is stupid... but C doesn't make this easier. 
 typedef struct zone_allocator zone_allocator_t;
 
 typedef enum file_extension
@@ -40,6 +40,10 @@ typedef struct file
     sys_handle_t handle;
     string_t    file_name;
     string_t    filepath;
+
+    u64         file_size;
+    u64         current_read_offset;
+    u64         current_write_offset;
 
     bool8       overlapping;
     bool8       for_writing;
@@ -105,28 +109,24 @@ file_t            c_file_open(string_t filepath, bool8 create);
 bool8             c_file_close(file_t *file);
 bool8             c_file_copy(string_t old_path, string_t new_path);
 
-// NOTE(Sleepster): These belong to the 'bytes_to_read' parameter of c_file_read_*... 
-#define READ_ENTIRE_FILE (U32_MAX)
-#define READ_TO_END      (0)
 
-u32               c_file_get_read_size(file_t *file, u32 bytes_to_read, u32 file_offset);
-string_t          c_file_read(string_t filepath, u32 bytes_to_read, u32 file_offset);
-string_t          c_file_read_arena(memory_arena_t *arena, string_t filepath, u32 bytes_to_read, u32 file_offset);
-string_t          c_file_read_za(zone_allocator_t *zone, string_t filepath, u32 bytes_to_read, u32 file_offset, za_allocation_tag_t tag);
+string_t          c_file_read(file_t *file_data, u32 bytes_to_read, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC, bool8 create = true);
+string_t          c_file_read_entirety(string_t filepath, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
+string_t          c_file_read_from_offset(file_t *file_data, u32 bytes_to_read, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
+string_t          c_file_read_to_end(file_t *file_data, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
 
 bool8             c_file_open_and_write(string_t filepath, void *data, s64 bytes_to_write, bool8 overwrite);
 bool8             c_file_write(file_t *file, void *data, s64 bytes_to_write);
 bool8             c_file_write_string(file_t *file, string_t data);
 
-s64               c_file_get_size(string_t filepath);
-file_data_t       c_file_get_data(string_t filepath);
+s64               c_file_get_size(file_t *file_data);
+file_data_t       c_file_get_file_system_info(string_t filepath);
 bool8             c_file_replace_or_rename(string_t old_file, string_t new_file);
 mapped_file_t     c_file_map(string_t filepath);
 bool8             c_file_unmap(mapped_file_t *map_data);
 u32               c_file_ext_string_to_enum(string_t file_ext);
 
 bool8             c_directory_exists(string_t filepath);
-
 visit_file_data_t c_directory_create_visit_data(visit_files_pfn_t *function, bool8 recursive, void *user_data);
 void              c_directory_visit(string_t filepath, visit_file_data_t *visit_file_data);
 

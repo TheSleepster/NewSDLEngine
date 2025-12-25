@@ -173,7 +173,7 @@ VISIT_FILES(get_resource_dir_files)
     
     if(type != AT_NONE)
     {
-        string_t data = c_file_read(filepath, READ_ENTIRE_FILE, 0);
+        string_t data = c_file_read_entirety(filepath);
         asset_file_add_entry(filename_no_ext, filepath, data, type);
 
         log_info("Adding asset: '%s' to the built file...\n", filename.data);

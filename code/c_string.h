@@ -53,14 +53,14 @@ void        c_string_override_file_separators(string_t *string);
 #define C_STR(x) ((char *)x.data)
 ///////////////////////////////////////////
 
+#define STRING_BUILDER_BUFFER_SIZE (4096 - sizeof(string_builder_buffer_t))
+
 typedef struct string_builder_buffer
 {
     s64                           bytes_allocated;
     s64                           bytes_used;
     struct string_builder_buffer *next_buffer;
 }string_builder_buffer_t;
-
-#define STRING_BUILDER_BUFFER_SIZE (4096 - sizeof(string_builder_buffer_t))
 
 typedef struct string_builder
 {

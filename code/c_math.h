@@ -64,11 +64,11 @@
 */
   
 #define C_MATH_H
+#include <c_types.h>
 
 #include <math.h>
+// SIMD
 #include <xmmintrin.h>
-
-#include <c_types.h>
 
 #ifdef MATH_IMPLEMENTATION
     #define MATH_API

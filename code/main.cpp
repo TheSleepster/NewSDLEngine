@@ -165,6 +165,7 @@ main(int argc, char **argv)
 
                 dt_accumulator -= gcv_tick_rate;
             }
+
             if(r_vulkan_begin_frame(render_context, gcv_tick_rate))
             {
                 r_vulkan_end_frame(render_context, gcv_tick_rate);
