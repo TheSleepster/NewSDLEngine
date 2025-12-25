@@ -69,16 +69,16 @@ BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FL
 # --------------------------------------------
 SRC_DIR   = ../code
 BUILD_DIR = ../build
+ASSET_DIR = ../run_tree/res
 
 # --------------------------------------------
-# Set The Inputs
+# Set Input Files
 # --------------------------------------------
 COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/Freetype/include/
 
 ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 
 # Exclude sys_ files
-GAME_SRCS  = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
@@ -87,16 +87,17 @@ GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/vulkan -L../run_tr
 EXCLUDE_PATTERNS = sys_%
 
 # Each test executable depends on one test source
-TESTS_SRC := $(wildcard ../code/tests/*.cpp)
-TESTS_OUT := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
-
+TESTS_SRC             := $(wildcard ../code/tests/*.cpp)
 ASSET_FILE_PACKER_SRC := ../code/asset_file_packer/asset_file_packer.cpp
-ASSET_FILE_PACKER_OUT  = $(BUILD_DIR)/asset_file_packer$(EXE_EXT)
+GAME_SRCS              = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
+
 
 # --------------------------------------------
 # Set the Outputs
 # --------------------------------------------
-GAME_OUT   = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
+GAME_OUT               = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
+TESTS_OUT             := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
+ASSET_FILE_PACKER_OUT  = $(BUILD_DIR)/asset_file_packer$(EXE_EXT)
 
 # --------------------------------------------
 # Create The Build Instructions
@@ -112,16 +113,7 @@ $(BUILD_DIR):
 	$(call MKDIR,$(BUILD_DIR))
 
 # -------------------------------------------------------------------------
-# Build Shaders 
-# -------------------------------------------------------------------------
-# SHADER_SCRIPT = ../code/shaders/build_shaders.sh
-#
-# shaders:
-# 	@echo [SHADERS] Rebuilding shaders...
-# 	@$(SHELL) $(SHADER_SCRIPT)
-
-# -------------------------------------------------------------------------
-# Unit Tests
+# Tests
 # -------------------------------------------------------------------------
 tests: $(TESTS_OUT)
 

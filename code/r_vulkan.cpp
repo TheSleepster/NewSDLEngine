@@ -20,8 +20,6 @@
 
 #include <r_vulkan.h>
 
-// TODO(Sleepster): Every structure that requires an AllocArray should just have a memory arena.
-
 VKAPI_ATTR VkBool32 VKAPI_CALL
 Vk_debug_log_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      message_severity,
                       VkDebugUtilsMessageTypeFlagsEXT             message_type,
@@ -198,6 +196,7 @@ r_vulkan_result_is_success(VkResult result)
 
 vulkan_framebuffer_data_t
 r_vulkan_framebuffer_create(vulkan_render_context_t  *render_context,
+                            vulkan_swapchain_data_t  *swapchain,
                             vulkan_renderpass_data_t *renderpass,
                             u32                       width,
                             u32                       height,
@@ -212,7 +211,7 @@ r_vulkan_framebuffer_create(vulkan_render_context_t  *render_context,
     // attachments pointer goes out of scope we don't just explode
     result.renderpass       = renderpass;
     result.attachment_count = attachment_count;
-    result.attachments      = AllocArray(VkImageView, attachment_count);
+    result.attachments      = c_arena_push_array(&swapchain->arena, VkImageView, attachment_count);
     memcpy(result.attachments, attachments, sizeof(VkImageView) * attachment_count);
 
     VkFramebufferCreateInfo framebuffer_create_info = {
@@ -239,14 +238,11 @@ r_vulkan_framebuffer_destroy(vulkan_render_context_t   *render_context,
     vkDestroyFramebuffer(render_context->rendering_device.logical_device,
                          framebuffer->handle,
                          render_context->allocators);
-    if(framebuffer->attachments)
-    {
-        free(framebuffer->attachments);
-        framebuffer->attachments = 0;
-    }
 
     framebuffer->handle           = null;
     framebuffer->renderpass       = null;
+    framebuffer->attachments      = null;
+
     framebuffer->attachment_count = 0;
 }
 
@@ -1141,11 +1137,6 @@ r_vulkan_physical_device_get_swapchain_support_info(vulkan_render_context_t     
     VkAssert(vkGetPhysicalDeviceSurfaceFormatsKHR(device, context->render_surface, &swapchain_info->valid_surface_format_count, 0));
     if(swapchain_info->valid_surface_format_count > 0)
     {
-        if(!swapchain_info->valid_surface_formats)
-        {
-            swapchain_info->valid_surface_formats = AllocArray(VkSurfaceFormatKHR, 
-                                                               swapchain_info->valid_surface_format_count);
-        }
         VkAssert(vkGetPhysicalDeviceSurfaceFormatsKHR(device, 
                                                       context->render_surface, 
                                                       &swapchain_info->valid_surface_format_count, 
@@ -1155,16 +1146,10 @@ r_vulkan_physical_device_get_swapchain_support_info(vulkan_render_context_t     
     VkAssert(vkGetPhysicalDeviceSurfacePresentModesKHR(device, context->render_surface, &swapchain_info->valid_present_mode_count, 0));
     if(swapchain_info->valid_present_mode_count > 0)
     {
-        if(!swapchain_info->valid_present_modes)
-        {
-            swapchain_info->valid_present_modes = AllocArray(VkPresentModeKHR, 
-                                                             swapchain_info->valid_present_mode_count);
-        }
+        VkAssert(vkGetPhysicalDeviceSurfacePresentModesKHR(device, context->render_surface, 
+                                                           &swapchain_info->valid_present_mode_count, 
+                                                           swapchain_info->valid_present_modes));
     }
-
-    VkAssert(vkGetPhysicalDeviceSurfacePresentModesKHR(device, context->render_surface, 
-                                                       &swapchain_info->valid_present_mode_count, 
-                                                       swapchain_info->valid_present_modes));
 }
 
 bool32 
@@ -1183,7 +1168,7 @@ r_vulkan_physical_device_is_supported(vulkan_render_context_t                   
 
     u32 queue_family_counter;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_counter, 0);
-    VkQueueFamilyProperties *queue_family_data = (VkQueueFamilyProperties*)malloc(sizeof(VkQueueFamilyProperties) * queue_family_counter);
+    VkQueueFamilyProperties *queue_family_data = c_arena_push_array(&context_data->initialization_arena, VkQueueFamilyProperties, queue_family_counter);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queue_family_counter, queue_family_data);
 
     u8 minimum_transfer_score = 255;
@@ -1256,7 +1241,7 @@ r_vulkan_physical_device_is_supported(vulkan_render_context_t                   
             VkAssert(vkEnumerateDeviceExtensionProperties(device, 0, &device_avaliable_extension_counter, 0));
             if(device_avaliable_extension_counter != 0)
             {
-                device_avaliable_extensions = AllocArray(VkExtensionProperties, device_avaliable_extension_counter);
+                device_avaliable_extensions = c_arena_push_array(&context_data->initialization_arena, VkExtensionProperties, device_avaliable_extension_counter);
             }
             VkAssert(vkEnumerateDeviceExtensionProperties(device, 0, &device_avaliable_extension_counter, device_avaliable_extensions));
 
@@ -1501,6 +1486,7 @@ r_vulkan_regenerate_framebuffers(vulkan_render_context_t  *render_context,
         };
 
         swapchain->framebuffers[image_index] = r_vulkan_framebuffer_create(render_context,
+                                                                           swapchain,
                                                                            renderpass,
                                                                            render_context->framebuffer_width,
                                                                            render_context->framebuffer_height,
@@ -1627,6 +1613,9 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     render_context->window_width  = 0;
     render_context->window_height = 0;
 
+    render_context->initialization_arena = c_arena_create(MB(10));
+    render_context->permanent_arena      = c_arena_create(MB(100));
+
 	VkApplicationInfo app_info = {};
 	app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	app_info.pApplicationName   = null;
@@ -1734,7 +1723,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     {
         u32 physical_device_counter = 0;
         VkAssert(vkEnumeratePhysicalDevices(render_context->instance, &physical_device_counter, 0));
-        VkPhysicalDevice *physical_devices = AllocArray(VkPhysicalDevice, physical_device_counter);
+        VkPhysicalDevice *physical_devices = c_arena_push_array(&render_context->initialization_arena, VkPhysicalDevice, physical_device_counter);
         VkAssert(vkEnumeratePhysicalDevices(render_context->instance, &physical_device_counter, physical_devices));
 
         log_info("Physical Device(s) found!\n");
@@ -1759,7 +1748,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
             requirements.has_transfer_queue = true;
             requirements.has_compute_queue  = true;
 
-            requirements.required_extensions = AllocArray(const char *, 10);
+            requirements.required_extensions = c_arena_push_array(&render_context->initialization_arena, const char *, 10);
             requirements.required_extensions[0] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
 
             vulkan_physical_device_swapchain_support_info_t device_swapchain_support_info = {};
@@ -1843,7 +1832,6 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         {
             log_fatal("No compatible physical GPU device was found...\n");
         }
-        free(physical_devices);
 
         log_info("Physical device created successfully...\n");
     }
@@ -1859,7 +1847,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         u32 index_count = 1;
         if(!present_queue_shares_graphics_queue)  index_count++;
         if(!transfer_queue_shares_graphics_queue) index_count++;
-        if(!compute_queue_shares_any) index_count++;
+        if(!compute_queue_shares_any)             index_count++;
 
         u32 indices[4] = {};
         u32 index = 0;
@@ -1949,15 +1937,14 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
                                     &render_context->main_renderpass);
     log_info("Framebuffers created...\n");
 
-    render_context->graphics_command_buffers = AllocArray(vulkan_command_buffer_data_t, 
-                                                          render_context->swapchain.image_count);
+    render_context->graphics_command_buffers = c_arena_push_array(&render_context->permanent_arena, vulkan_command_buffer_data_t, render_context->swapchain.image_count);
     r_vulkan_initialize_graphics_command_buffers(render_context);
     log_info("Command buffers initialized...\n");
 
-    render_context->queue_finished_semaphores  = AllocArray(VkSemaphore,     render_context->swapchain.image_count);
-    render_context->image_avaliable_semaphores = AllocArray(VkSemaphore,     render_context->swapchain.image_count);
-    render_context->image_fences               = AllocArray(vulkan_fence_t,  render_context->swapchain.image_count);
-    render_context->frame_fences               = AllocArray(vulkan_fence_t*, render_context->swapchain.image_count);
+    render_context->queue_finished_semaphores  = c_arena_push_array(&render_context->permanent_arena, VkSemaphore,     render_context->swapchain.image_count);
+    render_context->image_avaliable_semaphores = c_arena_push_array(&render_context->permanent_arena, VkSemaphore,     render_context->swapchain.image_count);
+    render_context->image_fences               = c_arena_push_array(&render_context->permanent_arena, vulkan_fence_t,  render_context->swapchain.image_count);
+    render_context->frame_fences               = c_arena_push_array(&render_context->permanent_arena, vulkan_fence_t*, render_context->swapchain.image_count);
     for(u32 image_index = 0;
         image_index < render_context->swapchain.image_count;
         ++image_index)
@@ -1979,4 +1966,5 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     }
 
     log_info("Vulkan context initialized...\n");
+    c_arena_destroy(&render_context->initialization_arena);
 }

@@ -22,11 +22,12 @@
 // VULKAN PHYSICAL DEVICE STUFF 
 //////////////////////////////////
 
+#define MAX_VULKAN_FORMATS (128)
 typedef struct vulkan_physical_device_swapchain_support_info
 {
     VkSurfaceCapabilitiesKHR surface_capabilities;
-    VkSurfaceFormatKHR      *valid_surface_formats;
-    VkPresentModeKHR        *valid_present_modes;
+    VkSurfaceFormatKHR       valid_surface_formats[MAX_VULKAN_FORMATS];
+    VkPresentModeKHR         valid_present_modes[MAX_VULKAN_FORMATS];
 
     u32                      valid_surface_format_count;
     u32                      valid_present_mode_count;
@@ -201,7 +202,8 @@ typedef struct vulkan_command_buffer_data
 
 typedef struct vulkan_render_context
 {
-    memory_arena_t                arena;
+    memory_arena_t                initialization_arena;
+    memory_arena_t                permanent_arena;
 
     SDL_Window                   *window;
     u32                           window_width;
