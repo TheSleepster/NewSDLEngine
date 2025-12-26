@@ -1,0 +1,91 @@
+{
+    // Debug configurations for Linux (CodeLLDB)
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "game_debug (host)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/game_debug",
+            "args": ["--host", "7777"],
+            "cwd": "${workspaceFolder}/run_tree/res",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
+        {
+            "name": "game_debug (client)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/game_debug",
+            "args": ["--client", "127.0.0.1", "7777"],
+            "cwd": "${workspaceFolder}/run_tree/res",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
+        {
+            "name": "asset_file_packer",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/asset_file_packer",
+            "args": [],
+            "cwd": "${workspaceFolder}/run_tree/res",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
+        {
+            "name": "test_dynarray",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_dynarray",
+            "args": [],
+            "cwd": "${workspaceFolder}/build",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
+        {
+            "name": "test_networking",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_networking",
+            "args": [],
+            "cwd": "${workspaceFolder}/build",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
+        {
+            "name": "test_threadpool",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_threadpool",
+            "args": [],
+            "cwd": "${workspaceFolder}/build",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
+        {
+            "name": "test_memory_arena",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_memory_arena",
+            "args": [],
+            "cwd": "${workspaceFolder}/build",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Host + Client",
+            "configurations": ["game_debug (host)", "game_debug (client)"]
+        },
+        {
+            "name": "All Tests",
+            "configurations": [
+                "test_dynarray",
+                "test_networking",
+                "test_threadpool",
+                "test_memory_arena"
+            ]
+        }
+    ]
+}
