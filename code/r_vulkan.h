@@ -36,6 +36,7 @@ typedef struct vulkan_pipeline_data
 typedef struct vulkan_shader_stage_info
 {
     VkShaderStageFlagBits           type;
+    const char                     *entry_point;
     VkShaderModuleCreateInfo        module_create_info;
     VkPipelineShaderStageCreateInfo shader_stage_create_info; 
     VkShaderModule                  handle;
@@ -269,6 +270,7 @@ typedef struct vulkan_render_context
     vulkan_command_buffer_data_t *graphics_command_buffers;
 
     vulkan_renderpass_data_t      main_renderpass;
+    vulkan_shader_data_t          default_shader;
 
     VkDebugUtilsMessengerEXT debug_callback;
 }vulkan_render_context_t;

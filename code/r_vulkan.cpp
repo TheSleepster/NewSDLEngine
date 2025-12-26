@@ -195,6 +195,74 @@ r_vulkan_result_is_success(VkResult result)
 // VULKAN SHADER MODULES 
 ////////////////////////////
 
+void
+r_vulkan_shader_stage_create(vulkan_render_context_t    *render_context, 
+                             string_t                    shader_source, 
+                             SpvReflectEntryPoint       *entry_point, 
+                             vulkan_shader_stage_info_t *stage)
+{
+    char *type_string = null;
+    SpvExecutionModel shader_stage_type = entry_point->spirv_execution_model;
+    switch(shader_stage_type)
+    {
+        case SpvExecutionModelVertex:
+        {
+            type_string = "Vertex";
+            stage->type = VK_SHADER_STAGE_VERTEX_BIT;
+        }break;
+        case SpvExecutionModelFragment:
+        {
+            type_string = "Fragment";
+            stage->type = VK_SHADER_STAGE_FRAGMENT_BIT;
+        }break;
+        case SpvExecutionModelGeometry:
+        {
+            type_string = "Geometry";
+            stage->type = VK_SHADER_STAGE_GEOMETRY_BIT;
+        }break;
+        case SpvExecutionModelGLCompute:
+        {
+            type_string = "Compute";
+            stage->type = VK_SHADER_STAGE_COMPUTE_BIT;
+        }break;
+        case SpvExecutionModelTessellationControl:
+        {
+            type_string = "Tess Control";
+            stage->type = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+        }break;
+        case SpvExecutionModelTessellationEvaluation:
+        {
+            type_string = "Tess Evaluate";
+            stage->type = VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+        }
+        default:
+        {
+            InvalidCodePath;
+        }break;
+    }
+
+    stage->entry_point = entry_point->name;
+    stage->module_create_info = {
+        .sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+        .codeSize = shader_source.count,
+        .pCode    = (u32*)shader_source.data,
+    };
+
+    VkAssert(vkCreateShaderModule(render_context->rendering_device.logical_device,
+                                  &stage->module_create_info,
+                                  render_context->allocators,
+                                  &stage->handle));
+
+    stage->shader_stage_create_info = {
+        .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+        .stage  = stage->type,
+        .module = stage->handle,
+        .pName  = entry_point->name,
+    };
+
+    log_info("Shader module of type: '%s' created...\n", type_string);
+}
+
 vulkan_shader_data_t
 r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepath)
 {
@@ -213,7 +281,11 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         entry_point_index < module.entry_point_count;
         ++entry_point_index)
     {
-        SpvReflectEntryPoint *entry_point = module.entry_points + entry_point_index;
+        SpvReflectEntryPoint       *entry_point = module.entry_points + entry_point_index;
+        vulkan_shader_stage_info_t *stage       = result.stages + entry_point_index;
+
+        r_vulkan_shader_stage_create(render_context, shader_source, entry_point, stage);
+
         const char *name = entry_point->name;
         log_trace("Entry Point %d: '%s'...\n", entry_point_index, name);
     }
@@ -2004,8 +2076,8 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         render_context->image_fences[image_index] = r_vulkan_fence_create(render_context, true);
     }
 
+    render_context->default_shader = r_vulkan_shader_create(render_context, STR("shader_binaries/test.spv"));
+
     log_info("Vulkan context initialized...\n");
     c_arena_destroy(&render_context->initialization_arena);
-
-    r_vulkan_shader_create(render_context, STR("shader_binaries/test.spv"));
 }

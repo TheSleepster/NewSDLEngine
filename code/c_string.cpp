@@ -4,9 +4,11 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#include <stdlib.h>
+#include <stdarg.h>
+
 #include <c_string.h>
 #include <c_math.h>
-
 #include <c_globals.h>
 
 #include <c_file_api.h>
@@ -48,7 +50,7 @@ c_string_make_heap(memory_arena_t *arena, string_t string)
 {
     string_t result;
     result.count = string.count;
-    result.data  = c_arena_push_array(arena, byte, string.count * sizeof(byte));
+    result.data  = c_arena_push_array(arena, byte, string.count);
 
     MemoryCopy(result.data, string.data, string.count * sizeof(byte));
     return(result);
@@ -232,6 +234,212 @@ c_string_get_filename_from_path_and_ext(string_t filepath)
     return(result);
 }
 
+string_t 
+c_string_read_line(string_t *data)
+{
+    string_t result;
+
+    for(u32 char_index = 0;
+        char_index < data->count;
+        ++char_index)
+    {
+        char character = (char)data->data[char_index];
+        if(character == '\n' || character == '\r')
+        {
+            result.count = char_index + 1;
+            result.data  = data->data;
+            
+            c_string_advance_by(data, result.count);
+        }
+    }
+
+    return(result);
+}
+
+// NOTE(Sleepster): Element size is in bytes
+internal_api byte*
+c_string_read_value(string_t *data, u32 element_size)
+{
+    byte *result = null;
+    result = data->data;
+    result[element_size] = '\0';
+
+    return(result);
+}
+
+s8
+c_string_read_s8(string_t data)
+{
+    s8 result = 0;
+    byte *value_string = c_string_read_value(&data, sizeof(s8));
+    result = ((s8)*value_string - (s8)0x30);
+
+    return(result);
+}
+
+s16 
+c_string_read_s16(string_t data)
+{
+    s16 result = 0;
+    byte *value_string = c_string_read_value(&data, sizeof(s16));
+
+    for(u32 index = 0;
+        index < sizeof(s16);
+        ++index)
+    {
+        result += ((s16)value_string[index] - (s16)0x30);
+    }
+
+    return(result);
+}
+
+s32 
+c_string_read_s32(string_t data)
+{
+    s32 result = 0;
+    byte *value_string = c_string_read_value(&data, sizeof(s32));
+
+    for(u32 index = 0;
+        index < sizeof(s32);
+        ++index)
+    {
+        result += ((s32)value_string[index] - (s32)0x30);
+    }
+
+    return(result);
+}
+
+s64 
+c_string_read_s64(string_t data)
+{
+    s64 result = 0;
+    byte *value_string = c_string_read_value(&data, sizeof(s64));
+
+    for(u32 index = 0;
+        index < sizeof(s64);
+        ++index)
+    {
+        result += ((s64)value_string[index] - (s64)0x30);
+    }
+
+    return(result);
+}
+
+// NOTE(Sleepster): Copy pasta from above
+u8
+c_string_read_u8(string_t data)
+{
+    u8 result = 0;
+    byte *value_string = c_string_read_value(&data, sizeof(u8));
+    result = ((u8)*value_string - (u8)0x30);
+
+    return(result);
+}
+
+u16 
+c_string_read_u16(string_t data)
+{
+    u16 result = 0;
+    byte *value_string = c_string_read_value(&data, sizeof(u16));
+
+    for(u32 index = 0;
+        index < sizeof(u16);
+        ++index)
+    {
+        result += ((u16)value_string[index] - (u16)0x30);
+    }
+
+    return(result);
+}
+
+u32 
+c_string_read_u32(string_t data)
+{
+    u32 result = 0;
+    byte *value_string = c_string_read_value(&data, sizeof(u32));
+
+    for(u32 index = 0;
+        index < sizeof(u32);
+        ++index)
+    {
+        result += ((u32)value_string[index] - (u32)0x30);
+    }
+
+    return(result);
+}
+
+u64 
+c_string_read_u64(string_t data)
+{
+    u64 result = 0;
+    byte *value_string = c_string_read_value(&data, sizeof(u64));
+
+    for(u32 index = 0;
+        index < sizeof(u64);
+        ++index)
+    {
+        result += ((u64)value_string[index] - (u64)0x30);
+    }
+
+    return(result);
+}
+
+float32 
+c_string_read_float32(string_t data)
+{
+    float32 result = 0;
+    byte *value_string = c_string_read_value(&data, sizeof(float32));
+    result = strtof((char*)value_string, null);
+
+    return(result);
+}
+
+float64 
+c_string_read_float64(string_t data)
+{
+    float64 result = 0;
+    byte *value_string = c_string_read_value(&data, sizeof(float64));
+    result = strtod((char*)value_string, null);
+
+    return(result);
+}
+
+bool8 
+c_string_read_bool8(string_t data)
+{
+    bool8 result = false;
+    byte *value_string = c_string_read_value(&data, sizeof(bool8));
+
+    result = ((bool8)*value_string);
+
+    return(result);
+}
+
+bool32 
+c_string_read_bool32(string_t data)
+{
+    bool32 result = false;
+    byte *value_string = c_string_read_value(&data, sizeof(bool32));
+    result = ((bool32)*value_string);
+
+    return(result);
+}
+
+string_t
+c_string_format(string_t memory, string_t string, ...)
+{
+    string_t result;
+
+    va_list arg_ptr;
+    va_start(arg_ptr, string);
+    vsnprintf((char*)memory.data, memory.count, (char*)string.data, arg_ptr);
+    va_end(arg_ptr);
+    
+    result.data  = memory.data;
+    result.count = memory.count;
+
+    return(result);
+}
 
 ///////////////////
 // STRING BUILDER
