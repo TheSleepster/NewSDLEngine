@@ -1,5 +1,6 @@
-CXX = clang++
-CC  = clang
+CXX    = clang++
+CC     = clang
+SLANGC = slangc
 
 SILENT          ?=
 DEBUG_BUILD     ?=
@@ -67,30 +68,33 @@ BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FL
 # --------------------------------------------
 # Directories
 # --------------------------------------------
-SRC_DIR   = ../code
-BUILD_DIR = ../build
-ASSET_DIR = ../run_tree/res
+SRC_DIR    = ../code
+SHADER_DIR = ../code/shaders
+BUILD_DIR  = ../build
+ASSET_DIR  = ../run_tree/res
 
 # --------------------------------------------
 # Set Input Files
 # --------------------------------------------
-COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/Freetype/include/
-
-ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/vulkan/spirv_reflect/include/ -I../run_tree/deps/Freetype/include/
 
 # Exclude sys_ files
+ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
-GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -lSDL3-Static -lfreetype -lvulkan
-EXCLUDE_PATTERNS = sys_%
+GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static -lfreetype -lvulkan -lspirv_reflect
+EXCLUDE_PATTERNS        = sys_%
 
 # Each test executable depends on one test source
 TESTS_SRC             := $(wildcard ../code/tests/*.cpp)
 ASSET_FILE_PACKER_SRC := ../code/asset_file_packer/asset_file_packer.cpp
 GAME_SRCS              = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
 
+# Each slang file is it's own shader.
+SHADERS_SRC    := $(wildcard $(SHADER_DIR)/*.slang)
+SLANG_FLAGS    := -target spirv -I$(SHADER_DIR) -O0
 
 # --------------------------------------------
 # Set the Outputs
@@ -98,19 +102,30 @@ GAME_SRCS              = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
 GAME_OUT               = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
 TESTS_OUT             := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
 ASSET_FILE_PACKER_OUT  = $(BUILD_DIR)/asset_file_packer$(EXE_EXT)
+SHADER_OUTPUTS         = $(patsubst $(SHADER_DIR)/%.slang,../run_tree/res/shader_binaries/%.spv,$(SHADERS_SRC))
 
 # --------------------------------------------
 # Create The Build Instructions
 # --------------------------------------------
-.PHONY: all game_out asset_file_packer tests clean
+.PHONY: all game_out asset_file_packer tests shaders clean
 
-all: game_out asset_file_packer tests
+all: game_out asset_file_packer shaders tests
 
 # -------------------------------------------------------------------------
 # Create Build Directory 
 # -------------------------------------------------------------------------
 $(BUILD_DIR):
 	$(call MKDIR,$(BUILD_DIR))
+
+# -------------------------------------------------------------------------
+# Shaders 
+# -------------------------------------------------------------------------
+shaders: $(SHADER_OUTPUTS)
+
+../run_tree/res/shader_binaries/%.spv: $(SHADER_DIR)/%.slang
+	@mkdir -p $(dir $@)
+	$(SLANGC) $< $(SLANG_FLAGS) -o $@
+	@echo "[SHADERS]: $< -> $@"
 
 # -------------------------------------------------------------------------
 # Tests
@@ -129,7 +144,7 @@ $(BUILD_DIR)/test_%$(EXE_EXT): ../code/tests/%.cpp | $(BUILD_DIR)
 asset_file_packer: $(ASSET_FILE_PACKER_OUT)
 
 $(ASSET_FILE_PACKER_OUT): $(ASSET_FILE_PACKER_SRC) | ../build
-	@echo [Asset File Packer] $@
+	@echo [ASSET FILE PACKER] $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) $< $(GAME_EXTERNAL_LIBRARIES) -o $@ -MMD -MF ../build/asset_file_packer.d
 
 # -------------------------------------------------------------------------
@@ -142,7 +157,7 @@ $(GAME_OUT): $(GAME_OBJS) | $(BUILD_DIR)
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(LDFLAGS) $(GAME_OBJS) $(GAME_EXTERNAL_LIBRARIES) -o $@
 
 $(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
-	@echo Compiling: $< ...
+	@echo [ENGINE SOURCE]: $< ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) -MMD -MP -c $< -o $@
 
 # -------------------------------------------------------------------------

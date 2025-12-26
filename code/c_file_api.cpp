@@ -118,7 +118,6 @@ c_file_read_entirety(string_t            filepath,
     Assert(file_data.handle != INVALID_FILE_HANDLE);
 
     s64 file_size    = c_file_get_size(&file_data);
-    printf("file_size is: '%ld'...\n", file_size);
     result = c_file_read(&file_data, file_size, 0, arena, zone, tag, true);
     if(result.data == null)
     {
@@ -164,8 +163,6 @@ c_file_get_size(file_t *file_data)
 {
     Assert(file_data->handle != INVALID_FILE_HANDLE);
     s64 result = 0;
-
-    printf("file name: '%s'...\n", C_STR(file_data->filepath));
 
     result = sys_file_get_size(file_data);
     return(result);

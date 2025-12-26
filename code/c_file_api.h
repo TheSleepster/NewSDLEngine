@@ -105,6 +105,7 @@ typedef struct visit_file_data
 /*===========================================
   =============== GENERAL API ===============
   ===========================================*/
+
 file_t            c_file_open(string_t filepath, bool8 create);
 bool8             c_file_close(file_t *file);
 bool8             c_file_copy(string_t old_path, string_t new_path);
@@ -114,6 +115,7 @@ string_t          c_file_read(file_t *file_data, u32 bytes_to_read, u32 offset, 
 string_t          c_file_read_entirety(string_t filepath, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
 string_t          c_file_read_from_offset(file_t *file_data, u32 bytes_to_read, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
 string_t          c_file_read_to_end(file_t *file_data, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
+
 
 bool8             c_file_open_and_write(string_t filepath, void *data, s64 bytes_to_write, bool8 overwrite);
 bool8             c_file_write(file_t *file, void *data, s64 bytes_to_write);

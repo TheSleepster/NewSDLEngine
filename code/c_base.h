@@ -133,7 +133,7 @@
 #define GlueHelper(A, B)             A##B
 #define Glue(A, B)                   GlueHelper(A, B)
 
-#define ArrayCount(x)                (sizeof(x) / sizeof(*(x)))
+#define ArrayCount(x)                (sizeof(x) / sizeof((x[0])))
 #define IntFromPtr(x)                ((u32)    ((char *)x - (char*)0))
 #define PtrFromInt(x)                ((void *) ((char *)0 + (x)))
 
@@ -185,7 +185,7 @@ typedef void void_func(void);
 
 #define StaticAssert(cond, msg) static_assert(cond, msg) 
 #define Expect(cond, ...) if(!(cond)) { fprintf(stderr, "FILE: [%s], LINE: '%d':\t", __FILE__, __LINE__); fprintf(stderr, ##__VA_ARGS__); getchar(); AssertBreak;}
-#define Assert(cond)      if(!(cond)) { AssertBreak; getchar(); }
+#define Assert(cond)      if(!(cond)) { fprintf(stderr, "FILE: [%s], LINE: '%d': Assertion failed:...\n", __FILE__, __LINE__); AssertBreak;}
 #else
 #define StaticAssert(cond, msg)
 #define Expect(cond, ...)

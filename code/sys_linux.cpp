@@ -280,7 +280,6 @@ sys_file_get_size(file_t *file_data)
     if(fstat(file_data->handle, &file_stats) != -1)
     {
         file_size = file_stats.st_size;
-        printf("file_size is: '%ld'...\n", file_size);
     }
     else
     {
@@ -314,8 +313,6 @@ sys_file_read(file_t *file_data, void *memory, u32 bytes_to_read, u32 file_offse
     if(bytes_read == 0)
     {
         log_error("Failure to read file '%s', error: '%s'...\n", C_STR(file_data->filepath), strerror(errno));
-        printf("Bytes to read: '%d'...\n", bytes_to_read);
-        printf("Bytes read: '%lu'...\n", bytes_read);
     }
 
     return(result);

@@ -12,11 +12,12 @@
 #include <c_threadpool.h>
 #include <c_log.h>
 #include <c_globals.h>
+#include <c_file_api.h>
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.h>
-#include <slang.h>
+#include <spirv_reflect.h>
 
 #include <r_vulkan.h>
 
@@ -188,6 +189,46 @@ r_vulkan_result_is_success(VkResult result)
         case VK_ERROR_UNKNOWN:
             return false; 
     }
+}
+
+////////////////////////////
+// VULKAN SHADER MODULES 
+////////////////////////////
+
+vulkan_shader_data_t
+r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepath)
+{
+    vulkan_shader_data_t result;
+    string_t shader_source = c_file_read_entirety(filepath);
+
+    SpvReflectShaderModule module;
+    SpvReflectResult error = spvReflectCreateShaderModule(shader_source.count, shader_source.data, &module);
+    if(error != SPV_REFLECT_RESULT_SUCCESS)
+    {
+        printf("Failure to create a spvReflectCreateShaderModule for shader file: '%s'...\n", C_STR(filepath));
+    }
+
+    log_info("Shader: '%s' has '%u' entry points...\n", C_STR(filepath), module.entry_point_count);
+    for(u32 entry_point_index = 0;
+        entry_point_index < module.entry_point_count;
+        ++entry_point_index)
+    {
+        SpvReflectEntryPoint *entry_point = module.entry_points + entry_point_index;
+        const char *name = entry_point->name;
+        log_trace("Entry Point %d: '%s'...\n", entry_point_index, name);
+    }
+
+    return(result);
+}
+
+void
+r_vulkan_shader_destroy(vulkan_render_context_t *render_context, vulkan_shader_data_t *shader)
+{
+}
+
+void
+r_vulkan_shader_bind(vulkan_render_context_t *render_context, vulkan_shader_data_t *shader)
+{
 }
 
 ////////////////////////////
@@ -1965,4 +2006,6 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
 
     log_info("Vulkan context initialized...\n");
     c_arena_destroy(&render_context->initialization_arena);
+
+    r_vulkan_shader_create(render_context, STR("shader_binaries/test.spv"));
 }

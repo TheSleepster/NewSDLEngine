@@ -19,6 +19,37 @@
 #define INVALID_SWAPCHAIN_IMAGE_INDEX ((u32)-1)
 
 //////////////////////////////////
+// VULKAN PIPELINE STUFF 
+//////////////////////////////////
+
+typedef struct vulkan_pipeline_data
+{
+    VkPipeline       handle;
+    VkPipelineLayout layout;
+}vulkan_pipeline_data_t;
+
+//////////////////////////////////
+// VULKAN SHADER STUFF 
+//////////////////////////////////
+#define MAX_VULKAN_SHADER_STAGES (10)
+
+typedef struct vulkan_shader_stage_info
+{
+    VkShaderStageFlagBits           type;
+    VkShaderModuleCreateInfo        module_create_info;
+    VkPipelineShaderStageCreateInfo shader_stage_create_info; 
+    VkShaderModule                  handle;
+}vulkan_shader_stage_info_t;
+
+typedef struct vulkan_shader_data
+{
+    vulkan_shader_stage_info_t stages[MAX_VULKAN_SHADER_STAGES];
+    u32                        stage_count;
+
+    vulkan_pipeline_data_t     pipeline;
+}vulkan_shader_data_t;
+
+//////////////////////////////////
 // VULKAN PHYSICAL DEVICE STUFF 
 //////////////////////////////////
 
