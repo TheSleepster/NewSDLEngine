@@ -19,6 +19,23 @@
 #define INVALID_SWAPCHAIN_IMAGE_INDEX ((u32)-1)
 
 //////////////////////////////////
+// VULKAN BUFFER STUFF 
+//////////////////////////////////
+
+typedef struct vulkan_buffer_data
+{
+    bool8                 is_valid;
+    bool8                 is_mapped;
+    u64                   buffer_size;
+
+    VkBuffer              handle;
+    VkDeviceMemory        device_memory;
+    VkBufferUsageFlagBits usage_flags;
+    s32                   memory_index;
+    u32                   memory_property_flags;
+}vulkan_buffer_data_t;
+
+//////////////////////////////////
 // VULKAN PIPELINE STUFF 
 //////////////////////////////////
 
@@ -272,6 +289,12 @@ typedef struct vulkan_render_context
     vulkan_renderpass_data_t      main_renderpass;
     vulkan_shader_data_t          default_shader;
 
+    vulkan_buffer_data_t          vertex_buffer;
+    vulkan_buffer_data_t          index_buffer;
+
+    u32                           vertex_offset;
+    u32                           geometry_index;
+
     VkDebugUtilsMessengerEXT debug_callback;
 }vulkan_render_context_t;
 
@@ -281,5 +304,13 @@ bool8 r_vulkan_physical_device_detect_depth_format(vulkan_physical_device_t *dev
 
 s32   r_vulkan_find_memory_index(vulkan_render_context_t *render_context, u32 type_filter, u32 property_flags);
 bool8 r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context);
+
+vulkan_command_buffer_data_t r_vulkan_command_buffer_acquire_scratch_buffer(vulkan_render_context_t *render_context, VkCommandPool command_pool);
+
+void
+r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *render_context,
+                                                vulkan_command_buffer_data_t *command_buffer,
+                                                VkCommandPool                 command_pool,
+                                                VkQueue                       queue);
 #endif // R_VULKAN_H
 

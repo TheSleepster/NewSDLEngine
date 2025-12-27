@@ -197,6 +197,244 @@ r_vulkan_result_is_success(VkResult result)
 }
 
 ////////////////////////////
+// VULKAN BUFFERS 
+////////////////////////////
+
+void
+r_vulkan_buffer_bind(vulkan_render_context_t *render_context,
+                     vulkan_buffer_data_t    *buffer,
+                     u64                      offset)
+{
+    Assert(buffer->is_valid);
+    VkAssert(vkBindBufferMemory(render_context->rendering_device.logical_device, 
+                                buffer->handle,
+                                buffer->device_memory, 
+                                offset));
+}
+
+vulkan_buffer_data_t
+r_vulkan_buffer_create(vulkan_render_context_t *render_context,
+                       u64                      buffer_size,
+                       VkBufferUsageFlagBits    usage_flags,
+                       u32                      memory_flags,
+                       bool8                    bind_on_create)
+{
+    vulkan_buffer_data_t result  = {};
+    result.buffer_size           = buffer_size;
+    result.usage_flags           = usage_flags;
+    result.memory_property_flags = memory_flags;
+    VkBufferCreateInfo buffer_create_info = {
+        .sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+        .size        = buffer_size,
+        .usage       = usage_flags,
+        .sharingMode = VK_SHARING_MODE_EXCLUSIVE
+    };
+
+    VkAssert(vkCreateBuffer(render_context->rendering_device.logical_device,
+                           &buffer_create_info,
+                            render_context->allocators,
+                           &result.handle));
+
+    VkMemoryRequirements memory_requirements;
+    vkGetBufferMemoryRequirements(render_context->rendering_device.logical_device, 
+                                  result.handle, 
+                                  &memory_requirements);
+
+    result.memory_index = r_vulkan_find_memory_index(render_context, 
+                                                     memory_requirements.memoryTypeBits, 
+                                                     result.memory_property_flags);
+    Assert(result.memory_index != -1);
+    VkMemoryAllocateInfo allocate_info = {
+        .sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+        .allocationSize  = buffer_size,
+        .memoryTypeIndex = (u32)result.memory_index,
+    };
+    VkResult success = vkAllocateMemory(render_context->rendering_device.logical_device,
+                                       &allocate_info,
+                                        render_context->allocators,
+                                       &result.device_memory);
+    if(success != VK_SUCCESS)
+    {
+        log_fatal("We have failed to create a buffer of size: '%d'... Error is: '%s'...\n", 
+                  buffer_size, r_vulkan_result_string(success, true));
+    }
+    else
+    {
+        result.is_valid = true;
+    }
+
+    if(bind_on_create)
+    {
+        r_vulkan_buffer_bind(render_context, &result, 0);
+    }
+
+    return(result);
+}
+
+void
+r_vulkan_buffer_destroy(vulkan_render_context_t *render_context,
+                        vulkan_buffer_data_t    *buffer)
+{
+    Assert(buffer);
+    Assert(buffer->is_valid);
+
+    if(buffer->device_memory)
+    {
+        vkFreeMemory(render_context->rendering_device.logical_device,
+                     buffer->device_memory,
+                     render_context->allocators);
+    }
+    if(buffer->handle)
+    {
+        vkDestroyBuffer(render_context->rendering_device.logical_device,
+                        buffer->handle,
+                        render_context->allocators);
+    }
+
+    ZeroStruct(*buffer);
+}
+
+void*
+r_vulkan_buffer_map_memory(vulkan_render_context_t *render_context,
+                           vulkan_buffer_data_t    *buffer,
+                           u64                      offset,
+                           u64                      map_size,
+                           u32                      flags)
+{
+    Assert(buffer->is_valid);
+    Assert(buffer->device_memory);
+    Assert(buffer->buffer_size != 0);
+
+    void *result = null;
+    VkAssert(vkMapMemory(render_context->rendering_device.logical_device,
+                         buffer->device_memory,
+                         offset,
+                         map_size,
+                         flags,
+                        &result));
+    buffer->is_mapped = true;
+
+    return(result);
+}
+
+void
+r_vulkan_buffer_unmap_memory(vulkan_render_context_t *render_context,
+                             vulkan_buffer_data_t    *buffer,
+                             void                    *data)
+{
+    Assert(buffer->is_mapped);
+    vkUnmapMemory(render_context->rendering_device.logical_device,
+                  buffer->device_memory);
+    buffer->is_mapped = false;
+}
+
+void
+r_vulkan_buffer_copy_buffer(vulkan_render_context_t *render_context,
+                            vulkan_buffer_data_t    *src_buffer,
+                            u64                      src_offset,
+                            vulkan_buffer_data_t    *dst_buffer,
+                            u64                      copy_size,
+                            u64                      dst_offset,
+                            VkFence                  fence,
+                            VkQueue                  queue,
+                            VkCommandPool            command_pool)
+{
+    vkQueueWaitIdle(queue);
+    vulkan_command_buffer_data_t temp_buffer = r_vulkan_command_buffer_acquire_scratch_buffer(render_context, 
+                                                                                              command_pool);
+    VkBufferCopy copy_region = {
+        .srcOffset = src_offset,
+        .dstOffset = dst_offset,
+        .size      = copy_size
+    };
+    vkCmdCopyBuffer(temp_buffer.handle, src_buffer->handle, dst_buffer->handle, 1, &copy_region);
+    r_vulkan_command_buffer_dispatch_scratch_buffer(render_context, &temp_buffer, command_pool, queue);
+}
+
+void
+r_vulkan_buffer_copy_data(vulkan_render_context_t *render_context,
+                          vulkan_buffer_data_t    *buffer,
+                          void                    *data,
+                          u64                      data_size,
+                          u64                      offset,
+                          u32                      flags)
+{
+    void *data_ptr = null;
+    VkAssert(vkMapMemory(render_context->rendering_device.logical_device, 
+                         buffer->device_memory, 
+                         offset, 
+                         data_size, 
+                         flags, 
+                        &data_ptr));
+
+    memcpy(data_ptr, data, data_size);
+
+    vkUnmapMemory(render_context->rendering_device.logical_device,
+                  buffer->device_memory);
+}
+
+void
+r_vulkan_buffer_resize(vulkan_render_context_t *render_context,
+                       vulkan_buffer_data_t    *buffer,
+                       u64                      new_buffer_size,
+                       VkQueue                  queue,
+                       VkCommandPool            pool)
+{
+    vulkan_buffer_data_t new_buffer = r_vulkan_buffer_create(render_context,
+                                                             new_buffer_size,
+                                                             buffer->usage_flags,
+                                                             buffer->memory_property_flags,
+                                                             true);
+    r_vulkan_buffer_copy_buffer(render_context, 
+                                &new_buffer, 
+                                0, 
+                                buffer, 
+                                buffer->buffer_size, 
+                                0, 
+                                null, 
+                                queue,
+                                pool);
+
+    vkDeviceWaitIdle(render_context->rendering_device.logical_device);
+    r_vulkan_buffer_destroy(render_context, buffer);
+
+    *buffer = new_buffer;
+}
+
+// TODO(Sleepster): TEMPORARY
+void
+r_vulkan_buffer_upload(vulkan_render_context_t *render_context, 
+                       vulkan_buffer_data_t    *buffer,
+                       void                    *data,
+                       u64                      upload_size,
+                       u64                      offset,
+                       VkFence                  fence,
+                       VkCommandPool            command_pool,
+                       VkQueue                  queue)
+{
+    VkBufferUsageFlagBits staging_buffer_flags = (VkBufferUsageFlagBits)(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    vulkan_buffer_data_t staging_buffer = r_vulkan_buffer_create(render_context,
+                                                                 upload_size,
+                                                                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                                                 staging_buffer_flags,
+                                                                 true);
+    Assert(staging_buffer.is_valid);
+    Assert(staging_buffer.handle != null);
+
+    r_vulkan_buffer_copy_data(render_context, &staging_buffer, data, upload_size, offset, 0);
+    r_vulkan_buffer_copy_buffer(render_context, 
+                               &staging_buffer, 
+                                0, 
+                                buffer, 
+                                upload_size, 
+                                offset, 
+                                fence, 
+                                queue, 
+                                command_pool);
+    r_vulkan_buffer_destroy(render_context, &staging_buffer);
+}
+
+////////////////////////////
 // VULKAN PIPELINE 
 ////////////////////////////
 
@@ -581,6 +819,9 @@ r_vulkan_shader_destroy(vulkan_render_context_t *render_context, vulkan_shader_d
 void
 r_vulkan_shader_bind(vulkan_render_context_t *render_context, vulkan_shader_data_t *shader)
 {
+    r_vulkan_pipeline_bind(&render_context->graphics_command_buffers[render_context->current_image_index],
+                           VK_PIPELINE_BIND_POINT_GRAPHICS,
+                           &shader->pipeline);
 }
 
 ////////////////////////////
@@ -972,8 +1213,8 @@ r_vulkan_command_buffer_reset(vulkan_command_buffer_data_t *command_buffer)
 }
 
 vulkan_command_buffer_data_t
-r_vulkan_command_buffer_initialize_scratch_buffer(vulkan_render_context_t *render_context, 
-                                                  VkCommandPool            command_pool)
+r_vulkan_command_buffer_acquire_scratch_buffer(vulkan_render_context_t *render_context, 
+                                               VkCommandPool            command_pool)
 {
     vulkan_command_buffer_data_t result;
     result = r_vulkan_command_buffer_acquire(render_context, command_pool, true);
@@ -1790,6 +2031,17 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
                                  &render_context->main_renderpass, 
                                   command_buffer, 
                                   render_context->swapchain.framebuffers[render_context->current_image_index].handle);
+
+
+    // TODO(Sleepster): TRIANGLE CODE
+    r_vulkan_shader_bind(render_context, &render_context->default_shader);
+    VkDeviceSize offsets[1] = {};
+    vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &render_context->vertex_buffer.handle, (VkDeviceSize*)&offsets);
+    vkCmdBindIndexBuffer(command_buffer->handle, render_context->index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+
+    vkCmdDrawIndexed(command_buffer->handle, 3, 1, 0, 0, 0);
+
+    // TODO(Sleepster): TRIANGLE CODE
     }
 
 begin_frame_return:
@@ -2362,6 +2614,67 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     }
 
     render_context->default_shader = r_vulkan_shader_create(render_context, STR("shader_binaries/test.spv"));
+
+    // NOTE(Sleepster): buffer initialization 
+    {
+        VkMemoryPropertyFlagBits memory_flags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+        VkBufferUsageFlagBits vertex_buffer_usage_bits = (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT| 
+                                                                                 VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
+                                                                                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+        render_context->vertex_buffer = r_vulkan_buffer_create(render_context,
+                                                               (sizeof(vertex_t) * 1024),
+                                                               vertex_buffer_usage_bits,
+                                                          (u32)memory_flags,
+                                                               true);
+        Assert(render_context->vertex_buffer.is_valid);
+        VkBufferUsageFlagBits index_buffer_usage_bits = (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | 
+                                                                                VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
+                                                                                VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+        render_context->index_buffer = r_vulkan_buffer_create(render_context,
+                                                              (sizeof(u32) * 1024),
+                                                              index_buffer_usage_bits,
+                                                         (u32)memory_flags,
+                                                              true);
+        Assert(render_context->index_buffer.is_valid);
+
+        log_info("Vertex and Index buffers created...\n");
+    }
+
+    // TODO(Sleepster): TRIANGLE CODE
+    vertex_t vertices[] = {
+        [0] = {
+            .vPosition = {0.5, -0.5},
+        },
+        [1] = {
+            .vPosition = {0.0, 1.0},
+        },
+        [2] = {
+            .vPosition = {-0.5, -0.5},
+        },
+    };
+
+    u32 indices[] = {
+        0, 1, 2
+    };
+
+    r_vulkan_buffer_upload(render_context, 
+                          &render_context->vertex_buffer, 
+                           vertices,
+                           sizeof(vertex_t) * ArrayCount(vertices), 
+                           0, 
+                           null, 
+                           render_context->rendering_device.graphics_command_pool, 
+                           render_context->rendering_device.graphics_queue);
+
+    r_vulkan_buffer_upload(render_context, 
+                          &render_context->index_buffer, 
+                           vertices,
+                           sizeof(u32) * ArrayCount(indices), 
+                           0, 
+                           null, 
+                           render_context->rendering_device.graphics_command_pool, 
+                           render_context->rendering_device.graphics_queue);
+    // TODO(Sleepster): TRIANGLE CODE
 
     log_info("Vulkan context initialized...\n");
     c_arena_destroy(&render_context->initialization_arena);
