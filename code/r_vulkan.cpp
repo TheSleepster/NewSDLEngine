@@ -492,6 +492,74 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         const char *name = entry_point->name;
         log_trace("Entry Point %d: '%s'...\n", entry_point_index, name);
     }
+    result.stage_count = module.entry_point_count;
+
+    VkViewport viewport = {
+        .x        =  (float32)0.0f,
+        .y        =  (float32)render_context->framebuffer_height,
+        .width    =  (float32)render_context->framebuffer_width,
+        .height   = -(float32)render_context->framebuffer_height,
+        .minDepth =  0.0f,
+        .maxDepth =  1.0f
+    };
+
+    VkRect2D scissor = {
+        .extent = {
+            .width  = render_context->framebuffer_width,
+            .height = render_context->framebuffer_height
+        },
+    };
+
+    const u32 attribute_count = 1;
+    VkVertexInputAttributeDescription attributes[attribute_count] = {};
+
+    VkFormat attribute_formats[attribute_count] = {
+        VK_FORMAT_R32G32B32_SFLOAT,
+        //VK_FORMAT_R32G32B32A32_SFLOAT
+    };
+
+    u64 attribute_sizes[attribute_count] = {
+        sizeof(vec3_t),
+        //sizeof(vec4_t)
+    };
+
+    u32 offset = 0;
+    for(u32 index = 0;
+        index < attribute_count;
+        ++index)
+    {
+        VkVertexInputAttributeDescription *attrib = attributes + index;
+        attrib->binding = 0;
+        attrib->format  = attribute_formats[index];
+        attrib->location = index;
+        attrib->offset   = offset;
+
+        offset += attribute_sizes[index];
+    }
+
+    VkPipelineShaderStageCreateInfo stage_create_infos[2] = {};
+    for(u32 index = 0;
+        index < 2;
+        ++index)
+    {
+        stage_create_infos[index] = result.stages[index].shader_stage_create_info;
+    }
+
+    result.pipeline = r_vulkan_pipeline_create(render_context,
+                                              &render_context->main_renderpass,
+                                               attributes,
+                                               attribute_count,
+                                               null,
+                                               0,
+                                               stage_create_infos,
+                                               2,
+                                               viewport,
+                                               scissor,
+                                               false);
+    if(!result.pipeline.handle)
+    {
+        log_fatal("We have failed to create our pipeline...\n");
+    }
 
     return(result);
 }
@@ -1939,7 +2007,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     render_context->initialization_arena = c_arena_create(MB(10));
     render_context->permanent_arena      = c_arena_create(MB(100));
 
-	VkApplicationInfo app_info = {};
+	VkApplicationInfo app_info  = {};
 	app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	app_info.pApplicationName   = null;
 	app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -2211,11 +2279,16 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
             info->pQueuePriorities = &queue_priority;
         }
 
+        VkPhysicalDeviceFeatures device_features = {
+            .logicOp           = true,
+            .samplerAnisotropy = true,
+        };
+
         VkDeviceCreateInfo device_create_info = {};
         device_create_info.sType                 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         device_create_info.queueCreateInfoCount  = index_count;
         device_create_info.pQueueCreateInfos     = queue_create_infos;
-        device_create_info.pEnabledFeatures      = 0;
+        device_create_info.pEnabledFeatures      = &device_features;
         device_create_info.enabledExtensionCount = 1;
 
         const char *extension = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
