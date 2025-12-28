@@ -23,7 +23,7 @@
 
 struct vertex_t
 {
-    vec3_t vPosition;
+    vec4_t vPosition;
 };
 
 VKAPI_ATTR VkBool32 VKAPI_CALL
@@ -246,7 +246,7 @@ r_vulkan_buffer_create(vulkan_render_context_t *render_context,
     Assert(result.memory_index != -1);
     VkMemoryAllocateInfo allocate_info = {
         .sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-        .allocationSize  = buffer_size,
+        .allocationSize  = memory_requirements.size,
         .memoryTypeIndex = (u32)result.memory_index,
     };
     VkResult success = vkAllocateMemory(render_context->rendering_device.logical_device,
@@ -265,6 +265,7 @@ r_vulkan_buffer_create(vulkan_render_context_t *render_context,
 
     if(bind_on_create)
     {
+        Assert(result.is_valid == true);
         r_vulkan_buffer_bind(render_context, &result, 0);
     }
 
@@ -504,7 +505,7 @@ r_vulkan_pipeline_create(vulkan_render_context_t           *render_context,
         .srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
         .dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
         .alphaBlendOp        = VK_BLEND_OP_ADD,
-        .colorWriteMask      = VK_COLOR_COMPONENT_B_BIT|VK_COLOR_COMPONENT_G_BIT|VK_COLOR_COMPONENT_B_BIT|VK_COLOR_COMPONENT_A_BIT
+        .colorWriteMask      = VK_COLOR_COMPONENT_R_BIT|VK_COLOR_COMPONENT_G_BIT|VK_COLOR_COMPONENT_B_BIT|VK_COLOR_COMPONENT_A_BIT
     };
 
     VkPipelineColorBlendStateCreateInfo color_blend_state = {
@@ -573,7 +574,7 @@ r_vulkan_pipeline_create(vulkan_render_context_t           *render_context,
         .layout              =  result.layout,
         .renderPass          =  renderpass->handle,
         .subpass             =  0,
-        .basePipelineHandle  = VK_NULL_HANDLE,
+        .basePipelineHandle  =  VK_NULL_HANDLE,
         .basePipelineIndex   = -1,
     };
 
@@ -752,12 +753,12 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
     VkVertexInputAttributeDescription attributes[attribute_count] = {};
 
     VkFormat attribute_formats[attribute_count] = {
-        VK_FORMAT_R32G32B32_SFLOAT,
+        VK_FORMAT_R32G32B32A32_SFLOAT,
         //VK_FORMAT_R32G32B32A32_SFLOAT
     };
 
     u64 attribute_sizes[attribute_count] = {
-        sizeof(vec3_t),
+        sizeof(vec4_t),
         //sizeof(vec4_t)
     };
 
@@ -767,8 +768,8 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         ++index)
     {
         VkVertexInputAttributeDescription *attrib = attributes + index;
-        attrib->binding = 0;
-        attrib->format  = attribute_formats[index];
+        attrib->binding  = 0;
+        attrib->format   = attribute_formats[index];
         attrib->location = index;
         attrib->offset   = offset;
 
@@ -2100,7 +2101,6 @@ r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time)
     else
     {
         r_vulkan_command_buffer_submit(command_buffer);
-        
         r_vulkan_swapchain_present(render_context, 
                                   &render_context->swapchain,
                                    render_context->rendering_device.graphics_queue,
@@ -2643,13 +2643,13 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     // TODO(Sleepster): TRIANGLE CODE
     vertex_t vertices[] = {
         [0] = {
-            .vPosition = {0.5, -0.5},
+            .vPosition = {0.5, -0.5, 1.0},
         },
         [1] = {
-            .vPosition = {0.0, 1.0},
+            .vPosition = {0.0, 1.0, 1.0},
         },
         [2] = {
-            .vPosition = {-0.5, -0.5},
+            .vPosition = {-0.5, -0.5, 1.0},
         },
     };
 
