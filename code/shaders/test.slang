@@ -8,6 +8,11 @@ struct VertexOutput_t
     float4 vOutPosition : SV_POSITION;
 };
 
+struct PixelOutput_t
+{
+    float4 vFragColor : SV_Target;
+};
+
 [shader("vertex")]
 VertexOutput_t
 VSMain(VertexInput_t input)
@@ -19,10 +24,11 @@ VSMain(VertexInput_t input)
 }
 
 [shader("fragment")]
-float4
-PSMain(VertexOutput_t input) : SV_Target
+PixelOutput_t
+PSMain(VertexOutput_t input)
 {
-    float4 vFragColor = float4(1.0);
+    PixelOutput_t result;
+    result.vFragColor = float4(1.0);
 
-    return(vFragColor);
+    return(result);
 }
