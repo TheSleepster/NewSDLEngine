@@ -24,6 +24,7 @@
 struct vertex_t
 {
     vec4_t vPosition;
+    vec4_t vColor;
 };
 
 VKAPI_ATTR VkBool32 VKAPI_CALL
@@ -749,17 +750,17 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         },
     };
 
-    const u32 attribute_count = 1;
+    const u32 attribute_count = 2;
     VkVertexInputAttributeDescription attributes[attribute_count] = {};
 
     VkFormat attribute_formats[attribute_count] = {
         VK_FORMAT_R32G32B32A32_SFLOAT,
-        //VK_FORMAT_R32G32B32A32_SFLOAT
+        VK_FORMAT_R32G32B32A32_SFLOAT
     };
 
     u64 attribute_sizes[attribute_count] = {
         sizeof(vec4_t),
-        //sizeof(vec4_t)
+        sizeof(vec4_t)
     };
 
     u32 offset = 0;
@@ -2644,12 +2645,15 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     vertex_t vertices[] = {
         [0] = {
             .vPosition = {0.5, -0.5, 1.0},
+            .vColor    = {1.0, 0.0, 0.0, 1.0}
         },
         [1] = {
             .vPosition = {0.0, 1.0, 1.0},
+            .vColor    = {0.0, 1.0, 0.0, 1.0}
         },
         [2] = {
             .vPosition = {-0.5, -0.5, 1.0},
+            .vColor    = {0.0, 0.0, 1.0, 1.0}
         },
     };
 
