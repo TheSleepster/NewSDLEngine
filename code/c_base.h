@@ -13,6 +13,8 @@
 
 #include <stdlib.h>
 
+// TODO(Sleepster): Instruction set support (SSE2, SSE3, AVX, AVX2, etc...)
+
 // MSVC
 #if defined(_MSC_VER)
 #define COMPILER_CL 1

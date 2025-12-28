@@ -690,9 +690,9 @@ r_vulkan_shader_stage_create(vulkan_render_context_t    *render_context,
     };
 
     VkAssert(vkCreateShaderModule(render_context->rendering_device.logical_device,
-                                  &stage->module_create_info,
+                                 &stage->module_create_info,
                                   render_context->allocators,
-                                  &stage->handle));
+                                 &stage->handle));
 
     stage->shader_stage_create_info = {
         .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
@@ -2668,7 +2668,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
 
     r_vulkan_buffer_upload(render_context, 
                           &render_context->index_buffer, 
-                           vertices,
+                           indices,
                            sizeof(u32) * ArrayCount(indices), 
                            0, 
                            null, 
