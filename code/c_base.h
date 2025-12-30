@@ -151,8 +151,9 @@
 
 #define InvalidCodePath Assert(false)
 
-#define Align4(value)  ((value  + 3)  & ~3)
-#define Align8(value)  ((value  + 7)  & ~7)
+#define Align(value, number) ((value + ((number) - 1))  & ~((number) - 1))
+#define Align4(value)  ((value + 3)  & ~3)
+#define Align8(value)  ((value + 7)  & ~7)
 #define Align16(value) ((value + 15) & ~15)
 
 #include "c_types.h"

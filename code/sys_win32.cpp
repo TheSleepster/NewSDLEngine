@@ -643,6 +643,7 @@ sys_mutex_unlock(sys_mutex_t *mutex)
 /*===========================================
   =============== FILE WATCHER ==============
   ===========================================*/
+
 void
 sys_file_watcher_init_watch_data(memory_arena_t *arena, file_watcher_sys_watch_data_t *watch_data)
 {

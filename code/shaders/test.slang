@@ -10,12 +10,23 @@ struct VertexOutput_t
     float4 vOutColor    : SV_TARGET;
 };
 
+struct global_matrix_uniforms 
+{
+    float4x4 ViewMatrix;
+    float4x4 ProjectionMatrix;
+};
+
+[[vk::binding(0, 0)]]
+ParameterBlock<global_matrix_uniforms> Matrices;
+
 [shader("vertex")]
 VertexOutput_t
 VSMain(VertexInput_t input)
 {
     VertexOutput_t result;
-    result.vOutPosition = float4(input.vPosition.xyz, 1.0);
+
+    float4 VSPosition   = mul(Matrices.ViewMatrix, float4(input.vPosition.xyz, 1.0));
+    result.vOutPosition = mul(Matrices.ProjectionMatrix, VSPosition);
     result.vOutColor    = input.vColor;
 
     return(result);

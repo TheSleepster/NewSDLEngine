@@ -10,6 +10,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.h>
+#include <spirv_reflect.h>
 
 #include <c_types.h>
 #include <c_memory_arena.h>
@@ -17,6 +18,15 @@
 
 #define VkAssert(result) Statement(Assert(result == VK_SUCCESS))
 #define INVALID_SWAPCHAIN_IMAGE_INDEX ((u32)-1)
+
+// TODO: TEMPORARY
+
+// NOTE(Sleepster): Nvidia needs 256 byte alignment
+typedef struct global_matrix_uniforms
+{
+    mat4_t view_matrix;
+    mat4_t projection_matrix;
+}global_matrix_uniforms;
 
 //////////////////////////////////
 // VULKAN BUFFER STUFF 
@@ -49,6 +59,28 @@ typedef struct vulkan_pipeline_data
 // VULKAN SHADER STUFF 
 //////////////////////////////////
 #define MAX_VULKAN_SHADER_STAGES (10)
+#define MAX_DESCRIPTOR_TYPES  (SPV_REFLECT_DESCRIPTOR_TYPE_INPUT_ATTACHMENT + 1)
+
+typedef enum vulkan_shader_descriptor_set_index
+{
+    // NOTE(Sleepster): "Static" per frame
+    SDS_Static      = 0,
+    // NOTE(Sleepster): "PerDraw" per draw call
+    SDS_PerDraw     = 1,
+    // NOTE(Sleepster): "PerInstance" per object in the scene / vkCmdDrawInstance 
+    SDS_PerInstance = 2,
+    SDS_Count
+}vulkan_shader_descriptor_set_index;
+
+typedef struct vulkan_shader_descriptor_set_info
+{
+    // NOTE(Sleepster): 3 sets, 1 per "image index" in our triple buffering
+    VkDescriptorSetLayoutBinding *bindings;
+    u32                           binding_count;
+
+    VkDescriptorSet               sets[3];
+    vulkan_buffer_data_t          buffer;
+}vulkan_shader_descriptor_set_info_t;
 
 typedef struct vulkan_shader_stage_info
 {
@@ -61,10 +93,36 @@ typedef struct vulkan_shader_stage_info
 
 typedef struct vulkan_shader_data
 {
-    vulkan_shader_stage_info_t stages[MAX_VULKAN_SHADER_STAGES];
-    u32                        stage_count;
+    memory_arena_t                      arena;
+    SpvReflectShaderModule              spv_reflect_module;
 
-    vulkan_pipeline_data_t     pipeline;
+    vulkan_shader_stage_info_t          stages[MAX_VULKAN_SHADER_STAGES];
+    u32                                 stage_count;
+
+    VkDescriptorPool                    primary_pool;
+    u32                                 type_counts[MAX_DESCRIPTOR_TYPES];
+    
+    // NOTE(Sleepster): This has to be like this instead of in the
+    // vulkan_shader_stage_info_t because our pipeline wants this information 
+    // as an array of VkDescriptorSetLayouts
+    VkDescriptorSetLayout               layouts[3];
+    // NOTE(Sleepster): Group these by the frequency of their updates
+    // "global" are once per frame (0)
+    // "local" are many times a frame, (1)
+    // "instance / object" are per instance or object... (2)
+    // amounting to 3 different sets, this applies to the layouts as well 
+
+    u32                                 used_descriptor_set_count;
+    vulkan_shader_descriptor_set_info_t set_info[3];
+
+    // TODO(Sleepster): Store what kind of pipeline we use, either GRAPHICS or COMPUTE  
+    // ideally something like:
+    //
+    // VkPipelineBindPoint current_bind_point = shader->pipeline.binding_point;
+    vulkan_pipeline_data_t              pipeline;
+
+    // TODO(Sleepster): TEMPORARY 
+    global_matrix_uniforms camera_matrices;
 }vulkan_shader_data_t;
 
 //////////////////////////////////
@@ -252,6 +310,7 @@ typedef struct vulkan_command_buffer_data
 typedef struct vulkan_render_context
 {
     memory_arena_t                initialization_arena;
+    memory_arena_t                frame_arena;
     memory_arena_t                permanent_arena;
 
     SDL_Window                   *window;

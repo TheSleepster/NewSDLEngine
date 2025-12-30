@@ -13,6 +13,7 @@
 #include <c_log.h>
 #include <c_globals.h>
 #include <c_file_api.h>
+#include <c_memory_arena.h>
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
@@ -27,6 +28,10 @@ struct vertex_t
     vec4_t vColor;
 };
 
+/////////////////////////
+// VULKAN UTILITIES
+/////////////////////////
+
 VKAPI_ATTR VkBool32 VKAPI_CALL
 Vk_debug_log_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      message_severity,
                       VkDebugUtilsMessageTypeFlagsEXT             message_type,
@@ -38,26 +43,26 @@ Vk_debug_log_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      message_severi
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
         {
             log_fatal(callback_data->pMessage);
+            printf("\n");
         }break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
         {
             log_warning(callback_data->pMessage);
+            printf("\n");
         }break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
         {
             log_info(callback_data->pMessage);
+            printf("\n");
         }break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
         {
             log_trace(callback_data->pMessage);
+            printf("\n");
         }break;
     }
     return VK_FALSE;
 }
-
-/////////////////////////
-// VULKAN UTILITIES
-/////////////////////////
 
 const char* 
 r_vulkan_result_string(VkResult result, bool8 get_extended) 
@@ -488,12 +493,11 @@ r_vulkan_pipeline_create(vulkan_render_context_t           *render_context,
         .alphaToOneEnable      = false,
     };
 
-    // TODO(Sleepster): VK_COMPARE_OP_LESS 
     VkPipelineDepthStencilStateCreateInfo depth_stencil = {
         .sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
         .depthTestEnable       = true,
         .depthWriteEnable      = true,
-        .depthCompareOp        = VK_COMPARE_OP_GREATER,
+        .depthCompareOp        = VK_COMPARE_OP_LESS,
         .depthBoundsTestEnable = false,
         .stencilTestEnable     = false,
     };
@@ -637,6 +641,58 @@ r_vulkan_pipeline_bind(vulkan_command_buffer_data_t *command_buffer,
 ////////////////////////////
 // VULKAN SHADER MODULES 
 ////////////////////////////
+VkDescriptorType 
+r_vulkan_convert_spv_reflect_descriptor_type(SpvReflectDescriptorType spv_type)
+{
+    switch(spv_type)
+    {
+        case SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLER:
+            return VK_DESCRIPTOR_TYPE_SAMPLER;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+            return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
+            return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+            return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
+            return VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+            return VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+            return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+            return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
+            return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
+            return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
+            return VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+        default:
+            return VK_DESCRIPTOR_TYPE_MAX_ENUM;
+    }
+}
+
+VkShaderStageFlags
+r_vulkan_convert_spv_shader_stage(SpvReflectShaderStageFlagBits spv_stage)
+{
+    VkShaderStageFlags result = 0;
+    
+    if(spv_stage & SPV_REFLECT_SHADER_STAGE_VERTEX_BIT)
+        result |= VK_SHADER_STAGE_VERTEX_BIT;
+    if(spv_stage & SPV_REFLECT_SHADER_STAGE_TESSELLATION_CONTROL_BIT)
+        result |= VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+    if(spv_stage & SPV_REFLECT_SHADER_STAGE_TESSELLATION_EVALUATION_BIT)
+        result |= VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+    if(spv_stage & SPV_REFLECT_SHADER_STAGE_GEOMETRY_BIT)
+        result |= VK_SHADER_STAGE_GEOMETRY_BIT;
+    if(spv_stage & SPV_REFLECT_SHADER_STAGE_FRAGMENT_BIT)
+        result |= VK_SHADER_STAGE_FRAGMENT_BIT;
+    if(spv_stage & SPV_REFLECT_SHADER_STAGE_COMPUTE_BIT)
+        result |= VK_SHADER_STAGE_COMPUTE_BIT;
+    
+    return(result);
+}
 
 void
 r_vulkan_shader_stage_create(vulkan_render_context_t    *render_context, 
@@ -644,46 +700,7 @@ r_vulkan_shader_stage_create(vulkan_render_context_t    *render_context,
                              SpvReflectEntryPoint       *entry_point, 
                              vulkan_shader_stage_info_t *stage)
 {
-    char *type_string = null;
-    SpvExecutionModel shader_stage_type = entry_point->spirv_execution_model;
-    switch(shader_stage_type)
-    {
-        case SpvExecutionModelVertex:
-        {
-            type_string = "Vertex";
-            stage->type = VK_SHADER_STAGE_VERTEX_BIT;
-        }break;
-        case SpvExecutionModelFragment:
-        {
-            type_string = "Fragment";
-            stage->type = VK_SHADER_STAGE_FRAGMENT_BIT;
-        }break;
-        case SpvExecutionModelGeometry:
-        {
-            type_string = "Geometry";
-            stage->type = VK_SHADER_STAGE_GEOMETRY_BIT;
-        }break;
-        case SpvExecutionModelGLCompute:
-        {
-            type_string = "Compute";
-            stage->type = VK_SHADER_STAGE_COMPUTE_BIT;
-        }break;
-        case SpvExecutionModelTessellationControl:
-        {
-            type_string = "Tess Control";
-            stage->type = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-        }break;
-        case SpvExecutionModelTessellationEvaluation:
-        {
-            type_string = "Tess Evaluate";
-            stage->type = VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-        }
-        default:
-        {
-            InvalidCodePath;
-        }break;
-    }
-
+    stage->type        = (VkShaderStageFlagBits)r_vulkan_convert_spv_shader_stage(entry_point->shader_stage);
     stage->entry_point = entry_point->name;
     stage->module_create_info = {
         .sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
@@ -702,53 +719,207 @@ r_vulkan_shader_stage_create(vulkan_render_context_t    *render_context,
         .module = stage->handle,
         .pName  = entry_point->name,
     };
-
-    log_info("Shader module of type: '%s' created...\n", type_string);
 }
+    
+struct spv_vulkan_type_map 
+{
+    SpvReflectDescriptorType spv_type;
+    VkDescriptorType         vk_type;
+};
+
+global_variable spv_vulkan_type_map type_map[] = {
+    {SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLER,                VK_DESCRIPTOR_TYPE_SAMPLER               },
+    {SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLED_IMAGE,          VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE         },
+    {SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER        },
+    {SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_BUFFER,         VK_DESCRIPTOR_TYPE_STORAGE_BUFFER        },
+    {SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_IMAGE,          VK_DESCRIPTOR_TYPE_STORAGE_IMAGE         },
+    {SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER},
+};
 
 vulkan_shader_data_t
 r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepath)
 {
-    vulkan_shader_data_t result;
-    string_t shader_source = c_file_read_entirety(filepath);
+    vulkan_shader_data_t result = {};
+    result.arena = c_arena_create(MB(10));
+    string_t shader_source = c_file_read_entirety(filepath, &result.arena);
 
-    SpvReflectShaderModule module;
-    SpvReflectResult error = spvReflectCreateShaderModule(shader_source.count, shader_source.data, &module);
+    // TODO(Sleepster): TEMPORARY
+    
+    float32 framebuffer_width  = (float32)render_context->framebuffer_width;
+    float32 framebuffer_height = (float32)render_context->framebuffer_height;
+
+    mat4_t view_matrix       = mat4_identity();
+    mat4_t projection_matrix = mat4_RHGL_ortho(framebuffer_width  * -0.5f,
+                                               framebuffer_width  *  0.5f,
+                                               framebuffer_height * -0.5f,
+                                               framebuffer_height *  0.5f,
+                                              -1.0f,
+                                               1.0f);
+
+    result.camera_matrices = {
+        .view_matrix       = view_matrix,
+        .projection_matrix = projection_matrix,
+    };
+
+    // TODO(Sleepster): TEMPORARY
+
+    SpvReflectShaderModule *module = &result.spv_reflect_module;
+    SpvReflectResult error = spvReflectCreateShaderModule(shader_source.count, shader_source.data, module);
     if(error != SPV_REFLECT_RESULT_SUCCESS)
     {
         printf("Failure to create a spvReflectCreateShaderModule for shader file: '%s'...\n", C_STR(filepath));
     }
 
-    log_info("Shader: '%s' has '%u' entry points...\n", C_STR(filepath), module.entry_point_count);
+    log_info("Shader: '%s' has '%u' entry points...\n", C_STR(filepath), module->entry_point_count);
+
+    VkDescriptorPoolSize descriptor_pool_type_info[16] = {};
+    u32                  used_pool_indices     = 0;
+    u32                  total_descriptor_sets = 0;
+
     for(u32 entry_point_index = 0;
-        entry_point_index < module.entry_point_count;
+        entry_point_index < module->entry_point_count;
         ++entry_point_index)
     {
-        SpvReflectEntryPoint       *entry_point = module.entry_points + entry_point_index;
+        SpvReflectEntryPoint       *entry_point = module->entry_points + entry_point_index;
         vulkan_shader_stage_info_t *stage       = result.stages + entry_point_index;
 
-        r_vulkan_shader_stage_create(render_context, shader_source, entry_point, stage);
+        VkShaderStageFlags current_stage = r_vulkan_convert_spv_shader_stage(entry_point->shader_stage);
 
         const char *name = entry_point->name;
         log_trace("Entry Point %d: '%s'...\n", entry_point_index, name);
+
+        for(u32 set_index = 0;
+            set_index < entry_point->descriptor_set_count;
+            ++set_index)
+        {
+            SpvReflectDescriptorSet             *current_set    = entry_point->descriptor_sets + set_index;
+            vulkan_shader_descriptor_set_info_t *set_info       = result.set_info + set_index;
+            VkDescriptorSetLayout               *current_layout = result.layouts  + set_index;
+            u64 set_buffer_size = 0;
+
+            ZeroStruct(*set_info);
+
+            total_descriptor_sets += 1;
+
+            log_trace("Shader Descriptor Set: '%u' has '%u' bindings...\n",
+                     current_set->set, current_set->binding_count);
+
+            set_info->bindings = c_arena_push_array(&result.arena, VkDescriptorSetLayoutBinding, current_set->binding_count);
+            set_info->binding_count = current_set->binding_count;
+
+            VkDescriptorSetLayoutBinding *set_bindings = set_info->bindings;
+            for(u32 binding_index = 0;
+                binding_index < current_set->binding_count;
+                ++binding_index)
+            {
+                SpvReflectDescriptorBinding *binding = current_set->bindings[binding_index];
+                log_trace("Binding of index: '%u' with name: '%s' of type: '%d'...\n", 
+                         binding->binding, binding->name, binding->descriptor_type);
+
+                set_buffer_size += binding->block.padded_size;
+
+                result.type_counts[binding->descriptor_type] += 1;
+                set_bindings[binding_index] = {
+                    .binding            = binding->binding,
+                    .descriptorType     = r_vulkan_convert_spv_reflect_descriptor_type(binding->descriptor_type),
+                    .descriptorCount    = binding->count,
+                    .stageFlags         = current_stage,
+                    .pImmutableSamplers = null,
+                };
+            }
+
+            VkDescriptorSetLayoutCreateInfo layout_create_info = {
+                .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+                .bindingCount = current_set->binding_count,
+                .pBindings    = set_bindings,
+            };
+            VkAssert(vkCreateDescriptorSetLayout(render_context->rendering_device.logical_device,
+                                                &layout_create_info,
+                                                 null,
+                                                 current_layout));
+            for(u32 type_index = 0;
+                type_index < ArrayCount(type_map);
+                ++type_index)
+            {
+                u32 set_type_count = result.type_counts[type_map[type_index].spv_type];
+                if(set_type_count > 0)
+                {
+                    // TODO(Sleepster): this is also hardcoded for triple buffering... 
+                    // Maybe bad idea...
+                    descriptor_pool_type_info[used_pool_indices++] = {
+                        .type            = type_map[type_index].vk_type,
+                        .descriptorCount = set_type_count * 3 
+                    };
+                }
+            }
+
+            // NOTE(Sleepster): Aligning with a value of 256 because nvidia cards sometimes 
+            // require uniform buffers to be at least 256 bytes...
+            set_info->buffer = r_vulkan_buffer_create(render_context, 
+                                                Align(set_buffer_size, 256), 
+                               (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT),
+                                                  (u32)VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                                      true);
+            Assert(set_info->buffer.handle);
+        }
+
+        r_vulkan_shader_stage_create(render_context, shader_source, entry_point, stage);
     }
-    result.stage_count = module.entry_point_count;
+    
+    if(used_pool_indices == 0)
+    {
+        log_warning("No desciptor pool sizes set...\n");
+        descriptor_pool_type_info[0] = {
+            .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            .descriptorCount = 1
+        };
+        used_pool_indices = 1;
+    }
+    result.stage_count = module->entry_point_count;
 
-    VkViewport viewport = {
-        .x        =  (float32)0.0f,
-        .y        =  (float32)render_context->framebuffer_height,
-        .width    =  (float32)render_context->framebuffer_width,
-        .height   = -(float32)render_context->framebuffer_height,
-        .minDepth =  0.0f,
-        .maxDepth =  1.0f
-    };
+    // NOTE(Sleepster): 3 frames in flight 
+    u32 allocated_descriptor_sets = total_descriptor_sets * render_context->swapchain.image_count;
+    VkDescriptorPoolCreateInfo pool_create_info = {
+        .sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 
-    VkRect2D scissor = {
-        .extent = {
-            .width  = render_context->framebuffer_width,
-            .height = render_context->framebuffer_height
-        },
-    };
+        // TODO(Sleepster): Do we care???          
+        //https://docs.vulkan.org/refpages/latest/refpages/source/VkDescriptorPoolCreateFlagBits.html
+        //.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+        
+        .maxSets       = allocated_descriptor_sets,
+        .poolSizeCount = used_pool_indices,
+        .pPoolSizes    = descriptor_pool_type_info
+    };   
+    VkAssert(vkCreateDescriptorPool(render_context->rendering_device.logical_device, 
+                                   &pool_create_info, 
+                                    render_context->allocators, 
+                                   &result.primary_pool));
+
+    for(u32 set_index = 0;
+        set_index < total_descriptor_sets;
+        ++set_index)
+    {
+        vulkan_shader_descriptor_set_info_t *info   = result.set_info + set_index;
+        VkDescriptorSetLayout                layout = result.layouts[set_index];
+
+        VkDescriptorSetLayout layout_info[3] = {
+            layout,
+            layout,
+            layout
+        };
+
+        // TODO(Sleepster): maybe not hard code the count...
+        VkDescriptorSetAllocateInfo allocation_info = {
+            .sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+            .descriptorPool     = result.primary_pool,
+            .descriptorSetCount = 3,
+            .pSetLayouts        = layout_info
+        };
+        VkAssert(vkAllocateDescriptorSets(render_context->rendering_device.logical_device,
+                                         &allocation_info,
+                                          info->sets));
+    }
+
 
     const u32 attribute_count = 2;
     VkVertexInputAttributeDescription attributes[attribute_count] = {};
@@ -777,20 +948,37 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         offset += attribute_sizes[index];
     }
 
+    // TODO(Sleepster): We will explode if we ever try to support more than 2 shaders in a file... Oh well!
     VkPipelineShaderStageCreateInfo stage_create_infos[2] = {};
     for(u32 index = 0;
-        index < 2;
+        index < ArrayCount(stage_create_infos);
         ++index)
     {
         stage_create_infos[index] = result.stages[index].shader_stage_create_info;
     }
 
+    VkViewport viewport = {
+        .x        =  (float32)0.0f,
+        .y        =  (float32)render_context->framebuffer_height,
+        .width    =  (float32)render_context->framebuffer_width,
+        .height   = -(float32)render_context->framebuffer_height,
+        .minDepth =  0.0f,
+        .maxDepth =  1.0f
+    };
+
+    VkRect2D scissor = {
+        .extent = {
+            .width  = render_context->framebuffer_width,
+            .height = render_context->framebuffer_height
+        },
+    };
+    result.used_descriptor_set_count = total_descriptor_sets;
     result.pipeline = r_vulkan_pipeline_create(render_context,
                                               &render_context->main_renderpass,
                                                attributes,
                                                attribute_count,
-                                               null,
-                                               0,
+                                               result.layouts,
+                                               total_descriptor_sets,
                                                stage_create_infos,
                                                2,
                                                viewport,
@@ -807,6 +995,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
 void
 r_vulkan_shader_destroy(vulkan_render_context_t *render_context, vulkan_shader_data_t *shader)
 {
+    spvReflectDestroyShaderModule(&shader->spv_reflect_module);
     for(u32 module_index = 0;
         module_index < shader->stage_count;
         ++module_index)
@@ -816,14 +1005,107 @@ r_vulkan_shader_destroy(vulkan_render_context_t *render_context, vulkan_shader_d
                               stage->handle, 
                               render_context->allocators);
     }
+    
+    // TODO(Sleepster): hardcoded for triple buffering again... 
+    for(u32 set_index = 0;
+        set_index < 3;
+        ++set_index)
+    {
+        vulkan_shader_descriptor_set_info_t *info = shader->set_info + set_index;
+        r_vulkan_buffer_destroy(render_context, &info->buffer);
+
+        // TODO(Sleepster): Probably not a good idea, but we just happen to ALSO hard 
+        // code this to support triple buffering 
+        vkDestroyDescriptorSetLayout(render_context->rendering_device.logical_device,
+                                     shader->layouts[set_index],
+                                     render_context->allocators);
+    }
+    vkDestroyDescriptorPool(render_context->rendering_device.logical_device,
+                            shader->primary_pool,
+                            render_context->allocators);
+
+    r_vulkan_pipeline_destroy(render_context, &shader->pipeline);
+    c_arena_destroy(&shader->arena);
 }
 
 void
 r_vulkan_shader_bind(vulkan_render_context_t *render_context, vulkan_shader_data_t *shader)
 {
+    // TODO(Sleepster): Graphics is hard coded... 
     r_vulkan_pipeline_bind(&render_context->graphics_command_buffers[render_context->current_image_index],
                            VK_PIPELINE_BIND_POINT_GRAPHICS,
                            &shader->pipeline);
+}
+
+// TODO(Sleepster): Ability to control what kind of descriptor sets are updated:
+// r_vulkan_shader_update_static_sets
+// r_vulkan_shader_update_perdraw_sets
+// r_vulkan_shader_update_instance_sets
+// r_vulkan_shader_update_descriptor_sets
+void
+r_vulkan_shader_update_descriptor_sets(vulkan_render_context_t *render_context,
+                                       vulkan_shader_data_t    *shader)
+{
+    Assert(shader->used_descriptor_set_count <=  SDS_Count);
+
+    u32 current_image_index = render_context->current_image_index;
+    VkCommandBuffer command_buffer = render_context->graphics_command_buffers[current_image_index].handle;
+    
+    for(u32 descriptor_index = SDS_Static;
+        descriptor_index < shader->used_descriptor_set_count;
+        ++descriptor_index)
+    {
+        vulkan_shader_descriptor_set_info_t *info = shader->set_info + descriptor_index;
+        VkDescriptorSet current_set = info->sets[current_image_index];  
+
+        // TODO(Sleepster): Graphics is hard coded... 
+        vkCmdBindDescriptorSets(command_buffer, 
+                                VK_PIPELINE_BIND_POINT_GRAPHICS, 
+                                shader->pipeline.layout, 
+                                0, 
+                                1,
+                               &current_set,
+                                0,
+                                null);
+        // TODO(Sleepster): Transfer queue?
+        r_vulkan_buffer_upload(render_context, 
+                              &info->buffer, 
+                              &shader->camera_matrices, 
+                               info->buffer.buffer_size, 
+                               0, 
+                               null, 
+                               render_context->rendering_device.graphics_command_pool, 
+                               render_context->rendering_device.graphics_queue);
+
+        VkDescriptorBufferInfo buffer_info = {
+            .buffer = info->buffer.handle,
+            .offset = 0,
+            .range  = info->buffer.buffer_size
+        };
+
+        VkWriteDescriptorSet *writes = c_arena_push_array(&render_context->frame_arena, VkWriteDescriptorSet, info->binding_count);
+        for(u32 binding_index = 0;
+            binding_index < info->binding_count;
+            ++binding_index)
+        {
+            VkDescriptorSetLayoutBinding *binding = info->bindings + binding_index;
+            writes[binding_index] = {
+                .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .dstSet          = current_set,
+                .dstBinding      = binding->binding,
+                .dstArrayElement = 0,
+                .descriptorType  = binding->descriptorType,
+                .descriptorCount = binding->descriptorCount,
+                .pBufferInfo     = &buffer_info
+            };
+        }
+
+        vkUpdateDescriptorSets(render_context->rendering_device.logical_device,
+                               info->binding_count,
+                               writes,
+                               0,
+                               null);
+    }
 }
 
 ////////////////////////////
@@ -2037,6 +2319,9 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
 
     // TODO(Sleepster): TRIANGLE CODE
     r_vulkan_shader_bind(render_context, &render_context->default_shader);
+    r_vulkan_shader_update_descriptor_sets(render_context,
+                                           &render_context->default_shader);
+
     VkDeviceSize offsets[1] = {};
     vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &render_context->vertex_buffer.handle, (VkDeviceSize*)&offsets);
     vkCmdBindIndexBuffer(command_buffer->handle, render_context->index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
@@ -2110,6 +2395,7 @@ r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time)
                                    render_context->current_image_index);
     }
 
+    c_arena_reset(&render_context->frame_arena);
     return(result);
 }
 
@@ -2258,6 +2544,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     render_context->window_height = 0;
 
     render_context->initialization_arena = c_arena_create(MB(10));
+    render_context->frame_arena          = c_arena_create(MB(10));
     render_context->permanent_arena      = c_arena_create(MB(100));
 
 	VkApplicationInfo app_info  = {};
@@ -2334,7 +2621,9 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     // NOTE(Sleepster): DEBUG LAYERS 
     {
         u32 debug_log_severity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT|
-                                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
+                                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT|
+                                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT|
+                                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT;
 
         u32 debug_message_types = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT|
                                   VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT|
@@ -2579,7 +2868,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
                                                                  {0, 0}, 
                                                                  {(float32)render_context->framebuffer_width, (float32)render_context->framebuffer_height}, 
                                                                  {0.3, 0.2, 0.4, 1.0}, 
-                                                                 0.0f, 
+                                                                 1.0f, 
                                                                  0);
     r_vulkan_regenerate_framebuffers(render_context,
                                     &render_context->swapchain,
@@ -2644,15 +2933,15 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     // TODO(Sleepster): TRIANGLE CODE
     vertex_t vertices[] = {
         [0] = {
-            .vPosition = {0.5, -0.5, 1.0},
+            .vPosition = {100, -100, 0.0},
             .vColor    = {1.0, 0.0, 0.0, 1.0}
         },
         [1] = {
-            .vPosition = {0.0, 1.0, 1.0},
+            .vPosition = {0, 100, 0.0},
             .vColor    = {0.0, 1.0, 0.0, 1.0}
         },
         [2] = {
-            .vPosition = {-0.5, -0.5, 1.0},
+            .vPosition = {-100, -100, 0.0},
             .vColor    = {0.0, 0.0, 1.0, 1.0}
         },
     };
