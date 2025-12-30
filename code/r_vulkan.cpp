@@ -795,10 +795,9 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
             SpvReflectDescriptorSet             *current_set    = entry_point->descriptor_sets + set_index;
             vulkan_shader_descriptor_set_info_t *set_info       = result.set_info + set_index;
             VkDescriptorSetLayout               *current_layout = result.layouts  + set_index;
-            u64 set_buffer_size = 0;
 
             ZeroStruct(*set_info);
-
+            u64 set_buffer_size = 0;
             total_descriptor_sets += 1;
 
             log_trace("Shader Descriptor Set: '%u' has '%u' bindings...\n",
@@ -827,6 +826,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
                     .pImmutableSamplers = null,
                 };
             }
+            set_info->binding_upload_size = set_buffer_size;
 
             VkDescriptorSetLayoutCreateInfo layout_create_info = {
                 .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -856,7 +856,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
             // NOTE(Sleepster): Aligning with a value of 256 because nvidia cards sometimes 
             // require uniform buffers to be at least 256 bytes...
             set_info->buffer = r_vulkan_buffer_create(render_context, 
-                                                Align(set_buffer_size, 256), 
+                                                Align(set_buffer_size * 3, 256), 
                                (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT),
                                                   (u32)VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                                       true);
@@ -902,6 +902,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         vulkan_shader_descriptor_set_info_t *info   = result.set_info + set_index;
         VkDescriptorSetLayout                layout = result.layouts[set_index];
 
+        //TODO(Sleepster): Tiple buffering
         VkDescriptorSetLayout layout_info[3] = {
             layout,
             layout,
@@ -1080,7 +1081,7 @@ r_vulkan_shader_update_descriptor_sets(vulkan_render_context_t *render_context,
         VkDescriptorBufferInfo buffer_info = {
             .buffer = info->buffer.handle,
             .offset = 0,
-            .range  = info->buffer.buffer_size
+            .range  = info->binding_upload_size
         };
 
         VkWriteDescriptorSet *writes = c_arena_push_array(&render_context->frame_arena, VkWriteDescriptorSet, info->binding_count);
@@ -2357,7 +2358,7 @@ r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time)
     r_vulkan_fence_reset(render_context, render_context->image_fences + render_context->current_frame_index);
 
     VkPipelineStageFlags stage_flags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-    VkSubmitInfo submit_info = {
+    VkSubmitInfo submit_info  = {
         .sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 
         // NOTE(Sleepster): Command buffer()s that will be run 

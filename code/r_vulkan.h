@@ -74,10 +74,11 @@ typedef enum vulkan_shader_descriptor_set_index
 
 typedef struct vulkan_shader_descriptor_set_info
 {
-    // NOTE(Sleepster): 3 sets, 1 per "image index" in our triple buffering
     VkDescriptorSetLayoutBinding *bindings;
     u32                           binding_count;
+    u32                           binding_upload_size;
 
+    // NOTE(Sleepster): 3 sets, 1 per "image index" in our triple buffering
     VkDescriptorSet               sets[3];
     vulkan_buffer_data_t          buffer;
 }vulkan_shader_descriptor_set_info_t;
@@ -106,12 +107,12 @@ typedef struct vulkan_shader_data
     // vulkan_shader_stage_info_t because our pipeline wants this information 
     // as an array of VkDescriptorSetLayouts
     VkDescriptorSetLayout               layouts[3];
+
     // NOTE(Sleepster): Group these by the frequency of their updates
     // "global" are once per frame (0)
     // "local" are many times a frame, (1)
     // "instance / object" are per instance or object... (2)
     // amounting to 3 different sets, this applies to the layouts as well 
-
     u32                                 used_descriptor_set_count;
     vulkan_shader_descriptor_set_info_t set_info[3];
 
@@ -347,6 +348,8 @@ typedef struct vulkan_render_context
 
     vulkan_renderpass_data_t      main_renderpass;
     vulkan_shader_data_t          default_shader;
+
+    vulkan_buffer_data_t          main_staging_buffer;
 
     vulkan_buffer_data_t          vertex_buffer;
     vulkan_buffer_data_t          index_buffer;
