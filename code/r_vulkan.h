@@ -106,15 +106,16 @@ typedef struct vulkan_shader_data
     // NOTE(Sleepster): This has to be like this instead of in the
     // vulkan_shader_stage_info_t because our pipeline wants this information 
     // as an array of VkDescriptorSetLayouts
-    VkDescriptorSetLayout               layouts[3];
+    VkDescriptorSetLayout              *layouts;
 
     // NOTE(Sleepster): Group these by the frequency of their updates
-    // "global" are once per frame (0)
-    // "local" are many times a frame, (1)
-    // "instance / object" are per instance or object... (2)
+    // "Static" per frame (0)
+    // "PerDraw" are many times a frame, per draw call (1)
+    // "PerInstance" per object in the scene / vkCmdDrawInstance  (2)
     // amounting to 3 different sets, this applies to the layouts as well 
-    u32                                 used_descriptor_set_count;
-    vulkan_shader_descriptor_set_info_t set_info[3];
+    u32                                  total_descriptor_set_count;
+    u32                                  used_descriptor_set_count;
+    vulkan_shader_descriptor_set_info_t *set_info;
 
     // TODO(Sleepster): Store what kind of pipeline we use, either GRAPHICS or COMPUTE  
     // ideally something like:

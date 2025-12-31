@@ -775,7 +775,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
     VkDescriptorPoolSize descriptor_pool_type_info[16] = {};
     u32                  used_pool_indices     = 0;
     u32                  total_descriptor_sets = 0;
-
+    
     for(u32 entry_point_index = 0;
         entry_point_index < module->entry_point_count;
         ++entry_point_index)
@@ -787,6 +787,15 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
 
         const char *name = entry_point->name;
         log_trace("Entry Point %d: '%s'...\n", entry_point_index, name);
+
+        result.total_descriptor_set_count = entry_point->descriptor_set_count;
+        if(!result.layouts && !result.set_info)
+        {
+            result.layouts  = c_arena_push_array(&result.arena, VkDescriptorSetLayout,               entry_point->descriptor_set_count);
+            result.set_info = c_arena_push_array(&result.arena, vulkan_shader_descriptor_set_info_t, entry_point->descriptor_set_count);
+        }
+        Assert(result.layouts);
+        Assert(result.set_info);
 
         for(u32 set_index = 0;
             set_index < entry_point->descriptor_set_count;
@@ -909,18 +918,16 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
             layout
         };
 
-        // TODO(Sleepster): maybe not hard code the count...
         VkDescriptorSetAllocateInfo allocation_info = {
             .sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
             .descriptorPool     = result.primary_pool,
-            .descriptorSetCount = 3,
+            .descriptorSetCount = ArrayCount(layout_info),
             .pSetLayouts        = layout_info
         };
         VkAssert(vkAllocateDescriptorSets(render_context->rendering_device.logical_device,
                                          &allocation_info,
                                           info->sets));
     }
-
 
     const u32 attribute_count = 2;
     VkVertexInputAttributeDescription attributes[attribute_count] = {};
@@ -1007,16 +1014,13 @@ r_vulkan_shader_destroy(vulkan_render_context_t *render_context, vulkan_shader_d
                               render_context->allocators);
     }
     
-    // TODO(Sleepster): hardcoded for triple buffering again... 
     for(u32 set_index = 0;
-        set_index < 3;
+        set_index < shader->used_descriptor_set_count;
         ++set_index)
     {
         vulkan_shader_descriptor_set_info_t *info = shader->set_info + set_index;
         r_vulkan_buffer_destroy(render_context, &info->buffer);
 
-        // TODO(Sleepster): Probably not a good idea, but we just happen to ALSO hard 
-        // code this to support triple buffering 
         vkDestroyDescriptorSetLayout(render_context->rendering_device.logical_device,
                                      shader->layouts[set_index],
                                      render_context->allocators);

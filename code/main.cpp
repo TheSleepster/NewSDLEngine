@@ -181,7 +181,7 @@ main(int argc, char **argv)
 
             delta_time    = (float32)(((float64)delta_tsc) / (float64)perf_count_freq);
 
-            //delta_time_ms = delta_time * 1000.0f;
+            //float32 delta_time_ms = delta_time * 1000.0f;
             //printf("delta time: '%.02f'...\n", delta_time_ms);
         }
     }
