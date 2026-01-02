@@ -37,12 +37,19 @@ struct PixelOutput_t
     float4 vFragColor : SV_TARGET;
 };
 
+struct ConstantData {
+    float4 DrawColor;
+};
+
+[[vk::push_constant]]
+ConstantData PushConstants;
+
 [shader("fragment")]
 PixelOutput_t
 PSMain(VertexOutput_t input)
 {
     PixelOutput_t result;
-    result.vFragColor = input.vOutColor;
+    result.vFragColor = PushConstants.DrawColor;
 
     return(result);
 }

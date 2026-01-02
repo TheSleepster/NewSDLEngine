@@ -444,17 +444,29 @@ r_vulkan_buffer_upload(vulkan_render_context_t *render_context,
 ////////////////////////////
 // VULKAN PIPELINE 
 ////////////////////////////
-
-// TODO(Sleepster): Dynamic state
+#if 0
 vulkan_pipeline_data_t
 r_vulkan_pipeline_create(vulkan_render_context_t           *render_context, 
                          vulkan_renderpass_data_t          *renderpass,
+                         vulkan_shader_data_t              *shader,
                          VkVertexInputAttributeDescription *vertex_attributes,
                          u32                                attribute_count,
                          VkDescriptorSetLayout             *descriptor_sets,
                          u32                                descriptor_set_count,
                          VkPipelineShaderStageCreateInfo   *shader_stages,
                          u32                                stage_count,
+                         VkViewport                         viewport,
+                         VkRect2D                           scissor,
+                         bool8                              wireframe)
+#endif
+
+// TODO(Sleepster): Dynamic state
+vulkan_pipeline_data_t
+r_vulkan_pipeline_create(vulkan_render_context_t           *render_context, 
+                         vulkan_renderpass_data_t          *renderpass,
+                         vulkan_shader_data_t              *shader,
+                         VkVertexInputAttributeDescription *vertex_attributes,
+                         u32                                attribute_count,
                          VkViewport                         viewport,
                          VkRect2D                           scissor,
                          bool8                              wireframe)
@@ -553,10 +565,22 @@ r_vulkan_pipeline_create(vulkan_render_context_t           *render_context,
         .primitiveRestartEnable = false,
     };
 
+    VkPipelineShaderStageCreateInfo *stage_create_infos = c_arena_push_array(&shader->arena, VkPipelineShaderStageCreateInfo, shader->stage_count); 
+    for(u32 stage_index = 0;
+        stage_index < shader->stage_count;
+        ++stage_index)
+    {
+        vulkan_shader_stage_info_t *stage = shader->stages + stage_index;
+
+        stage_create_infos[stage_index] = stage->shader_stage_create_info;
+    }
+
     VkPipelineLayoutCreateInfo pipeline_layout_info = {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-        .setLayoutCount = descriptor_set_count,
-        .pSetLayouts    = descriptor_sets
+        .sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .setLayoutCount         = shader->used_descriptor_set_count,
+        .pSetLayouts            = shader->layouts,
+        .pushConstantRangeCount = shader->push_constant_count,
+        .pPushConstantRanges    = shader->push_constants,
     };
 
     VkAssert(vkCreatePipelineLayout(render_context->rendering_device.logical_device,
@@ -566,8 +590,8 @@ r_vulkan_pipeline_create(vulkan_render_context_t           *render_context,
 
     VkGraphicsPipelineCreateInfo pipeline_create_info = {
         .sType               =  VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-        .pStages             =  shader_stages,
-        .stageCount          =  stage_count,
+        .pStages             =  stage_create_infos,
+        .stageCount          =  shader->stage_count,
         .pVertexInputState   = &vertex_input_state,
         .pInputAssemblyState = &assembly_state,
         .pViewportState      = &viewport_info,
@@ -679,17 +703,29 @@ r_vulkan_convert_spv_shader_stage(SpvReflectShaderStageFlagBits spv_stage)
     VkShaderStageFlags result = 0;
     
     if(spv_stage & SPV_REFLECT_SHADER_STAGE_VERTEX_BIT)
+    {
         result |= VK_SHADER_STAGE_VERTEX_BIT;
+    }
     if(spv_stage & SPV_REFLECT_SHADER_STAGE_TESSELLATION_CONTROL_BIT)
+    {
         result |= VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+    }
     if(spv_stage & SPV_REFLECT_SHADER_STAGE_TESSELLATION_EVALUATION_BIT)
+    {
         result |= VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+    }
     if(spv_stage & SPV_REFLECT_SHADER_STAGE_GEOMETRY_BIT)
+    {
         result |= VK_SHADER_STAGE_GEOMETRY_BIT;
+    }
     if(spv_stage & SPV_REFLECT_SHADER_STAGE_FRAGMENT_BIT)
+    {
         result |= VK_SHADER_STAGE_FRAGMENT_BIT;
+    }
     if(spv_stage & SPV_REFLECT_SHADER_STAGE_COMPUTE_BIT)
+    {
         result |= VK_SHADER_STAGE_COMPUTE_BIT;
+    }
     
     return(result);
 }
@@ -775,6 +811,32 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
     VkDescriptorPoolSize descriptor_pool_type_info[16] = {};
     u32                  used_pool_indices     = 0;
     u32                  total_descriptor_sets = 0;
+
+    result.total_descriptor_set_count = module->descriptor_set_count;
+    result.push_constant_count        = module->push_constant_block_count;
+    if(!result.layouts && !result.set_info)
+    {
+        result.layouts        = c_arena_push_array(&result.arena, VkDescriptorSetLayout,               module->descriptor_set_count);
+        result.set_info       = c_arena_push_array(&result.arena, vulkan_shader_descriptor_set_info_t, module->descriptor_set_count);
+        result.push_constants = c_arena_push_array(&result.arena, VkPushConstantRange,                 module->push_constant_block_count);
+    }
+    Assert(result.layouts);
+    Assert(result.set_info);
+    Assert(result.push_constants);
+
+    for(u32 push_constant_index = 0;
+        push_constant_index < module->push_constant_block_count;
+        ++push_constant_index)
+    {
+        SpvReflectBlockVariable *push_constant = module->push_constant_blocks + push_constant_index;
+        result.push_constants[push_constant_index] = {
+            .stageFlags = 0,
+            .offset     = push_constant->offset,
+            .size       = push_constant->padded_size
+        };
+        Expect(push_constant->padded_size <= 128, "We cannot support push constants with a size > that of 128 bytes...\n");
+        Expect(push_constant->offset <= 128, "We cannot have a push constant with an offset > 128...\n");
+    }
     
     for(u32 entry_point_index = 0;
         entry_point_index < module->entry_point_count;
@@ -788,14 +850,12 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         const char *name = entry_point->name;
         log_trace("Entry Point %d: '%s'...\n", entry_point_index, name);
 
-        result.total_descriptor_set_count = entry_point->descriptor_set_count;
-        if(!result.layouts && !result.set_info)
+        for(u32 push_constant_index = 0;
+            push_constant_index < entry_point->used_push_constant_count;
+            ++push_constant_index)
         {
-            result.layouts  = c_arena_push_array(&result.arena, VkDescriptorSetLayout,               entry_point->descriptor_set_count);
-            result.set_info = c_arena_push_array(&result.arena, vulkan_shader_descriptor_set_info_t, entry_point->descriptor_set_count);
+            result.push_constants[push_constant_index].stageFlags |= r_vulkan_convert_spv_shader_stage(entry_point->shader_stage);
         }
-        Assert(result.layouts);
-        Assert(result.set_info);
 
         for(u32 set_index = 0;
             set_index < entry_point->descriptor_set_count;
@@ -981,17 +1041,15 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         },
     };
     result.used_descriptor_set_count = total_descriptor_sets;
-    result.pipeline = r_vulkan_pipeline_create(render_context,
+    result.pipeline = r_vulkan_pipeline_create(render_context, 
                                               &render_context->main_renderpass,
+                                              &result,
                                                attributes,
                                                attribute_count,
-                                               result.layouts,
-                                               total_descriptor_sets,
-                                               stage_create_infos,
-                                               2,
                                                viewport,
                                                scissor,
                                                false);
+
     if(!result.pipeline.handle)
     {
         log_fatal("We have failed to create our pipeline...\n");
@@ -2324,6 +2382,24 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
 
     // TODO(Sleepster): TRIANGLE CODE
     r_vulkan_shader_bind(render_context, &render_context->default_shader);
+    vulkan_shader_data_t *shader = &render_context->default_shader; 
+    for(u32 push_constant_index = 0;
+        push_constant_index < render_context->default_shader.push_constant_count;
+        ++push_constant_index)
+    {
+        push_constant_t constant_data = {
+            .DrawColor = vec4(0.4, 0.4, 1.0, 1.0)
+        };
+
+        VkPushConstantRange *constant = shader->push_constants + push_constant_index;
+        vkCmdPushConstants(command_buffer->handle,
+                           shader->pipeline.layout,
+                           constant->stageFlags,
+                           constant->offset,
+                           constant->size,
+                          &constant_data);
+    }
+
     r_vulkan_shader_update_descriptor_sets(render_context,
                                            &render_context->default_shader);
 

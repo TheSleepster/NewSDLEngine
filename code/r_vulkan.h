@@ -28,6 +28,12 @@ typedef struct global_matrix_uniforms
     mat4_t projection_matrix;
 }global_matrix_uniforms;
 
+typedef struct push_constant
+{
+    vec4_t DrawColor;
+}push_constant_t;
+
+
 //////////////////////////////////
 // VULKAN BUFFER STUFF 
 //////////////////////////////////
@@ -85,11 +91,12 @@ typedef struct vulkan_shader_descriptor_set_info
 
 typedef struct vulkan_shader_stage_info
 {
-    VkShaderStageFlagBits           type;
-    const char                     *entry_point;
-    VkShaderModuleCreateInfo        module_create_info;
-    VkPipelineShaderStageCreateInfo shader_stage_create_info; 
-    VkShaderModule                  handle;
+    VkShaderStageFlagBits                type;
+    const char                          *entry_point;
+    VkShaderModuleCreateInfo             module_create_info;
+    VkPipelineShaderStageCreateInfo      shader_stage_create_info; 
+
+    VkShaderModule                       handle;
 }vulkan_shader_stage_info_t;
 
 typedef struct vulkan_shader_data
@@ -106,7 +113,8 @@ typedef struct vulkan_shader_data
     // NOTE(Sleepster): This has to be like this instead of in the
     // vulkan_shader_stage_info_t because our pipeline wants this information 
     // as an array of VkDescriptorSetLayouts
-    VkDescriptorSetLayout              *layouts;
+    VkDescriptorSetLayout               *layouts;
+
 
     // NOTE(Sleepster): Group these by the frequency of their updates
     // "Static" per frame (0)
@@ -116,6 +124,9 @@ typedef struct vulkan_shader_data
     u32                                  total_descriptor_set_count;
     u32                                  used_descriptor_set_count;
     vulkan_shader_descriptor_set_info_t *set_info;
+
+    u32                                  push_constant_count;
+    VkPushConstantRange                 *push_constants;
 
     // TODO(Sleepster): Store what kind of pipeline we use, either GRAPHICS or COMPUTE  
     // ideally something like:
