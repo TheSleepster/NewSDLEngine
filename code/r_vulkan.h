@@ -20,6 +20,8 @@
 #define VkAssert(result) Statement(Assert(result == VK_SUCCESS))
 #define INVALID_SWAPCHAIN_IMAGE_INDEX ((u32)-1)
 
+#define VULKAN_MAX_FRAMES_IN_FLIGHT (3)
+
 // TODO: TEMPORARY
 
 // NOTE(Sleepster): Nvidia needs 256 byte alignment

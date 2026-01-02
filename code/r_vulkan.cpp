@@ -917,7 +917,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
                     // Maybe bad idea...
                     descriptor_pool_type_info[used_pool_indices++] = {
                         .type            = type_map[type_index].vk_type,
-                        .descriptorCount = set_type_count * 3 
+                        .descriptorCount = set_type_count * VULKAN_MAX_FRAMES_IN_FLIGHT 
                     };
                 }
             }
@@ -947,7 +947,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
     result.stage_count = module->entry_point_count;
 
     // NOTE(Sleepster): 3 frames in flight 
-    u32 allocated_descriptor_sets = total_descriptor_sets * render_context->swapchain.image_count;
+    u32 allocated_descriptor_sets = total_descriptor_sets * VULKAN_MAX_FRAMES_IN_FLIGHT;
     VkDescriptorPoolCreateInfo pool_create_info = {
         .sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 
@@ -972,7 +972,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         VkDescriptorSetLayout                layout = result.layouts[set_index];
 
         //TODO(Sleepster): Tiple buffering
-        VkDescriptorSetLayout layout_info[3] = {
+        VkDescriptorSetLayout layout_info[VULKAN_MAX_FRAMES_IN_FLIGHT] = {
             layout,
             layout,
             layout
@@ -1596,7 +1596,7 @@ r_vulkan_initialize_graphics_command_buffers(vulkan_render_context_t *render_con
 {
     Assert(render_context->graphics_command_buffers);
     for(u32 frame_index = 0;
-        frame_index < render_context->swapchain.image_count;
+        frame_index < VULKAN_MAX_FRAMES_IN_FLIGHT;
         ++frame_index)
     {
         vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + frame_index; 
@@ -1798,7 +1798,7 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
     VkExtent2D swapchain_extent = {image_width, image_height};
         
     // NOTE(Sleepster): Triple buffering. 
-    result.max_frames_in_flight = 2;
+    result.max_frames_in_flight = VULKAN_MAX_FRAMES_IN_FLIGHT;
 
     vulkan_rendering_device_t *device_data = &render_context->rendering_device;
     
@@ -2519,7 +2519,7 @@ r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context)
             vkDeviceWaitIdle(render_context->rendering_device.logical_device);
 
             for(u32 frame_index = 0;
-                frame_index < render_context->swapchain.image_count;
+                frame_index < VULKAN_MAX_FRAMES_IN_FLIGHT;
                 ++frame_index)
             {
                 render_context->frame_fences[frame_index] = null;
@@ -2545,7 +2545,7 @@ r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context)
             // regardless of if they are a part of our "frames in flight"
             render_context->last_framebuffer_size_generation = render_context->current_framebuffer_size_generation;
             for(u32 command_buffer_index = 0;
-                command_buffer_index < render_context->swapchain.image_count;
+                command_buffer_index < VULKAN_MAX_FRAMES_IN_FLIGHT;
                 ++command_buffer_index)
             {
                 vulkan_command_buffer_data_t *graphics_command_buffer = render_context->graphics_command_buffers + command_buffer_index;
@@ -2553,7 +2553,7 @@ r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context)
             }
 
             for(u32 framebuffer_index = 0;
-                framebuffer_index < render_context->swapchain.image_count;
+                framebuffer_index < VULKAN_MAX_FRAMES_IN_FLIGHT;
                 ++framebuffer_index)
             {
                 vulkan_framebuffer_data_t *framebuffer = render_context->swapchain.framebuffers + framebuffer_index;
@@ -2957,16 +2957,16 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
                                     &render_context->main_renderpass);
     log_info("Framebuffers created...\n");
 
-    render_context->graphics_command_buffers = c_arena_push_array(&render_context->permanent_arena, vulkan_command_buffer_data_t, render_context->swapchain.image_count);
+    render_context->graphics_command_buffers = c_arena_push_array(&render_context->permanent_arena, vulkan_command_buffer_data_t, VULKAN_MAX_FRAMES_IN_FLIGHT);
     r_vulkan_initialize_graphics_command_buffers(render_context);
     log_info("Command buffers initialized...\n");
 
-    render_context->queue_finished_semaphores  = c_arena_push_array(&render_context->permanent_arena, VkSemaphore,     render_context->swapchain.image_count);
-    render_context->image_avaliable_semaphores = c_arena_push_array(&render_context->permanent_arena, VkSemaphore,     render_context->swapchain.image_count);
-    render_context->image_fences               = c_arena_push_array(&render_context->permanent_arena, vulkan_fence_t,  render_context->swapchain.image_count);
-    render_context->frame_fences               = c_arena_push_array(&render_context->permanent_arena, vulkan_fence_t*, render_context->swapchain.image_count);
+    render_context->queue_finished_semaphores  = c_arena_push_array(&render_context->permanent_arena, VkSemaphore,     VULKAN_MAX_FRAMES_IN_FLIGHT);
+    render_context->image_avaliable_semaphores = c_arena_push_array(&render_context->permanent_arena, VkSemaphore,     VULKAN_MAX_FRAMES_IN_FLIGHT);
+    render_context->image_fences               = c_arena_push_array(&render_context->permanent_arena, vulkan_fence_t,  VULKAN_MAX_FRAMES_IN_FLIGHT);
+    render_context->frame_fences               = c_arena_push_array(&render_context->permanent_arena, vulkan_fence_t*, VULKAN_MAX_FRAMES_IN_FLIGHT);
     for(u32 image_index = 0;
-        image_index < render_context->swapchain.image_count;
+        image_index < VULKAN_MAX_FRAMES_IN_FLIGHT;
         ++image_index)
     {
         VkSemaphoreCreateInfo semaphore_create_info = {
