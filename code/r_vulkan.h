@@ -73,7 +73,7 @@ typedef struct vulkan_pipeline_data
 // Set 1 are the "Draw" uniforms. Updated once per draw (texture bindings, samplers, camera matrices, etc.)
 // Set 2 are the "Instance" uniforms. These are generally items that are updated rapidly. Sometimes per object rendered.
 //
-// the bindings indices in these standardized uniform sets are not controlled at all.
+// the bindings indices in these standardized uniform sets are not controlled at all. 
 typedef enum vulkan_shader_uniform_type
 {
     // NOTE(Sleepster): "Static" per frame

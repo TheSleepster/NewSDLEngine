@@ -1855,6 +1855,7 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
     {
         swapchain_image_count = device_data->physical_device.swapchain_support_info.surface_capabilities.maxImageCount;
     }
+    swapchain_image_count = Min(swapchain_image_count, 3);
 
     VkSwapchainCreateInfoKHR swapchain_create_info = {
         .sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
