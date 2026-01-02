@@ -832,7 +832,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         result.push_constants[push_constant_index] = {
             .stageFlags = 0,
             .offset     = push_constant->offset,
-            .size       = push_constant->padded_size
+            .size       = Align16(push_constant->padded_size)
         };
         Expect(push_constant->padded_size <= 128, "We cannot support push constants with a size > that of 128 bytes...\n");
         Expect(push_constant->offset <= 128, "We cannot have a push constant with an offset > 128...\n");

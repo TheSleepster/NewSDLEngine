@@ -14,6 +14,7 @@
 
 #include <c_types.h>
 #include <c_memory_arena.h>
+#include <c_string.h>
 #include <c_math.h>
 
 #define VkAssert(result) Statement(Assert(result == VK_SUCCESS))
@@ -67,16 +68,22 @@ typedef struct vulkan_pipeline_data
 #define MAX_VULKAN_SHADER_STAGES (10)
 #define MAX_DESCRIPTOR_TYPES  (SPV_REFLECT_DESCRIPTOR_TYPE_INPUT_ATTACHMENT + 1)
 
-typedef enum vulkan_shader_descriptor_set_index
+// TODO(Sleepster): These "set indices" are completely fine for what we want. 
+// Set 0 are the "Static" uniforms. These are pieces of information only updated to once a frame. Think "Read Only storage buffers"
+// Set 1 are the "Draw" uniforms. Updated once per draw (texture bindings, samplers, camera matrices, etc.)
+// Set 2 are the "Instance" uniforms. These are generally items that are updated rapidly. Sometimes per object rendered.
+//
+// the bindings indices in these standardized uniform sets are not controlled at all.
+typedef enum vulkan_shader_uniform_type
 {
     // NOTE(Sleepster): "Static" per frame
-    SDS_Static      = 0,
+    SDS_Static   = 0,
     // NOTE(Sleepster): "PerDraw" per draw call
-    SDS_PerDraw     = 1,
+    SDS_Draw     = 1,
     // NOTE(Sleepster): "PerInstance" per object in the scene / vkCmdDrawInstance 
-    SDS_PerInstance = 2,
+    SDS_Instance = 2,
     SDS_Count
-}vulkan_shader_descriptor_set_index;
+}vulkan_shader_uniform_type_t;
 
 typedef struct vulkan_shader_descriptor_set_info
 {
@@ -88,6 +95,13 @@ typedef struct vulkan_shader_descriptor_set_info
     VkDescriptorSet               sets[3];
     vulkan_buffer_data_t          buffer;
 }vulkan_shader_descriptor_set_info_t;
+
+typedef struct vulkan_shader_uniform_data
+{
+    vulkan_shader_uniform_type type;
+    void                      *data;
+    u32                        size;
+}vulkan_shader_uniform_data_t;
 
 typedef struct vulkan_shader_stage_info
 {
@@ -115,7 +129,6 @@ typedef struct vulkan_shader_data
     // as an array of VkDescriptorSetLayouts
     VkDescriptorSetLayout               *layouts;
 
-
     // NOTE(Sleepster): Group these by the frequency of their updates
     // "Static" per frame (0)
     // "PerDraw" are many times a frame, per draw call (1)
@@ -127,6 +140,11 @@ typedef struct vulkan_shader_data
 
     u32                                  push_constant_count;
     VkPushConstantRange                 *push_constants;
+
+    // TODO(Sleepster): This will be moved out of here after a while once the asset 
+    // system is fully capable of handling a asset -> vulkan piping.  
+    vulkan_shader_uniform_data_t        *uniforms;
+    u32                                  uniform_count;
 
     // TODO(Sleepster): Store what kind of pipeline we use, either GRAPHICS or COMPUTE  
     // ideally something like:
