@@ -742,21 +742,6 @@ r_vulkan_shader_stage_create(vulkan_render_context_t    *render_context,
         .pName  = entry_point->name,
     };
 }
-    
-struct spv_vulkan_type_map 
-{
-    SpvReflectDescriptorType spv_type;
-    VkDescriptorType         vk_type;
-};
-
-global_variable spv_vulkan_type_map type_map[] = {
-    {SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLER,                VK_DESCRIPTOR_TYPE_SAMPLER               },
-    {SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLED_IMAGE,          VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE         },
-    {SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER        },
-    {SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_BUFFER,         VK_DESCRIPTOR_TYPE_STORAGE_BUFFER        },
-    {SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_IMAGE,          VK_DESCRIPTOR_TYPE_STORAGE_IMAGE         },
-    {SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER},
-};
 
 vulkan_shader_data_t
 r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepath)
@@ -838,6 +823,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
             .push_constant_index = push_constant_index,
             .uniform_location    = result.uniform_count,
             .set_type            = SDS_Instance,
+            .uniform_type        = (VkDescriptorType)-1,
             .data                = c_arena_push_size(&result.arena, push_constant->padded_size),
             .size                = Align16(push_constant->padded_size), 
         };
@@ -1206,6 +1192,7 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
         vulkan_shader_uniform_data_t *uniform_data = uniform_array[uniform_index];
         Assert(uniform_data->owner_shader_id == shader->shader_id);
         Assert(uniform_data->set_type != SDS_Instance);
+        Assert(uniform_data->uniform_type != (VkDescriptorType)INVALID_SWAPCHAIN_IMAGE_INDEX);
 
         memcpy(uniform_data_buffer + buffer_offset, uniform_data->data, uniform_data->size);
         buffer_offset += uniform_data->size;
@@ -1275,6 +1262,7 @@ r_vulkan_shader_update_instance_set(vulkan_render_context_t *render_context,
         ++uniform_index)
     {
         vulkan_shader_uniform_data_t *uniform_data = shader->instance_uniforms[uniform_index];
+        Assert(uniform_data->uniform_type == (VkDescriptorType)INVALID_SWAPCHAIN_IMAGE_INDEX);
         Expect(uniform_data->set_type == SDS_Instance, "The uniform: '%s' for this shader should be an instance level uniform...\n", 
                C_STR(uniform_data->name));
         if(uniform_data->data)
@@ -1283,8 +1271,6 @@ r_vulkan_shader_update_instance_set(vulkan_render_context_t *render_context,
             Assert(uniform_data->push_constant_index >= 0);
             VkPushConstantRange *constant = shader->push_constant_data + uniform_data->push_constant_index;
             
-            vec4_t *vector = (vec4_t*)uniform_data->data;
-
             vkCmdPushConstants(command_buffer->handle,
                                shader->pipeline.layout,
                                constant->stageFlags,

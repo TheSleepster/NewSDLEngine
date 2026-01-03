@@ -71,6 +71,21 @@ typedef struct vulkan_pipeline_data
 #define MAX_VULKAN_SHADER_STAGES (10)
 #define MAX_DESCRIPTOR_TYPES  (SPV_REFLECT_DESCRIPTOR_TYPE_INPUT_ATTACHMENT + 1)
 
+struct spv_vulkan_type_map 
+{
+    SpvReflectDescriptorType spv_type;
+    VkDescriptorType         vk_type;
+};
+
+global_variable inline spv_vulkan_type_map type_map[] = {
+    {SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLER,                VK_DESCRIPTOR_TYPE_SAMPLER               },
+    {SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLED_IMAGE,          VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE         },
+    {SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER        },
+    {SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_BUFFER,         VK_DESCRIPTOR_TYPE_STORAGE_BUFFER        },
+    {SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_IMAGE,          VK_DESCRIPTOR_TYPE_STORAGE_IMAGE         },
+    {SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER},
+};
+
 // TODO(Sleepster): These "set indices" are completely fine for what we want. 
 // Set 0 are the "Static" uniforms. These are pieces of information only updated to once a frame. Think "Read Only storage buffers"
 // Set 1 are the "Draw" uniforms. Updated once per draw (texture bindings, samplers, camera matrices, etc.)
