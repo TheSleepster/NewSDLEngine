@@ -1,3 +1,4 @@
+// VERTEX
 struct VertexInput_t
 {
     float4 vPosition : POSITION;
@@ -31,7 +32,9 @@ VSMain(VertexInput_t input)
 
     return(result);
 }
+// VERTEX 
 
+// FRAGMENT
 struct PixelOutput_t
 {
     float4 vFragColor : SV_TARGET;
@@ -53,3 +56,4 @@ PSMain(VertexOutput_t input)
 
     return(result);
 }
+// FRAGMENT 

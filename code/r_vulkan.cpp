@@ -86,7 +86,7 @@ r_vulkan_result_string(VkResult result, bool8 get_extended)
         case VK_SUBOPTIMAL_KHR:
             return !get_extended ? "VK_SUBOPTIMAL_KHR" : "VK_SUBOPTIMAL_KHR A swapchain no longer matches the surface properties exactly, but can still be used to present to the surface successfully.";
         case VK_THREAD_IDLE_KHR:
-            return !get_extended ? "VK_THREAD_IDLE_KHR" : "VK_THREAD_IDLE_KHR A deferred operation is not complete but there is currently no work for this thread to do at the time of this call.";
+return !get_extended ? "VK_THREAD_IDLE_KHR" : "VK_THREAD_IDLE_KHR A deferred operation is not complete but there is currently no work for this thread to do at the time of this call.";
         case VK_THREAD_DONE_KHR:
             return !get_extended ? "VK_THREAD_DONE_KHR" : "VK_THREAD_DONE_KHR A deferred operation is not complete but there is no work remaining to assign to additional threads.";
         case VK_OPERATION_DEFERRED_KHR:
@@ -444,21 +444,6 @@ r_vulkan_buffer_upload(vulkan_render_context_t *render_context,
 ////////////////////////////
 // VULKAN PIPELINE 
 ////////////////////////////
-#if 0
-vulkan_pipeline_data_t
-r_vulkan_pipeline_create(vulkan_render_context_t           *render_context, 
-                         vulkan_renderpass_data_t          *renderpass,
-                         vulkan_shader_data_t              *shader,
-                         VkVertexInputAttributeDescription *vertex_attributes,
-                         u32                                attribute_count,
-                         VkDescriptorSetLayout             *descriptor_sets,
-                         u32                                descriptor_set_count,
-                         VkPipelineShaderStageCreateInfo   *shader_stages,
-                         u32                                stage_count,
-                         VkViewport                         viewport,
-                         VkRect2D                           scissor,
-                         bool8                              wireframe)
-#endif
 
 // TODO(Sleepster): Dynamic state
 vulkan_pipeline_data_t
@@ -580,7 +565,7 @@ r_vulkan_pipeline_create(vulkan_render_context_t           *render_context,
         .setLayoutCount         = shader->used_descriptor_set_count,
         .pSetLayouts            = shader->layouts,
         .pushConstantRangeCount = shader->push_constant_count,
-        .pPushConstantRanges    = shader->push_constants,
+        .pPushConstantRanges    = shader->push_constant_data,
     };
 
     VkAssert(vkCreatePipelineLayout(render_context->rendering_device.logical_device,
@@ -665,6 +650,7 @@ r_vulkan_pipeline_bind(vulkan_command_buffer_data_t *command_buffer,
 ////////////////////////////
 // VULKAN SHADER MODULES 
 ////////////////////////////
+
 VkDescriptorType 
 r_vulkan_convert_spv_reflect_descriptor_type(SpvReflectDescriptorType spv_type)
 {
@@ -816,26 +802,46 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
     result.push_constant_count        = module->push_constant_block_count;
     if(!result.layouts && !result.set_info)
     {
-        result.layouts        = c_arena_push_array(&result.arena, VkDescriptorSetLayout,               module->descriptor_set_count);
-        result.set_info       = c_arena_push_array(&result.arena, vulkan_shader_descriptor_set_info_t, module->descriptor_set_count);
-        result.push_constants = c_arena_push_array(&result.arena, VkPushConstantRange,                 module->push_constant_block_count);
+        result.layouts            = c_arena_push_array(&result.arena,  VkDescriptorSetLayout,               module->descriptor_set_count);
+        result.set_info           = c_arena_push_array(&result.arena,  vulkan_shader_descriptor_set_info_t, module->descriptor_set_count);
+        result.push_constant_data = c_arena_push_array(&result.arena,  VkPushConstantRange,                 module->push_constant_block_count);
+        result.uniforms           = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t,        128);
+        result.static_uniforms    = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*,       128);
+        result.draw_uniforms      = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*,       128);
+        result.instance_uniforms  = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*,       128);
     }
     Assert(result.layouts);
     Assert(result.set_info);
-    Assert(result.push_constants);
+    Assert(result.push_constant_data);
+    Assert(result.static_uniforms);
+    Assert(result.draw_uniforms);
+    Assert(result.instance_uniforms);
 
     for(u32 push_constant_index = 0;
         push_constant_index < module->push_constant_block_count;
         ++push_constant_index)
     {
-        SpvReflectBlockVariable *push_constant = module->push_constant_blocks + push_constant_index;
-        result.push_constants[push_constant_index] = {
+        SpvReflectBlockVariable      *push_constant = module->push_constant_blocks + push_constant_index;
+        vulkan_shader_uniform_data_t *uniform_data  = result.uniforms + result.uniform_count++;
+
+        result.push_constant_data[push_constant_index] = {
             .stageFlags = 0,
             .offset     = push_constant->offset,
-            .size       = Align16(push_constant->padded_size)
+            .size       = Align16(push_constant->padded_size),
         };
         Expect(push_constant->padded_size <= 128, "We cannot support push constants with a size > that of 128 bytes...\n");
         Expect(push_constant->offset <= 128, "We cannot have a push constant with an offset > 128...\n");
+
+        *uniform_data = {
+            .owner_shader_id     = result.shader_id,
+            .name                = STR(push_constant->name),
+            .push_constant_index = push_constant_index,
+            .uniform_location    = result.uniform_count,
+            .set_type            = SDS_Instance,
+            .data                = c_arena_push_size(&result.arena, push_constant->padded_size),
+            .size                = Align16(push_constant->padded_size), 
+        };
+        result.instance_uniforms[result.instance_uniform_count++] = uniform_data;
     }
     
     for(u32 entry_point_index = 0;
@@ -854,18 +860,22 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
             push_constant_index < entry_point->used_push_constant_count;
             ++push_constant_index)
         {
-            result.push_constants[push_constant_index].stageFlags |= r_vulkan_convert_spv_shader_stage(entry_point->shader_stage);
+            result.push_constant_data[push_constant_index].stageFlags |= r_vulkan_convert_spv_shader_stage(entry_point->shader_stage);
         }
 
         for(u32 set_index = 0;
             set_index < entry_point->descriptor_set_count;
             ++set_index)
         {
+            Assert(set_index < SDS_Draw);
+
             SpvReflectDescriptorSet             *current_set    = entry_point->descriptor_sets + set_index;
             vulkan_shader_descriptor_set_info_t *set_info       = result.set_info + set_index;
             VkDescriptorSetLayout               *current_layout = result.layouts  + set_index;
 
             ZeroStruct(*set_info);
+            set_info->is_valid = true;
+
             u64 set_buffer_size = 0;
             total_descriptor_sets += 1;
 
@@ -885,11 +895,42 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
                          binding->binding, binding->name, binding->descriptor_type);
 
                 set_buffer_size += binding->block.padded_size;
+                VkDescriptorType uniform_binding_type = r_vulkan_convert_spv_reflect_descriptor_type(binding->descriptor_type);
+
+                vulkan_shader_uniform_data_t *uniform = result.uniforms + result.uniform_count++;
+                *uniform = {
+                    .uniform_location = binding_index,
+                    .name             = STR(binding->name),
+                    .size             = binding->block.padded_size,
+                    .set_type         = (vulkan_shader_descriptor_set_binding_type_t)set_index,
+                    .uniform_type     = uniform_binding_type,
+                    .data             = c_arena_push_size(&result.arena, binding->block.padded_size)
+                };
+
+                switch(uniform->set_type)
+                {
+                    case SDS_Static:
+                    {
+                        result.static_uniforms[result.static_uniform_count++] = uniform;
+                    }break;
+                    case SDS_Draw:
+                    {
+                        result.draw_uniforms[result.draw_uniform_count++] = uniform;
+                    }break;
+                    case SDS_Instance:
+                    {
+                        // NOTE(Sleepster): We should never actually get here because we handle 
+                        // the push_constants seperately from all other uniforms. 
+                         
+                        InvalidCodePath;
+                        //result.instance_uniforms[result.instance_uniform_count++] = uniform;
+                    }break;
+                }
 
                 result.type_counts[binding->descriptor_type] += 1;
                 set_bindings[binding_index] = {
                     .binding            = binding->binding,
-                    .descriptorType     = r_vulkan_convert_spv_reflect_descriptor_type(binding->descriptor_type),
+                    .descriptorType     = uniform_binding_type,
                     .descriptorCount    = binding->count,
                     .stageFlags         = current_stage,
                     .pImmutableSamplers = null,
@@ -925,7 +966,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
             // NOTE(Sleepster): Aligning with a value of 256 because nvidia cards sometimes 
             // require uniform buffers to be at least 256 bytes...
             set_info->buffer = r_vulkan_buffer_create(render_context, 
-                                                Align(set_buffer_size * render_context->swapchain.image_count, 256), 
+                                                Align((set_buffer_size * render_context->swapchain.image_count), 256), 
                                (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT),
                                                   (u32)VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                                       true);
@@ -1102,74 +1143,211 @@ r_vulkan_shader_bind(vulkan_render_context_t *render_context, vulkan_shader_data
                            &shader->pipeline);
 }
 
-// TODO(Sleepster): Ability to control what kind of descriptor sets are updated:
-// r_vulkan_shader_update_static_sets
-// r_vulkan_shader_update_perdraw_sets
-// r_vulkan_shader_update_instance_sets
-// r_vulkan_shader_update_descriptor_sets
 void
-r_vulkan_shader_update_descriptor_sets(vulkan_render_context_t *render_context,
-                                       vulkan_shader_data_t    *shader)
+r_vulkan_shader_uniform_update_data(vulkan_shader_data_t *shader, string_t uniform_name, void *data)
 {
-    Assert(shader->used_descriptor_set_count <=  SDS_Count);
+    Assert(data != null);
+
+    vulkan_shader_uniform_data_t *uniform = null;
+    for(u32 uniform_index = 0;
+        uniform_index < shader->uniform_count;
+        ++uniform_index)
+    {
+        vulkan_shader_uniform_data_t *this_uniform = shader->uniforms + uniform_index;
+        if(c_string_compare(this_uniform->name, uniform_name))
+        {
+            uniform = this_uniform;
+            break;
+        }
+    }
+    Assert(uniform);
+    Assert(uniform->data != null);
+    Assert(uniform->size != 0);
+
+    memcpy(uniform->data, data, uniform->size);
+}
+
+// TODO(Sleepster): Realistically... the shader will stored somewhere better later where we don't pass it to this function... 
+// We'll instead just check the "active_shader" or something of the sort
+void
+r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *render_context,
+                                      vulkan_shader_data_t                *shader,
+                                      vulkan_shader_descriptor_set_info_t *set_info,
+                                      vulkan_shader_uniform_data_t       **uniform_array,
+                                      u32                                  max_uniforms)
+{
+    Assert(set_info->is_valid); 
 
     u32 current_image_index = render_context->current_image_index;
-    VkCommandBuffer command_buffer = render_context->graphics_command_buffers[current_image_index].handle;
-    
-    for(u32 descriptor_index = SDS_Static;
-        descriptor_index < shader->used_descriptor_set_count;
-        ++descriptor_index)
+
+    vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + current_image_index;
+    VkDescriptorSet current_set                  = set_info->sets[current_image_index];
+
+    Assert(command_buffer->state == VKCBS_RECORDING || command_buffer->state == VKCBS_WITHIN_RENDERPASS);
+
+    // TODO(Sleepster): Obviously check if something like "render_context->current_set == this_set" 
+    // and only update this current set binding if we actually need too.. 
+    //
+    // TODO(Sleepster):  This should not just be a simple binding to the graphics pipeline 
+    vkCmdBindDescriptorSets(command_buffer->handle, 
+                            VK_PIPELINE_BIND_POINT_GRAPHICS, 
+                            shader->pipeline.layout, 
+                            0, 
+                            1,
+                           &current_set,
+                            0,
+                            null);
+    u32 buffer_offset     = 0;
+    byte *uniform_data_buffer = c_arena_push_size(&render_context->frame_arena, set_info->buffer.buffer_size);
+    for(u32 uniform_index = 0;
+        uniform_index < max_uniforms;
+        ++uniform_index)
     {
-        vulkan_shader_descriptor_set_info_t *info = shader->set_info + descriptor_index;
-        VkDescriptorSet current_set = info->sets[current_image_index];  
+        vulkan_shader_uniform_data_t *uniform_data = uniform_array[uniform_index];
+        Assert(uniform_data->owner_shader_id == shader->shader_id);
+        Assert(uniform_data->set_type != SDS_Instance);
 
-        // TODO(Sleepster): Graphics is hard coded... 
-        vkCmdBindDescriptorSets(command_buffer, 
-                                VK_PIPELINE_BIND_POINT_GRAPHICS, 
-                                shader->pipeline.layout, 
-                                0, 
-                                1,
-                               &current_set,
-                                0,
-                                null);
-        // TODO(Sleepster): Transfer queue?
-        r_vulkan_buffer_upload(render_context, 
-                              &info->buffer, 
-                              &shader->camera_matrices, 
-                               info->buffer.buffer_size, 
-                               0, 
-                               null, 
-                               render_context->rendering_device.graphics_command_pool, 
-                               render_context->rendering_device.graphics_queue);
+        memcpy(uniform_data_buffer + buffer_offset, uniform_data->data, uniform_data->size);
+        buffer_offset += uniform_data->size;
 
-        VkDescriptorBufferInfo buffer_info = {
-            .buffer = info->buffer.handle,
-            .offset = 0,
-            .range  = info->binding_upload_size
-        };
-
-        VkWriteDescriptorSet *writes = c_arena_push_array(&render_context->frame_arena, VkWriteDescriptorSet, info->binding_count);
-        for(u32 binding_index = 0;
-            binding_index < info->binding_count;
-            ++binding_index)
+        if(uniform_data->data == null)
         {
-            VkDescriptorSetLayoutBinding *binding = info->bindings + binding_index;
-            writes[binding_index] = {
-                .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .dstSet          = current_set,
-                .dstBinding      = binding->binding,
-                .dstArrayElement = 0,
-                .descriptorType  = binding->descriptorType,
-                .descriptorCount = binding->descriptorCount,
-                .pBufferInfo     = &buffer_info
-            };
+            log_warning("Updated a uniform named: '%s'... but it's data pointer was null...\n", C_STR(uniform_data->name));
         }
+    }
 
-        vkUpdateDescriptorSets(render_context->rendering_device.logical_device,
-                               info->binding_count,
-                               writes,
-                               0,
-                               null);
+
+    /* TODO(Sleepster):
+     *
+     * - [ ] This is just overall terrible!
+     * Create normal universal staging buffer(s) that are held in the context that dynamically grow as needed 
+     * so that we're not constantly creating and destroying GPU memory. This is slow. And most importantly stupid.
+     */  
+    r_vulkan_buffer_upload(render_context, 
+                          &set_info->buffer, 
+                           uniform_data_buffer, 
+                           set_info->buffer.buffer_size, 
+                           0, 
+                           null, 
+                           render_context->rendering_device.graphics_command_pool, 
+                           render_context->rendering_device.graphics_queue);
+
+    // TODO(Sleepster): Maybe create some r_vulkan_shader_finish_descriptor_updates() that will do this part for us...
+    VkDescriptorBufferInfo buffer_info = {
+        .buffer = set_info->buffer.handle,
+        .offset = 0,
+        .range  = set_info->binding_upload_size
+    };
+
+    VkWriteDescriptorSet *writes = c_arena_push_array(&render_context->frame_arena, VkWriteDescriptorSet, set_info->binding_count);
+    for(u32 binding_index = 0;
+        binding_index < set_info->binding_count;
+        ++binding_index)
+    {
+        VkDescriptorSetLayoutBinding *binding = set_info->bindings + binding_index;
+        writes[binding_index] = {
+            .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet          = current_set,
+            .dstBinding      = binding->binding,
+            .dstArrayElement = 0,
+            .descriptorType  = binding->descriptorType,
+            .descriptorCount = binding->descriptorCount,
+            .pBufferInfo     = &buffer_info
+        };
+    }
+
+    vkUpdateDescriptorSets(render_context->rendering_device.logical_device,
+                           set_info->binding_count,
+                           writes,
+                           0,
+                           null);
+}
+void
+r_vulkan_shader_update_instance_set(vulkan_render_context_t *render_context, 
+                                    vulkan_shader_data_t    *shader)
+{
+    u32 current_image_index = render_context->current_image_index;
+    vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + current_image_index;
+
+    Assert(command_buffer->state == VKCBS_RECORDING || command_buffer->state == VKCBS_WITHIN_RENDERPASS);
+    for(u32 uniform_index = 0;
+        uniform_index < shader->instance_uniform_count;
+        ++uniform_index)
+    {
+        vulkan_shader_uniform_data_t *uniform_data = shader->instance_uniforms[uniform_index];
+        Expect(uniform_data->set_type == SDS_Instance, "The uniform: '%s' for this shader should be an instance level uniform...\n", 
+               C_STR(uniform_data->name));
+        if(uniform_data->data)
+        {
+            // TODO(Sleepster): Ensure the correct shader is bound... 
+            Assert(uniform_data->push_constant_index >= 0);
+            VkPushConstantRange *constant = shader->push_constant_data + uniform_data->push_constant_index;
+            
+            vec4_t *vector = (vec4_t*)uniform_data->data;
+
+            vkCmdPushConstants(command_buffer->handle,
+                               shader->pipeline.layout,
+                               constant->stageFlags,
+                               constant->offset,
+                               constant->size,
+                               uniform_data->data);
+        }
+        else
+        {
+            log_error("Tried to update uniform: '%s' but the data ptr was null...\n", C_STR(uniform_data->name));
+        }
+    }
+}
+
+inline void
+r_vulkan_shader_update_draw_set(vulkan_render_context_t *render_context,
+                                vulkan_shader_data_t    *shader)
+{
+    Assert(shader->draw_uniform_count > 0);
+
+    vulkan_shader_descriptor_set_info_t *info = shader->set_info + SDS_Draw;
+    if(info->is_valid)
+    {
+        r_vulkan_shader_update_descriptor_set(render_context, 
+                                              shader, 
+                                              info,
+                                              shader->draw_uniforms,
+                                              shader->draw_uniform_count);
+    }
+}
+
+inline void
+r_vulkan_shader_update_static_set(vulkan_render_context_t *render_context,
+                                  vulkan_shader_data_t    *shader)
+{
+    Assert(shader->static_uniform_count > 0);
+
+    vulkan_shader_descriptor_set_info_t *info = shader->set_info + SDS_Static;
+    if(info->is_valid)
+    {
+        r_vulkan_shader_update_descriptor_set(render_context, 
+                                              shader, 
+                                              info, 
+                                              shader->static_uniforms,                                              
+                                              shader->static_uniform_count);
+    }
+}
+
+inline void
+r_vulkan_shader_update_all_sets(vulkan_render_context_t *render_context,
+                                vulkan_shader_data_t    *shader)
+{
+    if(shader->static_uniform_count > 0)
+    {
+        r_vulkan_shader_update_static_set(render_context, shader);
+    }
+    if(shader->draw_uniform_count > 0)
+    {
+        r_vulkan_shader_update_draw_set(render_context, shader);
+    }
+    if(shader->instance_uniform_count > 0)
+    {
+        r_vulkan_shader_update_instance_set(render_context, shader);
     }
 }
 
@@ -2385,26 +2563,12 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
 
     // TODO(Sleepster): TRIANGLE CODE
     r_vulkan_shader_bind(render_context, &render_context->default_shader);
-    vulkan_shader_data_t *shader = &render_context->default_shader; 
-    for(u32 push_constant_index = 0;
-        push_constant_index < render_context->default_shader.push_constant_count;
-        ++push_constant_index)
-    {
-        push_constant_t constant_data = {
-            .DrawColor = vec4(0.4, 0.4, 1.0, 1.0)
-        };
+    
+    push_constant_t test = {.DrawColor = {1.0f, 0.0f, 0.0f, 1.0f}};
+    r_vulkan_shader_uniform_update_data(&render_context->default_shader, STR("Matrices"),      &render_context->default_shader.camera_matrices);
+    r_vulkan_shader_uniform_update_data(&render_context->default_shader, STR("PushConstants"), &test);
 
-        VkPushConstantRange *constant = shader->push_constants + push_constant_index;
-        vkCmdPushConstants(command_buffer->handle,
-                           shader->pipeline.layout,
-                           constant->stageFlags,
-                           constant->offset,
-                           constant->size,
-                          &constant_data);
-    }
-
-    r_vulkan_shader_update_descriptor_sets(render_context,
-                                           &render_context->default_shader);
+    r_vulkan_shader_update_all_sets(render_context, &render_context->default_shader);
 
     VkDeviceSize offsets[1] = {};
     vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &render_context->vertex_buffer.handle, (VkDeviceSize*)&offsets);
@@ -2628,7 +2792,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     render_context->window_height = 0;
 
     render_context->initialization_arena = c_arena_create(MB(10));
-    render_context->frame_arena          = c_arena_create(MB(10));
+    render_context->frame_arena          = c_arena_create(MB(100));
     render_context->permanent_arena      = c_arena_create(MB(100));
 
 	VkApplicationInfo app_info  = {};

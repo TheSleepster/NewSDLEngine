@@ -14,6 +14,7 @@
 
 #include <c_types.h>
 #include <c_memory_arena.h>
+#include <c_hash_table.h>
 #include <c_string.h>
 #include <c_math.h>
 
@@ -56,10 +57,12 @@ typedef struct vulkan_buffer_data
 // VULKAN PIPELINE STUFF 
 //////////////////////////////////
 
+// TODO(Sleepster): https://docs.vulkan.org/refpages/latest/refpages/source/VkPipelineBindPoint.html
 typedef struct vulkan_pipeline_data
 {
-    VkPipeline       handle;
-    VkPipelineLayout layout;
+    VkPipeline          handle;
+    VkPipelineBindPoint binding;
+    VkPipelineLayout    layout;
 }vulkan_pipeline_data_t;
 
 //////////////////////////////////
@@ -74,7 +77,7 @@ typedef struct vulkan_pipeline_data
 // Set 2 are the "Instance" uniforms. These are generally items that are updated rapidly. Sometimes per object rendered.
 //
 // the bindings indices in these standardized uniform sets are not controlled at all. 
-typedef enum vulkan_shader_uniform_type
+typedef enum vulkan_shader_descriptor_set_type
 {
     // NOTE(Sleepster): "Static" per frame
     SDS_Static   = 0,
@@ -83,10 +86,12 @@ typedef enum vulkan_shader_uniform_type
     // NOTE(Sleepster): "PerInstance" per object in the scene / vkCmdDrawInstance 
     SDS_Instance = 2,
     SDS_Count
-}vulkan_shader_uniform_type_t;
+}vulkan_shader_descriptor_set_binding_type_t;
 
 typedef struct vulkan_shader_descriptor_set_info
 {
+    bool8                         is_valid;
+
     VkDescriptorSetLayoutBinding *bindings;
     u32                           binding_count;
     u32                           binding_upload_size;
@@ -98,9 +103,15 @@ typedef struct vulkan_shader_descriptor_set_info
 
 typedef struct vulkan_shader_uniform_data
 {
-    vulkan_shader_uniform_type type;
-    void                      *data;
-    u32                        size;
+    u32                                         owner_shader_id;
+    u32                                         uniform_location;
+    VkDescriptorType                            uniform_type;
+    vulkan_shader_descriptor_set_binding_type_t set_type;
+    u32                                         push_constant_index;
+
+    string_t                                    name;
+    u32                                         size;
+    void                                       *data;
 }vulkan_shader_uniform_data_t;
 
 typedef struct vulkan_shader_stage_info
@@ -115,6 +126,10 @@ typedef struct vulkan_shader_stage_info
 
 typedef struct vulkan_shader_data
 {
+    // TODO(Sleepster): Shader catalog will handle this... 
+    u32                                 shader_id;
+    string_t                            name;
+
     memory_arena_t                      arena;
     SpvReflectShaderModule              spv_reflect_module;
 
@@ -139,12 +154,19 @@ typedef struct vulkan_shader_data
     vulkan_shader_descriptor_set_info_t *set_info;
 
     u32                                  push_constant_count;
-    VkPushConstantRange                 *push_constants;
+    VkPushConstantRange                 *push_constant_data;
 
-    // TODO(Sleepster): This will be moved out of here after a while once the asset 
-    // system is fully capable of handling a asset -> vulkan piping.  
     vulkan_shader_uniform_data_t        *uniforms;
     u32                                  uniform_count;
+
+    vulkan_shader_uniform_data_t       **static_uniforms;
+    u32                                  static_uniform_count;
+
+    vulkan_shader_uniform_data_t       **draw_uniforms;
+    u32                                  draw_uniform_count;
+
+    vulkan_shader_uniform_data_t       **instance_uniforms;
+    u32                                  instance_uniform_count;
 
     // TODO(Sleepster): Store what kind of pipeline we use, either GRAPHICS or COMPUTE  
     // ideally something like:
