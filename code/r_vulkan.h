@@ -19,9 +19,25 @@
 #include <c_math.h>
 
 #define VkAssert(result) Statement(Assert(result == VK_SUCCESS))
-#define INVALID_SWAPCHAIN_IMAGE_INDEX ((u32)-1)
+#define INVALID_ID ((u32)-1)
+
+// NOTE(Sleepster): Triple Buffering
+#define MAX_FRAMES_IN_FLIGHT (2)
 
 // TODO: TEMPORARY
+
+typedef struct vulkan_image_data vulkan_image_data_t;
+typedef struct vulkan_texture
+{
+    u32                  width;
+    u32                  height;
+    u32                  channel_count;
+    u32                  generation;
+
+    vulkan_image_data_t *image_data;
+    VkSampler            sampler;
+}vulkan_texture_t;
+
 
 // NOTE(Sleepster): Nvidia needs 256 byte alignment
 typedef struct global_matrix_uniforms
@@ -34,7 +50,6 @@ typedef struct push_constant
 {
     vec4_t DrawColor;
 }push_constant_t;
-
 
 //////////////////////////////////
 // VULKAN BUFFER STUFF 
@@ -71,13 +86,13 @@ typedef struct vulkan_pipeline_data
 #define MAX_VULKAN_SHADER_STAGES (10)
 #define MAX_DESCRIPTOR_TYPES  (SPV_REFLECT_DESCRIPTOR_TYPE_INPUT_ATTACHMENT + 1)
 
-struct spv_vulkan_type_map 
+typedef struct spv_vulkan_type_map 
 {
     SpvReflectDescriptorType spv_type;
     VkDescriptorType         vk_type;
-};
+}spv_vulkan_type_map_t;
 
-global_variable inline spv_vulkan_type_map type_map[] = {
+global_variable inline spv_vulkan_type_map_t type_map[] = {
     {SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLER,                VK_DESCRIPTOR_TYPE_SAMPLER               },
     {SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLED_IMAGE,          VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE         },
     {SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER        },
@@ -126,7 +141,15 @@ typedef struct vulkan_shader_uniform_data
 
     string_t                                    name;
     u32                                         size;
-    void                                       *data;
+    bool8                                       is_texture;
+    union {
+        void *data;
+        struct 
+        {
+            VkImageView image_view;
+            VkSampler   sampler;
+        };
+    };
 }vulkan_shader_uniform_data_t;
 
 typedef struct vulkan_shader_stage_info
@@ -316,6 +339,7 @@ typedef struct vulkan_image_data
     VkImage        handle;
     VkDeviceMemory memory;
     VkFormat       format;
+    VkImageLayout  layout;
 
     VkImageView    view;
 
@@ -362,6 +386,7 @@ typedef enum vulkan_command_buffer_state
     VKCBS_COUNT,
 }vulkan_command_buffer_state_t;
 
+// TODO(Sleepster): Should likely store the GPU queue and the command pool it was allocated from for simplicity
 typedef struct vulkan_command_buffer_data
 {
     VkCommandBuffer               handle;
@@ -415,6 +440,7 @@ typedef struct vulkan_render_context
 
     vulkan_renderpass_data_t      main_renderpass;
     vulkan_shader_data_t          default_shader;
+    vulkan_texture_t              default_texture;
 
     vulkan_buffer_data_t          main_staging_buffer;
 

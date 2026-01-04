@@ -94,8 +94,7 @@ GAME_SRCS              = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
 
 # Each slang file is it's own shader.
 SHADERS_SRC    := $(wildcard $(SHADER_DIR)/*.slang)
-SLANG_FLAGS    := -target spirv -I$(SHADER_DIR) -O0
-
+SLANG_FLAGS    := -target spirv -matrix-layout-column-major -I$(SHADER_DIR) -O0 -profile sm_6_3
 # --------------------------------------------
 # Set the Outputs
 # --------------------------------------------

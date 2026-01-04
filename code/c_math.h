@@ -28,7 +28,10 @@
      - Cube Functions
   TODO:
 
-  SSE2 SIMD (mm128) ON ALL FUNCTIONS POSSIBLE
+  - [ ] FLOAT64 SUPPORT
+  - [ ] SSE2 SIMD (mm128) ON ALL FUNCTIONS POSSIBLE
+  - [ ] CREATE A WAY OF TOGGLING BETWEEN SSE AND NON-SSE FUNCTIONS (check handmade_math.h)
+  - [ ] AVX / AVX2 WIDE SIMD
   
   - MATRICES
       - [x] VECTOR TRANSFORMS
@@ -58,9 +61,6 @@
       
   - QUATERNIONS
       - EVERYTHING
-
-  - CREATE A WAY OF TOGGLING BETWEEN SSE AND NON-SSE FUNCTIONS
-      (check handmade_math.h)
 */
   
 #define C_MATH_H
@@ -382,6 +382,19 @@ MATH_API void    f32_approach(float32 *value, float32 target, float32 rate, floa
 MATH_API float32 f32_ease_out_quad(float32 x);
 MATH_API float32 f32_sin_breathe_normalized(float32 time, float32 modifier, float32 min, float32 max);
 MATH_API float32 f32_sin_breathe(float32 time, float32 modifier);
+
+/*===========================================
+  ================== FLOAT64 ================
+  ===========================================*/
+
+// TODO(Sleepster): These aren't actually implmented and this is copypasta, so may not actually be how we want to do it. 
+MATH_API float64 f64_lerp(float64 A, float64 B, float64 T);
+MATH_API float64 f64_unlerp(float64 A, float64 B, float64 X);
+MATH_API bool8   f64_equals(float64 A, float64 B, float64 tolerance);
+MATH_API void    f64_approach(float64 *value, float64 target, float64 rate, float64 delta_t);
+MATH_API float64 f64_ease_out_quad(float64 x);
+MATH_API float64 f64_sin_breathe_normalized(float64 time, float64 modifier, float64 min, float64 max);
+MATH_API float64 f64_sin_breathe(float64 time, float64 modifier);
 
 /*===========================================
   ================= VECTOR 2 ================

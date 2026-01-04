@@ -3,12 +3,14 @@ struct VertexInput_t
 {
     float4 vPosition : POSITION;
     float4 vColor    : COLOR;
+    float2 vTexCoord : TEXCOORD0;
 };
 
 struct VertexOutput_t
 {
-    float4 vOutPosition : SV_POSITION;
-    float4 vOutColor    : SV_TARGET;
+                        float4 vOutPosition : SV_POSITION;
+    [[vk::location(0)]] float4 vOutColor    : SV_TARGET;
+    [[vk::location(1)]] float2 vOutTexCoord : TEXCOORD0;
 };
 
 struct global_matrix_uniforms 
@@ -29,6 +31,7 @@ VSMain(VertexInput_t input)
     float4 VSPosition   = mul(Matrices.ViewMatrix, float4(input.vPosition.xyz, 1.0));
     result.vOutPosition = mul(Matrices.ProjectionMatrix, VSPosition);
     result.vOutColor    = input.vColor;
+    result.vOutTexCoord = input.vTexCoord;
 
     return(result);
 }
@@ -40,19 +43,25 @@ struct PixelOutput_t
     float4 vFragColor : SV_TARGET;
 };
 
-struct ConstantData {
-    float4 DrawColor;
-};
+// NOTE(Sleepster): binding first, set second 
+[[vk::binding(0, 1)]]
+Sampler2D TextureSampler;
 
-[[vk::push_constant]]
-ConstantData PushConstants;
+// struct ConstantData {
+//     float4 DrawColor;
+// };
+
+// [[vk::push_constant]]
+// ConstantData PushConstants;
 
 [shader("fragment")]
 PixelOutput_t
 PSMain(VertexOutput_t input)
 {
     PixelOutput_t result;
-    result.vFragColor = PushConstants.DrawColor;
+
+    float4 TextureColor = TextureSampler.Sample(input.vOutTexCoord);
+    result.vFragColor   = mul(TextureColor, input.vOutColor);
 
     return(result);
 }
