@@ -791,18 +791,26 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
     {
         result.layouts            = c_arena_push_array(&result.arena,  VkDescriptorSetLayout,               module->descriptor_set_count);
         result.set_info           = c_arena_push_array(&result.arena,  vulkan_shader_descriptor_set_info_t, module->descriptor_set_count);
-        result.push_constant_data = c_arena_push_array(&result.arena,  VkPushConstantRange,                 module->push_constant_block_count);
-        result.uniforms           = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t,        128);
-        result.static_uniforms    = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*,       128);
-        result.draw_uniforms      = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*,       128);
-        result.instance_uniforms  = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*,       128);
+        if(module->push_constant_block_count)
+        {
+            result.push_constant_data = c_arena_push_array(&result.arena, VkPushConstantRange, module->push_constant_block_count);
+            Assert(result.push_constant_data);
+        }
+        if(module->descriptor_set_count > 0)
+        {
+            result.uniforms           = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t,  64);
+            result.static_uniforms    = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*, 64);
+            result.draw_uniforms      = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*, 64);
+            result.instance_uniforms  = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*, 64);
+
+            Assert(result.static_uniforms);
+            Assert(result.draw_uniforms);
+            Assert(result.instance_uniforms);
+            Assert(result.uniforms);
+        }
     }
     Assert(result.layouts);
     Assert(result.set_info);
-    Assert(result.push_constant_data);
-    Assert(result.static_uniforms);
-    Assert(result.draw_uniforms);
-    Assert(result.instance_uniforms);
 
     for(u32 push_constant_index = 0;
         push_constant_index < module->push_constant_block_count;
@@ -843,8 +851,8 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         VkDescriptorSetLayout               *current_layout = result.layouts  + set_index;
         if(!set_info->bindings)
         {
-            set_info->bindings = c_arena_push_array(&result.arena, VkDescriptorSetLayoutBinding, set_info->binding_count);
-            set_info->binding_count = set_info->binding_count;
+            set_info->bindings = c_arena_push_array(&result.arena, VkDescriptorSetLayoutBinding, current_set->binding_count);
+            set_info->binding_count = current_set->binding_count;
         }
 
         set_info->is_valid = true;
@@ -881,6 +889,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
                 .set_type         = (vulkan_shader_descriptor_set_binding_type_t)set_index,
                 .uniform_type     = uniform_binding_type,
                 .data             = is_texture ? null : c_arena_push_size(&result.arena, binding->block.padded_size),
+                //.data             = is_texture ? null : AllocSize(binding->block.padded_size),
                 .is_texture       = is_texture
             };
 
@@ -927,7 +936,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
                         binding_index < set_data.binding_count;
                         ++binding_index)
                     {
-                        set_info->bindings[binding_index].stageFlags = current_stage;
+                        set_info->bindings[binding_index].stageFlags |= current_stage;
                     }
                 }
             }
@@ -936,6 +945,10 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
             result.type_counts[binding->descriptor_type] += 1;
             VkDescriptorSetLayoutBinding *current_binding = set_bindings + binding_index;
             VkShaderStageFlags stage_flags = current_binding->stageFlags;
+            if(uniform->is_texture)
+            {
+                stage_flags |= VK_SHADER_STAGE_FRAGMENT_BIT; 
+            }
 
             *current_binding = {
                 .binding            = binding->binding,
@@ -946,6 +959,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
             };
         }
         set_info->binding_upload_size = set_buffer_size;
+        set_info->binding_count       = current_set->binding_count;
 
         VkDescriptorSetLayoutCreateInfo layout_create_info = {
             .sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
@@ -1177,6 +1191,29 @@ r_vulkan_shader_bind(vulkan_render_context_t *render_context, vulkan_shader_data
 }
 
 void
+r_vulkan_shader_uniform_update_texture(vulkan_shader_data_t *shader, string_t texture_name, vulkan_texture_t *texture)
+{
+    Assert(texture != null);
+
+    vulkan_shader_uniform_data_t *uniform = null;
+    for(u32 uniform_index = 0;
+        uniform_index < shader->uniform_count;
+        ++uniform_index)
+    {
+        vulkan_shader_uniform_data_t *this_uniform = shader->uniforms + uniform_index;
+        if(c_string_compare(this_uniform->name, texture_name))
+        {
+            uniform = this_uniform;
+            break;
+        }
+    }
+    Assert(uniform);
+
+    uniform->image_view = texture->image_data->view;
+    uniform->sampler    = texture->sampler;
+}
+
+void
 r_vulkan_shader_uniform_update_data(vulkan_shader_data_t *shader, string_t uniform_name, void *data)
 {
     Assert(data != null);
@@ -1197,6 +1234,7 @@ r_vulkan_shader_uniform_update_data(vulkan_shader_data_t *shader, string_t unifo
     Assert(uniform->data != null);
     Assert(uniform->size != 0);
 
+    Assert(uniform->data != shader->set_info[0].bindings);
     memcpy(uniform->data, data, uniform->size);
 }
 
@@ -1240,37 +1278,27 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
         ++uniform_index)
     {
         vulkan_shader_uniform_data_t *uniform_data  = uniform_array[uniform_index];
-        VkWriteDescriptorSet         *current_write = writes + uniform_index;
+        //VkWriteDescriptorSet         *current_write = writes + uniform_index;
             
         Assert(uniform_data->owner_shader_id == shader->shader_id);
-        Assert(uniform_data->set_type != SDS_Instance);
-        Assert(uniform_data->uniform_type != (VkDescriptorType)INVALID_ID);
-        VkDescriptorBufferInfo buffer_info  = {};
-        VkDescriptorImageInfo  texture_info = {};
+        Assert(uniform_data->set_type      != SDS_Instance);
+        Assert(uniform_data->uniform_type  != (VkDescriptorType)INVALID_ID);
 
         if(!uniform_data->is_texture)
         {
             memcpy(uniform_data_buffer + buffer_offset, uniform_data->data, uniform_data->size);
             buffer_offset += uniform_data->size;
 
-            if(uniform_data->data != null)
+            if(uniform_data->data == null)
             {
                 log_warning("Updated a uniform named: '%s'... but it's data pointer was null...\n", C_STR(uniform_data->name));
             }
-
-            buffer_info = {
-                .buffer = set_info->buffer.handle,
-                .offset = 0,
-                .range  = set_info->binding_upload_size
-            };
         }
         else
         {
-            texture_info = {
-                .sampler     = uniform_data->sampler,
-                .imageView   = uniform_data->image_view,
-                .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-            };
+            set_info->image_views[set_info->image_count++] = uniform_data->image_view;
+            set_info->samplers[set_info->sampler_count++]  = uniform_data->sampler;
+            // TODO(Sleepster):  uniform->image_layout; 
         }
     }
 
@@ -1297,6 +1325,12 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
         .range  = set_info->binding_upload_size
     };
 
+    VkDescriptorImageInfo texture_info = {
+        .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        .imageView   = set_info->image_views[0],
+        .sampler     = set_info->samplers[0],
+    };
+
     for(u32 binding_index = 0;
         binding_index < set_info->binding_count;
         ++binding_index)
@@ -1309,7 +1343,8 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
             .dstArrayElement = 0,
             .descriptorType  = binding->descriptorType,
             .descriptorCount = binding->descriptorCount,
-            .pBufferInfo     = &buffer_info
+            .pBufferInfo     = &buffer_info,
+            .pImageInfo      = &texture_info
         };
     }
 
@@ -1318,6 +1353,8 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
                            writes,
                            0,
                            null);
+    set_info->image_count   = 0;
+    set_info->sampler_count = 0;
 }
 void
 r_vulkan_shader_update_instance_set(vulkan_render_context_t *render_context, 
@@ -2824,7 +2861,7 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
         //push_constant_t test = {.DrawColor = {1.0f, 0.0f, 0.0f, 1.0f}};
         //r_vulkan_shader_uniform_update_data(&render_context->default_shader, STR("PushConstants"), &test);
         r_vulkan_shader_uniform_update_data(&render_context->default_shader, STR("Matrices"),       &render_context->default_shader.camera_matrices);
-        //r_vulkan_shader_uniform_update_data(&render_context->default_shader, STR("TextureSampler"), null);
+        r_vulkan_shader_uniform_update_texture(&render_context->default_shader, STR("TextureSampler"), &render_context->default_texture);
 
         r_vulkan_shader_update_all_sets(render_context, &render_context->default_shader);
 
@@ -3443,22 +3480,22 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         [0] = {
             .vPosition = {100, -100, 0.0},
             .vColor    = {1.0, 0.0, 0.0, 1.0},
-            .vTexCoord = {1.0, 1.0}
+            .vTexCoord = {1.0, 0.0}
         },
         [1] = {
             .vPosition = {100, 100, 0.0},
             .vColor    = {0.0, 1.0, 0.0, 1.0},
-            .vTexCoord = {1.0, 0.0}
+            .vTexCoord = {1.0, 1.0}
         },
         [2] = {
             .vPosition = {-100, 100, 0.0},
             .vColor    = {0.0, 0.0, 1.0, 1.0},
-            .vTexCoord = {0.0, 0.0}
+            .vTexCoord = {0.0, 1.0}
         },
         [3] = {
             .vPosition = {-100, -100, 0.0},
             .vColor    = {1.0, 0.0, 1.0, 1.0},
-            .vTexCoord = {0.0, 1.0}
+            .vTexCoord = {0.0, 0.0}
         } 
     };
 

@@ -126,6 +126,11 @@ typedef struct vulkan_shader_descriptor_set_info
     u32                           binding_count;
     u32                           binding_upload_size;
 
+    VkImageView                   image_views[16];
+    VkSampler                     samplers[16];
+    u32                           image_count;
+    u32                           sampler_count;
+
     // NOTE(Sleepster): 3 sets, 1 per "image index" in our triple buffering
     VkDescriptorSet               sets[3];
     vulkan_buffer_data_t          buffer;
@@ -142,14 +147,10 @@ typedef struct vulkan_shader_uniform_data
     string_t                                    name;
     u32                                         size;
     bool8                                       is_texture;
-    union {
-        void *data;
-        struct 
-        {
-            VkImageView image_view;
-            VkSampler   sampler;
-        };
-    };
+
+    void *data;
+    VkImageView image_view;
+    VkSampler   sampler;
 }vulkan_shader_uniform_data_t;
 
 typedef struct vulkan_shader_stage_info

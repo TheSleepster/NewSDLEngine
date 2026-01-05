@@ -44,7 +44,7 @@ struct PixelOutput_t
 };
 
 // NOTE(Sleepster): binding first, set second 
-[[vk::binding(0, 1)]]
+[[vk::binding(1, 0)]]
 Sampler2D TextureSampler;
 
 // struct ConstantData {
@@ -62,6 +62,10 @@ PSMain(VertexOutput_t input)
 
     float4 TextureColor = TextureSampler.Sample(input.vOutTexCoord);
     result.vFragColor   = mul(TextureColor, input.vOutColor);
+    if(result.vFragColor.a == 0.0)
+    {
+        discard;
+    }
 
     return(result);
 }

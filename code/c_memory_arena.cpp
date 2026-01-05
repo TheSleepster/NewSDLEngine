@@ -47,6 +47,7 @@ byte*
 c_arena_push_size(memory_arena_t *arena, u64 size_init)
 {
     Assert(arena->is_initialized == true);
+    Assert(size_init > 0);
     
     byte *result = null;
 
