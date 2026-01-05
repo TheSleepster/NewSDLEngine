@@ -65,7 +65,7 @@ PSMain(VertexOutput_t input)
     {
         discard;
     }
-    result.vFragColor = TextureColor;
+    result.vFragColor   = mul(input.vOutColor, TextureColor);
 
     return(result);
 }

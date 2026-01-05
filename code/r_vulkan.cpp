@@ -3480,22 +3480,22 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         [0] = {
             .vPosition = {100, -100, 0.0},
             .vColor    = {1.0, 0.0, 0.0, 1.0},
-            .vTexCoord = {1.0, 0.0}
+            .vTexCoord = {1.0, 1.0}
         },
         [1] = {
             .vPosition = {100, 100, 0.0},
             .vColor    = {0.0, 1.0, 0.0, 1.0},
-            .vTexCoord = {1.0, 1.0}
+            .vTexCoord = {1.0, 0.0}
         },
         [2] = {
             .vPosition = {-100, 100, 0.0},
             .vColor    = {0.0, 0.0, 1.0, 1.0},
-            .vTexCoord = {0.0, 1.0}
+            .vTexCoord = {0.0, 0.0}
         },
         [3] = {
             .vPosition = {-100, -100, 0.0},
             .vColor    = {1.0, 0.0, 1.0, 1.0},
-            .vTexCoord = {0.0, 0.0}
+            .vTexCoord = {0.0, 1.0}
         } 
     };
 
