@@ -65,6 +65,9 @@ PSMain(VertexOutput_t input)
     {
         discard;
     }
+    // NOTE(Sleepster): This should be used for color override.  
+    //result.vFragColor = TextureColor * input.vOutColor;
+
     result.vFragColor = TextureColor;
 
     return(result);

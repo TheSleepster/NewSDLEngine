@@ -3475,7 +3475,6 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
 
     // TODO(Sleepster): TRIANGLE CODE
     render_context->default_texture = r_new_asset_texture_create(render_context, &render_context->permanent_arena, STR("textures/player.png"), false);
-
     vertex_t vertices[] = {
         [0] = {
             .vPosition = {100, -100, 0.0},
