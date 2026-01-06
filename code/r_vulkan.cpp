@@ -215,7 +215,7 @@ r_vulkan_buffer_bind(vulkan_render_context_t *render_context,
                      u64                      offset)
 {
     Assert(buffer->is_valid);
-    VkAssert(vkBindBufferMemory(render_context->rendering_device.logical_device, 
+    vkAssert(vkBindBufferMemory(render_context->rendering_device.logical_device, 
                                 buffer->handle,
                                 buffer->device_memory, 
                                 offset));
@@ -239,7 +239,7 @@ r_vulkan_buffer_create(vulkan_render_context_t *render_context,
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE
     };
 
-    VkAssert(vkCreateBuffer(render_context->rendering_device.logical_device,
+    vkAssert(vkCreateBuffer(render_context->rendering_device.logical_device,
                            &buffer_create_info,
                             render_context->allocators,
                            &result.handle));
@@ -316,7 +316,7 @@ r_vulkan_buffer_map_memory(vulkan_render_context_t *render_context,
     Assert(buffer->buffer_size != 0);
 
     void *result = null;
-    VkAssert(vkMapMemory(render_context->rendering_device.logical_device,
+    vkAssert(vkMapMemory(render_context->rendering_device.logical_device,
                          buffer->device_memory,
                          offset,
                          map_size,
@@ -358,7 +358,7 @@ r_vulkan_buffer_copy_buffer(vulkan_render_context_t *render_context,
         .size      = copy_size
     };
     vkCmdCopyBuffer(temp_buffer.handle, src_buffer->handle, dst_buffer->handle, 1, &copy_region);
-    r_vulkan_command_buffer_dispatch_scratch_buffer(render_context, &temp_buffer, command_pool, queue);
+    r_vulkan_command_buffer_dispatch_scratch_buffer(render_context, &temp_buffer, queue);
 }
 
 void
@@ -370,7 +370,7 @@ r_vulkan_buffer_copy_data(vulkan_render_context_t *render_context,
                           u32                      flags)
 {
     void *data_ptr = null;
-    VkAssert(vkMapMemory(render_context->rendering_device.logical_device, 
+    vkAssert(vkMapMemory(render_context->rendering_device.logical_device, 
                          buffer->device_memory, 
                          offset, 
                          data_size, 
@@ -570,7 +570,7 @@ r_vulkan_pipeline_create(vulkan_render_context_t           *render_context,
         .pPushConstantRanges    = shader->push_constant_data,
     };
 
-    VkAssert(vkCreatePipelineLayout(render_context->rendering_device.logical_device,
+    vkAssert(vkCreatePipelineLayout(render_context->rendering_device.logical_device,
                                    &pipeline_layout_info,
                                     render_context->allocators,
                                    &result.layout));
@@ -732,7 +732,7 @@ r_vulkan_shader_stage_create(vulkan_render_context_t    *render_context,
         .pCode    = (u32*)shader_source.data,
     };
 
-    VkAssert(vkCreateShaderModule(render_context->rendering_device.logical_device,
+    vkAssert(vkCreateShaderModule(render_context->rendering_device.logical_device,
                                  &stage->module_create_info,
                                   render_context->allocators,
                                  &stage->handle));
@@ -889,7 +889,6 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
                 .set_type         = (vulkan_shader_descriptor_set_binding_type_t)set_index,
                 .uniform_type     = uniform_binding_type,
                 .data             = is_texture ? null : c_arena_push_size(&result.arena, binding->block.padded_size),
-                //.data             = is_texture ? null : AllocSize(binding->block.padded_size),
                 .is_texture       = is_texture
             };
 
@@ -907,9 +906,9 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
                 {
                     // NOTE(Sleepster): We should never actually get here because we handle 
                     // the push_constants seperately from all other uniforms. 
+                    //result.instance_uniforms[result.instance_uniform_count++] = uniform;
 
                     InvalidCodePath;
-                    //result.instance_uniforms[result.instance_uniform_count++] = uniform;
                 }break;
             }
 
@@ -966,7 +965,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
             .bindingCount = current_set->binding_count,
             .pBindings    = set_bindings,
         };
-        VkAssert(vkCreateDescriptorSetLayout(render_context->rendering_device.logical_device,
+        vkAssert(vkCreateDescriptorSetLayout(render_context->rendering_device.logical_device,
                                             &layout_create_info,
                                              null,
                                              current_layout));
@@ -1038,14 +1037,14 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
         .sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
 
         // TODO(Sleepster): Do we care???          
-        //https://docs.vulkan.org/refpages/latest/refpages/source/VkDescriptorPoolCreateFlagBits.html
-        //.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+        // https://docs.vulkan.org/refpages/latest/refpages/source/VkDescriptorPoolCreateFlagBits.html
+        // v.flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
         
         .maxSets       = allocated_descriptor_sets,
         .poolSizeCount = used_pool_indices,
         .pPoolSizes    = descriptor_pool_type_info
     };   
-    VkAssert(vkCreateDescriptorPool(render_context->rendering_device.logical_device, 
+    vkAssert(vkCreateDescriptorPool(render_context->rendering_device.logical_device, 
                                    &pool_create_info, 
                                     render_context->allocators, 
                                    &result.primary_pool));
@@ -1072,7 +1071,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
             .descriptorSetCount = render_context->swapchain.image_count,
             .pSetLayouts        = layout_info
         };
-        VkAssert(vkAllocateDescriptorSets(render_context->rendering_device.logical_device,
+        vkAssert(vkAllocateDescriptorSets(render_context->rendering_device.logical_device,
                                          &allocation_info,
                                           info->sets));
     }
@@ -1238,7 +1237,7 @@ r_vulkan_shader_uniform_update_data(vulkan_shader_data_t *shader, string_t unifo
     memcpy(uniform->data, data, uniform->size);
 }
 
-// TODO(Sleepster): Realistically... the shader will stored somewhere better later where we don't pass it to this function... 
+// TODO(Sleepster): Realistically... the shader will be stored somewhere better later where we don't pass it to this function... 
 // We'll instead just check the "active_shader" or something of the sort
 void
 r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *render_context,
@@ -1255,19 +1254,6 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
     VkDescriptorSet current_set                  = set_info->sets[current_image_index];
 
     Assert(command_buffer->state == VKCBS_RECORDING || command_buffer->state == VKCBS_WITHIN_RENDERPASS);
-
-    // TODO(Sleepster): Obviously check if something like "render_context->current_set == this_set" 
-    // and only update this current set binding if we actually need too.. 
-    //
-    // TODO(Sleepster):  This should not just be a simple binding to the graphics pipeline 
-    vkCmdBindDescriptorSets(command_buffer->handle, 
-                            VK_PIPELINE_BIND_POINT_GRAPHICS, 
-                            shader->pipeline.layout, 
-                            0, 
-                            1,
-                           &current_set,
-                            0,
-                            null);
 
     u32 buffer_offset = 0;
     byte *uniform_data_buffer    = c_arena_push_size(&render_context->frame_arena, set_info->buffer.buffer_size);
@@ -1348,11 +1334,26 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
         };
     }
 
+    // NOTE(Sleepster): Some GPUs only support Update -> Bind, not Bind -> Update
     vkUpdateDescriptorSets(render_context->rendering_device.logical_device,
                            set_info->binding_count,
                            writes,
                            0,
                            null);
+
+    // TODO(Sleepster): Obviously check if something like "render_context->current_set == this_set" 
+    // and only update this current set binding if we actually need too.. 
+    //
+    // TODO(Sleepster):  This should not just be a simple binding to the graphics pipeline 
+    vkCmdBindDescriptorSets(command_buffer->handle, 
+                            VK_PIPELINE_BIND_POINT_GRAPHICS, 
+                            shader->pipeline.layout, 
+                            0, 
+                            1,
+                           &current_set,
+                            0,
+                            null);
+
     set_info->image_count   = 0;
     set_info->sampler_count = 0;
 }
@@ -1475,7 +1476,7 @@ r_vulkan_framebuffer_create(vulkan_render_context_t  *render_context,
         .height          = height,
         .layers          = 1
     };
-    VkAssert(vkCreateFramebuffer(render_context->rendering_device.logical_device, 
+    vkAssert(vkCreateFramebuffer(render_context->rendering_device.logical_device, 
                                 &framebuffer_create_info, 
                                  render_context->allocators, 
                                 &result.handle));
@@ -1514,7 +1515,7 @@ r_vulkan_fence_create(vulkan_render_context_t *render_context,
         .flags = start_signaled ? VK_FENCE_CREATE_SIGNALED_BIT : (u32)0 
     };
 
-    VkAssert(vkCreateFence(render_context->rendering_device.logical_device, 
+    vkAssert(vkCreateFence(render_context->rendering_device.logical_device, 
                  &fence_create_info, 
                   render_context->allocators,
                  &result.handle));
@@ -1588,7 +1589,7 @@ r_vulkan_fence_reset(vulkan_render_context_t *render_context,
 {
     if(fence->signaled)
     {
-        VkAssert(vkResetFences(render_context->rendering_device.logical_device, 1, &fence->handle));
+        vkAssert(vkResetFences(render_context->rendering_device.logical_device, 1, &fence->handle));
         fence->signaled = false;
     }
     else
@@ -1621,7 +1622,7 @@ r_vulkan_image_view_create(vulkan_render_context_t *render_context,
             .layerCount     = 1
         },
     };
-    VkAssert(vkCreateImageView(render_context->rendering_device.logical_device, &view_create_info, render_context->allocators, &result));
+    vkAssert(vkCreateImageView(render_context->rendering_device.logical_device, &view_create_info, render_context->allocators, &result));
 
     return(result);
 }
@@ -1694,7 +1695,7 @@ r_vulkan_image_create(vulkan_render_context_t *render_context,
         .sharingMode   = VK_SHARING_MODE_EXCLUSIVE
     };
 
-    VkAssert(vkCreateImage(render_context->rendering_device.logical_device, 
+    vkAssert(vkCreateImage(render_context->rendering_device.logical_device, 
                           &image_create_info, 
                            render_context->allocators, 
                           &result.handle));
@@ -1894,14 +1895,18 @@ r_new_asset_texture_create(vulkan_render_context_t *render_context, memory_arena
 
     r_vulkan_command_buffer_dispatch_scratch_buffer(render_context, 
                                                    &temp_buffer, 
-                                                    render_context->rendering_device.graphics_command_pool, 
                                                     render_context->rendering_device.graphics_queue);
 
     result.image_data->format = image_format;
     result.image_data->layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     // NOTE(Sleepster): Sampler creation 
-    // TODO(Sleepster): GO ON BART, SAY THE WORD!!!! configurable...
+    // TODO(Sleepster): 
+    // GO ON BART, SAY THE WORD! 
+    //
+    // sighhh configurable... 
+    //
+    // YAYYYYYYYYYYYYYYYYY
     VkSamplerCreateInfo sampler_data = {
         .sType                   = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
         .magFilter               = VK_FILTER_NEAREST,
@@ -1920,7 +1925,7 @@ r_new_asset_texture_create(vulkan_render_context_t *render_context, memory_arena
         .minLod                  = 0.0f,
         .maxLod                  = 0.0f
     };
-    VkAssert(vkCreateSampler(render_context->rendering_device.logical_device, &sampler_data, render_context->allocators, &result.sampler));
+    vkAssert(vkCreateSampler(render_context->rendering_device.logical_device, &sampler_data, render_context->allocators, &result.sampler));
     result.generation++;
 
     return(result);
@@ -1953,24 +1958,24 @@ r_vulkan_command_buffer_acquire(vulkan_render_context_t *render_context,
         .level              = is_primary_buffer ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY
     };
     // NOTE(Sleepster): This RETURNS the command buffer, so I don't think this is needed... 
-    VkAssert(vkAllocateCommandBuffers(render_context->rendering_device.logical_device, 
+    vkAssert(vkAllocateCommandBuffers(render_context->rendering_device.logical_device, 
                                      &command_buffer_allocate_info, 
                                      &result.handle));
-    result.state = VKCBS_READY;
+    result.state      = VKCBS_READY;
+    result.owner_pool = command_pool;
 
     return(result);
 }
 
 void
 r_vulkan_command_buffer_release(vulkan_render_context_t      *render_context,
-                                vulkan_command_buffer_data_t *command_buffer,
-                                VkCommandPool                 command_pool)
+                                vulkan_command_buffer_data_t *command_buffer)
 {
     Assert(command_buffer->handle);
     Assert(command_buffer->state != VKCBS_INVALID);
 
     vkFreeCommandBuffers(render_context->rendering_device.logical_device, 
-                         command_pool, 
+                         command_buffer->owner_pool, 
                          1, 
                         &command_buffer->handle);
     command_buffer->handle = null;
@@ -2006,7 +2011,7 @@ r_vulkan_command_buffer_begin(vulkan_command_buffer_data_t *command_buffer,
         .flags = begin_flags
     };
 
-    VkAssert(vkBeginCommandBuffer(command_buffer->handle, &begin_info));
+    vkAssert(vkBeginCommandBuffer(command_buffer->handle, &begin_info));
     command_buffer->state = VKCBS_RECORDING;
 }
 
@@ -2047,7 +2052,6 @@ r_vulkan_command_buffer_acquire_scratch_buffer(vulkan_render_context_t *render_c
 void
 r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *render_context,
                                                 vulkan_command_buffer_data_t *command_buffer,
-                                                VkCommandPool                 command_pool,
                                                 VkQueue                       queue)
 {
     r_vulkan_command_buffer_end(command_buffer);
@@ -2058,11 +2062,11 @@ r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *re
     };
 
     // TODO(Sleepster): No fence???
-    VkAssert(vkQueueSubmit(queue, 1, &submit_info, 0));
+    vkAssert(vkQueueSubmit(queue, 1, &submit_info, 0));
 
     // NOTE(Sleepster): Hack since we aren't using a fence... 
-    VkAssert(vkQueueWaitIdle(queue));
-    r_vulkan_command_buffer_release(render_context, command_buffer, command_pool);
+    vkAssert(vkQueueWaitIdle(queue));
+    r_vulkan_command_buffer_release(render_context, command_buffer);
 }
 
 void
@@ -2185,7 +2189,7 @@ r_vulkan_renderpass_create(vulkan_render_context_t *render_context,
         .pNext           = null,
         .flags           = 0
     };
-    VkAssert(vkCreateRenderPass(render_context->rendering_device.logical_device, 
+    vkAssert(vkCreateRenderPass(render_context->rendering_device.logical_device, 
                                &renderpass_create_info, 
                                 render_context->allocators, 
                                &result.handle));
@@ -2365,17 +2369,17 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
     swapchain_create_info.presentMode    = swapchain_present_mode;
     swapchain_create_info.clipped        = true;
     swapchain_create_info.oldSwapchain   = old_swapchain != null ? old_swapchain->handle : null;
-    VkAssert(vkCreateSwapchainKHR(device_data->logical_device, &swapchain_create_info, render_context->allocators, &result.handle));
+    vkAssert(vkCreateSwapchainKHR(device_data->logical_device, &swapchain_create_info, render_context->allocators, &result.handle));
 
     render_context->current_frame_index = 0;
     render_context->current_image_index = 0;
 
     result.image_count = 0;
-    VkAssert(vkGetSwapchainImagesKHR(device_data->logical_device, result.handle, &result.image_count, null));
+    vkAssert(vkGetSwapchainImagesKHR(device_data->logical_device, result.handle, &result.image_count, null));
     result.images       = c_arena_push_array(&result.arena, VkImage,     result.image_count);
     result.views        = c_arena_push_array(&result.arena, VkImageView, result.image_count);
     result.framebuffers = c_arena_push_array(&result.arena, vulkan_framebuffer_data_t, result.image_count);
-    VkAssert(vkGetSwapchainImagesKHR(device_data->logical_device, result.handle, &result.image_count, result.images));
+    vkAssert(vkGetSwapchainImagesKHR(device_data->logical_device, result.handle, &result.image_count, result.images));
 
     for(u32 view_index = 0;
         view_index < result.image_count;
@@ -2395,7 +2399,7 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
             },
         };
 
-        VkAssert(vkCreateImageView(device_data->logical_device, &image_view_create_info, render_context->allocators, &result.views[view_index]));
+        vkAssert(vkCreateImageView(device_data->logical_device, &image_view_create_info, render_context->allocators, &result.views[view_index]));
     }
 
     if(wants_depth_buffer)
@@ -2585,22 +2589,22 @@ r_vulkan_physical_device_get_swapchain_support_info(vulkan_render_context_t     
                                                     VkPhysicalDevice                                 device,
                                                     vulkan_physical_device_swapchain_support_info_t *swapchain_info)
 {
-    VkAssert(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, 
+    vkAssert(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, 
                                                        context->render_surface, 
                                                        &swapchain_info->surface_capabilities));
-    VkAssert(vkGetPhysicalDeviceSurfaceFormatsKHR(device, context->render_surface, &swapchain_info->valid_surface_format_count, 0));
+    vkAssert(vkGetPhysicalDeviceSurfaceFormatsKHR(device, context->render_surface, &swapchain_info->valid_surface_format_count, 0));
     if(swapchain_info->valid_surface_format_count > 0)
     {
-        VkAssert(vkGetPhysicalDeviceSurfaceFormatsKHR(device, 
+        vkAssert(vkGetPhysicalDeviceSurfaceFormatsKHR(device, 
                                                       context->render_surface, 
                                                       &swapchain_info->valid_surface_format_count, 
                                                       swapchain_info->valid_surface_formats));
     }
 
-    VkAssert(vkGetPhysicalDeviceSurfacePresentModesKHR(device, context->render_surface, &swapchain_info->valid_present_mode_count, 0));
+    vkAssert(vkGetPhysicalDeviceSurfacePresentModesKHR(device, context->render_surface, &swapchain_info->valid_present_mode_count, 0));
     if(swapchain_info->valid_present_mode_count > 0)
     {
-        VkAssert(vkGetPhysicalDeviceSurfacePresentModesKHR(device, context->render_surface, 
+        vkAssert(vkGetPhysicalDeviceSurfacePresentModesKHR(device, context->render_surface, 
                                                            &swapchain_info->valid_present_mode_count, 
                                                            swapchain_info->valid_present_modes));
     }
@@ -2655,7 +2659,7 @@ r_vulkan_physical_device_is_supported(vulkan_render_context_t                   
         }
 
         VkBool32 supports_presenting = VK_FALSE;
-        VkAssert(vkGetPhysicalDeviceSurfaceSupportKHR(device, queue_family_index, context_data->render_surface, &supports_presenting));
+        vkAssert(vkGetPhysicalDeviceSurfaceSupportKHR(device, queue_family_index, context_data->render_surface, &supports_presenting));
         if(supports_presenting)
         {
             device_queue_info->present_queue_family_index = queue_family_index;
@@ -2692,12 +2696,12 @@ r_vulkan_physical_device_is_supported(vulkan_render_context_t                   
             u32 device_avaliable_extension_counter = 0;
             VkExtensionProperties *device_avaliable_extensions = null;
 
-            VkAssert(vkEnumerateDeviceExtensionProperties(device, 0, &device_avaliable_extension_counter, 0));
+            vkAssert(vkEnumerateDeviceExtensionProperties(device, 0, &device_avaliable_extension_counter, 0));
             if(device_avaliable_extension_counter != 0)
             {
                 device_avaliable_extensions = c_arena_push_array(&context_data->initialization_arena, VkExtensionProperties, device_avaliable_extension_counter);
             }
-            VkAssert(vkEnumerateDeviceExtensionProperties(device, 0, &device_avaliable_extension_counter, device_avaliable_extensions));
+            vkAssert(vkEnumerateDeviceExtensionProperties(device, 0, &device_avaliable_extension_counter, device_avaliable_extensions));
 
             for(u32 extension_index = 0;
                 extension_index < ArrayCount(requirements->required_extensions);
@@ -3010,7 +3014,7 @@ r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context)
                 ++command_buffer_index)
             {
                 vulkan_command_buffer_data_t *graphics_command_buffer = render_context->graphics_command_buffers + command_buffer_index;
-                r_vulkan_command_buffer_release(render_context, graphics_command_buffer, render_context->rendering_device.graphics_command_pool);
+                r_vulkan_command_buffer_release(render_context, graphics_command_buffer);
             }
 
             for(u32 framebuffer_index = 0;
@@ -3118,12 +3122,12 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     c_dynarray_push(validation_layers, layer);
 
     u32 total_validation_layers = 0;
-    VkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, 0));
+    vkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, 0));
 
     DynArray(VkLayerProperties) found_validation_layers = c_dynarray_create(VkLayerProperties);
     found_validation_layers = c_dynarray_reserve(found_validation_layers, total_validation_layers);
 
-    VkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, found_validation_layers));
+    vkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, found_validation_layers));
     c_dynarray_for(validation_layers, layer_index)
     {
         const char *layer_to_find = c_dynarray_get_at_index(validation_layers, layer_index);
@@ -3158,7 +3162,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     instance_info.enabledLayerCount       = 1;
     instance_info.pApplicationInfo        = &app_info;
 
-    VkAssert(vkCreateInstance(&instance_info, render_context->allocators, &render_context->instance));
+    vkAssert(vkCreateInstance(&instance_info, render_context->allocators, &render_context->instance));
     log_info("Vulkan Instance Created..\n");
 
     // NOTE(Sleepster): DEBUG LAYERS 
@@ -3181,7 +3185,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         PFN_vkCreateDebugUtilsMessengerEXT vk_debug_func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(render_context->instance, 
                                                                                                                      "vkCreateDebugUtilsMessengerEXT");
 
-        VkAssert(vk_debug_func(render_context->instance, &vulkan_debug_info, null, &render_context->debug_callback));
+        vkAssert(vk_debug_func(render_context->instance, &vulkan_debug_info, null, &render_context->debug_callback));
     }
 
     c_dynarray_destroy(extensions);
@@ -3198,9 +3202,9 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     // NOTE(Sleepster): GET VULKAN PHYSICAL DEVICE
     {
         u32 physical_device_counter = 0;
-        VkAssert(vkEnumeratePhysicalDevices(render_context->instance, &physical_device_counter, 0));
+        vkAssert(vkEnumeratePhysicalDevices(render_context->instance, &physical_device_counter, 0));
         VkPhysicalDevice *physical_devices = c_arena_push_array(&render_context->initialization_arena, VkPhysicalDevice, physical_device_counter);
-        VkAssert(vkEnumeratePhysicalDevices(render_context->instance, &physical_device_counter, physical_devices));
+        vkAssert(vkEnumeratePhysicalDevices(render_context->instance, &physical_device_counter, physical_devices));
 
         log_info("Physical Device(s) found!\n");
         for(u32 device_index = 0;
@@ -3379,7 +3383,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         const char *extension = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
         device_create_info.ppEnabledExtensionNames = &extension;
 
-        VkAssert(vkCreateDevice(render_context->rendering_device.physical_device.handle,
+        vkAssert(vkCreateDevice(render_context->rendering_device.physical_device.handle,
                                &device_create_info,
                                 render_context->allocators,
                                &render_context->rendering_device.logical_device));
@@ -3400,7 +3404,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
             .queueFamilyIndex = render_context->rendering_device.graphics_queue_family_index,
             .flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT
         };
-        VkAssert(vkCreateCommandPool(render_context->rendering_device.logical_device, 
+        vkAssert(vkCreateCommandPool(render_context->rendering_device.logical_device, 
                                     &command_pool_info, 
                                      render_context->allocators, 
                                     &render_context->rendering_device.graphics_command_pool));

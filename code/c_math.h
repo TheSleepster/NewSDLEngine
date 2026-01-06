@@ -29,7 +29,7 @@
   TODO:
 
   - [ ] FLOAT64 SUPPORT
-  - [ ] SSE2 SIMD (mm128) ON ALL FUNCTIONS POSSIBLE
+  - [ ] SSE2 SIMD (__mm128) ON ALL FUNCTIONS POSSIBLE
   - [ ] CREATE A WAY OF TOGGLING BETWEEN SSE AND NON-SSE FUNCTIONS (check handmade_math.h)
   - [ ] AVX / AVX2 WIDE SIMD
   
@@ -65,6 +65,7 @@
   
 #define C_MATH_H
 #include <c_types.h>
+#include <c_intrinsics.h>
 
 #include <math.h>
 // SIMD
@@ -619,7 +620,7 @@ MATH_API vec2_t       rect2_get_vector_depth(rectangle2_t rect);
 
 #ifdef MATH_IMPLEMENTATION
 
-MATH_API float32
+MATH_API true_inline float32
 f32_lerp(float32 A, float32 B, float32 T)
 {
     float32 result;
@@ -628,7 +629,7 @@ f32_lerp(float32 A, float32 B, float32 T)
     return(result);
 }
 
-MATH_API float32
+MATH_API true_inline float32
 f32_unlerp(float32 A, float32 B, float32 X)
 {
     float32 result = 0.0f;
@@ -640,13 +641,13 @@ f32_unlerp(float32 A, float32 B, float32 X)
     return(result);
 }
 
-MATH_API bool8
+MATH_API true_inline bool8
 f32_equals(float32 A, float32 B, float32 tolerance)
 {
     return(fabs(A - B) <= tolerance);
 }
 
-MATH_API void
+MATH_API true_inline void
 f32_approach(float32 *value, float32 target, float32 rate, float32 delta_t)
 {
     *value += (float32)((target - *value) * (1.0 - pow(2.0f, -rate * delta_t)));
@@ -656,7 +657,7 @@ f32_approach(float32 *value, float32 target, float32 rate, float32 delta_t)
     }
 }
 
-MATH_API float32
+MATH_API true_inline float32
 f32_ease_out_quad(float32 x)
 {
     return(1 - (1 - x) * (1 - x));
@@ -669,7 +670,7 @@ f32_sin_breathe_normalized(float32 time, float32 modifier, float32 min, float32 
     return(min + (max - min) * sinevalue);
 }
 
-MATH_API float32
+MATH_API true_inline float32
 f32_sin_breathe(float32 time, float32 modifier)
 {
     return(sinf(time * modifier));

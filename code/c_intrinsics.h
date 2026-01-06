@@ -41,7 +41,6 @@
             #define rdtsc()                  __rdtsc()
             #define rdtscp(processor_id_out) (0) 
 
-            // NOTE(Sleepster): 3 intructions to get the thread ID as opposed to the 8 from GetCurrentThreadID on Windows
             #define GetThreadID() gettid() 
             #define true_inline __attribute__((always_inline))
         #elif OS_MAC

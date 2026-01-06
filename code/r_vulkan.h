@@ -18,7 +18,15 @@
 #include <c_string.h>
 #include <c_math.h>
 
-#define VkAssert(result) Statement(Assert(result == VK_SUCCESS))
+//#define VkAssert(result) Statement(Assert(result == VK_SUCCESS))
+#define vkAssert(result) ({                                                \
+    if(!r_vulkan_result_is_success(result))                                \
+    {                                                                      \
+        Expect(false, "Vulkan Assertion Failed!\nVulkan Error: '%s'...\n", \
+               r_vulkan_result_string(result, true));                      \
+    }                                                                      \
+}) 
+
 #define INVALID_ID ((u32)-1)
 
 // NOTE(Sleepster): Triple Buffering
@@ -38,6 +46,7 @@ typedef struct vulkan_texture
     VkSampler            sampler;
 }vulkan_texture_t;
 
+// TODO: TEMPORARY
 
 // NOTE(Sleepster): Nvidia needs 256 byte alignment
 typedef struct global_matrix_uniforms
@@ -163,6 +172,7 @@ typedef struct vulkan_shader_stage_info
     VkShaderModule                       handle;
 }vulkan_shader_stage_info_t;
 
+// TODO(Sleepster): The shader should store what kind of pipeline bind point it needs
 typedef struct vulkan_shader_data
 {
     // TODO(Sleepster): Shader catalog will handle this... 
@@ -387,10 +397,11 @@ typedef enum vulkan_command_buffer_state
     VKCBS_COUNT,
 }vulkan_command_buffer_state_t;
 
-// TODO(Sleepster): Should likely store the GPU queue and the command pool it was allocated from for simplicity
 typedef struct vulkan_command_buffer_data
 {
     VkCommandBuffer               handle;
+    VkCommandPool                 owner_pool;
+
     vulkan_command_buffer_state_t state;
 
     bool8                         is_primary_buffer;
@@ -466,7 +477,6 @@ vulkan_command_buffer_data_t r_vulkan_command_buffer_acquire_scratch_buffer(vulk
 void
 r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *render_context,
                                                 vulkan_command_buffer_data_t *command_buffer,
-                                                VkCommandPool                 command_pool,
                                                 VkQueue                       queue);
 #endif // R_VULKAN_H
 
