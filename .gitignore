@@ -13,3 +13,6 @@
 *.sln
 *.idf
 *.rdi
+misc/.cache/
+misc/.cache/clangd/
+
