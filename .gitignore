@@ -15,4 +15,3 @@
 *.rdi
 misc/.cache/
 misc/.cache/clangd/
-old_src/
