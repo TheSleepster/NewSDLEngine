@@ -4,6 +4,8 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#include <stdio.h>
+
 #include <c_types.h>
 #include <c_base.h>
 #include <c_math.h>
@@ -22,6 +24,7 @@
 #include <c_file_watcher.cpp>
 #include <c_zone_allocator.cpp>
 
+#define NEW_HASH_TABLE_IMPLEMENTATION
 #include <c_new_hash_table.h>
 
 struct thing
@@ -37,5 +40,37 @@ struct thing
 int
 main()
 {
-    HashTable(thing, 4096) table;
+    memory_arena_t arena = c_arena_create(MB(50));
+    HashTable(thing, string_t) table;
+    c_new_hash_table_init(&table, 4096, &arena);
+
+    string_t test0 = STR("Egg");
+    string_t test1 = STR("Egg");
+    string_t test2 = STR("Ain't nobody got time for that");
+
+    u64 value0 = c_new_hash_table_value_from_key(test0.data, test0.count, table.header.max_entries);
+    u64 value1 = c_new_hash_table_value_from_key(test1.data, test1.count, table.header.max_entries);
+    u64 value2 = c_new_hash_table_value_from_key(test1.data, test1.count, table.header.max_entries);
+
+    Assert(value0 > 0);
+    Assert(value1 > 0);
+
+    log_info("Value 0 from key: '%s' is '%llu'...\n", C_STR(test0), value0);
+    log_info("Value 1 from key: '%s' is '%llu'...\n", C_STR(test1), value1);
+    log_info("Value 2 from key: '%s' is '%llu'...\n", C_STR(test2), value2);
+
+    thing test_thing = {
+        1, 2, 3, 4, 5 
+    };
+
+    c_new_hash_table_insert_pair(&table, test_thing, test0);
+    thing *other_thing      = c_new_hash_table_get_value_ptr(&table, test0);
+    thing  copy_other_thing = c_new_hash_table_get_value(&table, test0);
+
+    (void)other_thing;
+    (void)copy_other_thing;
+
+    c_new_hash_table_clear_keyed_value(&table, test0);
+
+    getchar();
 }
