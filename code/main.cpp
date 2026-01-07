@@ -63,11 +63,9 @@ c_process_window_events(SDL_Window *window, vulkan_render_context_t *render_cont
 int
 main(int argc, char **argv)
 {
-    game_state_t *state = Alloc(game_state_t);
-    ZeroStruct(*state);
-
+    game_state_t            *state          = Alloc(game_state_t);
     vulkan_render_context_t *render_context = Alloc(vulkan_render_context_t);
-    ZeroStruct(*render_context);
+    asset_manager_t         *asset_manager  = Alloc(asset_manager_t);
 
     state->window_size = vec2(600, 600);
     if(SDL_Init(SDL_INIT_VIDEO))
@@ -80,11 +78,11 @@ main(int argc, char **argv)
         {
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
         }
+        gc_setup();
 
         render_context->window = state->window;
         r_renderer_init(render_context, state->window_size);
-
-        gc_setup();
+        s_asset_manager_init(asset_manager);
         s_nt_socket_api_init(state, argc, argv);
 
         input_manager_t input_manager = {};

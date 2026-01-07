@@ -25,8 +25,6 @@
 #include <p_platform_data.h>
 
 #include <s_asset_manager.h>
-#include <r_asset_texture.h>
-#include <r_asset_dynamic_render_font.h>
 
 #include <c_globals.cpp>
 #include <c_zone_allocator.cpp>
@@ -48,7 +46,7 @@ asset_packer_write_file(void)
         packer_entry_index < packer_state.next_entry_to_write;
         ++packer_entry_index)
     {
-        asset_package_entry_t *entry = &packer_state.entries[packer_entry_index];
+        asset_file_package_entry_t *entry = &packer_state.entries[packer_entry_index];
 
         entry->data_offset_from_start_of_file = offset;
         offset += entry->entry_data.count;
@@ -70,7 +68,7 @@ asset_packer_write_file(void)
         packer_entry_index < packer_state.next_entry_to_write;
         ++packer_entry_index)
     {
-        asset_package_entry_t *entry = packer_state.entries + packer_entry_index;
+        asset_file_package_entry_t *entry = packer_state.entries + packer_entry_index;
         bool8 success = c_file_write_string(&packer_state.asset_file_handle, entry->entry_data);
         if(!success)
         {
@@ -103,7 +101,7 @@ asset_packer_write_file(void)
         packer_entry_index < packer_state.next_entry_to_write;
         ++packer_entry_index)
     {
-        asset_package_entry_t *entry = &packer_state.entries[packer_entry_index];
+        asset_file_package_entry_t *entry = &packer_state.entries[packer_entry_index];
 
         c_string_builder_append_value(&packer_state.table_of_contents, &entry->name.count,                     sizeof(u32));
         c_string_builder_append_value(&packer_state.table_of_contents,  entry->name.data,                      entry->name.count);
@@ -131,7 +129,7 @@ asset_file_add_entry(string_t     filename,
                      asset_type_t type)
 {
     // NOTE(Sleepster): zeroth entry is null 
-    asset_package_entry_t *entry = packer_state.entries + packer_state.next_entry_to_write;
+    asset_file_package_entry_t *entry = packer_state.entries + packer_state.next_entry_to_write;
     u64 ID = c_fnv_hash_value(filename.data, filename.count, default_fnv_hash_value);
 
     entry->name       = c_string_make_copy(&packer_state.packer_arena, filename);
@@ -166,7 +164,7 @@ VISIT_FILES(get_resource_dir_files)
     {
         type = AT_BITMAP;
     }
-    else if(c_string_compare(file_ext, STR(".glsl")))
+    else if(c_string_compare(file_ext, STR(".spv")))
     {
         type = AT_SHADER;
     }

@@ -108,7 +108,8 @@ SHADER_OUTPUTS         = $(patsubst $(SHADER_DIR)/%.slang,../run_tree/res/shader
 # --------------------------------------------
 .PHONY: all game_out asset_file_packer tests shaders clean
 
-all: game_out asset_file_packer shaders tests
+# asset_file_packer
+all: game_out  shaders tests
 
 # -------------------------------------------------------------------------
 # Create Build Directory 
@@ -143,7 +144,7 @@ $(BUILD_DIR)/test_%$(EXE_EXT): ../code/tests/%.cpp | $(BUILD_DIR)
 asset_file_packer: $(ASSET_FILE_PACKER_OUT)
 
 $(ASSET_FILE_PACKER_OUT): $(ASSET_FILE_PACKER_SRC) | ../build
-    @echo [ASSET FILE PACKER]: $@
+	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) $< $(GAME_EXTERNAL_LIBRARIES) -o $@ -MMD -MF ../build/asset_file_packer.d
 
 # -------------------------------------------------------------------------

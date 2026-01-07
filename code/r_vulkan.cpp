@@ -22,6 +22,8 @@
 
 #include <r_vulkan.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_PNG
 #include <stb/stb_image.h>
 
 struct vertex_t
@@ -1264,7 +1266,6 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
         ++uniform_index)
     {
         vulkan_shader_uniform_data_t *uniform_data  = uniform_array[uniform_index];
-        //VkWriteDescriptorSet         *current_write = writes + uniform_index;
             
         Assert(uniform_data->owner_shader_id == shader->shader_id);
         Assert(uniform_data->set_type      != SDS_Instance);
@@ -1902,7 +1903,7 @@ r_new_asset_texture_create(vulkan_render_context_t *render_context, memory_arena
 
     // NOTE(Sleepster): Sampler creation 
     // TODO(Sleepster): 
-    // GO ON BART, SAY THE WORD! 
+    // Say the line Bart! 
     //
     // sighhh configurable... 
     //

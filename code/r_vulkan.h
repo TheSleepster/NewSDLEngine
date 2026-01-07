@@ -37,6 +37,7 @@
 typedef struct vulkan_image_data vulkan_image_data_t;
 typedef struct vulkan_texture
 {
+    // TODO(Sleepster): This stuff can go into the actual texture, but the VkSampler and the imagedata can stay. 
     u32                  width;
     u32                  height;
     u32                  channel_count;
@@ -45,7 +46,6 @@ typedef struct vulkan_texture
     vulkan_image_data_t *image_data;
     VkSampler            sampler;
 }vulkan_texture_t;
-
 // TODO: TEMPORARY
 
 // NOTE(Sleepster): Nvidia needs 256 byte alignment

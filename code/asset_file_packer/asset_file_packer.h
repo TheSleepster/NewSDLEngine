@@ -22,8 +22,6 @@
 #include <p_platform_data.h>
 
 #include <s_asset_manager.h>
-#include <r_asset_texture.h>
-#include <r_asset_dynamic_render_font.h>
 
 #define ASSET_FILE_MAGIC_VALUE(a, b, c, d) (((u32)(a) << 0) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
 #define ASSET_FILE_VERSION 1UL
@@ -48,7 +46,7 @@ typedef struct asset_file_table_of_contents
     u64 reserved[6];
 }asset_file_table_of_contents_t;
 
-typedef struct asset_package_entry
+typedef struct asset_file_package_entry
 {
     string_t     name;
     string_t     filepath;
@@ -58,29 +56,28 @@ typedef struct asset_package_entry
     asset_type_t type;
 
     u64          data_offset_from_start_of_file;
-}asset_package_entry_t;
+}asset_file_package_entry_t;
 #pragma pack(pop)
 
 typedef struct packer_state
 {
-    string_t              resource_dir_path;
-    string_t              output_dir;
-    string_t              packed_file_name;
-    string_t              file_extension;
+    string_t                   resource_dir_path;
+    string_t                   output_dir;
+    string_t                   packed_file_name;
+    string_t                   file_extension;
 
-    memory_arena_t        packer_arena;
-    file_t                asset_file_handle;
+    memory_arena_t             packer_arena;
+    file_t                     asset_file_handle;
 
-    string_builder_t      header;
-    string_builder_t      data;
-    string_builder_t      table_of_contents;
+    string_builder_t           header;
+    string_builder_t           data;
+    string_builder_t           table_of_contents;
 
-    asset_package_entry_t entries[4096];
-    u32                   next_entry_to_write;
-    u32                   next_entry_ID;
-    u32                   entry_count;
+    asset_file_package_entry_t entries[4096];
+    u32                        next_entry_to_write;
+    u32                        next_entry_ID;
+    u32                        entry_count;
 }packer_state_t;
-
 
 #endif // ASSET_FILE_PACKER_H
 
