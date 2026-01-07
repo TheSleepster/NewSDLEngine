@@ -37,16 +37,15 @@ struct thing
     u32 value3;
 };
 
-internal_api 
 C_HASH_TABLE_ALLOCATE_IMPL(memory_arena_hash_allocate)
 {
     void *result = null;
     result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
+    log_info("Arena allocated stuff...\n");
 
     return(result);
 }
 
-internal_api 
 C_HASH_TABLE_FREE_IMPL(memory_arena_hash_free)
 {
     return;

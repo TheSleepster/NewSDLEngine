@@ -90,8 +90,15 @@ struct {                                     \
            "Failure to get the correct size of the hash table's type...\n");                                                                            \
                                                                                                                                                         \
     (hash_table_ptr)->allocator   = GET_HASH_ALLOC(0, ##__VA_ARGS__, NULL);                                                                             \
-    (hash_table_ptr)->allocate_fn = GET_HASH_ALLOC_FN(0, ##__VA_ARGS__, c_hash_table_default_alloc_impl, NULL);                                         \
-    (hash_table_ptr)->free_fn     = GET_HASH_FREE_FN(0, ##__VA_ARGS__, NULL, c_hash_table_default_free_impl, NULL);                                     \
+    (hash_table_ptr)->allocate_fn = GET_HASH_ALLOC_FN(0, ##__VA_ARGS__,                                                                                 \
+                                                      c_hash_table_default_alloc_impl,                                                                  \
+                                                      c_hash_table_default_alloc_impl);                                                                 \
+                                                                                                                                                        \
+    (hash_table_ptr)->free_fn = GET_HASH_FREE_FN(0, ##__VA_ARGS__,                                                                                      \
+                                                 c_hash_table_default_free_impl,                                                                        \
+                                                 c_hash_table_default_free_impl,                                                                        \
+                                                 c_hash_table_default_free_impl);                                                                       \
+                                                                                                                                                        \
     Expect((hash_table_ptr)->allocate_fn, "Hash table alloc function pointer is null...\n");                                                            \
                                                                                                                                                         \
     typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;                                                                                             \
@@ -106,7 +113,7 @@ struct {                                     \
     (hash_table_ptr)->header.debug_id = HASH_TABLE_DEBUG_ID;                                                                                            \
 }while(0)
 
-// TODO(Sleepster): Copy key? 
+// TODO(Sleepster): Option to copy key and heap allocate it?
 #define c_hash_table_insert_pair(hash_table_ptr, value, key) do {                                                   \
     Expect((hash_table_ptr)->header.debug_id == HASH_TABLE_DEBUG_ID,                                                \
            "Hash table is invalid... the debug_id doesn't match...\n");                                             \
