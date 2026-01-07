@@ -73,7 +73,7 @@
             "terminal": "integrated"
         },
         {
-            "name": "test_new_hash_table",
+            "name": "new_hash_table",
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/build/test_new_hash_table",
