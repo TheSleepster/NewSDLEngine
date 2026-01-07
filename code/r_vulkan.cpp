@@ -3111,7 +3111,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         SDL_Quit();
     }
     platform_extension_count += 1;
-    DynArray(char*) extensions = c_dynarray_create(char*);
+    DynArray_t(char*) extensions = c_dynarray_create(char*);
     extensions = c_dynarray_reserve(extensions, platform_extension_count);
 
     // NOTE(Sleepster): DEBUG LAYERS 
@@ -3119,13 +3119,13 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     memcpy((byte*)extensions + sizeof(char *), SDL_extensions, (platform_extension_count - 1) * sizeof(char *));
 
     const char *layer = "VK_LAYER_KHRONOS_validation\0";
-    DynArray(char*) validation_layers = c_dynarray_create(char*);
+    DynArray_t(char*) validation_layers = c_dynarray_create(char*);
     c_dynarray_push(validation_layers, layer);
 
     u32 total_validation_layers = 0;
     vkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, 0));
 
-    DynArray(VkLayerProperties) found_validation_layers = c_dynarray_create(VkLayerProperties);
+    DynArray_t(VkLayerProperties) found_validation_layers = c_dynarray_create(VkLayerProperties);
     found_validation_layers = c_dynarray_reserve(found_validation_layers, total_validation_layers);
 
     vkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, found_validation_layers));

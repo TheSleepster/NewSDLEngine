@@ -28,7 +28,7 @@ s_asset_manager_init(asset_manager_t *asset_manager)
     {
         asset_catalog *catalog = asset_manager->asset_catalogs + catalog_index;
         catalog->asset_manager = asset_manager;
-        catalog->asset_lookup  = c_hash_table_create_ma(&asset_manager->manager_arena, ASSET_CATALOG_MAX_LOOKUPS, sizeof(asset_slot_t));
+        //catalog->asset_lookup  = c_hash_table_create_ma(&asset_manager->manager_arena, ASSET_CATALOG_MAX_LOOKUPS, sizeof(asset_slot_t));
     }
 
     // NOTE(Sleepster): Hard coded because it won't really matter anyway since there will be like only 4 of them in the future; 
@@ -77,8 +77,8 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
                                               ZA_TAG_STATIC);
 
         header = (asset_file_header_t*)header_data.data;
-        Expect(asset_file->header_data->magic_value == ASSET_FILE_MAGIC_VALUE('W', 'A', 'D', ' '), "Asset file: '%s' does not have the value magic number 'WAD '...\n",
-               C_STR(asset_file->file_info.file_name));
+        Expect(asset_file->header_data->magic_value == ASSET_FILE_MAGIC_VALUE('W', 'A', 'D', ' '), 
+               "Asset file: '%s' does not have the value magic number 'WAD '...\n", C_STR(asset_file->file_info.file_name));
         
         string_t table_of_contents_data = c_file_read(&asset_file->file_info, 
                                                       sizeof(asset_file_table_of_contents_t), 
@@ -87,10 +87,10 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
                                                       asset_file->file_allocator,
                                                       ZA_TAG_STATIC);
         table_of_contents = (asset_file_table_of_contents_t*)table_of_contents_data.data;
-        Expect(table_of_contents->magic_value == ASSET_FILE_MAGIC_VALUE('t', 'o', 'c', 'd'), "Asset file: '%s' does not have the valid TOC magic value of 'tocd'...\n",
-               C_STR(asset_file->file_info.file_name));
-        Expect(table_of_contents->entry_count > 0, "Asset file: '%s' has an entry count of zero...\n", C_STR(asset_file->file_info.file_name));
+        Expect(table_of_contents->magic_value == ASSET_FILE_MAGIC_VALUE('t', 'o', 'c', 'd'), 
+               "Asset file: '%s' does not have the valid TOC magic value of 'tocd'...\n", C_STR(asset_file->file_info.file_name));
 
+        Expect(table_of_contents->entry_count > 0, "Asset file: '%s' has an entry count of zero...\n", C_STR(asset_file->file_info.file_name));
         asset_file->package_entries_offset = header->offset_to_table_of_contents + sizeof(asset_file_table_of_contents_t);
 
         // TODO(Sleepster): Type safe hash tables 

@@ -11,6 +11,9 @@
 #include <c_math.h>
 #include <c_string.h>
 
+#define HASH_TABLE_IMPLEMENTATION
+#include <c_hash_table.h>
+
 #include <c_dynarray.h>
 
 #include <p_platform_data.h>
@@ -24,9 +27,6 @@
 #include <c_file_watcher.cpp>
 #include <c_zone_allocator.cpp>
 
-#define NEW_HASH_TABLE_IMPLEMENTATION
-#include <c_new_hash_table.h>
-
 struct thing
 {
     u32 ID;
@@ -37,23 +37,38 @@ struct thing
     u32 value3;
 };
 
+internal_api 
+C_HASH_TABLE_ALLOCATE_IMPL(memory_arena_hash_allocate)
+{
+    void *result = null;
+    result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
+
+    return(result);
+}
+
+internal_api 
+C_HASH_TABLE_FREE_IMPL(memory_arena_hash_free)
+{
+    return;
+}
+
 int
 main()
 {
-    memory_arena_t arena = c_arena_create(MB(50));
-    HashTable(thing, string_t) table;
-    c_new_hash_table_init(&table, 4096, &arena);
+    HashTable_t(thing, string_t) table;
+    c_hash_table_init(&table, 4096);
 
     string_t test0 = STR("Egg");
     string_t test1 = STR("Egg");
     string_t test2 = STR("Ain't nobody got time for that");
 
-    u64 value0 = c_new_hash_table_value_from_key(test0.data, test0.count, table.header.max_entries);
-    u64 value1 = c_new_hash_table_value_from_key(test1.data, test1.count, table.header.max_entries);
-    u64 value2 = c_new_hash_table_value_from_key(test1.data, test1.count, table.header.max_entries);
+    u64 value0 = c_hash_table_value_from_key(test0.data, test0.count, table.header.max_entries);
+    u64 value1 = c_hash_table_value_from_key(test1.data, test1.count, table.header.max_entries);
+    u64 value2 = c_hash_table_value_from_key(test1.data, test1.count, table.header.max_entries);
 
     Assert(value0 > 0);
     Assert(value1 > 0);
+    Assert(value2 > 0);
 
     log_info("Value 0 from key: '%s' is '%llu'...\n", C_STR(test0), value0);
     log_info("Value 1 from key: '%s' is '%llu'...\n", C_STR(test1), value1);
@@ -63,14 +78,18 @@ main()
         1, 2, 3, 4, 5 
     };
 
-    c_new_hash_table_insert_pair(&table, test_thing, test0);
-    thing *other_thing      = c_new_hash_table_get_value_ptr(&table, test0);
-    thing  copy_other_thing = c_new_hash_table_get_value(&table, test0);
+    c_hash_table_insert_pair(&table, test_thing, test0);
+    thing *other_thing      = c_hash_table_get_value_ptr(&table, test0);
+    thing  copy_other_thing = c_hash_table_get_value(&table, test0);
 
     (void)other_thing;
     (void)copy_other_thing;
 
-    c_new_hash_table_clear_keyed_value(&table, test0);
+    c_hash_table_clear_keyed_value(&table, test0);
+
+    memory_arena_t arena = c_arena_create(MB(50));
+    HashTable_t(thing, string_t) arena_hash;
+    c_hash_table_init(&arena_hash, 4096, &arena, memory_arena_hash_allocate, null);
 
     getchar();
 }

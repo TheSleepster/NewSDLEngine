@@ -126,7 +126,7 @@ typedef struct input_manager
     u32                        connected_controller_count;
     input_controller_t         controllers[MAX_INPUT_CONTROLLERS];
 
-    DynArray(game_action_t)   game_actions;
+    DynArray_t(game_action_t)  game_actions;
 }input_manager_t;
 
 /*===========================================

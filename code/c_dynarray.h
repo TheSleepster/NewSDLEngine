@@ -29,7 +29,7 @@ StaticAssert(sizeof(dynarray_header_t) % 16 == 0, "Dynamic Array header must be 
 #define DYNARRAY_INITIAL_SIZE  (4)
 #define DYNARRAY_GROWTH_FACTOR (2)
 
-#define DynArray(type) TypeOf((type*)null)
+#define DynArray_t(type) TypeOf((type*)null)
 
 void* _dynarray_create_impl(u32 element_size);
 void  _dynarray_destroy_impl(void **array);
@@ -129,7 +129,7 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
 })
 
 #define c_dynarray_copy(A, B) ({ \
-    StaticAssert(TypesCompatible(*(A), *(B)), "arrays are not of equal type");       \
+    StaticAssert(TypesSame(*(A), *(B)), "arrays are not of equal type");             \
     Expect(A, "First argument to c_dynarray_copy is invalid...\n")                   \
     dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(A);             \
     if(!B) {                                                                         \

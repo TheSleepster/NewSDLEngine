@@ -94,11 +94,11 @@ typedef struct asset_slot
 typedef struct asset_manager asset_manager_t;
 typedef struct asset_catalog
 {
-    u32               ID;
-    asset_type_t      catalog_type;
-    hash_table_t      asset_lookup;
+    u32                                 ID;
+    asset_type_t                        catalog_type;
+    asset_manager_t                     *asset_manager;
 
-    asset_manager_t  *asset_manager;
+    HashTable_t(asset_slot_t, string_t) asset_lookup;
 }asset_catalog_t;
 
 typedef struct asset_file_header asset_file_header_t;

@@ -16,7 +16,7 @@
 int
 main(void)
 {
-    DynArray(u32) test_elements = null;
+    DynArray_t(u32) test_elements = null;
     u32 element0 = 15;
 
     test_elements = c_dynarray_create(u32);
@@ -45,7 +45,7 @@ main(void)
     printf("success!\n");
 
     printf("testing copying...\n");
-    DynArray(u32) test_elements2 = null;
+    DynArray_t(u32) test_elements2 = null;
     c_dynarray_copy(test_elements, test_elements2);
     printf("success...\n");
     printf("element at index 2 in new array: '%d'...\n", test_elements2[2]);
