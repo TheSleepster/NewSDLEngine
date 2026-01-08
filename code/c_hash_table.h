@@ -54,12 +54,11 @@ typedef struct hash_table_header
 }hash_table_header_t;
 StaticAssert(sizeof(hash_table_header_t) % 16 == 0, "Hash table header must be 16 byte aligned...\n");
 
-// NOTE(Sleepster): Key -> Value 
-#define HashTable_t(key_type, stored_type)   \
+#define HashTable_t(stored_type)             \
 struct {                                     \
     hash_table_header_t header;              \
     stored_type        *data;                \
-    key_type           *keys;                \
+    string_t           *keys;                \
                                              \
     void                       *allocator;   \
     c_hash_table_allocate_fn_t *allocate_fn; \
@@ -120,40 +119,39 @@ struct {                                     \
 }while(0)
 
 // TODO(Sleepster): Option to copy key and heap allocate it?
-#define c_hash_table_insert_pair(hash_table_ptr, key, value) do {                                                   \
-    Expect((hash_table_ptr)->header.debug_id == HASH_TABLE_DEBUG_ID,                                                \
-           "Hash table is invalid... the debug_id doesn't match...\n");                                             \
-                                                                                                                    \
-    typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;                                                         \
-    typedef TypeOf(*((hash_table_ptr)->keys)) key_type_t;                                                           \
-                                                                                                                    \
-    key_type_t   *key_array   = (hash_table_ptr)->keys;                                                             \
-    table_type_t *value_array = (hash_table_ptr)->data;                                                             \
-                                                                                                                    \
-    StaticAssert(TypesSame(*value_array, value), "Value types within the table are not the same...\n");             \
-    StaticAssert(TypesSame(*key_array,   key),   "Key types within the table are not the same...\n");               \
-                                                                                                                    \
-    u64 index = c_hash_table_value_from_key((byte*)&key, sizeof(key_type_t), (hash_table_ptr)->header.max_entries); \
-    Assert(index > 0);                                                                                              \
-                                                                                                                    \
-    key_array[index]   = key;                                                                                       \
-    value_array[index] = value;                                                                                     \
-    (hash_table_ptr)->header.current_entry_count++;                                                                 \
+#define c_hash_table_insert_pair(hash_table_ptr, key, value) do {                                           \
+    Expect((hash_table_ptr)->header.debug_id == HASH_TABLE_DEBUG_ID,                                        \
+           "Hash table is invalid... the debug_id doesn't match...\n");                                     \
+                                                                                                            \
+    typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;                                                 \
+    typedef TypeOf(*((hash_table_ptr)->keys)) key_type_t;                                                   \
+                                                                                                            \
+    key_type_t   *key_array   = (hash_table_ptr)->keys;                                                     \
+    table_type_t *value_array = (hash_table_ptr)->data;                                                     \
+                                                                                                            \
+    StaticAssert(TypesSame(*value_array, value), "Value types within the table are not the same...\n");     \
+    StaticAssert(TypesSame(*key_array,   key),   "Key types within the table are not the same...\n");       \
+                                                                                                            \
+    u64 index = c_hash_table_value_from_key((key).data, (key).count, (hash_table_ptr)->header.max_entries); \
+    Assert(index > 0);                                                                                      \
+                                                                                                            \
+    key_array[index]   = key;                                                                               \
+    value_array[index] = value;                                                                             \
+    (hash_table_ptr)->header.current_entry_count++;                                                         \
 }while(0)
 
-#define c_hash_table_get_value_ptr(hash_table_ptr, key) ({                                                          \
-    Expect((hash_table_ptr)->header.debug_id == HASH_TABLE_DEBUG_ID,                                                \
-           "Hash table is invalid... the debug_id doesn't match...\n");                                             \
-                                                                                                                    \
-    typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;                                                         \
-    typedef TypeOf(*((hash_table_ptr)->keys)) key_type_t;                                                           \
-                                                                                                                    \
-    u64 index = c_hash_table_value_from_key((byte*)&key, sizeof(key_type_t), (hash_table_ptr)->header.max_entries); \
-    Assert(index > 0);                                                                                              \
-                                                                                                                    \
-    table_type_t *result = (hash_table_ptr)->data + index;                                                          \
-                                                                                                                    \
-    result;                                                                                                         \
+#define c_hash_table_get_value_ptr(hash_table_ptr, key) ({                                                  \
+    Expect((hash_table_ptr)->header.debug_id == HASH_TABLE_DEBUG_ID,                                        \
+           "Hash table is invalid... the debug_id doesn't match...\n");                                     \
+                                                                                                            \
+    typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;                                                 \
+                                                                                                            \
+    u64 index = c_hash_table_value_from_key((key).data, (key).count, (hash_table_ptr)->header.max_entries); \
+    Assert(index > 0);                                                                                      \
+                                                                                                            \
+    table_type_t *result = (hash_table_ptr)->data + index;                                                  \
+                                                                                                            \
+    result;                                                                                                 \
 })
 
 #define c_hash_table_get_value(hash_table_ptr, key) ({                      \

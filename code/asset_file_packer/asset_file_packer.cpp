@@ -65,6 +65,7 @@ asset_packer_write_file(void)
 
     c_string_builder_write_to_file(&packer_state.asset_file_handle, &packer_state.header);
 
+    u64 package_data_segment_size = 0;
     for(u32 packer_entry_index = 0;
         packer_entry_index < packer_state.next_entry_to_write;
         ++packer_entry_index)
@@ -75,11 +76,15 @@ asset_packer_write_file(void)
         {
             log_error("Failed to write entry: '%d'(%s) to the file...\n", packer_entry_index, entry->name);
         }
+        package_data_segment_size += sizeof(asset_file_package_entry_t); 
+        package_data_segment_size += entry->name.count;
+        package_data_segment_size += entry->filepath.count;
     }
 
     asset_file_table_of_contents_t table_of_contents = {};
     table_of_contents.magic_value = ASSET_FILE_MAGIC_VALUE('t', 'o', 'c', 'd');
     table_of_contents.entry_count = packer_state.next_entry_to_write;
+    table_of_contents.package_segment_size = package_data_segment_size;
 
     c_string_builder_append_value(&packer_state.table_of_contents, &table_of_contents, sizeof(asset_file_table_of_contents_t));
 

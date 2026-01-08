@@ -88,6 +88,7 @@ main(int argc, char **argv)
         s_nt_socket_api_init(state, argc, argv);
 
         s_asset_manager_load_asset_file(asset_manager, STR("asset_data.wad"));
+        asset_handle_t handle = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
 
         input_manager_t input_manager = {};
         s_im_init_input_manager(&input_manager);

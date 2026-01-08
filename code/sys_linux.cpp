@@ -624,17 +624,13 @@ sys_mutex_free(sys_mutex_t *mutex)
 }
 
 bool8
-sys_mutex_lock(sys_mutex_t *mutex, bool8 should_block)
+sys_mutex_lock(sys_mutex_t *mutex, const bool8 should_block)
 {
     bool8 result = false;
-    if(should_block)
-    {
-        SDL_LockMutex(mutex->handle);
-        result = true;
-    }
-    else
+    while(result == false)
     {
         result = SDL_TryLockMutex(mutex->handle);
+        if(!should_block) break;
     }
     return(result);
 }

@@ -46,8 +46,9 @@ internal_api void*
 c_file_allocate_file_data(memory_arena_t *arena, zone_allocator_t *zone, za_allocation_tag_t tag, u32 allocation_size)
 {
     void *result = null;
-    if(arena != null) result = c_arena_push_size(arena, allocation_size);
-    if(zone  != null) result = c_za_alloc(zone, allocation_size, tag);
+    if(arena  != null) result = c_arena_push_size(arena, allocation_size);
+    if(zone   != null) result = c_za_alloc(zone, allocation_size, tag);
+    if(result == null) result = AllocSize(allocation_size);
     Assert(result != null);
 
     return(result);

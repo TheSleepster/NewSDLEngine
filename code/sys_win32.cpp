@@ -599,7 +599,7 @@ sys_mutex_free(sys_mutex_t *mutex)
 }
 
 bool8
-sys_mutex_lock(sys_mutex_t *mutex, bool8 should_block)
+sys_mutex_lock(sys_mutex_t *mutex, const bool8 should_block)
 {
     Assert(mutex);
     bool8 result = false;

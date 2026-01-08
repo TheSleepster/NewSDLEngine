@@ -53,6 +53,9 @@ byte*
 c_za_alloc(zone_allocator_t *zone, u64 size_init, za_allocation_tag_t tag)
 {
     byte *result = null;
+    bool8 locked = sys_mutex_lock(&zone->mutex, true);
+    Assert(locked);
+
     u64 size = (size_init + 15) & ~15;
     size     = size + sizeof(zone_allocator_block_t);
 
@@ -122,6 +125,8 @@ c_za_alloc(zone_allocator_t *zone, u64 size_init, za_allocation_tag_t tag)
     memset(result, 0, size - sizeof(zone_allocator_block_t));
 
     log_info("Zone Allocated: %d bytes...\n", size);
+    sys_mutex_unlock(&zone->mutex);
+
     return(result);
 }
 
