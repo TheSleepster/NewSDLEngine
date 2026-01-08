@@ -41,7 +41,6 @@ C_HASH_TABLE_ALLOCATE_IMPL(memory_arena_hash_allocate)
 {
     void *result = null;
     result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
-    log_info("Arena allocated stuff...\n");
 
     return(result);
 }
@@ -54,7 +53,7 @@ C_HASH_TABLE_FREE_IMPL(memory_arena_hash_free)
 int
 main()
 {
-    HashTable_t(thing, string_t) table;
+    HashTable_t(string_t, thing) table;
     c_hash_table_init(&table, 4096);
 
     string_t test0 = STR("Egg");
@@ -87,7 +86,7 @@ main()
     c_hash_table_clear_keyed_value(&table, test0);
 
     memory_arena_t arena = c_arena_create(MB(50));
-    HashTable_t(thing, string_t) arena_hash;
+    HashTable_t(string_t, thing) arena_hash;
     c_hash_table_init(&arena_hash, 4096, &arena, memory_arena_hash_allocate, null);
 
     getchar();

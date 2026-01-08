@@ -18,6 +18,15 @@
 
 #include <r_vulkan.h>
 
+internal_api
+C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
+{
+    void *result = null;
+    result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
+
+    return(result);
+}
+
 void
 s_asset_manager_init(asset_manager_t *asset_manager)
 {
@@ -28,7 +37,10 @@ s_asset_manager_init(asset_manager_t *asset_manager)
     {
         asset_catalog *catalog = asset_manager->asset_catalogs + catalog_index;
         catalog->asset_manager = asset_manager;
-        //catalog->asset_lookup  = c_hash_table_create_ma(&asset_manager->manager_arena, ASSET_CATALOG_MAX_LOOKUPS, sizeof(asset_slot_t));
+        c_hash_table_init(&catalog->asset_lookup, 
+                           ASSET_CATALOG_MAX_LOOKUPS, 
+                          &asset_manager->manager_arena, 
+                           asset_manager_hash_arena_allocate);
     }
 
     // NOTE(Sleepster): Hard coded because it won't really matter anyway since there will be like only 4 of them in the future; 

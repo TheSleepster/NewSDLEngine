@@ -6,16 +6,19 @@
    ======================================================================== */
 #include <SDL3/SDL.h>
 
+#define MATH_IMPLEMENTATION
+#define HASH_TABLE_IMPLEMENTATION
 #include <c_types.h>
 #include <c_base.h>
 
-#define MATH_IMPLEMENTATION
 #include <c_math.h>
+#include <c_hash_table.h>
 #include <c_string.h>
 #include <c_dynarray.h>
 #include <c_threadpool.h>
 #include <c_log.h>
 #include <c_globals.h>
+
 #include <r_vulkan.h>
 
 #include <p_platform_data.h>

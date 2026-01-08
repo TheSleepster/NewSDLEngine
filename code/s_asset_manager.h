@@ -130,6 +130,7 @@ typedef struct asset_manager
     // Ex: "player.png" -> "/run_tree/res/main_asset_file.wad"
     // or even beter "player.png" -> index 0 of the asset_file array
     asset_manager_asset_file_data_t asset_files[ASSET_MANAGER_MAX_ASSET_FILES];
+    HashTable_t(string_t, s32)      asset_name_to_file;
     u32                             loaded_file_count;
 
     asset_catalog                   asset_catalogs[ASSET_MANAAGER_CATALOG_COUNT];

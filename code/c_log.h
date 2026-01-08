@@ -16,6 +16,7 @@
 
 typedef enum debug_log_level
 {
+    SL_LOG_DEBUG,
     SL_LOG_TRACE,
     SL_LOG_INFO,
     SL_LOG_WARNING,
@@ -25,6 +26,7 @@ typedef enum debug_log_level
 
 #define Log(log_level, message, ...) _log(log_level, message, __FUNCTION__, __FILE__, __LINE__, ##__VA_ARGS__)
 
+#define log_debug(message, ...)    Log(SL_LOG_DEBUG,   message, ##__VA_ARGS__)
 #define log_trace(message, ...)    Log(SL_LOG_TRACE,   message, ##__VA_ARGS__)
 #define log_info(message, ...)     Log(SL_LOG_INFO,    message, ##__VA_ARGS__)
 #define log_warning(message, ...)  Log(SL_LOG_WARNING, message, ##__VA_ARGS__)
@@ -38,16 +40,17 @@ _log(debug_log_level_t log_level,
      const char       *file, 
      s32               line, ...)
 {
-    const char *info_strings[] = {"[TRACE]: ", "[INFO]: ", "[WARNING]:", "[NON-FATAL ERROR]: ", "[FATAL ERROR]: "};
-    const char *color_schemes[]  =
+    const char *info_strings[]  = {"[DEBUG]: ", "[TRACE]: ", "[INFO]: ", "[WARNING]:", "[NON-FATAL ERROR]: ", "[FATAL ERROR]: "};
+    const char *color_schemes[] =
     {
+        "\033[94m",                // LOG_DEBUG: Bright Blue
         "\033[36m",                // LOG_TRACE:   Teal
         "\033[32m",                // LOG_INFO:    Green
         "\033[33m",                // LOG_WARNING: Yellow
         "\033[31m",                // LOG_ERROR:   Red
         "\033[1m\033[101m\033[30m" // LOG_FATAL:   Bold, bright red bg, true black text
     };
-    bool8 is_error = (log_level > 1);
+    bool8 is_error = (log_level > SL_LOG_INFO);
 
     char buffer[32000];
     memset(buffer, 0, sizeof(buffer));
