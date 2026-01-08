@@ -120,7 +120,7 @@ struct {                                     \
 }while(0)
 
 // TODO(Sleepster): Option to copy key and heap allocate it?
-#define c_hash_table_insert_pair(hash_table_ptr, value, key) do {                                                   \
+#define c_hash_table_insert_pair(hash_table_ptr, key, value) do {                                                   \
     Expect((hash_table_ptr)->header.debug_id == HASH_TABLE_DEBUG_ID,                                                \
            "Hash table is invalid... the debug_id doesn't match...\n");                                             \
                                                                                                                     \

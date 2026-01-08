@@ -108,8 +108,8 @@ SHADER_OUTPUTS         = $(patsubst $(SHADER_DIR)/%.slang,../run_tree/res/shader
 # --------------------------------------------
 .PHONY: all game_out asset_file_packer tests shaders clean
 
-# asset_file_packer
-all: game_out  shaders tests
+
+all: game_out asset_file_packer shaders tests
 
 # -------------------------------------------------------------------------
 # Create Build Directory 

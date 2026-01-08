@@ -23,11 +23,18 @@
 #define ASSET_CATALOG_MAX_LOOKUPS     (4096)
 #define ASSET_MANAGER_MAX_ASSET_FILES (32)
 
+typedef struct asset_file_header asset_file_header_t;
+typedef struct asset_file_table_of_contents asset_file_table_of_contents_t;
+typedef struct asset_file_package_entry asset_file_package_entry_t;
+typedef struct asset_manager asset_manager_t;
+
 typedef enum asset_type
 {
     AT_Invalid,
     AT_Bitmap,
     AT_Shader,
+    AT_Font,
+    AT_Sound,
 }asset_type_t;
 
 typedef enum asset_slot_state
@@ -76,6 +83,7 @@ typedef struct shader
 
 typedef struct asset_slot 
 {
+    bool8                  is_valid;
     asset_type_t           type;
     asset_slot_load_status load_status;
     
@@ -91,30 +99,30 @@ typedef struct asset_slot
     };
 }asset_slot_t;
 
-typedef struct asset_manager asset_manager_t;
 typedef struct asset_catalog
 {
     u32                                 ID;
     asset_type_t                        catalog_type;
-    asset_manager_t                     *asset_manager;
+    asset_manager_t                    *asset_manager;
 
     HashTable_t(asset_slot_t, string_t) asset_lookup;
 }asset_catalog_t;
 
-typedef struct asset_file_header asset_file_header_t;
-typedef struct asset_file_table_of_contents asset_file_table_of_contents_t;
-typedef struct asset_file_package_entry asset_file_package_entry_t;
 typedef struct asset_manager_asset_file_data
 {
     bool8                          is_initialized;
+    memory_arena_t                 init_arena;
+
     asset_slot_load_status         load_status;
     file_t                         file_info;
 
     // NOTE(Sleepster): Everything lives and dies with this. 
-    zone_allocator_t              *file_allocator;
+    zone_allocator_t              *asset_allocator;
     string_t                       raw_file_data;
 
     asset_file_package_entry_t    *package_entries;
+    u32                            package_entry_count;
+    HashTable_t(string_t, s32)     entry_hash;
 
     asset_file_header_t            *header_data;
     asset_file_table_of_contents_t *table_of_contents;

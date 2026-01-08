@@ -10,7 +10,6 @@
 #define HASH_TABLE_IMPLEMENTATION
 #include <c_types.h>
 #include <c_base.h>
-
 #include <c_math.h>
 #include <c_hash_table.h>
 #include <c_string.h>
@@ -87,6 +86,8 @@ main(int argc, char **argv)
         r_renderer_init(render_context, state->window_size);
         s_asset_manager_init(asset_manager);
         s_nt_socket_api_init(state, argc, argv);
+
+        s_asset_manager_load_asset_file(asset_manager, STR("asset_data.wad"));
 
         input_manager_t input_manager = {};
         s_im_init_input_manager(&input_manager);

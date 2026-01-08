@@ -6,8 +6,9 @@
    ======================================================================== */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#define HASH_TABLE_IMPLEMENTATION
+#define MATH_IMPLEMENTATION
 #include <asset_file_packer/asset_file_packer.h>
 
 #include <c_base.h>
@@ -22,6 +23,7 @@
 #include <c_zone_allocator.h>
 #include <c_threadpool.h>
 #include <c_memory_arena.h>
+#include <c_hash_table.h>
 #include <p_platform_data.h>
 
 #include <s_asset_manager.h>
@@ -32,7 +34,6 @@
 #include <c_string.cpp>
 #include <c_dynarray_impl.cpp>
 #include <c_file_api.cpp>
-#include <c_hash_table.cpp>
 #include <c_file_watcher.cpp>
 #include <p_platform_data.cpp>
 
@@ -111,6 +112,7 @@ asset_packer_write_file(void)
         c_string_builder_append_value(&packer_state.table_of_contents,  entry->filepath.data,                  entry->filepath.count);
         c_string_builder_append_value(&packer_state.table_of_contents, &null_term,                             sizeof(s8));
 
+        // TODO(Sleepster): This should be "entry_data_length" 
         c_string_builder_append_value(&packer_state.table_of_contents, &entry->entry_data.count,               sizeof(u32));
         c_string_builder_append_value(&packer_state.table_of_contents, &entry->ID,                             sizeof(u32));
         c_string_builder_append_value(&packer_state.table_of_contents, &entry->file_ID,                        sizeof(u32));
@@ -130,12 +132,12 @@ asset_file_add_entry(string_t     filename,
 {
     // NOTE(Sleepster): zeroth entry is null 
     asset_file_package_entry_t *entry = packer_state.entries + packer_state.next_entry_to_write;
-    u64 ID = c_fnv_hash_value(filename.data, filename.count, default_fnv_hash_value);
+    u64 ID = c_hash_table_value_from_key((byte*)&filename, sizeof(string_t), ASSET_CATALOG_MAX_LOOKUPS);
 
     entry->name       = c_string_make_copy(&packer_state.packer_arena, filename);
     entry->filepath   = c_string_make_copy(&packer_state.packer_arena, filepath);
     entry->entry_data = c_string_make_copy(&packer_state.packer_arena, file_data);
-    entry->ID         = (ID % MANAGER_HASH_TABLE_SIZE + MANAGER_HASH_TABLE_SIZE) % MANAGER_HASH_TABLE_SIZE;
+    entry->ID         = ID;
     entry->file_ID    = packer_state.next_entry_to_write;
     entry->type       = type;
 
@@ -151,25 +153,25 @@ VISIT_FILES(get_resource_dir_files)
     string_t filename_no_ext = filename;
     filename_no_ext.count   -= file_ext.count;
 
-    asset_type_t type = AT_NONE;
+    asset_type_t type = AT_Invalid;
     if(c_string_compare(file_ext, STR(".ttf")))
     {
-        type = AT_FONT;
+        type = AT_Font;
     }
     else if(c_string_compare(file_ext, STR(".wav")))
     {
-        type = AT_SOUND;
+        type = AT_Sound;
     }
     else if(c_string_compare(file_ext, STR(".png")))
     {
-        type = AT_BITMAP;
+        type = AT_Bitmap;
     }
     else if(c_string_compare(file_ext, STR(".spv")))
     {
-        type = AT_SHADER;
+        type = AT_Shader;
     }
     
-    if(type != AT_NONE)
+    if(type != AT_Invalid)
     {
         string_t data = c_file_read_entirety(filepath);
         asset_file_add_entry(filename_no_ext, filepath, data, type);

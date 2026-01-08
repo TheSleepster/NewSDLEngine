@@ -42,32 +42,29 @@ c_file_copy(string_t old_path, string_t new_path)
     return(result);
 }
 
+internal_api void*
+c_file_allocate_file_data(memory_arena_t *arena, zone_allocator_t *zone, za_allocation_tag_t tag, u32 allocation_size)
+{
+    void *result = null;
+    if(arena != null) result = c_arena_push_size(arena, allocation_size);
+    if(zone  != null) result = c_za_alloc(zone, allocation_size, tag);
+    Assert(result != null);
+
+    return(result);
+}
+
 string_t
 c_file_read(file_t             *file_data, 
             u32                 bytes_to_read, 
-            u32                 offset, 
             memory_arena_t     *arena, 
             zone_allocator_t   *zone, 
             za_allocation_tag_t tag,
             bool8               create)
 {
     string_t result;
-    void *data = null;
-    if(arena)
-    {
-        data = c_arena_push_size(arena, bytes_to_read);
-    }
-    else if(zone)
-    {
-        data = c_za_alloc(zone, bytes_to_read, tag);
-    }
-    else
-    {
-        data = AllocArray(byte, bytes_to_read);
-    }
-    Assert(data != null);
+    void *memory = c_file_allocate_file_data(arena, zone, tag, bytes_to_read);
 
-    result.data  = (byte*)data;
+    result.data  = (byte*)memory;
     result.count = bytes_to_read;
     sys_file_read(file_data, result.data, result.count, file_data->current_read_offset); 
     file_data->current_read_offset += bytes_to_read;
@@ -84,8 +81,17 @@ c_file_read_from_offset(file_t             *file_data,
                         za_allocation_tag_t tag)
 {
     string_t result;
-    result = c_file_read(file_data, bytes_to_read, offset, arena, zone, tag, false);
-    Assert(result.data != null);
+    void *memory = c_file_allocate_file_data(arena, zone, tag, bytes_to_read);
+    result.data  = (byte*)memory;
+    result.count = bytes_to_read;
+
+    bool8 success = sys_file_read(file_data, memory, bytes_to_read, offset); 
+    if(!success)
+    {
+        result.count = 0;
+        log_error("Failure to read '%d' bytes from file '%s' with offset '%s'...\n",
+                  bytes_to_read, C_STR(file_data->file_name), bytes_to_read);
+    }
 
     return(result);
 }
@@ -100,7 +106,7 @@ c_file_read_to_end(file_t             *file_data,
     string_t result;
 
     u32 bytes_to_read = file_data->file_size - offset;
-    result = c_file_read(file_data, bytes_to_read, offset, arena, zone, tag);
+    result = c_file_read_from_offset(file_data, bytes_to_read, offset, arena, zone, tag);
     Assert(result.data != null);
 
     return(result);
@@ -118,7 +124,7 @@ c_file_read_entirety(string_t            filepath,
     Assert(file_data.handle != INVALID_FILE_HANDLE);
 
     s64 file_size    = c_file_get_size(&file_data);
-    result = c_file_read(&file_data, file_size, 0, arena, zone, tag, true);
+    result = c_file_read(&file_data, file_size, arena, zone, tag, true);
     if(result.data == null)
     {
         log_error("Failure to read file: '%s'...\n", C_STR(filepath));

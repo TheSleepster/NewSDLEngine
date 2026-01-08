@@ -76,7 +76,7 @@ main()
         1, 2, 3, 4, 5 
     };
 
-    c_hash_table_insert_pair(&table, test_thing, test0);
+    c_hash_table_insert_pair(&table, test0, test_thing);
     thing *other_thing      = c_hash_table_get_value_ptr(&table, test0);
     thing  copy_other_thing = c_hash_table_get_value(&table, test0);
 

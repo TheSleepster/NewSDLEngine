@@ -3516,8 +3516,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
                            render_context->rendering_device.graphics_command_pool, 
                            render_context->rendering_device.graphics_queue);
 
-    r_vulkan_buffer_upload(render_context, 
-                          &render_context->index_buffer, 
+    r_vulkan_buffer_upload(render_context, &render_context->index_buffer, 
                            indices,
                            sizeof(u32) * ArrayCount(indices), 
                            0, 

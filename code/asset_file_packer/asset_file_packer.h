@@ -46,6 +46,7 @@ typedef struct asset_file_table_of_contents
     u64 reserved[6];
 }asset_file_table_of_contents_t;
 
+// TODO(Sleepster): We should have seperate sturcts for what the packer expects and for what the recipient expects...
 typedef struct asset_file_package_entry
 {
     string_t     name;

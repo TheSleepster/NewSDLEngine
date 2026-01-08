@@ -111,7 +111,7 @@ bool8             c_file_close(file_t *file);
 bool8             c_file_copy(string_t old_path, string_t new_path);
 
 
-string_t          c_file_read(file_t *file_data, u32 bytes_to_read, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC, bool8 create = true);
+string_t          c_file_read(file_t *file_data, u32 bytes_to_read, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC, bool8 create = true);
 string_t          c_file_read_entirety(string_t filepath, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
 string_t          c_file_read_from_offset(file_t *file_data, u32 bytes_to_read, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
 string_t          c_file_read_to_end(file_t *file_data, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
