@@ -82,11 +82,11 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
         asset_file_table_of_contents_t *table_of_contents = null;
 
         string_t header_data = c_file_read(&asset_file->file_info, 
-                                              sizeof(asset_file_header_t), 
-                                              0, 
-                                              null,
-                                              asset_file->file_allocator,
-                                              ZA_TAG_STATIC);
+                                           sizeof(asset_file_header_t), 
+                                           0, 
+                                           null,
+                                           asset_file->file_allocator,
+                                           ZA_TAG_STATIC);
 
         header = (asset_file_header_t*)header_data.data;
         Expect(asset_file->header_data->magic_value == ASSET_FILE_MAGIC_VALUE('W', 'A', 'D', ' '), 
@@ -105,7 +105,7 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
         Expect(table_of_contents->entry_count > 0, "Asset file: '%s' has an entry count of zero...\n", C_STR(asset_file->file_info.file_name));
         asset_file->package_entries_offset = header->offset_to_table_of_contents + sizeof(asset_file_table_of_contents_t);
 
-        // TODO(Sleepster): Type safe hash tables 
+        c_hash_table_init(&asset_file->asset_lookup, ASSET_CATALOG_MAX_LOOKUPS);
     }
     else
     {
