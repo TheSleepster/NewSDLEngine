@@ -26,7 +26,7 @@
 
 #define FOURCC(string) (((u32)(string[0]) << 0) | ((u32)(string[1]) << 8) | ((u32)(string[2]) << 16) | ((u32)(string[3]) << 24))
 
-#define ASSET_FILE_HEADER_MAGIC (FOURCC("jfd "))
+#define ASSET_FILE_HEADER_MAGIC (0x20646A6A)
 #define ASSET_FILE_CHUNK_MAGIC  (FOURCC("entr"))
 
 #define ASSET_FILE_VERSION (010)
