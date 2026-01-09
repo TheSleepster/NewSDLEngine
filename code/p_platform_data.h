@@ -52,6 +52,7 @@ file_data_t   sys_file_get_modtime_and_size(string_t filepath);
 bool8         sys_file_replace_or_rename(string_t old_file, string_t new_file);
 
 bool8         sys_directory_exists(string_t filepath);
+bool8         sys_directory_get_current_working_dir(byte *buffer, u32 buffer_length);
 void          sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data);
 
 void*         sys_load_library(string_t filepath);

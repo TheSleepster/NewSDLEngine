@@ -18,15 +18,16 @@
 #include <c_hash_table.h>
 #include <c_threadpool.h>
 
-#include <r_vulkan.h>
-
 #define ASSET_CATALOG_MAX_LOOKUPS     (4099)
 #define ASSET_MANAGER_MAX_ASSET_FILES (32)
 
 typedef struct asset_file_header asset_file_header_t;
 typedef struct asset_file_table_of_contents asset_file_table_of_contents_t;
 typedef struct asset_file_package_entry asset_file_package_entry_t;
+typedef struct vulkan_shader_data vulkan_shader_data_t;
+typedef struct vulkan_texture vulkan_texture_t;
 typedef struct asset_manager asset_manager_t;
+typedef struct asset_slot asset_slot_t;
 
 typedef enum asset_type
 {
@@ -58,6 +59,24 @@ typedef enum bitmap_format
     BMF_Count,
 }bitmap_format_t;
 
+#include <r_vulkan.h>
+
+/* NOTE(Sleepster): 
+ * The Asset handle is very simple, it is simply a means to only do the expensive hash lookups once, 
+ * and then have a means to update the asset's state in a way that is much less expensive than the lookups
+ * themselves. All actions relating to the asset performed through the handle. Actions like these are such as:
+ * - Allocating from the asset file
+ * - Freeing the asset's data
+ */
+typedef struct asset_handle
+{
+    bool32        is_valid;
+    asset_type_t  type;
+    s32           owner_asset_file_index;
+
+    asset_slot_t *slot;
+}asset_handle_t;
+
 typedef struct bitmap
 {
     u32      width;
@@ -71,16 +90,16 @@ typedef struct bitmap
 
 typedef struct texture2D
 {
-    bitmap_t         bitmap;
-    vulkan_texture_t gpu_data;
+    bitmap_t          bitmap;
+    vulkan_texture_t  gpu_data;
     
     u32              current_generation;
 }texture2D_t;
 
 typedef struct shader 
 {
-    u32                  ID;
-    vulkan_shader_data_t shader_data;
+    u32                   ID;
+    vulkan_shader_data_t  shader_data;
 }shader_t;
 
 typedef struct asset_slot 
@@ -101,22 +120,6 @@ typedef struct asset_slot
         shader_t    shader;
     };
 }asset_slot_t;
-
-/* NOTE(Sleepster): 
- * The Asset handle is very simple, it is simply a means to only do the expensive hash lookups once, 
- * and then have a means to update the asset's state in a way that is much less expensive than the lookups
- * themselves. All actions relating to the asset performed through the handle. Actions like these are such as:
- * - Allocating from the asset file
- * - Freeing the asset's data
- */
-typedef struct asset_handle
-{
-    bool32        is_valid;
-    asset_type_t  type;
-    s32           owner_asset_file_index;
-
-    asset_slot_t *slot;
-}asset_handle_t;
 
 typedef struct asset_catalog
 {

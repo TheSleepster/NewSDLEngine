@@ -432,6 +432,23 @@ sys_file_replace_or_rename(string_t old_file, string_t new_file)
 }
 
 bool8
+sys_directory_get_current_working_dir(byte *buffer, u32 buffer_length)
+{
+    bool8 result = false;
+    if(getcwd((char*)buffer, buffer_length) != null)
+    {
+        result = true;
+    }
+    else
+    {
+        s32 error = errno;
+        log_error("Failure to get our current working directory... Error: '%s'...\n", strerror(error));
+    }
+
+    return(result);
+}
+
+bool8
 sys_directory_exists(string_t filepath)
 {
     bool8 result = false;

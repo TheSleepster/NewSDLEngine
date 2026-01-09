@@ -32,22 +32,6 @@
 // NOTE(Sleepster): Triple Buffering
 #define MAX_FRAMES_IN_FLIGHT (2)
 
-// TODO: TEMPORARY
-
-typedef struct vulkan_image_data vulkan_image_data_t;
-typedef struct vulkan_texture
-{
-    // TODO(Sleepster): This stuff can go into the actual texture, but the VkSampler and the imagedata can stay. 
-    u32                  width;
-    u32                  height;
-    u32                  channel_count;
-    u32                  current_generation;
-
-    vulkan_image_data_t *image_data;
-    VkSampler            sampler;
-}vulkan_texture_t;
-// TODO: TEMPORARY
-
 // NOTE(Sleepster): Nvidia needs 256 byte alignment
 typedef struct global_matrix_uniforms
 {
@@ -358,6 +342,23 @@ typedef struct vulkan_image_data
     u32            height;
 }vulkan_image_data_t;
 
+
+// TODO: TEMPORARY
+
+typedef struct vulkan_image_data vulkan_image_data_t;
+typedef struct vulkan_texture
+{
+    // TODO(Sleepster): this stuff can go into the actual texture, but the VkSampler and the imagedata can stay. 
+    u32                 width;
+    u32                 height;
+    u32                 channel_count;
+    u32                 current_generation;
+
+    vulkan_image_data_t image_data;
+    VkSampler           sampler;
+}vulkan_texture_t;
+// TODO: TEMPORARY
+
 //////////////////////////////////
 // VULKAN SWAPCHAIN 
 //////////////////////////////////
@@ -401,7 +402,6 @@ typedef struct vulkan_command_buffer_data
 {
     VkCommandBuffer               handle;
     VkCommandPool                 owner_pool;
-
     vulkan_command_buffer_state_t state;
 
     bool8                         is_primary_buffer;
@@ -411,6 +411,9 @@ typedef struct vulkan_command_buffer_data
 //////////////////////////////////
 // VULKAN RENDER CONTEXT 
 //////////////////////////////////
+
+// TODO(Sleepster): Get rid of this crap
+typedef struct asset_handle asset_handle_t;
 
 typedef struct vulkan_render_context
 {
@@ -452,7 +455,7 @@ typedef struct vulkan_render_context
 
     vulkan_renderpass_data_t      main_renderpass;
     vulkan_shader_data_t          default_shader;
-    vulkan_texture_t              default_texture;
+    asset_handle_t               *default_texture;
 
     vulkan_buffer_data_t          main_staging_buffer;
 
@@ -473,6 +476,7 @@ s32   r_vulkan_find_memory_index(vulkan_render_context_t *render_context, u32 ty
 bool8 r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context);
 
 vulkan_command_buffer_data_t r_vulkan_command_buffer_acquire_scratch_buffer(vulkan_render_context_t *render_context, VkCommandPool command_pool);
+vulkan_texture_t r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_t *handle);
 
 void
 r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *render_context,

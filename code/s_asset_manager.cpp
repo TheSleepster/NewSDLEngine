@@ -14,11 +14,118 @@
 #include <c_string.h>
 #include <c_hash_table.h>
 
+#include <stb/stb_image.h>
+
 #include <asset_file_packer/asset_file_packer.h>
 
 #include <r_vulkan.h>
 
-#include <stb/stb_image.h>
+// ===============================
+// ========== TEXTURES ===========
+// ===============================
+
+bitmap_t
+s_asset_bitmap_create(asset_manager_t *asset_manager, 
+                      asset_slot_t    *asset_slot, 
+                      u32              width,
+                      u32              height, 
+                      u32              channels,
+                      bitmap_format_t  format)
+{
+    bitmap_t result  = {};
+    result.width     = width;
+    result.height    = height;
+    result.channels  = channels;
+    result.format    = format;
+
+    u32   pixel_count = width * height * channels;
+    byte *pixel_data  = c_za_push_array(asset_manager->asset_allocator, byte, pixel_count, ZA_TAG_STATIC);
+
+    result.pixels = {
+        .data  = pixel_data,
+        .count = pixel_count
+    };
+
+    return(result);
+}
+
+bitmap_t
+s_asset_bitmap_init(string_t pixels, s32 width, s32 height, s32 channels, u32 format)
+{
+    bitmap_t result = {};
+    result.width    = width;
+    result.height   = height;
+    result.channels = channels;
+    result.format   = format;
+    result.pixels   = pixels;
+
+    return(result);
+}
+
+texture2D_t 
+s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot)
+{
+    texture2D_t result = {};
+    string_t asset_data = slot->package_entry->entry_data;
+
+    s32 width;
+    s32 height;
+    s32 channels;
+
+    byte *pixel_data  = stbi_load_from_memory(asset_data.data, asset_data.count, &width, &height, &channels, 4);
+    u32   pixel_count = (u32)(width * height * channels);
+    string_t pixels = {
+        .data  = pixel_data,
+        .count = pixel_count 
+    };
+    Assert(pixel_data != null);
+    Assert(pixel_count > 0);
+
+    result.bitmap = s_asset_bitmap_init(pixels, width, height, channels, BMF_RGBA32);
+    return(result);
+}
+
+shader_t
+s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot)
+{
+    shader_t result;
+    return(result);
+}
+
+void
+s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *handle)
+{
+    asset_slot_t *slot = handle->slot;
+    Assert(slot->slot_state == ASLS_Unloaded || slot->slot_state == ASLS_ShouldReload);
+    slot->package_entry->entry_data = c_file_read_from_offset(&slot->owner_asset_file, 
+                                                               slot->package_entry->entry_data.count,
+                                                               slot->package_entry->data_offset_from_start_of_file, 
+                                                               null, 
+                                                               asset_manager->asset_allocator, 
+                                                               ZA_TAG_STATIC);
+    Assert(slot->package_entry->entry_data.data != null);
+    switch(slot->type)
+    {
+        case AT_Bitmap:
+        {
+            slot->texture = s_asset_texture_create(asset_manager, slot);
+        }break;
+        case AT_Shader:
+        {
+            //slot->shader = s_asset_shader_create(asset_manager, slot);
+            log_warning("Not loading shader... not currently supported...\n");
+        }break;
+        case AT_Font:
+        {
+            log_warning("Not loading font... not currently supported...\n");
+        }break;
+        case AT_Sound:
+        {
+            log_warning("Not loading sound... not currently supported...\n");
+        }break;
+    }
+    slot->slot_state = ASLS_Loaded;
+}
 
 internal_api
 C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
@@ -28,6 +135,10 @@ C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
 
     return(result);
 }
+
+// ===============================
+// ========== ASSET MANAGER ======
+// ===============================
 
 // TODO(Sleepster): Generate default assets 
 void
@@ -257,6 +368,11 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
         result.owner_asset_file_index         = file_index;
         result.is_valid                       = true;
 
+        if(result.slot->slot_state == ASLS_Unloaded)
+        {
+            s_asset_manager_load_asset_data(asset_manager, &result);
+        }
+
         Assert(result.slot->slot_state != ASLS_Invalid);
     }
     else
@@ -266,98 +382,4 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
     }
 
     return(result);
-}
-
-bitmap_t
-s_asset_bitmap_create(asset_manager_t *asset_manager, 
-                      asset_slot_t    *asset_slot, 
-                      u32              width,
-                      u32              height, 
-                      u32              channels,
-                      bitmap_format_t  format)
-{
-    bitmap_t result  = {};
-    result.width     = width;
-    result.height    = height;
-    result.channels  = channels;
-    result.format    = format;
-
-    u32   pixel_count = width * height * channels;
-    byte *pixel_data  = c_za_push_array(asset_manager->asset_allocator, byte, pixel_count, ZA_TAG_STATIC);
-
-    result.pixels = {
-        .data  = pixel_data,
-        .count = pixel_count
-    };
-
-    return(result);
-}
-
-bitmap_t
-s_asset_bitmap_init(string_t pixels, s32 width, s32 height, s32 channels, u32 format)
-{
-    bitmap_t result = {};
-    result.width    = width;
-    result.height   = height;
-    result.channels = channels;
-    result.format   = format;
-    result.pixels   = pixels;
-
-    return(result);
-}
-
-texture2D_t 
-s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot)
-{
-    texture2D_t result = {};
-    string_t asset_data = slot->package_entry->entry_data;
-    Assert(asset_data.data != null);
-
-    s32 width;
-    s32 height;
-    s32 channels;
-    string_t pixels = STR((char*)stbi_load_from_memory(asset_data.data, asset_data.count, &width, &height, &channels, 4));
-    result.bitmap   = s_asset_bitmap_init(pixels, width, height, channels, BMF_RGBA32);
-
-    return(result);
-}
-
-shader_t
-s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot)
-{
-    shader_t result;
-    return(result);
-}
-
-void
-s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *handle)
-{
-    asset_slot_t *slot = handle->slot;
-    Assert(slot->slot_state == ASLS_Unloaded || slot->slot_state == ASLS_ShouldReload);
-    slot->package_entry->entry_data = c_file_read_from_offset(&slot->owner_asset_file, 
-                                                               slot->package_entry->entry_data.count,
-                                                               slot->package_entry->data_offset_from_start_of_file, 
-                                                               null, 
-                                                               asset_manager->asset_allocator, 
-                                                               ZA_TAG_STATIC);
-    switch(slot->type)
-    {
-        case AT_Bitmap:
-        {
-            slot->texture = s_asset_texture_create(asset_manager, slot);
-        }break;
-        case AT_Shader:
-        {
-            slot->shader = s_asset_shader_create(asset_manager, slot);
-        }break;
-        case AT_Font:
-        {
-            log_warning("Not loading font... not currently supported...\n");
-        }break;
-        case AT_Sound:
-        {
-            log_warning("Not loading sound... not currently supported...\n");
-        }break;
-    }
-    slot->slot_state = ASLS_Loaded;
 }

@@ -580,13 +580,16 @@ c_string_builder_get_string(string_builder_t *builder)
     return(result);
 }
 
-void 
+bool8 
 c_string_builder_write_to_file(file_t *file, string_builder_t *builder)
 {
-    string_t string_to_write = c_string_builder_get_string(builder);
     Assert(file->for_writing);
 
-    c_file_write_string(file, string_to_write);
+    bool8 result;
+    string_t string_to_write = c_string_builder_get_string(builder);
+    result = c_file_write_string(file, string_to_write);
+
+    return(result);
 }
 
 s32

@@ -33,6 +33,16 @@
             "terminal": "integrated"
         },
         {
+            "name": "asset_file_packer2",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/asset_file_packer2",
+            "args": [],
+            "cwd": "${workspaceFolder}/run_tree/res",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
+        {
             "name": "test_dynarray",
             "type": "lldb",
             "request": "launch",
@@ -73,7 +83,7 @@
             "terminal": "integrated"
         },
         {
-            "name": "new_hash_table",
+            "name": "test_new_hash_table",
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/build/test_new_hash_table",
@@ -81,7 +91,17 @@
             "cwd": "${workspaceFolder}/build",
             "stopOnEntry": false,
             "terminal": "integrated"
-        }
+        },
+        {
+            "name": "test_asset_file_packer",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_file_packer",
+            "args": [],
+            "cwd": "${workspaceFolder}/run_tree/res",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
     ],
     "compounds": [
         {

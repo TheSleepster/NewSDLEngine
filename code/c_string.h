@@ -95,6 +95,8 @@ typedef struct string_builder
 }string_builder_t;
 
 //////////// API DEFINITIONS //////////////
+
+// TODO(Sleepster): The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal statb
 void                     c_string_builder_init(string_builder_t *builder, usize new_buffer_size);
 string_builder_buffer_t* c_string_builder_get_base_buffer(string_builder_t *builder);
 string_builder_buffer_t* c_string_builder_get_current_buffer(string_builder_t *builder);
@@ -103,7 +105,7 @@ bool8                    c_string_builder_create_new_buffer(string_builder_t *bu
 void                     c_string_builder_append(string_builder_t *builder, string_t data);
 void                     c_string_builder_append_value(string_builder_t *builder, void *value_ptr, byte len);
 string_t                 c_string_builder_get_string(string_builder_t *builder);
-void                     c_string_builder_write_to_file(file_t *file, string_builder_t *builder);
+bool8                    c_string_builder_write_to_file(file_t *file, string_builder_t *builder);
 s32                      c_string_builder_get_string_length(string_builder_t *builder);
 
 // TODO(Sleepster):
