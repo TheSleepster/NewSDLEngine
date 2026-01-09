@@ -66,20 +66,21 @@ typedef struct bitmap
     u32      format;
 
     // NOTE(Sleepster): Treated as byte arrays
-    string_t file_data;
     string_t pixels;
 }bitmap_t;
 
 typedef struct texture2D
 {
     bitmap_t         bitmap;
-    vulkan_texture_t texture_data;
+    vulkan_texture_t gpu_data;
+    
+    u32              current_generation;
 }texture2D_t;
 
 typedef struct shader 
 {
-    u32                   ID;
-    vulkan_shader_data_t *shader_data;
+    u32                  ID;
+    vulkan_shader_data_t shader_data;
 }shader_t;
 
 typedef struct asset_slot 
@@ -88,7 +89,8 @@ typedef struct asset_slot
     asset_type_t                type;
     
     string_t                    name;
-    //file_t                      owner_asset_file;
+    string_t                    file_data;
+    file_t                      owner_asset_file;
     asset_file_package_entry_t *package_entry;
 
     // NOTE(Sleepster): Should only be modified using atomic_* functions 

@@ -1927,7 +1927,7 @@ r_new_asset_texture_create(vulkan_render_context_t *render_context, memory_arena
         .maxLod                  = 0.0f
     };
     vkAssert(vkCreateSampler(render_context->rendering_device.logical_device, &sampler_data, render_context->allocators, &result.sampler));
-    result.generation++;
+    result.current_generation++;
 
     return(result);
 }

@@ -41,7 +41,7 @@ typedef struct vulkan_texture
     u32                  width;
     u32                  height;
     u32                  channel_count;
-    u32                  generation;
+    u32                  current_generation;
 
     vulkan_image_data_t *image_data;
     VkSampler            sampler;
