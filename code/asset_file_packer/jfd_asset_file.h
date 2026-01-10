@@ -69,13 +69,5 @@ StaticAssert(sizeof(jfd_file_header_t)           % 4 == 0, "jfd file header is n
 StaticAssert(sizeof(jfd_package_chunk_header_t)  % 4 == 0, "jfd package header struct is not 4 byte aligned...\n");
 StaticAssert(sizeof(jfd_chunk_data_t)            % 4 == 0, "jfd package entry struct is not 4 byte aligned...\n");
 
-typedef struct asset_entry_info
-{
-    string_t     filename;
-    string_t     fullpath;
-    string_t     asset_data;
-    asset_type_t type;
-}asset_entry_info_t;
-
 #endif // NEW_ASSET_PACKER_H
 

@@ -750,11 +750,10 @@ r_vulkan_shader_stage_create(vulkan_render_context_t    *render_context,
 }
 
 vulkan_shader_data_t
-r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepath)
+r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_source)
 {
     vulkan_shader_data_t result = {};
     result.arena = c_arena_create(MB(10));
-    string_t shader_source = c_file_read_entirety(filepath, &result.arena);
 
     // TODO(Sleepster): TEMPORARY
     
@@ -780,10 +779,8 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t filepat
     SpvReflectResult error = spvReflectCreateShaderModule(shader_source.count, shader_source.data, module);
     if(error != SPV_REFLECT_RESULT_SUCCESS)
     {
-        printf("Failure to create a spvReflectCreateShaderModule for shader file: '%s'...\n", C_STR(filepath));
+        log_error("Could not initialize spirv_reflect reflect data for this module...\n");
     }
-
-    log_info("Shader: '%s' has '%u' entry points...\n", C_STR(filepath), module->entry_point_count);
 
     VkDescriptorPoolSize descriptor_pool_type_info[16] = {};
     u32                  used_pool_indices     = 0;
@@ -2862,14 +2859,15 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
 
 
         // TODO(Sleepster): TRIANGLE CODE
-        r_vulkan_shader_bind(render_context, &render_context->default_shader);
+        vulkan_shader_data_t *shader = &render_context->default_shader->slot->shader.shader_data;
+        r_vulkan_shader_bind(render_context, shader);
 
         //push_constant_t test = {.DrawColor = {1.0f, 0.0f, 0.0f, 1.0f}};
         //r_vulkan_shader_uniform_update_data(&render_context->default_shader, STR("PushConstants"), &test);
-        r_vulkan_shader_uniform_update_data(&render_context->default_shader, STR("Matrices"),          &render_context->default_shader.camera_matrices);
-        r_vulkan_shader_uniform_update_texture(&render_context->default_shader, STR("TextureSampler"), &render_context->default_texture->slot->texture.gpu_data);
+        r_vulkan_shader_uniform_update_data(shader,    STR("Matrices"),       &shader->camera_matrices);
+        r_vulkan_shader_uniform_update_texture(shader, STR("TextureSampler"), &render_context->default_texture->slot->texture.gpu_data);
 
-        r_vulkan_shader_update_all_sets(render_context, &render_context->default_shader);
+        r_vulkan_shader_update_all_sets(render_context, shader);
 
         VkDeviceSize offsets[1] = {};
         vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &render_context->vertex_buffer.handle, (VkDeviceSize*)&offsets);
@@ -3452,7 +3450,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         render_context->image_fences[image_index] = r_vulkan_fence_create(render_context, true);
     }
 
-    render_context->default_shader = r_vulkan_shader_create(render_context, STR("shader_binaries/test.spv"));
+    //render_context->default_shader = r_vulkan_shader_create(render_context, STR("shader_binaries/test.spv"));
 
     // NOTE(Sleepster): buffer initialization 
     {

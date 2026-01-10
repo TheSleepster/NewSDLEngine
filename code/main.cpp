@@ -89,9 +89,13 @@ main(int argc, char **argv)
         s_asset_manager_init(asset_manager);
         s_asset_manager_load_asset_file(asset_manager, STR("asset_data.jfd"));
 
+        asset_manager->render_context = render_context;
         render_context->default_texture = Alloc(asset_handle_t);
         *render_context->default_texture = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
         r_vulkan_make_gpu_texture(render_context, render_context->default_texture);
+
+        render_context->default_shader = Alloc(asset_handle_t);
+        *render_context->default_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("test"));
 
         input_manager_t input_manager = {};
         s_im_init_input_manager(&input_manager);

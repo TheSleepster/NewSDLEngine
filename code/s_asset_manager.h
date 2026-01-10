@@ -99,6 +99,7 @@ typedef struct texture2D
 typedef struct shader 
 {
     u32                   ID;
+    u32                   current_generation;
     vulkan_shader_data_t  shader_data;
 }shader_t;
 
@@ -108,7 +109,6 @@ typedef struct asset_slot
     asset_type_t                type;
     
     string_t                    name;
-    string_t                    file_data;
     file_t                      owner_asset_file;
     jfd_package_entry_t        *package_entry;
 
@@ -171,6 +171,8 @@ typedef struct asset_manager
     asset_catalog_t                 asset_catalogs[AT_Count];
     asset_catalog_t                *texture_catalog;
     asset_catalog_t                *shader_catalog;
+
+    vulkan_render_context_t        *render_context;
 }asset_manager_t;
 
 void  s_asset_manager_init(asset_manager_t *asset_manager);

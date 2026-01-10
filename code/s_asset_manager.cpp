@@ -86,14 +86,17 @@ s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot)
 }
 
 shader_t
-s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot)
+s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     shader_t result;
+    result.shader_data        = r_vulkan_shader_create(asset_manager->render_context, slot->package_entry->asset_data);
+    result.current_generation = 0;
+    result.ID                 = name_hash;
     return(result);
 }
 
 void
-s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *handle)
+s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *handle, u64 name_hash)
 {
     asset_slot_t *slot = handle->slot;
     Assert(slot->slot_state == ASLS_Unloaded || slot->slot_state == ASLS_ShouldReload);
@@ -109,11 +112,11 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
         case AT_Bitmap:
         {
             slot->texture = s_asset_texture_create(asset_manager, slot);
-            log_warning("Loading texture data for bitmap: '%s'...\n", C_STR(handle->slot->name));
+            log_info("Loading texture data for bitmap: '%s'...\n", C_STR(handle->slot->name));
         }break;
         case AT_Shader:
         {
-            //slot->shader = s_asset_shader_create(asset_manager, slot);
+            slot->shader = s_asset_shader_create(asset_manager, slot, name_hash);
             log_warning("Not loading shader... not currently supported...\n");
         }break;
         case AT_Font:
@@ -310,10 +313,9 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
         result.slot = s_asset_manager_get_asset_slot(catalog, name);
         result.owner_asset_file_index         = file_index;
         result.is_valid                       = true;
-
         if(result.slot->slot_state == ASLS_Unloaded)
         {
-            s_asset_manager_load_asset_data(asset_manager, &result);
+            s_asset_manager_load_asset_data(asset_manager, &result, hash_value);
         }
 
         Assert(result.slot->slot_state != ASLS_Invalid);
