@@ -24,12 +24,18 @@
 int
 main(void)
 {
-    new_string_builder_t builder;
-    c_new_string_builder_init(&builder, MB(1000));
+    string_builder_t builder;
+    c_string_builder_init(&builder, KB(300));
 
-    string_t file_data = c_file_read_entirety(STR("new_string_builder.cpp"));
-    c_new_string_builder_append_data(&builder, file_data);
+    file_t test_file = c_file_open(STR("../../code/tests/test.txt"), true);
 
-    file_t test_file = c_file_open(STR("test.txt"), true);
-    c_new_string_builder_dump_to_file(&test_file, &builder);
+    string_t file_data = c_file_read_entirety(STR("../../code/tests/string_builder.cpp"));
+    c_string_builder_append_data(&builder, file_data);
+    c_string_builder_flush_to_file(&test_file, &builder);
+
+    string_t file_data1 = c_file_read_entirety(STR("../deps/stb/stb_image.h"));
+    c_string_builder_append_data(&builder, file_data1);
+    c_string_builder_dump_to_file(&test_file, &builder);
+
+    getchar();
 }

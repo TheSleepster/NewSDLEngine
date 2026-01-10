@@ -135,9 +135,9 @@ main(int arg_count, char **args)
     gc_setup();
 
     packer_state.builder_arena  = c_arena_create(GB(1));
-    packer_state.packages_arena = c_arena_create(GB(16));
+    packer_state.packages_arena = c_arena_create(GB(6));
     c_string_builder_init(&packer_state.builder, MB(500));
-    c_string_builder_init(&packer_state.header_builder, MB(500));
+    c_string_builder_init(&packer_state.header_builder, GB(6));
 
     if(arg_count < 2)
     {
@@ -179,7 +179,7 @@ main(int arg_count, char **args)
         header.entry_count = packer_state.asset_next_entry_to_write;
 
         c_string_builder_append_value(&packer_state.header_builder, (void*)&header, sizeof(header));
-        c_string_builder_write_to_file(&packer_state.output_file, &packer_state.header_builder);
+        c_string_builder_flush_to_file(&packer_state.output_file, &packer_state.header_builder);
 
         // NOTE(Sleepster): Write out asset blocks 
         for(u32 asset_entry_index = 0;
@@ -210,26 +210,18 @@ main(int arg_count, char **args)
             chunk_data.asset_entry_data = asset_info->asset_data.data;
 
             c_string_builder_append_value(&packer_state.builder, (void*)&chunk_data.chunk_header, sizeof(jfd_package_chunk_header_t));
-            c_string_builder_append(&packer_state.builder, asset_info->filename);
-            c_string_builder_append(&packer_state.builder, asset_info->asset_data);
+            c_string_builder_append_data(&packer_state.builder, asset_info->filename);
+            c_string_builder_append_data(&packer_state.builder, asset_info->asset_data);
         }
+        c_string_builder_flush_to_file(&packer_state.output_file, &packer_state.builder);
     }
     else
     {
         log_info("Exiting. There are no assets to pack...\n");
         exit(0);
     }
-    bool8 success = c_string_builder_write_to_file(&packer_state.output_file, &packer_state.builder);
-    if(success)
-    {
-        log_info("Successfully wrote to packed asset file: '%s'... exiting...\n", C_STR(packer_state.output_file.file_name));
-    }
-    else
-    {
-        log_fatal("Failure... Could not write to the asset_file: '%s'...\n", C_STR(packer_state.output_file.file_name));
-        exit(-1);
-    }
-    
+
+    log_info("Finished packing!...\n");
     getchar();
     return(0);
 }

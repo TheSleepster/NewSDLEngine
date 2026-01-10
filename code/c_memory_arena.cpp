@@ -114,6 +114,8 @@ c_arena_free_last_block(memory_arena_t *arena)
     u8 *block_to_free  = (u8*)arena->base;
     u64 free_size      = arena->block_size;
 
+    memset(arena->base, 0, arena->block_size);
+
     memory_arena_footer_t *footer = c_arena_get_footer(arena);
     arena->base       = footer->last_base;
     arena->used       = footer->last_used;
@@ -133,8 +135,8 @@ c_arena_reset(memory_arena_t *arena)
     }
     Assert(arena->base);
 
-    memset(arena->base, 0, arena->used);
     arena->used = 0;
+    memset(arena->base, 0, arena->block_size);
 }
 
 scratch_arena_t

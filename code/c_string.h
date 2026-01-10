@@ -74,79 +74,42 @@ string_t    c_string_format(string_t string, ...);
 #define STR(x)   (string_t){.data = (byte*)x, .count = c_string_length(x)}
 #define C_STR(x) ((const char *)x.data)
 ///////////////////////////////////////////
-
-#define STRING_BUILDER_BUFFER_SIZE (4096 - sizeof(string_builder_buffer_t))
-
-typedef struct string_builder_buffer
-{
-    s64                           bytes_allocated;
-    s64                           bytes_used;
-    struct string_builder_buffer *next_buffer;
-}string_builder_buffer_t;
-
-typedef struct string_builder
-{
-    bool8                    is_initialized;
-
-    usize                    new_buffer_size;
-    string_builder_buffer_t *current_buffer;
-    s64                      total_allocated;
-
-    byte                     initial_bytes[STRING_BUILDER_BUFFER_SIZE];
-}string_builder_t;
-
-//////////// API DEFINITIONS //////////////
-
-// TODO(Sleepster): The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal statb
-void                     c_string_builder_init(string_builder_t *builder, usize new_buffer_size);
-string_builder_buffer_t* c_string_builder_get_base_buffer(string_builder_t *builder);
-string_builder_buffer_t* c_string_builder_get_current_buffer(string_builder_t *builder);
-byte*                    c_string_builder_get_buffer_data(string_builder_buffer_t *buffer);
-bool8                    c_string_builder_create_new_buffer(string_builder_t *builder);
-void                     c_string_builder_append(string_builder_t *builder, string_t data);
-void                     c_string_builder_append_value(string_builder_t *builder, void *value_ptr, byte len);
-string_t                 c_string_builder_get_string(string_builder_t *builder);
-bool8                    c_string_builder_write_to_file(file_t *file, string_builder_t *builder);
-s32                      c_string_builder_get_string_length(string_builder_t *builder);
-
-// TODO(Sleepster):
-void c_string_builder_ensure_contiguous_space(string_builder_t *builder, usize byte_count);
+// STRING BUILDER
 ///////////////////////////////////////////
 
-typedef struct new_string_builder_buffer
+typedef struct string_builder_buffer
 {
     byte *buffer_data;
     u32   bytes_used;
     u32   buffer_size;
 
-    struct new_string_builder_buffer *next_buffer;
-    struct new_string_builder_buffer *prev_buffer;
-}new_string_builder_buffer_t;
+    struct string_builder_buffer *next_buffer;
+}string_builder_buffer_t;
 
 // NOTE(Sleepster): We just use a memory arena here since everything within this builder will live and die together... 
-typedef struct new_string_builder
+typedef struct string_builder
 {
     bool8                        is_initialized;
     memory_arena_t               arena;
 
-    new_string_builder_buffer_t *first_buffer;
-    new_string_builder_buffer_t *current_buffer;
+    string_builder_buffer_t *first_buffer;
+    string_builder_buffer_t *current_buffer;
     u64                          default_buffer_block_size;
 
     u64                          bytes_used;
     u64                          total_allocated;
-}new_string_builder_t;
+}string_builder_t;
 
-void     c_new_string_builder_init(new_string_builder_t *builder, u64 buffer_block_size);
-void     c_new_string_builder_deinit(new_string_builder_t *builder);
-void     c_new_string_builder_append_data(new_string_builder_t *builder, string_t data);
-void     c_new_string_builder_append_value(new_string_builder_t *builder, void *value, u32 value_size);
-string_t c_new_string_builder_get_current_string(new_string_builder_t *builder);
+void     c_string_builder_init(string_builder_t *builder, u64 buffer_block_size);
+void     c_string_builder_deinit(string_builder_t *builder);
+void     c_string_builder_append_data(string_builder_t *builder, string_t data);
+void     c_string_builder_append_value(string_builder_t *builder, void *value, u32 value_size);
+string_t c_string_builder_get_current_string(string_builder_t *builder);
 
 // NOTE(Sleepster): DUMP simply writes the data out and keeps the state of the builder the same, 
 //                  FLUSH writes out the data, and completely resets the state of the builder
-bool8 c_new_string_builder_dump_to_file(file_t *file, new_string_builder_t *builder);
-bool8 c_new_string_builder_flush_to_file(file_t *file, new_string_builder_t *builder);
+bool8 c_string_builder_dump_to_file(file_t *file, string_builder_t *builder);
+bool8 c_string_builder_flush_to_file(file_t *file, string_builder_t *builder);
 
 #endif // C_STRING_H
 

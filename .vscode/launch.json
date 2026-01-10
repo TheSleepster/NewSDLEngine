@@ -108,7 +108,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/test_new_string_builder",
             "args": [],
-            "cwd": "${workspaceFolder}/build",
+            "cwd": "${workspaceFolder}/run_tree/res",
             "stopOnEntry": false,
             "terminal": "integrated"
         },

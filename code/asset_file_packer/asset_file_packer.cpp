@@ -63,7 +63,7 @@ asset_packer_write_file(void)
     c_string_builder_append_value(&packer_state.header, (void*)&FLAGS_DWORD,      sizeof(u32));
     c_string_builder_append_value(&packer_state.header, (void*)&OFFSET_TO_TOC,    sizeof(u32));
 
-    c_string_builder_write_to_file(&packer_state.asset_file_handle, &packer_state.header);
+    c_string_builder_dump_to_file(&packer_state.asset_file_handle, &packer_state.header);
 
     u64 package_data_segment_size = 0;
     for(u32 packer_entry_index = 0;
@@ -125,7 +125,7 @@ asset_packer_write_file(void)
         c_string_builder_append_value(&packer_state.table_of_contents, &entry->data_offset_from_start_of_file, sizeof(u64));
     }
 
-    c_string_builder_write_to_file(&packer_state.asset_file_handle, &packer_state.table_of_contents);
+    c_string_builder_dump_to_file(&packer_state.asset_file_handle, &packer_state.table_of_contents);
     packer_state.entry_count = packer_state.next_entry_to_write;
 }
 
