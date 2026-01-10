@@ -56,7 +56,7 @@ endif
 # --------------------------------------------
 # Build Flags
 # --------------------------------------------
-PROJECT_COMMON_COMPILER_FLAGS = -std=c++20 -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension
+PROJECT_COMMON_COMPILER_FLAGS = -std=c++20 -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
 
 BUILD_TYPE ?= debug
 BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FLAGS) 
@@ -125,9 +125,9 @@ $(BUILD_DIR):
 shaders: $(SHADER_OUTPUTS)
 
 ../run_tree/res/shader_binaries/%.spv: $(SHADER_DIR)/%.slang
-	@mkdir -p $(dir $@)
+	$(call MKDIR,$(dir $@))
 	$(SLANGC) $< $(SLANG_FLAGS) -o $@
-	@echo "[SHADERS]: $< -> $@"
+	@echo [SHADERS]: $< to $@
 
 # -------------------------------------------------------------------------
 # Tests

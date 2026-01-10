@@ -174,7 +174,7 @@ sys_file_get_size(file_t *file_data)
 }
 
 bool8 
-sys_file_read(file_t *file_data, void *memory, u32 file_offset, u32 bytes_to_read)
+sys_file_read(file_t *file_data, void *memory, u32 bytes_to_read, u32 file_offset)
 {
     bool8 result = true;
     
@@ -353,6 +353,15 @@ sys_file_replace_or_rename(string_t old_file, string_t new_file)
 }
 
 bool8
+sys_directory_get_current_working_dir(byte *buffer, u32 buffer_length)
+{
+    bool8 result = false;
+    result = GetCurrentDirectory((DWORD)buffer_length, (LPTSTR)buffer);
+
+    return(result);
+}
+
+bool8
 sys_directory_exists(string_t filepath)
 {
     bool8 result = false;
@@ -374,7 +383,7 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
     HANDLE          find_handle = INVALID_HANDLE_VALUE;
 
     u32 cursor = 0;
-    DynArray(string_t) directories = c_dynarray_create(string_t);
+    DynArray_t(string_t) directories = c_dynarray_create(string_t);
     c_dynarray_push(directories, filepath);
     dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(directories); 
 

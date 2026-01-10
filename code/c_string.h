@@ -30,6 +30,7 @@ typedef struct string
 u32         c_string_length(const char *c_string);
 bool8       c_string_is_valid(string_t string);
 string_t    c_string_create(const char *c_string);
+string_t    c_string_create_with_length(byte *data, u32 length);
 string_t    c_string_make_heap(memory_arena_t *arena, string_t string);
 bool8       c_string_compare(string_t A, string_t B);
 string_t    c_string_concat(memory_arena_t *arena, string_t A, string_t B);
@@ -112,6 +113,40 @@ s32                      c_string_builder_get_string_length(string_builder_t *bu
 void c_string_builder_ensure_contiguous_space(string_builder_t *builder, usize byte_count);
 ///////////////////////////////////////////
 
+typedef struct new_string_builder_buffer
+{
+    byte *buffer_data;
+    u32   bytes_used;
+    u32   buffer_size;
+
+    struct new_string_builder_buffer *next_buffer;
+    struct new_string_builder_buffer *prev_buffer;
+}new_string_builder_buffer_t;
+
+// NOTE(Sleepster): We just use a memory arena here since everything within this builder will live and die together... 
+typedef struct new_string_builder
+{
+    bool8                        is_initialized;
+    memory_arena_t               arena;
+
+    new_string_builder_buffer_t *first_buffer;
+    new_string_builder_buffer_t *current_buffer;
+    u64                          default_buffer_block_size;
+
+    u64                          bytes_used;
+    u64                          total_allocated;
+}new_string_builder_t;
+
+void     c_new_string_builder_init(new_string_builder_t *builder, u64 buffer_block_size);
+void     c_new_string_builder_deinit(new_string_builder_t *builder);
+void     c_new_string_builder_append_data(new_string_builder_t *builder, string_t data);
+void     c_new_string_builder_append_value(new_string_builder_t *builder, void *value, u32 value_size);
+string_t c_new_string_builder_get_current_string(new_string_builder_t *builder);
+
+// NOTE(Sleepster): DUMP simply writes the data out and keeps the state of the builder the same, 
+//                  FLUSH writes out the data, and completely resets the state of the builder
+bool8 c_new_string_builder_dump_to_file(file_t *file, new_string_builder_t *builder);
+bool8 c_new_string_builder_flush_to_file(file_t *file, new_string_builder_t *builder);
 
 #endif // C_STRING_H
 

@@ -56,6 +56,7 @@ typedef struct file_packer_state
     memory_arena_t   packages_arena;
 
     string_builder_t builder;
+    string_builder_t header_builder;
 
     asset_entry_info_t asset_entries[MAX_ENTRIES];
     u32                asset_next_entry_to_write;
@@ -66,7 +67,7 @@ global_variable file_packer_state_t packer_state;
 internal_api void
 parse_arguments(s32 arg_count, char **args)
 {
-    for(s32 arg_index = 1;
+   for(s32 arg_index = 1;
         arg_index < arg_count;
         ++arg_index)
     {
@@ -77,6 +78,7 @@ parse_arguments(s32 arg_count, char **args)
 
         if(c_string_compare(test_arg, command_appendment))
         {
+            log_warning("command currently have no function...\n");
         }
         else
         {
@@ -112,6 +114,9 @@ VISIT_FILES(gather_all_asset_file_entries)
         entry->fullpath   = c_string_make_copy(&packer_state.packages_arena, filepath);
         entry->asset_data = c_file_read_entirety(filepath, &packer_state.packages_arena);
         entry->type       = type;
+
+        entry->asset_data.count += 1;
+        entry->filename.count   += 1;
         if(entry->asset_data.data == null)
         {
             log_error("Error reading file: '%s'...\n", C_STR(entry->filename));
@@ -132,6 +137,7 @@ main(int arg_count, char **args)
     packer_state.builder_arena  = c_arena_create(GB(1));
     packer_state.packages_arena = c_arena_create(GB(16));
     c_string_builder_init(&packer_state.builder, MB(500));
+    c_string_builder_init(&packer_state.header_builder, MB(500));
 
     if(arg_count < 2)
     {
@@ -172,11 +178,8 @@ main(int arg_count, char **args)
         header.flags       = 0;
         header.entry_count = packer_state.asset_next_entry_to_write;
 
-        string_t header_data = {
-            .data  = (byte*)&header,
-            .count = sizeof(hash_table_header_t)
-        };
-        c_string_builder_append(&packer_state.builder, header_data);
+        c_string_builder_append_value(&packer_state.header_builder, (void*)&header, sizeof(header));
+        c_string_builder_write_to_file(&packer_state.output_file, &packer_state.header_builder);
 
         // NOTE(Sleepster): Write out asset blocks 
         for(u32 asset_entry_index = 0;
@@ -184,18 +187,29 @@ main(int arg_count, char **args)
             ++asset_entry_index)
         {
             asset_entry_info_t *asset_info = packer_state.asset_entries + asset_entry_index;
+            Assert(asset_info->asset_data.data != null);
+            Assert(asset_info->asset_data.count > 0);
 
-            jfd_package_entry package_data = {};
-            package_data.chunk_header.magic_value      = ASSET_FILE_CHUNK_MAGIC;
-            package_data.chunk_header.total_entry_size = sizeof(jfd_package_chunk_header_t) + (asset_info->asset_data.count + asset_info->filename.count);
-            package_data.chunk_header.asset_type       = asset_info->type;
-            package_data.chunk_header.filename_count   = asset_info->filename.count;
-            package_data.chunk_header.entry_data_coumt = asset_info->asset_data.count;
+            Assert(asset_info->filename.data != null);
+            Assert(asset_info->filename.count > 0);
 
-            package_data.filename_data    = asset_info->filename.data;
-            package_data.asset_entry_data = asset_info->asset_data.data;
+            Assert(asset_info->fullpath.data != null);
+            Assert(asset_info->fullpath.count > 0);
 
-            c_string_builder_append(&packer_state.builder, STR((char*)&package_data.chunk_header));
+            Assert(asset_info->type != AT_Invalid);
+
+            // TODO(Sleepster): filenames should be null terminated...
+            jfd_chunk_data chunk_data = {};
+            chunk_data.chunk_header.magic_value      = ASSET_FILE_CHUNK_MAGIC;
+            chunk_data.chunk_header.total_entry_size = sizeof(jfd_package_chunk_header_t) + (asset_info->asset_data.count + asset_info->filename.count);
+            chunk_data.chunk_header.asset_type       = asset_info->type;
+            chunk_data.chunk_header.filename_count   = asset_info->filename.count;
+            chunk_data.chunk_header.entry_data_count = asset_info->asset_data.count;
+
+            chunk_data.filename_data    = asset_info->filename.data;
+            chunk_data.asset_entry_data = asset_info->asset_data.data;
+
+            c_string_builder_append_value(&packer_state.builder, (void*)&chunk_data.chunk_header, sizeof(jfd_package_chunk_header_t));
             c_string_builder_append(&packer_state.builder, asset_info->filename);
             c_string_builder_append(&packer_state.builder, asset_info->asset_data);
         }

@@ -46,6 +46,16 @@ c_string_create(const char *c_string)
 }
 
 string_t
+c_string_create_with_length(byte *data, u32 length)
+{
+    string_t result;
+    result.data  = data;
+    result.count = length;
+
+    return(result);
+}
+
+string_t
 c_string_make_heap(memory_arena_t *arena, string_t string)
 {
     string_t result;
@@ -67,6 +77,7 @@ string_t
 c_string_concat(memory_arena_t *arena, string_t A, string_t B)
 {
     string_t result;
+    
     result.count = A.count + B.count;
     result.data  = (byte*)c_arena_push_size(arena, (result.count + 1) * sizeof(byte));
     Assert(result.data != null);
@@ -90,6 +101,7 @@ c_string_make_copy(memory_arena_t *arena, string_t string)
         Assert(result.data);
 
         memcpy(result.data, string.data, string.count);
+        result.data[result.count] = '\0';
     }
     else
     {
@@ -492,7 +504,7 @@ c_string_builder_create_new_buffer(string_builder_t *builder)
     bool8 result = false;
     usize new_size = builder->new_buffer_size > 0 ? builder->new_buffer_size : STRING_BUILDER_BUFFER_SIZE;
 
-    byte *bytes = (byte *)malloc(new_size);
+    byte *bytes = (byte *)AllocSize(new_size);
     if(bytes)
     {
         ZeroMemory(bytes, new_size);
@@ -602,6 +614,117 @@ c_string_builder_get_string_length(string_builder_t *builder)
         result += buffer->bytes_used;
         buffer = buffer->next_buffer;
     }
+
+    return(result);
+}
+
+////////////////////////////
+
+internal_api new_string_builder_buffer_t*
+c_new_string_builder_create_and_attach_buffer(new_string_builder_t *builder, u64 block_size)
+{
+    new_string_builder_buffer_t *result = c_arena_push_struct(&builder->arena, new_string_builder_buffer_t);
+    Assert(result);
+
+    result->buffer_size = block_size;
+    result->next_buffer = null;
+    result->prev_buffer = builder->current_buffer;
+    result->buffer_data = c_arena_push_size(&builder->arena, block_size - sizeof(new_string_builder_buffer_t));
+
+    builder->current_buffer->next_buffer = result;
+    return(result);
+}
+
+// NOTE(Sleepster): I trust you won't call this while the builder is actually initialized.... 
+void
+c_new_string_builder_init(new_string_builder_t *builder, u64 buffer_block_size)
+{
+    ZeroStruct(*builder);
+
+    u64 block_size = Align16(buffer_block_size + sizeof(new_string_builder_buffer_t));
+    builder->arena                     =  c_arena_create(block_size);
+    builder->default_buffer_block_size =  block_size;
+    builder->first_buffer              =  c_new_string_builder_create_and_attach_buffer(builder, block_size);
+    builder->current_buffer            =  builder->first_buffer;
+    builder->is_initialized            =  true;
+}
+
+void
+c_new_string_builder_deinit(new_string_builder_t *builder)
+{
+    c_arena_destroy(&builder->arena);
+    builder->is_initialized = false;
+}
+
+internal_api void
+c_new_string_builder_advance_buffer(new_string_builder_t *builder)
+{
+    new_string_builder_buffer_t *next_buffer = builder->current_buffer->next_buffer;
+    if(!next_buffer)
+    {
+        next_buffer = c_new_string_builder_create_and_attach_buffer(builder, builder->default_buffer_block_size);
+    }
+    builder->current_buffer = next_buffer;
+}
+
+void
+c_new_string_builder_append_data(new_string_builder_t *builder, string_t data)
+{
+    new_string_builder_buffer_t *current_buffer = builder->current_buffer;
+    if(current_buffer->bytes_used + data.count > current_buffer->buffer_size)
+    {
+        c_new_string_builder_advance_buffer(builder);
+        Assert(current_buffer->next_buffer);
+        Assert(current_buffer->buffer_data);
+    }
+
+    byte *buffer_data = current_buffer->buffer_data + current_buffer->bytes_used;
+    memcpy(buffer_data, data.data, data.count);
+
+    current_buffer->bytes_used += data.count;
+}
+
+void
+c_new_string_builder_append_value(new_string_builder_t *builder, void *value, u32 value_size)
+{
+    string_t value_string = {
+        .data  = (byte*)value,
+        .count = value_size
+    };
+
+    c_new_string_builder_append_data(builder, value_string);
+}
+
+string_t
+c_new_string_builder_get_current_string(new_string_builder_t *builder)
+{
+    string_t result;
+    for(new_string_builder_buffer_t *current_buffer = builder->first_buffer;
+        current_buffer != null;
+        current_buffer = current_buffer->next_buffer)
+    {
+        string_t buffer_string = c_string_create_with_length(current_buffer->buffer_data, current_buffer->bytes_used);
+        result = c_string_concat(&builder->arena, result, buffer_string);
+    }
+
+    return(result);
+}
+
+bool8
+c_new_string_builder_dump_to_file(file_t *file, new_string_builder_t *builder)
+{
+    bool8 result = false;
+    string_t builder_string = c_new_string_builder_get_current_string(builder);
+    result = c_file_write_string(file, builder_string);
+
+    return(result);
+}
+
+bool8 
+c_new_string_builder_flush_to_file(file_t *file, new_string_builder_t *builder)
+{
+    bool8 result = c_new_string_builder_dump_to_file(file, builder);
+    c_arena_reset(&builder->arena);
 
     return(result);
 }

@@ -62,6 +62,8 @@ c_file_read(file_t             *file_data,
             za_allocation_tag_t tag,
             bool8               create)
 {
+    Assert(file_data->handle != INVALID_FILE_HANDLE);
+
     string_t result;
     void *memory = c_file_allocate_file_data(arena, zone, tag, bytes_to_read);
 
@@ -81,6 +83,8 @@ c_file_read_from_offset(file_t             *file_data,
                         zone_allocator_t   *zone, 
                         za_allocation_tag_t tag)
 {
+    Assert(file_data->handle != INVALID_FILE_HANDLE);
+
     string_t result;
     void *memory = c_file_allocate_file_data(arena, zone, tag, bytes_to_read);
     result.data  = (byte*)memory;
@@ -104,6 +108,7 @@ c_file_read_to_end(file_t             *file_data,
                    zone_allocator_t   *zone, 
                    za_allocation_tag_t tag)
 {
+    Assert(file_data->handle != INVALID_FILE_HANDLE);
     string_t result;
 
     u32 bytes_to_read = file_data->file_size - offset;
@@ -138,6 +143,9 @@ c_file_read_entirety(string_t            filepath,
 bool8 
 c_file_write(file_t *file, void *data, s64 bytes_to_write)
 {
+    Assert(file->for_writing);
+    Assert(file->handle != INVALID_FILE_HANDLE);
+
     bool8 success = sys_file_write(file, data, bytes_to_write);
     file->current_write_offset += bytes_to_write;
 
@@ -161,6 +169,9 @@ c_file_open_and_write(string_t filepath, void *data, s64 bytes_to_write, bool8 o
 bool8 
 c_file_write_string(file_t *file, string_t data)
 {
+    Assert(file->for_writing);
+    Assert(file->handle != INVALID_FILE_HANDLE);
+
     bool8 result = c_file_write(file, data.data, data.count);
     return(result);
 }

@@ -467,8 +467,8 @@ r_vulkan_pipeline_create(vulkan_render_context_t           *render_context,
 
     VkPipelineViewportStateCreateInfo viewport_info = {
         .sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-        .pViewports    = &viewport,
         .viewportCount = 1,
+        .pViewports    = &viewport,
         .pScissors     = &scissor,
         .scissorCount  = 1
     };

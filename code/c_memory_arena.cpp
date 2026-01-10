@@ -66,6 +66,7 @@ c_arena_push_size(memory_arena_t *arena, u64 size_init)
 
         size += sizeof(memory_arena_footer_t);
         u64 new_block_size = size > (arena->block_size + sizeof(memory_arena_footer_t)) ? size : arena->block_size;
+        size -= sizeof(memory_arena_footer_t);
 
         arena->block_size = new_block_size - sizeof(memory_arena_footer_t);
         arena->base       = (byte *)sys_allocate_memory(new_block_size);

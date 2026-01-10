@@ -1,5 +1,15 @@
 // raddbg 0.9.22 project file
 
+recent_file: path: "../code/tests/file_packer.cpp"
+recent_file: path: "../code/asset_file_packer/new_file_packer.cpp"
+recent_file: path: "../code/sys_win32.cpp"
+recent_file: path: "../code/s_asset_manager.cpp"
+recent_file: path: "../code/c_file_api.cpp"
+recent_file: path: "../code/c_memory_arena.cpp"
+recent_file: path: "../code/r_vulkan.cpp"
+recent_file: path: "../code/r_vulkan.cpp"
+recent_file: path: "../code/c_memory_arena.cpp"
+recent_file: path: "../code/c_string.cpp"
 recent_file: path: "../run_tree/deps/sokol/sokol_gfx.h"
 recent_file: path: "../code/r_render_group.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/startup/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/startup/abort.cpp"
@@ -11,39 +21,34 @@ recent_file: path: "../code/c_math.h"
 recent_file: path: "../code/r_asset_texture.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/startup/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/startup/assert.cpp"
 recent_file: path: "../run_tree/deps/sokol/sokol_log.h"
-recent_file: path: "../code/s_asset_manager.cpp"
 recent_file: path: "../code/tests/dynarray.cpp"
-recent_file: path: "W:/NewSDLEngine/code/r_render_group.cpp"
+recent_file: path: "../code/r_render_group.cpp"
 recent_file: path: "../code/c_hash_table.cpp"
-recent_file: path: "W:/NewSDLEngine/code/s_asset_manager.cpp"
-recent_file: path: "W:/NewSDLEngine/code/s_renderer.cpp"
-recent_file: path: "W:/NewSDLEngine/code/main.cpp"
-recent_file: path: "W:/NewSDLEngine/code/r_asset_texture.cpp"
-recent_file: path: "W:/NewSDLEngine/run_tree/deps/sokol/sokol_gfx.h"
-recent_file: path: "W:/NewSDLEngine/run_tree/deps/sokol/sokol_log.h"
+recent_file: path: "../code/s_asset_manager.cpp"
+recent_file: path: "../code/s_renderer.cpp"
+recent_file: path: "../code/main.cpp"
+recent_file: path: "../code/r_asset_texture.cpp"
+recent_file: path: "../run_tree/deps/sokol/sokol_gfx.h"
+recent_file: path: "../run_tree/deps/sokol/sokol_log.h"
 recent_file: path: "D:/a/_work/1/s/src/vctools/crt/vcruntime/src/string/amd64/memcpy.asm"
-recent_file: path: "W:/NewSDLEngine/code/c_hash_table.cpp"
+recent_file: path: "../code/c_hash_table.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/string/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/string/amd64/strlen.asm"
 recent_file: path: "../code/asset_file_packer/asset_file_packer.cpp"
+recent_file: path: "../code/c_globals.cpp"
+recent_file: path: "../code/asset_file_packer/asset_file_packer.cpp"
+recent_file: path: "../code/c_file_api.cpp"
 recent_file: path: "../code/sys_win32.cpp"
 recent_file: path: "../code/c_string.cpp"
-recent_file: path: "../code/c_globals.cpp"
-recent_file: path: "../code/c_file_api.cpp"
 recent_file: path: "../code/c_memory_arena.cpp"
-recent_file: path: "W:/NewSDLEngine/code/asset_file_packer/asset_file_packer.cpp"
-recent_file: path: "W:/NewSDLEngine/code/c_file_api.cpp"
-recent_file: path: "W:/NewSDLEngine/code/sys_win32.cpp"
-recent_file: path: "W:/NewSDLEngine/code/c_string.cpp"
-recent_file: path: "W:/NewSDLEngine/code/c_memory_arena.cpp"
 recent_file: path: "../code/s_nt_networking.cpp"
 recent_file: path: "../code/tests/memory_arena.cpp"
 recent_file: path: "../code/g_entity.cpp"
 recent_file: path: "../code/tests/threadpool.cpp"
 recent_file: path: "../../../../../../Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt/stdio.h"
 recent_file: path: "../code/c_threadpool.cpp"
-recent_file: path: "W:/NewSDLEngine/code/tests/threadpool.cpp"
+recent_file: path: "../code/tests/threadpool.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/stdio/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/stdio/output.cpp"
-recent_file: path: "W:/NewSDLEngine/code/c_threadpool.cpp"
+recent_file: path: "../code/c_threadpool.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/heap/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/heap/free_base.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/string/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/string/strnlen.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/string/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/string/amd64/strcmp.asm"
@@ -52,7 +57,7 @@ target:
   executable: "../build/game_debug.exe"
   working_directory: "../run_tree/res"
   arguments: "--host 7777 "
-  enabled: 1
+  enabled: 0
 }
 target:
 {
@@ -64,7 +69,6 @@ target:
 {
   executable: "../build/test_dynarray.exe"
   working_directory: "../build"
-  enabled: 0
 }
 target:
 {
@@ -86,4 +90,21 @@ target:
   executable: "../build/asset_file_packer.exe"
   working_directory: "../run_tree/res"
   enabled: 0
+}
+target:
+{
+  executable: "../build/test_file_packer.exe"
+  working_directory: "../run_tree/res"
+  enabled: 1
+}
+target:
+{
+  executable: "../build/asset_file_packer2.exe"
+  working_directory: "../run_tree/res"
+  enabled: 0
+}
+breakpoint:
+{
+  source_location: "../code/tests/file_packer.cpp:45:1"
+  hit_count: 1
 }

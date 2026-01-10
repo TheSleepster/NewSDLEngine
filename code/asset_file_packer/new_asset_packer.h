@@ -26,7 +26,7 @@
 
 #define FOURCC(string) (((u32)(string[0]) << 0) | ((u32)(string[1]) << 8) | ((u32)(string[2]) << 16) | ((u32)(string[3]) << 24))
 
-#define ASSET_FILE_HEADER_MAGIC (0x20646A6A)
+#define ASSET_FILE_HEADER_MAGIC (FOURCC("jfd "))
 #define ASSET_FILE_CHUNK_MAGIC  (FOURCC("entr"))
 
 #define ASSET_FILE_VERSION (010)
@@ -56,19 +56,19 @@ typedef struct jfd_package_chunk_header
     u32      total_entry_size;
     u32      asset_type; 
     u32      filename_count;
-    u32      entry_data_coumt;
+    u32      entry_data_count;
 }jfd_package_chunk_header_t;
 
-typedef struct jfd_package_entry
+typedef struct jfd_chunk_data
 {
     jfd_package_chunk_header_t chunk_header;
     byte                      *filename_data;
     byte                      *asset_entry_data;
-}jfd_package_entry;
+}jfd_chunk_data_t;
 #pragma pack(pop)
 
 StaticAssert(sizeof(jfd_file_header_t) % 4 == 0, "jfd file header is not 4 byte aligned...\n");
-StaticAssert(sizeof(jfd_package_entry) % 4 == 0, "jfd packge entry struct is not 4 byte aligned...\n");
+StaticAssert(sizeof(jfd_chunk_data_t)  % 4 == 0, "jfd packge entry struct is not 4 byte aligned...\n");
 
 typedef struct asset_entry_info
 {

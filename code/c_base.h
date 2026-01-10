@@ -225,6 +225,7 @@ typedef void void_func(void);
 #define GB(x) (MB((x))  * 1024ULL)
 
 // NOTE(Sleepster): C++
+#include <type_traits>
 #define TypesSame(A, B) std::is_same_v<TypeOf(A), TypeOf(B)>
 
 // For some reason, if you DEREFERENCE A POINTER, decltype still tells you it's a reference...

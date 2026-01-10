@@ -83,10 +83,10 @@
             "terminal": "integrated"
         },
         {
-            "name": "test_new_hash_table",
+            "name": "test_hash_table",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test_new_hash_table",
+            "program": "${workspaceFolder}/build/test_hash_table",
             "args": [],
             "cwd": "${workspaceFolder}/build",
             "stopOnEntry": false,
@@ -99,6 +99,16 @@
             "program": "${workspaceFolder}/build/test_file_packer",
             "args": [],
             "cwd": "${workspaceFolder}/run_tree/res",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
+        {
+            "name": "test_string_builder",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_new_string_builder",
+            "args": [],
+            "cwd": "${workspaceFolder}/build",
             "stopOnEntry": false,
             "terminal": "integrated"
         },
@@ -115,7 +125,8 @@
                 "test_networking",
                 "test_threadpool",
                 "test_memory_arena",
-                "test_new_hash_table"
+                "test_hash_table",
+                "test_string_builder"
             ]
         }
     ]

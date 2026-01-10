@@ -14,9 +14,6 @@
 #include <ws2tcpip.h>
 #include <timeapi.h> 
 
-#undef errno
-
-#define errno WSAGetLastError()
 #define SOCKET int
 
 #define INVALID_FILE_HANDLE (null)
