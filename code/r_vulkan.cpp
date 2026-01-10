@@ -1840,23 +1840,19 @@ r_vulkan_image_copy_from_buffer(vulkan_render_context_t      *render_context,
 
 // TODO(Sleepster): VERY TEMPORARY I JUST DON'T WANT TO NUKE OUR ASSET SYSTEM YET
 
-vulkan_texture_t
+void
 r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_t *handle)
 {
-    vulkan_texture_t result = {};
     Assert(handle->is_valid);
     Assert(handle->type == AT_Bitmap);
     Assert(handle->slot->type == AT_Bitmap);
     Assert(handle->slot->slot_state == ASLS_Loaded);
 
-    texture2D_t *texture = &handle->slot->texture;
+    texture2D_t      *texture      = &handle->slot->texture;
+    vulkan_texture_t *vulkan_image = &texture->gpu_data;
     u32 image_size = texture->bitmap.pixels.count;
     byte *pixels   = texture->bitmap.pixels.data;
 
-    result.width         = texture->bitmap.width;
-    result.height        = texture->bitmap.height;
-    result.channel_count = texture->bitmap.channels;
-    
     VkFormat image_format = VK_FORMAT_R8G8B8A8_UNORM;
 
     VkBufferUsageFlags    buffer_usage_flags = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
@@ -1865,34 +1861,34 @@ r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_
 
     r_vulkan_buffer_copy_data(render_context, &staging_buffer, pixels, image_size, 0, 0);
 
-    result.image_data = r_vulkan_image_create(render_context,
-                                              VK_IMAGE_TYPE_2D,
-                                              result.width,
-                                              result.height,
-                                              image_format,
-                                              VK_IMAGE_TILING_OPTIMAL,
-                                              VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                                              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                              VK_IMAGE_ASPECT_COLOR_BIT,
-                                              1,
-                                              true);
+    handle->slot->texture.gpu_data.image_data = r_vulkan_image_create(render_context,
+                                                                      VK_IMAGE_TYPE_2D,
+                                                                      texture->bitmap.width,
+                                                                      texture->bitmap.height, 
+                                                                      image_format,
+                                                                      VK_IMAGE_TILING_OPTIMAL,
+                                                                      VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                                                                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                                                      VK_IMAGE_ASPECT_COLOR_BIT,
+                                                                      1,
+                                                                      true);
 
     vulkan_command_buffer_data_t temp_buffer = r_vulkan_command_buffer_acquire_scratch_buffer(render_context, 
                                                                                               render_context->rendering_device.graphics_command_pool);
     // NOTE(Sleepster): Put into format that is optimal for transfering
     r_vulkan_image_transition_layout(render_context,
-                                    &result.image_data,
+                                    &vulkan_image->image_data,
                                      image_format,
                                      VK_IMAGE_LAYOUT_UNDEFINED,
                                      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                     &temp_buffer);
 
     // NOTE(Sleepster): Transfer the data 
-    r_vulkan_image_copy_from_buffer(render_context, &result.image_data, &staging_buffer, &temp_buffer);
+    r_vulkan_image_copy_from_buffer(render_context, &vulkan_image->image_data, &staging_buffer, &temp_buffer);
 
     // NOTE(Sleepster): Transition into a layout that is best for reading from a shader 
     r_vulkan_image_transition_layout(render_context,
-                                    &result.image_data,
+                                    &vulkan_image->image_data,
                                      image_format,
                                      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -1902,8 +1898,8 @@ r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_
                                                    &temp_buffer, 
                                                     render_context->rendering_device.graphics_queue);
 
-    result.image_data.format = image_format;
-    result.image_data.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    vulkan_image->image_data.format = image_format;
+    vulkan_image->image_data.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     // NOTE(Sleepster): Sampler creation 
     // TODO(Sleepster): 
@@ -1930,10 +1926,11 @@ r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_
         .minLod                  = 0.0f,
         .maxLod                  = 0.0f
     };
-    vkAssert(vkCreateSampler(render_context->rendering_device.logical_device, &sampler_data, render_context->allocators, &result.sampler));
-    result.current_generation++;
-
-    return(result);
+    vkAssert(vkCreateSampler(render_context->rendering_device.logical_device, 
+                            &sampler_data, 
+                             render_context->allocators, 
+                            &vulkan_image->sampler));
+    vulkan_image->current_generation++;
 }
 
 void

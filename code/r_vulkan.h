@@ -476,7 +476,7 @@ s32   r_vulkan_find_memory_index(vulkan_render_context_t *render_context, u32 ty
 bool8 r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context);
 
 vulkan_command_buffer_data_t r_vulkan_command_buffer_acquire_scratch_buffer(vulkan_render_context_t *render_context, VkCommandPool command_pool);
-vulkan_texture_t r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_t *handle);
+void r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_t *handle);
 
 void
 r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *render_context,

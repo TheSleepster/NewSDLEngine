@@ -88,10 +88,10 @@ GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/vulkan -L../run_tr
 EXCLUDE_PATTERNS        = sys_%
 
 # Each test executable depends on one test source
-TESTS_SRC              := $(wildcard ../code/tests/*.cpp)
-ASSET_FILE_PACKER_SRC  := ../code/asset_file_packer/asset_file_packer.cpp
-ASSET_FILE_PACKER2_SRC := ../code/asset_file_packer/new_file_packer.cpp
-GAME_SRCS               = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
+TESTS_SRC                 := $(wildcard ../code/tests/*.cpp)
+WAD_ASSET_FILE_PACKER_SRC := ../code/asset_file_packer/wad_asset_file_packer.cpp
+JFD_ASSET_FILE_PACKER_SRC := ../code/asset_file_packer/jfd_file_packer.cpp
+GAME_SRCS                  = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
 
 # Each slang file is it's own shader.
 SHADERS_SRC    := $(wildcard $(SHADER_DIR)/*.slang)
@@ -99,19 +99,19 @@ SLANG_FLAGS    := -target spirv -matrix-layout-column-major -I$(SHADER_DIR) -O0 
 # --------------------------------------------
 # Set the Outputs
 # --------------------------------------------
-GAME_OUT               = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
-TESTS_OUT             := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
-ASSET_FILE_PACKER_OUT  = $(BUILD_DIR)/asset_file_packer$(EXE_EXT)
-ASSET_FILE_PACKER2_OUT = $(BUILD_DIR)/asset_file_packer2$(EXE_EXT)
-SHADER_OUTPUTS         = $(patsubst $(SHADER_DIR)/%.slang,../run_tree/res/shader_binaries/%.spv,$(SHADERS_SRC))
+GAME_OUT                  = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
+TESTS_OUT                := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
+WAD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/wad_asset_file_packer$(EXE_EXT)
+JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
+SHADER_OUTPUTS            = $(patsubst $(SHADER_DIR)/%.slang,../run_tree/res/shader_binaries/%.spv,$(SHADERS_SRC))
 
 # --------------------------------------------
 # Create The Build Instructions
 # --------------------------------------------
-.PHONY: all game_out asset_file_packer asset_file_packer2 tests shaders clean
+.PHONY: all game_out jfd_asset_file_packer jfd_asset_file_packer tests shaders clean
 
 
-all: game_out asset_file_packer asset_file_packer2 shaders tests
+all: game_out wad_asset_file_packer jfd_asset_file_packer shaders tests
 
 # -------------------------------------------------------------------------
 # Create Build Directory 
@@ -143,17 +143,17 @@ $(BUILD_DIR)/test_%$(EXE_EXT): ../code/tests/%.cpp | $(BUILD_DIR)
 # -------------------------------------------------------------------------
 # Asset file builder
 # -------------------------------------------------------------------------
-asset_file_packer: $(ASSET_FILE_PACKER_OUT)
+wad_asset_file_packer: $(WAD_ASSET_FILE_PACKER_OUT)
 
-$(ASSET_FILE_PACKER_OUT): $(ASSET_FILE_PACKER_SRC) | ../build
+$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | ../build
 	@echo [ASSET FILE PACKER]: $@
-	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) $< $(GAME_EXTERNAL_LIBRARIES) -o $@ -MMD -MF ../build/asset_file_packer.d
+	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) $< $(GAME_EXTERNAL_LIBRARIES) -o $@ -MMD -MF ../build/wad_asset_file_packer.d
 
-asset_file_packer2: $(ASSET_FILE_PACKER2_OUT)
+jfd_asset_file_packer: $(JFD_ASSET_FILE_PACKER_OUT)
 
-$(ASSET_FILE_PACKER2_OUT): $(ASSET_FILE_PACKER2_SRC) | ../build
+$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | ../build
 	@echo [ASSET FILE PACKER]: $@
-	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) $< $(GAME_EXTERNAL_LIBRARIES) -o $@ -MMD -MF ../build/asset_file_packer2.d
+	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) $< $(GAME_EXTERNAL_LIBRARIES) -o $@ -MMD -MF ../build/jfd_asset_file_packer.d
 
 # -------------------------------------------------------------------------
 # Game build 
@@ -173,8 +173,8 @@ $(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 # -------------------------------------------------------------------------
 -include $(GAME_DEPS)
 -include $(patsubst ../code/tests/%.cpp,../build/test_%.d,$(TESTS_SRC))
--include ../build/asset_file_packer.d
--include ../build/asset_file_packer2.d
+-include ../build/jfd_file_packer.d
+-include ../build/wad_asset_file_packer.d
 
 clean:
 	-rm -rf $(BUILD_DIR)

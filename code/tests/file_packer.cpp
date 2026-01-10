@@ -4,7 +4,7 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-#include <asset_file_packer/new_asset_packer.h>
+#include <asset_file_packer/jfd_asset_file.h>
 
 #include <p_platform_data.h>
 #include <p_platform_data.cpp>
@@ -50,13 +50,13 @@ main()
         char *name = (char*)((byte*)chunk_header + sizeof(jfd_package_chunk_header_t));
 
         char buffer[4096];
-        memcpy(buffer, name, chunk_header->filename_count);
+        memcpy(buffer, name, chunk_header->filename_size);
         log_info("File name is: '%s'...\n", buffer);
 
         //iterator        += chunk_header->total_entry_size;
         //bytes_remaining -= chunk_header->total_entry_size;
 
-        u32 advance = sizeof(jfd_package_chunk_header_t) + (chunk_header->filename_count + chunk_header->entry_data_count);
+        u32 advance = sizeof(jfd_package_chunk_header_t) + (chunk_header->filename_size + chunk_header->entry_data_size);
         iterator += advance;
         bytes_remaining -= advance;
     }

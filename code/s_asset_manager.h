@@ -21,13 +21,13 @@
 #define ASSET_CATALOG_MAX_LOOKUPS     (4099)
 #define ASSET_MANAGER_MAX_ASSET_FILES (32)
 
-typedef struct asset_file_header asset_file_header_t;
-typedef struct asset_file_table_of_contents asset_file_table_of_contents_t;
-typedef struct asset_file_package_entry asset_file_package_entry_t;
 typedef struct vulkan_shader_data vulkan_shader_data_t;
 typedef struct vulkan_texture vulkan_texture_t;
 typedef struct asset_manager asset_manager_t;
 typedef struct asset_slot asset_slot_t;
+
+typedef struct jfd_package_entry jfd_package_entry_t;
+typedef struct jfd_file_header   jfd_file_header_t;
 
 typedef enum asset_type
 {
@@ -110,7 +110,7 @@ typedef struct asset_slot
     string_t                    name;
     string_t                    file_data;
     file_t                      owner_asset_file;
-    asset_file_package_entry_t *package_entry;
+    jfd_package_entry_t        *package_entry;
 
     // NOTE(Sleepster): Should only be modified using atomic_* functions 
     volatile u32                ref_counter;
@@ -143,13 +143,11 @@ typedef struct asset_manager_asset_file_data
  
     string_t                        raw_file_data;
 
-    asset_file_package_entry_t     *package_entries;
+    jfd_package_entry_t            *package_entries;
     u32                             package_entry_count;
     HashTable_t(s32)                entry_hash;
 
-    asset_file_header_t            *header_data;
-    asset_file_table_of_contents_t *table_of_contents;
-    u64                             package_entries_offset;
+    jfd_file_header_t              *header_data;
 }asset_manager_asset_file_data_t;
 
 typedef struct asset_manager

@@ -66,6 +66,7 @@ c_file_read(file_t             *file_data,
 
     string_t result;
     void *memory = c_file_allocate_file_data(arena, zone, tag, bytes_to_read);
+    Assert(memory != null);
 
     result.data  = (byte*)memory;
     result.count = bytes_to_read;
