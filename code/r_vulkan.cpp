@@ -1835,8 +1835,6 @@ r_vulkan_image_copy_from_buffer(vulkan_render_context_t      *render_context,
 }
 
 
-// TODO(Sleepster): VERY TEMPORARY I JUST DON'T WANT TO NUKE OUR ASSET SYSTEM YET
-
 void
 r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_t *handle)
 {
@@ -1935,8 +1933,6 @@ r_new_asset_texture_destroy(vulkan_texture_t *texture)
 {
     // NOTE(Sleepster): This does nothing because I literally just don't care! 
 }
-
-// TODO(Sleepster): VERY TEMPORARY I JUST DON'T WANT TO NUKE OUR ASSET SYSTEM YET
 
 ////////////////////////////
 // VULKAN COMMAND BUFFER 
@@ -2751,7 +2747,7 @@ r_vulkan_on_resize(vulkan_render_context_t *render_context, vec2_t new_window_si
 bool8
 r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time)
 {
-    bool8 result = false;
+    bool8 result = true;
     vulkan_rendering_device_t *device = &render_context->rendering_device;
 
     if(render_context->recreating_swapchain)
@@ -2769,7 +2765,6 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
     }
     else
     {
-        result = true;
         if(render_context->current_framebuffer_size_generation != 
            render_context->last_framebuffer_size_generation)
         {

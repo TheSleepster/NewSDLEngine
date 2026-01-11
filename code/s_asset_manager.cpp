@@ -89,9 +89,8 @@ shader_t
 s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     shader_t result;
-    result.shader_data        = r_vulkan_shader_create(asset_manager->render_context, slot->package_entry->asset_data);
-    result.current_generation = 0;
-    result.ID                 = name_hash;
+    result.shader_data = r_vulkan_shader_create(asset_manager->render_context, slot->package_entry->asset_data);
+    result.ID          = name_hash;
     return(result);
 }
 
@@ -129,6 +128,7 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
         }break;
     }
     slot->slot_state = ASLS_Loaded;
+    AtomicIncrement32(&slot->package_generation);
 }
 
 internal_api

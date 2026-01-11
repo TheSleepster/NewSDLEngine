@@ -415,6 +415,14 @@ typedef struct vulkan_command_buffer_data
 // TODO(Sleepster): Get rid of this crap
 typedef struct asset_handle asset_handle_t;
 
+typedef struct vulkan_render_frame_data
+{
+    VkSemaphore     image_avaliable_semaphore;
+    VkSemaphore     queue_finished_semaphore;
+
+    VkCommandBuffer command_buffer;
+}vulkan_render_frame_data;
+
 typedef struct vulkan_render_context
 {
     memory_arena_t                initialization_arena;
@@ -456,8 +464,6 @@ typedef struct vulkan_render_context
     vulkan_renderpass_data_t      main_renderpass;
     asset_handle_t               *default_shader;
     asset_handle_t               *default_texture;
-
-    vulkan_buffer_data_t          main_staging_buffer;
 
     vulkan_buffer_data_t          vertex_buffer;
     vulkan_buffer_data_t          index_buffer;

@@ -92,14 +92,11 @@ typedef struct texture2D
 {
     bitmap_t          bitmap;
     vulkan_texture_t  gpu_data;
-    
-    u32              current_generation;
 }texture2D_t;
 
 typedef struct shader 
 {
     u32                   ID;
-    u32                   current_generation;
     vulkan_shader_data_t  shader_data;
 }shader_t;
 
@@ -113,6 +110,7 @@ typedef struct asset_slot
     jfd_package_entry_t        *package_entry;
 
     // NOTE(Sleepster): Should only be modified using atomic_* functions 
+    volatile u32                package_generation;
     volatile u32                ref_counter;
     union 
     {
