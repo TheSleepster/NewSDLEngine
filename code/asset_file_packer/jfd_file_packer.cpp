@@ -33,6 +33,7 @@
 #include <c_dynarray_impl.cpp>
 #include <c_file_api.cpp>
 #include <c_file_watcher.cpp>
+#include <c_threadpool.cpp>
 #include <p_platform_data.cpp>
 
 #include "jfd_asset_file.h"
@@ -44,6 +45,14 @@ constexpr const char *commands[] = {
     "--output_dir"
 };
 #endif
+
+typedef struct asset_entry_info 
+{
+    string_t filename;
+    string_t fullpath;
+    string_t asset_data;
+    u32      type;
+}asset_entry_info_t;
 
 typedef struct file_packer_state
 {
@@ -129,7 +138,7 @@ int
 main(int arg_count, char **args)
 {
     ZeroStruct(packer_state);
-    gc_setup();
+    c_global_context_init();
 
     packer_state.builder_arena  = c_arena_create(GB(1));
     packer_state.packages_arena = c_arena_create(GB(6));
@@ -201,7 +210,7 @@ main(int arg_count, char **args)
             chunk_data.chunk_header.total_entry_size = sizeof(jfd_package_chunk_header_t) + (asset_info->asset_data.count + asset_info->filename.count);
             chunk_data.chunk_header.asset_type       = asset_info->type;
             chunk_data.chunk_header.filename_size    = asset_info->filename.count;
-            chunk_data.chunk_header.entry_data_size = asset_info->asset_data.count;
+            chunk_data.chunk_header.entry_data_size  = asset_info->asset_data.count;
 
             chunk_data.filename_data    = asset_info->filename.data;
             chunk_data.asset_entry_data = asset_info->asset_data.data;

@@ -1185,7 +1185,7 @@ void
 r_vulkan_shader_bind(vulkan_render_context_t *render_context, vulkan_shader_data_t *shader)
 {
     // TODO(Sleepster): Graphics is hard coded... 
-    r_vulkan_pipeline_bind(&render_context->graphics_command_buffers[render_context->current_image_index],
+    r_vulkan_pipeline_bind(&render_context->render_command_buffers[render_context->current_image_index],
                            VK_PIPELINE_BIND_POINT_GRAPHICS,
                            &shader->pipeline);
 }
@@ -1251,7 +1251,7 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
 
     u32 current_image_index = render_context->current_image_index;
 
-    vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + current_image_index;
+    vulkan_command_buffer_data_t *command_buffer = render_context->render_command_buffers + current_image_index;
     VkDescriptorSet current_set                  = set_info->sets[current_image_index];
 
     Assert(command_buffer->state == VKCBS_RECORDING || command_buffer->state == VKCBS_WITHIN_RENDERPASS);
@@ -1362,7 +1362,7 @@ r_vulkan_shader_update_instance_set(vulkan_render_context_t *render_context,
                                     vulkan_shader_data_t    *shader)
 {
     u32 current_image_index = render_context->current_image_index;
-    vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + current_image_index;
+    vulkan_command_buffer_data_t *command_buffer = render_context->render_command_buffers + current_image_index;
 
     Assert(command_buffer->state == VKCBS_RECORDING || command_buffer->state == VKCBS_WITHIN_RENDERPASS);
     for(u32 uniform_index = 0;
@@ -1516,9 +1516,9 @@ r_vulkan_fence_create(vulkan_render_context_t *render_context,
     };
 
     vkAssert(vkCreateFence(render_context->rendering_device.logical_device, 
-                 &fence_create_info, 
-                  render_context->allocators,
-                 &result.handle));
+                          &fence_create_info, 
+                           render_context->allocators,
+                          &result.handle));
 
     return(result);
 }
@@ -1554,8 +1554,6 @@ r_vulkan_fence_wait(vulkan_render_context_t  *render_context,
             case VK_SUCCESS:
             {
                 fence->signaled = true;
-
-                return(result);
             }break;
             case VK_TIMEOUT:
             {
@@ -2067,12 +2065,12 @@ r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *re
 void
 r_vulkan_initialize_graphics_command_buffers(vulkan_render_context_t *render_context)
 {
-    Assert(render_context->graphics_command_buffers);
+    Assert(render_context->render_command_buffers);
     for(u32 frame_index = 0;
         frame_index < render_context->swapchain.image_count;
         ++frame_index)
     {
-        vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + frame_index; 
+        vulkan_command_buffer_data_t *command_buffer = render_context->render_command_buffers + frame_index; 
         
         *command_buffer = r_vulkan_command_buffer_acquire(render_context, 
                                                           render_context->rendering_device.graphics_command_pool, 
@@ -2268,13 +2266,8 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
     vulkan_swapchain_data_t result = {};
     result.arena = c_arena_create(MB(10));
 
-    VkExtent2D swapchain_extent = {image_width, image_height};
-        
-    // NOTE(Sleepster): Triple buffering. 
-    result.max_frames_in_flight = render_context->swapchain.image_count;
-
     vulkan_rendering_device_t *device_data = &render_context->rendering_device;
-    
+
     bool8 default_surface_format_found = false;
     for(u32 format_index = 0;
         format_index < device_data->physical_device.swapchain_support_info.valid_surface_format_count;
@@ -2316,6 +2309,8 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
     r_vulkan_physical_device_get_swapchain_support_info(render_context, 
                                                         device_data->physical_device.handle,
                                                        &device_data->physical_device.swapchain_support_info);
+
+    VkExtent2D swapchain_extent = {image_width, image_height};
     if(device_data->physical_device.swapchain_support_info.surface_capabilities.currentExtent.width != U32_MAX)
     {
         swapchain_extent = device_data->physical_device.swapchain_support_info.surface_capabilities.currentExtent;
@@ -2328,7 +2323,8 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
     {
         swapchain_image_count = device_data->physical_device.swapchain_support_info.surface_capabilities.maxImageCount;
     }
-    swapchain_image_count = Min(swapchain_image_count, 3);
+    // NOTE(Sleepster): Triple buffering. 
+    result.max_frames_in_flight = Min(swapchain_image_count, render_context->additional_buffer_count);
 
     VkSwapchainCreateInfoKHR swapchain_create_info = {
         .sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
@@ -2371,8 +2367,8 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
 
     result.image_count = 0;
     vkAssert(vkGetSwapchainImagesKHR(device_data->logical_device, result.handle, &result.image_count, null));
-    result.images       = c_arena_push_array(&result.arena, VkImage,     result.image_count);
-    result.views        = c_arena_push_array(&result.arena, VkImageView, result.image_count);
+    result.images       = c_arena_push_array(&result.arena, VkImage,                   result.image_count);
+    result.views        = c_arena_push_array(&result.arena, VkImageView,               result.image_count);
     result.framebuffers = c_arena_push_array(&result.arena, vulkan_framebuffer_data_t, result.image_count);
     vkAssert(vkGetSwapchainImagesKHR(device_data->logical_device, result.handle, &result.image_count, result.images));
 
@@ -2464,7 +2460,6 @@ r_vulkan_swapchain_recreate(vulkan_render_context_t *render_context,
 
     // TODO(Sleepster): Let this reuse the swapchain if possible
     r_vulkan_swapchain_destroy(render_context, &render_context->swapchain);
-
     result = r_vulkan_swapchain_create(render_context, 
                                        image_width, 
                                        image_height, 
@@ -2490,6 +2485,7 @@ r_vulkan_swapchain_get_next_image_index(vulkan_render_context_t *render_context,
                                          &result);
     if(code == VK_ERROR_OUT_OF_DATE_KHR)
     {
+        // TODO(Sleepster): maybe just flag the render_context to rebuild the swapchain, seems like this could be stupid. 
         render_context->swapchain = r_vulkan_swapchain_recreate(render_context, 
                                                                 render_context->framebuffer_width, 
                                                                 render_context->framebuffer_height);
@@ -2510,13 +2506,13 @@ r_vulkan_swapchain_present(vulkan_render_context_t *render_context,
                            vulkan_swapchain_data_t *swapchain,
                            VkQueue                  graphics_queue,
                            VkQueue                  present_queue,
-                           VkSemaphore              render_semaphore,
+                           VkSemaphore              present_complete_semaphore,
                            u32                      image_index)
 {
     VkPresentInfoKHR present_info = {
         .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
         .waitSemaphoreCount = 1,
-        .pWaitSemaphores    = &render_semaphore,
+        .pWaitSemaphores    = &present_complete_semaphore,
         .swapchainCount     = 1,
         .pSwapchains        = &swapchain->handle,
         .pImageIndices      = &image_index,
@@ -2535,7 +2531,7 @@ r_vulkan_swapchain_present(vulkan_render_context_t *render_context,
         Assert(false);
     }
 
-    render_context->current_frame_index = (render_context->current_frame_index + 1) % render_context->swapchain.image_count;
+    render_context->current_frame_index = (render_context->current_frame_index + 1) % swapchain->max_frames_in_flight;
 }
 
 ////////////////////////////
@@ -2747,6 +2743,13 @@ r_vulkan_on_resize(vulkan_render_context_t *render_context, vec2_t new_window_si
 bool8
 r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time)
 {
+    vulkan_render_frame_state_t *this_frame = render_context->frames + render_context->current_frame_index;
+    render_context->current_frame = this_frame;
+
+    this_frame->image_render_idle_fence         = render_context->image_render_idle_fences   + render_context->current_frame_index;
+    this_frame->frame_in_flight_fence_ptr       = render_context->frame_in_flight_fence_ptrs + render_context->current_frame_index;
+    this_frame->image_avaliable_semaphore       = render_context->image_avaliable_semaphores + render_context->current_frame_index;
+
     bool8 result = true;
     vulkan_rendering_device_t *device = &render_context->rendering_device;
 
@@ -2790,7 +2793,7 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
         }
 
         bool8 waited = r_vulkan_fence_wait(render_context, 
-                                           render_context->image_fences + render_context->current_frame_index, 
+                                           this_frame->image_render_idle_fence,
                                            U64_MAX);
         if(!waited)
         {
@@ -2803,7 +2806,7 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
         render_context->current_image_index = r_vulkan_swapchain_get_next_image_index(render_context,
                                                                                       &render_context->swapchain,
                                                                                       U64_MAX,
-                                                                                      render_context->image_avaliable_semaphores[render_context->current_frame_index],
+                                                                                     *this_frame->image_avaliable_semaphore,
                                                                                       null);
         if(render_context->current_frame_index == INVALID_ID)
         {
@@ -2813,9 +2816,12 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
             goto begin_frame_return;
         }
 
-        vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + render_context->current_image_index; 
-        Assert(command_buffer);
+        this_frame->render_command_buffer            = render_context->render_command_buffers + render_context->current_image_index;
+        this_frame->current_framebuffer              = render_context->swapchain.framebuffers + render_context->current_image_index;
+        this_frame->presentation_complete_semaphore = render_context->presentation_complete_semaphores + render_context->current_image_index;
 
+        vulkan_command_buffer_data_t *command_buffer = this_frame->render_command_buffer; 
+        Assert(this_frame->render_command_buffer);
         r_vulkan_command_buffer_reset(command_buffer);
         r_vulkan_command_buffer_begin(command_buffer, false, false, false);
 
@@ -2850,7 +2856,7 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
         r_vulkan_renderpass_begin(render_context, 
                                   &render_context->main_renderpass, 
                                   command_buffer, 
-                                  render_context->swapchain.framebuffers[render_context->current_image_index].handle);
+                                  this_frame->current_framebuffer->handle);
 
 
         // TODO(Sleepster): TRIANGLE CODE
@@ -2882,21 +2888,24 @@ r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time)
 {
     bool8 result = true;
 
-    vulkan_command_buffer_data_t *command_buffer = render_context->graphics_command_buffers + render_context->current_image_index; 
+    vulkan_command_buffer_data_t *command_buffer = render_context->current_frame->render_command_buffer; 
     r_vulkan_renderpass_end(render_context, command_buffer, 
                            &render_context->main_renderpass);
     r_vulkan_command_buffer_end(command_buffer);
 
-    // NOTE(Sleepster): Blocking... just syncing to make sure we aren't writing too fast 
-    if(render_context->frame_fences[render_context->current_image_index] != VK_NULL_HANDLE)
+    // NOTE(Sleepster): We're essentially blocking here to make sure that we are actually done running commands into 
+    // the command buffers of the frame before continuing 
+    if(render_context->current_frame->frame_in_flight_fence_ptr != VK_NULL_HANDLE)
     {
         r_vulkan_fence_wait(render_context, 
-                            render_context->image_fences + render_context->current_image_index,
+                            render_context->current_frame->image_render_idle_fence,
                             U64_MAX);
     }
 
-    render_context->frame_fences[render_context->current_image_index] = &render_context->image_fences[render_context->current_frame_index];
-    r_vulkan_fence_reset(render_context, render_context->image_fences + render_context->current_frame_index);
+    render_context->frame_in_flight_fence_ptrs[render_context->current_image_index] = &render_context->image_render_idle_fences[render_context->current_frame_index];
+    render_context->current_frame->frame_in_flight_fence_ptr = &render_context->current_frame->image_render_idle_fence;
+
+    r_vulkan_fence_reset(render_context, render_context->current_frame->image_render_idle_fence);
 
     VkPipelineStageFlags stage_flags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     VkSubmitInfo submit_info  = {
@@ -2908,11 +2917,11 @@ r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time)
 
         // NOTE(Sleepster): The Semaphore(s) that signal when the queue is finished executing the commands
         .signalSemaphoreCount = 1,
-        .pSignalSemaphores    = render_context->queue_finished_semaphores + render_context->current_image_index,
+        .pSignalSemaphores    = render_context->current_frame->presentation_complete_semaphore,
 
         // NOTE(Sleepster): The Semaphore(s) that ensures the operation cannot begin until the image is avaliable 
         .waitSemaphoreCount   = 1,
-        .pWaitSemaphores      = render_context->image_avaliable_semaphores + render_context->current_frame_index,
+        .pWaitSemaphores      = render_context->current_frame->image_avaliable_semaphore,
 
         .pWaitDstStageMask    = stage_flags
     };
@@ -2920,7 +2929,7 @@ r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time)
     VkResult submit_result = vkQueueSubmit(render_context->rendering_device.graphics_queue, 
                                            1, 
                                           &submit_info, 
-                                           render_context->image_fences[render_context->current_frame_index].handle);
+                                           render_context->current_frame->image_render_idle_fence->handle);
     if(submit_result != VK_SUCCESS)
     {
         log_error("vkQueueSubmit has failed with result: '%s'...\n", r_vulkan_result_string(submit_result, true));
@@ -2933,7 +2942,7 @@ r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time)
                                   &render_context->swapchain,
                                    render_context->rendering_device.graphics_queue,
                                    render_context->rendering_device.present_queue,
-                                   render_context->queue_finished_semaphores[render_context->current_image_index],
+                                  *render_context->current_frame->presentation_complete_semaphore,
                                    render_context->current_image_index);
     }
 
@@ -2982,7 +2991,7 @@ r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context)
                 frame_index < render_context->swapchain.image_count;
                 ++frame_index)
             {
-                render_context->frame_fences[frame_index] = null;
+                render_context->frame_in_flight_fence_ptrs[frame_index] = null;
             }
 
             r_vulkan_physical_device_get_swapchain_support_info(render_context, 
@@ -3008,8 +3017,8 @@ r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context)
                 command_buffer_index < render_context->swapchain.image_count;
                 ++command_buffer_index)
             {
-                vulkan_command_buffer_data_t *graphics_command_buffer = render_context->graphics_command_buffers + command_buffer_index;
-                r_vulkan_command_buffer_release(render_context, graphics_command_buffer);
+                vulkan_command_buffer_data_t *render_command_buffer = render_context->render_command_buffers + command_buffer_index;
+                r_vulkan_command_buffer_release(render_context, render_command_buffer);
             }
 
             for(u32 framebuffer_index = 0;
@@ -3088,6 +3097,9 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     render_context->initialization_arena = c_arena_create(MB(10));
     render_context->frame_arena          = c_arena_create(MB(100));
     render_context->permanent_arena      = c_arena_create(MB(100));
+
+    // NOTE(Sleepster): Default to triple buffering 
+    render_context->additional_buffer_count = VULKAN_MAX_FRAMES_IN_FLIGHT;
 
 	VkApplicationInfo app_info  = {};
 	app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -3405,6 +3417,8 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
                                     &render_context->rendering_device.graphics_command_pool));
         log_info("Device Command Pools created...\n");
     }
+
+    render_context->frames          = c_arena_push_array(&render_context->permanent_arena, vulkan_render_frame_state_t, VULKAN_MAX_FRAMES_IN_FLIGHT);
     render_context->swapchain       = r_vulkan_swapchain_create(render_context, render_context->framebuffer_width, render_context->framebuffer_height, true, null);
     render_context->main_renderpass = r_vulkan_renderpass_create(render_context, 
                                                                  {0, 0}, 
@@ -3417,14 +3431,15 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
                                     &render_context->main_renderpass);
     log_info("Framebuffers created...\n");
 
-    render_context->graphics_command_buffers = c_arena_push_array(&render_context->permanent_arena, vulkan_command_buffer_data_t, render_context->swapchain.image_count);
+    render_context->render_command_buffers = c_arena_push_array(&render_context->permanent_arena, vulkan_command_buffer_data_t, render_context->swapchain.image_count);
     r_vulkan_initialize_graphics_command_buffers(render_context);
     log_info("Command buffers initialized...\n");
 
-    render_context->queue_finished_semaphores  = c_arena_push_array(&render_context->permanent_arena, VkSemaphore,     render_context->swapchain.image_count);
-    render_context->image_avaliable_semaphores = c_arena_push_array(&render_context->permanent_arena, VkSemaphore,     render_context->swapchain.image_count);
-    render_context->image_fences               = c_arena_push_array(&render_context->permanent_arena, vulkan_fence_t,  render_context->swapchain.image_count);
-    render_context->frame_fences               = c_arena_push_array(&render_context->permanent_arena, vulkan_fence_t*, render_context->swapchain.image_count);
+    // NOTE(Sleepster): Sync Objects... 
+    render_context->image_avaliable_semaphores       = c_arena_push_array(&render_context->permanent_arena, VkSemaphore,     render_context->swapchain.image_count);
+    render_context->presentation_complete_semaphores = c_arena_push_array(&render_context->permanent_arena, VkSemaphore,     render_context->swapchain.image_count);
+    render_context->image_render_idle_fences         = c_arena_push_array(&render_context->permanent_arena, vulkan_fence_t,  render_context->swapchain.image_count);
+    render_context->frame_in_flight_fence_ptrs       = c_arena_push_array(&render_context->permanent_arena, vulkan_fence_t*, render_context->swapchain.image_count);
     for(u32 image_index = 0;
         image_index < render_context->swapchain.image_count;
         ++image_index)
@@ -3435,17 +3450,15 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
         vkCreateSemaphore(render_context->rendering_device.logical_device, 
                          &semaphore_create_info, 
                           render_context->allocators, 
-                         &render_context->queue_finished_semaphores[image_index]);
+                          render_context->presentation_complete_semaphores + image_index);
 
         vkCreateSemaphore(render_context->rendering_device.logical_device, 
                          &semaphore_create_info, 
                           render_context->allocators, 
-                         &render_context->image_avaliable_semaphores[image_index]);
+                          render_context->image_avaliable_semaphores + image_index);
 
-        render_context->image_fences[image_index] = r_vulkan_fence_create(render_context, true);
+        render_context->image_render_idle_fences[image_index] = r_vulkan_fence_create(render_context, true);
     }
-
-    //render_context->default_shader = r_vulkan_shader_create(render_context, STR("shader_binaries/test.spv"));
 
     // NOTE(Sleepster): buffer initialization 
     {

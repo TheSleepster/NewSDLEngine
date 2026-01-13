@@ -35,6 +35,7 @@
 #include <c_dynarray_impl.cpp>
 #include <c_file_api.cpp>
 #include <c_file_watcher.cpp>
+#include <c_threadpool.cpp>
 #include <p_platform_data.cpp>
 
 global_variable packer_state_t packer_state;
@@ -192,7 +193,7 @@ VISIT_FILES(get_resource_dir_files)
 int
 main(int argc, char **argv)
 {
-    gc_setup();
+    c_global_context_init();
     packer_state.packer_arena      = c_arena_create(GB(16));
 
     packer_state.packed_file_name  = STR("asset_data");

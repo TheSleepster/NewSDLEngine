@@ -116,7 +116,7 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
         case AT_Shader:
         {
             slot->shader = s_asset_shader_create(asset_manager, slot, name_hash);
-            log_warning("Not loading shader... not currently supported...\n");
+            log_info("Loading shader data for: '%s'...\n", C_STR(handle->slot->name));
         }break;
         case AT_Font:
         {
@@ -168,7 +168,6 @@ s_asset_manager_init(asset_manager_t *asset_manager)
         Assert(catalog->catalog_type < AT_Count);
         Assert(catalog->catalog_type > AT_Invalid);
     }
-    c_threadpool_init(&asset_manager->worker_pool);
     c_hash_table_init(&asset_manager->asset_name_to_file, 
                        ASSET_CATALOG_MAX_LOOKUPS, 
                       &asset_manager->manager_arena, 
@@ -176,7 +175,6 @@ s_asset_manager_init(asset_manager_t *asset_manager)
                        null);
     // NOTE(Sleepster): Initializing all entries to -1 
     memset(asset_manager->asset_name_to_file.data, -1, sizeof(s32) * ASSET_CATALOG_MAX_LOOKUPS);
-        
     asset_manager->is_initialized = true;
 }
 

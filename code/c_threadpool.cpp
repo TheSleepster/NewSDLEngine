@@ -31,6 +31,8 @@ c_threadpool_perform_next_task(threadpool_queue_t *queue)
             threadpool_queue_entry_t *entry = queue->entries + task;
             if(entry->is_valid)
             {
+                ReadWriteBarrier;
+
                 entry->is_valid = false;
                 entry->callback(entry->user_data);
                 AtomicIncrement32(&queue->entries_completed);
@@ -97,6 +99,8 @@ c_threadpool_add_task(threadpool_t *threadpool, void *user_data, threadpool_call
     if(queue_entry_to_write == entry_to_write)
     {
         threadpool_queue_entry_t *entry = queue->entries + entry_to_write;
+
+        ReadWriteBarrier;
         entry->is_valid  = true;
         entry->user_data = user_data;
         entry->callback  = callback;

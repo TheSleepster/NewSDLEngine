@@ -13,7 +13,9 @@
 
 #include <p_platform_data.h>
 
-#define MAX_QUEUE_ENTRIES (10000)
+#define MAX_QUEUE_ENTRIES            (10000)
+#define THREADPOOL_ENTRY_BUFFER_SIZE (256)
+
 typedef void threadpool_callback_t(void *user_data);
 
 enum job_priority_t 
@@ -24,9 +26,11 @@ enum job_priority_t
     TPTP_Count
 };
 
+// NOTE(Sleepster): This buffer is an extra 2MB per threadpool... It's fine.
 struct threadpool_queue_entry_t
 {
     bool8                  is_valid;
+    byte                   entry_buffer[THREADPOOL_ENTRY_BUFFER_SIZE];
 
     void                  *user_data;
     threadpool_callback_t *callback;
@@ -45,6 +49,8 @@ struct threadpool_queue_t
 
 struct threadpool_t
 {
+    bool8           is_initialized;
+
     sys_semaphore_t semaphore;
     u32             threads_awake;
     u32             max_threads;

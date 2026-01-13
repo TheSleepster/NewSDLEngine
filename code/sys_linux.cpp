@@ -84,7 +84,6 @@ sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overl
     if(for_writing)
     {
         result.for_writing = true;
-
         if(overwrite)
         {
             flags = O_RDWR|O_CREAT;

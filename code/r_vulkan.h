@@ -27,10 +27,7 @@
     }                                                                      \
 }) 
 
-#define INVALID_ID ((u32)-1)
-
-// NOTE(Sleepster): Triple Buffering
-#define MAX_FRAMES_IN_FLIGHT (2)
+#define VULKAN_MAX_FRAMES_IN_FLIGHT (3)
 
 // NOTE(Sleepster): Nvidia needs 256 byte alignment
 typedef struct global_matrix_uniforms
@@ -412,22 +409,29 @@ typedef struct vulkan_command_buffer_data
 // VULKAN RENDER CONTEXT 
 //////////////////////////////////
 
+typedef struct vulkan_render_frame_state
+{
+    vulkan_fence_t               *image_render_idle_fence;
+    vulkan_fence_t              **frame_in_flight_fence_ptr;
+    VkSemaphore                  *image_avaliable_semaphore;
+    VkSemaphore                  *presentation_complete_semaphore;
+
+    vulkan_framebuffer_data_t    *current_framebuffer;
+    vulkan_command_buffer_data_t *render_command_buffer;
+}vulkan_render_frame_state_t;
+
 // TODO(Sleepster): Get rid of this crap
 typedef struct asset_handle asset_handle_t;
-
-typedef struct vulkan_render_frame_data
-{
-    VkSemaphore     image_avaliable_semaphore;
-    VkSemaphore     queue_finished_semaphore;
-
-    VkCommandBuffer command_buffer;
-}vulkan_render_frame_data;
+////////////////////
 
 typedef struct vulkan_render_context
 {
     memory_arena_t                initialization_arena;
     memory_arena_t                frame_arena;
     memory_arena_t                permanent_arena;
+
+    // NOTE(Sleepster): Double or triple buffering 
+    u32                           additional_buffer_count;
 
     SDL_Window                   *window;
     u32                           window_width;
@@ -454,12 +458,17 @@ typedef struct vulkan_render_context
 
     // NOTE(Sleepster): Semaphores are for GPU -> GPU signaling
     //                  Fences are for CPU -> GPU operation ordering 
-    VkSemaphore                  *queue_finished_semaphores;
+    vulkan_fence_t               *image_render_idle_fences;
+    // NOTE(Sleepster): Tells the CPU it can use the specific image index for rendering 
+    vulkan_fence_t              **frame_in_flight_fence_ptrs;
+    // NOTE(Sleepster): This tells us the image is avaliable from the swapchain for presenting 
     VkSemaphore                  *image_avaliable_semaphores;
-    vulkan_fence_t               *image_fences;
-    vulkan_fence_t              **frame_fences;
+    // NOTE(Sleepster): This tells us if the swapchain is done presenting that image 
+    VkSemaphore                  *presentation_complete_semaphores;
+    vulkan_command_buffer_data_t *render_command_buffers;
 
-    vulkan_command_buffer_data_t *graphics_command_buffers;
+    vulkan_render_frame_state_t  *frames;
+    vulkan_render_frame_state_t  *current_frame;
 
     vulkan_renderpass_data_t      main_renderpass;
     asset_handle_t               *default_shader;

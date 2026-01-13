@@ -12,7 +12,6 @@
 #include <c_log.h>
 #include <c_memory_arena.h>
 #include <c_zone_allocator.h>
-#include <c_globals.h>
 
 typedef struct file file_t;
 

@@ -5,6 +5,7 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <p_platform_data.h>
+#include <c_globals.h>
 
 #if OS_WINDOWS
     #include <sys_win32.cpp>

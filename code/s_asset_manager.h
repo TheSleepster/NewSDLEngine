@@ -152,7 +152,6 @@ typedef struct asset_manager
 {
     bool8                           is_initialized;
     memory_arena_t                  manager_arena;
-    threadpool_t                    worker_pool;
 
     // TODO(Sleepster): Hash table for hashing asset filenames with thier associated asset file
     // Ex: "player.png" -> "/run_tree/res/main_asset_file.wad"

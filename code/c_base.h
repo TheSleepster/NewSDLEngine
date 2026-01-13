@@ -224,6 +224,8 @@ typedef void void_func(void);
 #define MB(x) (KB((x))  * 1024ULL)
 #define GB(x) (MB((x))  * 1024ULL)
 
+#define INVALID_ID ((u32)-1)
+
 // NOTE(Sleepster): C++
 #include <type_traits>
 #define TypesSame(A, B) std::is_same_v<TypeOf(A), TypeOf(B)>

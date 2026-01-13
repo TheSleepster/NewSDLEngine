@@ -1,0 +1,1030 @@
+:PROPERTIES:
+:ID:       83bc20ce-34d1-45c3-884a-5729a1ffe784
+:END:
+#+title: Vulkan-Stuff
+* Vulkan Rendering Core Info 
+** Vulkan Instance Data
+*** Creation of the Instance
+Everything in the Vulkan context revolves around a Vulkan Instance. A
+Vulkan Instance is pretty much something that stores per-application
+data and initializes the library. To create an instance, we must setup
+some data first that describes to the driver what it is we want from
+Vulkan. The driver actually allows us to pass data from our
+Application to the driver in the form of
+*VkApplicationInfo*. VkApplicationInfo is defined as:
+
+#+BEGIN_SRC C
+typedef struct VkApplicationInfo {
+    VkStructureType sType;
+    const void* pNext;
+    const char* pApplicationName;
+    uint32_t applicationVersion;
+    const char* pEngineName;
+    uint32_t engineVersion;
+    uint32_t apiVersion;
+} VkApplicationInfo;
+#+END_SRC
+
+The data in this structure is meant to be defined for the use of the
+driver. In the driver's case, the only thing it cares about is that of
+the *apiVersion* member. Everything else is purely for developer
+convienence. Example usage looks like so:
+
+#+BEGIN_SRC C
+	VkApplicationInfo app_info = {};
+	app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	app_info.pApplicationName   = null;
+	app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+	app_info.pEngineName        = null;
+	app_info.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
+	app_info.apiVersion         = VK_API_VERSION_1_3;
+#+END_SRC
+
+You may note that hte *sType* member is a bit odd, this is a common
+pattern in Vulkan where we must tell Vulkan what kind of object it is
+before we use it. There's alot of these so be sure to get ready to
+type them alot. As above, we specifically ask Vulkan for the 1.3
+version of the driver. This is important for features we wish to make
+use of later. Since Vulkan in meant to be a low level abstraction
+above the driver, Vulkan itself comes with very little and you have to
+tell Vulkan what parts of it you want. There's two different types of
+additions you can choose from. The first being that of
+"extensions". Extensions are items or driver additions that "extend"
+Vulkan's capabilites, functionalities like rendering and presenting
+images are extensions. We'll get into that though. The second way to
+extend Vulkan's capabilities is that of "Layers". Layers are different
+from extensions where in they will add more between the driver and
+that of the program so that you can better intercept Vulkan's data so
+as you can do things like debug better and such. Easiest way to reason
+about these two is that Extensions add to the core functionality of
+Vulkan, where as Layers will add more calls between you and the driver
+making Vulkan slower in the process.
+
+For rendering images to the screen, we must give Vulkan the
+capabilities to do so. Vulkan on it's own doesn't actually have the
+functionality to be able to do this. There are many libraries that
+will do this for you. For example GLFW will give you a function
+something like *glfwGetRequiredInstanceExtensions()* which will return
+to you an array of C-Strings (char* array) which will be your
+necessary extensions for your platform and device. SDL has a function
+like *SDL_Vulkan_GetInstanceExtensions()* which performs the same
+job. On Windows and Linux (x11) however, it's a bit like the
+application_info we filled out above. I'll provide the windows side,
+but I lack the Linux code:
+
+#+BEGIN_SRC C
+bool8
+Win32GetVulkanSurface(vulkan_context_data *VulkanContext, platform_state *Windows)
+{
+    VkWin32SurfaceCreateInfoKHR SurfaceInfo = {};
+    SurfaceInfo.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    SurfaceInfo.hinstance = Windows->InstanceHandle;
+    SurfaceInfo.hwnd      = Windows->WindowHandle;
+
+    VkAssert(vkCreateWin32SurfaceKHR(VulkanContext->Instance,
+                                    &SurfaceInfo,
+                                     VulkanContext->AllocationCallbacks,
+                                    &VulkanContext->RenderSurface));
+    return true;
+}
+#+END_SRC
+
+Remember when I said that you'd be doing alot of the
+VK_STRUCTURE_TYPE* stuff? Yeah I wasn't kidding. Get used to it. This
+creates us something called a *VkWin32SurfaceKHR.* Pretty much any time
+you see "KHR", it's an extension. This VkWin32SurfaceKHR will allow us
+to render to the window's surface (the visible part of the window) and
+present images we draw inside it. This is obviously a critical
+function of a "renderer" so we need it. The functions I previously
+stated will return this extension and the
+*VK_KHR_SURFACE_EXTENSION_NAME* for you so you don't have too. It is
+recommended to use some kind of dynamically sized data structure like
+std::vector() for this since we could get back a varying number of
+extensions, so keep that in mind. In my case, I used SDL3 and used the
+SDL function mentioned before, you might not be using SDL but it's
+still good to talk about this since it's a common model in Vulkan:
+
+#+BEGIN_SRC C
+char const * const * SDL_Vulkan_GetInstanceExtensions(Uint32 *count);
+#+END_SRC
+https://wiki.libsdl.org/SDL3/SDL_Vulkan_GetInstanceExtensions
+
+As you can see, this function returns a *char const * const **. Makes
+sense right? No but really that's just our array of instance
+extensions needed to perform rendering like we want. The important
+part is the input to that function which is a pointer to an unsigned
+32 bit integer. The reason we have this is so that way we can know how
+MANY extensions it returned so we can modify/allocate the extensions
+however we wish. (It's important to note that if you use SDL for this,
+do not free this array. It is owned by SDL) For example, say we want
+to add debug capabilities to the driver, we can do this:
+
+#+BEGIN_SRC C
+u32 platform_extension_count = 0;
+const char * const *SDL_extensions = SDL_Vulkan_GetInstanceExtensions(&platform_extension_count);
+if(SDL_extensions == null)
+{
+    log_error("We have failed to get the SDL_Vulkan instance extensions... Error: '%s'\n", SDL_GetError());
+    SDL_Quit();
+}
+platform_extension_count += 1;
+DynArray(char*) extensions = c_dynarray_create(char*);
+extensions = c_dynarray_reserve(extensions, platform_extension_count);
+
+// NOTE(Sleepster): DEBUG EXTENSION 
+extensions[0] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+memcpy((byte*)extensions + sizeof(char *), SDL_extensions, (platform_extension_count - 1) * sizeof(char *));
+#+END_SRC
+
+Where we simply get back the extensions array and the number of
+extensions from SDL. We can then using that number allocate a new
+array of these extensions so we can add our own extensions like we do
+above where we add the debug utils extension and then just copy the
+rest of the extensions into the new allocation. This extension is
+important because without it or the Vulkan validation layers we have
+no way to gather information about what is wrong with our
+program. With that, the layers are next!
+
+Validation layers as said before are meant to allow us to
+well... "Validate" that what is currently happening is in line with
+what Vulkan and it's specification wants and that we are providing the
+correct data it needs to function. To Enable them, we just create
+another dynamic array of them like we did with extensions:
+
+#+BEGIN_SRC C
+const char *layer = "VK_LAYER_KHRONOS_validation\0";
+DynArray(char*) validation_layers = c_dynarray_create(char*);
+c_dynarray_push(validation_layers, layer);
+
+u32 total_validation_layers = 0;
+VkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, 0));
+
+DynArray(VkLayerProperties) found_validation_layers = c_dynarray_create(VkLayerProperties);
+found_validation_layers = c_dynarray_reserve(found_validation_layers, total_validation_layers);
+
+    VkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, found_validation_layers));
+#+END_SRC
+https://docs.vulkan.org/refpages/latest/refpages/source/vkEnumerateInstanceLayerProperties.html
+
+Which now that we're onto this, we should talk about how we're
+handling items here. It's very similar to how we did it with the
+extensions, but not completely the same. Earlier we called
+*SDL_Vulkan_GetInstanceExtensions()* to give us the amount of extensions
+it's returning, and then it allocated and returned the array for
+us. In this case however, Vulkan does not allocate us memory and we
+must perform the allocation ourselves. Vulkan does this having
+functions that have two purposes and should be called as such.  Vulkan
+has functions like our *vkEnumerateInstanceLayerProperties()* that looks
+like so:
+
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_0
+VkResult vkEnumerateInstanceLayerProperties(
+    uint32_t*                                   pPropertyCount,
+    VkLayerProperties*                          pProperties);
+#+END_SRC
+https://docs.vulkan.org/refpages/latest/refpages/source/vkEnumerateInstanceLayerProperties.html
+
+This function takes in a pointer to a u32 and a pointer to an array of
+*VkLayerProperties*. Like mentioned before, this is meant to be a two
+stage call. If you pass a pointer to a u32 for the first parameter and
+then null for the second, Vulkan will fill in the count and do nothing
+with the null pointer. Filling in the number of the items you need to
+allocate. You will then allocate the array with the size returned and
+pass that array back to the same function with the count which will
+fill the array with the data you need and can work with. I should
+probably talk about our *VKAssert()* macro here, it's simply a wrapper
+that looks like so:
+
+#+BEGIN_SRC C
+#define Statement(action) do {(action)}while(0)
+#define VkAssert(result) Statement(Assert(result == VK_SUCCESS))
+#+END_SRC
+
+*VkAssert()* Just checks if the value returned by a function that gives
+us a *VkResult* is that of VK_SUCCESS. The types of values that VkResult
+can be are here:
+https://docs.vulkan.org/refpages/latest/refpages/source/VkResult.html
+
+It's good practice to check if you have the extensions and the
+validation layers that you actually asked for since the user's device
+or operation system might not support them like so:
+
+#+BEGIN_SRC C
+c_dynarray_for(validation_layers, layer_index)
+{
+    const char *layer_to_find = c_dynarray_get_at_index(validation_layers, layer_index);
+    log_info("Searching for Vulkan validation layer: '%s'\n", layer_to_find);
+
+    bool8 found = false;
+    for(u32 property_index = 0;
+        property_index < total_validation_layers;
+        ++property_index)
+    {
+        char *layer_name = (found_validation_layers + property_index)->layerName;
+        if(strcmp(layer_to_find, layer_name) == 0)
+        {
+            found = true;
+            log_info("Layer found...\n");
+
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        log_error("Failure to find Vulkan validation layer: '%s'\n", layer_to_find);
+        SDL_Quit();
+    }
+}
+#+END_SRC
+
+We simply go through each of the layers we got back, and check against
+the array of layers we actually want to use. If we find it, we report
+we found it. If not? We exit and report an error. The same should
+probably be done for extensions.
+
+After we have verified that we can support all of our layers and
+extensions, it's finally time to create the Vulkan Instance. We can do this like so:
+
+#+BEGIN_SRC C
+VkInstanceCreateInfo instance_info = {};
+instance_info.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+instance_info.ppEnabledExtensionNames = extensions;
+instance_info.enabledExtensionCount   = platform_extension_count;
+instance_info.ppEnabledLayerNames     = validation_layers;
+instance_info.enabledLayerCount       = 1;
+instance_info.pApplicationInfo        = &app_info;
+
+VkAssert(vkCreateInstance(&instance_info, render_context->allocators, &render_context->instance));
+log_info("Vulkan Instance Created..\n");
+#+END_SRC
+https://docs.vulkan.org/refpages/latest/refpages/source/VkInstanceCreateInfo.html
+
+With this create our instance, but there's still some ways to get more out of our instance debug layers.
+
+*** Vulkan Debug Extension 
+Vulkan Provides us with a way to extend these validation layers. By
+default, it will report bugs. But Vulkan allows us to setup our own
+debug callbasck with the kinds of messages we want to recieve and
+control. The debug callback however is not a standard part of Vulkan
+but instead an extension. Therefore, we must introduce ourselves to
+this function:
+
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_0
+PFN_vkVoidFunction vkGetInstanceProcAddr(
+    VkInstance                                  instance,
+    const char*                                 pName);
+#+END_SRC
+https://docs.vulkan.org/refpages/latest/refpages/source/vkGetInstanceProcAddr.html
+
+This function is like all platform *GetProcAddr()* functions, It simply
+allows us to extract a certain function from that of the Vulkan DLL
+for our version. We need this for our vulkan debug messenger utility
+so that we can do as previously described. In order to make use of
+this function, we have to follow Vulkan's creation pattern yet again:
+
+#+BEGIN_SRC C
+u32 debug_log_severity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT|
+                         VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
+
+u32 debug_message_types = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT|
+                          VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT|
+                          VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT;
+
+VkDebugUtilsMessengerCreateInfoEXT vulkan_debug_info = {};
+vulkan_debug_info.sType           = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+vulkan_debug_info.messageSeverity = debug_log_severity;
+vulkan_debug_info.messageType     = debug_message_types;
+vulkan_debug_info.pfnUserCallback = Vk_debug_log_callback;
+#+END_SRC
+https://docs.vulkan.org/refpages/latest/refpages/source/VkDebugUtilsMessengerCreateInfoEXT.html
+
+We start by settings what flags we want Vulkan to send the debug log
+to process. We do the same for what categories of message types we
+want back. Additional information about these categories and what they
+pertain too can be found here:
+
+https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDebugUtilsMessageSeverityFlagBitsEXT.html
+https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDebugUtilsMessageTypeFlagBitsEXT.html
+
+With this, we can create our *VkDebugUtilsMessenger* and fill it with
+our necessary data. Our callback must look like so:
+#+BEGIN_SRC C
+VKAPI_ATTR VkBool32 VKAPI_CALL
+Vk_debug_log_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      message_severity,
+                      VkDebugUtilsMessageTypeFlagsEXT             message_type,
+                      const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
+                      void*                                       user_data)
+#+END_SRC
+https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/PFN_vkDebugUtilsMessengerCallbackEXT.html
+
+In my case, it's implemented like so:
+#+BEGIN_SRC C
+VKAPI_ATTR VkBool32 VKAPI_CALL
+Vk_debug_log_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      message_severity,
+                      VkDebugUtilsMessageTypeFlagsEXT             message_type,
+                      const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
+                      void*                                       user_data)
+{
+    switch(message_severity)
+    {
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+        {
+            log_fatal(callback_data->pMessage);
+        }break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+        {
+            log_warning(callback_data->pMessage);
+        }break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+        {
+            log_info(callback_data->pMessage);
+        }break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+        {
+            log_trace(callback_data->pMessage);
+        }break;
+    }
+    return VK_FALSE;
+}
+#+END_SRC 
+
+And this must be passed as part of the create info used for this
+messenger. Now it's finally time to use that *vkGetInstanceProcAddr()*
+function to get this function pointer from the DLL for our version:
+
+#+BEGIN_SRC C
+    PFN_vkCreateDebugUtilsMessengerEXT vk_debug_func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(render_context->instance, 
+                                                                                                                    "vkCreateDebugUtilsMessengerEXT");
+    VkAssert(vk_debug_func(render_context->instance, &vulkan_debug_info, null, &render_context->debug_callback));
+#+END_SRC
+https://docs.vulkan.org/refpages/latest/refpages/source/vkCreateDebugUtilsMessengerEXT.html
+
+And lastly, call the function with the data necessary to create our
+debugger. With that, pretty much everything is done with our instance
+creation. There's many more ways you can extend this, the instance
+validation layers allow you to change things such as both the enabled
+and disabled validation layers. There are also many many more
+extensions than what is shown here.
+https://registry.khronos.org/vulkan/specs/latest/pdf/vkspec.pdf
+
+there are many functions that can be extracted and added here so that
+we can get some extended information from Vulkan later. Calls like
+these in Godot's Vulkan renderer are an example:
+
+https://github.com/godotengine/godot/blob/63227bbc8ae5300319f14f8253c8158b846f355b/drivers/vulkan/rendering_context_driver_vulkan.cpp
+#+BEGIN_SRC C
+// Setup VK_EXT_debug_utils function pointers always (we use them for debug labels and names).
+functions.CreateDebugUtilsMessengerEXT  = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance,  "vkCreateDebugUtilsMessengerEXT");
+functions.DestroyDebugUtilsMessengerEXT = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+functions.CmdBeginDebugUtilsLabelEXT    = (PFN_vkCmdBeginDebugUtilsLabelEXT)vkGetInstanceProcAddr(instance,    "vkCmdBeginDebugUtilsLabelEXT");
+functions.CmdEndDebugUtilsLabelEXT      = (PFN_vkCmdEndDebugUtilsLabelEXT)vkGetInstanceProcAddr(instance,      "vkCmdEndDebugUtilsLabelEXT");
+functions.SetDebugUtilsObjectNameEXT    = (PFN_vkSetDebugUtilsObjectNameEXT)vkGetInstanceProcAddr(instance,    "vkSetDebugUtilsObjectNameEXT");
+#+END_SRC 
+
+Some more of these can be found here:
+https://docs.vulkan.org/samples/latest/samples/extensions/debug_utils/README.html
+
+** Vulkan Device Data
+*** Vulkan Physical Device
+In order to use Vulkan properly, We need a physical device to perform
+our render commands too. We can find out what devices on the system
+can be interfaced with using Vulkan's *vkEnumeratePhysicalDevices()**
+function, which looks like so:
+
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_0
+VkResult vkEnumeratePhysicalDevices(
+  VkInstance instance,
+  uint32_t* pPhysicalDeviceCount,
+  VkPhysicalDevice* pPhysicalDevices);
+#+END_SRC
+
+This function takes in a Vulkan instance, a pointer to an unsigned 32
+bit integer, and a pointer to an array of *VkPhysicalDevice*. This
+function follows the universal pattern of the "enumerate" functions
+that preside within Vulkan. We do as we've done before where we pass
+the integer so Vulkan can fill it's value with the count of physical
+devices on the system it can interface with. Then allocate an array of
+these *VkPhysicalDevice* so that Vulkan can fill the array with these
+objects. Like So:
+
+#+BEGIN_SRC C
+
+u32 physical_device_counter = 0;
+VkAssert(vkEnumeratePhysicalDevices(render_context->instance, &physical_device_counter, 0));
+
+// just a wrapper around malloc...
+VkPhysicalDevice *physical_devices = AllocArray(VkPhysicalDevice, physical_device_counter);
+
+VkAssert(vkEnumeratePhysicalDevices(render_context->instance, &physical_device_counter, physical_devices));
+#+END_SRC
+
+The documentation is very clear about what should happen when you call this function:
+#+BEGIN_QUOTE
+"If *pPhysicalDevices* is *NULL*, then the number of physical devices available is returned in
+*pPhysicalDeviceCount*. Otherwise, *pPhysicalDeviceCount* must point to a variable set by the
+application to the number of elements in the *pPhysicalDevices* array, and on return the variable is
+overwritten with the number of handles actually written to *pPhysicalDevices*. If
+*pPhysicalDeviceCount* is less than the number of physical devices available, at most
+*pPhysicalDeviceCount* structures will be written, and *VK_INCOMPLETE* will be returned instead of
+*VK_SUCCESS*, to indicate that not all the available physical devices were returned."
+#+END_QUOTE
+Thus if you allocated correctly, you'll get a list of physical devices
+back. There are other methods to gathering the physical devices
+present on the system if you do not wish to allocate memory for
+them. This functions is provided by Vulkan version 1.1 and is:
+
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_1
+VkResult vkEnumeratePhysicalDeviceGroups(
+    VkInstance                                  instance,
+    uint32_t*                                   pPhysicalDeviceGroupCount,
+    VkPhysicalDeviceGroupProperties*            pPhysicalDeviceGroupProperties);
+#+END_SRC
+
+How does this prevent us from allocating memory? Well:
+
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_1
+#define VK_MAX_DEVICE_GROUP_SIZE 32U
+typedef struct VkPhysicalDeviceGroupProperties {
+    VkStructureType     sType;
+    void*               pNext;
+    uint32_t            physicalDeviceCount;
+    VkPhysicalDevice    physicalDevices[VK_MAX_DEVICE_GROUP_SIZE];
+    VkBool32            subsetAllocation;
+} VkPhysicalDeviceGroupProperties;
+#+END_SRC
+
+When you create one of thse *VkPhysicalDEviceGroupProperties*, it
+creates a stack allocated array of *VkPhysicalDevice* and thusly you can
+just do this:
+
+#+BEGIN_SRC C
+VkPhysicalDeviceGroupProperties device_properties = {};
+u32 physical_device_counter = 0;
+vkEnumeratePhysicalDeviceGroups(render_context->instance, &physical_device_counter, &device_properties);
+#+END_SRC
+
+Which is much cleaner in my opinion, you're free to pick whichever you
+want but this "new" approach you can start using as of Vulkan 1.1 is
+rather convienent.
+
+These functions however, don't guarentee all the devices you get back
+are going to be able to perform the actions you wish them too. So far,
+we haven't run into the verbosity of Vulkan. Now however is that
+time. It is wise to loop over all the devices you get back from Vulkan
+and gather their *VkDeviceProperties*, their *VkDeviceFeatures*, and their
+,*VkPhysicalDeviceMemoryProperties*. This is to ensure that it's a
+device you actually wish to use, we can do this like so:
+
+#+BEGIN_SRC C
+for(u32 device_index = 0;
+    device_index < physical_device_counter;
+    ++device_index)
+{
+    VkPhysicalDevice current_device = physical_devices[device_index];
+
+    VkPhysicalDeviceProperties device_properties;
+    vkGetPhysicalDeviceProperties(current_device, &device_properties);
+
+    VkPhysicalDeviceFeatures device_features;
+    vkGetPhysicalDeviceFeatures(current_device, &device_features);
+
+    VkPhysicalDeviceMemoryProperties device_memory_properties;
+    vkGetPhysicalDeviceMemoryProperties(current_device, &device_memory_properties);
+    ...
+#+END_SRC
+
+At this point... it's a good idea to solidify what it is that you want
+from the GPU. In my case I am doing 2.5D rendering with special
+effects like Bloom and depth rendering. So my structure looks like so:
+
+#+BEGIN_SRC C
+typedef struct vulkan_physical_device_requirements
+{
+    bool8        has_graphics_queue;
+    bool8        has_present_queue;
+    bool8        has_transfer_queue;
+    bool8        has_compute_queue;
+
+    const char **required_extensions;
+}vulkan_physical_device_requirements_t;
+#+END_SRC
+
+With the only extension required being that of
+*VK_KHR_SWAPCHAIN_EXTENSION_NAME*. This isn't even necessarily
+required. I won't touch on what a "swapchain" is exactly right now,
+but all you need to know is that without a swapchain we're essentially
+just repeatedly drawing to the same image constantly. The reason why
+it's required for me is that I wish to have more than one image to
+draw to at a time. If you want to know more as of the Vulkan
+Specification version 1.4.337 you can read about the swapchain in
+chapter 36 section 10.This is also why we needed to create the surface
+earlier during the Instance initialization.
+https://docs.vulkan.org/spec/latest/chapters/VK_KHR_surface/wsi.html
+
+With this information in hand, we can then create a helper function
+that wraps this information up and checks if the device actually
+supports our requested requirements:
+
+#+BEGIN_SRC C
+for(u32 device_index = 0;
+    device_index < physical_device_counter;
+    ++device_index)
+{
+    VkPhysicalDevice current_device = physical_devices[device_index];
+
+    VkPhysicalDeviceProperties device_properties;
+    vkGetPhysicalDeviceProperties(current_device, &device_properties);
+
+    VkPhysicalDeviceFeatures device_features;
+    vkGetPhysicalDeviceFeatures(current_device, &device_features);
+
+    VkPhysicalDeviceMemoryProperties device_memory_properties;
+    vkGetPhysicalDeviceMemoryProperties(current_device, &device_memory_properties);
+
+    vulkan_physical_device_requirements_t requirements;
+    requirements.has_graphics_queue = true;
+    requirements.has_present_queue  = true;
+    requirements.has_transfer_queue = true;
+    requirements.has_compute_queue  = true;
+
+    requirements.required_extensions = AllocArray(const char *, 10);
+    requirements.required_extensions[0] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+
+    vulkan_physical_device_swapchain_support_info_t device_swapchain_support_info = {};
+    vulkan_physical_device_queue_info_t             device_queue_information = {};
+    if(r_vulkan_physical_device_is_supported(render_context,
+                                                current_device,
+                                                &device_properties,
+                                                &device_features,
+                                                &device_swapchain_support_info,
+                                                &device_queue_information,
+                                                &requirements))
+    {
+        // Save the device as the "rendering device" should it meet
+        // our requirements. Optionally you could continue to make
+        // sure it's the "best fit" device, rather than just one that
+        // just simply fits our requirements.
+    }
+#+END_SRC
+
+The check if our device is supported could be really huge, and we
+might not have the same requirements, so instead of just pasting the
+function here I'll instead just provide functions from the Vulkan API
+that help me figure out whether this device supports the things I
+need. For gathering the queue infromation, we can use
+*vkGetPhysicalDEviceQueueFamilyProperties()* to gather information about
+the device's queue families. What are queues? We'll explain that
+later. For now all you need to know is that Vulkan handles render
+commands differently from that of a GPU api like that of OpenGL and
+DirectX where the commands are simply performed "when
+requested". Vulkan instead pushes all the commands into a queue and
+then sends that queue to the appropriate part of the GPU to be
+executed. For example, we have different queues on the GPU that can
+perform many tasks. Each queue has a different level of support. The
+type of operations the queue supports can vary. Generally though
+(most) GPUs has queues to support operations like:
+
+- Graphics processing
+- Transferring data
+- Compute shader processing
+- Presenting images
+- Sparse Binding items
+- Video Encoding and decoding
+- DRM protecting memory
+
+You can read about it here:
+https://docs.vulkan.org/guide/latest/queues.html
+
+In our case, the GPU must support:
+- Using graphics rendering related functions
+- Presenting Images
+- Transfering data
+- Handling compute operations
+
+It must also support the swapchain extension from earlier which leads
+us to this next function which is
+*vkGetPhysicalDeviceSurfaceSupportKHR()*. Which looks like so:
+
+#+BEGIN_SRC C
+// Provided by VK_KHR_surface
+VkResult vkGetPhysicalDeviceSurfaceSupportKHR(
+    VkPhysicalDevice                            physicalDevice,
+    uint32_t                                    queueFamilyIndex,
+    VkSurfaceKHR                                surface,
+    VkBool32*                                   pSupported);
+#+END_SRC
+
+This takes in our device, the index of this queueFamily, the surface,
+and whether or not presenting images is supported on this surface by
+the device. Typically what you'd do for this is loop through the
+amount of queues on the GPU, which get get back from the
+*vkGetPhyiscalDeviceQueueFamilyProperties()* function mentioned earlier
+and test each of the queue's in a loop figuring out which one has the
+highest "score", which is our level of support like so:
+
+#+BEGIN_SRC C
+u8 minimum_transfer_score = 255;
+for(u32 queue_family_index = 0;
+    queue_family_index < queue_family_counter;
+    ++queue_family_index)
+{
+    u8 current_transfer_score = 0;
+
+    VkQueueFamilyProperties properties = queue_family_data[queue_family_index];
+    if(properties.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+    {
+        device_queue_info->graphics_queue_family_index = queue_family_index;
+        ++current_transfer_score;
+    }
+
+    if(properties.queueFlags & VK_QUEUE_COMPUTE_BIT)
+    {
+        device_queue_info->compute_queue_family_index = queue_family_index;
+        ++current_transfer_score;
+    }
+
+    if(properties.queueFlags & VK_QUEUE_TRANSFER_BIT)
+    {
+        if(current_transfer_score <= minimum_transfer_score)
+        {
+            minimum_transfer_score = current_transfer_score;
+            device_queue_info->transfer_queue_family_index = queue_family_index;
+        }
+    }
+
+    VkBool32 supports_presenting = VK_FALSE;
+    VkAssert(vkGetPhysicalDeviceSurfaceSupportKHR(device, queue_family_index, context_data->render_surface, &supports_presenting));
+    if(supports_presenting)
+    {
+        device_queue_info->present_queue_family_index = queue_family_index;
+    }
+}
+#+END_SRC
+
+The queue families on the GPU have a bitfield to store exactly what
+operations they support, we can use that bitfield to score this queue
+family appropriately and find out if this the appropriate queue family
+we should use for our presentation. This is good practice, but scoring
+can be skipped if you don't care. However, it's important to at least
+make sure that the queue family you pick at least supports
+presenting. The Vulkan tutorial does something similar here:
+https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Physical_devices_and_queue_families
+
+You can do whatever you want with your requirements and such beyond
+this point, but I will use *vkEnumerateDeviceExtensionProperties()* to
+figure out what extensions we actually have on the device, like how we
+did earlier with our instance data:
+
+#+BEGIN_SRC C
+VkAssert(vkEnumerateDeviceExtensionProperties(device, 0, &device_avaliable_extension_counter, 0));
+if(device_avaliable_extension_counter != 0)
+{
+    device_avaliable_extensions = AllocArray(VkExtensionProperties, device_avaliable_extension_counter);
+}
+VkAssert(vkEnumerateDeviceExtensionProperties(device, 0, &device_avaliable_extension_counter, device_avaliable_extensions));
+for(u32 extension_index = 0;
+    extension_index < ArrayCount(requirements->required_extensions);
+    ++extension_index)
+{
+    bool8 found = false;
+    const char *extension = requirements->required_extensions[extension_index];
+
+    for(u32 device_extension_index = 0;
+        device_extension_index < device_avaliable_extension_counter;
+        ++device_extension_index)
+    {
+        const char *device_extension = device_avaliable_extensions[device_extension_index].extensionName;
+        if(strcmp(extension, device_extension) == 0)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        log_info("Vulkan Extension '%s' was no found... skipping device...\n", extension);
+        return(false);
+    }
+}
+#+END_SRC
+
+This will tell us everything we need to know about the device. If all
+our requirements are met, we will fill our render_context's
+rendering_device with the data for this physical device and this will
+be used as our default rendering device for the rest of the programs
+runtime (or until something else happens... we'll get to that). It's
+important to note that not just the physical device is saved, handles
+in Vulkan are defined as such:
+
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_0
+#define VK_DEFINE_HANDLE(object) typedef struct object##_T* object;
+VK_DEFINE_HANDLE(VkPhysicalDevice)
+#+END_SRC
+
+where VK_DEFINE_HANDLE is just a void*. So keep in mine you need to
+store other data associated with the device, because if you don't
+you'll have to keep querying it the entire time. My storage looks like
+so:
+
+#+BEGIN_SRC C
+typedef struct vulkan_physical_device_data
+{
+    VkPhysicalDevice                                handle;
+    VkFormat                                        device_depth_format;
+    VkPhysicalDeviceProperties                      properties;
+    VkPhysicalDeviceFeatures                        features;
+    VkPhysicalDeviceMemoryProperties                memory_properties;
+    vulkan_physical_device_swapchain_support_info_t swapchain_support_info;
+}vulkan_physical_device_t;
+#+END_SRC
+*** Vulkan Logical Device
+In Vulkan, the physical device is meant to be an item that represents
+the actual GPU device you are intending to perform render commands
+from. It allows us to explicitly query the capabilities and features
+of the device effectively. We however cannot actually use this
+structure to perform render commands or allocate GPU memorywith the
+device directly, we instead have to use this phyiscal device to create
+what Vulkan calls a "logical device". This will allow us to directly
+interface with the gpu to allow us to do things such as allocate
+memory, execute draw commands, or order the GPU to perform some
+compute functionality.
+
+Depending on what you want from a Vulkan Instance, there's more you
+have to do so you can actually properly create a Vulkan device. It's
+time to introduce the idea of a queue in Vulkan. These were briefly
+mentioned before when talking about the Vulkan instance debug
+section. However now, they matter a great deal. They are how we
+actually tell Vulkan what commands we wish for it to
+perform. Thankfully we already gathered that information when we
+created the physical device, so now all we have to do is use it!:
+
+#+BEGIN_SRC C
+bool8 present_queue_shares_graphics_queue  = render_context->rendering_device.graphics_queue_family_index  == render_context->rendering_device.present_queue_family_index;
+bool8 transfer_queue_shares_graphics_queue = render_context->rendering_device.graphics_queue_family_index  == render_context->rendering_device.transfer_queue_family_index;
+bool8 compute_queue_shares_any             = (render_context->rendering_device.graphics_queue_family_index == render_context->rendering_device.compute_queue_family_index) ||
+                                             (render_context->rendering_device.present_queue_family_index  == render_context->rendering_device.compute_queue_family_index)  ||
+                                             (render_context->rendering_device.transfer_queue_family_index == render_context->rendering_device.compute_queue_family_index);
+
+u32 index_count = 1;
+if(!present_queue_shares_graphics_queue)  index_count++;
+if(!transfer_queue_shares_graphics_queue) index_count++;
+if(!compute_queue_shares_any) index_count++;
+
+u32 indices[4] = {};
+u32 index = 0;
+
+indices[index++] = render_context->rendering_device.graphics_queue_family_index;
+if(!present_queue_shares_graphics_queue)
+{
+    indices[index++] = render_context->rendering_device.present_queue_family_index;
+}
+if(!transfer_queue_shares_graphics_queue)
+{
+    indices[index++] = render_context->rendering_device.transfer_queue_family_index;
+}
+if(!compute_queue_shares_any)
+{
+    indices[index++] = render_context->rendering_device.compute_queue_family_index;
+}
+#+END_SRC
+
+As you can see above, all we're doing here is figuring out how many
+queue family indices we're actually using and filling each index of
+the array with the queue family index we intend to use there. Why do
+we do this? Well because the logical device requires us to provide
+some information when we go to create it. This information is intended
+to be provided via a *VkDeviceCreateInfo* I know, shocking. This data
+structure looks like so:
+
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_0
+typedef struct VkDeviceCreateInfo {
+    VkStructureType                    sType;
+    const void*                        pNext;
+    VkDeviceCreateFlags                flags;
+    uint32_t                           queueCreateInfoCount;
+    const VkDeviceQueueCreateInfo*     pQueueCreateInfos;
+    // enabledLayerCount is legacy and should not be used
+    uint32_t                           enabledLayerCount;
+    // ppEnabledLayerNames is legacy and should not be used
+    const char* const*                 ppEnabledLayerNames;
+    uint32_t                           enabledExtensionCount;
+    const char* const*                 ppEnabledExtensionNames;
+    const VkPhysicalDeviceFeatures*    pEnabledFeatures;
+} VkDeviceCreateInfo;
+#+END_SRC
+https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceCreateInfo.html
+
+The main things I wish to focus on are the members:
+#+BEGIN_SRC C
+uint32_t                           queueCreateInfoCount;
+const VkDeviceQueueCreateInfo*     pQueueCreateInfos;
+#+END_SRC
+
+and:
+
+#+BEGIN_SRC C
+uint32_t                           enabledExtensionCount;
+const char* const*                 ppEnabledExtensionNames;
+#+END_SRC
+
+Why is this you may ask? Well because Vulkan requires us to pass this
+information when we create the logical device so that it can allocate
+the data needed to make use of these requirements. The extensions are
+the easy part, you can simply pass them like so:
+
+#+BEGIN_SRC C
+const char *extension = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+device_create_info.ppEnabledExtensionNames = &extension;
+#+END_SRC
+
+In our case, this is simple since the array of extensions we make use
+of is really just one. However it's just as simple to create an array
+of c-strings like we did earlier and just pass that array to Vulkan.
+
+The "hard" part are these *pQueueCreateInfos*, this isn't really hat
+hard though. This is what a *VkDeviceQueueCreateInfo* looks like:
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_0
+typedef struct VkDeviceQueueCreateInfo {
+    VkStructureType             sType;
+    const void*                 pNext;
+    VkDeviceQueueCreateFlags    flags;
+    uint32_t                    queueFamilyIndex;
+    uint32_t                    queueCount;
+    const float*                pQueuePriorities;
+} VkDeviceQueueCreateInfo;
+#+END_SRC
+https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDeviceQueueCreateInfo.html
+
+If you have more than one queue family you wish to make use of, you
+can make them in a loop like so:
+#+BEGIN_SRC C
+VkDeviceQueueCreateInfo queue_create_infos[4] = {};
+for(u32 queue_index = 0;
+    queue_index < index_count;
+    ++queue_index)
+{
+    VkDeviceQueueCreateInfo *info = queue_create_infos + queue_index;
+
+    info->sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    info->queueFamilyIndex = indices[queue_index];
+    info->queueCount       = 1;
+    info->flags = 0;
+    info->pNext = 0;
+
+    float32 queue_priority = 1.0f;
+    info->pQueuePriorities = &queue_priority;
+}
+#+END_SRC
+
+and then supply this to our *vkCreateDevice()* and that will work for
+this instance. In fact, that's what I do and it's what's
+recommended. Especially if you have a workload that can be highly
+parallelized. (https://stackoverflow.com/questions/37575012/should-i-try-to-use-as-many-queues-as-possible)
+There is one more detail to talk about though with the queue create
+info, the queue priority member. It's best to let the specification
+describe this:
+
+#+BEGIN_QUOTE
+"Each queue is assigned a priority, as set in the
+*VkDeviceQueueCreateInfo* structures when creating the device. The
+priority of each queue is a normalized floating-point value between
+0.0 and 1.0, which is then translated to a discrete priority level by
+the implementation. Higher values indicate a higher priority, with 0.0
+being the lowest priority and 1.0 being the highest.  Within the same
+device, queues with higher priority may be allotted more processing
+time than queues with lower priority. The implementation makes no
+guarantees with regards to ordering or scheduling among queues with
+the same priority, other than the constraints defined by any explicit
+synchronization primitives. The implementation makes no guarantees
+with regards to queues across different devices.  An implementation
+may allow a higher-priority queue to starve a lower-priority queue on
+the same *VkDevice* until the higher-priority queue has no further
+commands to execute. The relationship of queue priorities must not
+cause queues on one *VkDevice* to starve queues on another *VkDevice*. No
+specific guarantees are made about higher priority queues receiving
+more processing time or better quality of service than lower priority
+queues."
+#+END_QUOTE
+
+With this set up, we can create the *VkDevice* like so:
+
+#+BEGIN_SRC C
+VkDeviceCreateInfo device_create_info = {};
+device_create_info.sType                 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+device_create_info.queueCreateInfoCount  = index_count;
+device_create_info.pQueueCreateInfos     = queue_create_infos;
+device_create_info.pEnabledFeatures      = 0;
+device_create_info.enabledExtensionCount = 1;
+
+const char *extension = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+device_create_info.ppEnabledExtensionNames = &extension;
+
+VkAssert(vkCreateDevice(render_context->rendering_device.physical_device.handle,
+                        &device_create_info,
+                        render_context->allocators,
+                        &render_context->rendering_device.logical_device));
+#+END_SRC
+
+Now with this, we have everything we need to start creating and
+managing Vulkan resources on the GPU. The first of these we must
+manage are that of the queues. Queues are needed to well, "queue" up
+commands so that we can tell the GPU what actions need to be performed
+and in what order they should be performed.
+
+** Vulkan Queues and Command Pools 
+*** Getting Queues
+Now with this, we have everything we need to start creating and
+managing Vulkan resources on the GPU. The first of these we must
+manage are that of the queues. Queues are needed to well, "queue" up
+commands so that we can tell the GPU what actions need to be performed
+and in what order they should be performed.
+
+#+BEGIN_SRC C
+void vkGetDeviceQueue(
+    VkDevice device,
+    uint32_t queueFamilyIndex,
+    uint32_t queueIndex,
+    VkQueue* pQueue);
+#+END_SRC
+
+In my code, we do this like so:
+
+#+BEGIN_SRC C
+vkGetDeviceQueue(render_context->rendering_device.logical_device,
+                 render_context->rendering_device.graphics_queue_family_index,
+                 0,
+                &render_context->rendering_device.graphics_queue);
+#+END_SRC
+
+This is only for the graphics queue, the rest is exactly the same but
+just using different queue family indices. There are other ways via
+the Vulkan specification to gather queue information. If you need a
+queue that is "protected" or needs flags then you should instead use
+*vkCreateDeviceQueue2*. It looks like so:
+
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_1
+void vkGetDeviceQueue2(
+    VkDevice device,
+    const VkDeviceQueueInfo2* pQueueInfo,
+    VkQueue* pQueue);
+#+END_SRC
+
+The difference here is that this takes a *VkDeviceQueueInfo2* which
+helps us set and customize traits about the queue we wish to
+receive. The queue info looks like so:
+
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_1
+typedef struct VkDeviceQueueInfo2 {
+    VkStructureType             sType;
+    const void*                 pNext;
+    VkDeviceQueueCreateFlags    flags;
+    uint32_t                    queueFamilyIndex;
+    uint32_t                    queueIndex;
+} VkDeviceQueueInfo2;
+#+END_SRC
+https://docs.vulkan.org/refpages/latest/refpages/source/VkDeviceQueueInfo2.html
+
+it allows us to pass our same *queueFamilyIndex* and *queueIndex*
+parameters as before, but also allows us to set special flags about
+this queue. The *flags* member is meant to be a bitfield that tells
+Vulkan whether or not the queue should be in a protected state:
+
+#+BEGIN_SRC C
+// Provided by VK_VERSION_1_1
+typedef enum VkDeviceQueueCreateFlagBits {
+  // Provided by VK_VERSION_1_1
+    VK_DEVICE_QUEUE_CREATE_PROTECTED_BIT = 0x00000001,
+} VkDeviceQueueCreateFlagBits;
+#+END_SRC
+https://docs.vulkan.org/refpages/latest/refpages/source/VkDeviceQueueCreateFlagBits.html
+https://docs.vulkan.org/refpages/latest/refpages/source/VkDeviceQueueCreateFlags.html
+
+So if you need this information, then you should use
+*vkGetDeviceQueue2()* instead of the original.
+
+*** Command Buffers and Commands Pools
+** Vulkan Images
+** Vulkan Swapchain
+** Vulkan Renderpasses
+** Vulkan Pipelines
+** Vulkan Shaders and Shader Modules
+** Vulkan Buffers
+** Vulkan Draw Commands
+** Vulkan Descriptors and Descriptor Sets
+** Vulkan Shader Uniforms
+** Vulkan Push Buffers
+** Vulkan Samplers and Texture
+** Vulkan Dynamic Render State
+** Vulkan Semaphores and Fences

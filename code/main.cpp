@@ -80,7 +80,8 @@ main(int argc, char **argv)
         {
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
         }
-        gc_setup();
+        c_global_context_init();
+        c_threadpool_init(&global_context->main_threadpool);
 
         render_context->window = state->window;
         r_renderer_init(render_context, state->window_size);
@@ -183,7 +184,7 @@ main(int argc, char **argv)
 #if 0
             float32 alpha = (dt_accumulator / gcv_tick_rate);
 #endif
-            gc_reset_temporary_data();
+            c_global_context_reset_temporary_data();
 
             current_tsc = SDL_GetPerformanceCounter();
             delta_tsc   = current_tsc - last_tsc;
