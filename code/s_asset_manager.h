@@ -59,7 +59,7 @@ typedef enum bitmap_format
     BMF_Count,
 }bitmap_format_t;
 
-#include <r_vulkan.h>
+#include <r_vulkan_types.h>
 
 /* NOTE(Sleepster): 
  * The Asset handle is very simple, it is simply a means to only do the expensive hash lookups once, 

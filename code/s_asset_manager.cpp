@@ -4,6 +4,8 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#include <stb/stb_image.h>
+
 #include <c_base.h>
 #include <c_types.h>
 #include <c_log.h>
@@ -13,12 +15,9 @@
 #include <c_file_watcher.h>
 #include <c_string.h>
 #include <c_hash_table.h>
-
-#include <stb/stb_image.h>
-
 #include <asset_file_packer/jfd_asset_file.h>
 
-#include <r_vulkan.h>
+#include <r_vulkan_core.h>
 
 // ===============================
 // ========== TEXTURES ===========

@@ -18,7 +18,7 @@
 #include <c_log.h>
 #include <c_globals.h>
 
-#include <r_vulkan.h>
+#include <r_vulkan_core.h>
 
 #include <p_platform_data.h>
 
