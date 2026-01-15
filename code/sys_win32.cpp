@@ -389,7 +389,7 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 
     while(cursor < header->size)
     {
-        string_t directory_name = c_dynarray_get_at_index(directories, cursor);
+        string_t directory_name = c_dynarray_get_value(directories, cursor);
         cursor += 1;
 
         char wildcard_name[256];

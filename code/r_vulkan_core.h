@@ -20,6 +20,8 @@
 
 #include <r_vulkan_types.h>
 
+typedef struct texture2D texture2D_t;
+
 //#define VkAssert(result) Statement(Assert(result == VK_SUCCESS))
 #define vkAssert(result) ({                                                \
     if(!r_vulkan_result_is_success(result))                                \
@@ -38,7 +40,7 @@ bool8 r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context);
 
 vulkan_command_buffer_data_t r_vulkan_command_buffer_acquire_scratch_buffer(vulkan_render_context_t *render_context, VkCommandPool command_pool);
 vulkan_shader_data_t r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_source);
-void r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_t *handle);
+void r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, texture2D_t *texture);
 
 void
 r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *render_context,

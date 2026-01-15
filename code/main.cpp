@@ -94,10 +94,20 @@ main(int argc, char **argv)
         asset_manager->render_context = render_context;
         render_context->default_texture = Alloc(asset_handle_t);
         *render_context->default_texture = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
-        r_vulkan_make_gpu_texture(render_context, render_context->default_texture);
+        r_vulkan_make_gpu_texture(render_context, &render_context->default_texture->slot->texture);
 
         render_context->default_shader = Alloc(asset_handle_t);
         *render_context->default_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("test"));
+
+        texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 1024, 4, BMF_RGBA32, 32);
+        s_texture_atlas_add_texture(atlas, render_context->default_texture);
+        s_texture_atlas_add_texture(atlas, render_context->default_texture);
+        s_texture_atlas_add_texture(atlas, render_context->default_texture);
+        s_texture_atlas_add_texture(atlas, render_context->default_texture);
+        s_texture_atlas_add_texture(atlas, render_context->default_texture);
+        s_texture_atlas_add_texture(atlas, render_context->default_texture);
+        s_texture_atlas_add_texture(atlas, render_context->default_texture);
+        s_texture_atlas_pack_added_textures(render_context, atlas);
 
         input_manager_t input_manager = {};
         s_im_init_input_manager(&input_manager);

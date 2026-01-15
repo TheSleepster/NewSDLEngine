@@ -15,6 +15,7 @@
 #include <c_file_watcher.h>
 #include <c_string.h>
 #include <c_hash_table.h>
+#include <c_dynarray.h>
 #include <asset_file_packer/jfd_asset_file.h>
 
 #include <r_vulkan_core.h>
@@ -58,6 +59,21 @@ s_asset_bitmap_init(string_t pixels, s32 width, s32 height, s32 channels, u32 fo
     result.format   = format;
     result.pixels   = pixels;
 
+    return(result);
+}
+
+bitmap_t 
+s_asset_bitmap_create(asset_manager_t *asset_manager, s32 width, s32 height, s32 channels, u32 format)
+{
+    bitmap_t result;
+
+    u32 pixel_count = width * height * channels;
+    string_t pixels = {
+        .data  = c_za_alloc(asset_manager->asset_allocator, pixel_count, ZA_TAG_TEXTURE),
+        .count = pixel_count 
+    };
+
+    result = s_asset_bitmap_init(pixels, width, height, channels, format);
     return(result);
 }
 
@@ -150,7 +166,8 @@ s_asset_manager_init(asset_manager_t *asset_manager)
     Assert(asset_manager->is_initialized == false);
     stbi_set_flip_vertically_on_load(0);
 
-    asset_manager->manager_arena = c_arena_create(MB(100));
+    asset_manager->manager_arena   = c_arena_create(MB(100));
+    asset_manager->asset_allocator = c_za_create(GB(1));
     for(u32 catalog_index = 1;
         catalog_index < AT_Count;
         ++catalog_index)
@@ -324,4 +341,132 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
     }
 
     return(result);
+}
+
+texture_atlas_t*
+s_texture_atlas_create(asset_manager_t *asset_manager, 
+                       u32              width, 
+                       u32              height, 
+                       u32              channel_count, 
+                       u32              format, 
+                       u32              initial_subtexture_count)
+{
+    texture_atlas_registry_t *registry = &asset_manager->atlas_registry;
+    texture_atlas_t *atlas = null;
+    for(u32 atlas_index = 0;
+        atlas_index < ArrayCount(registry->atlases);
+        ++atlas_index)
+    {
+        texture_atlas_t *found = registry->atlases + atlas_index;
+        if(found->is_valid == false)
+        {
+            atlas = found;
+            break;
+        }
+    }
+    // TODO(Sleepster): Might wanna do something about this assert... I just don't care right now.
+    Assert(atlas);
+    Assert(atlas->is_valid == false)
+
+    registry->current_atlas_count += 1;
+
+    atlas->texture.bitmap = s_asset_bitmap_create(asset_manager, width, height, channel_count, format);
+    atlas->bitmap_data    = &atlas->texture.bitmap;
+
+    atlas->textures_to_merge = c_dynarray_create(asset_handle_t*);
+    c_dynarray_reserve(atlas->textures_to_merge, initial_subtexture_count);
+
+    atlas->packed_subtextures = c_dynarray_create(subtexture_data_t);
+    atlas->packed_subtextures = c_dynarray_reserve(atlas->packed_subtextures, initial_subtexture_count);
+
+    atlas->ID       = registry->current_atlas_count - 1;
+    atlas->is_valid = true;
+
+    return(atlas);
+}
+
+void
+s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle)
+{
+    Assert(texture_handle);
+    Assert(texture_handle->is_valid);
+    Assert(texture_handle->type == AT_Bitmap);
+
+    c_dynarray_push(atlas->textures_to_merge, texture_handle);
+    atlas->merge_counter += 1;
+}
+
+void
+s_texture_atlas_pack_added_textures(vulkan_render_context_t *render_context, texture_atlas_t *atlas)
+{
+    Assert(atlas->is_valid);
+
+    if(atlas->merge_counter > 0)
+    {
+        u32 atlas_width       = atlas->bitmap_data->width;
+        u32 atlas_height      = atlas->bitmap_data->height;
+        u32 atlas_channels    = atlas->bitmap_data->channels;
+        string_t atlas_pixels = atlas->bitmap_data->pixels;
+
+        c_dynarray_for(atlas->textures_to_merge, texture_index)
+        {
+            asset_handle_t *asset        =  atlas->textures_to_merge[texture_index];
+            bitmap_t       *asset_bitmap = &asset->slot->texture.bitmap;
+
+            u32 padding = 1;
+            u32 bitmap_width       = asset_bitmap->width;
+            u32 bitmap_height      = asset_bitmap->height;
+            u32 bitmap_channels    = asset_bitmap->channels;
+            string_t bitmap_pixels = asset_bitmap->pixels;
+
+            Assert(asset_bitmap->channels == atlas->bitmap_data->channels);
+
+            // NOTE(Sleepster): Wrap to next y if needed. 
+            if((atlas->atlas_cursor_x + bitmap_width) >= atlas_height)
+            {
+                atlas->atlas_cursor_x  = 0;
+                atlas->atlas_cursor_y += atlas->tallest_y;
+            }
+            if(bitmap_height > atlas->tallest_y) atlas->tallest_y = bitmap_height;
+
+            u32 atlas_cursor_x = atlas->atlas_cursor_x + padding;
+            u32 atlas_cursor_y = atlas->atlas_cursor_y + padding;
+
+            // NOTE(Sleepster): Copy by row. 
+            for(u32 row_index = 0;
+                row_index < bitmap_height;
+                ++row_index)
+            {
+                u32 atlas_bitmap_offset  = ((atlas_cursor_y + row_index) * atlas_width + atlas_cursor_x) * atlas_channels;
+                byte *atlas_pixel_offset = atlas_pixels.data + atlas_bitmap_offset;
+
+
+                u32 bitmap_offset = (row_index * bitmap_width) * bitmap_channels;
+                byte *bitmap_data_offset = bitmap_pixels.data + bitmap_offset;
+
+                memcpy(atlas_pixel_offset, bitmap_data_offset, bitmap_width * bitmap_channels);
+            }
+
+            vec2_t uv_min = vec2(atlas_cursor_x, atlas_cursor_y);
+            vec2_t uv_max = vec2(atlas_cursor_x + bitmap_width, atlas_cursor_y + bitmap_height);
+
+            subtexture_data_t *subtexture = atlas->packed_subtextures + atlas->packed_subtexture_count;
+            asset->subtexture_data = subtexture;
+
+            subtexture->uv_min                 = uv_min;
+            subtexture->uv_max                 = uv_max;
+            subtexture->offset                 = uv_min;
+            subtexture->size                   = vec2(bitmap_width, bitmap_height);
+            subtexture->atlas_subtexture_index = atlas->packed_subtexture_count++;
+            subtexture->atlas                  = atlas;
+
+            atlas->atlas_cursor_x = atlas_cursor_x + bitmap_width;
+        }
+        c_dynarray_clear(atlas->textures_to_merge);
+        r_vulkan_make_gpu_texture(render_context, &atlas->texture);
+    }
+    else
+    {
+        log_info("There are no textures to pack currently...\n");
+    }
 }

@@ -1899,14 +1899,8 @@ r_vulkan_image_copy_from_buffer(vulkan_render_context_t      *render_context,
 
 
 void
-r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_t *handle)
+r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, texture2D_t *texture)
 {
-    Assert(handle->is_valid);
-    Assert(handle->type == AT_Bitmap);
-    Assert(handle->slot->type == AT_Bitmap);
-    Assert(handle->slot->slot_state == ASLS_Loaded);
-
-    texture2D_t      *texture      = &handle->slot->texture;
     vulkan_texture_t *vulkan_image = &texture->gpu_data;
     u32 image_size = texture->bitmap.pixels.count;
     byte *pixels   = texture->bitmap.pixels.data;
@@ -1919,17 +1913,17 @@ r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, asset_handle_
 
     r_vulkan_buffer_copy_data(render_context, &staging_buffer, pixels, image_size, 0, 0);
 
-    handle->slot->texture.gpu_data.image_data = r_vulkan_image_create(render_context,
-                                                                      VK_IMAGE_TYPE_2D,
-                                                                      texture->bitmap.width,
-                                                                      texture->bitmap.height, 
-                                                                      image_format,
-                                                                      VK_IMAGE_TILING_OPTIMAL,
-                                                                      VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                                                                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                                                      VK_IMAGE_ASPECT_COLOR_BIT,
-                                                                      1,
-                                                                      true);
+    texture->gpu_data.image_data = r_vulkan_image_create(render_context,
+                                                         VK_IMAGE_TYPE_2D,
+                                                         texture->bitmap.width,
+                                                         texture->bitmap.height, 
+                                                         image_format,
+                                                         VK_IMAGE_TILING_OPTIMAL,
+                                                         VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                                                         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                                         VK_IMAGE_ASPECT_COLOR_BIT,
+                                                         1,
+                                                         true);
 
     vulkan_command_buffer_data_t temp_buffer = r_vulkan_command_buffer_acquire_scratch_buffer(render_context, 
                                                                                               render_context->rendering_device.graphics_command_pool);
@@ -3201,7 +3195,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
     vkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, found_validation_layers));
     c_dynarray_for(validation_layers, layer_index)
     {
-        const char *layer_to_find = c_dynarray_get_at_index(validation_layers, layer_index);
+        const char *layer_to_find = c_dynarray_get_value(validation_layers, layer_index);
         log_info("Searching for Vulkan validation layer: '%s'\n", layer_to_find);
 
         bool8 found = false;

@@ -139,6 +139,7 @@ r_render_group_begin(render_state_t *render_state)
     Assert(result);
 
     draw_frame_t *draw_frame = &render_state->draw_frame;
+    result->ID                     = render_group_ID;
     result->dynamic_pipeline_state = draw_frame->state.active_pipeline_state;
     result->shader                 = draw_frame->state.active_shader;
 
@@ -169,4 +170,98 @@ void
 r_render_group_end(render_state_t *render_state)
 {
     render_state->draw_frame.state.active_render_group = null;
+}
+
+internal_api inline render_geometry_buffer_t*
+r_render_group_create_new_geoemetry_buffer(render_state_t *render_state)
+{
+    render_geometry_buffer_t *result = null;
+    result = c_arena_push_struct(&render_state->renderer_arena, render_geometry_buffer_t);
+
+    result->vertices    = c_arena_push_array(&render_state->renderer_arena, vertex_t, MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT);
+    result->next_buffer = null;
+    result->is_valid    = true;
+
+    return(result);
+}
+
+render_geometry_buffer_t*
+r_render_group_get_current_buffer(render_state_t *render_state)
+{
+    render_geometry_buffer_t *result = null;
+    render_group_t           *active_render_group = render_state->draw_frame.state.active_render_group;
+
+    // NOTE(Sleepster): Check if the cached buffer already has our camera. 
+    draw_frame_t *draw_frame = &render_state->draw_frame;
+    u64 camera_ID = r_render_camera_create_id(draw_frame->state.active_camera);
+    if(active_render_group->cached_buffer->camera_data.ID == camera_ID)
+    {
+        // NOTE(Sleepster): If it does, just set it as our result and leave. 
+        result = active_render_group->cached_buffer;
+    }
+
+    // NOTE(Sleepster): If the cached one isn't the one we need, look for it in the list of currently valid buffers 
+    if(!result)
+    {
+        render_geometry_buffer_t *found       = null;
+        render_geometry_buffer_t *last_buffer = null;
+        for(render_geometry_buffer_t *current_buffer = &draw_frame->state.active_render_group->first_buffer;
+            current_buffer;
+            current_buffer = current_buffer->next_buffer)
+        {
+            if(current_buffer->camera_data.ID == camera_ID)
+            {
+                // NOTE(Sleepster): If we find it, great. Leave the loop and assign this new buffer into the "cached_buffer" ptr
+                found = current_buffer;
+                break;
+            }
+            last_buffer = current_buffer;
+        }
+
+        // NOTE(Sleepster): Failed to find it? Create one. 
+        result = found;
+        if(!result)
+        {
+            result = r_render_group_create_new_geoemetry_buffer(render_state);
+            last_buffer->next_buffer = result;
+        }
+        Assert(result);
+        Assert(result->is_valid);
+
+        // NOTE(Sleepster): Assign this different buffer into our cached_buffer
+        render_state->draw_frame.state.active_render_group->cached_buffer = result;
+    }
+
+    return(result);
+}
+
+void
+r_draw_texture_ex(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, asset_handle_t *texture_data)
+{
+    render_geometry_buffer_t *buffer = r_render_group_get_current_buffer(render_state);
+    vertex_t *buffer_ptr = buffer->vertices + buffer->vertex_count;
+    buffer->vertex_count += 4;
+
+    vertex_t *bottom_right = buffer_ptr + 0;
+    vertex_t *top_right    = buffer_ptr + 1;
+    vertex_t *top_left     = buffer_ptr + 2;
+    vertex_t *bottom_left  = buffer_ptr + 3;
+
+    float32 top    = position.y + size.y;
+    float32 bottom = position.y;
+    float32 left   = position.x;
+    float32 right  = position.x + size.x;
+
+    bottom_right->vPosition = {right, bottom};
+    top_right->vPosition    = {right, top};
+    top_left->vPosition     = {left,  top};
+    bottom_left->vPosition  = {left,  bottom};
+
+    for(u32 vertex_index = 0;
+        vertex_index < 4;
+        ++vertex_index)
+    {
+        vertex_t *vertex = buffer_ptr + vertex_index;
+        vertex->vColor   = color;
+    }
 }

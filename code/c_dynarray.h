@@ -86,7 +86,7 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
 
 #define c_dynarray_remove_element(d_array, index) ({                    \
     TypeOf(d_array) *p_first = &(d_array);                              \
-    TypeOf(*(d_array)) value = c_dynarray_get_at_index(d_array, index); \
+    TypeOf(*(d_array)) value = c_dynarray_get_value(d_array, index);    \
     _dynarray_remove_impl((void**)p_first, sizeof(d_array[0]), index);  \
     value;                                                              \
 })
@@ -111,12 +111,22 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
         r_value;                                                                           \
     })
 
-#define c_dynarray_get_at_index(d_array, index) ({                             \
+#define c_dynarray_get_value(d_array, index) ({                                \
     dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(d_array); \
     TypeOf(*(d_array)) value = {};                                             \
     Expect(header, "Invalid d_array header...\n");                             \
     if(header && (index) < header->size) {                                     \
         value = d_array[(index)];                                              \
+    }                                                                          \
+    value;                                                                     \
+})
+
+#define c_dynarray_get_ptr(d_array, index) ({                                  \
+    dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(d_array); \
+    TypeOf(*(d_array)) *value = {};                                              \
+    Expect(header, "Invalid d_array header...\n");                             \
+    if(header && (index) < header->size) {                                     \
+        value = d_array + (index);                                             \
     }                                                                          \
     value;                                                                     \
 })
@@ -143,8 +153,9 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
     memcpy(B_data, A_data, (header->size * sizeof(*A)) + sizeof(dynarray_header_t)); \
 })
 
-#define c_dynarray_for(d_array, iterator)                                   \
-dynarray_header_t *header = (dynarray_header_t *)_dynarray_header(d_array); \
-if(header) for(u32 iterator = 0; iterator < header->size; ++iterator)
+#define c_dynarray_for(d_array, iterator_name)                                  \
+    dynarray_header_t *header = (dynarray_header_t *)_dynarray_header(d_array); \
+    Expect(header, "Header is invalid, cannot loop...\n");                      \
+    for(u32 iterator_name = 0; iterator_name < header->size; ++iterator_name)
 
 #endif // C_DYNARRAY_H

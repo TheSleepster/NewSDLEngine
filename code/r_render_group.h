@@ -15,6 +15,8 @@
 #define R_RENDER_GROUP_H
 #define MAX_RENDER_GROUPS (192)
 #define MAX_HASHED_RENDER_GROUPS (4093)
+#define MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT (2500)
+#define MAX_RENDER_GROUP_VERTEX_COUNT        (MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT * 4)
 
 // NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. Per render_group
 struct render_group_pipeline_state_t
@@ -40,6 +42,7 @@ struct render_geometry_buffer_t
 {
     render_camera_t           camera_data;
 
+    bool32                    is_valid;
     u32                       primitive_count;
     u32                       vertex_count;
     u32                       master_array_start_offset;
@@ -60,10 +63,12 @@ struct render_group_t
     asset_handle_t                *shader;
     asset_handle_t                *textures[16];
 
-    // NOTE(Sleepster):            size: 10000, if this fills,  
+    // NOTE(Sleepster):            size: 10000, if this fills, expand it doubly.
     vertex_t                      *master_vertex_array;
     u32                            total_vertex_count;
     u32                            total_primitive_count;
+
+    render_geometry_buffer_t      *cached_buffer;
     render_geometry_buffer_t       first_buffer;
 };
 
