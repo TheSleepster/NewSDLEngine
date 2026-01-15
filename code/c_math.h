@@ -70,6 +70,9 @@
 #include <math.h>
 // SIMD
 #include <xmmintrin.h>
+#include <immintrin.h>
+#include <emmintrin.h>
+#include <pmmintrin.h>
 
 #ifdef MATH_IMPLEMENTATION
     #define MATH_API

@@ -29,12 +29,76 @@
 #define STBI_ONLY_PNG
 #include <stb/stb_image.h>
 
-struct vertex_t
+#if 0
+// NOTE(Sleepster): Simply update by going through every single render_group used this frame, and fill it's master_vertex_array with all the data from the buffers 
+void
+update_render_groups()
 {
-    vec4_t vPosition;
-    vec4_t vColor;
-    vec2_t vTexCoord;
-};
+    for(u32 group_index = 0;
+        group_index < used_render_group_count;
+        ++group_index)
+    {
+        render_group_t *current_group = render_groups[group_index];
+        for(render_geometry_buffer_t *current_buffer = &current_group->first_buffer;
+            current_buffer;
+            current_buffer = current_buffer->next_buffer)
+        {
+            memcpy(current_group->master_vertex_array + current_group->total_vertex_count, current_buffer->vertices, sizeof(vertex_t) * current_buffer->vertex_count);
+
+            current_buffer->master_array_start_offset = current_group->total_vertex_count;
+            current_group->total_vertex_count        += current_buffer->vertex_count;
+            current_group->total_primitive_count     += current_buffer->primitive_count;
+        }
+    }
+}
+
+// NOTE(Sleepster): This is where it's lost the plot.... 
+void
+draw_render_group(vulkan_render_context_t *render_context, render_group_t *group)
+{
+    VkCommandBuffer *command_buffer = ...;
+    // NOTE(Sleepster): BEFORE THIS FUNCTION IS CALLED... 
+    r_vulkan_renderpass_begin(render_context, 
+                              &render_context->main_renderpass, 
+                              command_buffer, 
+                              this_frame->current_framebuffer->handle);
+    // NOTE(Sleepster): BEFORE THIS FUNCTION IS CALLED... 
+
+    r_vulkan_buffer_upload(render_context, 
+                          &render_context->vertex_buffer, 
+                           group->master_vertex_array,
+                           sizeof(vertex_t) * group->total_vertex_count, 
+                           0, 
+                           null, 
+                           render_context->rendering_device.graphics_command_pool, 
+                           render_context->rendering_device.graphics_queue);
+
+    r_vulkan_shader_bind(group->shader);
+    r_vulkan_shader_update_all_descriptor_sets(group->shader);
+
+    VkDeviceSize offsets[1] = {};
+    vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &render_context->vertex_buffer.handle, (VkDeviceSize*)&offsets);
+    vkCmdBindIndexBuffer(command_buffer->handle, render_context->index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+
+    u32 current_vertex_buffer_offset = 0;
+    u32 current_index_buffer_offset  = 0;
+    for(render_geometry_buffer_t *current_buffer = &group->first_buffer;
+        current_buffer;
+        current_buffer = current_buffer->next_buffer)
+    {
+        vkCmdSetViewport(command_buffer->handle, 0, 1, &group->viewport_data);
+        vkCmdSetScissor(command_buffer->handle,  0, 1, &group->scissor_data);
+
+        // NOTE(Sleepster): Technically don't need "index", and for now I don't actually care about this. We can use index data later. 
+        // This is just essentially my stupid "I don't want to use index data yet" hack 
+        vkCmdDrawIndexed(command_buffer->handle, current_buffer->primitive_count * 6, 1, current_index_buffer_offset, current_vertex_buffer_offset, 0);
+
+        current_vertex_buffer_offset += 4;
+        current_index_buffer_offset  += 6;
+    }
+}
+
+#endif
 
 /////////////////////////
 // VULKAN UTILITIES
@@ -2859,7 +2923,6 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
                                   command_buffer, 
                                   this_frame->current_framebuffer->handle);
 
-
         // TODO(Sleepster): TRIANGLE CODE
         vulkan_shader_data_t *shader = &render_context->default_shader->slot->shader.shader_data;
         r_vulkan_shader_bind(render_context, shader);
@@ -3192,7 +3255,6 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
 
         PFN_vkCreateDebugUtilsMessengerEXT vk_debug_func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(render_context->instance, 
                                                                                                                      "vkCreateDebugUtilsMessengerEXT");
-
         vkAssert(vk_debug_func(render_context->instance, &vulkan_debug_info, null, &render_context->debug_callback));
     }
 

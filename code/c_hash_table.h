@@ -42,6 +42,7 @@ typedef C_HASH_TABLE_FREE_IMPL(c_hash_table_free_fn_t);
 #endif
 
 HASH_API u64 c_hash_table_value_from_key(byte *key, u32 key_size, u32 max_table_entries);
+HASH_API u64 c_fnv_hash_value(byte *key, u32 key_size);
 HASH_API     C_HASH_TABLE_ALLOCATE_IMPL(c_hash_table_default_alloc_impl);
 HASH_API     C_HASH_TABLE_FREE_IMPL(c_hash_table_default_free_impl);
 
@@ -190,7 +191,7 @@ C_HASH_TABLE_FREE_IMPL(c_hash_table_default_free_impl)
 }
 
 HASH_API u64
-c_hash_table_value_from_key(byte *key, u32 key_size, u32 max_table_entries)
+c_fnv_hash_value(byte *key, u32 key_size)
 {
     u64 result = 0;
 
@@ -207,6 +208,16 @@ c_hash_table_value_from_key(byte *key, u32 key_size, u32 max_table_entries)
         current_hash  = current_hash * FNV_prime;
     }
 
+    result = current_hash;
+    return(result);
+}
+
+HASH_API u64
+c_hash_table_value_from_key(byte *key, u32 key_size, u32 max_table_entries)
+{
+    u64 result = 0;
+    
+    u64 current_hash = c_fnv_hash_value(key, key_size);
     result = current_hash % max_table_entries;
     return(result);
 }

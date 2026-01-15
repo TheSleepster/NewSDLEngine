@@ -18,7 +18,16 @@
 #include <c_string.h>
 #include <c_math.h>
 
+// NOTE(Sleepster): "Frame in flight" is not a requirement, but it's a cap.
 #define VULKAN_MAX_FRAMES_IN_FLIGHT (3)
+
+// NOTE(Sleepster): Used for rendering
+struct vertex_t
+{
+    vec4_t vPosition;
+    vec4_t vColor;
+    vec2_t vTexCoord;
+};
 
 // NOTE(Sleepster): Nvidia needs 256 byte alignment
 typedef struct global_matrix_uniforms
@@ -31,6 +40,16 @@ typedef struct push_constant
 {
     vec4_t DrawColor;
 }push_constant_t;
+
+// NOTE(Sleepster): The view and projection matrix used for rendering, this is per geometry_buffer to prevent an explosion of render_group counts.
+//                  If a piece of geometry has a different set of camera_matrices, but the rest of the data is identical, we simply allocate a new 
+//                  render_geometry_buffer_t and attach it to the render_group.
+struct render_camera_t 
+{
+    u64 ID;
+    mat4_t view_matrix;
+    mat4_t projection_matrix;
+};
 
 //////////////////////////////////
 // VULKAN BUFFER STUFF 
@@ -400,10 +419,16 @@ typedef struct vulkan_command_buffer_data
 // VULKAN RENDER CONTEXT 
 //////////////////////////////////
 
+// TODO(Sleepster): This maybe??? 
 typedef struct vulkan_render_backend_function_data
 {
     void *create_gpu_texture;
     void *create_gpu_shader;
+    void *create_gpu_buffer;
+
+    void *destroy_gpu_texture;
+    void *destroy_gpu_shader;
+    void *destroy_gpu_buffer;
 }vulkan_render_backend_function_data_t;
 
 typedef struct vulkan_render_frame_state
@@ -469,15 +494,19 @@ typedef struct vulkan_render_context
     vulkan_render_frame_state_t  *frames;
     vulkan_render_frame_state_t  *current_frame;
 
+    vulkan_buffer_data_t          vertex_buffers[VULKAN_MAX_FRAMES_IN_FLIGHT];
+    vulkan_buffer_data_t          index_buffer;
+
+    vulkan_buffer_data_t          vertex_buffer;
+
     vulkan_renderpass_data_t      main_renderpass;
     asset_handle_t               *default_shader;
     asset_handle_t               *default_texture;
 
-    vulkan_buffer_data_t          vertex_buffer;
-    vulkan_buffer_data_t          index_buffer;
-
     u32                           vertex_offset;
     u32                           geometry_index;
+
+    render_camera_t               test_camera;
 
     VkDebugUtilsMessengerEXT debug_callback;
 }vulkan_render_context_t;

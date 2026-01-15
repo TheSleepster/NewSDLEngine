@@ -1,0 +1,105 @@
+#if !defined(R_RENDER_GROUP_H)
+/* ========================================================================
+   $File: r_render_group.h $
+   $Date: January 14 2026 07:07 pm $
+   $Revision: $
+   $Creator: Justin Lewis $
+   ======================================================================== */
+#include <c_types.h>
+#include <c_memory_arena.h>
+#include <c_hash_table.h>
+#include <c_string.h>
+#include <c_math.h>
+#include <s_asset_manager.h>
+
+#define R_RENDER_GROUP_H
+#define MAX_RENDER_GROUPS (192)
+#define MAX_HASHED_RENDER_GROUPS (4093)
+
+// NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. Per render_group
+struct render_group_pipeline_state_t
+{
+    bool32 blend_enabled;
+    u32    color_blend_mode;
+    u32    alpha_blend_mode;
+    u32    color_blend_op;
+    u32    alpha_blend_op;
+
+    bool32 depth_enabled;
+    u32    depth_state;
+    u32    depth_func;
+
+    bool32 stencil_enabled;
+    u32    stencil_state;
+    u32    stencil_keep;
+};
+
+// NOTE(Sleepster): This stores all the geometry information needed when rendering. The "vertices" array contains all the vertex data associated with this buffer.
+//                  Since render_groups are simply hashed from IDs and such, we can afford to make the vertex array here smaller and create lists of them if we need more.
+struct render_geometry_buffer_t
+{
+    render_camera_t           camera_data;
+
+    u32                       primitive_count;
+    u32                       vertex_count;
+    u32                       master_array_start_offset;
+
+    // NOTE(Sleepster):       size: 2500 
+    vertex_t                 *vertices;
+    render_geometry_buffer_t *next_buffer;
+};
+
+// NOTE(Sleepster): Stores the state that is shared between all the buffers attached to this render_group. 
+//                  Items like dynamic pipeline state, the used shader (eventually material), textures needed, and the master_vertex_array. 
+//                  This master vertex array stores all the vertices across all geometry_buffers attached to the render_group.
+struct render_group_t 
+{
+    u64                            ID;
+
+    render_group_pipeline_state_t  dynamic_pipeline_state;
+    asset_handle_t                *shader;
+    asset_handle_t                *textures[16];
+
+    // NOTE(Sleepster):            size: 10000, if this fills,  
+    vertex_t                      *master_vertex_array;
+    u32                            total_vertex_count;
+    u32                            total_primitive_count;
+    render_geometry_buffer_t       first_buffer;
+};
+
+struct draw_frame_t
+{
+    // NOTE(Sleepster): Array of what render_groups are used this frame. size of MAX_RENDER_GROUPS
+    render_group_t              **used_render_groups;
+    u32                           used_render_group_count;
+ 
+    struct
+    {
+        u64                           cached_camera_ID;
+        render_group_t               *active_render_group;
+        render_camera_t              *active_camera;
+        asset_handle_t               *active_shader;
+        render_group_pipeline_state_t active_pipeline_state;
+    }state;
+};
+
+// NOTE(Sleepster): Stores the hash_table of render_groups, these are hash tabled so that an ID lookup will always give us the same render_group so long 
+//                  as the state is the same. And when that render_group is used that frame, we store it's pointer inside the render_groups array and 
+//                  increment the render_group_used_this_frame counter.
+struct render_state_t
+{
+    bool8                        is_initialized;
+    memory_arena_t               renderer_arena;
+
+    vulkan_render_context_t     *render_context;
+    vulkan_render_frame_state_t *current_frame_data;
+    HashTable_t(render_group_t)  render_group_hash;
+
+    draw_frame_t                 draw_frame;
+};
+
+render_group_t* r_render_group_begin(render_state_t *render_state);
+void            r_render_state_init(render_state_t *render_state, vulkan_render_context_t *render_context);
+
+#endif // R_RENDER_GROUP_H
+

@@ -19,6 +19,7 @@
 #include <c_globals.h>
 
 #include <r_vulkan_core.h>
+#include <r_render_group.h>
 
 #include <p_platform_data.h>
 

@@ -28,8 +28,8 @@ typedef SDL_Thread*    sys_thread_handle_t;
 typedef struct sys_thread
 {
     sys_thread_handle_t handle;
-    u32                thread_id;
-    void              *user_data;
+    u32                 thread_id;
+    void               *user_data;
 }sys_thread_t;
 
 typedef struct sys_mutex
