@@ -24,14 +24,14 @@
 #define ASSET_MANAGER_MAX_ASSET_FILES     (32)
 
 typedef struct vulkan_shader_data vulkan_shader_data_t;
-typedef struct vulkan_texture vulkan_texture_t;
-typedef struct asset_manager asset_manager_t;
-typedef struct asset_slot asset_slot_t;
-typedef struct subtexture_data subtexture_data_t;
-typedef struct texture_atlas texture_atlas_t;
+typedef struct vulkan_texture     vulkan_texture_t;
+typedef struct asset_manager      asset_manager_t;
+typedef struct asset_slot         asset_slot_t;
+typedef struct subtexture_data    subtexture_data_t;
+typedef struct texture_atlas      texture_atlas_t;
 
-typedef struct jfd_package_entry jfd_package_entry_t;
-typedef struct jfd_file_header   jfd_file_header_t;
+typedef struct jfd_package_entry  jfd_package_entry_t;
+typedef struct jfd_file_header    jfd_file_header_t;
 
 typedef enum asset_type
 {

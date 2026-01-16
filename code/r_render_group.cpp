@@ -127,6 +127,10 @@ r_render_camera_create(mat4_t view_matrix, mat4_t projection_matrix)
     return(result);
 }
 
+/*===========================================
+  ============== RENDER GROUPS  =============
+  ===========================================*/
+
 render_group_t*
 r_render_group_begin(render_state_t *render_state)
 {
@@ -236,9 +240,50 @@ r_render_group_get_current_buffer(render_state_t *render_state)
 }
 
 void
-r_draw_texture_ex(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, asset_handle_t *texture_data)
+r_render_group_fill_master_buffer(render_state_t *render_state, render_group_t *render_group)
 {
+    for(render_geometry_buffer_t *current_buffer = &render_group->first_buffer;
+        current_buffer;
+        current_buffer = current_buffer->next_buffer)
+    {
+        vertex_t *master_offset = render_group->master_vertex_array + render_group->total_vertex_count;
+        memcpy(master_offset, current_buffer->vertices, sizeof(vertex_t) * current_buffer->vertex_count);
+
+        render_group->total_vertex_count    += current_buffer->vertex_count;
+        render_group->total_primitive_count += current_buffer->primitive_count;
+    }
+}
+
+void
+r_render_group_update_used_groups(render_state_t *render_state)
+{
+    draw_frame_t *draw_frame = &render_state->draw_frame;
+
+    for(u32 group_index = 0;
+        group_index < draw_frame->used_render_group_count;
+        ++group_index)
+    {
+        render_group_t *render_group = draw_frame->used_render_groups[group_index];
+        r_render_group_fill_master_buffer(render_state, render_group);
+    }
+}
+
+/*===========================================
+  =============== DRAWING API ===============
+  ===========================================*/
+
+void
+r_draw_texture_ex(render_state_t    *render_state, 
+                  vec2_t             position, 
+                  vec2_t             size, 
+                  vec4_t             color, 
+                  float32            rotation, 
+                  subtexture_data_t *subtexture_data)
+{
+    // TODO(Sleepster): Deal with this if we cap out... 
     render_geometry_buffer_t *buffer = r_render_group_get_current_buffer(render_state);
+    Assert(buffer->vertex_count + 4 < MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT);
+
     vertex_t *buffer_ptr = buffer->vertices + buffer->vertex_count;
     buffer->vertex_count += 4;
 
@@ -264,4 +309,43 @@ r_draw_texture_ex(render_state_t *render_state, vec2_t position, vec2_t size, ve
         vertex_t *vertex = buffer_ptr + vertex_index;
         vertex->vColor   = color;
     }
+
+    // TODO(Sleepster): Texture index for the texture arrays.
+    if(subtexture_data)
+    {
+        subtexture_data_t *uv_data = subtexture_data;
+
+        bottom_right->vTexCoord = uv_data->uv_max;
+        top_right->vTexCoord    = vec2(uv_data->uv_max.x, uv_data->uv_min.y);
+        top_left->vTexCoord     = uv_data->uv_min;
+        bottom_left->vTexCoord  = vec2(uv_data->uv_min.x, uv_data->uv_max.y);
+    }
+    else
+    {
+        bottom_right->vTexCoord = {1.0, 1.0};
+        top_right->vTexCoord    = {1.0, 0.0};
+        top_left->vTexCoord     = {0.0, 0.0};
+        bottom_left->vTexCoord  = {0.0, 1.0};
+    }
+}
+
+inline void
+r_draw_texture(render_state_t *render_state, 
+               vec2_t          position, 
+               vec2_t          size, 
+               vec4_t          color, 
+               float32         rotation, 
+               asset_handle_t *texture_handle)
+{
+    r_draw_texture_ex(render_state, position, size, color, rotation, texture_handle->subtexture_data);
+}
+
+inline void
+r_draW_rect(render_state_t *render_state, 
+            vec2_t          position, 
+            vec2_t          size, 
+            vec4_t          color, 
+            float32         rotation)
+{
+    r_draw_texture(render_state, position, size, color, rotation, null);
 }

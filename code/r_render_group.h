@@ -106,5 +106,9 @@ struct render_state_t
 render_group_t* r_render_group_begin(render_state_t *render_state);
 void            r_render_state_init(render_state_t *render_state, vulkan_render_context_t *render_context);
 
+       void r_draw_texture_ex(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, subtexture_data_t *subtexture_data);
+inline void r_draw_texture(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, asset_handle_t *texture_handle);
+inline void r_draW_rect(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation);
+
 #endif // R_RENDER_GROUP_H
 

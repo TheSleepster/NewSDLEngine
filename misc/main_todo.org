@@ -1,0 +1,87 @@
+#+title: NewSDLEngine
+* Next Milestone:
+** Create a very early version of the new batch renderer
+- [ ] Draw quad functionality
+- [ ] Render Groups and their old functionality. They should group objects by what render state is needed for correct drawing.
+* IMMEDIATE TODO
+* General TODOs
+* Vulkan Renderer TODOs
+- [X] Images and Samplers
+- [X] Fix the descriptor set gathering
+- [X] Push Constants
+- [X] Make it possible to upload textures to the GPU in a way that makes snese
+- [X] Universal binding set indices:
+      "Static": Updated once per frame updates
+      "Draw": Updated once per draw
+      "Instance": Updated very fequently, uses Push Constants
+- [X] Create a way to store the data needed to suplement a shader uniform like we did in OpenGL.
+      We need a function pointer / data combination
+- [X] We have a bug where we are using the swapchain's image count for
+      the indexing of sync objects in some places, rather than our
+      "max_frames_in_flight" setup. This is causing crashes on the laptop
+      of all things because it supports FOUR whole fucking swapchain
+      images as opposed to my actual discrete GPU's THREE. The issue is
+      within the swapchain create function around line (1899) where we
+      query how many swapchain images we can have.
+ - [X] We need to standardize the uploading of uniforms and their data 
+ - [X] Modify VkAssert to give more constructive information rather than just a straight crash on anything but VK_SUCCESS
+ - [X] Command Buffers should likely store the GPU queue and the command pool it was allocated from for simplicity
+ - [X] Create methods for handling and storing logic relating to assets (r_vulkan_create_texture, r_vulkan_create_shader) that can be called from the asset manager
+ - [X] Some method of organizing and tracking what elements should be applied to bound shaders, bound descriptor sets (maybe shaders should just auto bind
+       these by default??), and other important state that can just be linked together simply
+ - [X] Restore our old "frames in flight logic", We are actually just going through each of the swapchain images as fast as we can rather than "triple buffering"
+ - [X] (??) r_vulkan_types.h && r_vulkan_api.h (??) for easy including of just the vulkan type information and just the API functions
+
+- [ ] Support for multiple renderpasses, restore the renderer to it's full glory. (lights, particle systems, etc.)
+- [ ] Dynamic state expansion, add support for dynamic blend modes, dynamic depth state, dynamic stencil states, line widths, etc.
+      (https://docs.vulkan.org/spec/latest/chapters/pipelines.html#VkDynamicState)
+- [ ] Take a look at instancing
+
+IMAGE TRANSITION STUFF
+- [ ] The image should store the informationa about it's current format, layout, baseMipLevel, aspectMask, etc.
+- [ ] The function itself should just take a parameterized list of information you want the image to actually transform into
+
+*** Maybe this isn't necessary? It seems like this is just a structure of arrays vs array of structures stuff.
+ - [X] Some method of organizing and tracking "render_context->this_frame_command_buffer" for objects that meant to accessed like "render_context->thing[frame_index]"
+ - [X] Create a part of the backend renderer to encapsulate all this "frame logic" that is specific to the backend renderer
+       (items like sync objects, framebuffers, command_buffers, etc.)
+
+* Drawing API (frontend renderer)
+- [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
+  (shader, blend modes, depth state, textures, camera data, etc.)
+ - [ ] (??) Backend API structure that contains the necessary Vulkan-render API function pointers for use with both the asset manager and the frontend renderer
+ - [ ] Functions like r_vulkan_swapchain_get_next_image_index() should instead inform the render_context that actions need to be performed rather than just doing them.
+       This would allow the renderer to handle these issues when it actually is meant too, which may reduce the chance of bugs arising
+* Asset System TODOs
+- [ ] Multithreading!
+- [ ] Establish the concept of a material
+- [ ] Refine the system to use atomic reference counting for asset releasing.
+- [ ] Modify all asset deletion so that we only delete the asset at the END of the game frame]
+- [X] Textures and other assets should store a "generation" ID that tells us whether it has been updated
+** Textures
+- [ ] Renderer's create Texture function only takes in pixels. The rest of the data is stored on the texture_t object
+- [ ] Texture Atlasing API
+- [ ] Actually make the "generation_ID" mean something
+** Fonts
+- [ ] Create a temporary glyph storage method, that way we can store what glyphs need to be added over the frame and add them at all at once at the end of the frame
+** Materials
+** Shaders
+- [X] Make the Vulkan renderer actually use the shader data...
+** Asset File
+- [X] Add Spirv Binaries to the asset file
+- [ ] Prebuild atlas' and store them as part of the .wad file so that we don't have to deal with the dynamic atlasing at runtime
+- [X] Switch to a more sane "chunk based" file format. Where the header stays almost exactly how it is, but the assets are moved into "chunks".
+      Each "chunk" should tell us the actual asset size and contain a bunch of information about the data. This also makes the table of contents less responsible
+      for stuff and makes parsing easier since we can just go through each chunk for the information relating to an asset.
+- [ ] Assets should store the information about themselves inside the asset file, ex: textures should store their w/h/c setup. Wav files should store their channel_count, sample_count, etc.
+- [ ] Find out why the hell it's taking so long to pack
+* Core stuff
+- [X] Type safe hash tables
+- [X] Allow us to set the custom allocator
+- [ ] Modify the file and sys_file APIs so that they work properly as one would expect. IE, sys_file_open returns a file_t, have it initialize the file's name and other easy things
+- [ ] Complete malloc replacement (thread safe heap allocator)
+- [ ] The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal state
+- [ ] The ability to dump the contents of a memory arena to a file, this is probably pretty useful...
+* Platform
+- [ ] Sys mutex lock and unlock on windows should change the boolean for if it is locked, this is already done on Linux
+- [X] Function to get current working directory Windows (https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentdirectory)

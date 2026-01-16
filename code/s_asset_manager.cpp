@@ -343,6 +343,10 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
     return(result);
 }
 
+// ===============================
+// ======= TEXTURE ATLASES =======
+// ===============================
+
 texture_atlas_t*
 s_texture_atlas_create(asset_manager_t *asset_manager, 
                        u32              width, 
@@ -439,7 +443,6 @@ s_texture_atlas_pack_added_textures(vulkan_render_context_t *render_context, tex
             {
                 u32 atlas_bitmap_offset  = ((atlas_cursor_y + row_index) * atlas_width + atlas_cursor_x) * atlas_channels;
                 byte *atlas_pixel_offset = atlas_pixels.data + atlas_bitmap_offset;
-
 
                 u32 bitmap_offset = (row_index * bitmap_width) * bitmap_channels;
                 byte *bitmap_data_offset = bitmap_pixels.data + bitmap_offset;
