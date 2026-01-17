@@ -132,6 +132,7 @@ typedef struct texture_atlas
     u32                           atlas_cursor_x;
     u32                           atlas_cursor_y;
     u32                           tallest_y;
+    u32                           atlas_size;
 }texture_atlas_t;
 
 /*===========================================
@@ -238,7 +239,7 @@ bool8 s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t f
 asset_handle_t s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name);
 
 
-texture_atlas_t* s_texture_atlas_create(asset_manager_t *asset_manager, u32 width, u32 height, u32 channel_count, u32 format, u32 initial_subtexture_count);
+texture_atlas_t* s_texture_atlas_create(asset_manager_t *asset_manager, u32 size, u32 channel_count, u32 format, u32 initial_subtexture_count);
 void s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle);
 void s_texture_atlas_pack_added_textures(vulkan_render_context_t *render_context, texture_atlas_t *atlas);
 

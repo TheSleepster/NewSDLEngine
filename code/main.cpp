@@ -17,23 +17,17 @@
 #include <c_threadpool.h>
 #include <c_log.h>
 #include <c_globals.h>
+#include <p_platform_data.h>
 
+#include <r_vulkan_types.h>
 #include <r_vulkan_core.h>
 #include <r_render_group.h>
-
-#include <p_platform_data.h>
 
 #include <s_nt_networking.h>
 #include <s_input_manager.h>
 #include <s_asset_manager.h>
 #include <g_game_state.h>
 #include <g_entity.h>
-
-struct render_context_t;
-void r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size);
-void r_vulkan_on_resize(vulkan_render_context_t *render_context, vec2_t new_window_size);
-bool8 r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time);
-bool8 r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time);
 
 internal_api void
 c_process_window_events(SDL_Window *window, vulkan_render_context_t *render_context, input_manager_t *input_manager)
@@ -69,6 +63,7 @@ main(int argc, char **argv)
     game_state_t            *state          = Alloc(game_state_t);
     vulkan_render_context_t *render_context = Alloc(vulkan_render_context_t);
     asset_manager_t         *asset_manager  = Alloc(asset_manager_t);
+    render_state_t          *render_state   = Alloc(render_state_t);
 
     state->window_size = vec2(600, 600);
     if(SDL_Init(SDL_INIT_VIDEO))
@@ -84,28 +79,25 @@ main(int argc, char **argv)
         c_global_context_init();
         c_threadpool_init(&global_context->main_threadpool);
 
-        render_context->window = state->window;
-        r_renderer_init(render_context, state->window_size);
-        s_nt_socket_api_init(state, argc, argv);
-
         s_asset_manager_init(asset_manager);
         s_asset_manager_load_asset_file(asset_manager, STR("asset_data.jfd"));
+
+        render_context->window = state->window;
+        r_renderer_init(render_context, render_state, state->window_size);
 
         asset_manager->render_context = render_context;
         render_context->default_texture = Alloc(asset_handle_t);
         *render_context->default_texture = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
-        r_vulkan_make_gpu_texture(render_context, &render_context->default_texture->slot->texture);
 
         render_context->default_shader = Alloc(asset_handle_t);
         *render_context->default_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("test"));
 
-        texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 1024, 4, BMF_RGBA32, 32);
-        s_texture_atlas_add_texture(atlas, render_context->default_texture);
-        s_texture_atlas_add_texture(atlas, render_context->default_texture);
-        s_texture_atlas_add_texture(atlas, render_context->default_texture);
-        s_texture_atlas_add_texture(atlas, render_context->default_texture);
-        s_texture_atlas_add_texture(atlas, render_context->default_texture);
-        s_texture_atlas_add_texture(atlas, render_context->default_texture);
+        r_vulkan_make_gpu_texture(render_context, &render_context->default_texture->slot->texture);
+        r_render_state_init(render_state, render_context);
+
+        s_nt_socket_api_init(state, argc, argv);
+
+        texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32, 32);
         s_texture_atlas_add_texture(atlas, render_context->default_texture);
         s_texture_atlas_pack_added_textures(render_context, atlas);
 
@@ -188,9 +180,20 @@ main(int argc, char **argv)
                 dt_accumulator -= gcv_tick_rate;
             }
 
-            if(r_vulkan_begin_frame(render_context, gcv_tick_rate))
+            if(r_vulkan_begin_frame(render_context, render_state, gcv_tick_rate))
             {
-                r_vulkan_end_frame(render_context, gcv_tick_rate);
+                vulkan_shader_data_t *shader = &render_context->default_shader->slot->shader.shader_data;
+
+                r_vulkan_shader_uniform_update_data(shader,    STR("Matrices"),       &shader->camera_matrices);
+                r_vulkan_shader_uniform_update_texture(shader, STR("TextureSampler"), &render_context->default_texture->subtexture_data->atlas->texture.gpu_data);
+
+                r_render_group_begin(render_state);
+                r_draw_texture(render_state, {0, 0}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0, render_context->default_texture);
+                r_draw_texture(render_state, {-100, 100}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0, render_context->default_texture);
+                r_render_group_end(render_state);
+                    
+                r_render_group_update_used_groups(render_state);
+                r_vulkan_end_frame(render_context, render_state, gcv_tick_rate);
             }
 #if 0
             float32 alpha = (dt_accumulator / gcv_tick_rate);

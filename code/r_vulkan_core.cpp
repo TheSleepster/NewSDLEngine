@@ -23,6 +23,7 @@
 #include <spirv_reflect.h>
 
 #include <r_vulkan_types.h>
+#include <r_render_group.h>
 #include <r_vulkan_core.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -2791,6 +2792,109 @@ r_vulkan_physical_device_is_supported(vulkan_render_context_t                   
 ////////////////////////////
 
 void
+r_vulkan_render_groups_to_output(render_state_t *render_state)
+{
+    draw_frame_t *draw_frame                     = &render_state->draw_frame;
+    vulkan_render_context_t *render_context      =  render_state->render_context;
+    vulkan_command_buffer_data_t *command_buffer =  render_context->current_frame->render_command_buffer;
+
+    r_vulkan_command_buffer_reset(command_buffer);
+    r_vulkan_command_buffer_begin(command_buffer, false, false, false);
+
+    // TODO(Sleepster): Custom viewport and Scissor states per render_group? 
+    VkViewport viewport_data = {
+        .x        =  0.0f,
+        .y        =  (float32)render_context->framebuffer_height,
+        .width    =  (float32)render_context->framebuffer_width,
+        .height   = -(float32)render_context->framebuffer_height,
+        .minDepth =  0.0f,
+        .maxDepth =  1.0f
+    };
+
+    VkRect2D scissor_data = {
+        .offset = {
+            .x = 0,
+            .y = 0,
+        },
+        .extent = {
+            .width  = render_context->framebuffer_width,
+            .height = render_context->framebuffer_height,
+        }
+    };
+
+    vkCmdSetViewport(command_buffer->handle, 0, 1, &viewport_data);
+    vkCmdSetScissor(command_buffer->handle,  0, 1, &scissor_data);
+
+    render_context->main_renderpass.size.x = (float32)render_context->framebuffer_width;
+    render_context->main_renderpass.size.y = (float32)render_context->framebuffer_height;
+
+    r_vulkan_renderpass_begin(render_context, 
+                              &render_context->main_renderpass, 
+                              command_buffer, 
+                              render_context->current_frame->current_framebuffer->handle);
+
+    for(u32 render_group_index = 0;
+        render_group_index < draw_frame->used_render_group_count;
+        ++render_group_index)
+    {
+        render_group_t *current_group = draw_frame->used_render_groups[render_group_index];
+        Assert(current_group);
+
+        r_vulkan_buffer_upload(render_context, 
+                               &render_context->vertex_buffer, 
+                               current_group->master_vertex_array,
+                               sizeof(vertex_t) * current_group->total_vertex_count, 
+                               0, 
+                               null, 
+                               render_context->rendering_device.graphics_command_pool, 
+                               render_context->rendering_device.graphics_queue);
+    
+        vulkan_shader_data_t *shader  = &current_group->shader->slot->shader.shader_data;
+        r_vulkan_shader_bind(render_context, shader);
+        r_vulkan_shader_update_all_sets(render_context, shader);
+
+        VkDeviceSize offsets[1] = {};
+        vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &render_context->vertex_buffer.handle, (VkDeviceSize*)&offsets);
+        vkCmdBindIndexBuffer(command_buffer->handle, render_context->index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
+
+        for(render_geometry_buffer_t *current_buffer = &current_group->first_buffer;
+            current_buffer;
+            current_buffer = current_buffer->next_buffer)
+        {
+            // TODO(Sleepster): We don't have anything for instancing... 
+#if 0
+            vkCmdDrawIndexed(command_buffer->handle, 
+                             6, 
+                             current_bufferr->primitive_count, 
+                             0, 
+                             current_buffer->master_array_start_offset,
+                             0);
+#else
+            for(u32 prim_index = 0;
+                prim_index < current_buffer->primitive_count;
+                ++prim_index)
+            {
+                vkCmdDrawIndexed(command_buffer->handle, 
+                                 6, 
+                                 1, 
+                                 0, 
+                                 current_buffer->master_array_start_offset + (prim_index * 4),
+                                 0);
+            }
+#endif
+            current_buffer->master_array_start_offset = 0;
+            current_buffer->primitive_count           = 0;
+            current_buffer->vertex_count              = 0;
+        }
+
+        current_group->total_primitive_count = 0;
+        current_group->total_vertex_count    = 0;
+    }
+    draw_frame->used_render_group_count = 0;
+    memset(draw_frame->used_render_groups, -1, draw_frame->used_render_group_count * sizeof(render_group_t**));
+}
+
+void
 r_vulkan_on_resize(vulkan_render_context_t *render_context, vec2_t new_window_size)
 {
     render_context->cached_framebuffer_width  = new_window_size.x;
@@ -2800,7 +2904,7 @@ r_vulkan_on_resize(vulkan_render_context_t *render_context, vec2_t new_window_si
 }
 
 bool8
-r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time)
+r_vulkan_begin_frame(vulkan_render_context_t *render_context, render_state_t *render_state, float32 delta_time)
 {
     vulkan_render_frame_state_t *this_frame = render_context->frames + render_context->current_frame_index;
     render_context->current_frame = this_frame;
@@ -2879,6 +2983,7 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
         this_frame->current_framebuffer              = render_context->swapchain.framebuffers + render_context->current_image_index;
         this_frame->presentation_complete_semaphore = render_context->presentation_complete_semaphores + render_context->current_image_index;
 
+#if 0
         vulkan_command_buffer_data_t *command_buffer = this_frame->render_command_buffer; 
         Assert(this_frame->render_command_buffer);
         r_vulkan_command_buffer_reset(command_buffer);
@@ -2935,6 +3040,7 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, float32 delta_time
         vkCmdDrawIndexed(command_buffer->handle, 6, 1, 0, 0, 0);
 
         // TODO(Sleepster): TRIANGLE CODE
+#endif
     }
 
 begin_frame_return:
@@ -2942,9 +3048,11 @@ begin_frame_return:
 }
 
 bool8
-r_vulkan_end_frame(vulkan_render_context_t *render_context, float32 delta_time)
+r_vulkan_end_frame(vulkan_render_context_t *render_context, render_state_t *render_state, float32 delta_time)
 {
     bool8 result = true;
+
+    r_vulkan_render_groups_to_output(render_state);
 
     vulkan_command_buffer_data_t *command_buffer = render_context->current_frame->render_command_buffer; 
     r_vulkan_renderpass_end(render_context, command_buffer, 
@@ -3145,7 +3253,7 @@ r_vulkan_find_memory_index(vulkan_render_context_t *render_context,
 }
 
 void
-r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
+r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_state, vec2_t window_size)
 {
     render_context->framebuffer_width  = window_size.x;
     render_context->framebuffer_height = window_size.y;
@@ -3524,7 +3632,7 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
                                                                                  VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
                                                                                  VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
         render_context->vertex_buffer = r_vulkan_buffer_create(render_context,
-                                                               (sizeof(vertex_t) * 1024),
+                                                               (sizeof(vertex_t) * MAX_RENDER_GROUP_VERTEX_COUNT),
                                                                vertex_buffer_usage_bits,
                                                           (u32)memory_flags,
                                                                true);

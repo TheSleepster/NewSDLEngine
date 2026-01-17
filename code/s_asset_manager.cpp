@@ -349,8 +349,7 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
 
 texture_atlas_t*
 s_texture_atlas_create(asset_manager_t *asset_manager, 
-                       u32              width, 
-                       u32              height, 
+                       u32              size, 
                        u32              channel_count, 
                        u32              format, 
                        u32              initial_subtexture_count)
@@ -374,8 +373,9 @@ s_texture_atlas_create(asset_manager_t *asset_manager,
 
     registry->current_atlas_count += 1;
 
-    atlas->texture.bitmap = s_asset_bitmap_create(asset_manager, width, height, channel_count, format);
+    atlas->texture.bitmap = s_asset_bitmap_create(asset_manager, size, size, channel_count, format);
     atlas->bitmap_data    = &atlas->texture.bitmap;
+    atlas->atlas_size     = size;
 
     atlas->textures_to_merge = c_dynarray_create(asset_handle_t*);
     c_dynarray_reserve(atlas->textures_to_merge, initial_subtexture_count);

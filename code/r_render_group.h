@@ -12,7 +12,6 @@
 #include <c_math.h>
 
 #include <s_asset_manager.h>
-#include <r_vulkan_types.h>
 
 #define R_RENDER_GROUP_H
 
@@ -55,6 +54,7 @@ struct render_geometry_buffer_t
 //                  This master vertex array stores all the vertices across all geometry_buffers attached to the render_group.
 struct render_group_t 
 {
+    // TODO(Sleepster): Custom Viewport? Custom Scissor?
     u64                            ID;
 
     render_group_pipeline_state_t  dynamic_pipeline_state;
@@ -73,8 +73,8 @@ struct render_group_t
 struct draw_frame_t
 {
     // NOTE(Sleepster): Array of what render_groups are used this frame. size of MAX_RENDER_GROUPS
-    render_group_t              **used_render_groups;
-    u32                           used_render_group_count;
+    render_group_t **used_render_groups;
+    u32              used_render_group_count;
  
     struct
     {
@@ -102,11 +102,13 @@ struct render_state_t
 };
 
 render_group_t* r_render_group_begin(render_state_t *render_state);
+void            r_render_group_end(render_state_t *render_state);
 void            r_render_state_init(render_state_t *render_state, vulkan_render_context_t *render_context);
+void            r_render_group_update_used_groups(render_state_t *render_state);
 
-       void r_draw_texture_ex(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, subtexture_data_t *subtexture_data);
-inline void r_draw_texture(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, asset_handle_t *texture_handle);
-inline void r_draW_rect(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation);
+void r_draw_texture_ex(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, subtexture_data_t *subtexture_data);
+void r_draw_texture(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, asset_handle_t *texture_handle);
+void r_draW_rect(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation);
 
 #endif // R_RENDER_GROUP_H
 

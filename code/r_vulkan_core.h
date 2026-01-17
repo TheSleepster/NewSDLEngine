@@ -21,6 +21,7 @@
 #include <r_vulkan_types.h>
 
 typedef struct texture2D texture2D_t;
+struct render_state_t;
 
 //#define VkAssert(result) Statement(Assert(result == VK_SUCCESS))
 #define vkAssert(result) ({                                                \
@@ -31,7 +32,7 @@ typedef struct texture2D texture2D_t;
     }                                                                      \
 }) 
 
-void  r_renderer_init(vulkan_render_context_t *render_context);
+void  r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_state, vec2_t window_size);
 void  r_vulkan_physical_device_get_swapchain_support_info(vulkan_render_context_t *context, VkPhysicalDevice device, vulkan_physical_device_swapchain_support_info_t *swapchain_info);
 bool8 r_vulkan_physical_device_detect_depth_format(vulkan_physical_device_t *device);
 
@@ -46,5 +47,13 @@ void
 r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *render_context,
                                                 vulkan_command_buffer_data_t *command_buffer,
                                                 VkQueue                       queue);
+
+void r_vulkan_on_resize(vulkan_render_context_t *render_context, vec2_t new_window_size);
+
+void r_vulkan_shader_uniform_update_data(vulkan_shader_data_t *shader, string_t uniform_name, void *data);
+void r_vulkan_shader_uniform_update_texture(vulkan_shader_data_t *shader, string_t texture_name, vulkan_texture_t *texture);
+
+bool8 r_vulkan_begin_frame(vulkan_render_context_t *render_context, render_state_t *render_state, float32 delta_time);
+bool8 r_vulkan_end_frame(vulkan_render_context_t *render_context, render_state_t *render_state, float32 delta_time);
 #endif // R_VULKAN_H
 

@@ -113,6 +113,9 @@ r_render_state_init(render_state_t *render_state, vulkan_render_context_t *rende
 
     render_state->draw_frame.used_render_groups = c_arena_push_array(&render_state->renderer_arena, render_group_t*, MAX_RENDER_GROUPS);
     render_state->is_initialized = true;
+
+    render_state->draw_frame.state.active_shader =  render_context->default_shader;
+    render_state->draw_frame.state.active_camera = &render_context->test_camera;
 }
 
 render_camera_t
@@ -130,51 +133,6 @@ r_render_camera_create(mat4_t view_matrix, mat4_t projection_matrix)
 /*===========================================
   ============== RENDER GROUPS  =============
   ===========================================*/
-
-render_group_t*
-r_render_group_begin(render_state_t *render_state)
-{
-    render_group_t *result = null;
-
-    u64 render_group_ID = c_fnv_hash_value((byte*)&render_state->draw_frame.state, sizeof(render_state->draw_frame.state));
-    render_group_ID %= render_state->render_group_hash.header.max_entries;
-
-    result = render_state->render_group_hash.data + render_group_ID;
-    Assert(result);
-
-    draw_frame_t *draw_frame = &render_state->draw_frame;
-    result->ID                     = render_group_ID;
-    result->dynamic_pipeline_state = draw_frame->state.active_pipeline_state;
-    result->shader                 = draw_frame->state.active_shader;
-
-    bool8 found = false;
-    for(u32 group_index = 0;
-        group_index < draw_frame->used_render_group_count;
-        ++group_index)
-    {
-        render_group_t *render_group = draw_frame->used_render_groups[group_index];
-        if(render_group->ID == result->ID)
-        {
-            found = true;
-            break;
-        }
-    }
-
-    if(!found)
-    {
-        u32 next_group_index = render_state->draw_frame.used_render_group_count++;
-        render_state->draw_frame.used_render_groups[next_group_index] = result;
-    }
-
-    draw_frame->state.active_render_group = result;
-    return(result);
-}
-
-void
-r_render_group_end(render_state_t *render_state)
-{
-    render_state->draw_frame.state.active_render_group = null;
-}
 
 internal_api inline render_geometry_buffer_t*
 r_render_group_create_new_geoemetry_buffer(render_state_t *render_state)
@@ -213,7 +171,7 @@ r_render_group_get_current_buffer(render_state_t *render_state)
             current_buffer;
             current_buffer = current_buffer->next_buffer)
         {
-            if(current_buffer->camera_data.ID == camera_ID)
+            if(current_buffer->camera_data.ID == camera_ID || current_buffer->camera_data.ID == 0)
             {
                 // NOTE(Sleepster): If we find it, great. Leave the loop and assign this new buffer into the "cached_buffer" ptr
                 found = current_buffer;
@@ -237,6 +195,57 @@ r_render_group_get_current_buffer(render_state_t *render_state)
     }
 
     return(result);
+}
+
+// TODO(Sleepster): r_render_batch_*
+render_group_t*
+r_render_group_begin(render_state_t *render_state)
+{
+    render_group_t *result = null;
+
+    u64 render_group_ID = c_fnv_hash_value((byte*)&render_state->draw_frame.state, sizeof(render_state->draw_frame.state));
+    render_group_ID %= render_state->render_group_hash.header.max_entries;
+
+    result = render_state->render_group_hash.data + render_group_ID;
+    Assert(result);
+
+    draw_frame_t *draw_frame = &render_state->draw_frame;
+    result->ID                     = render_group_ID;
+    result->dynamic_pipeline_state = draw_frame->state.active_pipeline_state;
+    result->shader                 = draw_frame->state.active_shader;
+
+    bool8 found = false;
+    for(u32 group_index = 0;
+        group_index < draw_frame->used_render_group_count;
+        ++group_index)
+    {
+        render_group_t *render_group = draw_frame->used_render_groups[group_index];
+        if(render_group->ID == result->ID)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        u32 next_group_index = render_state->draw_frame.used_render_group_count++;
+        render_state->draw_frame.used_render_groups[next_group_index] = result;
+
+        result->first_buffer        = *r_render_group_create_new_geoemetry_buffer(render_state);
+        result->master_vertex_array = c_arena_push_array(&render_state->renderer_arena, vertex_t, MAX_RENDER_GROUP_VERTEX_COUNT);
+        result->cached_buffer       = &result->first_buffer;
+    }
+
+    draw_frame->state.active_render_group = result;
+    return(result);
+}
+
+// TODO(Sleepster): r_render_batch_*
+void
+r_render_group_end(render_state_t *render_state)
+{
+    render_state->draw_frame.state.active_render_group = null;
 }
 
 void
@@ -315,10 +324,13 @@ r_draw_texture_ex(render_state_t    *render_state,
     {
         subtexture_data_t *uv_data = subtexture_data;
 
-        bottom_right->vTexCoord = uv_data->uv_max;
-        top_right->vTexCoord    = vec2(uv_data->uv_max.x, uv_data->uv_min.y);
-        top_left->vTexCoord     = uv_data->uv_min;
-        bottom_left->vTexCoord  = vec2(uv_data->uv_min.x, uv_data->uv_max.y);
+        vec2_t uv_min = vec2_reduce(uv_data->uv_min, subtexture_data->atlas->atlas_size);
+        vec2_t uv_max = vec2_reduce(uv_data->uv_max, subtexture_data->atlas->atlas_size);
+
+        bottom_right->vTexCoord = uv_max;
+        top_right->vTexCoord    = vec2(uv_max.x, uv_min.y);
+        top_left->vTexCoord     = uv_min;
+        bottom_left->vTexCoord  = vec2(uv_min.x, uv_max.y);
     }
     else
     {
@@ -327,9 +339,11 @@ r_draw_texture_ex(render_state_t    *render_state,
         top_left->vTexCoord     = {0.0, 0.0};
         bottom_left->vTexCoord  = {0.0, 1.0};
     }
+
+    buffer->primitive_count += 1;
 }
 
-inline void
+void
 r_draw_texture(render_state_t *render_state, 
                vec2_t          position, 
                vec2_t          size, 
@@ -340,7 +354,7 @@ r_draw_texture(render_state_t *render_state,
     r_draw_texture_ex(render_state, position, size, color, rotation, texture_handle->subtexture_data);
 }
 
-inline void
+void
 r_draW_rect(render_state_t *render_state, 
             vec2_t          position, 
             vec2_t          size, 
