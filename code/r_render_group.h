@@ -10,13 +10,11 @@
 #include <c_hash_table.h>
 #include <c_string.h>
 #include <c_math.h>
+
 #include <s_asset_manager.h>
+#include <r_vulkan_types.h>
 
 #define R_RENDER_GROUP_H
-#define MAX_RENDER_GROUPS (192)
-#define MAX_HASHED_RENDER_GROUPS (4093)
-#define MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT (2500)
-#define MAX_RENDER_GROUP_VERTEX_COUNT        (MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT * 4)
 
 // NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. Per render_group
 struct render_group_pipeline_state_t

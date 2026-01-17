@@ -18,6 +18,12 @@
 #include <c_string.h>
 #include <c_math.h>
 
+// TODO(Sleepster): I hate that these defines are here. But I can't put them anywhere else 
+#define MAX_RENDER_GROUPS (192)
+#define MAX_HASHED_RENDER_GROUPS (4093)
+#define MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT (2500)
+#define MAX_RENDER_GROUP_VERTEX_COUNT        (MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT * 4)
+
 // NOTE(Sleepster): "Frame in flight" is not a requirement, but it's a cap.
 #define VULKAN_MAX_FRAMES_IN_FLIGHT (3)
 
@@ -46,9 +52,10 @@ typedef struct push_constant
 //                  render_geometry_buffer_t and attach it to the render_group.
 struct render_camera_t 
 {
-    u64 ID;
     mat4_t view_matrix;
     mat4_t projection_matrix;
+
+    u64 ID;
 };
 
 //////////////////////////////////
@@ -84,7 +91,7 @@ typedef struct vulkan_pipeline_data
 // VULKAN SHADER STUFF 
 //////////////////////////////////
 #define MAX_VULKAN_SHADER_STAGES (10)
-#define MAX_DESCRIPTOR_TYPES  (SPV_REFLECT_DESCRIPTOR_TYPE_INPUT_ATTACHMENT + 1)
+#define MAX_DESCRIPTOR_TYPES     (SPV_REFLECT_DESCRIPTOR_TYPE_INPUT_ATTACHMENT + 1)
 
 typedef struct spv_vulkan_type_map 
 {

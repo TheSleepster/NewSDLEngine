@@ -3537,6 +3537,17 @@ r_renderer_init(vulkan_render_context_t *render_context, vec2_t window_size)
                                                               index_buffer_usage_bits,
                                                          (u32)memory_flags,
                                                               true);
+        for(u32 buffer_index = 0;
+            buffer_index < VULKAN_MAX_FRAMES_IN_FLIGHT;
+            ++buffer_index)
+        {
+            render_context->vertex_buffers[buffer_index] = r_vulkan_buffer_create(render_context,
+                                                                                  sizeof(vertex_t) * MAX_RENDER_GROUP_VERTEX_COUNT,
+                                                                                  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                                                                                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                                                                                  true);
+        }
+
         Assert(render_context->index_buffer.is_valid);
 
         log_info("Vertex and Index buffers created...\n");
