@@ -134,23 +134,23 @@ r_render_camera_create(mat4_t view_matrix, mat4_t projection_matrix)
   ============== RENDER GROUPS  =============
   ===========================================*/
 
-internal_api inline render_geometry_buffer_t*
+internal_api inline render_geometry_batch_t*
 r_render_group_create_new_geoemetry_buffer(render_state_t *render_state)
 {
-    render_geometry_buffer_t *result = null;
-    result = c_arena_push_struct(&render_state->renderer_arena, render_geometry_buffer_t);
+    render_geometry_batch_t *result = null;
+    result = c_arena_push_struct(&render_state->renderer_arena, render_geometry_batch_t);
 
-    result->vertices    = c_arena_push_array(&render_state->renderer_arena, vertex_t, MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT);
+    result->instances   = c_arena_push_array(&render_state->renderer_arena, render_geometry_instance_t, MAX_VULKAN_INSTANCES);
     result->next_buffer = null;
     result->is_valid    = true;
 
     return(result);
 }
 
-render_geometry_buffer_t*
+render_geometry_batch_t*
 r_render_group_get_current_buffer(render_state_t *render_state)
 {
-    render_geometry_buffer_t *result = null;
+    render_geometry_batch_t *result = null;
     render_group_t           *active_render_group = render_state->draw_frame.state.active_render_group;
 
     // NOTE(Sleepster): Check if the cached buffer already has our camera. 
@@ -165,9 +165,9 @@ r_render_group_get_current_buffer(render_state_t *render_state)
     // NOTE(Sleepster): If the cached one isn't the one we need, look for it in the list of currently valid buffers 
     if(!result)
     {
-        render_geometry_buffer_t *found       = null;
-        render_geometry_buffer_t *last_buffer = null;
-        for(render_geometry_buffer_t *current_buffer = &draw_frame->state.active_render_group->first_buffer;
+        render_geometry_batch_t *found       = null;
+        render_geometry_batch_t *last_buffer = null;
+        for(render_geometry_batch_t *current_buffer = &draw_frame->state.active_render_group->first_buffer;
             current_buffer;
             current_buffer = current_buffer->next_buffer)
         {
@@ -232,9 +232,9 @@ r_render_group_begin(render_state_t *render_state)
         u32 next_group_index = render_state->draw_frame.used_render_group_count++;
         render_state->draw_frame.used_render_groups[next_group_index] = result;
 
-        result->first_buffer        = *r_render_group_create_new_geoemetry_buffer(render_state);
-        result->master_vertex_array = c_arena_push_array(&render_state->renderer_arena, vertex_t, MAX_RENDER_GROUP_VERTEX_COUNT);
-        result->cached_buffer       = &result->first_buffer;
+        result->first_buffer       = *r_render_group_create_new_geoemetry_buffer(render_state);
+        result->master_batch_array = c_arena_push_array(&render_state->renderer_arena, render_geometry_instance_t, MAX_VULKAN_INSTANCES);
+        result->cached_buffer      = &result->first_buffer;
     }
 
     draw_frame->state.active_render_group = result;
@@ -251,14 +251,13 @@ r_render_group_end(render_state_t *render_state)
 void
 r_render_group_fill_master_buffer(render_state_t *render_state, render_group_t *render_group)
 {
-    for(render_geometry_buffer_t *current_buffer = &render_group->first_buffer;
+    for(render_geometry_batch_t *current_buffer = &render_group->first_buffer;
         current_buffer;
         current_buffer = current_buffer->next_buffer)
     {
-        vertex_t *master_offset = render_group->master_vertex_array + render_group->total_vertex_count;
-        memcpy(master_offset, current_buffer->vertices, sizeof(vertex_t) * current_buffer->vertex_count);
+        render_geometry_instance_t *master_offset = render_group->master_batch_array + render_group->total_primitive_count;
+        memcpy(master_offset, current_buffer->instances, sizeof(render_geometry_instance_t) * current_buffer->primitive_count);
 
-        render_group->total_vertex_count    += current_buffer->vertex_count;
         render_group->total_primitive_count += current_buffer->primitive_count;
     }
 }
@@ -289,10 +288,13 @@ r_draw_texture_ex(render_state_t    *render_state,
                   float32            rotation, 
                   subtexture_data_t *subtexture_data)
 {
+#if 0
     // TODO(Sleepster): Deal with this if we cap out... 
-    render_geometry_buffer_t *buffer = r_render_group_get_current_buffer(render_state);
+    render_geometry_batch_t *buffer = r_render_group_get_current_buffer(render_state);
     Assert(buffer->vertex_count + 4 < MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT);
 
+    render_geometry_instance_t intstance = {};
+    
     vertex_t *buffer_ptr = buffer->vertices + buffer->vertex_count;
     buffer->vertex_count += 4;
 
@@ -341,6 +343,30 @@ r_draw_texture_ex(render_state_t    *render_state,
     }
 
     buffer->primitive_count += 1;
+#else
+    render_geometry_batch_t *buffer = r_render_group_get_current_buffer(render_state);
+    Assert(buffer->primitive_count + 4 < MAX_VULKAN_INSTANCES);
+
+    render_geometry_instance_t *instance = buffer->instances + buffer->primitive_count++;
+    real32 layer_depth = 0.0f;
+
+    mat4_t transform = mat4_identity();
+    transform = mat4_translate(transform, vec2_expand_vec3(position, layer_depth));
+    transform = mat4_rotate(transform, {1.0, 1.0, 0.0}, rotation);
+    transform = mat4_scale(transform, vec2_expand_vec3(size, 1.0f));
+
+    subtexture_data_t *uv_data = subtexture_data;
+
+    vec2_t uv_min = vec2_reduce(uv_data->uv_min, subtexture_data->atlas->atlas_size);
+    vec2_t uv_max = vec2_reduce(uv_data->uv_max, subtexture_data->atlas->atlas_size);
+
+    instance->transform     = transform;
+    instance->color         = color;
+    instance->uv_min        = uv_min;
+    instance->uv_max        = uv_max;
+    instance->camera_index  = 0;
+    instance->texture_index = 0;
+#endif
 }
 
 void

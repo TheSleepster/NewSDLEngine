@@ -457,6 +457,9 @@ c_string_format(string_t memory, string_t string, ...)
 // STRING BUILDER
 ///////////////////
 
+// NOTE(Sleepster): We don't just eat the whole arena immediately even though conceptually that seems like a good idea. 
+//                  The problem is that by doing this we essentially tell mmap to map ALL the virtual memory into 
+//                  our system memory, making memset slow and almost bricking our pc 
 internal_api string_builder_buffer_t*
 c_string_builder_create_and_attach_buffer(string_builder_t *builder, u64 block_size)
 {
@@ -465,7 +468,7 @@ c_string_builder_create_and_attach_buffer(string_builder_t *builder, u64 block_s
 
     result->buffer_size = block_size;
     result->next_buffer = null;
-    result->buffer_data = c_arena_push_size(&builder->arena, block_size);
+    result->buffer_data = c_arena_push_size(&builder->arena, u64(block_size * 0.25f));
     if(builder->current_buffer)
     {
         builder->current_buffer->next_buffer = result;

@@ -19,20 +19,26 @@
 #include <c_math.h>
 
 // TODO(Sleepster): I hate that these defines are here. But I can't put them anywhere else 
-#define MAX_RENDER_GROUPS (192)
-#define MAX_HASHED_RENDER_GROUPS (4093)
+#define MAX_RENDER_GROUPS                    (192)
+#define MAX_HASHED_RENDER_GROUPS             (4093)
+
 #define MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT (2500)
 #define MAX_RENDER_GROUP_VERTEX_COUNT        (MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT * 4)
+#define MAX_RENDER_GROUP_CAMERA_COUNT        (64)
+
+// NOTE(Sleepster): This seems comically large. But it's literally 20MB
+#define MAX_VULKAN_INDEX_BUFFER_SIZE         (600000)
+#define MAX_VULKAN_INSTANCES                 (MAX_VULKAN_INDEX_BUFFER_SIZE / 6)
 
 // NOTE(Sleepster): "Frame in flight" is not a requirement, but it's a cap.
 #define VULKAN_MAX_FRAMES_IN_FLIGHT (3)
 
 // NOTE(Sleepster): Used for rendering
-struct vertex_t
+struct alignas(0) vertex_t
 {
     vec4_t vPosition;
-    vec4_t vColor;
-    vec2_t vTexCoord;
+    vec2_t vCorner;
+    vec2_t vPadding;
 };
 
 // NOTE(Sleepster): Nvidia needs 256 byte alignment
@@ -99,7 +105,7 @@ typedef struct spv_vulkan_type_map
     VkDescriptorType         vk_type;
 }spv_vulkan_type_map_t;
 
-global_variable inline spv_vulkan_type_map_t type_map[] = {
+global_variable spv_vulkan_type_map_t type_map[] = {
     {SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLER,                VK_DESCRIPTOR_TYPE_SAMPLER               },
     {SPV_REFLECT_DESCRIPTOR_TYPE_SAMPLED_IMAGE,          VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE         },
     {SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER        },
@@ -448,6 +454,8 @@ typedef struct vulkan_render_frame_state
     vulkan_framebuffer_data_t    *current_framebuffer;
     vulkan_command_buffer_data_t *render_command_buffer;
 
+    vulkan_buffer_data_t         *instanced_rendering_buffer;
+
     vulkan_shader_data_t         *bound_shader;
 }vulkan_render_frame_state_t;
 
@@ -501,7 +509,7 @@ typedef struct vulkan_render_context
     vulkan_render_frame_state_t  *frames;
     vulkan_render_frame_state_t  *current_frame;
 
-    vulkan_buffer_data_t          vertex_buffers[VULKAN_MAX_FRAMES_IN_FLIGHT];
+    vulkan_buffer_data_t          instanced_rendering_buffer[VULKAN_MAX_FRAMES_IN_FLIGHT];
     vulkan_buffer_data_t          index_buffer;
 
     vulkan_buffer_data_t          vertex_buffer;

@@ -523,8 +523,6 @@ vulkan_pipeline_data_t
 r_vulkan_pipeline_create(vulkan_render_context_t           *render_context, 
                          vulkan_renderpass_data_t          *renderpass,
                          vulkan_shader_data_t              *shader,
-                         VkVertexInputAttributeDescription *vertex_attributes,
-                         u32                                attribute_count,
                          VkViewport                         viewport,
                          VkRect2D                           scissor,
                          bool8                              wireframe)
@@ -603,18 +601,43 @@ r_vulkan_pipeline_create(vulkan_render_context_t           *render_context,
         .dynamicStateCount = ArrayCount(dynamic_state)
     };
 
+    // NOTE(Sleepster): Vertex Attribute stuff
+    const u32 attribute_count = 3;
+
+    VkVertexInputAttributeDescription attributes[] = {
+        [0] = {
+            .binding  = 0,
+            .format   = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .location = 0,
+            .offset   = offsetof(vertex_t, vPosition)
+        },
+        [1] = {
+            .binding  = 0,
+            .format   = VK_FORMAT_R32G32_SFLOAT, 
+            .location = 1,
+            .offset   = offsetof(vertex_t, vCorner)
+        },
+        [2] = {
+            .binding = 0,
+            .format   = VK_FORMAT_R32G32_SFLOAT, 
+            .location = 2,
+            .offset   = offsetof(vertex_t, vPadding)
+        },
+    };
+
     VkVertexInputBindingDescription vertex_input_desc = {
         .binding   = 0,
         .stride    = sizeof(vertex_t),
         .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
     };
+    // NOTE(Sleepster): Vertex Attribute stuff
 
     VkPipelineVertexInputStateCreateInfo vertex_input_state = {
-        .sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+        .sType                           =  VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .vertexBindingDescriptionCount   =  1,
         .pVertexBindingDescriptions      = &vertex_input_desc,
         .vertexAttributeDescriptionCount =  attribute_count,
-        .pVertexAttributeDescriptions    =  vertex_attributes,
+        .pVertexAttributeDescriptions    =  attributes,
     };
 
     VkPipelineInputAssemblyStateCreateInfo assembly_state = {
@@ -955,9 +978,23 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
                 .size             = binding->block.padded_size,
                 .set_type         = (vulkan_shader_descriptor_set_binding_type_t)set_index,
                 .uniform_type     = uniform_binding_type,
-                .data             = is_texture ? null : c_arena_push_size(&result.arena, binding->block.padded_size),
                 .is_texture       = is_texture
             };
+
+            if (uniform_binding_type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER || 
+                uniform_binding_type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC) 
+            {
+                SpvReflectTypeDescription* array_type = binding->type_description->members;
+                u32 element_stride       = array_type->traits.array.stride; 
+                u32 desired_instances    = MAX_VULKAN_INSTANCES;
+
+                uniform->size = element_stride * desired_instances;
+            }
+
+            if(!is_texture)
+            {
+                uniform->data = c_arena_push_size(&result.arena, uniform->size);
+            }
 
             switch(uniform->set_type)
             {
@@ -1058,7 +1095,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
         {
             set_info->buffer = r_vulkan_buffer_create(render_context, 
                                                       Align((set_buffer_size * render_context->swapchain.image_count), 256), 
-                                                      (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT),
+                                                      (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT|VK_BUFFER_USAGE_STORAGE_BUFFER_BIT),
                                                       (u32)VK_MEMORY_PROPERTY_HOST_COHERENT_BIT|VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                                       true);
             Assert(set_info->buffer.handle);
@@ -1143,44 +1180,6 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
                                           info->sets));
     }
 
-    const u32 attribute_count = 3;
-    VkVertexInputAttributeDescription attributes[attribute_count] = {};
-
-    VkFormat attribute_formats[attribute_count] = {
-        VK_FORMAT_R32G32B32A32_SFLOAT,
-        VK_FORMAT_R32G32B32A32_SFLOAT,
-        VK_FORMAT_R32G32_SFLOAT 
-    };
-
-    u64 attribute_sizes[attribute_count] = {
-        sizeof(vec4_t),
-        sizeof(vec4_t),
-        sizeof(vec2_t)
-    };
-
-    u32 offset = 0;
-    for(u32 index = 0;
-        index < attribute_count;
-        ++index)
-    {
-        VkVertexInputAttributeDescription *attrib = attributes + index;
-        attrib->binding  = 0;
-        attrib->format   = attribute_formats[index];
-        attrib->location = index;
-        attrib->offset   = offset;
-
-        offset += attribute_sizes[index];
-    }
-
-    Assert(result.stage_count < 10);
-    VkPipelineShaderStageCreateInfo stage_create_infos[10] = {};
-    for(u32 index = 0;
-        index < result.stage_count;
-        ++index)
-    {
-        stage_create_infos[index] = result.stages[index].shader_stage_create_info;
-    }
-
     VkViewport viewport = {
         .x        =  (float32)0.0f,
         .y        =  (float32)render_context->framebuffer_height,
@@ -1200,8 +1199,6 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
     result.pipeline = r_vulkan_pipeline_create(render_context, 
                                               &render_context->main_renderpass,
                                               &result,
-                                               attributes,
-                                               attribute_count,
                                                viewport,
                                                scissor,
                                                false);
@@ -2796,7 +2793,8 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
 {
     draw_frame_t *draw_frame                     = &render_state->draw_frame;
     vulkan_render_context_t *render_context      =  render_state->render_context;
-    vulkan_command_buffer_data_t *command_buffer =  render_context->current_frame->render_command_buffer;
+    vulkan_render_frame_state_t  *frame          =  render_context->current_frame;
+    vulkan_command_buffer_data_t *command_buffer =  frame->render_command_buffer;
 
     r_vulkan_command_buffer_reset(command_buffer);
     r_vulkan_command_buffer_begin(command_buffer, false, false, false);
@@ -2831,7 +2829,7 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
     r_vulkan_renderpass_begin(render_context, 
                               &render_context->main_renderpass, 
                               command_buffer, 
-                              render_context->current_frame->current_framebuffer->handle);
+                              frame->current_framebuffer->handle);
 
     for(u32 render_group_index = 0;
         render_group_index < draw_frame->used_render_group_count;
@@ -2840,34 +2838,39 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
         render_group_t *current_group = draw_frame->used_render_groups[render_group_index];
         Assert(current_group);
 
+#if 0
         r_vulkan_buffer_upload(render_context, 
-                               &render_context->vertex_buffer, 
-                               current_group->master_vertex_array,
-                               sizeof(vertex_t) * current_group->total_vertex_count, 
+                               frame->instanced_rendering_buffer,  
+                               current_group->master_batch_array,
+                               sizeof(render_geometry_instance_t) * current_group->total_primitive_count, 
                                0, 
                                null, 
                                render_context->rendering_device.graphics_command_pool, 
                                render_context->rendering_device.graphics_queue);
+#endif
     
         vulkan_shader_data_t *shader  = &current_group->shader->slot->shader.shader_data;
         r_vulkan_shader_bind(render_context, shader);
+        
+        r_vulkan_shader_uniform_update_data(shader, STR("RenderInstances"), current_group->master_batch_array);
+
         r_vulkan_shader_update_all_sets(render_context, shader);
 
         VkDeviceSize offsets[1] = {};
         vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &render_context->vertex_buffer.handle, (VkDeviceSize*)&offsets);
         vkCmdBindIndexBuffer(command_buffer->handle, render_context->index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
 
-        for(render_geometry_buffer_t *current_buffer = &current_group->first_buffer;
+        for(render_geometry_batch_t *current_buffer = &current_group->first_buffer;
             current_buffer;
             current_buffer = current_buffer->next_buffer)
         {
             // TODO(Sleepster): We don't have anything for instancing... 
-#if 0
+#if 1
             vkCmdDrawIndexed(command_buffer->handle, 
                              6, 
-                             current_bufferr->primitive_count, 
+                             1, 
                              0, 
-                             current_buffer->master_array_start_offset,
+                             0,
                              0);
 #else
             for(u32 prim_index = 0;
@@ -2884,11 +2887,9 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
 #endif
             current_buffer->master_array_start_offset = 0;
             current_buffer->primitive_count           = 0;
-            current_buffer->vertex_count              = 0;
         }
 
         current_group->total_primitive_count = 0;
-        current_group->total_vertex_count    = 0;
     }
     draw_frame->used_render_group_count = 0;
     memset(draw_frame->used_render_groups, -1, draw_frame->used_render_group_count * sizeof(render_group_t**));
@@ -2912,6 +2913,7 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, render_state_t *re
     this_frame->image_render_idle_fence         = render_context->image_render_idle_fences   + render_context->current_frame_index;
     this_frame->frame_in_flight_fence_ptr       = render_context->frame_in_flight_fence_ptrs + render_context->current_frame_index;
     this_frame->image_avaliable_semaphore       = render_context->image_avaliable_semaphores + render_context->current_frame_index;
+    this_frame->instanced_rendering_buffer      = render_context->instanced_rendering_buffer + render_context->current_frame_index;
 
     bool8 result = true;
     vulkan_rendering_device_t *device = &render_context->rendering_device;
@@ -2981,7 +2983,7 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, render_state_t *re
 
         this_frame->render_command_buffer            = render_context->render_command_buffers + render_context->current_image_index;
         this_frame->current_framebuffer              = render_context->swapchain.framebuffers + render_context->current_image_index;
-        this_frame->presentation_complete_semaphore = render_context->presentation_complete_semaphores + render_context->current_image_index;
+        this_frame->presentation_complete_semaphore  = render_context->presentation_complete_semaphores + render_context->current_image_index;
 
 #if 0
         vulkan_command_buffer_data_t *command_buffer = this_frame->render_command_buffer; 
@@ -3545,8 +3547,14 @@ r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_
             .samplerAnisotropy = true,
         };
 
+        VkPhysicalDeviceVulkan11Features device_11_features = {
+            .sType                = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
+            .shaderDrawParameters = true,
+        };
+
         VkDeviceCreateInfo device_create_info = {};
         device_create_info.sType                 = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        device_create_info.pNext                 = &device_11_features;
         device_create_info.queueCreateInfoCount  = index_count;
         device_create_info.pQueueCreateInfos     = queue_create_infos;
         device_create_info.pEnabledFeatures      = &device_features;
@@ -3641,7 +3649,7 @@ r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_
                                                                                 VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
                                                                                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
         render_context->index_buffer = r_vulkan_buffer_create(render_context,
-                                                              (sizeof(u32) * 1024),
+                                                              (sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE),
                                                               index_buffer_usage_bits,
                                                          (u32)memory_flags,
                                                               true);
@@ -3649,11 +3657,11 @@ r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_
             buffer_index < VULKAN_MAX_FRAMES_IN_FLIGHT;
             ++buffer_index)
         {
-            render_context->vertex_buffers[buffer_index] = r_vulkan_buffer_create(render_context,
-                                                                                  sizeof(vertex_t) * MAX_RENDER_GROUP_VERTEX_COUNT,
-                                                                                  VK_BUFFER_USAGE_VERTEX_BUFFER_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-                                                                                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT | VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                                                                                  true);
+            render_context->instanced_rendering_buffer[buffer_index] = r_vulkan_buffer_create(render_context,
+                                                                                              sizeof(render_geometry_instance_t) * MAX_VULKAN_INSTANCES,
+                                                                                              VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                                                                                              (u32)memory_flags,
+                                                                                              true);
         }
 
         Assert(render_context->index_buffer.is_valid);
@@ -3664,30 +3672,39 @@ r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_
     // TODO(Sleepster): TRIANGLE CODE
     vertex_t vertices[] = {
         [0] = {
-            .vPosition = {100, -100, 0.0},
-            .vColor    = {1.0, 0.0, 0.0, 1.0},
-            .vTexCoord = {1.0, 1.0}
+            .vPosition = {0.5, -0.5, 0.0, 1.0},
+            .vCorner   = {1.0, 1.0}
         },
         [1] = {
-            .vPosition = {100, 100, 0.0},
-            .vColor    = {0.0, 1.0, 0.0, 1.0},
-            .vTexCoord = {1.0, 0.0}
+            .vPosition = {0.5, 0.5, 0.0, 1.0},
+            .vCorner   = {1.0, 0.0}
         },
         [2] = {
-            .vPosition = {-100, 100, 0.0},
-            .vColor    = {0.0, 0.0, 1.0, 1.0},
-            .vTexCoord = {0.0, 0.0}
+            .vPosition = {-0.5, 0.5, 0.0, 1.0},
+            .vCorner   = {0.0, 0.0}
         },
         [3] = {
-            .vPosition = {-100, -100, 0.0},
-            .vColor    = {1.0, 0.0, 1.0, 1.0},
-            .vTexCoord = {0.0, 1.0}
+            .vPosition = {-0.5, -0.5, 0.0, 1.0},
+            .vCorner   = {0.0, 1.0}
         } 
     };
 
-    u32 indices[] = {
-        0, 1, 2, 2, 3, 0
-    };
+    // TODO(Sleepster): This shouldn't cause problems since the data is just sent to the GPU. But we'll see  
+    u32 *indices = c_arena_push_array(&render_context->initialization_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
+    u32  index_offset = 0;
+    for(u32 index = 0;
+        index < MAX_VULKAN_INDEX_BUFFER_SIZE;
+        index += 6)
+    {
+        indices[index + 0] = index_offset + 0;
+        indices[index + 1] = index_offset + 1;
+        indices[index + 2] = index_offset + 2;
+        indices[index + 3] = index_offset + 2;
+        indices[index + 4] = index_offset + 3;
+        indices[index + 5] = index_offset + 0;
+
+        index_offset += 4;
+    }
 
     r_vulkan_buffer_upload(render_context, 
                           &render_context->vertex_buffer, 
@@ -3700,7 +3717,7 @@ r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_
 
     r_vulkan_buffer_upload(render_context, &render_context->index_buffer, 
                            indices,
-                           sizeof(u32) * ArrayCount(indices), 
+                           sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, 
                            0, 
                            null, 
                            render_context->rendering_device.graphics_command_pool, 

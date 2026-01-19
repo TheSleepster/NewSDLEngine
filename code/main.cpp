@@ -185,7 +185,7 @@ main(int argc, char **argv)
                 vulkan_shader_data_t *shader = &render_context->default_shader->slot->shader.shader_data;
 
                 r_vulkan_shader_uniform_update_data(shader,    STR("Matrices"),       &shader->camera_matrices);
-                r_vulkan_shader_uniform_update_texture(shader, STR("TextureSampler"), &render_context->default_texture->subtexture_data->atlas->texture.gpu_data);
+                //r_vulkan_shader_uniform_update_texture(shader, STR("TextureSampler"), &render_context->default_texture->subtexture_data->atlas->texture.gpu_data);
 
                 r_render_group_begin(render_state);
                 r_draw_texture(render_state, {0, 0}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0, render_context->default_texture);

@@ -227,8 +227,7 @@ typedef void void_func(void);
 #define INVALID_ID ((u32)-1)
 
 // NOTE(Sleepster): C++
-#include <type_traits>
-#define TypesSame(A, B) std::is_same_v<TypeOf(A), TypeOf(B)>
+#define TypesSame(A, B) (true) 
 
 // For some reason, if you DEREFERENCE A POINTER, decltype still tells you it's a reference...
 //#define TypesSame(A, B) std::is_same_v<decltype(A), decltype(B)>

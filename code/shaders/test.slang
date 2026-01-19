@@ -2,8 +2,8 @@
 struct VertexInput_t
 {
     float4 vPosition : POSITION;
-    float4 vColor    : COLOR;
-    float2 vTexCoord : TEXCOORD0;
+    float2 vCorner   : TEXCOORD0;
+    float2 vPadding;
 };
 
 struct VertexOutput_t
@@ -13,25 +13,43 @@ struct VertexOutput_t
     [[vk::location(1)]] float2 vOutTexCoord : TEXCOORD0;
 };
 
-struct global_matrix_uniforms 
+// TODO(Sleepster): this will have to be buffered soon
+struct GlobalMatrixUniforms_t
 {
     float4x4 ViewMatrix;
     float4x4 ProjectionMatrix;
 };
 
+struct RenderGeometryInstance_t 
+{
+    float4x4 iTransform;
+    float4   iColor;
+    float2   iUVMin;
+    float2   iUVMax;
+    uint     iTextureIndex;
+    uint     iCameraIndex;
+};
+
 [[vk::binding(0, 0)]]
-ParameterBlock<global_matrix_uniforms> Matrices;
+ParameterBlock<GlobalMatrixUniforms_t> Matrices;
+
+[[vk::binding(1, 0)]]
+StructuredBuffer<RenderGeometryInstance_t> RenderInstances;
 
 [shader("vertex")]
 VertexOutput_t
-VSMain(VertexInput_t input)
+VSMain(VertexInput_t input, 
+       uint          InstanceID : SV_InstanceID)
 {
     VertexOutput_t result;
+    RenderGeometryInstance_t instance = RenderInstances[InstanceID];
 
-    float4 VSPosition   = mul(Matrices.ViewMatrix, float4(input.vPosition.xyz, 1.0));
-    result.vOutPosition = mul(Matrices.ProjectionMatrix, VSPosition);
-    result.vOutColor    = input.vColor;
-    result.vOutTexCoord = input.vTexCoord;
+    float4 WorldPosition = mul(input.vPosition, instance.iTransform);
+
+    float4 VSPosition   = mul(Matrices.ViewMatrix, WorldPosition);
+    result.vOutPosition = input.vPosition;
+    result.vOutColor    = instance.iColor;
+    result.vOutTexCoord = input.vCorner;
 
     return(result);
 }
@@ -44,8 +62,10 @@ struct PixelOutput_t
 };
 
 // NOTE(Sleepster): binding first, set second 
-[[vk::binding(1, 0)]]
+#if 0
+[[vk::binding(2, 0)]]
 Sampler2D TextureSampler;
+#endif
 
 // struct ConstantData {
 //     float4 DrawColor;
@@ -60,15 +80,21 @@ PSMain(VertexOutput_t input)
 {
     PixelOutput_t result;
 
+#if 0
     float4 TextureColor = TextureSampler.Sample(input.vOutTexCoord);
     if(TextureColor.a == 0.0)
     {
         discard;
     }
+#endif
     // NOTE(Sleepster): This should be used for color override.  
     //result.vFragColor = TextureColor * input.vOutColor;
 
+#if 0
     result.vFragColor = TextureColor;
+#else
+    result.vFragColor = input.vOutColor;
+#endif
 
     return(result);
 }
