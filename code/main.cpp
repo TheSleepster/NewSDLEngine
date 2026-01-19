@@ -182,14 +182,26 @@ main(int argc, char **argv)
 
             if(r_vulkan_begin_frame(render_context, render_state, gcv_tick_rate))
             {
-                vulkan_shader_data_t *shader = &render_context->default_shader->slot->shader.shader_data;
 
-                r_vulkan_shader_uniform_update_data(shader,    STR("Matrices"),       &shader->camera_matrices);
-                //r_vulkan_shader_uniform_update_texture(shader, STR("TextureSampler"), &render_context->default_texture->subtexture_data->atlas->texture.gpu_data);
+                vulkan_shader_data_t *shader = &render_context->default_shader->slot->shader.shader_data;
+                mat4_t view_matrix = mat4_identity();
+                mat4_t projection_matrix = mat4_RHGL_ortho(render_context->framebuffer_width  * -0.5,
+                                                           render_context->framebuffer_width  *  0.5,
+                                                           render_context->framebuffer_height * -0.5,
+                                                           render_context->framebuffer_height *  0.5,
+                                                           0.0,
+                                                           1.0);
+                shader->camera_matrices = {
+                    .view_matrix       = view_matrix,
+                    .projection_matrix = projection_matrix
+                };
+
+                r_vulkan_shader_set_uniform_data(render_context->default_shader, STR("Matrices"), &shader->camera_matrices, sizeof(shader->camera_matrices));
+                r_vulkan_shader_uniform_update_texture(shader, STR("TextureSampler"), &render_context->default_texture->subtexture_data->atlas->texture.gpu_data);
 
                 r_render_group_begin(render_state);
-                r_draw_texture(render_state, {0, 0}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0, render_context->default_texture);
-                r_draw_texture(render_state, {-100, 100}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0, render_context->default_texture);
+                r_draw_texture(render_state, {0, 0}, {100, 100}, {0.0, 1.0, 0.0, 1.0}, 0, render_context->default_texture);
+                r_draw_texture(render_state, {-100, 100}, {100, 100}, {1.0, 0.0, 1.0, 0.0}, 0, render_context->default_texture);
                 r_render_group_end(render_state);
                     
                 r_render_group_update_used_groups(render_state);

@@ -15,7 +15,6 @@
 
 #define R_RENDER_GROUP_H
 
-#pragma pack(push, 16) 
 struct render_geometry_instance_t 
 {
     mat4_t  transform;
@@ -25,7 +24,6 @@ struct render_geometry_instance_t
     u32     texture_index;
     u32     camera_index;
 };
-#pragma pack(pop) 
 
 // NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. Per render_group
 struct render_group_pipeline_state_t
@@ -70,7 +68,7 @@ struct render_group_t
 
     render_group_pipeline_state_t  dynamic_pipeline_state;
     asset_handle_t                *shader;
-    asset_handle_t                *textures[16];
+    asset_handle_t                *textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
 
     // NOTE(Sleepster):            size: 10000, if this fills, expand it doubly.
     render_geometry_instance_t    *master_batch_array;

@@ -352,8 +352,9 @@ r_draw_texture_ex(render_state_t    *render_state,
 
     mat4_t transform = mat4_identity();
     transform = mat4_translate(transform, vec2_expand_vec3(position, layer_depth));
-    transform = mat4_rotate(transform, {1.0, 1.0, 0.0}, rotation);
+    // transform = mat4_rotate(transform, {1.0, 1.0, 0.0}, rotation);
     transform = mat4_scale(transform, vec2_expand_vec3(size, 1.0f));
+    transform = mat4_transpose(transform);
 
     subtexture_data_t *uv_data = subtexture_data;
 

@@ -110,7 +110,6 @@ SHADER_OUTPUTS            = $(patsubst $(SHADER_DIR)/%.slang,../run_tree/res/sha
 # --------------------------------------------
 .PHONY: all game_out jfd_asset_file_packer jfd_asset_file_packer tests shaders clean
 
-
 all: game_out wad_asset_file_packer jfd_asset_file_packer shaders tests
 
 # -------------------------------------------------------------------------
@@ -160,13 +159,16 @@ $(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | ../build
 # -------------------------------------------------------------------------
 game_out: $(GAME_OUT)
 
+$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
+	@echo [ENGINE SOURCE]: $< ...
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) -MMD -MP -c $< -o $@
+
 $(GAME_OUT): $(GAME_OBJS) | $(BUILD_DIR)
 	@echo Linking game executable: $@ ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(LDFLAGS) $(GAME_OBJS) $(GAME_EXTERNAL_LIBRARIES) -o $@
 
-$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
-	@echo [ENGINE SOURCE]: $< ...
-	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) -MMD -MP -c $< -o $@
+clean:
+	-rm -rf $(BUILD_DIR)
 
 # -------------------------------------------------------------------------
 # Dependencies 
@@ -176,5 +178,3 @@ $(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 -include ../build/jfd_file_packer.d
 -include ../build/wad_asset_file_packer.d
 
-clean:
-	-rm -rf $(BUILD_DIR)

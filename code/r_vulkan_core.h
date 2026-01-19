@@ -50,10 +50,19 @@ r_vulkan_command_buffer_dispatch_scratch_buffer(vulkan_render_context_t      *re
 
 void r_vulkan_on_resize(vulkan_render_context_t *render_context, vec2_t new_window_size);
 
+void r_vulkan_shader_set_uniform_data(asset_handle_t *shader_handle, string_t uniform_name, void *data, u64 data_size);
 void r_vulkan_shader_uniform_update_data(vulkan_shader_data_t *shader, string_t uniform_name, void *data);
 void r_vulkan_shader_uniform_update_texture(vulkan_shader_data_t *shader, string_t texture_name, vulkan_texture_t *texture);
+void r_vulkan_shader_assign_vulkan_buffer(vulkan_shader_data_t *shader, string_t uniform_name, vulkan_buffer_data_t *buffer);
+
+vulkan_shader_uniform_data_t *r_vulkan_shader_get_uniform(asset_handle_t *shader_handle, string_t uniform_name);
 
 bool8 r_vulkan_begin_frame(vulkan_render_context_t *render_context, render_state_t *render_state, float32 delta_time);
 bool8 r_vulkan_end_frame(vulkan_render_context_t *render_context, render_state_t *render_state, float32 delta_time);
+
+// NOTE(Sleepster): The goal of this is that you only have to set the data pointer a single time, 
+//                  and just update that pointer every frame, not needing to query for the uniform every frame.
+//void  r_vulkan_shader_set_uniform_data(vulkan_shader_data_t *shader, string_t uniform_name, void *data, u64 data_size);
+
 #endif // R_VULKAN_H
 

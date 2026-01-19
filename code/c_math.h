@@ -1977,9 +1977,9 @@ MATH_API mat4_t
 mat4_make_translation(vec3_t translation)
 {
     mat4_t result = mat4_identity();
-    result.elements[3][0] = translation.x;
-    result.elements[3][1] = translation.y;
-    result.elements[3][2] = translation.z;
+    result.columns[3].x = translation.x;
+    result.columns[3].y = translation.y;
+    result.columns[3].z = translation.z;
     
     return(result);
 }

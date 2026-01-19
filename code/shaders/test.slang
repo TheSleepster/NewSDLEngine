@@ -31,7 +31,7 @@ struct RenderGeometryInstance_t
 };
 
 [[vk::binding(0, 0)]]
-ParameterBlock<GlobalMatrixUniforms_t> Matrices;
+ConstantBuffer<GlobalMatrixUniforms_t> Matrices;
 
 [[vk::binding(1, 0)]]
 StructuredBuffer<RenderGeometryInstance_t> RenderInstances;
@@ -47,9 +47,11 @@ VSMain(VertexInput_t input,
     float4 WorldPosition = mul(input.vPosition, instance.iTransform);
 
     float4 VSPosition   = mul(Matrices.ViewMatrix, WorldPosition);
-    result.vOutPosition = input.vPosition;
+    result.vOutPosition = mul(VSPosition, Matrices.ProjectionMatrix);
     result.vOutColor    = instance.iColor;
-    result.vOutTexCoord = input.vCorner;
+
+    float2 InterpolatedUV = lerp(instance.iUVMin.xy, instance.iUVMax.xy, input.vCorner);
+    result.vOutTexCoord   = InterpolatedUV;
 
     return(result);
 }
@@ -62,10 +64,8 @@ struct PixelOutput_t
 };
 
 // NOTE(Sleepster): binding first, set second 
-#if 0
 [[vk::binding(2, 0)]]
 Sampler2D TextureSampler;
-#endif
 
 // struct ConstantData {
 //     float4 DrawColor;
@@ -80,21 +80,15 @@ PSMain(VertexOutput_t input)
 {
     PixelOutput_t result;
 
-#if 0
     float4 TextureColor = TextureSampler.Sample(input.vOutTexCoord);
     if(TextureColor.a == 0.0)
     {
         discard;
     }
-#endif
     // NOTE(Sleepster): This should be used for color override.  
     //result.vFragColor = TextureColor * input.vOutColor;
 
-#if 0
     result.vFragColor = TextureColor;
-#else
-    result.vFragColor = input.vOutColor;
-#endif
 
     return(result);
 }

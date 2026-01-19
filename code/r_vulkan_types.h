@@ -25,6 +25,7 @@
 #define MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT (2500)
 #define MAX_RENDER_GROUP_VERTEX_COUNT        (MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT * 4)
 #define MAX_RENDER_GROUP_CAMERA_COUNT        (64)
+#define MAX_RENDER_GROUP_BOUND_TEXTURES      (16)
 
 // NOTE(Sleepster): This seems comically large. But it's literally 20MB
 #define MAX_VULKAN_INDEX_BUFFER_SIZE         (600000)
@@ -134,39 +135,72 @@ typedef enum vulkan_shader_descriptor_set_type
 typedef struct vulkan_shader_descriptor_set_info
 {
     bool8                         is_valid;
+    u32                           set_type;
 
     VkDescriptorSetLayoutBinding *bindings;
     u32                           binding_count;
     u32                           binding_upload_size;
 
-    VkImageView                   image_views[16];
-    VkSampler                     samplers[16];
+    VkImageView                   image_views[MAX_RENDER_GROUP_BOUND_TEXTURES];
+    VkSampler                     samplers[MAX_RENDER_GROUP_BOUND_TEXTURES];
     u32                           image_count;
     u32                           sampler_count;
 
     // NOTE(Sleepster): 3 sets, 1 per "image index" in our triple buffering
-    VkDescriptorSet               sets[3];
-    vulkan_buffer_data_t          buffer;
+    VkDescriptorSet               sets[VULKAN_MAX_FRAMES_IN_FLIGHT];
+    vulkan_buffer_data_t          uniform_buffer;
+    u32                           single_frame_uniform_buffer_size;
 }vulkan_shader_descriptor_set_info_t;
+
+// NOTE(Sleepster): Uniform types
+
+typedef struct vulkan_shader_uniform_texture_data
+{
+    VkImageView image_views[MAX_RENDER_GROUP_BOUND_TEXTURES];
+    VkSampler   image_samplers[MAX_RENDER_GROUP_BOUND_TEXTURES];
+
+    u32         image_counter;
+}vulkan_shader_uniform_texture_data_t;
+
+// NOTE(Sleepster): Uniform types
+
+typedef struct vulkan_shader_uniform_data_range
+{
+    void *data;
+    u64   data_size;
+}vulkan_shader_uniform_data_range_t;
 
 typedef struct vulkan_shader_uniform_data
 {
     u32                                         owner_shader_id;
-    u32                                         uniform_location;
     VkDescriptorType                            uniform_type;
     vulkan_shader_descriptor_set_binding_type_t set_type;
+    u32                                         uniform_location;
     u32                                         push_constant_index;
 
     string_t                                    name;
-    u32                                         size;
+    u32                                         uniform_size;
     bool8                                       is_texture;
 
-    void *data;
-    VkImageView image_view;
-    VkSampler   sampler;
+    union 
+    {
+        struct {
+            u32                    mapped_buffer_update_size;
+            void                  *mapped_uniform_buffer;
+            vulkan_buffer_data_t   storage_buffer;
+        };
+
+        vulkan_shader_uniform_texture_data_t texture_data;
+    };
+
+#if 0
+    void                                       *data;
+    VkImageView                                 image_view;
+    VkSampler                                   sampler;
+#endif
 }vulkan_shader_uniform_data_t;
 
-typedef struct vulkan_shader_stage_info
+typedef struct vulkan_shader_stage_info 
 {
     VkShaderStageFlagBits                type;
     const char                          *entry_point;
