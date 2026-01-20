@@ -4,6 +4,7 @@
 ** Materials
 - [ ] Materials should store their texture uniform, camera uniforms, and other important information for easy access and updating
 - [ ] Materials should "cache" special uniforms like "camera uniforms" "texture array uniforms"
+- [ ] Default texture should always be in slot 0, make our texture array in the shader 0 indexed
 ** Create a very early version of the new batch renderer
 - [ ] LAYERS. Use the depth buffer.
 - [ ] Clean up the code and allow for easy toggling of Debug macros

@@ -233,7 +233,7 @@ r_render_group_begin(render_state_t *render_state)
         render_state->draw_frame.used_render_groups[next_group_index] = result;
 
         result->first_buffer       = *r_render_group_create_new_geoemetry_buffer(render_state);
-        result->master_batch_array = c_arena_push_array(&render_state->renderer_arena, render_geometry_instance_t, MAX_VULKAN_INSTANCES);
+        result->master_batch_array =  c_arena_push_array(&render_state->renderer_arena, render_geometry_instance_t, MAX_VULKAN_INSTANCES);
         result->cached_buffer      = &result->first_buffer;
     }
 
@@ -405,7 +405,8 @@ r_draw_texture_ex(render_state_t    *render_state,
     {
         instance->uv_min = vec2_create(0.0);
         instance->uv_max = vec2_create(1.0);
-        instance->texture_index = 0;
+        // TODO(Sleepster): Fix this so that the texture will be bound to a texture that never gets overwritten 
+        instance->texture_index = 14;
     }
 
     instance->transform     = transform;
