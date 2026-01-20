@@ -406,7 +406,7 @@ r_draw_texture_ex(render_state_t    *render_state,
         instance->uv_min = vec2_create(0.0);
         instance->uv_max = vec2_create(1.0);
         // TODO(Sleepster): Fix this so that the texture will be bound to a texture that never gets overwritten 
-        instance->texture_index = 14;
+        instance->texture_index = -1;
     }
 
     instance->transform     = transform;
@@ -423,11 +423,16 @@ r_draw_texture(render_state_t *render_state,
                float32         rotation, 
                asset_handle_t *texture_handle)
 {
-    r_draw_texture_ex(render_state, position, size, color, rotation, texture_handle->subtexture_data);
+    subtexture_data_t *subtexture_data = null; 
+    if(texture_handle)
+    {
+        subtexture_data = texture_handle->subtexture_data;
+    }
+    r_draw_texture_ex(render_state, position, size, color, rotation, subtexture_data);
 }
 
 void
-r_draW_rect(render_state_t *render_state, 
+r_draw_rect(render_state_t *render_state, 
             vec2_t          position, 
             vec2_t          size, 
             vec4_t          color, 

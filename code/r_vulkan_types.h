@@ -35,7 +35,7 @@
 #define VULKAN_MAX_FRAMES_IN_FLIGHT (3)
 
 // NOTE(Sleepster): Used for rendering
-struct alignas(0) vertex_t
+struct alignas(16) vertex_t
 {
     vec4_t vPosition;
     vec2_t vCorner;

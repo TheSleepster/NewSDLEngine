@@ -82,15 +82,23 @@ PSMain(VertexOutput_t input)
 {
     PixelOutput_t result;
 
-    Sampler2D Texture = TextureSampler[input.vOutTexIndex];
-    float4 TextureColor = Texture.Sample(input.vOutTexCoord);
-    if(TextureColor.a == 0.0)
+    float4 TextureColor;
+    if(input.vOutTexIndex != (uint)-1)
     {
-        discard;
+        Sampler2D Texture = TextureSampler[input.vOutTexIndex];
+
+        TextureColor = Texture.Sample(input.vOutTexCoord);
+        if(TextureColor.a == 0.0)
+        {
+            discard;
+        }
+    }
+    else
+    {
+        TextureColor = input.vOutColor;
     }
     // NOTE(Sleepster): This should be used for color override.  
     //result.vFragColor = TextureColor * input.vOutColor;
-
     result.vFragColor = TextureColor;
 
     return(result);

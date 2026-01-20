@@ -3829,8 +3829,8 @@ r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_
     // TODO(Sleepster): TRIANGLE CODE
 
     u32 *pixel_data = (u32*)c_arena_push_array(&render_context->initialization_arena, u32, 4);
-    u32 PINK  = ((u32)255 << 24) | ((u32)0 << 16)   | ((u32)255 << 8) | ((u32)255);
-    u32 BLACK = ((u32)0   << 24) | ((u32)0 << 16)   | ((u32)0   << 8) | ((u32)255);
+    const u32 PINK  = ((u32)255 << 24) | ((u32)0   << 16) | ((u32)255 << 8) | ((u32)255);
+    const u32 BLACK = ((u32)255 << 24) | ((u32)255 << 16) | ((u32)255 << 8) | ((u32)255);
 
     pixel_data[0] = PINK; 
     pixel_data[1] = BLACK;
