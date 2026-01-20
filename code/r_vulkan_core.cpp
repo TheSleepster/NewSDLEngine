@@ -3012,6 +3012,25 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
         r_vulkan_shader_bind(render_context, shader);
 
         r_vulkan_shader_set_uniform_data(render_context->default_shader, STR("RenderInstances"), current_group->master_batch_array, sizeof(render_geometry_instance_t) * current_group->total_primitive_count);
+        
+        // TODO(Sleepster): Material system will make this unnecessary 
+        vulkan_shader_uniform_data_t *uniform = r_vulkan_shader_get_uniform_from_shader(shader, STR("TextureSampler"));
+        if(uniform)
+        {
+            for(u32 texture_index = 0; 
+                texture_index < current_group->current_texture_count; 
+                ++texture_index)
+            {
+                texture2D_t *current_texture = current_group->textures[texture_index];
+                Assert(current_texture);
+
+                uniform->texture_data.image_views[texture_index]    = current_texture->gpu_data.image_data.view;
+                uniform->texture_data.image_samplers[texture_index] = current_texture->gpu_data.sampler;
+
+                ++uniform->texture_data.image_counter;
+            }
+        }
+
         r_vulkan_shader_update_all_sets(render_context, shader);
 
         VkDeviceSize offsets[1] = {};

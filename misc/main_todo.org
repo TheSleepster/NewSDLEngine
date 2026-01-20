@@ -1,11 +1,16 @@
+
 #+title: NewSDLEngine
 * Next Milestone:
+** Materials
+- [ ] Materials should store their texture uniform, camera uniforms, and other important information for easy access and updating
+- [ ] Materials should "cache" special uniforms like "camera uniforms" "texture array uniforms"
 ** Create a very early version of the new batch renderer
 - [ ] LAYERS. Use the depth buffer.
 - [ ] Clean up the code and allow for easy toggling of Debug macros
-- [ ] A buffer for the texture array, this is largely the same as what
+- [X] A buffer for the texture array, this is largely the same as what
       we already do with vertices for our "textureindex" stuff. But
       this streamlines it.
+- [ ] Hook up the render frontend to actually set the textures properly
 
 - [X] Draw quad functionality
 - [X] Render Groups and their old functionality. They should group objects by what render state is needed for correct drawing.
@@ -106,7 +111,6 @@
 - [ ] Create a temporary glyph storage method, that way we can store what glyphs need to be added over the frame and add them at all at once at the end of the frame
 ** Sounds
 - [ ] vorbis OGG decoder
-** Materials
 ** Shaders
 - [X] Make the Vulkan renderer actually use the shader data...
 ** Asset File

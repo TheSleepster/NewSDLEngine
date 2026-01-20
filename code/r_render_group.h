@@ -68,7 +68,8 @@ struct render_group_t
 
     render_group_pipeline_state_t  dynamic_pipeline_state;
     asset_handle_t                *shader;
-    asset_handle_t                *textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
+    texture2D_t                   *textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
+    u32                            current_texture_count;
 
     // NOTE(Sleepster):            size: 10000, if this fills, expand it doubly.
     render_geometry_instance_t    *master_batch_array;

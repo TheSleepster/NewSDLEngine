@@ -280,6 +280,36 @@ r_render_group_update_used_groups(render_state_t *render_state)
   =============== DRAWING API ===============
   ===========================================*/
 
+internal_api bool8 
+r_add_texture_to_group_array(render_group_t *render_group, texture2D_t *texture)
+{
+    bool8 result = false;
+
+    bool8 found = false;
+    for(u32 texture_index = 0;
+        texture_index < render_group->current_texture_count;
+        ++texture_index)
+    {
+        texture2D_t *current_texture = render_group->textures[texture_index];
+        // NOTE(Sleepster): Just compare the pointers... 
+        if(current_texture == texture)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        Assert(render_group->current_texture_count + 1 < MAX_RENDER_GROUP_BOUND_TEXTURES);
+
+        render_group->textures[render_group->current_texture_count++] = texture;
+        result = true;
+    }
+
+    return(result);
+}
+
 void
 r_draw_texture_ex(render_state_t    *render_state, 
                   vec2_t             position, 
@@ -357,16 +387,30 @@ r_draw_texture_ex(render_state_t    *render_state,
     transform = mat4_transpose(transform);
 
     subtexture_data_t *uv_data = subtexture_data;
+    if(uv_data)
+    {
+        render_group_t *active_group = render_state->draw_frame.state.active_render_group;
+        r_add_texture_to_group_array(active_group, &uv_data->atlas->texture);
 
-    vec2_t uv_min = vec2_reduce(uv_data->uv_min, subtexture_data->atlas->atlas_size);
-    vec2_t uv_max = vec2_reduce(uv_data->uv_max, subtexture_data->atlas->atlas_size);
+        vec2_t uv_min = vec2_reduce(uv_data->uv_min, subtexture_data->atlas->atlas_size);
+        vec2_t uv_max = vec2_reduce(uv_data->uv_max, subtexture_data->atlas->atlas_size);
+
+        instance->uv_min        = uv_min;
+        instance->uv_max        = uv_max;
+        instance->texture_index = active_group->current_texture_count - 1;
+
+        Assert(instance->texture_index >= 0);
+    }
+    else
+    {
+        instance->uv_min = vec2_create(0.0);
+        instance->uv_max = vec2_create(1.0);
+        instance->texture_index = 0;
+    }
 
     instance->transform     = transform;
     instance->color         = color;
-    instance->uv_min        = uv_min;
-    instance->uv_max        = uv_max;
     instance->camera_index  = 0;
-    instance->texture_index = 0;
 #endif
 }
 
