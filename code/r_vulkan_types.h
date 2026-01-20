@@ -495,6 +495,7 @@ typedef struct vulkan_render_frame_state
 
 // TODO(Sleepster): Get rid of this crap
 typedef struct asset_handle asset_handle_t;
+typedef struct texture2D    texture2D_t;
 ////////////////////
 
 typedef struct vulkan_render_context
@@ -551,6 +552,8 @@ typedef struct vulkan_render_context
     vulkan_renderpass_data_t      main_renderpass;
     asset_handle_t               *default_shader;
     asset_handle_t               *default_texture;
+
+    texture2D_t                  *invalid_texture_data;
 
     u32                           vertex_offset;
     u32                           geometry_index;

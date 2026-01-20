@@ -11,6 +11,7 @@ struct VertexOutput_t
                         float4 vOutPosition : SV_POSITION;
     [[vk::location(0)]] float4 vOutColor    : SV_TARGET;
     [[vk::location(1)]] float2 vOutTexCoord : TEXCOORD0;
+    [[vk::location(2)]] uint   vOutTexIndex : TEXCOORD1;
 };
 
 // TODO(Sleepster): this will have to be buffered soon
@@ -44,14 +45,15 @@ VSMain(VertexInput_t input,
     VertexOutput_t result;
     RenderGeometryInstance_t instance = RenderInstances[InstanceID];
 
-    float4 WorldPosition = mul(input.vPosition, instance.iTransform);
-
-    float4 VSPosition   = mul(Matrices.ViewMatrix, WorldPosition);
-    result.vOutPosition = mul(VSPosition, Matrices.ProjectionMatrix);
-    result.vOutColor    = instance.iColor;
+    float4 WorldPosition  = mul(input.vPosition, instance.iTransform);
+    float4 VSPosition     = mul(Matrices.ViewMatrix, WorldPosition);
 
     float2 InterpolatedUV = lerp(instance.iUVMin.xy, instance.iUVMax.xy, input.vCorner);
+
+    result.vOutPosition   = mul(VSPosition, Matrices.ProjectionMatrix);
+    result.vOutColor      = instance.iColor;
     result.vOutTexCoord   = InterpolatedUV;
+    result.vOutTexIndex   = instance.iTextureIndex;
 
     return(result);
 }
@@ -65,7 +67,7 @@ struct PixelOutput_t
 
 // NOTE(Sleepster): binding first, set second 
 [[vk::binding(2, 0)]]
-Sampler2D TextureSampler;
+Sampler2D TextureSampler[16];
 
 // struct ConstantData {
 //     float4 DrawColor;
@@ -80,7 +82,8 @@ PSMain(VertexOutput_t input)
 {
     PixelOutput_t result;
 
-    float4 TextureColor = TextureSampler.Sample(input.vOutTexCoord);
+    Sampler2D Texture = TextureSampler[input.vOutTexIndex];
+    float4 TextureColor = Texture.Sample(input.vOutTexCoord);
     if(TextureColor.a == 0.0)
     {
         discard;

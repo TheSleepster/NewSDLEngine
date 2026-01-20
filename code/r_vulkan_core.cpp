@@ -882,17 +882,6 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
 
 
             vulkan_shader_uniform_data_t *uniform = result.uniforms + result.uniform_count++;
-#if 0
-            *uniform = {
-                .uniform_location = binding_index,
-                .name             = STR(binding->name),
-                .size             = binding->block.padded_size,
-                .set_type         = (vulkan_shader_descriptor_set_binding_type_t)set_index,
-                .data             = !is_texture && (binding->block.padded_size > 0) ? c_arena_push_size(&result.arena, binding->block.padded_size) : null,
-                .uniform_type     = uniform_binding_type,
-                .is_texture       = is_texture
-            };
-#else
             // TODO(Sleepster): is_texture can go... 
             *uniform = {
                 .uniform_location = binding_index,
@@ -924,7 +913,6 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
                     log_info("  Calculated buffer size: %zu bytes (%u elements × %u bytes)\n", total_size, element_count, element_size);
                 }
             }
-#endif
 
             switch(uniform->set_type)
             {
@@ -974,8 +962,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
                 }
             }
 
-
-            result.type_counts[binding->descriptor_type] += 1;
+            result.type_counts[binding->descriptor_type] += binding->count;
             VkDescriptorSetLayoutBinding *current_binding = set_bindings + binding_index;
             VkShaderStageFlags stage_flags = current_binding->stageFlags;
             if(uniform->is_texture)
@@ -990,6 +977,17 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
                 .stageFlags         = stage_flags,
                 .pImmutableSamplers = null,
             };
+
+            for(u32 texture_index = 0;
+                texture_index < binding->count;
+                ++texture_index)
+            {
+                uniform->texture_data.image_views[texture_index]    = render_context->invalid_texture_data->gpu_data.image_data.view;
+                uniform->texture_data.image_samplers[texture_index] = render_context->invalid_texture_data->gpu_data.sampler;
+
+            }
+
+            uniform->texture_data.image_counter = 16;
         }
         set_info->binding_upload_size = set_buffer_size;
         set_info->binding_count       = current_set->binding_count;
@@ -1099,7 +1097,6 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
             layout_info[frame_index] = layout;
         }
 
-
         VkDescriptorSetAllocateInfo allocation_info = {
             .sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
             .descriptorPool     = result.primary_pool,
@@ -1110,6 +1107,8 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
                                          &allocation_info,
                                           info->sets));
     }
+
+    //r_vulkan_shader_update_static_set(render_context, &result);
 
     VkViewport viewport = {
         .x        =  (float32)0.0f,
@@ -1234,7 +1233,7 @@ r_vulkan_shader_uniform_update_data(vulkan_shader_data_t *shader, string_t unifo
 }
 
 internal_api vulkan_shader_uniform_data_t*
-r_vulkan_shader_get_uniform(vulkan_shader_data_t *shader, string_t uniform_name)
+r_vulkan_shader_get_uniform_from_shader(vulkan_shader_data_t *shader, string_t uniform_name)
 {
     vulkan_shader_uniform_data_t *result = null;
     for(u32 uniform_index = 0;
@@ -1252,6 +1251,17 @@ r_vulkan_shader_get_uniform(vulkan_shader_data_t *shader, string_t uniform_name)
     return(result);
 }
 
+vulkan_shader_uniform_data_t *
+r_vulkan_shader_get_uniform(asset_handle_t *shader_handle, string_t uniform_name)
+{
+    vulkan_shader_uniform_data_t *result = null;
+    vulkan_shader_data_t *shader = &shader_handle->slot->shader.shader_data;
+
+    result = r_vulkan_shader_get_uniform_from_shader(shader, uniform_name);
+
+    return(result);
+}
+
 void
 r_vulkan_shader_set_uniform_data(asset_handle_t *shader_handle, string_t uniform_name, void *data, u64 data_size)
 {
@@ -1259,7 +1269,7 @@ r_vulkan_shader_set_uniform_data(asset_handle_t *shader_handle, string_t uniform
     Assert(shader_handle->is_valid);
     Assert(shader_handle->slot->type == AT_Shader);
 
-    vulkan_shader_uniform_data_t *uniform = r_vulkan_shader_get_uniform(shader, uniform_name);
+    vulkan_shader_uniform_data_t *uniform = r_vulkan_shader_get_uniform_from_shader(shader, uniform_name);
     Assert(uniform);
 
     uniform->mapped_uniform_buffer     =  data;
@@ -1275,134 +1285,12 @@ r_vulkan_shader_get_uniform_data_ptr(asset_handle_t *shader_handle, string_t uni
     Assert(shader_handle->is_valid);
     Assert(shader_handle->slot->type == AT_Shader);
 
-    vulkan_shader_uniform_data_t *uniform = r_vulkan_shader_get_uniform(shader, uniform_name);
+    vulkan_shader_uniform_data_t *uniform = r_vulkan_shader_get_uniform_from_shader(shader, uniform_name);
     result.data      = uniform->mapped_uniform_buffer;
     result.data_size = uniform->mapped_buffer_update_size;
 
     return(result);
 }
-
-#if 0
-// TODO(Sleepster): Realistically... the shader will be stored somewhere better later where we don't pass it to this function... 
-// We'll instead just check the "active_shader" or something of the sort
-void
-r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *render_context,
-                                      vulkan_shader_data_t                *shader,
-                                      vulkan_shader_descriptor_set_info_t *set_info,
-                                      vulkan_shader_uniform_data_t       **uniform_array,
-                                      u32                                  max_uniforms)
-{
-    Assert(set_info->is_valid); 
-
-    u32 current_image_index = render_context->current_image_index;
-
-    vulkan_command_buffer_data_t *command_buffer = render_context->render_command_buffers + current_image_index;
-    VkDescriptorSet current_set                  = set_info->sets[current_image_index];
-
-    Assert(command_buffer->state == VKCBS_RECORDING || command_buffer->state == VKCBS_WITHIN_RENDERPASS);
-
-    u32 buffer_offset = 0;
-    byte *uniform_data_buffer    = c_arena_push_size(&render_context->frame_arena, set_info->uniform_buffer.buffer_size);
-    VkWriteDescriptorSet *writes = c_arena_push_array(&render_context->frame_arena, VkWriteDescriptorSet, set_info->binding_count);
-
-    for(u32 uniform_index = 0;
-        uniform_index < max_uniforms;
-        ++uniform_index)
-    {
-        vulkan_shader_uniform_data_t *uniform_data  = uniform_array[uniform_index];
-            
-        Assert(uniform_data->owner_shader_id == shader->shader_id);
-        Assert(uniform_data->set_type      != SDS_Instance);
-        Assert(uniform_data->uniform_type  != (VkDescriptorType)INVALID_ID);
-
-        if(!uniform_data->is_texture)
-        {
-            memcpy(uniform_data_buffer + buffer_offset, uniform_data->data, uniform_data->size);
-            buffer_offset += uniform_data->size;
-
-            if(uniform_data->data == null)
-            {
-                log_warning("Updated a uniform named: '%s'... but it's data pointer was null...\n", C_STR(uniform_data->name));
-            }
-        }
-        else
-        {
-            set_info->image_views[set_info->image_count++] = uniform_data->image_view;
-            set_info->samplers[set_info->sampler_count++]  = uniform_data->sampler;
-            // TODO(Sleepster):  uniform->image_layout; 
-        }
-    }
-
-
-    /* TODO(Sleepster):
-     *
-     * - [ ] This is just overall terrible!
-     * Create normal universal staging buffer(s) that are held in the context that dynamically grow as needed 
-     * so that we're not constantly creating and destroying GPU memory. This is slow. And most importantly stupid.
-     */  
-    r_vulkan_buffer_upload(render_context, 
-                           &set_info->uniform_buffer, 
-                           uniform_data_buffer, 
-                           set_info->uniform_buffer.buffer_size, 
-                           0, 
-                           null, 
-                           render_context->rendering_device.graphics_command_pool, 
-                           render_context->rendering_device.graphics_queue);
-
-    // TODO(Sleepster): Maybe create some r_vulkan_shader_finish_descriptor_updates() that will do this part for us...
-    VkDescriptorBufferInfo buffer_info = {
-        .buffer = set_info->uniform_buffer.handle,
-        .offset = 0,
-        .range  = set_info->binding_upload_size
-    };
-
-    VkDescriptorImageInfo texture_info = {
-        .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-        .imageView   = set_info->image_views[0],
-        .sampler     = set_info->samplers[0],
-    };
-
-    for(u32 binding_index = 0;
-        binding_index < set_info->binding_count;
-        ++binding_index)
-    {
-        VkDescriptorSetLayoutBinding *binding = set_info->bindings + binding_index;
-        writes[binding_index] = {
-            .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-            .dstSet          = current_set,
-            .dstBinding      = binding->binding,
-            .dstArrayElement = 0,
-            .descriptorType  = binding->descriptorType,
-            .descriptorCount = binding->descriptorCount,
-            .pBufferInfo     = &buffer_info,
-            .pImageInfo      = &texture_info
-        };
-    }
-
-    // NOTE(Sleepster): Some GPUs only support Update -> Bind, not Bind -> Update
-    vkUpdateDescriptorSets(render_context->rendering_device.logical_device,
-                           set_info->binding_count,
-                           writes,
-                           0,
-                           null);
-
-    // TODO(Sleepster): Obviously check if something like "render_context->current_set == this_set" 
-    // and only update this current set binding if we actually need too.. 
-    //
-    // TODO(Sleepster):  This should not just be a simple binding to the graphics pipeline 
-    vkCmdBindDescriptorSets(command_buffer->handle, 
-                            VK_PIPELINE_BIND_POINT_GRAPHICS, 
-                            shader->pipeline.layout, 
-                            0, 
-                            1,
-                            &current_set,
-                            0,
-                            null);
-
-    set_info->image_count   = 0;
-    set_info->sampler_count = 0;
-}
-#else
 
 void
 r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *render_context,
@@ -1525,7 +1413,7 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
                 if(uniform->texture_data.image_counter > 0)
                 {
                     VkDescriptorImageInfo *image_info = image_infos + image_info_idx++;
-                    
+
                     // NOTE(Sleepster): Determine appropriate image layout
                     VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
                     if(uniform->uniform_type == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE)
@@ -1615,7 +1503,6 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
                                 null);
     }
 }
-#endif
 
 void
 r_vulkan_shader_update_instance_set(vulkan_render_context_t *render_context, 
@@ -1655,7 +1542,7 @@ r_vulkan_shader_update_instance_set(vulkan_render_context_t *render_context,
     }
 }
 
-inline void
+void
 r_vulkan_shader_update_draw_set(vulkan_render_context_t *render_context,
                                 vulkan_shader_data_t    *shader)
 {
@@ -1672,7 +1559,7 @@ r_vulkan_shader_update_draw_set(vulkan_render_context_t *render_context,
     }
 }
 
-inline void
+void
 r_vulkan_shader_update_static_set(vulkan_render_context_t *render_context,
                                   vulkan_shader_data_t    *shader)
 {
@@ -1689,7 +1576,7 @@ r_vulkan_shader_update_static_set(vulkan_render_context_t *render_context,
     }
 }
 
-inline void
+void
 r_vulkan_shader_update_all_sets(vulkan_render_context_t *render_context,
                                 vulkan_shader_data_t    *shader)
 {
@@ -1915,6 +1802,42 @@ r_vulkan_image_destroy(vulkan_render_context_t *render_context,
                        render_context->allocators);
         image_data->handle = 0;
     }
+}
+
+// NOTE(Sleepster): Sampler creation 
+// TODO(Sleepster): 
+// Say the line Bart! 
+//
+// sighhh configurable... 
+//
+// YAYYYYYYYYYYYYYYYYY
+VkSampler 
+r_vulkan_image_sampler_create(vulkan_render_context_t *render_context)
+{
+    VkSampler result;
+    VkSamplerCreateInfo sampler_data = {
+        .sType                   = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+        .magFilter               = VK_FILTER_NEAREST,
+        .minFilter               = VK_FILTER_NEAREST,
+        .addressModeU            = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+        .addressModeV            = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+        .addressModeW            = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+        .anisotropyEnable        = false,
+        .maxAnisotropy           = 0,
+        .borderColor             = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK,
+        .unnormalizedCoordinates = false,
+        .compareEnable           = false,
+        .compareOp               = VK_COMPARE_OP_ALWAYS,
+        .mipmapMode              = VK_SAMPLER_MIPMAP_MODE_LINEAR,
+        .mipLodBias              = 0.0f,
+        .minLod                  = 0.0f,
+        .maxLod                  = 0.0f
+    };
+    vkAssert(vkCreateSampler(render_context->rendering_device.logical_device, 
+                            &sampler_data, 
+                             render_context->allocators, 
+                            &result));
+    return(result);
 }
 
 vulkan_image_data_t
@@ -2149,36 +2072,8 @@ r_vulkan_make_gpu_texture(vulkan_render_context_t *render_context, texture2D_t *
 
     vulkan_image->image_data.format = image_format;
     vulkan_image->image_data.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    vulkan_image->sampler           = r_vulkan_image_sampler_create(render_context);
 
-    // NOTE(Sleepster): Sampler creation 
-    // TODO(Sleepster): 
-    // Say the line Bart! 
-    //
-    // sighhh configurable... 
-    //
-    // YAYYYYYYYYYYYYYYYYY
-    VkSamplerCreateInfo sampler_data = {
-        .sType                   = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
-        .magFilter               = VK_FILTER_NEAREST,
-        .minFilter               = VK_FILTER_NEAREST,
-        .addressModeU            = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-        .addressModeV            = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-        .addressModeW            = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-        .anisotropyEnable        = false,
-        .maxAnisotropy           = 0,
-        .borderColor             = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK,
-        .unnormalizedCoordinates = false,
-        .compareEnable           = false,
-        .compareOp               = VK_COMPARE_OP_ALWAYS,
-        .mipmapMode              = VK_SAMPLER_MIPMAP_MODE_LINEAR,
-        .mipLodBias              = 0.0f,
-        .minLod                  = 0.0f,
-        .maxLod                  = 0.0f
-    };
-    vkAssert(vkCreateSampler(render_context->rendering_device.logical_device, 
-                            &sampler_data, 
-                             render_context->allocators, 
-                            &vulkan_image->sampler));
     vulkan_image->current_generation++;
 }
 
@@ -3037,16 +2932,6 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
         render_group_t *current_group = draw_frame->used_render_groups[render_group_index];
         Assert(current_group);
 
-#if 0
-        r_vulkan_buffer_upload(render_context, 
-                               frame->instanced_rendering_buffer,  
-                               current_group->master_batch_array,
-                               sizeof(render_geometry_instance_t) * current_group->total_primitive_count, 
-                               0, 
-                               null, 
-                               render_context->rendering_device.graphics_command_pool, 
-                               render_context->rendering_device.graphics_queue);
-#endif
         vulkan_shader_data_t *shader  = &current_group->shader->slot->shader.shader_data;
         r_vulkan_shader_bind(render_context, shader);
 
@@ -3062,26 +2947,12 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
             current_buffer = current_buffer->next_buffer)
         {
             // TODO(Sleepster): We don't have anything for instancing... 
-#if 1
             vkCmdDrawIndexed(command_buffer->handle, 
                              6, 
                              current_buffer->primitive_count, 
                              0, 
                              0,
                              0);
-#else
-            for(u32 prim_index = 0;
-                prim_index < current_buffer->primitive_count;
-                ++prim_index)
-            {
-                vkCmdDrawIndexed(command_buffer->handle, 
-                                 6, 
-                                 1, 
-                                 0, 
-                                 current_buffer->master_array_start_offset + (prim_index * 4),
-                                 0);
-            }
-#endif
             current_buffer->master_array_start_offset = 0;
             current_buffer->primitive_count           = 0;
         }
@@ -3181,64 +3052,6 @@ r_vulkan_begin_frame(vulkan_render_context_t *render_context, render_state_t *re
         this_frame->render_command_buffer            = render_context->render_command_buffers + render_context->current_image_index;
         this_frame->current_framebuffer              = render_context->swapchain.framebuffers + render_context->current_image_index;
         this_frame->presentation_complete_semaphore  = render_context->presentation_complete_semaphores + render_context->current_image_index;
-
-#if 0
-        vulkan_command_buffer_data_t *command_buffer = this_frame->render_command_buffer; 
-        Assert(this_frame->render_command_buffer);
-        r_vulkan_command_buffer_reset(command_buffer);
-        r_vulkan_command_buffer_begin(command_buffer, false, false, false);
-
-        // NOTE(Sleepster): This might be a problem in the future... 
-        // We do this to keep this in line with how OpenGL does things.
-        VkViewport viewport_data = {
-            .x        = 0.0f,
-            .y        =  (float32)render_context->framebuffer_height,
-            .width    =  (float32)render_context->framebuffer_width,
-            .height   = -(float32)render_context->framebuffer_height,
-            .minDepth = 0.0f,
-            .maxDepth = 1.0f
-        };
-
-        VkRect2D scissor_data = {
-            .offset = {
-                .x = 0,
-                .y = 0,
-            },
-            .extent = {
-                .width  = render_context->framebuffer_width,
-                .height = render_context->framebuffer_height,
-            }
-        };
-
-        vkCmdSetViewport(command_buffer->handle, 0, 1, &viewport_data);
-        vkCmdSetScissor(command_buffer->handle,  0, 1, &scissor_data);
-
-        render_context->main_renderpass.size.x = (float32)render_context->framebuffer_width;
-        render_context->main_renderpass.size.y = (float32)render_context->framebuffer_height;
-
-        r_vulkan_renderpass_begin(render_context, 
-                                  &render_context->main_renderpass, 
-                                  command_buffer, 
-                                  this_frame->current_framebuffer->handle);
-
-        // TODO(Sleepster): TRIANGLE CODE
-        vulkan_shader_data_t *shader = &render_context->default_shader->slot->shader.shader_data;
-        r_vulkan_shader_bind(render_context, shader);
-
-        //push_constant_t test = {.DrawColor = {1.0f, 0.0f, 0.0f, 1.0f}};
-        //r_vulkan_shader_uniform_update_data(&render_context->default_shader, STR("PushConstants"), &test);
-        //r_vulkan_shader_uniform_update_data(shader,    STR("Matrices"),       &shader->camera_matrices);
-
-        r_vulkan_shader_update_all_sets(render_context, shader);
-
-        VkDeviceSize offsets[1] = {};
-        vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &render_context->vertex_buffer.handle, (VkDeviceSize*)&offsets);
-        vkCmdBindIndexBuffer(command_buffer->handle, render_context->index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
-
-        vkCmdDrawIndexed(command_buffer->handle, 6, 1, 0, 0, 0);
-
-        // TODO(Sleepster): TRIANGLE CODE
-#endif
     }
 
 begin_frame_return:
@@ -3919,6 +3732,28 @@ r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_
                            render_context->rendering_device.graphics_command_pool, 
                            render_context->rendering_device.graphics_queue);
     // TODO(Sleepster): TRIANGLE CODE
+
+    u32 *pixel_data = (u32*)c_arena_push_array(&render_context->initialization_arena, u32, 4);
+    u32 PINK  = ((u32)255 << 24) | ((u32)0 << 16)   | ((u32)255 << 8) | ((u32)255);
+    u32 BLACK = ((u32)0   << 24) | ((u32)0 << 16)   | ((u32)0   << 8) | ((u32)255);
+
+    pixel_data[0] = PINK; 
+    pixel_data[1] = BLACK;
+    pixel_data[2] = BLACK;
+    pixel_data[3] = PINK;
+
+    string_t pixels = {
+        .count = sizeof(u32) * 4,
+        .data  = (byte*)pixel_data
+    };
+
+    render_context->invalid_texture_data = c_arena_push_struct(&render_context->permanent_arena, texture2D_t);
+    render_context->invalid_texture_data->bitmap.pixels   = pixels;
+    render_context->invalid_texture_data->bitmap.channels = 4;
+    render_context->invalid_texture_data->bitmap.height   = 2;
+    render_context->invalid_texture_data->bitmap.width    = 2;
+
+    r_vulkan_make_gpu_texture(render_context, render_context->invalid_texture_data);
 
     log_info("Vulkan context initialized...\n");
     c_arena_destroy(&render_context->initialization_arena);
