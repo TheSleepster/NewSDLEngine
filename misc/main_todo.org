@@ -1,9 +1,54 @@
 #+title: NewSDLEngine
 * Next Milestone:
 ** Create a very early version of the new batch renderer
-- [ ] Draw quad functionality
-- [ ] Render Groups and their old functionality. They should group objects by what render state is needed for correct drawing.
+- [ ] LAYERS. Use the depth buffer.
+- [ ] Clean up the code and allow for easy toggling of Debug macros
+- [ ] A buffer for the texture array, this is largely the same as what
+      we already do with vertices for our "textureindex" stuff. But
+      this streamlines it.
+
+- [X] Draw quad functionality
+- [X] Render Groups and their old functionality. They should group objects by what render state is needed for correct drawing.
+- [X] Texture Atlasing API
+- [X] SSBO support.
+- [X] Ability for the user to acquire shader data and directly update it using cpu side buffers rather than just calling the specific update function.
+      (relate to our asset handles. Where we give the user the actual handle to the descriptor set and let them update the GPU buffer themselves)
+- [ ] Shader Common header (with #ifdef for __cplusplus for inclusion in the engine as well)
+- [ ] Push constants for cameras???
+*** Upgrading the damn renderer
+- [X] Take a look at instancing, upload 4 vertices and 6 indices at
+  the program's start. Create a vertex buffer, an index buffer, and an
+  INSTANCE info buffer. The reason for this dramatic shit is this:
+  - Instead of uploading a ton of vertices and grouping them in a
+    complicated manner, we just have a few simple buffers for each of
+    the information sets we need that are normally unique per
+    render_group_geometry_buffer:
+    - [ ] A buffer for the render_camera's used that frame. Each instance
+          will contain a "camera_index" into this buffer. Making the
+          accesssing of this data easy and the rendering with many
+          different camera easier to manage than the current system.
+
+- [ ] Indirect drawing
+- [ ] Seperate Transparent and Opaque geometry
+- [ ] Compute shader support
+- [X] Better method of applying uniform data
+- [ ] Support for multiple renderpasses, restore the renderer to it's full glory. (lights, particle systems, etc.)
+- [ ] Dynamic state expansion, add support for dynamic blend modes, dynamic depth state, dynamic stencil states, line widths, etc.
+      (https://docs.vulkan.org/spec/latest/chapters/pipelines.html#VkDynamicState)
+
+- [ ] Lighting could be easy with instancing, have each instance's
+      "position" be the center of the object. When we gather what geometry
+      are within what range of lights, instead of doing this process on
+      the CPU, we could instead use the GPU to check each of the instances
+      against the each of light to figure out if the instance is within
+      range of the light and could influence it.  In our case, we could
+      use a "clustered compute shader" to bucket the instances that are in
+      range of each light into a per light u32 buffer. The lights would
+      then only process and check the instances within their bucket,
+      saving resource time. This is very similar to clustered forward
+      compute shading.
 * IMMEDIATE TODO
+- [X] Fix the memory leak inside of the asset file packer
 * General TODOs
 * Vulkan Renderer TODOs
 - [X] Images and Samplers
@@ -31,24 +76,19 @@
        these by default??), and other important state that can just be linked together simply
  - [X] Restore our old "frames in flight logic", We are actually just going through each of the swapchain images as fast as we can rather than "triple buffering"
  - [X] (??) r_vulkan_types.h && r_vulkan_api.h (??) for easy including of just the vulkan type information and just the API functions
+ - [ ] Refactor "r_vulkan_begin_frame" and "r_vulkan_end_frame"
+  IMAGE TRANSITION STUFF
+    - [ ] The image should store the informationa about it's current format, layout, baseMipLevel, aspectMask, etc.
+    - [ ] The function itself should just take a parameterized list of information you want the image to actually transform into
 
-- [ ] Support for multiple renderpasses, restore the renderer to it's full glory. (lights, particle systems, etc.)
-- [ ] Dynamic state expansion, add support for dynamic blend modes, dynamic depth state, dynamic stencil states, line widths, etc.
-      (https://docs.vulkan.org/spec/latest/chapters/pipelines.html#VkDynamicState)
-- [ ] Take a look at instancing
-
-IMAGE TRANSITION STUFF
-- [ ] The image should store the informationa about it's current format, layout, baseMipLevel, aspectMask, etc.
-- [ ] The function itself should just take a parameterized list of information you want the image to actually transform into
-
-*** Maybe this isn't necessary? It seems like this is just a structure of arrays vs array of structures stuff.
- - [X] Some method of organizing and tracking "render_context->this_frame_command_buffer" for objects that meant to accessed like "render_context->thing[frame_index]"
- - [X] Create a part of the backend renderer to encapsulate all this "frame logic" that is specific to the backend renderer
-       (items like sync objects, framebuffers, command_buffers, etc.)
+    *** Maybe this isn't necessary? It seems like this is just a structure of arrays vs array of structures stuff.
+    - [X] Some method of organizing and tracking "render_context->this_frame_command_buffer" for objects that meant to accessed like "render_context->thing[frame_index]"
+    - [X] Create a part of the backend renderer to encapsulate all this "frame logic" that is specific to the backend renderer
+        (items like sync objects, framebuffers, command_buffers, etc.)
 
 * Drawing API (frontend renderer)
 - [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
-  (shader, blend modes, depth state, textures, camera data, etc.)
+      (shader, blend modes, depth state, textures, camera data, etc.)
  - [ ] (??) Backend API structure that contains the necessary Vulkan-render API function pointers for use with both the asset manager and the frontend renderer
  - [ ] Functions like r_vulkan_swapchain_get_next_image_index() should instead inform the render_context that actions need to be performed rather than just doing them.
        This would allow the renderer to handle these issues when it actually is meant too, which may reduce the chance of bugs arising
@@ -60,16 +100,18 @@ IMAGE TRANSITION STUFF
 - [X] Textures and other assets should store a "generation" ID that tells us whether it has been updated
 ** Textures
 - [ ] Renderer's create Texture function only takes in pixels. The rest of the data is stored on the texture_t object
-- [ ] Texture Atlasing API
 - [ ] Actually make the "generation_ID" mean something
+- [ ] PNG Decoder
 ** Fonts
 - [ ] Create a temporary glyph storage method, that way we can store what glyphs need to be added over the frame and add them at all at once at the end of the frame
+** Sounds
+- [ ] vorbis OGG decoder
 ** Materials
 ** Shaders
 - [X] Make the Vulkan renderer actually use the shader data...
 ** Asset File
 - [X] Add Spirv Binaries to the asset file
-- [ ] Prebuild atlas' and store them as part of the .wad file so that we don't have to deal with the dynamic atlasing at runtime
+- [ ] (???) Prebuild atlas' and store them as part of the .wad file so that we don't have to deal with the dynamic atlasing at runtime
 - [X] Switch to a more sane "chunk based" file format. Where the header stays almost exactly how it is, but the assets are moved into "chunks".
       Each "chunk" should tell us the actual asset size and contain a bunch of information about the data. This also makes the table of contents less responsible
       for stuff and makes parsing easier since we can just go through each chunk for the information relating to an asset.
@@ -77,11 +119,21 @@ IMAGE TRANSITION STUFF
 - [ ] Find out why the hell it's taking so long to pack
 * Core stuff
 - [X] Type safe hash tables
-- [X] Allow us to set the custom allocator
+- [X] Allow us to set the custom allocator for the hash tables
 - [ ] Modify the file and sys_file APIs so that they work properly as one would expect. IE, sys_file_open returns a file_t, have it initialize the file's name and other easy things
 - [ ] Complete malloc replacement (thread safe heap allocator)
 - [ ] The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal state
 - [ ] The ability to dump the contents of a memory arena to a file, this is probably pretty useful...
+- [ ] Vulkan style memory allocation for functions that would allocate
+      memory within the core lib. The core should have a "get_read_size"
+      or something to get the SIZE of the allocation and allow the user to
+      pass a buffer of memory to a function that will fill the user's
+      buffer with the data. Optionally, have an "I don't really care what
+      happens to this memory LMAO" function that just uses the core lib's
+      internal allocator.
+* Multithreading
+- [ ] Modify the threadpool to act as a governor and dispatcher, 
+- [ ] Maybe just rebuild the whole system... it seems that this model isn't actually any good anymore
 * Platform
 - [ ] Sys mutex lock and unlock on windows should change the boolean for if it is locked, this is already done on Linux
 - [X] Function to get current working directory Windows (https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentdirectory)
