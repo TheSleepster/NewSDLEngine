@@ -106,6 +106,7 @@ c_string_make_copy(memory_arena_t *arena, string_t string)
     else
     {
         log_error("Failed to allocate string memory...\n");
+        result.data = null;
     }
 
     return(result);

@@ -185,19 +185,13 @@ typedef struct vulkan_shader_uniform_data
     union 
     {
         struct {
-            u32                    mapped_buffer_update_size;
-            void                  *mapped_uniform_buffer;
-            vulkan_buffer_data_t   storage_buffer;
+            u32                  mapped_buffer_update_size;
+            void                *mapped_uniform_buffer;
+            vulkan_buffer_data_t storage_buffer;
         };
 
         vulkan_shader_uniform_texture_data_t texture_data;
     };
-
-#if 0
-    void                                       *data;
-    VkImageView                                 image_view;
-    VkSampler                                   sampler;
-#endif
 }vulkan_shader_uniform_data_t;
 
 typedef struct vulkan_shader_stage_info 

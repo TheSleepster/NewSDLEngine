@@ -767,6 +767,77 @@ r_vulkan_shader_stage_create(vulkan_render_context_t    *render_context,
     };
 }
 
+void
+r_vulkan_shader_initialize_texture_arrays(vulkan_render_context_t *render_context, vulkan_shader_data_t *shader)
+{
+    for(u32 set_index = 0; 
+        set_index < shader->total_descriptor_set_count; 
+        ++set_index)
+    {
+        vulkan_shader_descriptor_set_info_t *set_info = shader->set_info + set_index;
+        Assert(set_info->is_valid);
+
+        for(u32 binding_index = 0; 
+            binding_index < set_info->binding_count; 
+            ++binding_index)
+        {
+            VkDescriptorSetLayoutBinding *binding = &set_info->bindings[binding_index];
+
+            bool is_texture_array = ((binding->descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ||
+                                      binding->descriptorType == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE          ||
+                                      binding->descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE          ||
+                                      binding->descriptorType == VK_DESCRIPTOR_TYPE_SAMPLER)               &&
+                                      binding->descriptorCount > 1);
+            if(is_texture_array)
+            {
+                u32 texture_count = binding->descriptorCount;
+
+                log_info("Initializing texture array at set %u, binding %u with %u slots\n",
+                         set_index, 
+                         binding->binding, 
+                         texture_count);
+
+                VkDescriptorImageInfo *image_infos = c_arena_push_array(&render_context->frame_arena, VkDescriptorImageInfo, texture_count);
+                for(u32 info_index = 0; 
+                    info_index < texture_count; 
+                    ++info_index)
+                {
+                    VkDescriptorImageInfo *image_info = image_infos + info_index;
+                    image_info->imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                    image_info->imageView   = render_context->invalid_texture_data->gpu_data.image_data.view;
+                    image_info->sampler     = render_context->invalid_texture_data->gpu_data.sampler;
+                }
+
+                VkWriteDescriptorSet *writes = c_arena_push_array(&render_context->frame_arena, VkWriteDescriptorSet, VULKAN_MAX_FRAMES_IN_FLIGHT);
+                for(u32 frame = 0; 
+                    frame < VULKAN_MAX_FRAMES_IN_FLIGHT; 
+                    ++frame)
+                {
+                    writes[frame] = (VkWriteDescriptorSet){
+                        .sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                        .dstSet          = set_info->sets[frame],
+                        .dstBinding      = binding->binding,
+                        .dstArrayElement = 0,
+                        .descriptorType  = binding->descriptorType,
+                        .descriptorCount = texture_count,
+                        .pImageInfo      = image_infos
+                    };
+                }
+
+                vkUpdateDescriptorSets(render_context->rendering_device.logical_device,
+                                       VULKAN_MAX_FRAMES_IN_FLIGHT,
+                                       writes,
+                                       0,
+                                       NULL);
+
+                log_info("Initialized %u texture slots across %u frames\n", 
+                         texture_count, 
+                         VULKAN_MAX_FRAMES_IN_FLIGHT);
+            }
+        }
+    }
+}
+
 vulkan_shader_data_t
 r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_source)
 {
@@ -977,17 +1048,6 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
                 .stageFlags         = stage_flags,
                 .pImmutableSamplers = null,
             };
-
-            for(u32 texture_index = 0;
-                texture_index < binding->count;
-                ++texture_index)
-            {
-                uniform->texture_data.image_views[texture_index]    = render_context->invalid_texture_data->gpu_data.image_data.view;
-                uniform->texture_data.image_samplers[texture_index] = render_context->invalid_texture_data->gpu_data.sampler;
-
-            }
-
-            uniform->texture_data.image_counter = 16;
         }
         set_info->binding_upload_size = set_buffer_size;
         set_info->binding_count       = current_set->binding_count;
@@ -1106,6 +1166,8 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
         vkAssert(vkAllocateDescriptorSets(render_context->rendering_device.logical_device,
                                          &allocation_info,
                                           info->sets));
+
+        r_vulkan_shader_initialize_texture_arrays(render_context, &result);
     }
 
     //r_vulkan_shader_update_static_set(render_context, &result);
@@ -1202,10 +1264,10 @@ r_vulkan_shader_uniform_update_texture(vulkan_shader_data_t *shader, string_t te
     }
     Assert(uniform);
 
-    uniform->texture_data.image_views[uniform->texture_data.image_counter] = texture->image_data.view;
-    uniform->texture_data.image_samplers[uniform->texture_data.image_counter] = texture->sampler;
+    uniform->texture_data.image_views[uniform->texture_data.image_counter % MAX_RENDER_GROUP_BOUND_TEXTURES]    = texture->image_data.view;
+    uniform->texture_data.image_samplers[uniform->texture_data.image_counter % MAX_RENDER_GROUP_BOUND_TEXTURES] = texture->sampler;
 
-    uniform->texture_data.image_counter += 1;
+    uniform->texture_data.image_counter = (uniform->texture_data.image_counter + 1) % MAX_RENDER_GROUP_BOUND_TEXTURES;
 }
 
 void
@@ -1315,13 +1377,15 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
     byte *temp_uniform_buffer = c_arena_push_size(&render_context->frame_arena, uniform_buffer_frame_size);
 
     // NOTE(Sleepster): Pre-allocate arrays for descriptor writes
-    VkWriteDescriptorSet   *writes       = c_arena_push_array(&render_context->frame_arena, VkWriteDescriptorSet, uniform_count);
-    VkDescriptorBufferInfo *buffer_infos = c_arena_push_array(&render_context->frame_arena, VkDescriptorBufferInfo, uniform_count);
-    VkDescriptorImageInfo  *image_infos  = c_arena_push_array(&render_context->frame_arena, VkDescriptorImageInfo, uniform_count);
+    const u32 max_infos = 1024;
 
-    u32 write_count      = 0;
-    u32 buffer_info_idx  = 0;
-    u32 image_info_idx   = 0;
+    VkWriteDescriptorSet   *writes       = c_arena_push_array(&render_context->frame_arena, VkWriteDescriptorSet,   max_infos * 2);
+    VkDescriptorBufferInfo *buffer_infos = c_arena_push_array(&render_context->frame_arena, VkDescriptorBufferInfo, max_infos);
+    VkDescriptorImageInfo  *image_infos  = c_arena_push_array(&render_context->frame_arena, VkDescriptorImageInfo,  max_infos);
+
+    u32 write_count       = 0;
+    u32 buffer_info_index = 0;
+    u32 image_info_index  = 0;
 
     // NOTE(Sleepster): Process each uniform
     for(u32 uniform_index = 0; uniform_index < uniform_count; ++uniform_index)
@@ -1363,7 +1427,7 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
                                            render_context->rendering_device.graphics_command_pool, 
                                            render_context->rendering_device.graphics_queue);
 
-                    VkDescriptorBufferInfo *buffer_info = &buffer_infos[buffer_info_idx++];
+                    VkDescriptorBufferInfo *buffer_info = &buffer_infos[buffer_info_index++];
                     buffer_info->buffer = uniform->storage_buffer.handle;
                     buffer_info->offset = 0;
                     buffer_info->range  = uniform->mapped_buffer_update_size;
@@ -1390,7 +1454,7 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
                            uniform->mapped_uniform_buffer, 
                            uniform->mapped_buffer_update_size);
 
-                    VkDescriptorBufferInfo *buffer_info = &buffer_infos[buffer_info_idx++];
+                    VkDescriptorBufferInfo *buffer_info = &buffer_infos[buffer_info_index++];
                     buffer_info->buffer = set_info->uniform_buffer.handle;
                     buffer_info->offset = uniform_buffer_copy_offset;
                     buffer_info->range  = uniform->mapped_buffer_update_size;
@@ -1409,10 +1473,10 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
             case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
             case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
             case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+            case VK_DESCRIPTOR_TYPE_SAMPLER:
             {
                 if(uniform->texture_data.image_counter > 0)
                 {
-                    VkDescriptorImageInfo *image_info = image_infos + image_info_idx++;
 
                     // NOTE(Sleepster): Determine appropriate image layout
                     VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -1421,12 +1485,22 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
                         layout = VK_IMAGE_LAYOUT_GENERAL;
                     }
 
-                    image_info->imageLayout = layout;
-                    image_info->imageView   = uniform->texture_data.image_views[0];
-                    image_info->sampler     = uniform->texture_data.image_samplers[0];
+                    for(u32 texture_index = 0; 
+                        texture_index < uniform->texture_data.image_counter;
+                        ++texture_index)
+                    {
+                        VkDescriptorImageInfo *image_info = (image_infos + image_info_index) + texture_index; 
+                        image_info->imageLayout = layout;
+                        image_info->imageView   = uniform->texture_data.image_views[texture_index];
+                        image_info->sampler     = uniform->texture_data.image_samplers[texture_index];
+                    }
+                    image_info_index += uniform->texture_data.image_counter;
 
-                    --uniform->texture_data.image_counter;
-                    write->pImageInfo = image_info;
+                    write->dstArrayElement = 0;
+                    write->descriptorCount = uniform->texture_data.image_counter;
+                    write->pImageInfo      = image_infos;
+
+                    uniform->texture_data.image_counter = 0;
                 }
                 else
                 {
@@ -1435,6 +1509,7 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
                 }
             }break;
 
+#if 0
             case VK_DESCRIPTOR_TYPE_SAMPLER:
             {
                 if(uniform->texture_data.image_counter > 0)
@@ -1453,6 +1528,7 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
                     should_write = false;
                 }
             }break;
+#endif
 
             default:
             {
