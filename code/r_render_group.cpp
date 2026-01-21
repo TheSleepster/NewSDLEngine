@@ -280,6 +280,16 @@ r_render_group_update_used_groups(render_state_t *render_state)
   =============== DRAWING API ===============
   ===========================================*/
 
+void
+r_set_active_render_layer(render_state_t *render_state, u32 render_layer)
+{
+    Assert(render_layer >  0);
+    Assert(render_layer <= MAX_RENDER_LAYERS);
+
+    draw_frame_t *draw_frame = &render_state->draw_frame;
+    draw_frame->state.active_render_layer = render_layer;
+}
+
 internal_api bool8 
 r_add_texture_to_group_array(render_group_t *render_group, texture2D_t *texture)
 {
@@ -376,15 +386,21 @@ r_draw_texture_ex(render_state_t    *render_state,
 #else
     render_geometry_batch_t *buffer = r_render_group_get_current_buffer(render_state);
     Assert(buffer->primitive_count + 4 < MAX_VULKAN_INSTANCES);
-
     render_geometry_instance_t *instance = buffer->instances + buffer->primitive_count++;
-    real32 layer_depth = 0.0f;
+
+    const float32 near_value = 0;
+    const float32 far_value  = 1;
+    float32 depth_step       = (far_value - near_value) / MAX_RENDER_LAYERS;
+
+    // NOTE(Sleepster): Current "depth" of the object, this is for z-layering 
+    float32 layer_depth  = near_value + (render_state->draw_frame.state.active_render_layer * depth_step);
 
     mat4_t transform = mat4_identity();
     transform = mat4_translate(transform, vec2_expand_vec3(position, layer_depth));
-    // transform = mat4_rotate(transform, {1.0, 1.0, 0.0}, rotation);
     transform = mat4_scale(transform, vec2_expand_vec3(size, 1.0f));
     transform = mat4_transpose(transform);
+
+    // transform = mat4_rotate(transform, {1.0, 1.0, 0.0}, rotation);
 
     subtexture_data_t *uv_data = subtexture_data;
     if(uv_data)

@@ -15,6 +15,8 @@
 
 #define R_RENDER_GROUP_H
 
+#define MAX_RENDER_LAYERS (32)
+
 struct render_geometry_instance_t 
 {
     mat4_t  transform;
@@ -91,6 +93,7 @@ struct draw_frame_t
     struct
     {
         u64                           cached_camera_ID;
+        u32                           active_render_layer;
         render_group_t               *active_render_group;
         render_camera_t              *active_camera;
         asset_handle_t               *active_shader;

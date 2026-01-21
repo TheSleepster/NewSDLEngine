@@ -6,6 +6,8 @@
 - [ ] Materials should store their texture uniform, camera uniforms, and other important information for easy access and updating
 - [ ] Materials should "cache" special uniforms like "camera uniforms" "texture array uniforms"
 - [X] Default texture should always be in slot 0, make our texture array in the shader 0 indexed (we went with -1)
+- [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
+      (shader, blend modes, depth state, textures, camera data, etc.)
 ** Create a very early version of the new batch renderer
 - [ ] LAYERS. Use the depth buffer.
 - [ ] Clean up the code and allow for easy toggling of Debug macros
@@ -94,8 +96,6 @@
         (items like sync objects, framebuffers, command_buffers, etc.)
 
 * Drawing API (frontend renderer)
-- [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
-      (shader, blend modes, depth state, textures, camera data, etc.)
  - [ ] (??) Backend API structure that contains the necessary Vulkan-render API function pointers for use with both the asset manager and the frontend renderer
  - [ ] Functions like r_vulkan_swapchain_get_next_image_index() should instead inform the render_context that actions need to be performed rather than just doing them.
        This would allow the renderer to handle these issues when it actually is meant too, which may reduce the chance of bugs arising
