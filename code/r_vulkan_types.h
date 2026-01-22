@@ -94,6 +94,25 @@ typedef struct vulkan_pipeline_data
     VkPipelineLayout    layout;
 }vulkan_pipeline_data_t;
 
+// NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. 
+//                  Per material
+struct render_pipeline_state_t
+{
+    bool32 blend_enabled;
+    u32    color_blend_mode;
+    u32    alpha_blend_mode;
+    u32    color_blend_op;
+    u32    alpha_blend_op;
+
+    bool32 depth_enabled;
+    u32    depth_state;
+    u32    depth_func;
+
+    bool32 stencil_enabled;
+    u32    stencil_state;
+    u32    stencil_keep;
+};
+
 //////////////////////////////////
 // VULKAN SHADER STUFF 
 //////////////////////////////////
@@ -262,8 +281,8 @@ typedef struct vulkan_shader_data
 //////////////////////////////////
 // VULKAN PHYSICAL DEVICE STUFF 
 //////////////////////////////////
-
 #define MAX_VALID_VULKAN_FORMATS (128)
+
 typedef struct vulkan_physical_device_swapchain_support_info
 {
     VkSurfaceCapabilitiesKHR surface_capabilities;
@@ -335,6 +354,16 @@ typedef struct vulkan_fence
 // VULKAN RENDERPASS STUFF 
 //////////////////////////////////
 
+typedef enum renderer_effect_application_flags
+{
+    REAF_None,
+    REAF_Bloom,
+    REAF_Emmision,
+    REAF_Vignette,
+    REAF_FilmGrain,
+    REAF_Count,
+}renderer_effect_application_flags_t;
+
 typedef enum vulkan_renderpass_state
 {
     // NOTE(Sleepster): Not allocated 
@@ -390,22 +419,12 @@ typedef struct vulkan_image_data
     u32            height;
 }vulkan_image_data_t;
 
-
-// TODO: TEMPORARY
-
-typedef struct vulkan_image_data vulkan_image_data_t;
 typedef struct vulkan_texture
 {
-    // TODO(Sleepster): this stuff can go into the actual texture, but the VkSampler and the imagedata can stay. 
-    u32                 width;
-    u32                 height;
-    u32                 channel_count;
     u32                 current_generation;
-
     vulkan_image_data_t image_data;
     VkSampler           sampler;
 }vulkan_texture_t;
-// TODO: TEMPORARY
 
 //////////////////////////////////
 // VULKAN SWAPCHAIN 

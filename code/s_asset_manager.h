@@ -40,6 +40,7 @@ typedef enum asset_type
     AT_Shader,
     AT_Font,
     AT_Sound,
+    AT_Material,
     AT_Count
 }asset_type_t;
 
@@ -125,6 +126,8 @@ typedef struct texture_atlas
     u32                           merge_counter;
     DynArray_t(asset_handle_t*)   textures_to_merge;
 
+    // TODO(Sleepster): Technically we need "add" to this array, just pull from it. What do we do about this? 
+    //                  Guess it's not a problem for now.
     DynArray_t(subtexture_data_t) packed_subtextures;
     u32                           packed_subtexture_count;
     bool32                        is_valid;
@@ -143,7 +146,25 @@ typedef struct shader
 {
     u32                  ID;
     vulkan_shader_data_t shader_data;
+
+    // NOTE(Sleepster): Storing some basic things here. 
+    vulkan_shader_uniform_data_t *camera_uniform;
+    vulkan_shader_uniform_data_t *texture_uniform;
 }shader_t;
+
+// TODO(Sleepster): Effect flags and such for special rendering layers. 
+typedef struct material
+{
+    u64                     ID;
+    string_t                name;
+    
+    shader_t               *shader;
+
+    texture2D_t            *diffuse_map;
+    texture2D_t            *normal_map;
+
+    render_pipeline_state_t pipeline_state;
+}material_t;
 
 /*===========================================
   ============= ASSET FILE DATA =============
@@ -165,6 +186,7 @@ typedef struct asset_slot
     {
         texture2D_t texture;
         shader_t    shader;
+        material_t  material;
     };
 }asset_slot_t;
 

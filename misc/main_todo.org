@@ -1,21 +1,34 @@
 
 #+title: NewSDLEngine
+* IMMEDIATE TODO
+- [X] Fix the memory leak inside of the asset file packer
+- [ ] Transfer all the struct tags to typedef struct
 * Next Milestone:
 ** Materials
+- [ ] Perhaps we need a standard for autodetecting special
+      uniforms. For example, the engine wants to know if you have camera
+      matrices in your shader, how many and what textures you have,
+      whether you have instance data in there, or whatever else. If we
+      want to automatically infer this information then we may need a
+      standard like prefixing "camera" ubos with "Camera" and textures
+      with "Texture" and so on.
+- [ ] Introduce safeguards for when updating descriptor sets. For
+      example, if the user tries to add more than one texture to a
+      shader's descriptor, but that descriptor is only an array with 1
+      element, we should warn the user and return.
 - [ ] Establish the concept of a material
-- [ ] Materials should store their texture uniform, camera uniforms, and other important information for easy access and updating
-- [ ] Materials should "cache" special uniforms like "camera uniforms" "texture array uniforms"
+- [ ] Shaders should store their texture uniform, camera uniforms, and other important information for easy access and updating
+- [ ] Shaders should "cache" special uniforms like "camera uniforms" "texture array uniforms"
 - [X] Default texture should always be in slot 0, make our texture array in the shader 0 indexed (we went with -1)
 - [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
       (shader, blend modes, depth state, textures, camera data, etc.)
 ** Create a very early version of the new batch renderer
-- [ ] LAYERS. Use the depth buffer.
-- [ ] Clean up the code and allow for easy toggling of Debug macros
+- [X] LAYERS. Use the depth buffer.
 - [X] A buffer for the texture array, this is largely the same as what
       we already do with vertices for our "textureindex" stuff. But
       this streamlines it.
-- [ ] Hook up the render frontend to actually set the textures properly
 
+- [X] Hook up the render frontend to actually set the textures properly
 - [X] Draw quad functionality
 - [X] Render Groups and their old functionality. They should group objects by what render state is needed for correct drawing.
 - [X] Texture Atlasing API
@@ -24,6 +37,7 @@
       (relate to our asset handles. Where we give the user the actual handle to the descriptor set and let them update the GPU buffer themselves)
 - [ ] Shader Common header (with #ifdef for __cplusplus for inclusion in the engine as well)
 - [ ] Push constants for cameras???
+- [ ] Clean up the code and allow for easy toggling of Debug macros
 *** Upgrading the damn renderer
 - [X] Take a look at instancing, upload 4 vertices and 6 indices at
   the program's start. Create a vertex buffer, an index buffer, and an
@@ -56,8 +70,6 @@
       then only process and check the instances within their bucket,
       saving resource time. This is very similar to clustered forward
       compute shading.
-* IMMEDIATE TODO
-- [X] Fix the memory leak inside of the asset file packer
 * General TODOs
 * Vulkan Renderer TODOs
 - [X] Images and Samplers

@@ -1,4 +1,8 @@
 // VERTEX
+#define STATIC_DESCRIPTOR_SET   0
+#define PERDRAW_DESCRIPTOR_SET  1
+#define INSTANCE_DESCRIPTOR_SET 2
+
 struct VertexInput_t
 {
     float4 vPosition : POSITION;
@@ -14,7 +18,6 @@ struct VertexOutput_t
     [[vk::location(2)]] uint   vOutTexIndex : TEXCOORD1;
 };
 
-// TODO(Sleepster): this will have to be buffered soon
 struct GlobalMatrixUniforms_t
 {
     float4x4 ViewMatrix;
@@ -31,10 +34,10 @@ struct RenderGeometryInstance_t
     uint     iCameraIndex;
 };
 
-[[vk::binding(0, 0)]]
+[[vk::binding(0, STATIC_DESCRIPTOR_SET)]]
 ConstantBuffer<GlobalMatrixUniforms_t> Matrices;
 
-[[vk::binding(1, 0)]]
+[[vk::binding(0, PERDRAW_DESCRIPTOR_SET)]]
 StructuredBuffer<RenderGeometryInstance_t> RenderInstances;
 
 [shader("vertex")]
@@ -66,7 +69,7 @@ struct PixelOutput_t
 };
 
 // NOTE(Sleepster): binding first, set second 
-[[vk::binding(2, 0)]]
+[[vk::binding(1, STATIC_DESCRIPTOR_SET)]]
 Sampler2D TextureSampler[16];
 
 // struct ConstantData {

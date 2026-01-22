@@ -329,7 +329,8 @@ r_draw_texture_ex(render_state_t    *render_state,
                   subtexture_data_t *subtexture_data)
 {
     render_geometry_batch_t *buffer = r_render_group_get_current_buffer(render_state);
-    Assert(buffer->primitive_count + 4 < MAX_VULKAN_INSTANCES);
+    Assert(buffer->primitive_count + 1 < MAX_VULKAN_INSTANCES);
+
     render_geometry_instance_t *instance = buffer->instances + buffer->primitive_count++;
 
     const float32 near_value = 0;

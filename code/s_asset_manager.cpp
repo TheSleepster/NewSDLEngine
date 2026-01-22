@@ -314,7 +314,9 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
     {
         asset_manager_asset_file_data_t *asset_file = asset_manager->asset_files + file_index;
         s32 asset_entry_index = c_hash_table_get_value(&asset_file->entry_hash, name);
-        // NOTE(Sleepster): This just SHOULD NOT be possible...
+        // NOTE(Sleepster): This just SHOULD NOT be possible... 
+        //                  An assert here would imply that we found the file inside of a package, but cannot locate it.
+        //                  Which in any case is a bug and should be fixed immediately.
         Assert(asset_entry_index != -1);
 
         jfd_package_entry_t *entry = asset_file->package_entries + asset_entry_index;

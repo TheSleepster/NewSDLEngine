@@ -1015,20 +1015,24 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
                     descriptor_set_index < entry_point->descriptor_set_count;
                     ++descriptor_set_index)
                 {
-
                     SpvReflectDescriptorSet set_data = entry_point->descriptor_sets[descriptor_set_index];
                     vulkan_shader_descriptor_set_info_t *set_info = result.set_info + set_data.set;
-                    if(!set_info->bindings)
+
+                    if(!set_info->bindings && set_info->binding_count > 0)
                     {
                         set_info->bindings = c_arena_push_array(&result.arena, VkDescriptorSetLayoutBinding, set_info->binding_count);
                         set_info->binding_count = set_info->binding_count;
+
                     }
 
-                    for(u32 binding_index = 0;
-                        binding_index < set_data.binding_count;
-                        ++binding_index)
+                    if(set_info->bindings)
                     {
-                        set_info->bindings[binding_index].stageFlags |= current_stage;
+                        for(u32 binding_index = 0;
+                            binding_index < set_data.binding_count;
+                            ++binding_index)
+                        {
+                            set_info->bindings[binding_index].stageFlags |= current_stage;
+                        }
                     }
                 }
             }
@@ -1374,7 +1378,11 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
     u32 current_frame_uniform_buffer_offset = (uniform_buffer_frame_size * current_frame_index);
     u32 uniform_buffer_copy_offset          = current_frame_uniform_buffer_offset;
     
-    byte *temp_uniform_buffer = c_arena_push_size(&render_context->frame_arena, uniform_buffer_frame_size);
+    byte *temp_uniform_buffer = null;
+    if(uniform_buffer_frame_size > 0) 
+    {
+        temp_uniform_buffer = c_arena_push_size(&render_context->frame_arena, uniform_buffer_frame_size);
+    }
 
     // NOTE(Sleepster): Pre-allocate arrays for descriptor writes
     const u32 max_infos = 1024;
@@ -1388,7 +1396,9 @@ r_vulkan_shader_update_descriptor_set(vulkan_render_context_t             *rende
     u32 image_info_index  = 0;
 
     // NOTE(Sleepster): Process each uniform
-    for(u32 uniform_index = 0; uniform_index < uniform_count; ++uniform_index)
+    for(u32 uniform_index = 0; 
+        uniform_index < uniform_count; 
+        ++uniform_index)
     {
         vulkan_shader_uniform_data_t *uniform = uniform_array[uniform_index];
         Assert(uniform);

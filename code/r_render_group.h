@@ -27,24 +27,6 @@ struct render_geometry_instance_t
     u32     camera_index;
 };
 
-// NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. Per render_group
-struct render_group_pipeline_state_t
-{
-    bool32 blend_enabled;
-    u32    color_blend_mode;
-    u32    alpha_blend_mode;
-    u32    color_blend_op;
-    u32    alpha_blend_op;
-
-    bool32 depth_enabled;
-    u32    depth_state;
-    u32    depth_func;
-
-    bool32 stencil_enabled;
-    u32    stencil_state;
-    u32    stencil_keep;
-};
-
 // NOTE(Sleepster): This stores all the geometry information needed when rendering. The "vertices" array contains all the vertex data associated with this buffer.
 //                  Since render_groups are simply hashed from IDs and such, we can afford to make the vertex array here smaller and create lists of them if we need more.
 struct render_geometry_batch_t
@@ -68,8 +50,11 @@ struct render_group_t
     // TODO(Sleepster): Custom Viewport? Custom Scissor?
     u64                            ID;
 
-    render_group_pipeline_state_t  dynamic_pipeline_state;
+    // TODO(Sleepster): Merge these into the material 
+    render_pipeline_state_t        dynamic_pipeline_state;
     asset_handle_t                *shader;
+    //
+
     texture2D_t                   *textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
     u32                            current_texture_count;
 
@@ -92,12 +77,12 @@ struct draw_frame_t
  
     struct
     {
-        u64                           cached_camera_ID;
-        u32                           active_render_layer;
-        render_group_t               *active_render_group;
-        render_camera_t              *active_camera;
-        asset_handle_t               *active_shader;
-        render_group_pipeline_state_t active_pipeline_state;
+        u64                     cached_camera_ID;
+        u32                     active_render_layer;
+        render_group_t         *active_render_group;
+        render_camera_t        *active_camera;
+        asset_handle_t         *active_shader;
+        render_pipeline_state_t active_pipeline_state;
     }state;
 };
 
