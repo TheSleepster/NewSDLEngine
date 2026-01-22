@@ -328,62 +328,6 @@ r_draw_texture_ex(render_state_t    *render_state,
                   float32            rotation, 
                   subtexture_data_t *subtexture_data)
 {
-#if 0
-    // TODO(Sleepster): Deal with this if we cap out... 
-    render_geometry_batch_t *buffer = r_render_group_get_current_buffer(render_state);
-    Assert(buffer->vertex_count + 4 < MAX_RENDER_GROUP_BUFFER_VERTEX_COUNT);
-
-    render_geometry_instance_t intstance = {};
-    
-    vertex_t *buffer_ptr = buffer->vertices + buffer->vertex_count;
-    buffer->vertex_count += 4;
-
-    vertex_t *bottom_right = buffer_ptr + 0;
-    vertex_t *top_right    = buffer_ptr + 1;
-    vertex_t *top_left     = buffer_ptr + 2;
-    vertex_t *bottom_left  = buffer_ptr + 3;
-
-    float32 top    = position.y + size.y;
-    float32 bottom = position.y;
-    float32 left   = position.x;
-    float32 right  = position.x + size.x;
-
-    bottom_right->vPosition = {right, bottom};
-    top_right->vPosition    = {right, top};
-    top_left->vPosition     = {left,  top};
-    bottom_left->vPosition  = {left,  bottom};
-
-    for(u32 vertex_index = 0;
-        vertex_index < 4;
-        ++vertex_index)
-    {
-        vertex_t *vertex = buffer_ptr + vertex_index;
-        vertex->vColor   = color;
-    }
-
-    // TODO(Sleepster): Texture index for the texture arrays.
-    if(subtexture_data)
-    {
-        subtexture_data_t *uv_data = subtexture_data;
-
-        vec2_t uv_min = vec2_reduce(uv_data->uv_min, subtexture_data->atlas->atlas_size);
-        vec2_t uv_max = vec2_reduce(uv_data->uv_max, subtexture_data->atlas->atlas_size);
-
-        bottom_right->vTexCoord = uv_max;
-        top_right->vTexCoord    = vec2(uv_max.x, uv_min.y);
-        top_left->vTexCoord     = uv_min;
-        bottom_left->vTexCoord  = vec2(uv_min.x, uv_max.y);
-    }
-    else
-    {
-        bottom_right->vTexCoord = {1.0, 1.0};
-        top_right->vTexCoord    = {1.0, 0.0};
-        top_left->vTexCoord     = {0.0, 0.0};
-        bottom_left->vTexCoord  = {0.0, 1.0};
-    }
-
-    buffer->primitive_count += 1;
-#else
     render_geometry_batch_t *buffer = r_render_group_get_current_buffer(render_state);
     Assert(buffer->primitive_count + 4 < MAX_VULKAN_INSTANCES);
     render_geometry_instance_t *instance = buffer->instances + buffer->primitive_count++;
@@ -421,14 +365,13 @@ r_draw_texture_ex(render_state_t    *render_state,
     {
         instance->uv_min = vec2_create(0.0);
         instance->uv_max = vec2_create(1.0);
-        // TODO(Sleepster): Fix this so that the texture will be bound to a texture that never gets overwritten 
+
         instance->texture_index = -1;
     }
 
     instance->transform     = transform;
     instance->color         = color;
     instance->camera_index  = 0;
-#endif
 }
 
 void

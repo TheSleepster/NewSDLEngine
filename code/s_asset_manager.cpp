@@ -453,6 +453,7 @@ s_texture_atlas_pack_added_textures(vulkan_render_context_t *render_context, tex
             vec2_t uv_min = vec2(atlas_cursor_x, atlas_cursor_y);
             vec2_t uv_max = vec2(atlas_cursor_x + bitmap_width, atlas_cursor_y + bitmap_height);
 
+            // NOTE(Sleepster): Create the subtexture, let the owner of the sprite know this is that subtexture. 
             subtexture_data_t *subtexture = atlas->packed_subtextures + atlas->packed_subtexture_count;
             asset->subtexture_data = subtexture;
 
