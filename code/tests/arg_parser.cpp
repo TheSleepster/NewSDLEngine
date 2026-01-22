@@ -46,6 +46,10 @@ main(int argc, char **argv)
     log_info("Argument 'sensitivity' is: '%f'...\n", *sensitivity);
     log_info("Argument 'size' is: '%llu'...\n", *size);
     log_info("Argument 'data' is: '%s'...\n", *data);
+    if(*help)
+    {
+        c_program_flag_print_flag_list();
+    }
 
     return(0);
 }
