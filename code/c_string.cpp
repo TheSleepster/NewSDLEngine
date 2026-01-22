@@ -174,7 +174,7 @@ c_string_find_first_char_from_right(string_t string, char character)
 {
     u32 result = -1;
     for(u32 index = string.count;
-        index > 0;
+        index >= 0;
         --index)
     {
         char found = (char)string.data[index];

@@ -112,6 +112,16 @@
             "stopOnEntry": false,
             "terminal": "integrated"
         },
+        {
+            "name": "test_argument_parser",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_arg_parser",
+            "args": ["-test_bool", "-test_float=2.0f", "-test_u64=101101010", "-test_string=blablalbalbalbla"],
+            "cwd": "${workspaceFolder}/run_tree/res",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
     ],
     "compounds": [
         {
@@ -126,7 +136,8 @@
                 "test_threadpool",
                 "test_memory_arena",
                 "test_hash_table",
-                "test_string_builder"
+                "test_string_builder",
+                "test_argument_parser"
             ]
         }
     ]

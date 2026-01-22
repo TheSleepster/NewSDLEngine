@@ -96,7 +96,7 @@ typedef struct vulkan_pipeline_data
 
 // NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. 
 //                  Per material
-struct render_pipeline_state_t
+typedef struct render_pipeline_state
 {
     bool32 blend_enabled;
     u32    src_color_blend_mode;
@@ -115,7 +115,7 @@ struct render_pipeline_state_t
     bool32 stencil_enabled;
     u32    stencil_state;
     u32    stencil_keep;
-};
+}render_pipeline_state_t;
 
 //////////////////////////////////
 // VULKAN SHADER STUFF 

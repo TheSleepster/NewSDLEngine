@@ -23,6 +23,7 @@
 - [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
       (shader, blend modes, depth state, textures, camera data, etc.)
 ** Metaprogram
+- [ ] Input flag parser
 ** Material file parser
 ** Create a very early version of the new batch renderer
 - [X] LAYERS. Use the depth buffer.
