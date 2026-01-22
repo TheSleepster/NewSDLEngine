@@ -2,7 +2,7 @@
 #+title: NewSDLEngine
 * IMMEDIATE TODO
 - [X] Fix the memory leak inside of the asset file packer
-- [ ] Transfer all the struct tags to typedef struct
+- [ ] Transfer all the struct tags to typedef struct (C backwards compatibility where possible)
 * Next Milestone:
 ** Materials
 - [ ] Perhaps we need a standard for autodetecting special
@@ -22,6 +22,8 @@
 - [X] Default texture should always be in slot 0, make our texture array in the shader 0 indexed (we went with -1)
 - [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
       (shader, blend modes, depth state, textures, camera data, etc.)
+** Metaprogram
+** Material file parser
 ** Create a very early version of the new batch renderer
 - [X] LAYERS. Use the depth buffer.
 - [X] A buffer for the texture array, this is largely the same as what

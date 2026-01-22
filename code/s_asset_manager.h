@@ -152,6 +152,13 @@ typedef struct shader
     vulkan_shader_uniform_data_t *texture_uniform;
 }shader_t;
 
+/* MATERIAL CONFIG:
+ * - Shader name
+ * - ID
+ * - Name of the material
+ * - Default pipeline state (blend mode, blend enabled, depth mode, depth enabled, etc.)
+ */
+
 // TODO(Sleepster): Effect flags and such for special rendering layers. 
 typedef struct material
 {

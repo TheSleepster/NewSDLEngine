@@ -23,7 +23,7 @@
             "terminal": "integrated"
         },
         {
-            "name": "asset_file_packer",
+            "name": "wad_file_packer",
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/build/wad_asset_file_packer",
@@ -33,7 +33,7 @@
             "terminal": "integrated"
         },
         {
-            "name": "asset_file_packer2",
+            "name": "jfd_file_packer",
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/build/jfd_asset_file_packer",

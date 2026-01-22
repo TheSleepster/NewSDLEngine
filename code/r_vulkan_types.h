@@ -99,13 +99,17 @@ typedef struct vulkan_pipeline_data
 struct render_pipeline_state_t
 {
     bool32 blend_enabled;
-    u32    color_blend_mode;
-    u32    alpha_blend_mode;
+    u32    src_color_blend_mode;
+    u32    dst_color_blend_mode;
+
+    u32    src_alpha_blend_mode;
+    u32    dst_alpha_blend_mode;
+
     u32    color_blend_op;
     u32    alpha_blend_op;
 
-    bool32 depth_enabled;
-    u32    depth_state;
+    bool32 depth_testing_enabled;
+    u32    depth_writing_enabled;
     u32    depth_func;
 
     bool32 stencil_enabled;
