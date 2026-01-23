@@ -25,6 +25,8 @@ typedef struct string
     u32   count;
 }string_t;
 
+// TODO(Sleepster): - [ ] Any function in here that allocates memory should be reordered like the file API 
+
 //////////// API DEFINITIONS //////////////
 u32         c_string_length(const char *c_string);
 bool8       c_string_is_valid(string_t string);

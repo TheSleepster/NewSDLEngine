@@ -23,7 +23,7 @@
 - [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
       (shader, blend modes, depth state, textures, camera data, etc.)
 ** Metaprogram
-- [ ] Input flag parser
+- [X] Input flag parser
 ** Material file parser
 ** Create a very early version of the new batch renderer
 - [X] LAYERS. Use the depth buffer.
@@ -138,12 +138,14 @@
 - [ ] Assets should store the information about themselves inside the asset file, ex: textures should store their w/h/c setup. Wav files should store their channel_count, sample_count, etc.
 - [ ] Find out why the hell it's taking so long to pack
 * Core stuff
+- [ ] Compile the core into a single library. c_data.lib or something. then have c_base.h import all the core headers
 - [X] Type safe hash tables
 - [X] Allow us to set the custom allocator for the hash tables
 - [ ] Modify the file and sys_file APIs so that they work properly as one would expect. IE, sys_file_open returns a file_t, have it initialize the file's name and other easy things
 - [ ] Complete malloc replacement (thread safe heap allocator)
 - [ ] The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal state
 - [ ] The ability to dump the contents of a memory arena to a file, this is probably pretty useful...
+- [ ] Any function in the string.cpp file that allocates memory should be reordered like the file API
 - [ ] Vulkan style memory allocation for functions that would allocate
       memory within the core lib. The core should have a "get_read_size"
       or something to get the SIZE of the allocation and allow the user to

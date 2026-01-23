@@ -142,10 +142,11 @@ c_string_substring(string_t string, u32 first_index, u32 last_index)
     return(result);
 }
 
+// NOTE(Sleepster): Allowed to consume the whole string down to count == 0. 
 void
 c_string_advance_by(string_t *string, u32 amount)
 {
-    Assert(amount < string->count);
+    Assert(amount <= string->count);
     string->data  += amount;
     string->count -= amount;
 }
@@ -174,7 +175,7 @@ c_string_find_first_char_from_right(string_t string, char character)
 {
     u32 result = -1;
     for(u32 index = string.count;
-        index >= 0;
+        index > 0;
         --index)
     {
         char found = (char)string.data[index];
@@ -247,6 +248,7 @@ c_string_get_filename_from_path_and_ext(string_t filepath)
     return(result);
 }
 
+// NOTE(Sleepster): Get current line, advance the .data pointer 
 string_t 
 c_string_read_line(string_t *data)
 {
@@ -263,6 +265,7 @@ c_string_read_line(string_t *data)
             result.data  = data->data;
             
             c_string_advance_by(data, result.count);
+            break;
         }
     }
 

@@ -1,6 +1,6 @@
 [
   {
-    "file": "../code/tests/arg_parser.cpp",
+    "file": "tests/preprocessor.cpp",
     "arguments": [
       "clang++",
       "-g",
@@ -30,17 +30,23 @@
       "-Wno-reorder-init-list",
       "-DOS_LINUX=1",
       "-I../run_tree/deps/vulkan/Include/",
-      "-I../code/",
+      "-I.",
       "-I../run_tree/deps/",
       "-I../run_tree/deps/SDL3/include/",
       "-I../run_tree/deps/glad/include/",
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
-      "../code/tests/arg_parser.cpp",
+      "-MT",
+      "../build/test_preprocessor",
+      "-MMD",
+      "-MP",
+      "-MF",
+      "../build/preprocessor.d",
+      "tests/preprocessor.cpp",
       "-o",
-      "../build/test_arg_parser"
+      "../build/test_preprocessor"
     ],
     "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/test_arg_parser"
+    "output": "../build/test_preprocessor"
   }
 ]

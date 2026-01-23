@@ -209,7 +209,7 @@ c_program_flag_parse_args(s32 argc, char **argv)
             .count = c_string_length(arg_string)
         };
 
-        u32 dash_index = c_string_find_first_char_from_right(passed_arg, '-');
+        u32 dash_index = c_string_find_first_char_from_left(passed_arg, '-');
         c_string_advance_by(&passed_arg, dash_index + 1);
 
         bool8 arg_found = false;

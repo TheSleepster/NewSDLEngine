@@ -1,14 +1,30 @@
-CXX    = clang++
-CC     = clang
-SLANGC = slangc
+CXX      = clang++
+CC       = clang
+SLANGC   = slangc
 
 SILENT          ?=
 DEBUG_BUILD     ?=
 ASSERTS_ENABLED ?=
 SANITIZERS_ON   ?=
 
-# TODO:
-# -fsanitize=address,undefined 
+# --------------------------------------------
+# OS & Directories
+# --------------------------------------------
+# Assuming Makefile is IN the code directory
+SRC_DIR    = .
+SHADER_DIR = shaders
+# Output goes up one level and into build
+BUILD_DIR  = ../build
+ASSET_DIR  = ../run_tree/res
+
+# --------------------------------------------
+# Dependency Tracking Flags
+# --------------------------------------------
+# -MT $@  : Sets the target of the rule in the dependency file to match the output file exactly.
+# -MMD    : Generate dependency file (.d), ignoring system headers.
+# -MP     : Add dummy rules for headers (prevents errors if a header is deleted).
+# -MF ... : Explicitly specify where the .d file goes.
+DEPFLAGS = -MT $@ -MMD -MP -MF $(BUILD_DIR)/$*.d
 
 # --------------------------------------------
 # Project OS settings
@@ -24,11 +40,6 @@ ifeq ($(OS),Windows_NT)
     DEV_NULL = NUL
     PIC_FLAG =
     MKDIR = if not exist "$(subst /,\,$1)" mkdir "$(subst /,\,$1)"
-    PDB_SUFFIX := $(shell powershell -Command "[guid]::NewGuid().ToString('N').Substring(0,8)")
-    PDB_LDFLAG = -Wl /PDB:../build/game_$(BUILD_TYPE)_$(PDB_SUFFIX).pdb 
-
-    DEL_PDB = powershell -NoProfile -Command "Get-ChildItem ..\\build\\game_$(BUILD_TYPE)*.pdb -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue"
-    DEL_RDI = powershell -NoProfile -Command "Get-ChildItem ..\\build\\game_$(BUILD_TYPE)*.rdi -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue"
 else
     UNAME_S := $(shell uname -s)
     DLL_EXT = .so
@@ -36,15 +47,10 @@ else
     OBJ_EXT = .o
     PIC_FLAG = -fPIC
     MKDIR = mkdir -p $1
-    PDB_SUFFIX := $(shell head -c4 /dev/urandom | od -An -tx1 | tr -d ' \n')
-    PDB_LDFLAG =
-
-    DEL_PDB = rm -f ../build/game_$(BUILD_TYPE)*.pdb || true
-    DEL_RDI = rm -f ../build/game_$(BUILD_TYPE)*.rdi || true
 
     ifeq ($(UNAME_S),Linux)
         OS_DEFINE = -DOS_LINUX=1
-        PLATFORM_LIBS = -lX11 -lGL -lm
+        PLATFORM_LIBS = -lm
         DEV_NULL = /dev/null
     else ifeq ($(UNAME_S),Darwin)
         OS_DEFINE = -DOS_MAC=1
@@ -60,61 +66,49 @@ PROJECT_COMMON_COMPILER_FLAGS = -std=c++11 -flto -Wall -Wextra -Wno-unused-funct
 
 BUILD_TYPE ?= debug
 BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FLAGS) 
-# ifeq ($(DEBUG_BUILD),1)
-# else
-#     BUILD_COMPILER_FLAGS = -O3 $(PROJECT_COMMON_COMPILER_FLAGS)
-# endif
-
-# --------------------------------------------
-# Directories
-# --------------------------------------------
-SRC_DIR    = ../code
-SHADER_DIR = ../code/shaders
-BUILD_DIR  = ../build
-ASSET_DIR  = ../run_tree/res
 
 # --------------------------------------------
 # Set Input Files
 # --------------------------------------------
-COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I../code/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/vulkan/spirv_reflect/include/ -I../run_tree/deps/Freetype/include/
+COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I. -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/vulkan/spirv_reflect/include/ -I../run_tree/deps/Freetype/include/
 
-# Exclude sys_ files
-ALL_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+# Core Game Sources
+ALL_SRCS  = $(wildcard $(SRC_DIR)/*.cpp)
+GAME_SRCS = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
-GAME_DEPS = $(GAME_OBJS:$(OBJ_EXT)=.d)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
 GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static -lfreetype -lvulkan -lspirv_reflect
-EXCLUDE_PATTERNS        = sys_%
 
-# Each test executable depends on one test source
-TESTS_SRC                 := $(wildcard ../code/tests/*.cpp)
-WAD_ASSET_FILE_PACKER_SRC := ../code/asset_file_packer/wad_asset_file_packer.cpp
-JFD_ASSET_FILE_PACKER_SRC := ../code/asset_file_packer/jfd_file_packer.cpp
-GAME_SRCS                  = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
+# Tests
+TESTS_SRC = $(wildcard tests/*.cpp)
+# Use patsubst to strip 'tests/' prefix and add 'test_' prefix for output
+TESTS_OUT = $(patsubst tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
 
-# Each slang file is it's own shader.
+# Packers
+WAD_ASSET_FILE_PACKER_SRC = asset_file_packer/wad_asset_file_packer.cpp
+JFD_ASSET_FILE_PACKER_SRC = asset_file_packer/jfd_file_packer.cpp
+
+# Shaders
 SHADERS_SRC    := $(wildcard $(SHADER_DIR)/*.slang)
+SHADER_OUTPUTS := $(patsubst $(SHADER_DIR)/%.slang,../run_tree/res/shader_binaries/%.spv,$(SHADERS_SRC))
 SLANG_FLAGS    := -target spirv -matrix-layout-column-major -I$(SHADER_DIR) -O0 -g -profile sm_6_3
+
 # --------------------------------------------
 # Set the Outputs
 # --------------------------------------------
 GAME_OUT                  = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
-TESTS_OUT                := $(patsubst ../code/tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
 WAD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/wad_asset_file_packer$(EXE_EXT)
 JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
-SHADER_OUTPUTS            = $(patsubst $(SHADER_DIR)/%.slang,../run_tree/res/shader_binaries/%.spv,$(SHADERS_SRC))
 
 # --------------------------------------------
-# Create The Build Instructions
+# Build Instructions
 # --------------------------------------------
-.PHONY: all game_out jfd_asset_file_packer jfd_asset_file_packer tests shaders clean
+.PHONY: all shaders clean
 
-all: game_out wad_asset_file_packer jfd_asset_file_packer shaders tests
+all: $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
 
-# -------------------------------------------------------------------------
-# Create Build Directory 
-# -------------------------------------------------------------------------
+# Create Build Directory
 $(BUILD_DIR):
 	$(call MKDIR,$(BUILD_DIR))
 
@@ -129,40 +123,41 @@ shaders: $(SHADER_OUTPUTS)
 	@echo [SHADERS]: $< to $@
 
 # -------------------------------------------------------------------------
-# Tests
+# Tests (Now with Dependency Tracking)
 # -------------------------------------------------------------------------
 tests: $(TESTS_OUT)
 
-# Compile each test source file directly into an executable
-$(BUILD_DIR)/test_%$(EXE_EXT): ../code/tests/%.cpp | $(BUILD_DIR)
+# Note: We use $* to get the stem (filename without extension) for the .d file
+$(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR)
 	@echo [TEST] $@
-	@$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+		$(DEPFLAGS) \
 		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
 
 # -------------------------------------------------------------------------
-# Asset file builder
+# Asset file builder (Now with Dependency Tracking)
 # -------------------------------------------------------------------------
-wad_asset_file_packer: $(WAD_ASSET_FILE_PACKER_OUT)
-
-$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | ../build
+$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR)
 	@echo [ASSET FILE PACKER]: $@
-	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) $< $(GAME_EXTERNAL_LIBRARIES) -o $@ -MMD -MF ../build/wad_asset_file_packer.d
+	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
+		-MT $@ -MMD -MP -MF $(BUILD_DIR)/wad_asset_file_packer.d \
+		$< $(GAME_EXTERNAL_LIBRARIES) -o $@ 
 
-jfd_asset_file_packer: $(JFD_ASSET_FILE_PACKER_OUT)
-
-$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | ../build
+$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR)
 	@echo [ASSET FILE PACKER]: $@
-	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) $< $(GAME_EXTERNAL_LIBRARIES) -o $@ -MMD -MF ../build/jfd_asset_file_packer.d
+	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
+		-MT $@ -MMD -MP -MF $(BUILD_DIR)/jfd_asset_file_packer.d \
+		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
 
 # -------------------------------------------------------------------------
 # Game build 
 # -------------------------------------------------------------------------
-game_out: $(GAME_OUT)
-
+# Compile source to objects (With DEPFLAGS)
 $(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 	@echo [ENGINE SOURCE]: $< ...
-	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) -MMD -MP -c $< -o $@
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) $(DEPFLAGS) -c $< -o $@
 
+# Link objects to executable
 $(GAME_OUT): $(GAME_OBJS) | $(BUILD_DIR)
 	@echo Linking game executable: $@ ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(LDFLAGS) $(GAME_OBJS) $(GAME_EXTERNAL_LIBRARIES) -o $@
@@ -171,10 +166,8 @@ clean:
 	-rm -rf $(BUILD_DIR)
 
 # -------------------------------------------------------------------------
-# Dependencies 
+# Dependencies (Magic Logic)
 # -------------------------------------------------------------------------
--include $(GAME_DEPS)
--include $(patsubst ../code/tests/%.cpp,../build/test_%.d,$(TESTS_SRC))
--include ../build/jfd_file_packer.d
--include ../build/wad_asset_file_packer.d
-
+# Instead of manually listing files, we include ALL .d files found in the build folder.
+# This works for tests, packers, and game objects automatically.
+-include $(wildcard $(BUILD_DIR)/*.d)

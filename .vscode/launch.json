@@ -122,6 +122,16 @@
             "stopOnEntry": false,
             "terminal": "integrated"
         },
+        {
+            "name": "test_preprocessor",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_preprocessor",
+            "args": [],
+            "cwd": "${workspaceFolder}/code",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
     ],
     "compounds": [
         {

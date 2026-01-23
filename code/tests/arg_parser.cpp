@@ -27,6 +27,7 @@
 int
 main(int argc, char **argv)
 {
+    // NOTE(Sleepster): THESE WILL NEVER ALLOCATE ANY MEMORY
     bool32  *help        = c_program_flag_add_bool32("test_bool", false, "Displays this help message\n");
     float32 *sensitivity = c_program_flag_add_float32("test_float", 1.0f, "Sets the program's sensitivity\n");
     u64     *size        = c_program_flag_add_size("test_u64", 10, "Tells us the size of the file\n");
