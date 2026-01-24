@@ -47,8 +47,11 @@ typedef enum preprocessor_token_type
     TT_Comma,
     TT_OpenAngleBracket,
     TT_CloseAngleBracket,
+    TT_HashTag,
+    TT_Exclamation,
     TT_EOF,
 
+    TT_Error,
     TT_Identifier,
     TT_String,
 
@@ -160,7 +163,6 @@ internal_api preprocessor_token_t
 get_next_token(string_t *token_data)
 {
     eat_whitespace(token_data);
-    char character = *token_data->data;
     preprocessor_token_t token = {};
 
     token.string = {
@@ -168,10 +170,11 @@ get_next_token(string_t *token_data)
         .count = 1 
     };
 
+    char character = token_data->data[0];
+
     c_string_advance_by(token_data, 1);
     switch(character)
     {
-        // TODO(Sleepster): Closing bracket
         case ';':  {token.type = TT_Semicolon;        }break;
         case ':':  {token.type = TT_Colon;            }break;
         case '{':  {token.type = TT_OpeningBrace;     }break;
@@ -183,6 +186,8 @@ get_next_token(string_t *token_data)
         case ',':  {token.type = TT_Comma;            }break;
         case '<':  {token.type = TT_OpenAngleBracket; }break;
         case '>':  {token.type = TT_CloseAngleBracket;}break;
+        case '#':  {token.type = TT_HashTag;          }break;
+        case '!':  {token.type = TT_Exclamation;      }break;
         case '\0': {token.type = TT_EOF;              }break;
         case '*':  
         {
@@ -191,7 +196,7 @@ get_next_token(string_t *token_data)
             token.type = TT_Asterisk;      
             if(token_data->data[1] == '/')
             {
-                c_string_advance_by(token_data, 1);
+                eat_whitespace(token_data);
             }
         }break;
         case '"':  
@@ -220,22 +225,25 @@ get_next_token(string_t *token_data)
         }break;
         default:
         {
-            if(token_alphabetical((char)token_data->data[0]))
+            if(token_alphabetical((char)token.string.data[0]))
             {
                 token.type = TT_Identifier;
 
                 byte *at = token.string.data;
                 while((token.string.data) && 
-                      (token_alphabetical((char)token_data->data[0]) || 
-                       (token_numeric((char)token_data->data[0])) ||
-                       (token_data->data[0] == '_') || 
-                       (token_data->data[0] == '.')))
+                      (token_alphabetical((char)token.string.data[0]) || 
+                      (token_numeric((char)token.string.data[0])) ||
+                      (token.string.data[0] == '_') || 
+                      (token.string.data[0] == '.')))
                 {
-                    c_string_advance_by(token_data, 1);
+                    c_string_advance_by(&token.string, 1);
                 }
 
-                u64 token_length = (token_data->data - at);
+                u64 token_length = (token.string.data - at);
                 token.string.count = (u32)token_length;
+                token.string.data  = at;
+
+                c_string_advance_by(token_data, token.string.count);
             }
 #if 0
             else if(token_numeric(token_data->data[0]))
@@ -257,8 +265,41 @@ get_next_token(string_t *token_data)
 }
 
 internal_api void
-parse_structure(preprocessor_token_t token, string_t *tokenized_data)
+parse_struct_member(string_t *tokenized_data)
 {
+    preprocessor_token_t token = get_next_token(tokenized_data);
+    switch(token.type)
+    {
+        case TT_Asterisk: 
+        {
+            parse_struct_member(tokenized_data);
+        }break;
+        case TT_Identifier:
+        {
+            printf("\t\"%.*s\"\n", token.string.count,  C_STR(token.string));
+        };
+    }
+}
+
+internal_api void
+parse_structure(string_t *tokenized_data)
+{
+    preprocessor_token_t token = get_next_token(tokenized_data);
+    if(token.type == TT_OpeningBrace)
+    {
+        for(;;)
+        {
+            token = get_next_token(tokenized_data);
+            if(token.type == TT_ClosingBrace)
+            {
+                break;
+            }
+            else
+            {
+                parse_struct_member(tokenized_data);
+            }
+        }
+    }
 }
 
 int 
@@ -266,7 +307,7 @@ main(void)
 {
     c_global_context_init();
 
-    string_t file_data = c_file_read_entirety(STR("r_vulkan_types.h"));
+    string_t file_data = c_file_read_entirety(STR("r_vulkan_core.cpp"));
     //fprintf(stdout, "%s", C_STR(file_data));
     Assert(file_data.data);
     Assert(file_data.count > 0);
@@ -286,10 +327,12 @@ main(void)
             }break;
             case TT_Identifier:
             {
-                printf("Token type is: '%d'... string is: '%.*s'...\n", token.type, token.string.count,  C_STR(token.string));
                 if(c_string_compare(token.string, STR("struct")))
                 {
-                    parse_structure(token, &file_data);
+                    token = get_next_token(&file_data);
+                    printf("const char* %.*s_member_names[] = {\n", token.string.count,  C_STR(token.string));
+                    parse_structure(&file_data);
+                    printf("}\n");
                 }
             }break;
         }

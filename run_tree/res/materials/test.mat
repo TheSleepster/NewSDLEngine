@@ -1,6 +1,6 @@
 # this is a comment, this is also a standard normal material
 material_name: "Basic Builtin Material";
-shader_name: "test.spv";
+shader_binary_name: "test.spv";
 
 uses_diffuse_map: true;
 uses_normal_map: false;
@@ -26,8 +26,10 @@ render_pipeline_state: {
     dst_alpha_blend_mode: ONE_MINUS_SRC_ALPHA
 };
 
-shader_name/<uniform_block_name>: {
-    emmision_vibrance: 1.0
+# default shader uniform data
+shader_binary_name/RenderIntensityUBO: {
+    emmision_vibrance: 1.0,
+    bloom_value: 1.5
 };
 
 
