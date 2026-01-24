@@ -63,6 +63,7 @@ typedef struct preprocessor_token
 
 typedef struct preprocessor_state
 {
+    string_t token_data;
 }preprocessor_state_t;
 
 internal_api inline bool32
@@ -156,18 +157,18 @@ eat_whitespace(string_t *current_line)
 }
 
 internal_api preprocessor_token_t
-get_next_token(string_t *current_line)
+get_next_token(string_t *token_data)
 {
-    eat_whitespace(current_line);
-    char character = *current_line->data;
+    eat_whitespace(token_data);
+    char character = *token_data->data;
     preprocessor_token_t token = {};
 
     token.string = {
-        .data  = current_line->data,
+        .data  = token_data->data,
         .count = 1 
     };
 
-    c_string_advance_by(current_line, 1);
+    c_string_advance_by(token_data, 1);
     switch(character)
     {
         // TODO(Sleepster): Closing bracket
@@ -188,76 +189,76 @@ get_next_token(string_t *current_line)
             // TODO(Sleepster): Comments 
             //byte *at = token.string.data;
             token.type = TT_Asterisk;      
-            if(current_line->data[1] == '/')
+            if(token_data->data[1] == '/')
             {
-                c_string_advance_by(current_line, 1);
+                c_string_advance_by(token_data, 1);
             }
         }break;
         case '"':  
         {
-            byte *at = current_line->data;
+            byte *at = token_data->data;
 
-            while(current_line->data        && 
-                  (current_line->data[0] != '"'))
+            while(token_data->data        && 
+                  (token_data->data[0] != '"'))
             {
-                if((current_line->data[0] == '\\') && (current_line->data[1]))
+                if((token_data->data[0] == '\\') && (token_data->data[1]))
                 {
-                    c_string_advance_by(current_line, 1);
+                    c_string_advance_by(token_data, 1);
                 }
-                c_string_advance_by(current_line, 1);
+                c_string_advance_by(token_data, 1);
             }
 
-            u64 token_length = (current_line->data - at);
+            u64 token_length = (token_data->data - at);
 
             token.type = TT_String;
             token.string.count = (u32)token_length;
 
-            if(current_line->data[0] == '"')
+            if(token_data->data[0] == '"')
             {
-                c_string_advance_by(current_line, 1);
+                c_string_advance_by(token_data, 1);
             }
         }break;
         default:
         {
-            if(token_alphabetical((char)current_line->data[0]))
+            if(token_alphabetical((char)token_data->data[0]))
             {
                 token.type = TT_Identifier;
 
                 byte *at = token.string.data;
                 while((token.string.data) && 
-                      (token_alphabetical((char)current_line->data[0]) || 
-                       (token_numeric((char)current_line->data[0])) ||
-                       (current_line->data[0] == '_') || 
-                       (current_line->data[0] == '.')))
+                      (token_alphabetical((char)token_data->data[0]) || 
+                       (token_numeric((char)token_data->data[0])) ||
+                       (token_data->data[0] == '_') || 
+                       (token_data->data[0] == '.')))
                 {
-                    c_string_advance_by(current_line, 1);
+                    c_string_advance_by(token_data, 1);
                 }
 
-                u64 token_length = (current_line->data - at);
+                u64 token_length = (token_data->data - at);
                 token.string.count = (u32)token_length;
             }
 #if 0
-            else if(token_numeric(current_line->data[0]))
+            else if(token_numeric(token_data->data[0]))
             {
             }
 #endif
             else
             {
                 token.type = TT_Invalid;
-                if(current_line->count > 0)
+                if(token_data->count > 0)
                 {
-                    c_string_advance_by(current_line, 1);
+                    c_string_advance_by(token_data, 1);
                 }
             }
         }break;
     }
-#if 0
-    if(!is_end_of_line(current_line->)
-    {
-    }
-#endif
 
     return(token);
+}
+
+internal_api void
+parse_structure(preprocessor_token_t token, string_t *tokenized_data)
+{
 }
 
 int 
@@ -265,7 +266,7 @@ main(void)
 {
     c_global_context_init();
 
-    string_t file_data = c_file_read_entirety(STR("tests/preprocessor.cpp"));
+    string_t file_data = c_file_read_entirety(STR("r_vulkan_types.h"));
     //fprintf(stdout, "%s", C_STR(file_data));
     Assert(file_data.data);
     Assert(file_data.count > 0);
@@ -273,29 +274,24 @@ main(void)
     // NOTE(Sleepster): Get tokens for file... 
     while(file_data.count > 0)
     {
-        string_t current_line = c_string_read_line(&file_data);
-
-        //string_t current_line_copy = c_string_make_copy(&global_context->temporary_arena, current_line);
-        //current_line_copy.data[current_line_copy.count] = '\0';
-        //log_info("%s", C_STR(current_line_copy));
-
-        while(current_line.data)
+        preprocessor_token_t token = get_next_token(&file_data);
+        switch(token.type)
         {
-            preprocessor_token_t token = get_next_token(&current_line);
-            switch(token.type)
+            case TT_Invalid:
             {
-                case TT_Invalid:
+            }break;
+            case TT_EOF:
+            {
+                goto end;
+            }break;
+            case TT_Identifier:
+            {
+                printf("Token type is: '%d'... string is: '%.*s'...\n", token.type, token.string.count,  C_STR(token.string));
+                if(c_string_compare(token.string, STR("struct")))
                 {
-                }break;
-                case TT_EOF:
-                {
-                    goto end;
-                }break;
-                default:
-                {
-                    printf("Token type is: '%d'... string is: '%.*s'...\n", token.type, token.string.count,  C_STR(token.string));
-                }break;
-            }
+                    parse_structure(token, &file_data);
+                }
+            }break;
         }
         c_global_context_reset_temporary_data();
     }
