@@ -44,6 +44,8 @@ typedef enum preprocessor_token_type
     TT_OpenBracket,
     TT_ClosingBracket,
     TT_Comma,
+    TT_OpenAngleBracket,
+    TT_CloseAngleBracket,
     TT_EOF,
 
     TT_Identifier,
@@ -99,7 +101,7 @@ internal_api inline bool8
 token_alphabetical(char A)
 {
     bool8 result = (((A >= 'a') && (A <= 'z')) || 
-                     (A >= 'A'  && (A <= 'Z')));
+                    ((A >= 'A') && (A <= 'Z')));
     return(result);
 }
 
@@ -176,33 +178,41 @@ main(void)
             eat_whitespace(&current_line);
             char character = *current_line.data;
             preprocessor_token_t token = {};
+
             token.string = {
                 .data  = current_line.data,
-                .count = current_line.count
+                .count = 1 
             };
 
-            if(current_line.count > 0) c_string_advance_by(&current_line, 1);
+            c_string_advance_by(&current_line, 1);
             switch(character)
             {
-                case ';':  {token.type = TT_Semicolon;     }break;
-                case '{':  {token.type = TT_OpeningBrace;  }break;
-                case '}':  {token.type = TT_ClosingBrace;  }break;
-                case '(':  {token.type = TT_OpeningParen;  }break;
-                case ')':  {token.type = TT_ClosingParen;  }break;
-                case '*':  {token.type = TT_Asterisk;      }break;
-                case '[':  {token.type = TT_OpenBracket;   }break;
-                case ']':  {token.type = TT_ClosingBracket;}break;
-                case ',':  {token.type = TT_Comma;         }break;
-                case '\0': {token.type = TT_EOF;           }break;
+                // TODO(Sleepster): Closing bracket
+                case ';':  {token.type = TT_Semicolon;        }break;
+                case '{':  {token.type = TT_OpeningBrace;     }break;
+                case '}':  {token.type = TT_ClosingBrace;     }break;
+                case '(':  {token.type = TT_OpeningParen;     }break;
+                case ')':  {token.type = TT_ClosingParen;     }break;
+                case '[':  {token.type = TT_OpenBracket;      }break;
+                case ']':  {token.type = TT_ClosingBracket;   }break;
+                case ',':  {token.type = TT_Comma;            }break;
+                case '<':  {token.type = TT_OpenAngleBracket; }break;
+                case '>':  {token.type = TT_CloseAngleBracket;}break;
+                case '\0': {token.type = TT_EOF;              }break;
+                case '*':  
+                {
+                    // TODO(Sleepster): Comments 
+                    //byte *at = token.string.data;
+                    token.type = TT_Asterisk;      
+                }break;
                 case '"':  
                 {
-                    byte *at = token.string.data;
+                    byte *at = current_line.data;
 
                     while(current_line.data        && 
-                          (current_line.count > 0) && 
                           (current_line.data[0] != '"'))
                     {
-                        if((current_line.data[0] == '\\') && (current_line.data + 1))
+                        if((current_line.data[0] == '\\') && (current_line.data[1]))
                         {
                             c_string_advance_by(&current_line, 1);
                         }
@@ -212,10 +222,7 @@ main(void)
                     u64 token_length = (current_line.data - at);
 
                     token.type = TT_String;
-                    token.string = {
-                        .data  = at,
-                        .count = (u32)token_length 
-                    };
+                    token.string.count = (u32)token_length;
 
                     if(current_line.data[0] == '"')
                     {
@@ -224,14 +231,14 @@ main(void)
                 }break;
                 default:
                 {
-                    if(token_alphabetical(current_line.data[0]))
+                    if(token_alphabetical((char)current_line.data[0]))
                     {
-                    byte *at = token.string.data;
-
                         token.type = TT_Identifier;
-                        while((current_line.count > 0) && 
-                              (token_alphabetical(current_line.data[0]) || 
-                               token_numeric(current_line.data[0]) || 
+
+                        byte *at = token.string.data;
+                        while((token.string.data) && 
+                              (token_alphabetical((char)current_line.data[0]) || 
+                               (token_numeric((char)current_line.data[0])) ||
                                (current_line.data[0] == '_') || 
                                (current_line.data[0] == '.')))
                         {
@@ -241,10 +248,7 @@ main(void)
                         u64 token_length = (current_line.data - at);
 
                         token.type = TT_String;
-                        token.string = {
-                            .data  = at,
-                            .count = (u32)token_length 
-                        };
+                        token.string.count = (u32)token_length;
                     }
 #if 0
                     else if(token_numeric(current_line.data[0]))
@@ -254,10 +258,17 @@ main(void)
                     else
                     {
                         token.type = TT_Invalid;
+                        if(current_line.count > 0)
+                        {
+                            c_string_advance_by(&current_line, 1);
+                        }
                     }
                 }break;
             }
-            if(is_end_of_line(&current_line))
+            if(!is_end_of_line(&current_line))
+            {
+            }
+            else
             {
                 break;
             }

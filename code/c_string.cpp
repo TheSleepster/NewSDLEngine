@@ -146,7 +146,7 @@ c_string_substring(string_t string, u32 first_index, u32 last_index)
 void
 c_string_advance_by(string_t *string, u32 amount)
 {
-    Assert(amount <= string->count);
+    Assert(string->data + amount);
     string->data  += amount;
     string->count -= amount;
 }
