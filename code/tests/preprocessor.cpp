@@ -509,14 +509,13 @@ main(int argc, char **argv)
     }
     // NOTE(Sleepster): Get tokens for file... 
 end:
-    c_string_builder_append_data(&state.type_enum_builder, STR("};\n\n"));
-    c_string_builder_append_data(&state.type_enum_builder, STR("#endif // GENERATED_PROGRAM_TYPES_H\n\n"));
+    c_string_builder_append_data(&state.type_enum_builder, STR("};\n"));
     string_t builder_string = c_string_builder_get_current_string(&state.type_enum_builder);
-    fprintf(stdout, "%s", C_STR(builder_string));
+    fprintf(stdout, "%s\n", C_STR(builder_string));
 
 
     builder_string = c_string_builder_get_current_string(&state.struct_info_builder);
-    fprintf(stdout, "%s\n", C_STR(builder_string));
+    fprintf(stdout, "%s", C_STR(builder_string));
     c_string_builder_reset(&state.struct_info_builder);
 
     builder_string = c_string_builder_get_current_string(&state.struct_const_definition_builder);
