@@ -22,7 +22,7 @@
 #include <c_memory_arena.h>
 #include <c_string.h>
 
-typedef struct mapped_file_data mapped_file_t;
+typedef struct mapped_file      mapped_file_t;
 typedef struct file_data        file_data_t;
 typedef struct file_watcher     file_watcher_t;
 typedef struct visit_file_data  visit_file_data_t;

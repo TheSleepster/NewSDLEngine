@@ -49,7 +49,7 @@ typedef struct file
     bool8       for_writing;
 }file_t;
 
-typedef struct mapped_file_data
+typedef struct mapped_file
 {
     file_t      file;
     sys_handle_t mapping_handle;

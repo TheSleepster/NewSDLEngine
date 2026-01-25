@@ -1,6 +1,6 @@
 [
   {
-    "file": "r_vulkan_core.cpp",
+    "file": "tests/preprocessor.cpp",
     "arguments": [
       "clang++",
       "-g",
@@ -37,17 +37,16 @@
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
       "-MT",
-      "../build/r_vulkan_core.o",
+      "../build/test_preprocessor",
       "-MMD",
       "-MP",
       "-MF",
-      "../build/r_vulkan_core.d",
-      "-c",
-      "r_vulkan_core.cpp",
+      "../build/preprocessor.d",
+      "tests/preprocessor.cpp",
       "-o",
-      "../build/r_vulkan_core.o"
+      "../build/test_preprocessor"
     ],
     "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/r_vulkan_core.o"
+    "output": "../build/test_preprocessor"
   }
 ]
