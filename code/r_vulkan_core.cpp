@@ -1939,7 +1939,8 @@ r_vulkan_image_create(vulkan_render_context_t *render_context,
                       u32                      mip_levels,
                       bool32                   create_view)
 {
-    Assert(width < 4096);
+    // NOTE(Sleepster): This is completely unnecessary
+    //Assert(width < 4096);
     log_info("Creating image: %ux%u, format=%d\n", width, height, format);
  
     vulkan_image_data_t result = {};

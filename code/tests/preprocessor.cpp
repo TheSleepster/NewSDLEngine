@@ -307,7 +307,7 @@ main(void)
 {
     c_global_context_init();
 
-    string_t file_data = c_file_read_entirety(STR("r_vulkan_core.cpp"));
+    string_t file_data = c_file_read_entirety(STR("r_vulkan_types.h"));
     //fprintf(stdout, "%s", C_STR(file_data));
     Assert(file_data.data);
     Assert(file_data.count > 0);
@@ -332,7 +332,7 @@ main(void)
                     token = get_next_token(&file_data);
                     printf("const char* %.*s_member_names[] = {\n", token.string.count,  C_STR(token.string));
                     parse_structure(&file_data);
-                    printf("}\n");
+                    printf("};\n");
                 }
             }break;
         }
