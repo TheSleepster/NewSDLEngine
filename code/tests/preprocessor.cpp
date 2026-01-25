@@ -30,7 +30,11 @@
 
 #include <preprocessor_type_data.h>
 
-#include <GENERATED_test.h>
+// TODO(Sleepster): 
+// - [ ] UNIONS (NESTED AND UNNESTED)
+// - [ ] NESTED STRUCTURES
+// - [ ] LENGTH BASED ARRAY TYPES (u32 indices[32]... This might already be handled though using ArraySize()...)
+// - [ ] MULTITHREADING???
 
 #define INSPECT
 
@@ -71,12 +75,14 @@ typedef struct preprocessor_state
 {
     string_t          token_data;
     string_builder_t  struct_info_builder;
+    string_builder_t  struct_const_definition_builder;
 
     string_builder_t  type_enum_builder;
     DynArray_t(u64)   type_ids;
 }preprocessor_state_t;
-
 static preprocessor_state_t state = {};
+
+internal_api s32 parse_structure(string_t *tokenized_data, preprocessor_token_t struct_name_token);
 
 internal_api inline bool32
 is_end_of_line(string_t *current_line)
@@ -280,20 +286,16 @@ append_type_enum_token(preprocessor_token_t type_name_token)
 {
     if(type_name_token.type == TT_Identifier)
     {
-        Assert(type_name_token.string.count > 1);
-
-        string_t typedef_type_name = c_string_sub_from_left(type_name_token.string, type_name_token.string.count - 2);
-        string_t alt_type_name     = c_string_concat(&global_context->temporary_arena, type_name_token.string, STR("_t"));
+        string_t alt_type_name = c_string_concat(&global_context->temporary_arena, type_name_token.string, STR("_t"));
 
         u64 type_id = c_fnv_hash_value(type_name_token.string.data, type_name_token.string.count);
         u64 alt_type_id = c_fnv_hash_value(alt_type_name.data, alt_type_name.count);
-        u64 typedef_type_id = c_fnv_hash_value(typedef_type_name.data, typedef_type_name.count);
 
         bool8 ID_found = false;
         c_dynarray_for(state.type_ids, id_index)
         {
             u64 ID = state.type_ids[id_index];
-            if(ID == type_id || ID == alt_type_id || ID == typedef_type_id)
+            if(ID == type_id || ID == alt_type_id)
             {
                 ID_found = true;
                 break;
@@ -344,17 +346,30 @@ parse_struct_member(string_t *tokenized_data, bool8 is_pointer, preprocessor_tok
         }break;
         case TT_Identifier:
         {
+            if(c_string_compare(type_token.string, STR("const")) ||
+               c_string_compare(type_token.string, STR("static")))
+            {
+                type_token = get_next_token(tokenized_data);
+            }
+
             append_type_enum_token(type_token);
             append_struct_member_to_definition(type_token, token);
+            
+            char buffer[4096];
+            u32 length = sprintf(buffer, "\t\t.%.*s = {\"%.*s\", %s, type_%.*s, offsetof(%.*s, %.*s), sizeof(%.*s)},\n", 
+                                 token.string.count, C_STR(token.string), 
+                                 token.string.count, C_STR(token.string), 
+                                 is_pointer ? "true" : "false",
+                                 type_token.string.count, C_STR(type_token.string),
+                                 struct_name_token.string.count, C_STR(struct_name_token.string),
+                                 token.string.count, C_STR(token.string),
+                                 token.string.count, C_STR(token.string));
+            string_t member_data = {
+                .data  = (byte*)buffer,
+                .count = (u32)length
+            };
+            c_string_builder_append_data(&state.struct_const_definition_builder, member_data);
 
-            printf("\t\t.%.*s = {\"%.*s\", %s, type_%.*s, offsetof(%.*s, %.*s), sizeof(%.*s)},\n", 
-                   token.string.count, C_STR(token.string), 
-                   token.string.count, C_STR(token.string), 
-                   is_pointer ? "true" : "false",
-                   type_token.string.count, C_STR(type_token.string),
-                   struct_name_token.string.count, C_STR(struct_name_token.string),
-                   token.string.count, C_STR(token.string),
-                   token.string.count, C_STR(token.string));
             is_pointer = false;
         }break;
     }
@@ -368,7 +383,7 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t struct_name_token
     preprocessor_token_t token = get_next_token(tokenized_data);
     if(token.type == TT_OpeningBrace)
     {
-        char buffer[256];
+        char buffer[4096];
         s32 length = sprintf(buffer, "struct type_info_%.*s_t {\n\tconst char *name;\n\tu32 type;\n\tstruct members {\n", 
                              struct_name_token.string.count, C_STR(struct_name_token.string));
         
@@ -377,18 +392,38 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t struct_name_token
             .count = (u32)length
         };
         c_string_builder_append_data(&state.struct_info_builder, struct_info_string);
+        ZeroMemory(buffer, sizeof(buffer));
 
-        printf("const static type_info_%.*s_t type_info_%.*s = {\n", 
-               struct_name_token.string.count, C_STR(struct_name_token.string), 
-               struct_name_token.string.count, C_STR(struct_name_token.string));
+        length = sprintf(buffer, "const static type_info_%.*s_t type_info_%.*s = {\n", 
+                         struct_name_token.string.count, C_STR(struct_name_token.string), 
+                         struct_name_token.string.count, C_STR(struct_name_token.string));
+        string_t struct_const_definition_string = {
+            .data  = (byte*)buffer,
+            .count = (u32)length
+        };
+        c_string_builder_append_data(&state.struct_const_definition_builder, struct_const_definition_string);
+        ZeroMemory(buffer, sizeof(buffer));
 
-        printf("\t\"%.*s\",\n\tTYPE_%.*s,\n", 
-               struct_name_token.string.count, 
-               C_STR(struct_name_token.string),
-               struct_name_token.string.count, 
-               C_STR(struct_name_token.string));
+        length = sprintf(buffer, "\t\"%.*s\",\n\tTYPE_%.*s,\n", 
+                         struct_name_token.string.count, 
+                         C_STR(struct_name_token.string),
+                         struct_name_token.string.count, 
+                         C_STR(struct_name_token.string));
+        struct_const_definition_string = {
+            .data  = (byte*)buffer,
+            .count = (u32)length
+        };
+        c_string_builder_append_data(&state.struct_const_definition_builder, struct_const_definition_string);
+        ZeroMemory(buffer, sizeof(buffer));
 
-        printf("\t.members = {\n");
+        length = sprintf(buffer, "\t.members = {\n");
+        struct_const_definition_string = {
+            .data  = (byte*)buffer,
+            .count = (u32)length
+        };
+        c_string_builder_append_data(&state.struct_const_definition_builder, struct_const_definition_string);
+        ZeroMemory(buffer, sizeof(buffer));
+
         for(;;)
         {
             token = get_next_token(tokenized_data);
@@ -397,7 +432,7 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t struct_name_token
                 token = get_next_token(tokenized_data);
                 append_type_enum_token(token);
 
-                c_string_builder_append_data(&state.struct_info_builder, STR("\t};\n\tu32 member_count\n};"));
+                c_string_builder_append_data(&state.struct_info_builder, STR("\t};\n\tu32 member_count;\n};\n\n"));
                 break;
             }
             else
@@ -406,7 +441,12 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t struct_name_token
                 ++member_count;
             }
         }
-        printf("\t},\n");
+        length = sprintf(buffer, "\t},\n");
+        struct_const_definition_string = {
+            .data  = (byte*)buffer,
+            .count = (u32)length
+        };
+        c_string_builder_append_data(&state.struct_const_definition_builder, struct_const_definition_string);
     }
 
     return(member_count);
@@ -417,10 +457,9 @@ main(int argc, char **argv)
 {
     c_global_context_init();
 
-    file_t type_enum_file = c_file_open(STR("GENERATED_program_types_enum.h"), true);
-
-    c_string_builder_init(&state.type_enum_builder,   MB(200));
-    c_string_builder_init(&state.struct_info_builder, MB(200));
+    c_string_builder_init(&state.type_enum_builder,               MB(200));
+    c_string_builder_init(&state.struct_const_definition_builder, MB(200));
+    c_string_builder_init(&state.struct_info_builder,             MB(200));
     state.type_ids = c_dynarray_create(u64);
 
     c_string_builder_append_data(&state.type_enum_builder, STR("// THIS IS GENERATED BY THE PREPROCESSOR\n// THIS IS THE RTTI FOR THE ENTIRE PROGRAM\n\n"));
@@ -428,7 +467,7 @@ main(int argc, char **argv)
     c_string_builder_append_data(&state.type_enum_builder, STR("enum GENERATED_program_types_t {\n"));
 
     // TODO(Sleepster): feed a directory to this 
-    //string_t file_data = c_file_read_entirety(STR("r_vulkan_types.h"));
+    //string_t file_data = c_file_read_entirety(STR("tests/GENERATED_test.h"));
     string_t file_data = c_file_read_entirety(STR("c_globals.h"));
     //fprintf(stdout, "%s", C_STR(file_data));
     Assert(file_data.data);
@@ -455,8 +494,13 @@ main(int argc, char **argv)
                     s32 member_count = parse_structure(&file_data, token);
                     if(member_count > 0)
                     {
-                        printf("\t%d\n", member_count);
-                        printf("};\n");
+                        char buffer[240];
+                        u32 length = sprintf(buffer, "\t%d\n};\n", member_count);
+                        string_t struct_const_definition_string = {
+                            .data  = (byte*)buffer,
+                            .count = (u32)length
+                        };
+                        c_string_builder_append_data(&state.struct_const_definition_builder, struct_const_definition_string);
                     }
                 }
             }break;
@@ -465,8 +509,8 @@ main(int argc, char **argv)
     }
     // NOTE(Sleepster): Get tokens for file... 
 end:
-    c_string_builder_append_data(&state.type_enum_builder, STR("};\n"));
-    c_string_builder_append_data(&state.type_enum_builder, STR("#endif // GENERATED_PROGRAM_TYPES_H\n"));
+    c_string_builder_append_data(&state.type_enum_builder, STR("};\n\n"));
+    c_string_builder_append_data(&state.type_enum_builder, STR("#endif // GENERATED_PROGRAM_TYPES_H\n\n"));
     string_t builder_string = c_string_builder_get_current_string(&state.type_enum_builder);
     fprintf(stdout, "%s", C_STR(builder_string));
 
@@ -475,8 +519,11 @@ end:
     fprintf(stdout, "%s\n", C_STR(builder_string));
     c_string_builder_reset(&state.struct_info_builder);
 
+    builder_string = c_string_builder_get_current_string(&state.struct_const_definition_builder);
+    fprintf(stdout, "%s\n", C_STR(builder_string));
+    c_string_builder_reset(&state.struct_const_definition_builder);
 
-    c_string_builder_flush_to_file(&type_enum_file, &state.type_enum_builder);
+    fprintf(stdout, "#endif // GENERATED_PROGRAM_TYPES_H\n\n");
 
     return(0);
 }
