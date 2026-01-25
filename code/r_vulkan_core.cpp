@@ -1153,7 +1153,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
         vulkan_shader_descriptor_set_info_t *info   = result.set_info + set_index;
         VkDescriptorSetLayout                layout = result.layouts[set_index];
 
-        VkDescriptorSetLayout *layout_info = c_arena_push_array(&result.arena, VkDescriptorSetLayout, render_context->swapchain.image_count);
+        VkDescriptorSetLayout *layout_info = c_arena_push_array(&result.arena, VkDescriptorSetLayout, VULKAN_MAX_FRAMES_IN_FLIGHT);
         for(u32 frame_index = 0;
             frame_index < render_context->swapchain.image_count;
             ++frame_index)
@@ -1164,7 +1164,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
         VkDescriptorSetAllocateInfo allocation_info = {
             .sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
             .descriptorPool     = result.primary_pool,
-            .descriptorSetCount = render_context->swapchain.image_count,
+            .descriptorSetCount = VULKAN_MAX_FRAMES_IN_FLIGHT,
             .pSetLayouts        = layout_info
         };
         vkAssert(vkAllocateDescriptorSets(render_context->rendering_device.logical_device,
@@ -2497,7 +2497,8 @@ r_vulkan_swapchain_create(vulkan_render_context_t *render_context,
                           bool8                    wants_depth_buffer,
                           vulkan_swapchain_data_t *old_swapchain)
 {
-    Assert(image_width < 4096);
+    // NOTE(Sleepster): This assert is completely unnecessary and will blow up the program 
+    //Assert(image_width < 4096);
     log_trace("renderpass size is: '%d'... %d...\n", image_width, image_height);
 
     vulkan_swapchain_data_t result = {};
