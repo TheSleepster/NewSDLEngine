@@ -93,8 +93,8 @@ typedef struct string_builder
     bool8                        is_initialized;
     memory_arena_t               arena;
 
-    string_builder_buffer_t *first_buffer;
-    string_builder_buffer_t *current_buffer;
+    string_builder_buffer_t     *first_buffer;
+    string_builder_buffer_t     *current_buffer;
     u64                          default_buffer_block_size;
 
     u64                          bytes_used;
@@ -106,6 +106,7 @@ void     c_string_builder_deinit(string_builder_t *builder);
 void     c_string_builder_append_data(string_builder_t *builder, string_t data);
 void     c_string_builder_append_value(string_builder_t *builder, void *value, u32 value_size);
 string_t c_string_builder_get_current_string(string_builder_t *builder);
+void     c_string_builder_reset(string_builder_t *builder);
 
 // NOTE(Sleepster): DUMP simply writes the data out and keeps the state of the builder the same, 
 //                  FLUSH writes out the data, and completely resets the state of the builder

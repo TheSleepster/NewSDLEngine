@@ -4,18 +4,10 @@
 #ifndef GENERATED_PROGRAM_TYPES_H
 #define GENERATED_PROGRAM_TYPES_H
 
-enum GENERATED_program_type_t {
-	TYPE_sys_handle_t,
-	TYPE_string_t,
-	TYPE_u64,
+enum GENERATED_program_types_t {
 	TYPE_bool8,
-	TYPE_file_t,
-	TYPE_mapped_file_t,
-	TYPE_file_data_t,
-	TYPE_u32,
-	TYPE_overlap_io_data_t,
-	TYPE_visit_files_pfn_t,
-	TYPE_void,
-	TYPE_visit_file_data_t,
+	TYPE_memory_arena_t,
+	TYPE_threadpool_t,
+	TYPE_global_context_t,
 };
 #endif // GENERATED_PROGRAM_TYPES_H

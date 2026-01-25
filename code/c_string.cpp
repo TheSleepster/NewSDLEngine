@@ -576,16 +576,22 @@ c_string_builder_dump_to_file(file_t *file, string_builder_t *builder)
     return(result);
 }
 
-bool8 
-c_string_builder_flush_to_file(file_t *file, string_builder_t *builder)
+void 
+c_string_builder_reset(string_builder_t *builder)
 {
-    bool8 result = c_string_builder_dump_to_file(file, builder);
     c_arena_reset(&builder->arena);
 
     builder->bytes_used      = 0;
     builder->total_allocated = 0;
     builder->current_buffer  = null;
     builder->current_buffer  = c_string_builder_create_and_attach_buffer(builder, builder->default_buffer_block_size);
+}
+
+bool8 
+c_string_builder_flush_to_file(file_t *file, string_builder_t *builder)
+{
+    bool8 result = c_string_builder_dump_to_file(file, builder);
+    c_string_builder_reset(builder);
 
     return(result);
 }

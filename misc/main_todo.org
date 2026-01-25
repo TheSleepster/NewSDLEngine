@@ -141,6 +141,7 @@
 - [ ] Compile the core into a single library. c_data.lib or something. then have c_base.h import all the core headers
 - [X] Type safe hash tables
 - [X] Allow us to set the custom allocator for the hash tables
+- [ ] Spintf for our custom strings.
 - [ ] Modify the file and sys_file APIs so that they work properly as one would expect. IE, sys_file_open returns a file_t, have it initialize the file's name and other easy things
 - [ ] Complete malloc replacement (thread safe heap allocator)
 - [ ] The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal state
