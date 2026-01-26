@@ -9,46 +9,21 @@
 #define GENERATED_TEST_H
 #include <c_types.h>
 
-struct test_element_data 
+struct test_thing_t
 {
-    u32 oranges;
-    u32 internal_data[128];
-    struct internal_members {
-        u32 apples;
+    u32   element0;
+    char *element1[128];
+    const u32 element_array;
+
+    DynArray_t(u32) dynamic_elements;
+
+    struct test_nested_struct
+    {
+        const volatile u32 nested_element[128];
     };
 
-    union {
-        u32 banannas;
-        u32 limes;
-        u32 lemons;
-    };
+    const s32 thingy_after_nested_element;
 };
-
-union test_union
-{
-    bool8 test_bool;
-    u8    test_byte;
-};
-
-typedef struct test_element_typedeffed 
-{
-    u32 oranges;
-    u32 internal_data[128];
-    struct internal_members {
-        u32 apples;
-    };
-
-    union citrus {
-        u32 limes;
-        u32 lemons;
-    };
-}test_element_typedeffed_t;
-
-typedef union test_union_typedeffed
-{
-    bool8 test_bool;
-    u8    test_byte;
-}test_union_typedeffed_t;
 
 #endif // GENERATED_TEST_H
 

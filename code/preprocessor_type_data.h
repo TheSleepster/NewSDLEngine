@@ -9,43 +9,28 @@
 #define PREPROCESSOR_TYPE_DATA_H
 #include <c_types.h>
 
-#define MAX_STRUCTURE_MEMBERS (128)
+// TODO(Sleepster): Merge all the is_* flags (is_pointer, is_constant, is_volatile, etc.) into flags
 
 typedef struct type_info_member
 {
     const char *name;
     const char *type_name;
+    u32         type;
     u32         offset;
     u32         size;
 }type_info_member_t;
 
+// NOTE(Sleepster): Predefined, we use this as a generic 
+//                  We can simply cast other type_info_struct_* to this.
 typedef struct type_info_struct
 {
-    const char         *name;
-    type_info_member_t  members[MAX_STRUCTURE_MEMBERS];
-    u32                 member_count;
+    const char          *name;
+    u32                  type;
+    u32                  member_count;
+    type_info_member_t  *members;
 }type_info_struct_t;
 
 #if 0
-
-// NOTE(Sleepster): Predefined, we make this
-typedef struct member_type_info
-{
-    const char *name;
-    bool8       is_pointer;
-    u32         offset;
-    u32         size;
-    u32         type;
-}member_type_info_t;
-
-// NOTE(Sleepster): Predefined, we use this as a generic 
-struct type_info_struct
-{
-    const char         *name;
-    u32                 type;
-    type_info_member_t *members;
-    u32                 member_count;
-}type_info_struct_t;
 
 // NOTE(Sleepster): This is generated...
 typedef enum GENERATED_program_types
@@ -59,17 +44,17 @@ typedef enum GENERATED_program_types
 struct type_info_global_context_t 
 {
     const char *name;
-    u32         type;
+    u32 type;
+    u32 member_count;
     struct members {
         member_type_info_t is_initialized;
         member_type_info_t running;
         ...
     };
-    u32 member_count;
 };
 
 // NOTE(Sleepster): And so is this.
-struct type_info_global_context_t type_info_global_context = {
+const static type_info_global_context_t type_info_global_context = {
     .name = "global_context_t",
     .type = TYPE_global_context_t;
     .members = {

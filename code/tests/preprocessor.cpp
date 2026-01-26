@@ -31,10 +31,41 @@
 #include <preprocessor_type_data.h>
 
 // TODO(Sleepster): 
-// - [ ] UNIONS (NESTED AND UNNESTED)
-// - [ ] NESTED STRUCTURES
-// - [ ] LENGTH BASED ARRAY TYPES (u32 indices[32]... This might already be handled though using ArraySize()...)
+// - [X] UNIONS (NESTED AND UNNESTED)
+// - [X] NESTED STRUCTURES
+// - [ ] IS_CONSTANT MEMBER BOOL
+// - [ ] VOLATILE MEMBER BOOL
+// - [ ] LENGTH BASED ARRAY TYPES (U32 INDICES[32]... THIS MIGHT ALREADY BE HANDLED THOUGH USING ARRAYSIZE()...)
 // - [ ] MULTITHREADING???
+// - [ ] IGNORE #if 0 blocks
+// - [ ] REALLY JUST HANDLE ANY # BLOCK
+// - [ ] MERGE ALL THE IS_* FLAGS (IS_POINTER, IS_CONSTANT, IS_VOLATILE, ETC.) INTO FLAGS
+
+#if 0
+struct type_info_internal_members_t {
+        const char *name;
+        u32 type;
+        struct members {
+                type_info_member_t apples;
+        };
+        u32 member_count;
+};
+
+struct type_info_test_element_data_t {
+        const char *name;
+        u32 type;
+        struct members {
+                type_info_member_t oranges;
+                type_info_member_t internal_data;
+                type_info_member_t internal_members;
+                type_info_member_t banannas;
+                type_info_member_t limes;
+                type_info_member_t lemons;
+        };
+        u32 member_count;
+};
+#endif
+
 
 #define INSPECT
 
@@ -74,15 +105,14 @@ typedef struct preprocessor_token
 typedef struct preprocessor_state
 {
     string_t          token_data;
+
     string_builder_t  struct_info_builder;
     string_builder_t  struct_const_definition_builder;
-
     string_builder_t  type_enum_builder;
+
     DynArray_t(u64)   type_ids;
 }preprocessor_state_t;
 static preprocessor_state_t state = {};
-
-internal_api s32 parse_structure(string_t *tokenized_data, preprocessor_token_t struct_name_token);
 
 internal_api inline bool32
 is_end_of_line(string_t *current_line)
@@ -177,10 +207,14 @@ eat_whitespace(string_t *current_line)
 internal_api preprocessor_token_t
 get_next_token(string_t *token_data)
 {
-    (void)state;
-
     eat_whitespace(token_data);
+    
     preprocessor_token_t token = {};
+    if(token_data->count == 0)
+    {
+        token.type = TT_EOF;
+        return token;
+    }
 
     token.string = {
         .data  = token_data->data,
@@ -208,10 +242,8 @@ get_next_token(string_t *token_data)
         case '\0': {token.type = TT_EOF;              }break;
         case '*':  
         {
-            // TODO(Sleepster): Comments 
-            //byte *at = token.string.data;
             token.type = TT_Asterisk;      
-            if(token_data->data[1] == '/')
+            if(token_data->count > 0 && token.string.data[0] == '/')
             {
                 eat_whitespace(token_data);
             }
@@ -220,53 +252,44 @@ get_next_token(string_t *token_data)
         {
             byte *at = token_data->data;
 
-            while(token_data->data        && 
+            while(token_data->data && 
                   (token_data->data[0] != '"'))
             {
                 if((token_data->data[0] == '\\') && (token_data->data[1]))
                 {
+                    c_string_advance_by(token_data, 2);
+                }
+                else
+                {
                     c_string_advance_by(token_data, 1);
                 }
-                c_string_advance_by(token_data, 1);
             }
-
-            u64 token_length = (token_data->data - at);
-
-            token.type = TT_String;
-            token.string.count = (u32)token_length;
 
             if(token_data->data[0] == '"')
             {
                 c_string_advance_by(token_data, 1);
             }
+            u64 token_length = (token_data->data - at);
+
+            token.type = TT_String;
+            token.string.count = (u32)token_length;
         }break;
         default:
         {
-            if(token_alphabetical((char)token.string.data[0]))
+            if(token_alphabetical((char)token.string.data[0]) || character == '_')
             {
                 token.type = TT_Identifier;
-
-                byte *at = token.string.data;
-                while((token.string.data) && 
-                      (token_alphabetical((char)token.string.data[0]) || 
-                      (token_numeric((char)token.string.data[0])) ||
-                      (token.string.data[0] == '_') || 
-                      (token.string.data[0] == '.')))
+                while(token_data->count > 0 && 
+                      (token_alphabetical((char)token_data->data[0]) || 
+                       token_numeric((char)token_data->data[0]) ||
+                       token_data->data[0] == '_' || 
+                       token_data->data[0] == '.'))
                 {
-                    c_string_advance_by(&token.string, 1);
+                    c_string_advance_by(token_data, 1);
                 }
 
-                u64 token_length = (token.string.data - at);
-                token.string.count = (u32)token_length;
-                token.string.data  = at;
-
-                c_string_advance_by(token_data, token.string.count);
+                token.string.count = (u32)(token_data->data - token.string.data);
             }
-#if 0
-            else if(token_numeric(token_data->data[0]))
-            {
-            }
-#endif
             else
             {
                 token.type = TT_Invalid;
@@ -281,9 +304,11 @@ get_next_token(string_t *token_data)
     return(token);
 }
 
-internal_api void
+internal_api bool8 
 append_type_enum_token(preprocessor_token_t type_name_token)
-{
+{   
+    bool8 was_found = false;
+
     if(type_name_token.type == TT_Identifier)
     {
         string_t alt_type_name = c_string_concat(&global_context->temporary_arena, type_name_token.string, STR("_t"));
@@ -315,141 +340,202 @@ append_type_enum_token(preprocessor_token_t type_name_token)
 
             c_string_builder_append_data(&state.type_enum_builder, type_name_string);
         }
+        was_found = ID_found;
     }
+
+    return(was_found);
+}
+
+internal_api inline preprocessor_token_t
+peek_next_token(string_t token_data)
+{
+    preprocessor_token_t result = get_next_token(&token_data);
+    return(result);
 }
 
 internal_api void
-append_struct_member_to_definition(preprocessor_token_t member_type, preprocessor_token_t member_name)
+parse_member(preprocessor_token_t structure_name, 
+             preprocessor_token_t type_token, 
+             string_t            *tokenized_data, 
+             string_builder_t    *local_type_info_builder, 
+             string_builder_t    *local_const_definition_builder)
 {
-    char buffer[256];
-    s32 length = sprintf(buffer, "\t\ttype_info_member_t %.*s;\n",
-                         member_name.string.count, C_STR(member_name.string));
+    preprocessor_token_t element_identifier;
+    preprocessor_token_t type_identifier = type_token;
+    for(;;)
+    {
+        preprocessor_token_t token = get_next_token(tokenized_data);
+        switch(token.type)
+        {
+            case TT_Identifier:
+            {
+                bool8 is_constant   = c_string_compare(type_identifier.string, STR("const"));
+                bool8 is_volatile   = c_string_compare(type_identifier.string, STR("volatile"));
+                bool8 is_dynarray   = c_string_compare(type_identifier.string, STR("DynArray_t"));
+                bool8 is_hash_table = c_string_compare(type_identifier.string, STR("HashTable_t"));
 
-    string_t struct_info_string = {
+                // NOTE(Sleepster): If we find a modifier, breakout and advance.
+                if(is_constant || is_volatile)
+                {
+                    // NOTE(Sleepster): If we're in here, there's type qualifiers that we must skip for the true type 
+                    type_identifier = token;
+                    break;
+                }
+                if(is_dynarray)
+                {
+                    char *buffer = c_arena_push_array(&global_context->temporary_arena, char, 256);
+                    s32 length = sprintf(buffer, "DynArray_%.*s", token.string.count, C_STR(token.string));
+                    type_identifier.string = {
+                        .count = (u32)length,
+                        .data = (byte*)buffer,
+                    };
+                }
+                if(is_hash_table)
+                {
+                    char *buffer = c_arena_push_array(&global_context->temporary_arena, char, 256);
+                    s32 length = sprintf(buffer, "HashTable_%.*s", token.string.count, C_STR(token.string));
+                    type_identifier.string = {
+                        .count = (u32)length,
+                        .data = (byte*)buffer,
+                    };
+                }
+
+                // NOTE(Sleepster): If we reach here, this is a name or type, save it as the element_identifier.
+                element_identifier = token;
+            }break;
+            case TT_Semicolon:
+            {
+                append_type_enum_token(type_identifier);
+
+                // NOTE(Sleepster): format the type information 
+                char buffer[8192];
+
+                // NOTE(Sleepster): The most recently found element_identifier is exactly what we need.
+                s32 length = sprintf(buffer, "\t\ttype_info_member_t %.*s;\n", element_identifier.string.count, C_STR(element_identifier.string));
+                string_t test_string = {
+                    .data  = (byte*)buffer,
+                    .count = (u32)length
+                };
+                c_string_builder_append_data(local_type_info_builder, test_string);
+
+                // NOTE(Sleepster): format the const definition information 
+                memset(buffer, 0, sizeof(buffer));
+                length = sprintf(buffer, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .offset = offsetof(%.*s, %.*s), .size = sizeof(%.*s)},\n",
+                                 element_identifier.string.count, C_STR(element_identifier.string),  // initialized name
+                                 element_identifier.string.count, C_STR(element_identifier.string),  // .name
+                                 type_identifier.string.count,    C_STR(type_identifier.string),     // .type
+                                 structure_name.string.count,     C_STR(structure_name.string),      // .offset structure
+                                 element_identifier.string.count, C_STR(element_identifier.string),  // .offset element name
+                                 element_identifier.string.count, C_STR(element_identifier.string)); // .size
+                test_string = {
+                    .data  = (byte*)buffer,
+                    .count = (u32)length
+                };
+                c_string_builder_append_data(local_const_definition_builder, test_string);
+
+
+                return;
+            }break;
+        }
+    }
+}
+
+// NOTE(Sleepster): structure_type_token is for telling us whether this structure is a struct or a union... 
+internal_api preprocessor_token_t 
+parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_token)
+{
+    string_builder_t local_type_info_builder;
+    string_builder_t local_const_definition_builder;
+    c_string_builder_init(&local_type_info_builder, MB(10));
+    c_string_builder_init(&local_const_definition_builder, MB(10));
+
+    // NOTE(Sleepster): Peeking too see if it's an anonymous structure. If it is, just put it inline
+    preprocessor_token_t struct_name_token = peek_next_token(*tokenized_data);
+    if(struct_name_token.type == TT_OpeningBrace)
+    {
+        return(struct_name_token);
+    }
+
+    // NOTE(Sleepster): Build the local version of the struct info 
+    struct_name_token = get_next_token(tokenized_data);
+    char buffer[8192];
+
+    s32 length = sprintf(buffer, "struct type_info_%.*s {\n\tconst char *name;\n\tu32 type\n\tu32 member_count;\n\tstruct members {\n", 
+                         struct_name_token.string.count,    C_STR(struct_name_token.string));
+    string_t test_string = {
         .data  = (byte*)buffer,
         .count = (u32)length
     };
-    c_string_builder_append_data(&state.struct_info_builder, struct_info_string);
-}
+    c_string_builder_append_data(&local_type_info_builder, test_string);
 
-internal_api void
-parse_struct_member(string_t *tokenized_data, bool8 is_pointer, preprocessor_token_t struct_name_token, preprocessor_token_t type_token)
-{
-    preprocessor_token_t last_token = type_token;
-    preprocessor_token_t token = get_next_token(tokenized_data);
-    switch(token.type)
+    // NOTE(Sleepster): Do the same thing for the const definition 
+    memset(buffer, 0, sizeof(buffer));
+
+    length = sprintf(buffer, "const static type_info_%.*s_t type_info_%.*s = {\n\t.name = \"%.*s\",\n\t.type = TYPE_%.*s,\n\t.members = {\n", 
+                     struct_name_token.string.count, C_STR(struct_name_token.string),
+                     struct_name_token.string.count, C_STR(struct_name_token.string),
+                     struct_name_token.string.count, C_STR(struct_name_token.string),
+                     struct_name_token.string.count, C_STR(struct_name_token.string));
+    test_string = {
+        .data  = (byte*)buffer,
+        .count = (u32)length
+    };
+    c_string_builder_append_data(&local_const_definition_builder, test_string);
+
+    // NOTE(Sleepster): Loop until the end of this structure or the file 
+    for(;;)
     {
-        case TT_Asterisk: 
+        preprocessor_token_t token = get_next_token(tokenized_data);
+        switch(token.type)
         {
-            is_pointer = true;
-            parse_struct_member(tokenized_data, is_pointer, struct_name_token, last_token);
-        }break;
-        case TT_Identifier:
-        {
-            if(c_string_compare(type_token.string, STR("const")) ||
-               c_string_compare(type_token.string, STR("static")))
+            case TT_Identifier:
             {
-                type_token = get_next_token(tokenized_data);
-            }
+                // NOTE(Sleepster): If we find a nested structure, parse it.
+                if(c_string_compare(token.string, STR("struct")) ||
+                   c_string_compare(token.string, STR("union")))
+                {
+                    // NOTE(Sleepster): After we return from parse_structure, we've left the TT_Semicolon for the structure, just eat it.
+                    preprocessor_token_t nested_struct_name = parse_structure(tokenized_data, token);
+                    if(nested_struct_name.type != TT_OpeningBrace)
+                    {
+                        char buffer[8192];
 
-            append_type_enum_token(type_token);
-            append_struct_member_to_definition(type_token, token);
-            
-            char buffer[4096];
-            u32 length = sprintf(buffer, "\t\t.%.*s = {\"%.*s\", %s, type_%.*s, offsetof(%.*s, %.*s), sizeof(%.*s)},\n", 
-                                 token.string.count, C_STR(token.string), 
-                                 token.string.count, C_STR(token.string), 
-                                 is_pointer ? "true" : "false",
-                                 type_token.string.count, C_STR(type_token.string),
-                                 struct_name_token.string.count, C_STR(struct_name_token.string),
-                                 token.string.count, C_STR(token.string),
-                                 token.string.count, C_STR(token.string));
-            string_t member_data = {
-                .data  = (byte*)buffer,
-                .count = (u32)length
+                        s32 length = sprintf(buffer, "\t\ttype_info_member_t %.*s;\n", 
+                                             nested_struct_name.string.count, C_STR(nested_struct_name.string));
+                        string_t test_string = {
+                            .data  = (byte*)buffer,
+                            .count = (u32)length
+                        };
+
+                        c_string_builder_append_data(&local_type_info_builder, test_string);
+                    }
+
+                    get_next_token(tokenized_data);
+                    break;
+                }
+
+                // NOTE(Sleepster): Parse the member until the TT_Semicolon 
+                parse_member(struct_name_token, token, tokenized_data, &local_type_info_builder, &local_const_definition_builder);
+            }break;
+            case TT_ClosingBrace:
+            {
+                c_string_builder_append_data(&local_const_definition_builder, STR("\t}\n};\n\n"));
+                c_string_builder_append_data(&local_type_info_builder, STR("\t};\n};\n\n"));
             };
-            c_string_builder_append_data(&state.struct_const_definition_builder, member_data);
-
-            is_pointer = false;
-        }break;
-    }
-}
-
-internal_api s32 
-parse_structure(string_t *tokenized_data, preprocessor_token_t struct_name_token)
-{   
-    s32 member_count = 0;
-
-    preprocessor_token_t token = get_next_token(tokenized_data);
-    if(token.type == TT_OpeningBrace)
-    {
-        char buffer[4096];
-        s32 length = sprintf(buffer, "struct type_info_%.*s_t {\n\tconst char *name;\n\tu32 type;\n\tstruct members {\n", 
-                             struct_name_token.string.count, C_STR(struct_name_token.string));
-        
-        string_t struct_info_string = {
-            .data  = (byte*)buffer,
-            .count = (u32)length
-        };
-        c_string_builder_append_data(&state.struct_info_builder, struct_info_string);
-        ZeroMemory(buffer, sizeof(buffer));
-
-        length = sprintf(buffer, "const static type_info_%.*s_t type_info_%.*s = {\n", 
-                         struct_name_token.string.count, C_STR(struct_name_token.string), 
-                         struct_name_token.string.count, C_STR(struct_name_token.string));
-        string_t struct_const_definition_string = {
-            .data  = (byte*)buffer,
-            .count = (u32)length
-        };
-        c_string_builder_append_data(&state.struct_const_definition_builder, struct_const_definition_string);
-        ZeroMemory(buffer, sizeof(buffer));
-
-        length = sprintf(buffer, "\t\"%.*s\",\n\tTYPE_%.*s,\n", 
-                         struct_name_token.string.count, 
-                         C_STR(struct_name_token.string),
-                         struct_name_token.string.count, 
-                         C_STR(struct_name_token.string));
-        struct_const_definition_string = {
-            .data  = (byte*)buffer,
-            .count = (u32)length
-        };
-        c_string_builder_append_data(&state.struct_const_definition_builder, struct_const_definition_string);
-        ZeroMemory(buffer, sizeof(buffer));
-
-        length = sprintf(buffer, "\t.members = {\n");
-        struct_const_definition_string = {
-            .data  = (byte*)buffer,
-            .count = (u32)length
-        };
-        c_string_builder_append_data(&state.struct_const_definition_builder, struct_const_definition_string);
-        ZeroMemory(buffer, sizeof(buffer));
-
-        for(;;)
-        {
-            token = get_next_token(tokenized_data);
-            if(token.type == TT_ClosingBrace)
+            case TT_EOF:
             {
-                token = get_next_token(tokenized_data);
-                append_type_enum_token(token);
-
-                c_string_builder_append_data(&state.struct_info_builder, STR("\t};\n\tu32 member_count;\n};\n\n"));
-                break;
-            }
-            else
-            {
-                parse_struct_member(tokenized_data, false, struct_name_token, token);
-                ++member_count;
-            }
+                goto end;
+            }break;
         }
-        length = sprintf(buffer, "\t},\n");
-        struct_const_definition_string = {
-            .data  = (byte*)buffer,
-            .count = (u32)length
-        };
-        c_string_builder_append_data(&state.struct_const_definition_builder, struct_const_definition_string);
     }
+end: 
+    string_t type_info_builder_string = c_string_builder_get_current_string(&local_type_info_builder);
+    c_string_builder_append_data(&state.struct_info_builder, type_info_builder_string);
 
-    return(member_count);
+    string_t const_def_builder_string = c_string_builder_get_current_string(&local_const_definition_builder);
+    c_string_builder_append_data(&state.struct_const_definition_builder, const_def_builder_string);
+
+    return(struct_name_token);
 }
 
 int 
@@ -468,7 +554,9 @@ main(int argc, char **argv)
 
     // TODO(Sleepster): feed a directory to this 
     //string_t file_data = c_file_read_entirety(STR("tests/GENERATED_test.h"));
-    string_t file_data = c_file_read_entirety(STR("c_globals.h"));
+    //string_t file_data = c_file_read_entirety(STR("tests/GENERATED_test2.h"));
+    //string_t file_data = c_file_read_entirety(STR("c_globals.h"));
+    string_t file_data = c_file_read_entirety(STR("r_vulkan_types.h"));
     //fprintf(stdout, "%s", C_STR(file_data));
     Assert(file_data.data);
     Assert(file_data.count > 0);
@@ -476,6 +564,11 @@ main(int argc, char **argv)
     // NOTE(Sleepster): Get tokens for file... 
     while(file_data.count > 0)
     {
+        // NOTE(Sleepster): We need to set this loop up so that it works like this:
+        // - Look for the struct / union tag
+        // - If we find it, parse the structure. Inside parse_structure, we need to check each line for a member. 
+        //   If we find a modifier like const or volatile, we need to more forward once
+
         preprocessor_token_t token = get_next_token(&file_data);
         switch(token.type)
         {
@@ -488,20 +581,11 @@ main(int argc, char **argv)
             }break;
             case TT_Identifier:
             {
-                if(c_string_compare(token.string, STR("struct")))
+                if(c_string_compare(token.string, STR("struct")) || 
+                   c_string_compare(token.string, STR("union")))
                 {
-                    token = get_next_token(&file_data);
-                    s32 member_count = parse_structure(&file_data, token);
-                    if(member_count > 0)
-                    {
-                        char buffer[240];
-                        u32 length = sprintf(buffer, "\t%d\n};\n", member_count);
-                        string_t struct_const_definition_string = {
-                            .data  = (byte*)buffer,
-                            .count = (u32)length
-                        };
-                        c_string_builder_append_data(&state.struct_const_definition_builder, struct_const_definition_string);
-                    }
+                    // NOTE(Sleepster): With this, we know this is an item we wish to generate metadata for... 
+                    parse_structure(&file_data, token);
                 }
             }break;
         }
@@ -510,19 +594,18 @@ main(int argc, char **argv)
     // NOTE(Sleepster): Get tokens for file... 
 end:
     c_string_builder_append_data(&state.type_enum_builder, STR("};\n"));
+
     string_t builder_string = c_string_builder_get_current_string(&state.type_enum_builder);
     fprintf(stdout, "%s\n", C_STR(builder_string));
 
-
     builder_string = c_string_builder_get_current_string(&state.struct_info_builder);
-    fprintf(stdout, "%s", C_STR(builder_string));
-    c_string_builder_reset(&state.struct_info_builder);
+    fprintf(stdout, "%s\n", C_STR(builder_string));
+
+    c_string_builder_append_data(&state.struct_const_definition_builder, STR("#endif // GENERATED_PROGRAM_TYPES_H\n"));
 
     builder_string = c_string_builder_get_current_string(&state.struct_const_definition_builder);
     fprintf(stdout, "%s\n", C_STR(builder_string));
-    c_string_builder_reset(&state.struct_const_definition_builder);
 
-    fprintf(stdout, "#endif // GENERATED_PROGRAM_TYPES_H\n\n");
 
     return(0);
 }
