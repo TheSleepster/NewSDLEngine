@@ -104,7 +104,10 @@ sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overl
         flags |= O_NONBLOCK;
     }
 
-    result.handle = open(C_STR(filepath), flags, 0666);
+    char buffer[512];
+    sprintf(buffer, "%.*s", filepath.count, C_STR(filepath));
+
+    result.handle = open(buffer, flags, 0666);
     if(result.handle == -1)
     {
         log_error("Failure to open file '%s' for %s, error: '%s'...\n",

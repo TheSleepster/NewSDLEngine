@@ -127,11 +127,15 @@
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/build/test_preprocessor",
-            "args": [],
             "cwd": "${workspaceFolder}/code",
             "stopOnEntry": false,
-            "terminal": "integrated"
-        },
+            "terminal": "integrated",
+            "stdio": [
+                null,
+                "code/GENERATED_program_types.h",
+                null
+            ]
+        }
     ],
     "compounds": [
         {

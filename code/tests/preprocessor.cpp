@@ -40,6 +40,7 @@
 // - [ ] IGNORE #if 0 blocks
 // - [ ] REALLY JUST HANDLE ANY # BLOCK
 // - [ ] MERGE ALL THE IS_* FLAGS (IS_POINTER, IS_CONSTANT, IS_VOLATILE, ETC.) INTO FLAGS
+// - [ ] GET_STRUCT_INFO() FUNCTION TO SWITCH-CASE ON THE STRUCTURE_TYPE
 
 #if 0
 struct type_info_internal_members_t {
@@ -110,7 +111,7 @@ typedef struct preprocessor_state
     string_builder_t  struct_const_definition_builder;
     string_builder_t  type_enum_builder;
 
-    DynArray_t(u64)   type_ids;
+    DynArray_t(u64)      type_ids;
 }preprocessor_state_t;
 static preprocessor_state_t state = {};
 
@@ -369,10 +370,10 @@ parse_member(preprocessor_token_t structure_name,
         {
             case TT_Identifier:
             {
-                bool8 is_constant   = c_string_compare(type_identifier.string, STR("const"));
-                bool8 is_volatile   = c_string_compare(type_identifier.string, STR("volatile"));
-                bool8 is_dynarray   = c_string_compare(type_identifier.string, STR("DynArray_t"));
-                bool8 is_hash_table = c_string_compare(type_identifier.string, STR("HashTable_t"));
+                bool8 is_constant         = c_string_compare(type_identifier.string, STR("const"));
+                bool8 is_volatile         = c_string_compare(type_identifier.string, STR("volatile"));
+                bool8 is_dynarray         = c_string_compare(type_identifier.string, STR("DynArray_t"));
+                bool8 is_hash_table       = c_string_compare(type_identifier.string, STR("HashTable_t"));
 
                 // NOTE(Sleepster): If we find a modifier, breakout and advance.
                 if(is_constant || is_volatile)
@@ -426,7 +427,7 @@ parse_member(preprocessor_token_t structure_name,
                                  type_identifier.string.count,    C_STR(type_identifier.string),     // .type
                                  structure_name.string.count,     C_STR(structure_name.string),      // .offset structure
                                  element_identifier.string.count, C_STR(element_identifier.string),  // .offset element name
-                                 element_identifier.string.count, C_STR(element_identifier.string)); // .size
+                                 type_identifier.string.count,    C_STR(type_identifier.string)); // .size
                 test_string = {
                     .data  = (byte*)buffer,
                     .count = (u32)length
@@ -449,19 +450,28 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
     c_string_builder_init(&local_type_info_builder, MB(10));
     c_string_builder_init(&local_const_definition_builder, MB(10));
 
+
     // NOTE(Sleepster): Peeking too see if it's an anonymous structure. If it is, just put it inline
     preprocessor_token_t struct_name_token = peek_next_token(*tokenized_data);
     if(struct_name_token.type == TT_OpeningBrace)
     {
         return(struct_name_token);
     }
+    append_type_enum_token(struct_name_token);
+    struct_name_token = get_next_token(tokenized_data);
+
+    // NOTE(Sleepster): This checks if it's simply a struct declaration. If it is, we're out.
+    preprocessor_token_t struct_declaration = peek_next_token(*tokenized_data);
+    if(struct_declaration.type != TT_OpeningBrace) 
+    {
+        return(struct_name_token);
+    }
 
     // NOTE(Sleepster): Build the local version of the struct info 
-    struct_name_token = get_next_token(tokenized_data);
     char buffer[8192];
 
-    s32 length = sprintf(buffer, "struct type_info_%.*s {\n\tconst char *name;\n\tu32 type\n\tu32 member_count;\n\tstruct members {\n", 
-                         struct_name_token.string.count,    C_STR(struct_name_token.string));
+    s32 length = sprintf(buffer, "struct type_info_%.*s {\n\tconst char *name;\n\tu32 type;\n\tu32 member_count;\n\tstruct members {\n", 
+                         struct_name_token.string.count, C_STR(struct_name_token.string));
     string_t test_string = {
         .data  = (byte*)buffer,
         .count = (u32)length
@@ -471,7 +481,7 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
     // NOTE(Sleepster): Do the same thing for the const definition 
     memset(buffer, 0, sizeof(buffer));
 
-    length = sprintf(buffer, "const static type_info_%.*s_t type_info_%.*s = {\n\t.name = \"%.*s\",\n\t.type = TYPE_%.*s,\n\t.members = {\n", 
+    length = sprintf(buffer, "const static type_info_%.*s type_info_%.*s = {\n\t.name = \"%.*s\",\n\t.type = TYPE_%.*s,\n\t.members = {\n", 
                      struct_name_token.string.count, C_STR(struct_name_token.string),
                      struct_name_token.string.count, C_STR(struct_name_token.string),
                      struct_name_token.string.count, C_STR(struct_name_token.string),
@@ -520,7 +530,7 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
             case TT_ClosingBrace:
             {
                 c_string_builder_append_data(&local_const_definition_builder, STR("\t}\n};\n\n"));
-                c_string_builder_append_data(&local_type_info_builder, STR("\t};\n};\n\n"));
+                c_string_builder_append_data(&local_type_info_builder, STR("\t}members;\n};\n\n"));
             };
             case TT_EOF:
             {
@@ -538,26 +548,18 @@ end:
     return(struct_name_token);
 }
 
-int 
-main(int argc, char **argv)
+VISIT_FILES(generate_file_metadata)
 {
-    c_global_context_init();
+    string_t filename = visit_file_data->filename;
+    string_t file_ext = c_string_get_file_ext_from_path(filename);
+    if(!c_string_compare(file_ext, STR(".h")))
+    {
+        return;
+    }
+    if(c_string_compare(filename, STR("preprocessor_type_data.h"))) return;
+    if(c_string_compare(filename, STR("GENERATED_program_types.h"))) return;
 
-    c_string_builder_init(&state.type_enum_builder,               MB(200));
-    c_string_builder_init(&state.struct_const_definition_builder, MB(200));
-    c_string_builder_init(&state.struct_info_builder,             MB(200));
-    state.type_ids = c_dynarray_create(u64);
-
-    c_string_builder_append_data(&state.type_enum_builder, STR("// THIS IS GENERATED BY THE PREPROCESSOR\n// THIS IS THE RTTI FOR THE ENTIRE PROGRAM\n\n"));
-    c_string_builder_append_data(&state.type_enum_builder, STR("#ifndef GENERATED_PROGRAM_TYPES_H\n#define GENERATED_PROGRAM_TYPES_H\n\n"));
-    c_string_builder_append_data(&state.type_enum_builder, STR("enum GENERATED_program_types_t {\n"));
-
-    // TODO(Sleepster): feed a directory to this 
-    //string_t file_data = c_file_read_entirety(STR("tests/GENERATED_test.h"));
-    //string_t file_data = c_file_read_entirety(STR("tests/GENERATED_test2.h"));
-    //string_t file_data = c_file_read_entirety(STR("c_globals.h"));
-    string_t file_data = c_file_read_entirety(STR("r_vulkan_types.h"));
-    //fprintf(stdout, "%s", C_STR(file_data));
+    string_t file_data = c_file_read_entirety(filename);
     Assert(file_data.data);
     Assert(file_data.count > 0);
 
@@ -572,13 +574,6 @@ main(int argc, char **argv)
         preprocessor_token_t token = get_next_token(&file_data);
         switch(token.type)
         {
-            case TT_Invalid:
-            {
-            }break;
-            case TT_EOF:
-            {
-                goto end;
-            }break;
             case TT_Identifier:
             {
                 if(c_string_compare(token.string, STR("struct")) || 
@@ -588,11 +583,80 @@ main(int argc, char **argv)
                     parse_structure(&file_data, token);
                 }
             }break;
+            case TT_Invalid:
+            {
+            }break;
+            case TT_EOF:
+            {
+                goto end;
+            }break;
         }
-        c_global_context_reset_temporary_data();
     }
-    // NOTE(Sleepster): Get tokens for file... 
 end:
+    c_global_context_reset_temporary_data();
+}
+
+int 
+main(int argc, char **argv)
+{
+    c_global_context_init();
+
+    c_string_builder_init(&state.type_enum_builder,               MB(200));
+    c_string_builder_init(&state.struct_const_definition_builder, MB(200));
+    c_string_builder_init(&state.struct_info_builder,             MB(200));
+    state.type_ids = c_dynarray_create(u64);
+
+    c_string_builder_append_data(&state.type_enum_builder, STR("// THIS IS GENERATED BY THE PREPROCESSOR\n// THIS IS THE RTTI FOR THE ENTIRE PROGRAM\n\n"));
+    c_string_builder_append_data(&state.type_enum_builder, STR("#ifndef GENERATED_PROGRAM_TYPES_H\n#define GENERATED_PROGRAM_TYPES_H\n\n#include <preprocessor_type_data.h>\n\n"));
+    c_string_builder_append_data(&state.type_enum_builder, STR("enum GENERATED_program_types_t {\n"));
+
+    // TODO(Sleepster): feed a directory to this 
+    //string_t file_data = c_file_read_entirety(STR("tests/GENERATED_test.h"));
+    //string_t file_data = c_file_read_entirety(STR("tests/GENERATED_test2.h"));
+    //string_t file_data = c_file_read_entirety(STR("c_globals.h"));
+    //fprintf(stdout, "%s", C_STR(file_data));
+
+#if 0
+    visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
+    c_directory_visit(STR("../code"), &visit_info);
+#else
+    string_t file_data = c_file_read_entirety(STR("c_globals.h"));
+    Assert(file_data.data);
+    Assert(file_data.count > 0);
+
+    // NOTE(Sleepster): Get tokens for file... 
+    while(file_data.count > 0)
+    {
+        // NOTE(Sleepster): We need to set this loop up so that it works like this:
+        // - Look for the struct / union tag
+        // - If we find it, parse the structure. Inside parse_structure, we need to check each line for a member. 
+        //   If we find a modifier like const or volatile, we need to more forward once
+
+        preprocessor_token_t token = get_next_token(&file_data);
+        switch(token.type)
+        {
+            case TT_Identifier:
+            {
+                if(c_string_compare(token.string, STR("struct")) || 
+                   c_string_compare(token.string, STR("union")))
+                {
+                    // NOTE(Sleepster): With this, we know this is an item we wish to generate metadata for... 
+                    parse_structure(&file_data, token);
+                }
+            }break;
+            case TT_Invalid:
+            {
+            }break;
+            case TT_EOF:
+            {
+                goto end;
+            }break;
+        }
+    }
+end:
+    c_global_context_reset_temporary_data();
+#endif
+    
     c_string_builder_append_data(&state.type_enum_builder, STR("};\n"));
 
     string_t builder_string = c_string_builder_get_current_string(&state.type_enum_builder);

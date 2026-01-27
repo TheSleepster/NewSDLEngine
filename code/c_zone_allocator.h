@@ -38,10 +38,10 @@ typedef enum za_allocation_tag
 
 typedef struct zone_allocator_block
 {
-    u32                          block_id;
-    bool8                        is_allocated;
-    u64                          block_size;
-    u64                          allocation_tag;
+    u32                   block_id;
+    bool8                 is_allocated;
+    u64                   block_size;
+    u64                   allocation_tag;
 
     struct zone_allocator_block *next_block;
     struct zone_allocator_block *prev_block;
@@ -49,9 +49,9 @@ typedef struct zone_allocator_block
 
 typedef struct zone_allocator
 {
-    sys_mutex_t             mutex;
-    u64                     capacity;
-    u8                     *base;
+    sys_mutex_t            mutex;
+    u64                    capacity;
+    u8                    *base;
 
     zone_allocator_block_t  first_block;
     zone_allocator_block_t *cursor;

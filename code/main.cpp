@@ -17,6 +17,7 @@
 #include <c_threadpool.h>
 #include <c_log.h>
 #include <c_globals.h>
+#include <c_zone_allocator.h>
 #include <p_platform_data.h>
 
 #include <r_vulkan_types.h>
@@ -28,6 +29,8 @@
 #include <s_asset_manager.h>
 #include <g_game_state.h>
 #include <g_entity.h>
+
+//#include <GENERATED_program_types.h>
 
 internal_api void
 c_process_window_events(SDL_Window *window, vulkan_render_context_t *render_context, input_manager_t *input_manager)
