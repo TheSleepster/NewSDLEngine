@@ -84,5 +84,7 @@ void            sys_mutex_free(sys_mutex_t *mutex);
 bool8           sys_mutex_lock(sys_mutex_t *mutex, bool8 should_block);
 bool8           sys_mutex_unlock(sys_mutex_t *mutex);
 
+typedef struct sockaddr_in sockaddr_in_t;
+
 #endif // P_PLATFORM_DATA_H
 

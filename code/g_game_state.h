@@ -49,7 +49,7 @@ struct game_state_t
 
     bool8              is_host;
     s32                socket;
-    struct sockaddr_in host_address_data;
+    sockaddr_in_t      host_address_data;
 
     u32                client_id;
     client_data_t      clients[4];

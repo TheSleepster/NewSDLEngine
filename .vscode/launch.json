@@ -132,7 +132,7 @@
             "terminal": "integrated",
             "stdio": [
                 null,
-                "code/GENERATED_program_types.h",
+                "code/GENERATED/GENERATED_program_types.h",
                 null
             ]
         }

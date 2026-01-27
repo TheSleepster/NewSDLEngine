@@ -369,6 +369,7 @@ parse_member(preprocessor_token_t structure_name,
              string_t            *tokenized_data, 
              string_builder_t    *local_type_info_builder, 
              string_builder_t    *local_const_definition_builder,
+             string_builder_t    *struct_member_builder,
              bool8                c_style_struct)
 {
     preprocessor_token_t element_identifier;
@@ -443,19 +444,18 @@ parse_member(preprocessor_token_t structure_name,
 
                 // NOTE(Sleepster): format the const definition information 
                 memset(buffer, 0, sizeof(buffer));
-                length = sprintf(buffer, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .offset = offsetof(%.*s, %.*s), .size = sizeof(((%.*s*)0)->%.*s)},\n",
+                length = sprintf(buffer, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .offset = offsetof(%.*s, %.*s), .size = sizeof(%.*s)},\n",
                                  element_identifier.string.count,   C_STR(element_identifier.string),    // initialized name
                                  element_identifier.string.count,   C_STR(element_identifier.string),    // .name
                                  type_identifier.string.count,      C_STR(type_identifier.string),       // .type
                                  structure_name.string.count,       C_STR(structure_name.string),        // .offset structure
                                  element_identifier.string.count,   C_STR(element_identifier.string),    // .offset element name
-                                 structure_name.string.count,       C_STR(structure_name.string),        // .offset structure
-                                 element_identifier.string.count,   C_STR(element_identifier.string)); // .size
+                                 type_identifier_COPY.string.count, C_STR(type_identifier_COPY.string)); // .size
                 test_string = {
                     .data  = (byte*)buffer,
                     .count = (u32)length
                 };
-                c_string_builder_append_data(local_const_definition_builder, test_string);
+                c_string_builder_append_data(struct_member_builder, test_string);
 
 
                 return;
@@ -470,8 +470,13 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
 {
     string_builder_t local_type_info_builder;
     string_builder_t local_const_definition_builder;
+    string_builder_t struct_member_builder_t;
+
+    u32 member_count = 0;
+
     c_string_builder_init(&local_type_info_builder, MB(10));
     c_string_builder_init(&local_const_definition_builder, MB(10));
+    c_string_builder_init(&struct_member_builder_t, MB(10));
 
     // NOTE(Sleepster): Peeking too see if it's an anonymous structure. If it is, just put it inline
     preprocessor_token_t struct_name_token = peek_next_token(*tokenized_data);
@@ -512,7 +517,7 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
     // NOTE(Sleepster): Do the same thing for the const definition 
     memset(buffer, 0, sizeof(buffer));
 
-    length = sprintf(buffer, "const static type_info_%.*s type_info_%.*s = {\n\t.name = \"%.*s\",\n\t.type = TYPE_%.*s,\n\t.members = {\n", 
+    length = sprintf(buffer, "const static type_info_%.*s type_info_%.*s = {\n\t.name = \"%.*s\",\n\t.type = TYPE_%.*s,\n", 
                      struct_name_token.string.count, C_STR(struct_name_token.string),
                      struct_name_token.string.count, C_STR(struct_name_token.string),
                      struct_name_token.string.count, C_STR(struct_name_token.string),
@@ -585,11 +590,31 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
                 }
 
                 // NOTE(Sleepster): Parse the member until the TT_Semicolon 
-                parse_member(struct_name_token, token, tokenized_data, &local_type_info_builder, &local_const_definition_builder, c_style_struct);
+                parse_member(struct_name_token, 
+                             token, 
+                             tokenized_data, 
+                             &local_type_info_builder, 
+                             &local_const_definition_builder, 
+                             &struct_member_builder_t, 
+                             c_style_struct);
+
                 c_style_struct = false;
+                member_count++;
             }break;
             case TT_ClosingBrace:
             {
+                ZeroMemory(buffer, sizeof(buffer));
+
+                length = sprintf(buffer, "\t.member_count = %d,\n\t.members = {\n", member_count); 
+                test_string = {
+                    .data  = (byte*)buffer,
+                    .count = (u32)length
+                };
+                c_string_builder_append_data(&local_const_definition_builder, test_string);
+
+                string_t member_string = c_string_builder_get_current_string(&struct_member_builder_t);
+                c_string_builder_append_data(&local_const_definition_builder, member_string);
+
                 c_string_builder_append_data(&local_const_definition_builder, STR("\t}\n};\n\n"));
                 c_string_builder_append_data(&local_type_info_builder, STR("\t}members;\n};\n\n"));
             };
@@ -687,7 +712,7 @@ main(int argc, char **argv)
     //string_t file_data = c_file_read_entirety(STR("c_globals.h"));
     //fprintf(stdout, "%s", C_STR(file_data));
 
-#if 1 
+#if 0
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else
