@@ -34,8 +34,10 @@ typedef struct test_element_typedeffed
 {
     u32 oranges;
     u32 internal_data[128];
-    struct internal_members {
+    u32 internal_after_array;
+    struct orchard_data {
         u32 apples;
+        u32 plums;
     };
 
     union citrus {

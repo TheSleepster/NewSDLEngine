@@ -31,8 +31,7 @@ struct packet_t
     u32 magic_value = htonl(cv_packet_magic_value);
     u32 type;
     u32 client_id;
-    union 
-    {
+    union {
         input_data_t input_data;
     }payload;
 };

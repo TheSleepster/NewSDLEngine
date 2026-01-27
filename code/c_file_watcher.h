@@ -26,7 +26,7 @@ typedef struct file_watcher                 file_watcher_t;
 typedef struct file_watcher_recorded_change file_watcher_recorded_change_t;
 
 #define FILE_WATCHER_CALLBACK(name) void name(file_watcher_t *watcher, file_watcher_recorded_change_t *change, void *user_data)
-typedef FILE_WATCHER_CALLBACK(file_watcher_callback_t);
+typedef FILE_WATCHER_CALLBACK(file_watcher_callback_pfn_t);
 
 typedef enum file_watcher_change_event
 {
@@ -58,7 +58,7 @@ typedef struct file_watcher
     // NOTE(Sleepster): this has an arena mainly for copy string.
     memory_arena_t                 watcher_arena;
     
-    file_watcher_callback_t       *callback;
+    file_watcher_callback_pfn_t   *callback;
     file_watcher_change_event_t    events_to_monitor;
     void                          *user_data;
 
@@ -78,7 +78,7 @@ typedef struct file_watcher
 /*===========================================
   ============ API DEFINITIONS ==============
   ===========================================*/
-file_watcher_t  c_file_watcher_create(file_watcher_change_event_t events_to_monitor, bool8 recursive, file_watcher_callback_t *callback, void *user_data, bool8 verbose);
+file_watcher_t  c_file_watcher_create(file_watcher_change_event_t events_to_monitor, bool8 recursive, file_watcher_callback_pfn_t *callback, void *user_data, bool8 verbose);
 void            c_file_watcher_add_path(file_watcher_t *watcher, string_t filepath);
 void            c_file_watcher_issue_check_for_single_path(file_watcher_t *watcher, sys_file_check_event_data_t *watch_data);
 void            c_file_watcher_issue_check_over_all_paths(file_watcher_t *watcher);

@@ -47,7 +47,7 @@ typedef struct global_matrix_uniforms
 {
     mat4_t view_matrix;
     mat4_t projection_matrix;
-}global_matrix_uniforms;
+}global_matrix_uniforms_t;
 
 typedef struct push_constant
 {
@@ -279,7 +279,7 @@ typedef struct vulkan_shader_data
     vulkan_pipeline_data_t              pipeline;
 
     // TODO(Sleepster): TEMPORARY 
-    global_matrix_uniforms camera_matrices;
+    global_matrix_uniforms_t camera_matrices;
 }vulkan_shader_data_t;
 
 //////////////////////////////////
@@ -315,7 +315,7 @@ typedef struct vulkan_physical_device_requirements
     const char **required_extensions;
 }vulkan_physical_device_requirements_t;
 
-typedef struct vulkan_physical_device_data
+typedef struct vulkan_physical_device
 {
     VkPhysicalDevice                                handle;
     VkFormat                                        device_depth_format;
@@ -338,7 +338,6 @@ typedef struct vulkan_rendering_device
     VkQueue                  present_queue;
     VkQueue                  transfer_queue;
     VkQueue                  compute_queue;
-
     VkCommandPool            graphics_command_pool;
 
     VkDevice                 logical_device;

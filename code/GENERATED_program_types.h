@@ -7,18 +7,1335 @@
 #include <preprocessor_type_data.h>
 
 enum GENERATED_program_types_t {
-	TYPE_vec2,
-	TYPE_global_context,
+	TYPE_zone_allocator_block_t,
+	TYPE_u32,
 	TYPE_bool8,
+	TYPE_u64,
+	TYPE_zone_allocator_t,
+	TYPE_sys_mutex_t,
+	TYPE_u8,
+	TYPE_vulkan_shader_data_t,
+	TYPE_vulkan_texture_t,
+	TYPE_asset_manager_t,
+	TYPE_asset_slot_t,
+	TYPE_subtexture_data_t,
+	TYPE_texture_atlas_t,
+	TYPE_jfd_package_entry_t,
+	TYPE_jfd_file_header_t,
+	TYPE_asset_handle_t,
+	TYPE_bool32,
+	TYPE_asset_type_t,
+	TYPE_s32,
+	TYPE_bitmap_t,
+	TYPE_string_t,
+	TYPE_texture2D_t,
+	TYPE_vec2_t,
+	TYPE_shader_t,
+	TYPE_vulkan_shader_uniform_data_t,
+	TYPE_material_t,
+	TYPE_render_pipeline_state_t,
+	TYPE_asset_slot_load_status_t,
+	TYPE_file_t,
+	TYPE_asset_manager_asset_file_data_t,
 	TYPE_memory_arena_t,
+	TYPE_asset_catalog_t,
+	TYPE_texture_atlas_registry_t,
+	TYPE_vulkan_render_context_t,
+	TYPE_entity_t,
+	TYPE_entity_manager_t,
+	TYPE_game_state_t,
+	TYPE_input_data_t,
+	TYPE_packet_t,
+	TYPE_mapped_file_t,
+	TYPE_file_data_t,
+	TYPE_file_watcher_t,
+	TYPE_visit_file_data_t,
+	TYPE_sys_thread_t,
+	TYPE_sys_thread_handle_t,
+	TYPE_void,
+	TYPE_sys_mutex_handle_t,
+	TYPE_sys_semaphore_t,
+	TYPE_sys_semaphore_handle_t,
+	TYPE_byte,
+	TYPE_string_builder_buffer_t,
+	TYPE_string_builder_t,
+	TYPE_program_flag_data_t,
+	TYPE_float32,
+	TYPE_char,
+	TYPE_program_flag_t,
+	TYPE_arg_type_t,
+	TYPE_program_flag_state_t,
+	TYPE_dynarray_header_t,
+	TYPE_memory_arena_footer_t,
+	TYPE_scratch_arena_t,
+	TYPE_sys_handle_t,
+	TYPE_overlap_io_data_t,
+	TYPE_visit_files_pfn_t,
+	TYPE_action_button_t,
+	TYPE_keyboard_controller_data_t,
+	TYPE_analog_button_t,
+	TYPE_s16,
+	TYPE_gamepad_controller_data_t,
+	TYPE_SDL_Gamepad,
+	TYPE_SDL_Joystick,
+	TYPE_input_controller_t,
+	TYPE_controller_type_t,
+	TYPE_game_action_binding_t,
+	TYPE_game_action_t,
+	TYPE_input_manager_t,
+	TYPE_file_watcher_recorded_change_t,
+	TYPE_file_watcher_callback_pfn_t,
+	TYPE_file_watcher_change_event_t,
+	TYPE_file_watcher_sys_watch_data_t,
+	TYPE_alignas_t,
+	TYPE_global_matrix_uniforms_t,
+	TYPE_mat4_t,
+	TYPE_push_constant_t,
+	TYPE_vec4_t,
+	TYPE_render_camera_t,
+	TYPE_vulkan_buffer_data_t,
+	TYPE_VkBuffer,
+	TYPE_VkDeviceMemory,
+	TYPE_VkBufferUsageFlagBits,
+	TYPE_vulkan_pipeline_data_t,
+	TYPE_VkPipeline,
+	TYPE_VkPipelineBindPoint,
+	TYPE_VkPipelineLayout,
+	TYPE_spv_vulkan_type_map_t,
+	TYPE_SpvReflectDescriptorType,
+	TYPE_VkDescriptorType,
+	TYPE_vulkan_shader_descriptor_set_info_t,
+	TYPE_VkDescriptorSetLayoutBinding,
+	TYPE_VkImageView,
+	TYPE_VkSampler,
+	TYPE_VkDescriptorSet,
+	TYPE_vulkan_shader_uniform_texture_data_t,
+	TYPE_vulkan_shader_uniform_data_range_t,
+	TYPE_vulkan_shader_descriptor_set_binding_type_t,
+	TYPE_vulkan_shader_stage_info_t,
+	TYPE_VkShaderStageFlagBits,
+	TYPE_VkShaderModuleCreateInfo,
+	TYPE_VkPipelineShaderStageCreateInfo,
+	TYPE_VkShaderModule,
+	TYPE_SpvReflectShaderModule,
+	TYPE_VkDescriptorPool,
+	TYPE_VkDescriptorSetLayout,
+	TYPE_VkPushConstantRange,
+	TYPE_vulkan_physical_device_swapchain_support_info_t,
+	TYPE_VkSurfaceCapabilitiesKHR,
+	TYPE_VkSurfaceFormatKHR,
+	TYPE_VkPresentModeKHR,
+	TYPE_vulkan_physical_device_queue_info_t,
+	TYPE_vulkan_physical_device_requirements_t,
+	TYPE_vulkan_physical_device_t,
+	TYPE_VkPhysicalDevice,
+	TYPE_VkFormat,
+	TYPE_VkPhysicalDeviceProperties,
+	TYPE_VkPhysicalDeviceFeatures,
+	TYPE_VkPhysicalDeviceMemoryProperties,
+	TYPE_vulkan_rendering_device_t,
+	TYPE_VkQueue,
+	TYPE_VkCommandPool,
+	TYPE_VkDevice,
+	TYPE_vulkan_fence_t,
+	TYPE_VkFence,
+	TYPE_vulkan_renderpass_data_t,
+	TYPE_VkRenderPass,
+	TYPE_vulkan_renderpass_state_t,
+	TYPE_vulkan_framebuffer_data_t,
+	TYPE_VkFramebuffer,
+	TYPE_vulkan_image_data_t,
+	TYPE_VkImage,
+	TYPE_VkImageLayout,
+	TYPE_vulkan_swapchain_data_t,
+	TYPE_VkSwapchainKHR,
+	TYPE_vulkan_command_buffer_data_t,
+	TYPE_VkCommandBuffer,
+	TYPE_vulkan_command_buffer_state_t,
+	TYPE_vulkan_render_backend_function_data_t,
+	TYPE_vulkan_render_frame_state_t,
+	TYPE_VkSemaphore,
+	TYPE_SDL_Window,
+	TYPE_VkInstance,
+	TYPE_VkAllocationCallbacks,
+	TYPE_VkSurfaceKHR,
+	TYPE_VkDebugUtilsMessengerEXT,
+	TYPE_hash_table_header_t,
+	TYPE_threadpool_queue_entry_t,
+	TYPE_threadpool_callback_t,
+	TYPE_threadpool_queue_t,
 	TYPE_threadpool_t,
+	TYPE_render_geometry_instance_t,
+	TYPE_render_geometry_batch_t,
+	TYPE_render_group_t,
+	TYPE_draw_frame_t,
+	TYPE_render_state_t,
+	TYPE_global_context_t,
+	TYPE_client_data_t,
+	TYPE_sockaddr_storage,
+	TYPE_socklen_t,
+	TYPE_sockaddr_in,
 };
 
-struct type_info_global_context {
+struct type_info_zone_allocator_block_t {
 	const char *name;
 	u32 type;
 	u32 member_count;
-	struct members {
+	struct {
+		type_info_member_t block_id;
+		type_info_member_t is_allocated;
+		type_info_member_t block_size;
+		type_info_member_t allocation_tag;
+		type_info_member_t next_block;
+		type_info_member_t prev_block;
+	}members;
+};
+
+struct type_info_zone_allocator_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t mutex;
+		type_info_member_t capacity;
+		type_info_member_t base;
+		type_info_member_t first_block;
+		type_info_member_t cursor;
+	}members;
+};
+
+struct type_info_asset_handle_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_valid;
+		type_info_member_t type;
+		type_info_member_t owner_asset_file_index;
+		type_info_member_t subtexture_data;
+		type_info_member_t slot;
+	}members;
+};
+
+struct type_info_bitmap_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t width;
+		type_info_member_t height;
+		type_info_member_t channels;
+		type_info_member_t format;
+		type_info_member_t pixels;
+	}members;
+};
+
+struct type_info_texture2D_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t bitmap;
+		type_info_member_t gpu_data;
+	}members;
+};
+
+struct type_info_subtexture_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t uv_min;
+		type_info_member_t uv_max;
+		type_info_member_t offset;
+		type_info_member_t size;
+		type_info_member_t atlas_subtexture_index;
+		type_info_member_t atlas;
+	}members;
+};
+
+struct type_info_texture_atlas_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t texture;
+		type_info_member_t bitmap_data;
+		type_info_member_t ID;
+		type_info_member_t merge_counter;
+		type_info_member_t textures_to_merge;
+		type_info_member_t packed_subtextures;
+		type_info_member_t packed_subtexture_count;
+		type_info_member_t is_valid;
+		type_info_member_t atlas_cursor_x;
+		type_info_member_t atlas_cursor_y;
+		type_info_member_t tallest_y;
+		type_info_member_t atlas_size;
+	}members;
+};
+
+struct type_info_shader_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t ID;
+		type_info_member_t shader_data;
+		type_info_member_t camera_uniform;
+		type_info_member_t texture_uniform;
+	}members;
+};
+
+struct type_info_material_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t ID;
+		type_info_member_t name;
+		type_info_member_t shader;
+		type_info_member_t diffuse_map;
+		type_info_member_t normal_map;
+		type_info_member_t pipeline_state;
+	}members;
+};
+
+struct type_info_asset_slot_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t slot_state;
+		type_info_member_t type;
+		type_info_member_t name;
+		type_info_member_t owner_asset_file;
+		type_info_member_t package_entry;
+		type_info_member_t package_generation;
+		type_info_member_t ref_counter;
+		type_info_member_t texture;
+		type_info_member_t shader;
+		type_info_member_t material;
+	}members;
+};
+
+struct type_info_asset_manager_asset_file_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_initialized;
+		type_info_member_t ID;
+		type_info_member_t init_arena;
+		type_info_member_t load_status;
+		type_info_member_t file_info;
+		type_info_member_t raw_file_data;
+		type_info_member_t package_entries;
+		type_info_member_t package_entry_count;
+		type_info_member_t entry_hash;
+		type_info_member_t header_data;
+	}members;
+};
+
+struct type_info_asset_catalog_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t ID;
+		type_info_member_t catalog_type;
+		type_info_member_t asset_manager;
+		type_info_member_t asset_lookup;
+	}members;
+};
+
+struct type_info_texture_atlas_registry_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t atlases;
+		type_info_member_t current_atlas_count;
+	}members;
+};
+
+struct type_info_asset_manager_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_initialized;
+		type_info_member_t manager_arena;
+		type_info_member_t asset_files;
+		type_info_member_t asset_name_to_file;
+		type_info_member_t loaded_file_count;
+		type_info_member_t asset_load_queue;
+		type_info_member_t asset_unload_queue;
+		type_info_member_t atlas_registry;
+		type_info_member_t asset_allocator;
+		type_info_member_t asset_catalogs;
+		type_info_member_t texture_catalog;
+		type_info_member_t shader_catalog;
+		type_info_member_t render_context;
+	}members;
+};
+
+struct type_info_entity_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t e_type;
+		type_info_member_t e_flags;
+		type_info_member_t owner_client_id;
+		type_info_member_t last_position;
+		type_info_member_t position;
+		type_info_member_t velocity;
+	}members;
+};
+
+struct type_info_entity_manager_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t entities;
+		type_info_member_t active_entities;
+	}members;
+};
+
+struct type_info_packet_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t magic_value;
+		type_info_member_t type;
+		type_info_member_t client_id;
+		type_info_member_t input_data;
+	}members;
+};
+
+struct type_info_sys_thread_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+		type_info_member_t thread_id;
+		type_info_member_t user_data;
+	}members;
+};
+
+struct type_info_sys_mutex_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+	}members;
+};
+
+struct type_info_sys_semaphore_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+	}members;
+};
+
+struct type_info_string_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t data;
+		type_info_member_t count;
+	}members;
+};
+
+struct type_info_string_builder_buffer_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t buffer_data;
+		type_info_member_t bytes_used;
+		type_info_member_t buffer_size;
+		type_info_member_t next_buffer;
+	}members;
+};
+
+struct type_info_string_builder_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_initialized;
+		type_info_member_t arena;
+		type_info_member_t first_buffer;
+		type_info_member_t current_buffer;
+		type_info_member_t default_buffer_block_size;
+		type_info_member_t bytes_used;
+		type_info_member_t total_allocated;
+	}members;
+};
+
+struct type_info_program_flag_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t bool32;
+		type_info_member_t u64;
+		type_info_member_t float32;
+		type_info_member_t string;
+	}members;
+};
+
+struct type_info_program_flag_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_valid;
+		type_info_member_t name;
+		type_info_member_t description;
+		type_info_member_t arg_type;
+		type_info_member_t arg_value;
+		type_info_member_t default_arg_value;
+	}members;
+};
+
+struct type_info_program_flag_state_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t program_flags;
+		type_info_member_t flag_counter;
+	}members;
+};
+
+struct type_info_dynarray_header_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t flags;
+		type_info_member_t size;
+		type_info_member_t capacity;
+		type_info_member_t header_id;
+	}members;
+};
+
+struct type_info_memory_arena_footer_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t last_base;
+		type_info_member_t last_used;
+		type_info_member_t last_block_size;
+	}members;
+};
+
+struct type_info_memory_arena_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_initialized;
+		type_info_member_t base;
+		type_info_member_t used;
+		type_info_member_t block_size;
+		type_info_member_t block_counter;
+		type_info_member_t scratch_arena_count;
+	}members;
+};
+
+struct type_info_scratch_arena_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t parent;
+		type_info_member_t base;
+		type_info_member_t used;
+	}members;
+};
+
+struct type_info_file_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+		type_info_member_t file_name;
+		type_info_member_t filepath;
+		type_info_member_t file_size;
+		type_info_member_t current_read_offset;
+		type_info_member_t current_write_offset;
+		type_info_member_t overlapping;
+		type_info_member_t for_writing;
+	}members;
+};
+
+struct type_info_mapped_file_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t file;
+		type_info_member_t mapping_handle;
+		type_info_member_t mapped_file_data;
+	}members;
+};
+
+struct type_info_file_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t last_modtime;
+		type_info_member_t file_size;
+		type_info_member_t filename;
+		type_info_member_t filepath;
+	}members;
+};
+
+struct type_info_overlap_io_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t offset_to_read;
+		type_info_member_t bytes_to_read;
+		type_info_member_t status;
+		type_info_member_t bytes_transfered;
+		type_info_member_t event_handle;
+	}members;
+};
+
+struct type_info_visit_file_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t function;
+		type_info_member_t user_data;
+		type_info_member_t filename;
+		type_info_member_t fullname;
+		type_info_member_t recursive;
+		type_info_member_t is_directory;
+	}members;
+};
+
+struct type_info_action_button_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_down;
+		type_info_member_t is_released;
+		type_info_member_t is_pressed;
+		type_info_member_t half_transition_counter;
+	}members;
+};
+
+struct type_info_keyboard_controller_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t input;
+		type_info_member_t current_mouse_pos;
+		type_info_member_t last_mouse_pos;
+		type_info_member_t mouse_delta;
+		type_info_member_t is_shift_key_down;
+		type_info_member_t is_control_key_down;
+		type_info_member_t is_alt_key_down;
+	}members;
+};
+
+struct type_info_analog_button_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t deadzone;
+		type_info_member_t value;
+	}members;
+};
+
+struct type_info_gamepad_controller_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t gamepad_data;
+		type_info_member_t stick_data;
+		type_info_member_t gamepad_id;
+		type_info_member_t has_rumble;
+		type_info_member_t rumble_value;
+		type_info_member_t digital_buttons;
+		type_info_member_t analog_buttons;
+	}members;
+};
+
+struct type_info_input_controller_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_valid;
+		type_info_member_t is_analog;
+		type_info_member_t type;
+		type_info_member_t keyboard;
+		type_info_member_t gamepad;
+	}members;
+};
+
+struct type_info_game_action_binding_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t type;
+		type_info_member_t binding_id;
+	}members;
+};
+
+struct type_info_game_action_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t keyboard;
+		type_info_member_t gamepad;
+		type_info_member_t name;
+	}members;
+};
+
+struct type_info_input_manager_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t keyboard_data;
+		type_info_member_t gamepad_data;
+		type_info_member_t primary_controller_index;
+		type_info_member_t active_controller_index;
+		type_info_member_t connected_controller_count;
+		type_info_member_t controllers;
+		type_info_member_t game_actions;
+	}members;
+};
+
+struct type_info_file_watcher_recorded_change_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t full_path;
+		type_info_member_t old_filename;
+		type_info_member_t changes;
+		type_info_member_t last_change_timestamp;
+	}members;
+};
+
+struct type_info_file_watcher_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_valid;
+		type_info_member_t is_verbose;
+		type_info_member_t watcher_arena;
+		type_info_member_t callback;
+		type_info_member_t events_to_monitor;
+		type_info_member_t user_data;
+		type_info_member_t watch_recursively;
+		type_info_member_t observed_changes;
+		type_info_member_t change_count;
+		type_info_member_t paths_to_watch;
+		type_info_member_t paths_watched;
+		type_info_member_t notify_buffer_size;
+		type_info_member_t sys_watch_data;
+		type_info_member_t issues_when_checking;
+	}members;
+};
+
+struct type_info_global_matrix_uniforms_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t view_matrix;
+		type_info_member_t projection_matrix;
+	}members;
+};
+
+struct type_info_push_constant_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t DrawColor;
+	}members;
+};
+
+struct type_info_render_camera_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t view_matrix;
+		type_info_member_t projection_matrix;
+		type_info_member_t ID;
+	}members;
+};
+
+struct type_info_vulkan_buffer_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_valid;
+		type_info_member_t is_mapped;
+		type_info_member_t buffer_size;
+		type_info_member_t handle;
+		type_info_member_t device_memory;
+		type_info_member_t usage_flags;
+		type_info_member_t memory_index;
+		type_info_member_t memory_property_flags;
+	}members;
+};
+
+struct type_info_vulkan_pipeline_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+		type_info_member_t binding;
+		type_info_member_t layout;
+	}members;
+};
+
+struct type_info_render_pipeline_state_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t blend_enabled;
+		type_info_member_t src_color_blend_mode;
+		type_info_member_t dst_color_blend_mode;
+		type_info_member_t src_alpha_blend_mode;
+		type_info_member_t dst_alpha_blend_mode;
+		type_info_member_t color_blend_op;
+		type_info_member_t alpha_blend_op;
+		type_info_member_t depth_testing_enabled;
+		type_info_member_t depth_writing_enabled;
+		type_info_member_t depth_func;
+		type_info_member_t stencil_enabled;
+		type_info_member_t stencil_state;
+		type_info_member_t stencil_keep;
+	}members;
+};
+
+struct type_info_spv_vulkan_type_map_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t spv_type;
+		type_info_member_t vk_type;
+	}members;
+};
+
+struct type_info_vulkan_shader_descriptor_set_info_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_valid;
+		type_info_member_t set_type;
+		type_info_member_t bindings;
+		type_info_member_t binding_count;
+		type_info_member_t binding_upload_size;
+		type_info_member_t image_views;
+		type_info_member_t samplers;
+		type_info_member_t image_count;
+		type_info_member_t sampler_count;
+		type_info_member_t sets;
+		type_info_member_t uniform_buffer;
+		type_info_member_t single_frame_uniform_buffer_size;
+	}members;
+};
+
+struct type_info_vulkan_shader_uniform_texture_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t image_views;
+		type_info_member_t image_samplers;
+		type_info_member_t image_counter;
+	}members;
+};
+
+struct type_info_vulkan_shader_uniform_data_range_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t data;
+		type_info_member_t data_size;
+	}members;
+};
+
+struct type_info_vulkan_shader_uniform_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t owner_shader_id;
+		type_info_member_t uniform_type;
+		type_info_member_t set_type;
+		type_info_member_t uniform_location;
+		type_info_member_t push_constant_index;
+		type_info_member_t name;
+		type_info_member_t uniform_size;
+		type_info_member_t is_texture;
+		type_info_member_t mapped_buffer_update_size;
+		type_info_member_t mapped_uniform_buffer;
+		type_info_member_t storage_buffer;
+	}members;
+};
+
+struct type_info_vulkan_shader_stage_info_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t type;
+		type_info_member_t entry_point;
+		type_info_member_t module_create_info;
+		type_info_member_t shader_stage_create_info;
+		type_info_member_t handle;
+	}members;
+};
+
+struct type_info_vulkan_shader_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t shader_id;
+		type_info_member_t name;
+		type_info_member_t arena;
+		type_info_member_t spv_reflect_module;
+		type_info_member_t stages;
+		type_info_member_t stage_count;
+		type_info_member_t primary_pool;
+		type_info_member_t type_counts;
+		type_info_member_t layouts;
+		type_info_member_t total_descriptor_set_count;
+		type_info_member_t used_descriptor_set_count;
+		type_info_member_t set_info;
+		type_info_member_t push_constant_count;
+		type_info_member_t push_constant_data;
+		type_info_member_t uniforms;
+		type_info_member_t uniform_count;
+		type_info_member_t static_uniforms;
+		type_info_member_t static_uniform_count;
+		type_info_member_t draw_uniforms;
+		type_info_member_t draw_uniform_count;
+		type_info_member_t instance_uniforms;
+		type_info_member_t instance_uniform_count;
+		type_info_member_t pipeline;
+		type_info_member_t camera_matrices;
+	}members;
+};
+
+struct type_info_vulkan_physical_device_swapchain_support_info_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t surface_capabilities;
+		type_info_member_t valid_surface_formats;
+		type_info_member_t valid_present_modes;
+		type_info_member_t valid_surface_format_count;
+		type_info_member_t valid_present_mode_count;
+	}members;
+};
+
+struct type_info_vulkan_physical_device_queue_info_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t graphics_queue_family_index;
+		type_info_member_t present_queue_family_index;
+		type_info_member_t compute_queue_family_index;
+		type_info_member_t transfer_queue_family_index;
+	}members;
+};
+
+struct type_info_vulkan_physical_device_requirements_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t has_graphics_queue;
+		type_info_member_t has_present_queue;
+		type_info_member_t has_transfer_queue;
+		type_info_member_t has_compute_queue;
+		type_info_member_t required_extensions;
+	}members;
+};
+
+struct type_info_vulkan_physical_device_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+		type_info_member_t device_depth_format;
+		type_info_member_t properties;
+		type_info_member_t features;
+		type_info_member_t memory_properties;
+		type_info_member_t swapchain_support_info;
+	}members;
+};
+
+struct type_info_vulkan_rendering_device_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t physical_device;
+		type_info_member_t graphics_queue_family_index;
+		type_info_member_t present_queue_family_index;
+		type_info_member_t compute_queue_family_index;
+		type_info_member_t transfer_queue_family_index;
+		type_info_member_t graphics_queue;
+		type_info_member_t present_queue;
+		type_info_member_t transfer_queue;
+		type_info_member_t compute_queue;
+		type_info_member_t graphics_command_pool;
+		type_info_member_t logical_device;
+	}members;
+};
+
+struct type_info_vulkan_fence_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+		type_info_member_t signaled;
+	}members;
+};
+
+struct type_info_vulkan_renderpass_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+		type_info_member_t offset;
+		type_info_member_t size;
+		type_info_member_t clear_color;
+		type_info_member_t depth_clear;
+		type_info_member_t stencil_clear;
+		type_info_member_t renderpass_state;
+	}members;
+};
+
+struct type_info_vulkan_framebuffer_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+		type_info_member_t renderpass;
+		type_info_member_t attachments;
+		type_info_member_t attachment_count;
+	}members;
+};
+
+struct type_info_vulkan_image_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+		type_info_member_t memory;
+		type_info_member_t format;
+		type_info_member_t layout;
+		type_info_member_t view;
+		type_info_member_t width;
+		type_info_member_t height;
+	}members;
+};
+
+struct type_info_vulkan_texture_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t current_generation;
+		type_info_member_t image_data;
+		type_info_member_t sampler;
+	}members;
+};
+
+struct type_info_vulkan_swapchain_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_valid;
+		type_info_member_t arena;
+		type_info_member_t handle;
+		type_info_member_t image_format;
+		type_info_member_t present_mode;
+		type_info_member_t depth_attachment;
+		type_info_member_t has_depth_attachment;
+		type_info_member_t max_frames_in_flight;
+		type_info_member_t image_count;
+		type_info_member_t framebuffers;
+		type_info_member_t images;
+		type_info_member_t views;
+	}members;
+};
+
+struct type_info_vulkan_command_buffer_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t handle;
+		type_info_member_t owner_pool;
+		type_info_member_t state;
+		type_info_member_t is_primary_buffer;
+		type_info_member_t is_single_use;
+	}members;
+};
+
+struct type_info_vulkan_render_backend_function_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t create_gpu_texture;
+		type_info_member_t create_gpu_shader;
+		type_info_member_t create_gpu_buffer;
+		type_info_member_t destroy_gpu_texture;
+		type_info_member_t destroy_gpu_shader;
+		type_info_member_t destroy_gpu_buffer;
+	}members;
+};
+
+struct type_info_vulkan_render_frame_state_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t image_render_idle_fence;
+		type_info_member_t frame_in_flight_fence_ptr;
+		type_info_member_t image_avaliable_semaphore;
+		type_info_member_t presentation_complete_semaphore;
+		type_info_member_t current_framebuffer;
+		type_info_member_t render_command_buffer;
+		type_info_member_t instanced_rendering_buffer;
+		type_info_member_t bound_shader;
+	}members;
+};
+
+struct type_info_vulkan_render_context_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t initialization_arena;
+		type_info_member_t frame_arena;
+		type_info_member_t permanent_arena;
+		type_info_member_t additional_buffer_count;
+		type_info_member_t window;
+		type_info_member_t window_width;
+		type_info_member_t window_height;
+		type_info_member_t instance;
+		type_info_member_t allocators;
+		type_info_member_t render_surface;
+		type_info_member_t rendering_device;
+		type_info_member_t swapchain;
+		type_info_member_t current_image_index;
+		type_info_member_t current_frame_index;
+		type_info_member_t framebuffer_width;
+		type_info_member_t framebuffer_height;
+		type_info_member_t cached_framebuffer_width;
+		type_info_member_t cached_framebuffer_height;
+		type_info_member_t current_framebuffer_size_generation;
+		type_info_member_t last_framebuffer_size_generation;
+		type_info_member_t recreating_swapchain;
+		type_info_member_t image_render_idle_fences;
+		type_info_member_t frame_in_flight_fence_ptrs;
+		type_info_member_t image_avaliable_semaphores;
+		type_info_member_t presentation_complete_semaphores;
+		type_info_member_t render_command_buffers;
+		type_info_member_t frames;
+		type_info_member_t current_frame;
+		type_info_member_t instanced_rendering_buffer;
+		type_info_member_t index_buffer;
+		type_info_member_t vertex_buffer;
+		type_info_member_t main_renderpass;
+		type_info_member_t default_shader;
+		type_info_member_t default_texture;
+		type_info_member_t invalid_texture_data;
+		type_info_member_t vertex_offset;
+		type_info_member_t geometry_index;
+		type_info_member_t test_camera;
+		type_info_member_t debug_callback;
+	}members;
+};
+
+struct type_info_hash_table_header_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t max_entries;
+		type_info_member_t flags;
+		type_info_member_t current_entry_count;
+		type_info_member_t debug_id;
+	}members;
+};
+
+struct type_info_threadpool_queue_entry_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_valid;
+		type_info_member_t entry_buffer;
+		type_info_member_t user_data;
+		type_info_member_t callback;
+	}members;
+};
+
+struct type_info_threadpool_queue_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t completion_goal;
+		type_info_member_t entries_completed;
+		type_info_member_t next_entry_to_write;
+		type_info_member_t next_entry_to_read;
+		type_info_member_t entries;
+	}members;
+};
+
+struct type_info_threadpool_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_initialized;
+		type_info_member_t semaphore;
+		type_info_member_t threads_awake;
+		type_info_member_t max_threads;
+		type_info_member_t high_priority_queue;
+		type_info_member_t low_priority_queue;
+	}members;
+};
+
+struct type_info_render_geometry_instance_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t transform;
+		type_info_member_t color;
+		type_info_member_t uv_min;
+		type_info_member_t uv_max;
+		type_info_member_t texture_index;
+		type_info_member_t camera_index;
+	}members;
+};
+
+struct type_info_render_geometry_batch_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t camera_data;
+		type_info_member_t is_valid;
+		type_info_member_t primitive_count;
+		type_info_member_t master_array_start_offset;
+		type_info_member_t instances;
+		type_info_member_t next_buffer;
+	}members;
+};
+
+struct type_info_render_group_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t ID;
+		type_info_member_t dynamic_pipeline_state;
+		type_info_member_t shader;
+		type_info_member_t textures;
+		type_info_member_t current_texture_count;
+		type_info_member_t master_batch_array;
+		type_info_member_t total_primitive_count;
+		type_info_member_t cached_buffer;
+		type_info_member_t first_buffer;
+	}members;
+};
+
+struct type_info_draw_frame_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t used_render_groups;
+		type_info_member_t used_render_group_count;
+		type_info_member_t used_camera;
+		type_info_member_t used_camera_count;
+		type_info_member_t cached_camera_ID;
+		type_info_member_t active_render_layer;
+		type_info_member_t active_render_group;
+		type_info_member_t active_camera;
+		type_info_member_t active_shader;
+		type_info_member_t active_pipeline_state;
+	}members;
+};
+
+struct type_info_render_state_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t is_initialized;
+		type_info_member_t renderer_arena;
+		type_info_member_t render_context;
+		type_info_member_t current_frame_data;
+		type_info_member_t render_group_hash;
+		type_info_member_t draw_frame;
+	}members;
+};
+
+struct type_info_global_context_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
 		type_info_member_t is_initialized;
 		type_info_member_t running;
 		type_info_member_t context_arena;
@@ -27,16 +1344,1173 @@ struct type_info_global_context {
 	}members;
 };
 
+struct type_info_input_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t input_axis;
+	}members;
+};
 
-const static type_info_global_context type_info_global_context = {
-	.name = "global_context",
-	.type = TYPE_global_context,
+struct type_info_client_data_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t ID;
+		type_info_member_t connected;
+		type_info_member_t address;
+		type_info_member_t addr_len;
+		type_info_member_t player;
+		type_info_member_t input_data_buffer;
+		type_info_member_t input_data_head;
+		type_info_member_t input_data_tail;
+	}members;
+};
+
+struct type_info_game_state_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t window;
+		type_info_member_t window_size;
+		type_info_member_t input_axis;
+		type_info_member_t entity_manager;
+		type_info_member_t player;
+		type_info_member_t is_host;
+		type_info_member_t socket;
+		type_info_member_t host_address_data;
+		type_info_member_t client_id;
+		type_info_member_t clients;
+		type_info_member_t connected_client_count;
+	}members;
+};
+
+
+const static type_info_zone_allocator_block_t type_info_zone_allocator_block_t = {
+	.name = "zone_allocator_block_t",
+	.type = TYPE_zone_allocator_block_t,
 	.members = {
-		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .offset = offsetof(global_context, is_initialized), .size = sizeof(bool8)},
-		.running = {.name = "running", .type = TYPE_bool8, .offset = offsetof(global_context, running), .size = sizeof(bool8)},
-		.context_arena = {.name = "context_arena", .type = TYPE_memory_arena_t, .offset = offsetof(global_context, context_arena), .size = sizeof(memory_arena_t)},
-		.temporary_arena = {.name = "temporary_arena", .type = TYPE_memory_arena_t, .offset = offsetof(global_context, temporary_arena), .size = sizeof(memory_arena_t)},
-		.main_threadpool = {.name = "main_threadpool", .type = TYPE_threadpool_t, .offset = offsetof(global_context, main_threadpool), .size = sizeof(threadpool_t)},
+		.block_id = {.name = "block_id", .type = TYPE_u32, .offset = offsetof(zone_allocator_block_t, block_id), .size = sizeof(((zone_allocator_block_t*)0)->block_id)},
+		.is_allocated = {.name = "is_allocated", .type = TYPE_bool8, .offset = offsetof(zone_allocator_block_t, is_allocated), .size = sizeof(((zone_allocator_block_t*)0)->is_allocated)},
+		.block_size = {.name = "block_size", .type = TYPE_u64, .offset = offsetof(zone_allocator_block_t, block_size), .size = sizeof(((zone_allocator_block_t*)0)->block_size)},
+		.allocation_tag = {.name = "allocation_tag", .type = TYPE_u64, .offset = offsetof(zone_allocator_block_t, allocation_tag), .size = sizeof(((zone_allocator_block_t*)0)->allocation_tag)},
+		.next_block = {.name = "next_block", .type = TYPE_zone_allocator_block_t, .offset = offsetof(zone_allocator_block_t, next_block), .size = sizeof(((zone_allocator_block_t*)0)->next_block)},
+		.prev_block = {.name = "prev_block", .type = TYPE_zone_allocator_block_t, .offset = offsetof(zone_allocator_block_t, prev_block), .size = sizeof(((zone_allocator_block_t*)0)->prev_block)},
+	}
+};
+
+const static type_info_zone_allocator_t type_info_zone_allocator_t = {
+	.name = "zone_allocator_t",
+	.type = TYPE_zone_allocator_t,
+	.members = {
+		.mutex = {.name = "mutex", .type = TYPE_sys_mutex_t, .offset = offsetof(zone_allocator_t, mutex), .size = sizeof(((zone_allocator_t*)0)->mutex)},
+		.capacity = {.name = "capacity", .type = TYPE_u64, .offset = offsetof(zone_allocator_t, capacity), .size = sizeof(((zone_allocator_t*)0)->capacity)},
+		.base = {.name = "base", .type = TYPE_u8, .offset = offsetof(zone_allocator_t, base), .size = sizeof(((zone_allocator_t*)0)->base)},
+		.first_block = {.name = "first_block", .type = TYPE_zone_allocator_block_t, .offset = offsetof(zone_allocator_t, first_block), .size = sizeof(((zone_allocator_t*)0)->first_block)},
+		.cursor = {.name = "cursor", .type = TYPE_zone_allocator_block_t, .offset = offsetof(zone_allocator_t, cursor), .size = sizeof(((zone_allocator_t*)0)->cursor)},
+	}
+};
+
+const static type_info_asset_handle_t type_info_asset_handle_t = {
+	.name = "asset_handle_t",
+	.type = TYPE_asset_handle_t,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .offset = offsetof(asset_handle_t, is_valid), .size = sizeof(((asset_handle_t*)0)->is_valid)},
+		.type = {.name = "type", .type = TYPE_asset_type_t, .offset = offsetof(asset_handle_t, type), .size = sizeof(((asset_handle_t*)0)->type)},
+		.owner_asset_file_index = {.name = "owner_asset_file_index", .type = TYPE_s32, .offset = offsetof(asset_handle_t, owner_asset_file_index), .size = sizeof(((asset_handle_t*)0)->owner_asset_file_index)},
+		.subtexture_data = {.name = "subtexture_data", .type = TYPE_subtexture_data_t, .offset = offsetof(asset_handle_t, subtexture_data), .size = sizeof(((asset_handle_t*)0)->subtexture_data)},
+		.slot = {.name = "slot", .type = TYPE_asset_slot_t, .offset = offsetof(asset_handle_t, slot), .size = sizeof(((asset_handle_t*)0)->slot)},
+	}
+};
+
+const static type_info_bitmap_t type_info_bitmap_t = {
+	.name = "bitmap_t",
+	.type = TYPE_bitmap_t,
+	.members = {
+		.width = {.name = "width", .type = TYPE_u32, .offset = offsetof(bitmap_t, width), .size = sizeof(((bitmap_t*)0)->width)},
+		.height = {.name = "height", .type = TYPE_u32, .offset = offsetof(bitmap_t, height), .size = sizeof(((bitmap_t*)0)->height)},
+		.channels = {.name = "channels", .type = TYPE_u32, .offset = offsetof(bitmap_t, channels), .size = sizeof(((bitmap_t*)0)->channels)},
+		.format = {.name = "format", .type = TYPE_u32, .offset = offsetof(bitmap_t, format), .size = sizeof(((bitmap_t*)0)->format)},
+		.pixels = {.name = "pixels", .type = TYPE_string_t, .offset = offsetof(bitmap_t, pixels), .size = sizeof(((bitmap_t*)0)->pixels)},
+	}
+};
+
+const static type_info_texture2D_t type_info_texture2D_t = {
+	.name = "texture2D_t",
+	.type = TYPE_texture2D_t,
+	.members = {
+		.bitmap = {.name = "bitmap", .type = TYPE_bitmap_t, .offset = offsetof(texture2D_t, bitmap), .size = sizeof(((texture2D_t*)0)->bitmap)},
+		.gpu_data = {.name = "gpu_data", .type = TYPE_vulkan_texture_t, .offset = offsetof(texture2D_t, gpu_data), .size = sizeof(((texture2D_t*)0)->gpu_data)},
+	}
+};
+
+const static type_info_subtexture_data_t type_info_subtexture_data_t = {
+	.name = "subtexture_data_t",
+	.type = TYPE_subtexture_data_t,
+	.members = {
+		.uv_min = {.name = "uv_min", .type = TYPE_vec2_t, .offset = offsetof(subtexture_data_t, uv_min), .size = sizeof(((subtexture_data_t*)0)->uv_min)},
+		.uv_max = {.name = "uv_max", .type = TYPE_vec2_t, .offset = offsetof(subtexture_data_t, uv_max), .size = sizeof(((subtexture_data_t*)0)->uv_max)},
+		.offset = {.name = "offset", .type = TYPE_vec2_t, .offset = offsetof(subtexture_data_t, offset), .size = sizeof(((subtexture_data_t*)0)->offset)},
+		.size = {.name = "size", .type = TYPE_vec2_t, .offset = offsetof(subtexture_data_t, size), .size = sizeof(((subtexture_data_t*)0)->size)},
+		.atlas_subtexture_index = {.name = "atlas_subtexture_index", .type = TYPE_u32, .offset = offsetof(subtexture_data_t, atlas_subtexture_index), .size = sizeof(((subtexture_data_t*)0)->atlas_subtexture_index)},
+		.atlas = {.name = "atlas", .type = TYPE_texture_atlas_t, .offset = offsetof(subtexture_data_t, atlas), .size = sizeof(((subtexture_data_t*)0)->atlas)},
+	}
+};
+
+const static type_info_texture_atlas_t type_info_texture_atlas_t = {
+	.name = "texture_atlas_t",
+	.type = TYPE_texture_atlas_t,
+	.members = {
+		.texture = {.name = "texture", .type = TYPE_texture2D_t, .offset = offsetof(texture_atlas_t, texture), .size = sizeof(((texture_atlas_t*)0)->texture)},
+		.bitmap_data = {.name = "bitmap_data", .type = TYPE_bitmap_t, .offset = offsetof(texture_atlas_t, bitmap_data), .size = sizeof(((texture_atlas_t*)0)->bitmap_data)},
+		.ID = {.name = "ID", .type = TYPE_u32, .offset = offsetof(texture_atlas_t, ID), .size = sizeof(((texture_atlas_t*)0)->ID)},
+		.merge_counter = {.name = "merge_counter", .type = TYPE_u32, .offset = offsetof(texture_atlas_t, merge_counter), .size = sizeof(((texture_atlas_t*)0)->merge_counter)},
+		.textures_to_merge = {.name = "textures_to_merge", .type = TYPE_asset_handle_t, .offset = offsetof(texture_atlas_t, textures_to_merge), .size = sizeof(((texture_atlas_t*)0)->textures_to_merge)},
+		.packed_subtextures = {.name = "packed_subtextures", .type = TYPE_subtexture_data_t, .offset = offsetof(texture_atlas_t, packed_subtextures), .size = sizeof(((texture_atlas_t*)0)->packed_subtextures)},
+		.packed_subtexture_count = {.name = "packed_subtexture_count", .type = TYPE_u32, .offset = offsetof(texture_atlas_t, packed_subtexture_count), .size = sizeof(((texture_atlas_t*)0)->packed_subtexture_count)},
+		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .offset = offsetof(texture_atlas_t, is_valid), .size = sizeof(((texture_atlas_t*)0)->is_valid)},
+		.atlas_cursor_x = {.name = "atlas_cursor_x", .type = TYPE_u32, .offset = offsetof(texture_atlas_t, atlas_cursor_x), .size = sizeof(((texture_atlas_t*)0)->atlas_cursor_x)},
+		.atlas_cursor_y = {.name = "atlas_cursor_y", .type = TYPE_u32, .offset = offsetof(texture_atlas_t, atlas_cursor_y), .size = sizeof(((texture_atlas_t*)0)->atlas_cursor_y)},
+		.tallest_y = {.name = "tallest_y", .type = TYPE_u32, .offset = offsetof(texture_atlas_t, tallest_y), .size = sizeof(((texture_atlas_t*)0)->tallest_y)},
+		.atlas_size = {.name = "atlas_size", .type = TYPE_u32, .offset = offsetof(texture_atlas_t, atlas_size), .size = sizeof(((texture_atlas_t*)0)->atlas_size)},
+	}
+};
+
+const static type_info_shader_t type_info_shader_t = {
+	.name = "shader_t",
+	.type = TYPE_shader_t,
+	.members = {
+		.ID = {.name = "ID", .type = TYPE_u32, .offset = offsetof(shader_t, ID), .size = sizeof(((shader_t*)0)->ID)},
+		.shader_data = {.name = "shader_data", .type = TYPE_vulkan_shader_data_t, .offset = offsetof(shader_t, shader_data), .size = sizeof(((shader_t*)0)->shader_data)},
+		.camera_uniform = {.name = "camera_uniform", .type = TYPE_vulkan_shader_uniform_data_t, .offset = offsetof(shader_t, camera_uniform), .size = sizeof(((shader_t*)0)->camera_uniform)},
+		.texture_uniform = {.name = "texture_uniform", .type = TYPE_vulkan_shader_uniform_data_t, .offset = offsetof(shader_t, texture_uniform), .size = sizeof(((shader_t*)0)->texture_uniform)},
+	}
+};
+
+const static type_info_material_t type_info_material_t = {
+	.name = "material_t",
+	.type = TYPE_material_t,
+	.members = {
+		.ID = {.name = "ID", .type = TYPE_u64, .offset = offsetof(material_t, ID), .size = sizeof(((material_t*)0)->ID)},
+		.name = {.name = "name", .type = TYPE_string_t, .offset = offsetof(material_t, name), .size = sizeof(((material_t*)0)->name)},
+		.shader = {.name = "shader", .type = TYPE_shader_t, .offset = offsetof(material_t, shader), .size = sizeof(((material_t*)0)->shader)},
+		.diffuse_map = {.name = "diffuse_map", .type = TYPE_texture2D_t, .offset = offsetof(material_t, diffuse_map), .size = sizeof(((material_t*)0)->diffuse_map)},
+		.normal_map = {.name = "normal_map", .type = TYPE_texture2D_t, .offset = offsetof(material_t, normal_map), .size = sizeof(((material_t*)0)->normal_map)},
+		.pipeline_state = {.name = "pipeline_state", .type = TYPE_render_pipeline_state_t, .offset = offsetof(material_t, pipeline_state), .size = sizeof(((material_t*)0)->pipeline_state)},
+	}
+};
+
+const static type_info_asset_slot_t type_info_asset_slot_t = {
+	.name = "asset_slot_t",
+	.type = TYPE_asset_slot_t,
+	.members = {
+		.slot_state = {.name = "slot_state", .type = TYPE_asset_slot_load_status_t, .offset = offsetof(asset_slot_t, slot_state), .size = sizeof(((asset_slot_t*)0)->slot_state)},
+		.type = {.name = "type", .type = TYPE_asset_type_t, .offset = offsetof(asset_slot_t, type), .size = sizeof(((asset_slot_t*)0)->type)},
+		.name = {.name = "name", .type = TYPE_string_t, .offset = offsetof(asset_slot_t, name), .size = sizeof(((asset_slot_t*)0)->name)},
+		.owner_asset_file = {.name = "owner_asset_file", .type = TYPE_file_t, .offset = offsetof(asset_slot_t, owner_asset_file), .size = sizeof(((asset_slot_t*)0)->owner_asset_file)},
+		.package_entry = {.name = "package_entry", .type = TYPE_jfd_package_entry_t, .offset = offsetof(asset_slot_t, package_entry), .size = sizeof(((asset_slot_t*)0)->package_entry)},
+		.package_generation = {.name = "package_generation", .type = TYPE_u32, .offset = offsetof(asset_slot_t, package_generation), .size = sizeof(((asset_slot_t*)0)->package_generation)},
+		.ref_counter = {.name = "ref_counter", .type = TYPE_u32, .offset = offsetof(asset_slot_t, ref_counter), .size = sizeof(((asset_slot_t*)0)->ref_counter)},
+		.texture = {.name = "texture", .type = TYPE_texture2D_t, .offset = offsetof(asset_slot_t, texture), .size = sizeof(((asset_slot_t*)0)->texture)},
+		.shader = {.name = "shader", .type = TYPE_shader_t, .offset = offsetof(asset_slot_t, shader), .size = sizeof(((asset_slot_t*)0)->shader)},
+		.material = {.name = "material", .type = TYPE_material_t, .offset = offsetof(asset_slot_t, material), .size = sizeof(((asset_slot_t*)0)->material)},
+	}
+};
+
+const static type_info_asset_manager_asset_file_data_t type_info_asset_manager_asset_file_data_t = {
+	.name = "asset_manager_asset_file_data_t",
+	.type = TYPE_asset_manager_asset_file_data_t,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .offset = offsetof(asset_manager_asset_file_data_t, is_initialized), .size = sizeof(((asset_manager_asset_file_data_t*)0)->is_initialized)},
+		.ID = {.name = "ID", .type = TYPE_u32, .offset = offsetof(asset_manager_asset_file_data_t, ID), .size = sizeof(((asset_manager_asset_file_data_t*)0)->ID)},
+		.init_arena = {.name = "init_arena", .type = TYPE_memory_arena_t, .offset = offsetof(asset_manager_asset_file_data_t, init_arena), .size = sizeof(((asset_manager_asset_file_data_t*)0)->init_arena)},
+		.load_status = {.name = "load_status", .type = TYPE_asset_slot_load_status_t, .offset = offsetof(asset_manager_asset_file_data_t, load_status), .size = sizeof(((asset_manager_asset_file_data_t*)0)->load_status)},
+		.file_info = {.name = "file_info", .type = TYPE_file_t, .offset = offsetof(asset_manager_asset_file_data_t, file_info), .size = sizeof(((asset_manager_asset_file_data_t*)0)->file_info)},
+		.raw_file_data = {.name = "raw_file_data", .type = TYPE_string_t, .offset = offsetof(asset_manager_asset_file_data_t, raw_file_data), .size = sizeof(((asset_manager_asset_file_data_t*)0)->raw_file_data)},
+		.package_entries = {.name = "package_entries", .type = TYPE_jfd_package_entry_t, .offset = offsetof(asset_manager_asset_file_data_t, package_entries), .size = sizeof(((asset_manager_asset_file_data_t*)0)->package_entries)},
+		.package_entry_count = {.name = "package_entry_count", .type = TYPE_u32, .offset = offsetof(asset_manager_asset_file_data_t, package_entry_count), .size = sizeof(((asset_manager_asset_file_data_t*)0)->package_entry_count)},
+		.entry_hash = {.name = "entry_hash", .type = TYPE_s32, .offset = offsetof(asset_manager_asset_file_data_t, entry_hash), .size = sizeof(((asset_manager_asset_file_data_t*)0)->entry_hash)},
+		.header_data = {.name = "header_data", .type = TYPE_jfd_file_header_t, .offset = offsetof(asset_manager_asset_file_data_t, header_data), .size = sizeof(((asset_manager_asset_file_data_t*)0)->header_data)},
+	}
+};
+
+const static type_info_asset_catalog_t type_info_asset_catalog_t = {
+	.name = "asset_catalog_t",
+	.type = TYPE_asset_catalog_t,
+	.members = {
+		.ID = {.name = "ID", .type = TYPE_u32, .offset = offsetof(asset_catalog_t, ID), .size = sizeof(((asset_catalog_t*)0)->ID)},
+		.catalog_type = {.name = "catalog_type", .type = TYPE_asset_type_t, .offset = offsetof(asset_catalog_t, catalog_type), .size = sizeof(((asset_catalog_t*)0)->catalog_type)},
+		.asset_manager = {.name = "asset_manager", .type = TYPE_asset_manager_t, .offset = offsetof(asset_catalog_t, asset_manager), .size = sizeof(((asset_catalog_t*)0)->asset_manager)},
+		.asset_lookup = {.name = "asset_lookup", .type = TYPE_asset_slot_t, .offset = offsetof(asset_catalog_t, asset_lookup), .size = sizeof(((asset_catalog_t*)0)->asset_lookup)},
+	}
+};
+
+const static type_info_texture_atlas_registry_t type_info_texture_atlas_registry_t = {
+	.name = "texture_atlas_registry_t",
+	.type = TYPE_texture_atlas_registry_t,
+	.members = {
+		.atlases = {.name = "atlases", .type = TYPE_texture_atlas_t, .offset = offsetof(texture_atlas_registry_t, atlases), .size = sizeof(((texture_atlas_registry_t*)0)->atlases)},
+		.current_atlas_count = {.name = "current_atlas_count", .type = TYPE_u32, .offset = offsetof(texture_atlas_registry_t, current_atlas_count), .size = sizeof(((texture_atlas_registry_t*)0)->current_atlas_count)},
+	}
+};
+
+const static type_info_asset_manager_t type_info_asset_manager_t = {
+	.name = "asset_manager_t",
+	.type = TYPE_asset_manager_t,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .offset = offsetof(asset_manager_t, is_initialized), .size = sizeof(((asset_manager_t*)0)->is_initialized)},
+		.manager_arena = {.name = "manager_arena", .type = TYPE_memory_arena_t, .offset = offsetof(asset_manager_t, manager_arena), .size = sizeof(((asset_manager_t*)0)->manager_arena)},
+		.asset_files = {.name = "asset_files", .type = TYPE_asset_manager_asset_file_data_t, .offset = offsetof(asset_manager_t, asset_files), .size = sizeof(((asset_manager_t*)0)->asset_files)},
+		.asset_name_to_file = {.name = "asset_name_to_file", .type = TYPE_s32, .offset = offsetof(asset_manager_t, asset_name_to_file), .size = sizeof(((asset_manager_t*)0)->asset_name_to_file)},
+		.loaded_file_count = {.name = "loaded_file_count", .type = TYPE_u32, .offset = offsetof(asset_manager_t, loaded_file_count), .size = sizeof(((asset_manager_t*)0)->loaded_file_count)},
+		.asset_load_queue = {.name = "asset_load_queue", .type = TYPE_asset_slot_t, .offset = offsetof(asset_manager_t, asset_load_queue), .size = sizeof(((asset_manager_t*)0)->asset_load_queue)},
+		.asset_unload_queue = {.name = "asset_unload_queue", .type = TYPE_asset_slot_t, .offset = offsetof(asset_manager_t, asset_unload_queue), .size = sizeof(((asset_manager_t*)0)->asset_unload_queue)},
+		.atlas_registry = {.name = "atlas_registry", .type = TYPE_texture_atlas_registry_t, .offset = offsetof(asset_manager_t, atlas_registry), .size = sizeof(((asset_manager_t*)0)->atlas_registry)},
+		.asset_allocator = {.name = "asset_allocator", .type = TYPE_zone_allocator_t, .offset = offsetof(asset_manager_t, asset_allocator), .size = sizeof(((asset_manager_t*)0)->asset_allocator)},
+		.asset_catalogs = {.name = "asset_catalogs", .type = TYPE_asset_catalog_t, .offset = offsetof(asset_manager_t, asset_catalogs), .size = sizeof(((asset_manager_t*)0)->asset_catalogs)},
+		.texture_catalog = {.name = "texture_catalog", .type = TYPE_asset_catalog_t, .offset = offsetof(asset_manager_t, texture_catalog), .size = sizeof(((asset_manager_t*)0)->texture_catalog)},
+		.shader_catalog = {.name = "shader_catalog", .type = TYPE_asset_catalog_t, .offset = offsetof(asset_manager_t, shader_catalog), .size = sizeof(((asset_manager_t*)0)->shader_catalog)},
+		.render_context = {.name = "render_context", .type = TYPE_vulkan_render_context_t, .offset = offsetof(asset_manager_t, render_context), .size = sizeof(((asset_manager_t*)0)->render_context)},
+	}
+};
+
+const static type_info_entity_t type_info_entity_t = {
+	.name = "entity_t",
+	.type = TYPE_entity_t,
+	.members = {
+		.e_type = {.name = "e_type", .type = TYPE_u32, .offset = offsetof(entity_t, e_type), .size = sizeof(((entity_t*)0)->e_type)},
+		.e_flags = {.name = "e_flags", .type = TYPE_u32, .offset = offsetof(entity_t, e_flags), .size = sizeof(((entity_t*)0)->e_flags)},
+		.owner_client_id = {.name = "owner_client_id", .type = TYPE_u32, .offset = offsetof(entity_t, owner_client_id), .size = sizeof(((entity_t*)0)->owner_client_id)},
+		.last_position = {.name = "last_position", .type = TYPE_vec2_t, .offset = offsetof(entity_t, last_position), .size = sizeof(((entity_t*)0)->last_position)},
+		.position = {.name = "position", .type = TYPE_vec2_t, .offset = offsetof(entity_t, position), .size = sizeof(((entity_t*)0)->position)},
+		.velocity = {.name = "velocity", .type = TYPE_vec2_t, .offset = offsetof(entity_t, velocity), .size = sizeof(((entity_t*)0)->velocity)},
+	}
+};
+
+const static type_info_entity_manager_t type_info_entity_manager_t = {
+	.name = "entity_manager_t",
+	.type = TYPE_entity_manager_t,
+	.members = {
+		.entities = {.name = "entities", .type = TYPE_entity_t, .offset = offsetof(entity_manager_t, entities), .size = sizeof(((entity_manager_t*)0)->entities)},
+		.active_entities = {.name = "active_entities", .type = TYPE_u32, .offset = offsetof(entity_manager_t, active_entities), .size = sizeof(((entity_manager_t*)0)->active_entities)},
+	}
+};
+
+const static type_info_packet_t type_info_packet_t = {
+	.name = "packet_t",
+	.type = TYPE_packet_t,
+	.members = {
+		.magic_value = {.name = "magic_value", .type = TYPE_u32, .offset = offsetof(packet_t, magic_value), .size = sizeof(((packet_t*)0)->magic_value)},
+		.type = {.name = "type", .type = TYPE_u32, .offset = offsetof(packet_t, type), .size = sizeof(((packet_t*)0)->type)},
+		.client_id = {.name = "client_id", .type = TYPE_u32, .offset = offsetof(packet_t, client_id), .size = sizeof(((packet_t*)0)->client_id)},
+		.input_data = {.name = "input_data", .type = TYPE_input_data_t, .offset = offsetof(packet_t, input_data), .size = sizeof(((packet_t*)0)->input_data)},
+	}
+};
+
+const static type_info_sys_thread_t type_info_sys_thread_t = {
+	.name = "sys_thread_t",
+	.type = TYPE_sys_thread_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_thread_handle_t, .offset = offsetof(sys_thread_t, handle), .size = sizeof(((sys_thread_t*)0)->handle)},
+		.thread_id = {.name = "thread_id", .type = TYPE_u32, .offset = offsetof(sys_thread_t, thread_id), .size = sizeof(((sys_thread_t*)0)->thread_id)},
+		.user_data = {.name = "user_data", .type = TYPE_void, .offset = offsetof(sys_thread_t, user_data), .size = sizeof(((sys_thread_t*)0)->user_data)},
+	}
+};
+
+const static type_info_sys_mutex_t type_info_sys_mutex_t = {
+	.name = "sys_mutex_t",
+	.type = TYPE_sys_mutex_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_mutex_handle_t, .offset = offsetof(sys_mutex_t, handle), .size = sizeof(((sys_mutex_t*)0)->handle)},
+	}
+};
+
+const static type_info_sys_semaphore_t type_info_sys_semaphore_t = {
+	.name = "sys_semaphore_t",
+	.type = TYPE_sys_semaphore_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_semaphore_handle_t, .offset = offsetof(sys_semaphore_t, handle), .size = sizeof(((sys_semaphore_t*)0)->handle)},
+	}
+};
+
+const static type_info_string_t type_info_string_t = {
+	.name = "string_t",
+	.type = TYPE_string_t,
+	.members = {
+		.data = {.name = "data", .type = TYPE_byte, .offset = offsetof(string_t, data), .size = sizeof(((string_t*)0)->data)},
+		.count = {.name = "count", .type = TYPE_u32, .offset = offsetof(string_t, count), .size = sizeof(((string_t*)0)->count)},
+	}
+};
+
+const static type_info_string_builder_buffer_t type_info_string_builder_buffer_t = {
+	.name = "string_builder_buffer_t",
+	.type = TYPE_string_builder_buffer_t,
+	.members = {
+		.buffer_data = {.name = "buffer_data", .type = TYPE_byte, .offset = offsetof(string_builder_buffer_t, buffer_data), .size = sizeof(((string_builder_buffer_t*)0)->buffer_data)},
+		.bytes_used = {.name = "bytes_used", .type = TYPE_u32, .offset = offsetof(string_builder_buffer_t, bytes_used), .size = sizeof(((string_builder_buffer_t*)0)->bytes_used)},
+		.buffer_size = {.name = "buffer_size", .type = TYPE_u32, .offset = offsetof(string_builder_buffer_t, buffer_size), .size = sizeof(((string_builder_buffer_t*)0)->buffer_size)},
+		.next_buffer = {.name = "next_buffer", .type = TYPE_string_builder_buffer_t, .offset = offsetof(string_builder_buffer_t, next_buffer), .size = sizeof(((string_builder_buffer_t*)0)->next_buffer)},
+	}
+};
+
+const static type_info_string_builder_t type_info_string_builder_t = {
+	.name = "string_builder_t",
+	.type = TYPE_string_builder_t,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .offset = offsetof(string_builder_t, is_initialized), .size = sizeof(((string_builder_t*)0)->is_initialized)},
+		.arena = {.name = "arena", .type = TYPE_memory_arena_t, .offset = offsetof(string_builder_t, arena), .size = sizeof(((string_builder_t*)0)->arena)},
+		.first_buffer = {.name = "first_buffer", .type = TYPE_string_builder_buffer_t, .offset = offsetof(string_builder_t, first_buffer), .size = sizeof(((string_builder_t*)0)->first_buffer)},
+		.current_buffer = {.name = "current_buffer", .type = TYPE_string_builder_buffer_t, .offset = offsetof(string_builder_t, current_buffer), .size = sizeof(((string_builder_t*)0)->current_buffer)},
+		.default_buffer_block_size = {.name = "default_buffer_block_size", .type = TYPE_u64, .offset = offsetof(string_builder_t, default_buffer_block_size), .size = sizeof(((string_builder_t*)0)->default_buffer_block_size)},
+		.bytes_used = {.name = "bytes_used", .type = TYPE_u64, .offset = offsetof(string_builder_t, bytes_used), .size = sizeof(((string_builder_t*)0)->bytes_used)},
+		.total_allocated = {.name = "total_allocated", .type = TYPE_u64, .offset = offsetof(string_builder_t, total_allocated), .size = sizeof(((string_builder_t*)0)->total_allocated)},
+	}
+};
+
+const static type_info_program_flag_data_t type_info_program_flag_data_t = {
+	.name = "program_flag_data_t",
+	.type = TYPE_program_flag_data_t,
+	.members = {
+		.bool32 = {.name = "bool32", .type = TYPE_bool32, .offset = offsetof(program_flag_data_t, bool32), .size = sizeof(((program_flag_data_t*)0)->bool32)},
+		.u64 = {.name = "u64", .type = TYPE_u64, .offset = offsetof(program_flag_data_t, u64), .size = sizeof(((program_flag_data_t*)0)->u64)},
+		.float32 = {.name = "float32", .type = TYPE_float32, .offset = offsetof(program_flag_data_t, float32), .size = sizeof(((program_flag_data_t*)0)->float32)},
+		.string = {.name = "string", .type = TYPE_char, .offset = offsetof(program_flag_data_t, string), .size = sizeof(((program_flag_data_t*)0)->string)},
+	}
+};
+
+const static type_info_program_flag_t type_info_program_flag_t = {
+	.name = "program_flag_t",
+	.type = TYPE_program_flag_t,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .offset = offsetof(program_flag_t, is_valid), .size = sizeof(((program_flag_t*)0)->is_valid)},
+		.name = {.name = "name", .type = TYPE_char, .offset = offsetof(program_flag_t, name), .size = sizeof(((program_flag_t*)0)->name)},
+		.description = {.name = "description", .type = TYPE_char, .offset = offsetof(program_flag_t, description), .size = sizeof(((program_flag_t*)0)->description)},
+		.arg_type = {.name = "arg_type", .type = TYPE_arg_type_t, .offset = offsetof(program_flag_t, arg_type), .size = sizeof(((program_flag_t*)0)->arg_type)},
+		.arg_value = {.name = "arg_value", .type = TYPE_program_flag_data_t, .offset = offsetof(program_flag_t, arg_value), .size = sizeof(((program_flag_t*)0)->arg_value)},
+		.default_arg_value = {.name = "default_arg_value", .type = TYPE_program_flag_data_t, .offset = offsetof(program_flag_t, default_arg_value), .size = sizeof(((program_flag_t*)0)->default_arg_value)},
+	}
+};
+
+const static type_info_program_flag_state_t type_info_program_flag_state_t = {
+	.name = "program_flag_state_t",
+	.type = TYPE_program_flag_state_t,
+	.members = {
+		.program_flags = {.name = "program_flags", .type = TYPE_program_flag_t, .offset = offsetof(program_flag_state_t, program_flags), .size = sizeof(((program_flag_state_t*)0)->program_flags)},
+		.flag_counter = {.name = "flag_counter", .type = TYPE_u32, .offset = offsetof(program_flag_state_t, flag_counter), .size = sizeof(((program_flag_state_t*)0)->flag_counter)},
+	}
+};
+
+const static type_info_dynarray_header_t type_info_dynarray_header_t = {
+	.name = "dynarray_header_t",
+	.type = TYPE_dynarray_header_t,
+	.members = {
+		.flags = {.name = "flags", .type = TYPE_u32, .offset = offsetof(dynarray_header_t, flags), .size = sizeof(((dynarray_header_t*)0)->flags)},
+		.size = {.name = "size", .type = TYPE_u32, .offset = offsetof(dynarray_header_t, size), .size = sizeof(((dynarray_header_t*)0)->size)},
+		.capacity = {.name = "capacity", .type = TYPE_u32, .offset = offsetof(dynarray_header_t, capacity), .size = sizeof(((dynarray_header_t*)0)->capacity)},
+		.header_id = {.name = "header_id", .type = TYPE_u32, .offset = offsetof(dynarray_header_t, header_id), .size = sizeof(((dynarray_header_t*)0)->header_id)},
+	}
+};
+
+const static type_info_memory_arena_footer_t type_info_memory_arena_footer_t = {
+	.name = "memory_arena_footer_t",
+	.type = TYPE_memory_arena_footer_t,
+	.members = {
+		.last_base = {.name = "last_base", .type = TYPE_byte, .offset = offsetof(memory_arena_footer_t, last_base), .size = sizeof(((memory_arena_footer_t*)0)->last_base)},
+		.last_used = {.name = "last_used", .type = TYPE_u64, .offset = offsetof(memory_arena_footer_t, last_used), .size = sizeof(((memory_arena_footer_t*)0)->last_used)},
+		.last_block_size = {.name = "last_block_size", .type = TYPE_u64, .offset = offsetof(memory_arena_footer_t, last_block_size), .size = sizeof(((memory_arena_footer_t*)0)->last_block_size)},
+	}
+};
+
+const static type_info_memory_arena_t type_info_memory_arena_t = {
+	.name = "memory_arena_t",
+	.type = TYPE_memory_arena_t,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool32, .offset = offsetof(memory_arena_t, is_initialized), .size = sizeof(((memory_arena_t*)0)->is_initialized)},
+		.base = {.name = "base", .type = TYPE_byte, .offset = offsetof(memory_arena_t, base), .size = sizeof(((memory_arena_t*)0)->base)},
+		.used = {.name = "used", .type = TYPE_u64, .offset = offsetof(memory_arena_t, used), .size = sizeof(((memory_arena_t*)0)->used)},
+		.block_size = {.name = "block_size", .type = TYPE_u64, .offset = offsetof(memory_arena_t, block_size), .size = sizeof(((memory_arena_t*)0)->block_size)},
+		.block_counter = {.name = "block_counter", .type = TYPE_u32, .offset = offsetof(memory_arena_t, block_counter), .size = sizeof(((memory_arena_t*)0)->block_counter)},
+		.scratch_arena_count = {.name = "scratch_arena_count", .type = TYPE_u32, .offset = offsetof(memory_arena_t, scratch_arena_count), .size = sizeof(((memory_arena_t*)0)->scratch_arena_count)},
+	}
+};
+
+const static type_info_scratch_arena_t type_info_scratch_arena_t = {
+	.name = "scratch_arena_t",
+	.type = TYPE_scratch_arena_t,
+	.members = {
+		.parent = {.name = "parent", .type = TYPE_memory_arena_t, .offset = offsetof(scratch_arena_t, parent), .size = sizeof(((scratch_arena_t*)0)->parent)},
+		.base = {.name = "base", .type = TYPE_u8, .offset = offsetof(scratch_arena_t, base), .size = sizeof(((scratch_arena_t*)0)->base)},
+		.used = {.name = "used", .type = TYPE_u64, .offset = offsetof(scratch_arena_t, used), .size = sizeof(((scratch_arena_t*)0)->used)},
+	}
+};
+
+const static type_info_file_t type_info_file_t = {
+	.name = "file_t",
+	.type = TYPE_file_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_handle_t, .offset = offsetof(file_t, handle), .size = sizeof(((file_t*)0)->handle)},
+		.file_name = {.name = "file_name", .type = TYPE_string_t, .offset = offsetof(file_t, file_name), .size = sizeof(((file_t*)0)->file_name)},
+		.filepath = {.name = "filepath", .type = TYPE_string_t, .offset = offsetof(file_t, filepath), .size = sizeof(((file_t*)0)->filepath)},
+		.file_size = {.name = "file_size", .type = TYPE_u64, .offset = offsetof(file_t, file_size), .size = sizeof(((file_t*)0)->file_size)},
+		.current_read_offset = {.name = "current_read_offset", .type = TYPE_u64, .offset = offsetof(file_t, current_read_offset), .size = sizeof(((file_t*)0)->current_read_offset)},
+		.current_write_offset = {.name = "current_write_offset", .type = TYPE_u64, .offset = offsetof(file_t, current_write_offset), .size = sizeof(((file_t*)0)->current_write_offset)},
+		.overlapping = {.name = "overlapping", .type = TYPE_bool8, .offset = offsetof(file_t, overlapping), .size = sizeof(((file_t*)0)->overlapping)},
+		.for_writing = {.name = "for_writing", .type = TYPE_bool8, .offset = offsetof(file_t, for_writing), .size = sizeof(((file_t*)0)->for_writing)},
+	}
+};
+
+const static type_info_mapped_file_t type_info_mapped_file_t = {
+	.name = "mapped_file_t",
+	.type = TYPE_mapped_file_t,
+	.members = {
+		.file = {.name = "file", .type = TYPE_file_t, .offset = offsetof(mapped_file_t, file), .size = sizeof(((mapped_file_t*)0)->file)},
+		.mapping_handle = {.name = "mapping_handle", .type = TYPE_sys_handle_t, .offset = offsetof(mapped_file_t, mapping_handle), .size = sizeof(((mapped_file_t*)0)->mapping_handle)},
+		.mapped_file_data = {.name = "mapped_file_data", .type = TYPE_string_t, .offset = offsetof(mapped_file_t, mapped_file_data), .size = sizeof(((mapped_file_t*)0)->mapped_file_data)},
+	}
+};
+
+const static type_info_file_data_t type_info_file_data_t = {
+	.name = "file_data_t",
+	.type = TYPE_file_data_t,
+	.members = {
+		.last_modtime = {.name = "last_modtime", .type = TYPE_u64, .offset = offsetof(file_data_t, last_modtime), .size = sizeof(((file_data_t*)0)->last_modtime)},
+		.file_size = {.name = "file_size", .type = TYPE_u64, .offset = offsetof(file_data_t, file_size), .size = sizeof(((file_data_t*)0)->file_size)},
+		.filename = {.name = "filename", .type = TYPE_string_t, .offset = offsetof(file_data_t, filename), .size = sizeof(((file_data_t*)0)->filename)},
+		.filepath = {.name = "filepath", .type = TYPE_string_t, .offset = offsetof(file_data_t, filepath), .size = sizeof(((file_data_t*)0)->filepath)},
+	}
+};
+
+const static type_info_overlap_io_data_t type_info_overlap_io_data_t = {
+	.name = "overlap_io_data_t",
+	.type = TYPE_overlap_io_data_t,
+	.members = {
+		.offset_to_read = {.name = "offset_to_read", .type = TYPE_u64, .offset = offsetof(overlap_io_data_t, offset_to_read), .size = sizeof(((overlap_io_data_t*)0)->offset_to_read)},
+		.bytes_to_read = {.name = "bytes_to_read", .type = TYPE_u64, .offset = offsetof(overlap_io_data_t, bytes_to_read), .size = sizeof(((overlap_io_data_t*)0)->bytes_to_read)},
+		.status = {.name = "status", .type = TYPE_u32, .offset = offsetof(overlap_io_data_t, status), .size = sizeof(((overlap_io_data_t*)0)->status)},
+		.bytes_transfered = {.name = "bytes_transfered", .type = TYPE_u32, .offset = offsetof(overlap_io_data_t, bytes_transfered), .size = sizeof(((overlap_io_data_t*)0)->bytes_transfered)},
+		.event_handle = {.name = "event_handle", .type = TYPE_sys_handle_t, .offset = offsetof(overlap_io_data_t, event_handle), .size = sizeof(((overlap_io_data_t*)0)->event_handle)},
+	}
+};
+
+const static type_info_visit_file_data_t type_info_visit_file_data_t = {
+	.name = "visit_file_data_t",
+	.type = TYPE_visit_file_data_t,
+	.members = {
+		.function = {.name = "function", .type = TYPE_visit_files_pfn_t, .offset = offsetof(visit_file_data_t, function), .size = sizeof(((visit_file_data_t*)0)->function)},
+		.user_data = {.name = "user_data", .type = TYPE_void, .offset = offsetof(visit_file_data_t, user_data), .size = sizeof(((visit_file_data_t*)0)->user_data)},
+		.filename = {.name = "filename", .type = TYPE_string_t, .offset = offsetof(visit_file_data_t, filename), .size = sizeof(((visit_file_data_t*)0)->filename)},
+		.fullname = {.name = "fullname", .type = TYPE_string_t, .offset = offsetof(visit_file_data_t, fullname), .size = sizeof(((visit_file_data_t*)0)->fullname)},
+		.recursive = {.name = "recursive", .type = TYPE_bool8, .offset = offsetof(visit_file_data_t, recursive), .size = sizeof(((visit_file_data_t*)0)->recursive)},
+		.is_directory = {.name = "is_directory", .type = TYPE_bool8, .offset = offsetof(visit_file_data_t, is_directory), .size = sizeof(((visit_file_data_t*)0)->is_directory)},
+	}
+};
+
+const static type_info_action_button_t type_info_action_button_t = {
+	.name = "action_button_t",
+	.type = TYPE_action_button_t,
+	.members = {
+		.is_down = {.name = "is_down", .type = TYPE_bool8, .offset = offsetof(action_button_t, is_down), .size = sizeof(((action_button_t*)0)->is_down)},
+		.is_released = {.name = "is_released", .type = TYPE_bool8, .offset = offsetof(action_button_t, is_released), .size = sizeof(((action_button_t*)0)->is_released)},
+		.is_pressed = {.name = "is_pressed", .type = TYPE_bool8, .offset = offsetof(action_button_t, is_pressed), .size = sizeof(((action_button_t*)0)->is_pressed)},
+		.half_transition_counter = {.name = "half_transition_counter", .type = TYPE_u8, .offset = offsetof(action_button_t, half_transition_counter), .size = sizeof(((action_button_t*)0)->half_transition_counter)},
+	}
+};
+
+const static type_info_keyboard_controller_data_t type_info_keyboard_controller_data_t = {
+	.name = "keyboard_controller_data_t",
+	.type = TYPE_keyboard_controller_data_t,
+	.members = {
+		.input = {.name = "input", .type = TYPE_action_button_t, .offset = offsetof(keyboard_controller_data_t, input), .size = sizeof(((keyboard_controller_data_t*)0)->input)},
+		.current_mouse_pos = {.name = "current_mouse_pos", .type = TYPE_vec2_t, .offset = offsetof(keyboard_controller_data_t, current_mouse_pos), .size = sizeof(((keyboard_controller_data_t*)0)->current_mouse_pos)},
+		.last_mouse_pos = {.name = "last_mouse_pos", .type = TYPE_vec2_t, .offset = offsetof(keyboard_controller_data_t, last_mouse_pos), .size = sizeof(((keyboard_controller_data_t*)0)->last_mouse_pos)},
+		.mouse_delta = {.name = "mouse_delta", .type = TYPE_vec2_t, .offset = offsetof(keyboard_controller_data_t, mouse_delta), .size = sizeof(((keyboard_controller_data_t*)0)->mouse_delta)},
+		.is_shift_key_down = {.name = "is_shift_key_down", .type = TYPE_bool8, .offset = offsetof(keyboard_controller_data_t, is_shift_key_down), .size = sizeof(((keyboard_controller_data_t*)0)->is_shift_key_down)},
+		.is_control_key_down = {.name = "is_control_key_down", .type = TYPE_bool8, .offset = offsetof(keyboard_controller_data_t, is_control_key_down), .size = sizeof(((keyboard_controller_data_t*)0)->is_control_key_down)},
+		.is_alt_key_down = {.name = "is_alt_key_down", .type = TYPE_bool8, .offset = offsetof(keyboard_controller_data_t, is_alt_key_down), .size = sizeof(((keyboard_controller_data_t*)0)->is_alt_key_down)},
+	}
+};
+
+const static type_info_analog_button_t type_info_analog_button_t = {
+	.name = "analog_button_t",
+	.type = TYPE_analog_button_t,
+	.members = {
+		.deadzone = {.name = "deadzone", .type = TYPE_s16, .offset = offsetof(analog_button_t, deadzone), .size = sizeof(((analog_button_t*)0)->deadzone)},
+		.value = {.name = "value", .type = TYPE_s16, .offset = offsetof(analog_button_t, value), .size = sizeof(((analog_button_t*)0)->value)},
+	}
+};
+
+const static type_info_gamepad_controller_data_t type_info_gamepad_controller_data_t = {
+	.name = "gamepad_controller_data_t",
+	.type = TYPE_gamepad_controller_data_t,
+	.members = {
+		.gamepad_data = {.name = "gamepad_data", .type = TYPE_SDL_Gamepad, .offset = offsetof(gamepad_controller_data_t, gamepad_data), .size = sizeof(((gamepad_controller_data_t*)0)->gamepad_data)},
+		.stick_data = {.name = "stick_data", .type = TYPE_SDL_Joystick, .offset = offsetof(gamepad_controller_data_t, stick_data), .size = sizeof(((gamepad_controller_data_t*)0)->stick_data)},
+		.gamepad_id = {.name = "gamepad_id", .type = TYPE_u32, .offset = offsetof(gamepad_controller_data_t, gamepad_id), .size = sizeof(((gamepad_controller_data_t*)0)->gamepad_id)},
+		.has_rumble = {.name = "has_rumble", .type = TYPE_bool8, .offset = offsetof(gamepad_controller_data_t, has_rumble), .size = sizeof(((gamepad_controller_data_t*)0)->has_rumble)},
+		.rumble_value = {.name = "rumble_value", .type = TYPE_s32, .offset = offsetof(gamepad_controller_data_t, rumble_value), .size = sizeof(((gamepad_controller_data_t*)0)->rumble_value)},
+		.digital_buttons = {.name = "digital_buttons", .type = TYPE_action_button_t, .offset = offsetof(gamepad_controller_data_t, digital_buttons), .size = sizeof(((gamepad_controller_data_t*)0)->digital_buttons)},
+		.analog_buttons = {.name = "analog_buttons", .type = TYPE_analog_button_t, .offset = offsetof(gamepad_controller_data_t, analog_buttons), .size = sizeof(((gamepad_controller_data_t*)0)->analog_buttons)},
+	}
+};
+
+const static type_info_input_controller_t type_info_input_controller_t = {
+	.name = "input_controller_t",
+	.type = TYPE_input_controller_t,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .offset = offsetof(input_controller_t, is_valid), .size = sizeof(((input_controller_t*)0)->is_valid)},
+		.is_analog = {.name = "is_analog", .type = TYPE_bool8, .offset = offsetof(input_controller_t, is_analog), .size = sizeof(((input_controller_t*)0)->is_analog)},
+		.type = {.name = "type", .type = TYPE_controller_type_t, .offset = offsetof(input_controller_t, type), .size = sizeof(((input_controller_t*)0)->type)},
+		.keyboard = {.name = "keyboard", .type = TYPE_keyboard_controller_data_t, .offset = offsetof(input_controller_t, keyboard), .size = sizeof(((input_controller_t*)0)->keyboard)},
+		.gamepad = {.name = "gamepad", .type = TYPE_gamepad_controller_data_t, .offset = offsetof(input_controller_t, gamepad), .size = sizeof(((input_controller_t*)0)->gamepad)},
+	}
+};
+
+const static type_info_game_action_binding_t type_info_game_action_binding_t = {
+	.name = "game_action_binding_t",
+	.type = TYPE_game_action_binding_t,
+	.members = {
+		.type = {.name = "type", .type = TYPE_u32, .offset = offsetof(game_action_binding_t, type), .size = sizeof(((game_action_binding_t*)0)->type)},
+		.binding_id = {.name = "binding_id", .type = TYPE_u32, .offset = offsetof(game_action_binding_t, binding_id), .size = sizeof(((game_action_binding_t*)0)->binding_id)},
+	}
+};
+
+const static type_info_game_action_t type_info_game_action_t = {
+	.name = "game_action_t",
+	.type = TYPE_game_action_t,
+	.members = {
+		.keyboard = {.name = "keyboard", .type = TYPE_game_action_binding_t, .offset = offsetof(game_action_t, keyboard), .size = sizeof(((game_action_t*)0)->keyboard)},
+		.gamepad = {.name = "gamepad", .type = TYPE_game_action_binding_t, .offset = offsetof(game_action_t, gamepad), .size = sizeof(((game_action_t*)0)->gamepad)},
+		.name = {.name = "name", .type = TYPE_string_t, .offset = offsetof(game_action_t, name), .size = sizeof(((game_action_t*)0)->name)},
+	}
+};
+
+const static type_info_input_manager_t type_info_input_manager_t = {
+	.name = "input_manager_t",
+	.type = TYPE_input_manager_t,
+	.members = {
+		.keyboard_data = {.name = "keyboard_data", .type = TYPE_keyboard_controller_data_t, .offset = offsetof(input_manager_t, keyboard_data), .size = sizeof(((input_manager_t*)0)->keyboard_data)},
+		.gamepad_data = {.name = "gamepad_data", .type = TYPE_gamepad_controller_data_t, .offset = offsetof(input_manager_t, gamepad_data), .size = sizeof(((input_manager_t*)0)->gamepad_data)},
+		.primary_controller_index = {.name = "primary_controller_index", .type = TYPE_u32, .offset = offsetof(input_manager_t, primary_controller_index), .size = sizeof(((input_manager_t*)0)->primary_controller_index)},
+		.active_controller_index = {.name = "active_controller_index", .type = TYPE_u32, .offset = offsetof(input_manager_t, active_controller_index), .size = sizeof(((input_manager_t*)0)->active_controller_index)},
+		.connected_controller_count = {.name = "connected_controller_count", .type = TYPE_u32, .offset = offsetof(input_manager_t, connected_controller_count), .size = sizeof(((input_manager_t*)0)->connected_controller_count)},
+		.controllers = {.name = "controllers", .type = TYPE_input_controller_t, .offset = offsetof(input_manager_t, controllers), .size = sizeof(((input_manager_t*)0)->controllers)},
+		.game_actions = {.name = "game_actions", .type = TYPE_game_action_t, .offset = offsetof(input_manager_t, game_actions), .size = sizeof(((input_manager_t*)0)->game_actions)},
+	}
+};
+
+const static type_info_file_watcher_recorded_change_t type_info_file_watcher_recorded_change_t = {
+	.name = "file_watcher_recorded_change_t",
+	.type = TYPE_file_watcher_recorded_change_t,
+	.members = {
+		.full_path = {.name = "full_path", .type = TYPE_string_t, .offset = offsetof(file_watcher_recorded_change_t, full_path), .size = sizeof(((file_watcher_recorded_change_t*)0)->full_path)},
+		.old_filename = {.name = "old_filename", .type = TYPE_string_t, .offset = offsetof(file_watcher_recorded_change_t, old_filename), .size = sizeof(((file_watcher_recorded_change_t*)0)->old_filename)},
+		.changes = {.name = "changes", .type = TYPE_u32, .offset = offsetof(file_watcher_recorded_change_t, changes), .size = sizeof(((file_watcher_recorded_change_t*)0)->changes)},
+		.last_change_timestamp = {.name = "last_change_timestamp", .type = TYPE_u64, .offset = offsetof(file_watcher_recorded_change_t, last_change_timestamp), .size = sizeof(((file_watcher_recorded_change_t*)0)->last_change_timestamp)},
+	}
+};
+
+const static type_info_file_watcher_t type_info_file_watcher_t = {
+	.name = "file_watcher_t",
+	.type = TYPE_file_watcher_t,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .offset = offsetof(file_watcher_t, is_valid), .size = sizeof(((file_watcher_t*)0)->is_valid)},
+		.is_verbose = {.name = "is_verbose", .type = TYPE_bool8, .offset = offsetof(file_watcher_t, is_verbose), .size = sizeof(((file_watcher_t*)0)->is_verbose)},
+		.watcher_arena = {.name = "watcher_arena", .type = TYPE_memory_arena_t, .offset = offsetof(file_watcher_t, watcher_arena), .size = sizeof(((file_watcher_t*)0)->watcher_arena)},
+		.callback = {.name = "callback", .type = TYPE_file_watcher_callback_pfn_t, .offset = offsetof(file_watcher_t, callback), .size = sizeof(((file_watcher_t*)0)->callback)},
+		.events_to_monitor = {.name = "events_to_monitor", .type = TYPE_file_watcher_change_event_t, .offset = offsetof(file_watcher_t, events_to_monitor), .size = sizeof(((file_watcher_t*)0)->events_to_monitor)},
+		.user_data = {.name = "user_data", .type = TYPE_void, .offset = offsetof(file_watcher_t, user_data), .size = sizeof(((file_watcher_t*)0)->user_data)},
+		.watch_recursively = {.name = "watch_recursively", .type = TYPE_bool8, .offset = offsetof(file_watcher_t, watch_recursively), .size = sizeof(((file_watcher_t*)0)->watch_recursively)},
+		.observed_changes = {.name = "observed_changes", .type = TYPE_file_watcher_recorded_change_t, .offset = offsetof(file_watcher_t, observed_changes), .size = sizeof(((file_watcher_t*)0)->observed_changes)},
+		.change_count = {.name = "change_count", .type = TYPE_u32, .offset = offsetof(file_watcher_t, change_count), .size = sizeof(((file_watcher_t*)0)->change_count)},
+		.paths_to_watch = {.name = "paths_to_watch", .type = TYPE_string_t, .offset = offsetof(file_watcher_t, paths_to_watch), .size = sizeof(((file_watcher_t*)0)->paths_to_watch)},
+		.paths_watched = {.name = "paths_watched", .type = TYPE_u32, .offset = offsetof(file_watcher_t, paths_watched), .size = sizeof(((file_watcher_t*)0)->paths_watched)},
+		.notify_buffer_size = {.name = "notify_buffer_size", .type = TYPE_u32, .offset = offsetof(file_watcher_t, notify_buffer_size), .size = sizeof(((file_watcher_t*)0)->notify_buffer_size)},
+		.sys_watch_data = {.name = "sys_watch_data", .type = TYPE_file_watcher_sys_watch_data_t, .offset = offsetof(file_watcher_t, sys_watch_data), .size = sizeof(((file_watcher_t*)0)->sys_watch_data)},
+		.issues_when_checking = {.name = "issues_when_checking", .type = TYPE_bool8, .offset = offsetof(file_watcher_t, issues_when_checking), .size = sizeof(((file_watcher_t*)0)->issues_when_checking)},
+	}
+};
+
+const static type_info_global_matrix_uniforms_t type_info_global_matrix_uniforms_t = {
+	.name = "global_matrix_uniforms_t",
+	.type = TYPE_global_matrix_uniforms_t,
+	.members = {
+		.view_matrix = {.name = "view_matrix", .type = TYPE_mat4_t, .offset = offsetof(global_matrix_uniforms_t, view_matrix), .size = sizeof(((global_matrix_uniforms_t*)0)->view_matrix)},
+		.projection_matrix = {.name = "projection_matrix", .type = TYPE_mat4_t, .offset = offsetof(global_matrix_uniforms_t, projection_matrix), .size = sizeof(((global_matrix_uniforms_t*)0)->projection_matrix)},
+	}
+};
+
+const static type_info_push_constant_t type_info_push_constant_t = {
+	.name = "push_constant_t",
+	.type = TYPE_push_constant_t,
+	.members = {
+		.DrawColor = {.name = "DrawColor", .type = TYPE_vec4_t, .offset = offsetof(push_constant_t, DrawColor), .size = sizeof(((push_constant_t*)0)->DrawColor)},
+	}
+};
+
+const static type_info_render_camera_t type_info_render_camera_t = {
+	.name = "render_camera_t",
+	.type = TYPE_render_camera_t,
+	.members = {
+		.view_matrix = {.name = "view_matrix", .type = TYPE_mat4_t, .offset = offsetof(render_camera_t, view_matrix), .size = sizeof(((render_camera_t*)0)->view_matrix)},
+		.projection_matrix = {.name = "projection_matrix", .type = TYPE_mat4_t, .offset = offsetof(render_camera_t, projection_matrix), .size = sizeof(((render_camera_t*)0)->projection_matrix)},
+		.ID = {.name = "ID", .type = TYPE_u64, .offset = offsetof(render_camera_t, ID), .size = sizeof(((render_camera_t*)0)->ID)},
+	}
+};
+
+const static type_info_vulkan_buffer_data_t type_info_vulkan_buffer_data_t = {
+	.name = "vulkan_buffer_data_t",
+	.type = TYPE_vulkan_buffer_data_t,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .offset = offsetof(vulkan_buffer_data_t, is_valid), .size = sizeof(((vulkan_buffer_data_t*)0)->is_valid)},
+		.is_mapped = {.name = "is_mapped", .type = TYPE_bool8, .offset = offsetof(vulkan_buffer_data_t, is_mapped), .size = sizeof(((vulkan_buffer_data_t*)0)->is_mapped)},
+		.buffer_size = {.name = "buffer_size", .type = TYPE_u64, .offset = offsetof(vulkan_buffer_data_t, buffer_size), .size = sizeof(((vulkan_buffer_data_t*)0)->buffer_size)},
+		.handle = {.name = "handle", .type = TYPE_VkBuffer, .offset = offsetof(vulkan_buffer_data_t, handle), .size = sizeof(((vulkan_buffer_data_t*)0)->handle)},
+		.device_memory = {.name = "device_memory", .type = TYPE_VkDeviceMemory, .offset = offsetof(vulkan_buffer_data_t, device_memory), .size = sizeof(((vulkan_buffer_data_t*)0)->device_memory)},
+		.usage_flags = {.name = "usage_flags", .type = TYPE_VkBufferUsageFlagBits, .offset = offsetof(vulkan_buffer_data_t, usage_flags), .size = sizeof(((vulkan_buffer_data_t*)0)->usage_flags)},
+		.memory_index = {.name = "memory_index", .type = TYPE_s32, .offset = offsetof(vulkan_buffer_data_t, memory_index), .size = sizeof(((vulkan_buffer_data_t*)0)->memory_index)},
+		.memory_property_flags = {.name = "memory_property_flags", .type = TYPE_u32, .offset = offsetof(vulkan_buffer_data_t, memory_property_flags), .size = sizeof(((vulkan_buffer_data_t*)0)->memory_property_flags)},
+	}
+};
+
+const static type_info_vulkan_pipeline_data_t type_info_vulkan_pipeline_data_t = {
+	.name = "vulkan_pipeline_data_t",
+	.type = TYPE_vulkan_pipeline_data_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkPipeline, .offset = offsetof(vulkan_pipeline_data_t, handle), .size = sizeof(((vulkan_pipeline_data_t*)0)->handle)},
+		.binding = {.name = "binding", .type = TYPE_VkPipelineBindPoint, .offset = offsetof(vulkan_pipeline_data_t, binding), .size = sizeof(((vulkan_pipeline_data_t*)0)->binding)},
+		.layout = {.name = "layout", .type = TYPE_VkPipelineLayout, .offset = offsetof(vulkan_pipeline_data_t, layout), .size = sizeof(((vulkan_pipeline_data_t*)0)->layout)},
+	}
+};
+
+const static type_info_render_pipeline_state_t type_info_render_pipeline_state_t = {
+	.name = "render_pipeline_state_t",
+	.type = TYPE_render_pipeline_state_t,
+	.members = {
+		.blend_enabled = {.name = "blend_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, blend_enabled), .size = sizeof(((render_pipeline_state_t*)0)->blend_enabled)},
+		.src_color_blend_mode = {.name = "src_color_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, src_color_blend_mode), .size = sizeof(((render_pipeline_state_t*)0)->src_color_blend_mode)},
+		.dst_color_blend_mode = {.name = "dst_color_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, dst_color_blend_mode), .size = sizeof(((render_pipeline_state_t*)0)->dst_color_blend_mode)},
+		.src_alpha_blend_mode = {.name = "src_alpha_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, src_alpha_blend_mode), .size = sizeof(((render_pipeline_state_t*)0)->src_alpha_blend_mode)},
+		.dst_alpha_blend_mode = {.name = "dst_alpha_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, dst_alpha_blend_mode), .size = sizeof(((render_pipeline_state_t*)0)->dst_alpha_blend_mode)},
+		.color_blend_op = {.name = "color_blend_op", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, color_blend_op), .size = sizeof(((render_pipeline_state_t*)0)->color_blend_op)},
+		.alpha_blend_op = {.name = "alpha_blend_op", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, alpha_blend_op), .size = sizeof(((render_pipeline_state_t*)0)->alpha_blend_op)},
+		.depth_testing_enabled = {.name = "depth_testing_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, depth_testing_enabled), .size = sizeof(((render_pipeline_state_t*)0)->depth_testing_enabled)},
+		.depth_writing_enabled = {.name = "depth_writing_enabled", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, depth_writing_enabled), .size = sizeof(((render_pipeline_state_t*)0)->depth_writing_enabled)},
+		.depth_func = {.name = "depth_func", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, depth_func), .size = sizeof(((render_pipeline_state_t*)0)->depth_func)},
+		.stencil_enabled = {.name = "stencil_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, stencil_enabled), .size = sizeof(((render_pipeline_state_t*)0)->stencil_enabled)},
+		.stencil_state = {.name = "stencil_state", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, stencil_state), .size = sizeof(((render_pipeline_state_t*)0)->stencil_state)},
+		.stencil_keep = {.name = "stencil_keep", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, stencil_keep), .size = sizeof(((render_pipeline_state_t*)0)->stencil_keep)},
+	}
+};
+
+const static type_info_spv_vulkan_type_map_t type_info_spv_vulkan_type_map_t = {
+	.name = "spv_vulkan_type_map_t",
+	.type = TYPE_spv_vulkan_type_map_t,
+	.members = {
+		.spv_type = {.name = "spv_type", .type = TYPE_SpvReflectDescriptorType, .offset = offsetof(spv_vulkan_type_map_t, spv_type), .size = sizeof(((spv_vulkan_type_map_t*)0)->spv_type)},
+		.vk_type = {.name = "vk_type", .type = TYPE_VkDescriptorType, .offset = offsetof(spv_vulkan_type_map_t, vk_type), .size = sizeof(((spv_vulkan_type_map_t*)0)->vk_type)},
+	}
+};
+
+const static type_info_vulkan_shader_descriptor_set_info_t type_info_vulkan_shader_descriptor_set_info_t = {
+	.name = "vulkan_shader_descriptor_set_info_t",
+	.type = TYPE_vulkan_shader_descriptor_set_info_t,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .offset = offsetof(vulkan_shader_descriptor_set_info_t, is_valid), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->is_valid)},
+		.set_type = {.name = "set_type", .type = TYPE_u32, .offset = offsetof(vulkan_shader_descriptor_set_info_t, set_type), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->set_type)},
+		.bindings = {.name = "bindings", .type = TYPE_VkDescriptorSetLayoutBinding, .offset = offsetof(vulkan_shader_descriptor_set_info_t, bindings), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->bindings)},
+		.binding_count = {.name = "binding_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_descriptor_set_info_t, binding_count), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->binding_count)},
+		.binding_upload_size = {.name = "binding_upload_size", .type = TYPE_u32, .offset = offsetof(vulkan_shader_descriptor_set_info_t, binding_upload_size), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->binding_upload_size)},
+		.image_views = {.name = "image_views", .type = TYPE_VkImageView, .offset = offsetof(vulkan_shader_descriptor_set_info_t, image_views), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->image_views)},
+		.samplers = {.name = "samplers", .type = TYPE_VkSampler, .offset = offsetof(vulkan_shader_descriptor_set_info_t, samplers), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->samplers)},
+		.image_count = {.name = "image_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_descriptor_set_info_t, image_count), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->image_count)},
+		.sampler_count = {.name = "sampler_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_descriptor_set_info_t, sampler_count), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->sampler_count)},
+		.sets = {.name = "sets", .type = TYPE_VkDescriptorSet, .offset = offsetof(vulkan_shader_descriptor_set_info_t, sets), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->sets)},
+		.uniform_buffer = {.name = "uniform_buffer", .type = TYPE_vulkan_buffer_data_t, .offset = offsetof(vulkan_shader_descriptor_set_info_t, uniform_buffer), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->uniform_buffer)},
+		.single_frame_uniform_buffer_size = {.name = "single_frame_uniform_buffer_size", .type = TYPE_u32, .offset = offsetof(vulkan_shader_descriptor_set_info_t, single_frame_uniform_buffer_size), .size = sizeof(((vulkan_shader_descriptor_set_info_t*)0)->single_frame_uniform_buffer_size)},
+	}
+};
+
+const static type_info_vulkan_shader_uniform_texture_data_t type_info_vulkan_shader_uniform_texture_data_t = {
+	.name = "vulkan_shader_uniform_texture_data_t",
+	.type = TYPE_vulkan_shader_uniform_texture_data_t,
+	.members = {
+		.image_views = {.name = "image_views", .type = TYPE_VkImageView, .offset = offsetof(vulkan_shader_uniform_texture_data_t, image_views), .size = sizeof(((vulkan_shader_uniform_texture_data_t*)0)->image_views)},
+		.image_samplers = {.name = "image_samplers", .type = TYPE_VkSampler, .offset = offsetof(vulkan_shader_uniform_texture_data_t, image_samplers), .size = sizeof(((vulkan_shader_uniform_texture_data_t*)0)->image_samplers)},
+		.image_counter = {.name = "image_counter", .type = TYPE_u32, .offset = offsetof(vulkan_shader_uniform_texture_data_t, image_counter), .size = sizeof(((vulkan_shader_uniform_texture_data_t*)0)->image_counter)},
+	}
+};
+
+const static type_info_vulkan_shader_uniform_data_range_t type_info_vulkan_shader_uniform_data_range_t = {
+	.name = "vulkan_shader_uniform_data_range_t",
+	.type = TYPE_vulkan_shader_uniform_data_range_t,
+	.members = {
+		.data = {.name = "data", .type = TYPE_void, .offset = offsetof(vulkan_shader_uniform_data_range_t, data), .size = sizeof(((vulkan_shader_uniform_data_range_t*)0)->data)},
+		.data_size = {.name = "data_size", .type = TYPE_u64, .offset = offsetof(vulkan_shader_uniform_data_range_t, data_size), .size = sizeof(((vulkan_shader_uniform_data_range_t*)0)->data_size)},
+	}
+};
+
+const static type_info_vulkan_shader_uniform_data_t type_info_vulkan_shader_uniform_data_t = {
+	.name = "vulkan_shader_uniform_data_t",
+	.type = TYPE_vulkan_shader_uniform_data_t,
+	.members = {
+		.owner_shader_id = {.name = "owner_shader_id", .type = TYPE_u32, .offset = offsetof(vulkan_shader_uniform_data_t, owner_shader_id), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->owner_shader_id)},
+		.uniform_type = {.name = "uniform_type", .type = TYPE_VkDescriptorType, .offset = offsetof(vulkan_shader_uniform_data_t, uniform_type), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->uniform_type)},
+		.set_type = {.name = "set_type", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .offset = offsetof(vulkan_shader_uniform_data_t, set_type), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->set_type)},
+		.uniform_location = {.name = "uniform_location", .type = TYPE_u32, .offset = offsetof(vulkan_shader_uniform_data_t, uniform_location), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->uniform_location)},
+		.push_constant_index = {.name = "push_constant_index", .type = TYPE_u32, .offset = offsetof(vulkan_shader_uniform_data_t, push_constant_index), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->push_constant_index)},
+		.name = {.name = "name", .type = TYPE_string_t, .offset = offsetof(vulkan_shader_uniform_data_t, name), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->name)},
+		.uniform_size = {.name = "uniform_size", .type = TYPE_u32, .offset = offsetof(vulkan_shader_uniform_data_t, uniform_size), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->uniform_size)},
+		.is_texture = {.name = "is_texture", .type = TYPE_bool8, .offset = offsetof(vulkan_shader_uniform_data_t, is_texture), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->is_texture)},
+		.mapped_buffer_update_size = {.name = "mapped_buffer_update_size", .type = TYPE_u32_t, .offset = offsetof(vulkan_shader_uniform_data_t, mapped_buffer_update_size), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->mapped_buffer_update_size)},
+		.mapped_uniform_buffer = {.name = "mapped_uniform_buffer", .type = TYPE_void, .offset = offsetof(vulkan_shader_uniform_data_t, mapped_uniform_buffer), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->mapped_uniform_buffer)},
+		.storage_buffer = {.name = "storage_buffer", .type = TYPE_vulkan_buffer_data_t, .offset = offsetof(vulkan_shader_uniform_data_t, storage_buffer), .size = sizeof(((vulkan_shader_uniform_data_t*)0)->storage_buffer)},
+	}
+};
+
+const static type_info_vulkan_shader_stage_info_t type_info_vulkan_shader_stage_info_t = {
+	.name = "vulkan_shader_stage_info_t",
+	.type = TYPE_vulkan_shader_stage_info_t,
+	.members = {
+		.type = {.name = "type", .type = TYPE_VkShaderStageFlagBits, .offset = offsetof(vulkan_shader_stage_info_t, type), .size = sizeof(((vulkan_shader_stage_info_t*)0)->type)},
+		.entry_point = {.name = "entry_point", .type = TYPE_char, .offset = offsetof(vulkan_shader_stage_info_t, entry_point), .size = sizeof(((vulkan_shader_stage_info_t*)0)->entry_point)},
+		.module_create_info = {.name = "module_create_info", .type = TYPE_VkShaderModuleCreateInfo, .offset = offsetof(vulkan_shader_stage_info_t, module_create_info), .size = sizeof(((vulkan_shader_stage_info_t*)0)->module_create_info)},
+		.shader_stage_create_info = {.name = "shader_stage_create_info", .type = TYPE_VkPipelineShaderStageCreateInfo, .offset = offsetof(vulkan_shader_stage_info_t, shader_stage_create_info), .size = sizeof(((vulkan_shader_stage_info_t*)0)->shader_stage_create_info)},
+		.handle = {.name = "handle", .type = TYPE_VkShaderModule, .offset = offsetof(vulkan_shader_stage_info_t, handle), .size = sizeof(((vulkan_shader_stage_info_t*)0)->handle)},
+	}
+};
+
+const static type_info_vulkan_shader_data_t type_info_vulkan_shader_data_t = {
+	.name = "vulkan_shader_data_t",
+	.type = TYPE_vulkan_shader_data_t,
+	.members = {
+		.shader_id = {.name = "shader_id", .type = TYPE_u32, .offset = offsetof(vulkan_shader_data_t, shader_id), .size = sizeof(((vulkan_shader_data_t*)0)->shader_id)},
+		.name = {.name = "name", .type = TYPE_string_t, .offset = offsetof(vulkan_shader_data_t, name), .size = sizeof(((vulkan_shader_data_t*)0)->name)},
+		.arena = {.name = "arena", .type = TYPE_memory_arena_t, .offset = offsetof(vulkan_shader_data_t, arena), .size = sizeof(((vulkan_shader_data_t*)0)->arena)},
+		.spv_reflect_module = {.name = "spv_reflect_module", .type = TYPE_SpvReflectShaderModule, .offset = offsetof(vulkan_shader_data_t, spv_reflect_module), .size = sizeof(((vulkan_shader_data_t*)0)->spv_reflect_module)},
+		.stages = {.name = "stages", .type = TYPE_vulkan_shader_stage_info_t, .offset = offsetof(vulkan_shader_data_t, stages), .size = sizeof(((vulkan_shader_data_t*)0)->stages)},
+		.stage_count = {.name = "stage_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_data_t, stage_count), .size = sizeof(((vulkan_shader_data_t*)0)->stage_count)},
+		.primary_pool = {.name = "primary_pool", .type = TYPE_VkDescriptorPool, .offset = offsetof(vulkan_shader_data_t, primary_pool), .size = sizeof(((vulkan_shader_data_t*)0)->primary_pool)},
+		.type_counts = {.name = "type_counts", .type = TYPE_u32, .offset = offsetof(vulkan_shader_data_t, type_counts), .size = sizeof(((vulkan_shader_data_t*)0)->type_counts)},
+		.layouts = {.name = "layouts", .type = TYPE_VkDescriptorSetLayout, .offset = offsetof(vulkan_shader_data_t, layouts), .size = sizeof(((vulkan_shader_data_t*)0)->layouts)},
+		.total_descriptor_set_count = {.name = "total_descriptor_set_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_data_t, total_descriptor_set_count), .size = sizeof(((vulkan_shader_data_t*)0)->total_descriptor_set_count)},
+		.used_descriptor_set_count = {.name = "used_descriptor_set_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_data_t, used_descriptor_set_count), .size = sizeof(((vulkan_shader_data_t*)0)->used_descriptor_set_count)},
+		.set_info = {.name = "set_info", .type = TYPE_vulkan_shader_descriptor_set_info_t, .offset = offsetof(vulkan_shader_data_t, set_info), .size = sizeof(((vulkan_shader_data_t*)0)->set_info)},
+		.push_constant_count = {.name = "push_constant_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_data_t, push_constant_count), .size = sizeof(((vulkan_shader_data_t*)0)->push_constant_count)},
+		.push_constant_data = {.name = "push_constant_data", .type = TYPE_VkPushConstantRange, .offset = offsetof(vulkan_shader_data_t, push_constant_data), .size = sizeof(((vulkan_shader_data_t*)0)->push_constant_data)},
+		.uniforms = {.name = "uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .offset = offsetof(vulkan_shader_data_t, uniforms), .size = sizeof(((vulkan_shader_data_t*)0)->uniforms)},
+		.uniform_count = {.name = "uniform_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_data_t, uniform_count), .size = sizeof(((vulkan_shader_data_t*)0)->uniform_count)},
+		.static_uniforms = {.name = "static_uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .offset = offsetof(vulkan_shader_data_t, static_uniforms), .size = sizeof(((vulkan_shader_data_t*)0)->static_uniforms)},
+		.static_uniform_count = {.name = "static_uniform_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_data_t, static_uniform_count), .size = sizeof(((vulkan_shader_data_t*)0)->static_uniform_count)},
+		.draw_uniforms = {.name = "draw_uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .offset = offsetof(vulkan_shader_data_t, draw_uniforms), .size = sizeof(((vulkan_shader_data_t*)0)->draw_uniforms)},
+		.draw_uniform_count = {.name = "draw_uniform_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_data_t, draw_uniform_count), .size = sizeof(((vulkan_shader_data_t*)0)->draw_uniform_count)},
+		.instance_uniforms = {.name = "instance_uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .offset = offsetof(vulkan_shader_data_t, instance_uniforms), .size = sizeof(((vulkan_shader_data_t*)0)->instance_uniforms)},
+		.instance_uniform_count = {.name = "instance_uniform_count", .type = TYPE_u32, .offset = offsetof(vulkan_shader_data_t, instance_uniform_count), .size = sizeof(((vulkan_shader_data_t*)0)->instance_uniform_count)},
+		.pipeline = {.name = "pipeline", .type = TYPE_vulkan_pipeline_data_t, .offset = offsetof(vulkan_shader_data_t, pipeline), .size = sizeof(((vulkan_shader_data_t*)0)->pipeline)},
+		.camera_matrices = {.name = "camera_matrices", .type = TYPE_global_matrix_uniforms_t, .offset = offsetof(vulkan_shader_data_t, camera_matrices), .size = sizeof(((vulkan_shader_data_t*)0)->camera_matrices)},
+	}
+};
+
+const static type_info_vulkan_physical_device_swapchain_support_info_t type_info_vulkan_physical_device_swapchain_support_info_t = {
+	.name = "vulkan_physical_device_swapchain_support_info_t",
+	.type = TYPE_vulkan_physical_device_swapchain_support_info_t,
+	.members = {
+		.surface_capabilities = {.name = "surface_capabilities", .type = TYPE_VkSurfaceCapabilitiesKHR, .offset = offsetof(vulkan_physical_device_swapchain_support_info_t, surface_capabilities), .size = sizeof(((vulkan_physical_device_swapchain_support_info_t*)0)->surface_capabilities)},
+		.valid_surface_formats = {.name = "valid_surface_formats", .type = TYPE_VkSurfaceFormatKHR, .offset = offsetof(vulkan_physical_device_swapchain_support_info_t, valid_surface_formats), .size = sizeof(((vulkan_physical_device_swapchain_support_info_t*)0)->valid_surface_formats)},
+		.valid_present_modes = {.name = "valid_present_modes", .type = TYPE_VkPresentModeKHR, .offset = offsetof(vulkan_physical_device_swapchain_support_info_t, valid_present_modes), .size = sizeof(((vulkan_physical_device_swapchain_support_info_t*)0)->valid_present_modes)},
+		.valid_surface_format_count = {.name = "valid_surface_format_count", .type = TYPE_u32, .offset = offsetof(vulkan_physical_device_swapchain_support_info_t, valid_surface_format_count), .size = sizeof(((vulkan_physical_device_swapchain_support_info_t*)0)->valid_surface_format_count)},
+		.valid_present_mode_count = {.name = "valid_present_mode_count", .type = TYPE_u32, .offset = offsetof(vulkan_physical_device_swapchain_support_info_t, valid_present_mode_count), .size = sizeof(((vulkan_physical_device_swapchain_support_info_t*)0)->valid_present_mode_count)},
+	}
+};
+
+const static type_info_vulkan_physical_device_queue_info_t type_info_vulkan_physical_device_queue_info_t = {
+	.name = "vulkan_physical_device_queue_info_t",
+	.type = TYPE_vulkan_physical_device_queue_info_t,
+	.members = {
+		.graphics_queue_family_index = {.name = "graphics_queue_family_index", .type = TYPE_u32, .offset = offsetof(vulkan_physical_device_queue_info_t, graphics_queue_family_index), .size = sizeof(((vulkan_physical_device_queue_info_t*)0)->graphics_queue_family_index)},
+		.present_queue_family_index = {.name = "present_queue_family_index", .type = TYPE_u32, .offset = offsetof(vulkan_physical_device_queue_info_t, present_queue_family_index), .size = sizeof(((vulkan_physical_device_queue_info_t*)0)->present_queue_family_index)},
+		.compute_queue_family_index = {.name = "compute_queue_family_index", .type = TYPE_u32, .offset = offsetof(vulkan_physical_device_queue_info_t, compute_queue_family_index), .size = sizeof(((vulkan_physical_device_queue_info_t*)0)->compute_queue_family_index)},
+		.transfer_queue_family_index = {.name = "transfer_queue_family_index", .type = TYPE_u32, .offset = offsetof(vulkan_physical_device_queue_info_t, transfer_queue_family_index), .size = sizeof(((vulkan_physical_device_queue_info_t*)0)->transfer_queue_family_index)},
+	}
+};
+
+const static type_info_vulkan_physical_device_requirements_t type_info_vulkan_physical_device_requirements_t = {
+	.name = "vulkan_physical_device_requirements_t",
+	.type = TYPE_vulkan_physical_device_requirements_t,
+	.members = {
+		.has_graphics_queue = {.name = "has_graphics_queue", .type = TYPE_bool8, .offset = offsetof(vulkan_physical_device_requirements_t, has_graphics_queue), .size = sizeof(((vulkan_physical_device_requirements_t*)0)->has_graphics_queue)},
+		.has_present_queue = {.name = "has_present_queue", .type = TYPE_bool8, .offset = offsetof(vulkan_physical_device_requirements_t, has_present_queue), .size = sizeof(((vulkan_physical_device_requirements_t*)0)->has_present_queue)},
+		.has_transfer_queue = {.name = "has_transfer_queue", .type = TYPE_bool8, .offset = offsetof(vulkan_physical_device_requirements_t, has_transfer_queue), .size = sizeof(((vulkan_physical_device_requirements_t*)0)->has_transfer_queue)},
+		.has_compute_queue = {.name = "has_compute_queue", .type = TYPE_bool8, .offset = offsetof(vulkan_physical_device_requirements_t, has_compute_queue), .size = sizeof(((vulkan_physical_device_requirements_t*)0)->has_compute_queue)},
+		.required_extensions = {.name = "required_extensions", .type = TYPE_char, .offset = offsetof(vulkan_physical_device_requirements_t, required_extensions), .size = sizeof(((vulkan_physical_device_requirements_t*)0)->required_extensions)},
+	}
+};
+
+const static type_info_vulkan_physical_device_t type_info_vulkan_physical_device_t = {
+	.name = "vulkan_physical_device_t",
+	.type = TYPE_vulkan_physical_device_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkPhysicalDevice, .offset = offsetof(vulkan_physical_device_t, handle), .size = sizeof(((vulkan_physical_device_t*)0)->handle)},
+		.device_depth_format = {.name = "device_depth_format", .type = TYPE_VkFormat, .offset = offsetof(vulkan_physical_device_t, device_depth_format), .size = sizeof(((vulkan_physical_device_t*)0)->device_depth_format)},
+		.properties = {.name = "properties", .type = TYPE_VkPhysicalDeviceProperties, .offset = offsetof(vulkan_physical_device_t, properties), .size = sizeof(((vulkan_physical_device_t*)0)->properties)},
+		.features = {.name = "features", .type = TYPE_VkPhysicalDeviceFeatures, .offset = offsetof(vulkan_physical_device_t, features), .size = sizeof(((vulkan_physical_device_t*)0)->features)},
+		.memory_properties = {.name = "memory_properties", .type = TYPE_VkPhysicalDeviceMemoryProperties, .offset = offsetof(vulkan_physical_device_t, memory_properties), .size = sizeof(((vulkan_physical_device_t*)0)->memory_properties)},
+		.swapchain_support_info = {.name = "swapchain_support_info", .type = TYPE_vulkan_physical_device_swapchain_support_info_t, .offset = offsetof(vulkan_physical_device_t, swapchain_support_info), .size = sizeof(((vulkan_physical_device_t*)0)->swapchain_support_info)},
+	}
+};
+
+const static type_info_vulkan_rendering_device_t type_info_vulkan_rendering_device_t = {
+	.name = "vulkan_rendering_device_t",
+	.type = TYPE_vulkan_rendering_device_t,
+	.members = {
+		.physical_device = {.name = "physical_device", .type = TYPE_vulkan_physical_device_t, .offset = offsetof(vulkan_rendering_device_t, physical_device), .size = sizeof(((vulkan_rendering_device_t*)0)->physical_device)},
+		.graphics_queue_family_index = {.name = "graphics_queue_family_index", .type = TYPE_u32, .offset = offsetof(vulkan_rendering_device_t, graphics_queue_family_index), .size = sizeof(((vulkan_rendering_device_t*)0)->graphics_queue_family_index)},
+		.present_queue_family_index = {.name = "present_queue_family_index", .type = TYPE_u32, .offset = offsetof(vulkan_rendering_device_t, present_queue_family_index), .size = sizeof(((vulkan_rendering_device_t*)0)->present_queue_family_index)},
+		.compute_queue_family_index = {.name = "compute_queue_family_index", .type = TYPE_u32, .offset = offsetof(vulkan_rendering_device_t, compute_queue_family_index), .size = sizeof(((vulkan_rendering_device_t*)0)->compute_queue_family_index)},
+		.transfer_queue_family_index = {.name = "transfer_queue_family_index", .type = TYPE_u32, .offset = offsetof(vulkan_rendering_device_t, transfer_queue_family_index), .size = sizeof(((vulkan_rendering_device_t*)0)->transfer_queue_family_index)},
+		.graphics_queue = {.name = "graphics_queue", .type = TYPE_VkQueue, .offset = offsetof(vulkan_rendering_device_t, graphics_queue), .size = sizeof(((vulkan_rendering_device_t*)0)->graphics_queue)},
+		.present_queue = {.name = "present_queue", .type = TYPE_VkQueue, .offset = offsetof(vulkan_rendering_device_t, present_queue), .size = sizeof(((vulkan_rendering_device_t*)0)->present_queue)},
+		.transfer_queue = {.name = "transfer_queue", .type = TYPE_VkQueue, .offset = offsetof(vulkan_rendering_device_t, transfer_queue), .size = sizeof(((vulkan_rendering_device_t*)0)->transfer_queue)},
+		.compute_queue = {.name = "compute_queue", .type = TYPE_VkQueue, .offset = offsetof(vulkan_rendering_device_t, compute_queue), .size = sizeof(((vulkan_rendering_device_t*)0)->compute_queue)},
+		.graphics_command_pool = {.name = "graphics_command_pool", .type = TYPE_VkCommandPool, .offset = offsetof(vulkan_rendering_device_t, graphics_command_pool), .size = sizeof(((vulkan_rendering_device_t*)0)->graphics_command_pool)},
+		.logical_device = {.name = "logical_device", .type = TYPE_VkDevice, .offset = offsetof(vulkan_rendering_device_t, logical_device), .size = sizeof(((vulkan_rendering_device_t*)0)->logical_device)},
+	}
+};
+
+const static type_info_vulkan_fence_t type_info_vulkan_fence_t = {
+	.name = "vulkan_fence_t",
+	.type = TYPE_vulkan_fence_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkFence, .offset = offsetof(vulkan_fence_t, handle), .size = sizeof(((vulkan_fence_t*)0)->handle)},
+		.signaled = {.name = "signaled", .type = TYPE_bool8, .offset = offsetof(vulkan_fence_t, signaled), .size = sizeof(((vulkan_fence_t*)0)->signaled)},
+	}
+};
+
+const static type_info_vulkan_renderpass_data_t type_info_vulkan_renderpass_data_t = {
+	.name = "vulkan_renderpass_data_t",
+	.type = TYPE_vulkan_renderpass_data_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkRenderPass, .offset = offsetof(vulkan_renderpass_data_t, handle), .size = sizeof(((vulkan_renderpass_data_t*)0)->handle)},
+		.offset = {.name = "offset", .type = TYPE_vec2_t, .offset = offsetof(vulkan_renderpass_data_t, offset), .size = sizeof(((vulkan_renderpass_data_t*)0)->offset)},
+		.size = {.name = "size", .type = TYPE_vec2_t, .offset = offsetof(vulkan_renderpass_data_t, size), .size = sizeof(((vulkan_renderpass_data_t*)0)->size)},
+		.clear_color = {.name = "clear_color", .type = TYPE_vec4_t, .offset = offsetof(vulkan_renderpass_data_t, clear_color), .size = sizeof(((vulkan_renderpass_data_t*)0)->clear_color)},
+		.depth_clear = {.name = "depth_clear", .type = TYPE_float32, .offset = offsetof(vulkan_renderpass_data_t, depth_clear), .size = sizeof(((vulkan_renderpass_data_t*)0)->depth_clear)},
+		.stencil_clear = {.name = "stencil_clear", .type = TYPE_u32, .offset = offsetof(vulkan_renderpass_data_t, stencil_clear), .size = sizeof(((vulkan_renderpass_data_t*)0)->stencil_clear)},
+		.renderpass_state = {.name = "renderpass_state", .type = TYPE_vulkan_renderpass_state_t, .offset = offsetof(vulkan_renderpass_data_t, renderpass_state), .size = sizeof(((vulkan_renderpass_data_t*)0)->renderpass_state)},
+	}
+};
+
+const static type_info_vulkan_framebuffer_data_t type_info_vulkan_framebuffer_data_t = {
+	.name = "vulkan_framebuffer_data_t",
+	.type = TYPE_vulkan_framebuffer_data_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkFramebuffer, .offset = offsetof(vulkan_framebuffer_data_t, handle), .size = sizeof(((vulkan_framebuffer_data_t*)0)->handle)},
+		.renderpass = {.name = "renderpass", .type = TYPE_vulkan_renderpass_data_t, .offset = offsetof(vulkan_framebuffer_data_t, renderpass), .size = sizeof(((vulkan_framebuffer_data_t*)0)->renderpass)},
+		.attachments = {.name = "attachments", .type = TYPE_VkImageView, .offset = offsetof(vulkan_framebuffer_data_t, attachments), .size = sizeof(((vulkan_framebuffer_data_t*)0)->attachments)},
+		.attachment_count = {.name = "attachment_count", .type = TYPE_u32, .offset = offsetof(vulkan_framebuffer_data_t, attachment_count), .size = sizeof(((vulkan_framebuffer_data_t*)0)->attachment_count)},
+	}
+};
+
+const static type_info_vulkan_image_data_t type_info_vulkan_image_data_t = {
+	.name = "vulkan_image_data_t",
+	.type = TYPE_vulkan_image_data_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkImage, .offset = offsetof(vulkan_image_data_t, handle), .size = sizeof(((vulkan_image_data_t*)0)->handle)},
+		.memory = {.name = "memory", .type = TYPE_VkDeviceMemory, .offset = offsetof(vulkan_image_data_t, memory), .size = sizeof(((vulkan_image_data_t*)0)->memory)},
+		.format = {.name = "format", .type = TYPE_VkFormat, .offset = offsetof(vulkan_image_data_t, format), .size = sizeof(((vulkan_image_data_t*)0)->format)},
+		.layout = {.name = "layout", .type = TYPE_VkImageLayout, .offset = offsetof(vulkan_image_data_t, layout), .size = sizeof(((vulkan_image_data_t*)0)->layout)},
+		.view = {.name = "view", .type = TYPE_VkImageView, .offset = offsetof(vulkan_image_data_t, view), .size = sizeof(((vulkan_image_data_t*)0)->view)},
+		.width = {.name = "width", .type = TYPE_u32, .offset = offsetof(vulkan_image_data_t, width), .size = sizeof(((vulkan_image_data_t*)0)->width)},
+		.height = {.name = "height", .type = TYPE_u32, .offset = offsetof(vulkan_image_data_t, height), .size = sizeof(((vulkan_image_data_t*)0)->height)},
+	}
+};
+
+const static type_info_vulkan_texture_t type_info_vulkan_texture_t = {
+	.name = "vulkan_texture_t",
+	.type = TYPE_vulkan_texture_t,
+	.members = {
+		.current_generation = {.name = "current_generation", .type = TYPE_u32, .offset = offsetof(vulkan_texture_t, current_generation), .size = sizeof(((vulkan_texture_t*)0)->current_generation)},
+		.image_data = {.name = "image_data", .type = TYPE_vulkan_image_data_t, .offset = offsetof(vulkan_texture_t, image_data), .size = sizeof(((vulkan_texture_t*)0)->image_data)},
+		.sampler = {.name = "sampler", .type = TYPE_VkSampler, .offset = offsetof(vulkan_texture_t, sampler), .size = sizeof(((vulkan_texture_t*)0)->sampler)},
+	}
+};
+
+const static type_info_vulkan_swapchain_data_t type_info_vulkan_swapchain_data_t = {
+	.name = "vulkan_swapchain_data_t",
+	.type = TYPE_vulkan_swapchain_data_t,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .offset = offsetof(vulkan_swapchain_data_t, is_valid), .size = sizeof(((vulkan_swapchain_data_t*)0)->is_valid)},
+		.arena = {.name = "arena", .type = TYPE_memory_arena_t, .offset = offsetof(vulkan_swapchain_data_t, arena), .size = sizeof(((vulkan_swapchain_data_t*)0)->arena)},
+		.handle = {.name = "handle", .type = TYPE_VkSwapchainKHR, .offset = offsetof(vulkan_swapchain_data_t, handle), .size = sizeof(((vulkan_swapchain_data_t*)0)->handle)},
+		.image_format = {.name = "image_format", .type = TYPE_VkSurfaceFormatKHR, .offset = offsetof(vulkan_swapchain_data_t, image_format), .size = sizeof(((vulkan_swapchain_data_t*)0)->image_format)},
+		.present_mode = {.name = "present_mode", .type = TYPE_VkPresentModeKHR, .offset = offsetof(vulkan_swapchain_data_t, present_mode), .size = sizeof(((vulkan_swapchain_data_t*)0)->present_mode)},
+		.depth_attachment = {.name = "depth_attachment", .type = TYPE_vulkan_image_data_t, .offset = offsetof(vulkan_swapchain_data_t, depth_attachment), .size = sizeof(((vulkan_swapchain_data_t*)0)->depth_attachment)},
+		.has_depth_attachment = {.name = "has_depth_attachment", .type = TYPE_bool32, .offset = offsetof(vulkan_swapchain_data_t, has_depth_attachment), .size = sizeof(((vulkan_swapchain_data_t*)0)->has_depth_attachment)},
+		.max_frames_in_flight = {.name = "max_frames_in_flight", .type = TYPE_u32, .offset = offsetof(vulkan_swapchain_data_t, max_frames_in_flight), .size = sizeof(((vulkan_swapchain_data_t*)0)->max_frames_in_flight)},
+		.image_count = {.name = "image_count", .type = TYPE_u32, .offset = offsetof(vulkan_swapchain_data_t, image_count), .size = sizeof(((vulkan_swapchain_data_t*)0)->image_count)},
+		.framebuffers = {.name = "framebuffers", .type = TYPE_vulkan_framebuffer_data_t, .offset = offsetof(vulkan_swapchain_data_t, framebuffers), .size = sizeof(((vulkan_swapchain_data_t*)0)->framebuffers)},
+		.images = {.name = "images", .type = TYPE_VkImage, .offset = offsetof(vulkan_swapchain_data_t, images), .size = sizeof(((vulkan_swapchain_data_t*)0)->images)},
+		.views = {.name = "views", .type = TYPE_VkImageView, .offset = offsetof(vulkan_swapchain_data_t, views), .size = sizeof(((vulkan_swapchain_data_t*)0)->views)},
+	}
+};
+
+const static type_info_vulkan_command_buffer_data_t type_info_vulkan_command_buffer_data_t = {
+	.name = "vulkan_command_buffer_data_t",
+	.type = TYPE_vulkan_command_buffer_data_t,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkCommandBuffer, .offset = offsetof(vulkan_command_buffer_data_t, handle), .size = sizeof(((vulkan_command_buffer_data_t*)0)->handle)},
+		.owner_pool = {.name = "owner_pool", .type = TYPE_VkCommandPool, .offset = offsetof(vulkan_command_buffer_data_t, owner_pool), .size = sizeof(((vulkan_command_buffer_data_t*)0)->owner_pool)},
+		.state = {.name = "state", .type = TYPE_vulkan_command_buffer_state_t, .offset = offsetof(vulkan_command_buffer_data_t, state), .size = sizeof(((vulkan_command_buffer_data_t*)0)->state)},
+		.is_primary_buffer = {.name = "is_primary_buffer", .type = TYPE_bool8, .offset = offsetof(vulkan_command_buffer_data_t, is_primary_buffer), .size = sizeof(((vulkan_command_buffer_data_t*)0)->is_primary_buffer)},
+		.is_single_use = {.name = "is_single_use", .type = TYPE_bool8, .offset = offsetof(vulkan_command_buffer_data_t, is_single_use), .size = sizeof(((vulkan_command_buffer_data_t*)0)->is_single_use)},
+	}
+};
+
+const static type_info_vulkan_render_backend_function_data_t type_info_vulkan_render_backend_function_data_t = {
+	.name = "vulkan_render_backend_function_data_t",
+	.type = TYPE_vulkan_render_backend_function_data_t,
+	.members = {
+		.create_gpu_texture = {.name = "create_gpu_texture", .type = TYPE_void, .offset = offsetof(vulkan_render_backend_function_data_t, create_gpu_texture), .size = sizeof(((vulkan_render_backend_function_data_t*)0)->create_gpu_texture)},
+		.create_gpu_shader = {.name = "create_gpu_shader", .type = TYPE_void, .offset = offsetof(vulkan_render_backend_function_data_t, create_gpu_shader), .size = sizeof(((vulkan_render_backend_function_data_t*)0)->create_gpu_shader)},
+		.create_gpu_buffer = {.name = "create_gpu_buffer", .type = TYPE_void, .offset = offsetof(vulkan_render_backend_function_data_t, create_gpu_buffer), .size = sizeof(((vulkan_render_backend_function_data_t*)0)->create_gpu_buffer)},
+		.destroy_gpu_texture = {.name = "destroy_gpu_texture", .type = TYPE_void, .offset = offsetof(vulkan_render_backend_function_data_t, destroy_gpu_texture), .size = sizeof(((vulkan_render_backend_function_data_t*)0)->destroy_gpu_texture)},
+		.destroy_gpu_shader = {.name = "destroy_gpu_shader", .type = TYPE_void, .offset = offsetof(vulkan_render_backend_function_data_t, destroy_gpu_shader), .size = sizeof(((vulkan_render_backend_function_data_t*)0)->destroy_gpu_shader)},
+		.destroy_gpu_buffer = {.name = "destroy_gpu_buffer", .type = TYPE_void, .offset = offsetof(vulkan_render_backend_function_data_t, destroy_gpu_buffer), .size = sizeof(((vulkan_render_backend_function_data_t*)0)->destroy_gpu_buffer)},
+	}
+};
+
+const static type_info_vulkan_render_frame_state_t type_info_vulkan_render_frame_state_t = {
+	.name = "vulkan_render_frame_state_t",
+	.type = TYPE_vulkan_render_frame_state_t,
+	.members = {
+		.image_render_idle_fence = {.name = "image_render_idle_fence", .type = TYPE_vulkan_fence_t, .offset = offsetof(vulkan_render_frame_state_t, image_render_idle_fence), .size = sizeof(((vulkan_render_frame_state_t*)0)->image_render_idle_fence)},
+		.frame_in_flight_fence_ptr = {.name = "frame_in_flight_fence_ptr", .type = TYPE_vulkan_fence_t, .offset = offsetof(vulkan_render_frame_state_t, frame_in_flight_fence_ptr), .size = sizeof(((vulkan_render_frame_state_t*)0)->frame_in_flight_fence_ptr)},
+		.image_avaliable_semaphore = {.name = "image_avaliable_semaphore", .type = TYPE_VkSemaphore, .offset = offsetof(vulkan_render_frame_state_t, image_avaliable_semaphore), .size = sizeof(((vulkan_render_frame_state_t*)0)->image_avaliable_semaphore)},
+		.presentation_complete_semaphore = {.name = "presentation_complete_semaphore", .type = TYPE_VkSemaphore, .offset = offsetof(vulkan_render_frame_state_t, presentation_complete_semaphore), .size = sizeof(((vulkan_render_frame_state_t*)0)->presentation_complete_semaphore)},
+		.current_framebuffer = {.name = "current_framebuffer", .type = TYPE_vulkan_framebuffer_data_t, .offset = offsetof(vulkan_render_frame_state_t, current_framebuffer), .size = sizeof(((vulkan_render_frame_state_t*)0)->current_framebuffer)},
+		.render_command_buffer = {.name = "render_command_buffer", .type = TYPE_vulkan_command_buffer_data_t, .offset = offsetof(vulkan_render_frame_state_t, render_command_buffer), .size = sizeof(((vulkan_render_frame_state_t*)0)->render_command_buffer)},
+		.instanced_rendering_buffer = {.name = "instanced_rendering_buffer", .type = TYPE_vulkan_buffer_data_t, .offset = offsetof(vulkan_render_frame_state_t, instanced_rendering_buffer), .size = sizeof(((vulkan_render_frame_state_t*)0)->instanced_rendering_buffer)},
+		.bound_shader = {.name = "bound_shader", .type = TYPE_vulkan_shader_data_t, .offset = offsetof(vulkan_render_frame_state_t, bound_shader), .size = sizeof(((vulkan_render_frame_state_t*)0)->bound_shader)},
+	}
+};
+
+const static type_info_vulkan_render_context_t type_info_vulkan_render_context_t = {
+	.name = "vulkan_render_context_t",
+	.type = TYPE_vulkan_render_context_t,
+	.members = {
+		.initialization_arena = {.name = "initialization_arena", .type = TYPE_memory_arena_t, .offset = offsetof(vulkan_render_context_t, initialization_arena), .size = sizeof(((vulkan_render_context_t*)0)->initialization_arena)},
+		.frame_arena = {.name = "frame_arena", .type = TYPE_memory_arena_t, .offset = offsetof(vulkan_render_context_t, frame_arena), .size = sizeof(((vulkan_render_context_t*)0)->frame_arena)},
+		.permanent_arena = {.name = "permanent_arena", .type = TYPE_memory_arena_t, .offset = offsetof(vulkan_render_context_t, permanent_arena), .size = sizeof(((vulkan_render_context_t*)0)->permanent_arena)},
+		.additional_buffer_count = {.name = "additional_buffer_count", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, additional_buffer_count), .size = sizeof(((vulkan_render_context_t*)0)->additional_buffer_count)},
+		.window = {.name = "window", .type = TYPE_SDL_Window, .offset = offsetof(vulkan_render_context_t, window), .size = sizeof(((vulkan_render_context_t*)0)->window)},
+		.window_width = {.name = "window_width", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, window_width), .size = sizeof(((vulkan_render_context_t*)0)->window_width)},
+		.window_height = {.name = "window_height", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, window_height), .size = sizeof(((vulkan_render_context_t*)0)->window_height)},
+		.instance = {.name = "instance", .type = TYPE_VkInstance, .offset = offsetof(vulkan_render_context_t, instance), .size = sizeof(((vulkan_render_context_t*)0)->instance)},
+		.allocators = {.name = "allocators", .type = TYPE_VkAllocationCallbacks, .offset = offsetof(vulkan_render_context_t, allocators), .size = sizeof(((vulkan_render_context_t*)0)->allocators)},
+		.render_surface = {.name = "render_surface", .type = TYPE_VkSurfaceKHR, .offset = offsetof(vulkan_render_context_t, render_surface), .size = sizeof(((vulkan_render_context_t*)0)->render_surface)},
+		.rendering_device = {.name = "rendering_device", .type = TYPE_vulkan_rendering_device_t, .offset = offsetof(vulkan_render_context_t, rendering_device), .size = sizeof(((vulkan_render_context_t*)0)->rendering_device)},
+		.swapchain = {.name = "swapchain", .type = TYPE_vulkan_swapchain_data_t, .offset = offsetof(vulkan_render_context_t, swapchain), .size = sizeof(((vulkan_render_context_t*)0)->swapchain)},
+		.current_image_index = {.name = "current_image_index", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, current_image_index), .size = sizeof(((vulkan_render_context_t*)0)->current_image_index)},
+		.current_frame_index = {.name = "current_frame_index", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, current_frame_index), .size = sizeof(((vulkan_render_context_t*)0)->current_frame_index)},
+		.framebuffer_width = {.name = "framebuffer_width", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, framebuffer_width), .size = sizeof(((vulkan_render_context_t*)0)->framebuffer_width)},
+		.framebuffer_height = {.name = "framebuffer_height", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, framebuffer_height), .size = sizeof(((vulkan_render_context_t*)0)->framebuffer_height)},
+		.cached_framebuffer_width = {.name = "cached_framebuffer_width", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, cached_framebuffer_width), .size = sizeof(((vulkan_render_context_t*)0)->cached_framebuffer_width)},
+		.cached_framebuffer_height = {.name = "cached_framebuffer_height", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, cached_framebuffer_height), .size = sizeof(((vulkan_render_context_t*)0)->cached_framebuffer_height)},
+		.current_framebuffer_size_generation = {.name = "current_framebuffer_size_generation", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, current_framebuffer_size_generation), .size = sizeof(((vulkan_render_context_t*)0)->current_framebuffer_size_generation)},
+		.last_framebuffer_size_generation = {.name = "last_framebuffer_size_generation", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, last_framebuffer_size_generation), .size = sizeof(((vulkan_render_context_t*)0)->last_framebuffer_size_generation)},
+		.recreating_swapchain = {.name = "recreating_swapchain", .type = TYPE_bool8, .offset = offsetof(vulkan_render_context_t, recreating_swapchain), .size = sizeof(((vulkan_render_context_t*)0)->recreating_swapchain)},
+		.image_render_idle_fences = {.name = "image_render_idle_fences", .type = TYPE_vulkan_fence_t, .offset = offsetof(vulkan_render_context_t, image_render_idle_fences), .size = sizeof(((vulkan_render_context_t*)0)->image_render_idle_fences)},
+		.frame_in_flight_fence_ptrs = {.name = "frame_in_flight_fence_ptrs", .type = TYPE_vulkan_fence_t, .offset = offsetof(vulkan_render_context_t, frame_in_flight_fence_ptrs), .size = sizeof(((vulkan_render_context_t*)0)->frame_in_flight_fence_ptrs)},
+		.image_avaliable_semaphores = {.name = "image_avaliable_semaphores", .type = TYPE_VkSemaphore, .offset = offsetof(vulkan_render_context_t, image_avaliable_semaphores), .size = sizeof(((vulkan_render_context_t*)0)->image_avaliable_semaphores)},
+		.presentation_complete_semaphores = {.name = "presentation_complete_semaphores", .type = TYPE_VkSemaphore, .offset = offsetof(vulkan_render_context_t, presentation_complete_semaphores), .size = sizeof(((vulkan_render_context_t*)0)->presentation_complete_semaphores)},
+		.render_command_buffers = {.name = "render_command_buffers", .type = TYPE_vulkan_command_buffer_data_t, .offset = offsetof(vulkan_render_context_t, render_command_buffers), .size = sizeof(((vulkan_render_context_t*)0)->render_command_buffers)},
+		.frames = {.name = "frames", .type = TYPE_vulkan_render_frame_state_t, .offset = offsetof(vulkan_render_context_t, frames), .size = sizeof(((vulkan_render_context_t*)0)->frames)},
+		.current_frame = {.name = "current_frame", .type = TYPE_vulkan_render_frame_state_t, .offset = offsetof(vulkan_render_context_t, current_frame), .size = sizeof(((vulkan_render_context_t*)0)->current_frame)},
+		.instanced_rendering_buffer = {.name = "instanced_rendering_buffer", .type = TYPE_vulkan_buffer_data_t, .offset = offsetof(vulkan_render_context_t, instanced_rendering_buffer), .size = sizeof(((vulkan_render_context_t*)0)->instanced_rendering_buffer)},
+		.index_buffer = {.name = "index_buffer", .type = TYPE_vulkan_buffer_data_t, .offset = offsetof(vulkan_render_context_t, index_buffer), .size = sizeof(((vulkan_render_context_t*)0)->index_buffer)},
+		.vertex_buffer = {.name = "vertex_buffer", .type = TYPE_vulkan_buffer_data_t, .offset = offsetof(vulkan_render_context_t, vertex_buffer), .size = sizeof(((vulkan_render_context_t*)0)->vertex_buffer)},
+		.main_renderpass = {.name = "main_renderpass", .type = TYPE_vulkan_renderpass_data_t, .offset = offsetof(vulkan_render_context_t, main_renderpass), .size = sizeof(((vulkan_render_context_t*)0)->main_renderpass)},
+		.default_shader = {.name = "default_shader", .type = TYPE_asset_handle_t, .offset = offsetof(vulkan_render_context_t, default_shader), .size = sizeof(((vulkan_render_context_t*)0)->default_shader)},
+		.default_texture = {.name = "default_texture", .type = TYPE_asset_handle_t, .offset = offsetof(vulkan_render_context_t, default_texture), .size = sizeof(((vulkan_render_context_t*)0)->default_texture)},
+		.invalid_texture_data = {.name = "invalid_texture_data", .type = TYPE_texture2D_t, .offset = offsetof(vulkan_render_context_t, invalid_texture_data), .size = sizeof(((vulkan_render_context_t*)0)->invalid_texture_data)},
+		.vertex_offset = {.name = "vertex_offset", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, vertex_offset), .size = sizeof(((vulkan_render_context_t*)0)->vertex_offset)},
+		.geometry_index = {.name = "geometry_index", .type = TYPE_u32, .offset = offsetof(vulkan_render_context_t, geometry_index), .size = sizeof(((vulkan_render_context_t*)0)->geometry_index)},
+		.test_camera = {.name = "test_camera", .type = TYPE_render_camera_t, .offset = offsetof(vulkan_render_context_t, test_camera), .size = sizeof(((vulkan_render_context_t*)0)->test_camera)},
+		.debug_callback = {.name = "debug_callback", .type = TYPE_VkDebugUtilsMessengerEXT, .offset = offsetof(vulkan_render_context_t, debug_callback), .size = sizeof(((vulkan_render_context_t*)0)->debug_callback)},
+	}
+};
+
+const static type_info_hash_table_header_t type_info_hash_table_header_t = {
+	.name = "hash_table_header_t",
+	.type = TYPE_hash_table_header_t,
+	.members = {
+		.max_entries = {.name = "max_entries", .type = TYPE_u32, .offset = offsetof(hash_table_header_t, max_entries), .size = sizeof(((hash_table_header_t*)0)->max_entries)},
+		.flags = {.name = "flags", .type = TYPE_u32, .offset = offsetof(hash_table_header_t, flags), .size = sizeof(((hash_table_header_t*)0)->flags)},
+		.current_entry_count = {.name = "current_entry_count", .type = TYPE_u32, .offset = offsetof(hash_table_header_t, current_entry_count), .size = sizeof(((hash_table_header_t*)0)->current_entry_count)},
+		.debug_id = {.name = "debug_id", .type = TYPE_u32, .offset = offsetof(hash_table_header_t, debug_id), .size = sizeof(((hash_table_header_t*)0)->debug_id)},
+	}
+};
+
+const static type_info_threadpool_queue_entry_t type_info_threadpool_queue_entry_t = {
+	.name = "threadpool_queue_entry_t",
+	.type = TYPE_threadpool_queue_entry_t,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .offset = offsetof(threadpool_queue_entry_t, is_valid), .size = sizeof(((threadpool_queue_entry_t*)0)->is_valid)},
+		.entry_buffer = {.name = "entry_buffer", .type = TYPE_byte, .offset = offsetof(threadpool_queue_entry_t, entry_buffer), .size = sizeof(((threadpool_queue_entry_t*)0)->entry_buffer)},
+		.user_data = {.name = "user_data", .type = TYPE_void, .offset = offsetof(threadpool_queue_entry_t, user_data), .size = sizeof(((threadpool_queue_entry_t*)0)->user_data)},
+		.callback = {.name = "callback", .type = TYPE_threadpool_callback_t, .offset = offsetof(threadpool_queue_entry_t, callback), .size = sizeof(((threadpool_queue_entry_t*)0)->callback)},
+	}
+};
+
+const static type_info_threadpool_queue_t type_info_threadpool_queue_t = {
+	.name = "threadpool_queue_t",
+	.type = TYPE_threadpool_queue_t,
+	.members = {
+		.completion_goal = {.name = "completion_goal", .type = TYPE_u32, .offset = offsetof(threadpool_queue_t, completion_goal), .size = sizeof(((threadpool_queue_t*)0)->completion_goal)},
+		.entries_completed = {.name = "entries_completed", .type = TYPE_u32, .offset = offsetof(threadpool_queue_t, entries_completed), .size = sizeof(((threadpool_queue_t*)0)->entries_completed)},
+		.next_entry_to_write = {.name = "next_entry_to_write", .type = TYPE_u32, .offset = offsetof(threadpool_queue_t, next_entry_to_write), .size = sizeof(((threadpool_queue_t*)0)->next_entry_to_write)},
+		.next_entry_to_read = {.name = "next_entry_to_read", .type = TYPE_u32, .offset = offsetof(threadpool_queue_t, next_entry_to_read), .size = sizeof(((threadpool_queue_t*)0)->next_entry_to_read)},
+		.entries = {.name = "entries", .type = TYPE_threadpool_queue_entry_t, .offset = offsetof(threadpool_queue_t, entries), .size = sizeof(((threadpool_queue_t*)0)->entries)},
+	}
+};
+
+const static type_info_threadpool_t type_info_threadpool_t = {
+	.name = "threadpool_t",
+	.type = TYPE_threadpool_t,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .offset = offsetof(threadpool_t, is_initialized), .size = sizeof(((threadpool_t*)0)->is_initialized)},
+		.semaphore = {.name = "semaphore", .type = TYPE_sys_semaphore_t, .offset = offsetof(threadpool_t, semaphore), .size = sizeof(((threadpool_t*)0)->semaphore)},
+		.threads_awake = {.name = "threads_awake", .type = TYPE_u32, .offset = offsetof(threadpool_t, threads_awake), .size = sizeof(((threadpool_t*)0)->threads_awake)},
+		.max_threads = {.name = "max_threads", .type = TYPE_u32, .offset = offsetof(threadpool_t, max_threads), .size = sizeof(((threadpool_t*)0)->max_threads)},
+		.high_priority_queue = {.name = "high_priority_queue", .type = TYPE_threadpool_queue_t, .offset = offsetof(threadpool_t, high_priority_queue), .size = sizeof(((threadpool_t*)0)->high_priority_queue)},
+		.low_priority_queue = {.name = "low_priority_queue", .type = TYPE_threadpool_queue_t, .offset = offsetof(threadpool_t, low_priority_queue), .size = sizeof(((threadpool_t*)0)->low_priority_queue)},
+	}
+};
+
+const static type_info_render_geometry_instance_t type_info_render_geometry_instance_t = {
+	.name = "render_geometry_instance_t",
+	.type = TYPE_render_geometry_instance_t,
+	.members = {
+		.transform = {.name = "transform", .type = TYPE_mat4_t, .offset = offsetof(render_geometry_instance_t, transform), .size = sizeof(((render_geometry_instance_t*)0)->transform)},
+		.color = {.name = "color", .type = TYPE_vec4_t, .offset = offsetof(render_geometry_instance_t, color), .size = sizeof(((render_geometry_instance_t*)0)->color)},
+		.uv_min = {.name = "uv_min", .type = TYPE_vec2_t, .offset = offsetof(render_geometry_instance_t, uv_min), .size = sizeof(((render_geometry_instance_t*)0)->uv_min)},
+		.uv_max = {.name = "uv_max", .type = TYPE_vec2_t, .offset = offsetof(render_geometry_instance_t, uv_max), .size = sizeof(((render_geometry_instance_t*)0)->uv_max)},
+		.texture_index = {.name = "texture_index", .type = TYPE_u32, .offset = offsetof(render_geometry_instance_t, texture_index), .size = sizeof(((render_geometry_instance_t*)0)->texture_index)},
+		.camera_index = {.name = "camera_index", .type = TYPE_u32, .offset = offsetof(render_geometry_instance_t, camera_index), .size = sizeof(((render_geometry_instance_t*)0)->camera_index)},
+	}
+};
+
+const static type_info_render_geometry_batch_t type_info_render_geometry_batch_t = {
+	.name = "render_geometry_batch_t",
+	.type = TYPE_render_geometry_batch_t,
+	.members = {
+		.camera_data = {.name = "camera_data", .type = TYPE_render_camera_t, .offset = offsetof(render_geometry_batch_t, camera_data), .size = sizeof(((render_geometry_batch_t*)0)->camera_data)},
+		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .offset = offsetof(render_geometry_batch_t, is_valid), .size = sizeof(((render_geometry_batch_t*)0)->is_valid)},
+		.primitive_count = {.name = "primitive_count", .type = TYPE_u32, .offset = offsetof(render_geometry_batch_t, primitive_count), .size = sizeof(((render_geometry_batch_t*)0)->primitive_count)},
+		.master_array_start_offset = {.name = "master_array_start_offset", .type = TYPE_u32, .offset = offsetof(render_geometry_batch_t, master_array_start_offset), .size = sizeof(((render_geometry_batch_t*)0)->master_array_start_offset)},
+		.instances = {.name = "instances", .type = TYPE_render_geometry_instance_t, .offset = offsetof(render_geometry_batch_t, instances), .size = sizeof(((render_geometry_batch_t*)0)->instances)},
+		.next_buffer = {.name = "next_buffer", .type = TYPE_render_geometry_batch_t, .offset = offsetof(render_geometry_batch_t, next_buffer), .size = sizeof(((render_geometry_batch_t*)0)->next_buffer)},
+	}
+};
+
+const static type_info_render_group_t type_info_render_group_t = {
+	.name = "render_group_t",
+	.type = TYPE_render_group_t,
+	.members = {
+		.ID = {.name = "ID", .type = TYPE_u64, .offset = offsetof(render_group_t, ID), .size = sizeof(((render_group_t*)0)->ID)},
+		.dynamic_pipeline_state = {.name = "dynamic_pipeline_state", .type = TYPE_render_pipeline_state_t, .offset = offsetof(render_group_t, dynamic_pipeline_state), .size = sizeof(((render_group_t*)0)->dynamic_pipeline_state)},
+		.shader = {.name = "shader", .type = TYPE_asset_handle_t, .offset = offsetof(render_group_t, shader), .size = sizeof(((render_group_t*)0)->shader)},
+		.textures = {.name = "textures", .type = TYPE_texture2D_t, .offset = offsetof(render_group_t, textures), .size = sizeof(((render_group_t*)0)->textures)},
+		.current_texture_count = {.name = "current_texture_count", .type = TYPE_u32, .offset = offsetof(render_group_t, current_texture_count), .size = sizeof(((render_group_t*)0)->current_texture_count)},
+		.master_batch_array = {.name = "master_batch_array", .type = TYPE_render_geometry_instance_t, .offset = offsetof(render_group_t, master_batch_array), .size = sizeof(((render_group_t*)0)->master_batch_array)},
+		.total_primitive_count = {.name = "total_primitive_count", .type = TYPE_u32, .offset = offsetof(render_group_t, total_primitive_count), .size = sizeof(((render_group_t*)0)->total_primitive_count)},
+		.cached_buffer = {.name = "cached_buffer", .type = TYPE_render_geometry_batch_t, .offset = offsetof(render_group_t, cached_buffer), .size = sizeof(((render_group_t*)0)->cached_buffer)},
+		.first_buffer = {.name = "first_buffer", .type = TYPE_render_geometry_batch_t, .offset = offsetof(render_group_t, first_buffer), .size = sizeof(((render_group_t*)0)->first_buffer)},
+	}
+};
+
+const static type_info_draw_frame_t type_info_draw_frame_t = {
+	.name = "draw_frame_t",
+	.type = TYPE_draw_frame_t,
+	.members = {
+		.used_render_groups = {.name = "used_render_groups", .type = TYPE_render_group_t, .offset = offsetof(draw_frame_t, used_render_groups), .size = sizeof(((draw_frame_t*)0)->used_render_groups)},
+		.used_render_group_count = {.name = "used_render_group_count", .type = TYPE_u32, .offset = offsetof(draw_frame_t, used_render_group_count), .size = sizeof(((draw_frame_t*)0)->used_render_group_count)},
+		.used_camera = {.name = "used_camera", .type = TYPE_render_camera_t, .offset = offsetof(draw_frame_t, used_camera), .size = sizeof(((draw_frame_t*)0)->used_camera)},
+		.used_camera_count = {.name = "used_camera_count", .type = TYPE_u32, .offset = offsetof(draw_frame_t, used_camera_count), .size = sizeof(((draw_frame_t*)0)->used_camera_count)},
+		.cached_camera_ID = {.name = "cached_camera_ID", .type = TYPE_u64_t, .offset = offsetof(draw_frame_t, cached_camera_ID), .size = sizeof(((draw_frame_t*)0)->cached_camera_ID)},
+		.active_render_layer = {.name = "active_render_layer", .type = TYPE_u32, .offset = offsetof(draw_frame_t, active_render_layer), .size = sizeof(((draw_frame_t*)0)->active_render_layer)},
+		.active_render_group = {.name = "active_render_group", .type = TYPE_render_group_t, .offset = offsetof(draw_frame_t, active_render_group), .size = sizeof(((draw_frame_t*)0)->active_render_group)},
+		.active_camera = {.name = "active_camera", .type = TYPE_render_camera_t, .offset = offsetof(draw_frame_t, active_camera), .size = sizeof(((draw_frame_t*)0)->active_camera)},
+		.active_shader = {.name = "active_shader", .type = TYPE_asset_handle_t, .offset = offsetof(draw_frame_t, active_shader), .size = sizeof(((draw_frame_t*)0)->active_shader)},
+		.active_pipeline_state = {.name = "active_pipeline_state", .type = TYPE_render_pipeline_state_t, .offset = offsetof(draw_frame_t, active_pipeline_state), .size = sizeof(((draw_frame_t*)0)->active_pipeline_state)},
+	}
+};
+
+const static type_info_render_state_t type_info_render_state_t = {
+	.name = "render_state_t",
+	.type = TYPE_render_state_t,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .offset = offsetof(render_state_t, is_initialized), .size = sizeof(((render_state_t*)0)->is_initialized)},
+		.renderer_arena = {.name = "renderer_arena", .type = TYPE_memory_arena_t, .offset = offsetof(render_state_t, renderer_arena), .size = sizeof(((render_state_t*)0)->renderer_arena)},
+		.render_context = {.name = "render_context", .type = TYPE_vulkan_render_context_t, .offset = offsetof(render_state_t, render_context), .size = sizeof(((render_state_t*)0)->render_context)},
+		.current_frame_data = {.name = "current_frame_data", .type = TYPE_vulkan_render_frame_state_t, .offset = offsetof(render_state_t, current_frame_data), .size = sizeof(((render_state_t*)0)->current_frame_data)},
+		.render_group_hash = {.name = "render_group_hash", .type = TYPE_render_group_t, .offset = offsetof(render_state_t, render_group_hash), .size = sizeof(((render_state_t*)0)->render_group_hash)},
+		.draw_frame = {.name = "draw_frame", .type = TYPE_draw_frame_t, .offset = offsetof(render_state_t, draw_frame), .size = sizeof(((render_state_t*)0)->draw_frame)},
+	}
+};
+
+const static type_info_global_context_t type_info_global_context_t = {
+	.name = "global_context_t",
+	.type = TYPE_global_context_t,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .offset = offsetof(global_context_t, is_initialized), .size = sizeof(((global_context_t*)0)->is_initialized)},
+		.running = {.name = "running", .type = TYPE_bool8, .offset = offsetof(global_context_t, running), .size = sizeof(((global_context_t*)0)->running)},
+		.context_arena = {.name = "context_arena", .type = TYPE_memory_arena_t, .offset = offsetof(global_context_t, context_arena), .size = sizeof(((global_context_t*)0)->context_arena)},
+		.temporary_arena = {.name = "temporary_arena", .type = TYPE_memory_arena_t, .offset = offsetof(global_context_t, temporary_arena), .size = sizeof(((global_context_t*)0)->temporary_arena)},
+		.main_threadpool = {.name = "main_threadpool", .type = TYPE_threadpool_t, .offset = offsetof(global_context_t, main_threadpool), .size = sizeof(((global_context_t*)0)->main_threadpool)},
+	}
+};
+
+const static type_info_input_data_t type_info_input_data_t = {
+	.name = "input_data_t",
+	.type = TYPE_input_data_t,
+	.members = {
+		.input_axis = {.name = "input_axis", .type = TYPE_vec2_t, .offset = offsetof(input_data_t, input_axis), .size = sizeof(((input_data_t*)0)->input_axis)},
+	}
+};
+
+const static type_info_client_data_t type_info_client_data_t = {
+	.name = "client_data_t",
+	.type = TYPE_client_data_t,
+	.members = {
+		.ID = {.name = "ID", .type = TYPE_u32, .offset = offsetof(client_data_t, ID), .size = sizeof(((client_data_t*)0)->ID)},
+		.connected = {.name = "connected", .type = TYPE_bool32, .offset = offsetof(client_data_t, connected), .size = sizeof(((client_data_t*)0)->connected)},
+		.address = {.name = "address", .type = TYPE_sockaddr_storage, .offset = offsetof(client_data_t, address), .size = sizeof(((client_data_t*)0)->address)},
+		.addr_len = {.name = "addr_len", .type = TYPE_socklen_t, .offset = offsetof(client_data_t, addr_len), .size = sizeof(((client_data_t*)0)->addr_len)},
+		.player = {.name = "player", .type = TYPE_entity_t, .offset = offsetof(client_data_t, player), .size = sizeof(((client_data_t*)0)->player)},
+		.input_data_buffer = {.name = "input_data_buffer", .type = TYPE_input_data_t, .offset = offsetof(client_data_t, input_data_buffer), .size = sizeof(((client_data_t*)0)->input_data_buffer)},
+		.input_data_head = {.name = "input_data_head", .type = TYPE_u32, .offset = offsetof(client_data_t, input_data_head), .size = sizeof(((client_data_t*)0)->input_data_head)},
+		.input_data_tail = {.name = "input_data_tail", .type = TYPE_u32, .offset = offsetof(client_data_t, input_data_tail), .size = sizeof(((client_data_t*)0)->input_data_tail)},
+	}
+};
+
+const static type_info_game_state_t type_info_game_state_t = {
+	.name = "game_state_t",
+	.type = TYPE_game_state_t,
+	.members = {
+		.window = {.name = "window", .type = TYPE_SDL_Window, .offset = offsetof(game_state_t, window), .size = sizeof(((game_state_t*)0)->window)},
+		.window_size = {.name = "window_size", .type = TYPE_vec2_t, .offset = offsetof(game_state_t, window_size), .size = sizeof(((game_state_t*)0)->window_size)},
+		.input_axis = {.name = "input_axis", .type = TYPE_vec2_t, .offset = offsetof(game_state_t, input_axis), .size = sizeof(((game_state_t*)0)->input_axis)},
+		.entity_manager = {.name = "entity_manager", .type = TYPE_entity_manager_t, .offset = offsetof(game_state_t, entity_manager), .size = sizeof(((game_state_t*)0)->entity_manager)},
+		.player = {.name = "player", .type = TYPE_entity_t, .offset = offsetof(game_state_t, player), .size = sizeof(((game_state_t*)0)->player)},
+		.is_host = {.name = "is_host", .type = TYPE_bool8, .offset = offsetof(game_state_t, is_host), .size = sizeof(((game_state_t*)0)->is_host)},
+		.socket = {.name = "socket", .type = TYPE_s32, .offset = offsetof(game_state_t, socket), .size = sizeof(((game_state_t*)0)->socket)},
+		.host_address_data = {.name = "host_address_data", .type = TYPE_sockaddr_in_t, .offset = offsetof(game_state_t, host_address_data), .size = sizeof(((game_state_t*)0)->host_address_data)},
+		.client_id = {.name = "client_id", .type = TYPE_u32, .offset = offsetof(game_state_t, client_id), .size = sizeof(((game_state_t*)0)->client_id)},
+		.clients = {.name = "clients", .type = TYPE_client_data_t, .offset = offsetof(game_state_t, clients), .size = sizeof(((game_state_t*)0)->clients)},
+		.connected_client_count = {.name = "connected_client_count", .type = TYPE_u32, .offset = offsetof(game_state_t, connected_client_count), .size = sizeof(((game_state_t*)0)->connected_client_count)},
 	}
 };
 

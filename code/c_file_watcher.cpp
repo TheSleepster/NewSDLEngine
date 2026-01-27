@@ -8,11 +8,11 @@
 #include <c_file_watcher.h>
 
 file_watcher_t 
-c_file_watcher_create(file_watcher_change_event_t events_to_monitor,
-                      bool8                       recursive,
-                      file_watcher_callback_t    *callback,
-                      void                       *user_data,
-                      bool8                       is_verbose)
+c_file_watcher_create(file_watcher_change_event_t  events_to_monitor,
+                      bool8                        recursive,
+                      file_watcher_callback_pfn_t *callback,
+                      void                        *user_data,
+                      bool8                        is_verbose)
 {
     file_watcher_t result = {};
     

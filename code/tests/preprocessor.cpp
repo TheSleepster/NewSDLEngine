@@ -41,6 +41,7 @@
 // - [ ] REALLY JUST HANDLE ANY # BLOCK
 // - [ ] MERGE ALL THE IS_* FLAGS (IS_POINTER, IS_CONSTANT, IS_VOLATILE, ETC.) INTO FLAGS
 // - [ ] GET_STRUCT_INFO() FUNCTION TO SWITCH-CASE ON THE STRUCTURE_TYPE
+// - [ ] FIGURE OUT A BETTER WAY TO DEAL WITH INSTANCES LIKE ZONE_ALLOCATOR_BLOCK...
 
 #if 0
 struct type_info_internal_members_t {
@@ -66,7 +67,6 @@ struct type_info_test_element_data_t {
         u32 member_count;
 };
 #endif
-
 
 #define INSPECT
 
@@ -313,15 +313,18 @@ append_type_enum_token(preprocessor_token_t type_name_token)
     if(type_name_token.type == TT_Identifier)
     {
         string_t alt_type_name = c_string_concat(&global_context->temporary_arena, type_name_token.string, STR("_t"));
+        string_t non_type_name = type_name_token.string;
+        non_type_name.count -= 2;
 
-        u64 type_id = c_fnv_hash_value(type_name_token.string.data, type_name_token.string.count);
-        u64 alt_type_id = c_fnv_hash_value(alt_type_name.data, alt_type_name.count);
+        u64 type_id      = c_fnv_hash_value(type_name_token.string.data, type_name_token.string.count);
+        u64 alt_type_id  = c_fnv_hash_value(alt_type_name.data, alt_type_name.count);
+        u64 non_typed_id = c_fnv_hash_value(non_type_name.data, non_type_name.count);
 
         bool8 ID_found = false;
         c_dynarray_for(state.type_ids, id_index)
         {
             u64 ID = state.type_ids[id_index];
-            if(ID == type_id || ID == alt_type_id)
+            if(ID == type_id || ID == alt_type_id || ID == non_typed_id)
             {
                 ID_found = true;
                 break;
@@ -348,9 +351,15 @@ append_type_enum_token(preprocessor_token_t type_name_token)
 }
 
 internal_api inline preprocessor_token_t
-peek_next_token(string_t token_data)
+peek_next_token(string_t token_data, u32 times = 1)
 {
-    preprocessor_token_t result = get_next_token(&token_data);
+    preprocessor_token_t result = {};
+    for(u32 peek_index = 0;
+        peek_index < times;
+        ++peek_index)
+    {
+        result = get_next_token(&token_data);
+    }
     return(result);
 }
 
@@ -359,15 +368,23 @@ parse_member(preprocessor_token_t structure_name,
              preprocessor_token_t type_token, 
              string_t            *tokenized_data, 
              string_builder_t    *local_type_info_builder, 
-             string_builder_t    *local_const_definition_builder)
+             string_builder_t    *local_const_definition_builder,
+             bool8                c_style_struct)
 {
     preprocessor_token_t element_identifier;
     preprocessor_token_t type_identifier = type_token;
+
+    bool8 name_found = false;
+    bool8 is_pointer = false;
     for(;;)
     {
         preprocessor_token_t token = get_next_token(tokenized_data);
         switch(token.type)
         {
+            case TT_Asterisk:
+            {
+                is_pointer = true;
+            }break;
             case TT_Identifier:
             {
                 bool8 is_constant         = c_string_compare(type_identifier.string, STR("const"));
@@ -376,37 +393,33 @@ parse_member(preprocessor_token_t structure_name,
                 bool8 is_hash_table       = c_string_compare(type_identifier.string, STR("HashTable_t"));
 
                 // NOTE(Sleepster): If we find a modifier, breakout and advance.
-                if(is_constant || is_volatile)
+                if(is_constant || is_volatile || is_hash_table || is_dynarray)
                 {
                     // NOTE(Sleepster): If we're in here, there's type qualifiers that we must skip for the true type 
                     type_identifier = token;
                     break;
                 }
-                if(is_dynarray)
-                {
-                    char *buffer = c_arena_push_array(&global_context->temporary_arena, char, 256);
-                    s32 length = sprintf(buffer, "DynArray_%.*s", token.string.count, C_STR(token.string));
-                    type_identifier.string = {
-                        .count = (u32)length,
-                        .data = (byte*)buffer,
-                    };
-                }
-                if(is_hash_table)
-                {
-                    char *buffer = c_arena_push_array(&global_context->temporary_arena, char, 256);
-                    s32 length = sprintf(buffer, "HashTable_%.*s", token.string.count, C_STR(token.string));
-                    type_identifier.string = {
-                        .count = (u32)length,
-                        .data = (byte*)buffer,
-                    };
-                }
 
                 // NOTE(Sleepster): If we reach here, this is a name or type, save it as the element_identifier.
-                element_identifier = token;
+                if(!name_found)
+                {
+                    element_identifier = token;
+                    name_found = true;
+                }
             }break;
             case TT_Semicolon:
             {
                 append_type_enum_token(type_identifier);
+                if(c_style_struct)
+                {
+                    string_t struct_name_tail = type_identifier.string;
+                    struct_name_tail.data += struct_name_tail.count - 2;
+                    struct_name_tail.count = 2;
+                    if(!c_string_compare(struct_name_tail, STR("_t")))
+                    {
+                        type_identifier.string = c_string_concat(&global_context->temporary_arena, type_identifier.string, STR("_t"));
+                    }
+                }
 
                 // NOTE(Sleepster): format the type information 
                 char buffer[8192];
@@ -419,15 +432,25 @@ parse_member(preprocessor_token_t structure_name,
                 };
                 c_string_builder_append_data(local_type_info_builder, test_string);
 
+                preprocessor_token_t type_identifier_COPY = type_identifier;
+                if(is_pointer)
+                {
+                    type_identifier_COPY.string = c_string_concat(&global_context->temporary_arena, 
+                                                                  type_identifier_COPY.string, 
+                                                                  STR("*"));
+                    is_pointer = false;
+                }
+
                 // NOTE(Sleepster): format the const definition information 
                 memset(buffer, 0, sizeof(buffer));
-                length = sprintf(buffer, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .offset = offsetof(%.*s, %.*s), .size = sizeof(%.*s)},\n",
-                                 element_identifier.string.count, C_STR(element_identifier.string),  // initialized name
-                                 element_identifier.string.count, C_STR(element_identifier.string),  // .name
-                                 type_identifier.string.count,    C_STR(type_identifier.string),     // .type
-                                 structure_name.string.count,     C_STR(structure_name.string),      // .offset structure
-                                 element_identifier.string.count, C_STR(element_identifier.string),  // .offset element name
-                                 type_identifier.string.count,    C_STR(type_identifier.string)); // .size
+                length = sprintf(buffer, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .offset = offsetof(%.*s, %.*s), .size = sizeof(((%.*s*)0)->%.*s)},\n",
+                                 element_identifier.string.count,   C_STR(element_identifier.string),    // initialized name
+                                 element_identifier.string.count,   C_STR(element_identifier.string),    // .name
+                                 type_identifier.string.count,      C_STR(type_identifier.string),       // .type
+                                 structure_name.string.count,       C_STR(structure_name.string),        // .offset structure
+                                 element_identifier.string.count,   C_STR(element_identifier.string),    // .offset element name
+                                 structure_name.string.count,       C_STR(structure_name.string),        // .offset structure
+                                 element_identifier.string.count,   C_STR(element_identifier.string)); // .size
                 test_string = {
                     .data  = (byte*)buffer,
                     .count = (u32)length
@@ -450,15 +473,23 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
     c_string_builder_init(&local_type_info_builder, MB(10));
     c_string_builder_init(&local_const_definition_builder, MB(10));
 
-
     // NOTE(Sleepster): Peeking too see if it's an anonymous structure. If it is, just put it inline
     preprocessor_token_t struct_name_token = peek_next_token(*tokenized_data);
     if(struct_name_token.type == TT_OpeningBrace)
     {
         return(struct_name_token);
     }
-    append_type_enum_token(struct_name_token);
+
     struct_name_token = get_next_token(tokenized_data);
+    string_t struct_name_tail = struct_name_token.string;
+    struct_name_tail.data += struct_name_tail.count - 2;
+    struct_name_tail.count = 2;
+    if(!c_string_compare(struct_name_tail, STR("_t")))
+    {
+        struct_name_token.string = c_string_concat(&global_context->temporary_arena, struct_name_token.string, STR("_t"));
+    }
+
+    append_type_enum_token(struct_name_token);
 
     // NOTE(Sleepster): This checks if it's simply a struct declaration. If it is, we're out.
     preprocessor_token_t struct_declaration = peek_next_token(*tokenized_data);
@@ -470,7 +501,7 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
     // NOTE(Sleepster): Build the local version of the struct info 
     char buffer[8192];
 
-    s32 length = sprintf(buffer, "struct type_info_%.*s {\n\tconst char *name;\n\tu32 type;\n\tu32 member_count;\n\tstruct members {\n", 
+    s32 length = sprintf(buffer, "struct type_info_%.*s {\n\tconst char *name;\n\tu32 type;\n\tu32 member_count;\n\tstruct {\n", 
                          struct_name_token.string.count, C_STR(struct_name_token.string));
     string_t test_string = {
         .data  = (byte*)buffer,
@@ -492,6 +523,7 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
     };
     c_string_builder_append_data(&local_const_definition_builder, test_string);
 
+    bool8 c_style_struct = false;
     // NOTE(Sleepster): Loop until the end of this structure or the file 
     for(;;)
     {
@@ -504,12 +536,32 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
                 if(c_string_compare(token.string, STR("struct")) ||
                    c_string_compare(token.string, STR("union")))
                 {
+                    // NOTE(Sleepster): Peek ahead twice... This is to check if it's a C style declaration
+                    // something like:
+                    // typedef struct element
+                    // {
+                    //      struct element *first_element;
+                    // }element_t;
+                    //
+                    // This is behavior I want to support.
+                    preprocessor_token_t peeked = peek_next_token(*tokenized_data, 2);
+                    if(peeked.type != TT_OpeningBrace)
+                    {
+                        c_style_struct = true;
+                        break;
+                    }
+
                     // NOTE(Sleepster): After we return from parse_structure, we've left the TT_Semicolon for the structure, just eat it.
                     preprocessor_token_t nested_struct_name = parse_structure(tokenized_data, token);
                     if(nested_struct_name.type != TT_OpeningBrace)
                     {
-                        char buffer[8192];
+                        preprocessor_token_t next_token = peek_next_token(*tokenized_data);
+                        if(next_token.type != TT_Identifier) 
+                        {
+                            break;
+                        }
 
+                        char buffer[8192];
                         s32 length = sprintf(buffer, "\t\ttype_info_member_t %.*s;\n", 
                                              nested_struct_name.string.count, C_STR(nested_struct_name.string));
                         string_t test_string = {
@@ -524,8 +576,17 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
                     break;
                 }
 
+                string_t struct_name_tail = struct_name_token.string;
+                struct_name_tail.data += struct_name_tail.count - 2;
+                struct_name_tail.count = 2;
+                if(!c_string_compare(struct_name_tail, STR("_t")))
+                {
+                    struct_name_token.string = c_string_concat(&global_context->temporary_arena, struct_name_token.string, STR("_t"));
+                }
+
                 // NOTE(Sleepster): Parse the member until the TT_Semicolon 
-                parse_member(struct_name_token, token, tokenized_data, &local_type_info_builder, &local_const_definition_builder);
+                parse_member(struct_name_token, token, tokenized_data, &local_type_info_builder, &local_const_definition_builder, c_style_struct);
+                c_style_struct = false;
             }break;
             case TT_ClosingBrace:
             {
@@ -558,6 +619,16 @@ VISIT_FILES(generate_file_metadata)
     }
     if(c_string_compare(filename, STR("preprocessor_type_data.h"))) return;
     if(c_string_compare(filename, STR("GENERATED_program_types.h"))) return;
+    if(c_string_compare(filename, STR("c_math.h"))) return;
+
+    string_t file_desc = {
+        .count = 4,
+        .data  = filename.data
+    };
+    if(c_string_compare(file_desc, STR("sys_")))
+    {
+        return;
+    }
 
     string_t file_data = c_file_read_entirety(filename);
     Assert(file_data.data);
@@ -616,11 +687,11 @@ main(int argc, char **argv)
     //string_t file_data = c_file_read_entirety(STR("c_globals.h"));
     //fprintf(stdout, "%s", C_STR(file_data));
 
-#if 0
+#if 1 
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else
-    string_t file_data = c_file_read_entirety(STR("c_globals.h"));
+    string_t file_data = c_file_read_entirety(STR("tests/GENERATED_test2.h"));
     Assert(file_data.data);
     Assert(file_data.count > 0);
 
