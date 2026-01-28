@@ -126,13 +126,13 @@
             "name": "test_preprocessor",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test_preprocessor",
+            "program": "${workspaceFolder}/build/code_generator",
             "cwd": "${workspaceFolder}/code",
             "stopOnEntry": false,
             "terminal": "integrated",
             "stdio": [
                 null,
-                "code/GENERATED/GENERATED_program_types.h",
+                "code/meta/GENERATED_program_types.h",
                 null
             ]
         }

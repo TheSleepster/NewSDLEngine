@@ -32,7 +32,7 @@
 #include <g_entity.h>
 
 #include <asset_file_packer/jfd_asset_file.h>
-//#include <GENERATED/GENERATED_program_types.h>
+#include <meta/GENERATED_program_types.h>
 
 internal_api void
 c_process_window_events(SDL_Window *window, vulkan_render_context_t *render_context, input_manager_t *input_manager)

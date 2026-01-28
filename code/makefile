@@ -81,9 +81,13 @@ GAME_INCLUDES           = $(COMMON_INCLUDES)
 GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static -lfreetype -lvulkan -lspirv_reflect
 
 # Tests
+# Use patsubst to strip 'tests/' pefix and add 'test_' prefix for output
 TESTS_SRC = $(wildcard tests/*.cpp)
-# Use patsubst to strip 'tests/' prefix and add 'test_' prefix for output
 TESTS_OUT = $(patsubst tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
+
+# Metaprogram 
+CODE_GENERATOR_SRC = code_generator/preprocessor.cpp
+CODE_GENERATOR_OUT = $(BUILD_DIR)/code_generator$(EXE_EXT)
 
 # Packers
 WAD_ASSET_FILE_PACKER_SRC = asset_file_packer/wad_asset_file_packer.cpp
@@ -104,13 +108,31 @@ JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
 # --------------------------------------------
 # Build Instructions
 # --------------------------------------------
-.PHONY: all shaders clean
+.PHONY: all shaders clean run_codegen
 
-all: $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
+all: run_codegen $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
 
 # Create Build Directory
 $(BUILD_DIR):
 	$(call MKDIR,$(BUILD_DIR))
+
+# -------------------------------------------------------------------------
+# Code Generator - Build and Run BEFORE everything else
+# -------------------------------------------------------------------------
+$(CODE_GENERATOR_OUT): $(CODE_GENERATOR_SRC) | $(BUILD_DIR)
+	@echo [BUILDING METAPROGRAM] $@
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+		-MT $@ -MMD -MP -MF $(BUILD_DIR)/code_generator.d \
+		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
+
+# Run the code generator - this happens before any other compilation
+# Depends on all source files so it reruns when any source changes
+../code/meta/GENERATED_program_types.h: $(CODE_GENERATOR_OUT) $(ALL_SRCS)
+	@echo [GENERATING] $@
+	$(SILENT)$(call MKDIR,../code/meta)
+	$(SILENT)$(CODE_GENERATOR_OUT) > $@
+
+run_codegen: ../code/meta/GENERATED_program_types.h
 
 # -------------------------------------------------------------------------
 # Shaders 
@@ -118,32 +140,32 @@ $(BUILD_DIR):
 shaders: $(SHADER_OUTPUTS)
 
 ../run_tree/res/shader_binaries/%.spv: $(SHADER_DIR)/%.slang
-	$(call MKDIR,$(dir $@))
+	$(SILENT)$(call MKDIR,$(dir $@))
 	$(SLANGC) $< $(SLANG_FLAGS) -o $@
 	@echo [SHADERS]: $< to $@
 
 # -------------------------------------------------------------------------
-# Tests (Now with Dependency Tracking)
+# Tests 
 # -------------------------------------------------------------------------
-tests: $(TESTS_OUT)
+tests: run_codegen $(TESTS_OUT)
 
 # Note: We use $* to get the stem (filename without extension) for the .d file
-$(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR)
+$(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR) run_codegen
 	@echo [TEST] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		$(DEPFLAGS) \
 		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
 
 # -------------------------------------------------------------------------
-# Asset file builder (Now with Dependency Tracking)
+# Asset file builder 
 # -------------------------------------------------------------------------
-$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR)
+$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_codegen
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/wad_asset_file_packer.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@ 
 
-$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR)
+$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_codegen
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/jfd_asset_file_packer.d \
@@ -152,8 +174,8 @@ $(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR)
 # -------------------------------------------------------------------------
 # Game build 
 # -------------------------------------------------------------------------
-# Compile source to objects (With DEPFLAGS)
-$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR)
+# Compile source to objects 
+$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR) run_codegen
 	@echo [ENGINE SOURCE]: $< ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) $(DEPFLAGS) -c $< -o $@
 
@@ -166,7 +188,7 @@ clean:
 	-rm -rf $(BUILD_DIR)
 
 # -------------------------------------------------------------------------
-# Dependencies (Magic Logic)
+# Dependencies 
 # -------------------------------------------------------------------------
 # Instead of manually listing files, we include ALL .d files found in the build folder.
 # This works for tests, packers, and game objects automatically.

@@ -18,6 +18,8 @@
 #include <c_string.h>
 #include <c_math.h>
 
+#include <preprocessor_type_data.h>
+
 // TODO(Sleepster): I hate that these defines are here. But I can't put them anywhere else 
 #define MAX_RENDER_GROUPS                    (192)
 #define MAX_HASHED_RENDER_GROUPS             (4093)
@@ -96,6 +98,7 @@ typedef struct vulkan_pipeline_data
 
 // NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. 
 //                  Per material
+GENERATE_TYPE_INFO
 typedef struct render_pipeline_state
 {
     bool32 blend_enabled;

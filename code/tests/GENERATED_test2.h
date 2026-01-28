@@ -9,6 +9,7 @@
 #define GENERATED_TEST2_H
 #include <c_types.h>
 
+GENERATE_TYPE_INFO
 struct test_element_data 
 {
     u32 oranges;
@@ -30,6 +31,7 @@ union test_union
     u8    test_byte;
 };
 
+GENERATE_TYPE_INFO
 typedef struct test_element_typedeffed 
 {
     u32 oranges;
