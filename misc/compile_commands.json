@@ -46,7 +46,7 @@
       "-o",
       "../build/test_preprocessor"
     ],
-    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
+    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
     "output": "../build/test_preprocessor"
   }
 ]

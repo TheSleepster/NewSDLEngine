@@ -643,7 +643,6 @@ VISIT_FILES(generate_file_metadata)
         return;
     }
     if(c_string_compare(filename, STR("preprocessor_type_data.h"))) return;
-    if(c_string_compare(filename, STR("GENERATED_program_types.h"))) return;
     if(c_string_compare(filename, STR("c_math.h"))) return;
 
     string_t file_desc = {
@@ -712,11 +711,11 @@ main(int argc, char **argv)
     //string_t file_data = c_file_read_entirety(STR("c_globals.h"));
     //fprintf(stdout, "%s", C_STR(file_data));
 
-#if 0
+#if 1 
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else
-    string_t file_data = c_file_read_entirety(STR("tests/GENERATED_test2.h"));
+    string_t file_data = c_file_read_entirety(STR("c_globals.h"));
     Assert(file_data.data);
     Assert(file_data.count > 0);
 
