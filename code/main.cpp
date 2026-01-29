@@ -204,9 +204,9 @@ main(int argc, char **argv)
                 r_vulkan_shader_set_uniform_data(render_context->default_shader, STR("Matrices"), &shader->camera_matrices, sizeof(shader->camera_matrices));
 
                 r_render_group_begin(render_state);
-                r_draw_texture(render_state, {0, 0}, {100, 100}, {0.0, 1.0, 0.0, 1.0}, 0, render_context->default_texture);
-                r_draw_rect(render_state, {0, 150}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0);
-                r_draw_texture(render_state, {-100, 100}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0, render_context->default_texture);
+                r_push_texture(render_state, {0, 0}, {100, 100}, {0.0, 1.0, 0.0, 1.0}, 0, render_context->default_texture);
+                r_push_rect(render_state, {0, 150}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0);
+                r_push_texture(render_state, {-100, 100}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0, render_context->default_texture);
                 r_render_group_end(render_state);
                     
                 r_render_group_update_used_groups(render_state);

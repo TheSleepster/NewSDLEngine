@@ -1,13 +1,15 @@
+version: 001
+
 # this is a comment, this is also a standard normal material
-material_name: "Basic Builtin Material";
+name: "Basic Builtin Material";
 shader_binary_name: "test.spv";
 
-uses_diffuse_map: true;
-uses_normal_map: false;
+# TODO(Sleepster): maybe these in the future
+# uses_diffuse_map: true;
+# uses_normal_map: false;
 
-# doubles are marked with d, unsigned values are marked with u, example: "value: 4.0d, value2: 4u"
-
-renderer_effect_application_flags: REAF_Emmision|REAF_Bloom;
+# bitflags are marked like so:
+renderer_effect_flags: REAF_Emmision|REAF_Bloom;
 
 # this stores the whole pipeline state.
 render_pipeline_state: {
@@ -25,6 +27,8 @@ render_pipeline_state: {
     src_alpha_blend_mode: SRC_ALPHA
     dst_alpha_blend_mode: ONE_MINUS_SRC_ALPHA
 };
+
+# doubles are marked with d, unsigned values are marked with u, example: "value: 4.0d, value2: 4u"
 
 # default shader uniform data
 shader_binary_name/RenderIntensityUBO: {

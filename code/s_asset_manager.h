@@ -165,11 +165,11 @@ typedef struct material
     u64                     ID;
     string_t                name;
     
+    string_t                shader_binary_name;
     shader_t               *shader;
+    texture2D_t            *textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
 
-    texture2D_t            *diffuse_map;
-    texture2D_t            *normal_map;
-
+    u32                     renderer_effect_flags;
     render_pipeline_state_t pipeline_state;
 }material_t;
 

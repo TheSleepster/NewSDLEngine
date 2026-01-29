@@ -106,9 +106,9 @@ void            r_render_group_end(render_state_t *render_state);
 void            r_render_state_init(render_state_t *render_state, vulkan_render_context_t *render_context);
 void            r_render_group_update_used_groups(render_state_t *render_state);
 
-void r_draw_texture_ex(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, subtexture_data_t *subtexture_data);
-void r_draw_texture(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, asset_handle_t *texture_handle);
-void r_draw_rect(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation);
+void r_push_texture_ex(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, subtexture_data_t *subtexture_data);
+void r_push_texture(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation, asset_handle_t *texture_handle);
+void r_push_rect(render_state_t *render_state, vec2_t position, vec2_t size, vec4_t color, float32 rotation);
 
 #endif // R_RENDER_GROUP_H
 

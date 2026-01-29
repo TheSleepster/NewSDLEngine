@@ -321,7 +321,7 @@ r_add_texture_to_group_array(render_group_t *render_group, texture2D_t *texture)
 }
 
 void
-r_draw_texture_ex(render_state_t    *render_state, 
+r_push_texture_ex(render_state_t    *render_state, 
                   vec2_t             position, 
                   vec2_t             size, 
                   vec4_t             color, 
@@ -376,7 +376,7 @@ r_draw_texture_ex(render_state_t    *render_state,
 }
 
 void
-r_draw_texture(render_state_t *render_state, 
+r_push_texture(render_state_t *render_state, 
                vec2_t          position, 
                vec2_t          size, 
                vec4_t          color, 
@@ -388,15 +388,15 @@ r_draw_texture(render_state_t *render_state,
     {
         subtexture_data = texture_handle->subtexture_data;
     }
-    r_draw_texture_ex(render_state, position, size, color, rotation, subtexture_data);
+    r_push_texture_ex(render_state, position, size, color, rotation, subtexture_data);
 }
 
 void
-r_draw_rect(render_state_t *render_state, 
+r_push_rect(render_state_t *render_state, 
             vec2_t          position, 
             vec2_t          size, 
             vec4_t          color, 
             float32         rotation)
 {
-    r_draw_texture(render_state, position, size, color, rotation, null);
+    r_push_texture(render_state, position, size, color, rotation, null);
 }

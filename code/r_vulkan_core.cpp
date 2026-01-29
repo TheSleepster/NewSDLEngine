@@ -3022,7 +3022,6 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
 
         vulkan_shader_data_t *shader  = &current_group->shader->slot->shader.shader_data;
         r_vulkan_shader_bind(render_context, shader);
-
         r_vulkan_shader_set_uniform_data(render_context->default_shader, STR("RenderInstances"), current_group->master_batch_array, sizeof(render_geometry_instance_t) * current_group->total_primitive_count);
         
         // TODO(Sleepster): Material system will make this unnecessary 
@@ -3042,18 +3041,21 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
                 ++uniform->texture_data.image_counter;
             }
         }
-
-        r_vulkan_shader_update_all_sets(render_context, shader);
+        r_vulkan_shader_update_static_set(render_context, shader);
 
         VkDeviceSize offsets[1] = {};
         vkCmdBindVertexBuffers(command_buffer->handle, 0, 1, &render_context->vertex_buffer.handle, (VkDeviceSize*)&offsets);
         vkCmdBindIndexBuffer(command_buffer->handle, render_context->index_buffer.handle, 0, VK_INDEX_TYPE_UINT32);
-
         for(render_geometry_batch_t *current_buffer = &current_group->first_buffer;
             current_buffer;
             current_buffer = current_buffer->next_buffer)
         {
-            // TODO(Sleepster): We don't have anything for instancing... 
+            r_vulkan_shader_update_instance_set(render_context, shader);
+
+            // TODO(Sleepster): rename this for r_vulkan_shader_update_push_constants;
+            r_vulkan_shader_update_draw_set(render_context, shader);
+
+            // TODO(Sleepster): Multidraw indirect 
             vkCmdDrawIndexed(command_buffer->handle, 
                              6, 
                              current_buffer->primitive_count, 
