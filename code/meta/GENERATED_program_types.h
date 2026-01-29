@@ -10,6 +10,11 @@ enum GENERATED_program_types_t {
 	TYPE_render_pipeline_state_t,
 	TYPE_bool32,
 	TYPE_u32,
+	TYPE_material_t,
+	TYPE_u64,
+	TYPE_string_t,
+	TYPE_shader_t,
+	TYPE_texture2D_t,
 };
 
 struct type_info_render_pipeline_state_t {
@@ -33,6 +38,21 @@ struct type_info_render_pipeline_state_t {
 	}members;
 };
 
+struct type_info_material_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t ID;
+		type_info_member_t name;
+		type_info_member_t shader_binary_name;
+		type_info_member_t shader;
+		type_info_member_t textures;
+		type_info_member_t renderer_effect_flags;
+		type_info_member_t pipeline_state;
+	}members;
+};
+
 
 const static type_info_render_pipeline_state_t type_info_render_pipeline_state_t = {
 	.name = "render_pipeline_state_t",
@@ -52,6 +72,21 @@ const static type_info_render_pipeline_state_t type_info_render_pipeline_state_t
 		.stencil_enabled = {.name = "stencil_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, stencil_enabled), .size = sizeof(bool32)},
 		.stencil_state = {.name = "stencil_state", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, stencil_state), .size = sizeof(u32)},
 		.stencil_keep = {.name = "stencil_keep", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, stencil_keep), .size = sizeof(u32)},
+	}
+};
+
+const static type_info_material_t type_info_material_t = {
+	.name = "material_t",
+	.type = TYPE_material_t,
+	.member_count = 7,
+	.members = {
+		.ID = {.name = "ID", .type = TYPE_u64, .offset = offsetof(material_t, ID), .size = sizeof(u64)},
+		.name = {.name = "name", .type = TYPE_string_t, .offset = offsetof(material_t, name), .size = sizeof(string_t)},
+		.shader_binary_name = {.name = "shader_binary_name", .type = TYPE_string_t, .offset = offsetof(material_t, shader_binary_name), .size = sizeof(string_t)},
+		.shader = {.name = "shader", .type = TYPE_shader_t, .offset = offsetof(material_t, shader), .size = sizeof(shader_t*)},
+		.textures = {.name = "textures", .type = TYPE_texture2D_t, .offset = offsetof(material_t, textures), .size = sizeof(texture2D_t*)},
+		.renderer_effect_flags = {.name = "renderer_effect_flags", .type = TYPE_u32, .offset = offsetof(material_t, renderer_effect_flags), .size = sizeof(u32)},
+		.pipeline_state = {.name = "pipeline_state", .type = TYPE_render_pipeline_state_t, .offset = offsetof(material_t, pipeline_state), .size = sizeof(render_pipeline_state_t)},
 	}
 };
 

@@ -29,6 +29,9 @@ typedef struct asset_manager      asset_manager_t;
 typedef struct asset_slot         asset_slot_t;
 typedef struct subtexture_data    subtexture_data_t;
 typedef struct texture_atlas      texture_atlas_t;
+typedef struct texture2D          texture2D_t;
+typedef struct material           material_t;
+typedef struct shader             shader_t;
 
 typedef struct jfd_package_entry  jfd_package_entry_t;
 typedef struct jfd_file_header    jfd_file_header_t;
@@ -81,8 +84,13 @@ typedef struct asset_handle
 
     subtexture_data_t *subtexture_data;
     asset_slot_t      *slot;
-}asset_handle_t;
 
+    union {
+        texture2D_t *texture;
+        shader_t    *shader;
+        material_t  *material;
+    };
+}asset_handle_t;
 
 /*===========================================
   ================= TEXTURES ================
@@ -101,6 +109,7 @@ typedef struct bitmap
 
 typedef struct texture2D
 {
+    u64               ID;
     bitmap_t          bitmap;
     vulkan_texture_t  gpu_data;
 }texture2D_t;
@@ -117,6 +126,11 @@ typedef struct subtexture_data
     texture_atlas_t *atlas;
 }subtexture_data_t;
 
+/* TODO(Sleepster): 
+ * We need to allow the texture atlas (which is technically an atlas manager)
+ * to free textures and put their spaces into a "free list" of some sorts so that
+ * when an asset is flagged for release, it does not stay in the atlas.
+ */
 typedef struct texture_atlas
 {
     texture2D_t                   texture;
@@ -144,7 +158,7 @@ typedef struct texture_atlas
 
 typedef struct shader 
 {
-    u32                  ID;
+    u64                  ID;
     vulkan_shader_data_t shader_data;
 
     // NOTE(Sleepster): Storing some basic things here. 
@@ -159,13 +173,46 @@ typedef struct shader
  * - Default pipeline state (blend mode, blend enabled, depth mode, depth enabled, etc.)
  */
 
-// TODO(Sleepster): Effect flags and such for special rendering layers. 
+
+/* NOTE(Sleepster): 
+ * The idea is that you write out the base material you want to use using a .mat config file.
+ * When you need the material, you acquire an asset handle too it. If you need to change
+ * something about the base material such as "vibrance = 1.0f" instead of "vibrance = 0.8"
+ * as is defined in the material config, you would simply be able to make a copy to that material,
+ * then customize these settings. Keeping the base material untouched.
+ */
+// MATERIAL INSTANCE
+typedef struct material_instance
+{
+    asset_handle_t                textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
+    u32                           renderer_effect_flags;
+    render_pipeline_state_t       pipeline_state;
+
+    u32                           shader_uniform_count;
+    vulkan_shader_uniform_data_t *uniform_data;
+}material_instance_t;
+
+
+// MATERIAL ARCHETYPE
+typedef struct material_achetype
+{
+    u64                 ID;
+    string_t            shader_binary_name;
+    asset_handle_t      shader;
+
+    material_instance_t base_instance;
+}material_achetype_t;
+
+GENERATE_TYPE_INFO
 typedef struct material
 {
     u64                     ID;
-    string_t                name;
-    
     string_t                shader_binary_name;
+
+    /* TODO(Sleepster): These should store asset_handles so that we can reference count
+     * that something, in our case the material, and let the system know that it can't
+     * release these materials right now since they are still needed.
+     */
     shader_t               *shader;
     texture2D_t            *textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
 
@@ -179,6 +226,7 @@ typedef struct material
 
 typedef struct asset_slot 
 {
+    u64                      ID;
     asset_slot_load_status_t slot_state;
     asset_type_t             type;
     
@@ -189,8 +237,7 @@ typedef struct asset_slot
     // NOTE(Sleepster): Should only be modified using atomic_* functions 
     volatile u32             package_generation;
     volatile u32             ref_counter;
-    union 
-    {
+    union {
         texture2D_t texture;
         shader_t    shader;
         material_t  material;

@@ -78,7 +78,7 @@ s_asset_bitmap_create(asset_manager_t *asset_manager, s32 width, s32 height, s32
 }
 
 texture2D_t 
-s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot)
+s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     texture2D_t result = {};
     string_t asset_data = slot->package_entry->asset_data;
@@ -96,6 +96,7 @@ s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot)
     Assert(pixel_data != null);
     Assert(pixel_count > 0);
 
+    result.ID     = name_hash;
     result.bitmap = s_asset_bitmap_init(pixels, width, height, channels, BMF_RGBA32);
     return(result);
 }
@@ -108,19 +109,39 @@ shader_t
 s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     shader_t result;
-    result.shader_data = r_vulkan_shader_create(asset_manager->render_context, slot->package_entry->asset_data);
     result.ID          = name_hash;
+    slot->ID           = name_hash;
+    result.shader_data = r_vulkan_shader_create(asset_manager->render_context, slot->package_entry->asset_data);
+
     return(result);
 }
 
 /*===============================
-  =========== SHADERS ===========
+  ========== MATERIALS ==========
   =============================== */
+
+void
+s_asset_material_extract_file_data(material_t *default_material, string_t material_file_data)
+{
+    while(material_file_data.count > 0)
+    {
+    }
+}
 
 material_t
 s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     material_t result = {};
+    slot->ID  = name_hash;
+    result.ID = name_hash;
+    slot->package_entry->asset_data = c_file_read_from_offset(&slot->owner_asset_file, 
+                                                              slot->package_entry->asset_data.count,
+                                                              slot->package_entry->data_offset, 
+                                                              null, 
+                                                              asset_manager->asset_allocator, 
+                                                              ZA_TAG_STATIC);
+    string_t material_data = slot->package_entry->asset_data;
+    s_asset_material_extract_file_data(&result, material_data);
 
     return(result);
 }
@@ -141,13 +162,18 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
     {
         case AT_Bitmap:
         {
-            slot->texture = s_asset_texture_create(asset_manager, slot);
+            slot->texture = s_asset_texture_create(asset_manager, slot, name_hash);
             log_info("Loading texture data for bitmap: '%s'...\n", C_STR(handle->slot->name));
         }break;
         case AT_Shader:
         {
             slot->shader = s_asset_shader_create(asset_manager, slot, name_hash);
             log_info("Loading shader data for: '%s'...\n", C_STR(handle->slot->name));
+        }break;
+        case AT_Material:
+        {
+            slot->material = s_asset_material_create(asset_manager, slot, name_hash);
+            log_info("Loading material data for: '%s'...\n", C_STR(handle->slot->name));
         }break;
         case AT_Font:
         {
