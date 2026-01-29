@@ -20,9 +20,9 @@
 
 #include <r_vulkan_core.h>
 
-// ===============================
-// ========== TEXTURES ===========
-// ===============================
+/*===============================
+  ========== TEXTURES ===========
+  =============================== */
 
 bitmap_t
 s_asset_bitmap_create(asset_manager_t *asset_manager, 
@@ -100,12 +100,28 @@ s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot)
     return(result);
 }
 
+/*===============================
+  =========== SHADERS ===========
+  =============================== */
+
 shader_t
 s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     shader_t result;
     result.shader_data = r_vulkan_shader_create(asset_manager->render_context, slot->package_entry->asset_data);
     result.ID          = name_hash;
+    return(result);
+}
+
+/*===============================
+  =========== SHADERS ===========
+  =============================== */
+
+material_t
+s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
+{
+    material_t result = {};
+
     return(result);
 }
 
@@ -252,7 +268,7 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
                                                       data_offset, 
                                                      &asset_file->init_arena);
             entry->asset_data.count = entry->entry_header->entry_data_size;
-            entry->data_offset  = data_offset + entry->filename.count;
+            entry->data_offset   = data_offset + entry->filename.count;
             current_file_offset += entry->entry_header->total_entry_size;
              
             c_hash_table_insert_pair(&asset_file->entry_hash, entry->filename, (s32)entry_index);
@@ -263,8 +279,8 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
 
             asset_catalog_t *catalog = asset_manager->asset_catalogs + entry->entry_header->asset_type;
             asset_slot_t    *slot    = c_hash_table_get_value_ptr(&catalog->asset_lookup, entry->filename);
-            Assert(slot);
             Assert(entry->entry_header->asset_type == catalog->catalog_type);
+            Assert(slot);
 
             ZeroStruct(*slot);
             slot->slot_state       = ASLS_Unloaded;

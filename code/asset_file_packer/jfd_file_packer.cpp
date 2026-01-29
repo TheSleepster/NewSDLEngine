@@ -111,7 +111,7 @@ VISIT_FILES(gather_all_asset_file_entries)
     else if(c_string_compare(file_ext, STR(".wav"))) type = AT_Sound;
     else if(c_string_compare(file_ext, STR(".png"))) type = AT_Bitmap;
     else if(c_string_compare(file_ext, STR(".spv"))) type = AT_Shader;
-
+    else if(c_string_compare(file_ext, STR(".mat"))) type = AT_Material;
     if(type != AT_Invalid)
     {
         log_info("Adding asset entry: '%s'...\n", C_STR(filename));
@@ -149,7 +149,7 @@ main(int arg_count, char **args)
     {
         byte *buffer = c_arena_push_array(&packer_state.builder_arena, byte, 1024);
         Expect(buffer != null, "We have failed to allocate the buffer for our current working dir...\n");
-        sys_directory_get_current_working_dir(buffer ,1024);
+        sys_directory_get_current_working_dir(buffer, 1024);
 
         packer_state.resource_dir    = STR((char*)buffer);
         packer_state.output_dir      = STR((char*)buffer);
