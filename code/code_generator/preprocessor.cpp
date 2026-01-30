@@ -72,18 +72,16 @@ struct type_info_test_element_data_t {
         const char *name;
         u32 type;
         u32 member_count;
-        struct members {
-            type_info_member_t oranges;
-            type_info_member_t internal_data;
-
+        union members {
+            type_info_member_t array[5];
             struct {
-                type_info_member_t apples;
-            }internal_members;
-
-            type_info_member_t banannas;
-            type_info_member_t grapes;
-            type_info_member_t tomatos;
-        };
+                type_info_member_t oranges;
+                type_info_member_t internal_data;
+                type_info_member_t banannas;
+                type_info_member_t grapes;
+                type_info_member_t tomatos;
+            };
+        }
 };
 
 #endif
@@ -133,39 +131,6 @@ typedef struct preprocessor_state
 }preprocessor_state_t;
 static preprocessor_state_t state = {};
 
-internal_api inline bool32
-is_end_of_line(string_t *current_line)
-{
-    bool32 result = false;
-
-    char character = current_line->data[0]; 
-    if(character == '\n' ||
-       character == '\r' || 
-       current_line->count == 0)
-    {
-        result = true;
-    }
-
-    return(result);
-}
-
-internal_api inline bool32
-is_whitespace(string_t *current_line)
-{
-    bool32 result = false;
-
-    char character = current_line->data[0];
-    if(character == ' '  ||
-       character == '\n' ||
-       character == '\r' ||
-       character == '\t')
-    {
-        result = true;
-    }
-
-    return(result);
-}
-
 internal_api inline bool8
 token_alphabetical(char A)
 {
@@ -181,52 +146,10 @@ token_numeric(char A)
     return(result);
 }
 
-internal_api inline void
-eat_whitespace(string_t *current_line)
-{
-    while(current_line->count > 0)
-    {
-        if(is_whitespace(current_line))
-        {
-            c_string_advance_by(current_line, 1);
-        }
-        else if(current_line->data[0] == '/' &&
-                current_line->data[1] == '/')
-        {
-            c_string_advance_by(current_line, 2);
-            while(!is_end_of_line(current_line))
-            {
-                c_string_advance_by(current_line, 1);
-            }
-        }
-        else if(current_line->data[0] == '/' &&
-                current_line->data[1] == '*')
-        {
-            c_string_advance_by(current_line, 2);
-            while(current_line->data[0] && 
-                 (current_line->count > 0) && 
-                 !((current_line->data[0] == '*') && 
-                   (current_line->data[1] == '/')))
-            {
-                c_string_advance_by(current_line, 1);
-            }
-
-            if(current_line->data[0] == '*')
-            {
-                c_string_advance_by(current_line, 2);
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
-}
-
 internal_api preprocessor_token_t
 get_next_token(string_t *token_data)
 {
-    eat_whitespace(token_data);
+    c_string_eat_whitespace(token_data);
     
     preprocessor_token_t token = {};
     if(token_data->count == 0)
@@ -264,7 +187,7 @@ get_next_token(string_t *token_data)
             token.type = TT_Asterisk;      
             if(token_data->count > 0 && token.string.data[0] == '/')
             {
-                eat_whitespace(token_data);
+                c_string_eat_whitespace(token_data);
             }
         }break;
         case '"':  
@@ -323,6 +246,19 @@ get_next_token(string_t *token_data)
     return(token);
 }
 
+internal_api inline preprocessor_token_t
+peek_next_token(string_t token_data, u32 times = 1)
+{
+    preprocessor_token_t result = {};
+    for(u32 peek_index = 0;
+        peek_index < times;
+        ++peek_index)
+    {
+        result = get_next_token(&token_data);
+    }
+    return(result);
+}
+
 internal_api bool8 
 append_type_enum_token(preprocessor_token_t type_name_token)
 {   
@@ -368,19 +304,6 @@ append_type_enum_token(preprocessor_token_t type_name_token)
     return(was_found);
 }
 
-internal_api inline preprocessor_token_t
-peek_next_token(string_t token_data, u32 times = 1)
-{
-    preprocessor_token_t result = {};
-    for(u32 peek_index = 0;
-        peek_index < times;
-        ++peek_index)
-    {
-        result = get_next_token(&token_data);
-    }
-    return(result);
-}
-
 internal_api void
 parse_member(preprocessor_token_t structure_name, 
              preprocessor_token_t type_token, 
@@ -406,10 +329,10 @@ parse_member(preprocessor_token_t structure_name,
             }break;
             case TT_Identifier:
             {
-                bool8 is_constant         = c_string_compare(type_identifier.string, STR("const"));
-                bool8 is_volatile         = c_string_compare(type_identifier.string, STR("volatile"));
-                bool8 is_dynarray         = c_string_compare(type_identifier.string, STR("DynArray_t"));
-                bool8 is_hash_table       = c_string_compare(type_identifier.string, STR("HashTable_t"));
+                bool8 is_constant   = c_string_compare(type_identifier.string, STR("const"));
+                bool8 is_volatile   = c_string_compare(type_identifier.string, STR("volatile"));
+                bool8 is_dynarray   = c_string_compare(type_identifier.string, STR("DynArray_t"));
+                bool8 is_hash_table = c_string_compare(type_identifier.string, STR("HashTable_t"));
 
                 // NOTE(Sleepster): If we find a modifier, breakout and advance.
                 if(is_constant || is_volatile || is_hash_table || is_dynarray)
@@ -711,6 +634,7 @@ main(int argc, char **argv)
 
     c_string_builder_append_data(&state.type_enum_builder, STR("// THIS IS GENERATED BY THE PREPROCESSOR\n// THIS IS THE RTTI FOR THE ENTIRE PROGRAM\n\n"));
     c_string_builder_append_data(&state.type_enum_builder, STR("#ifndef GENERATED_PROGRAM_TYPES_H\n#define GENERATED_PROGRAM_TYPES_H\n\n#include <preprocessor_type_data.h>\n\n"));
+    c_string_builder_append_data(&state.type_enum_builder, STR("#pragma pack(push, 1)\n\n"));
     c_string_builder_append_data(&state.type_enum_builder, STR("enum GENERATED_program_types_t {\n"));
 
     // TODO(Sleepster): feed a directory to this 
@@ -769,6 +693,7 @@ end:
     builder_string = c_string_builder_get_current_string(&state.struct_info_builder);
     fprintf(stdout, "%s\n", C_STR(builder_string));
 
+    c_string_builder_append_data(&state.struct_const_definition_builder, STR("#pragma pack(pop)\n\n"));
     c_string_builder_append_data(&state.struct_const_definition_builder, STR("#endif // GENERATED_PROGRAM_TYPES_H\n"));
 
     builder_string = c_string_builder_get_current_string(&state.struct_const_definition_builder);

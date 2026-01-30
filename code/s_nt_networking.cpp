@@ -64,7 +64,7 @@ void
 s_nt_init_client_data(game_state_t *state, char *host_ip, u32 port)
 {    
     state->socket = socket(AF_INET, SOCK_DGRAM, 0);
-    if (state->socket == INVALID_SOCKET) 
+    if(state->socket == INVALID_SOCKET) 
     {
         fprintf(stderr, "Socket creation failed: '%d'\n", errno);
     }

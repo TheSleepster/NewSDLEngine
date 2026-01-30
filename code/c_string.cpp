@@ -116,8 +116,8 @@ string_t
 c_string_sub_from_left(string_t string, u32 index)
 {
     string_t result;
-    result.data  = string.data + index;
-    result.count = string.count - index;
+    result.data  = string.data;
+    result.count = string.count - (index - 1);
 
     return(result);
 }
@@ -456,6 +456,82 @@ c_string_format(string_t memory, string_t string, ...)
 
     return(result);
 }
+
+bool32
+c_string_is_end_of_line(string_t *current_line)
+{
+    bool32 result = false;
+
+    char character = current_line->data[0]; 
+    if(character == '\n' ||
+       character == '\r' || 
+       current_line->count == 0)
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+bool32
+c_string_is_whitespace(string_t *current_line)
+{
+    bool32 result = false;
+
+    char character = current_line->data[0];
+    if(character == ' '  ||
+       character == '\n' ||
+       character == '\r' ||
+       character == '\t')
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+void
+c_string_eat_whitespace(string_t *current_line)
+{
+    while(current_line->count > 0)
+    {
+        if(c_string_is_whitespace(current_line))
+        {
+            c_string_advance_by(current_line, 1);
+        }
+        else if(current_line->data[0] == '/' &&
+                current_line->data[1] == '/')
+        {
+            c_string_advance_by(current_line, 2);
+            while(!c_string_is_end_of_line(current_line))
+            {
+                c_string_advance_by(current_line, 1);
+            }
+        }
+        else if(current_line->data[0] == '/' &&
+                current_line->data[1] == '*')
+        {
+            c_string_advance_by(current_line, 2);
+            while(current_line->data[0] && 
+                 (current_line->count > 0) && 
+                 !((current_line->data[0] == '*') && 
+                   (current_line->data[1] == '/')))
+            {
+                c_string_advance_by(current_line, 1);
+            }
+
+            if(current_line->data[0] == '*')
+            {
+                c_string_advance_by(current_line, 2);
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
 
 ///////////////////
 // STRING BUILDER

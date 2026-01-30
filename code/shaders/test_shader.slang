@@ -40,6 +40,12 @@ ConstantBuffer<GlobalMatrixUniforms_t> Matrices;
 [[vk::binding(0, PERDRAW_DESCRIPTOR_SET)]]
 StructuredBuffer<RenderGeometryInstance_t> RenderInstances;
 
+[[vk::binding(0, PERDRAW_DESCRIPTOR_SET)]]
+struct UBO {
+    float vibrance;
+    float intensity;
+};
+
 [shader("vertex")]
 VertexOutput_t
 VSMain(VertexInput_t input, 

@@ -233,9 +233,7 @@ typedef struct vulkan_shader_stage_info
 // TODO(Sleepster): The shader should store what kind of pipeline bind point it needs
 typedef struct vulkan_shader_data
 {
-    // TODO(Sleepster): Shader catalog will handle this... 
     u32                                 shader_id;
-    string_t                            name;
 
     memory_arena_t                      arena;
     SpvReflectShaderModule              spv_reflect_module;
@@ -571,6 +569,7 @@ typedef struct vulkan_render_context
     vulkan_renderpass_data_t      main_renderpass;
     asset_handle_t               *default_shader;
     asset_handle_t               *default_texture;
+    asset_handle_t               *default_material;
 
     texture2D_t                  *invalid_texture_data;
 

@@ -17,6 +17,7 @@
 #include <c_hash_table.h>
 #include <c_dynarray.h>
 #include <asset_file_packer/jfd_asset_file.h>
+#include <meta/GENERATED_program_types.h>
 
 #include <r_vulkan_core.h>
 
@@ -119,12 +120,197 @@ s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 na
 /*===============================
   ========== MATERIALS ==========
   =============================== */
+typedef enum token_type
+{
+    TT_Invalid,
+    TT_Identifier,
+    TT_Colon,
+    TT_SemiColon,
+    TT_PipeOperator,
+    TT_OpenBrace,
+    TT_CloseBrace,
+    TT_ForwardSlash,
+    TT_PoundSymbol,
+    TT_EOF,
+}token_type_t;
+
+typedef struct token
+{
+    string_t     data;
+    token_type_t type;
+}token_t;
+
+internal_api inline bool8
+token_alphabetical(char A)
+{
+    bool8 result = (((A >= 'a') && (A <= 'z')) || 
+                    ((A >= 'A') && (A <= 'Z')));
+    return(result);
+}
+
+internal_api inline bool8
+token_numeric(char A)
+{
+    bool8 result = ((A >= '0') && (A <= '9'));
+    return(result);
+}
+
+token_t 
+get_next_token(string_t *tokenized_data)
+{
+    c_string_eat_whitespace(tokenized_data);
+    if(tokenized_data->data[0] == '#')
+    {
+        while(!c_string_is_end_of_line(tokenized_data))
+        {
+            c_string_advance_by(tokenized_data, 1);
+        }
+
+        if(c_string_is_end_of_line(tokenized_data))
+        {
+            c_string_eat_whitespace(tokenized_data);
+        }
+    }
+
+    token_t result    = {};
+    result.data.count = 1;
+    result.data.data  = tokenized_data->data;
+
+    char character = tokenized_data->data[0];
+    c_string_advance_by(tokenized_data, 1);
+    switch(character)
+    {
+        case ':':  {result.type = TT_Colon;        }break;
+        case '|':  {result.type = TT_PipeOperator; }break;
+        case '{':  {result.type = TT_OpenBrace;    }break;
+        case '}':  {result.type = TT_CloseBrace;   }break;
+        case '\0': {result.type = TT_EOF;          }break;
+        case '#':  {result.type = TT_PoundSymbol;  }break;
+        case '/':  {result.type = TT_ForwardSlash; }break;
+        case ';':  
+        {
+            result.type = TT_SemiColon;
+            if(c_string_is_end_of_line(tokenized_data))
+            {
+                c_string_advance_by(tokenized_data, 1);
+            }
+        }break;
+        case '"':
+        {
+            c_string_advance_by(tokenized_data, 1);
+            c_string_advance_by(&result.data, 1);
+            byte *at = tokenized_data->data;
+
+            while(tokenized_data->data && 
+                  (tokenized_data->data[0] != '"'))
+            {
+                if((tokenized_data->data[0] == '\\') && (tokenized_data->data[1]))
+                {
+                    c_string_advance_by(tokenized_data, 2);
+                }
+                else
+                {
+                    c_string_advance_by(tokenized_data, 1);
+                }
+            }
+
+            if(tokenized_data->data[0] == '"')
+            {
+                c_string_advance_by(tokenized_data, 1);
+            }
+            u64 token_length = (tokenized_data->data - at);
+
+            result.type = TT_Identifier;
+            result.data.count = (u32)token_length;
+        }break;
+        default: 
+        {
+            if(token_alphabetical(tokenized_data->data[0]) || 
+               token_numeric(tokenized_data->data[0]))
+            {
+                result.type = TT_Identifier;
+                while(token_alphabetical(tokenized_data->data[0]) ||
+                      token_numeric(tokenized_data->data[0])      ||
+                      tokenized_data->data[0] == '_')
+                {
+                    c_string_advance_by(tokenized_data, 1);
+                }
+                result.data.count = (u32)(tokenized_data->data - result.data.data);
+            }
+            else
+            {
+                result.type = TT_Invalid;
+                if(result.data.count > 0)
+                {
+                    c_string_advance_by(tokenized_data, 1);
+                }
+            }
+        }break;
+    }
+
+    return(result);
+}
+
+token_t
+peek_next_token(string_t token_data, u32 times = 1)
+{
+    token_t result = {};
+    for(u32 peek_index = 0;
+        peek_index < times;
+        ++peek_index)
+    {
+        result = get_next_token(&token_data);
+    }
+    return(result);
+}
+
+void
+assign_material_value(string_t *file_data, string_t parent_name)
+{
+    token_t value_token = get_next_token(file_data);
+    if(value_token.type == TT_Identifier)
+    {
+        type_info_member_t *member = null;
+        for(u32 member_index = 0;
+            member_index < type_info_material_archetype_t.member_count;
+            ++member_index)
+        {
+            type_info_member_t *found = (type_info_member_t*)((byte*)&type_info_material_archetype_t.members + (member_index * sizeof(type_info_member_t)));
+            if(c_string_compare(STR(found->name), parent_name))
+            {
+                member = found;
+                break;
+            }
+        }
+    }
+}
 
 void
 s_asset_material_extract_archetype_data(material_archetype_t *archetype, string_t material_file_data)
 {
     while(material_file_data.count > 0)
     {
+        token_t token = get_next_token(&material_file_data);
+        if(token.type == TT_Identifier)
+        {
+            string_t identifier  = token.data;
+            token_t future_token = peek_next_token(material_file_data, 2);
+
+            if(future_token.type == TT_Identifier)
+            {
+                // NOTE(Sleepster): Value Assignment 
+                get_next_token(&material_file_data);
+                assign_material_value(&material_file_data, identifier);
+            }
+            else if(future_token.type == TT_OpenBrace)
+            {
+                // NOTE(Sleepster): Grouped asssigment 
+            }
+        }
+        else if(token.type == TT_EOF || material_file_data.count == 0)
+        {
+            break;
+        }
     }
 }
 
@@ -145,6 +331,10 @@ s_asset_material_archetype_create(asset_manager_t *asset_manager, asset_slot_t *
 
     return(result);
 }
+
+/*===============================
+  ========= ASSET DATA ==========
+  =============================== */
 
 void
 s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *handle, u64 name_hash)

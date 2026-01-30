@@ -50,6 +50,10 @@ string_t    c_string_get_file_ext_from_path(string_t filepath);
 string_t    c_string_get_filename_from_path_and_ext(string_t filepath);
 void        c_string_override_file_separators(string_t *string);
 
+bool32      c_string_is_whitespace(string_t *current_line);
+bool32      c_string_is_end_of_line(string_t *current_line);
+void        c_string_eat_whitespace(string_t *current_line);
+
 // TODO(Sleepster): Test These
 string_t    c_string_read_line(string_t *data);
 

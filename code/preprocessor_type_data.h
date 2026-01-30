@@ -14,6 +14,7 @@
 
 // TODO(Sleepster): Merge all the is_* flags (is_pointer, is_constant, is_volatile, etc.) into flags
 
+#pragma pack(push, 1)
 typedef struct type_info_member
 {
     const char *name;
@@ -32,6 +33,7 @@ typedef struct type_info_struct
     u32                  member_count;
     type_info_member_t  *members;
 }type_info_struct_t;
+#pragma pack(pop)
 
 #endif // PREPROCESSOR_TYPE_DATA_H
 

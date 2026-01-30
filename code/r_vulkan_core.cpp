@@ -3013,6 +3013,9 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
                               command_buffer, 
                               frame->current_framebuffer->handle);
 
+    // TODO(Sleepster): Add the ability to set the pipeline, the state should cache the VkPipeline
+    // currently in use for the frame and check their handles for equality, only updating in the event that
+    // they are unequal handles.
     for(u32 render_group_index = 0;
         render_group_index < draw_frame->used_render_group_count;
         ++render_group_index)

@@ -187,12 +187,15 @@ typedef struct shader
 GENERATE_TYPE_INFO
 typedef struct material_instance
 {
+    u32                           ID;
+
     asset_handle_t                textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
-    u32                           renderer_effect_flags;
     render_pipeline_state_t       pipeline_state;
 
     u32                           shader_uniform_count;
     vulkan_shader_uniform_data_t *uniform_data;
+
+    material_archetype_t         *archetype;
 }material_instance_t;
 
 
@@ -201,8 +204,10 @@ GENERATE_TYPE_INFO
 typedef struct material_archetype
 {
     u64                 ID;
+    string_t            name;
     string_t            shader_binary_name;
     asset_handle_t      shader;
+    u32                 renderer_effect_flags;
 
     material_instance_t base_instance;
 }material_archetype_t;

@@ -91,11 +91,14 @@ main(int argc, char **argv)
         r_renderer_init(render_context, render_state, state->window_size);
 
         asset_manager->render_context = render_context;
-        render_context->default_texture = Alloc(asset_handle_t);
+        render_context->default_texture  = Alloc(asset_handle_t);
         *render_context->default_texture = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
 
-        render_context->default_shader = Alloc(asset_handle_t);
-        *render_context->default_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("test"));
+        render_context->default_shader  = Alloc(asset_handle_t);
+        *render_context->default_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_shader"));
+
+        render_context->default_material  = Alloc(asset_handle_t);
+        *render_context->default_material = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_material_data"));
 
         r_vulkan_make_gpu_texture(render_context, &render_context->default_texture->slot->texture);
         r_render_state_init(render_state, render_context);
@@ -115,8 +118,8 @@ main(int argc, char **argv)
         u64 current_tsc     = 0;
         u64 delta_tsc       = 0;
 
-        float32 delta_time    = 0;
-        //float32 delta_time_ms = 0;
+        //float32 delta_time_ms  = 0;
+        float32 delta_time     = 0;
         float64 dt_accumulator = 0.0f;
 
         g_running = true;
@@ -208,7 +211,7 @@ main(int argc, char **argv)
                 r_push_rect(render_state, {0, 150}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0);
                 r_push_texture(render_state, {-100, 100}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0, render_context->default_texture);
                 r_render_group_end(render_state);
-                    
+
                 r_render_group_update_used_groups(render_state);
                 r_vulkan_end_frame(render_context, render_state, gcv_tick_rate);
             }
