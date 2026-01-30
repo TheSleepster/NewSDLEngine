@@ -32,6 +32,8 @@ typedef struct texture_atlas      texture_atlas_t;
 typedef struct texture2D          texture2D_t;
 typedef struct material           material_t;
 typedef struct shader             shader_t;
+typedef struct material_archetype  material_archetype_t;
+typedef struct material_instance  material_instance_t;
 
 typedef struct jfd_package_entry  jfd_package_entry_t;
 typedef struct jfd_file_header    jfd_file_header_t;
@@ -182,6 +184,7 @@ typedef struct shader
  * then customize these settings. Keeping the base material untouched.
  */
 // MATERIAL INSTANCE
+GENERATE_TYPE_INFO
 typedef struct material_instance
 {
     asset_handle_t                textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
@@ -194,31 +197,15 @@ typedef struct material_instance
 
 
 // MATERIAL ARCHETYPE
-typedef struct material_achetype
+GENERATE_TYPE_INFO
+typedef struct material_archetype
 {
     u64                 ID;
     string_t            shader_binary_name;
     asset_handle_t      shader;
 
     material_instance_t base_instance;
-}material_achetype_t;
-
-GENERATE_TYPE_INFO
-typedef struct material
-{
-    u64                     ID;
-    string_t                shader_binary_name;
-
-    /* TODO(Sleepster): These should store asset_handles so that we can reference count
-     * that something, in our case the material, and let the system know that it can't
-     * release these materials right now since they are still needed.
-     */
-    shader_t               *shader;
-    texture2D_t            *textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
-
-    u32                     renderer_effect_flags;
-    render_pipeline_state_t pipeline_state;
-}material_t;
+}material_archetype_t;
 
 /*===========================================
   ============= ASSET FILE DATA =============
@@ -238,9 +225,9 @@ typedef struct asset_slot
     volatile u32             package_generation;
     volatile u32             ref_counter;
     union {
-        texture2D_t texture;
-        shader_t    shader;
-        material_t  material;
+        texture2D_t           texture;
+        shader_t              shader;
+        material_archetype_t  material;
     };
 }asset_slot_t;
 
