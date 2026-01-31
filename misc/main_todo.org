@@ -24,6 +24,10 @@
       (shader, blend modes, depth state, textures, camera data, etc.)
 ** Metaprogram
 - [X] Input flag parser
+- [ ] Type database for more efficient storage of types accross the program
+- [ ] Some sort of get_type_info(&structure) function that makes the retrieval of type info better.
+- [ ] Nested structure support
+- [ ] Type table to allow the user to query for the type_info via type name as a string.
 ** Material file parser
 ** Create a very early version of the new batch renderer
 - [X] LAYERS. Use the depth buffer.

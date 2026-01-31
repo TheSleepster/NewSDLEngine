@@ -136,6 +136,9 @@ typedef struct preprocessor_state
     string_builder_t  struct_const_definition_builder;
     string_builder_t  type_enum_builder;
 
+    string_builder_t  enum_info_builder;
+    string_builder_t  enum_definition_builder;
+
     DynArray_t(u64)      type_ids;
 }preprocessor_state_t;
 static preprocessor_state_t state = {};
@@ -570,7 +573,122 @@ end:
     string_t const_def_builder_string = c_string_builder_get_current_string(&local_const_definition_builder);
     c_string_builder_append_data(&state.struct_const_definition_builder, const_def_builder_string);
 
+    c_string_builder_deinit(&local_const_definition_builder);
+    c_string_builder_deinit(&local_type_info_builder);
+
     return(struct_name_token);
+}
+
+internal_api void
+generate_enum_type_info(string_t *tokenized_data, preprocessor_token_t enum_token)
+{
+    string_builder_t enum_info_builder;
+    string_builder_t enum_definition_builder;
+    string_builder_t enum_member_builder;
+
+    c_string_builder_init(&enum_info_builder, MB(20));
+    c_string_builder_init(&enum_definition_builder, MB(20));
+    c_string_builder_init(&enum_member_builder, MB(20));
+
+    preprocessor_token_t enum_name_token = get_next_token(tokenized_data);
+    // NOTE(Sleepster): Build the local version of the struct info 
+    char buffer[8192];
+
+    string_t enum_name_tail = enum_name_token.string;
+    enum_name_tail.data += enum_name_tail.count - 2;
+    enum_name_tail.count = 2;
+    if(!c_string_compare(enum_name_tail, STR("_t")))
+    {
+        enum_name_token.string = c_string_concat(&global_context->temporary_arena, enum_name_token.string, STR("_t"));
+    }
+    append_type_enum_token(enum_name_token);
+
+    s32 length = sprintf(buffer, "struct type_info_enum_%.*s {\n\tconst char *name;\n\tu32 type;\n\tu32 member_count;\n\tstruct {\n", 
+                         enum_name_token.string.count, C_STR(enum_name_token.string));
+    string_t test_string = {
+        .data  = (byte*)buffer,
+        .count = (u32)length
+    };
+    c_string_builder_append_data(&enum_info_builder, test_string);
+
+    memset(buffer, 0, sizeof(buffer));
+
+    length = sprintf(buffer, "const static type_info_enum_%.*s type_info_enum_%.*s = {\n\t.name = \"%.*s\",\n\t.type = TYPE_%.*s,\n", 
+                     enum_name_token.string.count, C_STR(enum_name_token.string),
+                     enum_name_token.string.count, C_STR(enum_name_token.string),
+                     enum_name_token.string.count, C_STR(enum_name_token.string),
+                     enum_name_token.string.count, C_STR(enum_name_token.string));
+    test_string = {
+        .data  = (byte*)buffer,
+        .count = (u32)length
+    };
+    c_string_builder_append_data(&enum_definition_builder, test_string);
+
+    u32 member_count = 0;
+    for(;;)
+    {
+        preprocessor_token_t token = get_next_token(tokenized_data);
+        switch(token.type)
+        {
+            case TT_Identifier:
+            {
+                memset(buffer, 0, sizeof(buffer));
+
+                length = sprintf(buffer, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .offset = %.*s, .size = 0},\n",
+                                 token.string.count,           C_STR(token.string),            // initialized name
+                                 token.string.count,           C_STR(token.string),            // .name
+                                 enum_name_token.string.count, C_STR(enum_name_token.string),  // .type
+                                 token.string.count,           C_STR(token.string));           // .offset, for enums this is just their numeric value 
+                string_t enum_data = {
+                    .data  = (byte*)buffer,
+                    .count = (u32)length
+                };
+                
+                c_string_builder_append_data(&enum_member_builder, enum_data);
+                member_count++;
+
+                // NOTE(Sleepster): format the type information 
+                char buffer[8192];
+
+                // NOTE(Sleepster): The most recently found element_identifier is exactly what we need.
+                s32 length = sprintf(buffer, "\t\ttype_info_member_t %.*s;\n", token.string.count, C_STR(token.string));
+                string_t test_string = {
+                    .data  = (byte*)buffer,
+                    .count = (u32)length
+                };
+                c_string_builder_append_data(&enum_info_builder, test_string);
+            }break;
+            case TT_ClosingBrace:
+            {
+                memset(buffer, 0, sizeof(buffer));
+
+                length = sprintf(buffer, "\t.member_count = %d,\n\t.members = {\n", member_count);
+                test_string = {
+                    .data  = (byte*)buffer,
+                    .count = (u32)length
+                };
+                c_string_builder_append_data(&enum_definition_builder, test_string);
+
+                string_t member_string = c_string_builder_get_current_string(&enum_member_builder);
+                c_string_builder_append_data(&enum_definition_builder, member_string);
+
+                c_string_builder_append_data(&enum_definition_builder, STR("\t}\n};\n\n"));
+                c_string_builder_append_data(&enum_info_builder, STR("\t}members;\n};\n\n"));
+
+                goto end;
+            }break;
+            case TT_EOF:
+            {
+                goto end;
+            }break;
+        }
+    }
+end:
+    string_t builder_string = c_string_builder_get_current_string(&enum_info_builder);
+    c_string_builder_append_data(&state.enum_info_builder, builder_string);
+
+    builder_string = c_string_builder_get_current_string(&enum_definition_builder);
+    c_string_builder_append_data(&state.enum_definition_builder, builder_string);
 }
 
 VISIT_FILES(generate_file_metadata)
@@ -617,7 +735,7 @@ VISIT_FILES(generate_file_metadata)
                     preprocessor_token_t type = get_next_token(&file_data);
                     if(c_string_compare(type.string, STR("enum")))
                     {
-                        fprintf(stdout, "//Enum found...\n//Not supported...\n");
+                        generate_enum_type_info(&file_data, token);
                     }
                     else
                     {
@@ -646,6 +764,8 @@ main(int argc, char **argv)
     c_string_builder_init(&state.type_enum_builder,               MB(200));
     c_string_builder_init(&state.struct_const_definition_builder, MB(200));
     c_string_builder_init(&state.struct_info_builder,             MB(200));
+    c_string_builder_init(&state.enum_info_builder,               MB(200));
+    c_string_builder_init(&state.enum_definition_builder,         MB(200));
     state.type_ids = c_dynarray_create(u64);
 
     c_string_builder_append_data(&state.type_enum_builder, STR("// THIS IS GENERATED BY THE PREPROCESSOR\n// THIS IS THE RTTI FOR THE ENTIRE PROGRAM\n\n"));
@@ -713,6 +833,12 @@ end:
     fprintf(stdout, "%s\n", C_STR(builder_string));
 
     builder_string = c_string_builder_get_current_string(&state.struct_info_builder);
+    fprintf(stdout, "%s\n", C_STR(builder_string));
+
+    builder_string = c_string_builder_get_current_string(&state.enum_info_builder);
+    fprintf(stdout, "%s\n", C_STR(builder_string));
+
+    builder_string = c_string_builder_get_current_string(&state.enum_definition_builder);
     fprintf(stdout, "%s\n", C_STR(builder_string));
 
     c_string_builder_append_data(&state.struct_const_definition_builder, STR("#pragma pack(pop)\n\n"));

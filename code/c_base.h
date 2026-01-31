@@ -227,11 +227,32 @@ typedef void void_func(void);
 #define INVALID_ID ((u32)-1)
 
 // NOTE(Sleepster): C++
+#ifdef __cplusplus
 #define TypesSame(A, B) (true) 
 
 // For some reason, if you DEREFERENCE A POINTER, decltype still tells you it's a reference...
 //#define TypesSame(A, B) std::is_same_v<decltype(A), decltype(B)>
 
+// NOTE(Sleepster): DEFER MACRO 
+// (thanks Ignacio: http://the-witness.net/news/2012/11/scopeexit-in-c11/)
+// (thanks as well to Ginger Bill: https://www.gingerbill.org/article/2015/08/19/defer-in-cpp/)
+template <typename F>
+struct privDefer {
+	F f;
+	privDefer(F f) : f(f) {}
+	~privDefer() { f(); }
+};
+
+template <typename F>
+privDefer<F> defer_func(F f) {
+	return privDefer<F>(f);
+}
+
+#define DEFER_1(x, y) x##y
+#define DEFER_2(x, y) DEFER_1(x, y)
+#define DEFER_3(x)    DEFER_2(x, __COUNTER__)
+#define defer(code)   auto DEFER_3(_defer_) = defer_func([&](){code;})
+#endif
 
 #endif // C_BASE_H
 

@@ -16,10 +16,11 @@
 #include <c_string.h>
 #include <c_hash_table.h>
 #include <c_dynarray.h>
+#include <r_vulkan_core.h>
+#include <r_vulkan_types.h>
+
 #include <asset_file_packer/jfd_asset_file.h>
 #include <meta/GENERATED_program_types.h>
-
-#include <r_vulkan_core.h>
 
 /*===============================
   ========== TEXTURES ===========
@@ -320,13 +321,56 @@ parse_archetype_data(material_archetype_t *archetype, string_t *file_data, strin
                         case TYPE_u32:
                         {
                             token_t next_token = peek_next_token(*file_data);
+
+                            u32 *value = (u32*)value_ptr;
+
+                            // NOTE(Sleepster): Enum 
                             if(next_token.type == TT_PipeOperator)
                             {
-                                // NOTE(Sleepster): Enum 
+                                token_t enum_token = value_token;
+
+                                // TODO(Sleepster): This is hardcoded for now, very awful. But code generation is hard. 
+                                // In the future, we would like to have some way to query for type info via the string of the object.
+                                // something like:
+                                //
+                                // type_info_struct_t structure_info = c_type_info_get_from_name(token.data);
+                                //
+                                // and
+                                //
+                                // type_info_member_t member_info = c_type_info_get_member_info(structure_info, member_name);
+                                //
+                                // just so we can avoid the awfulness below here.
+                                if(c_string_compare(token.data, STR("renderer_effect_flags")))
+                                {
+                                    while(enum_token.type != TT_SemiColon)
+                                    {
+                                        enum_token = get_next_token(file_data);
+                                        if(enum_token.type == TT_Identifier)
+                                        {
+                                            type_info_member_t *enum_data = null;
+                                            for(u32 member_index = 0;
+                                                member_index < type_info_enum_renderer_effect_application_flags_t.member_count;
+                                                ++member_index)
+                                            {
+                                                type_info_member_t *found = (type_info_member_t*)((byte*)&type_info_enum_renderer_effect_application_flags_t.members + (member_index * sizeof(type_info_member_t)));
+                                                if(c_string_compare(STR(found->name), value_token.data))
+                                                {
+                                                    enum_data = found;
+                                                    break;
+                                                }
+                                            }
+
+                                            if(enum_data)
+                                            {
+                                                log_debug("Name: '%.*s' found...\n", enum_token.data.count, C_STR(enum_token.data));
+                                                *value |= enum_data->offset;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
-                                u32 *value = (u32*)value_ptr;
                                 *value = c_string_read_u32(value_token.data);
                             }
                         }break;
