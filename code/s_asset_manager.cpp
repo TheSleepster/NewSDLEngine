@@ -226,24 +226,18 @@ get_next_token(string_t *tokenized_data)
         default: 
         {
             if(token_alphabetical(tokenized_data->data[0]) || 
-               token_numeric(tokenized_data->data[0]))
+               token_numeric(tokenized_data->data[0]) ||
+               tokenized_data->data[0] == '-') 
             {
                 result.type = TT_Identifier;
                 while(token_alphabetical(tokenized_data->data[0]) ||
                       token_numeric(tokenized_data->data[0])      ||
-                      tokenized_data->data[0] == '_')
+                      tokenized_data->data[0] == '_'              ||
+                      tokenized_data->data[0] == '.')
                 {
                     c_string_advance_by(tokenized_data, 1);
                 }
                 result.data.count = (u32)(tokenized_data->data - result.data.data);
-            }
-            else
-            {
-                result.type = TT_Invalid;
-                if(result.data.count > 0)
-                {
-                    c_string_advance_by(tokenized_data, 1);
-                }
             }
         }break;
     }
@@ -264,23 +258,87 @@ peek_next_token(string_t token_data, u32 times = 1)
     return(result);
 }
 
-void
-assign_material_value(string_t *file_data, string_t parent_name)
+internal_api bool8
+expect_token(string_t *file_data, token_type_t type, char *error_msg) 
 {
-    token_t value_token = get_next_token(file_data);
-    if(value_token.type == TT_Identifier)
+    bool8 result = true;
+
+    token_t token = get_next_token(file_data);
+    if (token.type != type) 
     {
-        type_info_member_t *member = null;
-        for(u32 member_index = 0;
-            member_index < type_info_material_archetype_t.member_count;
-            ++member_index)
+        log_error("Parse Error... Expected token: %s. Got '%.*s'\n", error_msg, token.data.count, token.data.data);
+        result = false;
+    }
+
+    return(result);
+}
+
+
+void
+parse_archetype_data(material_archetype_t *archetype, string_t *file_data, string_t parent_name)
+{
+    while(file_data->count > 0)
+    {
+        token_t token = get_next_token(file_data);
+        if(token.type == TT_Identifier)
         {
-            type_info_member_t *found = (type_info_member_t*)((byte*)&type_info_material_archetype_t.members + (member_index * sizeof(type_info_member_t)));
-            if(c_string_compare(STR(found->name), parent_name))
+            type_info_member_t *member = null;
+            for(u32 member_index = 0;
+                member_index < type_info_material_archetype_t.member_count;
+                ++member_index)
             {
-                member = found;
-                break;
+                type_info_member_t *found = (type_info_member_t*)((byte*)&type_info_material_archetype_t.members + (member_index * sizeof(type_info_member_t)));
+                if(c_string_compare(STR(found->name), token.data))
+                {
+                    member = found;
+                    break;
+                }
             }
+            if(member)
+            {
+                // NOTE(Sleepster): Eat the colon, then get the value 
+                get_next_token(file_data);
+                token_t value_token = get_next_token(file_data);
+                if(value_token.type == TT_Identifier)
+                {
+                    log_debug("Name: '%.*s' found...\n", token.data.count, C_STR(token.data));
+                    log_debug("Name: '%.*s' found...\n", value_token.data.count, C_STR(value_token.data));
+
+                    byte *value_ptr = (byte*)archetype + (member->offset);
+                    switch(member->type)
+                    {
+                        case TYPE_string_t:
+                        {
+                            string_t *string_value = (string_t*)value_ptr;
+                            *string_value = value_token.data;
+                        }break;
+                        case TYPE_bool32:
+                        {
+                            bool32 *boolean = (bool32*)value_ptr;
+                            *boolean = c_string_compare(value_token.data, STR("true")) ? true : false;
+                        }break;
+                        case TYPE_u32:
+                        {
+                            token_t next_token = peek_next_token(*file_data);
+                            if(next_token.type == TT_PipeOperator)
+                            {
+                                // NOTE(Sleepster): Enum 
+                            }
+                            else
+                            {
+                                u32 *value = (u32*)value_ptr;
+                                *value = c_string_read_u32(value_token.data);
+                            }
+                        }break;
+                    }
+                }
+            }
+        }
+        else if(token.type == TT_CloseBrace || token.type == TT_EOF)
+        {
+            // NOTE(Sleepster): Eat the semicolon 
+            get_next_token(file_data);
+            break;
         }
     }
 }
@@ -296,15 +354,18 @@ s_asset_material_extract_archetype_data(material_archetype_t *archetype, string_
             string_t identifier  = token.data;
             token_t future_token = peek_next_token(material_file_data, 2);
 
-            if(future_token.type == TT_Identifier)
-            {
-                // NOTE(Sleepster): Value Assignment 
-                get_next_token(&material_file_data);
-                assign_material_value(&material_file_data, identifier);
-            }
-            else if(future_token.type == TT_OpenBrace)
+            get_next_token(&material_file_data);
+            get_next_token(&material_file_data);
+            if(future_token.type == TT_OpenBrace)
             {
                 // NOTE(Sleepster): Grouped asssigment 
+                if(c_string_compare(identifier, STR("archetype")))
+                {
+                    parse_archetype_data(archetype, &material_file_data, identifier);
+                }
+                else if(c_string_compare(identifier, STR("instance")))
+                {
+                }
             }
         }
         else if(token.type == TT_EOF || material_file_data.count == 0)

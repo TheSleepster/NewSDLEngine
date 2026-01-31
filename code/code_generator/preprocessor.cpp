@@ -42,6 +42,7 @@
 // - [ ] MERGE ALL THE IS_* FLAGS (IS_POINTER, IS_CONSTANT, IS_VOLATILE, ETC.) INTO FLAGS
 // - [ ] GET_STRUCT_INFO() FUNCTION TO SWITCH-CASE ON THE STRUCTURE_TYPE
 // - [ ] FIGURE OUT A BETTER WAY TO DEAL WITH INSTANCES LIKE ZONE_ALLOCATOR_BLOCK...
+// - [ ] ENUM SUPPORT
 
 #if 0
 struct type_info_internal_members_t {
@@ -82,6 +83,14 @@ struct type_info_test_element_data_t {
                 type_info_member_t tomatos;
             };
         }
+};
+
+typedef enum types
+{
+    TYPE_EnumName
+}type_t;
+
+struct type_info_enum_name_t {
 };
 
 #endif
@@ -601,12 +610,19 @@ VISIT_FILES(generate_file_metadata)
         {
             case TT_Identifier:
             {
+                // NOTE(Sleepster): With this, we know this is an item we wish to generate metadata for... 
                 if(c_string_compare(token.string, STR("GENERATE_TYPE_INFO")))
                 {
                     get_next_token(&file_data);
-                    get_next_token(&file_data);
-                    // NOTE(Sleepster): With this, we know this is an item we wish to generate metadata for... 
-                    parse_structure(&file_data, token);
+                    preprocessor_token_t type = get_next_token(&file_data);
+                    if(c_string_compare(type.string, STR("enum")))
+                    {
+                        fprintf(stdout, "//Enum found...\n//Not supported...\n");
+                    }
+                    else
+                    {
+                        parse_structure(&file_data, token);
+                    }
                 }
             }break;
             case TT_Invalid:
@@ -664,12 +680,18 @@ main(int argc, char **argv)
         {
             case TT_Identifier:
             {
+                // NOTE(Sleepster): With this, we know this is an item we wish to generate metadata for... 
                 if(c_string_compare(token.string, STR("GENERATE_TYPE_INFO")))
                 {
                     get_next_token(&file_data);
-
-                    // NOTE(Sleepster): With this, we know this is an item we wish to generate metadata for... 
-                    parse_structure(&file_data, token);
+                    if(c_string_compare(token.string, STR("enum")))
+                    {
+                        log_info("Enum found...\nNot supported...\n");
+                    }
+                    else
+                    {
+                        parse_structure(&file_data, token);
+                    }
                 }
             }break;
             case TT_Invalid:

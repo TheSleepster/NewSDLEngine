@@ -98,7 +98,7 @@ typedef struct vulkan_pipeline_data
 
 // NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. 
 //                  Per material
-GENERATE_TYPE_INFO 
+GENERATE_TYPE_INFO
 typedef struct render_pipeline_state
 {
     bool32 blend_enabled;
@@ -358,6 +358,7 @@ typedef struct vulkan_fence
 // VULKAN RENDERPASS STUFF 
 //////////////////////////////////
 
+GENERATE_TYPE_INFO
 typedef enum renderer_effect_application_flags
 {
     REAF_None,
