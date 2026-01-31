@@ -17,7 +17,7 @@
 #include <c_hash_table.h>
 #include <c_dynarray.h>
 #include <r_vulkan_core.h>
-#include <r_vulkan_types.h>
+#include <r_render_group.h>
 
 #include <asset_file_packer/jfd_asset_file.h>
 #include <meta/GENERATED_program_types.h>
@@ -274,7 +274,7 @@ expect_token(string_t *file_data, token_type_t type, char *error_msg)
     return(result);
 }
 
-
+// TODO(Sleepster): Error checking 
 void
 parse_archetype_data(material_archetype_t *archetype, string_t *file_data, string_t parent_name)
 {
@@ -387,6 +387,83 @@ parse_archetype_data(material_archetype_t *archetype, string_t *file_data, strin
     }
 }
 
+// TODO(Sleepster): Same as above, once we have proper RTTI, we'll have to come back to this since this
+// current iteration of this parser is very stupid. 
+void
+parse_instance_data(material_archetype_t *archetype, string_t *file_data, string_t parent_name)
+{
+    while(file_data->count > 0)
+    {
+        token_t token = get_next_token(file_data);
+        token_t name_token = token;
+        if(c_string_compare(token.data, STR("render_pipeline_state")))
+        {
+            while(name_token.type != TT_CloseBrace && file_data->count > 0)
+            {
+                name_token = get_next_token(file_data);
+                switch(name_token.type)
+                {
+                    case TT_Identifier:
+                    {
+                        while(name_token.type != TT_Identifier && 
+                              name_token.type != TT_CloseBrace && 
+                              file_data->count > 0)
+                        {
+                            // NOTE(Sleepster): Eat up the next identifier 
+                            name_token = get_next_token(file_data);
+                        }
+
+                        for(u32 member_index = 0;
+                            member_index < type_info_render_pipeline_state_t.member_count;
+                            ++member_index)
+                        {
+                            // NOTE(Sleepster): For now, just eat the semicolon, comma, and brace. 
+                            type_info_member_t *member = (type_info_member_t*)((byte*)&type_info_render_pipeline_state_t.members + (member_index * sizeof(type_info_member_t)));
+                            if(c_string_compare(STR(member->name), name_token.data))
+                            {
+                                log_debug("Member found: '%.*s'...\n", name_token.data.count, C_STR(name_token.data));
+
+                                byte *value_ptr = (byte*)&archetype->base_instance.pipeline_state + (member->offset);
+                                token_t value_token = get_next_token(file_data);
+                                while(value_token.type != TT_Identifier)
+                                {
+                                    value_token = get_next_token(file_data);
+                                }
+
+                                if(member->type == TYPE_bool32)
+                                {
+                                    bool32 *boolean = (bool32*)value_ptr;
+                                    *boolean = c_string_compare(value_token.data, STR("true")) ? true : false;
+                                    log_debug("Value: '%.*s' set...\n", name_token.data.count, C_STR(name_token.data));
+
+                                    break;
+                                }
+                                else if(member->type == TYPE_u32)
+                                {
+                                    u32 *value = (u32*)value_ptr;
+                                    *value = c_string_read_u32(value_token.data);
+                                    log_debug("Value: '%.*s' set...\n", name_token.data.count, C_STR(name_token.data));
+
+                                    break;
+                                }
+                            }
+
+                            if(name_token.type == TT_CloseBrace || file_data->count < 0) 
+                            {
+                                return;
+                            }
+                        }
+                    }break;
+                    case TT_CloseBrace:
+                    {
+                        return;
+                    }break;
+                }
+            }
+        }
+    }
+}
+
 void
 s_asset_material_extract_archetype_data(material_archetype_t *archetype, string_t material_file_data)
 {
@@ -407,9 +484,7 @@ s_asset_material_extract_archetype_data(material_archetype_t *archetype, string_
                 {
                     parse_archetype_data(archetype, &material_file_data, identifier);
                 }
-                else if(c_string_compare(identifier, STR("instance")))
-                {
-                }
+                parse_instance_data(archetype, &material_file_data, identifier);
             }
         }
         else if(token.type == TT_EOF || material_file_data.count == 0)

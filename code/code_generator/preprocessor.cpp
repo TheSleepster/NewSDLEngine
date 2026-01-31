@@ -590,6 +590,10 @@ generate_enum_type_info(string_t *tokenized_data, preprocessor_token_t enum_toke
     c_string_builder_init(&enum_definition_builder, MB(20));
     c_string_builder_init(&enum_member_builder, MB(20));
 
+    defer(c_string_builder_deinit(&enum_member_builder));
+    defer(c_string_builder_deinit(&enum_definition_builder));
+    defer(c_string_builder_deinit(&enum_info_builder));
+
     preprocessor_token_t enum_name_token = get_next_token(tokenized_data);
     // NOTE(Sleepster): Build the local version of the struct info 
     char buffer[8192];

@@ -13,28 +13,26 @@ archetype: {
     renderer_effect_flags: REAF_Emmision|REAF_Bloom;
 };
 
-instance: {
-    # this stores the whole pipeline state.
-    render_pipeline_state: {
-        blend_enabled: true,
-        stencil_enabled: false,
-        depth_testing_enabled: true,
-        depth_writing_enabled: true,
-        depth_func: OP_LESS,
+# this stores the whole pipeline state.
+render_pipeline_state: {
+    blend_enabled: true,
+    stencil_enabled: false,
+    depth_testing_enabled: true,
+    depth_writing_enabled: true,
+    depth_func: RDF_Less,
 
-        color_blend_op: ADD,
-        alpha_blend_op: ADD,
-        src_color_blend_mode: SRC_ALPHA,
-        dst_color_blend_mode: ONE_MINUS_SRC_ALPHA,
+    color_blend_op: RBE_Add,
+    alpha_blend_op: RBE_Add,
+    src_color_blend_mode: RBM_SrcAlpha,
+    dst_color_blend_mode: RBM_OneMinusSrcAlpha,
 
-        src_alpha_blend_mode: SRC_ALPHA,
-        dst_alpha_blend_mode: ONE_MINUS_SRC_ALPHA
-    };
-    # doubles are marked with d, unsigned values are marked with u, example: "value: 4.0d, value2: 4u"
-    # default shader uniform data
-    RenderIntensityUBO: {
-        emmision_vibrance: 1.0,
-        bloom_value: 1.5
-    };
+    src_alpha_blend_mode: RBM_SrcAlpha,
+    dst_alpha_blend_mode: RBM_OneMinusSrcAlpha
+};
+# doubles are marked with d, unsigned values are marked with u, example: "value: 4.0d, value2: 4u"
+# default shader uniform data
+RenderIntensityUBO: {
+    emmision_vibrance: 1.0,
+    bloom_value: 1.5
 };
 

@@ -9,10 +9,13 @@
 #pragma pack(push, 1)
 
 enum GENERATED_program_types_t {
+	TYPE_renderer_effect_application_flags_t,
+	TYPE_render_pipeline_blending_mode_t,
+	TYPE_render_pipeline_blending_equation_t,
+	TYPE_render_pipeline_depth_function_t,
 	TYPE_render_pipeline_state_t,
 	TYPE_bool32,
 	TYPE_u32,
-	TYPE_renderer_effect_application_flags_t,
 	TYPE_material_instance_t,
 	TYPE_asset_handle_t,
 	TYPE_vulkan_shader_uniform_data_t,
@@ -85,6 +88,59 @@ struct type_info_enum_renderer_effect_application_flags_t {
 	}members;
 };
 
+struct type_info_enum_render_pipeline_blending_mode_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t RBM_Invalid;
+		type_info_member_t RBM_Zero;
+		type_info_member_t RBM_One;
+		type_info_member_t RBM_Constant;
+		type_info_member_t RBM_SrcColor;
+		type_info_member_t RBM_OneMinusSrcColor;
+		type_info_member_t RBM_DstColor;
+		type_info_member_t RBM_OneMinusDstColor;
+		type_info_member_t RBM_SrcAlpha;
+		type_info_member_t RBM_OneMinusSrcAlpha;
+		type_info_member_t RBM_DstAlpha;
+		type_info_member_t RBM_OneMinusDstAlpha;
+		type_info_member_t RBM_Count;
+	}members;
+};
+
+struct type_info_enum_render_pipeline_blending_equation_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t RBE_Invalid;
+		type_info_member_t RBE_Add;
+		type_info_member_t RBE_Subtract;
+		type_info_member_t RBE_ReverseSubtract;
+		type_info_member_t RBE_Min;
+		type_info_member_t RBE_Max;
+	}members;
+};
+
+struct type_info_enum_render_pipeline_depth_function_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t RDF_Invalid;
+		type_info_member_t RDF_Never;
+		type_info_member_t RDF_Always;
+		type_info_member_t RDF_Greater;
+		type_info_member_t RDF_Less;
+		type_info_member_t RDF_Equal;
+		type_info_member_t RDF_NotEqual;
+		type_info_member_t RDF_LessOrEqual;
+		type_info_member_t RDF_GreaterOrEqual;
+		type_info_member_t RDF_Count;
+	}members;
+};
+
 
 const static type_info_enum_renderer_effect_application_flags_t type_info_enum_renderer_effect_application_flags_t = {
 	.name = "renderer_effect_application_flags_t",
@@ -97,6 +153,59 @@ const static type_info_enum_renderer_effect_application_flags_t type_info_enum_r
 		.REAF_Vignette = {.name = "REAF_Vignette", .type = TYPE_renderer_effect_application_flags_t, .offset = REAF_Vignette, .size = 0},
 		.REAF_FilmGrain = {.name = "REAF_FilmGrain", .type = TYPE_renderer_effect_application_flags_t, .offset = REAF_FilmGrain, .size = 0},
 		.REAF_Count = {.name = "REAF_Count", .type = TYPE_renderer_effect_application_flags_t, .offset = REAF_Count, .size = 0},
+	}
+};
+
+const static type_info_enum_render_pipeline_blending_mode_t type_info_enum_render_pipeline_blending_mode_t = {
+	.name = "render_pipeline_blending_mode_t",
+	.type = TYPE_render_pipeline_blending_mode_t,
+	.member_count = 13,
+	.members = {
+		.RBM_Invalid = {.name = "RBM_Invalid", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_Invalid, .size = 0},
+		.RBM_Zero = {.name = "RBM_Zero", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_Zero, .size = 0},
+		.RBM_One = {.name = "RBM_One", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_One, .size = 0},
+		.RBM_Constant = {.name = "RBM_Constant", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_Constant, .size = 0},
+		.RBM_SrcColor = {.name = "RBM_SrcColor", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_SrcColor, .size = 0},
+		.RBM_OneMinusSrcColor = {.name = "RBM_OneMinusSrcColor", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_OneMinusSrcColor, .size = 0},
+		.RBM_DstColor = {.name = "RBM_DstColor", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_DstColor, .size = 0},
+		.RBM_OneMinusDstColor = {.name = "RBM_OneMinusDstColor", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_OneMinusDstColor, .size = 0},
+		.RBM_SrcAlpha = {.name = "RBM_SrcAlpha", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_SrcAlpha, .size = 0},
+		.RBM_OneMinusSrcAlpha = {.name = "RBM_OneMinusSrcAlpha", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_OneMinusSrcAlpha, .size = 0},
+		.RBM_DstAlpha = {.name = "RBM_DstAlpha", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_DstAlpha, .size = 0},
+		.RBM_OneMinusDstAlpha = {.name = "RBM_OneMinusDstAlpha", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_OneMinusDstAlpha, .size = 0},
+		.RBM_Count = {.name = "RBM_Count", .type = TYPE_render_pipeline_blending_mode_t, .offset = RBM_Count, .size = 0},
+	}
+};
+
+const static type_info_enum_render_pipeline_blending_equation_t type_info_enum_render_pipeline_blending_equation_t = {
+	.name = "render_pipeline_blending_equation_t",
+	.type = TYPE_render_pipeline_blending_equation_t,
+	.member_count = 6,
+	.members = {
+		.RBE_Invalid = {.name = "RBE_Invalid", .type = TYPE_render_pipeline_blending_equation_t, .offset = RBE_Invalid, .size = 0},
+		.RBE_Add = {.name = "RBE_Add", .type = TYPE_render_pipeline_blending_equation_t, .offset = RBE_Add, .size = 0},
+		.RBE_Subtract = {.name = "RBE_Subtract", .type = TYPE_render_pipeline_blending_equation_t, .offset = RBE_Subtract, .size = 0},
+		.RBE_ReverseSubtract = {.name = "RBE_ReverseSubtract", .type = TYPE_render_pipeline_blending_equation_t, .offset = RBE_ReverseSubtract, .size = 0},
+		.RBE_Min = {.name = "RBE_Min", .type = TYPE_render_pipeline_blending_equation_t, .offset = RBE_Min, .size = 0},
+		.RBE_Max = {.name = "RBE_Max", .type = TYPE_render_pipeline_blending_equation_t, .offset = RBE_Max, .size = 0},
+	}
+};
+
+const static type_info_enum_render_pipeline_depth_function_t type_info_enum_render_pipeline_depth_function_t = {
+	.name = "render_pipeline_depth_function_t",
+	.type = TYPE_render_pipeline_depth_function_t,
+	.member_count = 10,
+	.members = {
+		.RDF_Invalid = {.name = "RDF_Invalid", .type = TYPE_render_pipeline_depth_function_t, .offset = RDF_Invalid, .size = 0},
+		.RDF_Never = {.name = "RDF_Never", .type = TYPE_render_pipeline_depth_function_t, .offset = RDF_Never, .size = 0},
+		.RDF_Always = {.name = "RDF_Always", .type = TYPE_render_pipeline_depth_function_t, .offset = RDF_Always, .size = 0},
+		.RDF_Greater = {.name = "RDF_Greater", .type = TYPE_render_pipeline_depth_function_t, .offset = RDF_Greater, .size = 0},
+		.RDF_Less = {.name = "RDF_Less", .type = TYPE_render_pipeline_depth_function_t, .offset = RDF_Less, .size = 0},
+		.RDF_Equal = {.name = "RDF_Equal", .type = TYPE_render_pipeline_depth_function_t, .offset = RDF_Equal, .size = 0},
+		.RDF_NotEqual = {.name = "RDF_NotEqual", .type = TYPE_render_pipeline_depth_function_t, .offset = RDF_NotEqual, .size = 0},
+		.RDF_LessOrEqual = {.name = "RDF_LessOrEqual", .type = TYPE_render_pipeline_depth_function_t, .offset = RDF_LessOrEqual, .size = 0},
+		.RDF_GreaterOrEqual = {.name = "RDF_GreaterOrEqual", .type = TYPE_render_pipeline_depth_function_t, .offset = RDF_GreaterOrEqual, .size = 0},
+		.RDF_Count = {.name = "RDF_Count", .type = TYPE_render_pipeline_depth_function_t, .offset = RDF_Count, .size = 0},
 	}
 };
 

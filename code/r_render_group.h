@@ -17,6 +17,71 @@
 
 #define MAX_RENDER_LAYERS (32)
 
+GENERATE_TYPE_INFO
+typedef enum renderer_effect_application_flags
+{
+    REAF_None,
+    REAF_Bloom,
+    REAF_Emmision,
+    REAF_Vignette,
+    REAF_FilmGrain,
+    REAF_Count,
+}renderer_effect_application_flags_t;
+
+GENERATE_TYPE_INFO
+typedef enum render_pipeline_blending_mode
+{
+    RBM_Invalid,
+    RBM_Zero,
+    RBM_One,
+    RBM_Constant,
+
+    RBM_SrcColor,
+    RBM_OneMinusSrcColor,
+    RBM_DstColor,
+    RBM_OneMinusDstColor,
+
+    RBM_SrcAlpha,
+    RBM_OneMinusSrcAlpha,
+    RBM_DstAlpha,
+    RBM_OneMinusDstAlpha,
+    RBM_Count
+}render_pipeline_blending_mode_t;
+
+GENERATE_TYPE_INFO
+typedef enum render_pipeline_blending_equation
+{
+    RBE_Invalid,
+    RBE_Add,
+    RBE_Subtract,
+    RBE_ReverseSubtract,
+    RBE_Min,
+    RBE_Max,
+}render_pipeline_blending_equation_t;
+
+GENERATE_TYPE_INFO
+typedef enum render_pipeline_depth_function
+{
+    RDF_Invalid,
+    RDF_Never,
+    RDF_Always,
+
+    RDF_Greater,
+    RDF_Less,
+    RDF_Equal,
+    RDF_NotEqual,
+    RDF_LessOrEqual,
+    RDF_GreaterOrEqual,
+    RDF_Count
+}render_pipeline_depth_function_t;
+
+// TODO(Sleepster): This seems unnecessary for now
+#if 0
+typedef enum render_pipeline_stencil_function
+{
+}render_pipeline_stencil_function_t;
+#endif
+
 struct render_geometry_instance_t 
 {
     mat4_t  transform;

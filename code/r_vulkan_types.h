@@ -358,17 +358,6 @@ typedef struct vulkan_fence
 // VULKAN RENDERPASS STUFF 
 //////////////////////////////////
 
-GENERATE_TYPE_INFO
-typedef enum renderer_effect_application_flags
-{
-    REAF_None,
-    REAF_Bloom,
-    REAF_Emmision,
-    REAF_Vignette,
-    REAF_FilmGrain,
-    REAF_Count,
-}renderer_effect_application_flags_t;
-
 typedef enum vulkan_renderpass_state
 {
     // NOTE(Sleepster): Not allocated 
