@@ -23,12 +23,18 @@
 - [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
       (shader, blend modes, depth state, textures, camera data, etc.)
 ** Metaprogram
-- [X] Input flag parser
 - [ ] Type database for more efficient storage of types accross the program
 - [ ] Some sort of get_type_info(&structure) function that makes the retrieval of type info better.
-- [ ] Type table to allow the user to query for the type_info via type name as a string.H
 - [ ] The ability to do the same for members of structs get_member_info(structure_info, string_t member_name)
+- [ ] The ability to get the parent structure from the name of a member. (this might be impossible.)
+      This might be impossible simply do to the fact that we can have the same member in many different structs.
+      We can have token.data, bitmap.data, texture.data, etc. So how can we know which type_info_struct_t we want???
+- [ ] The ability to do the same for enums
+- [ ] Type table to allow the user to query for the type_info via type name as a string.
 - [ ] Nested structure support
+- [ ] Ignore #if 0 blocks completely
+- [ ] A better way of parsing modifiers like "volatile", "const", "static", etc.
+- [ ] Support Enums as well.
 ** Material file parser
 ** Create a very early version of the new batch renderer
 - [X] LAYERS. Use the depth buffer.
@@ -144,6 +150,7 @@
 - [ ] Find out why the hell it's taking so long to pack
 * Core stuff
 - [ ] Compile the core into a single library. c_data.lib or something. then have c_base.h import all the core headers
+- [X] Input flag parser
 - [X] Type safe hash tables
 - [X] Allow us to set the custom allocator for the hash tables
 - [ ] Spintf for our custom strings.

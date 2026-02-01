@@ -19,6 +19,8 @@
 #define PROGRAM_FLAG_HANDLER_IMPLEMENTATION
 #include <c_program_flag_handler.h>
 
+#include <c_tokenizer.h>
+
 #include <p_platform_data.cpp>
 #include <c_memory_arena.cpp>
 #include <c_zone_allocator.cpp>
@@ -27,6 +29,7 @@
 #include <c_globals.cpp>
 #include <c_file_api.cpp>
 #include <c_file_watcher.cpp>
+#include <c_tokenizer.cpp>
 
 #include <preprocessor_type_data.h>
 
@@ -44,93 +47,9 @@
 // - [ ] FIGURE OUT A BETTER WAY TO DEAL WITH INSTANCES LIKE ZONE_ALLOCATOR_BLOCK...
 // - [ ] ENUM SUPPORT
 
-#if 0
-struct type_info_internal_members_t {
-        const char *name;
-        u32 type;
-        struct members {
-                type_info_member_t apples;
-        };
-        u32 member_count;
-};
-
-struct test_element_data 
-{
-    u32 oranges;
-    u32 internal_data[128];
-    struct internal_members {
-        u32 apples;
-    };
-
-    union {
-        u32 banannas;
-        u32 grapes;
-        u32 tomatos;
-    };
-}
-
-struct type_info_test_element_data_t {
-        const char *name;
-        u32 type;
-        u32 member_count;
-        union members {
-            type_info_member_t array[5];
-            struct {
-                type_info_member_t oranges;
-                type_info_member_t internal_data;
-                type_info_member_t banannas;
-                type_info_member_t grapes;
-                type_info_member_t tomatos;
-            };
-        }
-};
-
-typedef enum types
-{
-    TYPE_EnumName
-}type_t;
-
-struct type_info_enum_name_t {
-};
-
-#endif
-
-typedef enum preprocessor_token_type
-{
-    TT_Invalid,
-
-    TT_Semicolon,
-    TT_Colon,
-    TT_OpeningBrace,
-    TT_ClosingBrace,
-    TT_OpeningParen,
-    TT_ClosingParen,
-    TT_Asterisk,
-    TT_OpenBracket,
-    TT_ClosingBracket,
-    TT_Comma,
-    TT_OpenAngleBracket,
-    TT_CloseAngleBracket,
-    TT_HashTag,
-    TT_Exclamation,
-    TT_EOF,
-
-    TT_Error,
-    TT_Identifier,
-    TT_String,
-
-    TT_Count
-}preprocessor_token_type_t;
-
-typedef struct preprocessor_token
-{
-    preprocessor_token_type_t type;
-    string_t                  string;
-}preprocessor_token_t;
-
 typedef struct preprocessor_state
 {
-    string_t          token_data;
+    tokenizer_t       tokenizer;
 
     string_builder_t  struct_info_builder;
     string_builder_t  struct_const_definition_builder;
@@ -143,136 +62,8 @@ typedef struct preprocessor_state
 }preprocessor_state_t;
 static preprocessor_state_t state = {};
 
-internal_api inline bool8
-token_alphabetical(char A)
-{
-    bool8 result = (((A >= 'a') && (A <= 'z')) || 
-                    ((A >= 'A') && (A <= 'Z')));
-    return(result);
-}
-
-internal_api inline bool8
-token_numeric(char A)
-{
-    bool8 result = ((A >= '0') && (A <= '9'));
-    return(result);
-}
-
-internal_api preprocessor_token_t
-get_next_token(string_t *token_data)
-{
-    c_string_eat_whitespace(token_data);
-    
-    preprocessor_token_t token = {};
-    if(token_data->count == 0)
-    {
-        token.type = TT_EOF;
-        return token;
-    }
-
-    token.string = {
-        .data  = token_data->data,
-        .count = 1 
-    };
-
-    char character = token_data->data[0];
-
-    c_string_advance_by(token_data, 1);
-    switch(character)
-    {
-        case ';':  {token.type = TT_Semicolon;        }break;
-        case ':':  {token.type = TT_Colon;            }break;
-        case '{':  {token.type = TT_OpeningBrace;     }break;
-        case '}':  {token.type = TT_ClosingBrace;     }break;
-        case '(':  {token.type = TT_OpeningParen;     }break;
-        case ')':  {token.type = TT_ClosingParen;     }break;
-        case '[':  {token.type = TT_OpenBracket;      }break;
-        case ']':  {token.type = TT_ClosingBracket;   }break;
-        case ',':  {token.type = TT_Comma;            }break;
-        case '<':  {token.type = TT_OpenAngleBracket; }break;
-        case '>':  {token.type = TT_CloseAngleBracket;}break;
-        case '#':  {token.type = TT_HashTag;          }break;
-        case '!':  {token.type = TT_Exclamation;      }break;
-        case '\0': {token.type = TT_EOF;              }break;
-        case '*':  
-        {
-            token.type = TT_Asterisk;      
-            if(token_data->count > 0 && token.string.data[0] == '/')
-            {
-                c_string_eat_whitespace(token_data);
-            }
-        }break;
-        case '"':  
-        {
-            byte *at = token_data->data;
-
-            while(token_data->data && 
-                  (token_data->data[0] != '"'))
-            {
-                if((token_data->data[0] == '\\') && (token_data->data[1]))
-                {
-                    c_string_advance_by(token_data, 2);
-                }
-                else
-                {
-                    c_string_advance_by(token_data, 1);
-                }
-            }
-
-            if(token_data->data[0] == '"')
-            {
-                c_string_advance_by(token_data, 1);
-            }
-            u64 token_length = (token_data->data - at);
-
-            token.type = TT_String;
-            token.string.count = (u32)token_length;
-        }break;
-        default:
-        {
-            if(token_alphabetical((char)token.string.data[0]) || character == '_')
-            {
-                token.type = TT_Identifier;
-                while(token_data->count > 0 && 
-                      (token_alphabetical((char)token_data->data[0]) || 
-                       token_numeric((char)token_data->data[0]) ||
-                       token_data->data[0] == '_' || 
-                       token_data->data[0] == '.'))
-                {
-                    c_string_advance_by(token_data, 1);
-                }
-
-                token.string.count = (u32)(token_data->data - token.string.data);
-            }
-            else
-            {
-                token.type = TT_Invalid;
-                if(token_data->count > 0)
-                {
-                    c_string_advance_by(token_data, 1);
-                }
-            }
-        }break;
-    }
-
-    return(token);
-}
-
-internal_api inline preprocessor_token_t
-peek_next_token(string_t token_data, u32 times = 1)
-{
-    preprocessor_token_t result = {};
-    for(u32 peek_index = 0;
-        peek_index < times;
-        ++peek_index)
-    {
-        result = get_next_token(&token_data);
-    }
-    return(result);
-}
-
 internal_api bool8 
-append_type_enum_token(preprocessor_token_t type_name_token)
+append_type_enum_token(token_data_t type_name_token)
 {   
     bool8 was_found = false;
 
@@ -317,22 +108,22 @@ append_type_enum_token(preprocessor_token_t type_name_token)
 }
 
 internal_api void
-parse_member(preprocessor_token_t structure_name, 
-             preprocessor_token_t type_token, 
-             string_t            *tokenized_data, 
+parse_member(token_data_t         structure_name, 
+             token_data_t         type_token, 
+             tokenizer_t         *tokenized_data, 
              string_builder_t    *local_type_info_builder, 
              string_builder_t    *local_const_definition_builder,
              string_builder_t    *struct_member_builder,
              bool8                c_style_struct)
 {
-    preprocessor_token_t element_identifier;
-    preprocessor_token_t type_identifier = type_token;
+    token_data_t element_identifier;
+    token_data_t type_identifier = type_token;
 
     bool8 name_found = false;
     bool8 is_pointer = false;
     for(;;)
     {
-        preprocessor_token_t token = get_next_token(tokenized_data);
+        token_data_t token = c_tokenizer_get_next_token(tokenized_data);
         switch(token.type)
         {
             case TT_Asterisk:
@@ -386,7 +177,7 @@ parse_member(preprocessor_token_t structure_name,
                 };
                 c_string_builder_append_data(local_type_info_builder, test_string);
 
-                preprocessor_token_t type_identifier_COPY = type_identifier;
+                token_data_t type_identifier_COPY = type_identifier;
                 if(is_pointer)
                 {
                     type_identifier_COPY.string = c_string_concat(&global_context->temporary_arena, 
@@ -417,8 +208,8 @@ parse_member(preprocessor_token_t structure_name,
 }
 
 // NOTE(Sleepster): structure_type_token is for telling us whether this structure is a struct or a union... 
-internal_api preprocessor_token_t 
-parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_token)
+internal_api token_data_t 
+parse_structure(tokenizer_t *tokenized_data, token_data_t structure_type_token)
 {
     string_builder_t local_type_info_builder;
     string_builder_t local_const_definition_builder;
@@ -431,13 +222,13 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
     c_string_builder_init(&struct_member_builder, MB(10));
 
     // NOTE(Sleepster): Peeking too see if it's an anonymous structure. If it is, just put it inline
-    preprocessor_token_t struct_name_token = peek_next_token(*tokenized_data);
+    token_data_t struct_name_token = c_tokenizer_peek_token(tokenized_data);
     if(struct_name_token.type == TT_OpeningBrace)
     {
         return(struct_name_token);
     }
 
-    struct_name_token = get_next_token(tokenized_data);
+    struct_name_token = c_tokenizer_get_next_token(tokenized_data);
     string_t struct_name_tail = struct_name_token.string;
     struct_name_tail.data += struct_name_tail.count - 2;
     struct_name_tail.count = 2;
@@ -449,7 +240,7 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
     append_type_enum_token(struct_name_token);
 
     // NOTE(Sleepster): This checks if it's simply a struct declaration. If it is, we're out.
-    preprocessor_token_t struct_declaration = peek_next_token(*tokenized_data);
+    token_data_t struct_declaration = c_tokenizer_peek_token(tokenized_data);
     if(struct_declaration.type != TT_OpeningBrace) 
     {
         return(struct_name_token);
@@ -484,7 +275,7 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
     // NOTE(Sleepster): Loop until the end of this structure or the file 
     for(;;)
     {
-        preprocessor_token_t token = get_next_token(tokenized_data);
+        token_data_t token = c_tokenizer_get_next_token(tokenized_data);
         switch(token.type)
         {
             case TT_Identifier:
@@ -507,7 +298,7 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
                     // }element_t;
                     //
                     // This is behavior I want to support.
-                    preprocessor_token_t peeked = peek_next_token(*tokenized_data, 2);
+                    token_data_t peeked = c_tokenizer_peek_token(tokenized_data, 2);
                     if(peeked.type != TT_OpeningBrace)
                     {
                         c_style_struct = true;
@@ -515,10 +306,10 @@ parse_structure(string_t *tokenized_data, preprocessor_token_t structure_type_to
                     }
 
                     // NOTE(Sleepster): After we return from parse_structure, we've left the TT_Semicolon for the structure, just eat it.
-                    preprocessor_token_t nested_struct_name = parse_structure(tokenized_data, token);
+                    token_data_t nested_struct_name = parse_structure(tokenized_data, token);
                     if(nested_struct_name.type != TT_OpeningBrace)
                     {
-                        get_next_token(tokenized_data);
+                        c_tokenizer_get_next_token(tokenized_data);
                     }
                     break;
                 }
@@ -580,7 +371,7 @@ end:
 }
 
 internal_api void
-generate_enum_type_info(string_t *tokenized_data, preprocessor_token_t enum_token)
+generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
 {
     string_builder_t enum_info_builder;
     string_builder_t enum_definition_builder;
@@ -594,7 +385,7 @@ generate_enum_type_info(string_t *tokenized_data, preprocessor_token_t enum_toke
     defer(c_string_builder_deinit(&enum_definition_builder));
     defer(c_string_builder_deinit(&enum_info_builder));
 
-    preprocessor_token_t enum_name_token = get_next_token(tokenized_data);
+    token_data_t enum_name_token = c_tokenizer_get_next_token(tokenized_data);
     // NOTE(Sleepster): Build the local version of the struct info 
     char buffer[8192];
 
@@ -631,7 +422,7 @@ generate_enum_type_info(string_t *tokenized_data, preprocessor_token_t enum_toke
     u32 member_count = 0;
     for(;;)
     {
-        preprocessor_token_t token = get_next_token(tokenized_data);
+        token_data_t token = c_tokenizer_get_next_token(tokenized_data);
         switch(token.type)
         {
             case TT_Identifier:
@@ -715,19 +506,20 @@ VISIT_FILES(generate_file_metadata)
         return;
     }
 
-    string_t file_data = c_file_read_entirety(filename);
-    Assert(file_data.data);
-    Assert(file_data.count > 0);
+    tokenizer_t tokenizer = {};
+    tokenizer.data = c_file_read_entirety(filename);
+    Assert(tokenizer.data.data);
+    Assert(tokenizer.data.count > 0);
 
     // NOTE(Sleepster): Get tokens for file... 
-    while(file_data.count > 0)
+    while(tokenizer.data.count > 0)
     {
         // NOTE(Sleepster): We need to set this loop up so that it works like this:
         // - Look for the struct / union tag
         // - If we find it, parse the structure. Inside parse_structure, we need to check each line for a member. 
         //   If we find a modifier like const or volatile, we need to more forward once
 
-        preprocessor_token_t token = get_next_token(&file_data);
+        token_data_t token = c_tokenizer_get_next_token(&tokenizer);
         switch(token.type)
         {
             case TT_Identifier:
@@ -735,15 +527,15 @@ VISIT_FILES(generate_file_metadata)
                 // NOTE(Sleepster): With this, we know this is an item we wish to generate metadata for... 
                 if(c_string_compare(token.string, STR("GENERATE_TYPE_INFO")))
                 {
-                    get_next_token(&file_data);
-                    preprocessor_token_t type = get_next_token(&file_data);
+                    c_tokenizer_get_next_token(&tokenizer);
+                    token_data_t type = c_tokenizer_get_next_token(&tokenizer);
                     if(c_string_compare(type.string, STR("enum")))
                     {
-                        generate_enum_type_info(&file_data, token);
+                        generate_enum_type_info(&tokenizer, token);
                     }
                     else
                     {
-                        parse_structure(&file_data, token);
+                        parse_structure(&tokenizer, token);
                     }
                 }
             }break;
@@ -787,7 +579,8 @@ main(int argc, char **argv)
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else
-    string_t file_data = c_file_read_entirety(STR("tests/GENERATED_test2.h"));
+    tokenizer_t tokenizer = {};
+    tokenizer.data = c_file_read_entirety(STR("tests/GENERATED_test2.h"));
     Assert(file_data.data);
     Assert(file_data.count > 0);
 
@@ -799,7 +592,7 @@ main(int argc, char **argv)
         // - If we find it, parse the structure. Inside parse_structure, we need to check each line for a member. 
         //   If we find a modifier like const or volatile, we need to more forward once
 
-        preprocessor_token_t token = get_next_token(&file_data);
+        token_data_t token = c_tokenizer_get_next_token(&file_data);
         switch(token.type)
         {
             case TT_Identifier:
@@ -807,7 +600,7 @@ main(int argc, char **argv)
                 // NOTE(Sleepster): With this, we know this is an item we wish to generate metadata for... 
                 if(c_string_compare(token.string, STR("GENERATE_TYPE_INFO")))
                 {
-                    get_next_token(&file_data);
+                    c_tokenizer_get_next_token(&file_data);
                     if(c_string_compare(token.string, STR("enum")))
                     {
                         log_info("Enum found...\nNot supported...\n");

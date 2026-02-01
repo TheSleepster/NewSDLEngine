@@ -7,10 +7,15 @@
 #include <p_platform_data.h>
 #include <c_globals.h>
 
-#if OS_WINDOWS
-    #include <sys_win32.cpp>
-#elif OS_LINUX
-    #include <sys_linux.cpp>
-#elif OS_MAC
-    #error "lmao really?"
-#endif
+#if !defined(OS_DEFINITION_FILE)
+#define OS_DEFINITION_FILE
+
+# if OS_WINDOWS
+#  include <sys_win32.cpp>
+# elif OS_LINUX
+#  include <sys_linux.cpp>
+# elif OS_MAC
+#  error "lmao really?"
+# endif // OS_*
+  
+#endif // OS_DEFINITION_FILE
