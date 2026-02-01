@@ -432,6 +432,13 @@ parse_instance_data(material_archetype_t *archetype, string_t *file_data, string
 
                                 if(member->type == TYPE_bool32)
                                 {
+#if 0
+                                    type_info_struct_t enum_info = get_parent_from_member_name(value_token.data); 
+                                    type_info_member_t enum_value_data = get_member_by_name(&enum_info, value_token.data);
+
+                                    type_info_member_t name_data = get_data_by_name(value_token.data);
+                                    type_info_struct_t parent = get_parent_data(name_data);
+#endif
                                     bool32 *boolean = (bool32*)value_ptr;
                                     *boolean = c_string_compare(value_token.data, STR("true")) ? true : false;
                                     log_debug("Value: '%.*s' set...\n", name_token.data.count, C_STR(name_token.data));
@@ -440,6 +447,7 @@ parse_instance_data(material_archetype_t *archetype, string_t *file_data, string
                                 }
                                 else if(member->type == TYPE_u32)
                                 {
+                                    // TODO(Sleepster): We can't do this. We don't know what member this belongs too. 
                                     u32 *value = (u32*)value_ptr;
                                     *value = c_string_read_u32(value_token.data);
                                     log_debug("Value: '%.*s' set...\n", name_token.data.count, C_STR(name_token.data));

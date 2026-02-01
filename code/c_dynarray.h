@@ -109,7 +109,7 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
         TypeOf(*(d_array)) r_value = c_dynarray_remove_element(d_array, header->size - 1); \
                                                                                            \
         r_value;                                                                           \
-    })
+})
 
 #define c_dynarray_get_value(d_array, index) ({                                \
     dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(d_array); \
@@ -123,7 +123,7 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
 
 #define c_dynarray_get_ptr(d_array, index) ({                                  \
     dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(d_array); \
-    TypeOf(*(d_array)) *value = {};                                              \
+    TypeOf(*(d_array)) *value = {};                                            \
     Expect(header, "Invalid d_array header...\n");                             \
     if(header && (index) < header->size) {                                     \
         value = d_array + (index);                                             \
