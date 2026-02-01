@@ -5,6 +5,10 @@
 - [ ] Transfer all the struct tags to typedef struct (C backwards compatibility where possible)
 * Next Milestone:
 ** Materials
+- [ ] A program to take whatever the material file looks like and transform it into a binary blob.
+      This way, parsing it and loading it is WAY faster. The asset file packer can probably do this.
+      We should also give the engine the ability to do this for the sake of asset hot reloading.
+
 - [ ] Perhaps we need a standard for autodetecting special
       uniforms. For example, the engine wants to know if you have camera
       matrices in your shader, how many and what textures you have,

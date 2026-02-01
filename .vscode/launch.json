@@ -43,6 +43,29 @@
             "terminal": "integrated"
         },
         {
+            "name": "preprocessor",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/preprocessor",
+            "cwd": "${workspaceFolder}/code",
+            "stopOnEntry": false,
+            "terminal": "integrated",
+            "stdio": [
+                null,
+                "code/meta/GENERATED_program_types.h",
+                null
+            ]
+        },
+        {
+            "name": "metaprogram",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/metaprogram",
+            "cwd": "${workspaceFolder}/code",
+            "stopOnEntry": false,
+            "terminal": "integrated",
+        },
+        {
             "name": "test_dynarray",
             "type": "lldb",
             "request": "launch",
@@ -122,20 +145,6 @@
             "stopOnEntry": false,
             "terminal": "integrated"
         },
-        {
-            "name": "test_preprocessor",
-            "type": "lldb",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/code_generator",
-            "cwd": "${workspaceFolder}/code",
-            "stopOnEntry": false,
-            "terminal": "integrated",
-            "stdio": [
-                null,
-                "code/meta/GENERATED_program_types.h",
-                null
-            ]
-        }
     ],
     "compounds": [
         {

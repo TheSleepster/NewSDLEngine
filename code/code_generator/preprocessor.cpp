@@ -39,7 +39,7 @@
 // - [ ] IS_CONSTANT MEMBER BOOL
 // - [ ] VOLATILE MEMBER BOOL
 // - [ ] LENGTH BASED ARRAY TYPES (U32 INDICES[32]... THIS MIGHT ALREADY BE HANDLED THOUGH USING ARRAYSIZE()...)
-// - [ ] MULTITHREADING???
+// - [ ] MULTITHREADING??? (thread local string_builder, main thread's string builder merges them 1 x 1)
 // - [ ] IGNORE #if 0 blocks
 // - [ ] REALLY JUST HANDLE ANY # BLOCK
 // - [ ] MERGE ALL THE IS_* FLAGS (IS_POINTER, IS_CONSTANT, IS_VOLATILE, ETC.) INTO FLAGS

@@ -62,9 +62,9 @@ endif
 # --------------------------------------------
 # Build Flags
 # --------------------------------------------
-PROJECT_COMMON_COMPILER_FLAGS = -std=c++11 -flto -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
-
 BUILD_TYPE ?= debug
+
+PROJECT_COMMON_COMPILER_FLAGS = -std=c++11 -flto -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
 BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FLAGS) 
 
 # --------------------------------------------
@@ -85,9 +85,13 @@ GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/vulkan -L../run_tr
 TESTS_SRC = $(wildcard tests/*.cpp)
 TESTS_OUT = $(patsubst tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
 
-# Metaprogram 
-CODE_GENERATOR_SRC = code_generator/preprocessor.cpp
-CODE_GENERATOR_OUT = $(BUILD_DIR)/code_generator$(EXE_EXT)
+# Preprocessor 
+PREPROCESSOR_SRC = code_generator/preprocessor.cpp
+PREPROCESSOR_OUT = $(BUILD_DIR)/preprocessor$(EXE_EXT)
+
+# Code Generator 
+CODE_GENERATOR_SRC = code_generator/metaprogram.cpp
+CODE_GENERATOR_OUT = $(BUILD_DIR)/metaprogram$(EXE_EXT)
 
 # Packers
 WAD_ASSET_FILE_PACKER_SRC = asset_file_packer/wad_asset_file_packer.cpp
@@ -108,31 +112,38 @@ JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
 # --------------------------------------------
 # Build Instructions
 # --------------------------------------------
-.PHONY: all shaders clean run_codegen
+.PHONY: all shaders clean run_preprocessor
 
-all: run_codegen $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
+all: run_preprocessor $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
 
 # Create Build Directory
 $(BUILD_DIR):
 	$(call MKDIR,$(BUILD_DIR))
 
 # -------------------------------------------------------------------------
-# Code Generator - Build and Run BEFORE everything else
+# Preprocessor - Build and Run BEFORE everything else
+# -------------------------------------------------------------------------
+$(PREPROCESSOR_OUT): $(PREPROCESSOR_SRC) | $(BUILD_DIR)
+	@echo [BUILDING PREPROCESSOR] $@
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+		-MT $@ -MMD -MP -MF $(BUILD_DIR)/preprocessor.d \
+		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
+
+../code/meta/GENERATED_program_types.h: $(PREPROCESSOR_OUT) $(ALL_SRCS)
+	@echo [GENERATING] $@
+	$(SILENT)$(call MKDIR,../code/meta)
+	$(SILENT)$(PREPROCESSOR_OUT) > $@
+
+run_preprocessor: ../code/meta/GENERATED_program_types.h
+
+# -------------------------------------------------------------------------
+# Code Generator 
 # -------------------------------------------------------------------------
 $(CODE_GENERATOR_OUT): $(CODE_GENERATOR_SRC) | $(BUILD_DIR)
 	@echo [BUILDING METAPROGRAM] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
-		-MT $@ -MMD -MP -MF $(BUILD_DIR)/code_generator.d \
+		-MT $@ -MMD -MP -MF $(BUILD_DIR)/metaprogram.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
-
-# Run the code generator - this happens before any other compilation
-# Depends on all source files so it reruns when any source changes
-../code/meta/GENERATED_program_types.h: $(CODE_GENERATOR_OUT) $(ALL_SRCS)
-	@echo [GENERATING] $@
-	$(SILENT)$(call MKDIR,../code/meta)
-	$(SILENT)$(CODE_GENERATOR_OUT) > $@
-
-run_codegen: ../code/meta/GENERATED_program_types.h
 
 # -------------------------------------------------------------------------
 # Shaders 
@@ -147,10 +158,10 @@ shaders: $(SHADER_OUTPUTS)
 # -------------------------------------------------------------------------
 # Tests 
 # -------------------------------------------------------------------------
-tests: run_codegen $(TESTS_OUT)
+tests: run_preprocessor $(TESTS_OUT)
 
 # Note: We use $* to get the stem (filename without extension) for the .d file
-$(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR) run_codegen
+$(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR) run_preprocessor
 	@echo [TEST] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		$(DEPFLAGS) \
@@ -159,13 +170,13 @@ $(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR) run_codegen
 # -------------------------------------------------------------------------
 # Asset file builder 
 # -------------------------------------------------------------------------
-$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_codegen
+$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_preprocessor
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/wad_asset_file_packer.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@ 
 
-$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_codegen
+$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_preprocessor
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/jfd_asset_file_packer.d \
@@ -174,8 +185,9 @@ $(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_co
 # -------------------------------------------------------------------------
 # Game build 
 # -------------------------------------------------------------------------
+
 # Compile source to objects 
-$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR) run_codegen
+$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR) run_preprocessor
 	@echo [ENGINE SOURCE]: $< ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) $(DEPFLAGS) -c $< -o $@
 

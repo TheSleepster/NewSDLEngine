@@ -12,17 +12,8 @@
 struct test_thing_t
 {
     u32   element0;
-    char *element1[128];
-    const u32 element_array;
-
-    DynArray_t(u32) dynamic_elements;
-
-    struct test_nested_struct
-    {
-        const volatile u32 nested_element[128];
-    };
-
-    const s32 thingy_after_nested_element;
+    u32   element1;
+    u32   element2;
 };
 
 #endif // GENERATED_TEST_H
