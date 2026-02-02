@@ -121,8 +121,6 @@ s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 na
 /*===============================
   ========== MATERIALS ==========
   =============================== */
-
-// TODO(Sleepster): We built the tokenizer elsewhere, and the other one is better. Get rid of this one once it's safe. 
 typedef enum token_type
 {
     TT_Invalid,

@@ -85,13 +85,14 @@ exit:
 typedef struct meta_struct meta_struct_t;
 typedef enum metatype_kind
 {
-    META_TYPE_KIND_Invalid,
+    // NOTE(Sleepster): Default to primitive 
     META_TYPE_KIND_Primitive, // int, float, uint, etc.
     META_TYPE_KIND_Struct, // struct, union
     META_TYPE_KIND_Enum,
     META_TYPE_KIND_Array,
     META_TYPE_KIND_DynamicArray,
     META_TYPE_KIND_HashTable,
+    META_TYPE_KIND_Invalid,
     META_TYPE_KIND_Count
 }metatype_kind_t;
 
@@ -145,16 +146,75 @@ typedef struct ast_file_data
     u32                       enum_count;
 }ast_file_data_t;
 
+typedef struct registry_type
+{
+    string_t canonical_name;
+}registry_type_t;
+
 typedef struct ast_state 
 {
     DynArray_t(ast_file_data) ast_files;
     u32                      file_count;
 
-    HashTable_t(string_t)    type_table;
-    u32                      type_count;
+    // NOTE(Sleepster): The hash will map string names of types to indices in the dynamic array below.
+    // This way we can make it so that both strings:
+    //
+    // ast_state
+    // 
+    // and
+    //
+    // ast_state_t
+    //
+    // will both map to slot 5, which will store the canonical name for the type as:
+    //
+    // ast_state_t
+    HashTable_t(s64)            type_table_hash;
+    DynArray_t(registry_type_t) type_table;
+    u32                         type_count;
 }ast_state_t;
  
 static ast_state_t state;
+
+internal_api void
+insert_type_information(metatype_data_t *type_info)
+{
+    string_t lookup_name = type_info->type_name;
+
+    // NOTE(Sleepster): Fix instances where the typename is something like:
+    //
+    // example
+    //
+    // vs
+    //
+    // example_t
+    if(type_info->kind == META_TYPE_KIND_Struct)
+    {
+        if(c_string_ends_with(lookup_name, STR("_t")))
+        {
+            lookup_name.count -= 2;
+        }
+    }
+        
+    s64 *registry_index = c_hash_table_get_value_ptr(&state.type_table_hash, lookup_name);
+    if(*registry_index == -1)
+    {
+        // NOTE(Sleepster): Type name is not in the hash 
+        registry_type_t new_type;
+        new_type.canonical_name = type_info->type_name;
+
+        c_dynarray_push(state.type_table, new_type);
+        *registry_index = state.type_count++;
+    }
+    else if((*registry_index != -1) && type_info->kind == META_TYPE_KIND_Struct)
+    {
+        // NOTE(Sleepster): It is in the hash, however we might need to update it's canonical name 
+        registry_type_t *type = c_dynarray_get_ptr(state.type_table, *registry_index);
+        if(c_string_ends_with(type_info->type_name, STR("_t")))
+        {
+            type->canonical_name = type_info->type_name;
+        }
+    }
+}
 
 internal_api void
 parse_member_data(ast_file_data_t *file_data, 
@@ -251,6 +311,10 @@ parse_member_data(ast_file_data_t *file_data,
         //type_info->array_size = c_string_read_u32(token.string);
     }
 
+    // NOTE(Sleepster): Insert the type into the type_table 
+    insert_type_information(type_info);
+
+
     // NOTE(Sleepster): Once we have the name and the array size, 
     //                  we care nothing about what comes after...
     while(token.type != TT_Semicolon)
@@ -322,8 +386,12 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
                 {
                     // TODO(Sleepster): Append this to the type table;
                     type_info->type_name = token.string;
+                    insert_type_information(type_info);
+
                     token = c_tokenizer_get_next_token(&file_data->tokenizer);
                 }
+
+
                 parsing = false;
             }break;
             case TT_EOF:
@@ -367,6 +435,7 @@ build_file_ast(ast_file_data_t *file)
     }
 }
 
+#if 0
 internal_api void
 generate_type_enum_table_data(ast_file_data_t *file_data)
 {
@@ -380,23 +449,26 @@ generate_type_enum_table_data(ast_file_data_t *file_data)
         }
     }
 }
+#endif
 
 int
 main(void)
 {
-    state.ast_files = c_dynarray_create(ast_file_data_t);
-    c_hash_table_init(&state.type_table, 9187);
+    state.ast_files  = c_dynarray_create(ast_file_data_t);
+    state.type_table = c_dynarray_create(registry_type_t);
+
+    c_hash_table_init(&state.type_table_hash, 9187);
+    memset(state.type_table_hash.data, -1, sizeof(s64) * 9187);
 
     ast_file_data_t file = {};
     ZeroStruct(file); 
 
     file.tokenizer.data = c_file_read_entirety(STR("tests/GENERATED_test.h"));
     build_file_ast(&file);
-    generate_type_enum_table_data(&file);
 #if 0
+    generate_type_enum_table_data(&file);
     generate_type_information(&file);
 #endif
-
     c_dynarray_push(state.ast_files, file);
 
     return(0);

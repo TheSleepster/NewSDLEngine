@@ -73,6 +73,22 @@ c_string_compare(string_t A, string_t B)
     return(memcmp(A.data, B.data, A.count) == 0);
 }
 
+bool8
+c_string_ends_with(string_t A, string_t ending)
+{
+    Assert(ending.count < A.count);
+
+    bool8 result;
+
+    string_t A_ending = A;
+    A_ending.data  += A.count - ending.count;
+    A_ending.count  = ending.count;
+
+    result = c_string_compare(A_ending, ending);
+
+    return(result);
+}
+
 string_t
 c_string_concat(memory_arena_t *arena, string_t A, string_t B)
 {

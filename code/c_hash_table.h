@@ -43,9 +43,10 @@ typedef C_HASH_TABLE_FREE_IMPL(c_hash_table_free_fn_t);
 
 HASH_API u64 c_hash_table_value_from_key(byte *key, u32 key_size, u32 max_table_entries);
 HASH_API u64 c_fnv_hash_value(byte *key, u32 key_size);
+HASH_API u64 c_fnv_hash_value(byte *key, u32 key_size);
+
 HASH_API     C_HASH_TABLE_ALLOCATE_IMPL(c_hash_table_default_alloc_impl);
 HASH_API     C_HASH_TABLE_FREE_IMPL(c_hash_table_default_free_impl);
-HASH_API u64 c_fnv_hash_value(byte *key, u32 key_size);
 
 typedef struct hash_table_header
 {
@@ -61,6 +62,7 @@ struct {                                     \
     hash_table_header_t header;              \
     stored_type        *data;                \
     string_t           *keys;                \
+    u64                *hashes;              \
                                              \
     void                       *allocator;   \
     c_hash_table_allocate_fn_t *allocate_fn; \
@@ -89,57 +91,61 @@ struct {                                     \
 // First:  "allocator" structure (ex: memory_arena, zone_allocator, etc.)
 // Second: "Allocate Function" allocation callback
 // Third:  "Free Function" free callback
-#define c_hash_table_init(hash_table_ptr, entry_count, ...) do {                                                                                                  \
-    Expect((hash_table_ptr) != null, "Hash table address is invalid...\n");                                                                                       \
-    ZeroStruct(*(hash_table_ptr));                                                                                                                                \
-    hash_table_header_t *header = &(hash_table_ptr)->header;                                                                                                      \
-    Expect(header, "Header is invalid...\n");                                                                                                                     \
-                                                                                                                                                                  \
-    header->max_entries = entry_count;                                                                                                                            \
-                                                                                                                                                                  \
-    (hash_table_ptr)->allocator   = GET_HASH_ALLOC(0, ##__VA_ARGS__, null);                                                                                       \
-    (hash_table_ptr)->allocate_fn = GET_HASH_ALLOC_FN(0, ##__VA_ARGS__,                                                                                           \
-                                                      c_hash_table_default_alloc_impl,                                                                            \
-                                                      c_hash_table_default_alloc_impl);                                                                           \
-                                                                                                                                                                  \
-    (hash_table_ptr)->free_fn = GET_HASH_FREE_FN(0, ##__VA_ARGS__,                                                                                                \
-                                                 c_hash_table_default_free_impl,                                                                                  \
-                                                 c_hash_table_default_free_impl,                                                                                  \
-                                                 c_hash_table_default_free_impl);                                                                                 \
-    Expect((hash_table_ptr)->allocate_fn, "Hash table alloc function pointer is null...\n");                                                                      \
-                                                                                                                                                                  \
-    typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;                                                                                                       \
-    typedef TypeOf(*((hash_table_ptr)->keys)) key_type_t;                                                                                                         \
-                                                                                                                                                                  \
-    (hash_table_ptr)->data = (table_type_t*)(hash_table_ptr)->allocate_fn((hash_table_ptr)->allocator,  sizeof(table_type_t) * header->max_entries, HTAF_Static); \
-    (hash_table_ptr)->keys = (key_type_t *) (hash_table_ptr)->allocate_fn((hash_table_ptr)->allocator,  sizeof(key_type_t)   * header->max_entries, HTAF_Static); \
-                                                                                                                                                                  \
-    Expect((hash_table_ptr)->data != null, "Data pointer for hash table is invalid...\n");                                                                        \
-    Expect((hash_table_ptr)->keys != null, "Keys pointer for hash table is invalid...\n");                                                                        \
-                                                                                                                                                                  \
-    (hash_table_ptr)->header.debug_id = HASH_TABLE_DEBUG_ID;                                                                                                      \
+#define c_hash_table_init(hash_table_ptr, entry_count, ...) do {                                                                                                    \
+    Expect((hash_table_ptr) != null, "Hash table address is invalid...\n");                                                                                         \
+    ZeroStruct(*(hash_table_ptr));                                                                                                                                  \
+    hash_table_header_t *header = &(hash_table_ptr)->header;                                                                                                        \
+    Expect(header, "Header is invalid...\n");                                                                                                                       \
+                                                                                                                                                                    \
+    header->max_entries = entry_count;                                                                                                                              \
+                                                                                                                                                                    \
+    (hash_table_ptr)->allocator   = GET_HASH_ALLOC(0, ##__VA_ARGS__, null);                                                                                         \
+    (hash_table_ptr)->allocate_fn = GET_HASH_ALLOC_FN(0, ##__VA_ARGS__,                                                                                             \
+                                                      c_hash_table_default_alloc_impl,                                                                              \
+                                                      c_hash_table_default_alloc_impl);                                                                             \
+                                                                                                                                                                    \
+    (hash_table_ptr)->free_fn = GET_HASH_FREE_FN(0, ##__VA_ARGS__,                                                                                                  \
+                                                 c_hash_table_default_free_impl,                                                                                    \
+                                                 c_hash_table_default_free_impl,                                                                                    \
+                                                 c_hash_table_default_free_impl);                                                                                   \
+    Expect((hash_table_ptr)->allocate_fn, "Hash table alloc function pointer is null...\n");                                                                        \
+                                                                                                                                                                    \
+    typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;                                                                                                         \
+    typedef TypeOf(*((hash_table_ptr)->keys)) key_type_t;                                                                                                           \
+                                                                                                                                                                    \
+    (hash_table_ptr)->data   = (table_type_t*)(hash_table_ptr)->allocate_fn((hash_table_ptr)->allocator,  sizeof(table_type_t) * header->max_entries, HTAF_Static); \
+    (hash_table_ptr)->keys   = (key_type_t *) (hash_table_ptr)->allocate_fn((hash_table_ptr)->allocator,  sizeof(key_type_t)   * header->max_entries, HTAF_Static); \
+    (hash_table_ptr)->hashes = (u64*)         (hash_table_ptr)->allocate_fn((hash_table_ptr)->allocator,  sizeof(u64)          * header->max_entries, HTAF_Static); \
+                                                                                                                                                                    \
+    Expect((hash_table_ptr)->data != null, "Data pointer for hash table is invalid...\n");                                                                          \
+    Expect((hash_table_ptr)->keys != null, "Keys pointer for hash table is invalid...\n");                                                                          \
+                                                                                                                                                                    \
+    (hash_table_ptr)->header.debug_id = HASH_TABLE_DEBUG_ID;                                                                                                        \
 }while(0)
 
 // TODO(Sleepster): Option to copy key and heap allocate it?
-#define c_hash_table_insert_pair(hash_table_ptr, key, value) do {                                           \
-    Expect((hash_table_ptr)->header.debug_id == HASH_TABLE_DEBUG_ID,                                        \
-           "Hash table is invalid... the debug_id doesn't match...\n");                                     \
-                                                                                                            \
-    typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;                                                 \
-    typedef TypeOf(*((hash_table_ptr)->keys)) key_type_t;                                                   \
-                                                                                                            \
-    key_type_t   *key_array   = (hash_table_ptr)->keys;                                                     \
-    table_type_t *value_array = (hash_table_ptr)->data;                                                     \
-                                                                                                            \
-    StaticAssert(TypesSame(*value_array, value), "Value types within the table are not the same...\n");     \
-    StaticAssert(TypesSame(*key_array,   key),   "Key types within the table are not the same...\n");       \
-                                                                                                            \
-    u64 index = c_hash_table_value_from_key((key).data, (key).count, (hash_table_ptr)->header.max_entries); \
-    Assert(index > 0);                                                                                      \
-                                                                                                            \
-    key_array[index]   = key;                                                                               \
-    value_array[index] = value;                                                                             \
-    (hash_table_ptr)->header.current_entry_count++;                                                         \
+#define c_hash_table_insert_pair(hash_table_ptr, key, value) do {                                                \
+    Expect((hash_table_ptr)->header.debug_id == HASH_TABLE_DEBUG_ID,                                             \
+           "Hash table is invalid... the debug_id doesn't match...\n");                                          \
+                                                                                                                 \
+    typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;                                                      \
+    typedef TypeOf(*((hash_table_ptr)->keys)) key_type_t;                                                        \
+                                                                                                                 \
+    key_type_t   *key_array   = (hash_table_ptr)->keys;                                                          \
+    table_type_t *value_array = (hash_table_ptr)->data;                                                          \
+    u64          *hash_array  = (hash_table_ptr)->hashes;                                                        \
+                                                                                                                 \
+    StaticAssert(TypesSame(*value_array, value), "Value types within the table are not the same...\n");          \
+    StaticAssert(TypesSame(*key_array,   key),   "Key types within the table are not the same...\n");            \
+                                                                                                                 \
+    u64 hash_value = c_fnv_hash_value((key).data, (key).count);                                                  \
+    u64 index      = c_hash_table_value_from_key((key).data, (key).count, (hash_table_ptr)->header.max_entries); \
+    Assert(index > 0);                                                                                           \
+                                                                                                                 \
+    key_array[index]   = key;                                                                                    \
+    value_array[index] = value;                                                                                  \
+    hash_array[index]  = hash_value;                                                                             \
+    (hash_table_ptr)->header.current_entry_count++;                                                              \
 }while(0)
 
 #define c_hash_table_get_value_ptr(hash_table_ptr, key) ({                                                  \
@@ -174,6 +180,26 @@ struct {                                     \
     table_type_t *result = c_hash_table_get_value_ptr(hash_table_ptr, key); \
     ZeroStruct(*result);                                                    \
 }while(0)
+
+#define c_hash_table_get_value_ptr_at_index(hash_table_ptr, index) ({   \
+    Expect((hash_table_ptr)->header.debug_id == HASH_TABLE_DEBUG_ID,    \
+           "Hash table is invalid... the debug_id doesn't match...\n"); \
+                                                                        \
+    typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;             \
+    table_type_t *result = (hash_table_ptr)->data + index;              \
+                                                                        \
+    result;                                                             \
+})
+
+#define c_hash_table_get_value_at_index(hash_table_ptr, index) ({                      \
+    Expect((hash_table_ptr)->header.debug_id == HASH_TABLE_DEBUG_ID,                   \
+           "Hash table is invalid... the debug_id doesn't match...\n");                \
+                                                                                       \
+    typedef TypeOf(*((hash_table_ptr)->data)) table_type_t;                            \
+    table_type_t result = *c_hash_table_get_value_ptr_at_index(hash_table_ptr, index); \
+                                                                                       \
+    result;                                                                            \
+})
 
 #ifdef HASH_TABLE_IMPLEMENTATION
 HASH_API
