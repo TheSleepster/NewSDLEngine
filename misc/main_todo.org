@@ -1,8 +1,7 @@
-
 #+title: NewSDLEngine
 * IMMEDIATE TODO
 - [X] Fix the memory leak inside of the asset file packer
-- [ ] Transfer all the struct tags to typedef struct (C backwards compatibility where possible)
+- [ ] Fix the c_string_read_* functions.
 * Next Milestone:
 ** Materials
 - [ ] A program to take whatever the material file looks like and transform it into a binary blob.
@@ -154,6 +153,7 @@
 - [ ] Find out why the hell it's taking so long to pack
 * Core stuff
 - [ ] Compile the core into a single library. c_data.lib or something. then have c_base.h import all the core headers
+- [ ] Convert Dynarray.cpp and Dynarray.h into an STB style library like the hash_tables
 - [X] Input flag parser
 - [X] Type safe hash tables
 - [X] Allow us to set the custom allocator for the hash tables

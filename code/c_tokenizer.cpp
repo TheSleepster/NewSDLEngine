@@ -105,6 +105,18 @@ c_tokenizer_get_next_token(tokenizer_t *tokenizer)
 
                 result.string.count = (u32)(tokenizer->data.data - result.string.data);
             }
+            else if(c_tokenizer_token_numeric((char)result.string.data[0]))
+            {
+                result.type = TT_Number;
+                while(tokenizer->data.count > 0 &&
+                      (c_tokenizer_token_numeric((char)tokenizer->data.data[0]) || 
+                      tokenizer->data.data[0] == '.'))
+                {
+                    c_string_advance_by(&tokenizer->data, 1);
+                }
+
+                result.string.count = (u32)(tokenizer->data.data - result.string.data);
+            }
             else
             {
                 result.type = TT_Invalid;

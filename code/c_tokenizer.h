@@ -31,6 +31,7 @@ typedef enum preprocessor_token_type
     TT_Exclamation,
     TT_Equals,
     TT_Dash,
+    TT_Number,
     TT_EOF,
 
     TT_Error,

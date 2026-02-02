@@ -9,12 +9,23 @@
 #define GENERATED_TEST_H
 #include <c_types.h>
 
-struct test_thing_t
+typedef struct test_thing
 {
-    u32   element0;
-    u32   element1;
-    u32   element2;
-};
+    const u32             element0[64];
+    DynArray_t(string_t)  element1;
+    HashTable_t(s32)      element2;
+    const volatile u32    element3;
+
+    struct test_structure {
+        u32 test_element;
+        u32 other_test_element;
+
+        struct other_thing {
+            s32 element_inside_other_struct0;
+            s32 element_inside_other_struct1;
+        }other_thing_t;
+    }test_structure_t;
+}test_thing_t;
 
 #endif // GENERATED_TEST_H
 

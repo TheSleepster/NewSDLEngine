@@ -54,7 +54,7 @@ bool32      c_string_is_whitespace(string_t *current_line);
 bool32      c_string_is_end_of_line(string_t *current_line);
 void        c_string_eat_whitespace(string_t *current_line);
 
-// TODO(Sleepster): Test These
+// TODO(Sleepster): Yeah... They just don't work. Fix this!
 string_t    c_string_read_line(string_t *data);
 
 s8          c_string_read_s8(string_t data);
