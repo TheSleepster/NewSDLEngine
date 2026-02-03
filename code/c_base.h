@@ -149,7 +149,7 @@
 #define MemoryCopy(dest, source, size) (memmove((dest), (source), (size)))
 #define MemoryCopyStruct(dest, source) (MemoryCopy((dest), (source), Min(sizeof(*(dest), sizeof(*(source))))))
 
-#define InvalidCodePath Assert(false)
+#define InvalidCodePath Expect(false, "Invalid code path...\n")
 
 #define Align(value, number) ((value + ((number) - 1))  & ~((number) - 1))
 #define Align4(value)  ((value + 3)  & ~3)

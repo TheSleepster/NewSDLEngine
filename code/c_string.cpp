@@ -687,3 +687,30 @@ c_string_builder_flush_to_file(file_t *file, string_builder_t *builder)
 
     return(result);
 }
+
+// NOTE(Sleepster): Might wanna flip these. 
+void
+c_string_builder_append_builder(string_builder_t *A, string_builder_t *B)
+{
+    string_t builder_string = c_string_builder_get_current_string(B);
+    c_string_builder_append_data(A, builder_string);
+}
+
+void
+c_string_builder_sprint(string_builder_t *builder, const char *string, ...)
+{
+    char buffer[32000];
+    ZeroMemory(buffer, sizeof(buffer));
+
+    va_list arg_ptr;
+    va_start(arg_ptr, string);
+    s32 length = vsnprintf(buffer, sizeof(buffer), string, arg_ptr);
+    va_end(arg_ptr);
+
+    string_t builder_string = {
+        .data  = (u8*)buffer,
+        .count = (u32)length
+    };
+
+    c_string_builder_append_data(builder, builder_string);
+}

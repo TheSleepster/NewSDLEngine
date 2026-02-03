@@ -12,16 +12,21 @@
 // NOTE(Sleepster): PLACE THIS MACRO ON A STURCTURE TO GENERATE TYPE INFORMATION ABOUT IT
 #define GENERATE_TYPE_INFO
 
+
 // TODO(Sleepster): Merge all the is_* flags (is_pointer, is_constant, is_volatile, etc.) into flags
+typedef struct type_info_struct type_info_struct_t;
 
 #pragma pack(push, 1)
 typedef struct type_info_member
 {
-    const char *name;
-    const char *type_name;
-    u32         type;
-    u32         offset;
-    u32         size;
+    const char         *name;
+    const char         *type_name;
+    u32                 type;
+    u32                 offset;
+    u32                 size;
+
+    // NOTE(Sleepster): For nesting 
+    type_info_struct_t *structure;
 }type_info_member_t;
 
 // NOTE(Sleepster): Predefined, we use this as a generic 

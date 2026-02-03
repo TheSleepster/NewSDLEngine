@@ -152,10 +152,12 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
     byte *B_data = (byte*)B - sizeof(dynarray_header_t);                             \
     memcpy(B_data, A_data, (header->size * sizeof(*A)) + sizeof(dynarray_header_t)); \
 })
+#define c_dynarray_for_impl(d_array, iterator_name, counter)                                  \
+    dynarray_header_t *Glue(header, counter) = (dynarray_header_t *)_dynarray_header(d_array); \
+    Expect(Glue(header, counter), "Header is invalid, cannot loop...\n");                      \
+    for(u32 iterator_name = 0; iterator_name < Glue(header, counter)->size; ++iterator_name)
 
 #define c_dynarray_for(d_array, iterator_name)                                  \
-    dynarray_header_t *header = (dynarray_header_t *)_dynarray_header(d_array); \
-    Expect(header, "Header is invalid, cannot loop...\n");                      \
-    for(u32 iterator_name = 0; iterator_name < header->size; ++iterator_name)
+    c_dynarray_for_impl(d_array, iterator_name, __COUNTER__)
 
 #endif // C_DYNARRAY_H

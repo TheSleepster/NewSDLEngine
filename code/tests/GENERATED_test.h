@@ -9,6 +9,22 @@
 #define GENERATED_TEST_H
 #include <c_types.h>
 
+enum thing_t
+{
+    THING_1,
+    THING_2,
+    THING_3,
+    THING_4,
+};
+
+typedef enum thing_stuff
+{
+    THING_STUFF_1,
+    THING_STUFF_2,
+    THING_STUFF_3,
+    THING_STUFF_4,
+}thing_stuff_t;
+
 typedef struct test_thing
 {
     const u32             element0[64];
@@ -26,6 +42,16 @@ typedef struct test_thing
         }other_thing_t;
     }test_structure_t;
 }test_thing_t;
+
+typedef struct test_object
+{
+    u32 test_object_element0;
+    u32 test_object_element1;
+    union {
+        u32 test_object_element2;
+        u32 test_object_element4;
+    };
+};
 
 #endif // GENERATED_TEST_H
 

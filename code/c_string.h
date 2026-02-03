@@ -112,6 +112,8 @@ void     c_string_builder_append_data(string_builder_t *builder, string_t data);
 void     c_string_builder_append_value(string_builder_t *builder, void *value, u32 value_size);
 string_t c_string_builder_get_current_string(string_builder_t *builder);
 void     c_string_builder_reset(string_builder_t *builder);
+void     c_string_builder_append_builder(string_builder_t *A, string_builder_t *B);
+void     c_string_builder_sprint(string_builder_t *builder, const char *string, ...);
 
 // NOTE(Sleepster): DUMP simply writes the data out and keeps the state of the builder the same, 
 //                  FLUSH writes out the data, and completely resets the state of the builder
