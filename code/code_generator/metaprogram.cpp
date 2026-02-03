@@ -37,6 +37,15 @@ typedef struct meta_struct meta_struct_t;
 // - [?] We are including structures that aren't directly embedded into a type as members of that type.
 //       (r_vulkan_types.h "vulkan_render_context") is an instance of that
 //
+// - [X] Random "(" in places where there should be names 
+//   (the issue had to do with how we managed hash tables / dynamic arrays that stored pointers to items)
+// - [ ] A bug with enums which cause strange anomalies of enum names repeating, but missing the first letter
+// - [ ] Enums that have their type specified (like entity flags) includes their type suffix. (ENUM_EXAMPLE_one = 1ul)
+// - [ ] Unknown issues with structures like memory_arena_footer_t
+//
+// - [ ] Perhaps we should prefix hash tables and dynarray members with
+//       special characters to denote this
+//
 // - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
 // - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
 // - [ ] We may have some (a lot) issues with multi-word C primtives in the future like 
@@ -478,7 +487,8 @@ parse_member_data(ast_file_data_t *file_data,
         c_tokenizer_get_next_token(&file_data->tokenizer);
 
         // NOTE(Sleepster): Then, eats the open paren, setting this to the type the special macro
-        // holds.
+        // holds. We also check for an asterisk to tell us this is a pointer
+        // type
         token = c_tokenizer_get_next_token(&file_data->tokenizer);
 
         // NOTE(Sleepster): Finally, sets the kind. 
@@ -519,11 +529,11 @@ parse_member_data(ast_file_data_t *file_data,
     // NOTE(Sleepster): Should be the type
     type_info->type_name = token.string;
 
-    // NOTE(Sleepster): If we used a special type, then this will be a closing paren
-    // if we used a pointer, then this will be an asterisk. In either case, advance
+    // NOTE(Sleepster): If we used a special type, then this will be a closing paren 
     token = c_tokenizer_get_next_token(&file_data->tokenizer);
     if(token.type == TT_ClosingParen)
     {
+        // NOTE(Sleepster): Eat closing paren, get name 
         token = c_tokenizer_get_next_token(&file_data->tokenizer);
     }
     else if(token.type == TT_Asterisk)
@@ -532,15 +542,16 @@ parse_member_data(ast_file_data_t *file_data,
         type_info->flag_counter++;
 
         token = c_tokenizer_get_next_token(&file_data->tokenizer);
-        while(token.type == TT_Asterisk)
+        while(token.type == TT_Asterisk || token.type == TT_ClosingParen)
         {
             token = c_tokenizer_get_next_token(&file_data->tokenizer);
-            type_info->pointer_depth++;
+            if(token.type == TT_Asterisk) ++type_info->pointer_depth;
         }
     }
 
     // NOTE(Sleepster): Name
     member->name = token.string;
+    Assert(token.type == TT_Identifier);
 
     // NOTE(Sleepster): Check if this is an array... 
     token = c_tokenizer_get_next_token(&file_data->tokenizer);
@@ -1275,6 +1286,19 @@ parse_enum(ast_file_data_t *file_data, token_data_t structure_type)
 
                 c_dynarray_push(enum_data.members, member);
                 ++enum_data.member_count;
+
+                // NOTE(Sleepster): Anything after the enum name we just literally don't care
+                // about. Remove it all.
+                token_data_t peek_token = c_tokenizer_peek_token(&file_data->tokenizer);
+                if(peek_token.type != TT_ClosingBrace && peek_token.type != TT_Comma)
+                {
+                    while((token.type != TT_Comma && token.type != TT_ClosingBrace) && 
+                          (peek_token.type != TT_ClosingBrace))
+                    {
+                        token      = c_tokenizer_get_next_token(&file_data->tokenizer);
+                        peek_token = c_tokenizer_peek_token(&file_data->tokenizer);
+                    }
+                }
             }break;
             case TT_ClosingBrace:
             {

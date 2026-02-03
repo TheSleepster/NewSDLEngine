@@ -46,7 +46,7 @@
       "-o",
       "../build/metaprogram"
     ],
-    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
+    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
     "output": "../build/metaprogram"
   }
 ]
