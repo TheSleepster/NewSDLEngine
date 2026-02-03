@@ -9,6 +9,14 @@
 #define GENERATED_TEST_H
 #include <c_types.h>
 
+typedef struct node 
+{
+    u32          node_size;
+    u32          node_capacity;
+
+    struct node *next_node;
+}node_t;
+
 typedef struct test_thing
 {
     const u32             element0[64];

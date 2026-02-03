@@ -6,6 +6,7 @@
 
 #define GENERATED_PROGRAM_TYPE_LIST(X) \
 	X(TYPE_u32, "u32") \
+	X(TYPE_node_t, "node_t") \
 	X(TYPE_string_t, "string_t") \
 	X(TYPE_s32, "s32") \
 	X(TYPE_other_thing_t, "other_thing_t") \
@@ -107,8 +108,31 @@ typedef struct type_info
     type_info_struct_t *struct_info;
 }type_info_t;
 
+struct type_info_struct_node_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t node_size;
+			type_info_member_t node_capacity;
+			type_info_member_t next_node;
+		}members;
+	};
+};
+
 struct type_info_struct_other_thing_t {
-	u32 size;
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
 	u32 member_count;
 	union {
 		type_info_member_t member_array[2];
@@ -120,7 +144,12 @@ struct type_info_struct_other_thing_t {
 };
 
 struct type_info_struct_test_structure_t {
-	u32 size;
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
 	u32 member_count;
 	union {
 		type_info_member_t member_array[2];
@@ -132,7 +161,12 @@ struct type_info_struct_test_structure_t {
 };
 
 struct type_info_struct_test_thing_t {
-	u32 size;
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
 	u32 member_count;
 	union {
 		type_info_member_t member_array[4];
@@ -146,7 +180,12 @@ struct type_info_struct_test_thing_t {
 };
 
 struct type_info_struct_test_object {
-	u32 size;
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
 	u32 member_count;
 	union {
 		type_info_member_t member_array[4];
@@ -161,12 +200,27 @@ struct type_info_struct_test_object {
 
 
 
+const static type_info_struct_node_t type_info_struct_node_t_const_data = {
+	.name = "node_t,",
+	.type = TYPE_node_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(node_t),
+	.member_count = 3,
+	.members = {
+		.node_size = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(node_t), .offset = offsetof(node_t, node_size)},
+		.node_capacity = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(node_t), .offset = offsetof(node_t, node_capacity)},
+		.next_node = {.name = "node", .type = TYPE_node, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 1, .array_size = 0, .size = sizeof(node_t), .offset = offsetof(node_t, next_node)},
+	}
+};
 const static type_info_struct_other_thing_t type_info_struct_other_thing_t_const_data = {
 	.name = "other_thing_t,",
 	.type = TYPE_other_thing_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
-	.size = sizeof(other_thing_t),
+	.flag_counter = 0,
+	.element_size = sizeof(other_thing_t),
 	.member_count = 2,
 	.members = {
 		.element_inside_other_struct0 = {.name = "s32", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(other_thing_t), .offset = offsetof(other_thing_t, element_inside_other_struct0)},
@@ -178,7 +232,8 @@ const static type_info_struct_test_structure_t type_info_struct_test_structure_t
 	.type = TYPE_test_structure_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
-	.size = sizeof(test_structure_t),
+	.flag_counter = 0,
+	.element_size = sizeof(test_structure_t),
 	.member_count = 2,
 	.members = {
 		.test_element = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_structure_t), .offset = offsetof(test_structure_t, test_element)},
@@ -190,7 +245,8 @@ const static type_info_struct_test_thing_t type_info_struct_test_thing_t_const_d
 	.type = TYPE_test_thing_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
-	.size = sizeof(test_thing_t),
+	.flag_counter = 0,
+	.element_size = sizeof(test_thing_t),
 	.member_count = 4,
 	.members = {
 		.element0 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_Constant, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_thing_t), .offset = offsetof(test_thing_t, element0)},
@@ -204,7 +260,8 @@ const static type_info_struct_test_object type_info_struct_test_object_const_dat
 	.type = TYPE_test_object,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
-	.size = sizeof(test_object),
+	.flag_counter = 0,
+	.element_size = sizeof(test_object),
 	.member_count = 4,
 	.members = {
 		.test_object_element0 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_object), .offset = offsetof(test_object, test_object_element0)},
@@ -217,6 +274,7 @@ const static type_info_struct_test_object type_info_struct_test_object_const_dat
 
 type_info_t GENERATED_type_table[] = {
 	{.name = "u32", .type = TYPE_u32, .size = sizeof(u32), .struct_info = null},
+	{.name = "node_t", .type = TYPE_node_t, .size = sizeof(node_t), .struct_info = (type_info_struct_t*)&type_info_struct_node_t_const_data},
 	{.name = "string_t", .type = TYPE_string_t, .size = sizeof(string_t), .struct_info = null},
 	{.name = "s32", .type = TYPE_s32, .size = sizeof(s32), .struct_info = null},
 	{.name = "other_thing_t", .type = TYPE_other_thing_t, .size = sizeof(other_thing_t), .struct_info = (type_info_struct_t*)&type_info_struct_other_thing_t_const_data},

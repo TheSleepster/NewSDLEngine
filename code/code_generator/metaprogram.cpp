@@ -323,12 +323,14 @@ insert_type_information(metatype_data_t *type_info)
     }
 }
 
-internal_api void
+internal_api bool8
 parse_member_data(ast_file_data_t *file_data, 
                   meta_struct_t   *structure, 
                   meta_member_t   *member,
                   token_data_t     token)
 {
+    bool8 result = true;
+        
     metatype_data_t *type_info = &member->type_info;
 
     // NOTE(Sleepster): Cleans up and sets modifiers 
@@ -381,7 +383,27 @@ parse_member_data(ast_file_data_t *file_data,
        c_string_compare(token.string, STR("union")))
     {
         type_info->kind = META_TYPE_KIND_Struct;
-        c_tokenizer_get_next_token(&file_data->tokenizer);
+        token_data_t peeking = c_tokenizer_peek_token(&file_data->tokenizer, 2);
+        if(peeking.type != TT_OpeningBrace)
+        {
+            // NOTE(Sleepster): Check if it's an anonymous structure 
+            peeking = c_tokenizer_peek_token(&file_data->tokenizer);
+            if(peeking.type == TT_OpeningBrace)
+            {
+                result = false;
+                return(result);
+            }
+
+            // NOTE(Sleepster): If this is anything BUT an open brace, it's
+            //                  a C-style struct embed.
+            token = c_tokenizer_get_next_token(&file_data->tokenizer);
+        }
+        else if(peeking.type == TT_OpeningBrace)
+        {
+            // NOTE(Sleepster): This is a nested structure 
+            result = false;
+            return(result);
+        }
     }
     // NOTE(Sleepster): Should be the type
     type_info->type_name = token.string;
@@ -430,6 +452,8 @@ parse_member_data(ast_file_data_t *file_data,
     {
         token = c_tokenizer_get_next_token(&file_data->tokenizer);
     }
+
+    return(result);
 }
 
 internal_api meta_struct_t* 
@@ -477,7 +501,7 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
             case TT_Identifier:
             {
                 meta_member_t member = {};
-
+#if 0
                 if(c_string_compare(token.string, STR("struct")) ||
                    c_string_compare(token.string, STR("union")))
                 {
@@ -506,10 +530,38 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
                         
                     break;
                 }
-                parse_member_data(file_data, &structure_info, &member, token);
+#endif
+                // NOTE(Sleepster): If we return true, this is a valid member.
+                //                  If we return false, this is a nested struct
+                if(parse_member_data(file_data, &structure_info, &member, token))
+                {
+                    c_dynarray_push(structure_info.members, member);
+                    structure_info.member_count++;
+                }
+                else
+                {
+                    meta_struct_t *nested_struct = parse_structure(file_data, token);
+                    if(!nested_struct) break;
 
-                c_dynarray_push(structure_info.members, member);
-                structure_info.member_count++;
+                    // NOTE(Sleepster): If the structure is anonymous, then there's no way to have any 
+                    // type information about it, so just cleanly append it to this structure.
+                    if(nested_struct->type_data.modifier_flags & META_TYPE_FLAGS_Anonymous)
+                    {
+                        for(u32 member_index = 0;
+                            member_index < nested_struct->member_count;
+                            ++member_index)
+                        {
+                            meta_member_t new_member = c_dynarray_get_value(nested_struct->members, member_index);
+
+                            c_dynarray_push(structure_info.members, new_member);
+                            structure_info.member_count++;
+                        }
+                    }
+                    else
+                    {
+                        member.nested_struct = nested_struct;
+                    }
+                }
             }break;
             case TT_ClosingBrace:
             {
@@ -551,7 +603,7 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
     return(result);
 }
 
-internal_api void
+internal_api void 
 append_item_modifier_flags(string_builder_t *builder, u32 object_flag_count, u32 modifier_flags)
 {
     u32 flag_count = 0;
@@ -580,7 +632,10 @@ append_item_modifier_flags(string_builder_t *builder, u32 object_flag_count, u32
             ++flag_count;
         }
         
-        if(flag_count >= object_flag_count) return;
+        if(flag_count >= object_flag_count) 
+        {
+            return;
+        }
     }
 }
 
@@ -734,7 +789,12 @@ typedef struct type_info
             meta_struct_t *structure = c_dynarray_get_ptr(ast->structures, type_index);
 
             c_string_builder_sprint(struct_info_builder, "struct type_info_struct_%.*s {\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
-            c_string_builder_sprint(struct_info_builder, "\tu32 size;\n");
+            c_string_builder_sprint(struct_info_builder, "\tconst char *name;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 type;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 kind;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 modifier_flags;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 flag_counter;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 element_size;\n");
             c_string_builder_sprint(struct_info_builder, "\tu32 member_count;\n");
             c_string_builder_sprint(struct_info_builder, "\tunion {\n");
             c_string_builder_sprint(struct_info_builder, "\t\ttype_info_member_t member_array[%d];\n", structure->member_count);
@@ -759,7 +819,12 @@ typedef struct type_info
         {
             meta_struct_t *enum_data = c_dynarray_get_ptr(ast->enums, enum_index);
             c_string_builder_sprint(struct_info_builder, "struct type_info_enum_%.*s {\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
-            c_string_builder_sprint(struct_info_builder, "\tu32 size;\n");
+            c_string_builder_sprint(struct_info_builder, "\tconst char *name;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 type;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 kind;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 modifier_flags;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 flag_counter;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 element_size;\n");
             c_string_builder_sprint(struct_info_builder, "\tu32 member_count;\n");
             c_string_builder_sprint(struct_info_builder, "\tunion {\n");
             c_string_builder_sprint(struct_info_builder, "\t\ttype_info_member_t member_array[%d];\n", enum_data->member_count);
@@ -795,9 +860,10 @@ typedef struct type_info
 
             c_string_builder_sprint(struct_info_builder, "\t.modifier_flags = ");
             append_item_modifier_flags(struct_info_builder, structure->type_data.flag_counter, structure->type_data.modifier_flags);
-
             c_string_builder_sprint(struct_info_builder, ",\n");
-            c_string_builder_sprint(struct_info_builder, "\t.size = sizeof(%.*s),\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            c_string_builder_sprint(struct_info_builder, "\t.flag_counter = %d,\n", structure->type_data.flag_counter);
+
+            c_string_builder_sprint(struct_info_builder, "\t.element_size = sizeof(%.*s),\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
             c_string_builder_sprint(struct_info_builder, "\t.member_count = %d,\n", structure->member_count);
 
             c_string_builder_sprint(struct_info_builder, "\t.members = {\n");
