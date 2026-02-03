@@ -5,13 +5,15 @@
 #define GENERATED_PROGRAM_RTTI_H
 
 #define GENERATED_PROGRAM_TYPE_LIST(X) \
+	X(TYPE_za_allocation_tag_t, "za_allocation_tag_t") \
 	X(TYPE_u32, "u32") \
-	X(TYPE_node_t, "node_t") \
-	X(TYPE_string_t, "string_t") \
-	X(TYPE_s32, "s32") \
-	X(TYPE_other_thing_t, "other_thing_t") \
-	X(TYPE_test_structure_t, "test_structure_t") \
-	X(TYPE_test_thing_t, "test_thing_t") \
+	X(TYPE_bool8, "bool8") \
+	X(TYPE_u64, "u64") \
+	X(TYPE_zone_allocator_block_t, "zone_allocator_block_t") \
+	X(TYPE_sys_mutex_t, "sys_mutex_t") \
+	X(TYPE_u8, "u8") \
+	X(TYPE_zone_allocator_block_t, "zone_allocator_block_t") \
+	X(TYPE_zone_allocator_t, "zone_allocator_t") \
 
 
 enum GENERATED_program_type_t { 
@@ -108,7 +110,7 @@ typedef struct type_info
     type_info_struct_t *struct_info;
 }type_info_t;
 
-struct type_info_struct_node_t {
+struct type_info_struct_zone_allocator_block_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -117,16 +119,19 @@ struct type_info_struct_node_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[3];
+		type_info_member_t member_array[6];
 		struct {
-			type_info_member_t node_size;
-			type_info_member_t node_capacity;
-			type_info_member_t next_node;
+			type_info_member_t block_id;
+			type_info_member_t is_allocated;
+			type_info_member_t block_size;
+			type_info_member_t allocation_tag;
+			type_info_member_t next_block;
+			type_info_member_t prev_block;
 		}members;
 	};
 };
 
-struct type_info_struct_other_thing_t {
+struct type_info_struct_zone_allocator_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -135,15 +140,19 @@ struct type_info_struct_other_thing_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[2];
+		type_info_member_t member_array[5];
 		struct {
-			type_info_member_t element_inside_other_struct0;
-			type_info_member_t element_inside_other_struct1;
+			type_info_member_t mutex;
+			type_info_member_t capacity;
+			type_info_member_t base;
+			type_info_member_t first_block;
+			type_info_member_t cursor;
 		}members;
 	};
 };
 
-struct type_info_struct_test_structure_t {
+
+struct type_info_enum_za_allocation_tag_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -152,134 +161,80 @@ struct type_info_struct_test_structure_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[2];
+		type_info_member_t member_array[7];
 		struct {
-			type_info_member_t test_element;
-			type_info_member_t other_test_element;
-		}members;
-	};
-};
-
-struct type_info_struct_test_thing_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t element0;
-			type_info_member_t element1;
-			type_info_member_t element2;
-			type_info_member_t element3;
-		}members;
-	};
-};
-
-struct type_info_struct_test_object {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t test_object_element0;
-			type_info_member_t test_object_element1;
-			type_info_member_t test_object_element2;
-			type_info_member_t test_object_element4;
+			type_info_member_t ZA_TAG_NONE;
+			type_info_member_t ZA_TAG_STATIC;
+			type_info_member_t ZA_TAG_TEXTURE;
+			type_info_member_t ZA_TAG_SOUND;
+			type_info_member_t ZA_TAG_FONT;
+			type_info_member_t ZA_TAG_PURGELEVEL;
+			type_info_member_t ZA_TAG_CACHE;
 		}members;
 	};
 };
 
 
-
-const static type_info_struct_node_t type_info_struct_node_t_const_data = {
-	.name = "node_t,",
-	.type = TYPE_node_t,
+const static type_info_struct_zone_allocator_block_t type_info_struct_zone_allocator_block_t_const_data = {
+	.name = "zone_allocator_block_t,",
+	.type = TYPE_zone_allocator_block_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(node_t),
-	.member_count = 3,
+	.element_size = sizeof(zone_allocator_block_t),
+	.member_count = 6,
 	.members = {
-		.node_size = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(node_t), .offset = offsetof(node_t, node_size)},
-		.node_capacity = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(node_t), .offset = offsetof(node_t, node_capacity)},
-		.next_node = {.name = "node", .type = TYPE_node, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 1, .array_size = 0, .size = sizeof(node_t), .offset = offsetof(node_t, next_node)},
+		.block_id = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(zone_allocator_block_t), .offset = offsetof(zone_allocator_block_t, block_id)},
+		.is_allocated = {.name = "bool8", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(zone_allocator_block_t), .offset = offsetof(zone_allocator_block_t, is_allocated)},
+		.block_size = {.name = "u64", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(zone_allocator_block_t), .offset = offsetof(zone_allocator_block_t, block_size)},
+		.allocation_tag = {.name = "u64", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(zone_allocator_block_t), .offset = offsetof(zone_allocator_block_t, allocation_tag)},
+		.next_block = {.name = "zone_allocator_block", .type = TYPE_zone_allocator_block, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 1, .array_size = 0, .size = sizeof(zone_allocator_block_t), .offset = offsetof(zone_allocator_block_t, next_block)},
+		.prev_block = {.name = "zone_allocator_block", .type = TYPE_zone_allocator_block, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 1, .array_size = 0, .size = sizeof(zone_allocator_block_t), .offset = offsetof(zone_allocator_block_t, prev_block)},
 	}
 };
-const static type_info_struct_other_thing_t type_info_struct_other_thing_t_const_data = {
-	.name = "other_thing_t,",
-	.type = TYPE_other_thing_t,
+const static type_info_struct_zone_allocator_t type_info_struct_zone_allocator_t_const_data = {
+	.name = "zone_allocator_t,",
+	.type = TYPE_zone_allocator_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(other_thing_t),
-	.member_count = 2,
+	.element_size = sizeof(zone_allocator_t),
+	.member_count = 5,
 	.members = {
-		.element_inside_other_struct0 = {.name = "s32", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(other_thing_t), .offset = offsetof(other_thing_t, element_inside_other_struct0)},
-		.element_inside_other_struct1 = {.name = "s32", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(other_thing_t), .offset = offsetof(other_thing_t, element_inside_other_struct1)},
-	}
-};
-const static type_info_struct_test_structure_t type_info_struct_test_structure_t_const_data = {
-	.name = "test_structure_t,",
-	.type = TYPE_test_structure_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(test_structure_t),
-	.member_count = 2,
-	.members = {
-		.test_element = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_structure_t), .offset = offsetof(test_structure_t, test_element)},
-		.other_test_element = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_structure_t), .offset = offsetof(test_structure_t, other_test_element)},
-	}
-};
-const static type_info_struct_test_thing_t type_info_struct_test_thing_t_const_data = {
-	.name = "test_thing_t,",
-	.type = TYPE_test_thing_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(test_thing_t),
-	.member_count = 4,
-	.members = {
-		.element0 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_Constant, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_thing_t), .offset = offsetof(test_thing_t, element0)},
-		.element1 = {.name = "string_t", .type = TYPE_string_t, .kind = META_TYPE_KIND_DynamicArray, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_thing_t), .offset = offsetof(test_thing_t, element1)},
-		.element2 = {.name = "s32", .type = TYPE_s32, .kind = META_TYPE_KIND_HashTable, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_thing_t), .offset = offsetof(test_thing_t, element2)},
-		.element3 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Volatile, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_thing_t), .offset = offsetof(test_thing_t, element3)},
-	}
-};
-const static type_info_struct_test_object type_info_struct_test_object_const_data = {
-	.name = "test_object,",
-	.type = TYPE_test_object,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(test_object),
-	.member_count = 4,
-	.members = {
-		.test_object_element0 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_object), .offset = offsetof(test_object, test_object_element0)},
-		.test_object_element1 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_object), .offset = offsetof(test_object, test_object_element1)},
-		.test_object_element2 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_object), .offset = offsetof(test_object, test_object_element2)},
-		.test_object_element4 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_object), .offset = offsetof(test_object, test_object_element4)},
+		.mutex = {.name = "sys_mutex_t", .type = TYPE_sys_mutex_t, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(zone_allocator_t), .offset = offsetof(zone_allocator_t, mutex)},
+		.capacity = {.name = "u64", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(zone_allocator_t), .offset = offsetof(zone_allocator_t, capacity)},
+		.base = {.name = "u8", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 1, .array_size = 0, .size = sizeof(zone_allocator_t), .offset = offsetof(zone_allocator_t, base)},
+		.first_block = {.name = "zone_allocator_block_t", .type = TYPE_zone_allocator_block_t, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(zone_allocator_t), .offset = offsetof(zone_allocator_t, first_block)},
+		.cursor = {.name = "zone_allocator_block_t", .type = TYPE_zone_allocator_block_t, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 1, .array_size = 0, .size = sizeof(zone_allocator_t), .offset = offsetof(zone_allocator_t, cursor)},
 	}
 };
 
+const static type_info_enum_za_allocation_tag_t type_info_enum_za_allocation_tag_t_const_data = {
+	.name = "za_allocation_tag_t,",
+	.type = TYPE_za_allocation_tag_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 7,
+	.members = {
+		.ZA_TAG_NONE = {.name = "ZA_TAG_NONE", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_NONE), .offset = ZA_TAG_NONE},
+		.ZA_TAG_STATIC = {.name = "ZA_TAG_STATIC", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_STATIC), .offset = ZA_TAG_STATIC},
+		.ZA_TAG_TEXTURE = {.name = "ZA_TAG_TEXTURE", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_TEXTURE), .offset = ZA_TAG_TEXTURE},
+		.ZA_TAG_SOUND = {.name = "ZA_TAG_SOUND", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_SOUND), .offset = ZA_TAG_SOUND},
+		.ZA_TAG_FONT = {.name = "ZA_TAG_FONT", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_FONT), .offset = ZA_TAG_FONT},
+		.ZA_TAG_PURGELEVEL = {.name = "ZA_TAG_PURGELEVEL", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_PURGELEVEL), .offset = ZA_TAG_PURGELEVEL},
+		.ZA_TAG_CACHE = {.name = "ZA_TAG_CACHE", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_CACHE), .offset = ZA_TAG_CACHE},
+	}
+};
 
 type_info_t GENERATED_type_table[] = {
+	{.name = "za_allocation_tag_t", .type = TYPE_za_allocation_tag_t, .size = sizeof(za_allocation_tag_t), .struct_info = (type_info_struct_t*)&type_info_struct_za_allocation_tag_t_const_data},
 	{.name = "u32", .type = TYPE_u32, .size = sizeof(u32), .struct_info = null},
-	{.name = "node_t", .type = TYPE_node_t, .size = sizeof(node_t), .struct_info = (type_info_struct_t*)&type_info_struct_node_t_const_data},
-	{.name = "string_t", .type = TYPE_string_t, .size = sizeof(string_t), .struct_info = null},
-	{.name = "s32", .type = TYPE_s32, .size = sizeof(s32), .struct_info = null},
-	{.name = "other_thing_t", .type = TYPE_other_thing_t, .size = sizeof(other_thing_t), .struct_info = (type_info_struct_t*)&type_info_struct_other_thing_t_const_data},
-	{.name = "test_structure_t", .type = TYPE_test_structure_t, .size = sizeof(test_structure_t), .struct_info = (type_info_struct_t*)&type_info_struct_test_structure_t_const_data},
-	{.name = "test_thing_t", .type = TYPE_test_thing_t, .size = sizeof(test_thing_t), .struct_info = (type_info_struct_t*)&type_info_struct_test_thing_t_const_data},
+	{.name = "bool8", .type = TYPE_bool8, .size = sizeof(bool8), .struct_info = null},
+	{.name = "u64", .type = TYPE_u64, .size = sizeof(u64), .struct_info = null},
+	{.name = "zone_allocator_block_t", .type = TYPE_zone_allocator_block_t, .size = sizeof(zone_allocator_block_t), .struct_info = (type_info_struct_t*)&type_info_struct_zone_allocator_block_t_const_data},
+	{.name = "sys_mutex_t", .type = TYPE_sys_mutex_t, .size = sizeof(sys_mutex_t), .struct_info = null},
+	{.name = "u8", .type = TYPE_u8, .size = sizeof(u8), .struct_info = null},
+	{.name = "zone_allocator_block_t", .type = TYPE_zone_allocator_block_t, .size = sizeof(zone_allocator_block_t), .struct_info = null},
+	{.name = "zone_allocator_t", .type = TYPE_zone_allocator_t, .size = sizeof(zone_allocator_t), .struct_info = (type_info_struct_t*)&type_info_struct_zone_allocator_t_const_data},
 };
 
 

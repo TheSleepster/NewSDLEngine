@@ -33,12 +33,19 @@
 typedef struct meta_struct meta_struct_t;
 
 // TODO(Sleepster): 
-// - [X] Enum support
 // - [?] X-Macro for mapping enum member names to their parent enum
 // - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
-// - [ ] C style struct member decls like zone_allocator
-//
 // - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
+// - [ ] We may have some (a lot) issues with multi-word C primtives in the future like 
+//       "unsigned long long" or "unsigned char"
+//
+//
+//
+// - [X] C style struct member decls like zone_allocator
+// - [X] Enum support
+// - [X] Map type name to canonical name when generating the structure information
+// - [X] Generate a table of primitive types. If the type we pass isn't found in the table, the it is either
+//       an unknown primitive, or a structure.
 // - [X] Anonymous structures need to be handled
 // - [X] X-Macro for mapping the member names to structures
 // - [X] X-Macro for mapping type names to their type information
@@ -97,6 +104,56 @@ typedef enum metatype_flags
 
     META_TYPE_FLAGS_Count
 }metatype_flags_t;
+
+// TODO(Sleepster): There's gotta be some way to find out if it's an alias of 
+//                  a primitive than just writing them all out.
+#define PRIMITIVE_TYPE_LIST(X)          \
+    X(PRIMITIVE_TYPE_s64,     "s64")    \
+    X(PRIMITIVE_TYPE_s32,     "s32")    \
+    X(PRIMITIVE_TYPE_s16,     "s16")    \
+    X(PRIMITIVE_TYPE_s8,      "s8")     \
+    X(PRIMITIVE_TYPE_u64,     "u64")    \
+    X(PRIMITIVE_TYPE_u32,     "u32")    \
+    X(PRIMITIVE_TYPE_u16,     "u16")    \
+    X(PRIMITIVE_TYPE_u8,      "u8")     \
+    X(PRIMITIVE_TYPE_b32,     "b32")    \
+    X(PRIMITIVE_TYPE_b8,      "b8")     \
+    X(PRIMITIVE_TYPE_bool32,  "bool32") \
+    X(PRIMITIVE_TYPE_bool8,   "bool8")  \
+    X(PRIMITIVE_TYPE_usize,   "usize")  \
+    X(PRIMITIVE_TYPE_byte,    "byte")   \
+    X(PRIMITIVE_TYPE_float64, "float64")\
+    X(PRIMITIVE_TYPE_float32, "float32")\
+    X(PRIMITIVE_TYPE_real64,  "real64") \
+    X(PRIMITIVE_TYPE_real32,  "real32") \
+    X(PRIMITIVE_TYPE_int,     "int")    \
+    X(PRIMITIVE_TYPE_short,   "short")  \
+    X(PRIMITIVE_TYPE_char,    "char")   \
+    X(PRIMITIVE_TYPE_float,   "float")  \
+    X(PRIMITIVE_TYPE_double,  "double") \
+    X(PRIMITIVE_TYPE_sizet,   "size_t") \
+    X(PRIMITIVE_TYPE_int64,   "int64")  \
+    X(PRIMITIVE_TYPE_int32,   "int32")  \
+    X(PRIMITIVE_TYPE_int16,   "int16")  \
+    X(PRIMITIVE_TYPE_int8,    "int8")   \
+    X(PRIMITIVE_TYPE_uint64,  "uint64") \
+    X(PRIMITIVE_TYPE_uint32,  "uint32") \
+    X(PRIMITIVE_TYPE_uint16,  "uint16") \
+    X(PRIMITIVE_TYPE_uint8,   "uint8")  
+
+// NOTE(Sleepster): This is mainly used for the type table. The job of this part is to allow the
+// type table to map whatever type name it gets passed into this table, if this table does not have
+// a type with the same name as the one passed to it, then it is NOT a primitive.
+typedef enum primitive_type_table
+{
+    PRIMITIVE_TYPE_Invalid,
+
+#define X(enum, string) enum,
+    PRIMITIVE_TYPE_LIST(X)
+#undef X
+
+    PRIMITIVE_TYPE_Count
+}primitive_type_t;
 
 // NOTE(Sleepster): For the type table. We can save this type as a string like we do now,
 //                  but when it comes time to add the string to the type table,
@@ -277,12 +334,37 @@ exit:
     return(result);
 }
 
+primitive_type_t
+map_type_name_to_primitive(string_t lookup_name)
+{
+    primitive_type_t result = {};
+#define X(enum, string)                                           \
+    if(memcmp(string, lookup_name.data, sizeof(string) - 1) == 0) \
+    {                                                             \
+        result = enum;                                            \
+        goto exit;                                                \
+    }                                                             \
+
+    PRIMITIVE_TYPE_LIST(X)
+#undef X
+exit:
+    return(result);
+}
+
 // TODO(Sleepster): There's a small issue, specifically with hash tables and such. If we find a type with a modifier or hash table or dynamic array,
 // the we will save that type as a dynamic array. Even if it's a primitive, or a structure
 internal_api void
 insert_type_information(metatype_data_t *type_info)
 {
     string_t lookup_name = type_info->type_name;
+
+    // NOTE(Sleepster): Map the name too see if it is a primitive. 
+    primitive_type_t type = map_type_name_to_primitive(lookup_name);
+    if(type == PRIMITIVE_TYPE_Invalid)
+    {
+        // NOTE(Sleepster): If we don't find the primitive, this is a structure 
+        type_info->kind = META_TYPE_KIND_Struct;
+    }
 
     // NOTE(Sleepster): Fix instances where the typename is something like:
     //
@@ -321,6 +403,31 @@ insert_type_information(metatype_data_t *type_info)
             type->type_kind      = type_info->kind;
         }
     }
+}
+
+internal_api registry_type_t*
+get_registered_type(metatype_data_t *type_info)
+{
+    registry_type_t *result = null;
+
+    string_t lookup_name = type_info->type_name;
+    if(type_info->kind == META_TYPE_KIND_Struct)
+    {
+        if(c_string_ends_with(lookup_name, STR("_t")))
+        {
+            Assert(lookup_name.count - 2 > 0);
+            lookup_name.count -= 2;
+        }
+    }
+
+    s64 registry_index = c_hash_table_get_value(&state.type_table_hash, lookup_name);
+    if(registry_index != -1)
+    {
+        result = c_dynarray_get_ptr(state.type_table, registry_index);
+    }
+    Assert(result != null);
+
+    return(result);
 }
 
 internal_api bool8
@@ -501,36 +608,7 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
             case TT_Identifier:
             {
                 meta_member_t member = {};
-#if 0
-                if(c_string_compare(token.string, STR("struct")) ||
-                   c_string_compare(token.string, STR("union")))
-                {
-                    // NOTE(Sleepster): Recursive descent 
-                    meta_struct_t *nested_struct = parse_structure(file_data, token);
-                    if(!nested_struct) break;
 
-                    // NOTE(Sleepster): If the structure is anonymous, then there's no way to have any 
-                    // type information about it, so just cleanly append it to this structure.
-                    if(nested_struct->type_data.modifier_flags & META_TYPE_FLAGS_Anonymous)
-                    {
-                        for(u32 member_index = 0;
-                            member_index < nested_struct->member_count;
-                            ++member_index)
-                        {
-                            meta_member_t new_member = c_dynarray_get_value(nested_struct->members, member_index);
-
-                            c_dynarray_push(structure_info.members, new_member);
-                            structure_info.member_count++;
-                        }
-                    }
-                    else
-                    {
-                        member.nested_struct = nested_struct;
-                    }
-                        
-                    break;
-                }
-#endif
                 // NOTE(Sleepster): If we return true, this is a valid member.
                 //                  If we return false, this is a nested struct
                 if(parse_member_data(file_data, &structure_info, &member, token))
@@ -639,9 +717,24 @@ append_item_modifier_flags(string_builder_t *builder, u32 object_flag_count, u32
     }
 }
 
+internal_api string_t
+get_canonical_type_name(metatype_data_t *type_info)
+{
+    string_t result = {};
+
+    registry_type_t *type_data = get_registered_type(type_info);
+    result = type_data->canonical_name;
+        
+    return(result);
+}
+
 internal_api void
 generate_type_information(ast_file_data_t *ast)
 {
+    // TODO(Sleepster): Instead of just printing the type as is, we should probably map whatever the 
+    // object's type name is to it's canonical_name inside the types table, otherwise why the hell 
+    // does that thing exist???
+
     string_builder_t *type_enum_builder         = &state.type_enum_builder;
     string_builder_t *type_table_builder        = &state.type_table_builder;
     string_builder_t *struct_info_builder       = &state.struct_info_builder;
@@ -871,19 +964,21 @@ typedef struct type_info
             {
                 meta_member_t *member = c_dynarray_get_ptr(structure->members, member_index);
 
-                string_t kind_string = get_metatype_kind_string(member->type_info.kind);
+                string_t kind_string         = get_metatype_kind_string(member->type_info.kind);
+                string_t canonical_type_name = get_canonical_type_name(&member->type_info);
+
                 c_string_builder_sprint(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = %.*s, .modifier_flags = ",
-                                        member->name.count, C_STR(member->name),
-                                        member->type_info.type_name.count, C_STR(member->type_info.type_name),
-                                        member->type_info.type_name.count, C_STR(member->type_info.type_name),
-                                        kind_string.count, C_STR(kind_string));
+                                        member->name.count, C_STR(member->name),               // member_name
+                                        member->name.count, C_STR(member->name),               // .name 
+                                        canonical_type_name.count, C_STR(canonical_type_name), // .type
+                                        kind_string.count, C_STR(kind_string));                // .kind
                 append_item_modifier_flags(struct_info_builder, member->type_info.flag_counter, member->type_info.modifier_flags);
 
                 c_string_builder_sprint(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, .size = sizeof(%.*s), .offset = offsetof(%.*s, %.*s)},\n",
                                         member->type_info.flag_counter, 
                                         member->type_info.pointer_depth,
                                         member->type_info.array_size,
-                                        structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
+                                        member->type_info.type_name.count, C_STR(member->type_info.type_name),
                                         structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
                                         member->name.count, C_STR(member->name));
             }
@@ -1134,8 +1229,6 @@ c_meta_get_struct_info(string_t structure_type_name)
     
     builder_string = c_string_builder_get_current_string(struct_info_builder);
     fprintf(stdout, "%.*s\n", builder_string.count, C_STR(builder_string));
-     
-    // TODO(Sleepster): Define an x macro that will map the name of the structure to it's type information 
 }
 
 void
@@ -1277,7 +1370,7 @@ main(void)
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else
-    state.ast_file.tokenizer.data = c_file_read_entirety(STR("tests/GENERATED_test.h"));
+    state.ast_file.tokenizer.data = c_file_read_entirety(STR("c_zone_allocator.h"));
     build_file_ast(&state.ast_file);
 #endif
 
