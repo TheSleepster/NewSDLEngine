@@ -35,7 +35,8 @@ typedef struct meta_struct meta_struct_t;
 // TODO(Sleepster): 
 // - [X] Enum support
 // - [?] X-Macro for mapping enum member names to their parent enum
-// - [ ] Other modifiers like extern and const expression
+// - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
+// - [ ] C style struct member decls like zone_allocator
 //
 // - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
 // - [X] Anonymous structures need to be handled
@@ -408,11 +409,12 @@ parse_member_data(ast_file_data_t *file_data,
     token = c_tokenizer_get_next_token(&file_data->tokenizer);
     if(token.type == TT_OpenBracket)
     {
+        // TODO(Sleepster): Hey, what happens if we aren't stupid? 
         type_info->kind = META_TYPE_KIND_Array;
 
         // NOTE(Sleepster): Get the array size;
         token = c_tokenizer_get_next_token(&file_data->tokenizer);
-        Assert(token.type == TT_Number);
+        //Assert(token.type == TT_Number);
          
         // TODO(Sleepster): Fix the read value functions inside c_string.cpp
         //type_info->array_size = c_string_read_u32(token.string);
@@ -435,7 +437,7 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
 {
     meta_struct_t *result = null;
 
-    meta_struct_t structure_info = {};
+    meta_struct_t structure_info  = {};
     structure_info.structure_type = get_structure_type_from_string(structure_type.string);
     structure_info.members        = c_dynarray_create(meta_member_t);
 
@@ -481,6 +483,7 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
                 {
                     // NOTE(Sleepster): Recursive descent 
                     meta_struct_t *nested_struct = parse_structure(file_data, token);
+                    if(!nested_struct) break;
 
                     // NOTE(Sleepster): If the structure is anonymous, then there's no way to have any 
                     // type information about it, so just cleanly append it to this structure.
@@ -724,27 +727,30 @@ typedef struct type_info
     fprintf(stdout, "%.*s\n", builder_string.count, C_STR(builder_string));
 
     // NOTE(Sleepster): Generate the type_info_t for the data structures 
-    c_dynarray_for(ast->structures, type_index)
+    if(ast->structure_count > 0)
     {
-        meta_struct_t *structure = c_dynarray_get_ptr(ast->structures, type_index);
-
-        c_string_builder_sprint(struct_info_builder, "struct type_info_struct_%.*s {\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
-        c_string_builder_sprint(struct_info_builder, "\tu32 size;\n");
-        c_string_builder_sprint(struct_info_builder, "\tu32 member_count;\n");
-        c_string_builder_sprint(struct_info_builder, "\tunion {\n");
-        c_string_builder_sprint(struct_info_builder, "\t\ttype_info_member_t member_array[%d];\n", structure->member_count);
-        c_string_builder_sprint(struct_info_builder, "\t\tstruct {\n");
-        c_dynarray_for(structure->members, member_index)
+        c_dynarray_for(ast->structures, type_index)
         {
-            meta_member_t *member = c_dynarray_get_ptr(structure->members, member_index);
-            c_string_builder_sprint(struct_info_builder, "\t\t\ttype_info_member_t %.*s;\n", 
-                                    member->name.count, C_STR(member->name));
+            meta_struct_t *structure = c_dynarray_get_ptr(ast->structures, type_index);
+
+            c_string_builder_sprint(struct_info_builder, "struct type_info_struct_%.*s {\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            c_string_builder_sprint(struct_info_builder, "\tu32 size;\n");
+            c_string_builder_sprint(struct_info_builder, "\tu32 member_count;\n");
+            c_string_builder_sprint(struct_info_builder, "\tunion {\n");
+            c_string_builder_sprint(struct_info_builder, "\t\ttype_info_member_t member_array[%d];\n", structure->member_count);
+            c_string_builder_sprint(struct_info_builder, "\t\tstruct {\n");
+            c_dynarray_for(structure->members, member_index)
+            {
+                meta_member_t *member = c_dynarray_get_ptr(structure->members, member_index);
+                c_string_builder_sprint(struct_info_builder, "\t\t\ttype_info_member_t %.*s;\n", 
+                                        member->name.count, C_STR(member->name));
+            }
+            c_string_builder_sprint(struct_info_builder, "\t\t}members;\n");
+            c_string_builder_sprint(struct_info_builder, "\t};\n");
+            c_string_builder_sprint(struct_info_builder, "};\n\n");
         }
-        c_string_builder_sprint(struct_info_builder, "\t\t}members;\n");
-        c_string_builder_sprint(struct_info_builder, "\t};\n");
-        c_string_builder_sprint(struct_info_builder, "};\n\n");
+        c_string_builder_sprint(struct_info_builder, "\n");
     }
-    c_string_builder_sprint(struct_info_builder, "\n");
 
     // NOTE(Sleepster): Generate the type_info_t for the enum data. 
     if(ast->enum_count > 0)
@@ -772,51 +778,54 @@ typedef struct type_info
     c_string_builder_sprint(struct_info_builder, "\n");
 
     // NOTE(Sleepster): Generate a const static definiton of the data for those structures 
-    c_dynarray_for(ast->structures, type_index)
+    if(ast->structure_count > 0)
     {
-        meta_struct_t *structure = c_dynarray_get_ptr(ast->structures, type_index);
-
-        c_string_builder_sprint(struct_info_builder, "const static type_info_struct_%.*s type_info_struct_%.*s_const_data = {\n", 
-                                structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
-                                structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
-        c_string_builder_sprint(struct_info_builder, "\t.name = \"%.*s,\",\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
-        c_string_builder_sprint(struct_info_builder, "\t.type = TYPE_%.*s,\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
-
-        string_t structure_kind = get_metatype_kind_string(structure->type_data.kind);
-        c_string_builder_sprint(struct_info_builder, "\t.kind = %.*s,\n", structure_kind.count, C_STR(structure_kind));
-
-        c_string_builder_sprint(struct_info_builder, "\t.modifier_flags = ");
-        append_item_modifier_flags(struct_info_builder, structure->type_data.flag_counter, structure->type_data.modifier_flags);
-
-        c_string_builder_sprint(struct_info_builder, ",\n");
-        c_string_builder_sprint(struct_info_builder, "\t.size = sizeof(%.*s),\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
-        c_string_builder_sprint(struct_info_builder, "\t.member_count = %d,\n", structure->member_count);
-
-        c_string_builder_sprint(struct_info_builder, "\t.members = {\n");
-        c_dynarray_for(structure->members, member_index)
+        c_dynarray_for(ast->structures, type_index)
         {
-            meta_member_t *member = c_dynarray_get_ptr(structure->members, member_index);
+            meta_struct_t *structure = c_dynarray_get_ptr(ast->structures, type_index);
 
-            string_t kind_string = get_metatype_kind_string(member->type_info.kind);
-            c_string_builder_sprint(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = %.*s, .modifier_flags = ",
-                                    member->name.count, C_STR(member->name),
-                                    member->type_info.type_name.count, C_STR(member->type_info.type_name),
-                                    member->type_info.type_name.count, C_STR(member->type_info.type_name),
-                                    kind_string.count, C_STR(kind_string));
-            append_item_modifier_flags(struct_info_builder, member->type_info.flag_counter, member->type_info.modifier_flags);
+            c_string_builder_sprint(struct_info_builder, "const static type_info_struct_%.*s type_info_struct_%.*s_const_data = {\n", 
+                                    structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
+                                    structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            c_string_builder_sprint(struct_info_builder, "\t.name = \"%.*s,\",\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            c_string_builder_sprint(struct_info_builder, "\t.type = TYPE_%.*s,\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
 
-            c_string_builder_sprint(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, .size = sizeof(%.*s), .offset = offsetof(%.*s, %.*s)},\n",
-                                    member->type_info.flag_counter, 
-                                    member->type_info.pointer_depth,
-                                    member->type_info.array_size,
-                                    structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
-                                    structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
-                                    member->name.count, C_STR(member->name));
+            string_t structure_kind = get_metatype_kind_string(structure->type_data.kind);
+            c_string_builder_sprint(struct_info_builder, "\t.kind = %.*s,\n", structure_kind.count, C_STR(structure_kind));
+
+            c_string_builder_sprint(struct_info_builder, "\t.modifier_flags = ");
+            append_item_modifier_flags(struct_info_builder, structure->type_data.flag_counter, structure->type_data.modifier_flags);
+
+            c_string_builder_sprint(struct_info_builder, ",\n");
+            c_string_builder_sprint(struct_info_builder, "\t.size = sizeof(%.*s),\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            c_string_builder_sprint(struct_info_builder, "\t.member_count = %d,\n", structure->member_count);
+
+            c_string_builder_sprint(struct_info_builder, "\t.members = {\n");
+            c_dynarray_for(structure->members, member_index)
+            {
+                meta_member_t *member = c_dynarray_get_ptr(structure->members, member_index);
+
+                string_t kind_string = get_metatype_kind_string(member->type_info.kind);
+                c_string_builder_sprint(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = %.*s, .modifier_flags = ",
+                                        member->name.count, C_STR(member->name),
+                                        member->type_info.type_name.count, C_STR(member->type_info.type_name),
+                                        member->type_info.type_name.count, C_STR(member->type_info.type_name),
+                                        kind_string.count, C_STR(kind_string));
+                append_item_modifier_flags(struct_info_builder, member->type_info.flag_counter, member->type_info.modifier_flags);
+
+                c_string_builder_sprint(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, .size = sizeof(%.*s), .offset = offsetof(%.*s, %.*s)},\n",
+                                        member->type_info.flag_counter, 
+                                        member->type_info.pointer_depth,
+                                        member->type_info.array_size,
+                                        structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
+                                        structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
+                                        member->name.count, C_STR(member->name));
+            }
+            c_string_builder_sprint(struct_info_builder, "\t}\n");
+            c_string_builder_sprint(struct_info_builder, "};\n");
         }
-        c_string_builder_sprint(struct_info_builder, "\t}\n");
-        c_string_builder_sprint(struct_info_builder, "};\n");
+        c_string_builder_sprint(struct_info_builder, "\n");
     }
-    c_string_builder_sprint(struct_info_builder, "\n");
 
     if(ast->enum_count > 0)
     {
@@ -1162,6 +1171,7 @@ VISIT_FILES(generate_file_metadata)
     }
     if(c_string_compare(filename, STR("preprocessor_type_data.h"))) return;
     if(c_string_compare(filename, STR("c_math.h"))) return;
+    if(c_string_compare(filename, STR("c_base.h"))) return;
 
     string_t file_desc = {
         .count = 4,
@@ -1201,7 +1211,7 @@ main(void)
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else
-    state.ast_file.tokenizer.data = c_file_read_entirety(STR("c_globals.h"));
+    state.ast_file.tokenizer.data = c_file_read_entirety(STR("tests/GENERATED_test.h"));
     build_file_ast(&state.ast_file);
 #endif
 

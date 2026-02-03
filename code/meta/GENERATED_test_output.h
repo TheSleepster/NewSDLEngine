@@ -145,6 +145,21 @@ struct type_info_struct_test_thing_t {
 	};
 };
 
+struct type_info_struct_test_object {
+	u32 size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t test_object_element0;
+			type_info_member_t test_object_element1;
+			type_info_member_t test_object_element2;
+			type_info_member_t test_object_element4;
+		}members;
+	};
+};
+
+
 
 const static type_info_struct_other_thing_t type_info_struct_other_thing_t_const_data = {
 	.name = "other_thing_t,",
@@ -182,6 +197,20 @@ const static type_info_struct_test_thing_t type_info_struct_test_thing_t_const_d
 		.element1 = {.name = "string_t", .type = TYPE_string_t, .kind = META_TYPE_KIND_DynamicArray, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_thing_t), .offset = offsetof(test_thing_t, element1)},
 		.element2 = {.name = "s32", .type = TYPE_s32, .kind = META_TYPE_KIND_HashTable, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_thing_t), .offset = offsetof(test_thing_t, element2)},
 		.element3 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Volatile, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_thing_t), .offset = offsetof(test_thing_t, element3)},
+	}
+};
+const static type_info_struct_test_object type_info_struct_test_object_const_data = {
+	.name = "test_object,",
+	.type = TYPE_test_object,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.size = sizeof(test_object),
+	.member_count = 4,
+	.members = {
+		.test_object_element0 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_object), .offset = offsetof(test_object, test_object_element0)},
+		.test_object_element1 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_object), .offset = offsetof(test_object, test_object_element1)},
+		.test_object_element2 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_object), .offset = offsetof(test_object, test_object_element2)},
+		.test_object_element4 = {.name = "u32", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_object), .offset = offsetof(test_object, test_object_element4)},
 	}
 };
 
@@ -365,6 +394,35 @@ c_meta_get_type_info_by_enum(GENERATED_program_type_t type_enum)
 
     return(result);
 });
+
+type_info_member_t*
+c_meta_get_member_info(type_info_struct_t *struct_info, string_t member_name)
+{
+    type_info_member_t *result = null;
+    for(u32 member_index = 0;
+        member_index < struct_info->member_count;
+        ++member_index)
+    {
+        found = struct_info->members + member_index;
+        if(c_string_compare(STR(found->name), member_name))
+        {
+            found = result;
+            break;
+        }
+    }
+
+    return(result);
+}
+
+type_info_struct_t*
+c_meta_get_struct_info(string_t structure_type_name)
+{
+    type_info_struct_t *result = null;
+    type_info_t *type = c_meta_get_type_info_by_name(structure_type_name);
+    result = type->struct_info;
+
+    return(result);
+}
 
 #endif
 
