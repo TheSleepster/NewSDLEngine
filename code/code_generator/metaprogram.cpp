@@ -34,6 +34,9 @@ typedef struct meta_struct meta_struct_t;
 
 // TODO(Sleepster): 
 // - [?] X-Macro for mapping enum member names to their parent enum
+// - [?] We are including structures that aren't directly embedded into a type as members of that type.
+//       (r_vulkan_types.h "vulkan_render_context") is an instance of that
+//
 // - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
 // - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
 // - [ ] We may have some (a lot) issues with multi-word C primtives in the future like 
@@ -41,6 +44,7 @@ typedef struct meta_struct meta_struct_t;
 //
 //
 //
+// - [X] Pointers of multiple depths seem to break things.
 // - [X] C style struct member decls like zone_allocator
 // - [X] Enum support
 // - [X] Map type name to canonical name when generating the structure information
@@ -526,9 +530,13 @@ parse_member_data(ast_file_data_t *file_data,
     {
         type_info->modifier_flags |= META_TYPE_FLAGS_Pointer;
         type_info->flag_counter++;
-        type_info->pointer_depth++;
 
         token = c_tokenizer_get_next_token(&file_data->tokenizer);
+        while(token.type == TT_Asterisk)
+        {
+            token = c_tokenizer_get_next_token(&file_data->tokenizer);
+            type_info->pointer_depth++;
+        }
     }
 
     // NOTE(Sleepster): Name
@@ -861,8 +869,7 @@ typedef struct type_info_struct {
     type_info_member_t *members;
 }type_info_struct_t;
 
-typedef struct type_info
-{
+typedef struct type_info {
     const char         *name;
     u32                 type;
     u32                 size;
@@ -1329,7 +1336,6 @@ VISIT_FILES(generate_file_metadata)
         return;
     }
     if(c_string_compare(filename, STR("preprocessor_type_data.h"))) return;
-    if(c_string_compare(filename, STR("c_math.h"))) return;
     if(c_string_compare(filename, STR("c_base.h"))) return;
 
     string_t file_desc = {
@@ -1366,11 +1372,11 @@ main(void)
     c_hash_table_init(&state.type_table_hash, 9187);
     memset(state.type_table_hash.data, -1, sizeof(s64) * 9187);
 
-#if 0
+#if 1
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else
-    state.ast_file.tokenizer.data = c_file_read_entirety(STR("c_zone_allocator.h"));
+    state.ast_file.tokenizer.data = c_file_read_entirety(STR("r_vulkan_types.h"));
     build_file_ast(&state.ast_file);
 #endif
 
