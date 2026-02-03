@@ -25,6 +25,8 @@
 #define MATH_IMPLEMENTATION
 #include <c_math.h>
 
+#include <meta/GENERATED_test_output.h>
+
 int
 main(void)
 {
