@@ -13,6 +13,8 @@
 #include <c_file_api.h>
 #include <c_string.h>
 
+#include <c_zone_allocator.h>
+
 #include <p_platform_data.cpp>
 #include <c_memory_arena.cpp>
 #include <c_zone_allocator.cpp>
@@ -24,8 +26,6 @@
 
 #define MATH_IMPLEMENTATION
 #include <c_math.h>
-
-//#include <meta/GENERATED_test_output.h>
 
 int
 main(void)

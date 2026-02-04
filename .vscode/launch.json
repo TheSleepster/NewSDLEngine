@@ -145,6 +145,16 @@
             "stopOnEntry": false,
             "terminal": "integrated"
         },
+        {
+            "name": "test_type_jnfo",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_type_jnfo",
+            "args": [],
+            "cwd": "${workspaceFolder}/code/",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
     ],
     "compounds": [
         {

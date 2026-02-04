@@ -24,10 +24,14 @@ typedef struct test_thing
     HashTable_t(s32)      element2;
     const volatile u32    element3;
 
+    // NOTE(Sleepster): We need to make it so that test_structure_t is a member of 
+    // test_thing_t
     struct test_structure {
         u32 test_element;
         u32 other_test_element;
 
+        // NOTE(Sleepster): Same thing here, make it so that other_thing_t is a mmember
+        // of test_structure_t
         struct other_thing {
             s32 element_inside_other_struct0;
             s32 element_inside_other_struct1;
@@ -43,7 +47,7 @@ typedef struct test_object
         u32 test_object_element2;
         u32 test_object_element4;
     };
-};
+}test_object_t;
 
 #endif // GENERATED_TEST_H
 

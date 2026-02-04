@@ -37,15 +37,24 @@ typedef struct meta_struct meta_struct_t;
 // - [?] We are including structures that aren't directly embedded into a type as members of that type.
 //       (r_vulkan_types.h "vulkan_render_context") is an instance of that
 //
-// - [X] Random "(" in places where there should be names 
-//   (the issue had to do with how we managed hash tables / dynamic arrays that stored pointers to items)
-// - [ ] A bug with enums which cause strange anomalies of enum names repeating, but missing the first letter
-// - [ ] Enums that have their type specified (like entity flags) includes their type suffix. (ENUM_EXAMPLE_one = 1ul)
-// - [ ] Unknown issues with structures like memory_arena_footer_t
+// - [ ] What do we do about nested structures that only have internal definitions?
+//       Perhaps we just save them as a member, and not adding them to the global types array
+//       since they are only able to be used either inside or exclusively with the strcture
+//       they are contained within.
+//       EXAMPLE: "other_thing_t" inside of the test file would simply be a member named
+//       "other_thing_t" and would contain a pointer to it's structure info which would have it's 
+//       members so that the caller can just loop over ALL members. and check the intenral members
+//       of nested structures EXPLICITLY and will naturally not do so.
 //
+// - [ ] We have an issue with how the metaprogram assigns the struct_info_type_*_t values
+//       inside the constant definition section. The issue is that the constant definition for the type
+//       might not exist... So saying ".struct_info = type_info_string_t_const-data"
+//       might be completely invalid! We need a table to store the generated struct info and const data names
+//       so that we can prevent this from being an issue. Because this is a pretty big issue.
+//
+// - [ ] Unknown issues with structures like memory_arena_footer_t
 // - [ ] Perhaps we should prefix hash tables and dynarray members with
 //       special characters to denote this
-//
 // - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
 // - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
 // - [ ] We may have some (a lot) issues with multi-word C primtives in the future like 
@@ -53,16 +62,20 @@ typedef struct meta_struct meta_struct_t;
 //
 //
 //
+//
+// - [X] Random "(" in places where there should be names  (the issue had to do with how we managed hash tables / dynamic arrays that stored pointers to items)
+// - [X] A bug with enums which cause strange anomalies of enum names repeating, but missing the first letter
+// - [X] Enums that have their type specified (like entity flags) includes their type suffix. (ENUM_EXAMPLE_one = 1ul)
 // - [X] Pointers of multiple depths seem to break things.
 // - [X] C style struct member decls like zone_allocator
 // - [X] Enum support
 // - [X] Map type name to canonical name when generating the structure information
-// - [X] Generate a table of primitive types. If the type we pass isn't found in the table, the it is either
-//       an unknown primitive, or a structure.
 // - [X] Anonymous structures need to be handled
 // - [X] X-Macro for mapping the member names to structures
 // - [X] X-Macro for mapping type names to their type information
 // - [X] Modifier flags are broken when output
+// - [X] Generate a table of primitive types. If the type we pass isn't found in the table, the it is either
+//       an unknown primitive, or a structure.
 
 // NOTE(Sleepster): This is an x-macro that generates a table for mapping 
 //                  the sturcture type to an enum 
@@ -102,12 +115,13 @@ typedef enum metatype_kind
 }metatype_kind_t;
 
 #define METATYPE_FLAG_LIST(X) \
-    X(META_TYPE_FLAGS_None,      1u << 0, "META_TYPE_FLAGS_None") \
-    X(META_TYPE_FLAGS_Constant,  1u << 1, "META_TYPE_FLAGS_Constant") \
-    X(META_TYPE_FLAGS_Volatile,  1u << 2, "META_TYPE_FLAGS_Volatile") \
-    X(META_TYPE_FLAGS_Static,    1u << 3, "META_TYPE_FLAGS_Static") \
-    X(META_TYPE_FLAGS_Pointer,   1u << 4, "META_TYPE_FLAGS_Pointer") \
-    X(META_TYPE_FLAGS_Anonymous, 1u << 5, "META_TYPE_FLAGS_Anonymous")
+    X(META_TYPE_FLAGS_None,              1u << 0, "META_TYPE_FLAGS_None") \
+    X(META_TYPE_FLAGS_Constant,          1u << 1, "META_TYPE_FLAGS_Constant") \
+    X(META_TYPE_FLAGS_Volatile,          1u << 2, "META_TYPE_FLAGS_Volatile") \
+    X(META_TYPE_FLAGS_Static,            1u << 3, "META_TYPE_FLAGS_Static") \
+    X(META_TYPE_FLAGS_Pointer,           1u << 4, "META_TYPE_FLAGS_Pointer") \
+    X(META_TYPE_FLAGS_Anonymous,         1u << 5, "META_TYPE_FLAGS_Anonymous") \
+    X(META_TYPE_FLAGS_PrivatelyDeclared, 1u << 6, "META_TYPE_FLAGS_PrivatelyDeclared") 
 
 typedef enum metatype_flags
 {
@@ -640,6 +654,9 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
                     meta_struct_t *nested_struct = parse_structure(file_data, token);
                     if(!nested_struct) break;
 
+                    // NOTE(Sleepster): This structure is only defined within the strcture it is parented to 
+                    nested_struct->type_data.modifier_flags |= META_TYPE_FLAGS_PrivatelyDeclared;
+
                     // NOTE(Sleepster): If the structure is anonymous, then there's no way to have any 
                     // type information about it, so just cleanly append it to this structure.
                     if(nested_struct->type_data.modifier_flags & META_TYPE_FLAGS_Anonymous)
@@ -656,26 +673,35 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
                     }
                     else
                     {
+                        // NOTE(Sleepster): This structure is only found inside of the current parent, treat it as though it were
+                        //                  a member.
+                        nested_struct->type_data.modifier_flags |= META_TYPE_FLAGS_PrivatelyDeclared;
+
                         member.nested_struct = nested_struct;
+                        member.name          = type_name_token.string; 
+                        member.type_info     = structure_info.type_data;
+                        member.type_info.modifier_flags |= META_TYPE_FLAGS_PrivatelyDeclared;
+
+                        c_dynarray_push(structure_info.members, member);
+                        structure_info.member_count++;
+
+                        insert_type_information(&nested_struct->type_data);
                     }
                 }
             }break;
             case TT_ClosingBrace:
             {
-                // TODO(Sleepster): check the next token, if it's an TT_Identifier 
+                // NOTE(Sleepster): check the next token, if it's an TT_Identifier 
                 // than we have a typedef struct, if it's a semicolon then it's a normal C++ 
                 // structure.
                 token = c_tokenizer_get_next_token(&file_data->tokenizer);
                 if(token.type == TT_Identifier)
                 {
-                    // TODO(Sleepster): Append this to the type table;
                     type_info->type_name = token.string;
-                    insert_type_information(type_info);
-
                     token = c_tokenizer_get_next_token(&file_data->tokenizer);
                 }
 
-
+                insert_type_information(type_info);
                 parsing = false;
             }break;
             case TT_EOF:
@@ -763,6 +789,9 @@ generate_type_information(ast_file_data_t *ast)
     c_string_builder_sprint(type_enum_builder, "// IT CONTAINS ALL THE RTTI NEEDED FOR THE PROGRAM...\n\n");
     c_string_builder_sprint(type_enum_builder, "#if !defined(GENERATED_PROGRAM_RTTI_H)\n");
     c_string_builder_sprint(type_enum_builder, "#define GENERATED_PROGRAM_RTTI_H\n\n");
+    c_string_builder_sprint(type_enum_builder, "#ifndef OffsetOf\n");
+    c_string_builder_sprint(type_enum_builder, "#define OffsetOf(type, member) ((size_t)&(((type*)0)->member))\n");
+    c_string_builder_sprint(type_enum_builder, "#endif\n\n");
 
     c_string_builder_sprint(type_enum_builder, "#define GENERATED_PROGRAM_TYPE_LIST(X) \\\n");
     c_string_builder_sprint(type_table_builder, "\ntype_info_t GENERATED_type_table[] = {\n");
@@ -838,12 +867,13 @@ typedef enum metatype_kind
 }metatype_kind_t;
 
 #define METATYPE_FLAG_LIST(X) \
-    X(META_TYPE_FLAGS_None,      1u << 0, "META_TYPE_FLAGS_None") \
-    X(META_TYPE_FLAGS_Constant,  1u << 1, "META_TYPE_FLAGS_Constant") \
-    X(META_TYPE_FLAGS_Volatile,  1u << 2, "META_TYPE_FLAGS_Volatile") \
-    X(META_TYPE_FLAGS_Static,    1u << 3, "META_TYPE_FLAGS_Static") \
-    X(META_TYPE_FLAGS_Pointer,   1u << 4, "META_TYPE_FLAGS_Pointer") \
-    X(META_TYPE_FLAGS_Anonymous, 1u << 5, "META_TYPE_FLAGS_Anonymous")
+    X(META_TYPE_FLAGS_None,              1u << 0, "META_TYPE_FLAGS_None") \
+    X(META_TYPE_FLAGS_Constant,          1u << 1, "META_TYPE_FLAGS_Constant") \
+    X(META_TYPE_FLAGS_Volatile,          1u << 2, "META_TYPE_FLAGS_Volatile") \
+    X(META_TYPE_FLAGS_Static,            1u << 3, "META_TYPE_FLAGS_Static") \
+    X(META_TYPE_FLAGS_Pointer,           1u << 4, "META_TYPE_FLAGS_Pointer") \
+    X(META_TYPE_FLAGS_Anonymous,         1u << 5, "META_TYPE_FLAGS_Anonymous") \
+    X(META_TYPE_FLAGS_PrivatelyDeclared, 1u << 6, "META_TYPE_FLAGS_PrivatelyDeclared") 
 
 typedef enum metatype_flags
 {
@@ -992,7 +1022,7 @@ typedef struct type_info {
                                         kind_string.count, C_STR(kind_string));                // .kind
                 append_item_modifier_flags(struct_info_builder, member->type_info.flag_counter, member->type_info.modifier_flags);
 
-                c_string_builder_sprint(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, .size = sizeof(%.*s), .offset = offsetof(%.*s, %.*s)},\n",
+                c_string_builder_sprint(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, .size = sizeof(%.*s), .offset = OffsetOf(%.*s, %.*s)},\n",
                                         member->type_info.flag_counter, 
                                         member->type_info.pointer_depth,
                                         member->type_info.array_size,
@@ -1396,11 +1426,11 @@ main(void)
     c_hash_table_init(&state.type_table_hash, 9187);
     memset(state.type_table_hash.data, -1, sizeof(s64) * 9187);
 
-#if 1
+#if 0
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else
-    state.ast_file.tokenizer.data = c_file_read_entirety(STR("r_vulkan_types.h"));
+    state.ast_file.tokenizer.data = c_file_read_entirety(STR("tests/GENERATED_test.h"));
     build_file_ast(&state.ast_file);
 #endif
 
