@@ -15,10 +15,12 @@
       want to automatically infer this information then we may need a
       standard like prefixing "camera" ubos with "Camera" and textures
       with "Texture" and so on.
+
 - [ ] Introduce safeguards for when updating descriptor sets. For
       example, if the user tries to add more than one texture to a
       shader's descriptor, but that descriptor is only an array with 1
       element, we should warn the user and return.
+
 - [ ] Establish the concept of a material
 - [ ] Shaders should store their texture uniform, camera uniforms, and other important information for easy access and updating
 - [ ] Shaders should "cache" special uniforms like "camera uniforms" "texture array uniforms"
@@ -160,7 +162,7 @@
 - [ ] Spintf for our custom strings.
 - [ ] Modify the file and sys_file APIs so that they work properly as one would expect. IE, sys_file_open returns a file_t, have it initialize the file's name and other easy things
 - [ ] Complete malloc replacement (thread safe heap allocator)
-- [ ] The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal state
+- [X] The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal state
 - [ ] The ability to dump the contents of a memory arena to a file, this is probably pretty useful...
 - [ ] Any function in the string.cpp file that allocates memory should be reordered like the file API
 - [ ] Vulkan style memory allocation for functions that would allocate

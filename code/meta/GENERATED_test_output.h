@@ -8,15 +8,17 @@
 #define OffsetOf(type, member) ((size_t)&(((type*)0)->member))
 #endif
 
+#ifndef IntFromPtr
+#define IntFromPtr(x) ((u32) ((char *)x - (char*)0))
+#endif
+
 #define GENERATED_PROGRAM_TYPE_LIST(X) \
 	X(TYPE_u32, "u32") \
-	X(TYPE_node_t, "node_t") \
 	X(TYPE_string_t, "string_t") \
 	X(TYPE_s32, "s32") \
-	X(TYPE_other_thing_t, "other_thing_t") \
-	X(TYPE_test_structure_t, "test_structure_t") \
+	X(TYPE_other_thing, "other_thing") \
+	X(TYPE_test_structure, "test_structure") \
 	X(TYPE_test_thing_t, "test_thing_t") \
-	X(TYPE_test_object, "test_object") \
 
 
 enum GENERATED_program_type_t { 
@@ -113,25 +115,12 @@ typedef struct type_info {
     type_info_struct_t *struct_info;
 }type_info_t;
 
-struct type_info_struct_node_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t node_size;
-			type_info_member_t node_capacity;
-			type_info_member_t next_node;
-		}members;
-	};
-};
+const static test_thing_t GENERATED_DEFAULT_test_thing_t = {};
+const static u32 GENERATED_DEFAULT_u32 = {};
+const static s32 GENERATED_DEFAULT_s32 = {};
+const static u32 GENERATED_DEFAULT_u32 = {};
 
-struct type_info_struct_other_thing_t {
+struct type_info_struct_other_thing {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -148,7 +137,7 @@ struct type_info_struct_other_thing_t {
 	};
 };
 
-struct type_info_struct_test_structure_t {
+struct type_info_struct_test_structure {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -161,7 +150,7 @@ struct type_info_struct_test_structure_t {
 		struct {
 			type_info_member_t test_element;
 			type_info_member_t other_test_element;
-			type_info_member_t test_structure;
+			type_info_member_t other_thing;
 		}members;
 	};
 };
@@ -181,71 +170,41 @@ struct type_info_struct_test_thing_t {
 			type_info_member_t element1;
 			type_info_member_t element2;
 			type_info_member_t element3;
-			type_info_member_t test_thing;
-		}members;
-	};
-};
-
-struct type_info_struct_test_object {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t test_object_element0;
-			type_info_member_t test_object_element1;
-			type_info_member_t test_object_element2;
-			type_info_member_t test_object_element4;
+			type_info_member_t test_structure;
 		}members;
 	};
 };
 
 
+// TODO(Sleepster): What we're working on right now is making it so that nested structures and the members that reside within them
+// are referenced correctly, kindly like below. 
 
-const static type_info_struct_node_t type_info_struct_node_t_const_data = {
-	.name = "node_t,",
-	.type = TYPE_node_t,
+
+const static type_info_struct_other_thing type_info_struct_other_thing_const_data = {
+	.name = "other_thing,",
+	.type = TYPE_other_thing,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(node_t),
-	.member_count = 3,
-	.members = {
-		.node_size = {.name = "node_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(u32), .offset = OffsetOf(node_t, node_size)},
-		.node_capacity = {.name = "node_capacity", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(u32), .offset = OffsetOf(node_t, node_capacity)},
-		.next_node = {.name = "next_node", .type = TYPE_node_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(node), .offset = OffsetOf(node_t, next_node)},
-	}
-};
-const static type_info_struct_other_thing_t type_info_struct_other_thing_t_const_data = {
-	.name = "other_thing_t,",
-	.type = TYPE_other_thing_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(other_thing_t),
+	.element_size = sizeof(GENERATED_DEFAULT_other_thing.other_thing);
 	.member_count = 2,
 	.members = {
-		.element_inside_other_struct0 = {.name = "element_inside_other_struct0", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(s32), .offset = OffsetOf(other_thing_t, element_inside_other_struct0)},
-		.element_inside_other_struct1 = {.name = "element_inside_other_struct1", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(s32), .offset = OffsetOf(other_thing_t, element_inside_other_struct1)},
+		.element_inside_other_struct0 = {.name = "element_inside_other_struct0", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GENERATED_DEFAULT_s32), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_other_thing, element_inside_other_struct0))},
+		.element_inside_other_struct1 = {.name = "element_inside_other_struct1", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GENERATED_DEFAULT_s32), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_other_thing, element_inside_other_struct1))},
 	}
 };
-const static type_info_struct_test_structure_t type_info_struct_test_structure_t_const_data = {
-	.name = "test_structure_t,",
-	.type = TYPE_test_structure_t,
+const static type_info_struct_test_structure type_info_struct_test_structure_const_data = {
+	.name = "test_structure,",
+	.type = TYPE_test_structure,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(test_structure_t),
+	.element_size = sizeof(GENERATED_DEFAULT_test_thing_t.test_structure);
 	.member_count = 3,
 	.members = {
-		.test_element = {.name = "test_element", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(u32), .offset = OffsetOf(test_structure_t, test_element)},
-		.other_test_element = {.name = "other_test_element", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(u32), .offset = OffsetOf(test_structure_t, other_test_element)},
-		.test_structure = {.name = "test_structure", .type = TYPE_test_structure_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_structure), .offset = OffsetOf(test_structure_t, test_structure)},
+		.test_element = {.name = "test_element", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GENERATED_DEFAULT_u32), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_test_structure, test_element))},
+		.other_test_element = {.name = "other_test_element", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GENERATED_DEFAULT_u32), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_test_structure, other_test_element))},
+		.other_thing = {.name = "other_thing", .type = TYPE_other_thing, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_test_thing_t.test_structure, other_thing))},
 	}
 };
 const static type_info_struct_test_thing_t type_info_struct_test_thing_t_const_data = {
@@ -254,43 +213,27 @@ const static type_info_struct_test_thing_t type_info_struct_test_thing_t_const_d
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(test_thing_t),
+	.element_size = sizeof(GENERATED_DEFAULT_test_thing_t);
 	.member_count = 5,
 	.members = {
-		.element0 = {.name = "element0", .type = TYPE_u32, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_Constant, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(u32), .offset = OffsetOf(test_thing_t, element0)},
-		.element1 = {.name = "element1", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(string_t), .offset = OffsetOf(test_thing_t, element1)},
-		.element2 = {.name = "element2", .type = TYPE_s32, .kind = META_TYPE_KIND_HashTable, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(s32), .offset = OffsetOf(test_thing_t, element2)},
-		.element3 = {.name = "element3", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Volatile, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(u32), .offset = OffsetOf(test_thing_t, element3)},
-		.test_thing = {.name = "test_thing", .type = TYPE_test_thing_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(test_thing), .offset = OffsetOf(test_thing_t, test_thing)},
-	}
-};
-const static type_info_struct_test_object type_info_struct_test_object_const_data = {
-	.name = "test_object,",
-	.type = TYPE_test_object,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(test_object),
-	.member_count = 4,
-	.members = {
-		.test_object_element0 = {.name = "test_object_element0", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(u32), .offset = OffsetOf(test_object, test_object_element0)},
-		.test_object_element1 = {.name = "test_object_element1", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(u32), .offset = OffsetOf(test_object, test_object_element1)},
-		.test_object_element2 = {.name = "test_object_element2", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(u32), .offset = OffsetOf(test_object, test_object_element2)},
-		.test_object_element4 = {.name = "test_object_element4", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(u32), .offset = OffsetOf(test_object, test_object_element4)},
+		.element0 = {.name = "element0", .type = TYPE_u32, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_Constant, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(GENERATED_DEFAULT_u32), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_test_thing_t, element0))},
+		.element1 = {.name = "element1", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GENERATED_DEFAULT_string_t), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_test_thing_t, element1))},
+		.element2 = {.name = "element2", .type = TYPE_s32, .kind = META_TYPE_KIND_HashTable, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GENERATED_DEFAULT_s32), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_test_thing_t, element2))},
+		.element3 = {.name = "element3", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Volatile, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(GENERATED_DEFAULT_u32), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_test_thing_t, element3))},
+		.test_structure = {.name = "test_structure", .type = TYPE_test_structure, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GENERATED_DEFAULT_test_thing_t.test_structure), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_test_thing_t, test_structure))},
 	}
 };
 
 
-type_info_t GENERATED_type_table[] = {
+const static type_info_t GENERATED_type_table[] = {
 	{.name = "u32", .type = TYPE_u32, .size = sizeof(u32), .struct_info = null},
-	{.name = "node_t", .type = TYPE_node_t, .size = sizeof(node_t), .struct_info = (type_info_struct_t*)&type_info_struct_node_t_const_data},
 	{.name = "string_t", .type = TYPE_string_t, .size = sizeof(string_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_t_const_data},
 	{.name = "s32", .type = TYPE_s32, .size = sizeof(s32), .struct_info = null},
-	{.name = "other_thing_t", .type = TYPE_other_thing_t, .size = sizeof(other_thing_t), .struct_info = (type_info_struct_t*)&type_info_struct_other_thing_t_const_data},
-	{.name = "test_structure_t", .type = TYPE_test_structure_t, .size = sizeof(test_structure_t), .struct_info = (type_info_struct_t*)&type_info_struct_test_structure_t_const_data},
+	{.name = "other_thing", .type = TYPE_other_thing, .size = sizeof(other_thing), .struct_info = (type_info_struct_t*)&type_info_struct_other_thing_const_data},
+	{.name = "test_structure", .type = TYPE_test_structure, .size = sizeof(test_structure), .struct_info = (type_info_struct_t*)&type_info_struct_test_structure_const_data},
 	{.name = "test_thing_t", .type = TYPE_test_thing_t, .size = sizeof(test_thing_t), .struct_info = (type_info_struct_t*)&type_info_struct_test_thing_t_const_data},
-	{.name = "test_object", .type = TYPE_test_object, .size = sizeof(test_object), .struct_info = (type_info_struct_t*)&type_info_struct_test_object_const_data},
 };
+
 
 
 string_t

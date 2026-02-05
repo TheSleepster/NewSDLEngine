@@ -37,7 +37,7 @@ typedef struct meta_struct meta_struct_t;
 // - [?] We are including structures that aren't directly embedded into a type as members of that type.
 //       (r_vulkan_types.h "vulkan_render_context") is an instance of that
 //
-// - [ ] What do we do about nested structures that only have internal definitions?
+// - [X] What do we do about nested structures that only have internal definitions?
 //       Perhaps we just save them as a member, and not adding them to the global types array
 //       since they are only able to be used either inside or exclusively with the strcture
 //       they are contained within.
@@ -46,9 +46,31 @@ typedef struct meta_struct meta_struct_t;
 //       members so that the caller can just loop over ALL members. and check the intenral members
 //       of nested structures EXPLICITLY and will naturally not do so.
 //
+// - [X] We have solved the issue of nested strctures and their internal type data, however we now have an issue of what do with 
+//       anonymous structures again, for some reason in an instance like this:
+//
+//        typedef struct test_object
+//        {
+//            u32 test_object_element0;
+//            u32 test_object_element1;
+//            union {
+//                u32 test_object_element2;
+//                u32 test_object_element4;
+//            };
+//            u32 after_semicolon;
+//        }test_object_t;
+//
+//        We neither ever find the variable named "after_semicolon", nor that test_object_t is typedeffed. This is a problem.
+//
+// - [ ] Ignore #if 0 blocks
+// - [ ] Take every type in the type table and declare a const static variant of them that is simply zeroed, name it something specific and special so only the 
+//       generated code can use it. Then, instead of being like "test_structure_t.test_thing_t.other_thing" which doesn't work we instead just use the zeroed variant
+//       to access it like "GENERATED_test_structure_t.test_thing_t.other_thing"
+//
+//
 // - [ ] We have an issue with how the metaprogram assigns the struct_info_type_*_t values
 //       inside the constant definition section. The issue is that the constant definition for the type
-//       might not exist... So saying ".struct_info = type_info_string_t_const-data"
+//       might not exist... So saying ".struct_info = type_info_string_t_const_data"
 //       might be completely invalid! We need a table to store the generated struct info and const data names
 //       so that we can prevent this from being an issue. Because this is a pretty big issue.
 //
@@ -83,6 +105,8 @@ typedef struct meta_struct meta_struct_t;
     X(META_STRUCT_TYPE_Struct, "struct") \
     X(META_STRUCT_TYPE_Union,  "union") \
     X(META_STRUCT_TYPE_Enum,   "enum")
+
+
 
 typedef enum meta_struct_type 
 {
@@ -208,6 +232,10 @@ typedef struct meta_struct
     meta_struct_type_t        structure_type;
     u32                       member_count;
     DynArray_t(meta_member_t) members;
+
+    struct meta_struct       *last_nested;
+    struct meta_struct       *sentinel;
+    u32                       nesting_depth;
 }meta_struct_t;
 
 typedef struct type_info_member {
@@ -272,6 +300,7 @@ typedef struct ast_state
     string_builder_t          type_table_builder;
     string_builder_t          struct_info_builder;
     string_builder_t          struct_static_def_builder;
+    string_builder_t          default_struct_def_builder;
 
 #if 0
     DynArray_t(ast_file_data) ast_files;
@@ -597,26 +626,38 @@ parse_member_data(ast_file_data_t *file_data,
 }
 
 internal_api meta_struct_t* 
-parse_structure(ast_file_data *file_data, token_data_t structure_type)
+parse_structure(ast_file_data *file_data, 
+                token_data_t   structure_type, 
+                u32            current_nesting_depth, 
+                meta_struct_t *last_struct)
 {
     meta_struct_t *result = null;
 
-    meta_struct_t structure_info  = {};
-    structure_info.structure_type = get_structure_type_from_string(structure_type.string);
-    structure_info.members        = c_dynarray_create(meta_member_t);
+    meta_struct_t *structure_info  = c_arena_push_struct(&global_context->temporary_arena, meta_struct_t);
+    structure_info->members        = c_dynarray_create(meta_member_t);
+    structure_info->structure_type = get_structure_type_from_string(structure_type.string);
 
-    token_data_t type_name_token = c_tokenizer_get_next_token(&file_data->tokenizer);
-
-    metatype_data_t *type_info = &structure_info.type_data;
-    type_info->kind      = META_TYPE_KIND_Struct;
-    type_info->type_name = type_name_token.string;
+    u32 our_nesting_depth = current_nesting_depth;
+    if(last_struct != null)
+    {
+        structure_info->type_data.modifier_flags |= META_TYPE_FLAGS_PrivatelyDeclared;
+    }
+    structure_info->nesting_depth = our_nesting_depth;
 
     // NOTE(Sleepster): If it's a declaration, GTFO 
-    token_data_t struct_declaration = c_tokenizer_peek_token(&file_data->tokenizer);
-    if(struct_declaration.type != TT_OpeningBrace) 
+    token_data_t type_name_token = c_tokenizer_get_next_token(&file_data->tokenizer);
+    if(type_name_token.type == TT_Identifier) 
     {
-        return(result);
+        token_data_t peek_token = c_tokenizer_peek_token(&file_data->tokenizer);
+        if(peek_token.type == TT_Identifier)
+        {
+            return(result);
+        }
     }
+
+    metatype_data_t *type_info = &structure_info->type_data;
+    type_info->kind      = META_TYPE_KIND_Struct;
+    type_info->type_name = type_name_token.string;
 
     if(type_name_token.type != TT_Identifier &&
        type_name_token.type == TT_OpeningBrace)
@@ -644,22 +685,28 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
 
                 // NOTE(Sleepster): If we return true, this is a valid member.
                 //                  If we return false, this is a nested struct
-                if(parse_member_data(file_data, &structure_info, &member, token))
+                if(parse_member_data(file_data, structure_info, &member, token))
                 {
-                    c_dynarray_push(structure_info.members, member);
-                    structure_info.member_count++;
+                    c_dynarray_push(structure_info->members, member);
+                    structure_info->member_count++;
                 }
                 else
                 {
-                    meta_struct_t *nested_struct = parse_structure(file_data, token);
+                    meta_struct_t *nested_struct = parse_structure(file_data, token, ++our_nesting_depth, structure_info);
                     if(!nested_struct) break;
 
-                    // NOTE(Sleepster): This structure is only defined within the strcture it is parented to 
-                    nested_struct->type_data.modifier_flags |= META_TYPE_FLAGS_PrivatelyDeclared;
+                    // NOTE(Sleepster): Link these two together as siblings 
+                    structure_info->last_nested = nested_struct;
+                    for(meta_struct_t *last_struct_node = last_struct;
+                        last_struct_node;
+                        last_struct_node = last_struct_node->last_nested)
+                    {
+                        structure_info->sentinel = last_struct_node;
+                    }
 
                     // NOTE(Sleepster): If the structure is anonymous, then there's no way to have any 
                     // type information about it, so just cleanly append it to this structure.
-                    if(nested_struct->type_data.modifier_flags & META_TYPE_FLAGS_Anonymous)
+                    if((nested_struct->type_data.modifier_flags & META_TYPE_FLAGS_Anonymous) != 0)
                     {
                         for(u32 member_index = 0;
                             member_index < nested_struct->member_count;
@@ -667,25 +714,27 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
                         {
                             meta_member_t new_member = c_dynarray_get_value(nested_struct->members, member_index);
 
-                            c_dynarray_push(structure_info.members, new_member);
-                            structure_info.member_count++;
+                            c_dynarray_push(structure_info->members, new_member);
+                            structure_info->member_count++;
                         }
                     }
                     else
                     {
                         // NOTE(Sleepster): This structure is only found inside of the current parent, treat it as though it were
                         //                  a member.
-                        nested_struct->type_data.modifier_flags |= META_TYPE_FLAGS_PrivatelyDeclared;
+                        if((nested_struct->type_data.modifier_flags & META_TYPE_FLAGS_Anonymous) == 0)
+                        {
+                            member.nested_struct = nested_struct;
+                            member.nested_struct->type_data.modifier_flags |= META_TYPE_FLAGS_PrivatelyDeclared;
 
-                        member.nested_struct = nested_struct;
-                        member.name          = type_name_token.string; 
-                        member.type_info     = structure_info.type_data;
-                        member.type_info.modifier_flags |= META_TYPE_FLAGS_PrivatelyDeclared;
+                            member.name          = nested_struct->type_data.type_name; 
+                            member.type_info     = nested_struct->type_data;
 
-                        c_dynarray_push(structure_info.members, member);
-                        structure_info.member_count++;
+                            c_dynarray_push(structure_info->members, member);
+                            structure_info->member_count++;
 
-                        insert_type_information(&nested_struct->type_data);
+                            insert_type_information(&nested_struct->type_data);
+                        }
                     }
                 }
             }break;
@@ -695,13 +744,16 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
                 // than we have a typedef struct, if it's a semicolon then it's a normal C++ 
                 // structure.
                 token = c_tokenizer_get_next_token(&file_data->tokenizer);
-                if(token.type == TT_Identifier)
+                if((type_info->modifier_flags & META_TYPE_FLAGS_Anonymous) == 0)
                 {
-                    type_info->type_name = token.string;
-                    token = c_tokenizer_get_next_token(&file_data->tokenizer);
-                }
+                    if(token.type == TT_Identifier)
+                    {
+                        type_info->type_name = token.string;
+                        token = c_tokenizer_get_next_token(&file_data->tokenizer);
 
-                insert_type_information(type_info);
+                        insert_type_information(type_info);
+                    }
+                }
                 parsing = false;
             }break;
             case TT_EOF:
@@ -713,16 +765,11 @@ parse_structure(ast_file_data *file_data, token_data_t structure_type)
 
     if((type_info->modifier_flags & META_TYPE_FLAGS_Anonymous) == 0)
     {
-        c_dynarray_push(file_data->structures, structure_info);
-        result = c_dynarray_get_value(&file_data->structures, file_data->structure_count);
+        c_dynarray_push(file_data->structures, *structure_info);
         file_data->structure_count++;
     }
-    else
-    {
-        result = c_arena_push_struct(&global_context->temporary_arena, meta_struct_t);
-        memcpy(result, &structure_info, sizeof(meta_struct_t));
-    }
 
+    result = structure_info;
     return(result);
 }
 
@@ -780,9 +827,11 @@ generate_type_information(ast_file_data_t *ast)
     // object's type name is to it's canonical_name inside the types table, otherwise why the hell 
     // does that thing exist???
 
-    string_builder_t *type_enum_builder         = &state.type_enum_builder;
-    string_builder_t *type_table_builder        = &state.type_table_builder;
-    string_builder_t *struct_info_builder       = &state.struct_info_builder;
+    string_builder_t *type_enum_builder               = &state.type_enum_builder;
+    string_builder_t *type_table_builder              = &state.type_table_builder;
+    string_builder_t *struct_info_builder             = &state.struct_info_builder;
+//    string_builder_t *default_struct_info_def_builder = &state.default_struct_def_builder;
+
     //string_builder_t *struct_static_def_builder = &state.struct_static_def_builder;
 
     c_string_builder_sprint(type_enum_builder, "// THIS FILE IS GENERATED BY METAPROGRAM.EXE...\n");
@@ -792,9 +841,12 @@ generate_type_information(ast_file_data_t *ast)
     c_string_builder_sprint(type_enum_builder, "#ifndef OffsetOf\n");
     c_string_builder_sprint(type_enum_builder, "#define OffsetOf(type, member) ((size_t)&(((type*)0)->member))\n");
     c_string_builder_sprint(type_enum_builder, "#endif\n\n");
+    c_string_builder_sprint(type_enum_builder, "#ifndef IntFromPtr\n");
+    c_string_builder_sprint(type_enum_builder, "#define IntFromPtr(x) ((u32) ((char *)x - (char*)0))\n");
+    c_string_builder_sprint(type_enum_builder, "#endif\n\n");
 
     c_string_builder_sprint(type_enum_builder, "#define GENERATED_PROGRAM_TYPE_LIST(X) \\\n");
-    c_string_builder_sprint(type_table_builder, "\ntype_info_t GENERATED_type_table[] = {\n");
+    c_string_builder_sprint(type_table_builder, "\nconst static type_info_t GENERATED_type_table[] = {\n");
 
     // NOTE(Sleepster): Generated Type Enum 
     c_dynarray_for(state.type_table, type_index)
@@ -918,7 +970,6 @@ typedef struct type_info {
     type_info_struct_t *struct_info;
 }type_info_t;
 )");
-
     string_t builder_string = c_string_builder_get_current_string(type_enum_builder);
     fprintf(stdout, "%.*s\n", builder_string.count, C_STR(builder_string));
 
@@ -989,6 +1040,14 @@ typedef struct type_info {
         c_dynarray_for(ast->structures, type_index)
         {
             meta_struct_t *structure = c_dynarray_get_ptr(ast->structures, type_index);
+            string_t struct_canonical_type_name = get_canonical_type_name(&structure->type_data);
+
+            if((structure->type_data.modifier_flags & META_TYPE_FLAGS_PrivatelyDeclared) == 0)
+            {
+                fprintf(stdout, "const static %.*s GENERATED_DEFAULT_%.*s = {};\n",
+                        struct_canonical_type_name.count, C_STR(struct_canonical_type_name),
+                        struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
+            }
 
             c_string_builder_sprint(struct_info_builder, "const static type_info_struct_%.*s type_info_struct_%.*s_const_data = {\n", 
                                     structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
@@ -1004,7 +1063,44 @@ typedef struct type_info {
             c_string_builder_sprint(struct_info_builder, ",\n");
             c_string_builder_sprint(struct_info_builder, "\t.flag_counter = %d,\n", structure->type_data.flag_counter);
 
-            c_string_builder_sprint(struct_info_builder, "\t.element_size = sizeof(%.*s),\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            // TODO(Sleepster): We are probably better off baking the list of nodes into a single string, so instead of the node list being constantly built,
+            // we just build it once and use it the whole iteration
+
+            meta_struct_t *struct_data = structure;
+            if(struct_data->last_nested)
+            {
+                if(structure->nesting_depth > 0)
+                {
+                    // NOTE(Sleepster): If this is nested, we start at the sentinel so we can work down the list for structures
+                    //                  that are only defined within the realm of this structure.
+                    struct_data = structure->sentinel;
+                }
+            }
+
+            // NOTE(Sleepster): Print out the sizeof list 
+            c_string_builder_sprint(struct_info_builder, "\t.element_size = sizeof(GENERATED_DEFAULT_%.*s",
+                                    struct_data->type_data.type_name.count, C_STR(struct_data->type_data.type_name));
+
+            // TODO(Sleepster): THIS IS THE RIGHT ONE, EVERY OTHER VERSION IS WRONG. BREAK THIS OUT INTO SOMETHING
+            u32 current_depth = 0;
+            for(meta_struct_t *current_structure = struct_data->last_nested;
+                current_structure && current_depth < Max(struct_data->nesting_depth, 0);
+                current_structure = current_structure->last_nested)
+            {
+                c_string_builder_sprint(struct_info_builder, ".%.*s",
+                                        current_structure->type_data.type_name.count, C_STR(current_structure->type_data.type_name));
+                ++current_depth;
+            }
+            
+            if(structure->nesting_depth > 0)
+            {
+                c_string_builder_sprint(struct_info_builder, ".%.*s);\n",
+                                        structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            }
+            else
+            {
+                c_string_builder_sprint(struct_info_builder, ");\n");
+            }
             c_string_builder_sprint(struct_info_builder, "\t.member_count = %d,\n", structure->member_count);
 
             c_string_builder_sprint(struct_info_builder, "\t.members = {\n");
@@ -1014,6 +1110,14 @@ typedef struct type_info {
 
                 string_t kind_string         = get_metatype_kind_string(member->type_info.kind);
                 string_t canonical_type_name = get_canonical_type_name(&member->type_info);
+                if((structure->type_data.modifier_flags & META_TYPE_FLAGS_PrivatelyDeclared) == 0 &&
+                   member->type_info.kind != META_TYPE_KIND_Struct)
+                {
+                    fprintf(stdout, "const static %.*s GENERATED_DEFAULT_%.*s = {};\n",
+                            canonical_type_name.count, C_STR(canonical_type_name),
+                            canonical_type_name.count, C_STR(canonical_type_name));
+                }
+
 
                 c_string_builder_sprint(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = %.*s, .modifier_flags = ",
                                         member->name.count, C_STR(member->name),               // member_name
@@ -1021,18 +1125,67 @@ typedef struct type_info {
                                         canonical_type_name.count, C_STR(canonical_type_name), // .type
                                         kind_string.count, C_STR(kind_string));                // .kind
                 append_item_modifier_flags(struct_info_builder, member->type_info.flag_counter, member->type_info.modifier_flags);
+                if(member->nested_struct)                                                                                                                     
+                {
+                    meta_struct_t *struct_data = structure;
+                    if(structure->nesting_depth > 0)
+                    {
+                        // NOTE(Sleepster): If this is nested, we start at the sentinel so we can work down the list for structures
+                        //                  that are only defined within the realm of this structure.
+                        struct_data = structure->sentinel;
+                    }
 
-                c_string_builder_sprint(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, .size = sizeof(%.*s), .offset = OffsetOf(%.*s, %.*s)},\n",
-                                        member->type_info.flag_counter, 
-                                        member->type_info.pointer_depth,
-                                        member->type_info.array_size,
-                                        member->type_info.type_name.count, C_STR(member->type_info.type_name),
-                                        structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
-                                        member->name.count, C_STR(member->name));
+                    // NOTE(Sleepster): Print the items that don't need to be looped over 
+                    c_string_builder_sprint(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, ",
+                                            member->type_info.flag_counter,                                              // flag counter 
+                                            member->type_info.pointer_depth,                                             // pointer depth
+                                            member->type_info.array_size);                                               // array size
+                    
+                    // NOTE(Sleepster): Print out the sizeof list 
+                    c_string_builder_sprint(struct_info_builder, ".size = sizeof(GENERATED_DEFAULT_%.*s",
+                                            struct_data->type_data.type_name.count, C_STR(struct_data->type_data.type_name));
+
+                    u32 current_depth = 0;
+                    for(meta_struct_t *current_structure = struct_data->last_nested;
+                        current_structure && current_depth < Max(member->nested_struct->nesting_depth, 0);
+                        current_structure = current_structure->last_nested)
+                    {
+                        c_string_builder_sprint(struct_info_builder, ".%.*s",
+                                                current_structure->type_data.type_name.count, C_STR(current_structure->type_data.type_name));
+                        ++current_depth;
+                    }
+
+                    // NOTE(Sleepster): Print out the OffsetOf list 
+                    c_string_builder_sprint(struct_info_builder, "), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_%.*s",
+                                            struct_data->type_data.type_name.count, C_STR(struct_data->type_data.type_name));
+
+                    current_depth = 0;
+                    for(meta_struct_t *current_structure = struct_data->last_nested;
+                        current_structure && current_depth < Max(member->nested_struct->nesting_depth - 1, 0);
+                        current_structure = current_structure->last_nested)
+                    {
+                        c_string_builder_sprint(struct_info_builder, ".%.*s",
+                                                current_structure->type_data.type_name.count, C_STR(current_structure->type_data.type_name));
+                        ++current_depth;
+                    }
+                    c_string_builder_sprint(struct_info_builder, ", %.*s))},\n",
+                                            member->name.count, C_STR(member->name));
+                }
+                else
+                {
+                    c_string_builder_sprint(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, .size = sizeof(GENERATED_DEFAULT_%.*s), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_%.*s, %.*s))},\n",
+                                            member->type_info.flag_counter,                                              // flag counter 
+                                            member->type_info.pointer_depth,                                             // pointer depth
+                                            member->type_info.array_size,                                                // array size
+                                            member->type_info.type_name.count, C_STR(member->type_info.type_name),       // size of
+                                            structure->type_data.type_name.count, C_STR(structure->type_data.type_name), // parent name
+                                            member->name.count, C_STR(member->name));                                    // type_name
+                }
             }
             c_string_builder_sprint(struct_info_builder, "\t}\n");
             c_string_builder_sprint(struct_info_builder, "};\n");
         }
+        fprintf(stdout, "\n");
         c_string_builder_sprint(struct_info_builder, "\n");
     }
 
@@ -1069,7 +1222,7 @@ typedef struct type_info {
     }
 
     c_string_builder_append_builder(struct_info_builder, type_table_builder);
-    c_string_builder_sprint(struct_info_builder, "\n");
+    c_string_builder_sprint(struct_info_builder, "\n\n");
 
     // NOTE(Sleepster): Helper functions 
     c_string_builder_sprint(struct_info_builder, R"(
@@ -1366,7 +1519,7 @@ build_file_ast(ast_file_data_t *file)
                 if(c_string_compare(token.string, STR("struct")) || 
                    c_string_compare(token.string, STR("union")))
                 {
-                    parse_structure(file, token);
+                    parse_structure(file, token, 0, null);
                 }
                 else if(c_string_compare(token.string, STR("enum")))
                 {
@@ -1413,10 +1566,11 @@ main(void)
     //state.ast_files  = c_dynarray_create(ast_file_data_t);
     state.type_table = c_dynarray_create(registry_type_t);
 
-    c_string_builder_init(&state.type_enum_builder,         MB(20));
-    c_string_builder_init(&state.type_table_builder,        MB(20));
-    c_string_builder_init(&state.struct_info_builder,       MB(20));
-    c_string_builder_init(&state.struct_static_def_builder, MB(20));
+    c_string_builder_init(&state.type_enum_builder,          MB(20));
+    c_string_builder_init(&state.type_table_builder,         MB(20));
+    c_string_builder_init(&state.struct_info_builder,        MB(20));
+    c_string_builder_init(&state.struct_static_def_builder,  MB(20));
+    c_string_builder_init(&state.default_struct_def_builder, MB(20));
 
     defer(c_string_builder_deinit(&state.type_enum_builder));
     defer(c_string_builder_deinit(&state.type_table_builder));
@@ -1426,7 +1580,7 @@ main(void)
     c_hash_table_init(&state.type_table_hash, 9187);
     memset(state.type_table_hash.data, -1, sizeof(s64) * 9187);
 
-#if 0
+#if 0 
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else

@@ -9,14 +9,6 @@
 #define GENERATED_TEST_H
 #include <c_types.h>
 
-typedef struct node 
-{
-    u32          node_size;
-    u32          node_capacity;
-
-    struct node *next_node;
-}node_t;
-
 typedef struct test_thing
 {
     const u32             element0[64];
@@ -35,19 +27,9 @@ typedef struct test_thing
         struct other_thing {
             s32 element_inside_other_struct0;
             s32 element_inside_other_struct1;
-        }other_thing_t;
-    }test_structure_t;
+        }other_thing;
+    }test_structure;
 }test_thing_t;
-
-typedef struct test_object
-{
-    u32 test_object_element0;
-    u32 test_object_element1;
-    union {
-        u32 test_object_element2;
-        u32 test_object_element4;
-    };
-}test_object_t;
 
 #endif // GENERATED_TEST_H
 
