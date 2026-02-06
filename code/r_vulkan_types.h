@@ -18,7 +18,9 @@
 #include <c_string.h>
 #include <c_math.h>
 
-#include <preprocessor_type_data.h>
+//#include <preprocessor_type_data.h>
+
+#define GENERATE_TYPE_INFO
 
 // TODO(Sleepster): I hate that these defines are here. But I can't put them anywhere else 
 #define MAX_RENDER_GROUPS                    (192)

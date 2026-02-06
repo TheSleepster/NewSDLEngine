@@ -13,6 +13,7 @@ enum GENERATED_program_types_t {
 	TYPE_render_pipeline_blending_mode_t,
 	TYPE_render_pipeline_blending_equation_t,
 	TYPE_render_pipeline_depth_function_t,
+	TYPE_MAX_RENDER_GROUPS_t,
 	TYPE_render_pipeline_state_t,
 	TYPE_bool32,
 	TYPE_u32,

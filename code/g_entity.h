@@ -51,6 +51,7 @@ struct entity_manager_t
 
 struct game_state_t;
 struct input_data_t;
+
 entity_t* entity_create(game_state_t *state);
 void entity_simulate_player(entity_t *player, input_data_t *input_data, float32 tick_rate);
 

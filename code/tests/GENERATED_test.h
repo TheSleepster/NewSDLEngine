@@ -9,6 +9,30 @@
 #define GENERATED_TEST_H
 #include <c_types.h>
 
+struct should_crash_this_shit;
+
+struct c_plus_plus_struct_test
+{
+    u32 thingy_inside_cpp_struct0;
+    u32 thingy_inside_cpp_struct1;
+    u32 thingy_inside_cpp_struct2;
+
+    // TODO(Sleepster): The problem here is that we find this open brace, 
+    // and marks it as an anonymous struct, this is bad.
+    //
+    // we essentially need to make a copy of the token stream from 
+    // token.data -> index which we get from c_string_find_first_char_from_left()
+    // looking for a '}'. Then perform c_tokenizer_get_next_token() on the copy until we 
+    // find that curling brace and check if it's an identifier or a ;. If it's an Identifier,
+    // it's not actually anonymous and should return false. If it's a ;, it is actually anonymous.
+    struct {
+        u32 test_anon_ending_element0;
+        u32 test_anon_ending_element1;
+        u32 test_anon_ending_element2;
+        u32 test_anon_ending_element3;
+    }test_anon_ending_name;
+}c_plus_plus_struct_test_t;
+
 typedef struct test_thing
 {
     const u32             element0[64];

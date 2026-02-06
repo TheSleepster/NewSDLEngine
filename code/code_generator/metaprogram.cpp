@@ -656,7 +656,7 @@ parse_structure(ast_file_data *file_data,
     if(type_name_token.type == TT_Identifier) 
     {
         token_data_t peek_token = c_tokenizer_peek_token(&file_data->tokenizer);
-        if(peek_token.type == TT_Identifier)
+        if(peek_token.type != TT_OpeningBrace)
         {
             return(result);
         }
@@ -666,7 +666,7 @@ parse_structure(ast_file_data *file_data,
     type_info->kind      = META_TYPE_KIND_Struct;
     type_info->type_name = type_name_token.string;
 
-    if(type_name_token.type != TT_Identifier &&
+    if(type_name_token.type != TT_Identifier && 
        type_name_token.type == TT_OpeningBrace)
     {
         // NOTE(Sleepster): Anonymous 
@@ -750,10 +750,9 @@ parse_structure(ast_file_data *file_data,
                     if(token.type == TT_Identifier)
                     {
                         type_info->type_name = token.string;
-
                         token = c_tokenizer_get_next_token(&file_data->tokenizer);
-                        insert_type_information(type_info, structure_info);
                     }
+                    insert_type_information(type_info, structure_info);
                 }
                 parsing = false;
             }break;
@@ -1576,7 +1575,7 @@ main(void)
     c_hash_table_init(&state.type_table_hash, 9187);
     memset(state.type_table_hash.data, -1, sizeof(s64) * 9187);
 
-#if 0 
+#if 1 
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else

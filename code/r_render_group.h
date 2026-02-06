@@ -139,7 +139,7 @@ struct draw_frame_t
 
     render_camera_t  used_camera[MAX_RENDER_GROUP_CAMERA_COUNT];
     u32              used_camera_count;
- 
+
     struct
     {
         u64                     cached_camera_ID;
