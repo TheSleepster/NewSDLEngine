@@ -47,6 +47,11 @@ void        c_string_advance_by(string_t *string, u32 advance);
 
 u32         c_string_find_first_char_from_left(string_t string,  char character);
 u32         c_string_find_first_char_from_right(string_t string, char character);
+u32         c_string_find_first_char_from_left_on_line(string_t string,  char character);
+// NOTE(Sleepster): This takes that "ending index" so that you don't have to parse the whole string.
+// if it's 0, we just use the string length
+u32         c_string_find_first_char_from_right_on_line(string_t string, char character, u32 ending_index);
+
 string_t    c_string_get_filename_from_path(string_t filepath);
 string_t    c_string_get_file_ext_from_path(string_t filepath);
 string_t    c_string_get_filename_from_path_and_ext(string_t filepath);

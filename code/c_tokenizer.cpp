@@ -54,6 +54,7 @@ c_tokenizer_get_next_token(tokenizer_t *tokenizer)
         case '#':  {result.type = TT_HashTag;          }break;
         case '!':  {result.type = TT_Exclamation;      }break;
         case '=':  {result.type = TT_Equals;           }break;
+        case '\\': {result.type = TT_BackSlash;        }break;
         case '\0': {result.type = TT_EOF;              }break;
         case '*':  
         {
@@ -146,5 +147,20 @@ c_tokenizer_peek_token(tokenizer_t *tokenizer, u32 times)
     }
 
     return(result);
+}
+
+void
+c_tokenizer_eat_lines(tokenizer_t *tokenizer, u32 line_count)
+{
+    for(u32 line_index = 0;
+        line_index < line_count;
+        ++line_index)
+    {
+        u32 end_line = c_string_find_first_char_from_left_on_line(tokenizer->data, '\n');
+        if(end_line != INVALID_ID)
+        {
+            c_string_advance_by(&tokenizer->data, end_line + 1);
+        }
+    }
 }
 

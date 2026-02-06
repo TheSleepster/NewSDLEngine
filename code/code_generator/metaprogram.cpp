@@ -276,6 +276,7 @@ typedef struct registry_type
     string_t        canonical_name;
     metatype_kind_t type_kind;
     bool32          generated_const_def;
+    u32             times_seen_as_non_pointer;
 
     meta_struct_t  *metadata;
 }registry_type_t;
@@ -409,7 +410,7 @@ exit:
 // TODO(Sleepster): There's a small issue, specifically with hash tables and such. If we find a type with a modifier or hash table or dynamic array,
 // the we will save that type as a dynamic array. Even if it's a primitive, or a structure
 internal_api void
-insert_type_information(metatype_data_t *type_info, meta_struct_t *struct_data)
+insert_type_information(metatype_data_t *type_info, meta_struct_t *struct_data, bool8 is_pointer)
 {
     string_t lookup_name = type_info->type_name;
 
@@ -442,6 +443,10 @@ insert_type_information(metatype_data_t *type_info, meta_struct_t *struct_data)
     {
         // NOTE(Sleepster): Type name is not in the hash 
         registry_type_t new_type = {};
+        if(!is_pointer)
+        {
+            new_type.times_seen_as_non_pointer++;
+        }
         new_type.canonical_name = type_info->type_name;
         new_type.type_kind      = type_info->kind;
         if(struct_data)
@@ -456,6 +461,11 @@ insert_type_information(metatype_data_t *type_info, meta_struct_t *struct_data)
     {
         // NOTE(Sleepster): It is in the hash, however we might need to update it's canonical name 
         registry_type_t *type = c_dynarray_get_ptr(state.type_table, *registry_index);
+        if(!is_pointer)
+        {
+            type->times_seen_as_non_pointer++;
+        }
+
         if(c_string_ends_with(type_info->type_name, STR("_t")))
         {
             type->canonical_name = type_info->type_name;
@@ -572,6 +582,8 @@ parse_member_data(ast_file_data_t *file_data,
             return(result);
         }
     }
+    bool8 is_pointer = false;
+
     // NOTE(Sleepster): Should be the type
     type_info->type_name = token.string;
 
@@ -586,6 +598,8 @@ parse_member_data(ast_file_data_t *file_data,
     {
         type_info->modifier_flags |= META_TYPE_FLAGS_Pointer;
         type_info->flag_counter++;
+
+        is_pointer = true;
 
         token = c_tokenizer_get_next_token(&file_data->tokenizer);
         while(token.type == TT_Asterisk || token.type == TT_ClosingParen)
@@ -615,7 +629,7 @@ parse_member_data(ast_file_data_t *file_data,
     }
 
     // NOTE(Sleepster): Insert the type into the type_table 
-    insert_type_information(type_info, null);
+    insert_type_information(type_info, null, is_pointer);
 
 
     // NOTE(Sleepster): Once we have the name and the array size, 
@@ -741,7 +755,7 @@ parse_structure(ast_file_data *file_data,
                             c_dynarray_push(structure_info->members, member);
                             structure_info->member_count++;
 
-                            insert_type_information(&nested_struct->type_data, nested_struct);
+                            insert_type_information(&nested_struct->type_data, nested_struct, false);
                         }
                     }
                 }
@@ -759,7 +773,7 @@ parse_structure(ast_file_data *file_data,
                         type_info->type_name = token.string;
                         token = c_tokenizer_get_next_token(&file_data->tokenizer);
                     }
-                    insert_type_information(type_info, structure_info);
+                    insert_type_information(type_info, structure_info, false);
                 }
                 parsing = false;
             }break;
@@ -1154,7 +1168,7 @@ typedef struct type_info {
             c_string_builder_sprintf(struct_info_builder, "const static type_info_enum_%.*s type_info_enum_%.*s_const_data = {\n", 
                                     enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name),
                                     enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
-            c_string_builder_sprintf(struct_info_builder, "\t.name = \"%.*s\"\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
+            c_string_builder_sprintf(struct_info_builder, "\t.name = \"%.*s\",\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
             c_string_builder_sprintf(struct_info_builder, "\t.type = TYPE_%.*s,\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
             c_string_builder_sprintf(struct_info_builder, "\t.kind = META_TYPE_KIND_Enum,\n");
             c_string_builder_sprintf(struct_info_builder, "\t.member_count = %d,\n", enum_data->member_count);
@@ -1181,6 +1195,12 @@ typedef struct type_info {
     c_dynarray_for(state.type_table, type_index)
     {
         registry_type_t *type = c_dynarray_get_ptr(state.type_table, type_index);
+
+        bool8 is_void = false;
+        if(c_string_compare(type->canonical_name, STR("void")))
+        {
+            is_void = true;
+        }
         if(type->type_kind == META_TYPE_KIND_Struct && type->metadata)
         {
             u32 current_depth = 0;
@@ -1204,10 +1224,23 @@ typedef struct type_info {
         }
         else
         {
-            c_string_builder_sprintf(type_table_builder, "\t{.name = \"%.*s\", .type = TYPE_%.*s, .size = sizeof(%.*s), ",
-                                     type->canonical_name.count, C_STR(type->canonical_name),
-                                     type->canonical_name.count, C_STR(type->canonical_name),
-                                     type->canonical_name.count, C_STR(type->canonical_name));
+            if(!is_void)
+            {
+                if(type->times_seen_as_non_pointer == 0)
+                {
+                    c_string_builder_sprintf(type_table_builder, "\t{.name = \"%.*s\", .type = TYPE_%.*s, .size = sizeof(%.*s*), ",
+                                             type->canonical_name.count, C_STR(type->canonical_name),
+                                             type->canonical_name.count, C_STR(type->canonical_name),
+                                             type->canonical_name.count, C_STR(type->canonical_name));
+                }
+                else
+                {
+                    c_string_builder_sprintf(type_table_builder, "\t{.name = \"%.*s\", .type = TYPE_%.*s, .size = sizeof(%.*s), ",
+                                             type->canonical_name.count, C_STR(type->canonical_name),
+                                             type->canonical_name.count, C_STR(type->canonical_name),
+                                             type->canonical_name.count, C_STR(type->canonical_name));
+                }
+            }
         }
 
         if((type->type_kind == META_TYPE_KIND_Struct || type->type_kind == META_TYPE_KIND_Enum) && 
@@ -1218,7 +1251,10 @@ typedef struct type_info {
         }
         else
         {
-            c_string_builder_sprintf(type_table_builder, ".struct_info = null},\n");
+            if(!is_void)
+            {
+                c_string_builder_sprintf(type_table_builder, ".struct_info = null},\n");
+            }
         }
     }
     c_string_builder_sprintf(type_table_builder, "};\n");
@@ -1494,7 +1530,7 @@ parse_enum(ast_file_data_t *file_data, token_data_t structure_type)
                     type_info->type_name = next_token.string;
                 }
 
-                insert_type_information(type_info, null);
+                insert_type_information(type_info, null, false);
                 parsing = false;
             }break;
             case TT_EOF:
@@ -1516,6 +1552,57 @@ build_file_ast(ast_file_data_t *file)
         token_data_t token = c_tokenizer_get_next_token(&file->tokenizer);
         switch(token.type)
         {
+            case TT_HashTag:
+            {
+                // NOTE(Sleepster): If we find a '#' we need to make sure it's not an 'if' block 
+                token = c_tokenizer_peek_token(&file->tokenizer);
+                if(c_string_compare(token.string, STR("if")))
+                {
+                    token_data_t peek_token = c_tokenizer_peek_token(&file->tokenizer, 2);
+                    if(peek_token.string.data[0] == '0')
+                    {
+                        bool8 parsing = true;
+                        while(parsing)
+                        {
+                            token = c_tokenizer_get_next_token(&file->tokenizer);
+                            if(c_string_compare(token.string, STR("endif")))
+                            {
+                                parsing = false;
+                            }
+                        }
+                    }
+                }
+                else if(c_string_compare(token.string, STR("define")))
+                {
+                    // NOTE(Sleepster): Multiline macros need to be ignored, instances like dynarray break things 
+                    u32 index      = c_string_find_first_char_from_left_on_line(file->tokenizer.data, '\\');
+                    char next_char = file->tokenizer.data.data[index + 1];
+                    if(index != INVALID_ID && (next_char == '\n' || next_char == '\r'))
+                    {
+                        c_tokenizer_eat_lines(&file->tokenizer, 1);
+
+                        bool8 parsing = true;
+                        while(parsing)
+                        {
+                            index = c_string_find_first_char_from_left_on_line(file->tokenizer.data, '\\');
+                            next_char = file->tokenizer.data.data[index + 1];
+                            if(index != INVALID_ID && (next_char == '\n' || next_char == '\r'))
+                            {
+                                c_tokenizer_eat_lines(&file->tokenizer, 1);
+                            }
+                            else if(index != INVALID_ID && (next_char != '\n' && next_char != '\r'))
+                            {
+                                c_string_advance_by(&file->tokenizer.data, index + 2);
+                            }
+                            else if(index == INVALID_ID)
+                            {
+                                c_tokenizer_eat_lines(&file->tokenizer, 1);
+                                parsing = false;
+                            }
+                        }
+                    }
+                }
+            }break;
             case TT_Identifier:
             {
                 if(c_string_compare(token.string, STR("struct")) || 
@@ -1582,7 +1669,7 @@ main(void)
     c_hash_table_init(&state.type_table_hash, 9187);
     memset(state.type_table_hash.data, -1, sizeof(s64) * 9187);
 
-#if 0 
+#if 1 
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else

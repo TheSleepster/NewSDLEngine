@@ -30,7 +30,6 @@ typedef struct asset_slot         asset_slot_t;
 typedef struct subtexture_data    subtexture_data_t;
 typedef struct texture_atlas      texture_atlas_t;
 typedef struct texture2D          texture2D_t;
-typedef struct material           material_t;
 typedef struct shader             shader_t;
 typedef struct material_archetype  material_archetype_t;
 typedef struct material_instance  material_instance_t;
@@ -90,7 +89,7 @@ typedef struct asset_handle
     union {
         texture2D_t *texture;
         shader_t    *shader;
-        material_t  *material;
+        //material_t  *material;
     };
 }asset_handle_t;
 

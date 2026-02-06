@@ -205,6 +205,55 @@ c_string_find_first_char_from_right(string_t string, char character)
     return(result);
 }
 
+u32
+c_string_find_first_char_from_left_on_line(string_t string, char character)
+{
+    u32 result = -1;
+    for(u32 index = 0;
+        index < string.count;
+        ++index)
+    {
+        char found = (char)string.data[index];
+        if(found == character)
+        {
+            result = index;
+            break;
+        }
+
+        if(found == '\n')
+        {
+            break;
+        }
+    }
+
+    return(result);
+}
+
+u32
+c_string_find_first_char_from_right_on_line(string_t string, char character, u32 ending_index)
+{
+    u32 count = ending_index;
+    if(ending_index == 0)
+    {
+        count = string.count;
+    }
+
+    u32 result = -1;
+    for(u32 index = count;
+        index > 0;
+        --index)
+    {
+        char found = (char)string.data[index];
+        if(found == character || (found == '\r' || found == '\n'))
+        {
+            result = index;
+            break;
+        }
+    }
+
+    return(result);
+}
+
 string_t
 c_string_get_filename_from_path(string_t filepath)
 {

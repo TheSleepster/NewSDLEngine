@@ -25,7 +25,7 @@
 #include <tests/GENERATED_test.h>
 #if 0
 #include <meta/GENERATED_test_output.h>
-#endif 
+#endif
 
 int
 main(void)
