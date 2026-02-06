@@ -146,10 +146,10 @@
             "terminal": "integrated"
         },
         {
-            "name": "test_type_jnfo",
+            "name": "test_type_info",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test_type_jnfo",
+            "program": "${workspaceFolder}/build/test_type_info",
             "args": [],
             "cwd": "${workspaceFolder}/code/",
             "stopOnEntry": false,

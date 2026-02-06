@@ -28,5 +28,14 @@
 int
 main(void)
 {
+    const type_info_t *type_data = c_meta_get_type_info_by_name(STR("test_structure"));
+    for(u32 member_index = 0;
+        member_index < type_data->struct_info->member_count;
+        ++member_index)
+    {
+        type_info_member_t *member = type_data->struct_info->members + member_index;
+        log_info("Member by name: '%s' found...\n", member->name);
+    }
+
     printf("Hello, World!\n");
 }

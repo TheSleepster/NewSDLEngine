@@ -101,10 +101,11 @@ typedef struct type_info_struct {
     u32                 type;           // types enum
     metatype_kind_t     kind;           // is it struct? union? enum?
     u32                 modifier_flags; // for anonymous structures
+    u32                 flag_counter;
 
     u32                 size;
     u32                 member_count;
-    type_info_member_t *members;
+    type_info_member_t  members[];
 }type_info_struct_t;
 
 typedef struct type_info {
@@ -175,7 +176,7 @@ struct type_info_struct_test_thing_t {
 
 
 const static type_info_struct_other_thing type_info_struct_other_thing_const_data = {
-	.name = "other_thing,",
+	.name = "other_thing",
 	.type = TYPE_other_thing,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
@@ -183,13 +184,13 @@ const static type_info_struct_other_thing type_info_struct_other_thing_const_dat
 	.element_size = sizeof(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing),
 	.member_count = 2,
 	.members = {
-		.element_inside_other_struct0 = {.name = "element_inside_other_struct0", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing.element_inside_other_struct0)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing), element_inside_other_struct0)),},
-		.element_inside_other_struct1 = {.name = "element_inside_other_struct1", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing.element_inside_other_struct1)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing), element_inside_other_struct1)),},
+		.element_inside_other_struct0 = {.name = "element_inside_other_struct0", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing.element_inside_other_struct0)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing), element_inside_other_struct0))},
+		.element_inside_other_struct1 = {.name = "element_inside_other_struct1", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing.element_inside_other_struct1)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing), element_inside_other_struct1))},
 	}
 };
 
 const static type_info_struct_test_structure type_info_struct_test_structure_const_data = {
-	.name = "test_structure,",
+	.name = "test_structure",
 	.type = TYPE_test_structure,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
@@ -197,14 +198,14 @@ const static type_info_struct_test_structure type_info_struct_test_structure_con
 	.element_size = sizeof(GENERATED_DEFAULT_test_thing_t.test_structure),
 	.member_count = 3,
 	.members = {
-		.test_element = {.name = "test_element", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.test_element)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t.test_structure), test_element)),},
-		.other_test_element = {.name = "other_test_element", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_test_element)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t.test_structure), other_test_element)),},
-		.other_thing = {.name = "other_thing", .type = TYPE_other_thing, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t.test_structure), other_thing)),},
+		.test_element = {.name = "test_element", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.test_element)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t.test_structure), test_element))},
+		.other_test_element = {.name = "other_test_element", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_test_element)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t.test_structure), other_test_element))},
+		.other_thing = {.name = "other_thing", .type = TYPE_other_thing, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure.other_thing)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t.test_structure), other_thing))},
 	}
 };
 
 const static type_info_struct_test_thing_t type_info_struct_test_thing_t_const_data = {
-	.name = "test_thing_t,",
+	.name = "test_thing_t",
 	.type = TYPE_test_thing_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
@@ -212,11 +213,11 @@ const static type_info_struct_test_thing_t type_info_struct_test_thing_t_const_d
 	.element_size = sizeof(GENERATED_DEFAULT_test_thing_t),
 	.member_count = 5,
 	.members = {
-		.element0 = {.name = "element0", .type = TYPE_u32, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_Constant, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.element0)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t), element0)),},
-		.element1 = {.name = "element1", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.element1)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t), element1)),},
-		.element2 = {.name = "element2", .type = TYPE_s32, .kind = META_TYPE_KIND_HashTable, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.element2)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t), element2)),},
-		.element3 = {.name = "element3", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Volatile, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.element3)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t), element3)),},
-		.test_structure = {.name = "test_structure", .type = TYPE_test_structure, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t), test_structure)),},
+		.element0 = {.name = "element0", .type = TYPE_u32, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_Constant, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.element0)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t), element0))},
+		.element1 = {.name = "element1", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.element1)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t), element1))},
+		.element2 = {.name = "element2", .type = TYPE_s32, .kind = META_TYPE_KIND_HashTable, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.element2)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t), element2))},
+		.element3 = {.name = "element3", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Volatile, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.element3)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t), element3))},
+		.test_structure = {.name = "test_structure", .type = TYPE_test_structure, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_test_thing_t.test_structure)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_test_thing_t), test_structure))},
 	}
 };
 

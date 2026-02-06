@@ -259,10 +259,11 @@ typedef struct type_info_struct {
     u32                 type;           // types enum
     metatype_kind_t     kind;           // is it struct? union? enum?
     u32                 modifier_flags; // for anonymous structures
+    u32                 flag_counter;
 
     u32                 size;
     u32                 member_count;
-    type_info_member_t *members;
+    type_info_member_t  members[];
 }type_info_struct_t;
 
 typedef struct type_info
@@ -969,10 +970,11 @@ typedef struct type_info_struct {
     u32                 type;           // types enum
     metatype_kind_t     kind;           // is it struct? union? enum?
     u32                 modifier_flags; // for anonymous structures
+    u32                 flag_counter;
 
     u32                 size;
     u32                 member_count;
-    type_info_member_t *members;
+    type_info_member_t  members[];
 }type_info_struct_t;
 
 typedef struct type_info {
@@ -1075,7 +1077,7 @@ typedef struct type_info {
                                      struct_canonical_type_name.count, C_STR(struct_canonical_type_name),
                                      struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
 
-            c_string_builder_sprintf(struct_info_builder, "\t.name = \"%.*s,\",\n", struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
+            c_string_builder_sprintf(struct_info_builder, "\t.name = \"%.*s\",\n", struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
             c_string_builder_sprintf(struct_info_builder, "\t.type = TYPE_%.*s,\n", struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
 
             string_t structure_kind = get_metatype_kind_string(structure->type_data.kind);
@@ -1126,7 +1128,7 @@ typedef struct type_info {
                 string_t fullname = c_string_concat(&global_context->temporary_arena, nested_name, STR("."));
                 fullname = c_string_concat(&global_context->temporary_arena, fullname, member->name);
                 c_string_builder_sprintf(struct_info_builder, ".size = sizeof(decltype(%.*s)), ", fullname.count, C_STR(fullname));
-                c_string_builder_sprintf(struct_info_builder, ".offset = IntFromPtr(OffsetOf(decltype(%.*s), %.*s)),},\n", 
+                c_string_builder_sprintf(struct_info_builder, ".offset = IntFromPtr(OffsetOf(decltype(%.*s), %.*s))},\n", 
                                          nested_name.count, C_STR(nested_name),
                                          member->name.count, C_STR(member->name));
             }
@@ -1146,7 +1148,7 @@ typedef struct type_info {
             c_string_builder_sprintf(struct_info_builder, "const static type_info_enum_%.*s type_info_enum_%.*s_const_data = {\n", 
                                     enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name),
                                     enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
-            c_string_builder_sprintf(struct_info_builder, "\t.name = \"%.*s,\",\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
+            c_string_builder_sprintf(struct_info_builder, "\t.name = \"%.*s\"\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
             c_string_builder_sprintf(struct_info_builder, "\t.type = TYPE_%.*s,\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
             c_string_builder_sprintf(struct_info_builder, "\t.kind = META_TYPE_KIND_Enum,\n");
             c_string_builder_sprintf(struct_info_builder, "\t.member_count = %d,\n", enum_data->member_count);
