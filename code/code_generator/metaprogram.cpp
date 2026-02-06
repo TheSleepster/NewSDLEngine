@@ -62,19 +62,7 @@ typedef struct meta_struct meta_struct_t;
 //
 //        We neither ever find the variable named "after_semicolon", nor that test_object_t is typedeffed. This is a problem.
 //
-// - [ ] Ignore #if 0 blocks
-// - [ ] Take every type in the type table and declare a const static variant of them that is simply zeroed, name it something specific and special so only the 
-//       generated code can use it. Then, instead of being like "test_structure_t.test_thing_t.other_thing" which doesn't work we instead just use the zeroed variant
-//       to access it like "GENERATED_test_structure_t.test_thing_t.other_thing"
-//
-//
-// - [ ] We have an issue with how the metaprogram assigns the struct_info_type_*_t values
-//       inside the constant definition section. The issue is that the constant definition for the type
-//       might not exist... So saying ".struct_info = type_info_string_t_const_data"
-//       might be completely invalid! We need a table to store the generated struct info and const data names
-//       so that we can prevent this from being an issue. Because this is a pretty big issue.
-//
-// - [ ] Unknown issues with structures like memory_arena_footer_t
+// - [ ] Ignore #if 0 blocks or really any #define block
 // - [ ] Perhaps we should prefix hash tables and dynarray members with
 //       special characters to denote this
 // - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
@@ -83,8 +71,7 @@ typedef struct meta_struct meta_struct_t;
 //       "unsigned long long" or "unsigned char"
 //
 //
-//
-//
+// - [X] Unknown issues with structures like memory_arena_footer_t
 // - [X] Random "(" in places where there should be names  (the issue had to do with how we managed hash tables / dynamic arrays that stored pointers to items)
 // - [X] A bug with enums which cause strange anomalies of enum names repeating, but missing the first letter
 // - [X] Enums that have their type specified (like entity flags) includes their type suffix. (ENUM_EXAMPLE_one = 1ul)
@@ -98,6 +85,15 @@ typedef struct meta_struct meta_struct_t;
 // - [X] Modifier flags are broken when output
 // - [X] Generate a table of primitive types. If the type we pass isn't found in the table, the it is either
 //       an unknown primitive, or a structure.
+// - [X] Take every type in the type table and declare a const static variant of them that is simply zeroed, name it something specific and special so only the 
+//       generated code can use it. Then, instead of being like "test_structure_t.test_thing_t.other_thing" which doesn't work we instead just use the zeroed variant
+//       to access it like "GENERATED_test_structure_t.test_thing_t.other_thing"
+//
+// - [X] We have an issue with how the metaprogram assigns the struct_info_type_*_t values
+//       inside the constant definition section. The issue is that the constant definition for the type
+//       might not exist... So saying ".struct_info = type_info_string_t_const_data"
+//       might be completely invalid! We need a table to store the generated struct info and const data names
+//       so that we can prevent this from being an issue. Because this is a pretty big issue.
 
 // NOTE(Sleepster): This is an x-macro that generates a table for mapping 
 //                  the sturcture type to an enum 
@@ -669,9 +665,20 @@ parse_structure(ast_file_data *file_data,
     if(type_name_token.type != TT_Identifier && 
        type_name_token.type == TT_OpeningBrace)
     {
+        s32 closing_index = c_string_find_first_char_from_left(file_data->tokenizer.data, '}');
+        Assert(closing_index > 0);
+
+        tokenizer_t anon_tokenizer = {};
+        anon_tokenizer.data = file_data->tokenizer.data;
+        c_string_advance_by(&anon_tokenizer.data, closing_index + 1);
+
         // NOTE(Sleepster): Anonymous 
-        type_info->modifier_flags |= META_TYPE_FLAGS_Anonymous;
-        type_info->flag_counter++;
+        token_data_t next_token = c_tokenizer_get_next_token(&anon_tokenizer);
+        if(next_token.type == TT_Semicolon)
+        {
+            type_info->modifier_flags |= META_TYPE_FLAGS_Anonymous;
+            type_info->flag_counter++;
+        }
     }
     else if(type_name_token.type == TT_Identifier)
     {
@@ -1575,7 +1582,7 @@ main(void)
     c_hash_table_init(&state.type_table_hash, 9187);
     memset(state.type_table_hash.data, -1, sizeof(s64) * 9187);
 
-#if 1 
+#if 0 
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
     c_directory_visit(STR("../code"), &visit_info);
 #else
