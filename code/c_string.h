@@ -38,6 +38,7 @@ bool8       c_string_ends_with(string_t A, string_t ending);
 string_t    c_string_concat(memory_arena_t *arena, string_t A, string_t B);
 const char *c_string_to_const_array(string_t string);
 
+string_t    c_string_sprintf(char *buffer, u32 buffer_size, const char *string, ...);
 string_t    c_string_make_copy(memory_arena_t *arena, string_t string);
 string_t    c_string_sub_from_left(string_t string, u32 index);
 string_t    c_string_sub_from_right(string_t string, u32 index);
@@ -73,8 +74,6 @@ float64     c_string_read_float64(string_t data);
 
 bool8       c_string_read_bool8(string_t data);
 bool32      c_string_read_bool32(string_t data);
-
-string_t    c_string_format(string_t string, ...);
 
 // MACROS
 #define STR(x)   (string_t){.data = (byte*)x, .count = c_string_length(x)}
@@ -113,7 +112,7 @@ void     c_string_builder_append_value(string_builder_t *builder, void *value, u
 string_t c_string_builder_get_current_string(string_builder_t *builder);
 void     c_string_builder_reset(string_builder_t *builder);
 void     c_string_builder_append_builder(string_builder_t *A, string_builder_t *B);
-void     c_string_builder_sprint(string_builder_t *builder, const char *string, ...);
+void     c_string_builder_sprintf(string_builder_t *builder, const char *string, ...);
 
 // NOTE(Sleepster): DUMP simply writes the data out and keeps the state of the builder the same, 
 //                  FLUSH writes out the data, and completely resets the state of the builder

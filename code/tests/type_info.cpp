@@ -23,7 +23,7 @@
 #include <c_zone_allocator.cpp>
 
 #include <tests/GENERATED_test.h>
-//#include <meta/GENERATED_test_output.h>
+#include <meta/GENERATED_test_output.h>
 
 int
 main(void)

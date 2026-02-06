@@ -1,6 +1,6 @@
 [
   {
-    "file": "code_generator/metaprogram.cpp",
+    "file": "tests/type_info.cpp",
     "arguments": [
       "clang++",
       "-g",
@@ -37,16 +37,16 @@
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
       "-MT",
-      "../build/metaprogram",
+      "../build/test_type_info",
       "-MMD",
       "-MP",
       "-MF",
-      "../build/metaprogram.d",
-      "code_generator/metaprogram.cpp",
+      "../build/type_info.d",
+      "tests/type_info.cpp",
       "-o",
-      "../build/metaprogram"
+      "../build/test_type_info"
     ],
     "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/metaprogram"
+    "output": "../build/test_type_info"
   }
 ]

@@ -457,18 +457,20 @@ c_string_read_bool32(string_t data)
     return(result);
 }
 
-string_t
-c_string_format(string_t memory, string_t string, ...)
+string_t 
+c_string_sprintf(char *buffer, u32 buffer_size, const char *string, ...)
 {
     string_t result;
 
     va_list arg_ptr;
     va_start(arg_ptr, string);
-    vsnprintf((char*)memory.data, memory.count, (char*)string.data, arg_ptr);
+    s32 length = vsnprintf(buffer, buffer_size, string, arg_ptr);
     va_end(arg_ptr);
-    
-    result.data  = memory.data;
-    result.count = memory.count;
+
+    result = {
+        .data  = (u8*)buffer,
+        .count = (u32)length
+    };
 
     return(result);
 }
@@ -697,7 +699,7 @@ c_string_builder_append_builder(string_builder_t *A, string_builder_t *B)
 }
 
 void
-c_string_builder_sprint(string_builder_t *builder, const char *string, ...)
+c_string_builder_sprintf(string_builder_t *builder, const char *string, ...)
 {
     char buffer[32000];
     ZeroMemory(buffer, sizeof(buffer));

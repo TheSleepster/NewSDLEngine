@@ -233,8 +233,7 @@ typedef struct meta_struct
     u32                       member_count;
     DynArray_t(meta_member_t) members;
 
-    struct meta_struct       *last_nested;
-    struct meta_struct       *sentinel;
+    struct meta_struct       *parent;
     u32                       nesting_depth;
 }meta_struct_t;
 
@@ -279,6 +278,9 @@ typedef struct registry_type
 {
     string_t        canonical_name;
     metatype_kind_t type_kind;
+    bool32          generated_const_def;
+
+    meta_struct_t  *metadata;
 }registry_type_t;
 
 typedef struct ast_file_data
@@ -410,7 +412,7 @@ exit:
 // TODO(Sleepster): There's a small issue, specifically with hash tables and such. If we find a type with a modifier or hash table or dynamic array,
 // the we will save that type as a dynamic array. Even if it's a primitive, or a structure
 internal_api void
-insert_type_information(metatype_data_t *type_info)
+insert_type_information(metatype_data_t *type_info, meta_struct_t *struct_data)
 {
     string_t lookup_name = type_info->type_name;
 
@@ -442,9 +444,13 @@ insert_type_information(metatype_data_t *type_info)
     if(*registry_index == -1)
     {
         // NOTE(Sleepster): Type name is not in the hash 
-        registry_type_t new_type;
+        registry_type_t new_type = {};
         new_type.canonical_name = type_info->type_name;
         new_type.type_kind      = type_info->kind;
+        if(struct_data)
+        {
+            new_type.metadata = struct_data;
+        }
 
         c_dynarray_push(state.type_table, new_type);
         *registry_index = state.type_count++;
@@ -612,7 +618,7 @@ parse_member_data(ast_file_data_t *file_data,
     }
 
     // NOTE(Sleepster): Insert the type into the type_table 
-    insert_type_information(type_info);
+    insert_type_information(type_info, null);
 
 
     // NOTE(Sleepster): Once we have the name and the array size, 
@@ -637,12 +643,12 @@ parse_structure(ast_file_data *file_data,
     structure_info->members        = c_dynarray_create(meta_member_t);
     structure_info->structure_type = get_structure_type_from_string(structure_type.string);
 
-    u32 our_nesting_depth = current_nesting_depth;
+    structure_info->parent        = last_struct;
+    structure_info->nesting_depth = current_nesting_depth;
     if(last_struct != null)
     {
         structure_info->type_data.modifier_flags |= META_TYPE_FLAGS_PrivatelyDeclared;
     }
-    structure_info->nesting_depth = our_nesting_depth;
 
     // NOTE(Sleepster): If it's a declaration, GTFO 
     token_data_t type_name_token = c_tokenizer_get_next_token(&file_data->tokenizer);
@@ -692,17 +698,11 @@ parse_structure(ast_file_data *file_data,
                 }
                 else
                 {
-                    meta_struct_t *nested_struct = parse_structure(file_data, token, ++our_nesting_depth, structure_info);
+                    meta_struct_t *nested_struct = parse_structure(file_data, token, ++current_nesting_depth, structure_info);
                     if(!nested_struct) break;
 
                     // NOTE(Sleepster): Link these two together as siblings 
-                    structure_info->last_nested = nested_struct;
-                    for(meta_struct_t *last_struct_node = last_struct;
-                        last_struct_node;
-                        last_struct_node = last_struct_node->last_nested)
-                    {
-                        structure_info->sentinel = last_struct_node;
-                    }
+                    nested_struct->parent = structure_info;
 
                     // NOTE(Sleepster): If the structure is anonymous, then there's no way to have any 
                     // type information about it, so just cleanly append it to this structure.
@@ -733,7 +733,7 @@ parse_structure(ast_file_data *file_data,
                             c_dynarray_push(structure_info->members, member);
                             structure_info->member_count++;
 
-                            insert_type_information(&nested_struct->type_data);
+                            insert_type_information(&nested_struct->type_data, nested_struct);
                         }
                     }
                 }
@@ -749,9 +749,9 @@ parse_structure(ast_file_data *file_data,
                     if(token.type == TT_Identifier)
                     {
                         type_info->type_name = token.string;
-                        token = c_tokenizer_get_next_token(&file_data->tokenizer);
 
-                        insert_type_information(type_info);
+                        token = c_tokenizer_get_next_token(&file_data->tokenizer);
+                        insert_type_information(type_info, structure_info);
                     }
                 }
                 parsing = false;
@@ -780,7 +780,7 @@ append_item_modifier_flags(string_builder_t *builder, u32 object_flag_count, u32
     if(object_flag_count == 0)
     {
         string_t flag_string = get_metatype_flag_string(META_TYPE_FLAGS_None);
-        c_string_builder_sprint(builder, "%.*s", flag_string.count, C_STR(flag_string));
+        c_string_builder_sprintf(builder, "%.*s", flag_string.count, C_STR(flag_string));
         
         return;
     }
@@ -793,10 +793,10 @@ append_item_modifier_flags(string_builder_t *builder, u32 object_flag_count, u32
         if((modifier_flags & flag) != 0)
         {
             string_t flag_string = get_metatype_flag_string(flag);
-            c_string_builder_sprint(builder, "%.*s", flag_string.count, C_STR(flag_string));
+            c_string_builder_sprintf(builder, "%.*s", flag_string.count, C_STR(flag_string));
             if(flag_count < (object_flag_count - 1))
             {
-                c_string_builder_sprint(builder, "|");
+                c_string_builder_sprintf(builder, "|");
             }
 
             ++flag_count;
@@ -820,6 +820,36 @@ get_canonical_type_name(metatype_data_t *type_info)
     return(result);
 }
 
+internal_api string_t 
+build_struct_access_name(meta_struct_t *structure, u32 max_depth, u32 *current_depth)
+{
+    Assert(current_depth != null);
+
+    string_t result = {};
+    string_t parent_string = {};
+
+    char *buffer = (char*)c_arena_push_size(&global_context->temporary_arena, 1024);
+    if(structure->parent)
+    {
+        // NOTE(Sleepster): We are down the stack, keep working up to the root. 
+        parent_string = build_struct_access_name(structure->parent, max_depth, current_depth);
+        if(*current_depth < max_depth)
+        {
+            // NOTE(Sleepster): Append ourselves if we are less than the depth
+            result          = c_string_sprintf(buffer, 1024, ".%.*s", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            *current_depth += 1;
+        }
+    }
+    else
+    {
+        // NOTE(Sleepster): We are the root node. 
+        result = c_string_sprintf(buffer, 1024, "%.*s", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+    }
+    result = c_string_concat(&global_context->temporary_arena, parent_string, result);
+
+    return(result);
+}
+
 internal_api void
 generate_type_information(ast_file_data_t *ast)
 {
@@ -834,55 +864,38 @@ generate_type_information(ast_file_data_t *ast)
 
     //string_builder_t *struct_static_def_builder = &state.struct_static_def_builder;
 
-    c_string_builder_sprint(type_enum_builder, "// THIS FILE IS GENERATED BY METAPROGRAM.EXE...\n");
-    c_string_builder_sprint(type_enum_builder, "// IT CONTAINS ALL THE RTTI NEEDED FOR THE PROGRAM...\n\n");
-    c_string_builder_sprint(type_enum_builder, "#if !defined(GENERATED_PROGRAM_RTTI_H)\n");
-    c_string_builder_sprint(type_enum_builder, "#define GENERATED_PROGRAM_RTTI_H\n\n");
-    c_string_builder_sprint(type_enum_builder, "#ifndef OffsetOf\n");
-    c_string_builder_sprint(type_enum_builder, "#define OffsetOf(type, member) ((size_t)&(((type*)0)->member))\n");
-    c_string_builder_sprint(type_enum_builder, "#endif\n\n");
-    c_string_builder_sprint(type_enum_builder, "#ifndef IntFromPtr\n");
-    c_string_builder_sprint(type_enum_builder, "#define IntFromPtr(x) ((u32) ((char *)x - (char*)0))\n");
-    c_string_builder_sprint(type_enum_builder, "#endif\n\n");
+    c_string_builder_sprintf(type_enum_builder, "// THIS FILE IS GENERATED BY METAPROGRAM.EXE...\n");
+    c_string_builder_sprintf(type_enum_builder, "// IT CONTAINS ALL THE RTTI NEEDED FOR THE PROGRAM...\n\n");
+    c_string_builder_sprintf(type_enum_builder, "#if !defined(GENERATED_PROGRAM_RTTI_H)\n");
+    c_string_builder_sprintf(type_enum_builder, "#define GENERATED_PROGRAM_RTTI_H\n\n");
+    c_string_builder_sprintf(type_enum_builder, "#ifndef OffsetOf\n");
+    c_string_builder_sprintf(type_enum_builder, "#define OffsetOf(type, member) ((size_t)&(((type*)0)->member))\n");
+    c_string_builder_sprintf(type_enum_builder, "#endif\n\n");
+    c_string_builder_sprintf(type_enum_builder, "#ifndef IntFromPtr\n");
+    c_string_builder_sprintf(type_enum_builder, "#define IntFromPtr(x) ((u32) ((char *)x - (char*)0))\n");
+    c_string_builder_sprintf(type_enum_builder, "#endif\n\n");
 
-    c_string_builder_sprint(type_enum_builder, "#define GENERATED_PROGRAM_TYPE_LIST(X) \\\n");
-    c_string_builder_sprint(type_table_builder, "\nconst static type_info_t GENERATED_type_table[] = {\n");
+    c_string_builder_sprintf(type_enum_builder, "#define GENERATED_PROGRAM_TYPE_LIST(X) \\\n");
 
     // NOTE(Sleepster): Generated Type Enum 
     c_dynarray_for(state.type_table, type_index)
     {
         registry_type_t *type = c_dynarray_get_ptr(state.type_table, type_index);
-        c_string_builder_sprint(type_enum_builder, "\tX(TYPE_%.*s, \"%.*s\") \\\n", 
-                                type->canonical_name.count, C_STR(type->canonical_name),
-                                type->canonical_name.count, C_STR(type->canonical_name));
-
-        c_string_builder_sprint(type_table_builder, "\t{.name = \"%.*s\", .type = TYPE_%.*s, .size = sizeof(%.*s), ",
-                                type->canonical_name.count, C_STR(type->canonical_name),
-                                type->canonical_name.count, C_STR(type->canonical_name),
-                                type->canonical_name.count, C_STR(type->canonical_name));
-        if(type->type_kind == META_TYPE_KIND_Struct || type->type_kind == META_TYPE_KIND_Enum)
-        {
-            c_string_builder_sprint(type_table_builder, ".struct_info = (type_info_struct_t*)&type_info_struct_%.*s_const_data},\n",
-                                    type->canonical_name.count, C_STR(type->canonical_name));
-        }
-        else
-        {
-            c_string_builder_sprint(type_table_builder, ".struct_info = %s},\n", "null");
-        }
+        c_string_builder_sprintf(type_enum_builder, "\tX(TYPE_%.*s, \"%.*s\") \\\n", 
+                                 type->canonical_name.count, C_STR(type->canonical_name),
+                                 type->canonical_name.count, C_STR(type->canonical_name));
     }
 
-    c_string_builder_sprint(type_enum_builder, "\n\n");
-    c_string_builder_sprint(type_enum_builder, "enum GENERATED_program_type_t { \n");
-    c_string_builder_sprint(type_enum_builder, "#define X(enum, string) enum,  \n");
-    c_string_builder_sprint(type_enum_builder, "GENERATED_PROGRAM_TYPE_LIST(X)\n");
-    c_string_builder_sprint(type_enum_builder, "#undef X\n");
-    c_string_builder_sprint(type_enum_builder, "};\n\n");
+    c_string_builder_sprintf(type_enum_builder, "\n\n");
+    c_string_builder_sprintf(type_enum_builder, "enum GENERATED_program_type_t { \n");
+    c_string_builder_sprintf(type_enum_builder, "#define X(enum, string) enum,  \n");
+    c_string_builder_sprintf(type_enum_builder, "GENERATED_PROGRAM_TYPE_LIST(X)\n");
+    c_string_builder_sprintf(type_enum_builder, "#undef X\n");
+    c_string_builder_sprintf(type_enum_builder, "};\n\n");
 
-
-    c_string_builder_sprint(type_table_builder, "};\n");
     // NOTE(Sleepster): Generate the functions that map the type string to the index that the correct type data occupies. 
     // TODO(Sleepster): Maybe we should just stuff all this into a header, I just don't want to depend on another file right now 
-    c_string_builder_sprint(type_enum_builder, R"(
+    c_string_builder_sprintf(type_enum_builder, R"(
 #define META_STRUCT_TYPE_LIST(X) \
     X(META_STRUCT_TYPE_Struct, "struct") \
     X(META_STRUCT_TYPE_Union,  "union") \
@@ -980,28 +993,28 @@ typedef struct type_info {
         {
             meta_struct_t *structure = c_dynarray_get_ptr(ast->structures, type_index);
 
-            c_string_builder_sprint(struct_info_builder, "struct type_info_struct_%.*s {\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
-            c_string_builder_sprint(struct_info_builder, "\tconst char *name;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 type;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 kind;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 modifier_flags;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 flag_counter;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 element_size;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 member_count;\n");
-            c_string_builder_sprint(struct_info_builder, "\tunion {\n");
-            c_string_builder_sprint(struct_info_builder, "\t\ttype_info_member_t member_array[%d];\n", structure->member_count);
-            c_string_builder_sprint(struct_info_builder, "\t\tstruct {\n");
+            c_string_builder_sprintf(struct_info_builder, "struct type_info_struct_%.*s {\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            c_string_builder_sprintf(struct_info_builder, "\tconst char *name;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 type;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 kind;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 modifier_flags;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 flag_counter;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 element_size;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 member_count;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tunion {\n");
+            c_string_builder_sprintf(struct_info_builder, "\t\ttype_info_member_t member_array[%d];\n", structure->member_count);
+            c_string_builder_sprintf(struct_info_builder, "\t\tstruct {\n");
             c_dynarray_for(structure->members, member_index)
             {
                 meta_member_t *member = c_dynarray_get_ptr(structure->members, member_index);
-                c_string_builder_sprint(struct_info_builder, "\t\t\ttype_info_member_t %.*s;\n", 
+                c_string_builder_sprintf(struct_info_builder, "\t\t\ttype_info_member_t %.*s;\n", 
                                         member->name.count, C_STR(member->name));
             }
-            c_string_builder_sprint(struct_info_builder, "\t\t}members;\n");
-            c_string_builder_sprint(struct_info_builder, "\t};\n");
-            c_string_builder_sprint(struct_info_builder, "};\n\n");
+            c_string_builder_sprintf(struct_info_builder, "\t\t}members;\n");
+            c_string_builder_sprintf(struct_info_builder, "\t};\n");
+            c_string_builder_sprintf(struct_info_builder, "};\n\n");
         }
-        c_string_builder_sprint(struct_info_builder, "\n");
+        c_string_builder_sprintf(struct_info_builder, "\n");
     }
 
     // NOTE(Sleepster): Generate the type_info_t for the enum data. 
@@ -1010,29 +1023,29 @@ typedef struct type_info {
         c_dynarray_for(ast->enums, enum_index)
         {
             meta_struct_t *enum_data = c_dynarray_get_ptr(ast->enums, enum_index);
-            c_string_builder_sprint(struct_info_builder, "struct type_info_enum_%.*s {\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
-            c_string_builder_sprint(struct_info_builder, "\tconst char *name;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 type;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 kind;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 modifier_flags;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 flag_counter;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 element_size;\n");
-            c_string_builder_sprint(struct_info_builder, "\tu32 member_count;\n");
-            c_string_builder_sprint(struct_info_builder, "\tunion {\n");
-            c_string_builder_sprint(struct_info_builder, "\t\ttype_info_member_t member_array[%d];\n", enum_data->member_count);
-            c_string_builder_sprint(struct_info_builder, "\t\tstruct {\n");
+            c_string_builder_sprintf(struct_info_builder, "struct type_info_enum_%.*s {\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
+            c_string_builder_sprintf(struct_info_builder, "\tconst char *name;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 type;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 kind;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 modifier_flags;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 flag_counter;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 element_size;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tu32 member_count;\n");
+            c_string_builder_sprintf(struct_info_builder, "\tunion {\n");
+            c_string_builder_sprintf(struct_info_builder, "\t\ttype_info_member_t member_array[%d];\n", enum_data->member_count);
+            c_string_builder_sprintf(struct_info_builder, "\t\tstruct {\n");
             c_dynarray_for(enum_data->members, member_index)
             {
                 meta_member_t *member = c_dynarray_get_ptr(enum_data->members, member_index);
-                c_string_builder_sprint(struct_info_builder, "\t\t\ttype_info_member_t %.*s;\n", 
+                c_string_builder_sprintf(struct_info_builder, "\t\t\ttype_info_member_t %.*s;\n", 
                                         member->name.count, C_STR(member->name));
             }
-            c_string_builder_sprint(struct_info_builder, "\t\t}members;\n");
-            c_string_builder_sprint(struct_info_builder, "\t};\n");
-            c_string_builder_sprint(struct_info_builder, "};\n\n");
+            c_string_builder_sprintf(struct_info_builder, "\t\t}members;\n");
+            c_string_builder_sprintf(struct_info_builder, "\t};\n");
+            c_string_builder_sprintf(struct_info_builder, "};\n\n");
         }
     }
-    c_string_builder_sprint(struct_info_builder, "\n");
+    c_string_builder_sprintf(struct_info_builder, "\n");
 
     // NOTE(Sleepster): Generate a const static definiton of the data for those structures 
     if(ast->structure_count > 0)
@@ -1040,8 +1053,11 @@ typedef struct type_info {
         c_dynarray_for(ast->structures, type_index)
         {
             meta_struct_t *structure = c_dynarray_get_ptr(ast->structures, type_index);
-            string_t struct_canonical_type_name = get_canonical_type_name(&structure->type_data);
 
+            registry_type_t *registry_data = get_registered_type(&structure->type_data);
+            registry_data->generated_const_def = true;
+
+            string_t struct_canonical_type_name = get_canonical_type_name(&structure->type_data);
             if((structure->type_data.modifier_flags & META_TYPE_FLAGS_PrivatelyDeclared) == 0)
             {
                 fprintf(stdout, "const static %.*s GENERATED_DEFAULT_%.*s = {};\n",
@@ -1049,144 +1065,76 @@ typedef struct type_info {
                         struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
             }
 
-            c_string_builder_sprint(struct_info_builder, "const static type_info_struct_%.*s type_info_struct_%.*s_const_data = {\n", 
-                                    structure->type_data.type_name.count, C_STR(structure->type_data.type_name),
-                                    structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
-            c_string_builder_sprint(struct_info_builder, "\t.name = \"%.*s,\",\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
-            c_string_builder_sprint(struct_info_builder, "\t.type = TYPE_%.*s,\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            // NOTE(Sleepster): Get the nested name 
+            u32 current_depth = 0;
+            string_t nested_name = build_struct_access_name(structure, structure->nesting_depth, &current_depth);
+            string_t appending   = STR("GENERATED_DEFAULT_");
+            nested_name = c_string_concat(&global_context->temporary_arena, appending, nested_name);
+
+            c_string_builder_sprintf(struct_info_builder, "const static type_info_struct_%.*s type_info_struct_%.*s_const_data = {\n", 
+                                     struct_canonical_type_name.count, C_STR(struct_canonical_type_name),
+                                     struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
+
+            c_string_builder_sprintf(struct_info_builder, "\t.name = \"%.*s,\",\n", struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
+            c_string_builder_sprintf(struct_info_builder, "\t.type = TYPE_%.*s,\n", struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
 
             string_t structure_kind = get_metatype_kind_string(structure->type_data.kind);
-            c_string_builder_sprint(struct_info_builder, "\t.kind = %.*s,\n", structure_kind.count, C_STR(structure_kind));
+            c_string_builder_sprintf(struct_info_builder, "\t.kind = %.*s,\n", structure_kind.count, C_STR(structure_kind));
 
-            c_string_builder_sprint(struct_info_builder, "\t.modifier_flags = ");
+            c_string_builder_sprintf(struct_info_builder, "\t.modifier_flags = ");
             append_item_modifier_flags(struct_info_builder, structure->type_data.flag_counter, structure->type_data.modifier_flags);
-            c_string_builder_sprint(struct_info_builder, ",\n");
-            c_string_builder_sprint(struct_info_builder, "\t.flag_counter = %d,\n", structure->type_data.flag_counter);
+            c_string_builder_sprintf(struct_info_builder, ",\n");
+            c_string_builder_sprintf(struct_info_builder, "\t.flag_counter = %d,\n", structure->type_data.flag_counter);
+            c_string_builder_sprintf(struct_info_builder, "\t.element_size = sizeof(%.*s),\n", nested_name.count, C_STR(nested_name));
+            c_string_builder_sprintf(struct_info_builder, "\t.member_count = %d,\n", structure->member_count);
 
-            // TODO(Sleepster): We are probably better off baking the list of nodes into a single string, so instead of the node list being constantly built,
-            // we just build it once and use it the whole iteration
-
-            meta_struct_t *struct_data = structure;
-            if(struct_data->last_nested)
-            {
-                if(structure->nesting_depth > 0)
-                {
-                    // NOTE(Sleepster): If this is nested, we start at the sentinel so we can work down the list for structures
-                    //                  that are only defined within the realm of this structure.
-                    struct_data = structure->sentinel;
-                }
-            }
-
-            // NOTE(Sleepster): Print out the sizeof list 
-            c_string_builder_sprint(struct_info_builder, "\t.element_size = sizeof(GENERATED_DEFAULT_%.*s",
-                                    struct_data->type_data.type_name.count, C_STR(struct_data->type_data.type_name));
-
-            // TODO(Sleepster): THIS IS THE RIGHT ONE, EVERY OTHER VERSION IS WRONG. BREAK THIS OUT INTO SOMETHING
-            u32 current_depth = 0;
-            for(meta_struct_t *current_structure = struct_data->last_nested;
-                current_structure && current_depth < Max(struct_data->nesting_depth, 0);
-                current_structure = current_structure->last_nested)
-            {
-                c_string_builder_sprint(struct_info_builder, ".%.*s",
-                                        current_structure->type_data.type_name.count, C_STR(current_structure->type_data.type_name));
-                ++current_depth;
-            }
-            
-            if(structure->nesting_depth > 0)
-            {
-                c_string_builder_sprint(struct_info_builder, ".%.*s);\n",
-                                        structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
-            }
-            else
-            {
-                c_string_builder_sprint(struct_info_builder, ");\n");
-            }
-            c_string_builder_sprint(struct_info_builder, "\t.member_count = %d,\n", structure->member_count);
-
-            c_string_builder_sprint(struct_info_builder, "\t.members = {\n");
+            c_string_builder_sprintf(struct_info_builder, "\t.members = {\n");
             c_dynarray_for(structure->members, member_index)
             {
                 meta_member_t *member = c_dynarray_get_ptr(structure->members, member_index);
 
                 string_t kind_string         = get_metatype_kind_string(member->type_info.kind);
                 string_t canonical_type_name = get_canonical_type_name(&member->type_info);
-                if((structure->type_data.modifier_flags & META_TYPE_FLAGS_PrivatelyDeclared) == 0 &&
-                   member->type_info.kind != META_TYPE_KIND_Struct)
+
+                if(member->type_info.kind == META_TYPE_KIND_Struct && 
+                 ((member->type_info.modifier_flags & META_TYPE_FLAGS_PrivatelyDeclared) != 0))
                 {
-                    fprintf(stdout, "const static %.*s GENERATED_DEFAULT_%.*s = {};\n",
-                            canonical_type_name.count, C_STR(canonical_type_name),
-                            canonical_type_name.count, C_STR(canonical_type_name));
-                }
-
-
-                c_string_builder_sprint(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = %.*s, .modifier_flags = ",
-                                        member->name.count, C_STR(member->name),               // member_name
-                                        member->name.count, C_STR(member->name),               // .name 
-                                        canonical_type_name.count, C_STR(canonical_type_name), // .type
-                                        kind_string.count, C_STR(kind_string));                // .kind
-                append_item_modifier_flags(struct_info_builder, member->type_info.flag_counter, member->type_info.modifier_flags);
-                if(member->nested_struct)                                                                                                                     
-                {
-                    meta_struct_t *struct_data = structure;
-                    if(structure->nesting_depth > 0)
-                    {
-                        // NOTE(Sleepster): If this is nested, we start at the sentinel so we can work down the list for structures
-                        //                  that are only defined within the realm of this structure.
-                        struct_data = structure->sentinel;
-                    }
-
-                    // NOTE(Sleepster): Print the items that don't need to be looped over 
-                    c_string_builder_sprint(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, ",
-                                            member->type_info.flag_counter,                                              // flag counter 
-                                            member->type_info.pointer_depth,                                             // pointer depth
-                                            member->type_info.array_size);                                               // array size
-                    
-                    // NOTE(Sleepster): Print out the sizeof list 
-                    c_string_builder_sprint(struct_info_builder, ".size = sizeof(GENERATED_DEFAULT_%.*s",
-                                            struct_data->type_data.type_name.count, C_STR(struct_data->type_data.type_name));
-
-                    u32 current_depth = 0;
-                    for(meta_struct_t *current_structure = struct_data->last_nested;
-                        current_structure && current_depth < Max(member->nested_struct->nesting_depth, 0);
-                        current_structure = current_structure->last_nested)
-                    {
-                        c_string_builder_sprint(struct_info_builder, ".%.*s",
-                                                current_structure->type_data.type_name.count, C_STR(current_structure->type_data.type_name));
-                        ++current_depth;
-                    }
-
-                    // NOTE(Sleepster): Print out the OffsetOf list 
-                    c_string_builder_sprint(struct_info_builder, "), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_%.*s",
-                                            struct_data->type_data.type_name.count, C_STR(struct_data->type_data.type_name));
-
-                    current_depth = 0;
-                    for(meta_struct_t *current_structure = struct_data->last_nested;
-                        current_structure && current_depth < Max(member->nested_struct->nesting_depth - 1, 0);
-                        current_structure = current_structure->last_nested)
-                    {
-                        c_string_builder_sprint(struct_info_builder, ".%.*s",
-                                                current_structure->type_data.type_name.count, C_STR(current_structure->type_data.type_name));
-                        ++current_depth;
-                    }
-                    c_string_builder_sprint(struct_info_builder, ", %.*s))},\n",
-                                            member->name.count, C_STR(member->name));
+                    string_t type_name = c_string_concat(&global_context->temporary_arena, nested_name, STR("."));
+                    type_name = c_string_concat(&global_context->temporary_arena, type_name, canonical_type_name);
+                    c_string_builder_sprintf(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = %.*s, .modifier_flags = ",
+                                             member->name.count,        C_STR(member->name),        // member_name
+                                             member->name.count,        C_STR(member->name),        // .name 
+                                             canonical_type_name.count, C_STR(canonical_type_name), // .type
+                                             kind_string.count,         C_STR(kind_string));        // .kind
+                    append_item_modifier_flags(struct_info_builder, member->type_info.flag_counter, member->type_info.modifier_flags);
                 }
                 else
                 {
-                    c_string_builder_sprint(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, .size = sizeof(GENERATED_DEFAULT_%.*s), .offset = IntFromPtr(OffsetOf(GENERATED_DEFAULT_%.*s, %.*s))},\n",
-                                            member->type_info.flag_counter,                                              // flag counter 
-                                            member->type_info.pointer_depth,                                             // pointer depth
-                                            member->type_info.array_size,                                                // array size
-                                            member->type_info.type_name.count, C_STR(member->type_info.type_name),       // size of
-                                            structure->type_data.type_name.count, C_STR(structure->type_data.type_name), // parent name
-                                            member->name.count, C_STR(member->name));                                    // type_name
+                    c_string_builder_sprintf(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = %.*s, .modifier_flags = ",
+                                             member->name.count,        C_STR(member->name),        // member_name
+                                             member->name.count,        C_STR(member->name),        // .name 
+                                             canonical_type_name.count, C_STR(canonical_type_name), // .type
+                                             kind_string.count,         C_STR(kind_string));        // .kind
+                    append_item_modifier_flags(struct_info_builder, member->type_info.flag_counter, member->type_info.modifier_flags);
                 }
+
+                c_string_builder_sprintf(struct_info_builder, ", .flag_counter = %d, .pointer_depth = %d, .array_size = %d, ",
+                                         member->type_info.flag_counter,  // flag counter 
+                                         member->type_info.pointer_depth, // pointer depth
+                                         member->type_info.array_size);   // array size
+                                                                          
+                string_t fullname = c_string_concat(&global_context->temporary_arena, nested_name, STR("."));
+                fullname = c_string_concat(&global_context->temporary_arena, fullname, member->name);
+                c_string_builder_sprintf(struct_info_builder, ".size = sizeof(decltype(%.*s)), ", fullname.count, C_STR(fullname));
+                c_string_builder_sprintf(struct_info_builder, ".offset = IntFromPtr(OffsetOf(decltype(%.*s), %.*s)),},\n", 
+                                         nested_name.count, C_STR(nested_name),
+                                         member->name.count, C_STR(member->name));
             }
-            c_string_builder_sprint(struct_info_builder, "\t}\n");
-            c_string_builder_sprint(struct_info_builder, "};\n");
+            c_string_builder_sprintf(struct_info_builder, "\t}\n");
+            c_string_builder_sprintf(struct_info_builder, "};\n\n");
         }
         fprintf(stdout, "\n");
-        c_string_builder_sprint(struct_info_builder, "\n");
+        c_string_builder_sprintf(struct_info_builder, "\n");
     }
 
     if(ast->enum_count > 0)
@@ -1195,19 +1143,19 @@ typedef struct type_info {
         {
             meta_struct_t *enum_data = c_dynarray_get_ptr(ast->enums, type_index);
 
-            c_string_builder_sprint(struct_info_builder, "const static type_info_enum_%.*s type_info_enum_%.*s_const_data = {\n", 
+            c_string_builder_sprintf(struct_info_builder, "const static type_info_enum_%.*s type_info_enum_%.*s_const_data = {\n", 
                                     enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name),
                                     enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
-            c_string_builder_sprint(struct_info_builder, "\t.name = \"%.*s,\",\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
-            c_string_builder_sprint(struct_info_builder, "\t.type = TYPE_%.*s,\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
-            c_string_builder_sprint(struct_info_builder, "\t.kind = META_TYPE_KIND_Enum,\n");
-            c_string_builder_sprint(struct_info_builder, "\t.member_count = %d,\n", enum_data->member_count);
+            c_string_builder_sprintf(struct_info_builder, "\t.name = \"%.*s,\",\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
+            c_string_builder_sprintf(struct_info_builder, "\t.type = TYPE_%.*s,\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
+            c_string_builder_sprintf(struct_info_builder, "\t.kind = META_TYPE_KIND_Enum,\n");
+            c_string_builder_sprintf(struct_info_builder, "\t.member_count = %d,\n", enum_data->member_count);
 
-            c_string_builder_sprint(struct_info_builder, "\t.members = {\n");
+            c_string_builder_sprintf(struct_info_builder, "\t.members = {\n");
             c_dynarray_for(enum_data->members, member_index)
             {
                 meta_member_t *member = c_dynarray_get_ptr(enum_data->members, member_index);
-                c_string_builder_sprint(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(%.*s), .offset = %.*s},\n",
+                c_string_builder_sprintf(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(%.*s), .offset = %.*s},\n",
                                         member->name.count,                    C_STR(member->name),                   // member name
                                         member->name.count,                    C_STR(member->name),                   // .name 
                                         enum_data->type_data.type_name.count,  C_STR(enum_data->type_data.type_name), // .type
@@ -1215,17 +1163,63 @@ typedef struct type_info {
                                         member->name.count,                    C_STR(member->name)                    // .offset
                                         );
             }
-            c_string_builder_sprint(struct_info_builder, "\t}\n");
-            c_string_builder_sprint(struct_info_builder, "};\n");
+            c_string_builder_sprintf(struct_info_builder, "\t}\n");
+            c_string_builder_sprintf(struct_info_builder, "};\n");
      
         }
     }
 
+    c_string_builder_sprintf(type_table_builder, "\nconst static type_info_t GENERATED_type_table[] = {\n");
+    c_dynarray_for(state.type_table, type_index)
+    {
+        registry_type_t *type = c_dynarray_get_ptr(state.type_table, type_index);
+        if(type->type_kind == META_TYPE_KIND_Struct && type->metadata)
+        {
+            u32 current_depth = 0;
+            string_t nested_name = build_struct_access_name(type->metadata, type->metadata->nesting_depth - 1, &current_depth);
+            nested_name = c_string_concat(&global_context->temporary_arena, nested_name, STR("."));
+            nested_name = c_string_concat(&global_context->temporary_arena, nested_name, type->canonical_name);
+
+            c_string_builder_sprintf(type_table_builder, "\t{.name = \"%.*s\", .type = TYPE_%.*s, ",
+                                     type->canonical_name.count, C_STR(type->canonical_name),
+                                     type->canonical_name.count, C_STR(type->canonical_name));
+            if(type->metadata->nesting_depth > 0)
+            {
+                c_string_builder_sprintf(type_table_builder, ".size = sizeof(decltype(GENERATED_DEFAULT_%.*s)), ",
+                                         nested_name.count, C_STR(nested_name));
+            }
+            else
+            {
+                c_string_builder_sprintf(type_table_builder, ".size = sizeof(%.*s), ",
+                                         type->canonical_name.count, C_STR(type->canonical_name));
+            }
+        }
+        else
+        {
+            c_string_builder_sprintf(type_table_builder, "\t{.name = \"%.*s\", .type = TYPE_%.*s, .size = sizeof(%.*s), ",
+                                     type->canonical_name.count, C_STR(type->canonical_name),
+                                     type->canonical_name.count, C_STR(type->canonical_name),
+                                     type->canonical_name.count, C_STR(type->canonical_name));
+        }
+
+        if((type->type_kind == META_TYPE_KIND_Struct || type->type_kind == META_TYPE_KIND_Enum) && 
+           type->generated_const_def == true)
+        {
+            c_string_builder_sprintf(type_table_builder, ".struct_info = (type_info_struct_t*)&type_info_struct_%.*s_const_data},\n",
+                                     type->canonical_name.count, C_STR(type->canonical_name));
+        }
+        else
+        {
+            c_string_builder_sprintf(type_table_builder, ".struct_info = null},\n");
+        }
+    }
+    c_string_builder_sprintf(type_table_builder, "};\n");
+
     c_string_builder_append_builder(struct_info_builder, type_table_builder);
-    c_string_builder_sprint(struct_info_builder, "\n\n");
+    c_string_builder_sprintf(struct_info_builder, "\n\n");
 
     // NOTE(Sleepster): Helper functions 
-    c_string_builder_sprint(struct_info_builder, R"(
+    c_string_builder_sprintf(struct_info_builder, R"(
 string_t
 c_meta_get_type_string_from_enum(GENERATED_program_type_t type_enum)
 {
@@ -1256,7 +1250,7 @@ c_meta_get_type_enum_from_string(string_t type_string)
     {                                                             \
         result = enum;                                            \
         goto exit;                                                \
-    }                                                             \
+    }
     GENERATED_PROGRAM_TYPE_LIST(X)
 #undef X
 
@@ -1330,7 +1324,7 @@ c_meta_get_type_flag_enum_from_string(string_t flag_name)
     {                                                           \
         result = enum;                                          \
         goto exit;                                              \
-    }                                                           \
+    }
 
     METATYPE_FLAG_LIST(X)
 #undef X
@@ -1347,7 +1341,7 @@ c_meta_get_struct_type_class_from_string(string_t type)
     {                                                      \
         result = enum;                                     \
         goto exit;                                         \
-    }                                                      \
+    }
 
     META_STRUCT_TYPE_LIST(X)
 #undef X
@@ -1376,10 +1370,10 @@ exit:
     return(result);
 }
 
-type_info_t*
+const type_info_t*
 c_meta_get_type_info_by_name(string_t type)
 {
-    type_info_t *result = null;
+    const type_info_t *result = null;
 
     GENERATED_program_type_t type_enum = c_meta_get_type_enum_from_string(type);
     result = &GENERATED_type_table[type_enum];
@@ -1387,24 +1381,24 @@ c_meta_get_type_info_by_name(string_t type)
     return(result);
 }
 
-type_info_t*
+const type_info_t*
 c_meta_get_type_info_by_enum(GENERATED_program_type_t type_enum)
 {
-    type_info_t *result = null;
+    const type_info_t *result = null;
     result = &GENERATED_type_table[type_enum];
 
     return(result);
-});
+}
 
-type_info_member_t*
+const type_info_member_t*
 c_meta_get_member_info(type_info_struct_t *struct_info, string_t member_name)
 {
-    type_info_member_t *result = null;
+    const type_info_member_t *result = null;
     for(u32 member_index = 0;
         member_index < struct_info->member_count;
         ++member_index)
     {
-        found = struct_info->members + member_index;
+        const type_info_member_t *found = struct_info->members + member_index;
         if(c_string_compare(STR(found->name), member_name))
         {
             found = result;
@@ -1415,18 +1409,18 @@ c_meta_get_member_info(type_info_struct_t *struct_info, string_t member_name)
     return(result);
 }
 
-type_info_struct_t*
+const type_info_struct_t*
 c_meta_get_struct_info(string_t structure_type_name)
 {
-    type_info_struct_t *result = null;
-    type_info_t *type = c_meta_get_type_info_by_name(structure_type_name);
+    const type_info_struct_t *result = null;
+    const type_info_t *type = c_meta_get_type_info_by_name(structure_type_name);
     result = type->struct_info;
 
     return(result);
 }
 
 )");
-    c_string_builder_sprint(struct_info_builder, "#endif\n");
+    c_string_builder_sprintf(struct_info_builder, "#endif\n");
     
     builder_string = c_string_builder_get_current_string(struct_info_builder);
     fprintf(stdout, "%.*s\n", builder_string.count, C_STR(builder_string));
@@ -1492,7 +1486,7 @@ parse_enum(ast_file_data_t *file_data, token_data_t structure_type)
                     type_info->type_name = next_token.string;
                 }
 
-                insert_type_information(type_info);
+                insert_type_information(type_info, null);
                 parsing = false;
             }break;
             case TT_EOF:
