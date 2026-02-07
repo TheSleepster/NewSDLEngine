@@ -10,6 +10,11 @@
 
 #include <stdlib.h>
 
+#include <p_platform_data.h>
+
+// TODO(Sleepster): Why are we using malloc???
+// Stop using this. Bad.
+
 void*
 _dynarray_create_impl(u32 element_size)
 {

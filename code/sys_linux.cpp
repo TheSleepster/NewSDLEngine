@@ -41,6 +41,7 @@ sys_allocate_memory(usize allocation_size)
     return(data);
 }
 
+// TODO(Sleepster): Doesn't offset imply "Get me new pages from the END of this allocation" rather than the start?
 void*
 sys_reallocate_memory(void *offset, u64 allocation_size)
 {

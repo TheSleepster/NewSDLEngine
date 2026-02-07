@@ -154,6 +154,7 @@
 - [ ] Assets should store the information about themselves inside the asset file, ex: textures should store their w/h/c setup. Wav files should store their channel_count, sample_count, etc.
 - [ ] Find out why the hell it's taking so long to pack
 * Core stuff
+- [ ] Why are we using Malloc with our dynamic arrays
 - [ ] Compile the core into a single library. c_data.lib or something. then have c_base.h import all the core headers
 - [ ] Convert Dynarray.cpp and Dynarray.h into an STB style library like the hash_tables
 - [X] Input flag parser

@@ -15,6 +15,8 @@
 
 #define DYNARRAY_HEADER_DEBUG_ID (0xC0FFEE)
 
+// TODO(Sleepster): Replace "size" with "indices_used"
+// TODO(Sleepster): Make the header store the size of the element type
 typedef struct dynarray_header 
 {
     u32   flags;
