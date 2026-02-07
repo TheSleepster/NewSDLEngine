@@ -1,6 +1,6 @@
 [
   {
-    "file": "main.cpp",
+    "file": "code_generator/metaprogram.cpp",
     "arguments": [
       "clang++",
       "-g",
@@ -37,17 +37,16 @@
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
       "-MT",
-      "../build/main.o",
+      "../build/metaprogram",
       "-MMD",
       "-MP",
       "-MF",
-      "../build/main.d",
-      "-c",
-      "main.cpp",
+      "../build/metaprogram.d",
+      "code_generator/metaprogram.cpp",
       "-o",
-      "../build/main.o"
+      "../build/metaprogram"
     ],
     "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/main.o"
+    "output": "../build/metaprogram"
   }
 ]

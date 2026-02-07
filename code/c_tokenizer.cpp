@@ -5,6 +5,7 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <c_tokenizer.h>
+#include <c_globals.h>
 
 bool8
 c_tokenizer_token_alphabetical(char A)
@@ -149,9 +150,11 @@ c_tokenizer_peek_token(tokenizer_t *tokenizer, u32 times)
     return(result);
 }
 
-void
+string_t
 c_tokenizer_eat_lines(tokenizer_t *tokenizer, u32 line_count)
 {
+    string_t result = {};
+
     for(u32 line_index = 0;
         line_index < line_count;
         ++line_index)
@@ -159,8 +162,13 @@ c_tokenizer_eat_lines(tokenizer_t *tokenizer, u32 line_count)
         u32 end_line = c_string_find_first_char_from_left_on_line(tokenizer->data, '\n');
         if(end_line != INVALID_ID)
         {
+            string_t line = tokenizer->data;
+            line.count    = end_line;
+            result = c_string_concat(&global_context->temporary_arena, line, result);
             c_string_advance_by(&tokenizer->data, end_line + 1);
         }
     }
+
+    return(result);
 }
 

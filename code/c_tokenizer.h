@@ -55,7 +55,7 @@ typedef struct tokenizer
 token_data_t c_tokenizer_get_next_token(tokenizer_t *tokenizer);
 // NOTE(Sleepster): This on the other hand, will look ahead, but not consume
 token_data_t c_tokenizer_peek_token(tokenizer_t *tokenizer, u32 times = 1);
-void         c_tokenizer_eat_lines(tokenizer_t *tokenizer, u32 line_count);
+string_t     c_tokenizer_eat_lines(tokenizer_t *tokenizer, u32 line_count);
 
 bool8 c_tokenizer_token_numeric(char A);
 bool8 c_tokenizer_token_alphabetical(char A);

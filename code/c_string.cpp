@@ -244,9 +244,14 @@ c_string_find_first_char_from_right_on_line(string_t string, char character, u32
         --index)
     {
         char found = (char)string.data[index];
-        if(found == character || (found == '\r' || found == '\n'))
+        if(found == character)
         {
             result = index;
+            break;
+        }
+
+        if(found == '\n')
+        {
             break;
         }
     }

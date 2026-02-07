@@ -33,6 +33,9 @@
 typedef struct meta_struct meta_struct_t;
 
 // TODO(Sleepster): 
+// - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
+// - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
+//
 // - [?] X-Macro for mapping enum member names to their parent enum
 // - [?] We are including structures that aren't directly embedded into a type as members of that type.
 //       (r_vulkan_types.h "vulkan_render_context") is an instance of that
@@ -62,15 +65,12 @@ typedef struct meta_struct meta_struct_t;
 //
 //        We neither ever find the variable named "after_semicolon", nor that test_object_t is typedeffed. This is a problem.
 //
-// - [ ] Ignore #if 0 blocks or really any #define block
-// - [ ] Perhaps we should prefix hash tables and dynarray members with
-//       special characters to denote this
-// - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
-// - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
+// - [ ] Perhaps we should prefix hash tables and dynarray members with special characters to denote this
 // - [ ] We may have some (a lot) issues with multi-word C primtives in the future like 
 //       "unsigned long long" or "unsigned char"
 //
 //
+// - [X] Ignore #if 0 blocks or really any #define block
 // - [X] Unknown issues with structures like memory_arena_footer_t
 // - [X] Random "(" in places where there should be names  (the issue had to do with how we managed hash tables / dynamic arrays that stored pointers to items)
 // - [X] A bug with enums which cause strange anomalies of enum names repeating, but missing the first letter
@@ -212,6 +212,7 @@ typedef struct metatype_data
     u32             flag_counter;
     u32             pointer_depth;
     u32             array_size;
+    string_t        array_size_string;
 }metatype_data_t;
 
 typedef struct meta_member
@@ -302,10 +303,9 @@ typedef struct ast_state
     string_builder_t          struct_static_def_builder;
     string_builder_t          default_struct_def_builder;
 
-#if 0
-    DynArray_t(ast_file_data) ast_files;
-    u32                       file_count;
-#endif
+    // NOTE(Sleepster): The name of the macro is the key, the value stored
+    //                  is what the macro actually expands too
+    HashTable_t(string_t)     macro_hash;
 
     // NOTE(Sleepster): The hash will map string names of types to indices in the dynamic array below.
     // This way we can make it so that both strings:
@@ -617,20 +617,19 @@ parse_member_data(ast_file_data_t *file_data,
     token = c_tokenizer_get_next_token(&file_data->tokenizer);
     if(token.type == TT_OpenBracket)
     {
-        // TODO(Sleepster): Hey, what happens if we aren't stupid? 
+        // TODO(Sleepster): Hey, what happens if we aren't stupid? and have a constant defined elsewhere. For now,
+        //                  macros are handled, but not constexpr
         type_info->kind = META_TYPE_KIND_Array;
 
-        // NOTE(Sleepster): Get the array size;
+        // NOTE(Sleepster): Get the array size string
         token = c_tokenizer_get_next_token(&file_data->tokenizer);
-        //Assert(token.type == TT_Number);
-         
-        // TODO(Sleepster): Fix the read value functions inside c_string.cpp
-        //type_info->array_size = c_string_read_u32(token.string);
+        type_info->array_size_string = token.string;
+
+        type_info->array_size = 0;
     }
 
     // NOTE(Sleepster): Insert the type into the type_table 
     insert_type_information(type_info, null, is_pointer);
-
 
     // NOTE(Sleepster): Once we have the name and the array size, 
     //                  we care nothing about what comes after...
@@ -874,10 +873,6 @@ build_struct_access_name(meta_struct_t *structure, u32 max_depth, u32 *current_d
 internal_api void
 generate_type_information(ast_file_data_t *ast)
 {
-    // TODO(Sleepster): Instead of just printing the type as is, we should probably map whatever the 
-    // object's type name is to it's canonical_name inside the types table, otherwise why the hell 
-    // does that thing exist???
-
     string_builder_t *type_enum_builder               = &state.type_enum_builder;
     string_builder_t *type_table_builder              = &state.type_table_builder;
     string_builder_t *struct_info_builder             = &state.struct_info_builder;
@@ -1601,6 +1596,18 @@ build_file_ast(ast_file_data_t *file)
                             }
                         }
                     }
+                    else
+                    {
+                        // NOTE(Sleepster): 
+                        // - Get the token after the 'define' token, this is the name
+                        // - Then, since we know it's not a multiline macro here, just make everything from the token after the name
+                        //   to the end of the line the macro expansion and store this in a "macros" hash table 
+                        //   using the name of the macro as the key
+                        token_data_t macro_name_token = c_tokenizer_get_next_token(&file->tokenizer);
+                        string_t expanded_macro_value = c_tokenizer_eat_lines(&file->tokenizer, 1);
+
+                        c_hash_table_insert_pair(&state.macro_hash, macro_name_token.string, expanded_macro_value);
+                    }
                 }
             }break;
             case TT_Identifier:
@@ -1654,6 +1661,7 @@ main(void)
 
     //state.ast_files  = c_dynarray_create(ast_file_data_t);
     state.type_table = c_dynarray_create(registry_type_t);
+    c_hash_table_init(&state.macro_hash, 1097);
 
     c_string_builder_init(&state.type_enum_builder,          MB(20));
     c_string_builder_init(&state.type_table_builder,         MB(20));

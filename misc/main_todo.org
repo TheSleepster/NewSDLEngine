@@ -28,18 +28,18 @@
 - [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
       (shader, blend modes, depth state, textures, camera data, etc.)
 ** Metaprogram
-- [ ] Type database for more efficient storage of types accross the program
-- [ ] Some sort of get_type_info(&structure) function that makes the retrieval of type info better.
-- [ ] The ability to do the same for members of structs get_member_info(structure_info, string_t member_name)
+- [X] Type database for more efficient storage of types accross the program
+- [X] Some sort of get_type_info(&structure) function that makes the retrieval of type info better.
+- [X] The ability to do the same for members of structs get_member_info(structure_info, string_t member_name)
+- [X] The ability to do the same for enums
+- [X] Type table to allow the user to query for the type_info via type name as a string.
+- [X] Nested structure support
+- [X] Ignore #if 0 blocks completely
+- [X] A better way of parsing modifiers like "volatile", "const", "static", etc.
+- [X] Support Enums as well.
 - [ ] The ability to get the parent structure from the name of a member. (this might be impossible.)
       This might be impossible simply do to the fact that we can have the same member in many different structs.
       We can have token.data, bitmap.data, texture.data, etc. So how can we know which type_info_struct_t we want???
-- [ ] The ability to do the same for enums
-- [ ] Type table to allow the user to query for the type_info via type name as a string.
-- [ ] Nested structure support
-- [ ] Ignore #if 0 blocks completely
-- [ ] A better way of parsing modifiers like "volatile", "const", "static", etc.
-- [ ] Support Enums as well.
 ** Material file parser
 ** Create a very early version of the new batch renderer
 - [X] LAYERS. Use the depth buffer.
