@@ -890,6 +890,11 @@ generate_type_information(ast_file_data_t *ast)
     c_string_builder_sprintf(type_enum_builder, "#ifndef IntFromPtr\n");
     c_string_builder_sprintf(type_enum_builder, "#define IntFromPtr(x) ((u32) ((char *)x - (char*)0))\n");
     c_string_builder_sprintf(type_enum_builder, "#endif\n\n");
+    c_string_builder_sprintf(type_enum_builder, "#include <stdio.h>\n\n");
+    c_string_builder_sprintf(type_enum_builder, "#ifndef Assert\n");
+    c_string_builder_append_data(type_enum_builder, STR("#define Assert(cond) if(!(cond)) { fprintf(stderr, \"FILE: [%s], FUNCTION: '%s', LINE: '%d': Assertion failed:...\\n\", __FILE__, __FUNCTION__, __LINE__); AssertBreak;}\n"));
+    c_string_builder_sprintf(type_enum_builder, "#endif\n\n");
+
 
     c_string_builder_sprintf(type_enum_builder, "#define GENERATED_PROGRAM_TYPE_LIST(X) \\\n");
 
@@ -1248,7 +1253,7 @@ typedef struct type_info {
         {
             if(!is_void)
             {
-                c_string_builder_sprintf(type_table_builder, ".struct_info = null},\n");
+                c_string_builder_sprintf(type_table_builder, ".struct_info = NULL},\n");
             }
         }
     }
@@ -1430,7 +1435,7 @@ c_meta_get_type_info_by_enum(GENERATED_program_type_t type_enum)
 }
 
 const type_info_member_t*
-c_meta_get_member_info(type_info_struct_t *struct_info, string_t member_name)
+c_meta_get_member_info(const type_info_struct_t *struct_info, string_t member_name)
 {
     const type_info_member_t *result = null;
     for(u32 member_index = 0;
@@ -1440,7 +1445,29 @@ c_meta_get_member_info(type_info_struct_t *struct_info, string_t member_name)
         const type_info_member_t *found = struct_info->members + member_index;
         if(c_string_compare(STR(found->name), member_name))
         {
-            found = result;
+            result = found;
+            break;
+        }
+    }
+
+    return(result);
+}
+
+// NOTE(Sleepster): OVERLOAD
+const type_info_member_t*
+c_meta_get_member_info(const type_info_t *type_info, string_t member_name)
+{
+    const type_info_member_t *result = null;
+    Assert(type_info->struct_info != null);
+
+    for(u32 member_index = 0;
+        member_index < type_info->struct_info->member_count;
+        ++member_index)
+    {
+        const type_info_member_t *found = type_info->struct_info->members + member_index;
+        if(c_string_compare(STR(found->name), member_name))
+        {
+            result = found;
             break;
         }
     }

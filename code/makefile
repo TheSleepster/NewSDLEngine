@@ -141,7 +141,7 @@ run_preprocessor: ../code/meta/GENERATED_program_types.h
 # -------------------------------------------------------------------------
 $(CODE_GENERATOR_OUT): $(CODE_GENERATOR_SRC) | $(BUILD_DIR)
 	@echo [BUILDING METAPROGRAM] $@
-	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) -O3 $(OS_DEFINE) $(GAME_INCLUDES) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/metaprogram.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
 
