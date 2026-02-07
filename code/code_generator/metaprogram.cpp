@@ -1639,6 +1639,11 @@ build_file_ast(ast_file_data_t *file)
             }break;
             case TT_Identifier:
             {
+                if(c_string_compare(token.string, STR("CODE_GEN_IGNORE_FILE")))
+                {
+                    return;
+                }
+
                 if(c_string_compare(token.string, STR("struct")) || 
                    c_string_compare(token.string, STR("union")))
                 {
@@ -1665,8 +1670,6 @@ VISIT_FILES(generate_file_metadata)
     {
         return;
     }
-    if(c_string_compare(filename, STR("preprocessor_type_data.h"))) return;
-    if(c_string_compare(filename, STR("c_base.h"))) return;
 
     string_t file_desc = {
         .count = 4,
