@@ -9,20 +9,41 @@
 #pragma pack(push, 1)
 
 enum GENERATED_program_types_t {
-	TYPE_material_instance_t,
-	TYPE_u32,
-	TYPE_asset_handle_t,
-	TYPE_render_pipeline_state_t,
-	TYPE_vulkan_shader_uniform_data_t,
-	TYPE_material_archetype_t,
-	TYPE_u64,
-	TYPE_string_t,
-	TYPE_MAX_RENDER_GROUPS_t,
-	TYPE_bool32,
 	TYPE_renderer_effect_application_flags_t,
 	TYPE_render_pipeline_blending_mode_t,
 	TYPE_render_pipeline_blending_equation_t,
 	TYPE_render_pipeline_depth_function_t,
+	TYPE_MAX_RENDER_GROUPS_t,
+	TYPE_render_pipeline_state_t,
+	TYPE_bool32,
+	TYPE_u32,
+	TYPE_material_instance_t,
+	TYPE_asset_handle_t,
+	TYPE_vulkan_shader_uniform_data_t,
+	TYPE_material_archetype_t,
+	TYPE_u64,
+	TYPE_string_t,
+};
+
+struct type_info_render_pipeline_state_t {
+	const char *name;
+	u32 type;
+	u32 member_count;
+	struct {
+		type_info_member_t blend_enabled;
+		type_info_member_t src_color_blend_mode;
+		type_info_member_t dst_color_blend_mode;
+		type_info_member_t src_alpha_blend_mode;
+		type_info_member_t dst_alpha_blend_mode;
+		type_info_member_t color_blend_op;
+		type_info_member_t alpha_blend_op;
+		type_info_member_t depth_testing_enabled;
+		type_info_member_t depth_writing_enabled;
+		type_info_member_t depth_func;
+		type_info_member_t stencil_enabled;
+		type_info_member_t stencil_state;
+		type_info_member_t stencil_keep;
+	}members;
 };
 
 struct type_info_material_instance_t {
@@ -50,27 +71,6 @@ struct type_info_material_archetype_t {
 		type_info_member_t shader;
 		type_info_member_t renderer_effect_flags;
 		type_info_member_t base_instance;
-	}members;
-};
-
-struct type_info_render_pipeline_state_t {
-	const char *name;
-	u32 type;
-	u32 member_count;
-	struct {
-		type_info_member_t blend_enabled;
-		type_info_member_t src_color_blend_mode;
-		type_info_member_t dst_color_blend_mode;
-		type_info_member_t src_alpha_blend_mode;
-		type_info_member_t dst_alpha_blend_mode;
-		type_info_member_t color_blend_op;
-		type_info_member_t alpha_blend_op;
-		type_info_member_t depth_testing_enabled;
-		type_info_member_t depth_writing_enabled;
-		type_info_member_t depth_func;
-		type_info_member_t stencil_enabled;
-		type_info_member_t stencil_state;
-		type_info_member_t stencil_keep;
 	}members;
 };
 
@@ -211,6 +211,27 @@ const static type_info_enum_render_pipeline_depth_function_t type_info_enum_rend
 };
 
 
+const static type_info_render_pipeline_state_t type_info_render_pipeline_state_t = {
+	.name = "render_pipeline_state_t",
+	.type = TYPE_render_pipeline_state_t,
+	.member_count = 13,
+	.members = {
+		.blend_enabled = {.name = "blend_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, blend_enabled), .size = sizeof(bool32)},
+		.src_color_blend_mode = {.name = "src_color_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, src_color_blend_mode), .size = sizeof(u32)},
+		.dst_color_blend_mode = {.name = "dst_color_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, dst_color_blend_mode), .size = sizeof(u32)},
+		.src_alpha_blend_mode = {.name = "src_alpha_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, src_alpha_blend_mode), .size = sizeof(u32)},
+		.dst_alpha_blend_mode = {.name = "dst_alpha_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, dst_alpha_blend_mode), .size = sizeof(u32)},
+		.color_blend_op = {.name = "color_blend_op", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, color_blend_op), .size = sizeof(u32)},
+		.alpha_blend_op = {.name = "alpha_blend_op", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, alpha_blend_op), .size = sizeof(u32)},
+		.depth_testing_enabled = {.name = "depth_testing_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, depth_testing_enabled), .size = sizeof(bool32)},
+		.depth_writing_enabled = {.name = "depth_writing_enabled", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, depth_writing_enabled), .size = sizeof(u32)},
+		.depth_func = {.name = "depth_func", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, depth_func), .size = sizeof(u32)},
+		.stencil_enabled = {.name = "stencil_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, stencil_enabled), .size = sizeof(bool32)},
+		.stencil_state = {.name = "stencil_state", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, stencil_state), .size = sizeof(u32)},
+		.stencil_keep = {.name = "stencil_keep", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, stencil_keep), .size = sizeof(u32)},
+	}
+};
+
 const static type_info_material_instance_t type_info_material_instance_t = {
 	.name = "material_instance_t",
 	.type = TYPE_material_instance_t,
@@ -236,27 +257,6 @@ const static type_info_material_archetype_t type_info_material_archetype_t = {
 		.shader = {.name = "shader", .type = TYPE_asset_handle_t, .offset = offsetof(material_archetype_t, shader), .size = sizeof(asset_handle_t)},
 		.renderer_effect_flags = {.name = "renderer_effect_flags", .type = TYPE_u32, .offset = offsetof(material_archetype_t, renderer_effect_flags), .size = sizeof(u32)},
 		.base_instance = {.name = "base_instance", .type = TYPE_material_instance_t, .offset = offsetof(material_archetype_t, base_instance), .size = sizeof(material_instance_t)},
-	}
-};
-
-const static type_info_render_pipeline_state_t type_info_render_pipeline_state_t = {
-	.name = "render_pipeline_state_t",
-	.type = TYPE_render_pipeline_state_t,
-	.member_count = 13,
-	.members = {
-		.blend_enabled = {.name = "blend_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, blend_enabled), .size = sizeof(bool32)},
-		.src_color_blend_mode = {.name = "src_color_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, src_color_blend_mode), .size = sizeof(u32)},
-		.dst_color_blend_mode = {.name = "dst_color_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, dst_color_blend_mode), .size = sizeof(u32)},
-		.src_alpha_blend_mode = {.name = "src_alpha_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, src_alpha_blend_mode), .size = sizeof(u32)},
-		.dst_alpha_blend_mode = {.name = "dst_alpha_blend_mode", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, dst_alpha_blend_mode), .size = sizeof(u32)},
-		.color_blend_op = {.name = "color_blend_op", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, color_blend_op), .size = sizeof(u32)},
-		.alpha_blend_op = {.name = "alpha_blend_op", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, alpha_blend_op), .size = sizeof(u32)},
-		.depth_testing_enabled = {.name = "depth_testing_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, depth_testing_enabled), .size = sizeof(bool32)},
-		.depth_writing_enabled = {.name = "depth_writing_enabled", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, depth_writing_enabled), .size = sizeof(u32)},
-		.depth_func = {.name = "depth_func", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, depth_func), .size = sizeof(u32)},
-		.stencil_enabled = {.name = "stencil_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, stencil_enabled), .size = sizeof(bool32)},
-		.stencil_state = {.name = "stencil_state", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, stencil_state), .size = sizeof(u32)},
-		.stencil_keep = {.name = "stencil_keep", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, stencil_keep), .size = sizeof(u32)},
 	}
 };
 

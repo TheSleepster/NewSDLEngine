@@ -873,10 +873,10 @@ build_struct_access_name(meta_struct_t *structure, u32 max_depth, u32 *current_d
 internal_api void
 generate_type_information(ast_file_data_t *ast)
 {
-    string_builder_t *type_enum_builder               = &state.type_enum_builder;
-    string_builder_t *type_table_builder              = &state.type_table_builder;
-    string_builder_t *struct_info_builder             = &state.struct_info_builder;
-//    string_builder_t *default_struct_info_def_builder = &state.default_struct_def_builder;
+    string_builder_t *type_enum_builder        = &state.type_enum_builder;
+    string_builder_t *type_table_builder       = &state.type_table_builder;
+    string_builder_t *struct_info_builder      = &state.struct_info_builder;
+    string_builder_t *type_member_enum_builder = &state.default_struct_def_builder;
 
     //string_builder_t *struct_static_def_builder = &state.struct_static_def_builder;
 
@@ -1111,12 +1111,19 @@ typedef struct type_info {
             c_string_builder_sprintf(struct_info_builder, "\t.member_count = %d,\n", structure->member_count);
 
             c_string_builder_sprintf(struct_info_builder, "\t.members = {\n");
+
+            c_string_builder_sprintf(type_member_enum_builder, "enum %.*s_member_list_enum {\n", 
+                                     struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
             c_dynarray_for(structure->members, member_index)
             {
                 meta_member_t *member = c_dynarray_get_ptr(structure->members, member_index);
 
                 string_t kind_string         = get_metatype_kind_string(member->type_info.kind);
                 string_t canonical_type_name = get_canonical_type_name(&member->type_info);
+
+                c_string_builder_sprintf(type_member_enum_builder, "\tTYPE_%.*s_MEMBER_%.*s,\n", 
+                                         struct_canonical_type_name.count, C_STR(c_string_to_upper(struct_canonical_type_name)),
+                                         member->name.count,               C_STR(member->name));
 
                 if(member->type_info.kind == META_TYPE_KIND_Struct && 
                  ((member->type_info.modifier_flags & META_TYPE_FLAGS_PrivatelyDeclared) != 0))
@@ -1152,6 +1159,7 @@ typedef struct type_info {
                                          nested_name.count, C_STR(nested_name),
                                          member->name.count, C_STR(member->name));
             }
+            c_string_builder_sprintf(type_member_enum_builder, "};\n\n"); 
             c_string_builder_sprintf(struct_info_builder, "\t}\n");
             c_string_builder_sprintf(struct_info_builder, "};\n\n");
         }
@@ -1258,9 +1266,9 @@ typedef struct type_info {
         }
     }
     c_string_builder_sprintf(type_table_builder, "};\n");
-
+    c_string_builder_append_builder(struct_info_builder, type_member_enum_builder);
     c_string_builder_append_builder(struct_info_builder, type_table_builder);
-    c_string_builder_sprintf(struct_info_builder, "\n\n");
+    c_string_builder_sprintf(struct_info_builder, "\n");
 
     // NOTE(Sleepster): Helper functions 
     c_string_builder_sprintf(struct_info_builder, R"(
@@ -1642,6 +1650,20 @@ build_file_ast(ast_file_data_t *file)
                 if(c_string_compare(token.string, STR("CODE_GEN_IGNORE_FILE")))
                 {
                     return;
+                }
+
+                if(c_string_compare(token.string, STR("CODE_GEN_IGNORE_STRUCTURE")))
+                {
+                    token_data_t open_brace = c_tokenizer_peek_token(&file->tokenizer, 5);
+                    Assert(open_brace.type == TT_OpeningBrace)
+
+                    token_data_t token = c_tokenizer_get_next_token(&file->tokenizer);
+                    while(token.type != TT_ClosingBrace)
+                    {
+                        c_tokenizer_eat_lines(&file->tokenizer, 1);
+                        token = c_tokenizer_get_next_token(&file->tokenizer);
+                    }
+                    c_tokenizer_eat_lines(&file->tokenizer, 1);
                 }
 
                 if(c_string_compare(token.string, STR("struct")) || 

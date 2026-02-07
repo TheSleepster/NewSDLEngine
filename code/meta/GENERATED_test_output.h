@@ -19,15 +19,36 @@
 #endif
 
 #define GENERATED_PROGRAM_TYPE_LIST(X) \
-	X(TYPE_debug_log_level_t, "debug_log_level_t") \
-	X(TYPE_za_allocation_tag_t, "za_allocation_tag_t") \
-	X(TYPE_u32, "u32") \
-	X(TYPE_bool8, "bool8") \
+	X(TYPE_byte, "byte") \
 	X(TYPE_u64, "u64") \
-	X(TYPE_zone_allocator_block_t, "zone_allocator_block_t") \
-	X(TYPE_sys_mutex_t, "sys_mutex_t") \
+	X(TYPE_memory_arena_footer_t, "memory_arena_footer_t") \
+	X(TYPE_bool32, "bool32") \
+	X(TYPE_u32, "u32") \
+	X(TYPE_memory_arena_t, "memory_arena_t") \
 	X(TYPE_u8, "u8") \
-	X(TYPE_zone_allocator_t, "zone_allocator_t") \
+	X(TYPE_scratch_arena_t, "scratch_arena_t") \
+	X(TYPE_dynarray_header_t, "dynarray_header_t") \
+	X(TYPE_file_extension_t, "file_extension_t") \
+	X(TYPE_sys_handle_t, "sys_handle_t") \
+	X(TYPE_string_t, "string_t") \
+	X(TYPE_bool8, "bool8") \
+	X(TYPE_file_t, "file_t") \
+	X(TYPE_mapped_file_t, "mapped_file_t") \
+	X(TYPE_file_data_t, "file_data_t") \
+	X(TYPE_overlap_io_data_t, "overlap_io_data_t") \
+	X(TYPE_visit_files_pfn_t, "visit_files_pfn_t") \
+	X(TYPE_void, "void") \
+	X(TYPE_visit_file_data_t, "visit_file_data_t") \
+	X(TYPE_file_watcher_change_event_t, "file_watcher_change_event_t") \
+	X(TYPE_file_watcher_recorded_change_t, "file_watcher_recorded_change_t") \
+	X(TYPE_file_watcher_callback_pfn_t, "file_watcher_callback_pfn_t") \
+	X(TYPE_file_watcher_sys_watch_data_t, "file_watcher_sys_watch_data_t") \
+	X(TYPE_file_watcher_t, "file_watcher_t") \
+	X(TYPE_threadpool_t, "threadpool_t") \
+	X(TYPE_global_context_t, "global_context_t") \
+	X(TYPE_hash_table_allocation_flags_t, "hash_table_allocation_flags_t") \
+	X(TYPE_hash_table_header_t, "hash_table_header_t") \
+	X(TYPE_debug_log_level_t, "debug_log_level_t") \
 	X(TYPE_float32, "float32") \
 	X(TYPE_vec2_t, "vec2_t") \
 	X(TYPE_vec3_t, "vec3_t") \
@@ -42,91 +63,59 @@
 	X(TYPE_mat3_t, "mat3_t") \
 	X(TYPE_mat2_t, "mat2_t") \
 	X(TYPE_rectangle2_t, "rectangle2_t") \
-	X(TYPE_bool32, "bool32") \
 	X(TYPE_raytest_t, "raytest_t") \
-	X(TYPE_asset_type_t, "asset_type_t") \
-	X(TYPE_asset_slot_load_status_t, "asset_slot_load_status_t") \
-	X(TYPE_bitmap_format_t, "bitmap_format_t") \
-	X(TYPE_subtexture_data_t, "subtexture_data_t") \
-	X(TYPE_asset_slot_t, "asset_slot_t") \
-	X(TYPE_texture2D_t, "texture2D_t") \
-	X(TYPE_shader_t, "shader_t") \
-	X(TYPE_asset_handle_t, "asset_handle_t") \
-	X(TYPE_string_t, "string_t") \
-	X(TYPE_bitmap_t, "bitmap_t") \
-	X(TYPE_vulkan_texture_t, "vulkan_texture_t") \
-	X(TYPE_texture_atlas_t, "texture_atlas_t") \
-	X(TYPE_vulkan_shader_data_t, "vulkan_shader_data_t") \
-	X(TYPE_vulkan_shader_uniform_data_t, "vulkan_shader_uniform_data_t") \
-	X(TYPE_render_pipeline_state_t, "render_pipeline_state_t") \
-	X(TYPE_material_archetype_t, "material_archetype_t") \
-	X(TYPE_material_instance_t, "material_instance_t") \
-	X(TYPE_file_t, "file_t") \
-	X(TYPE_jfd_package_entry_t, "jfd_package_entry_t") \
-	X(TYPE_memory_arena_t, "memory_arena_t") \
-	X(TYPE_jfd_file_header_t, "jfd_file_header_t") \
-	X(TYPE_asset_manager_asset_file_data_t, "asset_manager_asset_file_data_t") \
-	X(TYPE_asset_manager_t, "asset_manager_t") \
-	X(TYPE_asset_catalog_t, "asset_catalog_t") \
-	X(TYPE_texture_atlas_registry_t, "texture_atlas_registry_t") \
-	X(TYPE_vulkan_render_context_t, "vulkan_render_context_t") \
-	X(TYPE_entity_type, "entity_type") \
-	X(TYPE_entity_flags, "entity_flags") \
-	X(TYPE_entity_t, "entity_t") \
-	X(TYPE_entity_manager_t, "entity_manager_t") \
-	X(TYPE_packet_type_t, "packet_type_t") \
-	X(TYPE_input_data_t, "input_data_t") \
-	X(TYPE_payload, "payload") \
-	X(TYPE_packet_t, "packet_t") \
-	X(TYPE_sys_thread_handle_t, "sys_thread_handle_t") \
-	X(TYPE_void, "void") \
-	X(TYPE_sys_thread_t, "sys_thread_t") \
-	X(TYPE_sys_mutex_handle_t, "sys_mutex_handle_t") \
-	X(TYPE_sys_semaphore_handle_t, "sys_semaphore_handle_t") \
-	X(TYPE_sys_semaphore_t, "sys_semaphore_t") \
-	X(TYPE_byte, "byte") \
-	X(TYPE_string_builder_buffer_t, "string_builder_buffer_t") \
-	X(TYPE_string_builder_t, "string_builder_t") \
-	X(TYPE_preprocessor_token_type_t, "preprocessor_token_type_t") \
-	X(TYPE_token_data_t, "token_data_t") \
-	X(TYPE_tokenizer_t, "tokenizer_t") \
 	X(TYPE_arg_type_t, "arg_type_t") \
 	X(TYPE_char, "char") \
 	X(TYPE_program_flag_data_t, "program_flag_data_t") \
 	X(TYPE_program_flag_t, "program_flag_t") \
 	X(TYPE_program_flag_state_t, "program_flag_state_t") \
-	X(TYPE_dynarray_header_t, "dynarray_header_t") \
-	X(TYPE_memory_arena_footer_t, "memory_arena_footer_t") \
-	X(TYPE_scratch_arena_t, "scratch_arena_t") \
-	X(TYPE_file_extension_t, "file_extension_t") \
-	X(TYPE_sys_handle_t, "sys_handle_t") \
-	X(TYPE_mapped_file_t, "mapped_file_t") \
-	X(TYPE_file_data_t, "file_data_t") \
-	X(TYPE_overlap_io_data_t, "overlap_io_data_t") \
-	X(TYPE_visit_files_pfn_t, "visit_files_pfn_t") \
-	X(TYPE_visit_file_data_t, "visit_file_data_t") \
-	X(TYPE_controller_type_t, "controller_type_t") \
-	X(TYPE_input_mouse_buttons_t, "input_mouse_buttons_t") \
-	X(TYPE_action_button_t, "action_button_t") \
-	X(TYPE_keyboard_controller_data_t, "keyboard_controller_data_t") \
-	X(TYPE_s16, "s16") \
-	X(TYPE_analog_button_t, "analog_button_t") \
-	X(TYPE_SDL_Gamepad, "SDL_Gamepad") \
-	X(TYPE_SDL_Joystick, "SDL_Joystick") \
-	X(TYPE_gamepad_controller_data_t, "gamepad_controller_data_t") \
-	X(TYPE_input_controller_t, "input_controller_t") \
-	X(TYPE_game_action_binding_type_t, "game_action_binding_type_t") \
-	X(TYPE_game_action_binding_t, "game_action_binding_t") \
-	X(TYPE_game_action_t, "game_action_t") \
-	X(TYPE_input_manager_t, "input_manager_t") \
-	X(TYPE_file_watcher_change_event_t, "file_watcher_change_event_t") \
-	X(TYPE_file_watcher_recorded_change_t, "file_watcher_recorded_change_t") \
-	X(TYPE_file_watcher_callback_pfn_t, "file_watcher_callback_pfn_t") \
-	X(TYPE_file_watcher_sys_watch_data_t, "file_watcher_sys_watch_data_t") \
-	X(TYPE_file_watcher_t, "file_watcher_t") \
+	X(TYPE_string_builder_buffer_t, "string_builder_buffer_t") \
+	X(TYPE_string_builder_t, "string_builder_t") \
+	X(TYPE_sys_thread_handle_t, "sys_thread_handle_t") \
+	X(TYPE_sys_thread_t, "sys_thread_t") \
+	X(TYPE_sys_mutex_handle_t, "sys_mutex_handle_t") \
+	X(TYPE_sys_mutex_t, "sys_mutex_t") \
+	X(TYPE_sys_semaphore_handle_t, "sys_semaphore_handle_t") \
+	X(TYPE_sys_semaphore_t, "sys_semaphore_t") \
+	X(TYPE_job_priority_t, "job_priority_t") \
+	X(TYPE_threadpool_callback_t, "threadpool_callback_t") \
+	X(TYPE_threadpool_queue_entry_t, "threadpool_queue_entry_t") \
+	X(TYPE_threadpool_queue_t, "threadpool_queue_t") \
+	X(TYPE_preprocessor_token_type_t, "preprocessor_token_type_t") \
+	X(TYPE_token_data_t, "token_data_t") \
+	X(TYPE_tokenizer_t, "tokenizer_t") \
+	X(TYPE_za_allocation_tag_t, "za_allocation_tag_t") \
+	X(TYPE_zone_allocator_block_t, "zone_allocator_block_t") \
+	X(TYPE_zone_allocator_t, "zone_allocator_t") \
+	X(TYPE_entity_type, "entity_type") \
+	X(TYPE_entity_flags, "entity_flags") \
+	X(TYPE_entity_t, "entity_t") \
+	X(TYPE_entity_manager_t, "entity_manager_t") \
+	X(TYPE_input_data_t, "input_data_t") \
+	X(TYPE_sockaddr_storage, "sockaddr_storage") \
+	X(TYPE_socklen_t, "socklen_t") \
+	X(TYPE_client_data_t, "client_data_t") \
+	X(TYPE_SDL_Window, "SDL_Window") \
+	X(TYPE_sockaddr_in_t, "sockaddr_in_t") \
+	X(TYPE_game_state_t, "game_state_t") \
+	X(TYPE_renderer_effect_application_flags_t, "renderer_effect_application_flags_t") \
+	X(TYPE_render_pipeline_blending_mode_t, "render_pipeline_blending_mode_t") \
+	X(TYPE_render_pipeline_blending_equation_t, "render_pipeline_blending_equation_t") \
+	X(TYPE_render_pipeline_depth_function_t, "render_pipeline_depth_function_t") \
+	X(TYPE_render_geometry_instance_t, "render_geometry_instance_t") \
+	X(TYPE_render_camera_t, "render_camera_t") \
+	X(TYPE_render_geometry_batch_t, "render_geometry_batch_t") \
+	X(TYPE_render_pipeline_state_t, "render_pipeline_state_t") \
+	X(TYPE_asset_handle_t, "asset_handle_t") \
+	X(TYPE_texture2D_t, "texture2D_t") \
+	X(TYPE_render_group_t, "render_group_t") \
+	X(TYPE_state, "state") \
+	X(TYPE_draw_frame_t, "draw_frame_t") \
+	X(TYPE_vulkan_render_context_t, "vulkan_render_context_t") \
+	X(TYPE_vulkan_render_frame_state_t, "vulkan_render_frame_state_t") \
+	X(TYPE_render_state_t, "render_state_t") \
 	X(TYPE_global_matrix_uniforms_t, "global_matrix_uniforms_t") \
 	X(TYPE_push_constant_t, "push_constant_t") \
-	X(TYPE_render_camera_t, "render_camera_t") \
 	X(TYPE_VkBuffer, "VkBuffer") \
 	X(TYPE_VkDeviceMemory, "VkDeviceMemory") \
 	X(TYPE_VkBufferUsageFlagBits, "VkBufferUsageFlagBits") \
@@ -145,6 +134,7 @@
 	X(TYPE_vulkan_shader_descriptor_set_info_t, "vulkan_shader_descriptor_set_info_t") \
 	X(TYPE_vulkan_shader_uniform_texture_data_t, "vulkan_shader_uniform_texture_data_t") \
 	X(TYPE_vulkan_shader_uniform_data_range_t, "vulkan_shader_uniform_data_range_t") \
+	X(TYPE_vulkan_shader_uniform_data_t, "vulkan_shader_uniform_data_t") \
 	X(TYPE_VkShaderStageFlagBits, "VkShaderStageFlagBits") \
 	X(TYPE_VkShaderModuleCreateInfo, "VkShaderModuleCreateInfo") \
 	X(TYPE_VkPipelineShaderStageCreateInfo, "VkPipelineShaderStageCreateInfo") \
@@ -154,6 +144,7 @@
 	X(TYPE_VkDescriptorPool, "VkDescriptorPool") \
 	X(TYPE_VkDescriptorSetLayout, "VkDescriptorSetLayout") \
 	X(TYPE_VkPushConstantRange, "VkPushConstantRange") \
+	X(TYPE_vulkan_shader_data_t, "vulkan_shader_data_t") \
 	X(TYPE_VkSurfaceCapabilitiesKHR, "VkSurfaceCapabilitiesKHR") \
 	X(TYPE_VkSurfaceFormatKHR, "VkSurfaceFormatKHR") \
 	X(TYPE_VkPresentModeKHR, "VkPresentModeKHR") \
@@ -178,6 +169,7 @@
 	X(TYPE_vulkan_framebuffer_data_t, "vulkan_framebuffer_data_t") \
 	X(TYPE_VkImageLayout, "VkImageLayout") \
 	X(TYPE_vulkan_image_data_t, "vulkan_image_data_t") \
+	X(TYPE_vulkan_texture_t, "vulkan_texture_t") \
 	X(TYPE_VkSwapchainKHR, "VkSwapchainKHR") \
 	X(TYPE_vulkan_swapchain_data_t, "vulkan_swapchain_data_t") \
 	X(TYPE_vulkan_command_buffer_state_t, "vulkan_command_buffer_state_t") \
@@ -185,35 +177,43 @@
 	X(TYPE_vulkan_command_buffer_data_t, "vulkan_command_buffer_data_t") \
 	X(TYPE_vulkan_render_backend_function_data_t, "vulkan_render_backend_function_data_t") \
 	X(TYPE_VkSemaphore, "VkSemaphore") \
-	X(TYPE_vulkan_render_frame_state_t, "vulkan_render_frame_state_t") \
-	X(TYPE_SDL_Window, "SDL_Window") \
 	X(TYPE_VkInstance, "VkInstance") \
 	X(TYPE_VkAllocationCallbacks, "VkAllocationCallbacks") \
 	X(TYPE_VkSurfaceKHR, "VkSurfaceKHR") \
 	X(TYPE_VkDebugUtilsMessengerEXT, "VkDebugUtilsMessengerEXT") \
-	X(TYPE_hash_table_allocation_flags_t, "hash_table_allocation_flags_t") \
-	X(TYPE_hash_table_header_t, "hash_table_header_t") \
-	X(TYPE_job_priority_t, "job_priority_t") \
-	X(TYPE_threadpool_callback_t, "threadpool_callback_t") \
-	X(TYPE_threadpool_queue_entry_t, "threadpool_queue_entry_t") \
-	X(TYPE_threadpool_queue_t, "threadpool_queue_t") \
-	X(TYPE_threadpool_t, "threadpool_t") \
-	X(TYPE_renderer_effect_application_flags_t, "renderer_effect_application_flags_t") \
-	X(TYPE_render_pipeline_blending_mode_t, "render_pipeline_blending_mode_t") \
-	X(TYPE_render_pipeline_blending_equation_t, "render_pipeline_blending_equation_t") \
-	X(TYPE_render_pipeline_depth_function_t, "render_pipeline_depth_function_t") \
-	X(TYPE_render_geometry_instance_t, "render_geometry_instance_t") \
-	X(TYPE_render_geometry_batch_t, "render_geometry_batch_t") \
-	X(TYPE_render_group_t, "render_group_t") \
-	X(TYPE_state, "state") \
-	X(TYPE_draw_frame_t, "draw_frame_t") \
-	X(TYPE_render_state_t, "render_state_t") \
-	X(TYPE_global_context_t, "global_context_t") \
-	X(TYPE_sockaddr_storage, "sockaddr_storage") \
-	X(TYPE_socklen_t, "socklen_t") \
-	X(TYPE_client_data_t, "client_data_t") \
-	X(TYPE_sockaddr_in_t, "sockaddr_in_t") \
-	X(TYPE_game_state_t, "game_state_t") \
+	X(TYPE_asset_type_t, "asset_type_t") \
+	X(TYPE_asset_slot_load_status_t, "asset_slot_load_status_t") \
+	X(TYPE_bitmap_format_t, "bitmap_format_t") \
+	X(TYPE_subtexture_data_t, "subtexture_data_t") \
+	X(TYPE_asset_slot_t, "asset_slot_t") \
+	X(TYPE_shader_t, "shader_t") \
+	X(TYPE_bitmap_t, "bitmap_t") \
+	X(TYPE_texture_atlas_t, "texture_atlas_t") \
+	X(TYPE_material_archetype_t, "material_archetype_t") \
+	X(TYPE_material_instance_t, "material_instance_t") \
+	X(TYPE_jfd_package_entry_t, "jfd_package_entry_t") \
+	X(TYPE_jfd_file_header_t, "jfd_file_header_t") \
+	X(TYPE_asset_manager_asset_file_data_t, "asset_manager_asset_file_data_t") \
+	X(TYPE_asset_manager_t, "asset_manager_t") \
+	X(TYPE_asset_catalog_t, "asset_catalog_t") \
+	X(TYPE_texture_atlas_registry_t, "texture_atlas_registry_t") \
+	X(TYPE_controller_type_t, "controller_type_t") \
+	X(TYPE_input_mouse_buttons_t, "input_mouse_buttons_t") \
+	X(TYPE_action_button_t, "action_button_t") \
+	X(TYPE_keyboard_controller_data_t, "keyboard_controller_data_t") \
+	X(TYPE_s16, "s16") \
+	X(TYPE_analog_button_t, "analog_button_t") \
+	X(TYPE_SDL_Gamepad, "SDL_Gamepad") \
+	X(TYPE_SDL_Joystick, "SDL_Joystick") \
+	X(TYPE_gamepad_controller_data_t, "gamepad_controller_data_t") \
+	X(TYPE_input_controller_t, "input_controller_t") \
+	X(TYPE_game_action_binding_type_t, "game_action_binding_type_t") \
+	X(TYPE_game_action_binding_t, "game_action_binding_t") \
+	X(TYPE_game_action_t, "game_action_t") \
+	X(TYPE_input_manager_t, "input_manager_t") \
+	X(TYPE_packet_type_t, "packet_type_t") \
+	X(TYPE_payload, "payload") \
+	X(TYPE_packet_t, "packet_t") \
 
 
 enum GENERATED_program_type_t { 
@@ -311,8 +311,19 @@ typedef struct type_info {
     type_info_struct_t *struct_info;
 }type_info_t;
 
-const static zone_allocator_block_t GENERATED_DEFAULT_zone_allocator_block_t = {};
-const static zone_allocator_t GENERATED_DEFAULT_zone_allocator_t = {};
+const static memory_arena_footer_t GENERATED_DEFAULT_memory_arena_footer_t = {};
+const static memory_arena_t GENERATED_DEFAULT_memory_arena_t = {};
+const static scratch_arena_t GENERATED_DEFAULT_scratch_arena_t = {};
+const static dynarray_header_t GENERATED_DEFAULT_dynarray_header_t = {};
+const static file_t GENERATED_DEFAULT_file_t = {};
+const static mapped_file_t GENERATED_DEFAULT_mapped_file_t = {};
+const static file_data_t GENERATED_DEFAULT_file_data_t = {};
+const static overlap_io_data_t GENERATED_DEFAULT_overlap_io_data_t = {};
+const static visit_file_data_t GENERATED_DEFAULT_visit_file_data_t = {};
+const static file_watcher_recorded_change_t GENERATED_DEFAULT_file_watcher_recorded_change_t = {};
+const static file_watcher_t GENERATED_DEFAULT_file_watcher_t = {};
+const static global_context_t GENERATED_DEFAULT_global_context_t = {};
+const static hash_table_header_t GENERATED_DEFAULT_hash_table_header_t = {};
 const static vec2_t GENERATED_DEFAULT_vec2_t = {};
 const static vec3_t GENERATED_DEFAULT_vec3_t = {};
 const static vec4_t GENERATED_DEFAULT_vec4_t = {};
@@ -324,52 +335,32 @@ const static mat3_t GENERATED_DEFAULT_mat3_t = {};
 const static mat2_t GENERATED_DEFAULT_mat2_t = {};
 const static rectangle2_t GENERATED_DEFAULT_rectangle2_t = {};
 const static raytest_t GENERATED_DEFAULT_raytest_t = {};
-const static asset_handle_t GENERATED_DEFAULT_asset_handle_t = {};
-const static bitmap_t GENERATED_DEFAULT_bitmap_t = {};
-const static texture2D_t GENERATED_DEFAULT_texture2D_t = {};
-const static subtexture_data_t GENERATED_DEFAULT_subtexture_data_t = {};
-const static texture_atlas_t GENERATED_DEFAULT_texture_atlas_t = {};
-const static shader_t GENERATED_DEFAULT_shader_t = {};
-const static material_instance_t GENERATED_DEFAULT_material_instance_t = {};
-const static material_archetype_t GENERATED_DEFAULT_material_archetype_t = {};
-const static asset_slot_t GENERATED_DEFAULT_asset_slot_t = {};
-const static asset_manager_asset_file_data_t GENERATED_DEFAULT_asset_manager_asset_file_data_t = {};
-const static asset_catalog_t GENERATED_DEFAULT_asset_catalog_t = {};
-const static texture_atlas_registry_t GENERATED_DEFAULT_texture_atlas_registry_t = {};
-const static asset_manager_t GENERATED_DEFAULT_asset_manager_t = {};
-const static entity_t GENERATED_DEFAULT_entity_t = {};
-const static entity_manager_t GENERATED_DEFAULT_entity_manager_t = {};
-const static packet_t GENERATED_DEFAULT_packet_t = {};
-const static sys_thread_t GENERATED_DEFAULT_sys_thread_t = {};
-const static sys_mutex_t GENERATED_DEFAULT_sys_mutex_t = {};
-const static sys_semaphore_t GENERATED_DEFAULT_sys_semaphore_t = {};
-const static string_t GENERATED_DEFAULT_string_t = {};
-const static string_builder_buffer_t GENERATED_DEFAULT_string_builder_buffer_t = {};
-const static string_builder_t GENERATED_DEFAULT_string_builder_t = {};
-const static token_data_t GENERATED_DEFAULT_token_data_t = {};
-const static tokenizer_t GENERATED_DEFAULT_tokenizer_t = {};
 const static program_flag_data_t GENERATED_DEFAULT_program_flag_data_t = {};
 const static program_flag_t GENERATED_DEFAULT_program_flag_t = {};
 const static program_flag_state_t GENERATED_DEFAULT_program_flag_state_t = {};
-const static dynarray_header_t GENERATED_DEFAULT_dynarray_header_t = {};
-const static memory_arena_footer_t GENERATED_DEFAULT_memory_arena_footer_t = {};
-const static memory_arena_t GENERATED_DEFAULT_memory_arena_t = {};
-const static scratch_arena_t GENERATED_DEFAULT_scratch_arena_t = {};
-const static file_t GENERATED_DEFAULT_file_t = {};
-const static mapped_file_t GENERATED_DEFAULT_mapped_file_t = {};
-const static file_data_t GENERATED_DEFAULT_file_data_t = {};
-const static overlap_io_data_t GENERATED_DEFAULT_overlap_io_data_t = {};
-const static visit_file_data_t GENERATED_DEFAULT_visit_file_data_t = {};
-const static action_button_t GENERATED_DEFAULT_action_button_t = {};
-const static keyboard_controller_data_t GENERATED_DEFAULT_keyboard_controller_data_t = {};
-const static analog_button_t GENERATED_DEFAULT_analog_button_t = {};
-const static gamepad_controller_data_t GENERATED_DEFAULT_gamepad_controller_data_t = {};
-const static input_controller_t GENERATED_DEFAULT_input_controller_t = {};
-const static game_action_binding_t GENERATED_DEFAULT_game_action_binding_t = {};
-const static game_action_t GENERATED_DEFAULT_game_action_t = {};
-const static input_manager_t GENERATED_DEFAULT_input_manager_t = {};
-const static file_watcher_recorded_change_t GENERATED_DEFAULT_file_watcher_recorded_change_t = {};
-const static file_watcher_t GENERATED_DEFAULT_file_watcher_t = {};
+const static string_t GENERATED_DEFAULT_string_t = {};
+const static string_builder_buffer_t GENERATED_DEFAULT_string_builder_buffer_t = {};
+const static string_builder_t GENERATED_DEFAULT_string_builder_t = {};
+const static sys_thread_t GENERATED_DEFAULT_sys_thread_t = {};
+const static sys_mutex_t GENERATED_DEFAULT_sys_mutex_t = {};
+const static sys_semaphore_t GENERATED_DEFAULT_sys_semaphore_t = {};
+const static threadpool_queue_entry_t GENERATED_DEFAULT_threadpool_queue_entry_t = {};
+const static threadpool_queue_t GENERATED_DEFAULT_threadpool_queue_t = {};
+const static threadpool_t GENERATED_DEFAULT_threadpool_t = {};
+const static token_data_t GENERATED_DEFAULT_token_data_t = {};
+const static tokenizer_t GENERATED_DEFAULT_tokenizer_t = {};
+const static zone_allocator_block_t GENERATED_DEFAULT_zone_allocator_block_t = {};
+const static zone_allocator_t GENERATED_DEFAULT_zone_allocator_t = {};
+const static entity_t GENERATED_DEFAULT_entity_t = {};
+const static entity_manager_t GENERATED_DEFAULT_entity_manager_t = {};
+const static input_data_t GENERATED_DEFAULT_input_data_t = {};
+const static client_data_t GENERATED_DEFAULT_client_data_t = {};
+const static game_state_t GENERATED_DEFAULT_game_state_t = {};
+const static render_geometry_instance_t GENERATED_DEFAULT_render_geometry_instance_t = {};
+const static render_geometry_batch_t GENERATED_DEFAULT_render_geometry_batch_t = {};
+const static render_group_t GENERATED_DEFAULT_render_group_t = {};
+const static draw_frame_t GENERATED_DEFAULT_draw_frame_t = {};
+const static render_state_t GENERATED_DEFAULT_render_state_t = {};
 const static global_matrix_uniforms_t GENERATED_DEFAULT_global_matrix_uniforms_t = {};
 const static push_constant_t GENERATED_DEFAULT_push_constant_t = {};
 const static render_camera_t GENERATED_DEFAULT_render_camera_t = {};
@@ -398,21 +389,48 @@ const static vulkan_command_buffer_data_t GENERATED_DEFAULT_vulkan_command_buffe
 const static vulkan_render_backend_function_data_t GENERATED_DEFAULT_vulkan_render_backend_function_data_t = {};
 const static vulkan_render_frame_state_t GENERATED_DEFAULT_vulkan_render_frame_state_t = {};
 const static vulkan_render_context_t GENERATED_DEFAULT_vulkan_render_context_t = {};
-const static hash_table_header_t GENERATED_DEFAULT_hash_table_header_t = {};
-const static threadpool_queue_entry_t GENERATED_DEFAULT_threadpool_queue_entry_t = {};
-const static threadpool_queue_t GENERATED_DEFAULT_threadpool_queue_t = {};
-const static threadpool_t GENERATED_DEFAULT_threadpool_t = {};
-const static render_geometry_instance_t GENERATED_DEFAULT_render_geometry_instance_t = {};
-const static render_geometry_batch_t GENERATED_DEFAULT_render_geometry_batch_t = {};
-const static render_group_t GENERATED_DEFAULT_render_group_t = {};
-const static draw_frame_t GENERATED_DEFAULT_draw_frame_t = {};
-const static render_state_t GENERATED_DEFAULT_render_state_t = {};
-const static global_context_t GENERATED_DEFAULT_global_context_t = {};
-const static input_data_t GENERATED_DEFAULT_input_data_t = {};
-const static client_data_t GENERATED_DEFAULT_client_data_t = {};
-const static game_state_t GENERATED_DEFAULT_game_state_t = {};
+const static asset_handle_t GENERATED_DEFAULT_asset_handle_t = {};
+const static bitmap_t GENERATED_DEFAULT_bitmap_t = {};
+const static texture2D_t GENERATED_DEFAULT_texture2D_t = {};
+const static subtexture_data_t GENERATED_DEFAULT_subtexture_data_t = {};
+const static texture_atlas_t GENERATED_DEFAULT_texture_atlas_t = {};
+const static shader_t GENERATED_DEFAULT_shader_t = {};
+const static material_instance_t GENERATED_DEFAULT_material_instance_t = {};
+const static material_archetype_t GENERATED_DEFAULT_material_archetype_t = {};
+const static asset_slot_t GENERATED_DEFAULT_asset_slot_t = {};
+const static asset_manager_asset_file_data_t GENERATED_DEFAULT_asset_manager_asset_file_data_t = {};
+const static asset_catalog_t GENERATED_DEFAULT_asset_catalog_t = {};
+const static texture_atlas_registry_t GENERATED_DEFAULT_texture_atlas_registry_t = {};
+const static asset_manager_t GENERATED_DEFAULT_asset_manager_t = {};
+const static action_button_t GENERATED_DEFAULT_action_button_t = {};
+const static keyboard_controller_data_t GENERATED_DEFAULT_keyboard_controller_data_t = {};
+const static analog_button_t GENERATED_DEFAULT_analog_button_t = {};
+const static gamepad_controller_data_t GENERATED_DEFAULT_gamepad_controller_data_t = {};
+const static input_controller_t GENERATED_DEFAULT_input_controller_t = {};
+const static game_action_binding_t GENERATED_DEFAULT_game_action_binding_t = {};
+const static game_action_t GENERATED_DEFAULT_game_action_t = {};
+const static input_manager_t GENERATED_DEFAULT_input_manager_t = {};
+const static packet_t GENERATED_DEFAULT_packet_t = {};
 
-struct type_info_struct_zone_allocator_block_t {
+struct type_info_struct_memory_arena_footer_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t last_base;
+			type_info_member_t last_used;
+			type_info_member_t last_block_size;
+		}members;
+	};
+};
+
+struct type_info_struct_memory_arena_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -423,17 +441,114 @@ struct type_info_struct_zone_allocator_block_t {
 	union {
 		type_info_member_t member_array[6];
 		struct {
-			type_info_member_t block_id;
-			type_info_member_t is_allocated;
+			type_info_member_t is_initialized;
+			type_info_member_t base;
+			type_info_member_t used;
 			type_info_member_t block_size;
-			type_info_member_t allocation_tag;
-			type_info_member_t next_block;
-			type_info_member_t prev_block;
+			type_info_member_t block_counter;
+			type_info_member_t scratch_arena_count;
 		}members;
 	};
 };
 
-struct type_info_struct_zone_allocator_t {
+struct type_info_struct_scratch_arena_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t parent;
+			type_info_member_t base;
+			type_info_member_t used;
+		}members;
+	};
+};
+
+struct type_info_struct_dynarray_header_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t flags;
+			type_info_member_t size;
+			type_info_member_t capacity;
+			type_info_member_t header_id;
+		}members;
+	};
+};
+
+struct type_info_struct_file_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[8];
+		struct {
+			type_info_member_t handle;
+			type_info_member_t file_name;
+			type_info_member_t filepath;
+			type_info_member_t file_size;
+			type_info_member_t current_read_offset;
+			type_info_member_t current_write_offset;
+			type_info_member_t overlapping;
+			type_info_member_t for_writing;
+		}members;
+	};
+};
+
+struct type_info_struct_mapped_file_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t file;
+			type_info_member_t mapping_handle;
+			type_info_member_t mapped_file_data;
+		}members;
+	};
+};
+
+struct type_info_struct_file_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t last_modtime;
+			type_info_member_t file_size;
+			type_info_member_t filename;
+			type_info_member_t filepath;
+		}members;
+	};
+};
+
+struct type_info_struct_overlap_io_data_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -444,11 +559,119 @@ struct type_info_struct_zone_allocator_t {
 	union {
 		type_info_member_t member_array[5];
 		struct {
-			type_info_member_t mutex;
-			type_info_member_t capacity;
-			type_info_member_t base;
-			type_info_member_t first_block;
-			type_info_member_t cursor;
+			type_info_member_t offset_to_read;
+			type_info_member_t bytes_to_read;
+			type_info_member_t status;
+			type_info_member_t bytes_transfered;
+			type_info_member_t event_handle;
+		}members;
+	};
+};
+
+struct type_info_struct_visit_file_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t function;
+			type_info_member_t user_data;
+			type_info_member_t filename;
+			type_info_member_t fullname;
+			type_info_member_t recursive;
+			type_info_member_t is_directory;
+		}members;
+	};
+};
+
+struct type_info_struct_file_watcher_recorded_change_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t full_path;
+			type_info_member_t old_filename;
+			type_info_member_t changes;
+			type_info_member_t last_change_timestamp;
+		}members;
+	};
+};
+
+struct type_info_struct_file_watcher_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[14];
+		struct {
+			type_info_member_t is_valid;
+			type_info_member_t is_verbose;
+			type_info_member_t watcher_arena;
+			type_info_member_t callback;
+			type_info_member_t events_to_monitor;
+			type_info_member_t user_data;
+			type_info_member_t watch_recursively;
+			type_info_member_t observed_changes;
+			type_info_member_t change_count;
+			type_info_member_t paths_to_watch;
+			type_info_member_t paths_watched;
+			type_info_member_t notify_buffer_size;
+			type_info_member_t sys_watch_data;
+			type_info_member_t issues_when_checking;
+		}members;
+	};
+};
+
+struct type_info_struct_global_context_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t is_initialized;
+			type_info_member_t running;
+			type_info_member_t context_arena;
+			type_info_member_t temporary_arena;
+			type_info_member_t main_threadpool;
+		}members;
+	};
+};
+
+struct type_info_struct_hash_table_header_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t max_entries;
+			type_info_member_t flags;
+			type_info_member_t current_entry_count;
+			type_info_member_t debug_id;
 		}members;
 	};
 };
@@ -710,115 +933,7 @@ struct type_info_struct_raytest_t {
 	};
 };
 
-struct type_info_struct_asset_handle_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[7];
-		struct {
-			type_info_member_t is_valid;
-			type_info_member_t type;
-			type_info_member_t owner_asset_file_index;
-			type_info_member_t subtexture_data;
-			type_info_member_t slot;
-			type_info_member_t texture;
-			type_info_member_t shader;
-		}members;
-	};
-};
-
-struct type_info_struct_bitmap_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t width;
-			type_info_member_t height;
-			type_info_member_t channels;
-			type_info_member_t format;
-			type_info_member_t pixels;
-		}members;
-	};
-};
-
-struct type_info_struct_texture2D_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t ID;
-			type_info_member_t bitmap;
-			type_info_member_t gpu_data;
-		}members;
-	};
-};
-
-struct type_info_struct_subtexture_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t uv_min;
-			type_info_member_t uv_max;
-			type_info_member_t offset;
-			type_info_member_t size;
-			type_info_member_t atlas_subtexture_index;
-			type_info_member_t atlas;
-		}members;
-	};
-};
-
-struct type_info_struct_texture_atlas_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[12];
-		struct {
-			type_info_member_t texture;
-			type_info_member_t bitmap_data;
-			type_info_member_t ID;
-			type_info_member_t merge_counter;
-			type_info_member_t textures_to_merge;
-			type_info_member_t packed_subtextures;
-			type_info_member_t packed_subtexture_count;
-			type_info_member_t is_valid;
-			type_info_member_t atlas_cursor_x;
-			type_info_member_t atlas_cursor_y;
-			type_info_member_t tallest_y;
-			type_info_member_t atlas_size;
-		}members;
-	};
-};
-
-struct type_info_struct_shader_t {
+struct type_info_struct_program_flag_data_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -829,15 +944,15 @@ struct type_info_struct_shader_t {
 	union {
 		type_info_member_t member_array[4];
 		struct {
-			type_info_member_t ID;
-			type_info_member_t shader_data;
-			type_info_member_t camera_uniform;
-			type_info_member_t texture_uniform;
+			type_info_member_t bool32;
+			type_info_member_t u64;
+			type_info_member_t float32;
+			type_info_member_t string;
 		}members;
 	};
 };
 
-struct type_info_struct_material_instance_t {
+struct type_info_struct_program_flag_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -848,108 +963,17 @@ struct type_info_struct_material_instance_t {
 	union {
 		type_info_member_t member_array[6];
 		struct {
-			type_info_member_t ID;
-			type_info_member_t textures;
-			type_info_member_t pipeline_state;
-			type_info_member_t shader_uniform_count;
-			type_info_member_t uniform_data;
-			type_info_member_t archetype;
-		}members;
-	};
-};
-
-struct type_info_struct_material_archetype_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t ID;
+			type_info_member_t is_valid;
 			type_info_member_t name;
-			type_info_member_t shader_binary_name;
-			type_info_member_t shader;
-			type_info_member_t renderer_effect_flags;
-			type_info_member_t base_instance;
+			type_info_member_t description;
+			type_info_member_t arg_type;
+			type_info_member_t arg_value;
+			type_info_member_t default_arg_value;
 		}members;
 	};
 };
 
-struct type_info_struct_asset_slot_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[11];
-		struct {
-			type_info_member_t ID;
-			type_info_member_t slot_state;
-			type_info_member_t type;
-			type_info_member_t name;
-			type_info_member_t owner_asset_file;
-			type_info_member_t package_entry;
-			type_info_member_t package_generation;
-			type_info_member_t ref_counter;
-			type_info_member_t texture;
-			type_info_member_t shader;
-			type_info_member_t material;
-		}members;
-	};
-};
-
-struct type_info_struct_asset_manager_asset_file_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[10];
-		struct {
-			type_info_member_t is_initialized;
-			type_info_member_t ID;
-			type_info_member_t init_arena;
-			type_info_member_t load_status;
-			type_info_member_t file_info;
-			type_info_member_t raw_file_data;
-			type_info_member_t package_entries;
-			type_info_member_t package_entry_count;
-			type_info_member_t entry_hash;
-			type_info_member_t header_data;
-		}members;
-	};
-};
-
-struct type_info_struct_asset_catalog_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t ID;
-			type_info_member_t catalog_type;
-			type_info_member_t asset_manager;
-			type_info_member_t asset_lookup;
-		}members;
-	};
-};
-
-struct type_info_struct_texture_atlas_registry_t {
+struct type_info_struct_program_flag_state_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -960,159 +984,8 @@ struct type_info_struct_texture_atlas_registry_t {
 	union {
 		type_info_member_t member_array[2];
 		struct {
-			type_info_member_t atlases;
-			type_info_member_t current_atlas_count;
-		}members;
-	};
-};
-
-struct type_info_struct_asset_manager_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[13];
-		struct {
-			type_info_member_t is_initialized;
-			type_info_member_t manager_arena;
-			type_info_member_t asset_files;
-			type_info_member_t asset_name_to_file;
-			type_info_member_t loaded_file_count;
-			type_info_member_t asset_load_queue;
-			type_info_member_t asset_unload_queue;
-			type_info_member_t atlas_registry;
-			type_info_member_t asset_allocator;
-			type_info_member_t asset_catalogs;
-			type_info_member_t texture_catalog;
-			type_info_member_t shader_catalog;
-			type_info_member_t render_context;
-		}members;
-	};
-};
-
-struct type_info_struct_entity_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t e_type;
-			type_info_member_t e_flags;
-			type_info_member_t owner_client_id;
-			type_info_member_t last_position;
-			type_info_member_t position;
-			type_info_member_t velocity;
-		}members;
-	};
-};
-
-struct type_info_struct_entity_manager_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[2];
-		struct {
-			type_info_member_t entities;
-			type_info_member_t active_entities;
-		}members;
-	};
-};
-
-struct type_info_struct_payload {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[1];
-		struct {
-			type_info_member_t input_data;
-		}members;
-	};
-};
-
-struct type_info_struct_packet_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t magic_value;
-			type_info_member_t type;
-			type_info_member_t client_id;
-			type_info_member_t payload;
-		}members;
-	};
-};
-
-struct type_info_struct_sys_thread_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t handle;
-			type_info_member_t thread_id;
-			type_info_member_t user_data;
-		}members;
-	};
-};
-
-struct type_info_struct_sys_mutex_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[1];
-		struct {
-			type_info_member_t handle;
-		}members;
-	};
-};
-
-struct type_info_struct_sys_semaphore_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[1];
-		struct {
-			type_info_member_t handle;
+			type_info_member_t program_flags;
+			type_info_member_t flag_counter;
 		}members;
 	};
 };
@@ -1175,6 +1048,116 @@ struct type_info_struct_string_builder_t {
 	};
 };
 
+struct type_info_struct_sys_thread_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t handle;
+			type_info_member_t thread_id;
+			type_info_member_t user_data;
+		}members;
+	};
+};
+
+struct type_info_struct_sys_mutex_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[1];
+		struct {
+			type_info_member_t handle;
+		}members;
+	};
+};
+
+struct type_info_struct_sys_semaphore_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[1];
+		struct {
+			type_info_member_t handle;
+		}members;
+	};
+};
+
+struct type_info_struct_threadpool_queue_entry_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t is_valid;
+			type_info_member_t entry_buffer;
+			type_info_member_t user_data;
+			type_info_member_t callback;
+		}members;
+	};
+};
+
+struct type_info_struct_threadpool_queue_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t completion_goal;
+			type_info_member_t entries_completed;
+			type_info_member_t next_entry_to_write;
+			type_info_member_t next_entry_to_read;
+			type_info_member_t entries;
+		}members;
+	};
+};
+
+struct type_info_struct_threadpool_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t is_initialized;
+			type_info_member_t semaphore;
+			type_info_member_t threads_awake;
+			type_info_member_t max_threads;
+			type_info_member_t high_priority_queue;
+			type_info_member_t low_priority_queue;
+		}members;
+	};
+};
+
 struct type_info_struct_token_data_t {
 	const char *name;
 	u32 type;
@@ -1208,26 +1191,7 @@ struct type_info_struct_tokenizer_t {
 	};
 };
 
-struct type_info_struct_program_flag_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t bool32;
-			type_info_member_t u64;
-			type_info_member_t float32;
-			type_info_member_t string;
-		}members;
-	};
-};
-
-struct type_info_struct_program_flag_t {
+struct type_info_struct_zone_allocator_block_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -1238,17 +1202,58 @@ struct type_info_struct_program_flag_t {
 	union {
 		type_info_member_t member_array[6];
 		struct {
-			type_info_member_t is_valid;
-			type_info_member_t name;
-			type_info_member_t description;
-			type_info_member_t arg_type;
-			type_info_member_t arg_value;
-			type_info_member_t default_arg_value;
+			type_info_member_t block_id;
+			type_info_member_t is_allocated;
+			type_info_member_t block_size;
+			type_info_member_t allocation_tag;
+			type_info_member_t next_block;
+			type_info_member_t prev_block;
 		}members;
 	};
 };
 
-struct type_info_struct_program_flag_state_t {
+struct type_info_struct_zone_allocator_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t mutex;
+			type_info_member_t capacity;
+			type_info_member_t base;
+			type_info_member_t first_block;
+			type_info_member_t cursor;
+		}members;
+	};
+};
+
+struct type_info_struct_entity_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t e_type;
+			type_info_member_t e_flags;
+			type_info_member_t owner_client_id;
+			type_info_member_t last_position;
+			type_info_member_t position;
+			type_info_member_t velocity;
+		}members;
+	};
+};
+
+struct type_info_struct_entity_manager_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -1259,13 +1264,13 @@ struct type_info_struct_program_flag_state_t {
 	union {
 		type_info_member_t member_array[2];
 		struct {
-			type_info_member_t program_flags;
-			type_info_member_t flag_counter;
+			type_info_member_t entities;
+			type_info_member_t active_entities;
 		}members;
 	};
 };
 
-struct type_info_struct_dynarray_header_t {
+struct type_info_struct_input_data_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -1274,17 +1279,14 @@ struct type_info_struct_dynarray_header_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[4];
+		type_info_member_t member_array[1];
 		struct {
-			type_info_member_t flags;
-			type_info_member_t size;
-			type_info_member_t capacity;
-			type_info_member_t header_id;
+			type_info_member_t input_axis;
 		}members;
 	};
 };
 
-struct type_info_struct_memory_arena_footer_t {
+struct type_info_struct_client_data_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -1293,16 +1295,154 @@ struct type_info_struct_memory_arena_footer_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[3];
+		type_info_member_t member_array[8];
 		struct {
-			type_info_member_t last_base;
-			type_info_member_t last_used;
-			type_info_member_t last_block_size;
+			type_info_member_t ID;
+			type_info_member_t connected;
+			type_info_member_t address;
+			type_info_member_t addr_len;
+			type_info_member_t player;
+			type_info_member_t input_data_buffer;
+			type_info_member_t input_data_head;
+			type_info_member_t input_data_tail;
 		}members;
 	};
 };
 
-struct type_info_struct_memory_arena_t {
+struct type_info_struct_game_state_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[11];
+		struct {
+			type_info_member_t window;
+			type_info_member_t window_size;
+			type_info_member_t input_axis;
+			type_info_member_t entity_manager;
+			type_info_member_t player;
+			type_info_member_t is_host;
+			type_info_member_t socket;
+			type_info_member_t host_address_data;
+			type_info_member_t client_id;
+			type_info_member_t clients;
+			type_info_member_t connected_client_count;
+		}members;
+	};
+};
+
+struct type_info_struct_render_geometry_instance_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t transform;
+			type_info_member_t color;
+			type_info_member_t uv_min;
+			type_info_member_t uv_max;
+			type_info_member_t texture_index;
+			type_info_member_t camera_index;
+		}members;
+	};
+};
+
+struct type_info_struct_render_geometry_batch_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t camera_data;
+			type_info_member_t is_valid;
+			type_info_member_t primitive_count;
+			type_info_member_t master_array_start_offset;
+			type_info_member_t instances;
+			type_info_member_t next_buffer;
+		}members;
+	};
+};
+
+struct type_info_struct_render_group_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[9];
+		struct {
+			type_info_member_t ID;
+			type_info_member_t dynamic_pipeline_state;
+			type_info_member_t shader;
+			type_info_member_t textures;
+			type_info_member_t current_texture_count;
+			type_info_member_t master_batch_array;
+			type_info_member_t total_primitive_count;
+			type_info_member_t cached_buffer;
+			type_info_member_t first_buffer;
+		}members;
+	};
+};
+
+struct type_info_struct_state {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t cached_camera_ID;
+			type_info_member_t active_render_layer;
+			type_info_member_t active_render_group;
+			type_info_member_t active_camera;
+			type_info_member_t active_shader;
+			type_info_member_t active_pipeline_state;
+		}members;
+	};
+};
+
+struct type_info_struct_draw_frame_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t used_render_groups;
+			type_info_member_t used_render_group_count;
+			type_info_member_t used_camera;
+			type_info_member_t used_camera_count;
+			type_info_member_t state;
+		}members;
+	};
+};
+
+struct type_info_struct_render_state_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -1314,335 +1454,11 @@ struct type_info_struct_memory_arena_t {
 		type_info_member_t member_array[6];
 		struct {
 			type_info_member_t is_initialized;
-			type_info_member_t base;
-			type_info_member_t used;
-			type_info_member_t block_size;
-			type_info_member_t block_counter;
-			type_info_member_t scratch_arena_count;
-		}members;
-	};
-};
-
-struct type_info_struct_scratch_arena_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t parent;
-			type_info_member_t base;
-			type_info_member_t used;
-		}members;
-	};
-};
-
-struct type_info_struct_file_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[8];
-		struct {
-			type_info_member_t handle;
-			type_info_member_t file_name;
-			type_info_member_t filepath;
-			type_info_member_t file_size;
-			type_info_member_t current_read_offset;
-			type_info_member_t current_write_offset;
-			type_info_member_t overlapping;
-			type_info_member_t for_writing;
-		}members;
-	};
-};
-
-struct type_info_struct_mapped_file_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t file;
-			type_info_member_t mapping_handle;
-			type_info_member_t mapped_file_data;
-		}members;
-	};
-};
-
-struct type_info_struct_file_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t last_modtime;
-			type_info_member_t file_size;
-			type_info_member_t filename;
-			type_info_member_t filepath;
-		}members;
-	};
-};
-
-struct type_info_struct_overlap_io_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t offset_to_read;
-			type_info_member_t bytes_to_read;
-			type_info_member_t status;
-			type_info_member_t bytes_transfered;
-			type_info_member_t event_handle;
-		}members;
-	};
-};
-
-struct type_info_struct_visit_file_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t function;
-			type_info_member_t user_data;
-			type_info_member_t filename;
-			type_info_member_t fullname;
-			type_info_member_t recursive;
-			type_info_member_t is_directory;
-		}members;
-	};
-};
-
-struct type_info_struct_action_button_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t is_down;
-			type_info_member_t is_released;
-			type_info_member_t is_pressed;
-			type_info_member_t half_transition_counter;
-		}members;
-	};
-};
-
-struct type_info_struct_keyboard_controller_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[7];
-		struct {
-			type_info_member_t input;
-			type_info_member_t current_mouse_pos;
-			type_info_member_t last_mouse_pos;
-			type_info_member_t mouse_delta;
-			type_info_member_t is_shift_key_down;
-			type_info_member_t is_control_key_down;
-			type_info_member_t is_alt_key_down;
-		}members;
-	};
-};
-
-struct type_info_struct_analog_button_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[2];
-		struct {
-			type_info_member_t deadzone;
-			type_info_member_t value;
-		}members;
-	};
-};
-
-struct type_info_struct_gamepad_controller_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[7];
-		struct {
-			type_info_member_t gamepad_data;
-			type_info_member_t stick_data;
-			type_info_member_t gamepad_id;
-			type_info_member_t has_rumble;
-			type_info_member_t rumble_value;
-			type_info_member_t digital_buttons;
-			type_info_member_t analog_buttons;
-		}members;
-	};
-};
-
-struct type_info_struct_input_controller_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t is_valid;
-			type_info_member_t is_analog;
-			type_info_member_t type;
-			type_info_member_t keyboard;
-			type_info_member_t gamepad;
-		}members;
-	};
-};
-
-struct type_info_struct_game_action_binding_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[2];
-		struct {
-			type_info_member_t type;
-			type_info_member_t binding_id;
-		}members;
-	};
-};
-
-struct type_info_struct_game_action_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t keyboard;
-			type_info_member_t gamepad;
-			type_info_member_t name;
-		}members;
-	};
-};
-
-struct type_info_struct_input_manager_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[7];
-		struct {
-			type_info_member_t keyboard_data;
-			type_info_member_t gamepad_data;
-			type_info_member_t primary_controller_index;
-			type_info_member_t active_controller_index;
-			type_info_member_t connected_controller_count;
-			type_info_member_t controllers;
-			type_info_member_t game_actions;
-		}members;
-	};
-};
-
-struct type_info_struct_file_watcher_recorded_change_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t full_path;
-			type_info_member_t old_filename;
-			type_info_member_t changes;
-			type_info_member_t last_change_timestamp;
-		}members;
-	};
-};
-
-struct type_info_struct_file_watcher_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[14];
-		struct {
-			type_info_member_t is_valid;
-			type_info_member_t is_verbose;
-			type_info_member_t watcher_arena;
-			type_info_member_t callback;
-			type_info_member_t events_to_monitor;
-			type_info_member_t user_data;
-			type_info_member_t watch_recursively;
-			type_info_member_t observed_changes;
-			type_info_member_t change_count;
-			type_info_member_t paths_to_watch;
-			type_info_member_t paths_watched;
-			type_info_member_t notify_buffer_size;
-			type_info_member_t sys_watch_data;
-			type_info_member_t issues_when_checking;
+			type_info_member_t renderer_arena;
+			type_info_member_t render_context;
+			type_info_member_t current_frame_data;
+			type_info_member_t render_group_hash;
+			type_info_member_t draw_frame;
 		}members;
 	};
 };
@@ -2281,7 +2097,7 @@ struct type_info_struct_vulkan_render_context_t {
 	};
 };
 
-struct type_info_struct_hash_table_header_t {
+struct type_info_struct_asset_handle_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2290,36 +2106,20 @@ struct type_info_struct_hash_table_header_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t max_entries;
-			type_info_member_t flags;
-			type_info_member_t current_entry_count;
-			type_info_member_t debug_id;
-		}members;
-	};
-};
-
-struct type_info_struct_threadpool_queue_entry_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
+		type_info_member_t member_array[7];
 		struct {
 			type_info_member_t is_valid;
-			type_info_member_t entry_buffer;
-			type_info_member_t user_data;
-			type_info_member_t callback;
+			type_info_member_t type;
+			type_info_member_t owner_asset_file_index;
+			type_info_member_t subtexture_data;
+			type_info_member_t slot;
+			type_info_member_t texture;
+			type_info_member_t shader;
 		}members;
 	};
 };
 
-struct type_info_struct_threadpool_queue_t {
+struct type_info_struct_bitmap_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2330,16 +2130,34 @@ struct type_info_struct_threadpool_queue_t {
 	union {
 		type_info_member_t member_array[5];
 		struct {
-			type_info_member_t completion_goal;
-			type_info_member_t entries_completed;
-			type_info_member_t next_entry_to_write;
-			type_info_member_t next_entry_to_read;
-			type_info_member_t entries;
+			type_info_member_t width;
+			type_info_member_t height;
+			type_info_member_t channels;
+			type_info_member_t format;
+			type_info_member_t pixels;
 		}members;
 	};
 };
 
-struct type_info_struct_threadpool_t {
+struct type_info_struct_texture2D_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t ID;
+			type_info_member_t bitmap;
+			type_info_member_t gpu_data;
+		}members;
+	};
+};
+
+struct type_info_struct_subtexture_data_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2350,38 +2168,17 @@ struct type_info_struct_threadpool_t {
 	union {
 		type_info_member_t member_array[6];
 		struct {
-			type_info_member_t is_initialized;
-			type_info_member_t semaphore;
-			type_info_member_t threads_awake;
-			type_info_member_t max_threads;
-			type_info_member_t high_priority_queue;
-			type_info_member_t low_priority_queue;
-		}members;
-	};
-};
-
-struct type_info_struct_render_geometry_instance_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t transform;
-			type_info_member_t color;
 			type_info_member_t uv_min;
 			type_info_member_t uv_max;
-			type_info_member_t texture_index;
-			type_info_member_t camera_index;
+			type_info_member_t offset;
+			type_info_member_t size;
+			type_info_member_t atlas_subtexture_index;
+			type_info_member_t atlas;
 		}members;
 	};
 };
 
-struct type_info_struct_render_geometry_batch_t {
+struct type_info_struct_texture_atlas_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2390,19 +2187,25 @@ struct type_info_struct_render_geometry_batch_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[6];
+		type_info_member_t member_array[12];
 		struct {
-			type_info_member_t camera_data;
+			type_info_member_t texture;
+			type_info_member_t bitmap_data;
+			type_info_member_t ID;
+			type_info_member_t merge_counter;
+			type_info_member_t textures_to_merge;
+			type_info_member_t packed_subtextures;
+			type_info_member_t packed_subtexture_count;
 			type_info_member_t is_valid;
-			type_info_member_t primitive_count;
-			type_info_member_t master_array_start_offset;
-			type_info_member_t instances;
-			type_info_member_t next_buffer;
+			type_info_member_t atlas_cursor_x;
+			type_info_member_t atlas_cursor_y;
+			type_info_member_t tallest_y;
+			type_info_member_t atlas_size;
 		}members;
 	};
 };
 
-struct type_info_struct_render_group_t {
+struct type_info_struct_shader_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2411,22 +2214,38 @@ struct type_info_struct_render_group_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[9];
+		type_info_member_t member_array[4];
 		struct {
 			type_info_member_t ID;
-			type_info_member_t dynamic_pipeline_state;
-			type_info_member_t shader;
+			type_info_member_t shader_data;
+			type_info_member_t camera_uniform;
+			type_info_member_t texture_uniform;
+		}members;
+	};
+};
+
+struct type_info_struct_material_instance_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t ID;
 			type_info_member_t textures;
-			type_info_member_t current_texture_count;
-			type_info_member_t master_batch_array;
-			type_info_member_t total_primitive_count;
-			type_info_member_t cached_buffer;
-			type_info_member_t first_buffer;
+			type_info_member_t pipeline_state;
+			type_info_member_t shader_uniform_count;
+			type_info_member_t uniform_data;
+			type_info_member_t archetype;
 		}members;
 	};
 };
 
-struct type_info_struct_state {
+struct type_info_struct_material_archetype_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2436,118 +2255,18 @@ struct type_info_struct_state {
 	u32 member_count;
 	union {
 		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t cached_camera_ID;
-			type_info_member_t active_render_layer;
-			type_info_member_t active_render_group;
-			type_info_member_t active_camera;
-			type_info_member_t active_shader;
-			type_info_member_t active_pipeline_state;
-		}members;
-	};
-};
-
-struct type_info_struct_draw_frame_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t used_render_groups;
-			type_info_member_t used_render_group_count;
-			type_info_member_t used_camera;
-			type_info_member_t used_camera_count;
-			type_info_member_t state;
-		}members;
-	};
-};
-
-struct type_info_struct_render_state_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t is_initialized;
-			type_info_member_t renderer_arena;
-			type_info_member_t render_context;
-			type_info_member_t current_frame_data;
-			type_info_member_t render_group_hash;
-			type_info_member_t draw_frame;
-		}members;
-	};
-};
-
-struct type_info_struct_global_context_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t is_initialized;
-			type_info_member_t running;
-			type_info_member_t context_arena;
-			type_info_member_t temporary_arena;
-			type_info_member_t main_threadpool;
-		}members;
-	};
-};
-
-struct type_info_struct_input_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[1];
-		struct {
-			type_info_member_t input_axis;
-		}members;
-	};
-};
-
-struct type_info_struct_client_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[8];
 		struct {
 			type_info_member_t ID;
-			type_info_member_t connected;
-			type_info_member_t address;
-			type_info_member_t addr_len;
-			type_info_member_t player;
-			type_info_member_t input_data_buffer;
-			type_info_member_t input_data_head;
-			type_info_member_t input_data_tail;
+			type_info_member_t name;
+			type_info_member_t shader_binary_name;
+			type_info_member_t shader;
+			type_info_member_t renderer_effect_flags;
+			type_info_member_t base_instance;
 		}members;
 	};
 };
 
-struct type_info_struct_game_state_t {
+struct type_info_struct_asset_slot_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2558,21 +2277,370 @@ struct type_info_struct_game_state_t {
 	union {
 		type_info_member_t member_array[11];
 		struct {
-			type_info_member_t window;
-			type_info_member_t window_size;
-			type_info_member_t input_axis;
-			type_info_member_t entity_manager;
-			type_info_member_t player;
-			type_info_member_t is_host;
-			type_info_member_t socket;
-			type_info_member_t host_address_data;
-			type_info_member_t client_id;
-			type_info_member_t clients;
-			type_info_member_t connected_client_count;
+			type_info_member_t ID;
+			type_info_member_t slot_state;
+			type_info_member_t type;
+			type_info_member_t name;
+			type_info_member_t owner_asset_file;
+			type_info_member_t package_entry;
+			type_info_member_t package_generation;
+			type_info_member_t ref_counter;
+			type_info_member_t texture;
+			type_info_member_t shader;
+			type_info_member_t material;
 		}members;
 	};
 };
 
+struct type_info_struct_asset_manager_asset_file_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[10];
+		struct {
+			type_info_member_t is_initialized;
+			type_info_member_t ID;
+			type_info_member_t init_arena;
+			type_info_member_t load_status;
+			type_info_member_t file_info;
+			type_info_member_t raw_file_data;
+			type_info_member_t package_entries;
+			type_info_member_t package_entry_count;
+			type_info_member_t entry_hash;
+			type_info_member_t header_data;
+		}members;
+	};
+};
+
+struct type_info_struct_asset_catalog_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t ID;
+			type_info_member_t catalog_type;
+			type_info_member_t asset_manager;
+			type_info_member_t asset_lookup;
+		}members;
+	};
+};
+
+struct type_info_struct_texture_atlas_registry_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t atlases;
+			type_info_member_t current_atlas_count;
+		}members;
+	};
+};
+
+struct type_info_struct_asset_manager_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[13];
+		struct {
+			type_info_member_t is_initialized;
+			type_info_member_t manager_arena;
+			type_info_member_t asset_files;
+			type_info_member_t asset_name_to_file;
+			type_info_member_t loaded_file_count;
+			type_info_member_t asset_load_queue;
+			type_info_member_t asset_unload_queue;
+			type_info_member_t atlas_registry;
+			type_info_member_t asset_allocator;
+			type_info_member_t asset_catalogs;
+			type_info_member_t texture_catalog;
+			type_info_member_t shader_catalog;
+			type_info_member_t render_context;
+		}members;
+	};
+};
+
+struct type_info_struct_action_button_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t is_down;
+			type_info_member_t is_released;
+			type_info_member_t is_pressed;
+			type_info_member_t half_transition_counter;
+		}members;
+	};
+};
+
+struct type_info_struct_keyboard_controller_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t input;
+			type_info_member_t current_mouse_pos;
+			type_info_member_t last_mouse_pos;
+			type_info_member_t mouse_delta;
+			type_info_member_t is_shift_key_down;
+			type_info_member_t is_control_key_down;
+			type_info_member_t is_alt_key_down;
+		}members;
+	};
+};
+
+struct type_info_struct_analog_button_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t deadzone;
+			type_info_member_t value;
+		}members;
+	};
+};
+
+struct type_info_struct_gamepad_controller_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t gamepad_data;
+			type_info_member_t stick_data;
+			type_info_member_t gamepad_id;
+			type_info_member_t has_rumble;
+			type_info_member_t rumble_value;
+			type_info_member_t digital_buttons;
+			type_info_member_t analog_buttons;
+		}members;
+	};
+};
+
+struct type_info_struct_input_controller_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t is_valid;
+			type_info_member_t is_analog;
+			type_info_member_t type;
+			type_info_member_t keyboard;
+			type_info_member_t gamepad;
+		}members;
+	};
+};
+
+struct type_info_struct_game_action_binding_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t type;
+			type_info_member_t binding_id;
+		}members;
+	};
+};
+
+struct type_info_struct_game_action_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t keyboard;
+			type_info_member_t gamepad;
+			type_info_member_t name;
+		}members;
+	};
+};
+
+struct type_info_struct_input_manager_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t keyboard_data;
+			type_info_member_t gamepad_data;
+			type_info_member_t primary_controller_index;
+			type_info_member_t active_controller_index;
+			type_info_member_t connected_controller_count;
+			type_info_member_t controllers;
+			type_info_member_t game_actions;
+		}members;
+	};
+};
+
+struct type_info_struct_payload {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[1];
+		struct {
+			type_info_member_t input_data;
+		}members;
+	};
+};
+
+struct type_info_struct_packet_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t magic_value;
+			type_info_member_t type;
+			type_info_member_t client_id;
+			type_info_member_t payload;
+		}members;
+	};
+};
+
+
+struct type_info_enum_file_extension_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t FILE_EXT_INVALID;
+			type_info_member_t FILE_EXT_TTF;
+			type_info_member_t FILE_EXT_WAV;
+			type_info_member_t FILE_EXT_PNG;
+			type_info_member_t FILE_EXT_GLSL;
+			type_info_member_t FILE_EXT_OS_DLL;
+			type_info_member_t FILE_EXT_COUNT;
+		}members;
+	};
+};
+
+struct type_info_enum_file_watcher_change_event_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[10];
+		struct {
+			type_info_member_t FWC_EVENT_NONE;
+			type_info_member_t FWC_EVENT_ADDED;
+			type_info_member_t FWC_EVENT_MODIFIED;
+			type_info_member_t FWC_EVENT_DELETED;
+			type_info_member_t FWC_EVENT_MOVED;
+			type_info_member_t FWC_EVENT_ATTRIBUTE_CHANGE;
+			type_info_member_t FWC_EVENT_SCAN_CHILDREN;
+			type_info_member_t FWC_EVENT_RENAMED;
+			type_info_member_t FWC_EVENT_ALL;
+			type_info_member_t WFC_EVENT_COUNT;
+		}members;
+	};
+};
+
+struct type_info_enum_hash_table_allocation_flags_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t HTAF_Invalid;
+			type_info_member_t HTAF_Static;
+			type_info_member_t HTAF_KeyCopy;
+			type_info_member_t HTAF_ValueCopy;
+			type_info_member_t HTAF_Garbage;
+			type_info_member_t HTAF_None;
+		}members;
+	};
+};
 
 struct type_info_enum_debug_log_level_t {
 	const char *name;
@@ -2595,7 +2663,7 @@ struct type_info_enum_debug_log_level_t {
 	};
 };
 
-struct type_info_enum_za_allocation_tag_t {
+struct type_info_enum_arg_type_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2604,20 +2672,17 @@ struct type_info_enum_za_allocation_tag_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[7];
+		type_info_member_t member_array[4];
 		struct {
-			type_info_member_t ZA_TAG_NONE;
-			type_info_member_t ZA_TAG_STATIC;
-			type_info_member_t ZA_TAG_TEXTURE;
-			type_info_member_t ZA_TAG_SOUND;
-			type_info_member_t ZA_TAG_FONT;
-			type_info_member_t ZA_TAG_PURGELEVEL;
-			type_info_member_t ZA_TAG_CACHE;
+			type_info_member_t FLAG_TYPE_BOOL;
+			type_info_member_t FLAG_TYPE_U64;
+			type_info_member_t FLAG_TYPE_FLOAT32;
+			type_info_member_t FLAG_TYPE_STRING;
 		}members;
 	};
 };
 
-struct type_info_enum_asset_type_t {
+struct type_info_enum_job_priority_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2626,117 +2691,12 @@ struct type_info_enum_asset_type_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[7];
+		type_info_member_t member_array[4];
 		struct {
-			type_info_member_t AT_Invalid;
-			type_info_member_t AT_Bitmap;
-			type_info_member_t AT_Shader;
-			type_info_member_t AT_Font;
-			type_info_member_t AT_Sound;
-			type_info_member_t AT_Material;
-			type_info_member_t AT_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_asset_slot_load_status_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[7];
-		struct {
-			type_info_member_t ASLS_Invalid;
-			type_info_member_t ASLS_Unloaded;
-			type_info_member_t ASLS_LoadQueued;
-			type_info_member_t ASLS_Loaded;
-			type_info_member_t ASLS_ShouldUnload;
-			type_info_member_t ASLS_ShouldReload;
-			type_info_member_t ASLS_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_bitmap_format_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t BMF_Invalid;
-			type_info_member_t BMF_R8;
-			type_info_member_t BMF_RGBA32;
-			type_info_member_t BMF_RGB24;
-			type_info_member_t BMF_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_entity_type {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t ET_Invalid;
-			type_info_member_t ET_Player;
-			type_info_member_t ET_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_entity_flags {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t EF_Valid;
-			type_info_member_t EF_Alive;
-			type_info_member_t EF_Gravitic;
-			type_info_member_t EF_Actor;
-			type_info_member_t EF_Static;
-			type_info_member_t EF_IsGround;
-		}members;
-	};
-};
-
-struct type_info_enum_packet_type_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t PT_Invalid;
-			type_info_member_t PT_Connect;
-			type_info_member_t PT_ConnectAccepted;
-			type_info_member_t PT_Disconnect;
-			type_info_member_t PT_InputData;
-			type_info_member_t PT_Count;
+			type_info_member_t TPTP_Invalid;
+			type_info_member_t TPTP_Low;
+			type_info_member_t TPTP_High;
+			type_info_member_t TPTP_Count;
 		}members;
 	};
 };
@@ -2779,26 +2739,7 @@ struct type_info_enum_preprocessor_token_type_t {
 	};
 };
 
-struct type_info_enum_arg_type_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t FLAG_TYPE_BOOL;
-			type_info_member_t FLAG_TYPE_U64;
-			type_info_member_t FLAG_TYPE_FLOAT32;
-			type_info_member_t FLAG_TYPE_STRING;
-		}members;
-	};
-};
-
-struct type_info_enum_file_extension_t {
+struct type_info_enum_za_allocation_tag_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2809,18 +2750,18 @@ struct type_info_enum_file_extension_t {
 	union {
 		type_info_member_t member_array[7];
 		struct {
-			type_info_member_t FILE_EXT_INVALID;
-			type_info_member_t FILE_EXT_TTF;
-			type_info_member_t FILE_EXT_WAV;
-			type_info_member_t FILE_EXT_PNG;
-			type_info_member_t FILE_EXT_GLSL;
-			type_info_member_t FILE_EXT_OS_DLL;
-			type_info_member_t FILE_EXT_COUNT;
+			type_info_member_t ZA_TAG_NONE;
+			type_info_member_t ZA_TAG_STATIC;
+			type_info_member_t ZA_TAG_TEXTURE;
+			type_info_member_t ZA_TAG_SOUND;
+			type_info_member_t ZA_TAG_FONT;
+			type_info_member_t ZA_TAG_PURGELEVEL;
+			type_info_member_t ZA_TAG_CACHE;
 		}members;
 	};
 };
 
-struct type_info_enum_controller_type_t {
+struct type_info_enum_entity_type {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2829,101 +2770,16 @@ struct type_info_enum_controller_type_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[4];
+		type_info_member_t member_array[3];
 		struct {
-			type_info_member_t IM_CONTROLLER_INVALID;
-			type_info_member_t IM_CONTROLLER_GAMEPAD;
-			type_info_member_t IM_CONTROLLER_KEYBOARD;
-			type_info_member_t IM_CONTROLLER_COUNT;
+			type_info_member_t ET_Invalid;
+			type_info_member_t ET_Player;
+			type_info_member_t ET_Count;
 		}members;
 	};
 };
 
-struct type_info_enum_input_mouse_buttons_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t SDL_LEFT_MOUSE;
-			type_info_member_t SDL_RIGHT_MOUSE;
-			type_info_member_t SDL_MIDDLE_MOUSE;
-			type_info_member_t SDL_X1_MOUSE;
-			type_info_member_t SDL_X2_MOUSE;
-			type_info_member_t SDL_MOUSE_BUTTON_COUNT;
-		}members;
-	};
-};
-
-struct type_info_enum_game_action_binding_type_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t GAB_Invalid;
-			type_info_member_t GAB_Button;
-			type_info_member_t GAB_Axis;
-			type_info_member_t GAB_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_file_watcher_change_event_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[10];
-		struct {
-			type_info_member_t FWC_EVENT_NONE;
-			type_info_member_t FWC_EVENT_ADDED;
-			type_info_member_t FWC_EVENT_MODIFIED;
-			type_info_member_t FWC_EVENT_DELETED;
-			type_info_member_t FWC_EVENT_MOVED;
-			type_info_member_t FWC_EVENT_ATTRIBUTE_CHANGE;
-			type_info_member_t FWC_EVENT_SCAN_CHILDREN;
-			type_info_member_t FWC_EVENT_RENAMED;
-			type_info_member_t FWC_EVENT_ALL;
-			type_info_member_t WFC_EVENT_COUNT;
-		}members;
-	};
-};
-
-struct type_info_enum_vulkan_shader_descriptor_set_binding_type_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t SDS_Static;
-			type_info_member_t SDS_Draw;
-			type_info_member_t SDS_Instance;
-			type_info_member_t SDS_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_vulkan_renderpass_state_t {
+struct type_info_enum_entity_flags {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -2934,75 +2790,12 @@ struct type_info_enum_vulkan_renderpass_state_t {
 	union {
 		type_info_member_t member_array[6];
 		struct {
-			type_info_member_t VKRPS_INVALID;
-			type_info_member_t VKRPS_RECORDING;
-			type_info_member_t VKRPS_WITHIN_RENDERPASS;
-			type_info_member_t VKRPS_RECORDING_ENDED;
-			type_info_member_t VKRPS_COMMANDS_SUBMITTED;
-			type_info_member_t VKRPS_COUNT;
-		}members;
-	};
-};
-
-struct type_info_enum_vulkan_command_buffer_state_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[8];
-		struct {
-			type_info_member_t VKCBS_INVALID;
-			type_info_member_t VKCBS_NOT_ALLOCATED;
-			type_info_member_t VKCBS_READY;
-			type_info_member_t VKCBS_RECORDING;
-			type_info_member_t VKCBS_WITHIN_RENDERPASS;
-			type_info_member_t VKCBS_RECORDING_ENDED;
-			type_info_member_t VKCBS_SUBMITTED;
-			type_info_member_t VKCBS_COUNT;
-		}members;
-	};
-};
-
-struct type_info_enum_hash_table_allocation_flags_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t HTAF_Invalid;
-			type_info_member_t HTAF_Static;
-			type_info_member_t HTAF_KeyCopy;
-			type_info_member_t HTAF_ValueCopy;
-			type_info_member_t HTAF_Garbage;
-			type_info_member_t HTAF_None;
-		}members;
-	};
-};
-
-struct type_info_enum_job_priority_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t TPTP_Invalid;
-			type_info_member_t TPTP_Low;
-			type_info_member_t TPTP_High;
-			type_info_member_t TPTP_Count;
+			type_info_member_t EF_Valid;
+			type_info_member_t EF_Alive;
+			type_info_member_t EF_Gravitic;
+			type_info_member_t EF_Actor;
+			type_info_member_t EF_Static;
+			type_info_member_t EF_IsGround;
 		}members;
 	};
 };
@@ -3102,39 +2895,436 @@ struct type_info_enum_render_pipeline_depth_function_t {
 	};
 };
 
+struct type_info_enum_vulkan_shader_descriptor_set_binding_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t SDS_Static;
+			type_info_member_t SDS_Draw;
+			type_info_member_t SDS_Instance;
+			type_info_member_t SDS_Count;
+		}members;
+	};
+};
 
-const static type_info_struct_zone_allocator_block_t type_info_struct_zone_allocator_block_t_const_data = {
-	.name = "zone_allocator_block_t",
-	.type = TYPE_zone_allocator_block_t,
+struct type_info_enum_vulkan_renderpass_state_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t VKRPS_INVALID;
+			type_info_member_t VKRPS_RECORDING;
+			type_info_member_t VKRPS_WITHIN_RENDERPASS;
+			type_info_member_t VKRPS_RECORDING_ENDED;
+			type_info_member_t VKRPS_COMMANDS_SUBMITTED;
+			type_info_member_t VKRPS_COUNT;
+		}members;
+	};
+};
+
+struct type_info_enum_vulkan_command_buffer_state_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[8];
+		struct {
+			type_info_member_t VKCBS_INVALID;
+			type_info_member_t VKCBS_NOT_ALLOCATED;
+			type_info_member_t VKCBS_READY;
+			type_info_member_t VKCBS_RECORDING;
+			type_info_member_t VKCBS_WITHIN_RENDERPASS;
+			type_info_member_t VKCBS_RECORDING_ENDED;
+			type_info_member_t VKCBS_SUBMITTED;
+			type_info_member_t VKCBS_COUNT;
+		}members;
+	};
+};
+
+struct type_info_enum_asset_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t AT_Invalid;
+			type_info_member_t AT_Bitmap;
+			type_info_member_t AT_Shader;
+			type_info_member_t AT_Font;
+			type_info_member_t AT_Sound;
+			type_info_member_t AT_Material;
+			type_info_member_t AT_Count;
+		}members;
+	};
+};
+
+struct type_info_enum_asset_slot_load_status_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t ASLS_Invalid;
+			type_info_member_t ASLS_Unloaded;
+			type_info_member_t ASLS_LoadQueued;
+			type_info_member_t ASLS_Loaded;
+			type_info_member_t ASLS_ShouldUnload;
+			type_info_member_t ASLS_ShouldReload;
+			type_info_member_t ASLS_Count;
+		}members;
+	};
+};
+
+struct type_info_enum_bitmap_format_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t BMF_Invalid;
+			type_info_member_t BMF_R8;
+			type_info_member_t BMF_RGBA32;
+			type_info_member_t BMF_RGB24;
+			type_info_member_t BMF_Count;
+		}members;
+	};
+};
+
+struct type_info_enum_controller_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t IM_CONTROLLER_INVALID;
+			type_info_member_t IM_CONTROLLER_GAMEPAD;
+			type_info_member_t IM_CONTROLLER_KEYBOARD;
+			type_info_member_t IM_CONTROLLER_COUNT;
+		}members;
+	};
+};
+
+struct type_info_enum_input_mouse_buttons_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t SDL_LEFT_MOUSE;
+			type_info_member_t SDL_RIGHT_MOUSE;
+			type_info_member_t SDL_MIDDLE_MOUSE;
+			type_info_member_t SDL_X1_MOUSE;
+			type_info_member_t SDL_X2_MOUSE;
+			type_info_member_t SDL_MOUSE_BUTTON_COUNT;
+		}members;
+	};
+};
+
+struct type_info_enum_game_action_binding_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t GAB_Invalid;
+			type_info_member_t GAB_Button;
+			type_info_member_t GAB_Axis;
+			type_info_member_t GAB_Count;
+		}members;
+	};
+};
+
+struct type_info_enum_packet_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t PT_Invalid;
+			type_info_member_t PT_Connect;
+			type_info_member_t PT_ConnectAccepted;
+			type_info_member_t PT_Disconnect;
+			type_info_member_t PT_InputData;
+			type_info_member_t PT_Count;
+		}members;
+	};
+};
+
+
+const static type_info_struct_memory_arena_footer_t type_info_struct_memory_arena_footer_t_const_data = {
+	.name = "memory_arena_footer_t",
+	.type = TYPE_memory_arena_footer_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_zone_allocator_block_t),
-	.member_count = 6,
+	.element_size = sizeof(GENERATED_DEFAULT_memory_arena_footer_t),
+	.member_count = 3,
 	.members = {
-		.block_id = {.name = "block_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.block_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), block_id))},
-		.is_allocated = {.name = "is_allocated", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.is_allocated)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), is_allocated))},
-		.block_size = {.name = "block_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.block_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), block_size))},
-		.allocation_tag = {.name = "allocation_tag", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.allocation_tag)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), allocation_tag))},
-		.next_block = {.name = "next_block", .type = TYPE_zone_allocator_block_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.next_block)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), next_block))},
-		.prev_block = {.name = "prev_block", .type = TYPE_zone_allocator_block_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.prev_block)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), prev_block))},
+		.last_base = {.name = "last_base", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_footer_t.last_base)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_footer_t), last_base))},
+		.last_used = {.name = "last_used", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_footer_t.last_used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_footer_t), last_used))},
+		.last_block_size = {.name = "last_block_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_footer_t.last_block_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_footer_t), last_block_size))},
 	}
 };
 
-const static type_info_struct_zone_allocator_t type_info_struct_zone_allocator_t_const_data = {
-	.name = "zone_allocator_t",
-	.type = TYPE_zone_allocator_t,
+const static type_info_struct_memory_arena_t type_info_struct_memory_arena_t_const_data = {
+	.name = "memory_arena_t",
+	.type = TYPE_memory_arena_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_zone_allocator_t),
+	.element_size = sizeof(GENERATED_DEFAULT_memory_arena_t),
+	.member_count = 6,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), is_initialized))},
+		.base = {.name = "base", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.base)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), base))},
+		.used = {.name = "used", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), used))},
+		.block_size = {.name = "block_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.block_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), block_size))},
+		.block_counter = {.name = "block_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.block_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), block_counter))},
+		.scratch_arena_count = {.name = "scratch_arena_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.scratch_arena_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), scratch_arena_count))},
+	}
+};
+
+const static type_info_struct_scratch_arena_t type_info_struct_scratch_arena_t_const_data = {
+	.name = "scratch_arena_t",
+	.type = TYPE_scratch_arena_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_scratch_arena_t),
+	.member_count = 3,
+	.members = {
+		.parent = {.name = "parent", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.parent)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), parent))},
+		.base = {.name = "base", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.base)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), base))},
+		.used = {.name = "used", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), used))},
+	}
+};
+
+const static type_info_struct_dynarray_header_t type_info_struct_dynarray_header_t_const_data = {
+	.name = "dynarray_header_t",
+	.type = TYPE_dynarray_header_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_dynarray_header_t),
+	.member_count = 4,
+	.members = {
+		.flags = {.name = "flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynarray_header_t.flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynarray_header_t), flags))},
+		.size = {.name = "size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynarray_header_t.size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynarray_header_t), size))},
+		.capacity = {.name = "capacity", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynarray_header_t.capacity)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynarray_header_t), capacity))},
+		.header_id = {.name = "header_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynarray_header_t.header_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynarray_header_t), header_id))},
+	}
+};
+
+const static type_info_struct_file_t type_info_struct_file_t_const_data = {
+	.name = "file_t",
+	.type = TYPE_file_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_file_t),
+	.member_count = 8,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), handle))},
+		.file_name = {.name = "file_name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.file_name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), file_name))},
+		.filepath = {.name = "filepath", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.filepath)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), filepath))},
+		.file_size = {.name = "file_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.file_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), file_size))},
+		.current_read_offset = {.name = "current_read_offset", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.current_read_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), current_read_offset))},
+		.current_write_offset = {.name = "current_write_offset", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.current_write_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), current_write_offset))},
+		.overlapping = {.name = "overlapping", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.overlapping)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), overlapping))},
+		.for_writing = {.name = "for_writing", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.for_writing)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), for_writing))},
+	}
+};
+
+const static type_info_struct_mapped_file_t type_info_struct_mapped_file_t_const_data = {
+	.name = "mapped_file_t",
+	.type = TYPE_mapped_file_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_mapped_file_t),
+	.member_count = 3,
+	.members = {
+		.file = {.name = "file", .type = TYPE_file_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_mapped_file_t.file)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_mapped_file_t), file))},
+		.mapping_handle = {.name = "mapping_handle", .type = TYPE_sys_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_mapped_file_t.mapping_handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_mapped_file_t), mapping_handle))},
+		.mapped_file_data = {.name = "mapped_file_data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_mapped_file_t.mapped_file_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_mapped_file_t), mapped_file_data))},
+	}
+};
+
+const static type_info_struct_file_data_t type_info_struct_file_data_t_const_data = {
+	.name = "file_data_t",
+	.type = TYPE_file_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_file_data_t),
+	.member_count = 4,
+	.members = {
+		.last_modtime = {.name = "last_modtime", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_data_t.last_modtime)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_data_t), last_modtime))},
+		.file_size = {.name = "file_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_data_t.file_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_data_t), file_size))},
+		.filename = {.name = "filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_data_t.filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_data_t), filename))},
+		.filepath = {.name = "filepath", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_data_t.filepath)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_data_t), filepath))},
+	}
+};
+
+const static type_info_struct_overlap_io_data_t type_info_struct_overlap_io_data_t_const_data = {
+	.name = "overlap_io_data_t",
+	.type = TYPE_overlap_io_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_overlap_io_data_t),
 	.member_count = 5,
 	.members = {
-		.mutex = {.name = "mutex", .type = TYPE_sys_mutex_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_t.mutex)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_t), mutex))},
-		.capacity = {.name = "capacity", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_t.capacity)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_t), capacity))},
-		.base = {.name = "base", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_t.base)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_t), base))},
-		.first_block = {.name = "first_block", .type = TYPE_zone_allocator_block_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_t.first_block)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_t), first_block))},
-		.cursor = {.name = "cursor", .type = TYPE_zone_allocator_block_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_t.cursor)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_t), cursor))},
+		.offset_to_read = {.name = "offset_to_read", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_overlap_io_data_t.offset_to_read)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_overlap_io_data_t), offset_to_read))},
+		.bytes_to_read = {.name = "bytes_to_read", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_overlap_io_data_t.bytes_to_read)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_overlap_io_data_t), bytes_to_read))},
+		.status = {.name = "status", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_overlap_io_data_t.status)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_overlap_io_data_t), status))},
+		.bytes_transfered = {.name = "bytes_transfered", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_overlap_io_data_t.bytes_transfered)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_overlap_io_data_t), bytes_transfered))},
+		.event_handle = {.name = "event_handle", .type = TYPE_sys_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_overlap_io_data_t.event_handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_overlap_io_data_t), event_handle))},
+	}
+};
+
+const static type_info_struct_visit_file_data_t type_info_struct_visit_file_data_t_const_data = {
+	.name = "visit_file_data_t",
+	.type = TYPE_visit_file_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_visit_file_data_t),
+	.member_count = 6,
+	.members = {
+		.function = {.name = "function", .type = TYPE_visit_files_pfn_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.function)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), function))},
+		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.user_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), user_data))},
+		.filename = {.name = "filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), filename))},
+		.fullname = {.name = "fullname", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.fullname)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), fullname))},
+		.recursive = {.name = "recursive", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.recursive)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), recursive))},
+		.is_directory = {.name = "is_directory", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.is_directory)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), is_directory))},
+	}
+};
+
+const static type_info_struct_file_watcher_recorded_change_t type_info_struct_file_watcher_recorded_change_t_const_data = {
+	.name = "file_watcher_recorded_change_t",
+	.type = TYPE_file_watcher_recorded_change_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_file_watcher_recorded_change_t),
+	.member_count = 4,
+	.members = {
+		.full_path = {.name = "full_path", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t.full_path)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t), full_path))},
+		.old_filename = {.name = "old_filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t.old_filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t), old_filename))},
+		.changes = {.name = "changes", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t.changes)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t), changes))},
+		.last_change_timestamp = {.name = "last_change_timestamp", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t.last_change_timestamp)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t), last_change_timestamp))},
+	}
+};
+
+const static type_info_struct_file_watcher_t type_info_struct_file_watcher_t_const_data = {
+	.name = "file_watcher_t",
+	.type = TYPE_file_watcher_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_file_watcher_t),
+	.member_count = 14,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), is_valid))},
+		.is_verbose = {.name = "is_verbose", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.is_verbose)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), is_verbose))},
+		.watcher_arena = {.name = "watcher_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.watcher_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), watcher_arena))},
+		.callback = {.name = "callback", .type = TYPE_file_watcher_callback_pfn_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.callback)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), callback))},
+		.events_to_monitor = {.name = "events_to_monitor", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.events_to_monitor)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), events_to_monitor))},
+		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.user_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), user_data))},
+		.watch_recursively = {.name = "watch_recursively", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.watch_recursively)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), watch_recursively))},
+		.observed_changes = {.name = "observed_changes", .type = TYPE_file_watcher_recorded_change_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.observed_changes)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), observed_changes))},
+		.change_count = {.name = "change_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.change_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), change_count))},
+		.paths_to_watch = {.name = "paths_to_watch", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.paths_to_watch)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), paths_to_watch))},
+		.paths_watched = {.name = "paths_watched", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.paths_watched)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), paths_watched))},
+		.notify_buffer_size = {.name = "notify_buffer_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.notify_buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), notify_buffer_size))},
+		.sys_watch_data = {.name = "sys_watch_data", .type = TYPE_file_watcher_sys_watch_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.sys_watch_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), sys_watch_data))},
+		.issues_when_checking = {.name = "issues_when_checking", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.issues_when_checking)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), issues_when_checking))},
+	}
+};
+
+const static type_info_struct_global_context_t type_info_struct_global_context_t_const_data = {
+	.name = "global_context_t",
+	.type = TYPE_global_context_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_global_context_t),
+	.member_count = 5,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), is_initialized))},
+		.running = {.name = "running", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.running)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), running))},
+		.context_arena = {.name = "context_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.context_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), context_arena))},
+		.temporary_arena = {.name = "temporary_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.temporary_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), temporary_arena))},
+		.main_threadpool = {.name = "main_threadpool", .type = TYPE_threadpool_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.main_threadpool)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), main_threadpool))},
+	}
+};
+
+const static type_info_struct_hash_table_header_t type_info_struct_hash_table_header_t_const_data = {
+	.name = "hash_table_header_t",
+	.type = TYPE_hash_table_header_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_hash_table_header_t),
+	.member_count = 4,
+	.members = {
+		.max_entries = {.name = "max_entries", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_hash_table_header_t.max_entries)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_hash_table_header_t), max_entries))},
+		.flags = {.name = "flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_hash_table_header_t.flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_hash_table_header_t), flags))},
+		.current_entry_count = {.name = "current_entry_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_hash_table_header_t.current_entry_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_hash_table_header_t), current_entry_count))},
+		.debug_id = {.name = "debug_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_hash_table_header_t.debug_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_hash_table_header_t), debug_id))},
 	}
 };
 
@@ -3362,350 +3552,51 @@ const static type_info_struct_raytest_t type_info_struct_raytest_t_const_data = 
 	}
 };
 
-const static type_info_struct_asset_handle_t type_info_struct_asset_handle_t_const_data = {
-	.name = "asset_handle_t",
-	.type = TYPE_asset_handle_t,
+const static type_info_struct_program_flag_data_t type_info_struct_program_flag_data_t_const_data = {
+	.name = "program_flag_data_t",
+	.type = TYPE_program_flag_data_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_asset_handle_t),
-	.member_count = 7,
-	.members = {
-		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), is_valid))},
-		.type = {.name = "type", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), type))},
-		.owner_asset_file_index = {.name = "owner_asset_file_index", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.owner_asset_file_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), owner_asset_file_index))},
-		.subtexture_data = {.name = "subtexture_data", .type = TYPE_subtexture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.subtexture_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), subtexture_data))},
-		.slot = {.name = "slot", .type = TYPE_asset_slot_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.slot)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), slot))},
-		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), texture))},
-		.shader = {.name = "shader", .type = TYPE_shader_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), shader))},
-	}
-};
-
-const static type_info_struct_bitmap_t type_info_struct_bitmap_t_const_data = {
-	.name = "bitmap_t",
-	.type = TYPE_bitmap_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_bitmap_t),
-	.member_count = 5,
-	.members = {
-		.width = {.name = "width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_bitmap_t.width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_bitmap_t), width))},
-		.height = {.name = "height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_bitmap_t.height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_bitmap_t), height))},
-		.channels = {.name = "channels", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_bitmap_t.channels)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_bitmap_t), channels))},
-		.format = {.name = "format", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_bitmap_t.format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_bitmap_t), format))},
-		.pixels = {.name = "pixels", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_bitmap_t.pixels)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_bitmap_t), pixels))},
-	}
-};
-
-const static type_info_struct_texture2D_t type_info_struct_texture2D_t_const_data = {
-	.name = "texture2D_t",
-	.type = TYPE_texture2D_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_texture2D_t),
-	.member_count = 3,
-	.members = {
-		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture2D_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture2D_t), ID))},
-		.bitmap = {.name = "bitmap", .type = TYPE_bitmap_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture2D_t.bitmap)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture2D_t), bitmap))},
-		.gpu_data = {.name = "gpu_data", .type = TYPE_vulkan_texture_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture2D_t.gpu_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture2D_t), gpu_data))},
-	}
-};
-
-const static type_info_struct_subtexture_data_t type_info_struct_subtexture_data_t_const_data = {
-	.name = "subtexture_data_t",
-	.type = TYPE_subtexture_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_subtexture_data_t),
-	.member_count = 6,
-	.members = {
-		.uv_min = {.name = "uv_min", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.uv_min)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), uv_min))},
-		.uv_max = {.name = "uv_max", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.uv_max)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), uv_max))},
-		.offset = {.name = "offset", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), offset))},
-		.size = {.name = "size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), size))},
-		.atlas_subtexture_index = {.name = "atlas_subtexture_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.atlas_subtexture_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), atlas_subtexture_index))},
-		.atlas = {.name = "atlas", .type = TYPE_texture_atlas_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.atlas)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), atlas))},
-	}
-};
-
-const static type_info_struct_texture_atlas_t type_info_struct_texture_atlas_t_const_data = {
-	.name = "texture_atlas_t",
-	.type = TYPE_texture_atlas_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_texture_atlas_t),
-	.member_count = 12,
-	.members = {
-		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), texture))},
-		.bitmap_data = {.name = "bitmap_data", .type = TYPE_bitmap_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.bitmap_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), bitmap_data))},
-		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), ID))},
-		.merge_counter = {.name = "merge_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.merge_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), merge_counter))},
-		.textures_to_merge = {.name = "textures_to_merge", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.textures_to_merge)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), textures_to_merge))},
-		.packed_subtextures = {.name = "packed_subtextures", .type = TYPE_subtexture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.packed_subtextures)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), packed_subtextures))},
-		.packed_subtexture_count = {.name = "packed_subtexture_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.packed_subtexture_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), packed_subtexture_count))},
-		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), is_valid))},
-		.atlas_cursor_x = {.name = "atlas_cursor_x", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.atlas_cursor_x)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), atlas_cursor_x))},
-		.atlas_cursor_y = {.name = "atlas_cursor_y", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.atlas_cursor_y)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), atlas_cursor_y))},
-		.tallest_y = {.name = "tallest_y", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.tallest_y)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), tallest_y))},
-		.atlas_size = {.name = "atlas_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.atlas_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), atlas_size))},
-	}
-};
-
-const static type_info_struct_shader_t type_info_struct_shader_t_const_data = {
-	.name = "shader_t",
-	.type = TYPE_shader_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_shader_t),
+	.element_size = sizeof(GENERATED_DEFAULT_program_flag_data_t),
 	.member_count = 4,
 	.members = {
-		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_shader_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_shader_t), ID))},
-		.shader_data = {.name = "shader_data", .type = TYPE_vulkan_shader_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_shader_t.shader_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_shader_t), shader_data))},
-		.camera_uniform = {.name = "camera_uniform", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_shader_t.camera_uniform)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_shader_t), camera_uniform))},
-		.texture_uniform = {.name = "texture_uniform", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_shader_t.texture_uniform)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_shader_t), texture_uniform))},
+		.bool32 = {.name = "bool32", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_data_t.bool32)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_data_t), bool32))},
+		.u64 = {.name = "u64", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_data_t.u64)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_data_t), u64))},
+		.float32 = {.name = "float32", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_data_t.float32)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_data_t), float32))},
+		.string = {.name = "string", .type = TYPE_char, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_data_t.string)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_data_t), string))},
 	}
 };
 
-const static type_info_struct_material_instance_t type_info_struct_material_instance_t_const_data = {
-	.name = "material_instance_t",
-	.type = TYPE_material_instance_t,
+const static type_info_struct_program_flag_t type_info_struct_program_flag_t_const_data = {
+	.name = "program_flag_t",
+	.type = TYPE_program_flag_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_material_instance_t),
+	.element_size = sizeof(GENERATED_DEFAULT_program_flag_t),
 	.member_count = 6,
 	.members = {
-		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), ID))},
-		.textures = {.name = "textures", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.textures)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), textures))},
-		.pipeline_state = {.name = "pipeline_state", .type = TYPE_render_pipeline_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.pipeline_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), pipeline_state))},
-		.shader_uniform_count = {.name = "shader_uniform_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.shader_uniform_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), shader_uniform_count))},
-		.uniform_data = {.name = "uniform_data", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.uniform_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), uniform_data))},
-		.archetype = {.name = "archetype", .type = TYPE_material_archetype_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.archetype)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), archetype))},
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), is_valid))},
+		.name = {.name = "name", .type = TYPE_char, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), name))},
+		.description = {.name = "description", .type = TYPE_char, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.description)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), description))},
+		.arg_type = {.name = "arg_type", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.arg_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), arg_type))},
+		.arg_value = {.name = "arg_value", .type = TYPE_program_flag_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.arg_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), arg_value))},
+		.default_arg_value = {.name = "default_arg_value", .type = TYPE_program_flag_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.default_arg_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), default_arg_value))},
 	}
 };
 
-const static type_info_struct_material_archetype_t type_info_struct_material_archetype_t_const_data = {
-	.name = "material_archetype_t",
-	.type = TYPE_material_archetype_t,
+const static type_info_struct_program_flag_state_t type_info_struct_program_flag_state_t_const_data = {
+	.name = "program_flag_state_t",
+	.type = TYPE_program_flag_state_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_material_archetype_t),
-	.member_count = 6,
-	.members = {
-		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), ID))},
-		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), name))},
-		.shader_binary_name = {.name = "shader_binary_name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.shader_binary_name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), shader_binary_name))},
-		.shader = {.name = "shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), shader))},
-		.renderer_effect_flags = {.name = "renderer_effect_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.renderer_effect_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), renderer_effect_flags))},
-		.base_instance = {.name = "base_instance", .type = TYPE_material_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.base_instance)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), base_instance))},
-	}
-};
-
-const static type_info_struct_asset_slot_t type_info_struct_asset_slot_t_const_data = {
-	.name = "asset_slot_t",
-	.type = TYPE_asset_slot_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_asset_slot_t),
-	.member_count = 11,
-	.members = {
-		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), ID))},
-		.slot_state = {.name = "slot_state", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.slot_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), slot_state))},
-		.type = {.name = "type", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), type))},
-		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), name))},
-		.owner_asset_file = {.name = "owner_asset_file", .type = TYPE_file_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.owner_asset_file)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), owner_asset_file))},
-		.package_entry = {.name = "package_entry", .type = TYPE_jfd_package_entry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.package_entry)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), package_entry))},
-		.package_generation = {.name = "package_generation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.package_generation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), package_generation))},
-		.ref_counter = {.name = "ref_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.ref_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), ref_counter))},
-		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), texture))},
-		.shader = {.name = "shader", .type = TYPE_shader_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), shader))},
-		.material = {.name = "material", .type = TYPE_material_archetype_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.material)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), material))},
-	}
-};
-
-const static type_info_struct_asset_manager_asset_file_data_t type_info_struct_asset_manager_asset_file_data_t_const_data = {
-	.name = "asset_manager_asset_file_data_t",
-	.type = TYPE_asset_manager_asset_file_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_asset_manager_asset_file_data_t),
-	.member_count = 10,
-	.members = {
-		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), is_initialized))},
-		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), ID))},
-		.init_arena = {.name = "init_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.init_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), init_arena))},
-		.load_status = {.name = "load_status", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.load_status)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), load_status))},
-		.file_info = {.name = "file_info", .type = TYPE_file_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.file_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), file_info))},
-		.raw_file_data = {.name = "raw_file_data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.raw_file_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), raw_file_data))},
-		.package_entries = {.name = "package_entries", .type = TYPE_jfd_package_entry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.package_entries)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), package_entries))},
-		.package_entry_count = {.name = "package_entry_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.package_entry_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), package_entry_count))},
-		.entry_hash = {.name = "entry_hash", .type = TYPE_s32, .kind = META_TYPE_KIND_HashTable, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.entry_hash)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), entry_hash))},
-		.header_data = {.name = "header_data", .type = TYPE_jfd_file_header_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.header_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), header_data))},
-	}
-};
-
-const static type_info_struct_asset_catalog_t type_info_struct_asset_catalog_t_const_data = {
-	.name = "asset_catalog_t",
-	.type = TYPE_asset_catalog_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_asset_catalog_t),
-	.member_count = 4,
-	.members = {
-		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_catalog_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_catalog_t), ID))},
-		.catalog_type = {.name = "catalog_type", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_catalog_t.catalog_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_catalog_t), catalog_type))},
-		.asset_manager = {.name = "asset_manager", .type = TYPE_asset_manager_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_catalog_t.asset_manager)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_catalog_t), asset_manager))},
-		.asset_lookup = {.name = "asset_lookup", .type = TYPE_asset_slot_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_catalog_t.asset_lookup)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_catalog_t), asset_lookup))},
-	}
-};
-
-const static type_info_struct_texture_atlas_registry_t type_info_struct_texture_atlas_registry_t_const_data = {
-	.name = "texture_atlas_registry_t",
-	.type = TYPE_texture_atlas_registry_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_texture_atlas_registry_t),
+	.element_size = sizeof(GENERATED_DEFAULT_program_flag_state_t),
 	.member_count = 2,
 	.members = {
-		.atlases = {.name = "atlases", .type = TYPE_texture_atlas_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_registry_t.atlases)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_registry_t), atlases))},
-		.current_atlas_count = {.name = "current_atlas_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_registry_t.current_atlas_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_registry_t), current_atlas_count))},
-	}
-};
-
-const static type_info_struct_asset_manager_t type_info_struct_asset_manager_t_const_data = {
-	.name = "asset_manager_t",
-	.type = TYPE_asset_manager_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_asset_manager_t),
-	.member_count = 13,
-	.members = {
-		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), is_initialized))},
-		.manager_arena = {.name = "manager_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.manager_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), manager_arena))},
-		.asset_files = {.name = "asset_files", .type = TYPE_asset_manager_asset_file_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_files)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_files))},
-		.asset_name_to_file = {.name = "asset_name_to_file", .type = TYPE_s32, .kind = META_TYPE_KIND_HashTable, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_name_to_file)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_name_to_file))},
-		.loaded_file_count = {.name = "loaded_file_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.loaded_file_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), loaded_file_count))},
-		.asset_load_queue = {.name = "asset_load_queue", .type = TYPE_asset_slot_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_load_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_load_queue))},
-		.asset_unload_queue = {.name = "asset_unload_queue", .type = TYPE_asset_slot_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_unload_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_unload_queue))},
-		.atlas_registry = {.name = "atlas_registry", .type = TYPE_texture_atlas_registry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.atlas_registry)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), atlas_registry))},
-		.asset_allocator = {.name = "asset_allocator", .type = TYPE_zone_allocator_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_allocator)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_allocator))},
-		.asset_catalogs = {.name = "asset_catalogs", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_catalogs)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_catalogs))},
-		.texture_catalog = {.name = "texture_catalog", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.texture_catalog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), texture_catalog))},
-		.shader_catalog = {.name = "shader_catalog", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.shader_catalog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), shader_catalog))},
-		.render_context = {.name = "render_context", .type = TYPE_vulkan_render_context_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.render_context)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), render_context))},
-	}
-};
-
-const static type_info_struct_entity_t type_info_struct_entity_t_const_data = {
-	.name = "entity_t",
-	.type = TYPE_entity_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_entity_t),
-	.member_count = 6,
-	.members = {
-		.e_type = {.name = "e_type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.e_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), e_type))},
-		.e_flags = {.name = "e_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.e_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), e_flags))},
-		.owner_client_id = {.name = "owner_client_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.owner_client_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), owner_client_id))},
-		.last_position = {.name = "last_position", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.last_position)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), last_position))},
-		.position = {.name = "position", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.position)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), position))},
-		.velocity = {.name = "velocity", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.velocity)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), velocity))},
-	}
-};
-
-const static type_info_struct_entity_manager_t type_info_struct_entity_manager_t_const_data = {
-	.name = "entity_manager_t",
-	.type = TYPE_entity_manager_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_entity_manager_t),
-	.member_count = 2,
-	.members = {
-		.entities = {.name = "entities", .type = TYPE_entity_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_manager_t.entities)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_manager_t), entities))},
-		.active_entities = {.name = "active_entities", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_manager_t.active_entities)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_manager_t), active_entities))},
-	}
-};
-
-const static type_info_struct_payload type_info_struct_payload_const_data = {
-	.name = "payload",
-	.type = TYPE_payload,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_packet_t.payload),
-	.member_count = 1,
-	.members = {
-		.input_data = {.name = "input_data", .type = TYPE_input_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.payload.input_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packet_t.payload), input_data))},
-	}
-};
-
-const static type_info_struct_packet_t type_info_struct_packet_t_const_data = {
-	.name = "packet_t",
-	.type = TYPE_packet_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_packet_t),
-	.member_count = 4,
-	.members = {
-		.magic_value = {.name = "magic_value", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.magic_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packet_t), magic_value))},
-		.type = {.name = "type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packet_t), type))},
-		.client_id = {.name = "client_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.client_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packet_t), client_id))},
-		.payload = {.name = "payload", .type = TYPE_payload, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.payload)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packet_t), payload))},
-	}
-};
-
-const static type_info_struct_sys_thread_t type_info_struct_sys_thread_t_const_data = {
-	.name = "sys_thread_t",
-	.type = TYPE_sys_thread_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_sys_thread_t),
-	.member_count = 3,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_sys_thread_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), handle))},
-		.thread_id = {.name = "thread_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.thread_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), thread_id))},
-		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.user_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), user_data))},
-	}
-};
-
-const static type_info_struct_sys_mutex_t type_info_struct_sys_mutex_t_const_data = {
-	.name = "sys_mutex_t",
-	.type = TYPE_sys_mutex_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_sys_mutex_t),
-	.member_count = 1,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_sys_mutex_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_mutex_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_mutex_t), handle))},
-	}
-};
-
-const static type_info_struct_sys_semaphore_t type_info_struct_sys_semaphore_t_const_data = {
-	.name = "sys_semaphore_t",
-	.type = TYPE_sys_semaphore_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_sys_semaphore_t),
-	.member_count = 1,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_sys_semaphore_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_semaphore_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_semaphore_t), handle))},
+		.program_flags = {.name = "program_flags", .type = TYPE_program_flag_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_state_t.program_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_state_t), program_flags))},
+		.flag_counter = {.name = "flag_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_state_t.flag_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_state_t), flag_counter))},
 	}
 };
 
@@ -3758,6 +3649,98 @@ const static type_info_struct_string_builder_t type_info_struct_string_builder_t
 	}
 };
 
+const static type_info_struct_sys_thread_t type_info_struct_sys_thread_t_const_data = {
+	.name = "sys_thread_t",
+	.type = TYPE_sys_thread_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_sys_thread_t),
+	.member_count = 3,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_thread_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), handle))},
+		.thread_id = {.name = "thread_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.thread_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), thread_id))},
+		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.user_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), user_data))},
+	}
+};
+
+const static type_info_struct_sys_mutex_t type_info_struct_sys_mutex_t_const_data = {
+	.name = "sys_mutex_t",
+	.type = TYPE_sys_mutex_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_sys_mutex_t),
+	.member_count = 1,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_mutex_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_mutex_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_mutex_t), handle))},
+	}
+};
+
+const static type_info_struct_sys_semaphore_t type_info_struct_sys_semaphore_t_const_data = {
+	.name = "sys_semaphore_t",
+	.type = TYPE_sys_semaphore_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_sys_semaphore_t),
+	.member_count = 1,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_semaphore_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_semaphore_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_semaphore_t), handle))},
+	}
+};
+
+const static type_info_struct_threadpool_queue_entry_t type_info_struct_threadpool_queue_entry_t_const_data = {
+	.name = "threadpool_queue_entry_t",
+	.type = TYPE_threadpool_queue_entry_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_threadpool_queue_entry_t),
+	.member_count = 4,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), is_valid))},
+		.entry_buffer = {.name = "entry_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.entry_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), entry_buffer))},
+		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.user_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), user_data))},
+		.callback = {.name = "callback", .type = TYPE_threadpool_callback_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.callback)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), callback))},
+	}
+};
+
+const static type_info_struct_threadpool_queue_t type_info_struct_threadpool_queue_t_const_data = {
+	.name = "threadpool_queue_t",
+	.type = TYPE_threadpool_queue_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_threadpool_queue_t),
+	.member_count = 5,
+	.members = {
+		.completion_goal = {.name = "completion_goal", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.completion_goal)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), completion_goal))},
+		.entries_completed = {.name = "entries_completed", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.entries_completed)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), entries_completed))},
+		.next_entry_to_write = {.name = "next_entry_to_write", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.next_entry_to_write)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), next_entry_to_write))},
+		.next_entry_to_read = {.name = "next_entry_to_read", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.next_entry_to_read)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), next_entry_to_read))},
+		.entries = {.name = "entries", .type = TYPE_threadpool_queue_entry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.entries)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), entries))},
+	}
+};
+
+const static type_info_struct_threadpool_t type_info_struct_threadpool_t_const_data = {
+	.name = "threadpool_t",
+	.type = TYPE_threadpool_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_threadpool_t),
+	.member_count = 6,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), is_initialized))},
+		.semaphore = {.name = "semaphore", .type = TYPE_sys_semaphore_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.semaphore)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), semaphore))},
+		.threads_awake = {.name = "threads_awake", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.threads_awake)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), threads_awake))},
+		.max_threads = {.name = "max_threads", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.max_threads)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), max_threads))},
+		.high_priority_queue = {.name = "high_priority_queue", .type = TYPE_threadpool_queue_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.high_priority_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), high_priority_queue))},
+		.low_priority_queue = {.name = "low_priority_queue", .type = TYPE_threadpool_queue_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.low_priority_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), low_priority_queue))},
+	}
+};
+
 const static type_info_struct_token_data_t type_info_struct_token_data_t_const_data = {
 	.name = "token_data_t",
 	.type = TYPE_token_data_t,
@@ -3785,376 +3768,236 @@ const static type_info_struct_tokenizer_t type_info_struct_tokenizer_t_const_dat
 	}
 };
 
-const static type_info_struct_program_flag_data_t type_info_struct_program_flag_data_t_const_data = {
-	.name = "program_flag_data_t",
-	.type = TYPE_program_flag_data_t,
+const static type_info_struct_zone_allocator_block_t type_info_struct_zone_allocator_block_t_const_data = {
+	.name = "zone_allocator_block_t",
+	.type = TYPE_zone_allocator_block_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_program_flag_data_t),
-	.member_count = 4,
-	.members = {
-		.bool32 = {.name = "bool32", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_data_t.bool32)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_data_t), bool32))},
-		.u64 = {.name = "u64", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_data_t.u64)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_data_t), u64))},
-		.float32 = {.name = "float32", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_data_t.float32)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_data_t), float32))},
-		.string = {.name = "string", .type = TYPE_char, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_data_t.string)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_data_t), string))},
-	}
-};
-
-const static type_info_struct_program_flag_t type_info_struct_program_flag_t_const_data = {
-	.name = "program_flag_t",
-	.type = TYPE_program_flag_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_program_flag_t),
+	.element_size = sizeof(GENERATED_DEFAULT_zone_allocator_block_t),
 	.member_count = 6,
 	.members = {
-		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), is_valid))},
-		.name = {.name = "name", .type = TYPE_char, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), name))},
-		.description = {.name = "description", .type = TYPE_char, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.description)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), description))},
-		.arg_type = {.name = "arg_type", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.arg_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), arg_type))},
-		.arg_value = {.name = "arg_value", .type = TYPE_program_flag_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.arg_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), arg_value))},
-		.default_arg_value = {.name = "default_arg_value", .type = TYPE_program_flag_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_t.default_arg_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_t), default_arg_value))},
+		.block_id = {.name = "block_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.block_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), block_id))},
+		.is_allocated = {.name = "is_allocated", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.is_allocated)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), is_allocated))},
+		.block_size = {.name = "block_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.block_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), block_size))},
+		.allocation_tag = {.name = "allocation_tag", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.allocation_tag)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), allocation_tag))},
+		.next_block = {.name = "next_block", .type = TYPE_zone_allocator_block_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.next_block)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), next_block))},
+		.prev_block = {.name = "prev_block", .type = TYPE_zone_allocator_block_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_block_t.prev_block)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_block_t), prev_block))},
 	}
 };
 
-const static type_info_struct_program_flag_state_t type_info_struct_program_flag_state_t_const_data = {
-	.name = "program_flag_state_t",
-	.type = TYPE_program_flag_state_t,
+const static type_info_struct_zone_allocator_t type_info_struct_zone_allocator_t_const_data = {
+	.name = "zone_allocator_t",
+	.type = TYPE_zone_allocator_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_program_flag_state_t),
+	.element_size = sizeof(GENERATED_DEFAULT_zone_allocator_t),
+	.member_count = 5,
+	.members = {
+		.mutex = {.name = "mutex", .type = TYPE_sys_mutex_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_t.mutex)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_t), mutex))},
+		.capacity = {.name = "capacity", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_t.capacity)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_t), capacity))},
+		.base = {.name = "base", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_t.base)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_t), base))},
+		.first_block = {.name = "first_block", .type = TYPE_zone_allocator_block_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_t.first_block)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_t), first_block))},
+		.cursor = {.name = "cursor", .type = TYPE_zone_allocator_block_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_zone_allocator_t.cursor)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_zone_allocator_t), cursor))},
+	}
+};
+
+const static type_info_struct_entity_t type_info_struct_entity_t_const_data = {
+	.name = "entity_t",
+	.type = TYPE_entity_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_entity_t),
+	.member_count = 6,
+	.members = {
+		.e_type = {.name = "e_type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.e_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), e_type))},
+		.e_flags = {.name = "e_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.e_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), e_flags))},
+		.owner_client_id = {.name = "owner_client_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.owner_client_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), owner_client_id))},
+		.last_position = {.name = "last_position", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.last_position)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), last_position))},
+		.position = {.name = "position", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.position)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), position))},
+		.velocity = {.name = "velocity", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_t.velocity)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_t), velocity))},
+	}
+};
+
+const static type_info_struct_entity_manager_t type_info_struct_entity_manager_t_const_data = {
+	.name = "entity_manager_t",
+	.type = TYPE_entity_manager_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_entity_manager_t),
 	.member_count = 2,
 	.members = {
-		.program_flags = {.name = "program_flags", .type = TYPE_program_flag_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_state_t.program_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_state_t), program_flags))},
-		.flag_counter = {.name = "flag_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_program_flag_state_t.flag_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_program_flag_state_t), flag_counter))},
+		.entities = {.name = "entities", .type = TYPE_entity_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_manager_t.entities)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_manager_t), entities))},
+		.active_entities = {.name = "active_entities", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_entity_manager_t.active_entities)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_entity_manager_t), active_entities))},
 	}
 };
 
-const static type_info_struct_dynarray_header_t type_info_struct_dynarray_header_t_const_data = {
-	.name = "dynarray_header_t",
-	.type = TYPE_dynarray_header_t,
+const static type_info_struct_input_data_t type_info_struct_input_data_t_const_data = {
+	.name = "input_data_t",
+	.type = TYPE_input_data_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_dynarray_header_t),
-	.member_count = 4,
+	.element_size = sizeof(GENERATED_DEFAULT_input_data_t),
+	.member_count = 1,
 	.members = {
-		.flags = {.name = "flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynarray_header_t.flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynarray_header_t), flags))},
-		.size = {.name = "size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynarray_header_t.size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynarray_header_t), size))},
-		.capacity = {.name = "capacity", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynarray_header_t.capacity)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynarray_header_t), capacity))},
-		.header_id = {.name = "header_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynarray_header_t.header_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynarray_header_t), header_id))},
+		.input_axis = {.name = "input_axis", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_data_t.input_axis)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_data_t), input_axis))},
 	}
 };
 
-const static type_info_struct_memory_arena_footer_t type_info_struct_memory_arena_footer_t_const_data = {
-	.name = "memory_arena_footer_t",
-	.type = TYPE_memory_arena_footer_t,
+const static type_info_struct_client_data_t type_info_struct_client_data_t_const_data = {
+	.name = "client_data_t",
+	.type = TYPE_client_data_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_memory_arena_footer_t),
-	.member_count = 3,
-	.members = {
-		.last_base = {.name = "last_base", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_footer_t.last_base)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_footer_t), last_base))},
-		.last_used = {.name = "last_used", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_footer_t.last_used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_footer_t), last_used))},
-		.last_block_size = {.name = "last_block_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_footer_t.last_block_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_footer_t), last_block_size))},
-	}
-};
-
-const static type_info_struct_memory_arena_t type_info_struct_memory_arena_t_const_data = {
-	.name = "memory_arena_t",
-	.type = TYPE_memory_arena_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_memory_arena_t),
-	.member_count = 6,
-	.members = {
-		.is_initialized = {.name = "is_initialized", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), is_initialized))},
-		.base = {.name = "base", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.base)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), base))},
-		.used = {.name = "used", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), used))},
-		.block_size = {.name = "block_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.block_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), block_size))},
-		.block_counter = {.name = "block_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.block_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), block_counter))},
-		.scratch_arena_count = {.name = "scratch_arena_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_memory_arena_t.scratch_arena_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_memory_arena_t), scratch_arena_count))},
-	}
-};
-
-const static type_info_struct_scratch_arena_t type_info_struct_scratch_arena_t_const_data = {
-	.name = "scratch_arena_t",
-	.type = TYPE_scratch_arena_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_scratch_arena_t),
-	.member_count = 3,
-	.members = {
-		.parent = {.name = "parent", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.parent)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), parent))},
-		.base = {.name = "base", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.base)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), base))},
-		.used = {.name = "used", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), used))},
-	}
-};
-
-const static type_info_struct_file_t type_info_struct_file_t_const_data = {
-	.name = "file_t",
-	.type = TYPE_file_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_file_t),
+	.element_size = sizeof(GENERATED_DEFAULT_client_data_t),
 	.member_count = 8,
 	.members = {
-		.handle = {.name = "handle", .type = TYPE_sys_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), handle))},
-		.file_name = {.name = "file_name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.file_name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), file_name))},
-		.filepath = {.name = "filepath", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.filepath)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), filepath))},
-		.file_size = {.name = "file_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.file_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), file_size))},
-		.current_read_offset = {.name = "current_read_offset", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.current_read_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), current_read_offset))},
-		.current_write_offset = {.name = "current_write_offset", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.current_write_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), current_write_offset))},
-		.overlapping = {.name = "overlapping", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.overlapping)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), overlapping))},
-		.for_writing = {.name = "for_writing", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_t.for_writing)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_t), for_writing))},
+		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), ID))},
+		.connected = {.name = "connected", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.connected)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), connected))},
+		.address = {.name = "address", .type = TYPE_sockaddr_storage, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.address)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), address))},
+		.addr_len = {.name = "addr_len", .type = TYPE_socklen_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.addr_len)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), addr_len))},
+		.player = {.name = "player", .type = TYPE_entity_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.player)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), player))},
+		.input_data_buffer = {.name = "input_data_buffer", .type = TYPE_input_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.input_data_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), input_data_buffer))},
+		.input_data_head = {.name = "input_data_head", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.input_data_head)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), input_data_head))},
+		.input_data_tail = {.name = "input_data_tail", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.input_data_tail)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), input_data_tail))},
 	}
 };
 
-const static type_info_struct_mapped_file_t type_info_struct_mapped_file_t_const_data = {
-	.name = "mapped_file_t",
-	.type = TYPE_mapped_file_t,
+const static type_info_struct_game_state_t type_info_struct_game_state_t_const_data = {
+	.name = "game_state_t",
+	.type = TYPE_game_state_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_mapped_file_t),
-	.member_count = 3,
+	.element_size = sizeof(GENERATED_DEFAULT_game_state_t),
+	.member_count = 11,
 	.members = {
-		.file = {.name = "file", .type = TYPE_file_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_mapped_file_t.file)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_mapped_file_t), file))},
-		.mapping_handle = {.name = "mapping_handle", .type = TYPE_sys_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_mapped_file_t.mapping_handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_mapped_file_t), mapping_handle))},
-		.mapped_file_data = {.name = "mapped_file_data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_mapped_file_t.mapped_file_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_mapped_file_t), mapped_file_data))},
+		.window = {.name = "window", .type = TYPE_SDL_Window, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.window)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), window))},
+		.window_size = {.name = "window_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.window_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), window_size))},
+		.input_axis = {.name = "input_axis", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.input_axis)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), input_axis))},
+		.entity_manager = {.name = "entity_manager", .type = TYPE_entity_manager_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.entity_manager)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), entity_manager))},
+		.player = {.name = "player", .type = TYPE_entity_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.player)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), player))},
+		.is_host = {.name = "is_host", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.is_host)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), is_host))},
+		.socket = {.name = "socket", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.socket)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), socket))},
+		.host_address_data = {.name = "host_address_data", .type = TYPE_sockaddr_in_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.host_address_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), host_address_data))},
+		.client_id = {.name = "client_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.client_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), client_id))},
+		.clients = {.name = "clients", .type = TYPE_client_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.clients)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), clients))},
+		.connected_client_count = {.name = "connected_client_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.connected_client_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), connected_client_count))},
 	}
 };
 
-const static type_info_struct_file_data_t type_info_struct_file_data_t_const_data = {
-	.name = "file_data_t",
-	.type = TYPE_file_data_t,
+const static type_info_struct_render_geometry_instance_t type_info_struct_render_geometry_instance_t_const_data = {
+	.name = "render_geometry_instance_t",
+	.type = TYPE_render_geometry_instance_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_file_data_t),
-	.member_count = 4,
-	.members = {
-		.last_modtime = {.name = "last_modtime", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_data_t.last_modtime)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_data_t), last_modtime))},
-		.file_size = {.name = "file_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_data_t.file_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_data_t), file_size))},
-		.filename = {.name = "filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_data_t.filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_data_t), filename))},
-		.filepath = {.name = "filepath", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_data_t.filepath)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_data_t), filepath))},
-	}
-};
-
-const static type_info_struct_overlap_io_data_t type_info_struct_overlap_io_data_t_const_data = {
-	.name = "overlap_io_data_t",
-	.type = TYPE_overlap_io_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_overlap_io_data_t),
-	.member_count = 5,
-	.members = {
-		.offset_to_read = {.name = "offset_to_read", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_overlap_io_data_t.offset_to_read)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_overlap_io_data_t), offset_to_read))},
-		.bytes_to_read = {.name = "bytes_to_read", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_overlap_io_data_t.bytes_to_read)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_overlap_io_data_t), bytes_to_read))},
-		.status = {.name = "status", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_overlap_io_data_t.status)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_overlap_io_data_t), status))},
-		.bytes_transfered = {.name = "bytes_transfered", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_overlap_io_data_t.bytes_transfered)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_overlap_io_data_t), bytes_transfered))},
-		.event_handle = {.name = "event_handle", .type = TYPE_sys_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_overlap_io_data_t.event_handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_overlap_io_data_t), event_handle))},
-	}
-};
-
-const static type_info_struct_visit_file_data_t type_info_struct_visit_file_data_t_const_data = {
-	.name = "visit_file_data_t",
-	.type = TYPE_visit_file_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_visit_file_data_t),
+	.element_size = sizeof(GENERATED_DEFAULT_render_geometry_instance_t),
 	.member_count = 6,
 	.members = {
-		.function = {.name = "function", .type = TYPE_visit_files_pfn_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.function)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), function))},
-		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.user_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), user_data))},
-		.filename = {.name = "filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), filename))},
-		.fullname = {.name = "fullname", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.fullname)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), fullname))},
-		.recursive = {.name = "recursive", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.recursive)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), recursive))},
-		.is_directory = {.name = "is_directory", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_visit_file_data_t.is_directory)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_visit_file_data_t), is_directory))},
+		.transform = {.name = "transform", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.transform)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), transform))},
+		.color = {.name = "color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), color))},
+		.uv_min = {.name = "uv_min", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.uv_min)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), uv_min))},
+		.uv_max = {.name = "uv_max", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.uv_max)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), uv_max))},
+		.texture_index = {.name = "texture_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.texture_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), texture_index))},
+		.camera_index = {.name = "camera_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.camera_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), camera_index))},
 	}
 };
 
-const static type_info_struct_action_button_t type_info_struct_action_button_t_const_data = {
-	.name = "action_button_t",
-	.type = TYPE_action_button_t,
+const static type_info_struct_render_geometry_batch_t type_info_struct_render_geometry_batch_t_const_data = {
+	.name = "render_geometry_batch_t",
+	.type = TYPE_render_geometry_batch_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_action_button_t),
-	.member_count = 4,
+	.element_size = sizeof(GENERATED_DEFAULT_render_geometry_batch_t),
+	.member_count = 6,
 	.members = {
-		.is_down = {.name = "is_down", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.is_down)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), is_down))},
-		.is_released = {.name = "is_released", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.is_released)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), is_released))},
-		.is_pressed = {.name = "is_pressed", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.is_pressed)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), is_pressed))},
-		.half_transition_counter = {.name = "half_transition_counter", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.half_transition_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), half_transition_counter))},
+		.camera_data = {.name = "camera_data", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.camera_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), camera_data))},
+		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), is_valid))},
+		.primitive_count = {.name = "primitive_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.primitive_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), primitive_count))},
+		.master_array_start_offset = {.name = "master_array_start_offset", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.master_array_start_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), master_array_start_offset))},
+		.instances = {.name = "instances", .type = TYPE_render_geometry_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.instances)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), instances))},
+		.next_buffer = {.name = "next_buffer", .type = TYPE_render_geometry_batch_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.next_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), next_buffer))},
 	}
 };
 
-const static type_info_struct_keyboard_controller_data_t type_info_struct_keyboard_controller_data_t_const_data = {
-	.name = "keyboard_controller_data_t",
-	.type = TYPE_keyboard_controller_data_t,
+const static type_info_struct_render_group_t type_info_struct_render_group_t_const_data = {
+	.name = "render_group_t",
+	.type = TYPE_render_group_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_keyboard_controller_data_t),
-	.member_count = 7,
+	.element_size = sizeof(GENERATED_DEFAULT_render_group_t),
+	.member_count = 9,
 	.members = {
-		.input = {.name = "input", .type = TYPE_action_button_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.input)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), input))},
-		.current_mouse_pos = {.name = "current_mouse_pos", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.current_mouse_pos)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), current_mouse_pos))},
-		.last_mouse_pos = {.name = "last_mouse_pos", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.last_mouse_pos)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), last_mouse_pos))},
-		.mouse_delta = {.name = "mouse_delta", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.mouse_delta)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), mouse_delta))},
-		.is_shift_key_down = {.name = "is_shift_key_down", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.is_shift_key_down)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), is_shift_key_down))},
-		.is_control_key_down = {.name = "is_control_key_down", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.is_control_key_down)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), is_control_key_down))},
-		.is_alt_key_down = {.name = "is_alt_key_down", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.is_alt_key_down)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), is_alt_key_down))},
+		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), ID))},
+		.dynamic_pipeline_state = {.name = "dynamic_pipeline_state", .type = TYPE_render_pipeline_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.dynamic_pipeline_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), dynamic_pipeline_state))},
+		.shader = {.name = "shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), shader))},
+		.textures = {.name = "textures", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.textures)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), textures))},
+		.current_texture_count = {.name = "current_texture_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.current_texture_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), current_texture_count))},
+		.master_batch_array = {.name = "master_batch_array", .type = TYPE_render_geometry_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.master_batch_array)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), master_batch_array))},
+		.total_primitive_count = {.name = "total_primitive_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.total_primitive_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), total_primitive_count))},
+		.cached_buffer = {.name = "cached_buffer", .type = TYPE_render_geometry_batch_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.cached_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), cached_buffer))},
+		.first_buffer = {.name = "first_buffer", .type = TYPE_render_geometry_batch_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.first_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), first_buffer))},
 	}
 };
 
-const static type_info_struct_analog_button_t type_info_struct_analog_button_t_const_data = {
-	.name = "analog_button_t",
-	.type = TYPE_analog_button_t,
+const static type_info_struct_state type_info_struct_state_const_data = {
+	.name = "state",
+	.type = TYPE_state,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_analog_button_t),
-	.member_count = 2,
+	.element_size = sizeof(GENERATED_DEFAULT_draw_frame_t.state),
+	.member_count = 6,
 	.members = {
-		.deadzone = {.name = "deadzone", .type = TYPE_s16, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_analog_button_t.deadzone)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_analog_button_t), deadzone))},
-		.value = {.name = "value", .type = TYPE_s16, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_analog_button_t.value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_analog_button_t), value))},
+		.cached_camera_ID = {.name = "cached_camera_ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.cached_camera_ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), cached_camera_ID))},
+		.active_render_layer = {.name = "active_render_layer", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_render_layer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_render_layer))},
+		.active_render_group = {.name = "active_render_group", .type = TYPE_render_group_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_render_group)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_render_group))},
+		.active_camera = {.name = "active_camera", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_camera)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_camera))},
+		.active_shader = {.name = "active_shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_shader))},
+		.active_pipeline_state = {.name = "active_pipeline_state", .type = TYPE_render_pipeline_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_pipeline_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_pipeline_state))},
 	}
 };
 
-const static type_info_struct_gamepad_controller_data_t type_info_struct_gamepad_controller_data_t_const_data = {
-	.name = "gamepad_controller_data_t",
-	.type = TYPE_gamepad_controller_data_t,
+const static type_info_struct_draw_frame_t type_info_struct_draw_frame_t_const_data = {
+	.name = "draw_frame_t",
+	.type = TYPE_draw_frame_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_gamepad_controller_data_t),
-	.member_count = 7,
-	.members = {
-		.gamepad_data = {.name = "gamepad_data", .type = TYPE_SDL_Gamepad, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.gamepad_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), gamepad_data))},
-		.stick_data = {.name = "stick_data", .type = TYPE_SDL_Joystick, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.stick_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), stick_data))},
-		.gamepad_id = {.name = "gamepad_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.gamepad_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), gamepad_id))},
-		.has_rumble = {.name = "has_rumble", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.has_rumble)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), has_rumble))},
-		.rumble_value = {.name = "rumble_value", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.rumble_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), rumble_value))},
-		.digital_buttons = {.name = "digital_buttons", .type = TYPE_action_button_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.digital_buttons)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), digital_buttons))},
-		.analog_buttons = {.name = "analog_buttons", .type = TYPE_analog_button_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.analog_buttons)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), analog_buttons))},
-	}
-};
-
-const static type_info_struct_input_controller_t type_info_struct_input_controller_t_const_data = {
-	.name = "input_controller_t",
-	.type = TYPE_input_controller_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_input_controller_t),
+	.element_size = sizeof(GENERATED_DEFAULT_draw_frame_t),
 	.member_count = 5,
 	.members = {
-		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), is_valid))},
-		.is_analog = {.name = "is_analog", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.is_analog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), is_analog))},
-		.type = {.name = "type", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), type))},
-		.keyboard = {.name = "keyboard", .type = TYPE_keyboard_controller_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.keyboard)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), keyboard))},
-		.gamepad = {.name = "gamepad", .type = TYPE_gamepad_controller_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.gamepad)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), gamepad))},
+		.used_render_groups = {.name = "used_render_groups", .type = TYPE_render_group_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_render_groups)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_render_groups))},
+		.used_render_group_count = {.name = "used_render_group_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_render_group_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_render_group_count))},
+		.used_camera = {.name = "used_camera", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_camera)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_camera))},
+		.used_camera_count = {.name = "used_camera_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_camera_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_camera_count))},
+		.state = {.name = "state", .type = TYPE_state, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), state))},
 	}
 };
 
-const static type_info_struct_game_action_binding_t type_info_struct_game_action_binding_t_const_data = {
-	.name = "game_action_binding_t",
-	.type = TYPE_game_action_binding_t,
+const static type_info_struct_render_state_t type_info_struct_render_state_t_const_data = {
+	.name = "render_state_t",
+	.type = TYPE_render_state_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_game_action_binding_t),
-	.member_count = 2,
+	.element_size = sizeof(GENERATED_DEFAULT_render_state_t),
+	.member_count = 6,
 	.members = {
-		.type = {.name = "type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_action_binding_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_action_binding_t), type))},
-		.binding_id = {.name = "binding_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_action_binding_t.binding_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_action_binding_t), binding_id))},
-	}
-};
-
-const static type_info_struct_game_action_t type_info_struct_game_action_t_const_data = {
-	.name = "game_action_t",
-	.type = TYPE_game_action_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_game_action_t),
-	.member_count = 3,
-	.members = {
-		.keyboard = {.name = "keyboard", .type = TYPE_game_action_binding_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_action_t.keyboard)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_action_t), keyboard))},
-		.gamepad = {.name = "gamepad", .type = TYPE_game_action_binding_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_action_t.gamepad)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_action_t), gamepad))},
-		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_action_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_action_t), name))},
-	}
-};
-
-const static type_info_struct_input_manager_t type_info_struct_input_manager_t_const_data = {
-	.name = "input_manager_t",
-	.type = TYPE_input_manager_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_input_manager_t),
-	.member_count = 7,
-	.members = {
-		.keyboard_data = {.name = "keyboard_data", .type = TYPE_keyboard_controller_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.keyboard_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), keyboard_data))},
-		.gamepad_data = {.name = "gamepad_data", .type = TYPE_gamepad_controller_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.gamepad_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), gamepad_data))},
-		.primary_controller_index = {.name = "primary_controller_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.primary_controller_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), primary_controller_index))},
-		.active_controller_index = {.name = "active_controller_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.active_controller_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), active_controller_index))},
-		.connected_controller_count = {.name = "connected_controller_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.connected_controller_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), connected_controller_count))},
-		.controllers = {.name = "controllers", .type = TYPE_input_controller_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.controllers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), controllers))},
-		.game_actions = {.name = "game_actions", .type = TYPE_game_action_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.game_actions)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), game_actions))},
-	}
-};
-
-const static type_info_struct_file_watcher_recorded_change_t type_info_struct_file_watcher_recorded_change_t_const_data = {
-	.name = "file_watcher_recorded_change_t",
-	.type = TYPE_file_watcher_recorded_change_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_file_watcher_recorded_change_t),
-	.member_count = 4,
-	.members = {
-		.full_path = {.name = "full_path", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t.full_path)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t), full_path))},
-		.old_filename = {.name = "old_filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t.old_filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t), old_filename))},
-		.changes = {.name = "changes", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t.changes)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t), changes))},
-		.last_change_timestamp = {.name = "last_change_timestamp", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t.last_change_timestamp)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_recorded_change_t), last_change_timestamp))},
-	}
-};
-
-const static type_info_struct_file_watcher_t type_info_struct_file_watcher_t_const_data = {
-	.name = "file_watcher_t",
-	.type = TYPE_file_watcher_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_file_watcher_t),
-	.member_count = 14,
-	.members = {
-		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), is_valid))},
-		.is_verbose = {.name = "is_verbose", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.is_verbose)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), is_verbose))},
-		.watcher_arena = {.name = "watcher_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.watcher_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), watcher_arena))},
-		.callback = {.name = "callback", .type = TYPE_file_watcher_callback_pfn_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.callback)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), callback))},
-		.events_to_monitor = {.name = "events_to_monitor", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.events_to_monitor)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), events_to_monitor))},
-		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.user_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), user_data))},
-		.watch_recursively = {.name = "watch_recursively", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.watch_recursively)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), watch_recursively))},
-		.observed_changes = {.name = "observed_changes", .type = TYPE_file_watcher_recorded_change_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.observed_changes)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), observed_changes))},
-		.change_count = {.name = "change_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.change_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), change_count))},
-		.paths_to_watch = {.name = "paths_to_watch", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.paths_to_watch)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), paths_to_watch))},
-		.paths_watched = {.name = "paths_watched", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.paths_watched)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), paths_watched))},
-		.notify_buffer_size = {.name = "notify_buffer_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.notify_buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), notify_buffer_size))},
-		.sys_watch_data = {.name = "sys_watch_data", .type = TYPE_file_watcher_sys_watch_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.sys_watch_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), sys_watch_data))},
-		.issues_when_checking = {.name = "issues_when_checking", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_t.issues_when_checking)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_t), issues_when_checking))},
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), is_initialized))},
+		.renderer_arena = {.name = "renderer_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.renderer_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), renderer_arena))},
+		.render_context = {.name = "render_context", .type = TYPE_vulkan_render_context_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.render_context)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), render_context))},
+		.current_frame_data = {.name = "current_frame_data", .type = TYPE_vulkan_render_frame_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.current_frame_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), current_frame_data))},
+		.render_group_hash = {.name = "render_group_hash", .type = TYPE_render_group_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.render_group_hash)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), render_group_hash))},
+		.draw_frame = {.name = "draw_frame", .type = TYPE_draw_frame_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.draw_frame)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), draw_frame))},
 	}
 };
 
@@ -4708,257 +4551,461 @@ const static type_info_struct_vulkan_render_context_t type_info_struct_vulkan_re
 	}
 };
 
-const static type_info_struct_hash_table_header_t type_info_struct_hash_table_header_t_const_data = {
-	.name = "hash_table_header_t",
-	.type = TYPE_hash_table_header_t,
+const static type_info_struct_asset_handle_t type_info_struct_asset_handle_t_const_data = {
+	.name = "asset_handle_t",
+	.type = TYPE_asset_handle_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_hash_table_header_t),
+	.element_size = sizeof(GENERATED_DEFAULT_asset_handle_t),
+	.member_count = 7,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), is_valid))},
+		.type = {.name = "type", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), type))},
+		.owner_asset_file_index = {.name = "owner_asset_file_index", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.owner_asset_file_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), owner_asset_file_index))},
+		.subtexture_data = {.name = "subtexture_data", .type = TYPE_subtexture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.subtexture_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), subtexture_data))},
+		.slot = {.name = "slot", .type = TYPE_asset_slot_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.slot)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), slot))},
+		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), texture))},
+		.shader = {.name = "shader", .type = TYPE_shader_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), shader))},
+	}
+};
+
+const static type_info_struct_bitmap_t type_info_struct_bitmap_t_const_data = {
+	.name = "bitmap_t",
+	.type = TYPE_bitmap_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_bitmap_t),
+	.member_count = 5,
+	.members = {
+		.width = {.name = "width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_bitmap_t.width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_bitmap_t), width))},
+		.height = {.name = "height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_bitmap_t.height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_bitmap_t), height))},
+		.channels = {.name = "channels", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_bitmap_t.channels)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_bitmap_t), channels))},
+		.format = {.name = "format", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_bitmap_t.format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_bitmap_t), format))},
+		.pixels = {.name = "pixels", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_bitmap_t.pixels)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_bitmap_t), pixels))},
+	}
+};
+
+const static type_info_struct_texture2D_t type_info_struct_texture2D_t_const_data = {
+	.name = "texture2D_t",
+	.type = TYPE_texture2D_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_texture2D_t),
+	.member_count = 3,
+	.members = {
+		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture2D_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture2D_t), ID))},
+		.bitmap = {.name = "bitmap", .type = TYPE_bitmap_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture2D_t.bitmap)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture2D_t), bitmap))},
+		.gpu_data = {.name = "gpu_data", .type = TYPE_vulkan_texture_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture2D_t.gpu_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture2D_t), gpu_data))},
+	}
+};
+
+const static type_info_struct_subtexture_data_t type_info_struct_subtexture_data_t_const_data = {
+	.name = "subtexture_data_t",
+	.type = TYPE_subtexture_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_subtexture_data_t),
+	.member_count = 6,
+	.members = {
+		.uv_min = {.name = "uv_min", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.uv_min)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), uv_min))},
+		.uv_max = {.name = "uv_max", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.uv_max)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), uv_max))},
+		.offset = {.name = "offset", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), offset))},
+		.size = {.name = "size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), size))},
+		.atlas_subtexture_index = {.name = "atlas_subtexture_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.atlas_subtexture_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), atlas_subtexture_index))},
+		.atlas = {.name = "atlas", .type = TYPE_texture_atlas_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_subtexture_data_t.atlas)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_subtexture_data_t), atlas))},
+	}
+};
+
+const static type_info_struct_texture_atlas_t type_info_struct_texture_atlas_t_const_data = {
+	.name = "texture_atlas_t",
+	.type = TYPE_texture_atlas_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_texture_atlas_t),
+	.member_count = 12,
+	.members = {
+		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), texture))},
+		.bitmap_data = {.name = "bitmap_data", .type = TYPE_bitmap_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.bitmap_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), bitmap_data))},
+		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), ID))},
+		.merge_counter = {.name = "merge_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.merge_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), merge_counter))},
+		.textures_to_merge = {.name = "textures_to_merge", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.textures_to_merge)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), textures_to_merge))},
+		.packed_subtextures = {.name = "packed_subtextures", .type = TYPE_subtexture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.packed_subtextures)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), packed_subtextures))},
+		.packed_subtexture_count = {.name = "packed_subtexture_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.packed_subtexture_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), packed_subtexture_count))},
+		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), is_valid))},
+		.atlas_cursor_x = {.name = "atlas_cursor_x", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.atlas_cursor_x)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), atlas_cursor_x))},
+		.atlas_cursor_y = {.name = "atlas_cursor_y", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.atlas_cursor_y)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), atlas_cursor_y))},
+		.tallest_y = {.name = "tallest_y", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.tallest_y)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), tallest_y))},
+		.atlas_size = {.name = "atlas_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_t.atlas_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_t), atlas_size))},
+	}
+};
+
+const static type_info_struct_shader_t type_info_struct_shader_t_const_data = {
+	.name = "shader_t",
+	.type = TYPE_shader_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_shader_t),
 	.member_count = 4,
 	.members = {
-		.max_entries = {.name = "max_entries", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_hash_table_header_t.max_entries)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_hash_table_header_t), max_entries))},
-		.flags = {.name = "flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_hash_table_header_t.flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_hash_table_header_t), flags))},
-		.current_entry_count = {.name = "current_entry_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_hash_table_header_t.current_entry_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_hash_table_header_t), current_entry_count))},
-		.debug_id = {.name = "debug_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_hash_table_header_t.debug_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_hash_table_header_t), debug_id))},
+		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_shader_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_shader_t), ID))},
+		.shader_data = {.name = "shader_data", .type = TYPE_vulkan_shader_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_shader_t.shader_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_shader_t), shader_data))},
+		.camera_uniform = {.name = "camera_uniform", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_shader_t.camera_uniform)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_shader_t), camera_uniform))},
+		.texture_uniform = {.name = "texture_uniform", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_shader_t.texture_uniform)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_shader_t), texture_uniform))},
 	}
 };
 
-const static type_info_struct_threadpool_queue_entry_t type_info_struct_threadpool_queue_entry_t_const_data = {
-	.name = "threadpool_queue_entry_t",
-	.type = TYPE_threadpool_queue_entry_t,
+const static type_info_struct_material_instance_t type_info_struct_material_instance_t_const_data = {
+	.name = "material_instance_t",
+	.type = TYPE_material_instance_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_threadpool_queue_entry_t),
-	.member_count = 4,
-	.members = {
-		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), is_valid))},
-		.entry_buffer = {.name = "entry_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.entry_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), entry_buffer))},
-		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.user_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), user_data))},
-		.callback = {.name = "callback", .type = TYPE_threadpool_callback_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.callback)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), callback))},
-	}
-};
-
-const static type_info_struct_threadpool_queue_t type_info_struct_threadpool_queue_t_const_data = {
-	.name = "threadpool_queue_t",
-	.type = TYPE_threadpool_queue_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_threadpool_queue_t),
-	.member_count = 5,
-	.members = {
-		.completion_goal = {.name = "completion_goal", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.completion_goal)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), completion_goal))},
-		.entries_completed = {.name = "entries_completed", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.entries_completed)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), entries_completed))},
-		.next_entry_to_write = {.name = "next_entry_to_write", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.next_entry_to_write)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), next_entry_to_write))},
-		.next_entry_to_read = {.name = "next_entry_to_read", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.next_entry_to_read)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), next_entry_to_read))},
-		.entries = {.name = "entries", .type = TYPE_threadpool_queue_entry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.entries)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), entries))},
-	}
-};
-
-const static type_info_struct_threadpool_t type_info_struct_threadpool_t_const_data = {
-	.name = "threadpool_t",
-	.type = TYPE_threadpool_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_threadpool_t),
+	.element_size = sizeof(GENERATED_DEFAULT_material_instance_t),
 	.member_count = 6,
 	.members = {
-		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), is_initialized))},
-		.semaphore = {.name = "semaphore", .type = TYPE_sys_semaphore_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.semaphore)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), semaphore))},
-		.threads_awake = {.name = "threads_awake", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.threads_awake)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), threads_awake))},
-		.max_threads = {.name = "max_threads", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.max_threads)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), max_threads))},
-		.high_priority_queue = {.name = "high_priority_queue", .type = TYPE_threadpool_queue_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.high_priority_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), high_priority_queue))},
-		.low_priority_queue = {.name = "low_priority_queue", .type = TYPE_threadpool_queue_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.low_priority_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), low_priority_queue))},
+		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), ID))},
+		.textures = {.name = "textures", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.textures)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), textures))},
+		.pipeline_state = {.name = "pipeline_state", .type = TYPE_render_pipeline_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.pipeline_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), pipeline_state))},
+		.shader_uniform_count = {.name = "shader_uniform_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.shader_uniform_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), shader_uniform_count))},
+		.uniform_data = {.name = "uniform_data", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.uniform_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), uniform_data))},
+		.archetype = {.name = "archetype", .type = TYPE_material_archetype_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_instance_t.archetype)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_instance_t), archetype))},
 	}
 };
 
-const static type_info_struct_render_geometry_instance_t type_info_struct_render_geometry_instance_t_const_data = {
-	.name = "render_geometry_instance_t",
-	.type = TYPE_render_geometry_instance_t,
+const static type_info_struct_material_archetype_t type_info_struct_material_archetype_t_const_data = {
+	.name = "material_archetype_t",
+	.type = TYPE_material_archetype_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_render_geometry_instance_t),
+	.element_size = sizeof(GENERATED_DEFAULT_material_archetype_t),
 	.member_count = 6,
 	.members = {
-		.transform = {.name = "transform", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.transform)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), transform))},
-		.color = {.name = "color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), color))},
-		.uv_min = {.name = "uv_min", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.uv_min)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), uv_min))},
-		.uv_max = {.name = "uv_max", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.uv_max)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), uv_max))},
-		.texture_index = {.name = "texture_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.texture_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), texture_index))},
-		.camera_index = {.name = "camera_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.camera_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), camera_index))},
+		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), ID))},
+		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), name))},
+		.shader_binary_name = {.name = "shader_binary_name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.shader_binary_name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), shader_binary_name))},
+		.shader = {.name = "shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), shader))},
+		.renderer_effect_flags = {.name = "renderer_effect_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.renderer_effect_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), renderer_effect_flags))},
+		.base_instance = {.name = "base_instance", .type = TYPE_material_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.base_instance)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), base_instance))},
 	}
 };
 
-const static type_info_struct_render_geometry_batch_t type_info_struct_render_geometry_batch_t_const_data = {
-	.name = "render_geometry_batch_t",
-	.type = TYPE_render_geometry_batch_t,
+const static type_info_struct_asset_slot_t type_info_struct_asset_slot_t_const_data = {
+	.name = "asset_slot_t",
+	.type = TYPE_asset_slot_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_render_geometry_batch_t),
-	.member_count = 6,
-	.members = {
-		.camera_data = {.name = "camera_data", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.camera_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), camera_data))},
-		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), is_valid))},
-		.primitive_count = {.name = "primitive_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.primitive_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), primitive_count))},
-		.master_array_start_offset = {.name = "master_array_start_offset", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.master_array_start_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), master_array_start_offset))},
-		.instances = {.name = "instances", .type = TYPE_render_geometry_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.instances)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), instances))},
-		.next_buffer = {.name = "next_buffer", .type = TYPE_render_geometry_batch_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.next_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), next_buffer))},
-	}
-};
-
-const static type_info_struct_render_group_t type_info_struct_render_group_t_const_data = {
-	.name = "render_group_t",
-	.type = TYPE_render_group_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_render_group_t),
-	.member_count = 9,
-	.members = {
-		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), ID))},
-		.dynamic_pipeline_state = {.name = "dynamic_pipeline_state", .type = TYPE_render_pipeline_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.dynamic_pipeline_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), dynamic_pipeline_state))},
-		.shader = {.name = "shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), shader))},
-		.textures = {.name = "textures", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.textures)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), textures))},
-		.current_texture_count = {.name = "current_texture_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.current_texture_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), current_texture_count))},
-		.master_batch_array = {.name = "master_batch_array", .type = TYPE_render_geometry_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.master_batch_array)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), master_batch_array))},
-		.total_primitive_count = {.name = "total_primitive_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.total_primitive_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), total_primitive_count))},
-		.cached_buffer = {.name = "cached_buffer", .type = TYPE_render_geometry_batch_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.cached_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), cached_buffer))},
-		.first_buffer = {.name = "first_buffer", .type = TYPE_render_geometry_batch_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.first_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), first_buffer))},
-	}
-};
-
-const static type_info_struct_state type_info_struct_state_const_data = {
-	.name = "state",
-	.type = TYPE_state,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_draw_frame_t.state),
-	.member_count = 6,
-	.members = {
-		.cached_camera_ID = {.name = "cached_camera_ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.cached_camera_ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), cached_camera_ID))},
-		.active_render_layer = {.name = "active_render_layer", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_render_layer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_render_layer))},
-		.active_render_group = {.name = "active_render_group", .type = TYPE_render_group_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_render_group)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_render_group))},
-		.active_camera = {.name = "active_camera", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_camera)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_camera))},
-		.active_shader = {.name = "active_shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_shader))},
-		.active_pipeline_state = {.name = "active_pipeline_state", .type = TYPE_render_pipeline_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_pipeline_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_pipeline_state))},
-	}
-};
-
-const static type_info_struct_draw_frame_t type_info_struct_draw_frame_t_const_data = {
-	.name = "draw_frame_t",
-	.type = TYPE_draw_frame_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_draw_frame_t),
-	.member_count = 5,
-	.members = {
-		.used_render_groups = {.name = "used_render_groups", .type = TYPE_render_group_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_render_groups)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_render_groups))},
-		.used_render_group_count = {.name = "used_render_group_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_render_group_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_render_group_count))},
-		.used_camera = {.name = "used_camera", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_camera)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_camera))},
-		.used_camera_count = {.name = "used_camera_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_camera_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_camera_count))},
-		.state = {.name = "state", .type = TYPE_state, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), state))},
-	}
-};
-
-const static type_info_struct_render_state_t type_info_struct_render_state_t_const_data = {
-	.name = "render_state_t",
-	.type = TYPE_render_state_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_render_state_t),
-	.member_count = 6,
-	.members = {
-		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), is_initialized))},
-		.renderer_arena = {.name = "renderer_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.renderer_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), renderer_arena))},
-		.render_context = {.name = "render_context", .type = TYPE_vulkan_render_context_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.render_context)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), render_context))},
-		.current_frame_data = {.name = "current_frame_data", .type = TYPE_vulkan_render_frame_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.current_frame_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), current_frame_data))},
-		.render_group_hash = {.name = "render_group_hash", .type = TYPE_render_group_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.render_group_hash)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), render_group_hash))},
-		.draw_frame = {.name = "draw_frame", .type = TYPE_draw_frame_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_state_t.draw_frame)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_state_t), draw_frame))},
-	}
-};
-
-const static type_info_struct_global_context_t type_info_struct_global_context_t_const_data = {
-	.name = "global_context_t",
-	.type = TYPE_global_context_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_global_context_t),
-	.member_count = 5,
-	.members = {
-		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), is_initialized))},
-		.running = {.name = "running", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.running)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), running))},
-		.context_arena = {.name = "context_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.context_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), context_arena))},
-		.temporary_arena = {.name = "temporary_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.temporary_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), temporary_arena))},
-		.main_threadpool = {.name = "main_threadpool", .type = TYPE_threadpool_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.main_threadpool)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), main_threadpool))},
-	}
-};
-
-const static type_info_struct_input_data_t type_info_struct_input_data_t_const_data = {
-	.name = "input_data_t",
-	.type = TYPE_input_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_input_data_t),
-	.member_count = 1,
-	.members = {
-		.input_axis = {.name = "input_axis", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_data_t.input_axis)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_data_t), input_axis))},
-	}
-};
-
-const static type_info_struct_client_data_t type_info_struct_client_data_t_const_data = {
-	.name = "client_data_t",
-	.type = TYPE_client_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_client_data_t),
-	.member_count = 8,
-	.members = {
-		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), ID))},
-		.connected = {.name = "connected", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.connected)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), connected))},
-		.address = {.name = "address", .type = TYPE_sockaddr_storage, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.address)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), address))},
-		.addr_len = {.name = "addr_len", .type = TYPE_socklen_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.addr_len)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), addr_len))},
-		.player = {.name = "player", .type = TYPE_entity_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.player)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), player))},
-		.input_data_buffer = {.name = "input_data_buffer", .type = TYPE_input_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.input_data_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), input_data_buffer))},
-		.input_data_head = {.name = "input_data_head", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.input_data_head)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), input_data_head))},
-		.input_data_tail = {.name = "input_data_tail", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_client_data_t.input_data_tail)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_client_data_t), input_data_tail))},
-	}
-};
-
-const static type_info_struct_game_state_t type_info_struct_game_state_t_const_data = {
-	.name = "game_state_t",
-	.type = TYPE_game_state_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_game_state_t),
+	.element_size = sizeof(GENERATED_DEFAULT_asset_slot_t),
 	.member_count = 11,
 	.members = {
-		.window = {.name = "window", .type = TYPE_SDL_Window, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.window)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), window))},
-		.window_size = {.name = "window_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.window_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), window_size))},
-		.input_axis = {.name = "input_axis", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.input_axis)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), input_axis))},
-		.entity_manager = {.name = "entity_manager", .type = TYPE_entity_manager_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.entity_manager)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), entity_manager))},
-		.player = {.name = "player", .type = TYPE_entity_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.player)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), player))},
-		.is_host = {.name = "is_host", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.is_host)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), is_host))},
-		.socket = {.name = "socket", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.socket)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), socket))},
-		.host_address_data = {.name = "host_address_data", .type = TYPE_sockaddr_in_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.host_address_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), host_address_data))},
-		.client_id = {.name = "client_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.client_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), client_id))},
-		.clients = {.name = "clients", .type = TYPE_client_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.clients)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), clients))},
-		.connected_client_count = {.name = "connected_client_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_state_t.connected_client_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_state_t), connected_client_count))},
+		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), ID))},
+		.slot_state = {.name = "slot_state", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.slot_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), slot_state))},
+		.type = {.name = "type", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), type))},
+		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), name))},
+		.owner_asset_file = {.name = "owner_asset_file", .type = TYPE_file_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.owner_asset_file)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), owner_asset_file))},
+		.package_entry = {.name = "package_entry", .type = TYPE_jfd_package_entry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.package_entry)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), package_entry))},
+		.package_generation = {.name = "package_generation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.package_generation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), package_generation))},
+		.ref_counter = {.name = "ref_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.ref_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), ref_counter))},
+		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), texture))},
+		.shader = {.name = "shader", .type = TYPE_shader_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), shader))},
+		.material = {.name = "material", .type = TYPE_material_archetype_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.material)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), material))},
+	}
+};
+
+const static type_info_struct_asset_manager_asset_file_data_t type_info_struct_asset_manager_asset_file_data_t_const_data = {
+	.name = "asset_manager_asset_file_data_t",
+	.type = TYPE_asset_manager_asset_file_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_asset_manager_asset_file_data_t),
+	.member_count = 10,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), is_initialized))},
+		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), ID))},
+		.init_arena = {.name = "init_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.init_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), init_arena))},
+		.load_status = {.name = "load_status", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.load_status)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), load_status))},
+		.file_info = {.name = "file_info", .type = TYPE_file_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.file_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), file_info))},
+		.raw_file_data = {.name = "raw_file_data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.raw_file_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), raw_file_data))},
+		.package_entries = {.name = "package_entries", .type = TYPE_jfd_package_entry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.package_entries)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), package_entries))},
+		.package_entry_count = {.name = "package_entry_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.package_entry_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), package_entry_count))},
+		.entry_hash = {.name = "entry_hash", .type = TYPE_s32, .kind = META_TYPE_KIND_HashTable, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.entry_hash)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), entry_hash))},
+		.header_data = {.name = "header_data", .type = TYPE_jfd_file_header_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t.header_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_asset_file_data_t), header_data))},
+	}
+};
+
+const static type_info_struct_asset_catalog_t type_info_struct_asset_catalog_t_const_data = {
+	.name = "asset_catalog_t",
+	.type = TYPE_asset_catalog_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_asset_catalog_t),
+	.member_count = 4,
+	.members = {
+		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_catalog_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_catalog_t), ID))},
+		.catalog_type = {.name = "catalog_type", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_catalog_t.catalog_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_catalog_t), catalog_type))},
+		.asset_manager = {.name = "asset_manager", .type = TYPE_asset_manager_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_catalog_t.asset_manager)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_catalog_t), asset_manager))},
+		.asset_lookup = {.name = "asset_lookup", .type = TYPE_asset_slot_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_catalog_t.asset_lookup)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_catalog_t), asset_lookup))},
+	}
+};
+
+const static type_info_struct_texture_atlas_registry_t type_info_struct_texture_atlas_registry_t_const_data = {
+	.name = "texture_atlas_registry_t",
+	.type = TYPE_texture_atlas_registry_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_texture_atlas_registry_t),
+	.member_count = 2,
+	.members = {
+		.atlases = {.name = "atlases", .type = TYPE_texture_atlas_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_registry_t.atlases)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_registry_t), atlases))},
+		.current_atlas_count = {.name = "current_atlas_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_atlas_registry_t.current_atlas_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_atlas_registry_t), current_atlas_count))},
+	}
+};
+
+const static type_info_struct_asset_manager_t type_info_struct_asset_manager_t_const_data = {
+	.name = "asset_manager_t",
+	.type = TYPE_asset_manager_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_asset_manager_t),
+	.member_count = 13,
+	.members = {
+		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), is_initialized))},
+		.manager_arena = {.name = "manager_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.manager_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), manager_arena))},
+		.asset_files = {.name = "asset_files", .type = TYPE_asset_manager_asset_file_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_files)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_files))},
+		.asset_name_to_file = {.name = "asset_name_to_file", .type = TYPE_s32, .kind = META_TYPE_KIND_HashTable, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_name_to_file)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_name_to_file))},
+		.loaded_file_count = {.name = "loaded_file_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.loaded_file_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), loaded_file_count))},
+		.asset_load_queue = {.name = "asset_load_queue", .type = TYPE_asset_slot_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_load_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_load_queue))},
+		.asset_unload_queue = {.name = "asset_unload_queue", .type = TYPE_asset_slot_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_unload_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_unload_queue))},
+		.atlas_registry = {.name = "atlas_registry", .type = TYPE_texture_atlas_registry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.atlas_registry)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), atlas_registry))},
+		.asset_allocator = {.name = "asset_allocator", .type = TYPE_zone_allocator_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_allocator)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_allocator))},
+		.asset_catalogs = {.name = "asset_catalogs", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_catalogs)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_catalogs))},
+		.texture_catalog = {.name = "texture_catalog", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.texture_catalog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), texture_catalog))},
+		.shader_catalog = {.name = "shader_catalog", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.shader_catalog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), shader_catalog))},
+		.render_context = {.name = "render_context", .type = TYPE_vulkan_render_context_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.render_context)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), render_context))},
+	}
+};
+
+const static type_info_struct_action_button_t type_info_struct_action_button_t_const_data = {
+	.name = "action_button_t",
+	.type = TYPE_action_button_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_action_button_t),
+	.member_count = 4,
+	.members = {
+		.is_down = {.name = "is_down", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.is_down)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), is_down))},
+		.is_released = {.name = "is_released", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.is_released)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), is_released))},
+		.is_pressed = {.name = "is_pressed", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.is_pressed)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), is_pressed))},
+		.half_transition_counter = {.name = "half_transition_counter", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.half_transition_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), half_transition_counter))},
+	}
+};
+
+const static type_info_struct_keyboard_controller_data_t type_info_struct_keyboard_controller_data_t_const_data = {
+	.name = "keyboard_controller_data_t",
+	.type = TYPE_keyboard_controller_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_keyboard_controller_data_t),
+	.member_count = 7,
+	.members = {
+		.input = {.name = "input", .type = TYPE_action_button_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.input)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), input))},
+		.current_mouse_pos = {.name = "current_mouse_pos", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.current_mouse_pos)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), current_mouse_pos))},
+		.last_mouse_pos = {.name = "last_mouse_pos", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.last_mouse_pos)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), last_mouse_pos))},
+		.mouse_delta = {.name = "mouse_delta", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.mouse_delta)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), mouse_delta))},
+		.is_shift_key_down = {.name = "is_shift_key_down", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.is_shift_key_down)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), is_shift_key_down))},
+		.is_control_key_down = {.name = "is_control_key_down", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.is_control_key_down)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), is_control_key_down))},
+		.is_alt_key_down = {.name = "is_alt_key_down", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_keyboard_controller_data_t.is_alt_key_down)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_keyboard_controller_data_t), is_alt_key_down))},
+	}
+};
+
+const static type_info_struct_analog_button_t type_info_struct_analog_button_t_const_data = {
+	.name = "analog_button_t",
+	.type = TYPE_analog_button_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_analog_button_t),
+	.member_count = 2,
+	.members = {
+		.deadzone = {.name = "deadzone", .type = TYPE_s16, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_analog_button_t.deadzone)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_analog_button_t), deadzone))},
+		.value = {.name = "value", .type = TYPE_s16, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_analog_button_t.value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_analog_button_t), value))},
+	}
+};
+
+const static type_info_struct_gamepad_controller_data_t type_info_struct_gamepad_controller_data_t_const_data = {
+	.name = "gamepad_controller_data_t",
+	.type = TYPE_gamepad_controller_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_gamepad_controller_data_t),
+	.member_count = 7,
+	.members = {
+		.gamepad_data = {.name = "gamepad_data", .type = TYPE_SDL_Gamepad, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.gamepad_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), gamepad_data))},
+		.stick_data = {.name = "stick_data", .type = TYPE_SDL_Joystick, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.stick_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), stick_data))},
+		.gamepad_id = {.name = "gamepad_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.gamepad_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), gamepad_id))},
+		.has_rumble = {.name = "has_rumble", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.has_rumble)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), has_rumble))},
+		.rumble_value = {.name = "rumble_value", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.rumble_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), rumble_value))},
+		.digital_buttons = {.name = "digital_buttons", .type = TYPE_action_button_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.digital_buttons)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), digital_buttons))},
+		.analog_buttons = {.name = "analog_buttons", .type = TYPE_analog_button_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_gamepad_controller_data_t.analog_buttons)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_gamepad_controller_data_t), analog_buttons))},
+	}
+};
+
+const static type_info_struct_input_controller_t type_info_struct_input_controller_t_const_data = {
+	.name = "input_controller_t",
+	.type = TYPE_input_controller_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_input_controller_t),
+	.member_count = 5,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), is_valid))},
+		.is_analog = {.name = "is_analog", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.is_analog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), is_analog))},
+		.type = {.name = "type", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), type))},
+		.keyboard = {.name = "keyboard", .type = TYPE_keyboard_controller_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.keyboard)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), keyboard))},
+		.gamepad = {.name = "gamepad", .type = TYPE_gamepad_controller_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.gamepad)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), gamepad))},
+	}
+};
+
+const static type_info_struct_game_action_binding_t type_info_struct_game_action_binding_t_const_data = {
+	.name = "game_action_binding_t",
+	.type = TYPE_game_action_binding_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_game_action_binding_t),
+	.member_count = 2,
+	.members = {
+		.type = {.name = "type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_action_binding_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_action_binding_t), type))},
+		.binding_id = {.name = "binding_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_action_binding_t.binding_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_action_binding_t), binding_id))},
+	}
+};
+
+const static type_info_struct_game_action_t type_info_struct_game_action_t_const_data = {
+	.name = "game_action_t",
+	.type = TYPE_game_action_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_game_action_t),
+	.member_count = 3,
+	.members = {
+		.keyboard = {.name = "keyboard", .type = TYPE_game_action_binding_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_action_t.keyboard)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_action_t), keyboard))},
+		.gamepad = {.name = "gamepad", .type = TYPE_game_action_binding_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_action_t.gamepad)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_action_t), gamepad))},
+		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_game_action_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_game_action_t), name))},
+	}
+};
+
+const static type_info_struct_input_manager_t type_info_struct_input_manager_t_const_data = {
+	.name = "input_manager_t",
+	.type = TYPE_input_manager_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_input_manager_t),
+	.member_count = 7,
+	.members = {
+		.keyboard_data = {.name = "keyboard_data", .type = TYPE_keyboard_controller_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.keyboard_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), keyboard_data))},
+		.gamepad_data = {.name = "gamepad_data", .type = TYPE_gamepad_controller_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.gamepad_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), gamepad_data))},
+		.primary_controller_index = {.name = "primary_controller_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.primary_controller_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), primary_controller_index))},
+		.active_controller_index = {.name = "active_controller_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.active_controller_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), active_controller_index))},
+		.connected_controller_count = {.name = "connected_controller_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.connected_controller_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), connected_controller_count))},
+		.controllers = {.name = "controllers", .type = TYPE_input_controller_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.controllers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), controllers))},
+		.game_actions = {.name = "game_actions", .type = TYPE_game_action_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_manager_t.game_actions)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_input_manager_t), game_actions))},
+	}
+};
+
+const static type_info_struct_payload type_info_struct_payload_const_data = {
+	.name = "payload",
+	.type = TYPE_payload,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_packet_t.payload),
+	.member_count = 1,
+	.members = {
+		.input_data = {.name = "input_data", .type = TYPE_input_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.payload.input_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packet_t.payload), input_data))},
+	}
+};
+
+const static type_info_struct_packet_t type_info_struct_packet_t_const_data = {
+	.name = "packet_t",
+	.type = TYPE_packet_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_packet_t),
+	.member_count = 4,
+	.members = {
+		.magic_value = {.name = "magic_value", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.magic_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packet_t), magic_value))},
+		.type = {.name = "type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packet_t), type))},
+		.client_id = {.name = "client_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.client_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packet_t), client_id))},
+		.payload = {.name = "payload", .type = TYPE_payload, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.payload)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packet_t), payload))},
 	}
 };
 
 
+const static type_info_enum_file_extension_t type_info_enum_file_extension_t_const_data = {
+	.name = "file_extension_t",
+	.type = TYPE_file_extension_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 7,
+	.members = {
+		.FILE_EXT_INVALID = {.name = "FILE_EXT_INVALID", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_INVALID), .offset = FILE_EXT_INVALID},
+		.FILE_EXT_TTF = {.name = "FILE_EXT_TTF", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_TTF), .offset = FILE_EXT_TTF},
+		.FILE_EXT_WAV = {.name = "FILE_EXT_WAV", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_WAV), .offset = FILE_EXT_WAV},
+		.FILE_EXT_PNG = {.name = "FILE_EXT_PNG", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_PNG), .offset = FILE_EXT_PNG},
+		.FILE_EXT_GLSL = {.name = "FILE_EXT_GLSL", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_GLSL), .offset = FILE_EXT_GLSL},
+		.FILE_EXT_OS_DLL = {.name = "FILE_EXT_OS_DLL", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_OS_DLL), .offset = FILE_EXT_OS_DLL},
+		.FILE_EXT_COUNT = {.name = "FILE_EXT_COUNT", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_COUNT), .offset = FILE_EXT_COUNT},
+	}
+};
+const static type_info_enum_file_watcher_change_event_t type_info_enum_file_watcher_change_event_t_const_data = {
+	.name = "file_watcher_change_event_t",
+	.type = TYPE_file_watcher_change_event_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 10,
+	.members = {
+		.FWC_EVENT_NONE = {.name = "FWC_EVENT_NONE", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_NONE), .offset = FWC_EVENT_NONE},
+		.FWC_EVENT_ADDED = {.name = "FWC_EVENT_ADDED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_ADDED), .offset = FWC_EVENT_ADDED},
+		.FWC_EVENT_MODIFIED = {.name = "FWC_EVENT_MODIFIED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_MODIFIED), .offset = FWC_EVENT_MODIFIED},
+		.FWC_EVENT_DELETED = {.name = "FWC_EVENT_DELETED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_DELETED), .offset = FWC_EVENT_DELETED},
+		.FWC_EVENT_MOVED = {.name = "FWC_EVENT_MOVED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_MOVED), .offset = FWC_EVENT_MOVED},
+		.FWC_EVENT_ATTRIBUTE_CHANGE = {.name = "FWC_EVENT_ATTRIBUTE_CHANGE", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_ATTRIBUTE_CHANGE), .offset = FWC_EVENT_ATTRIBUTE_CHANGE},
+		.FWC_EVENT_SCAN_CHILDREN = {.name = "FWC_EVENT_SCAN_CHILDREN", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_SCAN_CHILDREN), .offset = FWC_EVENT_SCAN_CHILDREN},
+		.FWC_EVENT_RENAMED = {.name = "FWC_EVENT_RENAMED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_RENAMED), .offset = FWC_EVENT_RENAMED},
+		.FWC_EVENT_ALL = {.name = "FWC_EVENT_ALL", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_ALL), .offset = FWC_EVENT_ALL},
+		.WFC_EVENT_COUNT = {.name = "WFC_EVENT_COUNT", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(WFC_EVENT_COUNT), .offset = WFC_EVENT_COUNT},
+	}
+};
+const static type_info_enum_hash_table_allocation_flags_t type_info_enum_hash_table_allocation_flags_t_const_data = {
+	.name = "hash_table_allocation_flags_t",
+	.type = TYPE_hash_table_allocation_flags_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 6,
+	.members = {
+		.HTAF_Invalid = {.name = "HTAF_Invalid", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_Invalid), .offset = HTAF_Invalid},
+		.HTAF_Static = {.name = "HTAF_Static", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_Static), .offset = HTAF_Static},
+		.HTAF_KeyCopy = {.name = "HTAF_KeyCopy", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_KeyCopy), .offset = HTAF_KeyCopy},
+		.HTAF_ValueCopy = {.name = "HTAF_ValueCopy", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_ValueCopy), .offset = HTAF_ValueCopy},
+		.HTAF_Garbage = {.name = "HTAF_Garbage", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_Garbage), .offset = HTAF_Garbage},
+		.HTAF_None = {.name = "HTAF_None", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_None), .offset = HTAF_None},
+	}
+};
 const static type_info_enum_debug_log_level_t type_info_enum_debug_log_level_t_const_data = {
 	.name = "debug_log_level_t",
 	.type = TYPE_debug_log_level_t,
@@ -4973,101 +5020,28 @@ const static type_info_enum_debug_log_level_t type_info_enum_debug_log_level_t_c
 		.SL_LOG_FATAL = {.name = "SL_LOG_FATAL", .type = TYPE_debug_log_level_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SL_LOG_FATAL), .offset = SL_LOG_FATAL},
 	}
 };
-const static type_info_enum_za_allocation_tag_t type_info_enum_za_allocation_tag_t_const_data = {
-	.name = "za_allocation_tag_t",
-	.type = TYPE_za_allocation_tag_t,
+const static type_info_enum_arg_type_t type_info_enum_arg_type_t_const_data = {
+	.name = "arg_type_t",
+	.type = TYPE_arg_type_t,
 	.kind = META_TYPE_KIND_Enum,
-	.member_count = 7,
+	.member_count = 4,
 	.members = {
-		.ZA_TAG_NONE = {.name = "ZA_TAG_NONE", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_NONE), .offset = ZA_TAG_NONE},
-		.ZA_TAG_STATIC = {.name = "ZA_TAG_STATIC", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_STATIC), .offset = ZA_TAG_STATIC},
-		.ZA_TAG_TEXTURE = {.name = "ZA_TAG_TEXTURE", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_TEXTURE), .offset = ZA_TAG_TEXTURE},
-		.ZA_TAG_SOUND = {.name = "ZA_TAG_SOUND", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_SOUND), .offset = ZA_TAG_SOUND},
-		.ZA_TAG_FONT = {.name = "ZA_TAG_FONT", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_FONT), .offset = ZA_TAG_FONT},
-		.ZA_TAG_PURGELEVEL = {.name = "ZA_TAG_PURGELEVEL", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_PURGELEVEL), .offset = ZA_TAG_PURGELEVEL},
-		.ZA_TAG_CACHE = {.name = "ZA_TAG_CACHE", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_CACHE), .offset = ZA_TAG_CACHE},
+		.FLAG_TYPE_BOOL = {.name = "FLAG_TYPE_BOOL", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FLAG_TYPE_BOOL), .offset = FLAG_TYPE_BOOL},
+		.FLAG_TYPE_U64 = {.name = "FLAG_TYPE_U64", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FLAG_TYPE_U64), .offset = FLAG_TYPE_U64},
+		.FLAG_TYPE_FLOAT32 = {.name = "FLAG_TYPE_FLOAT32", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FLAG_TYPE_FLOAT32), .offset = FLAG_TYPE_FLOAT32},
+		.FLAG_TYPE_STRING = {.name = "FLAG_TYPE_STRING", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FLAG_TYPE_STRING), .offset = FLAG_TYPE_STRING},
 	}
 };
-const static type_info_enum_asset_type_t type_info_enum_asset_type_t_const_data = {
-	.name = "asset_type_t",
-	.type = TYPE_asset_type_t,
+const static type_info_enum_job_priority_t type_info_enum_job_priority_t_const_data = {
+	.name = "job_priority_t",
+	.type = TYPE_job_priority_t,
 	.kind = META_TYPE_KIND_Enum,
-	.member_count = 7,
+	.member_count = 4,
 	.members = {
-		.AT_Invalid = {.name = "AT_Invalid", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Invalid), .offset = AT_Invalid},
-		.AT_Bitmap = {.name = "AT_Bitmap", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Bitmap), .offset = AT_Bitmap},
-		.AT_Shader = {.name = "AT_Shader", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Shader), .offset = AT_Shader},
-		.AT_Font = {.name = "AT_Font", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Font), .offset = AT_Font},
-		.AT_Sound = {.name = "AT_Sound", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Sound), .offset = AT_Sound},
-		.AT_Material = {.name = "AT_Material", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Material), .offset = AT_Material},
-		.AT_Count = {.name = "AT_Count", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Count), .offset = AT_Count},
-	}
-};
-const static type_info_enum_asset_slot_load_status_t type_info_enum_asset_slot_load_status_t_const_data = {
-	.name = "asset_slot_load_status_t",
-	.type = TYPE_asset_slot_load_status_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 7,
-	.members = {
-		.ASLS_Invalid = {.name = "ASLS_Invalid", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_Invalid), .offset = ASLS_Invalid},
-		.ASLS_Unloaded = {.name = "ASLS_Unloaded", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_Unloaded), .offset = ASLS_Unloaded},
-		.ASLS_LoadQueued = {.name = "ASLS_LoadQueued", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_LoadQueued), .offset = ASLS_LoadQueued},
-		.ASLS_Loaded = {.name = "ASLS_Loaded", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_Loaded), .offset = ASLS_Loaded},
-		.ASLS_ShouldUnload = {.name = "ASLS_ShouldUnload", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_ShouldUnload), .offset = ASLS_ShouldUnload},
-		.ASLS_ShouldReload = {.name = "ASLS_ShouldReload", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_ShouldReload), .offset = ASLS_ShouldReload},
-		.ASLS_Count = {.name = "ASLS_Count", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_Count), .offset = ASLS_Count},
-	}
-};
-const static type_info_enum_bitmap_format_t type_info_enum_bitmap_format_t_const_data = {
-	.name = "bitmap_format_t",
-	.type = TYPE_bitmap_format_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 5,
-	.members = {
-		.BMF_Invalid = {.name = "BMF_Invalid", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_Invalid), .offset = BMF_Invalid},
-		.BMF_R8 = {.name = "BMF_R8", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_R8), .offset = BMF_R8},
-		.BMF_RGBA32 = {.name = "BMF_RGBA32", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_RGBA32), .offset = BMF_RGBA32},
-		.BMF_RGB24 = {.name = "BMF_RGB24", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_RGB24), .offset = BMF_RGB24},
-		.BMF_Count = {.name = "BMF_Count", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_Count), .offset = BMF_Count},
-	}
-};
-const static type_info_enum_entity_type type_info_enum_entity_type_const_data = {
-	.name = "entity_type",
-	.type = TYPE_entity_type,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 3,
-	.members = {
-		.ET_Invalid = {.name = "ET_Invalid", .type = TYPE_entity_type, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ET_Invalid), .offset = ET_Invalid},
-		.ET_Player = {.name = "ET_Player", .type = TYPE_entity_type, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ET_Player), .offset = ET_Player},
-		.ET_Count = {.name = "ET_Count", .type = TYPE_entity_type, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ET_Count), .offset = ET_Count},
-	}
-};
-const static type_info_enum_entity_flags type_info_enum_entity_flags_const_data = {
-	.name = "entity_flags",
-	.type = TYPE_entity_flags,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 6,
-	.members = {
-		.EF_Valid = {.name = "EF_Valid", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_Valid), .offset = EF_Valid},
-		.EF_Alive = {.name = "EF_Alive", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_Alive), .offset = EF_Alive},
-		.EF_Gravitic = {.name = "EF_Gravitic", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_Gravitic), .offset = EF_Gravitic},
-		.EF_Actor = {.name = "EF_Actor", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_Actor), .offset = EF_Actor},
-		.EF_Static = {.name = "EF_Static", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_Static), .offset = EF_Static},
-		.EF_IsGround = {.name = "EF_IsGround", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_IsGround), .offset = EF_IsGround},
-	}
-};
-const static type_info_enum_packet_type_t type_info_enum_packet_type_t_const_data = {
-	.name = "packet_type_t",
-	.type = TYPE_packet_type_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 6,
-	.members = {
-		.PT_Invalid = {.name = "PT_Invalid", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_Invalid), .offset = PT_Invalid},
-		.PT_Connect = {.name = "PT_Connect", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_Connect), .offset = PT_Connect},
-		.PT_ConnectAccepted = {.name = "PT_ConnectAccepted", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_ConnectAccepted), .offset = PT_ConnectAccepted},
-		.PT_Disconnect = {.name = "PT_Disconnect", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_Disconnect), .offset = PT_Disconnect},
-		.PT_InputData = {.name = "PT_InputData", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_InputData), .offset = PT_InputData},
-		.PT_Count = {.name = "PT_Count", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_Count), .offset = PT_Count},
+		.TPTP_Invalid = {.name = "TPTP_Invalid", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_Invalid), .offset = TPTP_Invalid},
+		.TPTP_Low = {.name = "TPTP_Low", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_Low), .offset = TPTP_Low},
+		.TPTP_High = {.name = "TPTP_High", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_High), .offset = TPTP_High},
+		.TPTP_Count = {.name = "TPTP_Count", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_Count), .offset = TPTP_Count},
 	}
 };
 const static type_info_enum_preprocessor_token_type_t type_info_enum_preprocessor_token_type_t_const_data = {
@@ -5101,155 +5075,44 @@ const static type_info_enum_preprocessor_token_type_t type_info_enum_preprocesso
 		.TT_Count = {.name = "TT_Count", .type = TYPE_preprocessor_token_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TT_Count), .offset = TT_Count},
 	}
 };
-const static type_info_enum_arg_type_t type_info_enum_arg_type_t_const_data = {
-	.name = "arg_type_t",
-	.type = TYPE_arg_type_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 4,
-	.members = {
-		.FLAG_TYPE_BOOL = {.name = "FLAG_TYPE_BOOL", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FLAG_TYPE_BOOL), .offset = FLAG_TYPE_BOOL},
-		.FLAG_TYPE_U64 = {.name = "FLAG_TYPE_U64", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FLAG_TYPE_U64), .offset = FLAG_TYPE_U64},
-		.FLAG_TYPE_FLOAT32 = {.name = "FLAG_TYPE_FLOAT32", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FLAG_TYPE_FLOAT32), .offset = FLAG_TYPE_FLOAT32},
-		.FLAG_TYPE_STRING = {.name = "FLAG_TYPE_STRING", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FLAG_TYPE_STRING), .offset = FLAG_TYPE_STRING},
-	}
-};
-const static type_info_enum_file_extension_t type_info_enum_file_extension_t_const_data = {
-	.name = "file_extension_t",
-	.type = TYPE_file_extension_t,
+const static type_info_enum_za_allocation_tag_t type_info_enum_za_allocation_tag_t_const_data = {
+	.name = "za_allocation_tag_t",
+	.type = TYPE_za_allocation_tag_t,
 	.kind = META_TYPE_KIND_Enum,
 	.member_count = 7,
 	.members = {
-		.FILE_EXT_INVALID = {.name = "FILE_EXT_INVALID", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_INVALID), .offset = FILE_EXT_INVALID},
-		.FILE_EXT_TTF = {.name = "FILE_EXT_TTF", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_TTF), .offset = FILE_EXT_TTF},
-		.FILE_EXT_WAV = {.name = "FILE_EXT_WAV", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_WAV), .offset = FILE_EXT_WAV},
-		.FILE_EXT_PNG = {.name = "FILE_EXT_PNG", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_PNG), .offset = FILE_EXT_PNG},
-		.FILE_EXT_GLSL = {.name = "FILE_EXT_GLSL", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_GLSL), .offset = FILE_EXT_GLSL},
-		.FILE_EXT_OS_DLL = {.name = "FILE_EXT_OS_DLL", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_OS_DLL), .offset = FILE_EXT_OS_DLL},
-		.FILE_EXT_COUNT = {.name = "FILE_EXT_COUNT", .type = TYPE_file_extension_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FILE_EXT_COUNT), .offset = FILE_EXT_COUNT},
+		.ZA_TAG_NONE = {.name = "ZA_TAG_NONE", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_NONE), .offset = ZA_TAG_NONE},
+		.ZA_TAG_STATIC = {.name = "ZA_TAG_STATIC", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_STATIC), .offset = ZA_TAG_STATIC},
+		.ZA_TAG_TEXTURE = {.name = "ZA_TAG_TEXTURE", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_TEXTURE), .offset = ZA_TAG_TEXTURE},
+		.ZA_TAG_SOUND = {.name = "ZA_TAG_SOUND", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_SOUND), .offset = ZA_TAG_SOUND},
+		.ZA_TAG_FONT = {.name = "ZA_TAG_FONT", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_FONT), .offset = ZA_TAG_FONT},
+		.ZA_TAG_PURGELEVEL = {.name = "ZA_TAG_PURGELEVEL", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_PURGELEVEL), .offset = ZA_TAG_PURGELEVEL},
+		.ZA_TAG_CACHE = {.name = "ZA_TAG_CACHE", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_CACHE), .offset = ZA_TAG_CACHE},
 	}
 };
-const static type_info_enum_controller_type_t type_info_enum_controller_type_t_const_data = {
-	.name = "controller_type_t",
-	.type = TYPE_controller_type_t,
+const static type_info_enum_entity_type type_info_enum_entity_type_const_data = {
+	.name = "entity_type",
+	.type = TYPE_entity_type,
 	.kind = META_TYPE_KIND_Enum,
-	.member_count = 4,
+	.member_count = 3,
 	.members = {
-		.IM_CONTROLLER_INVALID = {.name = "IM_CONTROLLER_INVALID", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(IM_CONTROLLER_INVALID), .offset = IM_CONTROLLER_INVALID},
-		.IM_CONTROLLER_GAMEPAD = {.name = "IM_CONTROLLER_GAMEPAD", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(IM_CONTROLLER_GAMEPAD), .offset = IM_CONTROLLER_GAMEPAD},
-		.IM_CONTROLLER_KEYBOARD = {.name = "IM_CONTROLLER_KEYBOARD", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(IM_CONTROLLER_KEYBOARD), .offset = IM_CONTROLLER_KEYBOARD},
-		.IM_CONTROLLER_COUNT = {.name = "IM_CONTROLLER_COUNT", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(IM_CONTROLLER_COUNT), .offset = IM_CONTROLLER_COUNT},
+		.ET_Invalid = {.name = "ET_Invalid", .type = TYPE_entity_type, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ET_Invalid), .offset = ET_Invalid},
+		.ET_Player = {.name = "ET_Player", .type = TYPE_entity_type, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ET_Player), .offset = ET_Player},
+		.ET_Count = {.name = "ET_Count", .type = TYPE_entity_type, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ET_Count), .offset = ET_Count},
 	}
 };
-const static type_info_enum_input_mouse_buttons_t type_info_enum_input_mouse_buttons_t_const_data = {
-	.name = "input_mouse_buttons_t",
-	.type = TYPE_input_mouse_buttons_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 6,
-	.members = {
-		.SDL_LEFT_MOUSE = {.name = "SDL_LEFT_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_LEFT_MOUSE), .offset = SDL_LEFT_MOUSE},
-		.SDL_RIGHT_MOUSE = {.name = "SDL_RIGHT_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_RIGHT_MOUSE), .offset = SDL_RIGHT_MOUSE},
-		.SDL_MIDDLE_MOUSE = {.name = "SDL_MIDDLE_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_MIDDLE_MOUSE), .offset = SDL_MIDDLE_MOUSE},
-		.SDL_X1_MOUSE = {.name = "SDL_X1_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_X1_MOUSE), .offset = SDL_X1_MOUSE},
-		.SDL_X2_MOUSE = {.name = "SDL_X2_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_X2_MOUSE), .offset = SDL_X2_MOUSE},
-		.SDL_MOUSE_BUTTON_COUNT = {.name = "SDL_MOUSE_BUTTON_COUNT", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_MOUSE_BUTTON_COUNT), .offset = SDL_MOUSE_BUTTON_COUNT},
-	}
-};
-const static type_info_enum_game_action_binding_type_t type_info_enum_game_action_binding_type_t_const_data = {
-	.name = "game_action_binding_type_t",
-	.type = TYPE_game_action_binding_type_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 4,
-	.members = {
-		.GAB_Invalid = {.name = "GAB_Invalid", .type = TYPE_game_action_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GAB_Invalid), .offset = GAB_Invalid},
-		.GAB_Button = {.name = "GAB_Button", .type = TYPE_game_action_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GAB_Button), .offset = GAB_Button},
-		.GAB_Axis = {.name = "GAB_Axis", .type = TYPE_game_action_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GAB_Axis), .offset = GAB_Axis},
-		.GAB_Count = {.name = "GAB_Count", .type = TYPE_game_action_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GAB_Count), .offset = GAB_Count},
-	}
-};
-const static type_info_enum_file_watcher_change_event_t type_info_enum_file_watcher_change_event_t_const_data = {
-	.name = "file_watcher_change_event_t",
-	.type = TYPE_file_watcher_change_event_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 10,
-	.members = {
-		.FWC_EVENT_NONE = {.name = "FWC_EVENT_NONE", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_NONE), .offset = FWC_EVENT_NONE},
-		.FWC_EVENT_ADDED = {.name = "FWC_EVENT_ADDED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_ADDED), .offset = FWC_EVENT_ADDED},
-		.FWC_EVENT_MODIFIED = {.name = "FWC_EVENT_MODIFIED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_MODIFIED), .offset = FWC_EVENT_MODIFIED},
-		.FWC_EVENT_DELETED = {.name = "FWC_EVENT_DELETED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_DELETED), .offset = FWC_EVENT_DELETED},
-		.FWC_EVENT_MOVED = {.name = "FWC_EVENT_MOVED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_MOVED), .offset = FWC_EVENT_MOVED},
-		.FWC_EVENT_ATTRIBUTE_CHANGE = {.name = "FWC_EVENT_ATTRIBUTE_CHANGE", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_ATTRIBUTE_CHANGE), .offset = FWC_EVENT_ATTRIBUTE_CHANGE},
-		.FWC_EVENT_SCAN_CHILDREN = {.name = "FWC_EVENT_SCAN_CHILDREN", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_SCAN_CHILDREN), .offset = FWC_EVENT_SCAN_CHILDREN},
-		.FWC_EVENT_RENAMED = {.name = "FWC_EVENT_RENAMED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_RENAMED), .offset = FWC_EVENT_RENAMED},
-		.FWC_EVENT_ALL = {.name = "FWC_EVENT_ALL", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_ALL), .offset = FWC_EVENT_ALL},
-		.WFC_EVENT_COUNT = {.name = "WFC_EVENT_COUNT", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(WFC_EVENT_COUNT), .offset = WFC_EVENT_COUNT},
-	}
-};
-const static type_info_enum_vulkan_shader_descriptor_set_binding_type_t type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data = {
-	.name = "vulkan_shader_descriptor_set_binding_type_t",
-	.type = TYPE_vulkan_shader_descriptor_set_binding_type_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 4,
-	.members = {
-		.SDS_Static = {.name = "SDS_Static", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Static), .offset = SDS_Static},
-		.SDS_Draw = {.name = "SDS_Draw", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Draw), .offset = SDS_Draw},
-		.SDS_Instance = {.name = "SDS_Instance", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Instance), .offset = SDS_Instance},
-		.SDS_Count = {.name = "SDS_Count", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Count), .offset = SDS_Count},
-	}
-};
-const static type_info_enum_vulkan_renderpass_state_t type_info_enum_vulkan_renderpass_state_t_const_data = {
-	.name = "vulkan_renderpass_state_t",
-	.type = TYPE_vulkan_renderpass_state_t,
+const static type_info_enum_entity_flags type_info_enum_entity_flags_const_data = {
+	.name = "entity_flags",
+	.type = TYPE_entity_flags,
 	.kind = META_TYPE_KIND_Enum,
 	.member_count = 6,
 	.members = {
-		.VKRPS_INVALID = {.name = "VKRPS_INVALID", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_INVALID), .offset = VKRPS_INVALID},
-		.VKRPS_RECORDING = {.name = "VKRPS_RECORDING", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_RECORDING), .offset = VKRPS_RECORDING},
-		.VKRPS_WITHIN_RENDERPASS = {.name = "VKRPS_WITHIN_RENDERPASS", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_WITHIN_RENDERPASS), .offset = VKRPS_WITHIN_RENDERPASS},
-		.VKRPS_RECORDING_ENDED = {.name = "VKRPS_RECORDING_ENDED", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_RECORDING_ENDED), .offset = VKRPS_RECORDING_ENDED},
-		.VKRPS_COMMANDS_SUBMITTED = {.name = "VKRPS_COMMANDS_SUBMITTED", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_COMMANDS_SUBMITTED), .offset = VKRPS_COMMANDS_SUBMITTED},
-		.VKRPS_COUNT = {.name = "VKRPS_COUNT", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_COUNT), .offset = VKRPS_COUNT},
-	}
-};
-const static type_info_enum_vulkan_command_buffer_state_t type_info_enum_vulkan_command_buffer_state_t_const_data = {
-	.name = "vulkan_command_buffer_state_t",
-	.type = TYPE_vulkan_command_buffer_state_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 8,
-	.members = {
-		.VKCBS_INVALID = {.name = "VKCBS_INVALID", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_INVALID), .offset = VKCBS_INVALID},
-		.VKCBS_NOT_ALLOCATED = {.name = "VKCBS_NOT_ALLOCATED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_NOT_ALLOCATED), .offset = VKCBS_NOT_ALLOCATED},
-		.VKCBS_READY = {.name = "VKCBS_READY", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_READY), .offset = VKCBS_READY},
-		.VKCBS_RECORDING = {.name = "VKCBS_RECORDING", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_RECORDING), .offset = VKCBS_RECORDING},
-		.VKCBS_WITHIN_RENDERPASS = {.name = "VKCBS_WITHIN_RENDERPASS", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_WITHIN_RENDERPASS), .offset = VKCBS_WITHIN_RENDERPASS},
-		.VKCBS_RECORDING_ENDED = {.name = "VKCBS_RECORDING_ENDED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_RECORDING_ENDED), .offset = VKCBS_RECORDING_ENDED},
-		.VKCBS_SUBMITTED = {.name = "VKCBS_SUBMITTED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_SUBMITTED), .offset = VKCBS_SUBMITTED},
-		.VKCBS_COUNT = {.name = "VKCBS_COUNT", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_COUNT), .offset = VKCBS_COUNT},
-	}
-};
-const static type_info_enum_hash_table_allocation_flags_t type_info_enum_hash_table_allocation_flags_t_const_data = {
-	.name = "hash_table_allocation_flags_t",
-	.type = TYPE_hash_table_allocation_flags_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 6,
-	.members = {
-		.HTAF_Invalid = {.name = "HTAF_Invalid", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_Invalid), .offset = HTAF_Invalid},
-		.HTAF_Static = {.name = "HTAF_Static", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_Static), .offset = HTAF_Static},
-		.HTAF_KeyCopy = {.name = "HTAF_KeyCopy", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_KeyCopy), .offset = HTAF_KeyCopy},
-		.HTAF_ValueCopy = {.name = "HTAF_ValueCopy", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_ValueCopy), .offset = HTAF_ValueCopy},
-		.HTAF_Garbage = {.name = "HTAF_Garbage", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_Garbage), .offset = HTAF_Garbage},
-		.HTAF_None = {.name = "HTAF_None", .type = TYPE_hash_table_allocation_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(HTAF_None), .offset = HTAF_None},
-	}
-};
-const static type_info_enum_job_priority_t type_info_enum_job_priority_t_const_data = {
-	.name = "job_priority_t",
-	.type = TYPE_job_priority_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 4,
-	.members = {
-		.TPTP_Invalid = {.name = "TPTP_Invalid", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_Invalid), .offset = TPTP_Invalid},
-		.TPTP_Low = {.name = "TPTP_Low", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_Low), .offset = TPTP_Low},
-		.TPTP_High = {.name = "TPTP_High", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_High), .offset = TPTP_High},
-		.TPTP_Count = {.name = "TPTP_Count", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_Count), .offset = TPTP_Count},
+		.EF_Valid = {.name = "EF_Valid", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_Valid), .offset = EF_Valid},
+		.EF_Alive = {.name = "EF_Alive", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_Alive), .offset = EF_Alive},
+		.EF_Gravitic = {.name = "EF_Gravitic", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_Gravitic), .offset = EF_Gravitic},
+		.EF_Actor = {.name = "EF_Actor", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_Actor), .offset = EF_Actor},
+		.EF_Static = {.name = "EF_Static", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_Static), .offset = EF_Static},
+		.EF_IsGround = {.name = "EF_IsGround", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_IsGround), .offset = EF_IsGround},
 	}
 };
 const static type_info_enum_renderer_effect_application_flags_t type_info_enum_renderer_effect_application_flags_t_const_data = {
@@ -5319,17 +5182,1111 @@ const static type_info_enum_render_pipeline_depth_function_t type_info_enum_rend
 		.RDF_Count = {.name = "RDF_Count", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Count), .offset = RDF_Count},
 	}
 };
+const static type_info_enum_vulkan_shader_descriptor_set_binding_type_t type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data = {
+	.name = "vulkan_shader_descriptor_set_binding_type_t",
+	.type = TYPE_vulkan_shader_descriptor_set_binding_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 4,
+	.members = {
+		.SDS_Static = {.name = "SDS_Static", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Static), .offset = SDS_Static},
+		.SDS_Draw = {.name = "SDS_Draw", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Draw), .offset = SDS_Draw},
+		.SDS_Instance = {.name = "SDS_Instance", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Instance), .offset = SDS_Instance},
+		.SDS_Count = {.name = "SDS_Count", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Count), .offset = SDS_Count},
+	}
+};
+const static type_info_enum_vulkan_renderpass_state_t type_info_enum_vulkan_renderpass_state_t_const_data = {
+	.name = "vulkan_renderpass_state_t",
+	.type = TYPE_vulkan_renderpass_state_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 6,
+	.members = {
+		.VKRPS_INVALID = {.name = "VKRPS_INVALID", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_INVALID), .offset = VKRPS_INVALID},
+		.VKRPS_RECORDING = {.name = "VKRPS_RECORDING", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_RECORDING), .offset = VKRPS_RECORDING},
+		.VKRPS_WITHIN_RENDERPASS = {.name = "VKRPS_WITHIN_RENDERPASS", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_WITHIN_RENDERPASS), .offset = VKRPS_WITHIN_RENDERPASS},
+		.VKRPS_RECORDING_ENDED = {.name = "VKRPS_RECORDING_ENDED", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_RECORDING_ENDED), .offset = VKRPS_RECORDING_ENDED},
+		.VKRPS_COMMANDS_SUBMITTED = {.name = "VKRPS_COMMANDS_SUBMITTED", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_COMMANDS_SUBMITTED), .offset = VKRPS_COMMANDS_SUBMITTED},
+		.VKRPS_COUNT = {.name = "VKRPS_COUNT", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_COUNT), .offset = VKRPS_COUNT},
+	}
+};
+const static type_info_enum_vulkan_command_buffer_state_t type_info_enum_vulkan_command_buffer_state_t_const_data = {
+	.name = "vulkan_command_buffer_state_t",
+	.type = TYPE_vulkan_command_buffer_state_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 8,
+	.members = {
+		.VKCBS_INVALID = {.name = "VKCBS_INVALID", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_INVALID), .offset = VKCBS_INVALID},
+		.VKCBS_NOT_ALLOCATED = {.name = "VKCBS_NOT_ALLOCATED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_NOT_ALLOCATED), .offset = VKCBS_NOT_ALLOCATED},
+		.VKCBS_READY = {.name = "VKCBS_READY", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_READY), .offset = VKCBS_READY},
+		.VKCBS_RECORDING = {.name = "VKCBS_RECORDING", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_RECORDING), .offset = VKCBS_RECORDING},
+		.VKCBS_WITHIN_RENDERPASS = {.name = "VKCBS_WITHIN_RENDERPASS", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_WITHIN_RENDERPASS), .offset = VKCBS_WITHIN_RENDERPASS},
+		.VKCBS_RECORDING_ENDED = {.name = "VKCBS_RECORDING_ENDED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_RECORDING_ENDED), .offset = VKCBS_RECORDING_ENDED},
+		.VKCBS_SUBMITTED = {.name = "VKCBS_SUBMITTED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_SUBMITTED), .offset = VKCBS_SUBMITTED},
+		.VKCBS_COUNT = {.name = "VKCBS_COUNT", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_COUNT), .offset = VKCBS_COUNT},
+	}
+};
+const static type_info_enum_asset_type_t type_info_enum_asset_type_t_const_data = {
+	.name = "asset_type_t",
+	.type = TYPE_asset_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 7,
+	.members = {
+		.AT_Invalid = {.name = "AT_Invalid", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Invalid), .offset = AT_Invalid},
+		.AT_Bitmap = {.name = "AT_Bitmap", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Bitmap), .offset = AT_Bitmap},
+		.AT_Shader = {.name = "AT_Shader", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Shader), .offset = AT_Shader},
+		.AT_Font = {.name = "AT_Font", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Font), .offset = AT_Font},
+		.AT_Sound = {.name = "AT_Sound", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Sound), .offset = AT_Sound},
+		.AT_Material = {.name = "AT_Material", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Material), .offset = AT_Material},
+		.AT_Count = {.name = "AT_Count", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Count), .offset = AT_Count},
+	}
+};
+const static type_info_enum_asset_slot_load_status_t type_info_enum_asset_slot_load_status_t_const_data = {
+	.name = "asset_slot_load_status_t",
+	.type = TYPE_asset_slot_load_status_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 7,
+	.members = {
+		.ASLS_Invalid = {.name = "ASLS_Invalid", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_Invalid), .offset = ASLS_Invalid},
+		.ASLS_Unloaded = {.name = "ASLS_Unloaded", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_Unloaded), .offset = ASLS_Unloaded},
+		.ASLS_LoadQueued = {.name = "ASLS_LoadQueued", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_LoadQueued), .offset = ASLS_LoadQueued},
+		.ASLS_Loaded = {.name = "ASLS_Loaded", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_Loaded), .offset = ASLS_Loaded},
+		.ASLS_ShouldUnload = {.name = "ASLS_ShouldUnload", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_ShouldUnload), .offset = ASLS_ShouldUnload},
+		.ASLS_ShouldReload = {.name = "ASLS_ShouldReload", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_ShouldReload), .offset = ASLS_ShouldReload},
+		.ASLS_Count = {.name = "ASLS_Count", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ASLS_Count), .offset = ASLS_Count},
+	}
+};
+const static type_info_enum_bitmap_format_t type_info_enum_bitmap_format_t_const_data = {
+	.name = "bitmap_format_t",
+	.type = TYPE_bitmap_format_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 5,
+	.members = {
+		.BMF_Invalid = {.name = "BMF_Invalid", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_Invalid), .offset = BMF_Invalid},
+		.BMF_R8 = {.name = "BMF_R8", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_R8), .offset = BMF_R8},
+		.BMF_RGBA32 = {.name = "BMF_RGBA32", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_RGBA32), .offset = BMF_RGBA32},
+		.BMF_RGB24 = {.name = "BMF_RGB24", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_RGB24), .offset = BMF_RGB24},
+		.BMF_Count = {.name = "BMF_Count", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_Count), .offset = BMF_Count},
+	}
+};
+const static type_info_enum_controller_type_t type_info_enum_controller_type_t_const_data = {
+	.name = "controller_type_t",
+	.type = TYPE_controller_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 4,
+	.members = {
+		.IM_CONTROLLER_INVALID = {.name = "IM_CONTROLLER_INVALID", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(IM_CONTROLLER_INVALID), .offset = IM_CONTROLLER_INVALID},
+		.IM_CONTROLLER_GAMEPAD = {.name = "IM_CONTROLLER_GAMEPAD", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(IM_CONTROLLER_GAMEPAD), .offset = IM_CONTROLLER_GAMEPAD},
+		.IM_CONTROLLER_KEYBOARD = {.name = "IM_CONTROLLER_KEYBOARD", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(IM_CONTROLLER_KEYBOARD), .offset = IM_CONTROLLER_KEYBOARD},
+		.IM_CONTROLLER_COUNT = {.name = "IM_CONTROLLER_COUNT", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(IM_CONTROLLER_COUNT), .offset = IM_CONTROLLER_COUNT},
+	}
+};
+const static type_info_enum_input_mouse_buttons_t type_info_enum_input_mouse_buttons_t_const_data = {
+	.name = "input_mouse_buttons_t",
+	.type = TYPE_input_mouse_buttons_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 6,
+	.members = {
+		.SDL_LEFT_MOUSE = {.name = "SDL_LEFT_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_LEFT_MOUSE), .offset = SDL_LEFT_MOUSE},
+		.SDL_RIGHT_MOUSE = {.name = "SDL_RIGHT_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_RIGHT_MOUSE), .offset = SDL_RIGHT_MOUSE},
+		.SDL_MIDDLE_MOUSE = {.name = "SDL_MIDDLE_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_MIDDLE_MOUSE), .offset = SDL_MIDDLE_MOUSE},
+		.SDL_X1_MOUSE = {.name = "SDL_X1_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_X1_MOUSE), .offset = SDL_X1_MOUSE},
+		.SDL_X2_MOUSE = {.name = "SDL_X2_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_X2_MOUSE), .offset = SDL_X2_MOUSE},
+		.SDL_MOUSE_BUTTON_COUNT = {.name = "SDL_MOUSE_BUTTON_COUNT", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_MOUSE_BUTTON_COUNT), .offset = SDL_MOUSE_BUTTON_COUNT},
+	}
+};
+const static type_info_enum_game_action_binding_type_t type_info_enum_game_action_binding_type_t_const_data = {
+	.name = "game_action_binding_type_t",
+	.type = TYPE_game_action_binding_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 4,
+	.members = {
+		.GAB_Invalid = {.name = "GAB_Invalid", .type = TYPE_game_action_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GAB_Invalid), .offset = GAB_Invalid},
+		.GAB_Button = {.name = "GAB_Button", .type = TYPE_game_action_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GAB_Button), .offset = GAB_Button},
+		.GAB_Axis = {.name = "GAB_Axis", .type = TYPE_game_action_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GAB_Axis), .offset = GAB_Axis},
+		.GAB_Count = {.name = "GAB_Count", .type = TYPE_game_action_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(GAB_Count), .offset = GAB_Count},
+	}
+};
+const static type_info_enum_packet_type_t type_info_enum_packet_type_t_const_data = {
+	.name = "packet_type_t",
+	.type = TYPE_packet_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 6,
+	.members = {
+		.PT_Invalid = {.name = "PT_Invalid", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_Invalid), .offset = PT_Invalid},
+		.PT_Connect = {.name = "PT_Connect", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_Connect), .offset = PT_Connect},
+		.PT_ConnectAccepted = {.name = "PT_ConnectAccepted", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_ConnectAccepted), .offset = PT_ConnectAccepted},
+		.PT_Disconnect = {.name = "PT_Disconnect", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_Disconnect), .offset = PT_Disconnect},
+		.PT_InputData = {.name = "PT_InputData", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_InputData), .offset = PT_InputData},
+		.PT_Count = {.name = "PT_Count", .type = TYPE_packet_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(PT_Count), .offset = PT_Count},
+	}
+};
+enum memory_arena_footer_t_member_list_enum {
+	TYPE_MEMORY_ARENA_FOOTER_T_MEMBER_last_base,
+	TYPE_MEMORY_ARENA_FOOTER_T_MEMBER_last_used,
+	TYPE_MEMORY_ARENA_FOOTER_T_MEMBER_last_block_size,
+};
+
+enum memory_arena_t_member_list_enum {
+	TYPE_MEMORY_ARENA_T_MEMBER_is_initialized,
+	TYPE_MEMORY_ARENA_T_MEMBER_base,
+	TYPE_MEMORY_ARENA_T_MEMBER_used,
+	TYPE_MEMORY_ARENA_T_MEMBER_block_size,
+	TYPE_MEMORY_ARENA_T_MEMBER_block_counter,
+	TYPE_MEMORY_ARENA_T_MEMBER_scratch_arena_count,
+};
+
+enum scratch_arena_t_member_list_enum {
+	TYPE_SCRATCH_ARENA_T_MEMBER_parent,
+	TYPE_SCRATCH_ARENA_T_MEMBER_base,
+	TYPE_SCRATCH_ARENA_T_MEMBER_used,
+};
+
+enum dynarray_header_t_member_list_enum {
+	TYPE_DYNARRAY_HEADER_T_MEMBER_flags,
+	TYPE_DYNARRAY_HEADER_T_MEMBER_size,
+	TYPE_DYNARRAY_HEADER_T_MEMBER_capacity,
+	TYPE_DYNARRAY_HEADER_T_MEMBER_header_id,
+};
+
+enum file_t_member_list_enum {
+	TYPE_FILE_T_MEMBER_handle,
+	TYPE_FILE_T_MEMBER_file_name,
+	TYPE_FILE_T_MEMBER_filepath,
+	TYPE_FILE_T_MEMBER_file_size,
+	TYPE_FILE_T_MEMBER_current_read_offset,
+	TYPE_FILE_T_MEMBER_current_write_offset,
+	TYPE_FILE_T_MEMBER_overlapping,
+	TYPE_FILE_T_MEMBER_for_writing,
+};
+
+enum mapped_file_t_member_list_enum {
+	TYPE_MAPPED_FILE_T_MEMBER_file,
+	TYPE_MAPPED_FILE_T_MEMBER_mapping_handle,
+	TYPE_MAPPED_FILE_T_MEMBER_mapped_file_data,
+};
+
+enum file_data_t_member_list_enum {
+	TYPE_FILE_DATA_T_MEMBER_last_modtime,
+	TYPE_FILE_DATA_T_MEMBER_file_size,
+	TYPE_FILE_DATA_T_MEMBER_filename,
+	TYPE_FILE_DATA_T_MEMBER_filepath,
+};
+
+enum overlap_io_data_t_member_list_enum {
+	TYPE_OVERLAP_IO_DATA_T_MEMBER_offset_to_read,
+	TYPE_OVERLAP_IO_DATA_T_MEMBER_bytes_to_read,
+	TYPE_OVERLAP_IO_DATA_T_MEMBER_status,
+	TYPE_OVERLAP_IO_DATA_T_MEMBER_bytes_transfered,
+	TYPE_OVERLAP_IO_DATA_T_MEMBER_event_handle,
+};
+
+enum visit_file_data_t_member_list_enum {
+	TYPE_VISIT_FILE_DATA_T_MEMBER_function,
+	TYPE_VISIT_FILE_DATA_T_MEMBER_user_data,
+	TYPE_VISIT_FILE_DATA_T_MEMBER_filename,
+	TYPE_VISIT_FILE_DATA_T_MEMBER_fullname,
+	TYPE_VISIT_FILE_DATA_T_MEMBER_recursive,
+	TYPE_VISIT_FILE_DATA_T_MEMBER_is_directory,
+};
+
+enum file_watcher_recorded_change_t_member_list_enum {
+	TYPE_FILE_WATCHER_RECORDED_CHANGE_T_MEMBER_full_path,
+	TYPE_FILE_WATCHER_RECORDED_CHANGE_T_MEMBER_old_filename,
+	TYPE_FILE_WATCHER_RECORDED_CHANGE_T_MEMBER_changes,
+	TYPE_FILE_WATCHER_RECORDED_CHANGE_T_MEMBER_last_change_timestamp,
+};
+
+enum file_watcher_t_member_list_enum {
+	TYPE_FILE_WATCHER_T_MEMBER_is_valid,
+	TYPE_FILE_WATCHER_T_MEMBER_is_verbose,
+	TYPE_FILE_WATCHER_T_MEMBER_watcher_arena,
+	TYPE_FILE_WATCHER_T_MEMBER_callback,
+	TYPE_FILE_WATCHER_T_MEMBER_events_to_monitor,
+	TYPE_FILE_WATCHER_T_MEMBER_user_data,
+	TYPE_FILE_WATCHER_T_MEMBER_watch_recursively,
+	TYPE_FILE_WATCHER_T_MEMBER_observed_changes,
+	TYPE_FILE_WATCHER_T_MEMBER_change_count,
+	TYPE_FILE_WATCHER_T_MEMBER_paths_to_watch,
+	TYPE_FILE_WATCHER_T_MEMBER_paths_watched,
+	TYPE_FILE_WATCHER_T_MEMBER_notify_buffer_size,
+	TYPE_FILE_WATCHER_T_MEMBER_sys_watch_data,
+	TYPE_FILE_WATCHER_T_MEMBER_issues_when_checking,
+};
+
+enum global_context_t_member_list_enum {
+	TYPE_GLOBAL_CONTEXT_T_MEMBER_is_initialized,
+	TYPE_GLOBAL_CONTEXT_T_MEMBER_running,
+	TYPE_GLOBAL_CONTEXT_T_MEMBER_context_arena,
+	TYPE_GLOBAL_CONTEXT_T_MEMBER_temporary_arena,
+	TYPE_GLOBAL_CONTEXT_T_MEMBER_main_threadpool,
+};
+
+enum hash_table_header_t_member_list_enum {
+	TYPE_HASH_TABLE_HEADER_T_MEMBER_max_entries,
+	TYPE_HASH_TABLE_HEADER_T_MEMBER_flags,
+	TYPE_HASH_TABLE_HEADER_T_MEMBER_current_entry_count,
+	TYPE_HASH_TABLE_HEADER_T_MEMBER_debug_id,
+};
+
+enum vec2_t_member_list_enum {
+	TYPE_VEC2_T_MEMBER_elements,
+	TYPE_VEC2_T_MEMBER_x,
+	TYPE_VEC2_T_MEMBER_y,
+	TYPE_VEC2_T_MEMBER_xy,
+};
+
+enum vec3_t_member_list_enum {
+	TYPE_VEC3_T_MEMBER_elements,
+	TYPE_VEC3_T_MEMBER_x,
+	TYPE_VEC3_T_MEMBER_y,
+	TYPE_VEC3_T_MEMBER_z,
+	TYPE_VEC3_T_MEMBER_xy,
+	TYPE_VEC3_T_MEMBER_z_,
+};
+
+enum vec4_t_member_list_enum {
+	TYPE_VEC4_T_MEMBER_elements,
+	TYPE_VEC4_T_MEMBER_x,
+	TYPE_VEC4_T_MEMBER_y,
+	TYPE_VEC4_T_MEMBER_z,
+	TYPE_VEC4_T_MEMBER_w,
+	TYPE_VEC4_T_MEMBER_xy,
+	TYPE_VEC4_T_MEMBER_zw,
+	TYPE_VEC4_T_MEMBER_xyz,
+	TYPE_VEC4_T_MEMBER__w,
+	TYPE_VEC4_T_MEMBER_SSE,
+};
+
+enum ivec4_t_member_list_enum {
+	TYPE_IVEC4_T_MEMBER_elements,
+	TYPE_IVEC4_T_MEMBER_x,
+	TYPE_IVEC4_T_MEMBER_y,
+	TYPE_IVEC4_T_MEMBER_z,
+	TYPE_IVEC4_T_MEMBER_w,
+	TYPE_IVEC4_T_MEMBER_xy,
+	TYPE_IVEC4_T_MEMBER_wz,
+	TYPE_IVEC4_T_MEMBER_xyz,
+	TYPE_IVEC4_T_MEMBER_z_,
+	TYPE_IVEC4_T_MEMBER_SSE,
+};
+
+enum ivec3_t_member_list_enum {
+	TYPE_IVEC3_T_MEMBER_elements,
+	TYPE_IVEC3_T_MEMBER_x,
+	TYPE_IVEC3_T_MEMBER_y,
+	TYPE_IVEC3_T_MEMBER_z,
+	TYPE_IVEC3_T_MEMBER_xy,
+	TYPE_IVEC3_T_MEMBER_z_1,
+};
+
+enum ivec2_t_member_list_enum {
+	TYPE_IVEC2_T_MEMBER_elements,
+	TYPE_IVEC2_T_MEMBER_x,
+	TYPE_IVEC2_T_MEMBER_y,
+	TYPE_IVEC2_T_MEMBER_width,
+	TYPE_IVEC2_T_MEMBER_height,
+};
+
+enum mat4_t_member_list_enum {
+	TYPE_MAT4_T_MEMBER_elements,
+	TYPE_MAT4_T_MEMBER_values,
+	TYPE_MAT4_T_MEMBER_columns,
+	TYPE_MAT4_T_MEMBER_SSE,
+	TYPE_MAT4_T_MEMBER__00,
+	TYPE_MAT4_T_MEMBER__01,
+	TYPE_MAT4_T_MEMBER__02,
+	TYPE_MAT4_T_MEMBER__03,
+	TYPE_MAT4_T_MEMBER__10,
+	TYPE_MAT4_T_MEMBER__11,
+	TYPE_MAT4_T_MEMBER__12,
+	TYPE_MAT4_T_MEMBER__13,
+	TYPE_MAT4_T_MEMBER__20,
+	TYPE_MAT4_T_MEMBER__21,
+	TYPE_MAT4_T_MEMBER__22,
+	TYPE_MAT4_T_MEMBER__23,
+	TYPE_MAT4_T_MEMBER__30,
+	TYPE_MAT4_T_MEMBER__31,
+	TYPE_MAT4_T_MEMBER__32,
+	TYPE_MAT4_T_MEMBER__33,
+	TYPE_MAT4_T_MEMBER_column0,
+	TYPE_MAT4_T_MEMBER_column1,
+	TYPE_MAT4_T_MEMBER_column2,
+	TYPE_MAT4_T_MEMBER_column3,
+};
+
+enum mat3_t_member_list_enum {
+	TYPE_MAT3_T_MEMBER_elements,
+	TYPE_MAT3_T_MEMBER_values,
+	TYPE_MAT3_T_MEMBER_columns,
+	TYPE_MAT3_T_MEMBER__00,
+	TYPE_MAT3_T_MEMBER__01,
+	TYPE_MAT3_T_MEMBER__02,
+	TYPE_MAT3_T_MEMBER__10,
+	TYPE_MAT3_T_MEMBER__11,
+	TYPE_MAT3_T_MEMBER__12,
+	TYPE_MAT3_T_MEMBER__20,
+	TYPE_MAT3_T_MEMBER__21,
+	TYPE_MAT3_T_MEMBER__22,
+};
+
+enum mat2_t_member_list_enum {
+	TYPE_MAT2_T_MEMBER_elements,
+	TYPE_MAT2_T_MEMBER_values,
+	TYPE_MAT2_T_MEMBER_columns,
+	TYPE_MAT2_T_MEMBER__00,
+	TYPE_MAT2_T_MEMBER__01,
+	TYPE_MAT2_T_MEMBER__10,
+	TYPE_MAT2_T_MEMBER__11,
+};
+
+enum rectangle2_t_member_list_enum {
+	TYPE_RECTANGLE2_T_MEMBER_min,
+	TYPE_RECTANGLE2_T_MEMBER_max,
+	TYPE_RECTANGLE2_T_MEMBER_center,
+	TYPE_RECTANGLE2_T_MEMBER_half_size,
+};
+
+enum raytest_t_member_list_enum {
+	TYPE_RAYTEST_T_MEMBER_hit,
+	TYPE_RAYTEST_T_MEMBER_time,
+	TYPE_RAYTEST_T_MEMBER_position,
+	TYPE_RAYTEST_T_MEMBER_normal,
+};
+
+enum program_flag_data_t_member_list_enum {
+	TYPE_PROGRAM_FLAG_DATA_T_MEMBER_bool32,
+	TYPE_PROGRAM_FLAG_DATA_T_MEMBER_u64,
+	TYPE_PROGRAM_FLAG_DATA_T_MEMBER_float32,
+	TYPE_PROGRAM_FLAG_DATA_T_MEMBER_string,
+};
+
+enum program_flag_t_member_list_enum {
+	TYPE_PROGRAM_FLAG_T_MEMBER_is_valid,
+	TYPE_PROGRAM_FLAG_T_MEMBER_name,
+	TYPE_PROGRAM_FLAG_T_MEMBER_description,
+	TYPE_PROGRAM_FLAG_T_MEMBER_arg_type,
+	TYPE_PROGRAM_FLAG_T_MEMBER_arg_value,
+	TYPE_PROGRAM_FLAG_T_MEMBER_default_arg_value,
+};
+
+enum program_flag_state_t_member_list_enum {
+	TYPE_PROGRAM_FLAG_STATE_T_MEMBER_program_flags,
+	TYPE_PROGRAM_FLAG_STATE_T_MEMBER_flag_counter,
+};
+
+enum string_t_member_list_enum {
+	TYPE_STRING_T_MEMBER_data,
+	TYPE_STRING_T_MEMBER_count,
+};
+
+enum string_builder_buffer_t_member_list_enum {
+	TYPE_STRING_BUILDER_BUFFER_T_MEMBER_buffer_data,
+	TYPE_STRING_BUILDER_BUFFER_T_MEMBER_bytes_used,
+	TYPE_STRING_BUILDER_BUFFER_T_MEMBER_buffer_size,
+	TYPE_STRING_BUILDER_BUFFER_T_MEMBER_next_buffer,
+};
+
+enum string_builder_t_member_list_enum {
+	TYPE_STRING_BUILDER_T_MEMBER_is_initialized,
+	TYPE_STRING_BUILDER_T_MEMBER_arena,
+	TYPE_STRING_BUILDER_T_MEMBER_first_buffer,
+	TYPE_STRING_BUILDER_T_MEMBER_current_buffer,
+	TYPE_STRING_BUILDER_T_MEMBER_default_buffer_block_size,
+	TYPE_STRING_BUILDER_T_MEMBER_bytes_used,
+	TYPE_STRING_BUILDER_T_MEMBER_total_allocated,
+};
+
+enum sys_thread_t_member_list_enum {
+	TYPE_SYS_THREAD_T_MEMBER_handle,
+	TYPE_SYS_THREAD_T_MEMBER_thread_id,
+	TYPE_SYS_THREAD_T_MEMBER_user_data,
+};
+
+enum sys_mutex_t_member_list_enum {
+	TYPE_SYS_MUTEX_T_MEMBER_handle,
+};
+
+enum sys_semaphore_t_member_list_enum {
+	TYPE_SYS_SEMAPHORE_T_MEMBER_handle,
+};
+
+enum threadpool_queue_entry_t_member_list_enum {
+	TYPE_THREADPOOL_QUEUE_ENTRY_T_MEMBER_is_valid,
+	TYPE_THREADPOOL_QUEUE_ENTRY_T_MEMBER_entry_buffer,
+	TYPE_THREADPOOL_QUEUE_ENTRY_T_MEMBER_user_data,
+	TYPE_THREADPOOL_QUEUE_ENTRY_T_MEMBER_callback,
+};
+
+enum threadpool_queue_t_member_list_enum {
+	TYPE_THREADPOOL_QUEUE_T_MEMBER_completion_goal,
+	TYPE_THREADPOOL_QUEUE_T_MEMBER_entries_completed,
+	TYPE_THREADPOOL_QUEUE_T_MEMBER_next_entry_to_write,
+	TYPE_THREADPOOL_QUEUE_T_MEMBER_next_entry_to_read,
+	TYPE_THREADPOOL_QUEUE_T_MEMBER_entries,
+};
+
+enum threadpool_t_member_list_enum {
+	TYPE_THREADPOOL_T_MEMBER_is_initialized,
+	TYPE_THREADPOOL_T_MEMBER_semaphore,
+	TYPE_THREADPOOL_T_MEMBER_threads_awake,
+	TYPE_THREADPOOL_T_MEMBER_max_threads,
+	TYPE_THREADPOOL_T_MEMBER_high_priority_queue,
+	TYPE_THREADPOOL_T_MEMBER_low_priority_queue,
+};
+
+enum token_data_t_member_list_enum {
+	TYPE_TOKEN_DATA_T_MEMBER_type,
+	TYPE_TOKEN_DATA_T_MEMBER_string,
+};
+
+enum tokenizer_t_member_list_enum {
+	TYPE_TOKENIZER_T_MEMBER_data,
+};
+
+enum zone_allocator_block_t_member_list_enum {
+	TYPE_ZONE_ALLOCATOR_BLOCK_T_MEMBER_block_id,
+	TYPE_ZONE_ALLOCATOR_BLOCK_T_MEMBER_is_allocated,
+	TYPE_ZONE_ALLOCATOR_BLOCK_T_MEMBER_block_size,
+	TYPE_ZONE_ALLOCATOR_BLOCK_T_MEMBER_allocation_tag,
+	TYPE_ZONE_ALLOCATOR_BLOCK_T_MEMBER_next_block,
+	TYPE_ZONE_ALLOCATOR_BLOCK_T_MEMBER_prev_block,
+};
+
+enum zone_allocator_t_member_list_enum {
+	TYPE_ZONE_ALLOCATOR_T_MEMBER_mutex,
+	TYPE_ZONE_ALLOCATOR_T_MEMBER_capacity,
+	TYPE_ZONE_ALLOCATOR_T_MEMBER_base,
+	TYPE_ZONE_ALLOCATOR_T_MEMBER_first_block,
+	TYPE_ZONE_ALLOCATOR_T_MEMBER_cursor,
+};
+
+enum entity_t_member_list_enum {
+	TYPE_ENTITY_T_MEMBER_e_type,
+	TYPE_ENTITY_T_MEMBER_e_flags,
+	TYPE_ENTITY_T_MEMBER_owner_client_id,
+	TYPE_ENTITY_T_MEMBER_last_position,
+	TYPE_ENTITY_T_MEMBER_position,
+	TYPE_ENTITY_T_MEMBER_velocity,
+};
+
+enum entity_manager_t_member_list_enum {
+	TYPE_ENTITY_MANAGER_T_MEMBER_entities,
+	TYPE_ENTITY_MANAGER_T_MEMBER_active_entities,
+};
+
+enum input_data_t_member_list_enum {
+	TYPE_INPUT_DATA_T_MEMBER_input_axis,
+};
+
+enum client_data_t_member_list_enum {
+	TYPE_CLIENT_DATA_T_MEMBER_ID,
+	TYPE_CLIENT_DATA_T_MEMBER_connected,
+	TYPE_CLIENT_DATA_T_MEMBER_address,
+	TYPE_CLIENT_DATA_T_MEMBER_addr_len,
+	TYPE_CLIENT_DATA_T_MEMBER_player,
+	TYPE_CLIENT_DATA_T_MEMBER_input_data_buffer,
+	TYPE_CLIENT_DATA_T_MEMBER_input_data_head,
+	TYPE_CLIENT_DATA_T_MEMBER_input_data_tail,
+};
+
+enum game_state_t_member_list_enum {
+	TYPE_GAME_STATE_T_MEMBER_window,
+	TYPE_GAME_STATE_T_MEMBER_window_size,
+	TYPE_GAME_STATE_T_MEMBER_input_axis,
+	TYPE_GAME_STATE_T_MEMBER_entity_manager,
+	TYPE_GAME_STATE_T_MEMBER_player,
+	TYPE_GAME_STATE_T_MEMBER_is_host,
+	TYPE_GAME_STATE_T_MEMBER_socket,
+	TYPE_GAME_STATE_T_MEMBER_host_address_data,
+	TYPE_GAME_STATE_T_MEMBER_client_id,
+	TYPE_GAME_STATE_T_MEMBER_clients,
+	TYPE_GAME_STATE_T_MEMBER_connected_client_count,
+};
+
+enum render_geometry_instance_t_member_list_enum {
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_transform,
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_color,
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_uv_min,
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_uv_max,
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_texture_index,
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_camera_index,
+};
+
+enum render_geometry_batch_t_member_list_enum {
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_camera_data,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_is_valid,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_primitive_count,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_master_array_start_offset,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_instances,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_next_buffer,
+};
+
+enum render_group_t_member_list_enum {
+	TYPE_RENDER_GROUP_T_MEMBER_ID,
+	TYPE_RENDER_GROUP_T_MEMBER_dynamic_pipeline_state,
+	TYPE_RENDER_GROUP_T_MEMBER_shader,
+	TYPE_RENDER_GROUP_T_MEMBER_textures,
+	TYPE_RENDER_GROUP_T_MEMBER_current_texture_count,
+	TYPE_RENDER_GROUP_T_MEMBER_master_batch_array,
+	TYPE_RENDER_GROUP_T_MEMBER_total_primitive_count,
+	TYPE_RENDER_GROUP_T_MEMBER_cached_buffer,
+	TYPE_RENDER_GROUP_T_MEMBER_first_buffer,
+};
+
+enum state_member_list_enum {
+	TYPE_STATE_MEMBER_cached_camera_ID,
+	TYPE_STATE_MEMBER_active_render_layer,
+	TYPE_STATE_MEMBER_active_render_group,
+	TYPE_STATE_MEMBER_active_camera,
+	TYPE_STATE_MEMBER_active_shader,
+	TYPE_STATE_MEMBER_active_pipeline_state,
+};
+
+enum draw_frame_t_member_list_enum {
+	TYPE_DRAW_FRAME_T_MEMBER_used_render_groups,
+	TYPE_DRAW_FRAME_T_MEMBER_used_render_group_count,
+	TYPE_DRAW_FRAME_T_MEMBER_used_camera,
+	TYPE_DRAW_FRAME_T_MEMBER_used_camera_count,
+	TYPE_DRAW_FRAME_T_MEMBER_state,
+};
+
+enum render_state_t_member_list_enum {
+	TYPE_RENDER_STATE_T_MEMBER_is_initialized,
+	TYPE_RENDER_STATE_T_MEMBER_renderer_arena,
+	TYPE_RENDER_STATE_T_MEMBER_render_context,
+	TYPE_RENDER_STATE_T_MEMBER_current_frame_data,
+	TYPE_RENDER_STATE_T_MEMBER_render_group_hash,
+	TYPE_RENDER_STATE_T_MEMBER_draw_frame,
+};
+
+enum global_matrix_uniforms_t_member_list_enum {
+	TYPE_GLOBAL_MATRIX_UNIFORMS_T_MEMBER_view_matrix,
+	TYPE_GLOBAL_MATRIX_UNIFORMS_T_MEMBER_projection_matrix,
+};
+
+enum push_constant_t_member_list_enum {
+	TYPE_PUSH_CONSTANT_T_MEMBER_DrawColor,
+};
+
+enum render_camera_t_member_list_enum {
+	TYPE_RENDER_CAMERA_T_MEMBER_view_matrix,
+	TYPE_RENDER_CAMERA_T_MEMBER_projection_matrix,
+	TYPE_RENDER_CAMERA_T_MEMBER_ID,
+};
+
+enum vulkan_buffer_data_t_member_list_enum {
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_is_valid,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_is_mapped,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_buffer_size,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_device_memory,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_usage_flags,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_memory_index,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_memory_property_flags,
+};
+
+enum vulkan_pipeline_data_t_member_list_enum {
+	TYPE_VULKAN_PIPELINE_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_PIPELINE_DATA_T_MEMBER_binding,
+	TYPE_VULKAN_PIPELINE_DATA_T_MEMBER_layout,
+};
+
+enum render_pipeline_state_t_member_list_enum {
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_blend_enabled,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_src_color_blend_mode,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_dst_color_blend_mode,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_src_alpha_blend_mode,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_dst_alpha_blend_mode,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_color_blend_op,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_alpha_blend_op,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_testing_enabled,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_writing_enabled,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_func,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_enabled,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_state,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_keep,
+};
+
+enum spv_vulkan_type_map_t_member_list_enum {
+	TYPE_SPV_VULKAN_TYPE_MAP_T_MEMBER_spv_type,
+	TYPE_SPV_VULKAN_TYPE_MAP_T_MEMBER_vk_type,
+};
+
+enum vulkan_shader_descriptor_set_info_t_member_list_enum {
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_is_valid,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_set_type,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_bindings,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_binding_count,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_binding_upload_size,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_image_views,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_samplers,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_image_count,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_sampler_count,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_sets,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_uniform_buffer,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_single_frame_uniform_buffer_size,
+};
+
+enum vulkan_shader_uniform_texture_data_t_member_list_enum {
+	TYPE_VULKAN_SHADER_UNIFORM_TEXTURE_DATA_T_MEMBER_image_views,
+	TYPE_VULKAN_SHADER_UNIFORM_TEXTURE_DATA_T_MEMBER_image_samplers,
+	TYPE_VULKAN_SHADER_UNIFORM_TEXTURE_DATA_T_MEMBER_image_counter,
+};
+
+enum vulkan_shader_uniform_data_range_t_member_list_enum {
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_RANGE_T_MEMBER_data,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_RANGE_T_MEMBER_data_size,
+};
+
+enum vulkan_shader_uniform_data_t_member_list_enum {
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_owner_shader_id,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_uniform_type,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_set_type,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_uniform_location,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_push_constant_index,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_name,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_uniform_size,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_is_texture,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_mapped_buffer_update_size,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_mapped_uniform_buffer,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_storage_buffer,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_texture_data,
+};
+
+enum vulkan_shader_stage_info_t_member_list_enum {
+	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_type,
+	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_entry_point,
+	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_module_create_info,
+	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_shader_stage_create_info,
+	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_handle,
+};
+
+enum vulkan_shader_data_t_member_list_enum {
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_shader_id,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_arena,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_spv_reflect_module,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_stages,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_stage_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_primary_pool,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_type_counts,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_layouts,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_total_descriptor_set_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_used_descriptor_set_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set_info,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_push_constant_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_push_constant_data,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_uniforms,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_uniform_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_static_uniforms,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_static_uniform_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_draw_uniforms,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_draw_uniform_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_instance_uniforms,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_instance_uniform_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_pipeline,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_camera_matrices,
+};
+
+enum vulkan_physical_device_swapchain_support_info_t_member_list_enum {
+	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_surface_capabilities,
+	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_surface_formats,
+	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_present_modes,
+	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_surface_format_count,
+	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_present_mode_count,
+};
+
+enum vulkan_physical_device_queue_info_t_member_list_enum {
+	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_graphics_queue_family_index,
+	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_present_queue_family_index,
+	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_compute_queue_family_index,
+	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_transfer_queue_family_index,
+};
+
+enum vulkan_physical_device_requirements_t_member_list_enum {
+	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_graphics_queue,
+	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_present_queue,
+	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_transfer_queue,
+	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_compute_queue,
+	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_required_extensions,
+};
+
+enum vulkan_physical_device_t_member_list_enum {
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_handle,
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_device_depth_format,
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_properties,
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_features,
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_memory_properties,
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_swapchain_support_info,
+};
+
+enum vulkan_rendering_device_t_member_list_enum {
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_physical_device,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_graphics_queue_family_index,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_present_queue_family_index,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_compute_queue_family_index,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_transfer_queue_family_index,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_graphics_queue,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_present_queue,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_transfer_queue,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_compute_queue,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_graphics_command_pool,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_logical_device,
+};
+
+enum vulkan_fence_t_member_list_enum {
+	TYPE_VULKAN_FENCE_T_MEMBER_handle,
+	TYPE_VULKAN_FENCE_T_MEMBER_signaled,
+};
+
+enum vulkan_renderpass_data_t_member_list_enum {
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_offset,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_size,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_clear_color,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_depth_clear,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_stencil_clear,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_renderpass_state,
+};
+
+enum vulkan_framebuffer_data_t_member_list_enum {
+	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_renderpass,
+	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_attachments,
+	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_attachment_count,
+};
+
+enum vulkan_image_data_t_member_list_enum {
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_memory,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_format,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_layout,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_view,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_width,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_height,
+};
+
+enum vulkan_texture_t_member_list_enum {
+	TYPE_VULKAN_TEXTURE_T_MEMBER_current_generation,
+	TYPE_VULKAN_TEXTURE_T_MEMBER_image_data,
+	TYPE_VULKAN_TEXTURE_T_MEMBER_sampler,
+};
+
+enum vulkan_swapchain_data_t_member_list_enum {
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_is_valid,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_arena,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_image_format,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_present_mode,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_depth_attachment,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_has_depth_attachment,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_max_frames_in_flight,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_image_count,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_framebuffers,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_images,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_views,
+};
+
+enum vulkan_command_buffer_data_t_member_list_enum {
+	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_owner_pool,
+	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_state,
+	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_is_primary_buffer,
+	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_is_single_use,
+};
+
+enum vulkan_render_backend_function_data_t_member_list_enum {
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_create_gpu_texture,
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_create_gpu_shader,
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_create_gpu_buffer,
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_destroy_gpu_texture,
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_destroy_gpu_shader,
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_destroy_gpu_buffer,
+};
+
+enum vulkan_render_frame_state_t_member_list_enum {
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_image_render_idle_fence,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_frame_in_flight_fence_ptr,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_image_avaliable_semaphore,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_presentation_complete_semaphore,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_current_framebuffer,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_render_command_buffer,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_instanced_rendering_buffer,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_bound_shader,
+};
+
+enum vulkan_render_context_t_member_list_enum {
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_initialization_arena,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_frame_arena,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_permanent_arena,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_additional_buffer_count,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_window,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_window_width,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_window_height,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_instance,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_allocators,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_render_surface,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_rendering_device,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_swapchain,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_image_index,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_frame_index,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_framebuffer_width,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_framebuffer_height,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_cached_framebuffer_width,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_cached_framebuffer_height,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_framebuffer_size_generation,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_last_framebuffer_size_generation,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_recreating_swapchain,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_image_render_idle_fences,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_frame_in_flight_fence_ptrs,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_image_avaliable_semaphores,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_presentation_complete_semaphores,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_render_command_buffers,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_frames,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_frame,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_instanced_rendering_buffer,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_index_buffer,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_vertex_buffer,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_main_renderpass,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_shader,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_texture,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_material,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_invalid_texture_data,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_vertex_offset,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_geometry_index,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_test_camera,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_debug_callback,
+};
+
+enum asset_handle_t_member_list_enum {
+	TYPE_ASSET_HANDLE_T_MEMBER_is_valid,
+	TYPE_ASSET_HANDLE_T_MEMBER_type,
+	TYPE_ASSET_HANDLE_T_MEMBER_owner_asset_file_index,
+	TYPE_ASSET_HANDLE_T_MEMBER_subtexture_data,
+	TYPE_ASSET_HANDLE_T_MEMBER_slot,
+	TYPE_ASSET_HANDLE_T_MEMBER_texture,
+	TYPE_ASSET_HANDLE_T_MEMBER_shader,
+};
+
+enum bitmap_t_member_list_enum {
+	TYPE_BITMAP_T_MEMBER_width,
+	TYPE_BITMAP_T_MEMBER_height,
+	TYPE_BITMAP_T_MEMBER_channels,
+	TYPE_BITMAP_T_MEMBER_format,
+	TYPE_BITMAP_T_MEMBER_pixels,
+};
+
+enum texture2D_t_member_list_enum {
+	TYPE_TEXTURE2D_T_MEMBER_ID,
+	TYPE_TEXTURE2D_T_MEMBER_bitmap,
+	TYPE_TEXTURE2D_T_MEMBER_gpu_data,
+};
+
+enum subtexture_data_t_member_list_enum {
+	TYPE_SUBTEXTURE_DATA_T_MEMBER_uv_min,
+	TYPE_SUBTEXTURE_DATA_T_MEMBER_uv_max,
+	TYPE_SUBTEXTURE_DATA_T_MEMBER_offset,
+	TYPE_SUBTEXTURE_DATA_T_MEMBER_size,
+	TYPE_SUBTEXTURE_DATA_T_MEMBER_atlas_subtexture_index,
+	TYPE_SUBTEXTURE_DATA_T_MEMBER_atlas,
+};
+
+enum texture_atlas_t_member_list_enum {
+	TYPE_TEXTURE_ATLAS_T_MEMBER_texture,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_bitmap_data,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_ID,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_merge_counter,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_textures_to_merge,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_packed_subtextures,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_packed_subtexture_count,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_is_valid,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_atlas_cursor_x,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_atlas_cursor_y,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_tallest_y,
+	TYPE_TEXTURE_ATLAS_T_MEMBER_atlas_size,
+};
+
+enum shader_t_member_list_enum {
+	TYPE_SHADER_T_MEMBER_ID,
+	TYPE_SHADER_T_MEMBER_shader_data,
+	TYPE_SHADER_T_MEMBER_camera_uniform,
+	TYPE_SHADER_T_MEMBER_texture_uniform,
+};
+
+enum material_instance_t_member_list_enum {
+	TYPE_MATERIAL_INSTANCE_T_MEMBER_ID,
+	TYPE_MATERIAL_INSTANCE_T_MEMBER_textures,
+	TYPE_MATERIAL_INSTANCE_T_MEMBER_pipeline_state,
+	TYPE_MATERIAL_INSTANCE_T_MEMBER_shader_uniform_count,
+	TYPE_MATERIAL_INSTANCE_T_MEMBER_uniform_data,
+	TYPE_MATERIAL_INSTANCE_T_MEMBER_archetype,
+};
+
+enum material_archetype_t_member_list_enum {
+	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_ID,
+	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_name,
+	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_shader_binary_name,
+	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_shader,
+	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_renderer_effect_flags,
+	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_base_instance,
+};
+
+enum asset_slot_t_member_list_enum {
+	TYPE_ASSET_SLOT_T_MEMBER_ID,
+	TYPE_ASSET_SLOT_T_MEMBER_slot_state,
+	TYPE_ASSET_SLOT_T_MEMBER_type,
+	TYPE_ASSET_SLOT_T_MEMBER_name,
+	TYPE_ASSET_SLOT_T_MEMBER_owner_asset_file,
+	TYPE_ASSET_SLOT_T_MEMBER_package_entry,
+	TYPE_ASSET_SLOT_T_MEMBER_package_generation,
+	TYPE_ASSET_SLOT_T_MEMBER_ref_counter,
+	TYPE_ASSET_SLOT_T_MEMBER_texture,
+	TYPE_ASSET_SLOT_T_MEMBER_shader,
+	TYPE_ASSET_SLOT_T_MEMBER_material,
+};
+
+enum asset_manager_asset_file_data_t_member_list_enum {
+	TYPE_ASSET_MANAGER_ASSET_FILE_DATA_T_MEMBER_is_initialized,
+	TYPE_ASSET_MANAGER_ASSET_FILE_DATA_T_MEMBER_ID,
+	TYPE_ASSET_MANAGER_ASSET_FILE_DATA_T_MEMBER_init_arena,
+	TYPE_ASSET_MANAGER_ASSET_FILE_DATA_T_MEMBER_load_status,
+	TYPE_ASSET_MANAGER_ASSET_FILE_DATA_T_MEMBER_file_info,
+	TYPE_ASSET_MANAGER_ASSET_FILE_DATA_T_MEMBER_raw_file_data,
+	TYPE_ASSET_MANAGER_ASSET_FILE_DATA_T_MEMBER_package_entries,
+	TYPE_ASSET_MANAGER_ASSET_FILE_DATA_T_MEMBER_package_entry_count,
+	TYPE_ASSET_MANAGER_ASSET_FILE_DATA_T_MEMBER_entry_hash,
+	TYPE_ASSET_MANAGER_ASSET_FILE_DATA_T_MEMBER_header_data,
+};
+
+enum asset_catalog_t_member_list_enum {
+	TYPE_ASSET_CATALOG_T_MEMBER_ID,
+	TYPE_ASSET_CATALOG_T_MEMBER_catalog_type,
+	TYPE_ASSET_CATALOG_T_MEMBER_asset_manager,
+	TYPE_ASSET_CATALOG_T_MEMBER_asset_lookup,
+};
+
+enum texture_atlas_registry_t_member_list_enum {
+	TYPE_TEXTURE_ATLAS_REGISTRY_T_MEMBER_atlases,
+	TYPE_TEXTURE_ATLAS_REGISTRY_T_MEMBER_current_atlas_count,
+};
+
+enum asset_manager_t_member_list_enum {
+	TYPE_ASSET_MANAGER_T_MEMBER_is_initialized,
+	TYPE_ASSET_MANAGER_T_MEMBER_manager_arena,
+	TYPE_ASSET_MANAGER_T_MEMBER_asset_files,
+	TYPE_ASSET_MANAGER_T_MEMBER_asset_name_to_file,
+	TYPE_ASSET_MANAGER_T_MEMBER_loaded_file_count,
+	TYPE_ASSET_MANAGER_T_MEMBER_asset_load_queue,
+	TYPE_ASSET_MANAGER_T_MEMBER_asset_unload_queue,
+	TYPE_ASSET_MANAGER_T_MEMBER_atlas_registry,
+	TYPE_ASSET_MANAGER_T_MEMBER_asset_allocator,
+	TYPE_ASSET_MANAGER_T_MEMBER_asset_catalogs,
+	TYPE_ASSET_MANAGER_T_MEMBER_texture_catalog,
+	TYPE_ASSET_MANAGER_T_MEMBER_shader_catalog,
+	TYPE_ASSET_MANAGER_T_MEMBER_render_context,
+};
+
+enum action_button_t_member_list_enum {
+	TYPE_ACTION_BUTTON_T_MEMBER_is_down,
+	TYPE_ACTION_BUTTON_T_MEMBER_is_released,
+	TYPE_ACTION_BUTTON_T_MEMBER_is_pressed,
+	TYPE_ACTION_BUTTON_T_MEMBER_half_transition_counter,
+};
+
+enum keyboard_controller_data_t_member_list_enum {
+	TYPE_KEYBOARD_CONTROLLER_DATA_T_MEMBER_input,
+	TYPE_KEYBOARD_CONTROLLER_DATA_T_MEMBER_current_mouse_pos,
+	TYPE_KEYBOARD_CONTROLLER_DATA_T_MEMBER_last_mouse_pos,
+	TYPE_KEYBOARD_CONTROLLER_DATA_T_MEMBER_mouse_delta,
+	TYPE_KEYBOARD_CONTROLLER_DATA_T_MEMBER_is_shift_key_down,
+	TYPE_KEYBOARD_CONTROLLER_DATA_T_MEMBER_is_control_key_down,
+	TYPE_KEYBOARD_CONTROLLER_DATA_T_MEMBER_is_alt_key_down,
+};
+
+enum analog_button_t_member_list_enum {
+	TYPE_ANALOG_BUTTON_T_MEMBER_deadzone,
+	TYPE_ANALOG_BUTTON_T_MEMBER_value,
+};
+
+enum gamepad_controller_data_t_member_list_enum {
+	TYPE_GAMEPAD_CONTROLLER_DATA_T_MEMBER_gamepad_data,
+	TYPE_GAMEPAD_CONTROLLER_DATA_T_MEMBER_stick_data,
+	TYPE_GAMEPAD_CONTROLLER_DATA_T_MEMBER_gamepad_id,
+	TYPE_GAMEPAD_CONTROLLER_DATA_T_MEMBER_has_rumble,
+	TYPE_GAMEPAD_CONTROLLER_DATA_T_MEMBER_rumble_value,
+	TYPE_GAMEPAD_CONTROLLER_DATA_T_MEMBER_digital_buttons,
+	TYPE_GAMEPAD_CONTROLLER_DATA_T_MEMBER_analog_buttons,
+};
+
+enum input_controller_t_member_list_enum {
+	TYPE_INPUT_CONTROLLER_T_MEMBER_is_valid,
+	TYPE_INPUT_CONTROLLER_T_MEMBER_is_analog,
+	TYPE_INPUT_CONTROLLER_T_MEMBER_type,
+	TYPE_INPUT_CONTROLLER_T_MEMBER_keyboard,
+	TYPE_INPUT_CONTROLLER_T_MEMBER_gamepad,
+};
+
+enum game_action_binding_t_member_list_enum {
+	TYPE_GAME_ACTION_BINDING_T_MEMBER_type,
+	TYPE_GAME_ACTION_BINDING_T_MEMBER_binding_id,
+};
+
+enum game_action_t_member_list_enum {
+	TYPE_GAME_ACTION_T_MEMBER_keyboard,
+	TYPE_GAME_ACTION_T_MEMBER_gamepad,
+	TYPE_GAME_ACTION_T_MEMBER_name,
+};
+
+enum input_manager_t_member_list_enum {
+	TYPE_INPUT_MANAGER_T_MEMBER_keyboard_data,
+	TYPE_INPUT_MANAGER_T_MEMBER_gamepad_data,
+	TYPE_INPUT_MANAGER_T_MEMBER_primary_controller_index,
+	TYPE_INPUT_MANAGER_T_MEMBER_active_controller_index,
+	TYPE_INPUT_MANAGER_T_MEMBER_connected_controller_count,
+	TYPE_INPUT_MANAGER_T_MEMBER_controllers,
+	TYPE_INPUT_MANAGER_T_MEMBER_game_actions,
+};
+
+enum payload_member_list_enum {
+	TYPE_PAYLOAD_MEMBER_input_data,
+};
+
+enum packet_t_member_list_enum {
+	TYPE_PACKET_T_MEMBER_magic_value,
+	TYPE_PACKET_T_MEMBER_type,
+	TYPE_PACKET_T_MEMBER_client_id,
+	TYPE_PACKET_T_MEMBER_payload,
+};
+
 
 const static type_info_t GENERATED_type_table[] = {
-	{.name = "debug_log_level_t", .type = TYPE_debug_log_level_t, .size = sizeof(debug_log_level_t), .struct_info = NULL},
-	{.name = "za_allocation_tag_t", .type = TYPE_za_allocation_tag_t, .size = sizeof(za_allocation_tag_t), .struct_info = NULL},
-	{.name = "u32", .type = TYPE_u32, .size = sizeof(u32), .struct_info = NULL},
-	{.name = "bool8", .type = TYPE_bool8, .size = sizeof(bool8), .struct_info = NULL},
+	{.name = "byte", .type = TYPE_byte, .size = sizeof(byte*), .struct_info = NULL},
 	{.name = "u64", .type = TYPE_u64, .size = sizeof(u64), .struct_info = NULL},
-	{.name = "zone_allocator_block_t", .type = TYPE_zone_allocator_block_t, .size = sizeof(zone_allocator_block_t), .struct_info = (type_info_struct_t*)&type_info_struct_zone_allocator_block_t_const_data},
-	{.name = "sys_mutex_t", .type = TYPE_sys_mutex_t, .size = sizeof(sys_mutex_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_mutex_t_const_data},
+	{.name = "memory_arena_footer_t", .type = TYPE_memory_arena_footer_t, .size = sizeof(memory_arena_footer_t), .struct_info = (type_info_struct_t*)&type_info_struct_memory_arena_footer_t_const_data},
+	{.name = "bool32", .type = TYPE_bool32, .size = sizeof(bool32), .struct_info = NULL},
+	{.name = "u32", .type = TYPE_u32, .size = sizeof(u32), .struct_info = NULL},
+	{.name = "memory_arena_t", .type = TYPE_memory_arena_t, .size = sizeof(memory_arena_t), .struct_info = (type_info_struct_t*)&type_info_struct_memory_arena_t_const_data},
 	{.name = "u8", .type = TYPE_u8, .size = sizeof(u8*), .struct_info = NULL},
-	{.name = "zone_allocator_t", .type = TYPE_zone_allocator_t, .size = sizeof(zone_allocator_t), .struct_info = (type_info_struct_t*)&type_info_struct_zone_allocator_t_const_data},
+	{.name = "scratch_arena_t", .type = TYPE_scratch_arena_t, .size = sizeof(scratch_arena_t), .struct_info = (type_info_struct_t*)&type_info_struct_scratch_arena_t_const_data},
+	{.name = "dynarray_header_t", .type = TYPE_dynarray_header_t, .size = sizeof(dynarray_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_dynarray_header_t_const_data},
+	{.name = "file_extension_t", .type = TYPE_file_extension_t, .size = sizeof(file_extension_t), .struct_info = NULL},
+	{.name = "sys_handle_t", .type = TYPE_sys_handle_t, .size = sizeof(sys_handle_t), .struct_info = NULL},
+	{.name = "string_t", .type = TYPE_string_t, .size = sizeof(string_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_t_const_data},
+	{.name = "bool8", .type = TYPE_bool8, .size = sizeof(bool8), .struct_info = NULL},
+	{.name = "file_t", .type = TYPE_file_t, .size = sizeof(file_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_t_const_data},
+	{.name = "mapped_file_t", .type = TYPE_mapped_file_t, .size = sizeof(mapped_file_t), .struct_info = (type_info_struct_t*)&type_info_struct_mapped_file_t_const_data},
+	{.name = "file_data_t", .type = TYPE_file_data_t, .size = sizeof(file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_data_t_const_data},
+	{.name = "overlap_io_data_t", .type = TYPE_overlap_io_data_t, .size = sizeof(overlap_io_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_overlap_io_data_t_const_data},
+	{.name = "visit_files_pfn_t", .type = TYPE_visit_files_pfn_t, .size = sizeof(visit_files_pfn_t*), .struct_info = NULL},
+	{.name = "visit_file_data_t", .type = TYPE_visit_file_data_t, .size = sizeof(visit_file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_visit_file_data_t_const_data},
+	{.name = "file_watcher_change_event_t", .type = TYPE_file_watcher_change_event_t, .size = sizeof(file_watcher_change_event_t), .struct_info = NULL},
+	{.name = "file_watcher_recorded_change_t", .type = TYPE_file_watcher_recorded_change_t, .size = sizeof(file_watcher_recorded_change_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_watcher_recorded_change_t_const_data},
+	{.name = "file_watcher_callback_pfn_t", .type = TYPE_file_watcher_callback_pfn_t, .size = sizeof(file_watcher_callback_pfn_t*), .struct_info = NULL},
+	{.name = "file_watcher_sys_watch_data_t", .type = TYPE_file_watcher_sys_watch_data_t, .size = sizeof(file_watcher_sys_watch_data_t), .struct_info = NULL},
+	{.name = "file_watcher_t", .type = TYPE_file_watcher_t, .size = sizeof(file_watcher_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_watcher_t_const_data},
+	{.name = "threadpool_t", .type = TYPE_threadpool_t, .size = sizeof(threadpool_t), .struct_info = (type_info_struct_t*)&type_info_struct_threadpool_t_const_data},
+	{.name = "global_context_t", .type = TYPE_global_context_t, .size = sizeof(global_context_t), .struct_info = (type_info_struct_t*)&type_info_struct_global_context_t_const_data},
+	{.name = "hash_table_allocation_flags_t", .type = TYPE_hash_table_allocation_flags_t, .size = sizeof(hash_table_allocation_flags_t), .struct_info = NULL},
+	{.name = "hash_table_header_t", .type = TYPE_hash_table_header_t, .size = sizeof(hash_table_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_hash_table_header_t_const_data},
+	{.name = "debug_log_level_t", .type = TYPE_debug_log_level_t, .size = sizeof(debug_log_level_t), .struct_info = NULL},
 	{.name = "float32", .type = TYPE_float32, .size = sizeof(float32), .struct_info = NULL},
 	{.name = "vec2_t", .type = TYPE_vec2_t, .size = sizeof(vec2_t), .struct_info = (type_info_struct_t*)&type_info_struct_vec2_t_const_data},
 	{.name = "vec3_t", .type = TYPE_vec3_t, .size = sizeof(vec3_t), .struct_info = (type_info_struct_t*)&type_info_struct_vec3_t_const_data},
@@ -5344,90 +6301,59 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "mat3_t", .type = TYPE_mat3_t, .size = sizeof(mat3_t), .struct_info = (type_info_struct_t*)&type_info_struct_mat3_t_const_data},
 	{.name = "mat2_t", .type = TYPE_mat2_t, .size = sizeof(mat2_t), .struct_info = (type_info_struct_t*)&type_info_struct_mat2_t_const_data},
 	{.name = "rectangle2_t", .type = TYPE_rectangle2_t, .size = sizeof(rectangle2_t), .struct_info = (type_info_struct_t*)&type_info_struct_rectangle2_t_const_data},
-	{.name = "bool32", .type = TYPE_bool32, .size = sizeof(bool32), .struct_info = NULL},
 	{.name = "raytest_t", .type = TYPE_raytest_t, .size = sizeof(raytest_t), .struct_info = (type_info_struct_t*)&type_info_struct_raytest_t_const_data},
-	{.name = "asset_type_t", .type = TYPE_asset_type_t, .size = sizeof(asset_type_t), .struct_info = NULL},
-	{.name = "asset_slot_load_status_t", .type = TYPE_asset_slot_load_status_t, .size = sizeof(asset_slot_load_status_t), .struct_info = NULL},
-	{.name = "bitmap_format_t", .type = TYPE_bitmap_format_t, .size = sizeof(bitmap_format_t), .struct_info = NULL},
-	{.name = "subtexture_data_t", .type = TYPE_subtexture_data_t, .size = sizeof(subtexture_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_subtexture_data_t_const_data},
-	{.name = "asset_slot_t", .type = TYPE_asset_slot_t, .size = sizeof(asset_slot_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_slot_t_const_data},
-	{.name = "texture2D_t", .type = TYPE_texture2D_t, .size = sizeof(texture2D_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture2D_t_const_data},
-	{.name = "shader_t", .type = TYPE_shader_t, .size = sizeof(shader_t), .struct_info = (type_info_struct_t*)&type_info_struct_shader_t_const_data},
-	{.name = "asset_handle_t", .type = TYPE_asset_handle_t, .size = sizeof(asset_handle_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_handle_t_const_data},
-	{.name = "string_t", .type = TYPE_string_t, .size = sizeof(string_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_t_const_data},
-	{.name = "bitmap_t", .type = TYPE_bitmap_t, .size = sizeof(bitmap_t), .struct_info = (type_info_struct_t*)&type_info_struct_bitmap_t_const_data},
-	{.name = "vulkan_texture_t", .type = TYPE_vulkan_texture_t, .size = sizeof(vulkan_texture_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_texture_t_const_data},
-	{.name = "texture_atlas_t", .type = TYPE_texture_atlas_t, .size = sizeof(texture_atlas_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture_atlas_t_const_data},
-	{.name = "vulkan_shader_data_t", .type = TYPE_vulkan_shader_data_t, .size = sizeof(vulkan_shader_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_data_t_const_data},
-	{.name = "vulkan_shader_uniform_data_t", .type = TYPE_vulkan_shader_uniform_data_t, .size = sizeof(vulkan_shader_uniform_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_uniform_data_t_const_data},
-	{.name = "render_pipeline_state_t", .type = TYPE_render_pipeline_state_t, .size = sizeof(render_pipeline_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_pipeline_state_t_const_data},
-	{.name = "material_archetype_t", .type = TYPE_material_archetype_t, .size = sizeof(material_archetype_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_archetype_t_const_data},
-	{.name = "material_instance_t", .type = TYPE_material_instance_t, .size = sizeof(material_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_instance_t_const_data},
-	{.name = "file_t", .type = TYPE_file_t, .size = sizeof(file_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_t_const_data},
-	{.name = "jfd_package_entry_t", .type = TYPE_jfd_package_entry_t, .size = sizeof(jfd_package_entry_t*), .struct_info = NULL},
-	{.name = "memory_arena_t", .type = TYPE_memory_arena_t, .size = sizeof(memory_arena_t), .struct_info = (type_info_struct_t*)&type_info_struct_memory_arena_t_const_data},
-	{.name = "jfd_file_header_t", .type = TYPE_jfd_file_header_t, .size = sizeof(jfd_file_header_t*), .struct_info = NULL},
-	{.name = "asset_manager_asset_file_data_t", .type = TYPE_asset_manager_asset_file_data_t, .size = sizeof(asset_manager_asset_file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_manager_asset_file_data_t_const_data},
-	{.name = "asset_manager_t", .type = TYPE_asset_manager_t, .size = sizeof(asset_manager_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_manager_t_const_data},
-	{.name = "asset_catalog_t", .type = TYPE_asset_catalog_t, .size = sizeof(asset_catalog_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_catalog_t_const_data},
-	{.name = "texture_atlas_registry_t", .type = TYPE_texture_atlas_registry_t, .size = sizeof(texture_atlas_registry_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture_atlas_registry_t_const_data},
-	{.name = "vulkan_render_context_t", .type = TYPE_vulkan_render_context_t, .size = sizeof(vulkan_render_context_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_context_t_const_data},
-	{.name = "entity_type", .type = TYPE_entity_type, .size = sizeof(entity_type), .struct_info = NULL},
-	{.name = "entity_flags", .type = TYPE_entity_flags, .size = sizeof(entity_flags), .struct_info = NULL},
-	{.name = "entity_t", .type = TYPE_entity_t, .size = sizeof(entity_t), .struct_info = (type_info_struct_t*)&type_info_struct_entity_t_const_data},
-	{.name = "entity_manager_t", .type = TYPE_entity_manager_t, .size = sizeof(entity_manager_t), .struct_info = (type_info_struct_t*)&type_info_struct_entity_manager_t_const_data},
-	{.name = "packet_type_t", .type = TYPE_packet_type_t, .size = sizeof(packet_type_t), .struct_info = NULL},
-	{.name = "input_data_t", .type = TYPE_input_data_t, .size = sizeof(input_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_input_data_t_const_data},
-	{.name = "payload", .type = TYPE_payload, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.payload)), .struct_info = (type_info_struct_t*)&type_info_struct_payload_const_data},
-	{.name = "packet_t", .type = TYPE_packet_t, .size = sizeof(packet_t), .struct_info = (type_info_struct_t*)&type_info_struct_packet_t_const_data},
-	{.name = "sys_thread_handle_t", .type = TYPE_sys_thread_handle_t, .size = sizeof(sys_thread_handle_t), .struct_info = NULL},
-	{.name = "sys_thread_t", .type = TYPE_sys_thread_t, .size = sizeof(sys_thread_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_thread_t_const_data},
-	{.name = "sys_mutex_handle_t", .type = TYPE_sys_mutex_handle_t, .size = sizeof(sys_mutex_handle_t), .struct_info = NULL},
-	{.name = "sys_semaphore_handle_t", .type = TYPE_sys_semaphore_handle_t, .size = sizeof(sys_semaphore_handle_t), .struct_info = NULL},
-	{.name = "sys_semaphore_t", .type = TYPE_sys_semaphore_t, .size = sizeof(sys_semaphore_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_semaphore_t_const_data},
-	{.name = "byte", .type = TYPE_byte, .size = sizeof(byte*), .struct_info = NULL},
-	{.name = "string_builder_buffer_t", .type = TYPE_string_builder_buffer_t, .size = sizeof(string_builder_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_buffer_t_const_data},
-	{.name = "string_builder_t", .type = TYPE_string_builder_t, .size = sizeof(string_builder_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_t_const_data},
-	{.name = "preprocessor_token_type_t", .type = TYPE_preprocessor_token_type_t, .size = sizeof(preprocessor_token_type_t), .struct_info = NULL},
-	{.name = "token_data_t", .type = TYPE_token_data_t, .size = sizeof(token_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_token_data_t_const_data},
-	{.name = "tokenizer_t", .type = TYPE_tokenizer_t, .size = sizeof(tokenizer_t), .struct_info = (type_info_struct_t*)&type_info_struct_tokenizer_t_const_data},
 	{.name = "arg_type_t", .type = TYPE_arg_type_t, .size = sizeof(arg_type_t), .struct_info = NULL},
 	{.name = "char", .type = TYPE_char, .size = sizeof(char*), .struct_info = NULL},
 	{.name = "program_flag_data_t", .type = TYPE_program_flag_data_t, .size = sizeof(program_flag_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_program_flag_data_t_const_data},
 	{.name = "program_flag_t", .type = TYPE_program_flag_t, .size = sizeof(program_flag_t), .struct_info = (type_info_struct_t*)&type_info_struct_program_flag_t_const_data},
 	{.name = "program_flag_state_t", .type = TYPE_program_flag_state_t, .size = sizeof(program_flag_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_program_flag_state_t_const_data},
-	{.name = "dynarray_header_t", .type = TYPE_dynarray_header_t, .size = sizeof(dynarray_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_dynarray_header_t_const_data},
-	{.name = "memory_arena_footer_t", .type = TYPE_memory_arena_footer_t, .size = sizeof(memory_arena_footer_t), .struct_info = (type_info_struct_t*)&type_info_struct_memory_arena_footer_t_const_data},
-	{.name = "scratch_arena_t", .type = TYPE_scratch_arena_t, .size = sizeof(scratch_arena_t), .struct_info = (type_info_struct_t*)&type_info_struct_scratch_arena_t_const_data},
-	{.name = "file_extension_t", .type = TYPE_file_extension_t, .size = sizeof(file_extension_t), .struct_info = NULL},
-	{.name = "sys_handle_t", .type = TYPE_sys_handle_t, .size = sizeof(sys_handle_t), .struct_info = NULL},
-	{.name = "mapped_file_t", .type = TYPE_mapped_file_t, .size = sizeof(mapped_file_t), .struct_info = (type_info_struct_t*)&type_info_struct_mapped_file_t_const_data},
-	{.name = "file_data_t", .type = TYPE_file_data_t, .size = sizeof(file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_data_t_const_data},
-	{.name = "overlap_io_data_t", .type = TYPE_overlap_io_data_t, .size = sizeof(overlap_io_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_overlap_io_data_t_const_data},
-	{.name = "visit_files_pfn_t", .type = TYPE_visit_files_pfn_t, .size = sizeof(visit_files_pfn_t*), .struct_info = NULL},
-	{.name = "visit_file_data_t", .type = TYPE_visit_file_data_t, .size = sizeof(visit_file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_visit_file_data_t_const_data},
-	{.name = "controller_type_t", .type = TYPE_controller_type_t, .size = sizeof(controller_type_t), .struct_info = NULL},
-	{.name = "input_mouse_buttons_t", .type = TYPE_input_mouse_buttons_t, .size = sizeof(input_mouse_buttons_t), .struct_info = NULL},
-	{.name = "action_button_t", .type = TYPE_action_button_t, .size = sizeof(action_button_t), .struct_info = (type_info_struct_t*)&type_info_struct_action_button_t_const_data},
-	{.name = "keyboard_controller_data_t", .type = TYPE_keyboard_controller_data_t, .size = sizeof(keyboard_controller_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_keyboard_controller_data_t_const_data},
-	{.name = "s16", .type = TYPE_s16, .size = sizeof(s16), .struct_info = NULL},
-	{.name = "analog_button_t", .type = TYPE_analog_button_t, .size = sizeof(analog_button_t), .struct_info = (type_info_struct_t*)&type_info_struct_analog_button_t_const_data},
-	{.name = "SDL_Gamepad", .type = TYPE_SDL_Gamepad, .size = sizeof(SDL_Gamepad*), .struct_info = NULL},
-	{.name = "SDL_Joystick", .type = TYPE_SDL_Joystick, .size = sizeof(SDL_Joystick*), .struct_info = NULL},
-	{.name = "gamepad_controller_data_t", .type = TYPE_gamepad_controller_data_t, .size = sizeof(gamepad_controller_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_gamepad_controller_data_t_const_data},
-	{.name = "input_controller_t", .type = TYPE_input_controller_t, .size = sizeof(input_controller_t), .struct_info = (type_info_struct_t*)&type_info_struct_input_controller_t_const_data},
-	{.name = "game_action_binding_type_t", .type = TYPE_game_action_binding_type_t, .size = sizeof(game_action_binding_type_t), .struct_info = NULL},
-	{.name = "game_action_binding_t", .type = TYPE_game_action_binding_t, .size = sizeof(game_action_binding_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_action_binding_t_const_data},
-	{.name = "game_action_t", .type = TYPE_game_action_t, .size = sizeof(game_action_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_action_t_const_data},
-	{.name = "input_manager_t", .type = TYPE_input_manager_t, .size = sizeof(input_manager_t), .struct_info = (type_info_struct_t*)&type_info_struct_input_manager_t_const_data},
-	{.name = "file_watcher_change_event_t", .type = TYPE_file_watcher_change_event_t, .size = sizeof(file_watcher_change_event_t), .struct_info = NULL},
-	{.name = "file_watcher_recorded_change_t", .type = TYPE_file_watcher_recorded_change_t, .size = sizeof(file_watcher_recorded_change_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_watcher_recorded_change_t_const_data},
-	{.name = "file_watcher_callback_pfn_t", .type = TYPE_file_watcher_callback_pfn_t, .size = sizeof(file_watcher_callback_pfn_t*), .struct_info = NULL},
-	{.name = "file_watcher_sys_watch_data_t", .type = TYPE_file_watcher_sys_watch_data_t, .size = sizeof(file_watcher_sys_watch_data_t), .struct_info = NULL},
-	{.name = "file_watcher_t", .type = TYPE_file_watcher_t, .size = sizeof(file_watcher_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_watcher_t_const_data},
+	{.name = "string_builder_buffer_t", .type = TYPE_string_builder_buffer_t, .size = sizeof(string_builder_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_buffer_t_const_data},
+	{.name = "string_builder_t", .type = TYPE_string_builder_t, .size = sizeof(string_builder_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_t_const_data},
+	{.name = "sys_thread_handle_t", .type = TYPE_sys_thread_handle_t, .size = sizeof(sys_thread_handle_t), .struct_info = NULL},
+	{.name = "sys_thread_t", .type = TYPE_sys_thread_t, .size = sizeof(sys_thread_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_thread_t_const_data},
+	{.name = "sys_mutex_handle_t", .type = TYPE_sys_mutex_handle_t, .size = sizeof(sys_mutex_handle_t), .struct_info = NULL},
+	{.name = "sys_mutex_t", .type = TYPE_sys_mutex_t, .size = sizeof(sys_mutex_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_mutex_t_const_data},
+	{.name = "sys_semaphore_handle_t", .type = TYPE_sys_semaphore_handle_t, .size = sizeof(sys_semaphore_handle_t), .struct_info = NULL},
+	{.name = "sys_semaphore_t", .type = TYPE_sys_semaphore_t, .size = sizeof(sys_semaphore_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_semaphore_t_const_data},
+	{.name = "job_priority_t", .type = TYPE_job_priority_t, .size = sizeof(job_priority_t), .struct_info = NULL},
+	{.name = "threadpool_callback_t", .type = TYPE_threadpool_callback_t, .size = sizeof(threadpool_callback_t*), .struct_info = NULL},
+	{.name = "threadpool_queue_entry_t", .type = TYPE_threadpool_queue_entry_t, .size = sizeof(threadpool_queue_entry_t), .struct_info = (type_info_struct_t*)&type_info_struct_threadpool_queue_entry_t_const_data},
+	{.name = "threadpool_queue_t", .type = TYPE_threadpool_queue_t, .size = sizeof(threadpool_queue_t), .struct_info = (type_info_struct_t*)&type_info_struct_threadpool_queue_t_const_data},
+	{.name = "preprocessor_token_type_t", .type = TYPE_preprocessor_token_type_t, .size = sizeof(preprocessor_token_type_t), .struct_info = NULL},
+	{.name = "token_data_t", .type = TYPE_token_data_t, .size = sizeof(token_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_token_data_t_const_data},
+	{.name = "tokenizer_t", .type = TYPE_tokenizer_t, .size = sizeof(tokenizer_t), .struct_info = (type_info_struct_t*)&type_info_struct_tokenizer_t_const_data},
+	{.name = "za_allocation_tag_t", .type = TYPE_za_allocation_tag_t, .size = sizeof(za_allocation_tag_t), .struct_info = NULL},
+	{.name = "zone_allocator_block_t", .type = TYPE_zone_allocator_block_t, .size = sizeof(zone_allocator_block_t), .struct_info = (type_info_struct_t*)&type_info_struct_zone_allocator_block_t_const_data},
+	{.name = "zone_allocator_t", .type = TYPE_zone_allocator_t, .size = sizeof(zone_allocator_t), .struct_info = (type_info_struct_t*)&type_info_struct_zone_allocator_t_const_data},
+	{.name = "entity_type", .type = TYPE_entity_type, .size = sizeof(entity_type), .struct_info = NULL},
+	{.name = "entity_flags", .type = TYPE_entity_flags, .size = sizeof(entity_flags), .struct_info = NULL},
+	{.name = "entity_t", .type = TYPE_entity_t, .size = sizeof(entity_t), .struct_info = (type_info_struct_t*)&type_info_struct_entity_t_const_data},
+	{.name = "entity_manager_t", .type = TYPE_entity_manager_t, .size = sizeof(entity_manager_t), .struct_info = (type_info_struct_t*)&type_info_struct_entity_manager_t_const_data},
+	{.name = "input_data_t", .type = TYPE_input_data_t, .size = sizeof(input_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_input_data_t_const_data},
+	{.name = "sockaddr_storage", .type = TYPE_sockaddr_storage, .size = sizeof(sockaddr_storage), .struct_info = NULL},
+	{.name = "socklen_t", .type = TYPE_socklen_t, .size = sizeof(socklen_t), .struct_info = NULL},
+	{.name = "client_data_t", .type = TYPE_client_data_t, .size = sizeof(client_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_client_data_t_const_data},
+	{.name = "SDL_Window", .type = TYPE_SDL_Window, .size = sizeof(SDL_Window*), .struct_info = NULL},
+	{.name = "sockaddr_in_t", .type = TYPE_sockaddr_in_t, .size = sizeof(sockaddr_in_t), .struct_info = NULL},
+	{.name = "game_state_t", .type = TYPE_game_state_t, .size = sizeof(game_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_state_t_const_data},
+	{.name = "renderer_effect_application_flags_t", .type = TYPE_renderer_effect_application_flags_t, .size = sizeof(renderer_effect_application_flags_t), .struct_info = NULL},
+	{.name = "render_pipeline_blending_mode_t", .type = TYPE_render_pipeline_blending_mode_t, .size = sizeof(render_pipeline_blending_mode_t), .struct_info = NULL},
+	{.name = "render_pipeline_blending_equation_t", .type = TYPE_render_pipeline_blending_equation_t, .size = sizeof(render_pipeline_blending_equation_t), .struct_info = NULL},
+	{.name = "render_pipeline_depth_function_t", .type = TYPE_render_pipeline_depth_function_t, .size = sizeof(render_pipeline_depth_function_t), .struct_info = NULL},
+	{.name = "render_geometry_instance_t", .type = TYPE_render_geometry_instance_t, .size = sizeof(render_geometry_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_geometry_instance_t_const_data},
+	{.name = "render_camera_t", .type = TYPE_render_camera_t, .size = sizeof(render_camera_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_camera_t_const_data},
+	{.name = "render_geometry_batch_t", .type = TYPE_render_geometry_batch_t, .size = sizeof(render_geometry_batch_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_geometry_batch_t_const_data},
+	{.name = "render_pipeline_state_t", .type = TYPE_render_pipeline_state_t, .size = sizeof(render_pipeline_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_pipeline_state_t_const_data},
+	{.name = "asset_handle_t", .type = TYPE_asset_handle_t, .size = sizeof(asset_handle_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_handle_t_const_data},
+	{.name = "texture2D_t", .type = TYPE_texture2D_t, .size = sizeof(texture2D_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture2D_t_const_data},
+	{.name = "render_group_t", .type = TYPE_render_group_t, .size = sizeof(render_group_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_group_t_const_data},
+	{.name = "state", .type = TYPE_state, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state)), .struct_info = (type_info_struct_t*)&type_info_struct_state_const_data},
+	{.name = "draw_frame_t", .type = TYPE_draw_frame_t, .size = sizeof(draw_frame_t), .struct_info = (type_info_struct_t*)&type_info_struct_draw_frame_t_const_data},
+	{.name = "vulkan_render_context_t", .type = TYPE_vulkan_render_context_t, .size = sizeof(vulkan_render_context_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_context_t_const_data},
+	{.name = "vulkan_render_frame_state_t", .type = TYPE_vulkan_render_frame_state_t, .size = sizeof(vulkan_render_frame_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_frame_state_t_const_data},
+	{.name = "render_state_t", .type = TYPE_render_state_t, .size = sizeof(render_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_state_t_const_data},
 	{.name = "global_matrix_uniforms_t", .type = TYPE_global_matrix_uniforms_t, .size = sizeof(global_matrix_uniforms_t), .struct_info = (type_info_struct_t*)&type_info_struct_global_matrix_uniforms_t_const_data},
 	{.name = "push_constant_t", .type = TYPE_push_constant_t, .size = sizeof(push_constant_t), .struct_info = (type_info_struct_t*)&type_info_struct_push_constant_t_const_data},
-	{.name = "render_camera_t", .type = TYPE_render_camera_t, .size = sizeof(render_camera_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_camera_t_const_data},
 	{.name = "VkBuffer", .type = TYPE_VkBuffer, .size = sizeof(VkBuffer), .struct_info = NULL},
 	{.name = "VkDeviceMemory", .type = TYPE_VkDeviceMemory, .size = sizeof(VkDeviceMemory), .struct_info = NULL},
 	{.name = "VkBufferUsageFlagBits", .type = TYPE_VkBufferUsageFlagBits, .size = sizeof(VkBufferUsageFlagBits), .struct_info = NULL},
@@ -5446,6 +6372,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "vulkan_shader_descriptor_set_info_t", .type = TYPE_vulkan_shader_descriptor_set_info_t, .size = sizeof(vulkan_shader_descriptor_set_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_descriptor_set_info_t_const_data},
 	{.name = "vulkan_shader_uniform_texture_data_t", .type = TYPE_vulkan_shader_uniform_texture_data_t, .size = sizeof(vulkan_shader_uniform_texture_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_uniform_texture_data_t_const_data},
 	{.name = "vulkan_shader_uniform_data_range_t", .type = TYPE_vulkan_shader_uniform_data_range_t, .size = sizeof(vulkan_shader_uniform_data_range_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_uniform_data_range_t_const_data},
+	{.name = "vulkan_shader_uniform_data_t", .type = TYPE_vulkan_shader_uniform_data_t, .size = sizeof(vulkan_shader_uniform_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_uniform_data_t_const_data},
 	{.name = "VkShaderStageFlagBits", .type = TYPE_VkShaderStageFlagBits, .size = sizeof(VkShaderStageFlagBits), .struct_info = NULL},
 	{.name = "VkShaderModuleCreateInfo", .type = TYPE_VkShaderModuleCreateInfo, .size = sizeof(VkShaderModuleCreateInfo), .struct_info = NULL},
 	{.name = "VkPipelineShaderStageCreateInfo", .type = TYPE_VkPipelineShaderStageCreateInfo, .size = sizeof(VkPipelineShaderStageCreateInfo), .struct_info = NULL},
@@ -5455,6 +6382,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "VkDescriptorPool", .type = TYPE_VkDescriptorPool, .size = sizeof(VkDescriptorPool), .struct_info = NULL},
 	{.name = "VkDescriptorSetLayout", .type = TYPE_VkDescriptorSetLayout, .size = sizeof(VkDescriptorSetLayout*), .struct_info = NULL},
 	{.name = "VkPushConstantRange", .type = TYPE_VkPushConstantRange, .size = sizeof(VkPushConstantRange*), .struct_info = NULL},
+	{.name = "vulkan_shader_data_t", .type = TYPE_vulkan_shader_data_t, .size = sizeof(vulkan_shader_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_data_t_const_data},
 	{.name = "VkSurfaceCapabilitiesKHR", .type = TYPE_VkSurfaceCapabilitiesKHR, .size = sizeof(VkSurfaceCapabilitiesKHR), .struct_info = NULL},
 	{.name = "VkSurfaceFormatKHR", .type = TYPE_VkSurfaceFormatKHR, .size = sizeof(VkSurfaceFormatKHR), .struct_info = NULL},
 	{.name = "VkPresentModeKHR", .type = TYPE_VkPresentModeKHR, .size = sizeof(VkPresentModeKHR), .struct_info = NULL},
@@ -5479,6 +6407,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "vulkan_framebuffer_data_t", .type = TYPE_vulkan_framebuffer_data_t, .size = sizeof(vulkan_framebuffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_framebuffer_data_t_const_data},
 	{.name = "VkImageLayout", .type = TYPE_VkImageLayout, .size = sizeof(VkImageLayout), .struct_info = NULL},
 	{.name = "vulkan_image_data_t", .type = TYPE_vulkan_image_data_t, .size = sizeof(vulkan_image_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_image_data_t_const_data},
+	{.name = "vulkan_texture_t", .type = TYPE_vulkan_texture_t, .size = sizeof(vulkan_texture_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_texture_t_const_data},
 	{.name = "VkSwapchainKHR", .type = TYPE_VkSwapchainKHR, .size = sizeof(VkSwapchainKHR), .struct_info = NULL},
 	{.name = "vulkan_swapchain_data_t", .type = TYPE_vulkan_swapchain_data_t, .size = sizeof(vulkan_swapchain_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_swapchain_data_t_const_data},
 	{.name = "vulkan_command_buffer_state_t", .type = TYPE_vulkan_command_buffer_state_t, .size = sizeof(vulkan_command_buffer_state_t), .struct_info = NULL},
@@ -5486,37 +6415,44 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "vulkan_command_buffer_data_t", .type = TYPE_vulkan_command_buffer_data_t, .size = sizeof(vulkan_command_buffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_command_buffer_data_t_const_data},
 	{.name = "vulkan_render_backend_function_data_t", .type = TYPE_vulkan_render_backend_function_data_t, .size = sizeof(vulkan_render_backend_function_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_backend_function_data_t_const_data},
 	{.name = "VkSemaphore", .type = TYPE_VkSemaphore, .size = sizeof(VkSemaphore*), .struct_info = NULL},
-	{.name = "vulkan_render_frame_state_t", .type = TYPE_vulkan_render_frame_state_t, .size = sizeof(vulkan_render_frame_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_frame_state_t_const_data},
-	{.name = "SDL_Window", .type = TYPE_SDL_Window, .size = sizeof(SDL_Window*), .struct_info = NULL},
 	{.name = "VkInstance", .type = TYPE_VkInstance, .size = sizeof(VkInstance), .struct_info = NULL},
 	{.name = "VkAllocationCallbacks", .type = TYPE_VkAllocationCallbacks, .size = sizeof(VkAllocationCallbacks*), .struct_info = NULL},
 	{.name = "VkSurfaceKHR", .type = TYPE_VkSurfaceKHR, .size = sizeof(VkSurfaceKHR), .struct_info = NULL},
 	{.name = "VkDebugUtilsMessengerEXT", .type = TYPE_VkDebugUtilsMessengerEXT, .size = sizeof(VkDebugUtilsMessengerEXT), .struct_info = NULL},
-	{.name = "hash_table_allocation_flags_t", .type = TYPE_hash_table_allocation_flags_t, .size = sizeof(hash_table_allocation_flags_t), .struct_info = NULL},
-	{.name = "hash_table_header_t", .type = TYPE_hash_table_header_t, .size = sizeof(hash_table_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_hash_table_header_t_const_data},
-	{.name = "job_priority_t", .type = TYPE_job_priority_t, .size = sizeof(job_priority_t), .struct_info = NULL},
-	{.name = "threadpool_callback_t", .type = TYPE_threadpool_callback_t, .size = sizeof(threadpool_callback_t*), .struct_info = NULL},
-	{.name = "threadpool_queue_entry_t", .type = TYPE_threadpool_queue_entry_t, .size = sizeof(threadpool_queue_entry_t), .struct_info = (type_info_struct_t*)&type_info_struct_threadpool_queue_entry_t_const_data},
-	{.name = "threadpool_queue_t", .type = TYPE_threadpool_queue_t, .size = sizeof(threadpool_queue_t), .struct_info = (type_info_struct_t*)&type_info_struct_threadpool_queue_t_const_data},
-	{.name = "threadpool_t", .type = TYPE_threadpool_t, .size = sizeof(threadpool_t), .struct_info = (type_info_struct_t*)&type_info_struct_threadpool_t_const_data},
-	{.name = "renderer_effect_application_flags_t", .type = TYPE_renderer_effect_application_flags_t, .size = sizeof(renderer_effect_application_flags_t), .struct_info = NULL},
-	{.name = "render_pipeline_blending_mode_t", .type = TYPE_render_pipeline_blending_mode_t, .size = sizeof(render_pipeline_blending_mode_t), .struct_info = NULL},
-	{.name = "render_pipeline_blending_equation_t", .type = TYPE_render_pipeline_blending_equation_t, .size = sizeof(render_pipeline_blending_equation_t), .struct_info = NULL},
-	{.name = "render_pipeline_depth_function_t", .type = TYPE_render_pipeline_depth_function_t, .size = sizeof(render_pipeline_depth_function_t), .struct_info = NULL},
-	{.name = "render_geometry_instance_t", .type = TYPE_render_geometry_instance_t, .size = sizeof(render_geometry_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_geometry_instance_t_const_data},
-	{.name = "render_geometry_batch_t", .type = TYPE_render_geometry_batch_t, .size = sizeof(render_geometry_batch_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_geometry_batch_t_const_data},
-	{.name = "render_group_t", .type = TYPE_render_group_t, .size = sizeof(render_group_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_group_t_const_data},
-	{.name = "state", .type = TYPE_state, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state)), .struct_info = (type_info_struct_t*)&type_info_struct_state_const_data},
-	{.name = "draw_frame_t", .type = TYPE_draw_frame_t, .size = sizeof(draw_frame_t), .struct_info = (type_info_struct_t*)&type_info_struct_draw_frame_t_const_data},
-	{.name = "render_state_t", .type = TYPE_render_state_t, .size = sizeof(render_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_state_t_const_data},
-	{.name = "global_context_t", .type = TYPE_global_context_t, .size = sizeof(global_context_t), .struct_info = (type_info_struct_t*)&type_info_struct_global_context_t_const_data},
-	{.name = "sockaddr_storage", .type = TYPE_sockaddr_storage, .size = sizeof(sockaddr_storage), .struct_info = NULL},
-	{.name = "socklen_t", .type = TYPE_socklen_t, .size = sizeof(socklen_t), .struct_info = NULL},
-	{.name = "client_data_t", .type = TYPE_client_data_t, .size = sizeof(client_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_client_data_t_const_data},
-	{.name = "sockaddr_in_t", .type = TYPE_sockaddr_in_t, .size = sizeof(sockaddr_in_t), .struct_info = NULL},
-	{.name = "game_state_t", .type = TYPE_game_state_t, .size = sizeof(game_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_state_t_const_data},
+	{.name = "asset_type_t", .type = TYPE_asset_type_t, .size = sizeof(asset_type_t), .struct_info = NULL},
+	{.name = "asset_slot_load_status_t", .type = TYPE_asset_slot_load_status_t, .size = sizeof(asset_slot_load_status_t), .struct_info = NULL},
+	{.name = "bitmap_format_t", .type = TYPE_bitmap_format_t, .size = sizeof(bitmap_format_t), .struct_info = NULL},
+	{.name = "subtexture_data_t", .type = TYPE_subtexture_data_t, .size = sizeof(subtexture_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_subtexture_data_t_const_data},
+	{.name = "asset_slot_t", .type = TYPE_asset_slot_t, .size = sizeof(asset_slot_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_slot_t_const_data},
+	{.name = "shader_t", .type = TYPE_shader_t, .size = sizeof(shader_t), .struct_info = (type_info_struct_t*)&type_info_struct_shader_t_const_data},
+	{.name = "bitmap_t", .type = TYPE_bitmap_t, .size = sizeof(bitmap_t), .struct_info = (type_info_struct_t*)&type_info_struct_bitmap_t_const_data},
+	{.name = "texture_atlas_t", .type = TYPE_texture_atlas_t, .size = sizeof(texture_atlas_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture_atlas_t_const_data},
+	{.name = "material_archetype_t", .type = TYPE_material_archetype_t, .size = sizeof(material_archetype_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_archetype_t_const_data},
+	{.name = "material_instance_t", .type = TYPE_material_instance_t, .size = sizeof(material_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_instance_t_const_data},
+	{.name = "jfd_package_entry_t", .type = TYPE_jfd_package_entry_t, .size = sizeof(jfd_package_entry_t*), .struct_info = NULL},
+	{.name = "jfd_file_header_t", .type = TYPE_jfd_file_header_t, .size = sizeof(jfd_file_header_t*), .struct_info = NULL},
+	{.name = "asset_manager_asset_file_data_t", .type = TYPE_asset_manager_asset_file_data_t, .size = sizeof(asset_manager_asset_file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_manager_asset_file_data_t_const_data},
+	{.name = "asset_manager_t", .type = TYPE_asset_manager_t, .size = sizeof(asset_manager_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_manager_t_const_data},
+	{.name = "asset_catalog_t", .type = TYPE_asset_catalog_t, .size = sizeof(asset_catalog_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_catalog_t_const_data},
+	{.name = "texture_atlas_registry_t", .type = TYPE_texture_atlas_registry_t, .size = sizeof(texture_atlas_registry_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture_atlas_registry_t_const_data},
+	{.name = "controller_type_t", .type = TYPE_controller_type_t, .size = sizeof(controller_type_t), .struct_info = NULL},
+	{.name = "input_mouse_buttons_t", .type = TYPE_input_mouse_buttons_t, .size = sizeof(input_mouse_buttons_t), .struct_info = NULL},
+	{.name = "action_button_t", .type = TYPE_action_button_t, .size = sizeof(action_button_t), .struct_info = (type_info_struct_t*)&type_info_struct_action_button_t_const_data},
+	{.name = "keyboard_controller_data_t", .type = TYPE_keyboard_controller_data_t, .size = sizeof(keyboard_controller_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_keyboard_controller_data_t_const_data},
+	{.name = "s16", .type = TYPE_s16, .size = sizeof(s16), .struct_info = NULL},
+	{.name = "analog_button_t", .type = TYPE_analog_button_t, .size = sizeof(analog_button_t), .struct_info = (type_info_struct_t*)&type_info_struct_analog_button_t_const_data},
+	{.name = "SDL_Gamepad", .type = TYPE_SDL_Gamepad, .size = sizeof(SDL_Gamepad*), .struct_info = NULL},
+	{.name = "SDL_Joystick", .type = TYPE_SDL_Joystick, .size = sizeof(SDL_Joystick*), .struct_info = NULL},
+	{.name = "gamepad_controller_data_t", .type = TYPE_gamepad_controller_data_t, .size = sizeof(gamepad_controller_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_gamepad_controller_data_t_const_data},
+	{.name = "input_controller_t", .type = TYPE_input_controller_t, .size = sizeof(input_controller_t), .struct_info = (type_info_struct_t*)&type_info_struct_input_controller_t_const_data},
+	{.name = "game_action_binding_type_t", .type = TYPE_game_action_binding_type_t, .size = sizeof(game_action_binding_type_t), .struct_info = NULL},
+	{.name = "game_action_binding_t", .type = TYPE_game_action_binding_t, .size = sizeof(game_action_binding_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_action_binding_t_const_data},
+	{.name = "game_action_t", .type = TYPE_game_action_t, .size = sizeof(game_action_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_action_t_const_data},
+	{.name = "input_manager_t", .type = TYPE_input_manager_t, .size = sizeof(input_manager_t), .struct_info = (type_info_struct_t*)&type_info_struct_input_manager_t_const_data},
+	{.name = "packet_type_t", .type = TYPE_packet_type_t, .size = sizeof(packet_type_t), .struct_info = NULL},
+	{.name = "payload", .type = TYPE_payload, .size = sizeof(decltype(GENERATED_DEFAULT_packet_t.payload)), .struct_info = (type_info_struct_t*)&type_info_struct_payload_const_data},
+	{.name = "packet_t", .type = TYPE_packet_t, .size = sizeof(packet_t), .struct_info = (type_info_struct_t*)&type_info_struct_packet_t_const_data},
 };
-
 
 
 string_t

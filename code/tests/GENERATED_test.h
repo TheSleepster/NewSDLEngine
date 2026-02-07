@@ -17,8 +17,7 @@ struct {                     \
     u32 thingy_mabob;        \
 }
 
-#if 0
-
+CODE_GEN_IGNORE_STRUCTURE()
 struct we_should_not_find_this 
 {
     u32 not_found0;
@@ -26,8 +25,6 @@ struct we_should_not_find_this
     u32 not_found2;
     u32 not_found3;
 };
-
-#endif
 
 struct should_crash_this;
 

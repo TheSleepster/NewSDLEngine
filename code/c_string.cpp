@@ -6,6 +6,7 @@
    ======================================================================== */
 #include <stdlib.h>
 #include <stdarg.h>
+#include <ctype.h>
 
 #include <c_string.h>
 #include <c_math.h>
@@ -289,6 +290,21 @@ const char *
 c_string_to_const_array(string_t string)
 {
     return((const char *)string.data);
+}
+
+string_t
+c_string_to_upper(string_t string)
+{
+    string_t result = c_string_make_copy(&global_context->temporary_arena, string);
+    for(u32 index = 0;
+        index < result.count;
+        ++index)
+    {
+        byte *item = (result.data + index);
+        *item = toupper(*item);
+    }
+
+    return(result);
 }
 
 void 

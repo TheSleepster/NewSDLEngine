@@ -14,8 +14,10 @@
 #include <stdlib.h>
 
 // NOTE(Sleepster): Meant to allow for labeling files to be hold on, ignored by the metaprogram.
-#define CODE_GEN_IGNORE_FILE
-CODE_GEN_IGNORE_FILE
+#define CODE_GEN_IGNORE_FILE()
+#define CODE_GEN_IGNORE_STRUCTURE()
+
+CODE_GEN_IGNORE_FILE()
 
 // TODO(Sleepster): Determine instruction set support (SSE2, SSE3, AVX, AVX2, etc...)
 
