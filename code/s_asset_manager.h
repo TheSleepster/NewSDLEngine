@@ -42,9 +42,9 @@ typedef enum asset_type
     AT_Invalid,
     AT_Bitmap,
     AT_Shader,
+    AT_Material,
     AT_Font,
     AT_Sound,
-    AT_Material,
     AT_Count
 }asset_type_t;
 
@@ -302,6 +302,9 @@ typedef struct asset_manager
     asset_catalog_t                 asset_catalogs[AT_Count];
     asset_catalog_t                *texture_catalog;
     asset_catalog_t                *shader_catalog;
+    asset_catalog_t                *material_catalog;
+    asset_catalog_t                *font_catalog;
+    asset_catalog_t                *sound_catalog;
 
     vulkan_render_context_t        *render_context;
 }asset_manager_t;

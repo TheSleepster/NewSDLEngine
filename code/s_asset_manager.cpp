@@ -135,89 +135,6 @@ s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 na
   ========== MATERIALS ==========
   =============================== */
 
-#if 0
-internal_api void
-material_file_parse_item(string_t              filename,
-                         material_archetype_t *archetype, 
-                         const type_info_t    *archetype_type_info, 
-                         tokenizer_t          *tokenizer, 
-                         token_data_t          item_name_token)
-{
-    string_t item_name = item_name_token.string; 
-    const type_info_member_t *member_info = c_meta_get_member_info(archetype_type_info, item_name);
-    if(member_info)
-    {
-    }
-    else
-    {
-        log_error("Item of name: '%.*s' was found in the material file: '%s' however this item is not contained within the material_archetype_t structure...\n",
-                  item_name.count, C_STR(item_name), C_STR(filename));
-
-        log_info("Valid members for structure of type name: '%s' are as follows:\n", archetype_type_info->name);
-        for(u32 member_index = 0;
-            member_index < archetype_type_info->struct_info->member_count;
-            ++member_index)
-        {
-            const type_info_member_t *member = archetype_type_info->struct_info->members + member_index;
-            log_info("[%d]: %s...\n", member_index, member->name);
-        }
-    }
-    
-    string_t parent_name = parent_ident.string;
-
-    const type_info_t *structure_data = c_meta_get_type_info_by_name(parent_name);
-    Assert(structure_data);
-
-    token_data_t next_token = c_tokenizer_peek_token(tokenizer);
-    if(next_token.type == TT_Colon)
-    {
-        // NOTE(Sleepster): Eat the colon 
-        c_tokenizer_get_next_token(tokenizer); 
-
-        // NOTE(Sleepster): If we're in here, it's a single assignment 
-        token_data_t value_token = c_tokenizer_get_next_token(tokenizer); 
-        if(value_token.type == TT_Identifier)
-        {
-            const type_info_member_t *member = c_meta_get_member_info(structure_data, next_token.string);
-            Assert(member);
-
-            byte *data_ptr = (byte*)archetype + member->offset; 
-            if(member->type == TYPE_string_t)
-            {
-                string_t *string_data = (string_t*)data_ptr;
-                *string_data = value_token.string;
-            }
-            else
-            {
-                memcpy(data_ptr, value_token.string.data, member->size);
-            }
-
-            return;
-        }
-        else
-        {
-            log_error("Expected Identifier after token: ':'... Got: '%.*s'...\n", 
-                      value_token.string.count, C_STR(value_token.string));
-        }
-    }
-    else if(next_token.type == TT_OpeningBrace)
-    {
-        token_data_t token = next_token;
-        while(token.type != TT_ClosingBrace)
-        {
-            material_file_parse_item(archetype, archetype_type_info, tokenizer, parent_ident);
-            token = c_tokenizer_get_next_token(tokenizer);
-        }
-    }
-    else
-    {
-        log_error("Expected to find ':' or '{' immediately after token: '%.*s'... Got: '%.*s'...\n", 
-                  next_token.string.count, C_STR(next_token.string),
-                  next_token.string.count, C_STR(next_token.string));
-    }
-}
-#endif
-
 // NOTE(Sleepster): We need to pass a pointer to the actual structure to actually store the file data
 void
 material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *tokenizer, const type_info_t *parent_type_data, token_data_t name_token)
@@ -342,9 +259,9 @@ s_asset_material_archetype_create(asset_manager_t *asset_manager, asset_slot_t *
                                                               asset_manager->asset_allocator, 
                                                               ZA_TAG_STATIC);
     string_t material_data = slot->package_entry->asset_data;
+
     tokenizer_t tokenizer = {};
     tokenizer.data = material_data;
-
     while(tokenizer.data.count > 0)
     {
         token_data_t token = c_tokenizer_get_next_token(&tokenizer);
@@ -372,10 +289,12 @@ s_asset_material_archetype_create(asset_manager_t *asset_manager, asset_slot_t *
                     if(c_string_compare(token.string, STR("material_archetype"))) 
                     {
                         struct_info = c_meta_get_type_info_by_name(STR("material_archetype_t"));
+                        material_file_parse_block_data(slot->owner_asset_file.file_name, &result, &tokenizer, struct_info, token);
                     }
                     else if(c_string_compare(token.string, STR("base_instance")))
                     {
                         struct_info = c_meta_get_type_info_by_name(STR("material_instance_t"));
+                        material_file_parse_block_data(slot->owner_asset_file.file_name, &result.base_instance, &tokenizer, struct_info, token);
                     }
                     else 
                     {
@@ -383,8 +302,6 @@ s_asset_material_archetype_create(asset_manager_t *asset_manager, asset_slot_t *
                                   token.string.count, C_STR(token.string));
                         break;
                     }
- 
-                    material_file_parse_block_data(slot->owner_asset_file.file_name, &result, &tokenizer, struct_info, token);
                 }
                 else
                 {
@@ -395,6 +312,12 @@ s_asset_material_archetype_create(asset_manager_t *asset_manager, asset_slot_t *
             }break;
         }
     }
+    // TODO(Sleepster): Is this really okay???
+    result.ID = c_fnv_hash_value(result.name.data, result.name.count);
+    result.shader = s_asset_manager_acquire_asset_handle(asset_manager, result.shader_binary_name);
+
+    result.base_instance.uniform_data         = result.shader.shader->shader_data.uniforms;
+    result.base_instance.shader_uniform_count = result.shader.shader->shader_data.uniform_count;
 
     return(result);
 }
@@ -490,6 +413,13 @@ s_asset_manager_init(asset_manager_t *asset_manager)
                        null);
     // NOTE(Sleepster): Initializing all entries to -1 
     memset(asset_manager->asset_name_to_file.data, -1, sizeof(s32) * ASSET_CATALOG_MAX_LOOKUPS);
+
+    asset_manager->texture_catalog  = asset_manager->asset_catalogs + AT_Bitmap;
+    asset_manager->shader_catalog   = asset_manager->asset_catalogs + AT_Shader;
+    asset_manager->material_catalog = asset_manager->asset_catalogs + AT_Material;
+    asset_manager->font_catalog     = asset_manager->asset_catalogs + AT_Font;
+    asset_manager->sound_catalog    = asset_manager->asset_catalogs + AT_Sound;
+
     asset_manager->is_initialized = true;
 }
 
@@ -754,7 +684,7 @@ s_texture_atlas_pack_added_textures(vulkan_render_context_t *render_context, tex
             vec2_t uv_min = vec2(atlas_cursor_x, atlas_cursor_y);
             vec2_t uv_max = vec2(atlas_cursor_x + bitmap_width, atlas_cursor_y + bitmap_height);
 
-            // NOTE(Sleepster): Create the subtexture, let the owner of the sprite know this is that subtexture. 
+            // NOTE(Sleepster): Create the subtexture, let the owner of the sprite know this is the new texture we will draw it from. 
             subtexture_data_t *subtexture = atlas->packed_subtextures + atlas->packed_subtexture_count;
             asset->subtexture_data = subtexture;
 

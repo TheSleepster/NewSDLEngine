@@ -68,6 +68,7 @@ c_tokenizer_get_next_token(tokenizer_t *tokenizer)
         }break;
         case '"':  
         {
+            c_string_advance_by(&result.string, 1);
             byte *at = tokenizer->data.data;
 
             while(tokenizer->data.count > 0 && 
@@ -90,7 +91,7 @@ c_tokenizer_get_next_token(tokenizer_t *tokenizer)
             u64 token_length = (tokenizer->data.data - at);
 
             result.type = TT_Identifier;
-            result.string.count = (u32)token_length;
+            result.string.count = (u32)token_length - 1;
         }break;
         default:
         {

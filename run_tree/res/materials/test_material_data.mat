@@ -49,8 +49,8 @@ base_instance {
     }
 
 # default shader uniform data
-    shader::RenderIntensityUBO {
-        emmision_vibrance: 1.0
-        bloom_value: 1.5
-    }
+#    shader::RenderIntensityUBO {
+#        emmision_vibrance: 1.0
+#        bloom_value: 1.5
+#    }
 }

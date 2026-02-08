@@ -2381,7 +2381,7 @@ struct type_info_struct_asset_manager_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[13];
+		type_info_member_t member_array[16];
 		struct {
 			type_info_member_t is_initialized;
 			type_info_member_t manager_arena;
@@ -2395,6 +2395,9 @@ struct type_info_struct_asset_manager_t {
 			type_info_member_t asset_catalogs;
 			type_info_member_t texture_catalog;
 			type_info_member_t shader_catalog;
+			type_info_member_t material_catalog;
+			type_info_member_t font_catalog;
+			type_info_member_t sound_catalog;
 			type_info_member_t render_context;
 		}members;
 	};
@@ -2992,9 +2995,9 @@ struct type_info_enum_asset_type_t {
 			type_info_member_t AT_Invalid;
 			type_info_member_t AT_Bitmap;
 			type_info_member_t AT_Shader;
+			type_info_member_t AT_Material;
 			type_info_member_t AT_Font;
 			type_info_member_t AT_Sound;
-			type_info_member_t AT_Material;
 			type_info_member_t AT_Count;
 		}members;
 	};
@@ -4805,7 +4808,7 @@ const static type_info_struct_asset_manager_t type_info_struct_asset_manager_t_c
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_asset_manager_t),
-	.member_count = 13,
+	.member_count = 16,
 	.members = {
 		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), is_initialized))},
 		.manager_arena = {.name = "manager_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.manager_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), manager_arena))},
@@ -4819,6 +4822,9 @@ const static type_info_struct_asset_manager_t type_info_struct_asset_manager_t_c
 		.asset_catalogs = {.name = "asset_catalogs", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.asset_catalogs)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), asset_catalogs))},
 		.texture_catalog = {.name = "texture_catalog", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.texture_catalog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), texture_catalog))},
 		.shader_catalog = {.name = "shader_catalog", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.shader_catalog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), shader_catalog))},
+		.material_catalog = {.name = "material_catalog", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.material_catalog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), material_catalog))},
+		.font_catalog = {.name = "font_catalog", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.font_catalog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), font_catalog))},
+		.sound_catalog = {.name = "sound_catalog", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.sound_catalog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), sound_catalog))},
 		.render_context = {.name = "render_context", .type = TYPE_vulkan_render_context_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_manager_t.render_context)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_manager_t), render_context))},
 	}
 };
@@ -5261,9 +5267,9 @@ const static type_info_enum_asset_type_t type_info_enum_asset_type_t_const_data 
 		.AT_Invalid = {.name = "AT_Invalid", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Invalid), .offset = AT_Invalid},
 		.AT_Bitmap = {.name = "AT_Bitmap", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Bitmap), .offset = AT_Bitmap},
 		.AT_Shader = {.name = "AT_Shader", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Shader), .offset = AT_Shader},
+		.AT_Material = {.name = "AT_Material", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Material), .offset = AT_Material},
 		.AT_Font = {.name = "AT_Font", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Font), .offset = AT_Font},
 		.AT_Sound = {.name = "AT_Sound", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Sound), .offset = AT_Sound},
-		.AT_Material = {.name = "AT_Material", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Material), .offset = AT_Material},
 		.AT_Count = {.name = "AT_Count", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(AT_Count), .offset = AT_Count},
 	}
 };
@@ -6216,6 +6222,9 @@ enum asset_manager_t_member_list_enum {
 	TYPE_ASSET_MANAGER_T_MEMBER_asset_catalogs,
 	TYPE_ASSET_MANAGER_T_MEMBER_texture_catalog,
 	TYPE_ASSET_MANAGER_T_MEMBER_shader_catalog,
+	TYPE_ASSET_MANAGER_T_MEMBER_material_catalog,
+	TYPE_ASSET_MANAGER_T_MEMBER_font_catalog,
+	TYPE_ASSET_MANAGER_T_MEMBER_sound_catalog,
 	TYPE_ASSET_MANAGER_T_MEMBER_render_context,
 };
 
@@ -6476,9 +6485,9 @@ enum asset_type_t_member_list_enum {
 	TYPE_ASSET_TYPE_T_MEMBER_AT_Invalid,
 	TYPE_ASSET_TYPE_T_MEMBER_AT_Bitmap,
 	TYPE_ASSET_TYPE_T_MEMBER_AT_Shader,
+	TYPE_ASSET_TYPE_T_MEMBER_AT_Material,
 	TYPE_ASSET_TYPE_T_MEMBER_AT_Font,
 	TYPE_ASSET_TYPE_T_MEMBER_AT_Sound,
-	TYPE_ASSET_TYPE_T_MEMBER_AT_Material,
 	TYPE_ASSET_TYPE_T_MEMBER_AT_Count,
 };
 
@@ -6666,9 +6675,9 @@ enum packet_type_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Invalid, "AT_Invalid") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Bitmap, "AT_Bitmap") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Shader, "AT_Shader") \
+	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Material, "AT_Material") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Font, "AT_Font") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Sound, "AT_Sound") \
-	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Material, "AT_Material") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Count, "AT_Count") \
 	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Invalid, "ASLS_Invalid") \
 	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Unloaded, "ASLS_Unloaded") \
@@ -7042,9 +7051,9 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "AT_Invalid", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Bitmap", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Bitmap, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Shader", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Shader, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
+	{.name = "AT_Material", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Material, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Font", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Font, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Sound", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Sound, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
-	{.name = "AT_Material", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Material, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Count", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "ASLS_Invalid", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
 	{.name = "ASLS_Unloaded", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Unloaded, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
