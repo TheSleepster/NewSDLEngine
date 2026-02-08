@@ -57,6 +57,7 @@ c_tokenizer_get_next_token(tokenizer_t *tokenizer)
         case '=':  {result.type = TT_Equals;           }break;
         case '\\': {result.type = TT_BackSlash;        }break;
         case '\0': {result.type = TT_EOF;              }break;
+        case '|':  {result.type = TT_Seperator;        }break;
         case '*':  
         {
             result.type = TT_Asterisk;

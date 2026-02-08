@@ -32,6 +32,7 @@ typedef enum preprocessor_token_type
     TT_Equals,
     TT_Dash,
     TT_BackSlash, // we only care about these if we're inside a macro
+    TT_Seperator,
     TT_Number,
     TT_EOF,
 

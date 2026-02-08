@@ -317,10 +317,10 @@ typedef struct type_info {
 
 typedef struct type_info_data_mapping
 {
-    char               *name;
-    u32                 member_enum;
+    char                     *name;
+    u32                       member_enum;
 
-    type_info_struct_t *type_info_ptr;
+    const type_info_struct_t *type_info_ptr;
 }type_info_data_mapping_t;
 
 const static memory_arena_footer_t GENERATED_DEFAULT_memory_arena_footer_t = {};
@@ -2729,7 +2729,7 @@ struct type_info_enum_preprocessor_token_type_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[23];
+		type_info_member_t member_array[24];
 		struct {
 			type_info_member_t TT_Invalid;
 			type_info_member_t TT_Semicolon;
@@ -2749,6 +2749,7 @@ struct type_info_enum_preprocessor_token_type_t {
 			type_info_member_t TT_Equals;
 			type_info_member_t TT_Dash;
 			type_info_member_t TT_BackSlash;
+			type_info_member_t TT_Seperator;
 			type_info_member_t TT_Number;
 			type_info_member_t TT_EOF;
 			type_info_member_t TT_Error;
@@ -5074,7 +5075,7 @@ const static type_info_enum_preprocessor_token_type_t type_info_enum_preprocesso
 	.name = "preprocessor_token_type_t",
 	.type = TYPE_preprocessor_token_type_t,
 	.kind = META_TYPE_KIND_Enum,
-	.member_count = 23,
+	.member_count = 24,
 	.members = {
 		.TT_Invalid = {.name = "TT_Invalid", .type = TYPE_preprocessor_token_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TT_Invalid), .offset = TT_Invalid},
 		.TT_Semicolon = {.name = "TT_Semicolon", .type = TYPE_preprocessor_token_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TT_Semicolon), .offset = TT_Semicolon},
@@ -5094,6 +5095,7 @@ const static type_info_enum_preprocessor_token_type_t type_info_enum_preprocesso
 		.TT_Equals = {.name = "TT_Equals", .type = TYPE_preprocessor_token_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TT_Equals), .offset = TT_Equals},
 		.TT_Dash = {.name = "TT_Dash", .type = TYPE_preprocessor_token_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TT_Dash), .offset = TT_Dash},
 		.TT_BackSlash = {.name = "TT_BackSlash", .type = TYPE_preprocessor_token_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TT_BackSlash), .offset = TT_BackSlash},
+		.TT_Seperator = {.name = "TT_Seperator", .type = TYPE_preprocessor_token_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TT_Seperator), .offset = TT_Seperator},
 		.TT_Number = {.name = "TT_Number", .type = TYPE_preprocessor_token_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TT_Number), .offset = TT_Number},
 		.TT_EOF = {.name = "TT_EOF", .type = TYPE_preprocessor_token_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TT_EOF), .offset = TT_EOF},
 		.TT_Error = {.name = "TT_Error", .type = TYPE_preprocessor_token_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TT_Error), .offset = TT_Error},
@@ -6363,6 +6365,7 @@ enum preprocessor_token_type_t_member_list_enum {
 	TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Equals,
 	TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Dash,
 	TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_BackSlash,
+	TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Seperator,
 	TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Number,
 	TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_EOF,
 	TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Error,
@@ -6530,174 +6533,175 @@ enum packet_type_t_member_list_enum {
 };
 
 #define GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X) \
-	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_INVALID, "file_extension_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_TTF, "file_extension_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_WAV, "file_extension_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_PNG, "file_extension_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_GLSL, "file_extension_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_OS_DLL, "file_extension_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_COUNT, "file_extension_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_NONE, "file_watcher_change_event_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ADDED, "file_watcher_change_event_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_MODIFIED, "file_watcher_change_event_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_DELETED, "file_watcher_change_event_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_MOVED, "file_watcher_change_event_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ATTRIBUTE_CHANGE, "file_watcher_change_event_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_SCAN_CHILDREN, "file_watcher_change_event_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_RENAMED, "file_watcher_change_event_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ALL, "file_watcher_change_event_t") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_WFC_EVENT_COUNT, "file_watcher_change_event_t") \
-	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Invalid, "hash_table_allocation_flags_t") \
-	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Static, "hash_table_allocation_flags_t") \
-	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_KeyCopy, "hash_table_allocation_flags_t") \
-	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_ValueCopy, "hash_table_allocation_flags_t") \
-	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Garbage, "hash_table_allocation_flags_t") \
-	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_None, "hash_table_allocation_flags_t") \
-	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_DEBUG, "debug_log_level_t") \
-	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_TRACE, "debug_log_level_t") \
-	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_INFO, "debug_log_level_t") \
-	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_WARNING, "debug_log_level_t") \
-	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_ERROR, "debug_log_level_t") \
-	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_FATAL, "debug_log_level_t") \
-	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_BOOL, "arg_type_t") \
-	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_U64, "arg_type_t") \
-	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_FLOAT32, "arg_type_t") \
-	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_STRING, "arg_type_t") \
-	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_Invalid, "job_priority_t") \
-	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_Low, "job_priority_t") \
-	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_High, "job_priority_t") \
-	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_Count, "job_priority_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Invalid, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Semicolon, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Colon, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpeningBrace, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingBrace, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpeningParen, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingParen, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Asterisk, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpenBracket, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingBracket, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Comma, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpenAngleBracket, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_CloseAngleBracket, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_HashTag, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Exclamation, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Equals, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Dash, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_BackSlash, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Number, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_EOF, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Error, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Identifier, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Count, "preprocessor_token_type_t") \
-	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_NONE, "za_allocation_tag_t") \
-	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_STATIC, "za_allocation_tag_t") \
-	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_TEXTURE, "za_allocation_tag_t") \
-	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_SOUND, "za_allocation_tag_t") \
-	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_FONT, "za_allocation_tag_t") \
-	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_PURGELEVEL, "za_allocation_tag_t") \
-	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_CACHE, "za_allocation_tag_t") \
-	X(TYPE_ENUM_LOOKUP_ENTITY_TYPE_MEMBER_ET_Invalid, "entity_type") \
-	X(TYPE_ENUM_LOOKUP_ENTITY_TYPE_MEMBER_ET_Player, "entity_type") \
-	X(TYPE_ENUM_LOOKUP_ENTITY_TYPE_MEMBER_ET_Count, "entity_type") \
-	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Valid, "entity_flags") \
-	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Alive, "entity_flags") \
-	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Gravitic, "entity_flags") \
-	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Actor, "entity_flags") \
-	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Static, "entity_flags") \
-	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_IsGround, "entity_flags") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, "renderer_effect_application_flags_t") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, "renderer_effect_application_flags_t") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, "renderer_effect_application_flags_t") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette, "renderer_effect_application_flags_t") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain, "renderer_effect_application_flags_t") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count, "renderer_effect_application_flags_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count, "render_pipeline_blending_mode_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid, "render_pipeline_blending_equation_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add, "render_pipeline_blending_equation_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract, "render_pipeline_blending_equation_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract, "render_pipeline_blending_equation_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min, "render_pipeline_blending_equation_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max, "render_pipeline_blending_equation_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid, "render_pipeline_depth_function_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never, "render_pipeline_depth_function_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, "render_pipeline_depth_function_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater, "render_pipeline_depth_function_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less, "render_pipeline_depth_function_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal, "render_pipeline_depth_function_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, "render_pipeline_depth_function_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual, "render_pipeline_depth_function_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, "render_pipeline_depth_function_t") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count, "render_pipeline_depth_function_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Static, "vulkan_shader_descriptor_set_binding_type_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Draw, "vulkan_shader_descriptor_set_binding_type_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Instance, "vulkan_shader_descriptor_set_binding_type_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Count, "vulkan_shader_descriptor_set_binding_type_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_INVALID, "vulkan_renderpass_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING, "vulkan_renderpass_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_WITHIN_RENDERPASS, "vulkan_renderpass_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING_ENDED, "vulkan_renderpass_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COMMANDS_SUBMITTED, "vulkan_renderpass_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COUNT, "vulkan_renderpass_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_INVALID, "vulkan_command_buffer_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_NOT_ALLOCATED, "vulkan_command_buffer_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_READY, "vulkan_command_buffer_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING, "vulkan_command_buffer_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_WITHIN_RENDERPASS, "vulkan_command_buffer_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING_ENDED, "vulkan_command_buffer_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_SUBMITTED, "vulkan_command_buffer_state_t") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_COUNT, "vulkan_command_buffer_state_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Invalid, "asset_type_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Bitmap, "asset_type_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Shader, "asset_type_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Font, "asset_type_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Sound, "asset_type_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Material, "asset_type_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Count, "asset_type_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Invalid, "asset_slot_load_status_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Unloaded, "asset_slot_load_status_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_LoadQueued, "asset_slot_load_status_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Loaded, "asset_slot_load_status_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_ShouldUnload, "asset_slot_load_status_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_ShouldReload, "asset_slot_load_status_t") \
-	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Count, "asset_slot_load_status_t") \
-	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_Invalid, "bitmap_format_t") \
-	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_R8, "bitmap_format_t") \
-	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_RGBA32, "bitmap_format_t") \
-	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_RGB24, "bitmap_format_t") \
-	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_Count, "bitmap_format_t") \
-	X(TYPE_ENUM_LOOKUP_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_INVALID, "controller_type_t") \
-	X(TYPE_ENUM_LOOKUP_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_GAMEPAD, "controller_type_t") \
-	X(TYPE_ENUM_LOOKUP_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_KEYBOARD, "controller_type_t") \
-	X(TYPE_ENUM_LOOKUP_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_COUNT, "controller_type_t") \
-	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_LEFT_MOUSE, "input_mouse_buttons_t") \
-	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_RIGHT_MOUSE, "input_mouse_buttons_t") \
-	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MIDDLE_MOUSE, "input_mouse_buttons_t") \
-	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X1_MOUSE, "input_mouse_buttons_t") \
-	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X2_MOUSE, "input_mouse_buttons_t") \
-	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MOUSE_BUTTON_COUNT, "input_mouse_buttons_t") \
-	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Invalid, "game_action_binding_type_t") \
-	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Button, "game_action_binding_type_t") \
-	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Axis, "game_action_binding_type_t") \
-	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Count, "game_action_binding_type_t") \
-	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_Invalid, "packet_type_t") \
-	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_Connect, "packet_type_t") \
-	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_ConnectAccepted, "packet_type_t") \
-	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_Disconnect, "packet_type_t") \
-	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_InputData, "packet_type_t") \
-	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_Count, "packet_type_t") \
+	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_INVALID, "FILE_EXT_INVALID") \
+	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_TTF, "FILE_EXT_TTF") \
+	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_WAV, "FILE_EXT_WAV") \
+	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_PNG, "FILE_EXT_PNG") \
+	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_GLSL, "FILE_EXT_GLSL") \
+	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_OS_DLL, "FILE_EXT_OS_DLL") \
+	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_COUNT, "FILE_EXT_COUNT") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_NONE, "FWC_EVENT_NONE") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ADDED, "FWC_EVENT_ADDED") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_MODIFIED, "FWC_EVENT_MODIFIED") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_DELETED, "FWC_EVENT_DELETED") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_MOVED, "FWC_EVENT_MOVED") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ATTRIBUTE_CHANGE, "FWC_EVENT_ATTRIBUTE_CHANGE") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_SCAN_CHILDREN, "FWC_EVENT_SCAN_CHILDREN") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_RENAMED, "FWC_EVENT_RENAMED") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ALL, "FWC_EVENT_ALL") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_WFC_EVENT_COUNT, "WFC_EVENT_COUNT") \
+	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Invalid, "HTAF_Invalid") \
+	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Static, "HTAF_Static") \
+	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_KeyCopy, "HTAF_KeyCopy") \
+	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_ValueCopy, "HTAF_ValueCopy") \
+	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Garbage, "HTAF_Garbage") \
+	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_None, "HTAF_None") \
+	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_DEBUG, "SL_LOG_DEBUG") \
+	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_TRACE, "SL_LOG_TRACE") \
+	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_INFO, "SL_LOG_INFO") \
+	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_WARNING, "SL_LOG_WARNING") \
+	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_ERROR, "SL_LOG_ERROR") \
+	X(TYPE_ENUM_LOOKUP_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_FATAL, "SL_LOG_FATAL") \
+	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_BOOL, "FLAG_TYPE_BOOL") \
+	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_U64, "FLAG_TYPE_U64") \
+	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_FLOAT32, "FLAG_TYPE_FLOAT32") \
+	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_STRING, "FLAG_TYPE_STRING") \
+	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_Invalid, "TPTP_Invalid") \
+	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_Low, "TPTP_Low") \
+	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_High, "TPTP_High") \
+	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_Count, "TPTP_Count") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Invalid, "TT_Invalid") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Semicolon, "TT_Semicolon") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Colon, "TT_Colon") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpeningBrace, "TT_OpeningBrace") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingBrace, "TT_ClosingBrace") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpeningParen, "TT_OpeningParen") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingParen, "TT_ClosingParen") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Asterisk, "TT_Asterisk") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpenBracket, "TT_OpenBracket") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingBracket, "TT_ClosingBracket") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Comma, "TT_Comma") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpenAngleBracket, "TT_OpenAngleBracket") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_CloseAngleBracket, "TT_CloseAngleBracket") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_HashTag, "TT_HashTag") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Exclamation, "TT_Exclamation") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Equals, "TT_Equals") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Dash, "TT_Dash") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_BackSlash, "TT_BackSlash") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Seperator, "TT_Seperator") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Number, "TT_Number") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_EOF, "TT_EOF") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Error, "TT_Error") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Identifier, "TT_Identifier") \
+	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Count, "TT_Count") \
+	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_NONE, "ZA_TAG_NONE") \
+	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_STATIC, "ZA_TAG_STATIC") \
+	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_TEXTURE, "ZA_TAG_TEXTURE") \
+	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_SOUND, "ZA_TAG_SOUND") \
+	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_FONT, "ZA_TAG_FONT") \
+	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_PURGELEVEL, "ZA_TAG_PURGELEVEL") \
+	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_CACHE, "ZA_TAG_CACHE") \
+	X(TYPE_ENUM_LOOKUP_ENTITY_TYPE_MEMBER_ET_Invalid, "ET_Invalid") \
+	X(TYPE_ENUM_LOOKUP_ENTITY_TYPE_MEMBER_ET_Player, "ET_Player") \
+	X(TYPE_ENUM_LOOKUP_ENTITY_TYPE_MEMBER_ET_Count, "ET_Count") \
+	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Valid, "EF_Valid") \
+	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Alive, "EF_Alive") \
+	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Gravitic, "EF_Gravitic") \
+	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Actor, "EF_Actor") \
+	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Static, "EF_Static") \
+	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_IsGround, "EF_IsGround") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, "REAF_None") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, "REAF_Bloom") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, "REAF_Emmision") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette, "REAF_Vignette") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain, "REAF_FilmGrain") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count, "REAF_Count") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid, "RBM_Invalid") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero, "RBM_Zero") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One, "RBM_One") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant, "RBM_Constant") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor, "RBM_SrcColor") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor, "RBM_OneMinusSrcColor") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor, "RBM_DstColor") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor, "RBM_OneMinusDstColor") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha, "RBM_SrcAlpha") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha, "RBM_OneMinusSrcAlpha") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha, "RBM_DstAlpha") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha, "RBM_OneMinusDstAlpha") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count, "RBM_Count") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid, "RBE_Invalid") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add, "RBE_Add") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract, "RBE_Subtract") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract, "RBE_ReverseSubtract") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min, "RBE_Min") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max, "RBE_Max") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid, "RDF_Invalid") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never, "RDF_Never") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, "RDF_Always") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater, "RDF_Greater") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less, "RDF_Less") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal, "RDF_Equal") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, "RDF_NotEqual") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual, "RDF_LessOrEqual") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, "RDF_GreaterOrEqual") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count, "RDF_Count") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Static, "SDS_Static") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Draw, "SDS_Draw") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Instance, "SDS_Instance") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Count, "SDS_Count") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_INVALID, "VKRPS_INVALID") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING, "VKRPS_RECORDING") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_WITHIN_RENDERPASS, "VKRPS_WITHIN_RENDERPASS") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING_ENDED, "VKRPS_RECORDING_ENDED") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COMMANDS_SUBMITTED, "VKRPS_COMMANDS_SUBMITTED") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COUNT, "VKRPS_COUNT") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_INVALID, "VKCBS_INVALID") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_NOT_ALLOCATED, "VKCBS_NOT_ALLOCATED") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_READY, "VKCBS_READY") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING, "VKCBS_RECORDING") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_WITHIN_RENDERPASS, "VKCBS_WITHIN_RENDERPASS") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING_ENDED, "VKCBS_RECORDING_ENDED") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_SUBMITTED, "VKCBS_SUBMITTED") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_COUNT, "VKCBS_COUNT") \
+	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Invalid, "AT_Invalid") \
+	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Bitmap, "AT_Bitmap") \
+	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Shader, "AT_Shader") \
+	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Font, "AT_Font") \
+	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Sound, "AT_Sound") \
+	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Material, "AT_Material") \
+	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Count, "AT_Count") \
+	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Invalid, "ASLS_Invalid") \
+	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Unloaded, "ASLS_Unloaded") \
+	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_LoadQueued, "ASLS_LoadQueued") \
+	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Loaded, "ASLS_Loaded") \
+	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_ShouldUnload, "ASLS_ShouldUnload") \
+	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_ShouldReload, "ASLS_ShouldReload") \
+	X(TYPE_ENUM_LOOKUP_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Count, "ASLS_Count") \
+	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_Invalid, "BMF_Invalid") \
+	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_R8, "BMF_R8") \
+	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_RGBA32, "BMF_RGBA32") \
+	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_RGB24, "BMF_RGB24") \
+	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_Count, "BMF_Count") \
+	X(TYPE_ENUM_LOOKUP_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_INVALID, "IM_CONTROLLER_INVALID") \
+	X(TYPE_ENUM_LOOKUP_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_GAMEPAD, "IM_CONTROLLER_GAMEPAD") \
+	X(TYPE_ENUM_LOOKUP_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_KEYBOARD, "IM_CONTROLLER_KEYBOARD") \
+	X(TYPE_ENUM_LOOKUP_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_COUNT, "IM_CONTROLLER_COUNT") \
+	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_LEFT_MOUSE, "SDL_LEFT_MOUSE") \
+	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_RIGHT_MOUSE, "SDL_RIGHT_MOUSE") \
+	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MIDDLE_MOUSE, "SDL_MIDDLE_MOUSE") \
+	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X1_MOUSE, "SDL_X1_MOUSE") \
+	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X2_MOUSE, "SDL_X2_MOUSE") \
+	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MOUSE_BUTTON_COUNT, "SDL_MOUSE_BUTTON_COUNT") \
+	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Invalid, "GAB_Invalid") \
+	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Button, "GAB_Button") \
+	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Axis, "GAB_Axis") \
+	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Count, "GAB_Count") \
+	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_Invalid, "PT_Invalid") \
+	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_Connect, "PT_Connect") \
+	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_ConnectAccepted, "PT_ConnectAccepted") \
+	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_Disconnect, "PT_Disconnect") \
+	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_InputData, "PT_InputData") \
+	X(TYPE_ENUM_LOOKUP_PACKET_TYPE_T_MEMBER_PT_Count, "PT_Count") \
 
  
 enum type_info_enum_member_mapping_t {
@@ -6905,174 +6909,175 @@ const static type_info_t GENERATED_type_table[] = {
 };
 
 const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_table[] = {
-	{.name = "FILE_EXT_INVALID", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_INVALID, .type_info_ptr = (type_info_struct*)&type_info_enum_file_extension_t_const_data},
-	{.name = "FILE_EXT_TTF", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_TTF, .type_info_ptr = (type_info_struct*)&type_info_enum_file_extension_t_const_data},
-	{.name = "FILE_EXT_WAV", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_WAV, .type_info_ptr = (type_info_struct*)&type_info_enum_file_extension_t_const_data},
-	{.name = "FILE_EXT_PNG", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_PNG, .type_info_ptr = (type_info_struct*)&type_info_enum_file_extension_t_const_data},
-	{.name = "FILE_EXT_GLSL", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_GLSL, .type_info_ptr = (type_info_struct*)&type_info_enum_file_extension_t_const_data},
-	{.name = "FILE_EXT_OS_DLL", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_OS_DLL, .type_info_ptr = (type_info_struct*)&type_info_enum_file_extension_t_const_data},
-	{.name = "FILE_EXT_COUNT", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_COUNT, .type_info_ptr = (type_info_struct*)&type_info_enum_file_extension_t_const_data},
-	{.name = "FWC_EVENT_NONE", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_NONE, .type_info_ptr = (type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "FWC_EVENT_ADDED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ADDED, .type_info_ptr = (type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "FWC_EVENT_MODIFIED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_MODIFIED, .type_info_ptr = (type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "FWC_EVENT_DELETED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_DELETED, .type_info_ptr = (type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "FWC_EVENT_MOVED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_MOVED, .type_info_ptr = (type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "FWC_EVENT_ATTRIBUTE_CHANGE", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ATTRIBUTE_CHANGE, .type_info_ptr = (type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "FWC_EVENT_SCAN_CHILDREN", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_SCAN_CHILDREN, .type_info_ptr = (type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "FWC_EVENT_RENAMED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_RENAMED, .type_info_ptr = (type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "FWC_EVENT_ALL", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ALL, .type_info_ptr = (type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "WFC_EVENT_COUNT", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_WFC_EVENT_COUNT, .type_info_ptr = (type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "HTAF_Invalid", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
-	{.name = "HTAF_Static", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Static, .type_info_ptr = (type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
-	{.name = "HTAF_KeyCopy", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_KeyCopy, .type_info_ptr = (type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
-	{.name = "HTAF_ValueCopy", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_ValueCopy, .type_info_ptr = (type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
-	{.name = "HTAF_Garbage", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Garbage, .type_info_ptr = (type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
-	{.name = "HTAF_None", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_None, .type_info_ptr = (type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
-	{.name = "SL_LOG_DEBUG", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_DEBUG, .type_info_ptr = (type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
-	{.name = "SL_LOG_TRACE", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_TRACE, .type_info_ptr = (type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
-	{.name = "SL_LOG_INFO", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_INFO, .type_info_ptr = (type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
-	{.name = "SL_LOG_WARNING", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_WARNING, .type_info_ptr = (type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
-	{.name = "SL_LOG_ERROR", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_ERROR, .type_info_ptr = (type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
-	{.name = "SL_LOG_FATAL", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_FATAL, .type_info_ptr = (type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
-	{.name = "FLAG_TYPE_BOOL", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_BOOL, .type_info_ptr = (type_info_struct*)&type_info_enum_arg_type_t_const_data},
-	{.name = "FLAG_TYPE_U64", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_U64, .type_info_ptr = (type_info_struct*)&type_info_enum_arg_type_t_const_data},
-	{.name = "FLAG_TYPE_FLOAT32", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_FLOAT32, .type_info_ptr = (type_info_struct*)&type_info_enum_arg_type_t_const_data},
-	{.name = "FLAG_TYPE_STRING", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_STRING, .type_info_ptr = (type_info_struct*)&type_info_enum_arg_type_t_const_data},
-	{.name = "TPTP_Invalid", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_job_priority_t_const_data},
-	{.name = "TPTP_Low", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Low, .type_info_ptr = (type_info_struct*)&type_info_enum_job_priority_t_const_data},
-	{.name = "TPTP_High", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_High, .type_info_ptr = (type_info_struct*)&type_info_enum_job_priority_t_const_data},
-	{.name = "TPTP_Count", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_job_priority_t_const_data},
-	{.name = "TT_Invalid", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Semicolon", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Semicolon, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Colon", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Colon, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_OpeningBrace", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpeningBrace, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_ClosingBrace", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingBrace, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_OpeningParen", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpeningParen, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_ClosingParen", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingParen, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Asterisk", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Asterisk, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_OpenBracket", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpenBracket, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_ClosingBracket", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingBracket, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Comma", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Comma, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_OpenAngleBracket", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpenAngleBracket, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_CloseAngleBracket", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_CloseAngleBracket, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_HashTag", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_HashTag, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Exclamation", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Exclamation, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Equals", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Equals, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Dash", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Dash, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_BackSlash", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_BackSlash, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Number", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Number, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_EOF", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_EOF, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Error", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Error, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Identifier", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Identifier, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "TT_Count", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
-	{.name = "ZA_TAG_NONE", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_NONE, .type_info_ptr = (type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
-	{.name = "ZA_TAG_STATIC", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_STATIC, .type_info_ptr = (type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
-	{.name = "ZA_TAG_TEXTURE", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_TEXTURE, .type_info_ptr = (type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
-	{.name = "ZA_TAG_SOUND", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_SOUND, .type_info_ptr = (type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
-	{.name = "ZA_TAG_FONT", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_FONT, .type_info_ptr = (type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
-	{.name = "ZA_TAG_PURGELEVEL", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_PURGELEVEL, .type_info_ptr = (type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
-	{.name = "ZA_TAG_CACHE", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_CACHE, .type_info_ptr = (type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
-	{.name = "ET_Invalid", .member_enum = TYPE_ENTITY_TYPE_MEMBER_ET_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_entity_type_const_data},
-	{.name = "ET_Player", .member_enum = TYPE_ENTITY_TYPE_MEMBER_ET_Player, .type_info_ptr = (type_info_struct*)&type_info_enum_entity_type_const_data},
-	{.name = "ET_Count", .member_enum = TYPE_ENTITY_TYPE_MEMBER_ET_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_entity_type_const_data},
-	{.name = "EF_Valid", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Valid, .type_info_ptr = (type_info_struct*)&type_info_enum_entity_flags_const_data},
-	{.name = "EF_Alive", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Alive, .type_info_ptr = (type_info_struct*)&type_info_enum_entity_flags_const_data},
-	{.name = "EF_Gravitic", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Gravitic, .type_info_ptr = (type_info_struct*)&type_info_enum_entity_flags_const_data},
-	{.name = "EF_Actor", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Actor, .type_info_ptr = (type_info_struct*)&type_info_enum_entity_flags_const_data},
-	{.name = "EF_Static", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Static, .type_info_ptr = (type_info_struct*)&type_info_enum_entity_flags_const_data},
-	{.name = "EF_IsGround", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_IsGround, .type_info_ptr = (type_info_struct*)&type_info_enum_entity_flags_const_data},
-	{.name = "REAF_None", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, .type_info_ptr = (type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Bloom", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, .type_info_ptr = (type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Emmision", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, .type_info_ptr = (type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Vignette", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette, .type_info_ptr = (type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_FilmGrain", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain, .type_info_ptr = (type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Count", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "RBM_Invalid", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_Zero", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_One", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_Constant", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_SrcColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusSrcColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_DstColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusDstColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_SrcAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusSrcAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_DstAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusDstAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_Count", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBE_Invalid", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Add", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Subtract", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_ReverseSubtract", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Min", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Max", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RDF_Invalid", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Never", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Always", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Greater", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Less", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Equal", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_NotEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_LessOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_GreaterOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Count", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "SDS_Static", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Static, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
-	{.name = "SDS_Draw", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Draw, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
-	{.name = "SDS_Instance", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Instance, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
-	{.name = "SDS_Count", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
-	{.name = "VKRPS_INVALID", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_INVALID, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKRPS_RECORDING", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKRPS_WITHIN_RENDERPASS", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_WITHIN_RENDERPASS, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKRPS_RECORDING_ENDED", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING_ENDED, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKRPS_COMMANDS_SUBMITTED", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COMMANDS_SUBMITTED, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKRPS_COUNT", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COUNT, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKCBS_INVALID", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_INVALID, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_NOT_ALLOCATED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_NOT_ALLOCATED, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_READY", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_READY, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_RECORDING", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_WITHIN_RENDERPASS", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_WITHIN_RENDERPASS, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_RECORDING_ENDED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING_ENDED, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_SUBMITTED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_SUBMITTED, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_COUNT", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_COUNT, .type_info_ptr = (type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "AT_Invalid", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_type_t_const_data},
-	{.name = "AT_Bitmap", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Bitmap, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_type_t_const_data},
-	{.name = "AT_Shader", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Shader, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_type_t_const_data},
-	{.name = "AT_Font", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Font, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_type_t_const_data},
-	{.name = "AT_Sound", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Sound, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_type_t_const_data},
-	{.name = "AT_Material", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Material, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_type_t_const_data},
-	{.name = "AT_Count", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_type_t_const_data},
-	{.name = "ASLS_Invalid", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
-	{.name = "ASLS_Unloaded", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Unloaded, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
-	{.name = "ASLS_LoadQueued", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_LoadQueued, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
-	{.name = "ASLS_Loaded", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Loaded, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
-	{.name = "ASLS_ShouldUnload", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_ShouldUnload, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
-	{.name = "ASLS_ShouldReload", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_ShouldReload, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
-	{.name = "ASLS_Count", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
-	{.name = "BMF_Invalid", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
-	{.name = "BMF_R8", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_R8, .type_info_ptr = (type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
-	{.name = "BMF_RGBA32", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGBA32, .type_info_ptr = (type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
-	{.name = "BMF_RGB24", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGB24, .type_info_ptr = (type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
-	{.name = "BMF_Count", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
-	{.name = "IM_CONTROLLER_INVALID", .member_enum = TYPE_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_INVALID, .type_info_ptr = (type_info_struct*)&type_info_enum_controller_type_t_const_data},
-	{.name = "IM_CONTROLLER_GAMEPAD", .member_enum = TYPE_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_GAMEPAD, .type_info_ptr = (type_info_struct*)&type_info_enum_controller_type_t_const_data},
-	{.name = "IM_CONTROLLER_KEYBOARD", .member_enum = TYPE_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_KEYBOARD, .type_info_ptr = (type_info_struct*)&type_info_enum_controller_type_t_const_data},
-	{.name = "IM_CONTROLLER_COUNT", .member_enum = TYPE_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_COUNT, .type_info_ptr = (type_info_struct*)&type_info_enum_controller_type_t_const_data},
-	{.name = "SDL_LEFT_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_LEFT_MOUSE, .type_info_ptr = (type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
-	{.name = "SDL_RIGHT_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_RIGHT_MOUSE, .type_info_ptr = (type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
-	{.name = "SDL_MIDDLE_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MIDDLE_MOUSE, .type_info_ptr = (type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
-	{.name = "SDL_X1_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X1_MOUSE, .type_info_ptr = (type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
-	{.name = "SDL_X2_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X2_MOUSE, .type_info_ptr = (type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
-	{.name = "SDL_MOUSE_BUTTON_COUNT", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MOUSE_BUTTON_COUNT, .type_info_ptr = (type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
-	{.name = "GAB_Invalid", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
-	{.name = "GAB_Button", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Button, .type_info_ptr = (type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
-	{.name = "GAB_Axis", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Axis, .type_info_ptr = (type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
-	{.name = "GAB_Count", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
-	{.name = "PT_Invalid", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_Invalid, .type_info_ptr = (type_info_struct*)&type_info_enum_packet_type_t_const_data},
-	{.name = "PT_Connect", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_Connect, .type_info_ptr = (type_info_struct*)&type_info_enum_packet_type_t_const_data},
-	{.name = "PT_ConnectAccepted", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_ConnectAccepted, .type_info_ptr = (type_info_struct*)&type_info_enum_packet_type_t_const_data},
-	{.name = "PT_Disconnect", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_Disconnect, .type_info_ptr = (type_info_struct*)&type_info_enum_packet_type_t_const_data},
-	{.name = "PT_InputData", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_InputData, .type_info_ptr = (type_info_struct*)&type_info_enum_packet_type_t_const_data},
-	{.name = "PT_Count", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_Count, .type_info_ptr = (type_info_struct*)&type_info_enum_packet_type_t_const_data},
+	{.name = "FILE_EXT_INVALID", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_INVALID, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_extension_t_const_data},
+	{.name = "FILE_EXT_TTF", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_TTF, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_extension_t_const_data},
+	{.name = "FILE_EXT_WAV", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_WAV, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_extension_t_const_data},
+	{.name = "FILE_EXT_PNG", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_PNG, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_extension_t_const_data},
+	{.name = "FILE_EXT_GLSL", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_GLSL, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_extension_t_const_data},
+	{.name = "FILE_EXT_OS_DLL", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_OS_DLL, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_extension_t_const_data},
+	{.name = "FILE_EXT_COUNT", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_extension_t_const_data},
+	{.name = "FWC_EVENT_NONE", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_NONE, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "FWC_EVENT_ADDED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ADDED, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "FWC_EVENT_MODIFIED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_MODIFIED, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "FWC_EVENT_DELETED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_DELETED, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "FWC_EVENT_MOVED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_MOVED, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "FWC_EVENT_ATTRIBUTE_CHANGE", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ATTRIBUTE_CHANGE, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "FWC_EVENT_SCAN_CHILDREN", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_SCAN_CHILDREN, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "FWC_EVENT_RENAMED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_RENAMED, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "FWC_EVENT_ALL", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ALL, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "WFC_EVENT_COUNT", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_WFC_EVENT_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "HTAF_Invalid", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
+	{.name = "HTAF_Static", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Static, .type_info_ptr = (const type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
+	{.name = "HTAF_KeyCopy", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_KeyCopy, .type_info_ptr = (const type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
+	{.name = "HTAF_ValueCopy", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_ValueCopy, .type_info_ptr = (const type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
+	{.name = "HTAF_Garbage", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Garbage, .type_info_ptr = (const type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
+	{.name = "HTAF_None", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_None, .type_info_ptr = (const type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
+	{.name = "SL_LOG_DEBUG", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_DEBUG, .type_info_ptr = (const type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
+	{.name = "SL_LOG_TRACE", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_TRACE, .type_info_ptr = (const type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
+	{.name = "SL_LOG_INFO", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_INFO, .type_info_ptr = (const type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
+	{.name = "SL_LOG_WARNING", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_WARNING, .type_info_ptr = (const type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
+	{.name = "SL_LOG_ERROR", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_ERROR, .type_info_ptr = (const type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
+	{.name = "SL_LOG_FATAL", .member_enum = TYPE_DEBUG_LOG_LEVEL_T_MEMBER_SL_LOG_FATAL, .type_info_ptr = (const type_info_struct*)&type_info_enum_debug_log_level_t_const_data},
+	{.name = "FLAG_TYPE_BOOL", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_BOOL, .type_info_ptr = (const type_info_struct*)&type_info_enum_arg_type_t_const_data},
+	{.name = "FLAG_TYPE_U64", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_U64, .type_info_ptr = (const type_info_struct*)&type_info_enum_arg_type_t_const_data},
+	{.name = "FLAG_TYPE_FLOAT32", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_FLOAT32, .type_info_ptr = (const type_info_struct*)&type_info_enum_arg_type_t_const_data},
+	{.name = "FLAG_TYPE_STRING", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_STRING, .type_info_ptr = (const type_info_struct*)&type_info_enum_arg_type_t_const_data},
+	{.name = "TPTP_Invalid", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_job_priority_t_const_data},
+	{.name = "TPTP_Low", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Low, .type_info_ptr = (const type_info_struct*)&type_info_enum_job_priority_t_const_data},
+	{.name = "TPTP_High", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_High, .type_info_ptr = (const type_info_struct*)&type_info_enum_job_priority_t_const_data},
+	{.name = "TPTP_Count", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_job_priority_t_const_data},
+	{.name = "TT_Invalid", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Semicolon", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Semicolon, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Colon", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Colon, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_OpeningBrace", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpeningBrace, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_ClosingBrace", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingBrace, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_OpeningParen", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpeningParen, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_ClosingParen", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingParen, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Asterisk", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Asterisk, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_OpenBracket", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpenBracket, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_ClosingBracket", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_ClosingBracket, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Comma", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Comma, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_OpenAngleBracket", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_OpenAngleBracket, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_CloseAngleBracket", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_CloseAngleBracket, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_HashTag", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_HashTag, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Exclamation", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Exclamation, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Equals", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Equals, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Dash", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Dash, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_BackSlash", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_BackSlash, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Seperator", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Seperator, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Number", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Number, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_EOF", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_EOF, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Error", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Error, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Identifier", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Identifier, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "TT_Count", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
+	{.name = "ZA_TAG_NONE", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_NONE, .type_info_ptr = (const type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
+	{.name = "ZA_TAG_STATIC", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_STATIC, .type_info_ptr = (const type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
+	{.name = "ZA_TAG_TEXTURE", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_TEXTURE, .type_info_ptr = (const type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
+	{.name = "ZA_TAG_SOUND", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_SOUND, .type_info_ptr = (const type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
+	{.name = "ZA_TAG_FONT", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_FONT, .type_info_ptr = (const type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
+	{.name = "ZA_TAG_PURGELEVEL", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_PURGELEVEL, .type_info_ptr = (const type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
+	{.name = "ZA_TAG_CACHE", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_CACHE, .type_info_ptr = (const type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
+	{.name = "ET_Invalid", .member_enum = TYPE_ENTITY_TYPE_MEMBER_ET_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_type_const_data},
+	{.name = "ET_Player", .member_enum = TYPE_ENTITY_TYPE_MEMBER_ET_Player, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_type_const_data},
+	{.name = "ET_Count", .member_enum = TYPE_ENTITY_TYPE_MEMBER_ET_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_type_const_data},
+	{.name = "EF_Valid", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Valid, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
+	{.name = "EF_Alive", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Alive, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
+	{.name = "EF_Gravitic", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Gravitic, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
+	{.name = "EF_Actor", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Actor, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
+	{.name = "EF_Static", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Static, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
+	{.name = "EF_IsGround", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_IsGround, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
+	{.name = "REAF_None", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "REAF_Bloom", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "REAF_Emmision", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "REAF_Vignette", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "REAF_FilmGrain", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "REAF_Count", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "RBM_Invalid", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_Zero", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_One", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_Constant", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_SrcColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_OneMinusSrcColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_DstColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_OneMinusDstColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_SrcAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_OneMinusSrcAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_DstAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_OneMinusDstAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_Count", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBE_Invalid", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RBE_Add", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RBE_Subtract", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RBE_ReverseSubtract", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RBE_Min", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RBE_Max", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RDF_Invalid", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Never", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Always", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Greater", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Less", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Equal", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_NotEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_LessOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_GreaterOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Count", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "SDS_Static", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Static, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
+	{.name = "SDS_Draw", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Draw, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
+	{.name = "SDS_Instance", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Instance, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
+	{.name = "SDS_Count", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
+	{.name = "VKRPS_INVALID", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_INVALID, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKRPS_RECORDING", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKRPS_WITHIN_RENDERPASS", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_WITHIN_RENDERPASS, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKRPS_RECORDING_ENDED", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING_ENDED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKRPS_COMMANDS_SUBMITTED", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COMMANDS_SUBMITTED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKRPS_COUNT", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKCBS_INVALID", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_INVALID, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_NOT_ALLOCATED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_NOT_ALLOCATED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_READY", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_READY, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_RECORDING", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_WITHIN_RENDERPASS", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_WITHIN_RENDERPASS, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_RECORDING_ENDED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING_ENDED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_SUBMITTED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_SUBMITTED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_COUNT", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "AT_Invalid", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
+	{.name = "AT_Bitmap", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Bitmap, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
+	{.name = "AT_Shader", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Shader, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
+	{.name = "AT_Font", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Font, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
+	{.name = "AT_Sound", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Sound, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
+	{.name = "AT_Material", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Material, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
+	{.name = "AT_Count", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
+	{.name = "ASLS_Invalid", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
+	{.name = "ASLS_Unloaded", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Unloaded, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
+	{.name = "ASLS_LoadQueued", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_LoadQueued, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
+	{.name = "ASLS_Loaded", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Loaded, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
+	{.name = "ASLS_ShouldUnload", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_ShouldUnload, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
+	{.name = "ASLS_ShouldReload", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_ShouldReload, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
+	{.name = "ASLS_Count", .member_enum = TYPE_ASSET_SLOT_LOAD_STATUS_T_MEMBER_ASLS_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_slot_load_status_t_const_data},
+	{.name = "BMF_Invalid", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
+	{.name = "BMF_R8", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_R8, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
+	{.name = "BMF_RGBA32", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGBA32, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
+	{.name = "BMF_RGB24", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGB24, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
+	{.name = "BMF_Count", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
+	{.name = "IM_CONTROLLER_INVALID", .member_enum = TYPE_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_INVALID, .type_info_ptr = (const type_info_struct*)&type_info_enum_controller_type_t_const_data},
+	{.name = "IM_CONTROLLER_GAMEPAD", .member_enum = TYPE_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_GAMEPAD, .type_info_ptr = (const type_info_struct*)&type_info_enum_controller_type_t_const_data},
+	{.name = "IM_CONTROLLER_KEYBOARD", .member_enum = TYPE_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_KEYBOARD, .type_info_ptr = (const type_info_struct*)&type_info_enum_controller_type_t_const_data},
+	{.name = "IM_CONTROLLER_COUNT", .member_enum = TYPE_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_controller_type_t_const_data},
+	{.name = "SDL_LEFT_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_LEFT_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
+	{.name = "SDL_RIGHT_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_RIGHT_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
+	{.name = "SDL_MIDDLE_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MIDDLE_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
+	{.name = "SDL_X1_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X1_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
+	{.name = "SDL_X2_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X2_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
+	{.name = "SDL_MOUSE_BUTTON_COUNT", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MOUSE_BUTTON_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
+	{.name = "GAB_Invalid", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
+	{.name = "GAB_Button", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Button, .type_info_ptr = (const type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
+	{.name = "GAB_Axis", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Axis, .type_info_ptr = (const type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
+	{.name = "GAB_Count", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
+	{.name = "PT_Invalid", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_packet_type_t_const_data},
+	{.name = "PT_Connect", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_Connect, .type_info_ptr = (const type_info_struct*)&type_info_enum_packet_type_t_const_data},
+	{.name = "PT_ConnectAccepted", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_ConnectAccepted, .type_info_ptr = (const type_info_struct*)&type_info_enum_packet_type_t_const_data},
+	{.name = "PT_Disconnect", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_Disconnect, .type_info_ptr = (const type_info_struct*)&type_info_enum_packet_type_t_const_data},
+	{.name = "PT_InputData", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_InputData, .type_info_ptr = (const type_info_struct*)&type_info_enum_packet_type_t_const_data},
+	{.name = "PT_Count", .member_enum = TYPE_PACKET_TYPE_T_MEMBER_PT_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_packet_type_t_const_data},
 };
 
 
@@ -7176,7 +7181,7 @@ c_meta_get_type_flag_enum_from_string(string_t flag_name)
 {
     metatype_flags_t result = {};
 #define X(enum, value, string)                                  \
-    if(memcmp(string, flag_name.data, sizeof(string) - 1) == 0) \
+    if(c_string_compare(flag_name, STR(string)))                \
     {                                                           \
         result = enum;                                          \
         goto exit;                                              \
@@ -7193,7 +7198,7 @@ c_meta_get_struct_type_class_from_string(string_t type)
 {
     meta_struct_type_t result = META_STRUCT_TYPE_Invalid;
 #define X(enum, string)                                    \
-    if(memcmp(string, type.data, sizeof(string) - 1) == 0) \
+    if(c_string_compare(type, STR(string)))                \
     {                                                      \
         result = enum;                                     \
         goto exit;                                         \
@@ -7312,9 +7317,9 @@ c_meta_get_member_info_from_member_enum(type_info_t *type_info, u32 member_enum)
 type_info_enum_member_mapping_t
 c_meta_get_enum_member_mapping_enum_from_string(string_t type)
 {
-    type_info_enum_member_mapping_t result = (type_info_enum_member_mapping_t)0;
+    type_info_enum_member_mapping_t result = (type_info_enum_member_mapping_t)-1;
 #define X(enum, string)                                    \
-    if(memcmp(string, type.data, sizeof(string) - 1) == 0) \
+    if(c_string_compare(type, STR(string)))                \
     {                                                      \
         result = enum;                                     \
         goto exit;                                         \
@@ -7347,13 +7352,16 @@ exit:
     return(result);
 }
 
-const type_info_t*
+const type_info_struct_t*
 c_meta_get_enum_type_info_from_member_string(string_t name)
 {
-    const type_info_t *result = null;
-    type_info_enum_member_mapping_t enum_mapping = c_meta_get_enum_member_mapping_enum_from_string(name);
+    const type_info_struct_t *result = null;
 
-    result = (const type_info_t *)GENERATED_enum_member_name_to_type_info_table[enum_mapping].type_info_ptr;
+    type_info_enum_member_mapping_t enum_mapping = c_meta_get_enum_member_mapping_enum_from_string(name);
+    if(enum_mapping != (type_info_enum_member_mapping_t)-1)
+    {
+        result = GENERATED_enum_member_name_to_type_info_table[enum_mapping].type_info_ptr;
+    }
 
     return(result);
 }

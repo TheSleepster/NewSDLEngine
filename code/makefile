@@ -134,13 +134,7 @@ $(PREPROCESSOR_OUT): $(PREPROCESSOR_SRC) | $(BUILD_DIR)
 	$(SILENT)$(call MKDIR,../code/meta)
 	$(SILENT)$(PREPROCESSOR_OUT) > $@
 
-../code/meta/GENERATED_program_RTTI.h: $(CODE_GENERATOR_OUT) $(ALL_SRCS)
-	@echo [GENERATING] $@
-	$(SILENT)$(call MKDIR,../code/meta)
-	$(SILENT)$(CODE_GENERATOR_OUT) > $@
-
 run_preprocessor: ../code/meta/GENERATED_program_types.h
-do_codegen:       ../code/meta/GENERATED_program_RTTI.h
 
 # -------------------------------------------------------------------------
 # Code Generator 
@@ -151,6 +145,12 @@ $(CODE_GENERATOR_OUT): $(CODE_GENERATOR_SRC) | $(BUILD_DIR)
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/metaprogram.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
 
+../code/meta/GENERATED_program_RTTI.h: $(CODE_GENERATOR_OUT) $(ALL_SRCS)
+	@echo [GENERATING] $@
+	$(SILENT)$(call MKDIR,../code/meta)
+	$(SILENT)$(CODE_GENERATOR_OUT) > $@
+
+do_codegen:       ../code/meta/GENERATED_program_RTTI.h
 # -------------------------------------------------------------------------
 # Shaders 
 # -------------------------------------------------------------------------
@@ -176,13 +176,13 @@ $(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR) run_preprocessor
 # -------------------------------------------------------------------------
 # Asset file builder 
 # -------------------------------------------------------------------------
-$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_preprocessor
+$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_preprocessor do_codegen 
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/wad_asset_file_packer.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@ 
 
-$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_preprocessor
+$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_preprocessor do_codegen 
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/jfd_asset_file_packer.d \
@@ -193,7 +193,7 @@ $(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_pr
 # -------------------------------------------------------------------------
 
 # Compile source to objects 
-$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR) run_preprocessor
+$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR) run_preprocessor do_codegen 
 	@echo [ENGINE SOURCE]: $< ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) $(DEPFLAGS) -c $< -o $@
 

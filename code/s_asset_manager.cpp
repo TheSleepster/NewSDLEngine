@@ -228,31 +228,42 @@ material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *toke
 
     // NOTE(Sleepster): Handle enums stuff. 
     const type_info_member_t *member = c_meta_get_member_info(parent_type_data, name_token.string); 
+    const type_info_struct_t *enum_data = c_meta_get_enum_type_info_from_member_string(value_token.string);
     if(member)
     {
         byte *data_ptr = (byte*)parent_data + member->offset; 
         if(member->type == TYPE_string_t)
         {
+            // NOTE(Sleepster): We'll need to ignore quotes in the tokenizer 
             string_t *string_data = (string_t*)data_ptr;
             *string_data = value_token.string;
         }
-        else if(member->type == TYPE_u32 || member->kind == META_TYPE_KIND_Enum)
+        else if(enum_data)
         {
-             
-            // NOTE(Sleepster): Just map from enum name to the enum value. 
-            u32 *number_data = (u32*)data_ptr;
-            (void)number_data;
-
+            // NOTE(Sleepster): rare instance of a do {}while(); loop being genuinely useful. We NEED this to happen at least once.
             token_data_t peek_token = c_tokenizer_peek_token(tokenizer);
-            if(peek_token.string.data[0] == '|')
-            {
-               //type_info_t *type_info_enum = c_get_type_info();
-            }
+            do {
+                const type_info_member_t *enum_member = c_meta_get_member_info(enum_data, value_token.string);
+                u32 *value = (u32*)data_ptr;
+
+                *value |= enum_member->offset;
+
+                peek_token  = c_tokenizer_peek_token(tokenizer);
+                if(peek_token.type == TT_Seperator)
+                {
+                    peek_token  = c_tokenizer_get_next_token(tokenizer);
+                    value_token = c_tokenizer_get_next_token(tokenizer);
+                }
+            }while(peek_token.type == TT_Seperator);
         }
         else
         {
             memcpy(data_ptr, value_token.string.data, member->size);
         }
+    }
+    else if(c_string_compare(name_token.string, STR("shader")))
+    {
+        log_warning("Currently, shader variables are not supported...\n");
     }
     else
     {
@@ -294,7 +305,7 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
                     // NOTE(Sleepster): Nested block. 
                     if(c_string_compare(token.string, STR("render_pipeline_state")))
                     {
-                        const type_info_member_t *render_pipeline_info = c_meta_get_member_info(parent_type_data, STR("render_pipeline_state_t"));
+                        const type_info_member_t *render_pipeline_info = c_meta_get_member_info(parent_type_data, STR("pipeline_state"));
                         render_pipeline_state *state_data = (render_pipeline_state_t*)((byte*)parent_data + render_pipeline_info->offset);
 
                         const type_info_t *type_data = c_meta_get_type_info_by_name(STR("render_pipeline_state_t"));
@@ -303,8 +314,10 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
                     }
                     else
                     {
-                        log_info("This nested block inside of our %s block is not a valid subblock, the only valid one right now is 'render_pipeline_state'...\n",
-                                 parent_type_data->name);
+                        log_error("This nested block named '%.*s' inside of our '%s' block is not a valid subblock, the only valid one right now is 'render_pipeline_state'...\n",
+                                  token.string.count, C_STR(token.string),
+                                  parent_type_data->name);
+                        return;
                     }
                 }
                 else
