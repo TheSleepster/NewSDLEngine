@@ -114,7 +114,7 @@ JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
 # --------------------------------------------
 .PHONY: all shaders clean run_preprocessor
 
-all: run_preprocessor $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
+all: run_preprocessor do_codegen $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
 
 # Create Build Directory
 $(BUILD_DIR):
@@ -134,7 +134,13 @@ $(PREPROCESSOR_OUT): $(PREPROCESSOR_SRC) | $(BUILD_DIR)
 	$(SILENT)$(call MKDIR,../code/meta)
 	$(SILENT)$(PREPROCESSOR_OUT) > $@
 
+../code/meta/GENERATED_program_RTTI.h: $(CODE_GENERATOR_OUT) $(ALL_SRCS)
+	@echo [GENERATING] $@
+	$(SILENT)$(call MKDIR,../code/meta)
+	$(SILENT)$(CODE_GENERATOR_OUT) > $@
+
 run_preprocessor: ../code/meta/GENERATED_program_types.h
+do_codegen:       ../code/meta/GENERATED_program_RTTI.h
 
 # -------------------------------------------------------------------------
 # Code Generator 
@@ -158,7 +164,7 @@ shaders: $(SHADER_OUTPUTS)
 # -------------------------------------------------------------------------
 # Tests 
 # -------------------------------------------------------------------------
-tests: run_preprocessor $(TESTS_OUT)
+tests: run_preprocessor do_codegen $(TESTS_OUT)
 
 # Note: We use $* to get the stem (filename without extension) for the .d file
 $(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR) run_preprocessor

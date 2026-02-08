@@ -48,15 +48,11 @@ sys_allocate_memory(usize allocation_size)
     return(result);
 }
 
-void
-sys_free_memory(void *data, usize free_size)
-{
-    VirtualFree(data, 0, MEM_RELEASE);
-}
-
 void*
-sys_reallocate_memory(void *offset, u64 allocation_size)
+sys_reallocate_memory(void *offset, u64 old_size, u64 allocation_size)
 {
+    (void)old_size;
+
     void *result = null;
     result = VirtualAlloc(offset, allocation_size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
     if(!result)
@@ -76,6 +72,13 @@ sys_reallocate_memory(void *offset, u64 allocation_size)
     }
 
     return(result);
+}
+
+
+void
+sys_free_memory(void *data, usize free_size)
+{
+    VirtualFree(data, 0, MEM_RELEASE);
 }
 
 ///////////////////////////////////

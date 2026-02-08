@@ -9,6 +9,7 @@
 #include <c_base.h>
 #include <c_types.h>
 #include <c_log.h>
+#include <c_globals.h>
 #include <c_memory_arena.h>
 #include <c_zone_allocator.h>
 #include <c_file_api.h>
@@ -16,11 +17,23 @@
 #include <c_string.h>
 #include <c_hash_table.h>
 #include <c_dynarray.h>
+#include <c_tokenizer.h>
+
+// TODO(Sleepster): This is annoying. We need to figure out a better way of allowing people to use the RTTI in chunks.
+//                  So that we don't have to include essentially every parsed header...
+#include <c_program_flag_handler.h>
+#include <g_game_state.h>
+#include <g_entity.h>
+#include <s_input_manager.h>
+#include <s_nt_networking.h>
+#include <r_vulkan_types.h>
+//
+
 #include <r_vulkan_core.h>
 #include <r_render_group.h>
 
 #include <asset_file_packer/jfd_asset_file.h>
-#include <meta/GENERATED_program_types.h>
+#include <meta/GENERATED_program_RTTI.h>
 
 /*===============================
   ========== TEXTURES ===========
@@ -121,383 +134,184 @@ s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 na
 /*===============================
   ========== MATERIALS ==========
   =============================== */
-typedef enum token_type
-{
-    TT_Invalid,
-    TT_Identifier,
-    TT_Colon,
-    TT_SemiColon,
-    TT_PipeOperator,
-    TT_OpenBrace,
-    TT_CloseBrace,
-    TT_ForwardSlash,
-    TT_PoundSymbol,
-    TT_EOF,
-}token_type_t;
 
-typedef struct token
+#if 0
+internal_api void
+material_file_parse_item(string_t              filename,
+                         material_archetype_t *archetype, 
+                         const type_info_t    *archetype_type_info, 
+                         tokenizer_t          *tokenizer, 
+                         token_data_t          item_name_token)
 {
-    string_t     data;
-    token_type_t type;
-}token_t;
-
-internal_api inline bool8
-token_alphabetical(char A)
-{
-    bool8 result = (((A >= 'a') && (A <= 'z')) || 
-                    ((A >= 'A') && (A <= 'Z')));
-    return(result);
-}
-
-internal_api inline bool8
-token_numeric(char A)
-{
-    bool8 result = ((A >= '0') && (A <= '9'));
-    return(result);
-}
-
-token_t 
-get_next_token(string_t *tokenized_data)
-{
-    c_string_eat_whitespace(tokenized_data);
-    if(tokenized_data->data[0] == '#')
+    string_t item_name = item_name_token.string; 
+    const type_info_member_t *member_info = c_meta_get_member_info(archetype_type_info, item_name);
+    if(member_info)
     {
-        while(!c_string_is_end_of_line(tokenized_data))
-        {
-            c_string_advance_by(tokenized_data, 1);
-        }
+    }
+    else
+    {
+        log_error("Item of name: '%.*s' was found in the material file: '%s' however this item is not contained within the material_archetype_t structure...\n",
+                  item_name.count, C_STR(item_name), C_STR(filename));
 
-        if(c_string_is_end_of_line(tokenized_data))
+        log_info("Valid members for structure of type name: '%s' are as follows:\n", archetype_type_info->name);
+        for(u32 member_index = 0;
+            member_index < archetype_type_info->struct_info->member_count;
+            ++member_index)
         {
-            c_string_eat_whitespace(tokenized_data);
+            const type_info_member_t *member = archetype_type_info->struct_info->members + member_index;
+            log_info("[%d]: %s...\n", member_index, member->name);
         }
     }
+    
+    string_t parent_name = parent_ident.string;
 
-    token_t result    = {};
-    result.data.count = 1;
-    result.data.data  = tokenized_data->data;
+    const type_info_t *structure_data = c_meta_get_type_info_by_name(parent_name);
+    Assert(structure_data);
 
-    char character = tokenized_data->data[0];
-    c_string_advance_by(tokenized_data, 1);
-    switch(character)
+    token_data_t next_token = c_tokenizer_peek_token(tokenizer);
+    if(next_token.type == TT_Colon)
     {
-        case ':':  {result.type = TT_Colon;        }break;
-        case '|':  {result.type = TT_PipeOperator; }break;
-        case '{':  {result.type = TT_OpenBrace;    }break;
-        case '}':  {result.type = TT_CloseBrace;   }break;
-        case '\0': {result.type = TT_EOF;          }break;
-        case '#':  {result.type = TT_PoundSymbol;  }break;
-        case '/':  {result.type = TT_ForwardSlash; }break;
-        case ';':  
-        {
-            result.type = TT_SemiColon;
-            if(c_string_is_end_of_line(tokenized_data))
-            {
-                c_string_advance_by(tokenized_data, 1);
-            }
-        }break;
-        case '"':
-        {
-            c_string_advance_by(tokenized_data, 1);
-            c_string_advance_by(&result.data, 1);
-            byte *at = tokenized_data->data;
+        // NOTE(Sleepster): Eat the colon 
+        c_tokenizer_get_next_token(tokenizer); 
 
-            while(tokenized_data->data && 
-                  (tokenized_data->data[0] != '"'))
+        // NOTE(Sleepster): If we're in here, it's a single assignment 
+        token_data_t value_token = c_tokenizer_get_next_token(tokenizer); 
+        if(value_token.type == TT_Identifier)
+        {
+            const type_info_member_t *member = c_meta_get_member_info(structure_data, next_token.string);
+            Assert(member);
+
+            byte *data_ptr = (byte*)archetype + member->offset; 
+            if(member->type == TYPE_string_t)
             {
-                if((tokenized_data->data[0] == '\\') && (tokenized_data->data[1]))
+                string_t *string_data = (string_t*)data_ptr;
+                *string_data = value_token.string;
+            }
+            else
+            {
+                memcpy(data_ptr, value_token.string.data, member->size);
+            }
+
+            return;
+        }
+        else
+        {
+            log_error("Expected Identifier after token: ':'... Got: '%.*s'...\n", 
+                      value_token.string.count, C_STR(value_token.string));
+        }
+    }
+    else if(next_token.type == TT_OpeningBrace)
+    {
+        token_data_t token = next_token;
+        while(token.type != TT_ClosingBrace)
+        {
+            material_file_parse_item(archetype, archetype_type_info, tokenizer, parent_ident);
+            token = c_tokenizer_get_next_token(tokenizer);
+        }
+    }
+    else
+    {
+        log_error("Expected to find ':' or '{' immediately after token: '%.*s'... Got: '%.*s'...\n", 
+                  next_token.string.count, C_STR(next_token.string),
+                  next_token.string.count, C_STR(next_token.string));
+    }
+}
+#endif
+
+// NOTE(Sleepster): We need to pass a pointer to the actual structure to actually store the file data
+void
+material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *tokenizer, const type_info_t *parent_type_data, token_data_t name_token)
+{
+    // NOTE(Sleepster): Eating the colon... 
+    c_tokenizer_get_next_token(tokenizer);
+    token_data_t value_token = c_tokenizer_get_next_token(tokenizer);
+
+    // NOTE(Sleepster): Handle enums stuff. 
+    const type_info_member_t *member = c_meta_get_member_info(parent_type_data, name_token.string); 
+    if(member)
+    {
+        byte *data_ptr = (byte*)parent_data + member->offset; 
+        if(member->type == TYPE_string_t)
+        {
+            string_t *string_data = (string_t*)data_ptr;
+            *string_data = value_token.string;
+        }
+        else if(member->type == TYPE_u32 || member->kind == META_TYPE_KIND_Enum)
+        {
+             
+            // NOTE(Sleepster): Just map from enum name to the enum value. 
+            u32 *number_data = (u32*)data_ptr;
+            (void)number_data;
+
+            token_data_t peek_token = c_tokenizer_peek_token(tokenizer);
+            if(peek_token.string.data[0] == '|')
+            {
+               //type_info_t *type_info_enum = c_get_type_info();
+            }
+        }
+        else
+        {
+            memcpy(data_ptr, value_token.string.data, member->size);
+        }
+    }
+    else
+    {
+        log_error("Item of name: '%.*s' was found in the material file: '%s' however this item is not contained within the %s structure...\n",
+                  name_token.string.count, C_STR(name_token.string), 
+                  C_STR(filename),
+                  parent_type_data->name);
+
+        log_info("Valid members for structure of type name: '%s' are as follows:\n", parent_type_data->name);
+        for(u32 member_index = 0;
+            member_index < parent_type_data->struct_info->member_count;
+            ++member_index)
+        {
+            const type_info_member_t *member = parent_type_data->struct_info->members + member_index;
+            log_info("[%d]: %s...\n", member_index, member->name);
+        }
+    }
+}
+
+void 
+material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t *tokenizer, const type_info_t *parent_type_data, token_data_t name_token)
+{
+    token_data_t token = c_tokenizer_get_next_token(tokenizer);
+    while(token.type != TT_ClosingBrace)
+    {
+        token = c_tokenizer_get_next_token(tokenizer);
+        switch(token.type)
+        {
+            case TT_HashTag:
+            {
+                c_tokenizer_eat_lines(tokenizer, 1);
+            }break;
+            case TT_Identifier:
+            {
+                // NOTE(Sleepster): Peek to make sure this isn't a nested block. 
+                token_data_t peek_token = c_tokenizer_peek_token(tokenizer);
+                if(peek_token.type == TT_OpeningBrace)
                 {
-                    c_string_advance_by(tokenized_data, 2);
+                    // NOTE(Sleepster): Nested block. 
+                    if(c_string_compare(token.string, STR("render_pipeline_state")))
+                    {
+                        const type_info_member_t *render_pipeline_info = c_meta_get_member_info(parent_type_data, STR("render_pipeline_state_t"));
+                        render_pipeline_state *state_data = (render_pipeline_state_t*)((byte*)parent_data + render_pipeline_info->offset);
+
+                        const type_info_t *type_data = c_meta_get_type_info_by_name(STR("render_pipeline_state_t"));
+                        material_file_parse_block_data(filename, state_data, tokenizer, type_data, token);
+
+                    }
+                    else
+                    {
+                        log_info("This nested block inside of our %s block is not a valid subblock, the only valid one right now is 'render_pipeline_state'...\n",
+                                 parent_type_data->name);
+                    }
                 }
                 else
                 {
-                    c_string_advance_by(tokenized_data, 1);
+                    material_file_parse_item(filename, parent_data, tokenizer, parent_type_data, token);
                 }
-            }
-
-            if(tokenized_data->data[0] == '"')
-            {
-                c_string_advance_by(tokenized_data, 1);
-            }
-            u64 token_length = (tokenized_data->data - at);
-
-            result.type = TT_Identifier;
-            result.data.count = (u32)token_length;
-        }break;
-        default: 
-        {
-            if(token_alphabetical(tokenized_data->data[0]) || 
-               token_numeric(tokenized_data->data[0]) ||
-               tokenized_data->data[0] == '-') 
-            {
-                result.type = TT_Identifier;
-                while(token_alphabetical(tokenized_data->data[0]) ||
-                      token_numeric(tokenized_data->data[0])      ||
-                      tokenized_data->data[0] == '_'              ||
-                      tokenized_data->data[0] == '.')
-                {
-                    c_string_advance_by(tokenized_data, 1);
-                }
-                result.data.count = (u32)(tokenized_data->data - result.data.data);
-            }
-        }break;
-    }
-
-    return(result);
-}
-
-token_t
-peek_next_token(string_t token_data, u32 times = 1)
-{
-    token_t result = {};
-    for(u32 peek_index = 0;
-        peek_index < times;
-        ++peek_index)
-    {
-        result = get_next_token(&token_data);
-    }
-    return(result);
-}
-
-internal_api bool8
-expect_token(string_t *file_data, token_type_t type, char *error_msg) 
-{
-    bool8 result = true;
-
-    token_t token = get_next_token(file_data);
-    if (token.type != type) 
-    {
-        log_error("Parse Error... Expected token: %s. Got '%.*s'\n", error_msg, token.data.count, token.data.data);
-        result = false;
-    }
-
-    return(result);
-}
-
-// TODO(Sleepster): Error checking 
-void
-parse_archetype_data(material_archetype_t *archetype, string_t *file_data, string_t parent_name)
-{
-    while(file_data->count > 0)
-    {
-        token_t token = get_next_token(file_data);
-        if(token.type == TT_Identifier)
-        {
-            type_info_member_t *member = null;
-            for(u32 member_index = 0;
-                member_index < type_info_material_archetype_t.member_count;
-                ++member_index)
-            {
-                type_info_member_t *found = (type_info_member_t*)((byte*)&type_info_material_archetype_t.members + (member_index * sizeof(type_info_member_t)));
-                if(c_string_compare(STR(found->name), token.data))
-                {
-                    member = found;
-                    break;
-                }
-            }
-            if(member)
-            {
-                // NOTE(Sleepster): Eat the colon, then get the value 
-                get_next_token(file_data);
-                token_t value_token = get_next_token(file_data);
-                if(value_token.type == TT_Identifier)
-                {
-                    log_debug("Name: '%.*s' found...\n", token.data.count, C_STR(token.data));
-                    log_debug("Name: '%.*s' found...\n", value_token.data.count, C_STR(value_token.data));
-
-                    byte *value_ptr = (byte*)archetype + (member->offset);
-                    switch(member->type)
-                    {
-                        case TYPE_string_t:
-                        {
-                            string_t *string_value = (string_t*)value_ptr;
-                            *string_value = value_token.data;
-                        }break;
-                        case TYPE_bool32:
-                        {
-                            bool32 *boolean = (bool32*)value_ptr;
-                            *boolean = c_string_compare(value_token.data, STR("true")) ? true : false;
-                        }break;
-                        case TYPE_u32:
-                        {
-                            token_t next_token = peek_next_token(*file_data);
-
-                            u32 *value = (u32*)value_ptr;
-
-                            // NOTE(Sleepster): Enum 
-                            if(next_token.type == TT_PipeOperator)
-                            {
-                                token_t enum_token = value_token;
-
-                                // TODO(Sleepster): This is hardcoded for now, very awful. But code generation is hard. 
-                                // In the future, we would like to have some way to query for type info via the string of the object.
-                                // something like:
-                                //
-                                // type_info_struct_t structure_info = c_type_info_get_from_name(token.data);
-                                //
-                                // and
-                                //
-                                // type_info_member_t member_info = c_type_info_get_member_info(structure_info, member_name);
-                                //
-                                // just so we can avoid the awfulness below here.
-                                if(c_string_compare(token.data, STR("renderer_effect_flags")))
-                                {
-                                    while(enum_token.type != TT_SemiColon)
-                                    {
-                                        enum_token = get_next_token(file_data);
-                                        if(enum_token.type == TT_Identifier)
-                                        {
-                                            type_info_member_t *enum_data = null;
-                                            for(u32 member_index = 0;
-                                                member_index < type_info_enum_renderer_effect_application_flags_t.member_count;
-                                                ++member_index)
-                                            {
-                                                type_info_member_t *found = (type_info_member_t*)((byte*)&type_info_enum_renderer_effect_application_flags_t.members + (member_index * sizeof(type_info_member_t)));
-                                                if(c_string_compare(STR(found->name), value_token.data))
-                                                {
-                                                    enum_data = found;
-                                                    break;
-                                                }
-                                            }
-
-                                            if(enum_data)
-                                            {
-                                                log_debug("Name: '%.*s' found...\n", enum_token.data.count, C_STR(enum_token.data));
-                                                *value |= enum_data->offset;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                *value = c_string_read_u32(value_token.data);
-                            }
-                        }break;
-                    }
-                }
-            }
-        }
-        else if(token.type == TT_CloseBrace || token.type == TT_EOF)
-        {
-            // NOTE(Sleepster): Eat the semicolon 
-            get_next_token(file_data);
-            break;
-        }
-    }
-}
-
-// TODO(Sleepster): Same as above, once we have proper RTTI, we'll have to come back to this since this
-// current iteration of this parser is very stupid. 
-void
-parse_instance_data(material_archetype_t *archetype, string_t *file_data, string_t parent_name)
-{
-    while(file_data->count > 0)
-    {
-        token_t token = get_next_token(file_data);
-        token_t name_token = token;
-        if(c_string_compare(token.data, STR("render_pipeline_state")))
-        {
-            while(name_token.type != TT_CloseBrace && file_data->count > 0)
-            {
-                name_token = get_next_token(file_data);
-                switch(name_token.type)
-                {
-                    case TT_Identifier:
-                    {
-                        while(name_token.type != TT_Identifier && 
-                              name_token.type != TT_CloseBrace && 
-                              file_data->count > 0)
-                        {
-                            // NOTE(Sleepster): Eat up the next identifier 
-                            name_token = get_next_token(file_data);
-                        }
-
-                        for(u32 member_index = 0;
-                            member_index < type_info_render_pipeline_state_t.member_count;
-                            ++member_index)
-                        {
-                            // NOTE(Sleepster): For now, just eat the semicolon, comma, and brace. 
-                            type_info_member_t *member = (type_info_member_t*)((byte*)&type_info_render_pipeline_state_t.members + (member_index * sizeof(type_info_member_t)));
-                            if(c_string_compare(STR(member->name), name_token.data))
-                            {
-                                log_debug("Member found: '%.*s'...\n", name_token.data.count, C_STR(name_token.data));
-
-                                byte *value_ptr = (byte*)&archetype->base_instance.pipeline_state + (member->offset);
-                                token_t value_token = get_next_token(file_data);
-                                while(value_token.type != TT_Identifier)
-                                {
-                                    value_token = get_next_token(file_data);
-                                }
-
-                                if(member->type == TYPE_bool32)
-                                {
-#if 0
-                                    type_info_struct_t enum_info = get_parent_from_member_name(value_token.data); 
-                                    type_info_member_t enum_value_data = get_member_by_name(&enum_info, value_token.data);
-
-                                    type_info_member_t name_data = get_data_by_name(value_token.data);
-                                    type_info_struct_t parent = get_parent_data(name_data);
-#endif
-                                    bool32 *boolean = (bool32*)value_ptr;
-                                    *boolean = c_string_compare(value_token.data, STR("true")) ? true : false;
-                                    log_debug("Value: '%.*s' set...\n", name_token.data.count, C_STR(name_token.data));
-
-                                    break;
-                                }
-                                else if(member->type == TYPE_u32)
-                                {
-                                    // TODO(Sleepster): We can't do this. We don't know what member this belongs too. 
-                                    u32 *value = (u32*)value_ptr;
-                                    *value = c_string_read_u32(value_token.data);
-                                    log_debug("Value: '%.*s' set...\n", name_token.data.count, C_STR(name_token.data));
-
-                                    break;
-                                }
-                            }
-
-                            if(name_token.type == TT_CloseBrace || file_data->count < 0) 
-                            {
-                                return;
-                            }
-                        }
-                    }break;
-                    case TT_CloseBrace:
-                    {
-                        return;
-                    }break;
-                }
-            }
-        }
-    }
-}
-
-void
-s_asset_material_extract_archetype_data(material_archetype_t *archetype, string_t material_file_data)
-{
-    while(material_file_data.count > 0)
-    {
-        token_t token = get_next_token(&material_file_data);
-        if(token.type == TT_Identifier)
-        {
-            string_t identifier  = token.data;
-            token_t future_token = peek_next_token(material_file_data, 2);
-
-            get_next_token(&material_file_data);
-            get_next_token(&material_file_data);
-            if(future_token.type == TT_OpenBrace)
-            {
-                // NOTE(Sleepster): Grouped asssigment 
-                if(c_string_compare(identifier, STR("archetype")))
-                {
-                    parse_archetype_data(archetype, &material_file_data, identifier);
-                }
-                parse_instance_data(archetype, &material_file_data, identifier);
-            }
-        }
-        else if(token.type == TT_EOF || material_file_data.count == 0)
-        {
-            break;
+            }break;
         }
     }
 }
@@ -515,7 +329,59 @@ s_asset_material_archetype_create(asset_manager_t *asset_manager, asset_slot_t *
                                                               asset_manager->asset_allocator, 
                                                               ZA_TAG_STATIC);
     string_t material_data = slot->package_entry->asset_data;
-    s_asset_material_extract_archetype_data(&result, material_data);
+    tokenizer_t tokenizer = {};
+    tokenizer.data = material_data;
+
+    while(tokenizer.data.count > 0)
+    {
+        token_data_t token = c_tokenizer_get_next_token(&tokenizer);
+        switch(token.type)
+        {
+            case TT_HashTag:
+            {
+                c_tokenizer_eat_lines(&tokenizer, 1);
+            }break;
+            case TT_Identifier:
+            {
+                token_data_t next_peeked = c_tokenizer_peek_token(&tokenizer);
+                if(next_peeked.type == TT_Colon)
+                {
+                    // TODO(Sleepster): For now nothing, this requires us to know what kind of file we are in so that we can properly parse this item.
+                    // If we are in a .m_arch file, then it should be material_archetype_t, if we are in a .m_inst file, it should be material_instance_t
+                    // hence why we're doing nothing with it right now.
+                    
+                    //material_file_parse_item(&tokenizer, token);
+                }
+                else if(next_peeked.type == TT_OpeningBrace)
+                {
+                    // parse_item_structure();
+                    const type_info_t *struct_info = null;
+                    if(c_string_compare(token.string, STR("material_archetype"))) 
+                    {
+                        struct_info = c_meta_get_type_info_by_name(STR("material_archetype_t"));
+                    }
+                    else if(c_string_compare(token.string, STR("base_instance")))
+                    {
+                        struct_info = c_meta_get_type_info_by_name(STR("material_instance_t"));
+                    }
+                    else 
+                    {
+                        log_error("The intializer item is neither a material_archetype or material_instance block. These are the ONLY TWO valid items that can be in this scope... Found: '%.*s'\n",
+                                  token.string.count, C_STR(token.string));
+                        break;
+                    }
+ 
+                    material_file_parse_block_data(slot->owner_asset_file.file_name, &result, &tokenizer, struct_info, token);
+                }
+                else
+                {
+                    log_error("Expected to find ':' or '{' immediately after token: '%.*s'... Got: '%.*s'...\n", 
+                              token.string.count, C_STR(token.string),
+                              next_peeked.string.count, C_STR(next_peeked.string));
+                }
+            }break;
+        }
+    }
 
     return(result);
 }

@@ -1,38 +1,56 @@
-version: 001;
-#archetype: "basic_builtin.arch"
+# NOTE(Sleepster):
+# The idea for this file format and organization method is very simple. We have a material archetype and a material 
+# instance. The archetype stores immutable data about the shader it uses and it's immutable uniforms. Essentially,
+# the archetype just stores the most basic and constant information. After that, we have the material instances.
+# Material instances essentially depend on the material archetype, but store the MuTABLE data about a material archetype.
+# that can freely differ from the base instance without breaking anything. More to the point, each archetype has a base
+# instance by default that we can use too have a general idea / default way of rendering before other materials that
+# rely on this archetype without crashing. 
+#
+# Instances are as previously mentioned based off an archetype. Although you can specify an archetype and an instance in 
+# the same file like we do below, it is probably better to make seperate files for instances and archetypes.
+# 
+# Archetypes should have the file extension .m_arch, while instances should have the file extension .m_inst
 
-# this is a comment, this is also a standard normal material
-archetype: {
-    name: "Basic Builtin Material";
-    shader_binary_name: "test_shader";
-    # TODO(Sleepster): maybe these in the future
-    # uses_diffuse_map: true;
-    # uses_normal_map: false;
 
-    # bitflags are marked like so:
-    renderer_effect_flags: REAF_Emmision|REAF_Bloom;
-};
+# This is the archetype data
+# base_material_archetype: "basic_builting.arch"
+material_archetype {
+    version: 001
+    name: "Basic Builtin Material"
+    shader_binary_name: "test_shader"
 
-# this stores the whole pipeline state.
-render_pipeline_state: {
-    blend_enabled: true,
-    stencil_enabled: false,
-    depth_testing_enabled: true,
-    depth_writing_enabled: true,
-    depth_func: RDF_Less,
+# NOTE(Sleepster): Right now this file stores it's own base instance, however if you 
+#                  wanted too you could split them like so:
+#
+#   base_instance: "basic_builtin_base_instance.mat"
+}
 
-    color_blend_op: RBE_Add,
-    alpha_blend_op: RBE_Add,
-    src_color_blend_mode: RBM_SrcAlpha,
-    dst_color_blend_mode: RBM_OneMinusSrcAlpha,
+# This is the archetype's base instance
+base_instance {
+    version              : 001
+    name                 : "Basic Builtin Material Base Instance"
+    renderer_effect_flags: REAF_Emmision|REAF_Bloom
 
-    src_alpha_blend_mode: RBM_SrcAlpha,
-    dst_alpha_blend_mode: RBM_OneMinusSrcAlpha
-};
-# doubles are marked with d, unsigned values are marked with u, example: "value: 4.0d, value2: 4u"
+    render_pipeline_state {
+        blend_enabled: true
+        stencil_enabled: false
+        depth_testing_enabled: true
+        depth_writing_enabled: true
+        depth_func: RDF_Less
+
+        color_blend_op: RBE_Add
+        alpha_blend_op: RBE_Add
+        src_color_blend_mode: RBM_SrcAlpha
+        dst_color_blend_mode: RBM_OneMinusSrcAlpha
+
+        src_alpha_blend_mode: RBM_SrcAlpha
+        dst_alpha_blend_mode: RBM_OneMinusSrcAlpha
+    }
+
 # default shader uniform data
-RenderIntensityUBO: {
-    emmision_vibrance: 1.0,
-    bloom_value: 1.5
-};
-
+    shader::RenderIntensityUBO {
+        emmision_vibrance: 1.0
+        bloom_value: 1.5
+    }
+}

@@ -12,6 +12,11 @@
 #include <c_file_api.h>
 #include <c_file_watcher.h>
 
+// NOTE(Sleepster): Defined for mremap() 
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
+
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/inotify.h>
@@ -24,12 +29,24 @@
 #include <poll.h>
 #include <stdlib.h>
 
+u32 
+sys_align_to_page_size(u32 size)
+{
+    u32 result = 0;
+    u32 page_size = sysconf(_SC_PAGESIZE);
+
+    result = Align(size, page_size);
+
+    return(result);
+}
+
 void*
 sys_allocate_memory(usize allocation_size)
 {
     errno = 0;
     
-    void *data = mmap(0, allocation_size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+    u32 true_allocation = sys_align_to_page_size(allocation_size);
+    void *data = mmap(0, true_allocation, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
     if(errno == -1)
     {
         int error = errno;
@@ -41,14 +58,14 @@ sys_allocate_memory(usize allocation_size)
     return(data);
 }
 
-// TODO(Sleepster): Doesn't offset imply "Get me new pages from the END of this allocation" rather than the start?
 void*
-sys_reallocate_memory(void *offset, u64 allocation_size)
+sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
 {
     errno = 0;
     
-    void *result = mmap(offset, allocation_size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
-    if(errno == -1)
+    u32 true_allocation = sys_align_to_page_size(allocation_size);
+    void *result = mremap(base, old_size, true_allocation, MREMAP_MAYMOVE);
+    if(result == MAP_FAILED)
     {
         int error = errno;
         log_fatal("mmap failed... error: (%s), code: '%d'...\n", strerror(error), error);

@@ -4,16 +4,17 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#include <stdlib.h>
+
 #include <c_base.h>
 #include <c_types.h>
 #include <c_dynarray.h>
 
-#include <stdlib.h>
-
 #include <p_platform_data.h>
 
-// TODO(Sleepster): Why are we using malloc???
-// Stop using this. Bad.
+// NOTE(Sleepster): Using Malloc here for simplicity. For some reason mmap is just so overly 
+// complicated and makes this a nightmare. Even mremap is a cancer against this Earth. 
+// For now until I build my own wrapper around mmap to act like VirtualAlloc, we're boned with this.
 
 void*
 _dynarray_create_impl(u32 element_size)
@@ -27,36 +28,39 @@ _dynarray_create_impl(u32 element_size)
     dynarray_header_t *header = (dynarray_header_t*)result;
     result = (byte*)result + sizeof(dynarray_header_t);
 
-    header->header_id = DYNARRAY_HEADER_DEBUG_ID;
-    header->capacity  = DYNARRAY_INITIAL_SIZE;
+    header->total_allocated_bytes = allocation_size;
+
+    header->header_id    = DYNARRAY_HEADER_DEBUG_ID;
+    header->capacity     = DYNARRAY_INITIAL_SIZE;
+    header->element_size = element_size;
 
     return(result);
 }
 
-void*
+void
 _dynarray_grow_impl(void **array, u32 element_size, u32 new_capacity)
 {
+    void *base   = ((byte*)*array - sizeof(dynarray_header_t));
+    void *result = base;
+
     Expect(array != null, "Array is invalid...\n");
 
     dynarray_header_t *header = _dynarray_header(*array); 
-
-    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
-    Expect(new_capacity > DYNARRAY_INITIAL_SIZE, "new capacity is <= Initial\n");
-    void *result = null;
-    result = (byte*)*array - sizeof(dynarray_header_t);
-    
     u64 old_size = header->capacity * element_size;
     u64 new_size = new_capacity     * element_size;
 
-    result = realloc(result, (element_size * new_capacity) + sizeof(dynarray_header_t));
+    result = realloc(base, (element_size * new_capacity) + sizeof(dynarray_header_t));
     memset((byte*)result + sizeof(dynarray_header_t) + old_size, 0, new_size - old_size);
-
+    
     result = (byte*)result + sizeof(dynarray_header_t);
+    *array = result;
 
     header = _dynarray_header(result); 
     header->capacity = new_capacity;
+    header->total_allocated_bytes = new_size;
 
-    return(result);
+    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
+    Expect(new_capacity > DYNARRAY_INITIAL_SIZE, "new capacity is <= Initial\n");
 }
 
 void
@@ -92,16 +96,16 @@ _dynarray_remove_impl(void **array, u32 element_size, u32 index)
 
     dynarray_header_t *header = _dynarray_header(*array); 
     Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
-    Expect(index <= header->size, "Index is > to that of the header->size");
+    Expect(index <= header->indices_used, "Index is > to that of the header->size");
 
     byte *array_data = (byte*)*array;
-    if(index < header->size - 1) 
+    if(index < header->indices_used - 1) 
     {
         byte *to   = array_data + (element_size * index);
         byte *from = array_data + (element_size * (index + 1));
 
-        usize bytes_to_write = (header->size - index - 1) * element_size;
+        usize bytes_to_write = (header->indices_used - index - 1) * element_size;
         memmove(to, from, bytes_to_write);
     }
-    header->size -= 1;
+    header->indices_used -= 1;
 }

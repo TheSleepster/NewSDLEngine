@@ -182,14 +182,18 @@ typedef struct shader
  * as is defined in the material config, you would simply be able to make a copy to that material,
  * then customize these settings. Keeping the base material untouched.
  */
+
 // MATERIAL INSTANCE
 GENERATE_TYPE_INFO
 typedef struct material_instance
 {
-    u32                           ID;
+    u64                           ID;
+    u32                           version;
+    string_t                      name;
 
     asset_handle_t                textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
     render_pipeline_state_t       pipeline_state;
+    u32                           renderer_effect_flags;
 
     u32                           shader_uniform_count;
     vulkan_shader_uniform_data_t *uniform_data;
@@ -203,10 +207,11 @@ GENERATE_TYPE_INFO
 typedef struct material_archetype
 {
     u64                 ID;
+    u32                 version;
+
     string_t            name;
     string_t            shader_binary_name;
     asset_handle_t      shader;
-    u32                 renderer_effect_flags;
 
     material_instance_t base_instance;
 }material_archetype_t;

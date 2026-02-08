@@ -30,9 +30,11 @@ typedef struct visit_file_data  visit_file_data_t;
 /*===========================================
   ============== OS MEMORY API ==============
   ===========================================*/
+u32   sys_align_to_page_size(u32 size);
+
 void* sys_allocate_memory(usize allocation_size);
 void  sys_free_memory(void *data, usize free_size);
-void* sys_reallocate_memory(void *offset, u64 allocation_size);
+void* sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size);
 
 /*===========================================
   ============== FILE IO STUFF ==============

@@ -18,11 +18,11 @@ enum GENERATED_program_types_t {
 	TYPE_bool32,
 	TYPE_u32,
 	TYPE_material_instance_t,
+	TYPE_u64,
+	TYPE_string_t,
 	TYPE_asset_handle_t,
 	TYPE_vulkan_shader_uniform_data_t,
 	TYPE_material_archetype_t,
-	TYPE_u64,
-	TYPE_string_t,
 };
 
 struct type_info_render_pipeline_state_t {
@@ -52,8 +52,11 @@ struct type_info_material_instance_t {
 	u32 member_count;
 	struct {
 		type_info_member_t ID;
+		type_info_member_t version;
+		type_info_member_t name;
 		type_info_member_t textures;
 		type_info_member_t pipeline_state;
+		type_info_member_t renderer_effect_flags;
 		type_info_member_t shader_uniform_count;
 		type_info_member_t uniform_data;
 		type_info_member_t archetype;
@@ -66,10 +69,10 @@ struct type_info_material_archetype_t {
 	u32 member_count;
 	struct {
 		type_info_member_t ID;
+		type_info_member_t version;
 		type_info_member_t name;
 		type_info_member_t shader_binary_name;
 		type_info_member_t shader;
-		type_info_member_t renderer_effect_flags;
 		type_info_member_t base_instance;
 	}members;
 };
@@ -235,11 +238,14 @@ const static type_info_render_pipeline_state_t type_info_render_pipeline_state_t
 const static type_info_material_instance_t type_info_material_instance_t = {
 	.name = "material_instance_t",
 	.type = TYPE_material_instance_t,
-	.member_count = 6,
+	.member_count = 9,
 	.members = {
-		.ID = {.name = "ID", .type = TYPE_u32, .offset = offsetof(material_instance_t, ID), .size = sizeof(u32)},
+		.ID = {.name = "ID", .type = TYPE_u64, .offset = offsetof(material_instance_t, ID), .size = sizeof(u64)},
+		.version = {.name = "version", .type = TYPE_u32, .offset = offsetof(material_instance_t, version), .size = sizeof(u32)},
+		.name = {.name = "name", .type = TYPE_string_t, .offset = offsetof(material_instance_t, name), .size = sizeof(string_t)},
 		.textures = {.name = "textures", .type = TYPE_asset_handle_t, .offset = offsetof(material_instance_t, textures), .size = sizeof(asset_handle_t)},
 		.pipeline_state = {.name = "pipeline_state", .type = TYPE_render_pipeline_state_t, .offset = offsetof(material_instance_t, pipeline_state), .size = sizeof(render_pipeline_state_t)},
+		.renderer_effect_flags = {.name = "renderer_effect_flags", .type = TYPE_u32, .offset = offsetof(material_instance_t, renderer_effect_flags), .size = sizeof(u32)},
 		.shader_uniform_count = {.name = "shader_uniform_count", .type = TYPE_u32, .offset = offsetof(material_instance_t, shader_uniform_count), .size = sizeof(u32)},
 		.uniform_data = {.name = "uniform_data", .type = TYPE_vulkan_shader_uniform_data_t, .offset = offsetof(material_instance_t, uniform_data), .size = sizeof(vulkan_shader_uniform_data_t*)},
 		.archetype = {.name = "archetype", .type = TYPE_material_archetype_t, .offset = offsetof(material_instance_t, archetype), .size = sizeof(material_archetype_t*)},
@@ -252,10 +258,10 @@ const static type_info_material_archetype_t type_info_material_archetype_t = {
 	.member_count = 6,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .offset = offsetof(material_archetype_t, ID), .size = sizeof(u64)},
+		.version = {.name = "version", .type = TYPE_u32, .offset = offsetof(material_archetype_t, version), .size = sizeof(u32)},
 		.name = {.name = "name", .type = TYPE_string_t, .offset = offsetof(material_archetype_t, name), .size = sizeof(string_t)},
 		.shader_binary_name = {.name = "shader_binary_name", .type = TYPE_string_t, .offset = offsetof(material_archetype_t, shader_binary_name), .size = sizeof(string_t)},
 		.shader = {.name = "shader", .type = TYPE_asset_handle_t, .offset = offsetof(material_archetype_t, shader), .size = sizeof(asset_handle_t)},
-		.renderer_effect_flags = {.name = "renderer_effect_flags", .type = TYPE_u32, .offset = offsetof(material_archetype_t, renderer_effect_flags), .size = sizeof(u32)},
 		.base_instance = {.name = "base_instance", .type = TYPE_material_instance_t, .offset = offsetof(material_archetype_t, base_instance), .size = sizeof(material_instance_t)},
 	}
 };

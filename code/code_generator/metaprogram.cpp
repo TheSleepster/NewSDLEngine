@@ -35,6 +35,17 @@ typedef struct meta_struct meta_struct_t;
 // TODO(Sleepster): 
 // - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
 // - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
+// - [ ] Make a function that takes in the member string and returns to us the member enum for the item,
+//       with  that also make a function capable of taking in the member enum and returning the member data
+// - [ ] Compile time hash table stored in the header that allows us to map every member name to the type_info_t* for the item is a member of
+//       c_meta_get_member_info_by_enum(structure, enum);
+// - [ ] Make it easier for people to use certain bits of the RTTI without having to include the entire chain of parsed
+//       headers. It's very annoying to use the RTTI currently.
+// - [ ] Allow for an interface that would take in a lambda / function pointer that would be called for each of the
+//       members of a struct. Something like c_meta_for_each_member(function);
+// - [ ] Perhaps we should prefix hash tables and dynarray members with special characters to denote this
+// - [ ] We may have some (a lot) issues with multi-word C primtives in the future like 
+//       "unsigned long long" or "unsigned char"
 //
 // - [?] X-Macro for mapping enum member names to their parent enum
 // - [?] We are including structures that aren't directly embedded into a type as members of that type.
@@ -64,10 +75,6 @@ typedef struct meta_struct meta_struct_t;
 //        }test_object_t;
 //
 //        We neither ever find the variable named "after_semicolon", nor that test_object_t is typedeffed. This is a problem.
-//
-// - [ ] Perhaps we should prefix hash tables and dynarray members with special characters to denote this
-// - [ ] We may have some (a lot) issues with multi-word C primtives in the future like 
-//       "unsigned long long" or "unsigned char"
 //
 //
 // - [X] Ignore #if 0 blocks or really any #define block
@@ -301,7 +308,15 @@ typedef struct ast_state
     string_builder_t          type_table_builder;
     string_builder_t          struct_info_builder;
     string_builder_t          struct_static_def_builder;
-    string_builder_t          default_struct_def_builder;
+    string_builder_t          type_member_enum_builder;
+    string_builder_t          member_name_to_enum_info_hash_builder;
+    string_builder_t          member_name_to_struct_info_hash_builder;
+
+    u32                       total_enum_members;
+    u32                       total_structure_members;
+
+    u32                       total_enums;
+    u32                       total_structures;
 
     // NOTE(Sleepster): The name of the macro is the key, the value stored
     //                  is what the macro actually expands too
@@ -317,7 +332,7 @@ typedef struct ast_state
     DynArray_t(registry_type_t) type_table;
     u32                         type_count;
 }ast_state_t;
- 
+
 static ast_state_t state;
 
 string_t 
@@ -876,7 +891,10 @@ generate_type_information(ast_file_data_t *ast)
     string_builder_t *type_enum_builder        = &state.type_enum_builder;
     string_builder_t *type_table_builder       = &state.type_table_builder;
     string_builder_t *struct_info_builder      = &state.struct_info_builder;
-    string_builder_t *type_member_enum_builder = &state.default_struct_def_builder;
+    string_builder_t *type_member_enum_builder = &state.type_member_enum_builder;
+
+    string_builder_t *member_name_to_struct_info_hash_builder = &state.member_name_to_struct_info_hash_builder;
+    string_builder_t *member_name_to_enum_info_hash_builder = &state.member_name_to_enum_info_hash_builder;
 
     //string_builder_t *struct_static_def_builder = &state.struct_static_def_builder;
 
@@ -917,6 +935,10 @@ generate_type_information(ast_file_data_t *ast)
     // NOTE(Sleepster): Generate the functions that map the type string to the index that the correct type data occupies. 
     // TODO(Sleepster): Maybe we should just stuff all this into a header, I just don't want to depend on another file right now 
     c_string_builder_sprintf(type_enum_builder, R"(
+#ifndef Max
+#define Max(A, B) (((A) > (B)) ? (A) : (B)) 
+#endif
+
 #define META_STRUCT_TYPE_LIST(X) \
     X(META_STRUCT_TYPE_Struct, "struct") \
     X(META_STRUCT_TYPE_Union,  "union") \
@@ -1004,6 +1026,14 @@ typedef struct type_info {
 
     type_info_struct_t *struct_info;
 }type_info_t;
+
+typedef struct type_info_data_mapping
+{
+    char               *name;
+    u32                 member_enum;
+
+    type_info_struct_t *type_info_ptr;
+}type_info_data_mapping_t;
 )");
     string_t builder_string = c_string_builder_get_current_string(type_enum_builder);
     fprintf(stdout, "%.*s\n", builder_string.count, C_STR(builder_string));
@@ -1014,6 +1044,7 @@ typedef struct type_info {
         c_dynarray_for(ast->structures, type_index)
         {
             meta_struct_t *structure = c_dynarray_get_ptr(ast->structures, type_index);
+            state.total_structures++;
 
             c_string_builder_sprintf(struct_info_builder, "struct type_info_struct_%.*s {\n", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
             c_string_builder_sprintf(struct_info_builder, "\tconst char *name;\n");
@@ -1028,6 +1059,8 @@ typedef struct type_info {
             c_string_builder_sprintf(struct_info_builder, "\t\tstruct {\n");
             c_dynarray_for(structure->members, member_index)
             {
+                state.total_structure_members++;
+
                 meta_member_t *member = c_dynarray_get_ptr(structure->members, member_index);
                 c_string_builder_sprintf(struct_info_builder, "\t\t\ttype_info_member_t %.*s;\n", 
                                         member->name.count, C_STR(member->name));
@@ -1045,6 +1078,8 @@ typedef struct type_info {
         c_dynarray_for(ast->enums, enum_index)
         {
             meta_struct_t *enum_data = c_dynarray_get_ptr(ast->enums, enum_index);
+            state.total_enums++;
+
             c_string_builder_sprintf(struct_info_builder, "struct type_info_enum_%.*s {\n", enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
             c_string_builder_sprintf(struct_info_builder, "\tconst char *name;\n");
             c_string_builder_sprintf(struct_info_builder, "\tu32 type;\n");
@@ -1058,6 +1093,8 @@ typedef struct type_info {
             c_string_builder_sprintf(struct_info_builder, "\t\tstruct {\n");
             c_dynarray_for(enum_data->members, member_index)
             {
+                state.total_enum_members++;
+
                 meta_member_t *member = c_dynarray_get_ptr(enum_data->members, member_index);
                 c_string_builder_sprintf(struct_info_builder, "\t\t\ttype_info_member_t %.*s;\n", 
                                         member->name.count, C_STR(member->name));
@@ -1169,6 +1206,7 @@ typedef struct type_info {
 
     if(ast->enum_count > 0)
     {
+        c_string_builder_sprintf(type_table_builder, "#define GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X) \\\n");
         c_dynarray_for(ast->enums, type_index)
         {
             meta_struct_t *enum_data = c_dynarray_get_ptr(ast->enums, type_index);
@@ -1181,10 +1219,23 @@ typedef struct type_info {
             c_string_builder_sprintf(struct_info_builder, "\t.kind = META_TYPE_KIND_Enum,\n");
             c_string_builder_sprintf(struct_info_builder, "\t.member_count = %d,\n", enum_data->member_count);
 
+
+            c_string_builder_sprintf(type_member_enum_builder, "enum %.*s_member_list_enum {\n", 
+                                     enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
+
             c_string_builder_sprintf(struct_info_builder, "\t.members = {\n");
             c_dynarray_for(enum_data->members, member_index)
             {
                 meta_member_t *member = c_dynarray_get_ptr(enum_data->members, member_index);
+                c_string_builder_sprintf(type_table_builder, "\tX(TYPE_ENUM_LOOKUP_%.*s_MEMBER_%.*s, \"%.*s\") \\\n", 
+                                         enum_data->type_data.type_name.count, C_STR(c_string_to_upper(enum_data->type_data.type_name)),
+                                         member->name.count,                   C_STR(member->name),
+                                         enum_data->type_data.type_name.count, C_STR(enum_data->type_data.type_name));
+
+                c_string_builder_sprintf(type_member_enum_builder, "\tTYPE_%.*s_MEMBER_%.*s,\n", 
+                                         enum_data->type_data.type_name.count, C_STR(c_string_to_upper(enum_data->type_data.type_name)),
+                                         member->name.count,                   C_STR(member->name));
+
                 c_string_builder_sprintf(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(%.*s), .offset = %.*s},\n",
                                         member->name.count,                    C_STR(member->name),                   // member name
                                         member->name.count,                    C_STR(member->name),                   // .name 
@@ -1193,11 +1244,21 @@ typedef struct type_info {
                                         member->name.count,                    C_STR(member->name)                    // .offset
                                         );
             }
+            c_string_builder_sprintf(type_member_enum_builder, "};\n\n");
             c_string_builder_sprintf(struct_info_builder, "\t}\n");
             c_string_builder_sprintf(struct_info_builder, "};\n");
-     
         }
+        c_string_builder_sprintf(type_table_builder, "\n");
     }
+
+
+    c_string_builder_sprintf(type_table_builder, R"( 
+enum type_info_enum_member_mapping_t {
+#define X(enum, string) enum,
+GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
+#undef X
+};)");
+    c_string_builder_sprintf(type_table_builder, "\n\n");
 
     c_string_builder_sprintf(type_table_builder, "\nconst static type_info_t GENERATED_type_table[] = {\n");
     c_dynarray_for(state.type_table, type_index)
@@ -1266,6 +1327,28 @@ typedef struct type_info {
         }
     }
     c_string_builder_sprintf(type_table_builder, "};\n");
+
+    // NOTE(Sleepster): We're going to do the same thing that we did for mapping type names / type enums -> structure data 
+    // for mapping enum members / enum member enum -> type_info 
+    c_string_builder_sprintf(type_table_builder, "\nconst static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_table[] = {\n");
+    c_dynarray_for(ast->enums, enum_index)
+    {
+        meta_struct_t *enum_info = ast->enums + enum_index;
+        string_t canonical_enum_name = get_canonical_type_name(&enum_info->type_data);
+
+        c_dynarray_for(enum_info->members, member_index)
+        {
+            meta_member_t *member = enum_info->members + member_index;
+
+            c_string_builder_sprintf(type_table_builder, "\t{.name = \"%.*s\", .member_enum = TYPE_%.*s_MEMBER_%.*s, .type_info_ptr = (type_info_struct*)&type_info_enum_%.*s_const_data},\n",
+                                     member->name.count,        C_STR(member->name),                           // .name
+                                     canonical_enum_name.count, C_STR(c_string_to_upper(canonical_enum_name)), // .member_enum, first half
+                                     member->name.count,        C_STR(member->name),                           // .member_enum, second half
+                                     canonical_enum_name.count, C_STR(canonical_enum_name));                   // .struct_const_data
+        }
+    }
+    c_string_builder_sprintf(type_table_builder, "};\n");
+
     c_string_builder_append_builder(struct_info_builder, type_member_enum_builder);
     c_string_builder_append_builder(struct_info_builder, type_table_builder);
     c_string_builder_sprintf(struct_info_builder, "\n");
@@ -1422,13 +1505,14 @@ exit:
     return(result);
 }
 
+// TODO(Sleepster): There's something weird going on here with how this enum works. Some are one over. Odd. Check it out some time. 
 const type_info_t*
 c_meta_get_type_info_by_name(string_t type)
 {
     const type_info_t *result = null;
 
     GENERATED_program_type_t type_enum = c_meta_get_type_enum_from_string(type);
-    result = &GENERATED_type_table[type_enum];
+    result = &GENERATED_type_table[Max(type_enum - 1, 0)];
 
     return(result);
 }
@@ -1493,6 +1577,65 @@ c_meta_get_struct_info(string_t structure_type_name)
     return(result);
 }
 
+const type_info_member_t*
+c_meta_get_member_info_from_member_enum(type_info_t *type_info, u32 member_enum)
+{
+    const type_info_member_t *result = null;
+    Assert(type_info != null);
+
+    result = type_info->struct_info->members + member_enum;
+
+    return(result);
+}
+
+type_info_enum_member_mapping_t
+c_meta_get_enum_member_mapping_enum_from_string(string_t type)
+{
+    type_info_enum_member_mapping_t result = (type_info_enum_member_mapping_t)0;
+#define X(enum, string)                                    \
+    if(memcmp(string, type.data, sizeof(string) - 1) == 0) \
+    {                                                      \
+        result = enum;                                     \
+        goto exit;                                         \
+    }
+
+    GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
+#undef X
+
+exit:
+    return(result);
+}
+
+string_t
+c_meta_get_enum_member_mapping_string_from_enum(type_info_enum_member_mapping_t type)
+{
+    string_t result = {};
+    switch(type)
+    {
+#define X(enum, string)                                                                 \
+        case enum:                                                                      \
+        {                                                                               \
+            result = c_string_make_copy(&global_context->temporary_arena, STR(string)); \
+            goto exit;                                                                  \
+        }break; 
+
+        GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
+#undef X
+    }
+exit:
+    return(result);
+}
+
+const type_info_t*
+c_meta_get_enum_type_info_from_member_string(string_t name)
+{
+    const type_info_t *result = null;
+    type_info_enum_member_mapping_t enum_mapping = c_meta_get_enum_member_mapping_enum_from_string(name);
+
+    result = (const type_info_t *)GENERATED_enum_member_name_to_type_info_table[enum_mapping].type_info_ptr;
+
+    return(result);
+}
 )");
     c_string_builder_sprintf(struct_info_builder, "#endif\n");
     
@@ -1715,11 +1858,14 @@ main(void)
     state.type_table = c_dynarray_create(registry_type_t);
     c_hash_table_init(&state.macro_hash, 1097);
 
-    c_string_builder_init(&state.type_enum_builder,          MB(20));
-    c_string_builder_init(&state.type_table_builder,         MB(20));
-    c_string_builder_init(&state.struct_info_builder,        MB(20));
-    c_string_builder_init(&state.struct_static_def_builder,  MB(20));
-    c_string_builder_init(&state.default_struct_def_builder, MB(20));
+    c_string_builder_init(&state.type_enum_builder,         MB(20));
+    c_string_builder_init(&state.type_table_builder,        MB(20));
+    c_string_builder_init(&state.struct_info_builder,       MB(20));
+    c_string_builder_init(&state.struct_static_def_builder, MB(20));
+    c_string_builder_init(&state.type_member_enum_builder,  MB(20));
+
+    c_string_builder_init(&state.member_name_to_enum_info_hash_builder,    MB(40));
+    c_string_builder_init(&state.member_name_to_struct_info_hash_builder,  MB(40));
 
     defer(c_string_builder_deinit(&state.type_enum_builder));
     defer(c_string_builder_deinit(&state.type_table_builder));

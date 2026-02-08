@@ -10,6 +10,7 @@
 #include <c_dynarray.h>
 
 #include <c_dynarray_impl.cpp>
+#include <p_platform_data.cpp>
 
 #define ITERATIONS (20)
 
