@@ -155,6 +155,16 @@
             "stopOnEntry": false,
             "terminal": "integrated"
         },
+        {
+            "name": "test_new_threadpool",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_new_threadpool",
+            "args": [],
+            "cwd": "${workspaceFolder}/code/",
+            "stopOnEntry": false,
+            "terminal": "integrated"
+        },
     ],
     "compounds": [
         {

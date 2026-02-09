@@ -21,11 +21,11 @@
       shader's descriptor, but that descriptor is only an array with 1
       element, we should warn the user and return.
 
-- [ ] Establish the concept of a material
+- [X] Establish the concept of a material
 - [ ] Shaders should store their texture uniform, camera uniforms, and other important information for easy access and updating
 - [ ] Shaders should "cache" special uniforms like "camera uniforms" "texture array uniforms"
 - [X] Default texture should always be in slot 0, make our texture array in the shader 0 indexed (we went with -1)
-- [ ] Materials. Materials should store what shader / blending states are needed for a given set of objects.
+- [X] Materials. Materials should store what shader / blending states are needed for a given set of objects.
       (shader, blend modes, depth state, textures, camera data, etc.)
 ** Metaprogram
 - [X] Type database for more efficient storage of types accross the program
@@ -37,7 +37,9 @@
 - [X] Ignore #if 0 blocks completely
 - [X] A better way of parsing modifiers like "volatile", "const", "static", etc.
 - [X] Support Enums as well.
-- [ ] The ability to get the parent structure from the name of a member. (this might be impossible.)
+
+  (This is done for enums)
+- [/] The ability to get the parent structure from the name of a member. (this might be impossible.)
       This might be impossible simply do to the fact that we can have the same member in many different structs.
       We can have token.data, bitmap.data, texture.data, etc. So how can we know which type_info_struct_t we want???
 ** Material file parser

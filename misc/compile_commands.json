@@ -1,6 +1,6 @@
 [
   {
-    "file": "s_asset_manager.cpp",
+    "file": "tests/new_threadpool.cpp",
     "arguments": [
       "clang++",
       "-g",
@@ -37,17 +37,16 @@
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
       "-MT",
-      "../build/s_asset_manager.o",
+      "../build/test_new_threadpool",
       "-MMD",
       "-MP",
       "-MF",
-      "../build/s_asset_manager.d",
-      "-c",
-      "s_asset_manager.cpp",
+      "../build/new_threadpool.d",
+      "tests/new_threadpool.cpp",
       "-o",
-      "../build/s_asset_manager.o"
+      "../build/test_new_threadpool"
     ],
-    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/s_asset_manager.o"
+    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
+    "output": "../build/test_new_threadpool"
   }
 ]
