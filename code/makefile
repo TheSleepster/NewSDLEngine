@@ -169,7 +169,7 @@ tests: run_preprocessor do_codegen $(TESTS_OUT)
 # Note: We use $* to get the stem (filename without extension) for the .d file
 $(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR) run_preprocessor
 	@echo [TEST] $@
-	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) -O3 $(OS_DEFINE) $(GAME_INCLUDES) \
 		$(DEPFLAGS) \
 		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
 

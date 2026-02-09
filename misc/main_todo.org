@@ -150,8 +150,10 @@
 - [ ] PNG Decoder
 ** Fonts
 - [ ] Create a temporary glyph storage method, that way we can store what glyphs need to be added over the frame and add them at all at once at the end of the frame
+- [ ] Really font rendering in general
 ** Sounds
-- [ ] vorbis OGG decoder
+- [ ] The ability to play sound period
+- [ ] Vorbis OGG decoder
 ** Shaders
 - [X] Make the Vulkan renderer actually use the shader data...
 ** Asset File
@@ -183,8 +185,10 @@
       happens to this memory LMAO" function that just uses the core lib's
       internal allocator.
 * Multithreading
-- [ ] Modify the threadpool to act as a governor and dispatcher, 
 - [ ] Maybe just rebuild the whole system... it seems that this model isn't actually any good anymore
+- [ ] A manner with which to run work in batches and get the results of that completed work back from the threadpool
+- [ ] Work stealing
+- [ ] Improvement to adding work_orders to the queue of each thread, currently the locking makes us slow
 * Platform
 - [ ] Sys mutex lock and unlock on windows should change the boolean for if it is locked, this is already done on Linux
 - [X] Function to get current working directory Windows (https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentdirectory)
