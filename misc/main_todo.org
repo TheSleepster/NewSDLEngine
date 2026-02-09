@@ -2,6 +2,13 @@
 * IMMEDIATE TODO
 - [X] Fix the memory leak inside of the asset file packer
 - [ ] Fix the c_string_read_* functions.
+- [ ] Fix the thread/synchronization API. It is bad. Why do we do it that way.
+- [ ] We need a proper timing API. Something that can just be attached to a program as a header or lib 
+      and timing record information about the process and certain subblocks. 
+- [ ] Sync API should have sys_mutex_lock() which will block. As well as sys_mutex_try_lock()
+      which won't block. The seperation is valuable.
+- [ ] We should add other debug values to the mutexes, semaphores, and threads.
+      Items like DEBUG_name, thread_id, redudant lock counter, etc. would be very helpful.
 * Next Milestone:
 ** Materials
 - [ ] A program to take whatever the material file looks like and transform it into a binary blob.

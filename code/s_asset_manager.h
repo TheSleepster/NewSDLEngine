@@ -193,6 +193,7 @@ typedef struct material_instance
     u32                           version;
     string_t                      name;
 
+    // TODO(Sleepster): Does this even serve a purpose??? 
     asset_handle_t                textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
     render_pipeline_state_t       pipeline_state;
     u32                           renderer_effect_flags;

@@ -223,7 +223,7 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
                     if(c_string_compare(token.string, STR("render_pipeline_state")))
                     {
                         const type_info_member_t *render_pipeline_info = c_meta_get_member_info(parent_type_data, STR("pipeline_state"));
-                        render_pipeline_state *state_data = (render_pipeline_state_t*)((byte*)parent_data + render_pipeline_info->offset);
+                        render_pipeline_state_t *state_data = (render_pipeline_state_t*)((byte*)parent_data + render_pipeline_info->offset);
 
                         const type_info_t *type_data = c_meta_get_type_info_by_name(STR("render_pipeline_state_t"));
                         material_file_parse_block_data(filename, state_data, tokenizer, type_data, token);

@@ -1328,6 +1328,7 @@ r_vulkan_shader_get_uniform(asset_handle_t *shader_handle, string_t uniform_name
     return(result);
 }
 
+// TODO(Sleepster): We need a better way to access these beyond that of string compare. This is slow.
 void
 r_vulkan_shader_set_uniform_data(asset_handle_t *shader_handle, string_t uniform_name, void *data, u64 data_size)
 {
@@ -3016,6 +3017,14 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
     // TODO(Sleepster): Add the ability to set the pipeline, the state should cache the VkPipeline
     // currently in use for the frame and check their handles for equality, only updating in the event that
     // they are unequal handles.
+
+    // TODO(Sleepster): We also need too revise this. We should just create a single buffer for ALL geometry. The render_groups
+    // have no reason to be split up like this when we can just simply store the offset into a master buffer per render_group.
+    // The geometry_buffers can stay as they are- intermediate storage objects for differentiatial render state blocks. However,
+    // instead of adding them to a render_group buffer, perhaps just add them to the master buffer.
+    //
+    // Even if threading is the concern here, we almost certainly can just first preserve a section of the buffer for our entire
+    // render_group, then copy into it. So there is really no reason we cannot do the above. This also allows for indirect rendering.
     for(u32 render_group_index = 0;
         render_group_index < draw_frame->used_render_group_count;
         ++render_group_index)
