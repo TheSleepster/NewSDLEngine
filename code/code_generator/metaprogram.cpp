@@ -1288,6 +1288,7 @@ GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
         }
         else
         {
+            // NOTE(Sleepster): GUYS I FORGOT VOID NEEDS TO BE IN HERE TOO OOPS 
             if(!is_void)
             {
                 if(type->times_seen_as_non_pointer == 0)
@@ -1305,6 +1306,13 @@ GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
                                              type->canonical_name.count, C_STR(type->canonical_name));
                 }
             }
+            else
+            {
+                c_string_builder_sprintf(type_table_builder, "\t{.name = \"%.*s\", .type = TYPE_%.*s, .size = sizeof(%.*s*), ",
+                                         type->canonical_name.count, C_STR(type->canonical_name),
+                                         type->canonical_name.count, C_STR(type->canonical_name),
+                                         type->canonical_name.count, C_STR(type->canonical_name));
+            }
         }
 
         if((type->type_kind == META_TYPE_KIND_Struct || type->type_kind == META_TYPE_KIND_Enum) && 
@@ -1315,10 +1323,7 @@ GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
         }
         else
         {
-            if(!is_void)
-            {
-                c_string_builder_sprintf(type_table_builder, ".struct_info = NULL},\n");
-            }
+            c_string_builder_sprintf(type_table_builder, ".struct_info = NULL},\n");
         }
     }
     c_string_builder_sprintf(type_table_builder, "};\n");
@@ -1507,7 +1512,7 @@ c_meta_get_type_info_by_name(string_t type)
     const type_info_t *result = null;
 
     GENERATED_program_type_t type_enum = c_meta_get_type_enum_from_string(type);
-    result = &GENERATED_type_table[Max(type_enum - 1, 0)];
+    result = &GENERATED_type_table[Max(type_enum, 0)];
 
     return(result);
 }

@@ -9,11 +9,11 @@
 #pragma pack(push, 1)
 
 enum GENERATED_program_types_t {
+	TYPE_MAX_RENDER_GROUPS_t,
 	TYPE_renderer_effect_application_flags_t,
 	TYPE_render_pipeline_blending_mode_t,
 	TYPE_render_pipeline_blending_equation_t,
 	TYPE_render_pipeline_depth_function_t,
-	TYPE_MAX_RENDER_GROUPS_t,
 	TYPE_render_pipeline_state_t,
 	TYPE_bool32,
 	TYPE_u32,
@@ -227,7 +227,7 @@ const static type_info_render_pipeline_state_t type_info_render_pipeline_state_t
 		.color_blend_op = {.name = "color_blend_op", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, color_blend_op), .size = sizeof(u32)},
 		.alpha_blend_op = {.name = "alpha_blend_op", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, alpha_blend_op), .size = sizeof(u32)},
 		.depth_testing_enabled = {.name = "depth_testing_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, depth_testing_enabled), .size = sizeof(bool32)},
-		.depth_writing_enabled = {.name = "depth_writing_enabled", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, depth_writing_enabled), .size = sizeof(u32)},
+		.depth_writing_enabled = {.name = "depth_writing_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, depth_writing_enabled), .size = sizeof(bool32)},
 		.depth_func = {.name = "depth_func", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, depth_func), .size = sizeof(u32)},
 		.stencil_enabled = {.name = "stencil_enabled", .type = TYPE_bool32, .offset = offsetof(render_pipeline_state_t, stencil_enabled), .size = sizeof(bool32)},
 		.stencil_state = {.name = "stencil_state", .type = TYPE_u32, .offset = offsetof(render_pipeline_state_t, stencil_state), .size = sizeof(u32)},

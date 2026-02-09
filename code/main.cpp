@@ -99,7 +99,7 @@ main(int argc, char **argv)
         *render_context->default_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_shader"));
 
         render_context->default_material  = Alloc(asset_handle_t);
-        *render_context->default_material = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_material_data"));
+        *render_context->default_material = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_material_archetype"));
 
         r_vulkan_make_gpu_texture(render_context, &render_context->default_texture->slot->texture);
         r_render_state_init(render_state, render_context);
@@ -205,16 +205,22 @@ main(int argc, char **argv)
                     .projection_matrix = projection_matrix
                 };
 
-                r_vulkan_shader_set_uniform_data(render_context->default_shader, STR("Matrices"), &shader->camera_matrices, sizeof(shader->camera_matrices));
+                //r_vulkan_shader_set_uniform_data(render_state->draw_frame.state.active_shader, STR("Matrices"), &shader->camera_matrices, sizeof(shader->camera_matrices));
+                r_set_active_render_material(render_state, &render_state->default_material);
+                r_set_active_material_constant(render_state, STR("Matrices"), &shader->camera_matrices, sizeof(shader->camera_matrices));
 
                 r_render_group_begin(render_state);
                 r_push_texture(render_state, {0, 0}, {100, 100}, {0.0, 1.0, 0.0, 1.0}, 0, render_context->default_texture);
-                r_push_rect(render_state, {0, 150}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0);
                 r_push_texture(render_state, {-100, 100}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0, render_context->default_texture);
+                r_render_group_end(render_state);
+
+                r_render_group_begin(render_state);
+                r_push_rect(render_state, {0, 150}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0);
                 r_render_group_end(render_state);
 
                 r_render_group_update_used_groups(render_state);
                 r_vulkan_end_frame(render_context, render_state, gcv_tick_rate);
+
             }
 #if 0
             float32 alpha = (dt_accumulator / gcv_tick_rate);

@@ -87,9 +87,9 @@ typedef struct asset_handle
     asset_slot_t      *slot;
 
     union {
-        texture2D_t *texture;
-        shader_t    *shader;
-        //material_t  *material;
+        texture2D_t         *texture;
+        shader_t            *shader;
+        material_instance_t *material;
     };
 }asset_handle_t;
 
@@ -141,8 +141,10 @@ typedef struct texture_atlas
     u32                           merge_counter;
     DynArray_t(asset_handle_t*)   textures_to_merge;
 
-    // TODO(Sleepster): Technically we need "add" to this array, just pull from it. What do we do about this? 
+    // TODO(Sleepster): Technically we need not "add" to this array, just pull from it. What do we do about this? 
     //                  Guess it's not a problem for now.
+    //
+    //                  If we run out of indices in here, just expand the size of the array?
     DynArray_t(subtexture_data_t) packed_subtextures;
     u32                           packed_subtexture_count;
     bool32                        is_valid;
@@ -206,6 +208,9 @@ typedef struct material_instance
 GENERATE_TYPE_INFO
 typedef struct material_archetype
 {
+    // TODO(Sleepster): Is dirty flag. If the contents of the material archetype change, we should
+    // tell the asset system we require this to be reloaded. All instances based off of this archetype
+    // will be fine since they store a pointer to the archetype.
     u64                 ID;
     u32                 version;
 
@@ -215,6 +220,22 @@ typedef struct material_archetype
 
     material_instance_t base_instance;
 }material_archetype_t;
+
+typedef enum stored_material_type
+{
+    SMT_Invalid,
+    SMT_Instance,
+    SMT_Archetype,
+}stored_material_type_t;
+
+typedef struct material_data
+{
+    stored_material_type_t material_type;
+    struct {
+        material_archetype_t archetype;
+        material_instance_t  instance;
+    };
+}material_data_t;
 
 /*===========================================
   ============= ASSET FILE DATA =============
@@ -234,9 +255,9 @@ typedef struct asset_slot
     volatile u32             package_generation;
     volatile u32             ref_counter;
     union {
-        texture2D_t           texture;
-        shader_t              shader;
-        material_archetype_t  material;
+        texture2D_t     texture;
+        shader_t        shader;
+        material_data_t material;
     };
 }asset_slot_t;
 
@@ -285,7 +306,7 @@ typedef struct asset_manager
     bool8                           is_initialized;
     memory_arena_t                  manager_arena;
 
-    // TODO(Sleepster): Hash table for hashing asset filenames with thier associated asset file
+    // NOTE(Sleepster): Hash table for hashing asset filenames with thier associated asset file
     // Ex: "player.png" -> "/run_tree/res/main_asset_file.wad"
     // or even beter "player.png" -> index 0 of the asset_file array
     asset_manager_asset_file_data_t asset_files[ASSET_MANAGER_MAX_ASSET_FILES];
@@ -312,7 +333,6 @@ typedef struct asset_manager
 void  s_asset_manager_init(asset_manager_t *asset_manager);
 bool8 s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath);
 asset_handle_t s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name);
-
 
 texture_atlas_t* s_texture_atlas_create(asset_manager_t *asset_manager, u32 size, u32 channel_count, u32 format, u32 initial_subtexture_count);
 void s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle);

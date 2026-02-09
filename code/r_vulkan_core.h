@@ -1,6 +1,6 @@
 #if !defined(R_VULKAN_H)
 /* ========================================================================
-   $File: r_vulkan.h $
+   $File: r_vulkan_core.h $
    $Date: December 14 2025 05:16 pm $
    $Revision: $
    $Creator: Justin Lewis $
@@ -35,6 +35,7 @@ struct render_state_t;
 void  r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_state, vec2_t window_size);
 void  r_vulkan_physical_device_get_swapchain_support_info(vulkan_render_context_t *context, VkPhysicalDevice device, vulkan_physical_device_swapchain_support_info_t *swapchain_info);
 bool8 r_vulkan_physical_device_detect_depth_format(vulkan_physical_device_t *device);
+void  r_vulkan_shader_set_uniform_data(asset_handle_t *shader_handle, string_t uniform_name, void *data, u64 data_size);
 
 s32   r_vulkan_find_memory_index(vulkan_render_context_t *render_context, u32 type_filter, u32 property_flags);
 bool8 r_vulkan_rebuild_swapchain(vulkan_render_context_t *render_context);

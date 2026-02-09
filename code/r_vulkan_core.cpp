@@ -3023,7 +3023,7 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
         render_group_t *current_group = draw_frame->used_render_groups[render_group_index];
         Assert(current_group);
 
-        vulkan_shader_data_t *shader  = &current_group->shader->slot->shader.shader_data;
+        vulkan_shader_data_t *shader  = &current_group->material->material->archetype->shader.slot->shader.shader_data;
         r_vulkan_shader_bind(render_context, shader);
         r_vulkan_shader_set_uniform_data(render_context->default_shader, STR("RenderInstances"), current_group->master_batch_array, sizeof(render_geometry_instance_t) * current_group->total_primitive_count);
         

@@ -246,12 +246,17 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
     }
 }
 
-material_archetype_t
-s_asset_material_archetype_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
+// TODO(Sleepster): 
+// For now, we're only worrying about archetypes for the sake of simplicity. Later on we WILL need instances, 
+// but for the moment we can live without them
+material_data_t
+s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
-    material_archetype_t result = {};
+    material_data_t result = {};
+    material_archetype_t archetype = {};
+
     slot->ID  = name_hash;
-    result.ID = name_hash;
+    archetype.ID = name_hash;
     slot->package_entry->asset_data = c_file_read_from_offset(&slot->owner_asset_file, 
                                                               slot->package_entry->asset_data.count,
                                                               slot->package_entry->data_offset, 
@@ -289,12 +294,12 @@ s_asset_material_archetype_create(asset_manager_t *asset_manager, asset_slot_t *
                     if(c_string_compare(token.string, STR("material_archetype"))) 
                     {
                         struct_info = c_meta_get_type_info_by_name(STR("material_archetype_t"));
-                        material_file_parse_block_data(slot->owner_asset_file.file_name, &result, &tokenizer, struct_info, token);
+                        material_file_parse_block_data(slot->owner_asset_file.file_name, &archetype, &tokenizer, struct_info, token);
                     }
                     else if(c_string_compare(token.string, STR("base_instance")))
                     {
                         struct_info = c_meta_get_type_info_by_name(STR("material_instance_t"));
-                        material_file_parse_block_data(slot->owner_asset_file.file_name, &result.base_instance, &tokenizer, struct_info, token);
+                        material_file_parse_block_data(slot->owner_asset_file.file_name, &archetype.base_instance, &tokenizer, struct_info, token);
                     }
                     else 
                     {
@@ -312,12 +317,19 @@ s_asset_material_archetype_create(asset_manager_t *asset_manager, asset_slot_t *
             }break;
         }
     }
-    // TODO(Sleepster): Is this really okay???
-    result.ID = c_fnv_hash_value(result.name.data, result.name.count);
-    result.shader = s_asset_manager_acquire_asset_handle(asset_manager, result.shader_binary_name);
+    // TODO(Sleepster): Is loading the shader here really okay? Is it a good idea? Only time will tell.
+    //
+    // Right now my assumption is that if you want to make use of this material, you should just load the shader now
+    // rather than wait for way later to load it when we're rendering. Seems bad to delay it that long... But who knows
+    // Maybe this is bad and that's a better idea.
+    archetype.ID     = c_fnv_hash_value(archetype.name.data, archetype.name.count);
+    archetype.shader = s_asset_manager_acquire_asset_handle(asset_manager, archetype.shader_binary_name);
 
-    result.base_instance.uniform_data         = result.shader.shader->shader_data.uniforms;
-    result.base_instance.shader_uniform_count = result.shader.shader->shader_data.uniform_count;
+    archetype.base_instance.uniform_data         = archetype.shader.slot->shader.shader_data.uniforms;
+    archetype.base_instance.shader_uniform_count = archetype.shader.slot->shader.shader_data.uniform_count;
+
+    result.material_type      = SMT_Archetype;
+    result.archetype          = archetype;
 
     return(result);
 }
@@ -326,6 +338,13 @@ s_asset_material_archetype_create(asset_manager_t *asset_manager, asset_slot_t *
   ========= ASSET DATA ==========
   =============================== */
 
+// TODO(Sleepster): 
+// Dude, this asset slot + handle setup is ABSOLUTE GARBAGE. Just look at something like
+//
+//
+// vulkan_shader_data_t *shader  = &current_group->material->material->archetype->shader.slot->shader.shader_data;
+//
+// Like what the fuck???
 void
 s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *handle, u64 name_hash)
 {
@@ -344,24 +363,33 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
         {
             slot->texture = s_asset_texture_create(asset_manager, slot, name_hash);
             log_info("Loading texture data for bitmap: '%s'...\n", C_STR(handle->slot->name));
+
+            handle->texture = &slot->texture;
         }break;
         case AT_Shader:
         {
             slot->shader = s_asset_shader_create(asset_manager, slot, name_hash);
             log_info("Loading shader data for: '%s'...\n", C_STR(handle->slot->name));
+
+            handle->shader = &slot->shader;
         }break;
         case AT_Material:
         {
-            slot->material = s_asset_material_archetype_create(asset_manager, slot, name_hash);
+            slot->material = s_asset_material_create(asset_manager, slot, name_hash);
             log_info("Loading material data for: '%s'...\n", C_STR(handle->slot->name));
+
+            handle->material = &slot->material.instance;
+            handle->material->archetype = &slot->material.archetype;
         }break;
         case AT_Font:
         {
             log_warning("Not loading font... not currently supported...\n");
+            //handle->found = &slot->font;
         }break;
         case AT_Sound:
         {
             log_warning("Not loading sound... not currently supported...\n");
+            //handle->sound = &slot->sound;
         }break;
     }
     slot->slot_state = ASLS_Loaded;
@@ -537,7 +565,7 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
     asset_handle_t result;
 
     u64 hash_value = c_hash_table_value_from_key(name.data, name.count, asset_manager->asset_name_to_file.header.max_entries);
-    log_info("hash index for: '%s' is '%llu'...\n", C_STR(name), hash_value);
+    log_info("hash index for: '%.*s' is '%llu'...\n", name.count, C_STR(name), hash_value);
     s32 file_index = c_hash_table_get_value(&asset_manager->asset_name_to_file, name);
     if(file_index != -1)
     {
@@ -567,8 +595,8 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
     }
     else
     {
-        log_error("Asset by name of: '%s' cannot be found in the asset file database...\n",
-                  C_STR(name));
+        log_error("Asset by name of: '%.*s' cannot be found in the asset file database...\n",
+                  name.count, C_STR(name));
     }
 
     return(result);

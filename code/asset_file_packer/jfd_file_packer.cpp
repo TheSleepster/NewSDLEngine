@@ -4,7 +4,6 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-#include <stdio.h>
 #include <stdlib.h>
 
 #define HASH_TABLE_IMPLEMENTATION
@@ -45,6 +44,9 @@ constexpr const char *commands[] = {
     "--output_dir"
 };
 #endif
+
+// TODO(Sleepster): 
+// The file packer should take non-binary file formats and "compile" them into binary formats
 
 typedef struct asset_entry_info 
 {
@@ -111,7 +113,8 @@ VISIT_FILES(gather_all_asset_file_entries)
     else if(c_string_compare(file_ext, STR(".wav"))) type = AT_Sound;
     else if(c_string_compare(file_ext, STR(".png"))) type = AT_Bitmap;
     else if(c_string_compare(file_ext, STR(".spv"))) type = AT_Shader;
-    else if(c_string_compare(file_ext, STR(".mat"))) type = AT_Material;
+    else if(c_string_compare(file_ext, STR(".m_arch"))) type = AT_Material;
+    else if(c_string_compare(file_ext, STR(".m_inst"))) type = AT_Material;
     if(type != AT_Invalid)
     {
         log_info("Adding asset entry: '%s'...\n", C_STR(filename));
@@ -228,8 +231,6 @@ main(int arg_count, char **args)
     }
 
     log_info("Finished packing!...\n");
-    getchar();
     return(0);
 }
-
 

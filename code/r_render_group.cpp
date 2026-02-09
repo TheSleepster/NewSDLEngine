@@ -12,6 +12,7 @@
 #include <s_asset_manager.h>
 
 #include <r_vulkan_types.h>
+#include <r_vulkan_core.h>
 #include <r_render_group.h>
 
 //vulkan_shader_data_t    *shader         = &render_context->default_shader->slot->shader.shader_data;
@@ -116,6 +117,12 @@ r_render_state_init(render_state_t *render_state, vulkan_render_context_t *rende
 
     render_state->draw_frame.state.active_shader =  render_context->default_shader;
     render_state->draw_frame.state.active_camera = &render_context->test_camera;
+
+    render_state->default_shader         = *render_context->default_shader; 
+    render_state->default_camera         =  render_context->test_camera;
+    render_state->default_material       = *render_context->default_material;
+    render_state->default_pipeline_state = {};
+    render_state->default_render_layer   = 15;
 }
 
 render_camera_t
@@ -197,7 +204,7 @@ r_render_group_get_current_buffer(render_state_t *render_state)
     return(result);
 }
 
-// TODO(Sleepster): r_render_batch_*
+// TODO(Sleepster): r_render_batch_*??
 render_group_t*
 r_render_group_begin(render_state_t *render_state)
 {
@@ -211,8 +218,7 @@ r_render_group_begin(render_state_t *render_state)
 
     draw_frame_t *draw_frame = &render_state->draw_frame;
     result->ID                     = render_group_ID;
-    result->dynamic_pipeline_state = draw_frame->state.active_pipeline_state;
-    result->shader                 = draw_frame->state.active_shader;
+    result->material               = draw_frame->state.active_material;
 
     bool8 found = false;
     for(u32 group_index = 0;
@@ -241,8 +247,8 @@ r_render_group_begin(render_state_t *render_state)
     return(result);
 }
 
-// TODO(Sleepster): r_render_batch_*
-void
+// TODO(Sleepster): r_render_batch_*??
+true_inline void
 r_render_group_end(render_state_t *render_state)
 {
     render_state->draw_frame.state.active_render_group = null;
@@ -276,11 +282,39 @@ r_render_group_update_used_groups(render_state_t *render_state)
     }
 }
 
+true_inline void
+r_render_group_reset_draw_frame(render_state_t *render_state, asset_manager_t *asset_manager)
+{
+    draw_frame_t *frame = &render_state->draw_frame; 
+    frame->state.active_pipeline_state =  render_state->default_pipeline_state;
+    frame->state.active_render_layer   =  render_state->default_render_layer;
+    frame->state.active_camera         = &render_state->default_camera;
+    frame->state.active_material       = &render_state->default_material;
+    frame->state.active_shader         = &render_state->default_shader;
+    frame->state.active_render_group   = null;
+}
+
 /*===========================================
   =============== DRAWING API ===============
   ===========================================*/
 
-void
+true_inline void 
+r_set_active_render_material(render_state_t *render_state, asset_handle_t *handle)
+{
+    Assert(handle->material);
+    Assert(handle->is_valid == true);
+    Assert(handle->type     == AT_Material);
+
+    render_state->draw_frame.state.active_material = handle;
+}
+
+true_inline void
+r_set_active_material_constant(render_state_t *render_state, string_t name, void *value, u64 value_size)
+{
+    r_vulkan_shader_set_uniform_data(render_state->draw_frame.state.active_shader, name, value, value_size);
+}
+
+true_inline void
 r_set_active_render_layer(render_state_t *render_state, u32 render_layer)
 {
     Assert(render_layer >  0);
@@ -375,7 +409,7 @@ r_push_texture_ex(render_state_t    *render_state,
     instance->camera_index  = 0;
 }
 
-void
+true_inline void
 r_push_texture(render_state_t *render_state, 
                vec2_t          position, 
                vec2_t          size, 
@@ -391,7 +425,7 @@ r_push_texture(render_state_t *render_state,
     r_push_texture_ex(render_state, position, size, color, rotation, subtexture_data);
 }
 
-void
+true_inline void
 r_push_rect(render_state_t *render_state, 
             vec2_t          position, 
             vec2_t          size, 

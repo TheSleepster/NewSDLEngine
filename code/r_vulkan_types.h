@@ -98,29 +98,96 @@ typedef struct vulkan_pipeline_data
     VkPipelineLayout    layout;
 }vulkan_pipeline_data_t;
 
+GENERATE_TYPE_INFO
+typedef enum renderer_effect_application_flags
+{
+    REAF_None,
+    REAF_Bloom,
+    REAF_Emmision,
+    REAF_Vignette,
+    REAF_FilmGrain,
+    REAF_Count,
+}renderer_effect_application_flags_t;
+
+GENERATE_TYPE_INFO
+typedef enum render_pipeline_blending_mode
+{
+    RBM_Invalid,
+    RBM_Zero,
+    RBM_One,
+    RBM_Constant,
+
+    RBM_SrcColor,
+    RBM_OneMinusSrcColor,
+    RBM_DstColor,
+    RBM_OneMinusDstColor,
+
+    RBM_SrcAlpha,
+    RBM_OneMinusSrcAlpha,
+    RBM_DstAlpha,
+    RBM_OneMinusDstAlpha,
+    RBM_Count
+}render_pipeline_blending_mode_t;
+
+GENERATE_TYPE_INFO
+typedef enum render_pipeline_blending_equation
+{
+    RBE_Invalid,
+    RBE_Add,
+    RBE_Subtract,
+    RBE_ReverseSubtract,
+    RBE_Min,
+    RBE_Max,
+}render_pipeline_blending_equation_t;
+
+GENERATE_TYPE_INFO
+typedef enum render_pipeline_depth_function
+{
+    RDF_Invalid,
+    RDF_Never,
+    RDF_Always,
+
+    RDF_Greater,
+    RDF_Less,
+    RDF_Equal,
+    RDF_NotEqual,
+    RDF_LessOrEqual,
+    RDF_GreaterOrEqual,
+    RDF_Count
+}render_pipeline_depth_function_t;
+
+// TODO(Sleepster): This seems unnecessary for now
+#if 0
+typedef enum render_pipeline_stencil_function
+{
+}render_pipeline_stencil_function_t;
+#endif
+
+
 // NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. 
 //                  Per material
 GENERATE_TYPE_INFO
 typedef struct render_pipeline_state
 {
-    bool32 blend_enabled;
-    u32    src_color_blend_mode;
-    u32    dst_color_blend_mode;
+    bool32 blend_enabled         = true;
+    u32    src_color_blend_mode  = RBM_SrcAlpha;
+    u32    dst_color_blend_mode  = RBM_OneMinusSrcAlpha;
 
-    u32    src_alpha_blend_mode;
-    u32    dst_alpha_blend_mode;
+    u32    src_alpha_blend_mode  = RBM_SrcAlpha;
+    u32    dst_alpha_blend_mode  = RBM_OneMinusSrcAlpha;
 
-    u32    color_blend_op;
-    u32    alpha_blend_op;
+    u32    color_blend_op        = RBE_Add;
+    u32    alpha_blend_op        = RBE_Add;
 
-    bool32 depth_testing_enabled;
-    u32    depth_writing_enabled;
-    u32    depth_func;
+    bool32 depth_testing_enabled = true;
+    bool32 depth_writing_enabled = true;
+    u32    depth_func            = RDF_Less;
 
-    bool32 stencil_enabled;
-    u32    stencil_state;
-    u32    stencil_keep;
+    bool32 stencil_enabled       = false;
+    u32    stencil_state         = 0;
+    u32    stencil_keep          = 0;
 }render_pipeline_state_t;
+
 
 //////////////////////////////////
 // VULKAN SHADER STUFF 
