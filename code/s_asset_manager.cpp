@@ -322,11 +322,11 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
     // Right now my assumption is that if you want to make use of this material, you should just load the shader now
     // rather than wait for way later to load it when we're rendering. Seems bad to delay it that long... But who knows
     // Maybe this is bad and that's a better idea.
-    archetype.ID     = c_fnv_hash_value(archetype.name.data, archetype.name.count);
-    archetype.shader = s_asset_manager_acquire_asset_handle(asset_manager, archetype.shader_binary_name);
+    archetype.ID            = c_fnv_hash_value(archetype.name.data, archetype.name.count);
+    archetype.shader_handle = s_asset_manager_acquire_asset_handle(asset_manager, archetype.shader_binary_name);
 
-    archetype.base_instance.uniform_data         = archetype.shader.slot->shader.shader_data.uniforms;
-    archetype.base_instance.shader_uniform_count = archetype.shader.slot->shader.shader_data.uniform_count;
+    archetype.base_instance.uniform_data         = archetype.shader_handle.shader->shader_data.uniforms;
+    archetype.base_instance.shader_uniform_count = archetype.shader_handle.shader->shader_data.uniform_count;
 
     result.material_type      = SMT_Archetype;
     result.archetype          = archetype;
@@ -361,25 +361,20 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
     {
         case AT_Bitmap:
         {
-            slot->texture = s_asset_texture_create(asset_manager, slot, name_hash);
+            slot->texture   = s_asset_texture_create(asset_manager, slot, name_hash);
             log_info("Loading texture data for bitmap: '%s'...\n", C_STR(handle->slot->name));
-
-            handle->texture = &slot->texture;
         }break;
         case AT_Shader:
         {
-            slot->shader = s_asset_shader_create(asset_manager, slot, name_hash);
+            slot->shader   = s_asset_shader_create(asset_manager, slot, name_hash);
             log_info("Loading shader data for: '%s'...\n", C_STR(handle->slot->name));
-
-            handle->shader = &slot->shader;
         }break;
         case AT_Material:
         {
-            slot->material = s_asset_material_create(asset_manager, slot, name_hash);
-            log_info("Loading material data for: '%s'...\n", C_STR(handle->slot->name));
+            slot->material.material_type = SMT_Archetype; 
 
-            handle->material = &slot->material.instance;
-            handle->material->archetype = &slot->material.archetype;
+            slot->material   = s_asset_material_create(asset_manager, slot, name_hash);
+            log_info("Loading material data for: '%s'...\n", C_STR(handle->slot->name));
         }break;
         case AT_Font:
         {
@@ -392,6 +387,8 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
             //handle->sound = &slot->sound;
         }break;
     }
+    s_asset_manager_set_handle_asset_data_pointer(handle, slot);
+
     slot->slot_state = ASLS_Loaded;
     AtomicIncrement32(&slot->package_generation);
 }
@@ -559,6 +556,19 @@ s_asset_manager_get_asset_slot(asset_catalog_t *catalog, string_t name)
     return(result);
 }
 
+true_inline void
+s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot_t *slot)
+{
+    switch(slot->type)
+    {
+        case AT_Bitmap:   {handle->texture       = &slot->texture; }break;
+        case AT_Shader:   {handle->shader        = &slot->shader;  }break;
+        case AT_Material: {handle->material_info = &slot->material;}break;
+        //case AT_Font:     {}break;
+        //case AT_Sound:    {}break;
+    }
+}
+
 asset_handle_t
 s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name)
 {
@@ -582,13 +592,21 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
         asset_catalog_t *catalog = asset_manager->asset_catalogs + entry->entry_header->asset_type;
         Assert(catalog);
 
+        asset_slot_t *slot = s_asset_manager_get_asset_slot(catalog, name);
+
         result.type = (asset_type_t)entry->entry_header->asset_type;
-        result.slot = s_asset_manager_get_asset_slot(catalog, name);
+        result.slot = slot;
         result.owner_asset_file_index         = file_index;
         result.is_valid                       = true;
         if(result.slot->slot_state == ASLS_Unloaded)
         {
+            // NOTE(Sleepster): If unloaded, get the data 
             s_asset_manager_load_asset_data(asset_manager, &result, hash_value);
+        }
+        else if(result.slot->slot_state == ASLS_Loaded)
+        {
+            // NOTE(Sleepster): If loaded, just set the handle pointers 
+            s_asset_manager_set_handle_asset_data_pointer(&result, slot);
         }
 
         Assert(result.slot->slot_state != ASLS_Invalid);

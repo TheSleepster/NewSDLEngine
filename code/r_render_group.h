@@ -42,6 +42,8 @@ struct render_geometry_batch_t
     u32                         primitive_count;
     u32                         master_array_start_offset;
 
+    asset_handle_t             *material_instance;
+
     // NOTE(Sleepster):       size: 2500 
     render_geometry_instance_t *instances;
     render_geometry_batch_t    *next_buffer;
@@ -54,8 +56,9 @@ struct render_group_t
 {
     // TODO(Sleepster): Custom Viewport? Custom Scissor?
     u64                            ID;
-    asset_handle_t                *material;
+    asset_handle_t                *material_archetype;
 
+    // TODO(Sleepster):            these can now go. With materials, these are redundant
     texture2D_t                   *textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
     u32                            current_texture_count;
 
@@ -67,6 +70,9 @@ struct render_group_t
     render_geometry_batch_t        first_buffer;
 };
 
+// TODO(Sleepster): 
+// Perhaps we should merge all the render groups into a MASSIVE render buffer like we do for the batches -> render_group
+// workload. Just so we only have to update the instance buffer 1 time.
 struct draw_frame_t
 {
     // NOTE(Sleepster): Array of what render_groups are used this frame. size of MAX_RENDER_GROUPS

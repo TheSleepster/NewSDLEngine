@@ -72,7 +72,7 @@ struct type_info_material_archetype_t {
 		type_info_member_t version;
 		type_info_member_t name;
 		type_info_member_t shader_binary_name;
-		type_info_member_t shader;
+		type_info_member_t shader_handle;
 		type_info_member_t base_instance;
 	}members;
 };
@@ -261,7 +261,7 @@ const static type_info_material_archetype_t type_info_material_archetype_t = {
 		.version = {.name = "version", .type = TYPE_u32, .offset = offsetof(material_archetype_t, version), .size = sizeof(u32)},
 		.name = {.name = "name", .type = TYPE_string_t, .offset = offsetof(material_archetype_t, name), .size = sizeof(string_t)},
 		.shader_binary_name = {.name = "shader_binary_name", .type = TYPE_string_t, .offset = offsetof(material_archetype_t, shader_binary_name), .size = sizeof(string_t)},
-		.shader = {.name = "shader", .type = TYPE_asset_handle_t, .offset = offsetof(material_archetype_t, shader), .size = sizeof(asset_handle_t)},
+		.shader_handle = {.name = "shader_handle", .type = TYPE_asset_handle_t, .offset = offsetof(material_archetype_t, shader_handle), .size = sizeof(asset_handle_t)},
 		.base_instance = {.name = "base_instance", .type = TYPE_material_instance_t, .offset = offsetof(material_archetype_t, base_instance), .size = sizeof(material_instance_t)},
 	}
 };

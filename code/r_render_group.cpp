@@ -217,8 +217,10 @@ r_render_group_begin(render_state_t *render_state)
     Assert(result);
 
     draw_frame_t *draw_frame = &render_state->draw_frame;
-    result->ID                     = render_group_ID;
-    result->material               = draw_frame->state.active_material;
+    Assert(draw_frame->state.active_material->material_info->material_type == SMT_Archetype);
+
+    result->ID                 = render_group_ID;
+    result->material_archetype = draw_frame->state.active_material;
 
     bool8 found = false;
     for(u32 group_index = 0;
@@ -301,7 +303,7 @@ r_render_group_reset_draw_frame(render_state_t *render_state, asset_manager_t *a
 true_inline void 
 r_set_active_render_material(render_state_t *render_state, asset_handle_t *handle)
 {
-    Assert(handle->material);
+    Assert(handle->material_info);
     Assert(handle->is_valid == true);
     Assert(handle->type     == AT_Material);
 

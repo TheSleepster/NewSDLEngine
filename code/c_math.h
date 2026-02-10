@@ -1987,6 +1987,10 @@ mat4_make_translation(vec3_t translation)
 MATH_API mat4_t
 mat4_translate(mat4_t A, vec3_t B)
 {
+    // TODO(Sleepster): Shouldn't we just do
+    // _30 += x;
+    // _31 += y;
+    // _32 += z;
     return(mat4_multiply(A, mat4_make_translation(B)));
 }
 

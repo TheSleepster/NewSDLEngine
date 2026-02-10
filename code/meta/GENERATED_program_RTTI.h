@@ -27,101 +27,17 @@
 	X(TYPE_memory_arena_t, "memory_arena_t") \
 	X(TYPE_u8, "u8") \
 	X(TYPE_scratch_arena_t, "scratch_arena_t") \
-	X(TYPE_mat4_t, "mat4_t") \
-	X(TYPE_global_matrix_uniforms_t, "global_matrix_uniforms_t") \
-	X(TYPE_vec4_t, "vec4_t") \
-	X(TYPE_push_constant_t, "push_constant_t") \
-	X(TYPE_render_camera_t, "render_camera_t") \
-	X(TYPE_bool8, "bool8") \
-	X(TYPE_VkBuffer, "VkBuffer") \
-	X(TYPE_VkDeviceMemory, "VkDeviceMemory") \
-	X(TYPE_VkBufferUsageFlagBits, "VkBufferUsageFlagBits") \
-	X(TYPE_s32, "s32") \
-	X(TYPE_vulkan_buffer_data_t, "vulkan_buffer_data_t") \
-	X(TYPE_VkPipeline, "VkPipeline") \
-	X(TYPE_VkPipelineBindPoint, "VkPipelineBindPoint") \
-	X(TYPE_VkPipelineLayout, "VkPipelineLayout") \
-	X(TYPE_vulkan_pipeline_data_t, "vulkan_pipeline_data_t") \
-	X(TYPE_renderer_effect_application_flags_t, "renderer_effect_application_flags_t") \
-	X(TYPE_render_pipeline_blending_mode_t, "render_pipeline_blending_mode_t") \
-	X(TYPE_render_pipeline_blending_equation_t, "render_pipeline_blending_equation_t") \
-	X(TYPE_render_pipeline_depth_function_t, "render_pipeline_depth_function_t") \
-	X(TYPE_render_pipeline_state_t, "render_pipeline_state_t") \
-	X(TYPE_VkDescriptorType, "VkDescriptorType") \
-	X(TYPE_spv_vulkan_type_map_t, "spv_vulkan_type_map_t") \
-	X(TYPE_vulkan_shader_descriptor_set_binding_type_t, "vulkan_shader_descriptor_set_binding_type_t") \
-	X(TYPE_VkDescriptorSetLayoutBinding, "VkDescriptorSetLayoutBinding") \
-	X(TYPE_VkImageView, "VkImageView") \
-	X(TYPE_VkSampler, "VkSampler") \
-	X(TYPE_VkDescriptorSet, "VkDescriptorSet") \
-	X(TYPE_vulkan_shader_descriptor_set_info_t, "vulkan_shader_descriptor_set_info_t") \
-	X(TYPE_vulkan_shader_uniform_texture_data_t, "vulkan_shader_uniform_texture_data_t") \
-	X(TYPE_void, "void") \
-	X(TYPE_vulkan_shader_uniform_data_range_t, "vulkan_shader_uniform_data_range_t") \
-	X(TYPE_string_t, "string_t") \
-	X(TYPE_vulkan_shader_uniform_data_t, "vulkan_shader_uniform_data_t") \
-	X(TYPE_VkShaderStageFlagBits, "VkShaderStageFlagBits") \
-	X(TYPE_char, "char") \
-	X(TYPE_VkShaderModuleCreateInfo, "VkShaderModuleCreateInfo") \
-	X(TYPE_VkPipelineShaderStageCreateInfo, "VkPipelineShaderStageCreateInfo") \
-	X(TYPE_VkShaderModule, "VkShaderModule") \
-	X(TYPE_vulkan_shader_stage_info_t, "vulkan_shader_stage_info_t") \
-	X(TYPE_SpvReflectShaderModule, "SpvReflectShaderModule") \
-	X(TYPE_VkDescriptorPool, "VkDescriptorPool") \
-	X(TYPE_VkDescriptorSetLayout, "VkDescriptorSetLayout") \
-	X(TYPE_VkPushConstantRange, "VkPushConstantRange") \
-	X(TYPE_vulkan_shader_data_t, "vulkan_shader_data_t") \
-	X(TYPE_VkSurfaceCapabilitiesKHR, "VkSurfaceCapabilitiesKHR") \
-	X(TYPE_VkSurfaceFormatKHR, "VkSurfaceFormatKHR") \
-	X(TYPE_VkPresentModeKHR, "VkPresentModeKHR") \
-	X(TYPE_vulkan_physical_device_swapchain_support_info_t, "vulkan_physical_device_swapchain_support_info_t") \
-	X(TYPE_vulkan_physical_device_queue_info_t, "vulkan_physical_device_queue_info_t") \
-	X(TYPE_vulkan_physical_device_requirements_t, "vulkan_physical_device_requirements_t") \
-	X(TYPE_VkPhysicalDevice, "VkPhysicalDevice") \
-	X(TYPE_VkFormat, "VkFormat") \
-	X(TYPE_VkPhysicalDeviceProperties, "VkPhysicalDeviceProperties") \
-	X(TYPE_VkPhysicalDeviceMemoryProperties, "VkPhysicalDeviceMemoryProperties") \
-	X(TYPE_vulkan_physical_device_t, "vulkan_physical_device_t") \
-	X(TYPE_VkQueue, "VkQueue") \
-	X(TYPE_VkCommandPool, "VkCommandPool") \
-	X(TYPE_VkDevice, "VkDevice") \
-	X(TYPE_vulkan_rendering_device_t, "vulkan_rendering_device_t") \
-	X(TYPE_VkFence, "VkFence") \
-	X(TYPE_vulkan_fence_t, "vulkan_fence_t") \
-	X(TYPE_vulkan_renderpass_state_t, "vulkan_renderpass_state_t") \
-	X(TYPE_VkRenderPass, "VkRenderPass") \
-	X(TYPE_vec2_t, "vec2_t") \
-	X(TYPE_float32, "float32") \
-	X(TYPE_vulkan_renderpass_data_t, "vulkan_renderpass_data_t") \
-	X(TYPE_VkFramebuffer, "VkFramebuffer") \
-	X(TYPE_vulkan_framebuffer_data_t, "vulkan_framebuffer_data_t") \
-	X(TYPE_VkImageLayout, "VkImageLayout") \
-	X(TYPE_vulkan_image_data_t, "vulkan_image_data_t") \
-	X(TYPE_vulkan_texture_t, "vulkan_texture_t") \
-	X(TYPE_VkSwapchainKHR, "VkSwapchainKHR") \
-	X(TYPE_vulkan_swapchain_data_t, "vulkan_swapchain_data_t") \
-	X(TYPE_vulkan_command_buffer_state_t, "vulkan_command_buffer_state_t") \
-	X(TYPE_VkCommandBuffer, "VkCommandBuffer") \
-	X(TYPE_vulkan_command_buffer_data_t, "vulkan_command_buffer_data_t") \
-	X(TYPE_vulkan_render_backend_function_data_t, "vulkan_render_backend_function_data_t") \
-	X(TYPE_VkSemaphore, "VkSemaphore") \
-	X(TYPE_vulkan_render_frame_state_t, "vulkan_render_frame_state_t") \
-	X(TYPE_SDL_Window, "SDL_Window") \
-	X(TYPE_VkInstance, "VkInstance") \
-	X(TYPE_VkAllocationCallbacks, "VkAllocationCallbacks") \
-	X(TYPE_VkSurfaceKHR, "VkSurfaceKHR") \
-	X(TYPE_asset_handle_t, "asset_handle_t") \
-	X(TYPE_texture2D_t, "texture2D_t") \
-	X(TYPE_VkDebugUtilsMessengerEXT, "VkDebugUtilsMessengerEXT") \
-	X(TYPE_vulkan_render_context_t, "vulkan_render_context_t") \
 	X(TYPE_dynarray_header_t, "dynarray_header_t") \
 	X(TYPE_file_extension_t, "file_extension_t") \
 	X(TYPE_sys_handle_t, "sys_handle_t") \
+	X(TYPE_string_t, "string_t") \
+	X(TYPE_bool8, "bool8") \
 	X(TYPE_file_t, "file_t") \
 	X(TYPE_mapped_file_t, "mapped_file_t") \
 	X(TYPE_file_data_t, "file_data_t") \
 	X(TYPE_overlap_io_data_t, "overlap_io_data_t") \
 	X(TYPE_visit_files_pfn_t, "visit_files_pfn_t") \
+	X(TYPE_void, "void") \
 	X(TYPE_visit_file_data_t, "visit_file_data_t") \
 	X(TYPE_file_watcher_change_event_t, "file_watcher_change_event_t") \
 	X(TYPE_file_watcher_recorded_change_t, "file_watcher_recorded_change_t") \
@@ -133,17 +49,23 @@
 	X(TYPE_hash_table_allocation_flags_t, "hash_table_allocation_flags_t") \
 	X(TYPE_hash_table_header_t, "hash_table_header_t") \
 	X(TYPE_debug_log_level_t, "debug_log_level_t") \
+	X(TYPE_float32, "float32") \
+	X(TYPE_vec2_t, "vec2_t") \
 	X(TYPE_vec3_t, "vec3_t") \
 	X(TYPE___m128, "__m128") \
+	X(TYPE_vec4_t, "vec4_t") \
+	X(TYPE_s32, "s32") \
 	X(TYPE___m128i, "__m128i") \
 	X(TYPE_ivec4_t, "ivec4_t") \
 	X(TYPE_ivec3_t, "ivec3_t") \
 	X(TYPE_ivec2_t, "ivec2_t") \
+	X(TYPE_mat4_t, "mat4_t") \
 	X(TYPE_mat3_t, "mat3_t") \
 	X(TYPE_mat2_t, "mat2_t") \
 	X(TYPE_rectangle2_t, "rectangle2_t") \
 	X(TYPE_raytest_t, "raytest_t") \
 	X(TYPE_arg_type_t, "arg_type_t") \
+	X(TYPE_char, "char") \
 	X(TYPE_program_flag_data_t, "program_flag_data_t") \
 	X(TYPE_program_flag_t, "program_flag_t") \
 	X(TYPE_program_flag_state_t, "program_flag_state_t") \
@@ -173,26 +95,105 @@
 	X(TYPE_sockaddr_storage, "sockaddr_storage") \
 	X(TYPE_socklen_t, "socklen_t") \
 	X(TYPE_client_data_t, "client_data_t") \
+	X(TYPE_SDL_Window, "SDL_Window") \
 	X(TYPE_sockaddr_in_t, "sockaddr_in_t") \
 	X(TYPE_game_state_t, "game_state_t") \
 	X(TYPE_render_geometry_instance_t, "render_geometry_instance_t") \
+	X(TYPE_render_camera_t, "render_camera_t") \
+	X(TYPE_asset_handle_t, "asset_handle_t") \
 	X(TYPE_render_geometry_batch_t, "render_geometry_batch_t") \
+	X(TYPE_texture2D_t, "texture2D_t") \
 	X(TYPE_render_group_t, "render_group_t") \
+	X(TYPE_render_pipeline_state_t, "render_pipeline_state_t") \
 	X(TYPE_state, "state") \
 	X(TYPE_draw_frame_t, "draw_frame_t") \
+	X(TYPE_vulkan_render_context_t, "vulkan_render_context_t") \
+	X(TYPE_vulkan_render_frame_state_t, "vulkan_render_frame_state_t") \
 	X(TYPE_render_state_t, "render_state_t") \
+	X(TYPE_global_matrix_uniforms_t, "global_matrix_uniforms_t") \
+	X(TYPE_push_constant_t, "push_constant_t") \
+	X(TYPE_vulkan_buffer_data_t, "vulkan_buffer_data_t") \
+	X(TYPE_render_constant_buffer_t, "render_constant_buffer_t") \
+	X(TYPE_VkBuffer, "VkBuffer") \
+	X(TYPE_VkDeviceMemory, "VkDeviceMemory") \
+	X(TYPE_VkBufferUsageFlagBits, "VkBufferUsageFlagBits") \
+	X(TYPE_VkPipeline, "VkPipeline") \
+	X(TYPE_VkPipelineBindPoint, "VkPipelineBindPoint") \
+	X(TYPE_VkPipelineLayout, "VkPipelineLayout") \
+	X(TYPE_vulkan_pipeline_data_t, "vulkan_pipeline_data_t") \
+	X(TYPE_renderer_effect_application_flags_t, "renderer_effect_application_flags_t") \
+	X(TYPE_render_pipeline_blending_mode_t, "render_pipeline_blending_mode_t") \
+	X(TYPE_render_pipeline_blending_equation_t, "render_pipeline_blending_equation_t") \
+	X(TYPE_render_pipeline_depth_function_t, "render_pipeline_depth_function_t") \
+	X(TYPE_VkDescriptorType, "VkDescriptorType") \
+	X(TYPE_spv_vulkan_type_map_t, "spv_vulkan_type_map_t") \
+	X(TYPE_vulkan_shader_descriptor_set_binding_type_t, "vulkan_shader_descriptor_set_binding_type_t") \
+	X(TYPE_VkDescriptorSetLayoutBinding, "VkDescriptorSetLayoutBinding") \
+	X(TYPE_VkImageView, "VkImageView") \
+	X(TYPE_VkSampler, "VkSampler") \
+	X(TYPE_VkDescriptorSet, "VkDescriptorSet") \
+	X(TYPE_vulkan_shader_descriptor_set_info_t, "vulkan_shader_descriptor_set_info_t") \
+	X(TYPE_vulkan_shader_uniform_texture_data_t, "vulkan_shader_uniform_texture_data_t") \
+	X(TYPE_vulkan_shader_uniform_data_range_t, "vulkan_shader_uniform_data_range_t") \
+	X(TYPE_vulkan_shader_uniform_data_t, "vulkan_shader_uniform_data_t") \
+	X(TYPE_VkShaderStageFlagBits, "VkShaderStageFlagBits") \
+	X(TYPE_VkShaderModuleCreateInfo, "VkShaderModuleCreateInfo") \
+	X(TYPE_VkPipelineShaderStageCreateInfo, "VkPipelineShaderStageCreateInfo") \
+	X(TYPE_VkShaderModule, "VkShaderModule") \
+	X(TYPE_vulkan_shader_stage_info_t, "vulkan_shader_stage_info_t") \
+	X(TYPE_SpvReflectShaderModule, "SpvReflectShaderModule") \
+	X(TYPE_VkDescriptorPool, "VkDescriptorPool") \
+	X(TYPE_VkDescriptorSetLayout, "VkDescriptorSetLayout") \
+	X(TYPE_VkPushConstantRange, "VkPushConstantRange") \
+	X(TYPE_vulkan_shader_data_t, "vulkan_shader_data_t") \
+	X(TYPE_VkSurfaceCapabilitiesKHR, "VkSurfaceCapabilitiesKHR") \
+	X(TYPE_VkSurfaceFormatKHR, "VkSurfaceFormatKHR") \
+	X(TYPE_VkPresentModeKHR, "VkPresentModeKHR") \
+	X(TYPE_vulkan_physical_device_swapchain_support_info_t, "vulkan_physical_device_swapchain_support_info_t") \
+	X(TYPE_vulkan_physical_device_queue_info_t, "vulkan_physical_device_queue_info_t") \
+	X(TYPE_vulkan_physical_device_requirements_t, "vulkan_physical_device_requirements_t") \
+	X(TYPE_VkPhysicalDevice, "VkPhysicalDevice") \
+	X(TYPE_VkFormat, "VkFormat") \
+	X(TYPE_VkPhysicalDeviceProperties, "VkPhysicalDeviceProperties") \
+	X(TYPE_VkPhysicalDeviceMemoryProperties, "VkPhysicalDeviceMemoryProperties") \
+	X(TYPE_vulkan_physical_device_t, "vulkan_physical_device_t") \
+	X(TYPE_VkQueue, "VkQueue") \
+	X(TYPE_VkCommandPool, "VkCommandPool") \
+	X(TYPE_VkDevice, "VkDevice") \
+	X(TYPE_vulkan_rendering_device_t, "vulkan_rendering_device_t") \
+	X(TYPE_VkFence, "VkFence") \
+	X(TYPE_vulkan_fence_t, "vulkan_fence_t") \
+	X(TYPE_vulkan_renderpass_state_t, "vulkan_renderpass_state_t") \
+	X(TYPE_VkRenderPass, "VkRenderPass") \
+	X(TYPE_vulkan_renderpass_data_t, "vulkan_renderpass_data_t") \
+	X(TYPE_VkFramebuffer, "VkFramebuffer") \
+	X(TYPE_vulkan_framebuffer_data_t, "vulkan_framebuffer_data_t") \
+	X(TYPE_VkImageLayout, "VkImageLayout") \
+	X(TYPE_vulkan_image_data_t, "vulkan_image_data_t") \
+	X(TYPE_vulkan_texture_t, "vulkan_texture_t") \
+	X(TYPE_VkSwapchainKHR, "VkSwapchainKHR") \
+	X(TYPE_vulkan_swapchain_data_t, "vulkan_swapchain_data_t") \
+	X(TYPE_vulkan_command_buffer_state_t, "vulkan_command_buffer_state_t") \
+	X(TYPE_VkCommandBuffer, "VkCommandBuffer") \
+	X(TYPE_vulkan_command_buffer_data_t, "vulkan_command_buffer_data_t") \
+	X(TYPE_vulkan_render_backend_function_data_t, "vulkan_render_backend_function_data_t") \
+	X(TYPE_VkSemaphore, "VkSemaphore") \
+	X(TYPE_VkInstance, "VkInstance") \
+	X(TYPE_VkAllocationCallbacks, "VkAllocationCallbacks") \
+	X(TYPE_VkSurfaceKHR, "VkSurfaceKHR") \
+	X(TYPE_VkDebugUtilsMessengerEXT, "VkDebugUtilsMessengerEXT") \
 	X(TYPE_asset_type_t, "asset_type_t") \
 	X(TYPE_asset_slot_load_status_t, "asset_slot_load_status_t") \
 	X(TYPE_bitmap_format_t, "bitmap_format_t") \
 	X(TYPE_subtexture_data_t, "subtexture_data_t") \
 	X(TYPE_asset_slot_t, "asset_slot_t") \
 	X(TYPE_shader_t, "shader_t") \
-	X(TYPE_material_instance_t, "material_instance_t") \
+	X(TYPE_material_data_t, "material_data_t") \
 	X(TYPE_bitmap_t, "bitmap_t") \
 	X(TYPE_texture_atlas_t, "texture_atlas_t") \
 	X(TYPE_material_archetype_t, "material_archetype_t") \
+	X(TYPE_material_instance_t, "material_instance_t") \
 	X(TYPE_stored_material_type_t, "stored_material_type_t") \
-	X(TYPE_material_data_t, "material_data_t") \
 	X(TYPE_jfd_package_entry_t, "jfd_package_entry_t") \
 	X(TYPE_jfd_file_header_t, "jfd_file_header_t") \
 	X(TYPE_asset_manager_asset_file_data_t, "asset_manager_asset_file_data_t") \
@@ -328,34 +329,6 @@ typedef struct type_info_data_mapping
 const static memory_arena_footer_t GENERATED_DEFAULT_memory_arena_footer_t = {};
 const static memory_arena_t GENERATED_DEFAULT_memory_arena_t = {};
 const static scratch_arena_t GENERATED_DEFAULT_scratch_arena_t = {};
-const static global_matrix_uniforms_t GENERATED_DEFAULT_global_matrix_uniforms_t = {};
-const static push_constant_t GENERATED_DEFAULT_push_constant_t = {};
-const static render_camera_t GENERATED_DEFAULT_render_camera_t = {};
-const static vulkan_buffer_data_t GENERATED_DEFAULT_vulkan_buffer_data_t = {};
-const static vulkan_pipeline_data_t GENERATED_DEFAULT_vulkan_pipeline_data_t = {};
-const static render_pipeline_state_t GENERATED_DEFAULT_render_pipeline_state_t = {};
-const static spv_vulkan_type_map_t GENERATED_DEFAULT_spv_vulkan_type_map_t = {};
-const static vulkan_shader_descriptor_set_info_t GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t = {};
-const static vulkan_shader_uniform_texture_data_t GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t = {};
-const static vulkan_shader_uniform_data_range_t GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t = {};
-const static vulkan_shader_uniform_data_t GENERATED_DEFAULT_vulkan_shader_uniform_data_t = {};
-const static vulkan_shader_stage_info_t GENERATED_DEFAULT_vulkan_shader_stage_info_t = {};
-const static vulkan_shader_data_t GENERATED_DEFAULT_vulkan_shader_data_t = {};
-const static vulkan_physical_device_swapchain_support_info_t GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t = {};
-const static vulkan_physical_device_queue_info_t GENERATED_DEFAULT_vulkan_physical_device_queue_info_t = {};
-const static vulkan_physical_device_requirements_t GENERATED_DEFAULT_vulkan_physical_device_requirements_t = {};
-const static vulkan_physical_device_t GENERATED_DEFAULT_vulkan_physical_device_t = {};
-const static vulkan_rendering_device_t GENERATED_DEFAULT_vulkan_rendering_device_t = {};
-const static vulkan_fence_t GENERATED_DEFAULT_vulkan_fence_t = {};
-const static vulkan_renderpass_data_t GENERATED_DEFAULT_vulkan_renderpass_data_t = {};
-const static vulkan_framebuffer_data_t GENERATED_DEFAULT_vulkan_framebuffer_data_t = {};
-const static vulkan_image_data_t GENERATED_DEFAULT_vulkan_image_data_t = {};
-const static vulkan_texture_t GENERATED_DEFAULT_vulkan_texture_t = {};
-const static vulkan_swapchain_data_t GENERATED_DEFAULT_vulkan_swapchain_data_t = {};
-const static vulkan_command_buffer_data_t GENERATED_DEFAULT_vulkan_command_buffer_data_t = {};
-const static vulkan_render_backend_function_data_t GENERATED_DEFAULT_vulkan_render_backend_function_data_t = {};
-const static vulkan_render_frame_state_t GENERATED_DEFAULT_vulkan_render_frame_state_t = {};
-const static vulkan_render_context_t GENERATED_DEFAULT_vulkan_render_context_t = {};
 const static dynarray_header_t GENERATED_DEFAULT_dynarray_header_t = {};
 const static file_t GENERATED_DEFAULT_file_t = {};
 const static mapped_file_t GENERATED_DEFAULT_mapped_file_t = {};
@@ -403,6 +376,35 @@ const static render_geometry_batch_t GENERATED_DEFAULT_render_geometry_batch_t =
 const static render_group_t GENERATED_DEFAULT_render_group_t = {};
 const static draw_frame_t GENERATED_DEFAULT_draw_frame_t = {};
 const static render_state_t GENERATED_DEFAULT_render_state_t = {};
+const static global_matrix_uniforms_t GENERATED_DEFAULT_global_matrix_uniforms_t = {};
+const static push_constant_t GENERATED_DEFAULT_push_constant_t = {};
+const static render_camera_t GENERATED_DEFAULT_render_camera_t = {};
+const static render_constant_buffer_t GENERATED_DEFAULT_render_constant_buffer_t = {};
+const static vulkan_buffer_data_t GENERATED_DEFAULT_vulkan_buffer_data_t = {};
+const static vulkan_pipeline_data_t GENERATED_DEFAULT_vulkan_pipeline_data_t = {};
+const static render_pipeline_state_t GENERATED_DEFAULT_render_pipeline_state_t = {};
+const static spv_vulkan_type_map_t GENERATED_DEFAULT_spv_vulkan_type_map_t = {};
+const static vulkan_shader_descriptor_set_info_t GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t = {};
+const static vulkan_shader_uniform_texture_data_t GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t = {};
+const static vulkan_shader_uniform_data_range_t GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t = {};
+const static vulkan_shader_uniform_data_t GENERATED_DEFAULT_vulkan_shader_uniform_data_t = {};
+const static vulkan_shader_stage_info_t GENERATED_DEFAULT_vulkan_shader_stage_info_t = {};
+const static vulkan_shader_data_t GENERATED_DEFAULT_vulkan_shader_data_t = {};
+const static vulkan_physical_device_swapchain_support_info_t GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t = {};
+const static vulkan_physical_device_queue_info_t GENERATED_DEFAULT_vulkan_physical_device_queue_info_t = {};
+const static vulkan_physical_device_requirements_t GENERATED_DEFAULT_vulkan_physical_device_requirements_t = {};
+const static vulkan_physical_device_t GENERATED_DEFAULT_vulkan_physical_device_t = {};
+const static vulkan_rendering_device_t GENERATED_DEFAULT_vulkan_rendering_device_t = {};
+const static vulkan_fence_t GENERATED_DEFAULT_vulkan_fence_t = {};
+const static vulkan_renderpass_data_t GENERATED_DEFAULT_vulkan_renderpass_data_t = {};
+const static vulkan_framebuffer_data_t GENERATED_DEFAULT_vulkan_framebuffer_data_t = {};
+const static vulkan_image_data_t GENERATED_DEFAULT_vulkan_image_data_t = {};
+const static vulkan_texture_t GENERATED_DEFAULT_vulkan_texture_t = {};
+const static vulkan_swapchain_data_t GENERATED_DEFAULT_vulkan_swapchain_data_t = {};
+const static vulkan_command_buffer_data_t GENERATED_DEFAULT_vulkan_command_buffer_data_t = {};
+const static vulkan_render_backend_function_data_t GENERATED_DEFAULT_vulkan_render_backend_function_data_t = {};
+const static vulkan_render_frame_state_t GENERATED_DEFAULT_vulkan_render_frame_state_t = {};
+const static vulkan_render_context_t GENERATED_DEFAULT_vulkan_render_context_t = {};
 const static asset_handle_t GENERATED_DEFAULT_asset_handle_t = {};
 const static bitmap_t GENERATED_DEFAULT_bitmap_t = {};
 const static texture2D_t GENERATED_DEFAULT_texture2D_t = {};
@@ -480,640 +482,6 @@ struct type_info_struct_scratch_arena_t {
 			type_info_member_t parent;
 			type_info_member_t base;
 			type_info_member_t used;
-		}members;
-	};
-};
-
-struct type_info_struct_global_matrix_uniforms_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[2];
-		struct {
-			type_info_member_t view_matrix;
-			type_info_member_t projection_matrix;
-		}members;
-	};
-};
-
-struct type_info_struct_push_constant_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[1];
-		struct {
-			type_info_member_t DrawColor;
-		}members;
-	};
-};
-
-struct type_info_struct_render_camera_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t view_matrix;
-			type_info_member_t projection_matrix;
-			type_info_member_t ID;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_buffer_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[8];
-		struct {
-			type_info_member_t is_valid;
-			type_info_member_t is_mapped;
-			type_info_member_t buffer_size;
-			type_info_member_t handle;
-			type_info_member_t device_memory;
-			type_info_member_t usage_flags;
-			type_info_member_t memory_index;
-			type_info_member_t memory_property_flags;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_pipeline_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t handle;
-			type_info_member_t binding;
-			type_info_member_t layout;
-		}members;
-	};
-};
-
-struct type_info_struct_render_pipeline_state_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[13];
-		struct {
-			type_info_member_t blend_enabled;
-			type_info_member_t src_color_blend_mode;
-			type_info_member_t dst_color_blend_mode;
-			type_info_member_t src_alpha_blend_mode;
-			type_info_member_t dst_alpha_blend_mode;
-			type_info_member_t color_blend_op;
-			type_info_member_t alpha_blend_op;
-			type_info_member_t depth_testing_enabled;
-			type_info_member_t depth_writing_enabled;
-			type_info_member_t depth_func;
-			type_info_member_t stencil_enabled;
-			type_info_member_t stencil_state;
-			type_info_member_t stencil_keep;
-		}members;
-	};
-};
-
-struct type_info_struct_spv_vulkan_type_map_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[2];
-		struct {
-			type_info_member_t spv_type;
-			type_info_member_t vk_type;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_shader_descriptor_set_info_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[12];
-		struct {
-			type_info_member_t is_valid;
-			type_info_member_t set_type;
-			type_info_member_t bindings;
-			type_info_member_t binding_count;
-			type_info_member_t binding_upload_size;
-			type_info_member_t image_views;
-			type_info_member_t samplers;
-			type_info_member_t image_count;
-			type_info_member_t sampler_count;
-			type_info_member_t sets;
-			type_info_member_t uniform_buffer;
-			type_info_member_t single_frame_uniform_buffer_size;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_shader_uniform_texture_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t image_views;
-			type_info_member_t image_samplers;
-			type_info_member_t image_counter;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_shader_uniform_data_range_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[2];
-		struct {
-			type_info_member_t data;
-			type_info_member_t data_size;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_shader_uniform_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[12];
-		struct {
-			type_info_member_t owner_shader_id;
-			type_info_member_t uniform_type;
-			type_info_member_t set_type;
-			type_info_member_t uniform_location;
-			type_info_member_t push_constant_index;
-			type_info_member_t name;
-			type_info_member_t uniform_size;
-			type_info_member_t is_texture;
-			type_info_member_t mapped_buffer_update_size;
-			type_info_member_t mapped_uniform_buffer;
-			type_info_member_t storage_buffer;
-			type_info_member_t texture_data;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_shader_stage_info_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t type;
-			type_info_member_t entry_point;
-			type_info_member_t module_create_info;
-			type_info_member_t shader_stage_create_info;
-			type_info_member_t handle;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_shader_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[23];
-		struct {
-			type_info_member_t shader_id;
-			type_info_member_t arena;
-			type_info_member_t spv_reflect_module;
-			type_info_member_t stages;
-			type_info_member_t stage_count;
-			type_info_member_t primary_pool;
-			type_info_member_t type_counts;
-			type_info_member_t layouts;
-			type_info_member_t total_descriptor_set_count;
-			type_info_member_t used_descriptor_set_count;
-			type_info_member_t set_info;
-			type_info_member_t push_constant_count;
-			type_info_member_t push_constant_data;
-			type_info_member_t uniforms;
-			type_info_member_t uniform_count;
-			type_info_member_t static_uniforms;
-			type_info_member_t static_uniform_count;
-			type_info_member_t draw_uniforms;
-			type_info_member_t draw_uniform_count;
-			type_info_member_t instance_uniforms;
-			type_info_member_t instance_uniform_count;
-			type_info_member_t pipeline;
-			type_info_member_t camera_matrices;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_physical_device_swapchain_support_info_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t surface_capabilities;
-			type_info_member_t valid_surface_formats;
-			type_info_member_t valid_present_modes;
-			type_info_member_t valid_surface_format_count;
-			type_info_member_t valid_present_mode_count;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_physical_device_queue_info_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t graphics_queue_family_index;
-			type_info_member_t present_queue_family_index;
-			type_info_member_t compute_queue_family_index;
-			type_info_member_t transfer_queue_family_index;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_physical_device_requirements_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t has_graphics_queue;
-			type_info_member_t has_present_queue;
-			type_info_member_t has_transfer_queue;
-			type_info_member_t has_compute_queue;
-			type_info_member_t required_extensions;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_physical_device_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t handle;
-			type_info_member_t device_depth_format;
-			type_info_member_t properties;
-			type_info_member_t features;
-			type_info_member_t memory_properties;
-			type_info_member_t swapchain_support_info;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_rendering_device_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[11];
-		struct {
-			type_info_member_t physical_device;
-			type_info_member_t graphics_queue_family_index;
-			type_info_member_t present_queue_family_index;
-			type_info_member_t compute_queue_family_index;
-			type_info_member_t transfer_queue_family_index;
-			type_info_member_t graphics_queue;
-			type_info_member_t present_queue;
-			type_info_member_t transfer_queue;
-			type_info_member_t compute_queue;
-			type_info_member_t graphics_command_pool;
-			type_info_member_t logical_device;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_fence_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[2];
-		struct {
-			type_info_member_t handle;
-			type_info_member_t signaled;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_renderpass_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[7];
-		struct {
-			type_info_member_t handle;
-			type_info_member_t offset;
-			type_info_member_t size;
-			type_info_member_t clear_color;
-			type_info_member_t depth_clear;
-			type_info_member_t stencil_clear;
-			type_info_member_t renderpass_state;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_framebuffer_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t handle;
-			type_info_member_t renderpass;
-			type_info_member_t attachments;
-			type_info_member_t attachment_count;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_image_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[7];
-		struct {
-			type_info_member_t handle;
-			type_info_member_t memory;
-			type_info_member_t format;
-			type_info_member_t layout;
-			type_info_member_t view;
-			type_info_member_t width;
-			type_info_member_t height;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_texture_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t current_generation;
-			type_info_member_t image_data;
-			type_info_member_t sampler;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_swapchain_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[12];
-		struct {
-			type_info_member_t is_valid;
-			type_info_member_t arena;
-			type_info_member_t handle;
-			type_info_member_t image_format;
-			type_info_member_t present_mode;
-			type_info_member_t depth_attachment;
-			type_info_member_t has_depth_attachment;
-			type_info_member_t max_frames_in_flight;
-			type_info_member_t image_count;
-			type_info_member_t framebuffers;
-			type_info_member_t images;
-			type_info_member_t views;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_command_buffer_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t handle;
-			type_info_member_t owner_pool;
-			type_info_member_t state;
-			type_info_member_t is_primary_buffer;
-			type_info_member_t is_single_use;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_render_backend_function_data_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t create_gpu_texture;
-			type_info_member_t create_gpu_shader;
-			type_info_member_t create_gpu_buffer;
-			type_info_member_t destroy_gpu_texture;
-			type_info_member_t destroy_gpu_shader;
-			type_info_member_t destroy_gpu_buffer;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_render_frame_state_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[8];
-		struct {
-			type_info_member_t image_render_idle_fence;
-			type_info_member_t frame_in_flight_fence_ptr;
-			type_info_member_t image_avaliable_semaphore;
-			type_info_member_t presentation_complete_semaphore;
-			type_info_member_t current_framebuffer;
-			type_info_member_t render_command_buffer;
-			type_info_member_t instanced_rendering_buffer;
-			type_info_member_t bound_shader;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_render_context_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[40];
-		struct {
-			type_info_member_t initialization_arena;
-			type_info_member_t frame_arena;
-			type_info_member_t permanent_arena;
-			type_info_member_t additional_buffer_count;
-			type_info_member_t window;
-			type_info_member_t window_width;
-			type_info_member_t window_height;
-			type_info_member_t instance;
-			type_info_member_t allocators;
-			type_info_member_t render_surface;
-			type_info_member_t rendering_device;
-			type_info_member_t swapchain;
-			type_info_member_t current_image_index;
-			type_info_member_t current_frame_index;
-			type_info_member_t framebuffer_width;
-			type_info_member_t framebuffer_height;
-			type_info_member_t cached_framebuffer_width;
-			type_info_member_t cached_framebuffer_height;
-			type_info_member_t current_framebuffer_size_generation;
-			type_info_member_t last_framebuffer_size_generation;
-			type_info_member_t recreating_swapchain;
-			type_info_member_t image_render_idle_fences;
-			type_info_member_t frame_in_flight_fence_ptrs;
-			type_info_member_t image_avaliable_semaphores;
-			type_info_member_t presentation_complete_semaphores;
-			type_info_member_t render_command_buffers;
-			type_info_member_t frames;
-			type_info_member_t current_frame;
-			type_info_member_t instanced_rendering_buffer;
-			type_info_member_t index_buffer;
-			type_info_member_t vertex_buffer;
-			type_info_member_t main_renderpass;
-			type_info_member_t default_shader;
-			type_info_member_t default_texture;
-			type_info_member_t default_material;
-			type_info_member_t invalid_texture_data;
-			type_info_member_t vertex_offset;
-			type_info_member_t geometry_index;
-			type_info_member_t test_camera;
-			type_info_member_t debug_callback;
 		}members;
 	};
 };
@@ -2018,12 +1386,13 @@ struct type_info_struct_render_geometry_batch_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[6];
+		type_info_member_t member_array[7];
 		struct {
 			type_info_member_t camera_data;
 			type_info_member_t is_valid;
 			type_info_member_t primitive_count;
 			type_info_member_t master_array_start_offset;
+			type_info_member_t material_instance;
 			type_info_member_t instances;
 			type_info_member_t next_buffer;
 		}members;
@@ -2042,7 +1411,7 @@ struct type_info_struct_render_group_t {
 		type_info_member_t member_array[8];
 		struct {
 			type_info_member_t ID;
-			type_info_member_t material;
+			type_info_member_t material_archetype;
 			type_info_member_t textures;
 			type_info_member_t current_texture_count;
 			type_info_member_t master_batch_array;
@@ -2122,6 +1491,658 @@ struct type_info_struct_render_state_t {
 	};
 };
 
+struct type_info_struct_global_matrix_uniforms_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t view_matrix;
+			type_info_member_t projection_matrix;
+		}members;
+	};
+};
+
+struct type_info_struct_push_constant_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[1];
+		struct {
+			type_info_member_t DrawColor;
+		}members;
+	};
+};
+
+struct type_info_struct_render_camera_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t view_matrix;
+			type_info_member_t projection_matrix;
+			type_info_member_t ID;
+		}members;
+	};
+};
+
+struct type_info_struct_render_constant_buffer_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t GPU_buffer;
+			type_info_member_t CPU_buffer;
+			type_info_member_t buffer_data;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_buffer_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[8];
+		struct {
+			type_info_member_t is_valid;
+			type_info_member_t is_mapped;
+			type_info_member_t buffer_size;
+			type_info_member_t handle;
+			type_info_member_t device_memory;
+			type_info_member_t usage_flags;
+			type_info_member_t memory_index;
+			type_info_member_t memory_property_flags;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_pipeline_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t handle;
+			type_info_member_t binding;
+			type_info_member_t layout;
+		}members;
+	};
+};
+
+struct type_info_struct_render_pipeline_state_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[13];
+		struct {
+			type_info_member_t blend_enabled;
+			type_info_member_t src_color_blend_mode;
+			type_info_member_t dst_color_blend_mode;
+			type_info_member_t src_alpha_blend_mode;
+			type_info_member_t dst_alpha_blend_mode;
+			type_info_member_t color_blend_op;
+			type_info_member_t alpha_blend_op;
+			type_info_member_t depth_testing_enabled;
+			type_info_member_t depth_writing_enabled;
+			type_info_member_t depth_func;
+			type_info_member_t stencil_enabled;
+			type_info_member_t stencil_state;
+			type_info_member_t stencil_keep;
+		}members;
+	};
+};
+
+struct type_info_struct_spv_vulkan_type_map_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t spv_type;
+			type_info_member_t vk_type;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_shader_descriptor_set_info_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[12];
+		struct {
+			type_info_member_t is_valid;
+			type_info_member_t set_type;
+			type_info_member_t bindings;
+			type_info_member_t binding_count;
+			type_info_member_t binding_upload_size;
+			type_info_member_t image_views;
+			type_info_member_t samplers;
+			type_info_member_t image_count;
+			type_info_member_t sampler_count;
+			type_info_member_t sets;
+			type_info_member_t uniform_buffer;
+			type_info_member_t single_frame_uniform_buffer_size;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_shader_uniform_texture_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t image_views;
+			type_info_member_t image_samplers;
+			type_info_member_t image_counter;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_shader_uniform_data_range_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t data;
+			type_info_member_t data_size;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_shader_uniform_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[12];
+		struct {
+			type_info_member_t owner_shader_id;
+			type_info_member_t uniform_type;
+			type_info_member_t set_type;
+			type_info_member_t uniform_location;
+			type_info_member_t push_constant_index;
+			type_info_member_t name;
+			type_info_member_t uniform_size;
+			type_info_member_t is_texture;
+			type_info_member_t mapped_buffer_update_size;
+			type_info_member_t mapped_uniform_buffer;
+			type_info_member_t storage_buffer;
+			type_info_member_t texture_data;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_shader_stage_info_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t type;
+			type_info_member_t entry_point;
+			type_info_member_t module_create_info;
+			type_info_member_t shader_stage_create_info;
+			type_info_member_t handle;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_shader_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[23];
+		struct {
+			type_info_member_t shader_id;
+			type_info_member_t arena;
+			type_info_member_t spv_reflect_module;
+			type_info_member_t stages;
+			type_info_member_t stage_count;
+			type_info_member_t primary_pool;
+			type_info_member_t type_counts;
+			type_info_member_t layouts;
+			type_info_member_t total_descriptor_set_count;
+			type_info_member_t used_descriptor_set_count;
+			type_info_member_t set_info;
+			type_info_member_t push_constant_count;
+			type_info_member_t push_constant_data;
+			type_info_member_t uniforms;
+			type_info_member_t uniform_count;
+			type_info_member_t static_uniforms;
+			type_info_member_t static_uniform_count;
+			type_info_member_t draw_uniforms;
+			type_info_member_t draw_uniform_count;
+			type_info_member_t instance_uniforms;
+			type_info_member_t instance_uniform_count;
+			type_info_member_t pipeline;
+			type_info_member_t camera_matrices;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_physical_device_swapchain_support_info_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t surface_capabilities;
+			type_info_member_t valid_surface_formats;
+			type_info_member_t valid_present_modes;
+			type_info_member_t valid_surface_format_count;
+			type_info_member_t valid_present_mode_count;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_physical_device_queue_info_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t graphics_queue_family_index;
+			type_info_member_t present_queue_family_index;
+			type_info_member_t compute_queue_family_index;
+			type_info_member_t transfer_queue_family_index;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_physical_device_requirements_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t has_graphics_queue;
+			type_info_member_t has_present_queue;
+			type_info_member_t has_transfer_queue;
+			type_info_member_t has_compute_queue;
+			type_info_member_t required_extensions;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_physical_device_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t handle;
+			type_info_member_t device_depth_format;
+			type_info_member_t properties;
+			type_info_member_t features;
+			type_info_member_t memory_properties;
+			type_info_member_t swapchain_support_info;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_rendering_device_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[11];
+		struct {
+			type_info_member_t physical_device;
+			type_info_member_t graphics_queue_family_index;
+			type_info_member_t present_queue_family_index;
+			type_info_member_t compute_queue_family_index;
+			type_info_member_t transfer_queue_family_index;
+			type_info_member_t graphics_queue;
+			type_info_member_t present_queue;
+			type_info_member_t transfer_queue;
+			type_info_member_t compute_queue;
+			type_info_member_t graphics_command_pool;
+			type_info_member_t logical_device;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_fence_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t handle;
+			type_info_member_t signaled;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_renderpass_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t handle;
+			type_info_member_t offset;
+			type_info_member_t size;
+			type_info_member_t clear_color;
+			type_info_member_t depth_clear;
+			type_info_member_t stencil_clear;
+			type_info_member_t renderpass_state;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_framebuffer_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t handle;
+			type_info_member_t renderpass;
+			type_info_member_t attachments;
+			type_info_member_t attachment_count;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_image_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t handle;
+			type_info_member_t memory;
+			type_info_member_t format;
+			type_info_member_t layout;
+			type_info_member_t view;
+			type_info_member_t width;
+			type_info_member_t height;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_texture_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t current_generation;
+			type_info_member_t image_data;
+			type_info_member_t sampler;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_swapchain_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[12];
+		struct {
+			type_info_member_t is_valid;
+			type_info_member_t arena;
+			type_info_member_t handle;
+			type_info_member_t image_format;
+			type_info_member_t present_mode;
+			type_info_member_t depth_attachment;
+			type_info_member_t has_depth_attachment;
+			type_info_member_t max_frames_in_flight;
+			type_info_member_t image_count;
+			type_info_member_t framebuffers;
+			type_info_member_t images;
+			type_info_member_t views;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_command_buffer_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t handle;
+			type_info_member_t owner_pool;
+			type_info_member_t state;
+			type_info_member_t is_primary_buffer;
+			type_info_member_t is_single_use;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_render_backend_function_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t create_gpu_texture;
+			type_info_member_t create_gpu_shader;
+			type_info_member_t create_gpu_buffer;
+			type_info_member_t destroy_gpu_texture;
+			type_info_member_t destroy_gpu_shader;
+			type_info_member_t destroy_gpu_buffer;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_render_frame_state_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[8];
+		struct {
+			type_info_member_t image_render_idle_fence;
+			type_info_member_t frame_in_flight_fence_ptr;
+			type_info_member_t image_avaliable_semaphore;
+			type_info_member_t presentation_complete_semaphore;
+			type_info_member_t current_framebuffer;
+			type_info_member_t render_command_buffer;
+			type_info_member_t instanced_rendering_buffer;
+			type_info_member_t bound_shader;
+		}members;
+	};
+};
+
+struct type_info_struct_vulkan_render_context_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[40];
+		struct {
+			type_info_member_t initialization_arena;
+			type_info_member_t frame_arena;
+			type_info_member_t permanent_arena;
+			type_info_member_t additional_buffer_count;
+			type_info_member_t window;
+			type_info_member_t window_width;
+			type_info_member_t window_height;
+			type_info_member_t instance;
+			type_info_member_t allocators;
+			type_info_member_t render_surface;
+			type_info_member_t rendering_device;
+			type_info_member_t swapchain;
+			type_info_member_t current_image_index;
+			type_info_member_t current_frame_index;
+			type_info_member_t framebuffer_width;
+			type_info_member_t framebuffer_height;
+			type_info_member_t cached_framebuffer_width;
+			type_info_member_t cached_framebuffer_height;
+			type_info_member_t current_framebuffer_size_generation;
+			type_info_member_t last_framebuffer_size_generation;
+			type_info_member_t recreating_swapchain;
+			type_info_member_t image_render_idle_fences;
+			type_info_member_t frame_in_flight_fence_ptrs;
+			type_info_member_t image_avaliable_semaphores;
+			type_info_member_t presentation_complete_semaphores;
+			type_info_member_t render_command_buffers;
+			type_info_member_t frames;
+			type_info_member_t current_frame;
+			type_info_member_t instanced_rendering_buffer;
+			type_info_member_t index_buffer;
+			type_info_member_t vertex_buffer;
+			type_info_member_t main_renderpass;
+			type_info_member_t default_shader;
+			type_info_member_t default_texture;
+			type_info_member_t default_material;
+			type_info_member_t invalid_texture_data;
+			type_info_member_t vertex_offset;
+			type_info_member_t geometry_index;
+			type_info_member_t test_camera;
+			type_info_member_t debug_callback;
+		}members;
+	};
+};
+
 struct type_info_struct_asset_handle_t {
 	const char *name;
 	u32 type;
@@ -2140,7 +2161,7 @@ struct type_info_struct_asset_handle_t {
 			type_info_member_t slot;
 			type_info_member_t texture;
 			type_info_member_t shader;
-			type_info_member_t material;
+			type_info_member_t material_info;
 		}members;
 	};
 };
@@ -2289,7 +2310,7 @@ struct type_info_struct_material_archetype_t {
 			type_info_member_t version;
 			type_info_member_t name;
 			type_info_member_t shader_binary_name;
-			type_info_member_t shader;
+			type_info_member_t shader_handle;
 			type_info_member_t base_instance;
 		}members;
 	};
@@ -2624,164 +2645,6 @@ struct type_info_struct_packet_t {
 };
 
 
-struct type_info_enum_renderer_effect_application_flags_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t REAF_None;
-			type_info_member_t REAF_Bloom;
-			type_info_member_t REAF_Emmision;
-			type_info_member_t REAF_Vignette;
-			type_info_member_t REAF_FilmGrain;
-			type_info_member_t REAF_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_render_pipeline_blending_mode_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[13];
-		struct {
-			type_info_member_t RBM_Invalid;
-			type_info_member_t RBM_Zero;
-			type_info_member_t RBM_One;
-			type_info_member_t RBM_Constant;
-			type_info_member_t RBM_SrcColor;
-			type_info_member_t RBM_OneMinusSrcColor;
-			type_info_member_t RBM_DstColor;
-			type_info_member_t RBM_OneMinusDstColor;
-			type_info_member_t RBM_SrcAlpha;
-			type_info_member_t RBM_OneMinusSrcAlpha;
-			type_info_member_t RBM_DstAlpha;
-			type_info_member_t RBM_OneMinusDstAlpha;
-			type_info_member_t RBM_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_render_pipeline_blending_equation_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t RBE_Invalid;
-			type_info_member_t RBE_Add;
-			type_info_member_t RBE_Subtract;
-			type_info_member_t RBE_ReverseSubtract;
-			type_info_member_t RBE_Min;
-			type_info_member_t RBE_Max;
-		}members;
-	};
-};
-
-struct type_info_enum_render_pipeline_depth_function_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[10];
-		struct {
-			type_info_member_t RDF_Invalid;
-			type_info_member_t RDF_Never;
-			type_info_member_t RDF_Always;
-			type_info_member_t RDF_Greater;
-			type_info_member_t RDF_Less;
-			type_info_member_t RDF_Equal;
-			type_info_member_t RDF_NotEqual;
-			type_info_member_t RDF_LessOrEqual;
-			type_info_member_t RDF_GreaterOrEqual;
-			type_info_member_t RDF_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_vulkan_shader_descriptor_set_binding_type_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t SDS_Static;
-			type_info_member_t SDS_Draw;
-			type_info_member_t SDS_Instance;
-			type_info_member_t SDS_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_vulkan_renderpass_state_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t VKRPS_INVALID;
-			type_info_member_t VKRPS_RECORDING;
-			type_info_member_t VKRPS_WITHIN_RENDERPASS;
-			type_info_member_t VKRPS_RECORDING_ENDED;
-			type_info_member_t VKRPS_COMMANDS_SUBMITTED;
-			type_info_member_t VKRPS_COUNT;
-		}members;
-	};
-};
-
-struct type_info_enum_vulkan_command_buffer_state_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[8];
-		struct {
-			type_info_member_t VKCBS_INVALID;
-			type_info_member_t VKCBS_NOT_ALLOCATED;
-			type_info_member_t VKCBS_READY;
-			type_info_member_t VKCBS_RECORDING;
-			type_info_member_t VKCBS_WITHIN_RENDERPASS;
-			type_info_member_t VKCBS_RECORDING_ENDED;
-			type_info_member_t VKCBS_SUBMITTED;
-			type_info_member_t VKCBS_COUNT;
-		}members;
-	};
-};
-
 struct type_info_enum_file_extension_t {
 	const char *name;
 	u32 type;
@@ -3009,6 +2872,164 @@ struct type_info_enum_entity_flags {
 	};
 };
 
+struct type_info_enum_renderer_effect_application_flags_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t REAF_None;
+			type_info_member_t REAF_Bloom;
+			type_info_member_t REAF_Emmision;
+			type_info_member_t REAF_Vignette;
+			type_info_member_t REAF_FilmGrain;
+			type_info_member_t REAF_Count;
+		}members;
+	};
+};
+
+struct type_info_enum_render_pipeline_blending_mode_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[13];
+		struct {
+			type_info_member_t RBM_Invalid;
+			type_info_member_t RBM_Zero;
+			type_info_member_t RBM_One;
+			type_info_member_t RBM_Constant;
+			type_info_member_t RBM_SrcColor;
+			type_info_member_t RBM_OneMinusSrcColor;
+			type_info_member_t RBM_DstColor;
+			type_info_member_t RBM_OneMinusDstColor;
+			type_info_member_t RBM_SrcAlpha;
+			type_info_member_t RBM_OneMinusSrcAlpha;
+			type_info_member_t RBM_DstAlpha;
+			type_info_member_t RBM_OneMinusDstAlpha;
+			type_info_member_t RBM_Count;
+		}members;
+	};
+};
+
+struct type_info_enum_render_pipeline_blending_equation_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t RBE_Invalid;
+			type_info_member_t RBE_Add;
+			type_info_member_t RBE_Subtract;
+			type_info_member_t RBE_ReverseSubtract;
+			type_info_member_t RBE_Min;
+			type_info_member_t RBE_Max;
+		}members;
+	};
+};
+
+struct type_info_enum_render_pipeline_depth_function_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[10];
+		struct {
+			type_info_member_t RDF_Invalid;
+			type_info_member_t RDF_Never;
+			type_info_member_t RDF_Always;
+			type_info_member_t RDF_Greater;
+			type_info_member_t RDF_Less;
+			type_info_member_t RDF_Equal;
+			type_info_member_t RDF_NotEqual;
+			type_info_member_t RDF_LessOrEqual;
+			type_info_member_t RDF_GreaterOrEqual;
+			type_info_member_t RDF_Count;
+		}members;
+	};
+};
+
+struct type_info_enum_vulkan_shader_descriptor_set_binding_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t SDS_Static;
+			type_info_member_t SDS_Draw;
+			type_info_member_t SDS_Instance;
+			type_info_member_t SDS_Count;
+		}members;
+	};
+};
+
+struct type_info_enum_vulkan_renderpass_state_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t VKRPS_INVALID;
+			type_info_member_t VKRPS_RECORDING;
+			type_info_member_t VKRPS_WITHIN_RENDERPASS;
+			type_info_member_t VKRPS_RECORDING_ENDED;
+			type_info_member_t VKRPS_COMMANDS_SUBMITTED;
+			type_info_member_t VKRPS_COUNT;
+		}members;
+	};
+};
+
+struct type_info_enum_vulkan_command_buffer_state_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[8];
+		struct {
+			type_info_member_t VKCBS_INVALID;
+			type_info_member_t VKCBS_NOT_ALLOCATED;
+			type_info_member_t VKCBS_READY;
+			type_info_member_t VKCBS_RECORDING;
+			type_info_member_t VKCBS_WITHIN_RENDERPASS;
+			type_info_member_t VKCBS_RECORDING_ENDED;
+			type_info_member_t VKCBS_SUBMITTED;
+			type_info_member_t VKCBS_COUNT;
+		}members;
+	};
+};
+
 struct type_info_enum_asset_type_t {
 	const char *name;
 	u32 type;
@@ -3217,556 +3238,6 @@ const static type_info_struct_scratch_arena_t type_info_struct_scratch_arena_t_c
 		.parent = {.name = "parent", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.parent)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), parent))},
 		.base = {.name = "base", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.base)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), base))},
 		.used = {.name = "used", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), used))},
-	}
-};
-
-const static type_info_struct_global_matrix_uniforms_t type_info_struct_global_matrix_uniforms_t_const_data = {
-	.name = "global_matrix_uniforms_t",
-	.type = TYPE_global_matrix_uniforms_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_global_matrix_uniforms_t),
-	.member_count = 2,
-	.members = {
-		.view_matrix = {.name = "view_matrix", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_matrix_uniforms_t.view_matrix)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_matrix_uniforms_t), view_matrix))},
-		.projection_matrix = {.name = "projection_matrix", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_matrix_uniforms_t.projection_matrix)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_matrix_uniforms_t), projection_matrix))},
-	}
-};
-
-const static type_info_struct_push_constant_t type_info_struct_push_constant_t_const_data = {
-	.name = "push_constant_t",
-	.type = TYPE_push_constant_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_push_constant_t),
-	.member_count = 1,
-	.members = {
-		.DrawColor = {.name = "DrawColor", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_push_constant_t.DrawColor)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_push_constant_t), DrawColor))},
-	}
-};
-
-const static type_info_struct_render_camera_t type_info_struct_render_camera_t_const_data = {
-	.name = "render_camera_t",
-	.type = TYPE_render_camera_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_render_camera_t),
-	.member_count = 3,
-	.members = {
-		.view_matrix = {.name = "view_matrix", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_camera_t.view_matrix)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_camera_t), view_matrix))},
-		.projection_matrix = {.name = "projection_matrix", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_camera_t.projection_matrix)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_camera_t), projection_matrix))},
-		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_camera_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_camera_t), ID))},
-	}
-};
-
-const static type_info_struct_vulkan_buffer_data_t type_info_struct_vulkan_buffer_data_t_const_data = {
-	.name = "vulkan_buffer_data_t",
-	.type = TYPE_vulkan_buffer_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_buffer_data_t),
-	.member_count = 8,
-	.members = {
-		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), is_valid))},
-		.is_mapped = {.name = "is_mapped", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.is_mapped)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), is_mapped))},
-		.buffer_size = {.name = "buffer_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), buffer_size))},
-		.handle = {.name = "handle", .type = TYPE_VkBuffer, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), handle))},
-		.device_memory = {.name = "device_memory", .type = TYPE_VkDeviceMemory, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.device_memory)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), device_memory))},
-		.usage_flags = {.name = "usage_flags", .type = TYPE_VkBufferUsageFlagBits, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.usage_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), usage_flags))},
-		.memory_index = {.name = "memory_index", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.memory_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), memory_index))},
-		.memory_property_flags = {.name = "memory_property_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.memory_property_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), memory_property_flags))},
-	}
-};
-
-const static type_info_struct_vulkan_pipeline_data_t type_info_struct_vulkan_pipeline_data_t_const_data = {
-	.name = "vulkan_pipeline_data_t",
-	.type = TYPE_vulkan_pipeline_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_pipeline_data_t),
-	.member_count = 3,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_VkPipeline, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t), handle))},
-		.binding = {.name = "binding", .type = TYPE_VkPipelineBindPoint, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t.binding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t), binding))},
-		.layout = {.name = "layout", .type = TYPE_VkPipelineLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t.layout)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t), layout))},
-	}
-};
-
-const static type_info_struct_render_pipeline_state_t type_info_struct_render_pipeline_state_t_const_data = {
-	.name = "render_pipeline_state_t",
-	.type = TYPE_render_pipeline_state_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_render_pipeline_state_t),
-	.member_count = 13,
-	.members = {
-		.blend_enabled = {.name = "blend_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.blend_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), blend_enabled))},
-		.src_color_blend_mode = {.name = "src_color_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.src_color_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), src_color_blend_mode))},
-		.dst_color_blend_mode = {.name = "dst_color_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.dst_color_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), dst_color_blend_mode))},
-		.src_alpha_blend_mode = {.name = "src_alpha_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.src_alpha_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), src_alpha_blend_mode))},
-		.dst_alpha_blend_mode = {.name = "dst_alpha_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.dst_alpha_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), dst_alpha_blend_mode))},
-		.color_blend_op = {.name = "color_blend_op", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.color_blend_op)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), color_blend_op))},
-		.alpha_blend_op = {.name = "alpha_blend_op", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.alpha_blend_op)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), alpha_blend_op))},
-		.depth_testing_enabled = {.name = "depth_testing_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.depth_testing_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), depth_testing_enabled))},
-		.depth_writing_enabled = {.name = "depth_writing_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.depth_writing_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), depth_writing_enabled))},
-		.depth_func = {.name = "depth_func", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.depth_func)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), depth_func))},
-		.stencil_enabled = {.name = "stencil_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_enabled))},
-		.stencil_state = {.name = "stencil_state", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_state))},
-		.stencil_keep = {.name = "stencil_keep", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_keep)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_keep))},
-	}
-};
-
-const static type_info_struct_spv_vulkan_type_map_t type_info_struct_spv_vulkan_type_map_t_const_data = {
-	.name = "spv_vulkan_type_map_t",
-	.type = TYPE_spv_vulkan_type_map_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_spv_vulkan_type_map_t),
-	.member_count = 2,
-	.members = {
-		.spv_type = {.name = "spv_type", .type = TYPE_VkBuffer, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_spv_vulkan_type_map_t.spv_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_spv_vulkan_type_map_t), spv_type))},
-		.vk_type = {.name = "vk_type", .type = TYPE_VkDescriptorType, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_spv_vulkan_type_map_t.vk_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_spv_vulkan_type_map_t), vk_type))},
-	}
-};
-
-const static type_info_struct_vulkan_shader_descriptor_set_info_t type_info_struct_vulkan_shader_descriptor_set_info_t_const_data = {
-	.name = "vulkan_shader_descriptor_set_info_t",
-	.type = TYPE_vulkan_shader_descriptor_set_info_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t),
-	.member_count = 12,
-	.members = {
-		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), is_valid))},
-		.set_type = {.name = "set_type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.set_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), set_type))},
-		.bindings = {.name = "bindings", .type = TYPE_VkDescriptorSetLayoutBinding, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.bindings)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), bindings))},
-		.binding_count = {.name = "binding_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.binding_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), binding_count))},
-		.binding_upload_size = {.name = "binding_upload_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.binding_upload_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), binding_upload_size))},
-		.image_views = {.name = "image_views", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.image_views)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), image_views))},
-		.samplers = {.name = "samplers", .type = TYPE_VkSampler, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.samplers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), samplers))},
-		.image_count = {.name = "image_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.image_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), image_count))},
-		.sampler_count = {.name = "sampler_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.sampler_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), sampler_count))},
-		.sets = {.name = "sets", .type = TYPE_VkDescriptorSet, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.sets)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), sets))},
-		.uniform_buffer = {.name = "uniform_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.uniform_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), uniform_buffer))},
-		.single_frame_uniform_buffer_size = {.name = "single_frame_uniform_buffer_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.single_frame_uniform_buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), single_frame_uniform_buffer_size))},
-	}
-};
-
-const static type_info_struct_vulkan_shader_uniform_texture_data_t type_info_struct_vulkan_shader_uniform_texture_data_t_const_data = {
-	.name = "vulkan_shader_uniform_texture_data_t",
-	.type = TYPE_vulkan_shader_uniform_texture_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t),
-	.member_count = 3,
-	.members = {
-		.image_views = {.name = "image_views", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t.image_views)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t), image_views))},
-		.image_samplers = {.name = "image_samplers", .type = TYPE_VkSampler, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t.image_samplers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t), image_samplers))},
-		.image_counter = {.name = "image_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t.image_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t), image_counter))},
-	}
-};
-
-const static type_info_struct_vulkan_shader_uniform_data_range_t type_info_struct_vulkan_shader_uniform_data_range_t_const_data = {
-	.name = "vulkan_shader_uniform_data_range_t",
-	.type = TYPE_vulkan_shader_uniform_data_range_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t),
-	.member_count = 2,
-	.members = {
-		.data = {.name = "data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t), data))},
-		.data_size = {.name = "data_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t.data_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t), data_size))},
-	}
-};
-
-const static type_info_struct_vulkan_shader_uniform_data_t type_info_struct_vulkan_shader_uniform_data_t_const_data = {
-	.name = "vulkan_shader_uniform_data_t",
-	.type = TYPE_vulkan_shader_uniform_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_uniform_data_t),
-	.member_count = 12,
-	.members = {
-		.owner_shader_id = {.name = "owner_shader_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.owner_shader_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), owner_shader_id))},
-		.uniform_type = {.name = "uniform_type", .type = TYPE_VkDescriptorType, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.uniform_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), uniform_type))},
-		.set_type = {.name = "set_type", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.set_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), set_type))},
-		.uniform_location = {.name = "uniform_location", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.uniform_location)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), uniform_location))},
-		.push_constant_index = {.name = "push_constant_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.push_constant_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), push_constant_index))},
-		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), name))},
-		.uniform_size = {.name = "uniform_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.uniform_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), uniform_size))},
-		.is_texture = {.name = "is_texture", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.is_texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), is_texture))},
-		.mapped_buffer_update_size = {.name = "mapped_buffer_update_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.mapped_buffer_update_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), mapped_buffer_update_size))},
-		.mapped_uniform_buffer = {.name = "mapped_uniform_buffer", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.mapped_uniform_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), mapped_uniform_buffer))},
-		.storage_buffer = {.name = "storage_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.storage_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), storage_buffer))},
-		.texture_data = {.name = "texture_data", .type = TYPE_vulkan_shader_uniform_texture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.texture_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), texture_data))},
-	}
-};
-
-const static type_info_struct_vulkan_shader_stage_info_t type_info_struct_vulkan_shader_stage_info_t_const_data = {
-	.name = "vulkan_shader_stage_info_t",
-	.type = TYPE_vulkan_shader_stage_info_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_stage_info_t),
-	.member_count = 5,
-	.members = {
-		.type = {.name = "type", .type = TYPE_VkShaderStageFlagBits, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t), type))},
-		.entry_point = {.name = "entry_point", .type = TYPE_char, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Pointer, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t.entry_point)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t), entry_point))},
-		.module_create_info = {.name = "module_create_info", .type = TYPE_VkShaderModuleCreateInfo, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t.module_create_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t), module_create_info))},
-		.shader_stage_create_info = {.name = "shader_stage_create_info", .type = TYPE_VkPipelineShaderStageCreateInfo, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t.shader_stage_create_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t), shader_stage_create_info))},
-		.handle = {.name = "handle", .type = TYPE_VkShaderModule, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t), handle))},
-	}
-};
-
-const static type_info_struct_vulkan_shader_data_t type_info_struct_vulkan_shader_data_t_const_data = {
-	.name = "vulkan_shader_data_t",
-	.type = TYPE_vulkan_shader_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_data_t),
-	.member_count = 23,
-	.members = {
-		.shader_id = {.name = "shader_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.shader_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), shader_id))},
-		.arena = {.name = "arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), arena))},
-		.spv_reflect_module = {.name = "spv_reflect_module", .type = TYPE_SpvReflectShaderModule, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.spv_reflect_module)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), spv_reflect_module))},
-		.stages = {.name = "stages", .type = TYPE_vulkan_shader_stage_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.stages)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), stages))},
-		.stage_count = {.name = "stage_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.stage_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), stage_count))},
-		.primary_pool = {.name = "primary_pool", .type = TYPE_VkDescriptorPool, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.primary_pool)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), primary_pool))},
-		.type_counts = {.name = "type_counts", .type = TYPE_u32, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.type_counts)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), type_counts))},
-		.layouts = {.name = "layouts", .type = TYPE_VkDescriptorSetLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.layouts)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), layouts))},
-		.total_descriptor_set_count = {.name = "total_descriptor_set_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.total_descriptor_set_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), total_descriptor_set_count))},
-		.used_descriptor_set_count = {.name = "used_descriptor_set_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.used_descriptor_set_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), used_descriptor_set_count))},
-		.set_info = {.name = "set_info", .type = TYPE_vulkan_shader_descriptor_set_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.set_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), set_info))},
-		.push_constant_count = {.name = "push_constant_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.push_constant_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), push_constant_count))},
-		.push_constant_data = {.name = "push_constant_data", .type = TYPE_VkPushConstantRange, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.push_constant_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), push_constant_data))},
-		.uniforms = {.name = "uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.uniforms)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), uniforms))},
-		.uniform_count = {.name = "uniform_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.uniform_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), uniform_count))},
-		.static_uniforms = {.name = "static_uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.static_uniforms)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), static_uniforms))},
-		.static_uniform_count = {.name = "static_uniform_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.static_uniform_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), static_uniform_count))},
-		.draw_uniforms = {.name = "draw_uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.draw_uniforms)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), draw_uniforms))},
-		.draw_uniform_count = {.name = "draw_uniform_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.draw_uniform_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), draw_uniform_count))},
-		.instance_uniforms = {.name = "instance_uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.instance_uniforms)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), instance_uniforms))},
-		.instance_uniform_count = {.name = "instance_uniform_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.instance_uniform_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), instance_uniform_count))},
-		.pipeline = {.name = "pipeline", .type = TYPE_vulkan_pipeline_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.pipeline)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), pipeline))},
-		.camera_matrices = {.name = "camera_matrices", .type = TYPE_global_matrix_uniforms_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.camera_matrices)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), camera_matrices))},
-	}
-};
-
-const static type_info_struct_vulkan_physical_device_swapchain_support_info_t type_info_struct_vulkan_physical_device_swapchain_support_info_t_const_data = {
-	.name = "vulkan_physical_device_swapchain_support_info_t",
-	.type = TYPE_vulkan_physical_device_swapchain_support_info_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t),
-	.member_count = 5,
-	.members = {
-		.surface_capabilities = {.name = "surface_capabilities", .type = TYPE_VkSurfaceCapabilitiesKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t.surface_capabilities)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t), surface_capabilities))},
-		.valid_surface_formats = {.name = "valid_surface_formats", .type = TYPE_VkSurfaceFormatKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t.valid_surface_formats)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t), valid_surface_formats))},
-		.valid_present_modes = {.name = "valid_present_modes", .type = TYPE_VkPresentModeKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t.valid_present_modes)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t), valid_present_modes))},
-		.valid_surface_format_count = {.name = "valid_surface_format_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t.valid_surface_format_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t), valid_surface_format_count))},
-		.valid_present_mode_count = {.name = "valid_present_mode_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t.valid_present_mode_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t), valid_present_mode_count))},
-	}
-};
-
-const static type_info_struct_vulkan_physical_device_queue_info_t type_info_struct_vulkan_physical_device_queue_info_t_const_data = {
-	.name = "vulkan_physical_device_queue_info_t",
-	.type = TYPE_vulkan_physical_device_queue_info_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t),
-	.member_count = 4,
-	.members = {
-		.graphics_queue_family_index = {.name = "graphics_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t.graphics_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t), graphics_queue_family_index))},
-		.present_queue_family_index = {.name = "present_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t.present_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t), present_queue_family_index))},
-		.compute_queue_family_index = {.name = "compute_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t.compute_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t), compute_queue_family_index))},
-		.transfer_queue_family_index = {.name = "transfer_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t.transfer_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t), transfer_queue_family_index))},
-	}
-};
-
-const static type_info_struct_vulkan_physical_device_requirements_t type_info_struct_vulkan_physical_device_requirements_t_const_data = {
-	.name = "vulkan_physical_device_requirements_t",
-	.type = TYPE_vulkan_physical_device_requirements_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_physical_device_requirements_t),
-	.member_count = 5,
-	.members = {
-		.has_graphics_queue = {.name = "has_graphics_queue", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t.has_graphics_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t), has_graphics_queue))},
-		.has_present_queue = {.name = "has_present_queue", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t.has_present_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t), has_present_queue))},
-		.has_transfer_queue = {.name = "has_transfer_queue", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t.has_transfer_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t), has_transfer_queue))},
-		.has_compute_queue = {.name = "has_compute_queue", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t.has_compute_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t), has_compute_queue))},
-		.required_extensions = {.name = "required_extensions", .type = TYPE_char, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Pointer, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t.required_extensions)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t), required_extensions))},
-	}
-};
-
-const static type_info_struct_vulkan_physical_device_t type_info_struct_vulkan_physical_device_t_const_data = {
-	.name = "vulkan_physical_device_t",
-	.type = TYPE_vulkan_physical_device_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_physical_device_t),
-	.member_count = 6,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_VkPhysicalDevice, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), handle))},
-		.device_depth_format = {.name = "device_depth_format", .type = TYPE_VkFormat, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.device_depth_format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), device_depth_format))},
-		.properties = {.name = "properties", .type = TYPE_VkPhysicalDeviceProperties, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.properties)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), properties))},
-		.features = {.name = "features", .type = TYPE_u32, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.features)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), features))},
-		.memory_properties = {.name = "memory_properties", .type = TYPE_VkPhysicalDeviceMemoryProperties, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.memory_properties)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), memory_properties))},
-		.swapchain_support_info = {.name = "swapchain_support_info", .type = TYPE_vulkan_physical_device_swapchain_support_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.swapchain_support_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), swapchain_support_info))},
-	}
-};
-
-const static type_info_struct_vulkan_rendering_device_t type_info_struct_vulkan_rendering_device_t_const_data = {
-	.name = "vulkan_rendering_device_t",
-	.type = TYPE_vulkan_rendering_device_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_rendering_device_t),
-	.member_count = 11,
-	.members = {
-		.physical_device = {.name = "physical_device", .type = TYPE_vulkan_physical_device_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.physical_device)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), physical_device))},
-		.graphics_queue_family_index = {.name = "graphics_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.graphics_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), graphics_queue_family_index))},
-		.present_queue_family_index = {.name = "present_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.present_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), present_queue_family_index))},
-		.compute_queue_family_index = {.name = "compute_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.compute_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), compute_queue_family_index))},
-		.transfer_queue_family_index = {.name = "transfer_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.transfer_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), transfer_queue_family_index))},
-		.graphics_queue = {.name = "graphics_queue", .type = TYPE_VkQueue, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.graphics_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), graphics_queue))},
-		.present_queue = {.name = "present_queue", .type = TYPE_VkQueue, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.present_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), present_queue))},
-		.transfer_queue = {.name = "transfer_queue", .type = TYPE_VkQueue, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.transfer_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), transfer_queue))},
-		.compute_queue = {.name = "compute_queue", .type = TYPE_VkQueue, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.compute_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), compute_queue))},
-		.graphics_command_pool = {.name = "graphics_command_pool", .type = TYPE_VkCommandPool, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.graphics_command_pool)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), graphics_command_pool))},
-		.logical_device = {.name = "logical_device", .type = TYPE_VkDevice, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.logical_device)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), logical_device))},
-	}
-};
-
-const static type_info_struct_vulkan_fence_t type_info_struct_vulkan_fence_t_const_data = {
-	.name = "vulkan_fence_t",
-	.type = TYPE_vulkan_fence_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_fence_t),
-	.member_count = 2,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_VkFence, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_fence_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_fence_t), handle))},
-		.signaled = {.name = "signaled", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_fence_t.signaled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_fence_t), signaled))},
-	}
-};
-
-const static type_info_struct_vulkan_renderpass_data_t type_info_struct_vulkan_renderpass_data_t_const_data = {
-	.name = "vulkan_renderpass_data_t",
-	.type = TYPE_vulkan_renderpass_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_renderpass_data_t),
-	.member_count = 7,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_VkRenderPass, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), handle))},
-		.offset = {.name = "offset", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), offset))},
-		.size = {.name = "size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), size))},
-		.clear_color = {.name = "clear_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.clear_color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), clear_color))},
-		.depth_clear = {.name = "depth_clear", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.depth_clear)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), depth_clear))},
-		.stencil_clear = {.name = "stencil_clear", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.stencil_clear)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), stencil_clear))},
-		.renderpass_state = {.name = "renderpass_state", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.renderpass_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), renderpass_state))},
-	}
-};
-
-const static type_info_struct_vulkan_framebuffer_data_t type_info_struct_vulkan_framebuffer_data_t_const_data = {
-	.name = "vulkan_framebuffer_data_t",
-	.type = TYPE_vulkan_framebuffer_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_framebuffer_data_t),
-	.member_count = 4,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_VkFramebuffer, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t), handle))},
-		.renderpass = {.name = "renderpass", .type = TYPE_vulkan_renderpass_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t.renderpass)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t), renderpass))},
-		.attachments = {.name = "attachments", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t.attachments)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t), attachments))},
-		.attachment_count = {.name = "attachment_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t.attachment_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t), attachment_count))},
-	}
-};
-
-const static type_info_struct_vulkan_image_data_t type_info_struct_vulkan_image_data_t_const_data = {
-	.name = "vulkan_image_data_t",
-	.type = TYPE_vulkan_image_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_image_data_t),
-	.member_count = 7,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_vulkan_shader_uniform_texture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), handle))},
-		.memory = {.name = "memory", .type = TYPE_VkDeviceMemory, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.memory)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), memory))},
-		.format = {.name = "format", .type = TYPE_VkFormat, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), format))},
-		.layout = {.name = "layout", .type = TYPE_VkImageLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.layout)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), layout))},
-		.view = {.name = "view", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.view)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), view))},
-		.width = {.name = "width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), width))},
-		.height = {.name = "height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), height))},
-	}
-};
-
-const static type_info_struct_vulkan_texture_t type_info_struct_vulkan_texture_t_const_data = {
-	.name = "vulkan_texture_t",
-	.type = TYPE_vulkan_texture_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_texture_t),
-	.member_count = 3,
-	.members = {
-		.current_generation = {.name = "current_generation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_texture_t.current_generation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_texture_t), current_generation))},
-		.image_data = {.name = "image_data", .type = TYPE_vulkan_image_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_texture_t.image_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_texture_t), image_data))},
-		.sampler = {.name = "sampler", .type = TYPE_VkSampler, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_texture_t.sampler)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_texture_t), sampler))},
-	}
-};
-
-const static type_info_struct_vulkan_swapchain_data_t type_info_struct_vulkan_swapchain_data_t_const_data = {
-	.name = "vulkan_swapchain_data_t",
-	.type = TYPE_vulkan_swapchain_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_swapchain_data_t),
-	.member_count = 12,
-	.members = {
-		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), is_valid))},
-		.arena = {.name = "arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), arena))},
-		.handle = {.name = "handle", .type = TYPE_VkSwapchainKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), handle))},
-		.image_format = {.name = "image_format", .type = TYPE_VkSurfaceFormatKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.image_format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), image_format))},
-		.present_mode = {.name = "present_mode", .type = TYPE_VkPresentModeKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.present_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), present_mode))},
-		.depth_attachment = {.name = "depth_attachment", .type = TYPE_vulkan_image_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.depth_attachment)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), depth_attachment))},
-		.has_depth_attachment = {.name = "has_depth_attachment", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.has_depth_attachment)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), has_depth_attachment))},
-		.max_frames_in_flight = {.name = "max_frames_in_flight", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.max_frames_in_flight)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), max_frames_in_flight))},
-		.image_count = {.name = "image_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.image_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), image_count))},
-		.framebuffers = {.name = "framebuffers", .type = TYPE_vulkan_framebuffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.framebuffers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), framebuffers))},
-		.images = {.name = "images", .type = TYPE_vulkan_shader_uniform_texture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.images)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), images))},
-		.views = {.name = "views", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.views)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), views))},
-	}
-};
-
-const static type_info_struct_vulkan_command_buffer_data_t type_info_struct_vulkan_command_buffer_data_t_const_data = {
-	.name = "vulkan_command_buffer_data_t",
-	.type = TYPE_vulkan_command_buffer_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_command_buffer_data_t),
-	.member_count = 5,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_VkCommandBuffer, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t), handle))},
-		.owner_pool = {.name = "owner_pool", .type = TYPE_VkCommandPool, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t.owner_pool)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t), owner_pool))},
-		.state = {.name = "state", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t.state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t), state))},
-		.is_primary_buffer = {.name = "is_primary_buffer", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t.is_primary_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t), is_primary_buffer))},
-		.is_single_use = {.name = "is_single_use", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t.is_single_use)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t), is_single_use))},
-	}
-};
-
-const static type_info_struct_vulkan_render_backend_function_data_t type_info_struct_vulkan_render_backend_function_data_t_const_data = {
-	.name = "vulkan_render_backend_function_data_t",
-	.type = TYPE_vulkan_render_backend_function_data_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_render_backend_function_data_t),
-	.member_count = 6,
-	.members = {
-		.create_gpu_texture = {.name = "create_gpu_texture", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.create_gpu_texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), create_gpu_texture))},
-		.create_gpu_shader = {.name = "create_gpu_shader", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.create_gpu_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), create_gpu_shader))},
-		.create_gpu_buffer = {.name = "create_gpu_buffer", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.create_gpu_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), create_gpu_buffer))},
-		.destroy_gpu_texture = {.name = "destroy_gpu_texture", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.destroy_gpu_texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), destroy_gpu_texture))},
-		.destroy_gpu_shader = {.name = "destroy_gpu_shader", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.destroy_gpu_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), destroy_gpu_shader))},
-		.destroy_gpu_buffer = {.name = "destroy_gpu_buffer", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.destroy_gpu_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), destroy_gpu_buffer))},
-	}
-};
-
-const static type_info_struct_vulkan_render_frame_state_t type_info_struct_vulkan_render_frame_state_t_const_data = {
-	.name = "vulkan_render_frame_state_t",
-	.type = TYPE_vulkan_render_frame_state_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_render_frame_state_t),
-	.member_count = 8,
-	.members = {
-		.image_render_idle_fence = {.name = "image_render_idle_fence", .type = TYPE_vulkan_fence_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.image_render_idle_fence)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), image_render_idle_fence))},
-		.frame_in_flight_fence_ptr = {.name = "frame_in_flight_fence_ptr", .type = TYPE_vulkan_fence_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.frame_in_flight_fence_ptr)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), frame_in_flight_fence_ptr))},
-		.image_avaliable_semaphore = {.name = "image_avaliable_semaphore", .type = TYPE_VkSemaphore, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.image_avaliable_semaphore)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), image_avaliable_semaphore))},
-		.presentation_complete_semaphore = {.name = "presentation_complete_semaphore", .type = TYPE_VkSemaphore, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.presentation_complete_semaphore)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), presentation_complete_semaphore))},
-		.current_framebuffer = {.name = "current_framebuffer", .type = TYPE_vulkan_framebuffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.current_framebuffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), current_framebuffer))},
-		.render_command_buffer = {.name = "render_command_buffer", .type = TYPE_vulkan_command_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.render_command_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), render_command_buffer))},
-		.instanced_rendering_buffer = {.name = "instanced_rendering_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.instanced_rendering_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), instanced_rendering_buffer))},
-		.bound_shader = {.name = "bound_shader", .type = TYPE_vulkan_shader_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.bound_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), bound_shader))},
-	}
-};
-
-const static type_info_struct_vulkan_render_context_t type_info_struct_vulkan_render_context_t_const_data = {
-	.name = "vulkan_render_context_t",
-	.type = TYPE_vulkan_render_context_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_render_context_t),
-	.member_count = 40,
-	.members = {
-		.initialization_arena = {.name = "initialization_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.initialization_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), initialization_arena))},
-		.frame_arena = {.name = "frame_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.frame_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), frame_arena))},
-		.permanent_arena = {.name = "permanent_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.permanent_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), permanent_arena))},
-		.additional_buffer_count = {.name = "additional_buffer_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.additional_buffer_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), additional_buffer_count))},
-		.window = {.name = "window", .type = TYPE_SDL_Window, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.window)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), window))},
-		.window_width = {.name = "window_width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.window_width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), window_width))},
-		.window_height = {.name = "window_height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.window_height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), window_height))},
-		.instance = {.name = "instance", .type = TYPE_VkInstance, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.instance)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), instance))},
-		.allocators = {.name = "allocators", .type = TYPE_VkAllocationCallbacks, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.allocators)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), allocators))},
-		.render_surface = {.name = "render_surface", .type = TYPE_VkSurfaceKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.render_surface)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), render_surface))},
-		.rendering_device = {.name = "rendering_device", .type = TYPE_vulkan_rendering_device_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.rendering_device)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), rendering_device))},
-		.swapchain = {.name = "swapchain", .type = TYPE_vulkan_swapchain_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.swapchain)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), swapchain))},
-		.current_image_index = {.name = "current_image_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.current_image_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), current_image_index))},
-		.current_frame_index = {.name = "current_frame_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.current_frame_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), current_frame_index))},
-		.framebuffer_width = {.name = "framebuffer_width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.framebuffer_width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), framebuffer_width))},
-		.framebuffer_height = {.name = "framebuffer_height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.framebuffer_height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), framebuffer_height))},
-		.cached_framebuffer_width = {.name = "cached_framebuffer_width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.cached_framebuffer_width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), cached_framebuffer_width))},
-		.cached_framebuffer_height = {.name = "cached_framebuffer_height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.cached_framebuffer_height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), cached_framebuffer_height))},
-		.current_framebuffer_size_generation = {.name = "current_framebuffer_size_generation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.current_framebuffer_size_generation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), current_framebuffer_size_generation))},
-		.last_framebuffer_size_generation = {.name = "last_framebuffer_size_generation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.last_framebuffer_size_generation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), last_framebuffer_size_generation))},
-		.recreating_swapchain = {.name = "recreating_swapchain", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.recreating_swapchain)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), recreating_swapchain))},
-		.image_render_idle_fences = {.name = "image_render_idle_fences", .type = TYPE_vulkan_fence_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.image_render_idle_fences)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), image_render_idle_fences))},
-		.frame_in_flight_fence_ptrs = {.name = "frame_in_flight_fence_ptrs", .type = TYPE_vulkan_fence_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.frame_in_flight_fence_ptrs)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), frame_in_flight_fence_ptrs))},
-		.image_avaliable_semaphores = {.name = "image_avaliable_semaphores", .type = TYPE_VkSemaphore, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.image_avaliable_semaphores)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), image_avaliable_semaphores))},
-		.presentation_complete_semaphores = {.name = "presentation_complete_semaphores", .type = TYPE_VkSemaphore, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.presentation_complete_semaphores)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), presentation_complete_semaphores))},
-		.render_command_buffers = {.name = "render_command_buffers", .type = TYPE_vulkan_command_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.render_command_buffers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), render_command_buffers))},
-		.frames = {.name = "frames", .type = TYPE_vulkan_render_frame_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.frames)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), frames))},
-		.current_frame = {.name = "current_frame", .type = TYPE_vulkan_render_frame_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.current_frame)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), current_frame))},
-		.instanced_rendering_buffer = {.name = "instanced_rendering_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.instanced_rendering_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), instanced_rendering_buffer))},
-		.index_buffer = {.name = "index_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.index_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), index_buffer))},
-		.vertex_buffer = {.name = "vertex_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.vertex_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), vertex_buffer))},
-		.main_renderpass = {.name = "main_renderpass", .type = TYPE_vulkan_renderpass_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.main_renderpass)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), main_renderpass))},
-		.default_shader = {.name = "default_shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.default_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), default_shader))},
-		.default_texture = {.name = "default_texture", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.default_texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), default_texture))},
-		.default_material = {.name = "default_material", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.default_material)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), default_material))},
-		.invalid_texture_data = {.name = "invalid_texture_data", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.invalid_texture_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), invalid_texture_data))},
-		.vertex_offset = {.name = "vertex_offset", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.vertex_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), vertex_offset))},
-		.geometry_index = {.name = "geometry_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.geometry_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), geometry_index))},
-		.test_camera = {.name = "test_camera", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.test_camera)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), test_camera))},
-		.debug_callback = {.name = "debug_callback", .type = TYPE_VkDebugUtilsMessengerEXT, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.debug_callback)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), debug_callback))},
 	}
 };
 
@@ -4539,12 +4010,13 @@ const static type_info_struct_render_geometry_batch_t type_info_struct_render_ge
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_render_geometry_batch_t),
-	.member_count = 6,
+	.member_count = 7,
 	.members = {
 		.camera_data = {.name = "camera_data", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.camera_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), camera_data))},
 		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), is_valid))},
 		.primitive_count = {.name = "primitive_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.primitive_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), primitive_count))},
 		.master_array_start_offset = {.name = "master_array_start_offset", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.master_array_start_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), master_array_start_offset))},
+		.material_instance = {.name = "material_instance", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.material_instance)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), material_instance))},
 		.instances = {.name = "instances", .type = TYPE_render_geometry_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.instances)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), instances))},
 		.next_buffer = {.name = "next_buffer", .type = TYPE_render_geometry_batch_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.next_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), next_buffer))},
 	}
@@ -4560,7 +4032,7 @@ const static type_info_struct_render_group_t type_info_struct_render_group_t_con
 	.member_count = 8,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), ID))},
-		.material = {.name = "material", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.material)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), material))},
+		.material_archetype = {.name = "material_archetype", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.material_archetype)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), material_archetype))},
 		.textures = {.name = "textures", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.textures)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), textures))},
 		.current_texture_count = {.name = "current_texture_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.current_texture_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), current_texture_count))},
 		.master_batch_array = {.name = "master_batch_array", .type = TYPE_render_geometry_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.master_batch_array)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), master_batch_array))},
@@ -4630,6 +4102,571 @@ const static type_info_struct_render_state_t type_info_struct_render_state_t_con
 	}
 };
 
+const static type_info_struct_global_matrix_uniforms_t type_info_struct_global_matrix_uniforms_t_const_data = {
+	.name = "global_matrix_uniforms_t",
+	.type = TYPE_global_matrix_uniforms_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_global_matrix_uniforms_t),
+	.member_count = 2,
+	.members = {
+		.view_matrix = {.name = "view_matrix", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_matrix_uniforms_t.view_matrix)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_matrix_uniforms_t), view_matrix))},
+		.projection_matrix = {.name = "projection_matrix", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_matrix_uniforms_t.projection_matrix)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_matrix_uniforms_t), projection_matrix))},
+	}
+};
+
+const static type_info_struct_push_constant_t type_info_struct_push_constant_t_const_data = {
+	.name = "push_constant_t",
+	.type = TYPE_push_constant_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_push_constant_t),
+	.member_count = 1,
+	.members = {
+		.DrawColor = {.name = "DrawColor", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_push_constant_t.DrawColor)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_push_constant_t), DrawColor))},
+	}
+};
+
+const static type_info_struct_render_camera_t type_info_struct_render_camera_t_const_data = {
+	.name = "render_camera_t",
+	.type = TYPE_render_camera_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_render_camera_t),
+	.member_count = 3,
+	.members = {
+		.view_matrix = {.name = "view_matrix", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_camera_t.view_matrix)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_camera_t), view_matrix))},
+		.projection_matrix = {.name = "projection_matrix", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_camera_t.projection_matrix)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_camera_t), projection_matrix))},
+		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_camera_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_camera_t), ID))},
+	}
+};
+
+const static type_info_struct_render_constant_buffer_t type_info_struct_render_constant_buffer_t_const_data = {
+	.name = "render_constant_buffer_t",
+	.type = TYPE_render_constant_buffer_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_render_constant_buffer_t),
+	.member_count = 3,
+	.members = {
+		.GPU_buffer = {.name = "GPU_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.GPU_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), GPU_buffer))},
+		.CPU_buffer = {.name = "CPU_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.CPU_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), CPU_buffer))},
+		.buffer_data = {.name = "buffer_data", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.buffer_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), buffer_data))},
+	}
+};
+
+const static type_info_struct_vulkan_buffer_data_t type_info_struct_vulkan_buffer_data_t_const_data = {
+	.name = "vulkan_buffer_data_t",
+	.type = TYPE_vulkan_buffer_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_buffer_data_t),
+	.member_count = 8,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), is_valid))},
+		.is_mapped = {.name = "is_mapped", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.is_mapped)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), is_mapped))},
+		.buffer_size = {.name = "buffer_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), buffer_size))},
+		.handle = {.name = "handle", .type = TYPE_VkBuffer, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), handle))},
+		.device_memory = {.name = "device_memory", .type = TYPE_VkDeviceMemory, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.device_memory)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), device_memory))},
+		.usage_flags = {.name = "usage_flags", .type = TYPE_VkBufferUsageFlagBits, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.usage_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), usage_flags))},
+		.memory_index = {.name = "memory_index", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.memory_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), memory_index))},
+		.memory_property_flags = {.name = "memory_property_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.memory_property_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), memory_property_flags))},
+	}
+};
+
+const static type_info_struct_vulkan_pipeline_data_t type_info_struct_vulkan_pipeline_data_t_const_data = {
+	.name = "vulkan_pipeline_data_t",
+	.type = TYPE_vulkan_pipeline_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_pipeline_data_t),
+	.member_count = 3,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkPipeline, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t), handle))},
+		.binding = {.name = "binding", .type = TYPE_VkPipelineBindPoint, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t.binding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t), binding))},
+		.layout = {.name = "layout", .type = TYPE_VkPipelineLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t.layout)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_pipeline_data_t), layout))},
+	}
+};
+
+const static type_info_struct_render_pipeline_state_t type_info_struct_render_pipeline_state_t_const_data = {
+	.name = "render_pipeline_state_t",
+	.type = TYPE_render_pipeline_state_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_render_pipeline_state_t),
+	.member_count = 13,
+	.members = {
+		.blend_enabled = {.name = "blend_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.blend_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), blend_enabled))},
+		.src_color_blend_mode = {.name = "src_color_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.src_color_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), src_color_blend_mode))},
+		.dst_color_blend_mode = {.name = "dst_color_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.dst_color_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), dst_color_blend_mode))},
+		.src_alpha_blend_mode = {.name = "src_alpha_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.src_alpha_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), src_alpha_blend_mode))},
+		.dst_alpha_blend_mode = {.name = "dst_alpha_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.dst_alpha_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), dst_alpha_blend_mode))},
+		.color_blend_op = {.name = "color_blend_op", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.color_blend_op)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), color_blend_op))},
+		.alpha_blend_op = {.name = "alpha_blend_op", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.alpha_blend_op)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), alpha_blend_op))},
+		.depth_testing_enabled = {.name = "depth_testing_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.depth_testing_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), depth_testing_enabled))},
+		.depth_writing_enabled = {.name = "depth_writing_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.depth_writing_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), depth_writing_enabled))},
+		.depth_func = {.name = "depth_func", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.depth_func)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), depth_func))},
+		.stencil_enabled = {.name = "stencil_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_enabled))},
+		.stencil_state = {.name = "stencil_state", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_state))},
+		.stencil_keep = {.name = "stencil_keep", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_keep)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_keep))},
+	}
+};
+
+const static type_info_struct_spv_vulkan_type_map_t type_info_struct_spv_vulkan_type_map_t_const_data = {
+	.name = "spv_vulkan_type_map_t",
+	.type = TYPE_spv_vulkan_type_map_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_spv_vulkan_type_map_t),
+	.member_count = 2,
+	.members = {
+		.spv_type = {.name = "spv_type", .type = TYPE_VkBuffer, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_spv_vulkan_type_map_t.spv_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_spv_vulkan_type_map_t), spv_type))},
+		.vk_type = {.name = "vk_type", .type = TYPE_VkDescriptorType, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_spv_vulkan_type_map_t.vk_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_spv_vulkan_type_map_t), vk_type))},
+	}
+};
+
+const static type_info_struct_vulkan_shader_descriptor_set_info_t type_info_struct_vulkan_shader_descriptor_set_info_t_const_data = {
+	.name = "vulkan_shader_descriptor_set_info_t",
+	.type = TYPE_vulkan_shader_descriptor_set_info_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t),
+	.member_count = 12,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), is_valid))},
+		.set_type = {.name = "set_type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.set_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), set_type))},
+		.bindings = {.name = "bindings", .type = TYPE_VkDescriptorSetLayoutBinding, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.bindings)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), bindings))},
+		.binding_count = {.name = "binding_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.binding_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), binding_count))},
+		.binding_upload_size = {.name = "binding_upload_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.binding_upload_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), binding_upload_size))},
+		.image_views = {.name = "image_views", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.image_views)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), image_views))},
+		.samplers = {.name = "samplers", .type = TYPE_VkSampler, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.samplers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), samplers))},
+		.image_count = {.name = "image_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.image_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), image_count))},
+		.sampler_count = {.name = "sampler_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.sampler_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), sampler_count))},
+		.sets = {.name = "sets", .type = TYPE_VkDescriptorSet, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.sets)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), sets))},
+		.uniform_buffer = {.name = "uniform_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.uniform_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), uniform_buffer))},
+		.single_frame_uniform_buffer_size = {.name = "single_frame_uniform_buffer_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t.single_frame_uniform_buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_descriptor_set_info_t), single_frame_uniform_buffer_size))},
+	}
+};
+
+const static type_info_struct_vulkan_shader_uniform_texture_data_t type_info_struct_vulkan_shader_uniform_texture_data_t_const_data = {
+	.name = "vulkan_shader_uniform_texture_data_t",
+	.type = TYPE_vulkan_shader_uniform_texture_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t),
+	.member_count = 3,
+	.members = {
+		.image_views = {.name = "image_views", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t.image_views)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t), image_views))},
+		.image_samplers = {.name = "image_samplers", .type = TYPE_VkSampler, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t.image_samplers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t), image_samplers))},
+		.image_counter = {.name = "image_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t.image_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_texture_data_t), image_counter))},
+	}
+};
+
+const static type_info_struct_vulkan_shader_uniform_data_range_t type_info_struct_vulkan_shader_uniform_data_range_t_const_data = {
+	.name = "vulkan_shader_uniform_data_range_t",
+	.type = TYPE_vulkan_shader_uniform_data_range_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t),
+	.member_count = 2,
+	.members = {
+		.data = {.name = "data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t), data))},
+		.data_size = {.name = "data_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t.data_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_range_t), data_size))},
+	}
+};
+
+const static type_info_struct_vulkan_shader_uniform_data_t type_info_struct_vulkan_shader_uniform_data_t_const_data = {
+	.name = "vulkan_shader_uniform_data_t",
+	.type = TYPE_vulkan_shader_uniform_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_uniform_data_t),
+	.member_count = 12,
+	.members = {
+		.owner_shader_id = {.name = "owner_shader_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.owner_shader_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), owner_shader_id))},
+		.uniform_type = {.name = "uniform_type", .type = TYPE_VkDescriptorType, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.uniform_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), uniform_type))},
+		.set_type = {.name = "set_type", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.set_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), set_type))},
+		.uniform_location = {.name = "uniform_location", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.uniform_location)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), uniform_location))},
+		.push_constant_index = {.name = "push_constant_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.push_constant_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), push_constant_index))},
+		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), name))},
+		.uniform_size = {.name = "uniform_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.uniform_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), uniform_size))},
+		.is_texture = {.name = "is_texture", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.is_texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), is_texture))},
+		.mapped_buffer_update_size = {.name = "mapped_buffer_update_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.mapped_buffer_update_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), mapped_buffer_update_size))},
+		.mapped_uniform_buffer = {.name = "mapped_uniform_buffer", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.mapped_uniform_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), mapped_uniform_buffer))},
+		.storage_buffer = {.name = "storage_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.storage_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), storage_buffer))},
+		.texture_data = {.name = "texture_data", .type = TYPE_vulkan_shader_uniform_texture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t.texture_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_uniform_data_t), texture_data))},
+	}
+};
+
+const static type_info_struct_vulkan_shader_stage_info_t type_info_struct_vulkan_shader_stage_info_t_const_data = {
+	.name = "vulkan_shader_stage_info_t",
+	.type = TYPE_vulkan_shader_stage_info_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_stage_info_t),
+	.member_count = 5,
+	.members = {
+		.type = {.name = "type", .type = TYPE_VkShaderStageFlagBits, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t), type))},
+		.entry_point = {.name = "entry_point", .type = TYPE_char, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Pointer, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t.entry_point)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t), entry_point))},
+		.module_create_info = {.name = "module_create_info", .type = TYPE_VkShaderModuleCreateInfo, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t.module_create_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t), module_create_info))},
+		.shader_stage_create_info = {.name = "shader_stage_create_info", .type = TYPE_VkPipelineShaderStageCreateInfo, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t.shader_stage_create_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t), shader_stage_create_info))},
+		.handle = {.name = "handle", .type = TYPE_VkShaderModule, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_stage_info_t), handle))},
+	}
+};
+
+const static type_info_struct_vulkan_shader_data_t type_info_struct_vulkan_shader_data_t_const_data = {
+	.name = "vulkan_shader_data_t",
+	.type = TYPE_vulkan_shader_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_data_t),
+	.member_count = 23,
+	.members = {
+		.shader_id = {.name = "shader_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.shader_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), shader_id))},
+		.arena = {.name = "arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), arena))},
+		.spv_reflect_module = {.name = "spv_reflect_module", .type = TYPE_SpvReflectShaderModule, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.spv_reflect_module)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), spv_reflect_module))},
+		.stages = {.name = "stages", .type = TYPE_vulkan_shader_stage_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.stages)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), stages))},
+		.stage_count = {.name = "stage_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.stage_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), stage_count))},
+		.primary_pool = {.name = "primary_pool", .type = TYPE_VkDescriptorPool, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.primary_pool)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), primary_pool))},
+		.type_counts = {.name = "type_counts", .type = TYPE_u32, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.type_counts)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), type_counts))},
+		.layouts = {.name = "layouts", .type = TYPE_VkDescriptorSetLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.layouts)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), layouts))},
+		.total_descriptor_set_count = {.name = "total_descriptor_set_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.total_descriptor_set_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), total_descriptor_set_count))},
+		.used_descriptor_set_count = {.name = "used_descriptor_set_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.used_descriptor_set_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), used_descriptor_set_count))},
+		.set_info = {.name = "set_info", .type = TYPE_vulkan_shader_descriptor_set_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.set_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), set_info))},
+		.push_constant_count = {.name = "push_constant_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.push_constant_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), push_constant_count))},
+		.push_constant_data = {.name = "push_constant_data", .type = TYPE_VkPushConstantRange, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.push_constant_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), push_constant_data))},
+		.uniforms = {.name = "uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.uniforms)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), uniforms))},
+		.uniform_count = {.name = "uniform_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.uniform_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), uniform_count))},
+		.static_uniforms = {.name = "static_uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.static_uniforms)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), static_uniforms))},
+		.static_uniform_count = {.name = "static_uniform_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.static_uniform_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), static_uniform_count))},
+		.draw_uniforms = {.name = "draw_uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.draw_uniforms)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), draw_uniforms))},
+		.draw_uniform_count = {.name = "draw_uniform_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.draw_uniform_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), draw_uniform_count))},
+		.instance_uniforms = {.name = "instance_uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.instance_uniforms)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), instance_uniforms))},
+		.instance_uniform_count = {.name = "instance_uniform_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.instance_uniform_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), instance_uniform_count))},
+		.pipeline = {.name = "pipeline", .type = TYPE_vulkan_pipeline_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.pipeline)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), pipeline))},
+		.camera_matrices = {.name = "camera_matrices", .type = TYPE_global_matrix_uniforms_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.camera_matrices)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), camera_matrices))},
+	}
+};
+
+const static type_info_struct_vulkan_physical_device_swapchain_support_info_t type_info_struct_vulkan_physical_device_swapchain_support_info_t_const_data = {
+	.name = "vulkan_physical_device_swapchain_support_info_t",
+	.type = TYPE_vulkan_physical_device_swapchain_support_info_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t),
+	.member_count = 5,
+	.members = {
+		.surface_capabilities = {.name = "surface_capabilities", .type = TYPE_VkSurfaceCapabilitiesKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t.surface_capabilities)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t), surface_capabilities))},
+		.valid_surface_formats = {.name = "valid_surface_formats", .type = TYPE_VkSurfaceFormatKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t.valid_surface_formats)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t), valid_surface_formats))},
+		.valid_present_modes = {.name = "valid_present_modes", .type = TYPE_VkPresentModeKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t.valid_present_modes)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t), valid_present_modes))},
+		.valid_surface_format_count = {.name = "valid_surface_format_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t.valid_surface_format_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t), valid_surface_format_count))},
+		.valid_present_mode_count = {.name = "valid_present_mode_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t.valid_present_mode_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_swapchain_support_info_t), valid_present_mode_count))},
+	}
+};
+
+const static type_info_struct_vulkan_physical_device_queue_info_t type_info_struct_vulkan_physical_device_queue_info_t_const_data = {
+	.name = "vulkan_physical_device_queue_info_t",
+	.type = TYPE_vulkan_physical_device_queue_info_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t),
+	.member_count = 4,
+	.members = {
+		.graphics_queue_family_index = {.name = "graphics_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t.graphics_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t), graphics_queue_family_index))},
+		.present_queue_family_index = {.name = "present_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t.present_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t), present_queue_family_index))},
+		.compute_queue_family_index = {.name = "compute_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t.compute_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t), compute_queue_family_index))},
+		.transfer_queue_family_index = {.name = "transfer_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t.transfer_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_queue_info_t), transfer_queue_family_index))},
+	}
+};
+
+const static type_info_struct_vulkan_physical_device_requirements_t type_info_struct_vulkan_physical_device_requirements_t_const_data = {
+	.name = "vulkan_physical_device_requirements_t",
+	.type = TYPE_vulkan_physical_device_requirements_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_physical_device_requirements_t),
+	.member_count = 5,
+	.members = {
+		.has_graphics_queue = {.name = "has_graphics_queue", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t.has_graphics_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t), has_graphics_queue))},
+		.has_present_queue = {.name = "has_present_queue", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t.has_present_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t), has_present_queue))},
+		.has_transfer_queue = {.name = "has_transfer_queue", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t.has_transfer_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t), has_transfer_queue))},
+		.has_compute_queue = {.name = "has_compute_queue", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t.has_compute_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t), has_compute_queue))},
+		.required_extensions = {.name = "required_extensions", .type = TYPE_char, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Pointer, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t.required_extensions)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_requirements_t), required_extensions))},
+	}
+};
+
+const static type_info_struct_vulkan_physical_device_t type_info_struct_vulkan_physical_device_t_const_data = {
+	.name = "vulkan_physical_device_t",
+	.type = TYPE_vulkan_physical_device_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_physical_device_t),
+	.member_count = 6,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkPhysicalDevice, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), handle))},
+		.device_depth_format = {.name = "device_depth_format", .type = TYPE_VkFormat, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.device_depth_format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), device_depth_format))},
+		.properties = {.name = "properties", .type = TYPE_VkPhysicalDeviceProperties, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.properties)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), properties))},
+		.features = {.name = "features", .type = TYPE_u32, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.features)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), features))},
+		.memory_properties = {.name = "memory_properties", .type = TYPE_VkPhysicalDeviceMemoryProperties, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.memory_properties)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), memory_properties))},
+		.swapchain_support_info = {.name = "swapchain_support_info", .type = TYPE_vulkan_physical_device_swapchain_support_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_physical_device_t.swapchain_support_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_physical_device_t), swapchain_support_info))},
+	}
+};
+
+const static type_info_struct_vulkan_rendering_device_t type_info_struct_vulkan_rendering_device_t_const_data = {
+	.name = "vulkan_rendering_device_t",
+	.type = TYPE_vulkan_rendering_device_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_rendering_device_t),
+	.member_count = 11,
+	.members = {
+		.physical_device = {.name = "physical_device", .type = TYPE_vulkan_physical_device_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.physical_device)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), physical_device))},
+		.graphics_queue_family_index = {.name = "graphics_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.graphics_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), graphics_queue_family_index))},
+		.present_queue_family_index = {.name = "present_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.present_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), present_queue_family_index))},
+		.compute_queue_family_index = {.name = "compute_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.compute_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), compute_queue_family_index))},
+		.transfer_queue_family_index = {.name = "transfer_queue_family_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.transfer_queue_family_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), transfer_queue_family_index))},
+		.graphics_queue = {.name = "graphics_queue", .type = TYPE_VkQueue, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.graphics_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), graphics_queue))},
+		.present_queue = {.name = "present_queue", .type = TYPE_VkQueue, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.present_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), present_queue))},
+		.transfer_queue = {.name = "transfer_queue", .type = TYPE_VkQueue, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.transfer_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), transfer_queue))},
+		.compute_queue = {.name = "compute_queue", .type = TYPE_VkQueue, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.compute_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), compute_queue))},
+		.graphics_command_pool = {.name = "graphics_command_pool", .type = TYPE_VkCommandPool, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.graphics_command_pool)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), graphics_command_pool))},
+		.logical_device = {.name = "logical_device", .type = TYPE_VkDevice, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t.logical_device)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_rendering_device_t), logical_device))},
+	}
+};
+
+const static type_info_struct_vulkan_fence_t type_info_struct_vulkan_fence_t_const_data = {
+	.name = "vulkan_fence_t",
+	.type = TYPE_vulkan_fence_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_fence_t),
+	.member_count = 2,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkFence, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_fence_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_fence_t), handle))},
+		.signaled = {.name = "signaled", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_fence_t.signaled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_fence_t), signaled))},
+	}
+};
+
+const static type_info_struct_vulkan_renderpass_data_t type_info_struct_vulkan_renderpass_data_t_const_data = {
+	.name = "vulkan_renderpass_data_t",
+	.type = TYPE_vulkan_renderpass_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_renderpass_data_t),
+	.member_count = 7,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkRenderPass, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), handle))},
+		.offset = {.name = "offset", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), offset))},
+		.size = {.name = "size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), size))},
+		.clear_color = {.name = "clear_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.clear_color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), clear_color))},
+		.depth_clear = {.name = "depth_clear", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.depth_clear)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), depth_clear))},
+		.stencil_clear = {.name = "stencil_clear", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.stencil_clear)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), stencil_clear))},
+		.renderpass_state = {.name = "renderpass_state", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t.renderpass_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_renderpass_data_t), renderpass_state))},
+	}
+};
+
+const static type_info_struct_vulkan_framebuffer_data_t type_info_struct_vulkan_framebuffer_data_t_const_data = {
+	.name = "vulkan_framebuffer_data_t",
+	.type = TYPE_vulkan_framebuffer_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_framebuffer_data_t),
+	.member_count = 4,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkFramebuffer, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t), handle))},
+		.renderpass = {.name = "renderpass", .type = TYPE_vulkan_renderpass_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t.renderpass)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t), renderpass))},
+		.attachments = {.name = "attachments", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t.attachments)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t), attachments))},
+		.attachment_count = {.name = "attachment_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t.attachment_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_framebuffer_data_t), attachment_count))},
+	}
+};
+
+const static type_info_struct_vulkan_image_data_t type_info_struct_vulkan_image_data_t_const_data = {
+	.name = "vulkan_image_data_t",
+	.type = TYPE_vulkan_image_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_image_data_t),
+	.member_count = 7,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_vulkan_shader_uniform_texture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), handle))},
+		.memory = {.name = "memory", .type = TYPE_VkDeviceMemory, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.memory)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), memory))},
+		.format = {.name = "format", .type = TYPE_VkFormat, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), format))},
+		.layout = {.name = "layout", .type = TYPE_VkImageLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.layout)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), layout))},
+		.view = {.name = "view", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.view)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), view))},
+		.width = {.name = "width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), width))},
+		.height = {.name = "height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_data_t.height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_data_t), height))},
+	}
+};
+
+const static type_info_struct_vulkan_texture_t type_info_struct_vulkan_texture_t_const_data = {
+	.name = "vulkan_texture_t",
+	.type = TYPE_vulkan_texture_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_texture_t),
+	.member_count = 3,
+	.members = {
+		.current_generation = {.name = "current_generation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_texture_t.current_generation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_texture_t), current_generation))},
+		.image_data = {.name = "image_data", .type = TYPE_vulkan_image_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_texture_t.image_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_texture_t), image_data))},
+		.sampler = {.name = "sampler", .type = TYPE_VkSampler, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_texture_t.sampler)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_texture_t), sampler))},
+	}
+};
+
+const static type_info_struct_vulkan_swapchain_data_t type_info_struct_vulkan_swapchain_data_t_const_data = {
+	.name = "vulkan_swapchain_data_t",
+	.type = TYPE_vulkan_swapchain_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_swapchain_data_t),
+	.member_count = 12,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), is_valid))},
+		.arena = {.name = "arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), arena))},
+		.handle = {.name = "handle", .type = TYPE_VkSwapchainKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), handle))},
+		.image_format = {.name = "image_format", .type = TYPE_VkSurfaceFormatKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.image_format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), image_format))},
+		.present_mode = {.name = "present_mode", .type = TYPE_VkPresentModeKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.present_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), present_mode))},
+		.depth_attachment = {.name = "depth_attachment", .type = TYPE_vulkan_image_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.depth_attachment)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), depth_attachment))},
+		.has_depth_attachment = {.name = "has_depth_attachment", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.has_depth_attachment)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), has_depth_attachment))},
+		.max_frames_in_flight = {.name = "max_frames_in_flight", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.max_frames_in_flight)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), max_frames_in_flight))},
+		.image_count = {.name = "image_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.image_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), image_count))},
+		.framebuffers = {.name = "framebuffers", .type = TYPE_vulkan_framebuffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.framebuffers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), framebuffers))},
+		.images = {.name = "images", .type = TYPE_vulkan_shader_uniform_texture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.images)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), images))},
+		.views = {.name = "views", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t.views)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_swapchain_data_t), views))},
+	}
+};
+
+const static type_info_struct_vulkan_command_buffer_data_t type_info_struct_vulkan_command_buffer_data_t_const_data = {
+	.name = "vulkan_command_buffer_data_t",
+	.type = TYPE_vulkan_command_buffer_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_command_buffer_data_t),
+	.member_count = 5,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_VkCommandBuffer, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t), handle))},
+		.owner_pool = {.name = "owner_pool", .type = TYPE_VkCommandPool, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t.owner_pool)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t), owner_pool))},
+		.state = {.name = "state", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t.state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t), state))},
+		.is_primary_buffer = {.name = "is_primary_buffer", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t.is_primary_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t), is_primary_buffer))},
+		.is_single_use = {.name = "is_single_use", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t.is_single_use)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_command_buffer_data_t), is_single_use))},
+	}
+};
+
+const static type_info_struct_vulkan_render_backend_function_data_t type_info_struct_vulkan_render_backend_function_data_t_const_data = {
+	.name = "vulkan_render_backend_function_data_t",
+	.type = TYPE_vulkan_render_backend_function_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_render_backend_function_data_t),
+	.member_count = 6,
+	.members = {
+		.create_gpu_texture = {.name = "create_gpu_texture", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.create_gpu_texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), create_gpu_texture))},
+		.create_gpu_shader = {.name = "create_gpu_shader", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.create_gpu_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), create_gpu_shader))},
+		.create_gpu_buffer = {.name = "create_gpu_buffer", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.create_gpu_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), create_gpu_buffer))},
+		.destroy_gpu_texture = {.name = "destroy_gpu_texture", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.destroy_gpu_texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), destroy_gpu_texture))},
+		.destroy_gpu_shader = {.name = "destroy_gpu_shader", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.destroy_gpu_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), destroy_gpu_shader))},
+		.destroy_gpu_buffer = {.name = "destroy_gpu_buffer", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t.destroy_gpu_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_backend_function_data_t), destroy_gpu_buffer))},
+	}
+};
+
+const static type_info_struct_vulkan_render_frame_state_t type_info_struct_vulkan_render_frame_state_t_const_data = {
+	.name = "vulkan_render_frame_state_t",
+	.type = TYPE_vulkan_render_frame_state_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_render_frame_state_t),
+	.member_count = 8,
+	.members = {
+		.image_render_idle_fence = {.name = "image_render_idle_fence", .type = TYPE_vulkan_fence_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.image_render_idle_fence)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), image_render_idle_fence))},
+		.frame_in_flight_fence_ptr = {.name = "frame_in_flight_fence_ptr", .type = TYPE_vulkan_fence_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.frame_in_flight_fence_ptr)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), frame_in_flight_fence_ptr))},
+		.image_avaliable_semaphore = {.name = "image_avaliable_semaphore", .type = TYPE_VkSemaphore, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.image_avaliable_semaphore)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), image_avaliable_semaphore))},
+		.presentation_complete_semaphore = {.name = "presentation_complete_semaphore", .type = TYPE_VkSemaphore, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.presentation_complete_semaphore)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), presentation_complete_semaphore))},
+		.current_framebuffer = {.name = "current_framebuffer", .type = TYPE_vulkan_framebuffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.current_framebuffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), current_framebuffer))},
+		.render_command_buffer = {.name = "render_command_buffer", .type = TYPE_vulkan_command_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.render_command_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), render_command_buffer))},
+		.instanced_rendering_buffer = {.name = "instanced_rendering_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.instanced_rendering_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), instanced_rendering_buffer))},
+		.bound_shader = {.name = "bound_shader", .type = TYPE_vulkan_shader_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t.bound_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_frame_state_t), bound_shader))},
+	}
+};
+
+const static type_info_struct_vulkan_render_context_t type_info_struct_vulkan_render_context_t_const_data = {
+	.name = "vulkan_render_context_t",
+	.type = TYPE_vulkan_render_context_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vulkan_render_context_t),
+	.member_count = 40,
+	.members = {
+		.initialization_arena = {.name = "initialization_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.initialization_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), initialization_arena))},
+		.frame_arena = {.name = "frame_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.frame_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), frame_arena))},
+		.permanent_arena = {.name = "permanent_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.permanent_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), permanent_arena))},
+		.additional_buffer_count = {.name = "additional_buffer_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.additional_buffer_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), additional_buffer_count))},
+		.window = {.name = "window", .type = TYPE_SDL_Window, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.window)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), window))},
+		.window_width = {.name = "window_width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.window_width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), window_width))},
+		.window_height = {.name = "window_height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.window_height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), window_height))},
+		.instance = {.name = "instance", .type = TYPE_VkInstance, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.instance)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), instance))},
+		.allocators = {.name = "allocators", .type = TYPE_VkAllocationCallbacks, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.allocators)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), allocators))},
+		.render_surface = {.name = "render_surface", .type = TYPE_VkSurfaceKHR, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.render_surface)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), render_surface))},
+		.rendering_device = {.name = "rendering_device", .type = TYPE_vulkan_rendering_device_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.rendering_device)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), rendering_device))},
+		.swapchain = {.name = "swapchain", .type = TYPE_vulkan_swapchain_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.swapchain)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), swapchain))},
+		.current_image_index = {.name = "current_image_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.current_image_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), current_image_index))},
+		.current_frame_index = {.name = "current_frame_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.current_frame_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), current_frame_index))},
+		.framebuffer_width = {.name = "framebuffer_width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.framebuffer_width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), framebuffer_width))},
+		.framebuffer_height = {.name = "framebuffer_height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.framebuffer_height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), framebuffer_height))},
+		.cached_framebuffer_width = {.name = "cached_framebuffer_width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.cached_framebuffer_width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), cached_framebuffer_width))},
+		.cached_framebuffer_height = {.name = "cached_framebuffer_height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.cached_framebuffer_height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), cached_framebuffer_height))},
+		.current_framebuffer_size_generation = {.name = "current_framebuffer_size_generation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.current_framebuffer_size_generation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), current_framebuffer_size_generation))},
+		.last_framebuffer_size_generation = {.name = "last_framebuffer_size_generation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.last_framebuffer_size_generation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), last_framebuffer_size_generation))},
+		.recreating_swapchain = {.name = "recreating_swapchain", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.recreating_swapchain)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), recreating_swapchain))},
+		.image_render_idle_fences = {.name = "image_render_idle_fences", .type = TYPE_vulkan_fence_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.image_render_idle_fences)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), image_render_idle_fences))},
+		.frame_in_flight_fence_ptrs = {.name = "frame_in_flight_fence_ptrs", .type = TYPE_vulkan_fence_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.frame_in_flight_fence_ptrs)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), frame_in_flight_fence_ptrs))},
+		.image_avaliable_semaphores = {.name = "image_avaliable_semaphores", .type = TYPE_VkSemaphore, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.image_avaliable_semaphores)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), image_avaliable_semaphores))},
+		.presentation_complete_semaphores = {.name = "presentation_complete_semaphores", .type = TYPE_VkSemaphore, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.presentation_complete_semaphores)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), presentation_complete_semaphores))},
+		.render_command_buffers = {.name = "render_command_buffers", .type = TYPE_vulkan_command_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.render_command_buffers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), render_command_buffers))},
+		.frames = {.name = "frames", .type = TYPE_vulkan_render_frame_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.frames)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), frames))},
+		.current_frame = {.name = "current_frame", .type = TYPE_vulkan_render_frame_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.current_frame)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), current_frame))},
+		.instanced_rendering_buffer = {.name = "instanced_rendering_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.instanced_rendering_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), instanced_rendering_buffer))},
+		.index_buffer = {.name = "index_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.index_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), index_buffer))},
+		.vertex_buffer = {.name = "vertex_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.vertex_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), vertex_buffer))},
+		.main_renderpass = {.name = "main_renderpass", .type = TYPE_vulkan_renderpass_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.main_renderpass)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), main_renderpass))},
+		.default_shader = {.name = "default_shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.default_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), default_shader))},
+		.default_texture = {.name = "default_texture", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.default_texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), default_texture))},
+		.default_material = {.name = "default_material", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.default_material)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), default_material))},
+		.invalid_texture_data = {.name = "invalid_texture_data", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.invalid_texture_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), invalid_texture_data))},
+		.vertex_offset = {.name = "vertex_offset", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.vertex_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), vertex_offset))},
+		.geometry_index = {.name = "geometry_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.geometry_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), geometry_index))},
+		.test_camera = {.name = "test_camera", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.test_camera)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), test_camera))},
+		.debug_callback = {.name = "debug_callback", .type = TYPE_VkDebugUtilsMessengerEXT, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.debug_callback)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), debug_callback))},
+	}
+};
+
 const static type_info_struct_asset_handle_t type_info_struct_asset_handle_t_const_data = {
 	.name = "asset_handle_t",
 	.type = TYPE_asset_handle_t,
@@ -4646,7 +4683,7 @@ const static type_info_struct_asset_handle_t type_info_struct_asset_handle_t_con
 		.slot = {.name = "slot", .type = TYPE_asset_slot_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.slot)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), slot))},
 		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), texture))},
 		.shader = {.name = "shader", .type = TYPE_shader_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), shader))},
-		.material = {.name = "material", .type = TYPE_material_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.material)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), material))},
+		.material_info = {.name = "material_info", .type = TYPE_material_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.material_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), material_info))},
 	}
 };
 
@@ -4774,7 +4811,7 @@ const static type_info_struct_material_archetype_t type_info_struct_material_arc
 		.version = {.name = "version", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.version)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), version))},
 		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), name))},
 		.shader_binary_name = {.name = "shader_binary_name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.shader_binary_name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), shader_binary_name))},
-		.shader = {.name = "shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), shader))},
+		.shader_handle = {.name = "shader_handle", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.shader_handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), shader_handle))},
 		.base_instance = {.name = "base_instance", .type = TYPE_material_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_material_archetype_t.base_instance)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_material_archetype_t), base_instance))},
 	}
 };
@@ -5060,115 +5097,6 @@ const static type_info_struct_packet_t type_info_struct_packet_t_const_data = {
 };
 
 
-const static type_info_enum_renderer_effect_application_flags_t type_info_enum_renderer_effect_application_flags_t_const_data = {
-	.name = "renderer_effect_application_flags_t",
-	.type = TYPE_renderer_effect_application_flags_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 6,
-	.members = {
-		.REAF_None = {.name = "REAF_None", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_None), .offset = REAF_None},
-		.REAF_Bloom = {.name = "REAF_Bloom", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Bloom), .offset = REAF_Bloom},
-		.REAF_Emmision = {.name = "REAF_Emmision", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Emmision), .offset = REAF_Emmision},
-		.REAF_Vignette = {.name = "REAF_Vignette", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Vignette), .offset = REAF_Vignette},
-		.REAF_FilmGrain = {.name = "REAF_FilmGrain", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_FilmGrain), .offset = REAF_FilmGrain},
-		.REAF_Count = {.name = "REAF_Count", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Count), .offset = REAF_Count},
-	}
-};
-const static type_info_enum_render_pipeline_blending_mode_t type_info_enum_render_pipeline_blending_mode_t_const_data = {
-	.name = "render_pipeline_blending_mode_t",
-	.type = TYPE_render_pipeline_blending_mode_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 13,
-	.members = {
-		.RBM_Invalid = {.name = "RBM_Invalid", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Invalid), .offset = RBM_Invalid},
-		.RBM_Zero = {.name = "RBM_Zero", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Zero), .offset = RBM_Zero},
-		.RBM_One = {.name = "RBM_One", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_One), .offset = RBM_One},
-		.RBM_Constant = {.name = "RBM_Constant", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Constant), .offset = RBM_Constant},
-		.RBM_SrcColor = {.name = "RBM_SrcColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_SrcColor), .offset = RBM_SrcColor},
-		.RBM_OneMinusSrcColor = {.name = "RBM_OneMinusSrcColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusSrcColor), .offset = RBM_OneMinusSrcColor},
-		.RBM_DstColor = {.name = "RBM_DstColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_DstColor), .offset = RBM_DstColor},
-		.RBM_OneMinusDstColor = {.name = "RBM_OneMinusDstColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusDstColor), .offset = RBM_OneMinusDstColor},
-		.RBM_SrcAlpha = {.name = "RBM_SrcAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_SrcAlpha), .offset = RBM_SrcAlpha},
-		.RBM_OneMinusSrcAlpha = {.name = "RBM_OneMinusSrcAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusSrcAlpha), .offset = RBM_OneMinusSrcAlpha},
-		.RBM_DstAlpha = {.name = "RBM_DstAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_DstAlpha), .offset = RBM_DstAlpha},
-		.RBM_OneMinusDstAlpha = {.name = "RBM_OneMinusDstAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusDstAlpha), .offset = RBM_OneMinusDstAlpha},
-		.RBM_Count = {.name = "RBM_Count", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Count), .offset = RBM_Count},
-	}
-};
-const static type_info_enum_render_pipeline_blending_equation_t type_info_enum_render_pipeline_blending_equation_t_const_data = {
-	.name = "render_pipeline_blending_equation_t",
-	.type = TYPE_render_pipeline_blending_equation_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 6,
-	.members = {
-		.RBE_Invalid = {.name = "RBE_Invalid", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Invalid), .offset = RBE_Invalid},
-		.RBE_Add = {.name = "RBE_Add", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Add), .offset = RBE_Add},
-		.RBE_Subtract = {.name = "RBE_Subtract", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Subtract), .offset = RBE_Subtract},
-		.RBE_ReverseSubtract = {.name = "RBE_ReverseSubtract", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_ReverseSubtract), .offset = RBE_ReverseSubtract},
-		.RBE_Min = {.name = "RBE_Min", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Min), .offset = RBE_Min},
-		.RBE_Max = {.name = "RBE_Max", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Max), .offset = RBE_Max},
-	}
-};
-const static type_info_enum_render_pipeline_depth_function_t type_info_enum_render_pipeline_depth_function_t_const_data = {
-	.name = "render_pipeline_depth_function_t",
-	.type = TYPE_render_pipeline_depth_function_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 10,
-	.members = {
-		.RDF_Invalid = {.name = "RDF_Invalid", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Invalid), .offset = RDF_Invalid},
-		.RDF_Never = {.name = "RDF_Never", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Never), .offset = RDF_Never},
-		.RDF_Always = {.name = "RDF_Always", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Always), .offset = RDF_Always},
-		.RDF_Greater = {.name = "RDF_Greater", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Greater), .offset = RDF_Greater},
-		.RDF_Less = {.name = "RDF_Less", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Less), .offset = RDF_Less},
-		.RDF_Equal = {.name = "RDF_Equal", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Equal), .offset = RDF_Equal},
-		.RDF_NotEqual = {.name = "RDF_NotEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_NotEqual), .offset = RDF_NotEqual},
-		.RDF_LessOrEqual = {.name = "RDF_LessOrEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_LessOrEqual), .offset = RDF_LessOrEqual},
-		.RDF_GreaterOrEqual = {.name = "RDF_GreaterOrEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_GreaterOrEqual), .offset = RDF_GreaterOrEqual},
-		.RDF_Count = {.name = "RDF_Count", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Count), .offset = RDF_Count},
-	}
-};
-const static type_info_enum_vulkan_shader_descriptor_set_binding_type_t type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data = {
-	.name = "vulkan_shader_descriptor_set_binding_type_t",
-	.type = TYPE_vulkan_shader_descriptor_set_binding_type_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 4,
-	.members = {
-		.SDS_Static = {.name = "SDS_Static", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Static), .offset = SDS_Static},
-		.SDS_Draw = {.name = "SDS_Draw", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Draw), .offset = SDS_Draw},
-		.SDS_Instance = {.name = "SDS_Instance", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Instance), .offset = SDS_Instance},
-		.SDS_Count = {.name = "SDS_Count", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Count), .offset = SDS_Count},
-	}
-};
-const static type_info_enum_vulkan_renderpass_state_t type_info_enum_vulkan_renderpass_state_t_const_data = {
-	.name = "vulkan_renderpass_state_t",
-	.type = TYPE_vulkan_renderpass_state_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 6,
-	.members = {
-		.VKRPS_INVALID = {.name = "VKRPS_INVALID", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_INVALID), .offset = VKRPS_INVALID},
-		.VKRPS_RECORDING = {.name = "VKRPS_RECORDING", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_RECORDING), .offset = VKRPS_RECORDING},
-		.VKRPS_WITHIN_RENDERPASS = {.name = "VKRPS_WITHIN_RENDERPASS", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_WITHIN_RENDERPASS), .offset = VKRPS_WITHIN_RENDERPASS},
-		.VKRPS_RECORDING_ENDED = {.name = "VKRPS_RECORDING_ENDED", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_RECORDING_ENDED), .offset = VKRPS_RECORDING_ENDED},
-		.VKRPS_COMMANDS_SUBMITTED = {.name = "VKRPS_COMMANDS_SUBMITTED", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_COMMANDS_SUBMITTED), .offset = VKRPS_COMMANDS_SUBMITTED},
-		.VKRPS_COUNT = {.name = "VKRPS_COUNT", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_COUNT), .offset = VKRPS_COUNT},
-	}
-};
-const static type_info_enum_vulkan_command_buffer_state_t type_info_enum_vulkan_command_buffer_state_t_const_data = {
-	.name = "vulkan_command_buffer_state_t",
-	.type = TYPE_vulkan_command_buffer_state_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 8,
-	.members = {
-		.VKCBS_INVALID = {.name = "VKCBS_INVALID", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_INVALID), .offset = VKCBS_INVALID},
-		.VKCBS_NOT_ALLOCATED = {.name = "VKCBS_NOT_ALLOCATED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_NOT_ALLOCATED), .offset = VKCBS_NOT_ALLOCATED},
-		.VKCBS_READY = {.name = "VKCBS_READY", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_READY), .offset = VKCBS_READY},
-		.VKCBS_RECORDING = {.name = "VKCBS_RECORDING", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_RECORDING), .offset = VKCBS_RECORDING},
-		.VKCBS_WITHIN_RENDERPASS = {.name = "VKCBS_WITHIN_RENDERPASS", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_WITHIN_RENDERPASS), .offset = VKCBS_WITHIN_RENDERPASS},
-		.VKCBS_RECORDING_ENDED = {.name = "VKCBS_RECORDING_ENDED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_RECORDING_ENDED), .offset = VKCBS_RECORDING_ENDED},
-		.VKCBS_SUBMITTED = {.name = "VKCBS_SUBMITTED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_SUBMITTED), .offset = VKCBS_SUBMITTED},
-		.VKCBS_COUNT = {.name = "VKCBS_COUNT", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_COUNT), .offset = VKCBS_COUNT},
-	}
-};
 const static type_info_enum_file_extension_t type_info_enum_file_extension_t_const_data = {
 	.name = "file_extension_t",
 	.type = TYPE_file_extension_t,
@@ -5326,6 +5254,115 @@ const static type_info_enum_entity_flags type_info_enum_entity_flags_const_data 
 		.EF_IsGround = {.name = "EF_IsGround", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_IsGround), .offset = EF_IsGround},
 	}
 };
+const static type_info_enum_renderer_effect_application_flags_t type_info_enum_renderer_effect_application_flags_t_const_data = {
+	.name = "renderer_effect_application_flags_t",
+	.type = TYPE_renderer_effect_application_flags_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 6,
+	.members = {
+		.REAF_None = {.name = "REAF_None", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_None), .offset = REAF_None},
+		.REAF_Bloom = {.name = "REAF_Bloom", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Bloom), .offset = REAF_Bloom},
+		.REAF_Emmision = {.name = "REAF_Emmision", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Emmision), .offset = REAF_Emmision},
+		.REAF_Vignette = {.name = "REAF_Vignette", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Vignette), .offset = REAF_Vignette},
+		.REAF_FilmGrain = {.name = "REAF_FilmGrain", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_FilmGrain), .offset = REAF_FilmGrain},
+		.REAF_Count = {.name = "REAF_Count", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Count), .offset = REAF_Count},
+	}
+};
+const static type_info_enum_render_pipeline_blending_mode_t type_info_enum_render_pipeline_blending_mode_t_const_data = {
+	.name = "render_pipeline_blending_mode_t",
+	.type = TYPE_render_pipeline_blending_mode_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 13,
+	.members = {
+		.RBM_Invalid = {.name = "RBM_Invalid", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Invalid), .offset = RBM_Invalid},
+		.RBM_Zero = {.name = "RBM_Zero", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Zero), .offset = RBM_Zero},
+		.RBM_One = {.name = "RBM_One", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_One), .offset = RBM_One},
+		.RBM_Constant = {.name = "RBM_Constant", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Constant), .offset = RBM_Constant},
+		.RBM_SrcColor = {.name = "RBM_SrcColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_SrcColor), .offset = RBM_SrcColor},
+		.RBM_OneMinusSrcColor = {.name = "RBM_OneMinusSrcColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusSrcColor), .offset = RBM_OneMinusSrcColor},
+		.RBM_DstColor = {.name = "RBM_DstColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_DstColor), .offset = RBM_DstColor},
+		.RBM_OneMinusDstColor = {.name = "RBM_OneMinusDstColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusDstColor), .offset = RBM_OneMinusDstColor},
+		.RBM_SrcAlpha = {.name = "RBM_SrcAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_SrcAlpha), .offset = RBM_SrcAlpha},
+		.RBM_OneMinusSrcAlpha = {.name = "RBM_OneMinusSrcAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusSrcAlpha), .offset = RBM_OneMinusSrcAlpha},
+		.RBM_DstAlpha = {.name = "RBM_DstAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_DstAlpha), .offset = RBM_DstAlpha},
+		.RBM_OneMinusDstAlpha = {.name = "RBM_OneMinusDstAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusDstAlpha), .offset = RBM_OneMinusDstAlpha},
+		.RBM_Count = {.name = "RBM_Count", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Count), .offset = RBM_Count},
+	}
+};
+const static type_info_enum_render_pipeline_blending_equation_t type_info_enum_render_pipeline_blending_equation_t_const_data = {
+	.name = "render_pipeline_blending_equation_t",
+	.type = TYPE_render_pipeline_blending_equation_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 6,
+	.members = {
+		.RBE_Invalid = {.name = "RBE_Invalid", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Invalid), .offset = RBE_Invalid},
+		.RBE_Add = {.name = "RBE_Add", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Add), .offset = RBE_Add},
+		.RBE_Subtract = {.name = "RBE_Subtract", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Subtract), .offset = RBE_Subtract},
+		.RBE_ReverseSubtract = {.name = "RBE_ReverseSubtract", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_ReverseSubtract), .offset = RBE_ReverseSubtract},
+		.RBE_Min = {.name = "RBE_Min", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Min), .offset = RBE_Min},
+		.RBE_Max = {.name = "RBE_Max", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Max), .offset = RBE_Max},
+	}
+};
+const static type_info_enum_render_pipeline_depth_function_t type_info_enum_render_pipeline_depth_function_t_const_data = {
+	.name = "render_pipeline_depth_function_t",
+	.type = TYPE_render_pipeline_depth_function_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 10,
+	.members = {
+		.RDF_Invalid = {.name = "RDF_Invalid", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Invalid), .offset = RDF_Invalid},
+		.RDF_Never = {.name = "RDF_Never", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Never), .offset = RDF_Never},
+		.RDF_Always = {.name = "RDF_Always", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Always), .offset = RDF_Always},
+		.RDF_Greater = {.name = "RDF_Greater", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Greater), .offset = RDF_Greater},
+		.RDF_Less = {.name = "RDF_Less", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Less), .offset = RDF_Less},
+		.RDF_Equal = {.name = "RDF_Equal", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Equal), .offset = RDF_Equal},
+		.RDF_NotEqual = {.name = "RDF_NotEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_NotEqual), .offset = RDF_NotEqual},
+		.RDF_LessOrEqual = {.name = "RDF_LessOrEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_LessOrEqual), .offset = RDF_LessOrEqual},
+		.RDF_GreaterOrEqual = {.name = "RDF_GreaterOrEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_GreaterOrEqual), .offset = RDF_GreaterOrEqual},
+		.RDF_Count = {.name = "RDF_Count", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Count), .offset = RDF_Count},
+	}
+};
+const static type_info_enum_vulkan_shader_descriptor_set_binding_type_t type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data = {
+	.name = "vulkan_shader_descriptor_set_binding_type_t",
+	.type = TYPE_vulkan_shader_descriptor_set_binding_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 4,
+	.members = {
+		.SDS_Static = {.name = "SDS_Static", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Static), .offset = SDS_Static},
+		.SDS_Draw = {.name = "SDS_Draw", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Draw), .offset = SDS_Draw},
+		.SDS_Instance = {.name = "SDS_Instance", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Instance), .offset = SDS_Instance},
+		.SDS_Count = {.name = "SDS_Count", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDS_Count), .offset = SDS_Count},
+	}
+};
+const static type_info_enum_vulkan_renderpass_state_t type_info_enum_vulkan_renderpass_state_t_const_data = {
+	.name = "vulkan_renderpass_state_t",
+	.type = TYPE_vulkan_renderpass_state_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 6,
+	.members = {
+		.VKRPS_INVALID = {.name = "VKRPS_INVALID", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_INVALID), .offset = VKRPS_INVALID},
+		.VKRPS_RECORDING = {.name = "VKRPS_RECORDING", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_RECORDING), .offset = VKRPS_RECORDING},
+		.VKRPS_WITHIN_RENDERPASS = {.name = "VKRPS_WITHIN_RENDERPASS", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_WITHIN_RENDERPASS), .offset = VKRPS_WITHIN_RENDERPASS},
+		.VKRPS_RECORDING_ENDED = {.name = "VKRPS_RECORDING_ENDED", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_RECORDING_ENDED), .offset = VKRPS_RECORDING_ENDED},
+		.VKRPS_COMMANDS_SUBMITTED = {.name = "VKRPS_COMMANDS_SUBMITTED", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_COMMANDS_SUBMITTED), .offset = VKRPS_COMMANDS_SUBMITTED},
+		.VKRPS_COUNT = {.name = "VKRPS_COUNT", .type = TYPE_vulkan_renderpass_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKRPS_COUNT), .offset = VKRPS_COUNT},
+	}
+};
+const static type_info_enum_vulkan_command_buffer_state_t type_info_enum_vulkan_command_buffer_state_t_const_data = {
+	.name = "vulkan_command_buffer_state_t",
+	.type = TYPE_vulkan_command_buffer_state_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 8,
+	.members = {
+		.VKCBS_INVALID = {.name = "VKCBS_INVALID", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_INVALID), .offset = VKCBS_INVALID},
+		.VKCBS_NOT_ALLOCATED = {.name = "VKCBS_NOT_ALLOCATED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_NOT_ALLOCATED), .offset = VKCBS_NOT_ALLOCATED},
+		.VKCBS_READY = {.name = "VKCBS_READY", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_READY), .offset = VKCBS_READY},
+		.VKCBS_RECORDING = {.name = "VKCBS_RECORDING", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_RECORDING), .offset = VKCBS_RECORDING},
+		.VKCBS_WITHIN_RENDERPASS = {.name = "VKCBS_WITHIN_RENDERPASS", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_WITHIN_RENDERPASS), .offset = VKCBS_WITHIN_RENDERPASS},
+		.VKCBS_RECORDING_ENDED = {.name = "VKCBS_RECORDING_ENDED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_RECORDING_ENDED), .offset = VKCBS_RECORDING_ENDED},
+		.VKCBS_SUBMITTED = {.name = "VKCBS_SUBMITTED", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_SUBMITTED), .offset = VKCBS_SUBMITTED},
+		.VKCBS_COUNT = {.name = "VKCBS_COUNT", .type = TYPE_vulkan_command_buffer_state_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VKCBS_COUNT), .offset = VKCBS_COUNT},
+	}
+};
 const static type_info_enum_asset_type_t type_info_enum_asset_type_t_const_data = {
 	.name = "asset_type_t",
 	.type = TYPE_asset_type_t,
@@ -5451,304 +5488,6 @@ enum scratch_arena_t_member_list_enum {
 	TYPE_SCRATCH_ARENA_T_MEMBER_parent,
 	TYPE_SCRATCH_ARENA_T_MEMBER_base,
 	TYPE_SCRATCH_ARENA_T_MEMBER_used,
-};
-
-enum global_matrix_uniforms_t_member_list_enum {
-	TYPE_GLOBAL_MATRIX_UNIFORMS_T_MEMBER_view_matrix,
-	TYPE_GLOBAL_MATRIX_UNIFORMS_T_MEMBER_projection_matrix,
-};
-
-enum push_constant_t_member_list_enum {
-	TYPE_PUSH_CONSTANT_T_MEMBER_DrawColor,
-};
-
-enum render_camera_t_member_list_enum {
-	TYPE_RENDER_CAMERA_T_MEMBER_view_matrix,
-	TYPE_RENDER_CAMERA_T_MEMBER_projection_matrix,
-	TYPE_RENDER_CAMERA_T_MEMBER_ID,
-};
-
-enum vulkan_buffer_data_t_member_list_enum {
-	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_is_valid,
-	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_is_mapped,
-	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_buffer_size,
-	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_handle,
-	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_device_memory,
-	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_usage_flags,
-	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_memory_index,
-	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_memory_property_flags,
-};
-
-enum vulkan_pipeline_data_t_member_list_enum {
-	TYPE_VULKAN_PIPELINE_DATA_T_MEMBER_handle,
-	TYPE_VULKAN_PIPELINE_DATA_T_MEMBER_binding,
-	TYPE_VULKAN_PIPELINE_DATA_T_MEMBER_layout,
-};
-
-enum render_pipeline_state_t_member_list_enum {
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_blend_enabled,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_src_color_blend_mode,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_dst_color_blend_mode,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_src_alpha_blend_mode,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_dst_alpha_blend_mode,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_color_blend_op,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_alpha_blend_op,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_testing_enabled,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_writing_enabled,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_func,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_enabled,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_state,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_keep,
-};
-
-enum spv_vulkan_type_map_t_member_list_enum {
-	TYPE_SPV_VULKAN_TYPE_MAP_T_MEMBER_spv_type,
-	TYPE_SPV_VULKAN_TYPE_MAP_T_MEMBER_vk_type,
-};
-
-enum vulkan_shader_descriptor_set_info_t_member_list_enum {
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_is_valid,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_set_type,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_bindings,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_binding_count,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_binding_upload_size,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_image_views,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_samplers,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_image_count,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_sampler_count,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_sets,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_uniform_buffer,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_single_frame_uniform_buffer_size,
-};
-
-enum vulkan_shader_uniform_texture_data_t_member_list_enum {
-	TYPE_VULKAN_SHADER_UNIFORM_TEXTURE_DATA_T_MEMBER_image_views,
-	TYPE_VULKAN_SHADER_UNIFORM_TEXTURE_DATA_T_MEMBER_image_samplers,
-	TYPE_VULKAN_SHADER_UNIFORM_TEXTURE_DATA_T_MEMBER_image_counter,
-};
-
-enum vulkan_shader_uniform_data_range_t_member_list_enum {
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_RANGE_T_MEMBER_data,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_RANGE_T_MEMBER_data_size,
-};
-
-enum vulkan_shader_uniform_data_t_member_list_enum {
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_owner_shader_id,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_uniform_type,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_set_type,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_uniform_location,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_push_constant_index,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_name,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_uniform_size,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_is_texture,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_mapped_buffer_update_size,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_mapped_uniform_buffer,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_storage_buffer,
-	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_texture_data,
-};
-
-enum vulkan_shader_stage_info_t_member_list_enum {
-	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_type,
-	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_entry_point,
-	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_module_create_info,
-	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_shader_stage_create_info,
-	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_handle,
-};
-
-enum vulkan_shader_data_t_member_list_enum {
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_shader_id,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_arena,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_spv_reflect_module,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_stages,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_stage_count,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_primary_pool,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_type_counts,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_layouts,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_total_descriptor_set_count,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_used_descriptor_set_count,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set_info,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_push_constant_count,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_push_constant_data,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_uniforms,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_uniform_count,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_static_uniforms,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_static_uniform_count,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_draw_uniforms,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_draw_uniform_count,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_instance_uniforms,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_instance_uniform_count,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_pipeline,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_camera_matrices,
-};
-
-enum vulkan_physical_device_swapchain_support_info_t_member_list_enum {
-	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_surface_capabilities,
-	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_surface_formats,
-	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_present_modes,
-	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_surface_format_count,
-	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_present_mode_count,
-};
-
-enum vulkan_physical_device_queue_info_t_member_list_enum {
-	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_graphics_queue_family_index,
-	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_present_queue_family_index,
-	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_compute_queue_family_index,
-	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_transfer_queue_family_index,
-};
-
-enum vulkan_physical_device_requirements_t_member_list_enum {
-	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_graphics_queue,
-	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_present_queue,
-	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_transfer_queue,
-	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_compute_queue,
-	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_required_extensions,
-};
-
-enum vulkan_physical_device_t_member_list_enum {
-	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_handle,
-	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_device_depth_format,
-	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_properties,
-	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_features,
-	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_memory_properties,
-	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_swapchain_support_info,
-};
-
-enum vulkan_rendering_device_t_member_list_enum {
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_physical_device,
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_graphics_queue_family_index,
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_present_queue_family_index,
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_compute_queue_family_index,
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_transfer_queue_family_index,
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_graphics_queue,
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_present_queue,
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_transfer_queue,
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_compute_queue,
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_graphics_command_pool,
-	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_logical_device,
-};
-
-enum vulkan_fence_t_member_list_enum {
-	TYPE_VULKAN_FENCE_T_MEMBER_handle,
-	TYPE_VULKAN_FENCE_T_MEMBER_signaled,
-};
-
-enum vulkan_renderpass_data_t_member_list_enum {
-	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_handle,
-	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_offset,
-	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_size,
-	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_clear_color,
-	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_depth_clear,
-	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_stencil_clear,
-	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_renderpass_state,
-};
-
-enum vulkan_framebuffer_data_t_member_list_enum {
-	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_handle,
-	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_renderpass,
-	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_attachments,
-	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_attachment_count,
-};
-
-enum vulkan_image_data_t_member_list_enum {
-	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_handle,
-	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_memory,
-	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_format,
-	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_layout,
-	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_view,
-	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_width,
-	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_height,
-};
-
-enum vulkan_texture_t_member_list_enum {
-	TYPE_VULKAN_TEXTURE_T_MEMBER_current_generation,
-	TYPE_VULKAN_TEXTURE_T_MEMBER_image_data,
-	TYPE_VULKAN_TEXTURE_T_MEMBER_sampler,
-};
-
-enum vulkan_swapchain_data_t_member_list_enum {
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_is_valid,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_arena,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_handle,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_image_format,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_present_mode,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_depth_attachment,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_has_depth_attachment,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_max_frames_in_flight,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_image_count,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_framebuffers,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_images,
-	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_views,
-};
-
-enum vulkan_command_buffer_data_t_member_list_enum {
-	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_handle,
-	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_owner_pool,
-	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_state,
-	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_is_primary_buffer,
-	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_is_single_use,
-};
-
-enum vulkan_render_backend_function_data_t_member_list_enum {
-	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_create_gpu_texture,
-	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_create_gpu_shader,
-	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_create_gpu_buffer,
-	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_destroy_gpu_texture,
-	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_destroy_gpu_shader,
-	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_destroy_gpu_buffer,
-};
-
-enum vulkan_render_frame_state_t_member_list_enum {
-	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_image_render_idle_fence,
-	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_frame_in_flight_fence_ptr,
-	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_image_avaliable_semaphore,
-	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_presentation_complete_semaphore,
-	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_current_framebuffer,
-	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_render_command_buffer,
-	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_instanced_rendering_buffer,
-	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_bound_shader,
-};
-
-enum vulkan_render_context_t_member_list_enum {
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_initialization_arena,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_frame_arena,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_permanent_arena,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_additional_buffer_count,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_window,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_window_width,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_window_height,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_instance,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_allocators,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_render_surface,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_rendering_device,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_swapchain,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_image_index,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_frame_index,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_framebuffer_width,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_framebuffer_height,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_cached_framebuffer_width,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_cached_framebuffer_height,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_framebuffer_size_generation,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_last_framebuffer_size_generation,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_recreating_swapchain,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_image_render_idle_fences,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_frame_in_flight_fence_ptrs,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_image_avaliable_semaphores,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_presentation_complete_semaphores,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_render_command_buffers,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_frames,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_frame,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_instanced_rendering_buffer,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_index_buffer,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_vertex_buffer,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_main_renderpass,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_shader,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_texture,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_material,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_invalid_texture_data,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_vertex_offset,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_geometry_index,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_test_camera,
-	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_debug_callback,
 };
 
 enum dynarray_header_t_member_list_enum {
@@ -6131,13 +5870,14 @@ enum render_geometry_batch_t_member_list_enum {
 	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_is_valid,
 	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_primitive_count,
 	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_master_array_start_offset,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_material_instance,
 	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_instances,
 	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_next_buffer,
 };
 
 enum render_group_t_member_list_enum {
 	TYPE_RENDER_GROUP_T_MEMBER_ID,
-	TYPE_RENDER_GROUP_T_MEMBER_material,
+	TYPE_RENDER_GROUP_T_MEMBER_material_archetype,
 	TYPE_RENDER_GROUP_T_MEMBER_textures,
 	TYPE_RENDER_GROUP_T_MEMBER_current_texture_count,
 	TYPE_RENDER_GROUP_T_MEMBER_master_batch_array,
@@ -6179,6 +5919,310 @@ enum render_state_t_member_list_enum {
 	TYPE_RENDER_STATE_T_MEMBER_draw_frame,
 };
 
+enum global_matrix_uniforms_t_member_list_enum {
+	TYPE_GLOBAL_MATRIX_UNIFORMS_T_MEMBER_view_matrix,
+	TYPE_GLOBAL_MATRIX_UNIFORMS_T_MEMBER_projection_matrix,
+};
+
+enum push_constant_t_member_list_enum {
+	TYPE_PUSH_CONSTANT_T_MEMBER_DrawColor,
+};
+
+enum render_camera_t_member_list_enum {
+	TYPE_RENDER_CAMERA_T_MEMBER_view_matrix,
+	TYPE_RENDER_CAMERA_T_MEMBER_projection_matrix,
+	TYPE_RENDER_CAMERA_T_MEMBER_ID,
+};
+
+enum render_constant_buffer_t_member_list_enum {
+	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_GPU_buffer,
+	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_CPU_buffer,
+	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_buffer_data,
+};
+
+enum vulkan_buffer_data_t_member_list_enum {
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_is_valid,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_is_mapped,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_buffer_size,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_device_memory,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_usage_flags,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_memory_index,
+	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_memory_property_flags,
+};
+
+enum vulkan_pipeline_data_t_member_list_enum {
+	TYPE_VULKAN_PIPELINE_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_PIPELINE_DATA_T_MEMBER_binding,
+	TYPE_VULKAN_PIPELINE_DATA_T_MEMBER_layout,
+};
+
+enum render_pipeline_state_t_member_list_enum {
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_blend_enabled,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_src_color_blend_mode,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_dst_color_blend_mode,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_src_alpha_blend_mode,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_dst_alpha_blend_mode,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_color_blend_op,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_alpha_blend_op,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_testing_enabled,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_writing_enabled,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_func,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_enabled,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_state,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_keep,
+};
+
+enum spv_vulkan_type_map_t_member_list_enum {
+	TYPE_SPV_VULKAN_TYPE_MAP_T_MEMBER_spv_type,
+	TYPE_SPV_VULKAN_TYPE_MAP_T_MEMBER_vk_type,
+};
+
+enum vulkan_shader_descriptor_set_info_t_member_list_enum {
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_is_valid,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_set_type,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_bindings,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_binding_count,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_binding_upload_size,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_image_views,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_samplers,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_image_count,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_sampler_count,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_sets,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_uniform_buffer,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_INFO_T_MEMBER_single_frame_uniform_buffer_size,
+};
+
+enum vulkan_shader_uniform_texture_data_t_member_list_enum {
+	TYPE_VULKAN_SHADER_UNIFORM_TEXTURE_DATA_T_MEMBER_image_views,
+	TYPE_VULKAN_SHADER_UNIFORM_TEXTURE_DATA_T_MEMBER_image_samplers,
+	TYPE_VULKAN_SHADER_UNIFORM_TEXTURE_DATA_T_MEMBER_image_counter,
+};
+
+enum vulkan_shader_uniform_data_range_t_member_list_enum {
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_RANGE_T_MEMBER_data,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_RANGE_T_MEMBER_data_size,
+};
+
+enum vulkan_shader_uniform_data_t_member_list_enum {
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_owner_shader_id,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_uniform_type,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_set_type,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_uniform_location,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_push_constant_index,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_name,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_uniform_size,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_is_texture,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_mapped_buffer_update_size,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_mapped_uniform_buffer,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_storage_buffer,
+	TYPE_VULKAN_SHADER_UNIFORM_DATA_T_MEMBER_texture_data,
+};
+
+enum vulkan_shader_stage_info_t_member_list_enum {
+	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_type,
+	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_entry_point,
+	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_module_create_info,
+	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_shader_stage_create_info,
+	TYPE_VULKAN_SHADER_STAGE_INFO_T_MEMBER_handle,
+};
+
+enum vulkan_shader_data_t_member_list_enum {
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_shader_id,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_arena,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_spv_reflect_module,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_stages,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_stage_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_primary_pool,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_type_counts,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_layouts,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_total_descriptor_set_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_used_descriptor_set_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set_info,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_push_constant_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_push_constant_data,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_uniforms,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_uniform_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_static_uniforms,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_static_uniform_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_draw_uniforms,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_draw_uniform_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_instance_uniforms,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_instance_uniform_count,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_pipeline,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_camera_matrices,
+};
+
+enum vulkan_physical_device_swapchain_support_info_t_member_list_enum {
+	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_surface_capabilities,
+	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_surface_formats,
+	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_present_modes,
+	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_surface_format_count,
+	TYPE_VULKAN_PHYSICAL_DEVICE_SWAPCHAIN_SUPPORT_INFO_T_MEMBER_valid_present_mode_count,
+};
+
+enum vulkan_physical_device_queue_info_t_member_list_enum {
+	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_graphics_queue_family_index,
+	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_present_queue_family_index,
+	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_compute_queue_family_index,
+	TYPE_VULKAN_PHYSICAL_DEVICE_QUEUE_INFO_T_MEMBER_transfer_queue_family_index,
+};
+
+enum vulkan_physical_device_requirements_t_member_list_enum {
+	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_graphics_queue,
+	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_present_queue,
+	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_transfer_queue,
+	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_has_compute_queue,
+	TYPE_VULKAN_PHYSICAL_DEVICE_REQUIREMENTS_T_MEMBER_required_extensions,
+};
+
+enum vulkan_physical_device_t_member_list_enum {
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_handle,
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_device_depth_format,
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_properties,
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_features,
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_memory_properties,
+	TYPE_VULKAN_PHYSICAL_DEVICE_T_MEMBER_swapchain_support_info,
+};
+
+enum vulkan_rendering_device_t_member_list_enum {
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_physical_device,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_graphics_queue_family_index,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_present_queue_family_index,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_compute_queue_family_index,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_transfer_queue_family_index,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_graphics_queue,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_present_queue,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_transfer_queue,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_compute_queue,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_graphics_command_pool,
+	TYPE_VULKAN_RENDERING_DEVICE_T_MEMBER_logical_device,
+};
+
+enum vulkan_fence_t_member_list_enum {
+	TYPE_VULKAN_FENCE_T_MEMBER_handle,
+	TYPE_VULKAN_FENCE_T_MEMBER_signaled,
+};
+
+enum vulkan_renderpass_data_t_member_list_enum {
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_offset,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_size,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_clear_color,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_depth_clear,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_stencil_clear,
+	TYPE_VULKAN_RENDERPASS_DATA_T_MEMBER_renderpass_state,
+};
+
+enum vulkan_framebuffer_data_t_member_list_enum {
+	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_renderpass,
+	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_attachments,
+	TYPE_VULKAN_FRAMEBUFFER_DATA_T_MEMBER_attachment_count,
+};
+
+enum vulkan_image_data_t_member_list_enum {
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_memory,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_format,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_layout,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_view,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_width,
+	TYPE_VULKAN_IMAGE_DATA_T_MEMBER_height,
+};
+
+enum vulkan_texture_t_member_list_enum {
+	TYPE_VULKAN_TEXTURE_T_MEMBER_current_generation,
+	TYPE_VULKAN_TEXTURE_T_MEMBER_image_data,
+	TYPE_VULKAN_TEXTURE_T_MEMBER_sampler,
+};
+
+enum vulkan_swapchain_data_t_member_list_enum {
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_is_valid,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_arena,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_image_format,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_present_mode,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_depth_attachment,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_has_depth_attachment,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_max_frames_in_flight,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_image_count,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_framebuffers,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_images,
+	TYPE_VULKAN_SWAPCHAIN_DATA_T_MEMBER_views,
+};
+
+enum vulkan_command_buffer_data_t_member_list_enum {
+	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_handle,
+	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_owner_pool,
+	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_state,
+	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_is_primary_buffer,
+	TYPE_VULKAN_COMMAND_BUFFER_DATA_T_MEMBER_is_single_use,
+};
+
+enum vulkan_render_backend_function_data_t_member_list_enum {
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_create_gpu_texture,
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_create_gpu_shader,
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_create_gpu_buffer,
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_destroy_gpu_texture,
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_destroy_gpu_shader,
+	TYPE_VULKAN_RENDER_BACKEND_FUNCTION_DATA_T_MEMBER_destroy_gpu_buffer,
+};
+
+enum vulkan_render_frame_state_t_member_list_enum {
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_image_render_idle_fence,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_frame_in_flight_fence_ptr,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_image_avaliable_semaphore,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_presentation_complete_semaphore,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_current_framebuffer,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_render_command_buffer,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_instanced_rendering_buffer,
+	TYPE_VULKAN_RENDER_FRAME_STATE_T_MEMBER_bound_shader,
+};
+
+enum vulkan_render_context_t_member_list_enum {
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_initialization_arena,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_frame_arena,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_permanent_arena,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_additional_buffer_count,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_window,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_window_width,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_window_height,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_instance,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_allocators,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_render_surface,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_rendering_device,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_swapchain,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_image_index,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_frame_index,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_framebuffer_width,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_framebuffer_height,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_cached_framebuffer_width,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_cached_framebuffer_height,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_framebuffer_size_generation,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_last_framebuffer_size_generation,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_recreating_swapchain,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_image_render_idle_fences,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_frame_in_flight_fence_ptrs,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_image_avaliable_semaphores,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_presentation_complete_semaphores,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_render_command_buffers,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_frames,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_current_frame,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_instanced_rendering_buffer,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_index_buffer,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_vertex_buffer,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_main_renderpass,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_shader,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_texture,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_material,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_invalid_texture_data,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_vertex_offset,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_geometry_index,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_test_camera,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_debug_callback,
+};
+
 enum asset_handle_t_member_list_enum {
 	TYPE_ASSET_HANDLE_T_MEMBER_is_valid,
 	TYPE_ASSET_HANDLE_T_MEMBER_type,
@@ -6187,7 +6231,7 @@ enum asset_handle_t_member_list_enum {
 	TYPE_ASSET_HANDLE_T_MEMBER_slot,
 	TYPE_ASSET_HANDLE_T_MEMBER_texture,
 	TYPE_ASSET_HANDLE_T_MEMBER_shader,
-	TYPE_ASSET_HANDLE_T_MEMBER_material,
+	TYPE_ASSET_HANDLE_T_MEMBER_material_info,
 };
 
 enum bitmap_t_member_list_enum {
@@ -6252,7 +6296,7 @@ enum material_archetype_t_member_list_enum {
 	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_version,
 	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_name,
 	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_shader_binary_name,
-	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_shader,
+	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_shader_handle,
 	TYPE_MATERIAL_ARCHETYPE_T_MEMBER_base_instance,
 };
 
@@ -6392,80 +6436,6 @@ enum packet_t_member_list_enum {
 	TYPE_PACKET_T_MEMBER_payload,
 };
 
-enum renderer_effect_application_flags_t_member_list_enum {
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None,
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom,
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision,
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette,
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain,
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count,
-};
-
-enum render_pipeline_blending_mode_t_member_list_enum {
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count,
-};
-
-enum render_pipeline_blending_equation_t_member_list_enum {
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid,
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add,
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract,
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract,
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min,
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max,
-};
-
-enum render_pipeline_depth_function_t_member_list_enum {
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count,
-};
-
-enum vulkan_shader_descriptor_set_binding_type_t_member_list_enum {
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Static,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Draw,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Instance,
-	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Count,
-};
-
-enum vulkan_renderpass_state_t_member_list_enum {
-	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_INVALID,
-	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING,
-	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_WITHIN_RENDERPASS,
-	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING_ENDED,
-	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COMMANDS_SUBMITTED,
-	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COUNT,
-};
-
-enum vulkan_command_buffer_state_t_member_list_enum {
-	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_INVALID,
-	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_NOT_ALLOCATED,
-	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_READY,
-	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING,
-	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_WITHIN_RENDERPASS,
-	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING_ENDED,
-	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_SUBMITTED,
-	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_COUNT,
-};
-
 enum file_extension_t_member_list_enum {
 	TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_INVALID,
 	TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_TTF,
@@ -6573,6 +6543,80 @@ enum entity_flags_member_list_enum {
 	TYPE_ENTITY_FLAGS_MEMBER_EF_IsGround,
 };
 
+enum renderer_effect_application_flags_t_member_list_enum {
+	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None,
+	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom,
+	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision,
+	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette,
+	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain,
+	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count,
+};
+
+enum render_pipeline_blending_mode_t_member_list_enum {
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha,
+	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count,
+};
+
+enum render_pipeline_blending_equation_t_member_list_enum {
+	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid,
+	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add,
+	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract,
+	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract,
+	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min,
+	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max,
+};
+
+enum render_pipeline_depth_function_t_member_list_enum {
+	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid,
+	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never,
+	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always,
+	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater,
+	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less,
+	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal,
+	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual,
+	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual,
+	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual,
+	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count,
+};
+
+enum vulkan_shader_descriptor_set_binding_type_t_member_list_enum {
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Static,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Draw,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Instance,
+	TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Count,
+};
+
+enum vulkan_renderpass_state_t_member_list_enum {
+	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_INVALID,
+	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING,
+	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_WITHIN_RENDERPASS,
+	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING_ENDED,
+	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COMMANDS_SUBMITTED,
+	TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COUNT,
+};
+
+enum vulkan_command_buffer_state_t_member_list_enum {
+	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_INVALID,
+	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_NOT_ALLOCATED,
+	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_READY,
+	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING,
+	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_WITHIN_RENDERPASS,
+	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING_ENDED,
+	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_SUBMITTED,
+	TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_COUNT,
+};
+
 enum asset_type_t_member_list_enum {
 	TYPE_ASSET_TYPE_T_MEMBER_AT_Invalid,
 	TYPE_ASSET_TYPE_T_MEMBER_AT_Bitmap,
@@ -6640,59 +6684,6 @@ enum packet_type_t_member_list_enum {
 };
 
 #define GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X) \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, "REAF_None") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, "REAF_Bloom") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, "REAF_Emmision") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette, "REAF_Vignette") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain, "REAF_FilmGrain") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count, "REAF_Count") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid, "RBM_Invalid") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero, "RBM_Zero") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One, "RBM_One") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant, "RBM_Constant") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor, "RBM_SrcColor") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor, "RBM_OneMinusSrcColor") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor, "RBM_DstColor") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor, "RBM_OneMinusDstColor") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha, "RBM_SrcAlpha") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha, "RBM_OneMinusSrcAlpha") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha, "RBM_DstAlpha") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha, "RBM_OneMinusDstAlpha") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count, "RBM_Count") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid, "RBE_Invalid") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add, "RBE_Add") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract, "RBE_Subtract") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract, "RBE_ReverseSubtract") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min, "RBE_Min") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max, "RBE_Max") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid, "RDF_Invalid") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never, "RDF_Never") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, "RDF_Always") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater, "RDF_Greater") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less, "RDF_Less") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal, "RDF_Equal") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, "RDF_NotEqual") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual, "RDF_LessOrEqual") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, "RDF_GreaterOrEqual") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count, "RDF_Count") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Static, "SDS_Static") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Draw, "SDS_Draw") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Instance, "SDS_Instance") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Count, "SDS_Count") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_INVALID, "VKRPS_INVALID") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING, "VKRPS_RECORDING") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_WITHIN_RENDERPASS, "VKRPS_WITHIN_RENDERPASS") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING_ENDED, "VKRPS_RECORDING_ENDED") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COMMANDS_SUBMITTED, "VKRPS_COMMANDS_SUBMITTED") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COUNT, "VKRPS_COUNT") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_INVALID, "VKCBS_INVALID") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_NOT_ALLOCATED, "VKCBS_NOT_ALLOCATED") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_READY, "VKCBS_READY") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING, "VKCBS_RECORDING") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_WITHIN_RENDERPASS, "VKCBS_WITHIN_RENDERPASS") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING_ENDED, "VKCBS_RECORDING_ENDED") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_SUBMITTED, "VKCBS_SUBMITTED") \
-	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_COUNT, "VKCBS_COUNT") \
 	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_INVALID, "FILE_EXT_INVALID") \
 	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_TTF, "FILE_EXT_TTF") \
 	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_WAV, "FILE_EXT_WAV") \
@@ -6770,6 +6761,59 @@ enum packet_type_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Actor, "EF_Actor") \
 	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Static, "EF_Static") \
 	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_IsGround, "EF_IsGround") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, "REAF_None") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, "REAF_Bloom") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, "REAF_Emmision") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette, "REAF_Vignette") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain, "REAF_FilmGrain") \
+	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count, "REAF_Count") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid, "RBM_Invalid") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero, "RBM_Zero") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One, "RBM_One") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant, "RBM_Constant") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor, "RBM_SrcColor") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor, "RBM_OneMinusSrcColor") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor, "RBM_DstColor") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor, "RBM_OneMinusDstColor") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha, "RBM_SrcAlpha") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha, "RBM_OneMinusSrcAlpha") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha, "RBM_DstAlpha") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha, "RBM_OneMinusDstAlpha") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count, "RBM_Count") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid, "RBE_Invalid") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add, "RBE_Add") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract, "RBE_Subtract") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract, "RBE_ReverseSubtract") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min, "RBE_Min") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max, "RBE_Max") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid, "RDF_Invalid") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never, "RDF_Never") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, "RDF_Always") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater, "RDF_Greater") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less, "RDF_Less") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal, "RDF_Equal") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, "RDF_NotEqual") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual, "RDF_LessOrEqual") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, "RDF_GreaterOrEqual") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count, "RDF_Count") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Static, "SDS_Static") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Draw, "SDS_Draw") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Instance, "SDS_Instance") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Count, "SDS_Count") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_INVALID, "VKRPS_INVALID") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING, "VKRPS_RECORDING") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_WITHIN_RENDERPASS, "VKRPS_WITHIN_RENDERPASS") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING_ENDED, "VKRPS_RECORDING_ENDED") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COMMANDS_SUBMITTED, "VKRPS_COMMANDS_SUBMITTED") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COUNT, "VKRPS_COUNT") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_INVALID, "VKCBS_INVALID") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_NOT_ALLOCATED, "VKCBS_NOT_ALLOCATED") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_READY, "VKCBS_READY") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING, "VKCBS_RECORDING") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_WITHIN_RENDERPASS, "VKCBS_WITHIN_RENDERPASS") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING_ENDED, "VKCBS_RECORDING_ENDED") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_SUBMITTED, "VKCBS_SUBMITTED") \
+	X(TYPE_ENUM_LOOKUP_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_COUNT, "VKCBS_COUNT") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Invalid, "AT_Invalid") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Bitmap, "AT_Bitmap") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Shader, "AT_Shader") \
@@ -6830,101 +6874,17 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "memory_arena_t", .type = TYPE_memory_arena_t, .size = sizeof(memory_arena_t), .struct_info = (type_info_struct_t*)&type_info_struct_memory_arena_t_const_data},
 	{.name = "u8", .type = TYPE_u8, .size = sizeof(u8*), .struct_info = NULL},
 	{.name = "scratch_arena_t", .type = TYPE_scratch_arena_t, .size = sizeof(scratch_arena_t), .struct_info = (type_info_struct_t*)&type_info_struct_scratch_arena_t_const_data},
-	{.name = "mat4_t", .type = TYPE_mat4_t, .size = sizeof(mat4_t), .struct_info = (type_info_struct_t*)&type_info_struct_mat4_t_const_data},
-	{.name = "global_matrix_uniforms_t", .type = TYPE_global_matrix_uniforms_t, .size = sizeof(global_matrix_uniforms_t), .struct_info = (type_info_struct_t*)&type_info_struct_global_matrix_uniforms_t_const_data},
-	{.name = "vec4_t", .type = TYPE_vec4_t, .size = sizeof(vec4_t), .struct_info = (type_info_struct_t*)&type_info_struct_vec4_t_const_data},
-	{.name = "push_constant_t", .type = TYPE_push_constant_t, .size = sizeof(push_constant_t), .struct_info = (type_info_struct_t*)&type_info_struct_push_constant_t_const_data},
-	{.name = "render_camera_t", .type = TYPE_render_camera_t, .size = sizeof(render_camera_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_camera_t_const_data},
-	{.name = "bool8", .type = TYPE_bool8, .size = sizeof(bool8), .struct_info = NULL},
-	{.name = "VkBuffer", .type = TYPE_VkBuffer, .size = sizeof(VkBuffer), .struct_info = NULL},
-	{.name = "VkDeviceMemory", .type = TYPE_VkDeviceMemory, .size = sizeof(VkDeviceMemory), .struct_info = NULL},
-	{.name = "VkBufferUsageFlagBits", .type = TYPE_VkBufferUsageFlagBits, .size = sizeof(VkBufferUsageFlagBits), .struct_info = NULL},
-	{.name = "s32", .type = TYPE_s32, .size = sizeof(s32), .struct_info = NULL},
-	{.name = "vulkan_buffer_data_t", .type = TYPE_vulkan_buffer_data_t, .size = sizeof(vulkan_buffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_buffer_data_t_const_data},
-	{.name = "VkPipeline", .type = TYPE_VkPipeline, .size = sizeof(VkPipeline), .struct_info = NULL},
-	{.name = "VkPipelineBindPoint", .type = TYPE_VkPipelineBindPoint, .size = sizeof(VkPipelineBindPoint), .struct_info = NULL},
-	{.name = "VkPipelineLayout", .type = TYPE_VkPipelineLayout, .size = sizeof(VkPipelineLayout), .struct_info = NULL},
-	{.name = "vulkan_pipeline_data_t", .type = TYPE_vulkan_pipeline_data_t, .size = sizeof(vulkan_pipeline_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_pipeline_data_t_const_data},
-	{.name = "renderer_effect_application_flags_t", .type = TYPE_renderer_effect_application_flags_t, .size = sizeof(renderer_effect_application_flags_t), .struct_info = NULL},
-	{.name = "render_pipeline_blending_mode_t", .type = TYPE_render_pipeline_blending_mode_t, .size = sizeof(render_pipeline_blending_mode_t), .struct_info = NULL},
-	{.name = "render_pipeline_blending_equation_t", .type = TYPE_render_pipeline_blending_equation_t, .size = sizeof(render_pipeline_blending_equation_t), .struct_info = NULL},
-	{.name = "render_pipeline_depth_function_t", .type = TYPE_render_pipeline_depth_function_t, .size = sizeof(render_pipeline_depth_function_t), .struct_info = NULL},
-	{.name = "render_pipeline_state_t", .type = TYPE_render_pipeline_state_t, .size = sizeof(render_pipeline_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_pipeline_state_t_const_data},
-	{.name = "VkDescriptorType", .type = TYPE_VkDescriptorType, .size = sizeof(VkDescriptorType), .struct_info = NULL},
-	{.name = "spv_vulkan_type_map_t", .type = TYPE_spv_vulkan_type_map_t, .size = sizeof(spv_vulkan_type_map_t), .struct_info = (type_info_struct_t*)&type_info_struct_spv_vulkan_type_map_t_const_data},
-	{.name = "vulkan_shader_descriptor_set_binding_type_t", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .size = sizeof(vulkan_shader_descriptor_set_binding_type_t), .struct_info = NULL},
-	{.name = "VkDescriptorSetLayoutBinding", .type = TYPE_VkDescriptorSetLayoutBinding, .size = sizeof(VkDescriptorSetLayoutBinding*), .struct_info = NULL},
-	{.name = "VkImageView", .type = TYPE_VkImageView, .size = sizeof(VkImageView), .struct_info = NULL},
-	{.name = "VkSampler", .type = TYPE_VkSampler, .size = sizeof(VkSampler), .struct_info = NULL},
-	{.name = "VkDescriptorSet", .type = TYPE_VkDescriptorSet, .size = sizeof(VkDescriptorSet), .struct_info = NULL},
-	{.name = "vulkan_shader_descriptor_set_info_t", .type = TYPE_vulkan_shader_descriptor_set_info_t, .size = sizeof(vulkan_shader_descriptor_set_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_descriptor_set_info_t_const_data},
-	{.name = "vulkan_shader_uniform_texture_data_t", .type = TYPE_vulkan_shader_uniform_texture_data_t, .size = sizeof(vulkan_shader_uniform_texture_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_uniform_texture_data_t_const_data},
-	{.name = "void", .type = TYPE_void, .size = sizeof(void*), .struct_info = NULL},
-	{.name = "vulkan_shader_uniform_data_range_t", .type = TYPE_vulkan_shader_uniform_data_range_t, .size = sizeof(vulkan_shader_uniform_data_range_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_uniform_data_range_t_const_data},
-	{.name = "string_t", .type = TYPE_string_t, .size = sizeof(string_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_t_const_data},
-	{.name = "vulkan_shader_uniform_data_t", .type = TYPE_vulkan_shader_uniform_data_t, .size = sizeof(vulkan_shader_uniform_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_uniform_data_t_const_data},
-	{.name = "VkShaderStageFlagBits", .type = TYPE_VkShaderStageFlagBits, .size = sizeof(VkShaderStageFlagBits), .struct_info = NULL},
-	{.name = "char", .type = TYPE_char, .size = sizeof(char*), .struct_info = NULL},
-	{.name = "VkShaderModuleCreateInfo", .type = TYPE_VkShaderModuleCreateInfo, .size = sizeof(VkShaderModuleCreateInfo), .struct_info = NULL},
-	{.name = "VkPipelineShaderStageCreateInfo", .type = TYPE_VkPipelineShaderStageCreateInfo, .size = sizeof(VkPipelineShaderStageCreateInfo), .struct_info = NULL},
-	{.name = "VkShaderModule", .type = TYPE_VkShaderModule, .size = sizeof(VkShaderModule), .struct_info = NULL},
-	{.name = "vulkan_shader_stage_info_t", .type = TYPE_vulkan_shader_stage_info_t, .size = sizeof(vulkan_shader_stage_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_stage_info_t_const_data},
-	{.name = "SpvReflectShaderModule", .type = TYPE_SpvReflectShaderModule, .size = sizeof(SpvReflectShaderModule), .struct_info = NULL},
-	{.name = "VkDescriptorPool", .type = TYPE_VkDescriptorPool, .size = sizeof(VkDescriptorPool), .struct_info = NULL},
-	{.name = "VkDescriptorSetLayout", .type = TYPE_VkDescriptorSetLayout, .size = sizeof(VkDescriptorSetLayout*), .struct_info = NULL},
-	{.name = "VkPushConstantRange", .type = TYPE_VkPushConstantRange, .size = sizeof(VkPushConstantRange*), .struct_info = NULL},
-	{.name = "vulkan_shader_data_t", .type = TYPE_vulkan_shader_data_t, .size = sizeof(vulkan_shader_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_data_t_const_data},
-	{.name = "VkSurfaceCapabilitiesKHR", .type = TYPE_VkSurfaceCapabilitiesKHR, .size = sizeof(VkSurfaceCapabilitiesKHR), .struct_info = NULL},
-	{.name = "VkSurfaceFormatKHR", .type = TYPE_VkSurfaceFormatKHR, .size = sizeof(VkSurfaceFormatKHR), .struct_info = NULL},
-	{.name = "VkPresentModeKHR", .type = TYPE_VkPresentModeKHR, .size = sizeof(VkPresentModeKHR), .struct_info = NULL},
-	{.name = "vulkan_physical_device_swapchain_support_info_t", .type = TYPE_vulkan_physical_device_swapchain_support_info_t, .size = sizeof(vulkan_physical_device_swapchain_support_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_physical_device_swapchain_support_info_t_const_data},
-	{.name = "vulkan_physical_device_queue_info_t", .type = TYPE_vulkan_physical_device_queue_info_t, .size = sizeof(vulkan_physical_device_queue_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_physical_device_queue_info_t_const_data},
-	{.name = "vulkan_physical_device_requirements_t", .type = TYPE_vulkan_physical_device_requirements_t, .size = sizeof(vulkan_physical_device_requirements_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_physical_device_requirements_t_const_data},
-	{.name = "VkPhysicalDevice", .type = TYPE_VkPhysicalDevice, .size = sizeof(VkPhysicalDevice), .struct_info = NULL},
-	{.name = "VkFormat", .type = TYPE_VkFormat, .size = sizeof(VkFormat), .struct_info = NULL},
-	{.name = "VkPhysicalDeviceProperties", .type = TYPE_VkPhysicalDeviceProperties, .size = sizeof(VkPhysicalDeviceProperties), .struct_info = NULL},
-	{.name = "VkPhysicalDeviceMemoryProperties", .type = TYPE_VkPhysicalDeviceMemoryProperties, .size = sizeof(VkPhysicalDeviceMemoryProperties), .struct_info = NULL},
-	{.name = "vulkan_physical_device_t", .type = TYPE_vulkan_physical_device_t, .size = sizeof(vulkan_physical_device_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_physical_device_t_const_data},
-	{.name = "VkQueue", .type = TYPE_VkQueue, .size = sizeof(VkQueue), .struct_info = NULL},
-	{.name = "VkCommandPool", .type = TYPE_VkCommandPool, .size = sizeof(VkCommandPool), .struct_info = NULL},
-	{.name = "VkDevice", .type = TYPE_VkDevice, .size = sizeof(VkDevice), .struct_info = NULL},
-	{.name = "vulkan_rendering_device_t", .type = TYPE_vulkan_rendering_device_t, .size = sizeof(vulkan_rendering_device_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_rendering_device_t_const_data},
-	{.name = "VkFence", .type = TYPE_VkFence, .size = sizeof(VkFence), .struct_info = NULL},
-	{.name = "vulkan_fence_t", .type = TYPE_vulkan_fence_t, .size = sizeof(vulkan_fence_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_fence_t_const_data},
-	{.name = "vulkan_renderpass_state_t", .type = TYPE_vulkan_renderpass_state_t, .size = sizeof(vulkan_renderpass_state_t), .struct_info = NULL},
-	{.name = "VkRenderPass", .type = TYPE_VkRenderPass, .size = sizeof(VkRenderPass), .struct_info = NULL},
-	{.name = "vec2_t", .type = TYPE_vec2_t, .size = sizeof(vec2_t), .struct_info = (type_info_struct_t*)&type_info_struct_vec2_t_const_data},
-	{.name = "float32", .type = TYPE_float32, .size = sizeof(float32), .struct_info = NULL},
-	{.name = "vulkan_renderpass_data_t", .type = TYPE_vulkan_renderpass_data_t, .size = sizeof(vulkan_renderpass_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_renderpass_data_t_const_data},
-	{.name = "VkFramebuffer", .type = TYPE_VkFramebuffer, .size = sizeof(VkFramebuffer), .struct_info = NULL},
-	{.name = "vulkan_framebuffer_data_t", .type = TYPE_vulkan_framebuffer_data_t, .size = sizeof(vulkan_framebuffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_framebuffer_data_t_const_data},
-	{.name = "VkImageLayout", .type = TYPE_VkImageLayout, .size = sizeof(VkImageLayout), .struct_info = NULL},
-	{.name = "vulkan_image_data_t", .type = TYPE_vulkan_image_data_t, .size = sizeof(vulkan_image_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_image_data_t_const_data},
-	{.name = "vulkan_texture_t", .type = TYPE_vulkan_texture_t, .size = sizeof(vulkan_texture_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_texture_t_const_data},
-	{.name = "VkSwapchainKHR", .type = TYPE_VkSwapchainKHR, .size = sizeof(VkSwapchainKHR), .struct_info = NULL},
-	{.name = "vulkan_swapchain_data_t", .type = TYPE_vulkan_swapchain_data_t, .size = sizeof(vulkan_swapchain_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_swapchain_data_t_const_data},
-	{.name = "vulkan_command_buffer_state_t", .type = TYPE_vulkan_command_buffer_state_t, .size = sizeof(vulkan_command_buffer_state_t), .struct_info = NULL},
-	{.name = "VkCommandBuffer", .type = TYPE_VkCommandBuffer, .size = sizeof(VkCommandBuffer), .struct_info = NULL},
-	{.name = "vulkan_command_buffer_data_t", .type = TYPE_vulkan_command_buffer_data_t, .size = sizeof(vulkan_command_buffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_command_buffer_data_t_const_data},
-	{.name = "vulkan_render_backend_function_data_t", .type = TYPE_vulkan_render_backend_function_data_t, .size = sizeof(vulkan_render_backend_function_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_backend_function_data_t_const_data},
-	{.name = "VkSemaphore", .type = TYPE_VkSemaphore, .size = sizeof(VkSemaphore*), .struct_info = NULL},
-	{.name = "vulkan_render_frame_state_t", .type = TYPE_vulkan_render_frame_state_t, .size = sizeof(vulkan_render_frame_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_frame_state_t_const_data},
-	{.name = "SDL_Window", .type = TYPE_SDL_Window, .size = sizeof(SDL_Window*), .struct_info = NULL},
-	{.name = "VkInstance", .type = TYPE_VkInstance, .size = sizeof(VkInstance), .struct_info = NULL},
-	{.name = "VkAllocationCallbacks", .type = TYPE_VkAllocationCallbacks, .size = sizeof(VkAllocationCallbacks*), .struct_info = NULL},
-	{.name = "VkSurfaceKHR", .type = TYPE_VkSurfaceKHR, .size = sizeof(VkSurfaceKHR), .struct_info = NULL},
-	{.name = "asset_handle_t", .type = TYPE_asset_handle_t, .size = sizeof(asset_handle_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_handle_t_const_data},
-	{.name = "texture2D_t", .type = TYPE_texture2D_t, .size = sizeof(texture2D_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture2D_t_const_data},
-	{.name = "VkDebugUtilsMessengerEXT", .type = TYPE_VkDebugUtilsMessengerEXT, .size = sizeof(VkDebugUtilsMessengerEXT), .struct_info = NULL},
-	{.name = "vulkan_render_context_t", .type = TYPE_vulkan_render_context_t, .size = sizeof(vulkan_render_context_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_context_t_const_data},
 	{.name = "dynarray_header_t", .type = TYPE_dynarray_header_t, .size = sizeof(dynarray_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_dynarray_header_t_const_data},
 	{.name = "file_extension_t", .type = TYPE_file_extension_t, .size = sizeof(file_extension_t), .struct_info = NULL},
 	{.name = "sys_handle_t", .type = TYPE_sys_handle_t, .size = sizeof(sys_handle_t), .struct_info = NULL},
+	{.name = "string_t", .type = TYPE_string_t, .size = sizeof(string_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_t_const_data},
+	{.name = "bool8", .type = TYPE_bool8, .size = sizeof(bool8), .struct_info = NULL},
 	{.name = "file_t", .type = TYPE_file_t, .size = sizeof(file_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_t_const_data},
 	{.name = "mapped_file_t", .type = TYPE_mapped_file_t, .size = sizeof(mapped_file_t), .struct_info = (type_info_struct_t*)&type_info_struct_mapped_file_t_const_data},
 	{.name = "file_data_t", .type = TYPE_file_data_t, .size = sizeof(file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_data_t_const_data},
 	{.name = "overlap_io_data_t", .type = TYPE_overlap_io_data_t, .size = sizeof(overlap_io_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_overlap_io_data_t_const_data},
 	{.name = "visit_files_pfn_t", .type = TYPE_visit_files_pfn_t, .size = sizeof(visit_files_pfn_t*), .struct_info = NULL},
+	{.name = "void", .type = TYPE_void, .size = sizeof(void*), .struct_info = NULL},
 	{.name = "visit_file_data_t", .type = TYPE_visit_file_data_t, .size = sizeof(visit_file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_visit_file_data_t_const_data},
 	{.name = "file_watcher_change_event_t", .type = TYPE_file_watcher_change_event_t, .size = sizeof(file_watcher_change_event_t), .struct_info = NULL},
 	{.name = "file_watcher_recorded_change_t", .type = TYPE_file_watcher_recorded_change_t, .size = sizeof(file_watcher_recorded_change_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_watcher_recorded_change_t_const_data},
@@ -6936,17 +6896,23 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "hash_table_allocation_flags_t", .type = TYPE_hash_table_allocation_flags_t, .size = sizeof(hash_table_allocation_flags_t), .struct_info = NULL},
 	{.name = "hash_table_header_t", .type = TYPE_hash_table_header_t, .size = sizeof(hash_table_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_hash_table_header_t_const_data},
 	{.name = "debug_log_level_t", .type = TYPE_debug_log_level_t, .size = sizeof(debug_log_level_t), .struct_info = NULL},
+	{.name = "float32", .type = TYPE_float32, .size = sizeof(float32), .struct_info = NULL},
+	{.name = "vec2_t", .type = TYPE_vec2_t, .size = sizeof(vec2_t), .struct_info = (type_info_struct_t*)&type_info_struct_vec2_t_const_data},
 	{.name = "vec3_t", .type = TYPE_vec3_t, .size = sizeof(vec3_t), .struct_info = (type_info_struct_t*)&type_info_struct_vec3_t_const_data},
 	{.name = "__m128", .type = TYPE___m128, .size = sizeof(__m128), .struct_info = NULL},
+	{.name = "vec4_t", .type = TYPE_vec4_t, .size = sizeof(vec4_t), .struct_info = (type_info_struct_t*)&type_info_struct_vec4_t_const_data},
+	{.name = "s32", .type = TYPE_s32, .size = sizeof(s32), .struct_info = NULL},
 	{.name = "__m128i", .type = TYPE___m128i, .size = sizeof(__m128i), .struct_info = NULL},
 	{.name = "ivec4_t", .type = TYPE_ivec4_t, .size = sizeof(ivec4_t), .struct_info = (type_info_struct_t*)&type_info_struct_ivec4_t_const_data},
 	{.name = "ivec3_t", .type = TYPE_ivec3_t, .size = sizeof(ivec3_t), .struct_info = (type_info_struct_t*)&type_info_struct_ivec3_t_const_data},
 	{.name = "ivec2_t", .type = TYPE_ivec2_t, .size = sizeof(ivec2_t), .struct_info = (type_info_struct_t*)&type_info_struct_ivec2_t_const_data},
+	{.name = "mat4_t", .type = TYPE_mat4_t, .size = sizeof(mat4_t), .struct_info = (type_info_struct_t*)&type_info_struct_mat4_t_const_data},
 	{.name = "mat3_t", .type = TYPE_mat3_t, .size = sizeof(mat3_t), .struct_info = (type_info_struct_t*)&type_info_struct_mat3_t_const_data},
 	{.name = "mat2_t", .type = TYPE_mat2_t, .size = sizeof(mat2_t), .struct_info = (type_info_struct_t*)&type_info_struct_mat2_t_const_data},
 	{.name = "rectangle2_t", .type = TYPE_rectangle2_t, .size = sizeof(rectangle2_t), .struct_info = (type_info_struct_t*)&type_info_struct_rectangle2_t_const_data},
 	{.name = "raytest_t", .type = TYPE_raytest_t, .size = sizeof(raytest_t), .struct_info = (type_info_struct_t*)&type_info_struct_raytest_t_const_data},
 	{.name = "arg_type_t", .type = TYPE_arg_type_t, .size = sizeof(arg_type_t), .struct_info = NULL},
+	{.name = "char", .type = TYPE_char, .size = sizeof(char*), .struct_info = NULL},
 	{.name = "program_flag_data_t", .type = TYPE_program_flag_data_t, .size = sizeof(program_flag_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_program_flag_data_t_const_data},
 	{.name = "program_flag_t", .type = TYPE_program_flag_t, .size = sizeof(program_flag_t), .struct_info = (type_info_struct_t*)&type_info_struct_program_flag_t_const_data},
 	{.name = "program_flag_state_t", .type = TYPE_program_flag_state_t, .size = sizeof(program_flag_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_program_flag_state_t_const_data},
@@ -6976,26 +6942,105 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "sockaddr_storage", .type = TYPE_sockaddr_storage, .size = sizeof(sockaddr_storage), .struct_info = NULL},
 	{.name = "socklen_t", .type = TYPE_socklen_t, .size = sizeof(socklen_t), .struct_info = NULL},
 	{.name = "client_data_t", .type = TYPE_client_data_t, .size = sizeof(client_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_client_data_t_const_data},
+	{.name = "SDL_Window", .type = TYPE_SDL_Window, .size = sizeof(SDL_Window*), .struct_info = NULL},
 	{.name = "sockaddr_in_t", .type = TYPE_sockaddr_in_t, .size = sizeof(sockaddr_in_t), .struct_info = NULL},
 	{.name = "game_state_t", .type = TYPE_game_state_t, .size = sizeof(game_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_state_t_const_data},
 	{.name = "render_geometry_instance_t", .type = TYPE_render_geometry_instance_t, .size = sizeof(render_geometry_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_geometry_instance_t_const_data},
+	{.name = "render_camera_t", .type = TYPE_render_camera_t, .size = sizeof(render_camera_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_camera_t_const_data},
+	{.name = "asset_handle_t", .type = TYPE_asset_handle_t, .size = sizeof(asset_handle_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_handle_t_const_data},
 	{.name = "render_geometry_batch_t", .type = TYPE_render_geometry_batch_t, .size = sizeof(render_geometry_batch_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_geometry_batch_t_const_data},
+	{.name = "texture2D_t", .type = TYPE_texture2D_t, .size = sizeof(texture2D_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture2D_t_const_data},
 	{.name = "render_group_t", .type = TYPE_render_group_t, .size = sizeof(render_group_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_group_t_const_data},
+	{.name = "render_pipeline_state_t", .type = TYPE_render_pipeline_state_t, .size = sizeof(render_pipeline_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_pipeline_state_t_const_data},
 	{.name = "state", .type = TYPE_state, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state)), .struct_info = (type_info_struct_t*)&type_info_struct_state_const_data},
 	{.name = "draw_frame_t", .type = TYPE_draw_frame_t, .size = sizeof(draw_frame_t), .struct_info = (type_info_struct_t*)&type_info_struct_draw_frame_t_const_data},
+	{.name = "vulkan_render_context_t", .type = TYPE_vulkan_render_context_t, .size = sizeof(vulkan_render_context_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_context_t_const_data},
+	{.name = "vulkan_render_frame_state_t", .type = TYPE_vulkan_render_frame_state_t, .size = sizeof(vulkan_render_frame_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_frame_state_t_const_data},
 	{.name = "render_state_t", .type = TYPE_render_state_t, .size = sizeof(render_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_state_t_const_data},
+	{.name = "global_matrix_uniforms_t", .type = TYPE_global_matrix_uniforms_t, .size = sizeof(global_matrix_uniforms_t), .struct_info = (type_info_struct_t*)&type_info_struct_global_matrix_uniforms_t_const_data},
+	{.name = "push_constant_t", .type = TYPE_push_constant_t, .size = sizeof(push_constant_t), .struct_info = (type_info_struct_t*)&type_info_struct_push_constant_t_const_data},
+	{.name = "vulkan_buffer_data_t", .type = TYPE_vulkan_buffer_data_t, .size = sizeof(vulkan_buffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_buffer_data_t_const_data},
+	{.name = "render_constant_buffer_t", .type = TYPE_render_constant_buffer_t, .size = sizeof(render_constant_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_constant_buffer_t_const_data},
+	{.name = "VkBuffer", .type = TYPE_VkBuffer, .size = sizeof(VkBuffer), .struct_info = NULL},
+	{.name = "VkDeviceMemory", .type = TYPE_VkDeviceMemory, .size = sizeof(VkDeviceMemory), .struct_info = NULL},
+	{.name = "VkBufferUsageFlagBits", .type = TYPE_VkBufferUsageFlagBits, .size = sizeof(VkBufferUsageFlagBits), .struct_info = NULL},
+	{.name = "VkPipeline", .type = TYPE_VkPipeline, .size = sizeof(VkPipeline), .struct_info = NULL},
+	{.name = "VkPipelineBindPoint", .type = TYPE_VkPipelineBindPoint, .size = sizeof(VkPipelineBindPoint), .struct_info = NULL},
+	{.name = "VkPipelineLayout", .type = TYPE_VkPipelineLayout, .size = sizeof(VkPipelineLayout), .struct_info = NULL},
+	{.name = "vulkan_pipeline_data_t", .type = TYPE_vulkan_pipeline_data_t, .size = sizeof(vulkan_pipeline_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_pipeline_data_t_const_data},
+	{.name = "renderer_effect_application_flags_t", .type = TYPE_renderer_effect_application_flags_t, .size = sizeof(renderer_effect_application_flags_t), .struct_info = NULL},
+	{.name = "render_pipeline_blending_mode_t", .type = TYPE_render_pipeline_blending_mode_t, .size = sizeof(render_pipeline_blending_mode_t), .struct_info = NULL},
+	{.name = "render_pipeline_blending_equation_t", .type = TYPE_render_pipeline_blending_equation_t, .size = sizeof(render_pipeline_blending_equation_t), .struct_info = NULL},
+	{.name = "render_pipeline_depth_function_t", .type = TYPE_render_pipeline_depth_function_t, .size = sizeof(render_pipeline_depth_function_t), .struct_info = NULL},
+	{.name = "VkDescriptorType", .type = TYPE_VkDescriptorType, .size = sizeof(VkDescriptorType), .struct_info = NULL},
+	{.name = "spv_vulkan_type_map_t", .type = TYPE_spv_vulkan_type_map_t, .size = sizeof(spv_vulkan_type_map_t), .struct_info = (type_info_struct_t*)&type_info_struct_spv_vulkan_type_map_t_const_data},
+	{.name = "vulkan_shader_descriptor_set_binding_type_t", .type = TYPE_vulkan_shader_descriptor_set_binding_type_t, .size = sizeof(vulkan_shader_descriptor_set_binding_type_t), .struct_info = NULL},
+	{.name = "VkDescriptorSetLayoutBinding", .type = TYPE_VkDescriptorSetLayoutBinding, .size = sizeof(VkDescriptorSetLayoutBinding*), .struct_info = NULL},
+	{.name = "VkImageView", .type = TYPE_VkImageView, .size = sizeof(VkImageView), .struct_info = NULL},
+	{.name = "VkSampler", .type = TYPE_VkSampler, .size = sizeof(VkSampler), .struct_info = NULL},
+	{.name = "VkDescriptorSet", .type = TYPE_VkDescriptorSet, .size = sizeof(VkDescriptorSet), .struct_info = NULL},
+	{.name = "vulkan_shader_descriptor_set_info_t", .type = TYPE_vulkan_shader_descriptor_set_info_t, .size = sizeof(vulkan_shader_descriptor_set_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_descriptor_set_info_t_const_data},
+	{.name = "vulkan_shader_uniform_texture_data_t", .type = TYPE_vulkan_shader_uniform_texture_data_t, .size = sizeof(vulkan_shader_uniform_texture_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_uniform_texture_data_t_const_data},
+	{.name = "vulkan_shader_uniform_data_range_t", .type = TYPE_vulkan_shader_uniform_data_range_t, .size = sizeof(vulkan_shader_uniform_data_range_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_uniform_data_range_t_const_data},
+	{.name = "vulkan_shader_uniform_data_t", .type = TYPE_vulkan_shader_uniform_data_t, .size = sizeof(vulkan_shader_uniform_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_uniform_data_t_const_data},
+	{.name = "VkShaderStageFlagBits", .type = TYPE_VkShaderStageFlagBits, .size = sizeof(VkShaderStageFlagBits), .struct_info = NULL},
+	{.name = "VkShaderModuleCreateInfo", .type = TYPE_VkShaderModuleCreateInfo, .size = sizeof(VkShaderModuleCreateInfo), .struct_info = NULL},
+	{.name = "VkPipelineShaderStageCreateInfo", .type = TYPE_VkPipelineShaderStageCreateInfo, .size = sizeof(VkPipelineShaderStageCreateInfo), .struct_info = NULL},
+	{.name = "VkShaderModule", .type = TYPE_VkShaderModule, .size = sizeof(VkShaderModule), .struct_info = NULL},
+	{.name = "vulkan_shader_stage_info_t", .type = TYPE_vulkan_shader_stage_info_t, .size = sizeof(vulkan_shader_stage_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_stage_info_t_const_data},
+	{.name = "SpvReflectShaderModule", .type = TYPE_SpvReflectShaderModule, .size = sizeof(SpvReflectShaderModule), .struct_info = NULL},
+	{.name = "VkDescriptorPool", .type = TYPE_VkDescriptorPool, .size = sizeof(VkDescriptorPool), .struct_info = NULL},
+	{.name = "VkDescriptorSetLayout", .type = TYPE_VkDescriptorSetLayout, .size = sizeof(VkDescriptorSetLayout*), .struct_info = NULL},
+	{.name = "VkPushConstantRange", .type = TYPE_VkPushConstantRange, .size = sizeof(VkPushConstantRange*), .struct_info = NULL},
+	{.name = "vulkan_shader_data_t", .type = TYPE_vulkan_shader_data_t, .size = sizeof(vulkan_shader_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_data_t_const_data},
+	{.name = "VkSurfaceCapabilitiesKHR", .type = TYPE_VkSurfaceCapabilitiesKHR, .size = sizeof(VkSurfaceCapabilitiesKHR), .struct_info = NULL},
+	{.name = "VkSurfaceFormatKHR", .type = TYPE_VkSurfaceFormatKHR, .size = sizeof(VkSurfaceFormatKHR), .struct_info = NULL},
+	{.name = "VkPresentModeKHR", .type = TYPE_VkPresentModeKHR, .size = sizeof(VkPresentModeKHR), .struct_info = NULL},
+	{.name = "vulkan_physical_device_swapchain_support_info_t", .type = TYPE_vulkan_physical_device_swapchain_support_info_t, .size = sizeof(vulkan_physical_device_swapchain_support_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_physical_device_swapchain_support_info_t_const_data},
+	{.name = "vulkan_physical_device_queue_info_t", .type = TYPE_vulkan_physical_device_queue_info_t, .size = sizeof(vulkan_physical_device_queue_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_physical_device_queue_info_t_const_data},
+	{.name = "vulkan_physical_device_requirements_t", .type = TYPE_vulkan_physical_device_requirements_t, .size = sizeof(vulkan_physical_device_requirements_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_physical_device_requirements_t_const_data},
+	{.name = "VkPhysicalDevice", .type = TYPE_VkPhysicalDevice, .size = sizeof(VkPhysicalDevice), .struct_info = NULL},
+	{.name = "VkFormat", .type = TYPE_VkFormat, .size = sizeof(VkFormat), .struct_info = NULL},
+	{.name = "VkPhysicalDeviceProperties", .type = TYPE_VkPhysicalDeviceProperties, .size = sizeof(VkPhysicalDeviceProperties), .struct_info = NULL},
+	{.name = "VkPhysicalDeviceMemoryProperties", .type = TYPE_VkPhysicalDeviceMemoryProperties, .size = sizeof(VkPhysicalDeviceMemoryProperties), .struct_info = NULL},
+	{.name = "vulkan_physical_device_t", .type = TYPE_vulkan_physical_device_t, .size = sizeof(vulkan_physical_device_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_physical_device_t_const_data},
+	{.name = "VkQueue", .type = TYPE_VkQueue, .size = sizeof(VkQueue), .struct_info = NULL},
+	{.name = "VkCommandPool", .type = TYPE_VkCommandPool, .size = sizeof(VkCommandPool), .struct_info = NULL},
+	{.name = "VkDevice", .type = TYPE_VkDevice, .size = sizeof(VkDevice), .struct_info = NULL},
+	{.name = "vulkan_rendering_device_t", .type = TYPE_vulkan_rendering_device_t, .size = sizeof(vulkan_rendering_device_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_rendering_device_t_const_data},
+	{.name = "VkFence", .type = TYPE_VkFence, .size = sizeof(VkFence), .struct_info = NULL},
+	{.name = "vulkan_fence_t", .type = TYPE_vulkan_fence_t, .size = sizeof(vulkan_fence_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_fence_t_const_data},
+	{.name = "vulkan_renderpass_state_t", .type = TYPE_vulkan_renderpass_state_t, .size = sizeof(vulkan_renderpass_state_t), .struct_info = NULL},
+	{.name = "VkRenderPass", .type = TYPE_VkRenderPass, .size = sizeof(VkRenderPass), .struct_info = NULL},
+	{.name = "vulkan_renderpass_data_t", .type = TYPE_vulkan_renderpass_data_t, .size = sizeof(vulkan_renderpass_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_renderpass_data_t_const_data},
+	{.name = "VkFramebuffer", .type = TYPE_VkFramebuffer, .size = sizeof(VkFramebuffer), .struct_info = NULL},
+	{.name = "vulkan_framebuffer_data_t", .type = TYPE_vulkan_framebuffer_data_t, .size = sizeof(vulkan_framebuffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_framebuffer_data_t_const_data},
+	{.name = "VkImageLayout", .type = TYPE_VkImageLayout, .size = sizeof(VkImageLayout), .struct_info = NULL},
+	{.name = "vulkan_image_data_t", .type = TYPE_vulkan_image_data_t, .size = sizeof(vulkan_image_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_image_data_t_const_data},
+	{.name = "vulkan_texture_t", .type = TYPE_vulkan_texture_t, .size = sizeof(vulkan_texture_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_texture_t_const_data},
+	{.name = "VkSwapchainKHR", .type = TYPE_VkSwapchainKHR, .size = sizeof(VkSwapchainKHR), .struct_info = NULL},
+	{.name = "vulkan_swapchain_data_t", .type = TYPE_vulkan_swapchain_data_t, .size = sizeof(vulkan_swapchain_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_swapchain_data_t_const_data},
+	{.name = "vulkan_command_buffer_state_t", .type = TYPE_vulkan_command_buffer_state_t, .size = sizeof(vulkan_command_buffer_state_t), .struct_info = NULL},
+	{.name = "VkCommandBuffer", .type = TYPE_VkCommandBuffer, .size = sizeof(VkCommandBuffer), .struct_info = NULL},
+	{.name = "vulkan_command_buffer_data_t", .type = TYPE_vulkan_command_buffer_data_t, .size = sizeof(vulkan_command_buffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_command_buffer_data_t_const_data},
+	{.name = "vulkan_render_backend_function_data_t", .type = TYPE_vulkan_render_backend_function_data_t, .size = sizeof(vulkan_render_backend_function_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_render_backend_function_data_t_const_data},
+	{.name = "VkSemaphore", .type = TYPE_VkSemaphore, .size = sizeof(VkSemaphore*), .struct_info = NULL},
+	{.name = "VkInstance", .type = TYPE_VkInstance, .size = sizeof(VkInstance), .struct_info = NULL},
+	{.name = "VkAllocationCallbacks", .type = TYPE_VkAllocationCallbacks, .size = sizeof(VkAllocationCallbacks*), .struct_info = NULL},
+	{.name = "VkSurfaceKHR", .type = TYPE_VkSurfaceKHR, .size = sizeof(VkSurfaceKHR), .struct_info = NULL},
+	{.name = "VkDebugUtilsMessengerEXT", .type = TYPE_VkDebugUtilsMessengerEXT, .size = sizeof(VkDebugUtilsMessengerEXT), .struct_info = NULL},
 	{.name = "asset_type_t", .type = TYPE_asset_type_t, .size = sizeof(asset_type_t), .struct_info = NULL},
 	{.name = "asset_slot_load_status_t", .type = TYPE_asset_slot_load_status_t, .size = sizeof(asset_slot_load_status_t), .struct_info = NULL},
 	{.name = "bitmap_format_t", .type = TYPE_bitmap_format_t, .size = sizeof(bitmap_format_t), .struct_info = NULL},
 	{.name = "subtexture_data_t", .type = TYPE_subtexture_data_t, .size = sizeof(subtexture_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_subtexture_data_t_const_data},
 	{.name = "asset_slot_t", .type = TYPE_asset_slot_t, .size = sizeof(asset_slot_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_slot_t_const_data},
 	{.name = "shader_t", .type = TYPE_shader_t, .size = sizeof(shader_t), .struct_info = (type_info_struct_t*)&type_info_struct_shader_t_const_data},
-	{.name = "material_instance_t", .type = TYPE_material_instance_t, .size = sizeof(material_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_instance_t_const_data},
+	{.name = "material_data_t", .type = TYPE_material_data_t, .size = sizeof(material_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_data_t_const_data},
 	{.name = "bitmap_t", .type = TYPE_bitmap_t, .size = sizeof(bitmap_t), .struct_info = (type_info_struct_t*)&type_info_struct_bitmap_t_const_data},
 	{.name = "texture_atlas_t", .type = TYPE_texture_atlas_t, .size = sizeof(texture_atlas_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture_atlas_t_const_data},
 	{.name = "material_archetype_t", .type = TYPE_material_archetype_t, .size = sizeof(material_archetype_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_archetype_t_const_data},
+	{.name = "material_instance_t", .type = TYPE_material_instance_t, .size = sizeof(material_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_instance_t_const_data},
 	{.name = "stored_material_type_t", .type = TYPE_stored_material_type_t, .size = sizeof(stored_material_type_t), .struct_info = NULL},
-	{.name = "material_data_t", .type = TYPE_material_data_t, .size = sizeof(material_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_data_t_const_data},
 	{.name = "jfd_package_entry_t", .type = TYPE_jfd_package_entry_t, .size = sizeof(jfd_package_entry_t*), .struct_info = NULL},
 	{.name = "jfd_file_header_t", .type = TYPE_jfd_file_header_t, .size = sizeof(jfd_file_header_t*), .struct_info = NULL},
 	{.name = "asset_manager_asset_file_data_t", .type = TYPE_asset_manager_asset_file_data_t, .size = sizeof(asset_manager_asset_file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_manager_asset_file_data_t_const_data},
@@ -7022,59 +7067,6 @@ const static type_info_t GENERATED_type_table[] = {
 };
 
 const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_table[] = {
-	{.name = "REAF_None", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Bloom", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Emmision", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Vignette", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_FilmGrain", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Count", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "RBM_Invalid", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_Zero", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_One", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_Constant", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_SrcColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusSrcColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_DstColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusDstColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_SrcAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusSrcAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_DstAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusDstAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_Count", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBE_Invalid", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Add", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Subtract", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_ReverseSubtract", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Min", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Max", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RDF_Invalid", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Never", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Always", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Greater", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Less", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Equal", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_NotEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_LessOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_GreaterOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Count", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "SDS_Static", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Static, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
-	{.name = "SDS_Draw", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Draw, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
-	{.name = "SDS_Instance", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Instance, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
-	{.name = "SDS_Count", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
-	{.name = "VKRPS_INVALID", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_INVALID, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKRPS_RECORDING", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKRPS_WITHIN_RENDERPASS", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_WITHIN_RENDERPASS, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKRPS_RECORDING_ENDED", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING_ENDED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKRPS_COMMANDS_SUBMITTED", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COMMANDS_SUBMITTED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKRPS_COUNT", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
-	{.name = "VKCBS_INVALID", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_INVALID, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_NOT_ALLOCATED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_NOT_ALLOCATED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_READY", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_READY, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_RECORDING", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_WITHIN_RENDERPASS", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_WITHIN_RENDERPASS, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_RECORDING_ENDED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING_ENDED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_SUBMITTED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_SUBMITTED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
-	{.name = "VKCBS_COUNT", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
 	{.name = "FILE_EXT_INVALID", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_INVALID, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_extension_t_const_data},
 	{.name = "FILE_EXT_TTF", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_TTF, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_extension_t_const_data},
 	{.name = "FILE_EXT_WAV", .member_enum = TYPE_FILE_EXTENSION_T_MEMBER_FILE_EXT_WAV, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_extension_t_const_data},
@@ -7152,6 +7144,59 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "EF_Actor", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Actor, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
 	{.name = "EF_Static", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Static, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
 	{.name = "EF_IsGround", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_IsGround, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
+	{.name = "REAF_None", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "REAF_Bloom", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "REAF_Emmision", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "REAF_Vignette", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "REAF_FilmGrain", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "REAF_Count", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
+	{.name = "RBM_Invalid", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_Zero", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_One", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_Constant", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_SrcColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_OneMinusSrcColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_DstColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_OneMinusDstColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_SrcAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_OneMinusSrcAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_DstAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_OneMinusDstAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBM_Count", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
+	{.name = "RBE_Invalid", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RBE_Add", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RBE_Subtract", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RBE_ReverseSubtract", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RBE_Min", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RBE_Max", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
+	{.name = "RDF_Invalid", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Never", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Always", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Greater", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Less", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Equal", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_NotEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_LessOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_GreaterOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RDF_Count", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "SDS_Static", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Static, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
+	{.name = "SDS_Draw", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Draw, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
+	{.name = "SDS_Instance", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Instance, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
+	{.name = "SDS_Count", .member_enum = TYPE_VULKAN_SHADER_DESCRIPTOR_SET_BINDING_TYPE_T_MEMBER_SDS_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_shader_descriptor_set_binding_type_t_const_data},
+	{.name = "VKRPS_INVALID", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_INVALID, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKRPS_RECORDING", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKRPS_WITHIN_RENDERPASS", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_WITHIN_RENDERPASS, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKRPS_RECORDING_ENDED", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_RECORDING_ENDED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKRPS_COMMANDS_SUBMITTED", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COMMANDS_SUBMITTED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKRPS_COUNT", .member_enum = TYPE_VULKAN_RENDERPASS_STATE_T_MEMBER_VKRPS_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_renderpass_state_t_const_data},
+	{.name = "VKCBS_INVALID", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_INVALID, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_NOT_ALLOCATED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_NOT_ALLOCATED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_READY", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_READY, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_RECORDING", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_WITHIN_RENDERPASS", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_WITHIN_RENDERPASS, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_RECORDING_ENDED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_RECORDING_ENDED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_SUBMITTED", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_SUBMITTED, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
+	{.name = "VKCBS_COUNT", .member_enum = TYPE_VULKAN_COMMAND_BUFFER_STATE_T_MEMBER_VKCBS_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_command_buffer_state_t_const_data},
 	{.name = "AT_Invalid", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Bitmap", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Bitmap, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Shader", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Shader, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},

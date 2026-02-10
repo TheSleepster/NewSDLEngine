@@ -1,19 +1,21 @@
 #+title: NewSDLEngine
 * IMMEDIATE TODO
-- [X] Fix the memory leak inside of the asset file packer
-- [ ] Fix the c_string_read_* functions.
-- [ ] Fix the thread/synchronization API. It is bad. Why do we do it that way.
-- [ ] We need a proper timing API. Something that can just be attached to a program as a header or lib 
-      and timing record information about the process and certain subblocks. 
-- [ ] Sync API should have sys_mutex_lock() which will block. As well as sys_mutex_try_lock()
-      which won't block. The seperation is valuable.
-- [ ] We should add other debug values to the mutexes, semaphores, and threads.
-      Items like DEBUG_name, thread_id, redudant lock counter, etc. would be very helpful.
 * Next Milestone:
+- [ ] We need to completely rework descriptors and how they function. Right now, everything in the shader
+      revolves around the shader, which is not right. We need to have the shader / material_archetype own it's
+      descriptor_set_layout and have some sort of global descriptor manager that controls and allocates us data
+      for these descriptors in accordance to the set layout stored within the shader. 
+
+- [ ] We should migrate from whatever you want to call this asscan system to a "constant_buffer" system. This way,
+      we can allow the user to just give us data into the constant buffer and we'll just update it as the time comes
+      in the vulkan renderer.
+
 ** Materials
 - [ ] A program to take whatever the material file looks like and transform it into a binary blob.
       This way, parsing it and loading it is WAY faster. The asset file packer can probably do this.
       We should also give the engine the ability to do this for the sake of asset hot reloading.
+- [ ] Perhaps some kind of "constant_buffer" object that maps the name of a buffer / uniform object inside a shader
+      to some CPU side data that we can access easily.
 
 - [ ] Perhaps we need a standard for autodetecting special
       uniforms. For example, the engine wants to know if you have camera
@@ -28,28 +30,13 @@
       shader's descriptor, but that descriptor is only an array with 1
       element, we should warn the user and return.
 
-- [X] Establish the concept of a material
 - [ ] Shaders should store their texture uniform, camera uniforms, and other important information for easy access and updating
 - [ ] Shaders should "cache" special uniforms like "camera uniforms" "texture array uniforms"
+- [ ] Instead of cacheing uniforms, we should just use "constant buffers"
+- [X] Establish the concept of a material
 - [X] Default texture should always be in slot 0, make our texture array in the shader 0 indexed (we went with -1)
 - [X] Materials. Materials should store what shader / blending states are needed for a given set of objects.
       (shader, blend modes, depth state, textures, camera data, etc.)
-** Metaprogram
-- [X] Type database for more efficient storage of types accross the program
-- [X] Some sort of get_type_info(&structure) function that makes the retrieval of type info better.
-- [X] The ability to do the same for members of structs get_member_info(structure_info, string_t member_name)
-- [X] The ability to do the same for enums
-- [X] Type table to allow the user to query for the type_info via type name as a string.
-- [X] Nested structure support
-- [X] Ignore #if 0 blocks completely
-- [X] A better way of parsing modifiers like "volatile", "const", "static", etc.
-- [X] Support Enums as well.
-
-  (This is done for enums)
-- [/] The ability to get the parent structure from the name of a member. (this might be impossible.)
-      This might be impossible simply do to the fact that we can have the same member in many different structs.
-      We can have token.data, bitmap.data, texture.data, etc. So how can we know which type_info_struct_t we want???
-** Material file parser
 ** Create a very early version of the new batch renderer
 - [X] LAYERS. Use the depth buffer.
 - [X] A buffer for the texture array, this is largely the same as what
@@ -144,6 +131,7 @@
 - [ ] Refine the system to use atomic reference counting for asset releasing.
 - [ ] Modify all asset deletion so that we only delete the asset at the END of the game frame]
 - [X] Textures and other assets should store a "generation" ID that tells us whether it has been updated
+- [ ] Have the catalog of a specific asset type keep track of what assets are loaded. This way we can simply loop over all assets that are loaded
 ** Textures
 - [ ] Renderer's create Texture function only takes in pixels. The rest of the data is stored on the texture_t object
 - [ ] Actually make the "generation_ID" mean something
@@ -158,13 +146,30 @@
 - [X] Make the Vulkan renderer actually use the shader data...
 ** Asset File
 - [X] Add Spirv Binaries to the asset file
-- [ ] (???) Prebuild atlas' and store them as part of the .wad file so that we don't have to deal with the dynamic atlasing at runtime
+- [X] Fix the memory leak inside of the asset file packer
 - [X] Switch to a more sane "chunk based" file format. Where the header stays almost exactly how it is, but the assets are moved into "chunks".
+- [X] Find out why the hell it's taking so long to pack
+- [ ] (???) Prebuild atlas' and store them as part of the .wad file so that we don't have to deal with the dynamic atlasing at runtime
       Each "chunk" should tell us the actual asset size and contain a bunch of information about the data. This also makes the table of contents less responsible
       for stuff and makes parsing easier since we can just go through each chunk for the information relating to an asset.
 - [ ] Assets should store the information about themselves inside the asset file, ex: textures should store their w/h/c setup. Wav files should store their channel_count, sample_count, etc.
-- [ ] Find out why the hell it's taking so long to pack
+* Metaprogram
+- [X] Type database for more efficient storage of types accross the program
+- [X] Some sort of get_type_info(&structure) function that makes the retrieval of type info better.
+- [X] The ability to do the same for members of structs get_member_info(structure_info, string_t member_name)
+- [X] The ability to do the same for enums
+- [X] Type table to allow the user to query for the type_info via type name as a string.
+- [X] Nested structure support
+- [X] Ignore #if 0 blocks completely
+- [X] A better way of parsing modifiers like "volatile", "const", "static", etc.
+- [X] Support Enums as well.
+
+  (This is done for enums)
+- [/] The ability to get the parent structure from the name of a member. (this might be impossible.)
+      This might be impossible simply do to the fact that we can have the same member in many different structs.
+      We can have token.data, bitmap.data, texture.data, etc. So how can we know which type_info_struct_t we want???
 * Core stuff
+- [ ] Fix the c_string_read_* functions.
 - [ ] Why are we using Malloc with our dynamic arrays
 - [ ] Compile the core into a single library. c_data.lib or something. then have c_base.h import all the core headers
 - [ ] Convert Dynarray.cpp and Dynarray.h into an STB style library like the hash_tables
@@ -177,6 +182,8 @@
 - [X] The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal state
 - [ ] The ability to dump the contents of a memory arena to a file, this is probably pretty useful...
 - [ ] Any function in the string.cpp file that allocates memory should be reordered like the file API
+- [ ] We need a proper timing API. Something that can just be attached to a program as a header or lib 
+      and timing record information about the process and certain subblocks. 
 - [ ] Vulkan style memory allocation for functions that would allocate
       memory within the core lib. The core should have a "get_read_size"
       or something to get the SIZE of the allocation and allow the user to
@@ -186,9 +193,14 @@
       internal allocator.
 * Multithreading
 - [ ] Maybe just rebuild the whole system... it seems that this model isn't actually any good anymore
+- [ ] Fix the thread/synchronization API. It is bad. Why do we do it that way.
 - [ ] A manner with which to run work in batches and get the results of that completed work back from the threadpool
 - [ ] Work stealing
 - [ ] Improvement to adding work_orders to the queue of each thread, currently the locking makes us slow
-* Platform
+- [ ] Sync API should have sys_mutex_lock() which will block. As well as sys_mutex_try_lock()
+      which won't block. The seperation is valuable.
+- [ ] We should add other debug values to the mutexes, semaphores, and threads.
+      Items like DEBUG_name, thread_id, redudant lock counter, etc. would be very helpful.
 - [ ] Sys mutex lock and unlock on windows should change the boolean for if it is locked, this is already done on Linux
+* Platform
 - [X] Function to get current working directory Windows (https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentdirectory)

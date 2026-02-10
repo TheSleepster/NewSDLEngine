@@ -2037,7 +2037,7 @@ r_vulkan_image_transition_layout(vulkan_render_context_t      *render_context,
 
     /* TODO(Sleepster): This is really silly, I know Travis does this for the sake of getting a video done quickly and such but 
      * there's a much better way (in theory):
-     * - [ ] The image should store the informationa about it's current format, layout, baseMipLevel, aspectMask, etc.
+     * - [ ] The image should store the information about it's current format, layout, baseMipLevel, aspectMask, etc.
      * - [ ] The function itself should just take a parameterized list of information you want the image to actually transform into
      *
      * This current setup essentially just forces us into uncomfortable areas, what if we want an image to be write only when accessed by a shader? 
@@ -3032,7 +3032,18 @@ r_vulkan_render_groups_to_output(render_state_t *render_state)
         render_group_t *current_group = draw_frame->used_render_groups[render_group_index];
         Assert(current_group);
 
-        vulkan_shader_data_t *shader  = &current_group->material->material->archetype->shader.slot->shader.shader_data;
+#if 0
+        if(render_group->material_archetype.constant_buffer->is_dirty)
+        {
+            // TODO(Sleepster): These could be one function??? 
+            r_vulkan_update_constants_buffer(render_group->material_archetype.constant_buffer);
+            r_vulkan_shader_update_descriptor_set(render_group->material_archetype.constant_buffer->descriptor_set);
+        }
+#endif
+        // TODO(Sleepster): 
+        // Instead of doing this for EVERY group, just make one buffer we can simply tie to material_archetype->constant_buffer
+        // allowing us to update that descriptor_set a single time per frame.
+        vulkan_shader_data_t *shader  = &current_group->material_archetype->material_info->archetype.shader_handle.shader->shader_data;
         r_vulkan_shader_bind(render_context, shader);
         r_vulkan_shader_set_uniform_data(render_context->default_shader, STR("RenderInstances"), current_group->master_batch_array, sizeof(render_geometry_instance_t) * current_group->total_primitive_count);
         

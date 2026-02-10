@@ -18,8 +18,6 @@
 #include <c_string.h>
 #include <c_math.h>
 
-//#include <preprocessor_type_data.h>
-
 #define GENERATE_TYPE_INFO
 
 // TODO(Sleepster): I hate that these defines are here. But I can't put them anywhere else 
@@ -85,6 +83,18 @@ typedef struct vulkan_buffer_data
     s32                   memory_index;
     u32                   memory_property_flags;
 }vulkan_buffer_data_t;
+
+// TODO(Sleepster): 
+// We want to move from our current method of updating descriptors
+// to this. This will allow us to just push the whole buffer data to the
+// gpu and give us what we need in a more accessable and faster way.
+typedef struct render_constant_buffer
+{
+    vulkan_buffer_data_t *GPU_buffer;
+
+    byte                 *CPU_buffer;
+    u32                   buffer_data;
+}render_constant_buffer_t;
 
 //////////////////////////////////
 // VULKAN PIPELINE STUFF 

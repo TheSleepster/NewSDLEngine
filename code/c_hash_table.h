@@ -11,6 +11,17 @@
 #include <c_base.h>
 #include <c_string.h>
 
+// TODO(Sleepster): 
+// This is a very naive implementation of a type safe hash table. In this table, we don't beleive in collisions. Which,
+// is a terrible idea. But I'm lazy so what can you do. I'll figure out a way to effectively manage collisions because
+// they WILL happen. Even if your table is like 4096 with 23 elements.
+//
+// https://en.wikipedia.org/wiki/Birthday_problem
+//
+// should also store the HASH value itself
+// and to prevent "grouping" of cells in the table from collisions,
+// we can just add the hash % table_size if we find a collision.
+
 #define HASH_TABLE_DEBUG_ID (0xC0FFEE)
 
 typedef enum hash_table_allocation_flags

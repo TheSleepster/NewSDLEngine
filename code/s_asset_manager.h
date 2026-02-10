@@ -31,8 +31,9 @@ typedef struct subtexture_data    subtexture_data_t;
 typedef struct texture_atlas      texture_atlas_t;
 typedef struct texture2D          texture2D_t;
 typedef struct shader             shader_t;
-typedef struct material_archetype  material_archetype_t;
+typedef struct material_archetype material_archetype_t;
 typedef struct material_instance  material_instance_t;
+typedef struct material_data      material_data_t;
 
 typedef struct jfd_package_entry  jfd_package_entry_t;
 typedef struct jfd_file_header    jfd_file_header_t;
@@ -87,9 +88,9 @@ typedef struct asset_handle
     asset_slot_t      *slot;
 
     union {
-        texture2D_t         *texture;
-        shader_t            *shader;
-        material_instance_t *material;
+        texture2D_t     *texture;
+        shader_t        *shader;
+        material_data_t *material_info;
     };
 }asset_handle_t;
 
@@ -141,10 +142,11 @@ typedef struct texture_atlas
     u32                           merge_counter;
     DynArray_t(asset_handle_t*)   textures_to_merge;
 
-    // TODO(Sleepster): Technically we need not "add" to this array, just pull from it. What do we do about this? 
-    //                  Guess it's not a problem for now.
+    // TODO(Sleepster): 
+    // Technically we need not "add" to this array, just pull from it. What do we do once we 
+    // pull more than what's in it? Guess it's not a problem for now.
     //
-    //                  If we run out of indices in here, just expand the size of the array?
+    // If we run out of indices in here, just expand the size of the array?
     DynArray_t(subtexture_data_t) packed_subtextures;
     u32                           packed_subtexture_count;
     bool32                        is_valid;
@@ -209,7 +211,8 @@ typedef struct material_instance
 GENERATE_TYPE_INFO
 typedef struct material_archetype
 {
-    // TODO(Sleepster): Is dirty flag. If the contents of the material archetype change, we should
+    // TODO(Sleepster): 
+    // Is dirty flag. If the contents of the material archetype change, we should
     // tell the asset system we require this to be reloaded. All instances based off of this archetype
     // will be fine since they store a pointer to the archetype.
     u64                 ID;
@@ -217,7 +220,7 @@ typedef struct material_archetype
 
     string_t            name;
     string_t            shader_binary_name;
-    asset_handle_t      shader;
+    asset_handle_t      shader_handle;
 
     material_instance_t base_instance;
 }material_archetype_t;
@@ -232,7 +235,7 @@ typedef enum stored_material_type
 typedef struct material_data
 {
     stored_material_type_t material_type;
-    struct {
+    union {
         material_archetype_t archetype;
         material_instance_t  instance;
     };
@@ -338,6 +341,8 @@ asset_handle_t s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manag
 texture_atlas_t* s_texture_atlas_create(asset_manager_t *asset_manager, u32 size, u32 channel_count, u32 format, u32 initial_subtexture_count);
 void s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle);
 void s_texture_atlas_pack_added_textures(vulkan_render_context_t *render_context, texture_atlas_t *atlas);
+
+true_inline void s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot_t *slot);
 
 #endif // S_ASSET_MANAGER_H
 
