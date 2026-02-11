@@ -209,6 +209,11 @@ main(int argc, char **argv)
                 r_set_active_render_material(render_state, &render_state->default_material);
                 r_set_active_material_constant(render_state, STR("Matrices"), &shader->camera_matrices, sizeof(shader->camera_matrices));
 
+#if 0 
+                asset_handle_t material_instance = r_create_material_instance(&render_state->shiny_material);
+                r_set_constant_buffer_data(material_instance.set0.matrices, &shader->camera_matrices, sizeof(shader->camera_matrices));
+#endif 
+
                 r_render_group_begin(render_state);
                 r_push_texture(render_state, {0, 0}, {100, 100}, {0.0, 1.0, 0.0, 1.0}, 0, render_context->default_texture);
                 r_push_texture(render_state, {-100, 100}, {100, 100}, {1.0, 1.0, 1.0, 1.0}, 0, render_context->default_texture);

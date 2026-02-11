@@ -1963,6 +1963,11 @@ r_vulkan_image_create(vulkan_render_context_t *render_context,
         .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
         .usage         = usage_flags,
         .samples       = VK_SAMPLE_COUNT_1_BIT,
+        // TODO(Sleepster): We may not need sharing mode exclusive:         
+        // https://developer.nvidia.com/blog/vulkan-dos-donts/
+        //
+        // "VkSharingMode is ignored by the driver, so VK_SHARING_MODE_CONCURRENT 
+        // incurs no overhead relative to VK_SHARING_MODE_EXCLUSIVE."
         .sharingMode   = VK_SHARING_MODE_EXCLUSIVE
     };
 

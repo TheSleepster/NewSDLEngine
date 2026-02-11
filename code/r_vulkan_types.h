@@ -88,12 +88,33 @@ typedef struct vulkan_buffer_data
 // We want to move from our current method of updating descriptors
 // to this. This will allow us to just push the whole buffer data to the
 // gpu and give us what we need in a more accessable and faster way.
+//
+//
+// TODO(Sleepster):
+// Take a look at s_asset_manager.h Perhaps this is the better way where instead of each of these constant
+// buffers storing a GPU_Buffer we instead just have them act as CPU side buffers with descriptors attached to them.
+// This way has many benefits. Firsly, we don't waste tons of GPU memory creating MANY of these same GPU buffers. Secondly,
+// We only need to update the GPU buffers as Vulkan needs them for rendering so, the CPU buffer here allows us to have many
+// instances of the same material while only using the buffer data from the one we actually need. CPU Memory shouldn't be much of 
+// an issue since these buffers can't really be that big. Even the render_instances buffer is only a couple MB (~20MB) so if
+// we have 100 of them, then sure, that's a problem (total usage would be ~2GB of RAM). But until then, nuh uh.
+//
+// There is a caveat of which I'm unaware how much it actually matters, but we may need a TON of vkMemoryBarriers to make this
+// work properly if this is really only going to be one GPU buffer, there's a chance that we render drawcall A but then overwrite
+// it's data with drawcall B's data while drawcall A is still going... Perhaps that's not a real thing I need to worry about,
+// but just wanted to make note. -Justin Febuary 11 26
 typedef struct render_constant_buffer
 {
+#if 0
     vulkan_buffer_data_t *GPU_buffer;
+#endif
 
     byte                 *CPU_buffer;
-    u32                   buffer_data;
+    u32                   buffer_size;
+
+#if 0
+    VkDescriptorSet       set_data[3];
+#endif
 }render_constant_buffer_t;
 
 //////////////////////////////////

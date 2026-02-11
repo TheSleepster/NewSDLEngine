@@ -30,6 +30,7 @@ enum job_priority_t
 struct threadpool_queue_entry_t
 {
     bool8                  is_valid;
+    // TODO(Sleepster): Why is this here???? 
     byte                   entry_buffer[THREADPOOL_ENTRY_BUFFER_SIZE];
 
     void                  *user_data;

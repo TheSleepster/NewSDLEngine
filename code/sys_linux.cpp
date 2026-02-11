@@ -561,6 +561,7 @@ sys_semaphore_close(sys_semaphore_t *semaphore)
     semaphore->handle = null;
 }
 
+// TODO(Sleepster): sys_semaphore_signal 
 s32
 sys_semaphore_release(sys_semaphore_t *semaphore, s32 threads_to_release)
 {

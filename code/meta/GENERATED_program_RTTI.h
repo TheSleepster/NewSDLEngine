@@ -112,11 +112,11 @@
 	X(TYPE_render_state_t, "render_state_t") \
 	X(TYPE_global_matrix_uniforms_t, "global_matrix_uniforms_t") \
 	X(TYPE_push_constant_t, "push_constant_t") \
-	X(TYPE_vulkan_buffer_data_t, "vulkan_buffer_data_t") \
-	X(TYPE_render_constant_buffer_t, "render_constant_buffer_t") \
 	X(TYPE_VkBuffer, "VkBuffer") \
 	X(TYPE_VkDeviceMemory, "VkDeviceMemory") \
 	X(TYPE_VkBufferUsageFlagBits, "VkBufferUsageFlagBits") \
+	X(TYPE_vulkan_buffer_data_t, "vulkan_buffer_data_t") \
+	X(TYPE_render_constant_buffer_t, "render_constant_buffer_t") \
 	X(TYPE_VkPipeline, "VkPipeline") \
 	X(TYPE_VkPipelineBindPoint, "VkPipelineBindPoint") \
 	X(TYPE_VkPipelineLayout, "VkPipelineLayout") \
@@ -379,8 +379,8 @@ const static render_state_t GENERATED_DEFAULT_render_state_t = {};
 const static global_matrix_uniforms_t GENERATED_DEFAULT_global_matrix_uniforms_t = {};
 const static push_constant_t GENERATED_DEFAULT_push_constant_t = {};
 const static render_camera_t GENERATED_DEFAULT_render_camera_t = {};
-const static render_constant_buffer_t GENERATED_DEFAULT_render_constant_buffer_t = {};
 const static vulkan_buffer_data_t GENERATED_DEFAULT_vulkan_buffer_data_t = {};
+const static render_constant_buffer_t GENERATED_DEFAULT_render_constant_buffer_t = {};
 const static vulkan_pipeline_data_t GENERATED_DEFAULT_vulkan_pipeline_data_t = {};
 const static render_pipeline_state_t GENERATED_DEFAULT_render_pipeline_state_t = {};
 const static spv_vulkan_type_map_t GENERATED_DEFAULT_spv_vulkan_type_map_t = {};
@@ -1542,24 +1542,6 @@ struct type_info_struct_render_camera_t {
 	};
 };
 
-struct type_info_struct_render_constant_buffer_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t GPU_buffer;
-			type_info_member_t CPU_buffer;
-			type_info_member_t buffer_data;
-		}members;
-	};
-};
-
 struct type_info_struct_vulkan_buffer_data_t {
 	const char *name;
 	u32 type;
@@ -1579,6 +1561,23 @@ struct type_info_struct_vulkan_buffer_data_t {
 			type_info_member_t usage_flags;
 			type_info_member_t memory_index;
 			type_info_member_t memory_property_flags;
+		}members;
+	};
+};
+
+struct type_info_struct_render_constant_buffer_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t CPU_buffer;
+			type_info_member_t buffer_size;
 		}members;
 	};
 };
@@ -4144,21 +4143,6 @@ const static type_info_struct_render_camera_t type_info_struct_render_camera_t_c
 	}
 };
 
-const static type_info_struct_render_constant_buffer_t type_info_struct_render_constant_buffer_t_const_data = {
-	.name = "render_constant_buffer_t",
-	.type = TYPE_render_constant_buffer_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_render_constant_buffer_t),
-	.member_count = 3,
-	.members = {
-		.GPU_buffer = {.name = "GPU_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.GPU_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), GPU_buffer))},
-		.CPU_buffer = {.name = "CPU_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.CPU_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), CPU_buffer))},
-		.buffer_data = {.name = "buffer_data", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.buffer_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), buffer_data))},
-	}
-};
-
 const static type_info_struct_vulkan_buffer_data_t type_info_struct_vulkan_buffer_data_t_const_data = {
 	.name = "vulkan_buffer_data_t",
 	.type = TYPE_vulkan_buffer_data_t,
@@ -4176,6 +4160,20 @@ const static type_info_struct_vulkan_buffer_data_t type_info_struct_vulkan_buffe
 		.usage_flags = {.name = "usage_flags", .type = TYPE_VkBufferUsageFlagBits, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.usage_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), usage_flags))},
 		.memory_index = {.name = "memory_index", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.memory_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), memory_index))},
 		.memory_property_flags = {.name = "memory_property_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t.memory_property_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_data_t), memory_property_flags))},
+	}
+};
+
+const static type_info_struct_render_constant_buffer_t type_info_struct_render_constant_buffer_t_const_data = {
+	.name = "render_constant_buffer_t",
+	.type = TYPE_render_constant_buffer_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_render_constant_buffer_t),
+	.member_count = 2,
+	.members = {
+		.CPU_buffer = {.name = "CPU_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.CPU_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), CPU_buffer))},
+		.buffer_size = {.name = "buffer_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), buffer_size))},
 	}
 };
 
@@ -5934,12 +5932,6 @@ enum render_camera_t_member_list_enum {
 	TYPE_RENDER_CAMERA_T_MEMBER_ID,
 };
 
-enum render_constant_buffer_t_member_list_enum {
-	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_GPU_buffer,
-	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_CPU_buffer,
-	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_buffer_data,
-};
-
 enum vulkan_buffer_data_t_member_list_enum {
 	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_is_valid,
 	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_is_mapped,
@@ -5949,6 +5941,11 @@ enum vulkan_buffer_data_t_member_list_enum {
 	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_usage_flags,
 	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_memory_index,
 	TYPE_VULKAN_BUFFER_DATA_T_MEMBER_memory_property_flags,
+};
+
+enum render_constant_buffer_t_member_list_enum {
+	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_CPU_buffer,
+	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_buffer_size,
 };
 
 enum vulkan_pipeline_data_t_member_list_enum {
@@ -6959,11 +6956,11 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "render_state_t", .type = TYPE_render_state_t, .size = sizeof(render_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_state_t_const_data},
 	{.name = "global_matrix_uniforms_t", .type = TYPE_global_matrix_uniforms_t, .size = sizeof(global_matrix_uniforms_t), .struct_info = (type_info_struct_t*)&type_info_struct_global_matrix_uniforms_t_const_data},
 	{.name = "push_constant_t", .type = TYPE_push_constant_t, .size = sizeof(push_constant_t), .struct_info = (type_info_struct_t*)&type_info_struct_push_constant_t_const_data},
-	{.name = "vulkan_buffer_data_t", .type = TYPE_vulkan_buffer_data_t, .size = sizeof(vulkan_buffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_buffer_data_t_const_data},
-	{.name = "render_constant_buffer_t", .type = TYPE_render_constant_buffer_t, .size = sizeof(render_constant_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_constant_buffer_t_const_data},
 	{.name = "VkBuffer", .type = TYPE_VkBuffer, .size = sizeof(VkBuffer), .struct_info = NULL},
 	{.name = "VkDeviceMemory", .type = TYPE_VkDeviceMemory, .size = sizeof(VkDeviceMemory), .struct_info = NULL},
 	{.name = "VkBufferUsageFlagBits", .type = TYPE_VkBufferUsageFlagBits, .size = sizeof(VkBufferUsageFlagBits), .struct_info = NULL},
+	{.name = "vulkan_buffer_data_t", .type = TYPE_vulkan_buffer_data_t, .size = sizeof(vulkan_buffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_buffer_data_t_const_data},
+	{.name = "render_constant_buffer_t", .type = TYPE_render_constant_buffer_t, .size = sizeof(render_constant_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_constant_buffer_t_const_data},
 	{.name = "VkPipeline", .type = TYPE_VkPipeline, .size = sizeof(VkPipeline), .struct_info = NULL},
 	{.name = "VkPipelineBindPoint", .type = TYPE_VkPipelineBindPoint, .size = sizeof(VkPipelineBindPoint), .struct_info = NULL},
 	{.name = "VkPipelineLayout", .type = TYPE_VkPipelineLayout, .size = sizeof(VkPipelineLayout), .struct_info = NULL},

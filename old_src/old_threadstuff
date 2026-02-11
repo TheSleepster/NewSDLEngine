@@ -1,0 +1,160 @@
+void
+append_work_to_thread_list(threadpool_thread_t *thread, work_order_t *work_order)
+{
+    work_order_list_t *list = &thread->work_available;
+    for(;;)
+    {
+        u32 original_next_entry_to_write = list->next_entry_to_write;
+        u32 new_next_entry_to_write      = (original_next_entry_to_write + 1) % MAX_WORK_ORDERS;
+
+        list->work_orders[original_next_entry_to_write] = *work_order;
+        if((u32)AtomicCompareExchange(&list->next_entry_to_write, 
+                                      new_next_entry_to_write, 
+                                      original_next_entry_to_write) == original_next_entry_to_write)
+        {
+            AtomicIncrement(&thread->work_order_count);
+            break;
+        }
+    }
+}
+template <typename LambdaType>
+void
+push_work_order(threadpool_data_t *threadpool, LambdaType lambda)
+{
+    u32 original_next_worker_index = threadpool->next_worker_thread_index;
+    u32 next_worker_index          = (original_next_worker_index + 1) % threadpool->thread_count;
+
+    u32 next_work_index = AtomicCompareExchange32((volatile s32*)&threadpool->next_worker_thread_index,
+                                                  next_worker_index,
+                                                  original_next_worker_index);
+    if(next_work_index == original_next_worker_index)
+    {
+        threadpool_thread_t *thread = threadpool->threads + next_worker_index;
+        work_order_t new_work_order = {}; 
+        void *data = 0;
+
+        sys_mutex_lock(&thread->allocator.mutex, true);
+
+        u32 allocation_size = Align8(sizeof(LambdaType));
+        if(thread->allocator.used + allocation_size <= thread->allocator.size)
+        {
+            data = thread->allocator.buffer + thread->allocator.used;
+            thread->allocator.used += allocation_size;
+        }
+
+        sys_mutex_unlock(&thread->allocator.mutex);
+
+        Assert(data != null);
+        memcpy(data, &lambda, sizeof(LambdaType));
+        new_work_order.data     = data;
+        new_work_order.function = invoker<LambdaType>;
+
+        append_work_to_thread_list(thread, &new_work_order);
+        sys_semaphore_release(&thread->work_available.semaphore, 1);
+    }
+}
+
+bool8 
+thread_steal_work_order(threadpool_thread_t *theif_thread)
+{
+    bool8 result = true;
+
+    u32 current_highest_job_counter = 0;
+    threadpool_thread_t *target_thread = null;
+    for(u32 thread_index = 0;
+        thread_index < theif_thread->thread_count;
+        ++thread_index)
+    {
+        threadpool_thread_t *thread = theif_thread->threads + thread_index;
+        u32 work_orders_left = (thread->work_order_count - thread->work_orders_completed);
+        if(work_orders_left > current_highest_job_counter)
+        {
+            current_highest_job_counter = work_orders_left;
+            target_thread               = thread;
+        }
+    }
+
+    // NOTE(Sleepster): Spin until we steal 
+    if(target_thread)
+    {
+        for(;;)
+        {
+            u32 next_entry_to_read  = AtomicLoad(&target_thread->work_available.next_entry_to_read);
+            u32 next_entry_to_write = AtomicLoad(&target_thread->work_available.next_entry_to_write) - 1;
+            if(next_entry_to_read != next_entry_to_write)
+            {
+                u32 new_next_entry_to_write = (next_entry_to_write == 0) ? (MAX_WORK_ORDERS - 1) : (next_entry_to_write - 1);;
+                u32 entry_to_steal = AtomicCompareExchange32(&target_thread->work_available.next_entry_to_write,
+                                                             new_next_entry_to_write,
+                                                             next_entry_to_write);
+                if(entry_to_steal == next_entry_to_write)
+                {
+                    work_order_t *work_order = target_thread->work_available.work_orders + entry_to_steal;
+                    Assert(work_order);
+                    Assert(work_order->data);
+                    Assert(work_order->function);
+
+                    work_order->function(work_order->data);
+                    AtomicIncrement(&target_thread->work_orders_completed);
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        result = false;
+    }
+    
+    return(result);
+}
+
+bool8 
+thread_do_next_work_order(threadpool_thread_t *thread)
+{    
+    bool8 result = true;
+
+    u32 original_entry_to_read =  thread->work_available.next_entry_to_read;
+    u32 new_next_entry_to_read = (original_entry_to_read + 1) % MAX_WORK_ORDERS;
+
+    if(original_entry_to_read != thread->work_available.next_entry_to_write)
+    {
+        u32 next_entry_to_read = AtomicCompareExchange((volatile s32*)&thread->work_available.next_entry_to_read, 
+                                                       new_next_entry_to_read,
+                                                       original_entry_to_read);
+        if(next_entry_to_read == original_entry_to_read)
+        {
+            work_order_t *work_order = &thread->work_available.work_orders[next_entry_to_read];
+            Assert(work_order);
+            Assert(work_order->data);
+            Assert(work_order->function);
+
+            work_order->function(work_order->data);
+            AtomicIncrement(&thread->work_orders_completed);
+        }
+    }
+    else
+    {
+        result = false;
+    }
+
+    return(result);
+}
+
+bool8 
+thread_get_next_work_order(threadpool_thread_t *thread)
+{
+    bool8 result = false;
+    if(!thread_do_next_work_order(thread))
+    {
+        if(!thread_steal_work_order(thread))
+        {
+            result = true;
+        }
+    }
+
+    return(result);
+}

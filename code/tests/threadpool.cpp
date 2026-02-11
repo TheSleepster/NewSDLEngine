@@ -51,6 +51,7 @@ test_callback(void *user_data)
         ++mul_index)
     {
         final_matrix = mat4_multiply(final_matrix, mat4_multiply(translation_mat, rotation_matrix));
+        final_matrix = mat4_scale(final_matrix, vec3(mul_index, mul_index, mul_index));
         (void)final_matrix;
     }
 
@@ -65,7 +66,6 @@ main(void)
     threadpool_t *threadpool = Alloc(threadpool_t);
     c_threadpool_init(threadpool);
 
-    u64 last_tsc = SDL_GetPerformanceCounter();
     for(u32 job_index = 0;
         job_index < 10000;
         ++job_index)
@@ -77,6 +77,7 @@ main(void)
         data->parent_id     = job_index;
         c_threadpool_add_task(threadpool, data, &test_callback, TPTP_High);
     }
+    u64 last_tsc = SDL_GetPerformanceCounter();
     c_threadpool_flush_task_queues(threadpool);
 
     u64 current_tsc = SDL_GetPerformanceCounter();

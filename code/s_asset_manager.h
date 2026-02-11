@@ -202,9 +202,54 @@ typedef struct material_instance
 
     u32                           shader_uniform_count;
     vulkan_shader_uniform_data_t *uniform_data;
+#if 0
+    VkDescriptorSet               sets[];
+#endif 
 
     material_archetype_t         *archetype;
 }material_instance_t;
+
+#if 0
+// TODO(Sleepster): 
+// Perhaps this is the way we would like to handle materials going forward.
+// This setup is very simple. We have a generator analyze each of our material files
+// and output structures EXACTLY like so.
+//
+// The idea is simple, for every material we don't want to have to perform hashing for
+// finding and updating the material's data. This is because it's slow, and we can just know
+// the offset into the buffer manually. This approach allows us to do things like so:
+//
+// NOTE(Sleepster): We can pass the size here, but again the generator should let us know that without having to pass this.
+  asset_handle_t material_instance = r_create_material_instance(&render_state->shiny_material);
+  r_set_constant_buffer_data(material_instance.set0.matrices, &shader->camera_matrices, sizeof(shader->camera_matrices));
+// 
+// Where since we already know the offsets, we can just pass the byte* (which to be clear, is predetermined from the size of the
+// uniform that the generator would ALSO give us) which will be the offset of the uniform in question inside the buffer.
+// Giving us an easy way to cheaply update the data for the uniform without much effort. 
+//
+// -Justin Febuary 11 26
+
+struct shiny_material_t: public material_instance_t
+{
+    struct set0 {
+        constant_buffer_t constant_buffer;
+        byte             *camera_matrices;
+    };
+
+    struct set1 {
+        constant_buffer_t constant_buffer;
+        byte             *material_uniform_buffer;
+        byte             *sampler_data;
+        byte             *render_instances;
+    };
+
+    struct set2 {
+        constant_buffer_t constant_buffer;
+        byte             *model_matrix;
+        byte             *texture_data;
+    };
+};
+#endif
 
 
 // MATERIAL ARCHETYPE

@@ -22,6 +22,8 @@ enum GENERATED_program_types_t {
 	TYPE_string_t,
 	TYPE_asset_handle_t,
 	TYPE_vulkan_shader_uniform_data_t,
+	TYPE_if,
+	TYPE_endif,
 	TYPE_material_archetype_t,
 };
 
@@ -59,7 +61,8 @@ struct type_info_material_instance_t {
 		type_info_member_t renderer_effect_flags;
 		type_info_member_t shader_uniform_count;
 		type_info_member_t uniform_data;
-		type_info_member_t archetype;
+		type_info_member_t VkDescriptorSet;
+		type_info_member_t material_archetype_t;
 	}members;
 };
 
@@ -238,7 +241,7 @@ const static type_info_render_pipeline_state_t type_info_render_pipeline_state_t
 const static type_info_material_instance_t type_info_material_instance_t = {
 	.name = "material_instance_t",
 	.type = TYPE_material_instance_t,
-	.member_count = 9,
+	.member_count = 10,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .offset = offsetof(material_instance_t, ID), .size = sizeof(u64)},
 		.version = {.name = "version", .type = TYPE_u32, .offset = offsetof(material_instance_t, version), .size = sizeof(u32)},
@@ -248,7 +251,8 @@ const static type_info_material_instance_t type_info_material_instance_t = {
 		.renderer_effect_flags = {.name = "renderer_effect_flags", .type = TYPE_u32, .offset = offsetof(material_instance_t, renderer_effect_flags), .size = sizeof(u32)},
 		.shader_uniform_count = {.name = "shader_uniform_count", .type = TYPE_u32, .offset = offsetof(material_instance_t, shader_uniform_count), .size = sizeof(u32)},
 		.uniform_data = {.name = "uniform_data", .type = TYPE_vulkan_shader_uniform_data_t, .offset = offsetof(material_instance_t, uniform_data), .size = sizeof(vulkan_shader_uniform_data_t*)},
-		.archetype = {.name = "archetype", .type = TYPE_material_archetype_t, .offset = offsetof(material_instance_t, archetype), .size = sizeof(material_archetype_t*)},
+		.VkDescriptorSet = {.name = "VkDescriptorSet", .type = TYPE_if, .offset = offsetof(material_instance_t, VkDescriptorSet), .size = sizeof(if)},
+		.material_archetype_t = {.name = "material_archetype_t", .type = TYPE_endif, .offset = offsetof(material_instance_t, material_archetype_t), .size = sizeof(endif*)},
 	}
 };
 

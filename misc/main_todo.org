@@ -10,6 +10,8 @@
       we can allow the user to just give us data into the constant buffer and we'll just update it as the time comes
       in the vulkan renderer.
 
+- [ ] Proper test suite that allows us to actually get REAL benchmarking data
+
 ** Materials
 - [ ] A program to take whatever the material file looks like and transform it into a binary blob.
       This way, parsing it and loading it is WAY faster. The asset file packer can probably do this.
@@ -195,6 +197,7 @@
 - [ ] Maybe just rebuild the whole system... it seems that this model isn't actually any good anymore
 - [ ] Fix the thread/synchronization API. It is bad. Why do we do it that way.
 - [ ] A manner with which to run work in batches and get the results of that completed work back from the threadpool
+- [ ] sys_semaphore_signal (instead of release...)
 - [ ] Work stealing
 - [ ] Improvement to adding work_orders to the queue of each thread, currently the locking makes us slow
 - [ ] Sync API should have sys_mutex_lock() which will block. As well as sys_mutex_try_lock()

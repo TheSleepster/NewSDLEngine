@@ -33,6 +33,7 @@
 typedef struct meta_struct meta_struct_t;
 
 // TODO(Sleepster): 
+// - [ ] Parse #if 0 blocks inside of structures.
 // - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
 // - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
 // - [ ] Make a function that takes in the member string and returns to us the member enum for the item,
@@ -46,6 +47,24 @@ typedef struct meta_struct meta_struct_t;
 // - [ ] Perhaps we should prefix hash tables and dynarray members with special characters to denote this
 // - [ ] We may have some (a lot) issues with multi-word C primtives in the future like 
 //       "unsigned long long" or "unsigned char"
+// - [ ] Perhaps to solve the issue of includes when using the metaprogram, it would be best to use the 
+//       #if !defined(...) blocks of the header we're parsing from, and include it in that section of the metaprogram's
+//       generated file so that we only include header information that's actually defined within that translation unit.
+//       This would kind of require us to change the way the system works. Moving away from "All in one go" to that of a
+//       "build as we go" system. Where, instead of parsing every file in one go we instead we parse on a per file basis.
+//       Items like the type table would have #ifdef "header_name.h" inside of them to prevent collisions.
+//
+//       This would probably require us to move from a single file_ast to what was originally planned. Multiple file
+//       asts for the total database. We'd need to maintain a global type_table that would check if types are already
+//       added and have a way to map them to their file so we can do something like:
+//
+//       #if defined(HEADER_MACRO_H)
+//       (items from within header_macro)
+//       #endif
+//
+//       #if defined(OTHER_HEADER_MACRO)
+//       (same here)
+//       #endif
 //
 // - [?] X-Macro for mapping enum member names to their parent enum
 // - [?] We are including structures that aren't directly embedded into a type as members of that type.
@@ -108,8 +127,6 @@ typedef struct meta_struct meta_struct_t;
     X(META_STRUCT_TYPE_Struct, "struct") \
     X(META_STRUCT_TYPE_Union,  "union") \
     X(META_STRUCT_TYPE_Enum,   "enum")
-
-
 
 typedef enum meta_struct_type 
 {
@@ -213,6 +230,7 @@ typedef enum primitive_type_table
 //                  but when it comes time to add the string to the type table,
 typedef struct metatype_data
 {
+    string_t        parent_filename;
     string_t        type_name;
     metatype_kind_t kind;
     u32             modifier_flags;
@@ -292,6 +310,7 @@ typedef struct registry_type
 typedef struct ast_file_data
 {
     tokenizer_t               tokenizer;
+    string_t                  filename;
 
     DynArray_t(meta_struct_t) structures;
     u32                       structure_count;
@@ -330,6 +349,8 @@ typedef struct ast_state
     DynArray_t(registry_type_t) type_table;
     u32                         type_count;
 }ast_state_t;
+
+internal_api token_data_t check_define_data(ast_file_data_t *file, token_data_t token);
 
 static ast_state_t state;
 
@@ -624,13 +645,13 @@ parse_member_data(ast_file_data_t *file_data,
 
     // NOTE(Sleepster): Name
     member->name = token.string;
-    Assert(token.type == TT_Identifier);
+    Expect(token.type == TT_Identifier, "Name token was not an TT_Identifier...\n");
 
     // NOTE(Sleepster): Check if this is an array... 
     token = c_tokenizer_get_next_token(&file_data->tokenizer);
     if(token.type == TT_OpenBracket)
     {
-        // TODO(Sleepster): Hey, what happens if we aren't stupid? and have a constant defined elsewhere. For now,
+        // TODO(Sleepster): Hey, what happens if we aren't stupid? and have a constant defined elsewhere? For now,
         //                  macros are handled, but not constexpr
         type_info->kind = META_TYPE_KIND_Array;
 
@@ -665,6 +686,7 @@ parse_structure(ast_file_data *file_data,
     meta_struct_t *structure_info  = c_arena_push_struct(&global_context->temporary_arena, meta_struct_t);
     structure_info->members        = c_dynarray_create(meta_member_t);
     structure_info->structure_type = get_structure_type_from_string(structure_type.string);
+    structure_info->type_data.parent_filename = file_data->filename;
 
     structure_info->parent        = last_struct;
     structure_info->nesting_depth = current_nesting_depth;
@@ -717,6 +739,7 @@ parse_structure(ast_file_data *file_data,
     while(parsing)
     {
         token = c_tokenizer_get_next_token(&file_data->tokenizer);
+        token = check_define_data(file_data, token);
         switch(token.type)
         {
             case TT_Identifier:
@@ -1669,6 +1692,7 @@ parse_enum(ast_file_data_t *file_data, token_data_t structure_type)
     while(parsing)
     {
         token_data_t token = c_tokenizer_get_next_token(&file_data->tokenizer);
+        token = check_define_data(file_data, token);
         switch(token.type)
         {
             case TT_Identifier:
@@ -1721,77 +1745,90 @@ parse_enum(ast_file_data_t *file_data, token_data_t structure_type)
     ++file_data->enum_count;
 }
 
+internal_api token_data_t 
+check_define_data(ast_file_data_t *file, token_data_t token)
+{
+    switch(token.type)
+    {
+        case TT_HashTag:
+        {
+            // NOTE(Sleepster): If we find a '#' we need to make sure it's not an 'if' block 
+            token = c_tokenizer_peek_token(&file->tokenizer);
+            if(c_string_compare(token.string, STR("if")))
+            {
+                token_data_t peek_token = c_tokenizer_peek_token(&file->tokenizer, 2);
+                if(peek_token.string.data[0] == '0')
+                {
+                    bool8 parsing = true;
+                    while(parsing)
+                    {
+                        token = c_tokenizer_get_next_token(&file->tokenizer);
+                        if(c_string_compare(token.string, STR("endif")))
+                        {
+                            token = c_tokenizer_get_next_token(&file->tokenizer);
+                            parsing = false;
+                        }
+                    }
+                }
+            }
+            else if(c_string_compare(token.string, STR("define")))
+            {
+                // NOTE(Sleepster): Multiline macros need to be ignored, instances like dynarray break things 
+                u32 index      = c_string_find_first_char_from_left_on_line(file->tokenizer.data, '\\');
+                char next_char = file->tokenizer.data.data[index + 1];
+                if(index != INVALID_ID && (next_char == '\n' || next_char == '\r'))
+                {
+                    c_tokenizer_eat_lines(&file->tokenizer, 1);
+
+                    bool8 parsing = true;
+                    while(parsing)
+                    {
+                        index = c_string_find_first_char_from_left_on_line(file->tokenizer.data, '\\');
+                        next_char = file->tokenizer.data.data[index + 1];
+                        if(index != INVALID_ID && (next_char == '\n' || next_char == '\r'))
+                        {
+                            c_tokenizer_eat_lines(&file->tokenizer, 1);
+                        }
+                        else if(index != INVALID_ID && (next_char != '\n' && next_char != '\r'))
+                        {
+                            c_string_advance_by(&file->tokenizer.data, index + 2);
+                        }
+                        else if(index == INVALID_ID)
+                        {
+                            c_tokenizer_eat_lines(&file->tokenizer, 1);
+                            parsing = false;
+                        }
+                    }
+                }
+                else
+                {
+                    // NOTE(Sleepster): 
+                    // - Get the token after the 'define' token, this is the name
+                    // - Then, since we know it's not a multiline macro here, just make everything from the token after the name
+                    //   to the end of the line the macro expansion and store this in a "macros" hash table 
+                    //   using the name of the macro as the key
+                    token_data_t macro_name_token = c_tokenizer_get_next_token(&file->tokenizer);
+                    string_t expanded_macro_value = c_tokenizer_eat_lines(&file->tokenizer, 1);
+
+                    c_hash_table_insert_pair(&state.macro_hash, macro_name_token.string, expanded_macro_value);
+                }
+            }
+        }break;
+    }
+
+    return(token);
+}
+
 internal_api void
 build_file_ast(ast_file_data_t *file)
 {
     while(file->tokenizer.data.count > 0)
     {
         token_data_t token = c_tokenizer_get_next_token(&file->tokenizer);
+        token = check_define_data(file, token);
+
         switch(token.type)
         {
-            case TT_HashTag:
-            {
-                // NOTE(Sleepster): If we find a '#' we need to make sure it's not an 'if' block 
-                token = c_tokenizer_peek_token(&file->tokenizer);
-                if(c_string_compare(token.string, STR("if")))
-                {
-                    token_data_t peek_token = c_tokenizer_peek_token(&file->tokenizer, 2);
-                    if(peek_token.string.data[0] == '0')
-                    {
-                        bool8 parsing = true;
-                        while(parsing)
-                        {
-                            token = c_tokenizer_get_next_token(&file->tokenizer);
-                            if(c_string_compare(token.string, STR("endif")))
-                            {
-                                parsing = false;
-                            }
-                        }
-                    }
-                }
-                else if(c_string_compare(token.string, STR("define")))
-                {
-                    // NOTE(Sleepster): Multiline macros need to be ignored, instances like dynarray break things 
-                    u32 index      = c_string_find_first_char_from_left_on_line(file->tokenizer.data, '\\');
-                    char next_char = file->tokenizer.data.data[index + 1];
-                    if(index != INVALID_ID && (next_char == '\n' || next_char == '\r'))
-                    {
-                        c_tokenizer_eat_lines(&file->tokenizer, 1);
-
-                        bool8 parsing = true;
-                        while(parsing)
-                        {
-                            index = c_string_find_first_char_from_left_on_line(file->tokenizer.data, '\\');
-                            next_char = file->tokenizer.data.data[index + 1];
-                            if(index != INVALID_ID && (next_char == '\n' || next_char == '\r'))
-                            {
-                                c_tokenizer_eat_lines(&file->tokenizer, 1);
-                            }
-                            else if(index != INVALID_ID && (next_char != '\n' && next_char != '\r'))
-                            {
-                                c_string_advance_by(&file->tokenizer.data, index + 2);
-                            }
-                            else if(index == INVALID_ID)
-                            {
-                                c_tokenizer_eat_lines(&file->tokenizer, 1);
-                                parsing = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // NOTE(Sleepster): 
-                        // - Get the token after the 'define' token, this is the name
-                        // - Then, since we know it's not a multiline macro here, just make everything from the token after the name
-                        //   to the end of the line the macro expansion and store this in a "macros" hash table 
-                        //   using the name of the macro as the key
-                        token_data_t macro_name_token = c_tokenizer_get_next_token(&file->tokenizer);
-                        string_t expanded_macro_value = c_tokenizer_eat_lines(&file->tokenizer, 1);
-
-                        c_hash_table_insert_pair(&state.macro_hash, macro_name_token.string, expanded_macro_value);
-                    }
-                }
-            }break;
             case TT_Identifier:
             {
                 if(c_string_compare(token.string, STR("CODE_GEN_IGNORE_FILE")))
@@ -1849,7 +1886,10 @@ VISIT_FILES(generate_file_metadata)
         return;
     }
 
+    state.ast_file.filename       = c_string_make_copy(&global_context->temporary_arena, filename);
     state.ast_file.tokenizer.data = c_file_read_entirety(filename);
+    Assert(state.ast_file.tokenizer.data.data);
+
     build_file_ast(&state.ast_file);
 }
 
