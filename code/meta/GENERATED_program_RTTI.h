@@ -116,6 +116,7 @@
 	X(TYPE_VkDeviceMemory, "VkDeviceMemory") \
 	X(TYPE_VkBufferUsageFlagBits, "VkBufferUsageFlagBits") \
 	X(TYPE_vulkan_buffer_data_t, "vulkan_buffer_data_t") \
+	X(TYPE_render_constant_buffer_type_t, "render_constant_buffer_type_t") \
 	X(TYPE_render_constant_buffer_t, "render_constant_buffer_t") \
 	X(TYPE_VkPipeline, "VkPipeline") \
 	X(TYPE_VkPipelineBindPoint, "VkPipelineBindPoint") \
@@ -1574,8 +1575,10 @@ struct type_info_struct_render_constant_buffer_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[2];
+		type_info_member_t member_array[4];
 		struct {
+			type_info_member_t buffer_type;
+			type_info_member_t GPU_buffer;
 			type_info_member_t CPU_buffer;
 			type_info_member_t buffer_size;
 		}members;
@@ -1763,7 +1766,7 @@ struct type_info_struct_vulkan_shader_data_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[23];
+		type_info_member_t member_array[26];
 		struct {
 			type_info_member_t shader_id;
 			type_info_member_t arena;
@@ -1776,6 +1779,9 @@ struct type_info_struct_vulkan_shader_data_t {
 			type_info_member_t total_descriptor_set_count;
 			type_info_member_t used_descriptor_set_count;
 			type_info_member_t set_info;
+			type_info_member_t set0_buffers;
+			type_info_member_t set1_buffers;
+			type_info_member_t set2_buffers;
 			type_info_member_t push_constant_count;
 			type_info_member_t push_constant_data;
 			type_info_member_t uniforms;
@@ -2867,6 +2873,23 @@ struct type_info_enum_entity_flags {
 			type_info_member_t EF_Actor;
 			type_info_member_t EF_Static;
 			type_info_member_t EF_IsGround;
+		}members;
+	};
+};
+
+struct type_info_enum_render_constant_buffer_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t RCBT_Standard;
+			type_info_member_t RCBT_SSBO;
 		}members;
 	};
 };
@@ -4170,8 +4193,10 @@ const static type_info_struct_render_constant_buffer_t type_info_struct_render_c
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_render_constant_buffer_t),
-	.member_count = 2,
+	.member_count = 4,
 	.members = {
+		.buffer_type = {.name = "buffer_type", .type = TYPE_render_constant_buffer_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.buffer_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), buffer_type))},
+		.GPU_buffer = {.name = "GPU_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.GPU_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), GPU_buffer))},
 		.CPU_buffer = {.name = "CPU_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.CPU_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), CPU_buffer))},
 		.buffer_size = {.name = "buffer_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), buffer_size))},
 	}
@@ -4332,7 +4357,7 @@ const static type_info_struct_vulkan_shader_data_t type_info_struct_vulkan_shade
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_data_t),
-	.member_count = 23,
+	.member_count = 26,
 	.members = {
 		.shader_id = {.name = "shader_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.shader_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), shader_id))},
 		.arena = {.name = "arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), arena))},
@@ -4345,6 +4370,9 @@ const static type_info_struct_vulkan_shader_data_t type_info_struct_vulkan_shade
 		.total_descriptor_set_count = {.name = "total_descriptor_set_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.total_descriptor_set_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), total_descriptor_set_count))},
 		.used_descriptor_set_count = {.name = "used_descriptor_set_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.used_descriptor_set_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), used_descriptor_set_count))},
 		.set_info = {.name = "set_info", .type = TYPE_vulkan_shader_descriptor_set_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.set_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), set_info))},
+		.set0_buffers = {.name = "set0_buffers", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.set0_buffers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), set0_buffers))},
+		.set1_buffers = {.name = "set1_buffers", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.set1_buffers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), set1_buffers))},
+		.set2_buffers = {.name = "set2_buffers", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.set2_buffers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), set2_buffers))},
 		.push_constant_count = {.name = "push_constant_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.push_constant_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), push_constant_count))},
 		.push_constant_data = {.name = "push_constant_data", .type = TYPE_VkPushConstantRange, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.push_constant_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), push_constant_data))},
 		.uniforms = {.name = "uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.uniforms)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), uniforms))},
@@ -5252,6 +5280,16 @@ const static type_info_enum_entity_flags type_info_enum_entity_flags_const_data 
 		.EF_IsGround = {.name = "EF_IsGround", .type = TYPE_entity_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(EF_IsGround), .offset = EF_IsGround},
 	}
 };
+const static type_info_enum_render_constant_buffer_type_t type_info_enum_render_constant_buffer_type_t_const_data = {
+	.name = "render_constant_buffer_type_t",
+	.type = TYPE_render_constant_buffer_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 2,
+	.members = {
+		.RCBT_Standard = {.name = "RCBT_Standard", .type = TYPE_render_constant_buffer_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCBT_Standard), .offset = RCBT_Standard},
+		.RCBT_SSBO = {.name = "RCBT_SSBO", .type = TYPE_render_constant_buffer_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCBT_SSBO), .offset = RCBT_SSBO},
+	}
+};
 const static type_info_enum_renderer_effect_application_flags_t type_info_enum_renderer_effect_application_flags_t_const_data = {
 	.name = "renderer_effect_application_flags_t",
 	.type = TYPE_renderer_effect_application_flags_t,
@@ -5944,6 +5982,8 @@ enum vulkan_buffer_data_t_member_list_enum {
 };
 
 enum render_constant_buffer_t_member_list_enum {
+	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_buffer_type,
+	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_GPU_buffer,
 	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_CPU_buffer,
 	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_buffer_size,
 };
@@ -6036,6 +6076,9 @@ enum vulkan_shader_data_t_member_list_enum {
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_total_descriptor_set_count,
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_used_descriptor_set_count,
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set_info,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set0_buffers,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set1_buffers,
+	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set2_buffers,
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_push_constant_count,
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_push_constant_data,
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_uniforms,
@@ -6540,6 +6583,11 @@ enum entity_flags_member_list_enum {
 	TYPE_ENTITY_FLAGS_MEMBER_EF_IsGround,
 };
 
+enum render_constant_buffer_type_t_member_list_enum {
+	TYPE_RENDER_CONSTANT_BUFFER_TYPE_T_MEMBER_RCBT_Standard,
+	TYPE_RENDER_CONSTANT_BUFFER_TYPE_T_MEMBER_RCBT_SSBO,
+};
+
 enum renderer_effect_application_flags_t_member_list_enum {
 	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None,
 	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom,
@@ -6758,6 +6806,8 @@ enum packet_type_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Actor, "EF_Actor") \
 	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_Static, "EF_Static") \
 	X(TYPE_ENUM_LOOKUP_ENTITY_FLAGS_MEMBER_EF_IsGround, "EF_IsGround") \
+	X(TYPE_ENUM_LOOKUP_RENDER_CONSTANT_BUFFER_TYPE_T_MEMBER_RCBT_Standard, "RCBT_Standard") \
+	X(TYPE_ENUM_LOOKUP_RENDER_CONSTANT_BUFFER_TYPE_T_MEMBER_RCBT_SSBO, "RCBT_SSBO") \
 	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, "REAF_None") \
 	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, "REAF_Bloom") \
 	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, "REAF_Emmision") \
@@ -6960,6 +7010,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "VkDeviceMemory", .type = TYPE_VkDeviceMemory, .size = sizeof(VkDeviceMemory), .struct_info = NULL},
 	{.name = "VkBufferUsageFlagBits", .type = TYPE_VkBufferUsageFlagBits, .size = sizeof(VkBufferUsageFlagBits), .struct_info = NULL},
 	{.name = "vulkan_buffer_data_t", .type = TYPE_vulkan_buffer_data_t, .size = sizeof(vulkan_buffer_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_buffer_data_t_const_data},
+	{.name = "render_constant_buffer_type_t", .type = TYPE_render_constant_buffer_type_t, .size = sizeof(render_constant_buffer_type_t), .struct_info = NULL},
 	{.name = "render_constant_buffer_t", .type = TYPE_render_constant_buffer_t, .size = sizeof(render_constant_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_constant_buffer_t_const_data},
 	{.name = "VkPipeline", .type = TYPE_VkPipeline, .size = sizeof(VkPipeline), .struct_info = NULL},
 	{.name = "VkPipelineBindPoint", .type = TYPE_VkPipelineBindPoint, .size = sizeof(VkPipelineBindPoint), .struct_info = NULL},
@@ -7141,6 +7192,8 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "EF_Actor", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Actor, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
 	{.name = "EF_Static", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_Static, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
 	{.name = "EF_IsGround", .member_enum = TYPE_ENTITY_FLAGS_MEMBER_EF_IsGround, .type_info_ptr = (const type_info_struct*)&type_info_enum_entity_flags_const_data},
+	{.name = "RCBT_Standard", .member_enum = TYPE_RENDER_CONSTANT_BUFFER_TYPE_T_MEMBER_RCBT_Standard, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_constant_buffer_type_t_const_data},
+	{.name = "RCBT_SSBO", .member_enum = TYPE_RENDER_CONSTANT_BUFFER_TYPE_T_MEMBER_RCBT_SSBO, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_constant_buffer_type_t_const_data},
 	{.name = "REAF_None", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
 	{.name = "REAF_Bloom", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
 	{.name = "REAF_Emmision", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},

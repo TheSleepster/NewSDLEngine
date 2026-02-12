@@ -103,17 +103,26 @@ typedef struct vulkan_buffer_data
 // work properly if this is really only going to be one GPU buffer, there's a chance that we render drawcall A but then overwrite
 // it's data with drawcall B's data while drawcall A is still going... Perhaps that's not a real thing I need to worry about,
 // but just wanted to make note. -Justin Febuary 11 26
+
+typedef enum render_constant_buffer_type
+{
+    RCBT_Standard,
+    RCBT_SSBO,
+}render_constant_buffer_type_t;
+
+// NOTE(Sleepster): only SSBOs will have their own buffer. This is for the sake of simplicity.
+// All other uniforms like UBOs and shader ConstantBuffers will share a single buffer for a single upload.
+// Since SSBOs might get resized as their datasets grow and shrik this is the easiest solution.
 typedef struct render_constant_buffer
 {
-#if 0
-    vulkan_buffer_data_t *GPU_buffer;
-#endif
+    render_constant_buffer_type_t constant_buffer_type;
+    vulkan_buffer_data_t          GPU_buffer;
 
-    byte                 *CPU_buffer;
-    u32                   buffer_size;
+    byte                         *CPU_buffer;
+    u32                           buffer_size;
 
 #if 0
-    VkDescriptorSet       set_data[3];
+    VkDescriptorSet              *set_data;
 #endif
 }render_constant_buffer_t;
 
@@ -330,6 +339,10 @@ typedef struct vulkan_shader_stage_info
     VkShaderModule                       handle;
 }vulkan_shader_stage_info_t;
 
+// TODO(Sleepster): Big rework needed here. The only things the shader should be in charge or have ownership over
+// are the pipeline, the descriptor set layouts, and the actual GPU data that corresponds to both the shader and it's 
+// constant buffers.
+
 // TODO(Sleepster): The shader should store what kind of pipeline bind point it needs
 typedef struct vulkan_shader_data
 {
@@ -357,6 +370,12 @@ typedef struct vulkan_shader_data
     u32                                  total_descriptor_set_count;
     u32                                  used_descriptor_set_count;
     vulkan_shader_descriptor_set_info_t *set_info;
+
+    // TODO(Sleepster): 
+    // Instead of saving the uniforms, just save the constant buffers
+    vulkan_buffer_data_t                 set0_buffers[VULKAN_MAX_FRAMES_IN_FLIGHT];
+    vulkan_buffer_data_t                 set1_buffers[VULKAN_MAX_FRAMES_IN_FLIGHT];
+    vulkan_buffer_data_t                 set2_buffers[VULKAN_MAX_FRAMES_IN_FLIGHT];
 
     u32                                  push_constant_count;
     VkPushConstantRange                 *push_constant_data;

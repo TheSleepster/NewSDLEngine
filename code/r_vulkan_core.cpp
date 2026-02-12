@@ -559,8 +559,8 @@ r_vulkan_pipeline_create(vulkan_render_context_t           *render_context,
         .stride    = sizeof(vertex_t),
         .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
     };
-    // NOTE(Sleepster): Vertex Attribute stuff
 
+    // NOTE(Sleepster): Vertex Attribute stuff
     VkPipelineVertexInputStateCreateInfo vertex_input_state = {
         .sType                           =  VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .vertexBindingDescriptionCount   =  1,
