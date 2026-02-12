@@ -838,6 +838,7 @@ r_vulkan_shader_initialize_texture_arrays(vulkan_render_context_t *render_contex
     }
 }
 
+#if 0
 vulkan_shader_data_t
 r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_source)
 {
@@ -1204,6 +1205,14 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
         log_fatal("We have failed to create our pipeline...\n");
     }
 
+    return(result);
+}
+#endif
+
+vulkan_shader_data_t
+r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_source)
+{
+    vulkan_shader_data_t result = {};
     return(result);
 }
 

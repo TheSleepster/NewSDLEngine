@@ -227,7 +227,7 @@ typedef struct material_instance
 // uniform that the generator would ALSO give us) which will be the offset of the uniform in question inside the buffer.
 // Giving us an easy way to cheaply update the data for the uniform without much effort. 
 //
-// -Justin Febuary 11 26
+// -Justin Febuary 11 2026
 
 struct shiny_material_t: public material_instance_t
 {
@@ -237,10 +237,16 @@ struct shiny_material_t: public material_instance_t
     };
 
     struct set1 {
-        constant_buffer_t constant_buffer;
-        byte             *material_uniform_buffer;
-        byte             *sampler_data;
-        byte             *render_instances;
+        struct uniform_buffer {
+            constant_buffer_t constant_buffer;
+            byte             *material_uniform_buffer;
+            byte             *sampler_data;
+        };
+
+        struct SSBO {
+            constant_buffer_t  storage_buffer;
+            byte              *render_instances;
+        };
     };
 
     struct set2 {

@@ -1577,7 +1577,7 @@ struct type_info_struct_render_constant_buffer_t {
 	union {
 		type_info_member_t member_array[4];
 		struct {
-			type_info_member_t buffer_type;
+			type_info_member_t constant_buffer_type;
 			type_info_member_t GPU_buffer;
 			type_info_member_t CPU_buffer;
 			type_info_member_t buffer_size;
@@ -4195,7 +4195,7 @@ const static type_info_struct_render_constant_buffer_t type_info_struct_render_c
 	.element_size = sizeof(GENERATED_DEFAULT_render_constant_buffer_t),
 	.member_count = 4,
 	.members = {
-		.buffer_type = {.name = "buffer_type", .type = TYPE_render_constant_buffer_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.buffer_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), buffer_type))},
+		.constant_buffer_type = {.name = "constant_buffer_type", .type = TYPE_render_constant_buffer_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.constant_buffer_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), constant_buffer_type))},
 		.GPU_buffer = {.name = "GPU_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.GPU_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), GPU_buffer))},
 		.CPU_buffer = {.name = "CPU_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.CPU_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), CPU_buffer))},
 		.buffer_size = {.name = "buffer_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_constant_buffer_t.buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_constant_buffer_t), buffer_size))},
@@ -5982,7 +5982,7 @@ enum vulkan_buffer_data_t_member_list_enum {
 };
 
 enum render_constant_buffer_t_member_list_enum {
-	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_buffer_type,
+	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_constant_buffer_type,
 	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_GPU_buffer,
 	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_CPU_buffer,
 	TYPE_RENDER_CONSTANT_BUFFER_T_MEMBER_buffer_size,

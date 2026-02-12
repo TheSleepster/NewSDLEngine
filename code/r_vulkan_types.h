@@ -89,7 +89,6 @@ typedef struct vulkan_buffer_data
 // to this. This will allow us to just push the whole buffer data to the
 // gpu and give us what we need in a more accessable and faster way.
 //
-//
 // TODO(Sleepster):
 // Take a look at s_asset_manager.h Perhaps this is the better way where instead of each of these constant
 // buffers storing a GPU_Buffer we instead just have them act as CPU side buffers with descriptors attached to them.
@@ -102,7 +101,7 @@ typedef struct vulkan_buffer_data
 // There is a caveat of which I'm unaware how much it actually matters, but we may need a TON of vkMemoryBarriers to make this
 // work properly if this is really only going to be one GPU buffer, there's a chance that we render drawcall A but then overwrite
 // it's data with drawcall B's data while drawcall A is still going... Perhaps that's not a real thing I need to worry about,
-// but just wanted to make note. -Justin Febuary 11 26
+// but just wanted to make note. -Justin Febuary 11 2026
 
 typedef enum render_constant_buffer_type
 {
@@ -370,12 +369,6 @@ typedef struct vulkan_shader_data
     u32                                  total_descriptor_set_count;
     u32                                  used_descriptor_set_count;
     vulkan_shader_descriptor_set_info_t *set_info;
-
-    // TODO(Sleepster): 
-    // Instead of saving the uniforms, just save the constant buffers
-    vulkan_buffer_data_t                 set0_buffers[VULKAN_MAX_FRAMES_IN_FLIGHT];
-    vulkan_buffer_data_t                 set1_buffers[VULKAN_MAX_FRAMES_IN_FLIGHT];
-    vulkan_buffer_data_t                 set2_buffers[VULKAN_MAX_FRAMES_IN_FLIGHT];
 
     u32                                  push_constant_count;
     VkPushConstantRange                 *push_constant_data;
