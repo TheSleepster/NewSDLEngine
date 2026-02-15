@@ -103,8 +103,3 @@ target:
   working_directory: "../run_tree/res"
   enabled: 0
 }
-breakpoint:
-{
-  source_location: "../code/tests/file_packer.cpp:45:1"
-  hit_count: 1
-}

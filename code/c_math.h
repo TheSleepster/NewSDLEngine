@@ -31,7 +31,7 @@
   - [ ] FLOAT64 SUPPORT
   - [ ] SSE2 SIMD (__mm128) ON ALL FUNCTIONS POSSIBLE
   - [ ] CREATE A WAY OF TOGGLING BETWEEN SSE AND NON-SSE FUNCTIONS (check handmade_math.h)
-  - [ ] AVX / AVX2 WIDE SIMD
+  - [x] AVX / AVX2 WIDE SIMD
   
   - MATRICES
       - [x] VECTOR TRANSFORMS
@@ -264,6 +264,9 @@ typedef struct mat4
         vec4_t  columns[4];
 
         __m128 SSE[4];
+#ifdef __AVX2__
+        __m256 AVX[2];
+#endif
 
         struct
         {
@@ -1204,7 +1207,20 @@ MATH_API float32
 vec4_length(vec4_t A)
 {
     float32 result;
+
+#ifdef __SSE4_1__
+    __m128 dp = _mm_dp_ps(A.SSE, A.SSE, 0xFF);
+    result = _mm_cvtss_f32(_mm_sqrt_ss(dp));
+#elif defined(__SSE__)
+    __m128 mul  = _mm_mul_ps(A.SSE, A.SSE);
+    __m128 shuf = _mm_movehdup_ps(mul);
+    __m128 sums = _mm_add_ps(mul, shuf);
+    shuf = _mm_movehl_ps(shuf, sums);
+    sums = _mm_add_ss(sums, shuf);
+    result = _mm_cvtss_f32(_mm_sqrt_ss(sums));
+#else
     result = sqrt(Square(A.x) + Square(A.y) + Square(A.z) + Square(A.w));
+#endif
 
     return(result);
 }
@@ -1224,7 +1240,20 @@ MATH_API float32
 vec4_dot(vec4_t A, vec4_t B)
 {
     float32 result;
+
+#ifdef __SSE4_1__
+    __m128 dp = _mm_dp_ps(A.SSE, B.SSE, 0xFF);
+    result = _mm_cvtss_f32(dp);
+#elif defined(__SSE__)
+    __m128 mul  = _mm_mul_ps(A.SSE, B.SSE);
+    __m128 shuf = _mm_movehdup_ps(mul);
+    __m128 sums = _mm_add_ps(mul, shuf);
+    shuf = _mm_movehl_ps(shuf, sums);
+    sums = _mm_add_ss(sums, shuf);
+    result = _mm_cvtss_f32(sums);
+#else
     result = (A.x * B.x) + (A.y * B.y) + (A.z * B.z) + (A.w * B.w);
+#endif
 
     return(result);
 }
@@ -1251,10 +1280,9 @@ MATH_API vec4_t
 vec4_lerp(vec4_t A, vec4_t B, real32 time)
 {
     vec4_t result;
-    result.x = f32_lerp(A.x, B.x, time);
-    result.y = f32_lerp(A.y, B.y, time);
-    result.z = f32_lerp(A.z, B.z, time);
-    result.w = f32_lerp(A.w, B.w, time);
+
+    __m128 t_reg = _mm_set1_ps(time);
+    result.SSE = _mm_add_ps(A.SSE, _mm_mul_ps(_mm_sub_ps(B.SSE, A.SSE), t_reg));
 
     return(result);
 }
@@ -1912,10 +1940,16 @@ MATH_API mat4_t
 mat4_add(mat4_t A, mat4_t B)
 {
     mat4_t result;
+
+#ifdef __AVX2__
+    result.AVX[0] = _mm256_add_ps(A.AVX[0], B.AVX[0]);
+    result.AVX[1] = _mm256_add_ps(A.AVX[1], B.AVX[1]);
+#else
     result.columns[0].SSE = _mm_add_ps(A.columns[0].SSE, B.columns[0].SSE);
     result.columns[1].SSE = _mm_add_ps(A.columns[1].SSE, B.columns[1].SSE);
     result.columns[2].SSE = _mm_add_ps(A.columns[2].SSE, B.columns[2].SSE);
     result.columns[3].SSE = _mm_add_ps(A.columns[3].SSE, B.columns[3].SSE);
+#endif
 
     return(result);
 }
@@ -1924,10 +1958,16 @@ MATH_API mat4_t
 mat4_subtract(mat4_t A, mat4_t B)
 {
     mat4_t result;
+
+#ifdef __AVX2__
+    result.AVX[0] = _mm256_sub_ps(A.AVX[0], B.AVX[0]);
+    result.AVX[1] = _mm256_sub_ps(A.AVX[1], B.AVX[1]);
+#else
     result.columns[0].SSE = _mm_sub_ps(A.columns[0].SSE, B.columns[0].SSE);
     result.columns[1].SSE = _mm_sub_ps(A.columns[1].SSE, B.columns[1].SSE);
     result.columns[2].SSE = _mm_sub_ps(A.columns[2].SSE, B.columns[2].SSE);
     result.columns[3].SSE = _mm_sub_ps(A.columns[3].SSE, B.columns[3].SSE);
+#endif
 
     return(result);
 }
@@ -1937,11 +1977,58 @@ mat4_multiply(mat4_t A, mat4_t B)
 {
     mat4_t result;
 
-    // TODO(Sleepster): Optimize this... 
+#if defined(__AVX2__) && defined(__FMA__)
+    // NOTE(Sleepster): Process 2 result columns at a time using 256-bit registers.
+    // result.col[i] = A.col[0]*B[i].x + A.col[1]*B[i].y + A.col[2]*B[i].z + A.col[3]*B[i].w
+    // We duplicate each A column into both 128-bit lanes, then broadcast B components
+    // so low lane computes one result column and high lane computes the other.
+    __m256 Acol0 = _mm256_set_m128(A.SSE[0], A.SSE[0]);
+    __m256 Acol1 = _mm256_set_m128(A.SSE[1], A.SSE[1]);
+    __m256 Acol2 = _mm256_set_m128(A.SSE[2], A.SSE[2]);
+    __m256 Acol3 = _mm256_set_m128(A.SSE[3], A.SSE[3]);
+
+    // Result columns 0 and 1 packed into AVX[0]
+    {
+        // low 128 = B.col[0] broadcasts, high 128 = B.col[1] broadcasts
+        __m256 bx = _mm256_set_m128(_mm_shuffle_ps(B.SSE[1], B.SSE[1], 0x00),
+                                     _mm_shuffle_ps(B.SSE[0], B.SSE[0], 0x00));
+        __m256 by = _mm256_set_m128(_mm_shuffle_ps(B.SSE[1], B.SSE[1], 0x55),
+                                     _mm_shuffle_ps(B.SSE[0], B.SSE[0], 0x55));
+        __m256 bz = _mm256_set_m128(_mm_shuffle_ps(B.SSE[1], B.SSE[1], 0xaa),
+                                     _mm_shuffle_ps(B.SSE[0], B.SSE[0], 0xaa));
+        __m256 bw = _mm256_set_m128(_mm_shuffle_ps(B.SSE[1], B.SSE[1], 0xff),
+                                     _mm_shuffle_ps(B.SSE[0], B.SSE[0], 0xff));
+
+        __m256 r = _mm256_mul_ps(Acol0, bx);
+        r = _mm256_fmadd_ps(Acol1, by, r);
+        r = _mm256_fmadd_ps(Acol2, bz, r);
+        r = _mm256_fmadd_ps(Acol3, bw, r);
+        result.AVX[0] = r;
+    }
+
+    // Result columns 2 and 3 packed into AVX[1]
+    {
+        __m256 bx = _mm256_set_m128(_mm_shuffle_ps(B.SSE[3], B.SSE[3], 0x00),
+                                     _mm_shuffle_ps(B.SSE[2], B.SSE[2], 0x00));
+        __m256 by = _mm256_set_m128(_mm_shuffle_ps(B.SSE[3], B.SSE[3], 0x55),
+                                     _mm_shuffle_ps(B.SSE[2], B.SSE[2], 0x55));
+        __m256 bz = _mm256_set_m128(_mm_shuffle_ps(B.SSE[3], B.SSE[3], 0xaa),
+                                     _mm_shuffle_ps(B.SSE[2], B.SSE[2], 0xaa));
+        __m256 bw = _mm256_set_m128(_mm_shuffle_ps(B.SSE[3], B.SSE[3], 0xff),
+                                     _mm_shuffle_ps(B.SSE[2], B.SSE[2], 0xff));
+
+        __m256 r = _mm256_mul_ps(Acol0, bx);
+        r = _mm256_fmadd_ps(Acol1, by, r);
+        r = _mm256_fmadd_ps(Acol2, bz, r);
+        r = _mm256_fmadd_ps(Acol3, bw, r);
+        result.AVX[1] = r;
+    }
+#else
     result.columns[0] = vec4_transform(A, B.columns[0]);
     result.columns[1] = vec4_transform(A, B.columns[1]);
     result.columns[2] = vec4_transform(A, B.columns[2]);
     result.columns[3] = vec4_transform(A, B.columns[3]);
+#endif
 
     return(result);
 }
@@ -1950,11 +2037,16 @@ MATH_API mat4_t
 mat4_divide(mat4_t A, mat4_t B)
 {
     mat4_t result;
-    
+
+#ifdef __AVX2__
+    result.AVX[0] = _mm256_div_ps(A.AVX[0], B.AVX[0]);
+    result.AVX[1] = _mm256_div_ps(A.AVX[1], B.AVX[1]);
+#else
     result.columns[0].SSE = _mm_div_ps(A.columns[0].SSE, B.columns[0].SSE);
     result.columns[1].SSE = _mm_div_ps(A.columns[1].SSE, B.columns[1].SSE);
     result.columns[2].SSE = _mm_div_ps(A.columns[2].SSE, B.columns[2].SSE);
     result.columns[3].SSE = _mm_div_ps(A.columns[3].SSE, B.columns[3].SSE);
+#endif
 
     return(result);
 }
@@ -1963,12 +2055,18 @@ MATH_API mat4_t
 mat4_reduce(mat4_t A, float32 B)
 {
     mat4_t result;
-    __m128 scaler_vector = _mm_set_ps1(B);
 
+#ifdef __AVX2__
+    __m256 scaler_wide = _mm256_set1_ps(B);
+    result.AVX[0] = _mm256_div_ps(A.AVX[0], scaler_wide);
+    result.AVX[1] = _mm256_div_ps(A.AVX[1], scaler_wide);
+#else
+    __m128 scaler_vector = _mm_set_ps1(B);
     result.columns[0].SSE = _mm_div_ps(A.columns[0].SSE, scaler_vector);
     result.columns[1].SSE = _mm_div_ps(A.columns[1].SSE, scaler_vector);
     result.columns[2].SSE = _mm_div_ps(A.columns[2].SSE, scaler_vector);
     result.columns[3].SSE = _mm_div_ps(A.columns[3].SSE, scaler_vector);
+#endif
 
     return(result);
 }
@@ -1987,11 +2085,17 @@ mat4_make_translation(vec3_t translation)
 MATH_API mat4_t
 mat4_translate(mat4_t A, vec3_t B)
 {
-    // TODO(Sleepster): Shouldn't we just do
-    // _30 += x;
-    // _31 += y;
-    // _32 += z;
-    return(mat4_multiply(A, mat4_make_translation(B)));
+    // NOTE(Sleepster): A * T where T is identity with translation in col3.
+    // result = A, result.col3 = A.col0*tx + A.col1*ty + A.col2*tz + A.col3
+    mat4_t result = A;
+    __m128 tx = _mm_set1_ps(B.x);
+    __m128 ty = _mm_set1_ps(B.y);
+    __m128 tz = _mm_set1_ps(B.z);
+    result.columns[3].SSE = _mm_add_ps(
+        _mm_add_ps(_mm_mul_ps(A.columns[0].SSE, tx), _mm_mul_ps(A.columns[1].SSE, ty)),
+        _mm_add_ps(_mm_mul_ps(A.columns[2].SSE, tz), A.columns[3].SSE));
+
+    return(result);
 }
 
 MATH_API mat4_t
@@ -2008,7 +2112,15 @@ mat4_make_scale(vec3_t scale)
 MATH_API mat4_t
 mat4_scale(mat4_t A, vec3_t B)
 {
-    return(mat4_multiply(A, mat4_make_scale(B)));
+    // NOTE(Sleepster): A * S where S is diagonal(sx, sy, sz, 1).
+    // result.col[i] = A.col[i] * S[i][i], col3 unchanged.
+    mat4_t result;
+    result.columns[0].SSE = _mm_mul_ps(A.columns[0].SSE, _mm_set1_ps(B.x));
+    result.columns[1].SSE = _mm_mul_ps(A.columns[1].SSE, _mm_set1_ps(B.y));
+    result.columns[2].SSE = _mm_mul_ps(A.columns[2].SSE, _mm_set1_ps(B.z));
+    result.columns[3]     = A.columns[3];
+
+    return(result);
 }
 
 MATH_API mat4_t

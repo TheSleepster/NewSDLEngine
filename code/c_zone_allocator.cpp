@@ -184,18 +184,19 @@ c_za_free(zone_allocator_t *zone, void *data)
 void
 c_za_free_zone_tag(zone_allocator_t *zone, za_allocation_tag_t tag)
 {
-    for(zone_allocator_block_t *current_block = &zone->first_block;
-        current_block;
-        current_block = current_block->next_block)
+    zone_allocator_block_t *current_block = zone->first_block.next_block;
+    while(current_block != &zone->first_block)
     {
+        zone_allocator_block_t *next = current_block->next_block;
         if(current_block->is_allocated)
         {
             if((za_allocation_tag_t)current_block->allocation_tag == tag)
             {
-                c_za_free(zone, current_block);
+                c_za_free(zone, (byte*)current_block + sizeof(zone_allocator_block_t));
                 log_info("Freed block with tag: '%d'...\n", tag);
             }
         }
+        current_block = next;
     }
 }
 
@@ -203,19 +204,20 @@ void
 c_za_free_zone_tag_range(zone_allocator_t *zone, za_allocation_tag_t low_tag, za_allocation_tag_t high_tag)
 {
     log_info("Freed blocks with tag range: '%d' to '%d'...\n", low_tag, high_tag);
-    for(zone_allocator_block_t *current_block = &zone->first_block;
-        current_block;
-        current_block = current_block->next_block)
+    zone_allocator_block_t *current_block = zone->first_block.next_block;
+    while(current_block != &zone->first_block)
     {
+        zone_allocator_block_t *next = current_block->next_block;
         if(current_block->is_allocated)
         {
             if((za_allocation_tag_t)current_block->allocation_tag > low_tag &&
                (za_allocation_tag_t)current_block->allocation_tag < (za_allocation_tag_t)high_tag)
             {
-                c_za_free_zone_tag(zone, (za_allocation_tag_t)current_block->allocation_tag);
+                c_za_free(zone, (byte*)current_block + sizeof(zone_allocator_block_t));
                 log_info("Freed block with tag: '%d'...\n", current_block->allocation_tag);
             }
         }
+        current_block = next;
     }
 }
 

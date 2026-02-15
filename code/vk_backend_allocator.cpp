@@ -164,7 +164,7 @@ vk_allocator_free_block(vulkan_allocator_t        *allocator,
                         vulkan_allocation_block_t *block_to_free)
 {
     vulkan_allocation_block_t *next_block = block_to_free->next_block;
-    vulkan_allocation_block_t *prev_block = block_to_free->next_block;
+    vulkan_allocation_block_t *prev_block = block_to_free->prev_block;
 
     prev_block->next_block = next_block;
     next_block->prev_block = prev_block;
@@ -218,13 +218,13 @@ vk_allocator_reset(vulkan_allocator_t *allocator)
     c_arena_reset(&allocator->block_allocator);
 }
 
-void
-vk_allocator_get_or_create_block(vulkan_allocator_t        *allocator, 
-                                 vulkan_allocation_block_t *valid_block,
+vulkan_allocation_block_t*
+vk_allocator_get_or_create_block(vulkan_allocator_t        *allocator,
                                  u32                        memory_index,
                                  u32                        allocation_size,
                                  bool8                      temporary_allocation)
 {
+    vulkan_allocation_block_t *valid_block = null;
     for(vulkan_allocation_block_t *current_block = allocator->first_free_block;
         current_block;
         current_block = current_block->next_block)
@@ -236,8 +236,8 @@ vk_allocator_get_or_create_block(vulkan_allocator_t        *allocator,
 
             valid_block = current_block;
 
-            prev_block->next_block = next_block;
-            next_block->prev_block = prev_block;
+            if(prev_block) prev_block->next_block = next_block;
+            if(next_block) next_block->prev_block = prev_block;
 
             break;
         }
@@ -256,35 +256,42 @@ vk_allocator_get_or_create_block(vulkan_allocator_t        *allocator,
     VkMemoryAllocateInfo info = {};
     info.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     info.memoryTypeIndex = memory_index;
-    info.allocationSize  = allocation_size;
+    info.allocationSize  = valid_block->block_size;
     vkAllocateMemory(allocator->device, &info, allocator->cpu_allocation_callbacks, &valid_block->memory);
 
-    vulkan_allocation_block_t *first_block = temporary_allocation ? 
-                                             allocator->first_transient_block : 
-                                             allocator->first_allocated_block;
-
-    vulkan_allocation_block_t *last_block  = temporary_allocation ? 
-                                             allocator->last_transient_block  : 
-                                             allocator->last_allocated_block;
-    // NOTE(Sleepster): Chain the new block 
-    if(first_block == null)
+    // NOTE(Sleepster): Chain the new block
+    if(temporary_allocation)
     {
-        first_block = valid_block;
+        if(allocator->first_transient_block == null)
+        {
+            allocator->first_transient_block = valid_block;
+        }
+
+        if(allocator->last_transient_block != null)
+        {
+            allocator->last_transient_block->next_block = valid_block;
+            valid_block->prev_block = allocator->last_transient_block;
+            valid_block->next_block = null;
+        }
+        allocator->last_transient_block = valid_block;
+    }
+    else
+    {
+        if(allocator->first_allocated_block == null)
+        {
+            allocator->first_allocated_block = valid_block;
+        }
+
+        if(allocator->last_allocated_block != null)
+        {
+            allocator->last_allocated_block->next_block = valid_block;
+            valid_block->prev_block = allocator->last_allocated_block;
+            valid_block->next_block = null;
+        }
+        allocator->last_allocated_block = valid_block;
     }
 
-    if(last_block != null)
-    {
-        last_block->next_block = valid_block;
-
-        valid_block->prev_block = last_block;
-        valid_block->next_block = null;
-
-        last_block = valid_block;
-    }
-    else if(last_block == null)
-    {
-        last_block = valid_block;
-    }
+    return(valid_block);
 }
 
 vulkan_allocation_chunk_t
@@ -325,7 +332,7 @@ vk_allocator_allocate(vulkan_allocator_t            *allocator,
     }
     if(valid_block == null)
     {
-        vk_allocator_get_or_create_block(allocator, valid_block, memory_index, allocation_size, temporary_allocation);
+        valid_block = vk_allocator_get_or_create_block(allocator, memory_index, allocation_size, temporary_allocation);
     }
     Assert(valid_block->DEBUG_id == VK_ALLOCATOR_DEBUG_ID);
     u32 offset = valid_block->used;
