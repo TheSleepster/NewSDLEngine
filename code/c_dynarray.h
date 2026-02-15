@@ -131,6 +131,14 @@ void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
     value;                                                                     \
 })
 
+#define c_dynarray_count(d_array) ({ \
+    dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(d_array); \
+    Expect(header, "Invalid d_array header...\n");                             \
+    u32 count = header->capacity;                                              \
+                                                                               \
+    count;                                                                     \
+})
+
 #define c_dynarray_clear(d_array) ({                                           \
     dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(d_array); \
     Expect(header != null, "Invalid d_array header...\n");                     \

@@ -3900,6 +3900,20 @@ r_renderer_init(vulkan_render_context_t *render_context, render_state_t *render_
     render_context->invalid_texture_data->bitmap.width    = 2;
 
     r_vulkan_make_gpu_texture(render_context, render_context->invalid_texture_data);
+    VkDescriptorPoolSize pool_sizes[] = {
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,         1024},
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 4096}
+    };
+    VkDescriptorPoolCreateInfo pool_info = {
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .maxSets = 1,
+        .poolSizeCount = ArrayCount(pool_sizes),
+        .pPoolSizes = pool_sizes
+    };
+    vkCreateDescriptorPool(render_context->rendering_device.logical_device, 
+                          &pool_info, 
+                           render_context->allocators, 
+                          &render_context->global_descriptor_pool);
 
     log_info("Vulkan context initialized...\n");
     c_arena_destroy(&render_context->initialization_arena);

@@ -1,6 +1,11 @@
 #+title: NewSDLEngine
 * IMMEDIATE TODO
 * Next Milestone:
+- [ ] Vulkan GPU memory allocator
+- [ ] Image manager should have the ability to provide "scratch images"
+- [ ] Create our own custom GPU image format. Something like idImage
+- [ ] Image manager like idSoftware's in DOOM3 BFG
+
 - [ ] We need to completely rework descriptors and how they function. Right now, everything in the shader
       revolves around the shader, which is not right. We need to have the shader / material_archetype own it's
       descriptor_set_layout and have some sort of global descriptor manager that controls and allocates us data

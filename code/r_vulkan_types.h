@@ -665,8 +665,9 @@ typedef struct vulkan_render_context
 
     vulkan_buffer_data_t          instanced_rendering_buffer[VULKAN_MAX_FRAMES_IN_FLIGHT];
     vulkan_buffer_data_t          index_buffer;
-
     vulkan_buffer_data_t          vertex_buffer;
+
+    VkDescriptorPool              global_descriptor_pool;
 
     vulkan_renderpass_data_t      main_renderpass;
     asset_handle_t               *default_shader;

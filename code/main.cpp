@@ -22,9 +22,13 @@
 #include <c_tokenizer.h>
 #include <p_platform_data.h>
 
+#if 0
 #include <r_vulkan_types.h>
 #include <r_vulkan_core.h>
 #include <r_render_group.h>
+#endif
+
+#include <vk_backend_core.h>
 
 #include <s_nt_networking.h>
 #include <s_input_manager.h>
@@ -56,8 +60,9 @@ c_process_window_events(SDL_Window *window, vulkan_render_context_t *render_cont
 
                 g_window_size.x = (float32)window_x;
                 g_window_size.y = (float32)window_y;
-
+#if 0
                 r_vulkan_on_resize(render_context, g_window_size);
+#endif
             }break;
         }
     }
@@ -68,8 +73,10 @@ main(int argc, char **argv)
 {
     game_state_t            *state          = Alloc(game_state_t);
     vulkan_render_context_t *render_context = Alloc(vulkan_render_context_t);
+#if 0
     asset_manager_t         *asset_manager  = Alloc(asset_manager_t);
     render_state_t          *render_state   = Alloc(render_state_t);
+#endif
 
     state->window_size = vec2(600, 600);
     if(SDL_Init(SDL_INIT_VIDEO))
@@ -83,6 +90,10 @@ main(int argc, char **argv)
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
         }
         c_global_context_init();
+
+        vulkan_context_t context = {};
+        vk_backend_init(&context, state->window);
+#if 0
         c_threadpool_init(&global_context->main_threadpool);
 
         s_asset_manager_init(asset_manager);
@@ -109,6 +120,7 @@ main(int argc, char **argv)
         texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32, 32);
         s_texture_atlas_add_texture(atlas, render_context->default_texture);
         s_texture_atlas_pack_added_textures(render_context, atlas);
+#endif
 
         input_manager_t input_manager = {};
         s_im_init_input_manager(&input_manager);
@@ -189,6 +201,7 @@ main(int argc, char **argv)
                 dt_accumulator -= gcv_tick_rate;
             }
 
+#if 0
             if(r_vulkan_begin_frame(render_context, render_state, gcv_tick_rate))
             {
 
@@ -209,10 +222,8 @@ main(int argc, char **argv)
                 r_set_active_render_material(render_state, &render_state->default_material);
                 r_set_active_material_constant(render_state, STR("Matrices"), &shader->camera_matrices, sizeof(shader->camera_matrices));
 
-#if 0 
                 asset_handle_t material_instance = r_create_material_instance(&render_state->shiny_material);
                 r_set_constant_buffer_data(material_instance.set0.matrices, &shader->camera_matrices, sizeof(shader->camera_matrices));
-#endif 
 
                 r_render_group_begin(render_state);
                 r_push_texture(render_state, {0, 0}, {100, 100}, {0.0, 1.0, 0.0, 1.0}, 0, render_context->default_texture);
@@ -229,6 +240,7 @@ main(int argc, char **argv)
             }
 #if 0
             float32 alpha = (dt_accumulator / gcv_tick_rate);
+#endif
 #endif
             c_global_context_reset_temporary_data();
 

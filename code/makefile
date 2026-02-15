@@ -70,12 +70,17 @@ BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FL
 # --------------------------------------------
 # Set Input Files
 # --------------------------------------------
-COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I. -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/vulkan/spirv_reflect/include/ -I../run_tree/deps/Freetype/include/
+COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I. -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/vulkan/VMA/ -I../run_tree/deps/vulkan/spirv_reflect/include/ -I../run_tree/deps/Freetype/include/
 
 # Core Game Sources
 ALL_SRCS  = $(wildcard $(SRC_DIR)/*.cpp)
-GAME_SRCS = $(filter-out $(SRC_DIR)/sys_%,$(ALL_SRCS))
+
+# Filter out vk_vma_implementation so it isn't compiled as C++11. We also filter out the sys_ files
+GAME_SRCS = $(filter-out $(SRC_DIR)/sys_% $(SRC_DIR)/vk_vma_implementation.cpp,$(ALL_SRCS))
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
+
+# Define the specific VMA object file
+VMA_OBJ   = $(BUILD_DIR)/vk_vma_implementation$(OBJ_EXT)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
 GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static -lfreetype -lvulkan -lspirv_reflect
@@ -114,7 +119,7 @@ JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
 # --------------------------------------------
 .PHONY: all shaders clean run_preprocessor
 
-all: run_preprocessor do_codegen $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
+all: $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
 
 # Create Build Directory
 $(BUILD_DIR):
@@ -164,10 +169,10 @@ shaders: $(SHADER_OUTPUTS)
 # -------------------------------------------------------------------------
 # Tests 
 # -------------------------------------------------------------------------
-tests: run_preprocessor do_codegen $(TESTS_OUT)
+tests: $(TESTS_OUT)
 
 # Note: We use $* to get the stem (filename without extension) for the .d file
-$(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR) run_preprocessor
+$(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR)
 	@echo [TEST] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		$(DEPFLAGS) \
@@ -176,13 +181,13 @@ $(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR) run_preprocessor
 # -------------------------------------------------------------------------
 # Asset file builder 
 # -------------------------------------------------------------------------
-$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_preprocessor do_codegen 
+$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) 
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/wad_asset_file_packer.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@ 
 
-$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_preprocessor do_codegen 
+$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) 
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/jfd_asset_file_packer.d \
@@ -192,15 +197,21 @@ $(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) run_pr
 # Game build 
 # -------------------------------------------------------------------------
 
-# Compile source to objects 
-$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR) run_preprocessor do_codegen 
+# Compile regular C++11 source to objects 
+$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR) 
 	@echo [ENGINE SOURCE]: $< ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) $(DEPFLAGS) -c $< -o $@
 
-# Link objects to executable
-$(GAME_OUT): $(GAME_OBJS) | $(BUILD_DIR)
+# Compile VMA Implementation with C++17
+# We strip -std=c++11 from the flags and replace it with -std=c++17
+$(VMA_OBJ): $(SRC_DIR)/vk_vma_implementation.cpp | $(BUILD_DIR)
+	@echo [VMA IMPL C++17]: $< ...
+	$(SILENT)$(CXX) $(filter-out -std=c++11,$(BUILD_COMPILER_FLAGS)) -std=c++17 $(OS_DEFINE) $(GAME_INCLUDES) $(DEPFLAGS) -c $< -o $@
+
+# Link objects to executable (Include VMA_OBJ)
+$(GAME_OUT): $(GAME_OBJS) $(VMA_OBJ) | $(BUILD_DIR)
 	@echo Linking game executable: $@ ...
-	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(LDFLAGS) $(GAME_OBJS) $(GAME_EXTERNAL_LIBRARIES) -o $@
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(LDFLAGS) $(GAME_OBJS) $(VMA_OBJ) $(GAME_EXTERNAL_LIBRARIES) -o $@
 
 clean:
 	-rm -rf $(BUILD_DIR)

@@ -1766,7 +1766,7 @@ struct type_info_struct_vulkan_shader_data_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[26];
+		type_info_member_t member_array[23];
 		struct {
 			type_info_member_t shader_id;
 			type_info_member_t arena;
@@ -1779,9 +1779,6 @@ struct type_info_struct_vulkan_shader_data_t {
 			type_info_member_t total_descriptor_set_count;
 			type_info_member_t used_descriptor_set_count;
 			type_info_member_t set_info;
-			type_info_member_t set0_buffers;
-			type_info_member_t set1_buffers;
-			type_info_member_t set2_buffers;
 			type_info_member_t push_constant_count;
 			type_info_member_t push_constant_data;
 			type_info_member_t uniforms;
@@ -2102,7 +2099,7 @@ struct type_info_struct_vulkan_render_context_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[40];
+		type_info_member_t member_array[41];
 		struct {
 			type_info_member_t initialization_arena;
 			type_info_member_t frame_arena;
@@ -2135,6 +2132,7 @@ struct type_info_struct_vulkan_render_context_t {
 			type_info_member_t instanced_rendering_buffer;
 			type_info_member_t index_buffer;
 			type_info_member_t vertex_buffer;
+			type_info_member_t global_descriptor_pool;
 			type_info_member_t main_renderpass;
 			type_info_member_t default_shader;
 			type_info_member_t default_texture;
@@ -4357,7 +4355,7 @@ const static type_info_struct_vulkan_shader_data_t type_info_struct_vulkan_shade
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_data_t),
-	.member_count = 26,
+	.member_count = 23,
 	.members = {
 		.shader_id = {.name = "shader_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.shader_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), shader_id))},
 		.arena = {.name = "arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), arena))},
@@ -4370,9 +4368,6 @@ const static type_info_struct_vulkan_shader_data_t type_info_struct_vulkan_shade
 		.total_descriptor_set_count = {.name = "total_descriptor_set_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.total_descriptor_set_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), total_descriptor_set_count))},
 		.used_descriptor_set_count = {.name = "used_descriptor_set_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.used_descriptor_set_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), used_descriptor_set_count))},
 		.set_info = {.name = "set_info", .type = TYPE_vulkan_shader_descriptor_set_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.set_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), set_info))},
-		.set0_buffers = {.name = "set0_buffers", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.set0_buffers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), set0_buffers))},
-		.set1_buffers = {.name = "set1_buffers", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.set1_buffers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), set1_buffers))},
-		.set2_buffers = {.name = "set2_buffers", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.set2_buffers)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), set2_buffers))},
 		.push_constant_count = {.name = "push_constant_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.push_constant_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), push_constant_count))},
 		.push_constant_data = {.name = "push_constant_data", .type = TYPE_VkPushConstantRange, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.push_constant_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), push_constant_data))},
 		.uniforms = {.name = "uniforms", .type = TYPE_vulkan_shader_uniform_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_data_t.uniforms)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_data_t), uniforms))},
@@ -4648,7 +4643,7 @@ const static type_info_struct_vulkan_render_context_t type_info_struct_vulkan_re
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_vulkan_render_context_t),
-	.member_count = 40,
+	.member_count = 41,
 	.members = {
 		.initialization_arena = {.name = "initialization_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.initialization_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), initialization_arena))},
 		.frame_arena = {.name = "frame_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.frame_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), frame_arena))},
@@ -4681,6 +4676,7 @@ const static type_info_struct_vulkan_render_context_t type_info_struct_vulkan_re
 		.instanced_rendering_buffer = {.name = "instanced_rendering_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.instanced_rendering_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), instanced_rendering_buffer))},
 		.index_buffer = {.name = "index_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.index_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), index_buffer))},
 		.vertex_buffer = {.name = "vertex_buffer", .type = TYPE_vulkan_buffer_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.vertex_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), vertex_buffer))},
+		.global_descriptor_pool = {.name = "global_descriptor_pool", .type = TYPE_VkDescriptorPool, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.global_descriptor_pool)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), global_descriptor_pool))},
 		.main_renderpass = {.name = "main_renderpass", .type = TYPE_vulkan_renderpass_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.main_renderpass)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), main_renderpass))},
 		.default_shader = {.name = "default_shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.default_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), default_shader))},
 		.default_texture = {.name = "default_texture", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_render_context_t.default_texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_render_context_t), default_texture))},
@@ -6076,9 +6072,6 @@ enum vulkan_shader_data_t_member_list_enum {
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_total_descriptor_set_count,
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_used_descriptor_set_count,
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set_info,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set0_buffers,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set1_buffers,
-	TYPE_VULKAN_SHADER_DATA_T_MEMBER_set2_buffers,
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_push_constant_count,
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_push_constant_data,
 	TYPE_VULKAN_SHADER_DATA_T_MEMBER_uniforms,
@@ -6252,6 +6245,7 @@ enum vulkan_render_context_t_member_list_enum {
 	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_instanced_rendering_buffer,
 	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_index_buffer,
 	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_vertex_buffer,
+	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_global_descriptor_pool,
 	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_main_renderpass,
 	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_shader,
 	TYPE_VULKAN_RENDER_CONTEXT_T_MEMBER_default_texture,
