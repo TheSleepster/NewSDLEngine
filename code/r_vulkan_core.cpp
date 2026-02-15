@@ -34,6 +34,7 @@
 // VULKAN UTILITIES
 /////////////////////////
 
+#if 0
 VKAPI_ATTR VkBool32 VKAPI_CALL
 Vk_debug_log_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      message_severity,
                       VkDebugUtilsMessageTypeFlagsEXT             message_type,
@@ -65,6 +66,7 @@ Vk_debug_log_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      message_severi
     }
     return VK_FALSE;
 }
+#endif
 
 const char* 
 r_vulkan_result_string(VkResult result, bool8 get_extended) 
