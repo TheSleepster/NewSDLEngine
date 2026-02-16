@@ -4,6 +4,10 @@
 #if !defined(GENERATED_PROGRAM_RTTI_H)
 #define GENERATED_PROGRAM_RTTI_H
 
+#ifndef CODE_GEN_IGNORE_FILE
+#define CODE_GEN_IGNORE_FILE()
+#endif
+
 #ifndef OffsetOf
 #define OffsetOf(type, member) ((size_t)&(((type*)0)->member))
 #endif

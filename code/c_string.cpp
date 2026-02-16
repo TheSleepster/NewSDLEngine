@@ -77,15 +77,19 @@ c_string_compare(string_t A, string_t B)
 bool8
 c_string_ends_with(string_t A, string_t ending)
 {
-    Assert(ending.count < A.count);
-
     bool8 result;
+    if(ending.count <= A.count)
+    {
+        string_t A_ending = A;
+        A_ending.data  += A.count - ending.count;
+        A_ending.count  = ending.count;
 
-    string_t A_ending = A;
-    A_ending.data  += A.count - ending.count;
-    A_ending.count  = ending.count;
-
-    result = c_string_compare(A_ending, ending);
+        result = c_string_compare(A_ending, ending);
+    }
+    else
+    {
+        result = false;
+    }
 
     return(result);
 }

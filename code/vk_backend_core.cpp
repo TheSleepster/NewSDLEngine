@@ -5,6 +5,7 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <vk_backend_core.h>
+#include <r_render_group.h>
 
 /*
 =============
@@ -857,8 +858,9 @@ vk_backend_init_VMA_allocator
 */
 
 void
-vk_backend_init_VMA_allocator(vulkan_context_t *vulkan_context)
+vk_backend_init_vulkan_allocator(vulkan_context_t *vulkan_context)
 {
+#if 0
     VmaAllocatorCreateInfo allocator_create_info = {};
     allocator_create_info.flags            = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
     allocator_create_info.vulkanApiVersion = VK_API_VERSION_1_3;
@@ -867,6 +869,8 @@ vk_backend_init_VMA_allocator(vulkan_context_t *vulkan_context)
     allocator_create_info.instance         = vulkan_context->instance;
 
     vmaCreateAllocator(&allocator_create_info, &vulkan_context->vulkan_allocator);
+#endif
+    vulkan_context->vulkan_allocator = vk_allocator_create(vulkan_context, MB(32));
 }
 
 /*
@@ -885,8 +889,11 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
     s32 width;
     s32 height;
     Assert(SDL_GetWindowSizeInPixels(vulkan_context->window, &width, &height));
-    vulkan_context->window_width  = width;
-    vulkan_context->window_height = height;
+    vulkan_context->last_window_width  = vulkan_context->current_window_width;
+    vulkan_context->last_window_height = vulkan_context->current_window_height;
+
+    vulkan_context->current_window_width  = width;
+    vulkan_context->current_window_height = height;
 
     VkSwapchainCreateInfoKHR info = {
         .sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
@@ -1034,8 +1041,8 @@ vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context)
     {
         // TODO(Sleepster): We need a proper backend image handler, after we have that we can replace this crap
         image->internal_format = vulkan_context->depth_format;
-        image->width           = vulkan_context->window_width;
-        image->height          = vulkan_context->window_height;
+        image->width           = vulkan_context->current_window_width;
+        image->height          = vulkan_context->current_window_height;
 
         // NOTE(Sleepster): The sharing mode matters very little here
         // https://developer.nvidia.com/blog/vulkan-dos-donts/
@@ -1059,16 +1066,20 @@ vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context)
 
         vkAssert(vkCreateImage(vulkan_context->device, &info, vulkan_context->cpu_allocation_callbacks, &image->handle));
 
-        VmaAllocationCreateInfo alloc_create_info = {};
-        alloc_create_info.usage = VMA_MEMORY_USAGE_AUTO;
-        alloc_create_info.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
-        alloc_create_info.priority = 1.0f;
-
-        vmaCreateImage(vulkan_context->vulkan_allocator, &info, &alloc_create_info, &image->handle, &image->gpu_memory, null);
-#if 0
-        // TODO(Sleepster): The GPU memory allocator
         VkMemoryRequirements memory_requirements;
         vkGetImageMemoryRequirements(vulkan_context->device, image->handle, &memory_requirements);
+#if 1
+        vulkan_allocation_info_t alloc_info = vk_allocator_allocate(&vulkan_context->vulkan_allocator, 
+                                                                    &memory_requirements, 
+                                                                     VULKAN_MEMORY_USAGE_GPU_ONLY, 
+                                                                     true, 
+                                                                     false);
+        VkResult code = vkBindImageMemory(vulkan_context->device, image->handle, alloc_info.parent_block->memory, alloc_info.offset);
+        if(!vk_backend_result_is_success(code))
+        {
+            Expect(false, "Failed to bind the memory for the depth buffer...\n");
+        }
+#else
         s32 memory_index = vk_backend_find_memory_index(vulkan_context, memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
         if(memory_index == -1)
         {
@@ -1111,6 +1122,209 @@ vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context)
     }
 }
 
+
+/*
+=============
+vk_backend_create_renderpasses
+=============
+*/
+
+void
+vk_backend_create_renderpasses(vulkan_context_t *vulkan_context)
+{
+    VkAttachmentDescription attachments[2];
+
+    // NOTE(Sleepster): Color attachment 
+    attachments[0] = {
+        .format         = vulkan_context->swapchain.format.format,
+        .samples        = VK_SAMPLE_COUNT_1_BIT,
+        .loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR,
+        .storeOp        = VK_ATTACHMENT_STORE_OP_STORE,
+        .stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+        .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+        .initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED,
+        .finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+    };
+
+    // NOTE(Sleepster): Depth attachments 
+    attachments[1] = {
+        .format         = vulkan_context->depth_format,
+        .samples        = VK_SAMPLE_COUNT_1_BIT,
+        .loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR,
+        .storeOp        = VK_ATTACHMENT_STORE_OP_STORE,
+        .stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+        .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+        .initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED,
+        .finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+    };
+
+    VkAttachmentReference color_attachment_reference = {
+        .attachment = 0,
+        .layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+    };
+
+    VkAttachmentReference depth_attachment_reference = {
+        .attachment = 1,
+        .layout     = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL 
+    };
+
+    VkSubpassDescription primary_subpass = {
+        .pipelineBindPoint       = VK_PIPELINE_BIND_POINT_GRAPHICS,
+        .colorAttachmentCount    = 1,
+        .pColorAttachments       = &color_attachment_reference,
+        .pDepthStencilAttachment = &depth_attachment_reference,
+        // NOTE(Sleepster): These supply imput to the shader
+        .inputAttachmentCount    = 0,
+        .pInputAttachments       = null,
+        // NOTE(Sleepster): Multisampling resolution 
+        .pResolveAttachments     = null,
+        // NOTE(Sleepster): Items that should be preserved between subpasses and future renderpasses
+        .preserveAttachmentCount = 0,
+        .pPreserveAttachments    = null
+    };
+
+    // NOTE(Sleepster): We only have 1 subpass, so it's VK_SUBPASS_EXTERNAL here. 
+    VkSubpassDependency subpass_dependencies = {
+        .srcSubpass      = VK_SUBPASS_EXTERNAL,
+        .dstSubpass      = null,
+        .srcStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        .srcAccessMask   = 0,
+        .dstStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        .dstAccessMask   = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+        .dependencyFlags = 0
+    };
+
+    VkRenderPassCreateInfo renderpass_create_info = {
+        .sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+        .attachmentCount = ArrayCount(attachments),
+        .pAttachments    = attachments,
+        .subpassCount    = 1,
+        .pSubpasses      = &primary_subpass,
+        .dependencyCount = 1,
+        .pDependencies   = &subpass_dependencies,
+        .pNext           = null,
+        .flags           = 0
+    };
+    vkAssert(vkCreateRenderPass(vulkan_context->device, 
+                               &renderpass_create_info, 
+                                vulkan_context->cpu_allocation_callbacks, 
+                               &vulkan_context->primary_renderpass));
+}
+
+/*
+=============
+vk_backend_create_framebuffers
+=============
+*/
+
+void
+vk_backend_create_framebuffers(vulkan_context_t *vulkan_context)
+{
+    for(u32 frame_index = 0;
+        frame_index < MAX_FRAMES_IN_FLIGHT;
+        ++frame_index)
+    {
+        VkImageView attachments[] = {
+            vulkan_context->swapchain_views[frame_index],
+            vulkan_context->depth_buffer.view
+        };
+        VkFramebufferCreateInfo framebuffer_create_info = {
+            .sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+            .renderPass      = vulkan_context->primary_renderpass,
+            .attachmentCount = ArrayCount(attachments),
+            .pAttachments    = attachments,
+            .width           = vulkan_context->current_window_width,
+            .height          = vulkan_context->current_window_height,
+            .layers          = 1
+        };
+        vkAssert(vkCreateFramebuffer(vulkan_context->device, 
+                                     &framebuffer_create_info, 
+                                     vulkan_context->cpu_allocation_callbacks, 
+                                     &vulkan_context->framebuffers[frame_index]));
+    }
+}
+
+/*
+=============
+vk_backend_create_render_buffers
+=============
+*/
+
+void
+vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
+{
+    VkBufferUsageFlagBits vertex_buffer_usage_bits = (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT| 
+                                                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
+                                                                             VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+
+    VkBufferUsageFlagBits index_buffer_usage_bits = (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | 
+                                                                            VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
+                                                                            VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
+
+    vulkan_context->main_vertex_buffer   = vk_backend_buffer_create(vulkan_context, sizeof(vertex_t) * 4,                       vertex_buffer_usage_bits, VULKAN_MEMORY_USAGE_GPU_ONLY, false, false);
+    vulkan_context->main_index_buffer    = vk_backend_buffer_create(vulkan_context, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, index_buffer_usage_bits,  VULKAN_MEMORY_USAGE_GPU_ONLY, false, false);
+
+    // NOTE(Sleepster): Create the frame-based buffers 
+    for(u32 index = 0;
+        index < MAX_FRAMES_IN_FLIGHT;
+        ++index)
+    {
+        vulkan_context->main_instance_buffer[index] = vk_backend_buffer_create(vulkan_context, 
+                                                                               sizeof(render_geometry_instance_t) * MAX_VULKAN_INSTANCES, 
+                                                                               VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
+                                                                               VULKAN_MEMORY_USAGE_GPU_ONLY, 
+                                                                               false, 
+                                                                               false);
+        vulkan_context->staging_buffers[index] = vk_backend_buffer_create(vulkan_context,
+                                                                          MB(64),
+                                                                          VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                                                          VULKAN_MEMORY_USAGE_CPU_TO_GPU,
+                                                                          false,
+                                                                          false);
+    }
+
+    // NOTE(Sleepster): Fill vertex buffer
+    vertex_t vertices[] = {
+        [0] = {
+            .vPosition = {0.5, -0.5, 0.0, 1.0},
+            .vCorner   = {1.0, 1.0}
+        },
+        [1] = {
+            .vPosition = {0.5, 0.5, 0.0, 1.0},
+            .vCorner   = {1.0, 0.0}
+        },
+        [2] = {
+            .vPosition = {-0.5, 0.5, 0.0, 1.0},
+            .vCorner   = {0.0, 0.0}
+        },
+        [3] = {
+            .vPosition = {-0.5, -0.5, 0.0, 1.0},
+            .vCorner   = {0.0, 1.0}
+        } 
+    };
+    vk_backend_buffer_copy_data(&vulkan_context->staging_buffers[0], vertices, sizeof(vertex_t) * 4, 0);
+    vk_backend_buffer_copy_buffer(vulkan_context, &vulkan_context->staging_buffers[0], &vulkan_context->main_vertex_buffer, 0, vulkan_context->main_vertex_buffer.size, 0);
+
+    // NOTE(Sleepster): Fill the index buffer 
+    u32 *indices = c_arena_push_array(&vulkan_context->initialization_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
+    u32  index_offset = 0;
+    for(u32 index = 0;
+        index < MAX_VULKAN_INDEX_BUFFER_SIZE;
+        index += 6)
+    {
+        indices[index + 0] = index_offset + 0;
+        indices[index + 1] = index_offset + 1;
+        indices[index + 2] = index_offset + 2;
+        indices[index + 3] = index_offset + 2;
+        indices[index + 4] = index_offset + 3;
+        indices[index + 5] = index_offset + 0;
+
+        index_offset += 4;
+    }
+    vk_backend_buffer_copy_data(&vulkan_context->staging_buffers[0], indices, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, 0);
+    vk_backend_buffer_copy_buffer(vulkan_context, &vulkan_context->staging_buffers[0], &vulkan_context->main_index_buffer, 0, vulkan_context->main_index_buffer.size, 0);
+}
+
 /*
 =============
 vk_backend_init
@@ -1118,12 +1332,11 @@ vk_backend_init
 */
 
 // TODO(Sleepster): 
-// - Vulkan GPU memory allocator
 // - Image handler and manager
 // - Staging buffer manager
 // - Shader handler and manager
 void
-vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
+vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window) 
 {
     log_info("----- vk_backend_init -----\n");
     vk_backend_create_instance(vulkan_context);
@@ -1146,12 +1359,24 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
     // NOTE(Sleepster): Create the comamnd buffers for the rendering in the engine 
     vk_backend_create_command_buffers(vulkan_context);
 
-    // TODO(Sleepster): Define the Vulkan allocator we will use here, create a macro to toggle between ours and VMA
-    vk_backend_init_VMA_allocator(vulkan_context);
+    // NOTE(Sleepster): Either use VMA or our own 
+    vk_backend_init_vulkan_allocator(vulkan_context);
 
     // NOTE(Sleepster): Generate the swapchain, it's images, and the views for those images. We do not create the depth buffer. 
     vk_backend_swapchain_create(vulkan_context);
 
     // NOTE(Sleepster): Generate the program's depth buffer 
     vk_backend_create_depth_buffer(vulkan_context);
+
+    // NOTE(Sleepster): Generate the programs renderpasses 
+    vk_backend_create_renderpasses(vulkan_context);
+
+    // NOTE(Sleepster): Generate the programs framebuffers 
+    vk_backend_create_framebuffers(vulkan_context);
+
+    // NOTE(Sleepster): Generate the main vertex, index, and instanced_rendering buffers
+    vk_backend_create_render_buffers(vulkan_context);
+
+    c_arena_destroy(&vulkan_context->initialization_arena);
+    log_info("----- Vulkan backend initialized -----\n");
 }

@@ -8,6 +8,9 @@
 
 #define GENERATED_TEST_H
 #include <c_types.h>
+#include <c_base.h>
+
+CODE_GEN_IGNORE_FILE()
 
 #define SIZE_MACRO_TEST (20)
 #define MULTILINE()          \

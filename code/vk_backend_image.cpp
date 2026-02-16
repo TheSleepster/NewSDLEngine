@@ -16,6 +16,8 @@ vk_backend_image_create
 vulkan_image_t
 vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *image_info)
 {
+    Assert(image_info);
+
     vulkan_image_t result = {};
     result.info   = *image_info;
     result.width  =  image_info->width;
@@ -38,12 +40,28 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
 
     vkAssert(vkCreateImage(vulkan_context->device, &info, vulkan_context->cpu_allocation_callbacks, &result.handle));
 
+    // NOTE(Sleepster): Allocation 
+    VkMemoryRequirements memory_requirements;
+    vkGetImageMemoryRequirements(vulkan_context->device, result.handle, &memory_requirements);
+    result.allocation = vk_allocator_allocate(&vulkan_context->vulkan_allocator, 
+                                              &memory_requirements, 
+                                              VULKAN_MEMORY_USAGE_GPU_ONLY, 
+                                              true, 
+                                              false);
+    VkResult code = vkBindImageMemory(vulkan_context->device, result.handle, result.allocation.parent_block->memory, result.allocation.offset);
+    if(!vk_backend_result_is_success(code))
+    {
+        Expect(false, "Failed to bind the memory for this image...\n");
+    }
+
+#if 0
     VmaAllocationCreateInfo alloc_create_info = {};
     alloc_create_info.usage = VMA_MEMORY_USAGE_AUTO;
     alloc_create_info.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
     alloc_create_info.priority = 1.0f;
 
     vmaCreateImage(vulkan_context->vulkan_allocator, &info, &alloc_create_info, &result.handle, &result.gpu_memory, null);
+#endif
 
     return(result);
 }
@@ -54,10 +72,21 @@ vk_backend_image_destroy
 =============
 */
 
+// NOTE(Sleepster): If we used a unique allocation block for this image, then 
+//                  it should be moved to the allocator's free list 
 void
 vk_backend_image_destroy(vulkan_context_t *vulkan_context, vulkan_image_t *image)
 {
+    Assert(image);
+    Assert(image->allocation.parent_block);
+#if 1
+    if(image->allocation.parent_block->is_unique)
+    {
+        vk_allocator_free_block(&vulkan_context->vulkan_allocator, image->allocation.parent_block);
+    }
+#else
     vmaDestroyImage(vulkan_context->vulkan_allocator, image->handle, image->gpu_memory);
+#endif
     vkDestroyImage(vulkan_context->device, image->handle, vulkan_context->cpu_allocation_callbacks);
 }
 
@@ -130,6 +159,7 @@ vk_backend_sampler_create
 VkSampler
 vk_backend_sampler_create(vulkan_context_t *vulkan_context, vulkan_sampler_info_t *info)
 {
+    Assert(info);
     VkSampler result = {};
 
     VkSamplerCreateInfo create_info = {};

@@ -37,7 +37,7 @@ typedef struct jfd_file_header
  * - filename for hashing in engine
  * - filedata for obvious reasons
  *
- **/
+ */
 
 typedef struct jfd_package_chunk_header
 {

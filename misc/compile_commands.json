@@ -1,6 +1,6 @@
 [
   {
-    "file": "vk_backend_allocator.cpp",
+    "file": "vk_backend_core.cpp",
     "arguments": [
       "clang++",
       "-g",
@@ -8,6 +8,8 @@
       "-fno-inline-functions",
       "-std=c++11",
       "-flto",
+      "-mavx2",
+      "-mfma",
       "-Wall",
       "-Wextra",
       "-Wno-unused-function",
@@ -38,17 +40,17 @@
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
       "-MT",
-      "../build/vk_backend_allocator.o",
+      "../build/vk_backend_core.o",
       "-MMD",
       "-MP",
       "-MF",
-      "../build/vk_backend_allocator.d",
+      "../build/vk_backend_core.d",
       "-c",
-      "vk_backend_allocator.cpp",
+      "vk_backend_core.cpp",
       "-o",
-      "../build/vk_backend_allocator.o"
+      "../build/vk_backend_core.o"
     ],
     "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/vk_backend_allocator.o"
+    "output": "../build/vk_backend_core.o"
   }
 ]

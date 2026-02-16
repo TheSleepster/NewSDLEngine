@@ -4,33 +4,29 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#include <vk_backend_buffer.h>
 #include <vk_backend_core.h>
 
-struct vulkan_buffer_t
-{
-    VkBuffer          handle;
-
-    u64               size;
-    u64               offset;
-    u32               usage_flags;
-    u32               memory_property_flags;
-    u32               memory_index;
-
-    byte             *mapped_data;
-    VmaAllocationInfo allocation_info;
-    VmaAllocation     gpu_memory;
-};
+/*
+=============
+vk_backend_buffer_create
+=============
+*/
 
 vulkan_buffer_t
-vk_backend_buffer_create(vulkan_context_t *vulkan_context, 
-                         u64               buffer_size, 
-                         u32               usage_flags, 
-                         u32               memory_properties)
+vk_backend_buffer_create(vulkan_context_t              *vulkan_context, 
+                         u64                            buffer_size, 
+                         VkBufferUsageFlags             usage_flags, 
+                         vulkan_allocation_usage_type_t usage_type,
+                         bool8                          transient_allocation,
+                         bool8                          use_unique)
 {
+    Assert(buffer_size > 0);
+
     vulkan_buffer_t result = {};
     result.size                  = buffer_size;
     result.offset                = 0;
-    result.memory_property_flags = memory_properties;
+    result.used                  = 0;
     result.usage_flags           = usage_flags;
 
     VkBufferCreateInfo info = {};
@@ -41,11 +37,141 @@ vk_backend_buffer_create(vulkan_context_t *vulkan_context,
     
     vkAssert(vkCreateBuffer(vulkan_context->device, &info, vulkan_context->cpu_allocation_callbacks, &result.handle));
 
+    VkMemoryRequirements memory_requirements;
+    vkGetBufferMemoryRequirements(vulkan_context->device, result.handle, &memory_requirements);
+    result.allocation = vk_allocator_allocate(&vulkan_context->vulkan_allocator, 
+                                              &memory_requirements, 
+                                               usage_type,
+                                               false,
+                                               false);
+    VkResult code = vkBindBufferMemory(vulkan_context->device, result.handle, result.allocation.parent_block->memory, result.allocation.offset);
+    if(!vk_backend_result_is_success(code))
+    {
+        Expect(false, "Failed to bind the memory for this GPU buffer...\n");
+    }
+#if 0
     VmaAllocationCreateInfo allocation_info = {};
     allocation_info.usage    = VMA_MEMORY_USAGE_AUTO;
     allocation_info.flags    = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
     allocation_info.priority = 1.0f;
     vmaCreateBuffer(vulkan_context->vulkan_allocator, &info, &allocation_info, &result.handle, &result.gpu_memory, &result.allocation_info);
+#endif
 
     return(result);
+}
+
+/*
+=============
+vk_backend_buffer_destroy
+=============
+*/
+
+void
+vk_backend_buffer_destroy(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer)
+{
+    Assert(buffer);
+    if(buffer->allocation.parent_block->is_unique)
+    {
+        vk_allocator_free_block(&vulkan_context->vulkan_allocator, buffer->allocation.parent_block);
+    }
+    vkDestroyBuffer(vulkan_context->device, buffer->handle, vulkan_context->cpu_allocation_callbacks);
+}
+
+/*
+=============
+vk_backend_buffer_copy_buffer
+=============
+*/
+
+// TODO(Sleepster): Maybe the backend should just store a bunch of these commands that just need to get done arbitrarily in no 
+// particular order with a fence instead of just creating a command buffer here and just shooting it off.
+void
+vk_backend_buffer_copy_buffer(vulkan_context_t *vulkan_context,
+                              vulkan_buffer_t  *source_buffer,
+                              vulkan_buffer_t  *destination_buffer,
+                              u64               source_offset,
+                              u64               source_copy_size,
+                              u64               destination_offset)
+{
+    VkCommandBuffer scratch_buffer;
+    VkCommandBufferAllocateInfo command_buffer_allocate_info = {
+        .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .commandPool        = vulkan_context->graphics_command_pool,
+        .commandBufferCount = 1,
+        .level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY
+    };
+    vkAssert(vkAllocateCommandBuffers(vulkan_context->device, &command_buffer_allocate_info, &scratch_buffer));
+
+    VkCommandBufferBeginInfo begin_info = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
+    };
+    vkBeginCommandBuffer(scratch_buffer, &begin_info);
+
+    VkBufferCopy copy_range = {};
+    copy_range.srcOffset = source_offset;
+    copy_range.dstOffset = destination_offset;
+    copy_range.size      = source_copy_size;
+
+    vkCmdCopyBuffer(scratch_buffer, source_buffer->handle, destination_buffer->handle, 1, &copy_range);
+    vkEndCommandBuffer(scratch_buffer);
+
+    VkSubmitInfo submit_info = {
+        .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .commandBufferCount = 1,
+        .pCommandBuffers    = &scratch_buffer
+    };
+
+    vkAssert(vkQueueSubmit(vulkan_context->graphics_queue, 1, &submit_info, 0));
+    vkAssert(vkQueueWaitIdle(vulkan_context->graphics_queue));
+
+    vkFreeCommandBuffers(vulkan_context->device, 
+                         vulkan_context->graphics_command_pool, 
+                         1, 
+                        &scratch_buffer);
+    destination_buffer->used = source_copy_size;
+}
+
+/*
+=============
+vk_backend_buffer_copy_data
+=============
+*/
+
+void
+vk_backend_buffer_copy_data(vulkan_buffer_t *buffer,
+                            void            *data,
+                            u64              copy_size,
+                            u64              offset)
+{
+    Assert(buffer->allocation.allocation_type != VULKAN_MEMORY_USAGE_GPU_ONLY);
+    Assert(buffer->allocation.mapped_data != null);
+    Assert(buffer->allocation.allocation_size - offset >= copy_size);
+
+    memcpy(buffer->allocation.mapped_data, data, copy_size);
+    buffer->used += copy_size;
+}
+
+/*
+=============
+vk_backend_buffer_resize
+=============
+*/
+
+// TODO(Sleepster): Maybe optimize this so that if both buffers are HOST_VISIBLE it's just a memcpy, but meh
+void
+vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, u64 new_size)
+{
+    Assert(buffer->handle);
+    Assert(new_size > buffer->size);
+    vulkan_buffer_t new_buffer = vk_backend_buffer_create(vulkan_context, 
+                                                          new_size, 
+                                                          buffer->usage_flags, 
+                                                          buffer->allocation.allocation_type, 
+                                                          buffer->allocation.parent_block->is_transient, 
+                                                          buffer->allocation.parent_block->is_unique);
+    vk_backend_buffer_copy_buffer(vulkan_context, buffer, &new_buffer, 0, buffer->size, 0);
+    vk_backend_buffer_destroy(vulkan_context, buffer);
+
+    *buffer = new_buffer;
 }

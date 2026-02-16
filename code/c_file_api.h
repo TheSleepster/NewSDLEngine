@@ -87,6 +87,7 @@ typedef struct visit_file_data
 
     string_t           filename;
     string_t           fullname;
+    string_t           directory_name;
 
     bool8              recursive;
     bool8              is_directory;

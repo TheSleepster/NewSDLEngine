@@ -496,8 +496,12 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
             }
 
             visit_file_data->filename = c_string_make_heap(&global_context->temporary_arena, STR(entry->d_name));
-            string_t temp_name        = c_string_concat(&global_context->temporary_arena, filepath, STR("/"));
-            visit_file_data->fullname = c_string_concat(&global_context->temporary_arena, temp_name, visit_file_data->filename);
+            Assert(visit_file_data->filename.data != null);
+
+            string_t temp_name              = c_string_concat(&global_context->temporary_arena, filepath, STR("/"));
+            temp_name                       = c_string_concat(&global_context->temporary_arena, temp_name, visit_file_data->filename);
+            visit_file_data->fullname       = c_string_make_copy(&global_context->context_arena, temp_name);
+            visit_file_data->directory_name = c_string_make_copy(&global_context->temporary_arena, STR(entry->d_name));
 
             bool8 is_directory            = (entry->d_type == DT_DIR);
             visit_file_data->is_directory = is_directory;

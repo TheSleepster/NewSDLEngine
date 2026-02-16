@@ -8,9 +8,10 @@
 
 #define VK_BACKEND_IMAGE_H
 #include <vulkan/vulkan.h>
-#include <vk_mem_alloc.h>
 
 #include <c_types.h>
+
+#include <vk_backend_allocator.h>
 
 struct vulkan_context_t;
 struct vulkan_sampler_info_t
@@ -44,20 +45,19 @@ struct vulkan_image_info_t
 
 struct vulkan_image_t
 {
-    vulkan_image_info_t info;
-    VkImage             handle;
-    VkImageView         view;
-    VkSampler           sampler;
-    VkImageLayout       layout;
-    VkFormat            internal_format;
-#if 0
-    VkDeviceMemory      gpu_memory;
+    vulkan_image_info_t      info;
+    VkImage                  handle;
+    VkImageView              view;
+    VkSampler                sampler;
+    VkImageLayout            layout;
+    VkFormat                 internal_format;
+#if 1
+    vulkan_allocation_info_t allocation;
 #else
-    VmaAllocation       gpu_memory;
+    VmaAllocation            gpu_memory;
 #endif
-
-    u32                 width;
-    u32                 height;
+    u32                      width;
+    u32                      height;
 };
 
 vulkan_image_t vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *image_info);

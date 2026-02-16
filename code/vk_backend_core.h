@@ -11,9 +11,6 @@
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.h>
 
-// VMA
-#include <vk_mem_alloc.h>
-
 #include <c_base.h>
 #include <c_types.h>
 #include <c_globals.h>
@@ -23,6 +20,8 @@
 #include <c_log.h>
 
 #include <vk_backend_image.h>
+#include <vk_backend_buffer.h>
+#include <vk_backend_allocator.h>
 
 static const s32 g_device_extension_count = 1;
 static const char *g_device_extensions[g_device_extension_count] = {
@@ -58,15 +57,25 @@ struct vulkan_context_t
     memory_arena_t           initialization_arena;
 
     SDL_Window              *window;
-    u32                      window_width;
-    u32                      window_height;
+    u32                      current_window_width;
+    u32                      current_window_height;
+    u32                      last_window_width;
+    u32                      last_window_height;
+    u64                      window_size_generation;
+
+    u32                      current_frame_index;
+    u32                      current_image_index;
 
     VkInstance               instance;
     VkSurfaceKHR             render_surface;
 
     VkDebugUtilsMessengerEXT debug_messenger;
     VkAllocationCallbacks   *cpu_allocation_callbacks;
+#if 0
     VmaAllocator             vulkan_allocator;
+#else
+    vulkan_allocator_t       vulkan_allocator;
+#endif
 
     gpu_info_t               gpu;
     VkDevice                 device;
@@ -96,6 +105,17 @@ struct vulkan_context_t
 
     VkSemaphore              swapchain_image_acquired_semaphores[MAX_FRAMES_IN_FLIGHT];
     VkSemaphore              render_complete_semaphores[MAX_FRAMES_IN_FLIGHT];
+
+    vulkan_buffer_t          staging_buffers[MAX_FRAMES_IN_FLIGHT];
+
+    VkRenderPass             primary_renderpass;
+    VkFramebuffer            framebuffers[MAX_FRAMES_IN_FLIGHT];
+
+    // NOTE(Sleepster): We don't really need these, they're static and only modified
+    // when created. 
+    vulkan_buffer_t          main_vertex_buffer;
+    vulkan_buffer_t          main_index_buffer;
+    vulkan_buffer_t          main_instance_buffer[MAX_FRAMES_IN_FLIGHT];
 };
 
 #define vkAssert(result) ({                                                \
