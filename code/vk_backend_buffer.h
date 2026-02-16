@@ -10,6 +10,17 @@
 #include <vulkan/vulkan.h>
 #include <vk_backend_allocator.h>
 
+struct vulkan_staging_buffer_t
+{
+    byte           *mapped_data;
+    u64             upload_size;
+    u64             mapped_offset;
+    bool32          submitted;
+
+    VkBuffer        buffer_handle;
+    VkCommandBuffer command_buffer_handle;
+};
+
 struct vulkan_buffer_t
 {
     VkBuffer                 handle;

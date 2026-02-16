@@ -1,6 +1,6 @@
 [
   {
-    "file": "vk_backend_core.cpp",
+    "file": "vk_backend_buffer.cpp",
     "arguments": [
       "clang++",
       "-g",
@@ -40,17 +40,17 @@
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
       "-MT",
-      "../build/vk_backend_core.o",
+      "../build/vk_backend_buffer.o",
       "-MMD",
       "-MP",
       "-MF",
-      "../build/vk_backend_core.d",
+      "../build/vk_backend_buffer.d",
       "-c",
-      "vk_backend_core.cpp",
+      "vk_backend_buffer.cpp",
       "-o",
-      "../build/vk_backend_core.o"
+      "../build/vk_backend_buffer.o"
     ],
     "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/vk_backend_core.o"
+    "output": "../build/vk_backend_buffer.o"
   }
 ]

@@ -106,16 +106,14 @@ struct vulkan_context_t
     VkSemaphore              swapchain_image_acquired_semaphores[MAX_FRAMES_IN_FLIGHT];
     VkSemaphore              render_complete_semaphores[MAX_FRAMES_IN_FLIGHT];
 
-    vulkan_buffer_t          staging_buffers[MAX_FRAMES_IN_FLIGHT];
-
     VkRenderPass             primary_renderpass;
     VkFramebuffer            framebuffers[MAX_FRAMES_IN_FLIGHT];
 
-    // NOTE(Sleepster): We don't really need these, they're static and only modified
-    // when created. 
+    // NOTE(Sleepster): We don't really need these, they're static and only modified when created. 
     vulkan_buffer_t          main_vertex_buffer;
     vulkan_buffer_t          main_index_buffer;
     vulkan_buffer_t          main_instance_buffer[MAX_FRAMES_IN_FLIGHT];
+    vulkan_buffer_t          staging_buffers[MAX_FRAMES_IN_FLIGHT * 2];
 };
 
 #define vkAssert(result) ({                                                \
