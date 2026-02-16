@@ -55,6 +55,7 @@ struct swapchain_info_t
 struct vulkan_context_t 
 {
     memory_arena_t           initialization_arena;
+    memory_arena_t           swapchain_arena;
 
     SDL_Window              *window;
     u32                      current_window_width;
@@ -96,8 +97,8 @@ struct vulkan_context_t
     swapchain_info_t         swapchain;
     vulkan_image_t           depth_buffer;
 
-    VkImage                  swapchain_images[MAX_FRAMES_IN_FLIGHT];
-    VkImageView              swapchain_views[MAX_FRAMES_IN_FLIGHT];
+    VkImage                 *swapchain_images;
+    VkImageView             *swapchain_views;
 
     VkCommandBuffer          frame_command_buffer[MAX_FRAMES_IN_FLIGHT];
     VkFence                  frame_command_buffer_fences[MAX_FRAMES_IN_FLIGHT];

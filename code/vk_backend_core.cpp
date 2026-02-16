@@ -277,6 +277,7 @@ void
 vk_backend_create_instance(vulkan_context_t *vulkan_context)
 {
     vulkan_context->initialization_arena = c_arena_create(MB(10));
+    vulkan_context->swapchain_arena      = c_arena_create(MB(10));
 
 	VkApplicationInfo app_info  = {};
 	app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -638,6 +639,7 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
 
     defer(c_dynarray_destroy(queue_create_infos));
 
+    // TODO(Sleepster): Devices like the laptop really hate this.. Fix it later. 
     s32 queue_indices[] = {
         vulkan_context->graphics_queue_family_idx,
         vulkan_context->present_queue_family_idx,
@@ -667,7 +669,7 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
     device_features.fillModeNonSolid  = VK_TRUE;
     device_features.logicOp           = VK_TRUE;
     device_features.samplerAnisotropy = VK_TRUE;
-    device_features.sparseBinding     = VK_TRUE;
+    //device_features.sparseBinding     = VK_TRUE;
 
     VkPhysicalDeviceVulkan11Features device_11_features = {};
     device_11_features.sType                = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
@@ -676,7 +678,7 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
     VkDeviceCreateInfo device_create_info = {};
     device_create_info.sType                   =  VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     device_create_info.pNext                   = &device_11_features;
-    device_create_info.queueCreateInfoCount    =  c_dynarray_count(queue_indices);
+    device_create_info.queueCreateInfoCount    =  ArrayCount(queue_indices);
     device_create_info.pQueueCreateInfos       =  queue_create_infos;
     device_create_info.pEnabledFeatures        = &device_features;
     device_create_info.enabledExtensionCount   =  g_device_extension_count;
@@ -932,6 +934,9 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
     u32 num_images = 0;
     vkAssert(vkGetSwapchainImagesKHR(vulkan_context->device, vulkan_context->swapchain.handle, &num_images, null));
     Expect(num_images > 0, "vkGetSwapchainImagesKHR returned a value of zero...\n");
+
+    vulkan_context->swapchain_images = c_arena_push_array(&vulkan_context->swapchain_arena, VkImage,     num_images);
+    vulkan_context->swapchain_views  = c_arena_push_array(&vulkan_context->swapchain_arena, VkImageView, num_images);
     
     vkAssert(vkGetSwapchainImagesKHR(vulkan_context->device, vulkan_context->swapchain.handle, &num_images, vulkan_context->swapchain_images));
     Expect(num_images > 0, "vkGetSwapchainImagesKHR returned a value of zero...\n");

@@ -181,3 +181,5 @@ vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buff
 // tells us information about the copy. Items like the command buffer used, the buffer-copy is simply turned into a sort of render
 // command that gets executed later. All staging buffers are uploaded at once. This is so that instead of having to set multiple
 // pipeline barriers and fences, we can instead just set a single fence and barrier, making life much better.
+//
+// // NOTE(Sleepster): Maybe it can just be a ring buffer??? 
