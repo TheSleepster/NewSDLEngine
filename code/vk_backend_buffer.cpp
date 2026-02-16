@@ -183,3 +183,8 @@ vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buff
 // pipeline barriers and fences, we can instead just set a single fence and barrier, making life much better.
 //
 // // NOTE(Sleepster): Maybe it can just be a ring buffer??? 
+
+void
+vk_backend_buffer_stage()
+{
+}
