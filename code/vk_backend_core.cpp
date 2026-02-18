@@ -1268,6 +1268,7 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
 
     vulkan_context->main_vertex_buffer   = vk_backend_buffer_create(vulkan_context, sizeof(vertex_t) * 4,                       vertex_buffer_usage_bits, VULKAN_MEMORY_USAGE_GPU_ONLY, false, false);
     vulkan_context->main_index_buffer    = vk_backend_buffer_create(vulkan_context, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, index_buffer_usage_bits,  VULKAN_MEMORY_USAGE_GPU_ONLY, false, false);
+    vulkan_context->staging_infos        = c_dynarray_create(vulkan_staging_info_t);
 
     // NOTE(Sleepster): Create the frame-based buffers 
     for(u32 index = 0;
@@ -1280,12 +1281,10 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
                                                                                VULKAN_MEMORY_USAGE_GPU_ONLY, 
                                                                                false, 
                                                                                false);
-        vulkan_context->staging_buffers[index] = vk_backend_buffer_create(vulkan_context,
-                                                                          MB(64),
-                                                                          VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                                                          VULKAN_MEMORY_USAGE_CPU_TO_GPU,
-                                                                          false,
-                                                                          false);
+        vulkan_context->staging_buffers[index] = vk_backend_staging_buffer_create(vulkan_context,
+                                                                                  MB(64),
+                                                                                  VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                                                                  VULKAN_MEMORY_USAGE_CPU_TO_GPU);
     }
 
     // NOTE(Sleepster): Fill vertex buffer

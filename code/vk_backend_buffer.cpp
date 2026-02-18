@@ -176,15 +176,90 @@ vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buff
     *buffer = new_buffer;
 }
 
+/*
+=============
+vk_backend_staging_buffer_create
+=============
+*/
+
 // NOTE(Sleepster):
 // The way of handling staging buffers is simple. Each staging buffer is a node of a singly linked-list where each of the nodes
 // tells us information about the copy. Items like the command buffer used, the buffer-copy is simply turned into a sort of render
 // command that gets executed later. All staging buffers are uploaded at once. This is so that instead of having to set multiple
 // pipeline barriers and fences, we can instead just set a single fence and barrier, making life much better.
 //
-// // NOTE(Sleepster): Maybe it can just be a ring buffer??? 
+// NOTE(Sleepster): Maybe it can just be a ring buffer??? 
+vulkan_staging_buffer_t
+vk_backend_staging_buffer_create(vulkan_context_t *vulkan_context, u64 size, VkBufferUsageFlags usage_flags, vulkan_allocation_usage_type_t memory_type)
+{
+    vulkan_staging_buffer_t result;
+    result.buffer    = vk_backend_buffer_create(vulkan_context, size, usage_flags, memory_type, false, false);
+    result.submitted = false;
+
+    VkFenceCreateInfo fence_info = {};
+    fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    vkCreateFence(vulkan_context->device, &fence_info, vulkan_context->cpu_allocation_callbacks, &result.upload_complete_fence);
+
+    return(result);
+}
+
+/*
+=============
+vk_backend_buffer_stage_data
+=============
+*/
 
 void
-vk_backend_buffer_stage()
+vk_backend_buffer_stage_data(vulkan_context_t *vulkan_context, byte *data, u64 data_size, vulkan_buffer_t *target)
 {
+    vulkan_staging_info_t staging_info = {};
+    staging_info.data_to_upload = data;
+    staging_info.upload_size    = data_size;
+    staging_info.target_buffer  = target->handle;
+
+    c_dynarray_push(vulkan_context->staging_infos, staging_info);
+}
+
+/*
+=============
+vk_backend_buffer_flush_staging_buffer
+=============
+*/
+
+void
+vk_backend_buffer_flush_staging_buffer(vulkan_context_t *vulkan_context, vulkan_staging_buffer_t *buffer)
+{
+    // ???
+}
+
+/*
+=============
+vk_backend_buffer_upload_staged_data
+=============
+*/
+
+void
+vk_backend_buffer_upload_staged_data(vulkan_context_t *vulkan_context, VkCommandBuffer command_buffer)
+{
+    vulkan_staging_buffer_t *staging_buffer = vulkan_context->staging_buffers + vulkan_context->current_frame_index;
+    vulkan_buffer_t         *buffer         = &staging_buffer->buffer;
+    c_dynarray_for(vulkan_context->staging_infos, info_index)
+    {
+        vulkan_staging_info_t *info = c_dynarray_get_ptr(vulkan_context->staging_infos, info_index);
+        if(info->upload_size > buffer->size) 
+        {
+            log_error("Requested upload size of: '%lu' for staging buffer of size: '%lu' is not a valid request...\n", 
+                      info->upload_size, buffer->size);
+        }
+
+        u64 new_offset = buffer->used + info->upload_size;
+        if(new_offset > buffer->size)
+        {
+            vk_backend_buffer_flush_staging_buffer(vulkan_context, staging_buffer);
+        }
+        vk_backend_buffer_copy_data(buffer, info->data_to_upload, info->upload_size, buffer->used);
+
+        info->upload_offset = buffer->used;
+        buffer->used       += info->upload_size;
+    }    
 }

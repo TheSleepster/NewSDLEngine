@@ -10,15 +10,17 @@
 #include <vulkan/vulkan.h>
 #include <vk_backend_allocator.h>
 
-struct vulkan_staging_buffer_t
+// NOTE(Sleepster): We can build a list of these infos so that they can all be uploaded at once
+// right before rendering so that we can limit the amount of pipeline barriers and waits. Waiting on
+// one barrier and set of sync objects instead of many duplicate fences and commands.
+struct vulkan_staging_info_t
 {
-    byte           *mapped_data;
+    VkBuffer        target_buffer;
+    byte           *data_to_upload;
     u64             upload_size;
-    u64             mapped_offset;
-    bool32          submitted;
 
-    VkBuffer        buffer_handle;
-    VkCommandBuffer command_buffer_handle;
+    // NOTE(Sleepster): Written to us by the uploader 
+    u64             upload_offset;
 };
 
 struct vulkan_buffer_t
@@ -35,6 +37,13 @@ struct vulkan_buffer_t
     VmaAllocationInfo allocation_info;
     VmaAllocation     gpu_memory;
 #endif
+};
+
+struct vulkan_staging_buffer_t
+{
+    vulkan_buffer_t buffer;
+    bool32          submitted;
+    VkFence         upload_complete_fence;
 };
 
 vulkan_buffer_t
@@ -57,8 +66,9 @@ vk_backend_buffer_copy_data(vulkan_buffer_t *buffer,
                             u64              copy_size,
                             u64              offset);
 
-void vk_backend_buffer_destroy(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
-void vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, u64 new_size);
+void                    vk_backend_buffer_destroy(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
+void                    vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, u64 new_size);
+vulkan_staging_buffer_t vk_backend_staging_buffer_create(vulkan_context_t *vulkan_context, u64 size, VkBufferUsageFlags usage_flags, vulkan_allocation_usage_type_t memory_type);
 
 #endif // VK_BACKEND_BUFFER_H
 
