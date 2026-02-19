@@ -40,7 +40,7 @@
 //#include <meta/GENERATED_program_RTTI.h>
 
 internal_api void
-c_process_window_events(SDL_Window *window, vulkan_render_context_t *render_context, input_manager_t *input_manager)
+c_process_window_events(SDL_Window *window, vulkan_context_t *vulkan_context, input_manager_t *input_manager)
 {
     SDL_Event event;
     while(SDL_PollEvent(&event))
@@ -63,6 +63,7 @@ c_process_window_events(SDL_Window *window, vulkan_render_context_t *render_cont
 #if 0
                 r_vulkan_on_resize(render_context, g_window_size);
 #endif
+                vk_backend_handle_window_resize(vulkan_context, g_window_size);
             }break;
         }
     }
@@ -72,8 +73,8 @@ int
 main(int argc, char **argv)
 {
     game_state_t            *state          = Alloc(game_state_t);
-    vulkan_render_context_t *render_context = Alloc(vulkan_render_context_t);
 #if 0
+    vulkan_render_context_t *render_context = Alloc(vulkan_render_context_t);
     asset_manager_t         *asset_manager  = Alloc(asset_manager_t);
     render_state_t          *render_state   = Alloc(render_state_t);
 #endif
@@ -139,7 +140,7 @@ main(int argc, char **argv)
         while(g_running)
         {
             s_im_reset_controller_states(&input_manager);
-            c_process_window_events(state->window, render_context, &input_manager);
+            c_process_window_events(state->window, &context, &input_manager);
 
             state->input_axis = {};
             if(s_im_is_keyboard_key_down(game_controller, SDL_SCANCODE_W))
@@ -201,6 +202,7 @@ main(int argc, char **argv)
                 dt_accumulator -= gcv_tick_rate;
             }
 
+            vk_backend_render_frame(&context);
 #if 0
             if(r_vulkan_begin_frame(render_context, render_state, gcv_tick_rate))
             {

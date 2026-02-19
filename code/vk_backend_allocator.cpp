@@ -7,6 +7,12 @@
 #include <vk_backend_core.h>
 #include <vk_backend_allocator.h>
 
+/*
+=============
+find_memory_index
+=============
+*/
+
 internal_api s32
 find_memory_index(gpu_info_t *gpu, u32 memory_type_bits, vulkan_allocation_usage_type_t usage_type)
 {
@@ -26,8 +32,11 @@ find_memory_index(gpu_info_t *gpu, u32 memory_type_bits, vulkan_allocation_usage
         }break;
         case VULKAN_MEMORY_USAGE_CPU_TO_GPU:
         {
-            required  |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
-            preferred |= VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+            // NOTE(Sleepster): We don't use device local here because of 2 reasons:
+            // 1.) The heap is capped to 240MB on my GPU
+            // 2.) Apparently it's faster to just copy from HOST_VISIBLE|HOST_COHERENT memory to the GPU
+            required  |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+            preferred |= VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
         }break;
         case VULKAN_MEMORY_USAGE_GPU_TO_CPU:
         {
@@ -79,6 +88,12 @@ find_memory_index(gpu_info_t *gpu, u32 memory_type_bits, vulkan_allocation_usage
 
 }
 
+/*
+=============
+vk_allocator_create
+=============
+*/
+
 vulkan_allocator_t
 vk_allocator_create(vulkan_context_t *vulkan_context, u64 default_block_size)
 {
@@ -102,6 +117,12 @@ vk_allocator_create(vulkan_context_t *vulkan_context, u64 default_block_size)
     return(result);
 }
 
+/*
+=============
+vk_allocator_destroy
+=============
+*/
+
 void
 vk_allocator_destroy(vulkan_allocator_t *allocator)
 {
@@ -110,17 +131,25 @@ vk_allocator_destroy(vulkan_allocator_t *allocator)
     c_arena_destroy(&allocator->block_allocator);
 }
 
+/*
+=============
+vk_allocator_free_block
+=============
+*/
+
 void
 vk_allocator_free_block(vulkan_allocator_t        *allocator,
                         vulkan_allocation_block_t *block_to_free)
 {
     Assert(block_to_free->DEBUG_id == VK_ALLOCATOR_DEBUG_ID);
 
+    block_to_free->used = 0;
+
     vulkan_allocation_block_t *next_block = block_to_free->next_block;
     vulkan_allocation_block_t *prev_block = block_to_free->prev_block;
 
-    prev_block->next_block = next_block;
-    next_block->prev_block = prev_block;
+    if(prev_block) prev_block->next_block = next_block;
+    if(next_block) next_block->prev_block = prev_block;
 
     if(allocator->first_free_block == null)
     {
@@ -132,6 +161,12 @@ vk_allocator_free_block(vulkan_allocator_t        *allocator,
         allocator->first_free_block = block_to_free;
     }
 }
+
+/*
+=============
+vk_allocator_clear_free_list
+=============
+*/
 
 void
 vk_allocator_clear_free_list(vulkan_allocator_t *allocator)
@@ -151,6 +186,12 @@ vk_allocator_clear_free_list(vulkan_allocator_t *allocator)
     }
 }
 
+/*
+=============
+vk_allocator_clear_transient_blocks
+=============
+*/
+
 void
 vk_allocator_clear_transient_blocks(vulkan_allocator_t *allocator)
 {
@@ -162,6 +203,12 @@ vk_allocator_clear_transient_blocks(vulkan_allocator_t *allocator)
         vk_allocator_free_block(allocator, current_block);
     }
 }
+
+/*
+=============
+vk_allocator_reset
+=============
+*/
 
 void
 vk_allocator_reset(vulkan_allocator_t *allocator)
@@ -190,6 +237,11 @@ vk_allocator_reset(vulkan_allocator_t *allocator)
     c_arena_reset(&allocator->block_allocator);
 }
 
+/*
+=============
+vk_allocator_get_or_create_block
+=============
+*/
 
 vulkan_allocation_block_t*
 vk_allocator_get_or_create_block(vulkan_allocator_t *allocator,
@@ -231,6 +283,7 @@ vk_allocator_get_or_create_block(vulkan_allocator_t *allocator,
     info.memoryTypeIndex = memory_index;
     info.allocationSize  = Max(valid_block->block_size, allocation_size);
     vkAllocateMemory(allocator->device, &info, allocator->cpu_allocation_callbacks, &valid_block->memory);
+    Assert(valid_block->memory);
 
     gpu_info_t *gpu_info = (gpu_info_t *)allocator->gpu_info;
     VkMemoryPropertyFlags flags = gpu_info->memory_properties.memoryTypes[memory_index].propertyFlags;
@@ -279,6 +332,12 @@ vk_allocator_get_or_create_block(vulkan_allocator_t *allocator,
     return(valid_block);
 }
 
+/*
+=============
+get_device_heap_size
+=============
+*/
+
 internal_api u64
 get_device_heap_size(void *device, u32 memory_index)
 {
@@ -288,6 +347,12 @@ get_device_heap_size(void *device, u32 memory_index)
 
     return(result);
 }
+
+/*
+=============
+vk_allocator_allocate
+=============
+*/
 
 vulkan_allocation_info_t
 vk_allocator_allocate(vulkan_allocator_t            *allocator, 

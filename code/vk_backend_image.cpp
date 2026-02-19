@@ -46,7 +46,7 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
     result.allocation = vk_allocator_allocate(&vulkan_context->vulkan_allocator, 
                                               &memory_requirements, 
                                               VULKAN_MEMORY_USAGE_GPU_ONLY, 
-                                              true, 
+                                              false, 
                                               false);
     VkResult code = vkBindImageMemory(vulkan_context->device, result.handle, result.allocation.parent_block->memory, result.allocation.offset);
     if(!vk_backend_result_is_success(code))

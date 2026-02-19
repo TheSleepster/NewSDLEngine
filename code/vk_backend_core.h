@@ -23,12 +23,12 @@
 #include <vk_backend_buffer.h>
 #include <vk_backend_allocator.h>
 
+static const u32 MAX_FRAMES_IN_FLIGHT     = 3;
 static const s32 g_device_extension_count = 1;
+
 static const char *g_device_extensions[g_device_extension_count] = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
-
-static const u32 MAX_FRAMES_IN_FLIGHT = 3;
 
 struct gpu_info_t 
 {
@@ -38,6 +38,7 @@ struct gpu_info_t
 	VkPhysicalDeviceFeatures            features;
 	VkSurfaceCapabilitiesKHR            surface_capabilities;
 
+    u32                                 queue_family_count;
     DynArray_t(VkSurfaceFormatKHR)      valid_surface_formats;
     DynArray_t(VkPresentModeKHR)        valid_present_modes;
     DynArray_t(VkQueueFamilyProperties)	queue_family_properties;
@@ -50,43 +51,47 @@ struct swapchain_info_t
     VkPresentModeKHR   present_mode;
     VkSurfaceFormatKHR format;
     VkExtent2D         extent;
+    u32                image_count;
 };
 
 struct vulkan_context_t 
 {
-    memory_arena_t                   initialization_arena;
-    memory_arena_t                   swapchain_arena;
+    memory_arena_t                     initialization_arena;
+    memory_arena_t                     swapchain_arena;
+    memory_arena_t                     permanent_arena;
+    memory_arena_t                     frame_arena;
 
-    SDL_Window                      *window;
-    u32                              current_window_width;
-    u32                              current_window_height;
-    u32                              last_window_width;
-    u32                              last_window_height;
-    u64                              window_size_generation;
+    SDL_Window                        *window;
+    u32                                current_window_width;
+    u32                                current_window_height;
+    u32                                last_window_width;
+    u32                                last_window_height;
+    u64                                window_size_generation;
+    u64                                last_window_size_generation;
 
-    u32                              current_frame_index;
-    u32                              current_image_index;
+    u32                                current_frame_index;
+    u32                                current_image_index;
 
-    VkInstance                       instance;
-    VkSurfaceKHR                     render_surface;
+    VkInstance                         instance;
+    VkSurfaceKHR                       render_surface;
 
-    VkDebugUtilsMessengerEXT         debug_messenger;
-    VkAllocationCallbacks           *cpu_allocation_callbacks;
+    VkDebugUtilsMessengerEXT           debug_messenger;
+    VkAllocationCallbacks             *cpu_allocation_callbacks;
 #if 0
-    VmaAllocator                      vulkan_allocator;
+    VmaAllocator                       vulkan_allocator;
 #else
-    vulkan_allocator_t                vulkan_allocator;
+    vulkan_allocator_t                 vulkan_allocator;
 #endif
 
-    gpu_info_t                        gpu;
-    VkDevice                          device;
+    gpu_info_t                         gpu;
+    VkDevice                           device;
 
-    s32                               graphics_queue_family_idx;
-    s32                               present_queue_family_idx;
-    s32                               transfer_queue_family_idx;
-    s32                               compute_queue_family_idx;
+    s32                                graphics_queue_family_idx;
+    s32                                present_queue_family_idx;
+    s32                                transfer_queue_family_idx;
+    s32                                compute_queue_family_idx;
 
-    VkCommandPool                     graphics_command_pool;
+    VkCommandPool                      graphics_command_pool;
 
     VkQueue	                           graphics_queue;
     VkQueue                            present_queue;
@@ -95,25 +100,39 @@ struct vulkan_context_t
 
     VkFormat                           depth_format;
     swapchain_info_t                   swapchain;
-    vulkan_image_t                     depth_buffer;
-
     VkImage                           *swapchain_images;
     VkImageView                       *swapchain_views;
+    vulkan_image_t                     depth_buffer;
 
-    VkCommandBuffer                    frame_command_buffer[MAX_FRAMES_IN_FLIGHT];
-    VkFence                            frame_command_buffer_fences[MAX_FRAMES_IN_FLIGHT];
-    bool32                             frame_command_buffer_recorded[MAX_FRAMES_IN_FLIGHT];
+    bool32                             rebuilding_swapchain;
 
-    VkSemaphore                        swapchain_image_acquired_semaphores[MAX_FRAMES_IN_FLIGHT];
-    VkSemaphore                        render_complete_semaphores[MAX_FRAMES_IN_FLIGHT];
+    VkCommandBuffer                   *frame_command_buffers;
+    bool32                            *frame_command_buffer_recorded;
+    VkFence                           *frame_command_buffer_fences;
+
+    VkSemaphore                       *swapchain_image_acquired_semaphores;
+    VkSemaphore                       *render_complete_semaphores;
+
+    VkFence                           *image_render_idle_fences;
+    VkFence                          **image_in_flight_fences;
+
+    VkFence                          **image_in_flight_fence;
+    VkFence                           *image_render_idle_fence;
+    VkSemaphore                       *render_complete_semaphore;
+    VkSemaphore                       *image_acquired_semaphore;
+    VkCommandBuffer                   *render_command_buffer;
+    VkFramebuffer                     *render_framebuffer;
+
+    VkDescriptorPool                   descriptor_pool;
 
     VkRenderPass                       primary_renderpass;
-    VkFramebuffer                      framebuffers[MAX_FRAMES_IN_FLIGHT];
+    VkFramebuffer                     *framebuffers;
 
     // NOTE(Sleepster): We don't really need these, they're static and only modified when created. 
     vulkan_buffer_t                    main_vertex_buffer;
     vulkan_buffer_t                    main_index_buffer;
     vulkan_buffer_t                    main_instance_buffer[MAX_FRAMES_IN_FLIGHT];
+    vulkan_buffer_t                    frame_render_buffer[MAX_FRAMES_IN_FLIGHT];
 
     // NOTE(Sleepster): Each staging buffer is a large singular buffer with which we stage by incrementing the offset value of the buffer
     // and later uploading at once when we flush the buffer. However, if the buffer gets full before the designated "flush" time, then we
@@ -134,6 +153,8 @@ struct vulkan_context_t
 void        vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window);
 const char *vk_backend_vulkan_result_string(VkResult result, bool8 get_extended);
 bool8       vk_backend_result_is_success(VkResult result);
+void        vk_backend_handle_window_resize(vulkan_context_t *vulkan_context, vec2_t window_size);
+void        vk_backend_render_frame(vulkan_context_t *vulkan_context);
 
 #endif // VK_BACKEND_CORE_H
 

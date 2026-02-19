@@ -7,6 +7,10 @@
 #include <vk_backend_core.h>
 #include <r_render_group.h>
 
+void vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context);
+void vk_backend_create_framebuffers(vulkan_context_t *vulkan_context);
+void vk_backend_destroy_framebuffers(vulkan_context_t *vulkan_context);
+
 /*
 =============
 Vk_backend_debug_log_callback
@@ -278,6 +282,8 @@ vk_backend_create_instance(vulkan_context_t *vulkan_context)
 {
     vulkan_context->initialization_arena = c_arena_create(MB(10));
     vulkan_context->swapchain_arena      = c_arena_create(MB(10));
+    vulkan_context->permanent_arena      = c_arena_create(MB(10));
+    vulkan_context->frame_arena          = c_arena_create(MB(100));
 
 	VkApplicationInfo app_info  = {};
 	app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -474,6 +480,8 @@ vk_backend_select_physical_device(vulkan_context_t *vulkan_context)
         vkGetPhysicalDeviceMemoryProperties(gpu_info->device, &gpu_info->memory_properties);
         vkGetPhysicalDeviceProperties(gpu_info->device, &gpu_info->properties);
         vkGetPhysicalDeviceFeatures(gpu_info->device, &gpu_info->features);
+
+        gpu_info->queue_family_count = c_dynarray_count(gpu_info->queue_family_properties);
     }
 
     // NOTE(Sleepster): Select the best fit device 
@@ -487,87 +495,83 @@ vk_backend_select_physical_device(vulkan_context_t *vulkan_context)
         s32 present_index  = -1;
         s32 compute_index  = -1;
         s32 transfer_index = -1;
+
+        s32 graphics_score = -1;
+        s32 present_score  = -1;
+        s32 compute_score  = -1;
+        s32 transfer_score = -1;
+
         if(vk_backend_check_physical_device_support(gpu))
         {
             if(c_dynarray_count(gpu->valid_present_modes)   == 0) continue;
             if(c_dynarray_count(gpu->valid_surface_formats) == 0) continue;
 
-            // NOTE(Sleepster): Graphics queue family 
-            for(u32 queue_properties_index = 0;
-                queue_properties_index < c_dynarray_count(gpu->queue_family_properties);
-                ++queue_properties_index)
+            u32 family_count = c_dynarray_count(gpu->queue_family_properties);
+            for(u32 queue_family_index = 0; 
+                queue_family_index < family_count; 
+                ++queue_family_index)
             {
-                VkQueueFamilyProperties *properties = gpu->queue_family_properties + queue_properties_index;
-                if(properties->queueCount == 0)
+                VkQueueFamilyProperties *properties = gpu->queue_family_properties + queue_family_index;
+                if(properties->queueCount == 0) continue;
+
+                VkQueueFlags flags = properties->queueFlags;
+
+                // NOTE(Sleepster): Count how many capabilities this family has.
+                // Fewer capabilities = more dedicated = higher score.
+                s32 capability_count = __builtin_popcount(flags &
+                                                          (VK_QUEUE_GRAPHICS_BIT  |
+                                                           VK_QUEUE_COMPUTE_BIT   |
+                                                           VK_QUEUE_TRANSFER_BIT  |
+                                                           VK_QUEUE_SPARSE_BINDING_BIT));
+
+                // NOTE(Sleepster): A more dedicated queue scores higher (inverted penalty).
+                s32 dedication_score = 4 - capability_count;
+
+                // NOTE(Sleepster): Graphics queue family
+                if(flags & VK_QUEUE_GRAPHICS_BIT)
                 {
-                    continue;
+                    if(dedication_score > graphics_score)
+                    {
+                        graphics_score = dedication_score;
+                        graphics_index = (s32)queue_family_index;
+                    }
                 }
 
-                if(properties->queueFlags & VK_QUEUE_GRAPHICS_BIT)
-                {
-                    graphics_index = queue_properties_index;
-                    break;
-                }
-            }
-
-            // NOTE(Sleepster): Present queue family 
-            for(u32 queue_properties_index = 0;
-                queue_properties_index < c_dynarray_count(gpu->queue_family_properties);
-                ++queue_properties_index)
-            {
-                VkQueueFamilyProperties *properties = gpu->queue_family_properties + queue_properties_index;
-                if(properties->queueCount == 0)
-                {
-                    continue;
-                }
-
+                // NOTE(Sleepster): Present queue family
                 VkBool32 supports_presenting = VK_FALSE;
-                vkGetPhysicalDeviceSurfaceSupportKHR(gpu->device, queue_properties_index, vulkan_context->render_surface, &supports_presenting);
+                vkGetPhysicalDeviceSurfaceSupportKHR(gpu->device, queue_family_index, vulkan_context->render_surface, &supports_presenting);
                 if(supports_presenting)
                 {
-                    present_index = queue_properties_index;
-                    break;
-                }
-            }
-
-            // NOTE(Sleepster): Transfer queue family 
-            for(u32 queue_properties_index = 0;
-                queue_properties_index < c_dynarray_count(gpu->queue_family_properties);
-                ++queue_properties_index)
-            {
-                VkQueueFamilyProperties *properties = gpu->queue_family_properties + queue_properties_index;
-                if(properties->queueCount == 0)
-                {
-                    continue;
+                    if(dedication_score > present_score)
+                    {
+                        present_score = dedication_score;
+                        present_index = (s32)queue_family_index;
+                    }
                 }
 
-                if(properties->queueFlags & VK_QUEUE_TRANSFER_BIT)
+                // NOTE(Sleepster): Transfer queue family
+                if(flags & VK_QUEUE_TRANSFER_BIT)
                 {
-                    transfer_index = queue_properties_index;
-                    break;
-                }
-            }
-
-            // NOTE(Sleepster): Compute queue family 
-            for(u32 queue_properties_index = 0;
-                queue_properties_index < c_dynarray_count(gpu->queue_family_properties);
-                ++queue_properties_index)
-            {
-                VkQueueFamilyProperties *properties = gpu->queue_family_properties + queue_properties_index;
-                if(properties->queueCount == 0)
-                {
-                    continue;
+                    if(dedication_score > transfer_score)
+                    {
+                        transfer_score = dedication_score;
+                        transfer_index = (s32)queue_family_index;
+                    }
                 }
 
-                if(properties->queueFlags & VK_QUEUE_COMPUTE_BIT)
+                // NOTE(Sleepster): Compute queue family
+                if(flags & VK_QUEUE_COMPUTE_BIT)
                 {
-                    compute_index = queue_properties_index;
-                    break;
+                    if(dedication_score > compute_score)
+                    {
+                        compute_score = dedication_score;
+                        compute_index = (s32)queue_family_index;
+                    }
                 }
             }
         }
 
-        if(graphics_index > -1 && present_index > -1 && 
+        if(graphics_index > -1 && present_index > -1 &&
            transfer_index > -1 && compute_index > -1)
         {
             vulkan_context->graphics_queue_family_idx = graphics_index;
@@ -576,37 +580,15 @@ vk_backend_select_physical_device(vulkan_context_t *vulkan_context)
             vulkan_context->compute_queue_family_idx  = compute_index;
             vulkan_context->gpu = *gpu;
 
-            log_info("Device meets queue requirements...\n");
-            log_info("GRAPHICS | PRESENT | COMPUTE | TRANSFER | DEVICE NAME\n");
-            log_info("   %d     |    %d    |    %d    |     %d    | %s\n",
-                     graphics_index, present_index,
-                     compute_index,  compute_index,
-                     gpu->properties.deviceName);
-
             VkPhysicalDeviceProperties device_properties = gpu->properties;
             log_info("Device: '%s' selected...\n", device_properties.deviceName);
             switch(device_properties.deviceType)
             {
-                case VK_PHYSICAL_DEVICE_TYPE_OTHER:
-                {
-                    log_info("Device Type is unknown...\n");
-                }break;
-                case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
-                {
-                    log_info("Device Type is 'Discrete GPU'\n");
-                }break;
-                case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
-                {
-                    log_info("Device Type is 'Integrated GPU'\n");
-                }break;
-                case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
-                {
-                    log_info("Device Type is 'Virtual GPU'\n");
-                }break;
-                case VK_PHYSICAL_DEVICE_TYPE_CPU:
-                {
-                    log_info("Device Type is 'CPU'\n");
-                }break;
+                case VK_PHYSICAL_DEVICE_TYPE_OTHER:          log_info("Device Type is unknown...\n");      break;
+                case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:   log_info("Device Type is 'Discrete GPU'\n");  break;
+                case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU: log_info("Device Type is 'Integrated GPU'\n"); break;
+                case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:    log_info("Device Type is 'Virtual GPU'\n");   break;
+                case VK_PHYSICAL_DEVICE_TYPE_CPU:            log_info("Device Type is 'CPU'\n");           break;
             }
 
             log_info("GPU DRIVER VERSION: %d.%d.%d\n",
@@ -617,7 +599,6 @@ vk_backend_select_physical_device(vulkan_context_t *vulkan_context)
                      VK_VERSION_MAJOR(device_properties.apiVersion),
                      VK_VERSION_MINOR(device_properties.apiVersion),
                      VK_VERSION_PATCH(device_properties.apiVersion));
-
             return;
         }
     }
@@ -639,22 +620,44 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
 
     defer(c_dynarray_destroy(queue_create_infos));
 
-    // TODO(Sleepster): Devices like the laptop really hate this.. Fix it later. 
-    s32 queue_indices[] = {
-        vulkan_context->graphics_queue_family_idx,
-        vulkan_context->present_queue_family_idx,
-        vulkan_context->transfer_queue_family_idx,
-        vulkan_context->compute_queue_family_idx
-    };
+    bool8 present_queue_shares_graphics_queue  = vulkan_context->graphics_queue_family_idx  == vulkan_context->present_queue_family_idx;
+    bool8 transfer_queue_shares_graphics_queue = vulkan_context->graphics_queue_family_idx  == vulkan_context->transfer_queue_family_idx;
+    bool8 compute_queue_shares_any             = (vulkan_context->graphics_queue_family_idx == vulkan_context->compute_queue_family_idx) ||
+    (vulkan_context->present_queue_family_idx  == vulkan_context->compute_queue_family_idx)  ||
+    (vulkan_context->transfer_queue_family_idx == vulkan_context->compute_queue_family_idx);
 
+    u32 index_count = 1;
+    if(!present_queue_shares_graphics_queue)  index_count++;
+    if(!transfer_queue_shares_graphics_queue) index_count++;
+    if(!compute_queue_shares_any)             index_count++;
+
+    u32 indices[4] = {};
+    u32 index = 0;
+
+    indices[index++] = vulkan_context->graphics_queue_family_idx;
+    if(!present_queue_shares_graphics_queue)
+    {
+        indices[index++] = vulkan_context->present_queue_family_idx;
+    }
+    if(!transfer_queue_shares_graphics_queue)
+    {
+        indices[index++] = vulkan_context->transfer_queue_family_idx;
+    }
+    if(!compute_queue_shares_any)
+    {
+        indices[index++] = vulkan_context->compute_queue_family_idx;
+    }
+
+
+    // TODO(Sleepster): Devices like the laptop really hate this.. Fix it later. 
     float32 priority = 1.0f;
     for(u32 queue_index = 0;
-        queue_index < ArrayCount(queue_indices);
+        queue_index < index_count;
         ++queue_index)
     {
         VkDeviceQueueCreateInfo queue_info = {};
         queue_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queue_info.queueFamilyIndex = queue_indices[queue_index];
+        queue_info.queueFamilyIndex = indices[queue_index];
         queue_info.queueCount = 1;
         queue_info.pQueuePriorities = &priority;
 
@@ -678,7 +681,7 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
     VkDeviceCreateInfo device_create_info = {};
     device_create_info.sType                   =  VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     device_create_info.pNext                   = &device_11_features;
-    device_create_info.queueCreateInfoCount    =  ArrayCount(queue_indices);
+    device_create_info.queueCreateInfoCount    =  index_count;
     device_create_info.pQueueCreateInfos       =  queue_create_infos;
     device_create_info.pEnabledFeatures        = &device_features;
     device_create_info.enabledExtensionCount   =  g_device_extension_count;
@@ -692,26 +695,48 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
     vkGetDeviceQueue(vulkan_context->device, vulkan_context->present_queue_family_idx,  0, &vulkan_context->present_queue);
     vkGetDeviceQueue(vulkan_context->device, vulkan_context->transfer_queue_family_idx, 0, &vulkan_context->transfer_queue);
     vkGetDeviceQueue(vulkan_context->device, vulkan_context->compute_queue_family_idx,  0, &vulkan_context->compute_queue);
+
+
+    log_info("Device meets queue requirements...\n");
+    log_info("GRAPHICS | PRESENT | COMPUTE | TRANSFER | DEVICE NAME\n");
+    log_info("   %d     |    %d    |    %d    |     %d    | %s\n",
+             vulkan_context->graphics_queue_family_idx,
+             vulkan_context->present_queue_family_idx,
+             vulkan_context->transfer_queue_family_idx,
+             vulkan_context->compute_queue_family_idx,
+             vulkan_context->gpu.properties.deviceName);
 }
 
 /*
 =============
-vk_backend_create_semaphores
+vk_backend_create_sync_objects
 =============
 */
 
 void
-vk_backend_create_semaphores(vulkan_context_t *vulkan_context)
+vk_backend_create_sync_objects(vulkan_context_t *vulkan_context)
 {
     VkSemaphoreCreateInfo semaphore_create_info = {};
     semaphore_create_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
+    VkFenceCreateInfo fence_create_info = {};
+    fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+    vulkan_context->swapchain_image_acquired_semaphores = c_arena_push_array(&vulkan_context->permanent_arena, VkSemaphore, vulkan_context->swapchain.image_count);
+    vulkan_context->render_complete_semaphores          = c_arena_push_array(&vulkan_context->permanent_arena, VkSemaphore, vulkan_context->swapchain.image_count);
+
+    vulkan_context->image_render_idle_fences            = c_arena_push_array(&vulkan_context->permanent_arena, VkFence,     vulkan_context->swapchain.image_count);
+    vulkan_context->image_in_flight_fences              = c_arena_push_array(&vulkan_context->permanent_arena, VkFence*,    vulkan_context->swapchain.image_count);
+
     for(u32 frame_index = 0;
-        frame_index < MAX_FRAMES_IN_FLIGHT;
+        frame_index < vulkan_context->swapchain.image_count;
         ++frame_index)
     {
-        vkAssert(vkCreateSemaphore(vulkan_context->device, &semaphore_create_info, null, vulkan_context->swapchain_image_acquired_semaphores));
-        vkAssert(vkCreateSemaphore(vulkan_context->device, &semaphore_create_info, null, vulkan_context->render_complete_semaphores));
+        vkAssert(vkCreateSemaphore(vulkan_context->device, &semaphore_create_info, null, vulkan_context->swapchain_image_acquired_semaphores + frame_index));
+        vkAssert(vkCreateSemaphore(vulkan_context->device, &semaphore_create_info, null, vulkan_context->render_complete_semaphores + frame_index));
+
+        vkAssert(vkCreateFence(vulkan_context->device, &fence_create_info, null, vulkan_context->image_render_idle_fences + frame_index));
     }
 }
 
@@ -741,18 +766,23 @@ vk_backend_create_command_buffers
 void
 vk_backend_create_command_buffers(vulkan_context_t *vulkan_context)
 {
+    u32 image_count = vulkan_context->swapchain.image_count;
+
+    vulkan_context->frame_command_buffers         = c_arena_push_array(&vulkan_context->permanent_arena, VkCommandBuffer, image_count);
+    vulkan_context->frame_command_buffer_fences   = c_arena_push_array(&vulkan_context->permanent_arena, VkFence,         image_count);
+    vulkan_context->frame_command_buffer_recorded = c_arena_push_array(&vulkan_context->permanent_arena, bool32,          image_count);
+
     VkCommandBufferAllocateInfo command_buffer_allocate_info = {};
     command_buffer_allocate_info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     command_buffer_allocate_info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     command_buffer_allocate_info.commandPool        = vulkan_context->graphics_command_pool;
-    command_buffer_allocate_info.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
-
-    vkAssert(vkAllocateCommandBuffers(vulkan_context->device, &command_buffer_allocate_info, vulkan_context->frame_command_buffer));
+    command_buffer_allocate_info.commandBufferCount = image_count;
+    vkAssert(vkAllocateCommandBuffers(vulkan_context->device, &command_buffer_allocate_info, vulkan_context->frame_command_buffers));
 
     VkFenceCreateInfo fence_create_info = {};
     fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     for(u32 fence_index = 0;
-        fence_index < MAX_FRAMES_IN_FLIGHT;
+        fence_index < vulkan_context->swapchain.image_count;
         ++fence_index) 
     {
         vkAssert(vkCreateFence(vulkan_context->device, &fence_create_info, null, vulkan_context->frame_command_buffer_fences));
@@ -905,7 +935,7 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
         .imageColorSpace  = surface_format.colorSpace,
         .imageExtent      = swapchain_extent,
         .imageArrayLayers = 1,
-        .imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+        .imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT 
     };
 
     if(vulkan_context->graphics_queue_family_idx != vulkan_context->present_queue_family_idx)
@@ -941,6 +971,7 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
     vkAssert(vkGetSwapchainImagesKHR(vulkan_context->device, vulkan_context->swapchain.handle, &num_images, vulkan_context->swapchain_images));
     Expect(num_images > 0, "vkGetSwapchainImagesKHR returned a value of zero...\n");
 
+    vulkan_context->swapchain.image_count = num_images;
     for(u32 image_index = 0;
         image_index < num_images;
         ++image_index)
@@ -983,6 +1014,42 @@ vk_backend_swapchain_destroy(vulkan_context_t *vulkan_context)
 
     ZeroMemory(vulkan_context->swapchain_views, sizeof(VkImageView) * MAX_FRAMES_IN_FLIGHT);
     vkDestroySwapchainKHR(vulkan_context->device, vulkan_context->swapchain.handle, vulkan_context->cpu_allocation_callbacks);
+}
+
+
+/*
+=============
+vk_backend_swapchain_rebuild
+=============
+*/
+
+void
+vk_backend_swapchain_rebuild(vulkan_context_t *vulkan_context)
+{
+    if(vulkan_context->current_window_width > 0 && vulkan_context->current_window_height > 0)
+    {            
+        VkResult wait_result = vkDeviceWaitIdle(vulkan_context->device);
+        if(!vk_backend_result_is_success(wait_result))
+        {
+            log_error("Begin frame failed on VkDeviceWaitIdle(): '%s'...\n", 
+                      vk_backend_vulkan_result_string(wait_result, true));
+        }
+
+        vk_backend_swapchain_destroy(vulkan_context);
+        vk_backend_image_destroy(vulkan_context, &vulkan_context->depth_buffer);
+        vk_backend_destroy_framebuffers(vulkan_context);
+
+        c_arena_reset(&vulkan_context->swapchain_arena);
+
+        vk_backend_swapchain_create(vulkan_context);
+        vk_backend_create_depth_buffer(vulkan_context);
+        vk_backend_create_framebuffers(vulkan_context);
+
+        vulkan_context->last_window_size_generation = vulkan_context->window_size_generation;
+        log_debug("Window resized...\n");
+
+        vulkan_context->rebuilding_swapchain = false;
+    }
 }
 
 /*
@@ -1074,12 +1141,12 @@ vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context)
         VkMemoryRequirements memory_requirements;
         vkGetImageMemoryRequirements(vulkan_context->device, image->handle, &memory_requirements);
 #if 1
-        vulkan_allocation_info_t alloc_info = vk_allocator_allocate(&vulkan_context->vulkan_allocator, 
+        image->allocation = vk_allocator_allocate(&vulkan_context->vulkan_allocator, 
                                                                     &memory_requirements, 
                                                                      VULKAN_MEMORY_USAGE_GPU_ONLY, 
-                                                                     true, 
+                                                                     false, 
                                                                      false);
-        VkResult code = vkBindImageMemory(vulkan_context->device, image->handle, alloc_info.parent_block->memory, alloc_info.offset);
+        VkResult code = vkBindImageMemory(vulkan_context->device, image->handle, image->allocation.parent_block->memory, image->allocation.offset);
         if(!vk_backend_result_is_success(code))
         {
             Expect(false, "Failed to bind the memory for the depth buffer...\n");
@@ -1225,6 +1292,7 @@ vk_backend_create_framebuffers
 void
 vk_backend_create_framebuffers(vulkan_context_t *vulkan_context)
 {
+    vulkan_context->framebuffers = c_arena_push_array(&vulkan_context->swapchain_arena, VkFramebuffer, vulkan_context->swapchain.image_count);
     for(u32 frame_index = 0;
         frame_index < MAX_FRAMES_IN_FLIGHT;
         ++frame_index)
@@ -1246,6 +1314,25 @@ vk_backend_create_framebuffers(vulkan_context_t *vulkan_context)
                                      &framebuffer_create_info, 
                                      vulkan_context->cpu_allocation_callbacks, 
                                      &vulkan_context->framebuffers[frame_index]));
+    }
+}
+
+/*
+=============
+vk_backend_destroy_framebuffers
+=============
+*/
+
+void
+vk_backend_destroy_framebuffers(vulkan_context_t *vulkan_context)
+{
+    for(u32 frame_index = 0;
+        frame_index < MAX_FRAMES_IN_FLIGHT;
+        ++frame_index)
+    {
+        vkDestroyFramebuffer(vulkan_context->device, 
+                             vulkan_context->framebuffers[frame_index],
+                             vulkan_context->cpu_allocation_callbacks);
     }
 }
 
@@ -1275,18 +1362,17 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
         index < MAX_FRAMES_IN_FLIGHT;
         ++index)
     {
-        vulkan_context->main_instance_buffer[index] = vk_backend_buffer_create(vulkan_context, 
-                                                                               sizeof(render_geometry_instance_t) * MAX_VULKAN_INSTANCES, 
-                                                                               VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
-                                                                               VULKAN_MEMORY_USAGE_GPU_ONLY, 
-                                                                               false, 
-                                                                               false);
+        vulkan_context->frame_render_buffer[index] = vk_backend_buffer_create(vulkan_context, 
+                                                                              MB(128), 
+                                                                              VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
+                                                                              VULKAN_MEMORY_USAGE_GPU_ONLY, 
+                                                                              false, 
+                                                                              false);
         vulkan_context->staging_buffers[index] = vk_backend_staging_buffer_create(vulkan_context,
-                                                                                  MB(64),
+                                                                                  MB(128),
                                                                                   VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                                                                   VULKAN_MEMORY_USAGE_CPU_TO_GPU);
     }
-
     // NOTE(Sleepster): Fill vertex buffer
     vertex_t vertices[] = {
         [0] = {
@@ -1306,8 +1392,8 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
             .vCorner   = {0.0, 1.0}
         } 
     };
-    vk_backend_buffer_copy_data(&vulkan_context->staging_buffers[0], vertices, sizeof(vertex_t) * 4, 0);
-    vk_backend_buffer_copy_buffer(vulkan_context, &vulkan_context->staging_buffers[0], &vulkan_context->main_vertex_buffer, 0, vulkan_context->main_vertex_buffer.size, 0);
+    //vk_backend_buffer_copy_data(&vulkan_context->staging_buffers[0], vertices, sizeof(vertex_t) * 4, 0);
+    //vk_backend_buffer_copy_buffer(vulkan_context, &vulkan_context->staging_buffers[0], &vulkan_context->main_vertex_buffer, 0, vulkan_context->main_vertex_buffer.size, 0);
 
     // NOTE(Sleepster): Fill the index buffer 
     u32 *indices = c_arena_push_array(&vulkan_context->initialization_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
@@ -1325,8 +1411,47 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
 
         index_offset += 4;
     }
-    vk_backend_buffer_copy_data(&vulkan_context->staging_buffers[0], indices, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, 0);
-    vk_backend_buffer_copy_buffer(vulkan_context, &vulkan_context->staging_buffers[0], &vulkan_context->main_index_buffer, 0, vulkan_context->main_index_buffer.size, 0);
+    //vk_backend_buffer_copy_data(&vulkan_context->staging_buffers[0], indices, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, 0);
+    //vk_backend_buffer_copy_buffer(vulkan_context, &vulkan_context->staging_buffers[0], &vulkan_context->main_index_buffer, 0, vulkan_context->main_index_buffer.size, 0);
+    
+    vk_backend_buffer_stage_data(vulkan_context, (byte*)vertices, sizeof(vertices), &vulkan_context->main_vertex_buffer);
+    vk_backend_buffer_stage_data(vulkan_context, (byte*)indices,  sizeof(indices),  &vulkan_context->main_index_buffer);
+
+    VkCommandBuffer scratch_buffer;
+    VkCommandBufferAllocateInfo command_buffer_allocate_info = {
+        .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .commandPool        = vulkan_context->graphics_command_pool,
+        .commandBufferCount = 1,
+        .level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY
+    };
+    vkAssert(vkAllocateCommandBuffers(vulkan_context->device, &command_buffer_allocate_info, &scratch_buffer));
+
+    VkCommandBufferBeginInfo begin_info = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
+    };
+    vkBeginCommandBuffer(scratch_buffer, &begin_info);
+
+    vk_backend_buffer_flush_staging_buffer(vulkan_context, scratch_buffer);
+
+    VkMemoryBarrier barrier = {};
+    barrier.sType           = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+    barrier.srcAccessMask   = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask   = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT | VK_ACCESS_INDEX_READ_BIT;
+    vkCmdPipelineBarrier(scratch_buffer,
+                         VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         VK_PIPELINE_STAGE_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+                         0, 1, &barrier, 0, null, 0, null);
+    vkEndCommandBuffer(scratch_buffer);
+
+    VkSubmitInfo submit_info = {
+        .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .commandBufferCount = 1,
+        .pCommandBuffers    = &scratch_buffer
+    };
+
+    vkAssert(vkQueueSubmit(vulkan_context->graphics_queue, 1, &submit_info, 0));
+    vkAssert(vkQueueWaitIdle(vulkan_context->graphics_queue));
 }
 
 /*
@@ -1337,7 +1462,6 @@ vk_backend_init
 
 // TODO(Sleepster): 
 // - Image handler and manager
-// - Staging buffer manager
 // - Shader handler and manager
 void
 vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window) 
@@ -1354,8 +1478,11 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
     // NOTE(Sleepster): Create the logical device interface for the context 
     vk_backend_create_logical_device_and_queues(vulkan_context);
 
-    // NOTE(Sleepster): Create the image acquisition and rendering completion semaphore objects 
-    vk_backend_create_semaphores(vulkan_context);
+    // NOTE(Sleepster): Either use VMA or our own 
+    vk_backend_init_vulkan_allocator(vulkan_context);
+
+    // NOTE(Sleepster): Generate the swapchain, it's images, and the views for those images. We do not create the depth buffer. 
+    vk_backend_swapchain_create(vulkan_context);
 
     // NOTE(Sleepster): Create the command pools for our context's buffers
     vk_backend_create_command_pools(vulkan_context);
@@ -1363,11 +1490,8 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
     // NOTE(Sleepster): Create the comamnd buffers for the rendering in the engine 
     vk_backend_create_command_buffers(vulkan_context);
 
-    // NOTE(Sleepster): Either use VMA or our own 
-    vk_backend_init_vulkan_allocator(vulkan_context);
-
-    // NOTE(Sleepster): Generate the swapchain, it's images, and the views for those images. We do not create the depth buffer. 
-    vk_backend_swapchain_create(vulkan_context);
+    // NOTE(Sleepster): Create the image acquisition and rendering completion semaphore objects, do the same for the fences
+    vk_backend_create_sync_objects(vulkan_context);
 
     // NOTE(Sleepster): Generate the program's depth buffer 
     vk_backend_create_depth_buffer(vulkan_context);
@@ -1383,4 +1507,140 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
 
     c_arena_destroy(&vulkan_context->initialization_arena);
     log_info("----- Vulkan backend initialized -----\n");
+}
+
+/*
+=============
+vk_backend_render_frame
+=============
+*/
+
+void
+vk_backend_render_frame(vulkan_context_t *vulkan_context)
+{
+    bool32 window_resize = (vulkan_context->window_size_generation != vulkan_context->last_window_size_generation);
+    if(window_resize || vulkan_context->rebuilding_swapchain)
+    {
+        vk_backend_swapchain_rebuild(vulkan_context);
+        return;
+    }
+
+    vulkan_context->image_render_idle_fence   = vulkan_context->image_render_idle_fences            + vulkan_context->current_frame_index;
+    vulkan_context->image_acquired_semaphore  = vulkan_context->swapchain_image_acquired_semaphores + vulkan_context->current_frame_index;
+
+    vkAssert(vkWaitForFences(vulkan_context->device, 1, vulkan_context->image_render_idle_fence, true, U64_MAX));
+
+    u32 image_index = 0;
+    VkResult code = vkAcquireNextImageKHR(vulkan_context->device, vulkan_context->swapchain.handle, U64_MAX, *vulkan_context->image_acquired_semaphore, null, &image_index);
+    if(code == VK_ERROR_OUT_OF_DATE_KHR)
+    {
+        vulkan_context->rebuilding_swapchain = true;
+        return;
+    }
+    else if(code != VK_SUCCESS && code != VK_SUBOPTIMAL_KHR)
+    {
+        Expect(false, "Could not acquire the next swapchain image!...\n");
+    }
+
+    vulkan_context->image_in_flight_fence     = vulkan_context->image_in_flight_fences     + image_index;
+    vulkan_context->render_complete_semaphore = vulkan_context->render_complete_semaphores + image_index;
+    vulkan_context->render_command_buffer     = vulkan_context->frame_command_buffers      + image_index;
+    vulkan_context->render_framebuffer        = vulkan_context->framebuffers               + image_index;
+    if(*vulkan_context->image_in_flight_fence != VK_NULL_HANDLE)
+    {
+        vkAssert(vkWaitForFences(vulkan_context->device, 1, *vulkan_context->image_in_flight_fence, true, U64_MAX));
+    }
+    *vulkan_context->image_in_flight_fence = vulkan_context->image_render_idle_fence;
+    vulkan_context->current_image_index    = image_index;
+    // TODO(Sleepster): Multithreading is important... This is not good for that... 
+    VkCommandBufferBeginInfo begin_info = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+    };
+    vkAssert(vkBeginCommandBuffer(*vulkan_context->render_command_buffer, &begin_info));
+
+    VkRenderPassBeginInfo renderpass_info = {};
+    renderpass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderpass_info.renderPass  =  vulkan_context->primary_renderpass;
+    renderpass_info.framebuffer = *vulkan_context->render_framebuffer;
+    renderpass_info.renderArea = {
+        .offset.x = 0,
+        .offset.y = 0,
+        .extent.width = vulkan_context->current_window_width,
+        .extent.height = vulkan_context->current_window_height
+    };
+
+    VkClearValue clear_values[2] = {};
+    clear_values[0].color.float32[0] = 0.4;
+    clear_values[0].color.float32[1] = 0.3;
+    clear_values[0].color.float32[2] = 0.8;
+    clear_values[0].color.float32[3] = 1.0;
+
+    clear_values[1].depthStencil.depth   = 0.0;
+    clear_values[1].depthStencil.stencil = 0;
+
+    renderpass_info.clearValueCount = 2;
+    renderpass_info.pClearValues    = clear_values;
+    
+    vkCmdBeginRenderPass(*vulkan_context->render_command_buffer, &renderpass_info, VK_SUBPASS_CONTENTS_INLINE);
+
+    // render commands here
+    
+    vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
+    vkEndCommandBuffer(*vulkan_context->render_command_buffer);
+
+    vkAssert(vkResetFences(vulkan_context->device, 1, vulkan_context->image_render_idle_fence));
+
+    VkPipelineStageFlags stage_flags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    VkSubmitInfo submit_info  = {
+        .sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+
+        // NOTE(Sleepster): Command buffer()s that will be run 
+        .commandBufferCount   = 1,
+        .pCommandBuffers      = vulkan_context->render_command_buffer,
+
+        // NOTE(Sleepster): The Semaphore(s) that signal when the queue is finished executing the commands
+        .signalSemaphoreCount = 1,
+        .pSignalSemaphores    = vulkan_context->render_complete_semaphore,
+
+        // NOTE(Sleepster): The Semaphore(s) that ensures the operation cannot begin until the image is avaliable 
+        .waitSemaphoreCount   = 1,
+        .pWaitSemaphores      = vulkan_context->image_acquired_semaphore,
+        .pWaitDstStageMask    = stage_flags
+    };
+    vkAssert(vkQueueSubmit(vulkan_context->graphics_queue, 1, &submit_info, *vulkan_context->image_render_idle_fence));
+
+    VkPresentInfoKHR present_info = {
+        .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores    = vulkan_context->render_complete_semaphore,
+        .swapchainCount     = 1,
+        .pSwapchains        = &vulkan_context->swapchain.handle,
+        .pImageIndices      = &image_index,
+    };
+    VkResult result = vkQueuePresentKHR(vulkan_context->graphics_queue, &present_info);
+    if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+    {
+        vulkan_context->rebuilding_swapchain = true;
+    }
+
+    c_arena_reset(&vulkan_context->frame_arena);
+    vulkan_context->current_frame_index = (vulkan_context->current_frame_index + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+/*
+=============
+vk_backend_handle_window_resize
+=============
+*/
+
+void
+vk_backend_handle_window_resize(vulkan_context_t *vulkan_context, vec2_t window_size)
+{
+    vulkan_context->last_window_width  = vulkan_context->current_window_width;
+    vulkan_context->last_window_height = vulkan_context->current_window_height;
+
+    vulkan_context->current_window_width  = window_size.x;
+    vulkan_context->current_window_height = window_size.y;
+
+    ++vulkan_context->window_size_generation;
 }
