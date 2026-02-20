@@ -119,7 +119,7 @@ JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
 # --------------------------------------------
 .PHONY: all shaders clean run_preprocessor
 
-all: $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
+all: $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) do_codegen $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
 
 # Create Build Directory
 $(BUILD_DIR):
@@ -172,7 +172,7 @@ shaders: $(SHADER_OUTPUTS)
 tests: $(TESTS_OUT)
 
 # Note: We use $* to get the stem (filename without extension) for the .d file
-$(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR)
+$(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | do_codegen $(BUILD_DIR)
 	@echo [TEST] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		$(DEPFLAGS) \
@@ -181,13 +181,13 @@ $(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | $(BUILD_DIR)
 # -------------------------------------------------------------------------
 # Asset file builder 
 # -------------------------------------------------------------------------
-$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) 
+$(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | do_codegen $(BUILD_DIR) 
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/wad_asset_file_packer.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@ 
 
-$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR) 
+$(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | do_codegen $(BUILD_DIR) 
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/jfd_asset_file_packer.d \
@@ -198,7 +198,7 @@ $(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | $(BUILD_DIR)
 # -------------------------------------------------------------------------
 
 # Compile regular C++11 source to objects 
-$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | $(BUILD_DIR) 
+$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | do_codegen $(BUILD_DIR) 
 	@echo [ENGINE SOURCE]: $< ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) $(DEPFLAGS) -c $< -o $@
 

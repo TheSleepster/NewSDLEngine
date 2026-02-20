@@ -7,6 +7,10 @@
    ======================================================================== */
 
 #define SYS_LINUX_H
+#ifndef CODE_GEN_IGNORE_FILE
+#define CODE_GEN_IGNORE_FILE()
+#endif
+
 #include <c_types.h>
 #include <c_base.h>
 #include <c_hash_table.h>

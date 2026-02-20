@@ -19,12 +19,13 @@
 #include <c_threadpool.h>
 #include <c_dynarray.h>
 
+#include <vk_backend_image.h>
+#include <vk_backend_shader.h>
+
 #define ASSET_CATALOG_MAX_LOOKUPS         (4099)
 #define ASSET_MANAGER_MAX_TEXTURE_ATLASES (128)
 #define ASSET_MANAGER_MAX_ASSET_FILES     (32)
 
-typedef struct vulkan_shader_data vulkan_shader_data_t;
-typedef struct vulkan_texture     vulkan_texture_t;
 typedef struct asset_manager      asset_manager_t;
 typedef struct asset_slot         asset_slot_t;
 typedef struct subtexture_data    subtexture_data_t;
@@ -69,8 +70,6 @@ typedef enum bitmap_format
     BMF_Count,
 }bitmap_format_t;
 
-#include <r_vulkan_types.h>
-
 /* NOTE(Sleepster): 
  * The Asset handle is very simple, it is simply a means to only do the expensive hash lookups once, 
  * and then have a means to update the asset's state in a way that is much less expensive than the lookups
@@ -113,7 +112,7 @@ typedef struct texture2D
 {
     u64               ID;
     bitmap_t          bitmap;
-    vulkan_texture_t  gpu_data;
+    vulkan_image_t    gpu_data;
 }texture2D_t;
 
 typedef struct subtexture_data
@@ -163,51 +162,9 @@ typedef struct texture_atlas
 
 typedef struct shader 
 {
-    u64                  ID;
-    vulkan_shader_data_t shader_data;
-
-    // NOTE(Sleepster): Storing some basic things here. 
-    vulkan_shader_uniform_data_t *camera_uniform;
-    vulkan_shader_uniform_data_t *texture_uniform;
+    u64              ID;
+    vulkan_shader_t  shader_data;
 }shader_t;
-
-/* MATERIAL CONFIG:
- * - Shader name
- * - ID
- * - Name of the material
- * - Default pipeline state (blend mode, blend enabled, depth mode, depth enabled, etc.)
- */
-
-
-/* NOTE(Sleepster): 
- * The idea is that you write out the base material you want to use using a .mat config file.
- * When you need the material, you acquire an asset handle too it. If you need to change
- * something about the base material such as "vibrance = 1.0f" instead of "vibrance = 0.8"
- * as is defined in the material config, you would simply be able to make a copy to that material,
- * then customize these settings. Keeping the base material untouched.
- */
-
-// MATERIAL INSTANCE
-GENERATE_TYPE_INFO
-typedef struct material_instance
-{
-    u64                           ID;
-    u32                           version;
-    string_t                      name;
-
-    // TODO(Sleepster): Does this even serve a purpose??? 
-    asset_handle_t                textures[MAX_RENDER_GROUP_BOUND_TEXTURES];
-    render_pipeline_state_t       pipeline_state;
-    u32                           renderer_effect_flags;
-
-    u32                           shader_uniform_count;
-    vulkan_shader_uniform_data_t *uniform_data;
-#if 0
-    VkDescriptorSet               sets[];
-#endif 
-
-    material_archetype_t         *archetype;
-}material_instance_t;
 
 #if 0
 // TODO(Sleepster): 
@@ -257,9 +214,41 @@ struct shiny_material_t: public material_instance_t
 };
 #endif
 
+/* MATERIAL CONFIG:
+ * - Shader name
+ * - ID
+ * - Name of the material
+ * - Default pipeline state (blend mode, blend enabled, depth mode, depth enabled, etc.)
+ */
+
+
+/* NOTE(Sleepster): 
+ * The idea is that you write out the base material you want to use using a .mat config file.
+ * When you need the material, you acquire an asset handle too it. If you need to change
+ * something about the base material such as "vibrance = 1.0f" instead of "vibrance = 0.8"
+ * as is defined in the material config, you would simply be able to make a copy to that material,
+ * then customize these settings. Keeping the base material untouched.
+ */
+
+// MATERIAL INSTANCE
+typedef struct material_instance
+{
+    u64                           ID;
+    u32                           version;
+    string_t                      name;
+
+    // TODO(Sleepster): Does this even serve a purpose??? 
+    u32                           renderer_effect_flags;
+
+    u32                           shader_uniform_count;
+#if 0
+    VkDescriptorSet               sets[];
+#endif 
+
+    material_archetype_t         *archetype;
+}material_instance_t;
 
 // MATERIAL ARCHETYPE
-GENERATE_TYPE_INFO
 typedef struct material_archetype
 {
     // TODO(Sleepster): 
@@ -382,7 +371,7 @@ typedef struct asset_manager
     asset_catalog_t                *font_catalog;
     asset_catalog_t                *sound_catalog;
 
-    vulkan_render_context_t        *render_context;
+    vulkan_context_t               *vulkan_context;
 }asset_manager_t;
 
 void  s_asset_manager_init(asset_manager_t *asset_manager);
@@ -391,7 +380,7 @@ asset_handle_t s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manag
 
 texture_atlas_t* s_texture_atlas_create(asset_manager_t *asset_manager, u32 size, u32 channel_count, u32 format, u32 initial_subtexture_count);
 void s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle);
-void s_texture_atlas_pack_added_textures(vulkan_render_context_t *render_context, texture_atlas_t *atlas);
+void s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_atlas_t *atlas);
 
 true_inline void s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot_t *slot);
 

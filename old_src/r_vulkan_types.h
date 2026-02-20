@@ -205,7 +205,6 @@ typedef enum render_pipeline_stencil_function
 
 // NOTE(Sleepster): Should be obvious, what the correct state for each of these parts is at the time of drawing. 
 //                  Per material
-GENERATE_TYPE_INFO
 typedef struct render_pipeline_state
 {
     bool32 blend_enabled         = true;

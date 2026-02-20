@@ -23,12 +23,98 @@
 #include <vk_backend_buffer.h>
 #include <vk_backend_allocator.h>
 
-static const u32 MAX_FRAMES_IN_FLIGHT     = 3;
-static const s32 g_device_extension_count = 1;
+constexpr u32 MAX_FRAMES_IN_FLIGHT         = 3;
+constexpr u64 MAX_VULKAN_INDEX_BUFFER_SIZE = 600000;
+constexpr u64 MAX_VULKAN_INSTANCES         = MAX_VULKAN_INDEX_BUFFER_SIZE / 6;
+constexpr u32 MAX_VULKAN_SHADER_STAGES     = 10;
 
+constexpr s32 g_device_extension_count = 1;
 static const char *g_device_extensions[g_device_extension_count] = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
+
+// NOTE(Sleepster): Used for rendering
+struct alignas(16) vertex_t
+{
+    vec4_t vPosition;
+    vec2_t vCorner;
+    vec2_t vPadding;
+};
+
+typedef enum renderer_effect_application_flags
+{
+    REAF_None,
+    REAF_Bloom,
+    REAF_Emmision,
+    REAF_Vignette,
+    REAF_FilmGrain,
+    REAF_Count,
+}renderer_effect_application_flags_t;
+
+typedef enum render_pipeline_blending_mode
+{
+    RBM_Invalid,
+    RBM_Zero,
+    RBM_One,
+    RBM_Constant,
+
+    RBM_SrcColor,
+    RBM_OneMinusSrcColor,
+    RBM_DstColor,
+    RBM_OneMinusDstColor,
+
+    RBM_SrcAlpha,
+    RBM_OneMinusSrcAlpha,
+    RBM_DstAlpha,
+    RBM_OneMinusDstAlpha,
+    RBM_Count
+}render_pipeline_blending_mode_t;
+
+typedef enum render_pipeline_blending_equation
+{
+    RBE_Invalid,
+    RBE_Add,
+    RBE_Subtract,
+    RBE_ReverseSubtract,
+    RBE_Min,
+    RBE_Max,
+}render_pipeline_blending_equation_t;
+
+typedef enum render_pipeline_depth_function
+{
+    RDF_Invalid,
+    RDF_Never,
+    RDF_Always,
+
+    RDF_Greater,
+    RDF_Less,
+    RDF_Equal,
+    RDF_NotEqual,
+    RDF_LessOrEqual,
+    RDF_GreaterOrEqual,
+    RDF_Count
+}render_pipeline_depth_function_t;
+
+typedef struct render_pipeline_state
+{
+    bool32 blend_enabled         = true;
+    u32    src_color_blend_mode  = RBM_SrcAlpha;
+    u32    dst_color_blend_mode  = RBM_OneMinusSrcAlpha;
+
+    u32    src_alpha_blend_mode  = RBM_SrcAlpha;
+    u32    dst_alpha_blend_mode  = RBM_OneMinusSrcAlpha;
+
+    u32    color_blend_op        = RBE_Add;
+    u32    alpha_blend_op        = RBE_Add;
+
+    bool32 depth_testing_enabled = true;
+    bool32 depth_writing_enabled = true;
+    u32    depth_func            = RDF_Less;
+
+    bool32 stencil_enabled       = false;
+    u32    stencil_state         = 0;
+    u32    stencil_keep          = 0;
+}render_pipeline_state_t;
 
 struct gpu_info_t 
 {
@@ -123,7 +209,7 @@ struct vulkan_context_t
     VkCommandBuffer                   *render_command_buffer;
     VkFramebuffer                     *render_framebuffer;
 
-    VkDescriptorPool                   descriptor_pool;
+    VkDescriptorPool                   first_descriptor_pool;
 
     VkRenderPass                       primary_renderpass;
     VkFramebuffer                     *framebuffers;
@@ -155,6 +241,9 @@ const char *vk_backend_vulkan_result_string(VkResult result, bool8 get_extended)
 bool8       vk_backend_result_is_success(VkResult result);
 void        vk_backend_handle_window_resize(vulkan_context_t *vulkan_context, vec2_t window_size);
 void        vk_backend_render_frame(vulkan_context_t *vulkan_context);
+
+struct vulkan_shader_t;
+void        vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, bool8 wireframe);
 
 #endif // VK_BACKEND_CORE_H
 

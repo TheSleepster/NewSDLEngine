@@ -869,7 +869,7 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
         }
         if(module->descriptor_set_count > 0)
         {
-            result.uniforms           = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t,  64);
+            result.uniforms           = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t , 64);
             result.static_uniforms    = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*, 64);
             result.draw_uniforms      = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*, 64);
             result.instance_uniforms  = c_arena_push_array(&result.arena,  vulkan_shader_uniform_data_t*, 64);
@@ -1010,8 +1010,8 @@ r_vulkan_shader_create(vulkan_render_context_t *render_context, string_t shader_
                 entry_point_index < module->entry_point_count;
                 ++entry_point_index)
             {
-                SpvReflectEntryPoint       *entry_point = module->entry_points + entry_point_index;
-                VkShaderStageFlags current_stage = r_vulkan_convert_spv_shader_stage(entry_point->shader_stage);
+                SpvReflectEntryPoint *entry_point = module->entry_points + entry_point_index;
+                VkShaderStageFlags current_stage  = r_vulkan_convert_spv_shader_stage(entry_point->shader_stage);
                 for(u32 descriptor_set_index = 0;
                     descriptor_set_index < entry_point->descriptor_set_count;
                     ++descriptor_set_index)

@@ -26,11 +26,8 @@
 #include <g_entity.h>
 #include <s_input_manager.h>
 #include <s_nt_networking.h>
-#include <r_vulkan_types.h>
+#include <s_asset_manager.h>
 //
-
-#include <r_vulkan_core.h>
-#include <r_render_group.h>
 
 #include <asset_file_packer/jfd_asset_file.h>
 #include <meta/GENERATED_program_RTTI.h>
@@ -126,7 +123,7 @@ s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 na
     shader_t result;
     result.ID          = name_hash;
     slot->ID           = name_hash;
-    result.shader_data = r_vulkan_shader_create(asset_manager->render_context, slot->package_entry->asset_data);
+    result.shader_data = vk_backend_shader_create(asset_manager->vulkan_context, slot->package_entry->asset_data);
 
     return(result);
 }
@@ -324,9 +321,6 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
     // Maybe this is bad and that's a better idea.
     archetype.ID            = c_fnv_hash_value(archetype.name.data, archetype.name.count);
     archetype.shader_handle = s_asset_manager_acquire_asset_handle(asset_manager, archetype.shader_binary_name);
-
-    archetype.base_instance.uniform_data         = archetype.shader_handle.shader->shader_data.uniforms;
-    archetype.base_instance.shader_uniform_count = archetype.shader_handle.shader->shader_data.uniform_count;
 
     result.material_type      = SMT_Archetype;
     result.archetype          = archetype;
@@ -678,7 +672,7 @@ s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_hand
 }
 
 void
-s_texture_atlas_pack_added_textures(vulkan_render_context_t *render_context, texture_atlas_t *atlas)
+s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_atlas_t *atlas)
 {
     Assert(atlas->is_valid);
 
@@ -744,7 +738,7 @@ s_texture_atlas_pack_added_textures(vulkan_render_context_t *render_context, tex
             atlas->atlas_cursor_x = atlas_cursor_x + bitmap_width;
         }
         c_dynarray_clear(atlas->textures_to_merge);
-        r_vulkan_make_gpu_texture(render_context, &atlas->texture);
+        vk_backend_image_create(vulkan_context, &atlas->texture);
     }
     else
     {

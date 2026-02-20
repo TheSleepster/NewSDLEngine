@@ -7,6 +7,10 @@
    ======================================================================== */
 #define SYS_WIN32_H
 
+#ifndef CODE_GEN_IGNORE_FILE
+#define CODE_GEN_IGNORE_FILE()
+#endif
+
 #define WIN32_LEAN_AND_MEAN
 #define NO_MIN_MAX
 #include <windows.h>

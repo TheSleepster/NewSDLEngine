@@ -2,11 +2,10 @@
 // IT CONTAINS ALL THE RTTI NEEDED FOR THE PROGRAM...
 
 #if !defined(GENERATED_PROGRAM_RTTI_H)
-#define GENERATED_PROGRAM_RTTI_H
-
 #ifndef CODE_GEN_IGNORE_FILE
 #define CODE_GEN_IGNORE_FILE()
-#endif
+#endif#define GENERATED_PROGRAM_RTTI_H
+
 #ifndef OffsetOf
 #define OffsetOf(type, member) ((size_t)&(((type*)0)->member))
 #endif
@@ -30,12 +29,23 @@
 	X(TYPE_memory_arena_t, "memory_arena_t") \
 	X(TYPE_u8, "u8") \
 	X(TYPE_scratch_arena_t, "scratch_arena_t") \
+	X(TYPE_jfd_file_header_t, "jfd_file_header_t") \
+	X(TYPE_jfd_package_chunk_header_t, "jfd_package_chunk_header_t") \
+	X(TYPE_jfd_chunk_data_t, "jfd_chunk_data_t") \
+	X(TYPE_string_t, "string_t") \
+	X(TYPE_jfd_package_entry_t, "jfd_package_entry_t") \
+	X(TYPE_asset_file_header_t, "asset_file_header_t") \
+	X(TYPE_s64, "s64") \
+	X(TYPE_asset_file_table_of_contents_t, "asset_file_table_of_contents_t") \
+	X(TYPE_asset_type_t, "asset_type_t") \
+	X(TYPE_asset_file_package_entry_t, "asset_file_package_entry_t") \
+	X(TYPE_file_t, "file_t") \
+	X(TYPE_string_builder_t, "string_builder_t") \
+	X(TYPE_packer_state_t, "packer_state_t") \
 	X(TYPE_dynarray_header_t, "dynarray_header_t") \
 	X(TYPE_file_extension_t, "file_extension_t") \
 	X(TYPE_sys_handle_t, "sys_handle_t") \
-	X(TYPE_string_t, "string_t") \
 	X(TYPE_bool8, "bool8") \
-	X(TYPE_file_t, "file_t") \
 	X(TYPE_mapped_file_t, "mapped_file_t") \
 	X(TYPE_file_data_t, "file_data_t") \
 	X(TYPE_overlap_io_data_t, "overlap_io_data_t") \
@@ -73,7 +83,6 @@
 	X(TYPE_program_flag_t, "program_flag_t") \
 	X(TYPE_program_flag_state_t, "program_flag_state_t") \
 	X(TYPE_string_builder_buffer_t, "string_builder_buffer_t") \
-	X(TYPE_string_builder_t, "string_builder_t") \
 	X(TYPE_sys_thread_handle_t, "sys_thread_handle_t") \
 	X(TYPE_sys_thread_t, "sys_thread_t") \
 	X(TYPE_sys_mutex_handle_t, "sys_mutex_handle_t") \
@@ -101,15 +110,26 @@
 	X(TYPE_SDL_Window, "SDL_Window") \
 	X(TYPE_sockaddr_in_t, "sockaddr_in_t") \
 	X(TYPE_game_state_t, "game_state_t") \
-	X(TYPE_asset_type_t, "asset_type_t") \
+	X(TYPE_render_geometry_instance_t, "render_geometry_instance_t") \
+	X(TYPE_render_camera_t, "render_camera_t") \
+	X(TYPE_asset_handle_t, "asset_handle_t") \
+	X(TYPE_render_geometry_batch_t, "render_geometry_batch_t") \
+	X(TYPE_texture2D_t, "texture2D_t") \
+	X(TYPE_render_group_t, "render_group_t") \
+	X(TYPE_render_pipeline_state_t, "render_pipeline_state_t") \
+	X(TYPE_state, "state") \
+	X(TYPE_draw_frame_t, "draw_frame_t") \
+	X(TYPE_vulkan_render_context_t, "vulkan_render_context_t") \
+	X(TYPE_vulkan_render_frame_state_t, "vulkan_render_frame_state_t") \
+	X(TYPE_sys_file_check_event_data_t, "sys_file_check_event_data_t") \
+	X(TYPE_OVERLAPPED, "OVERLAPPED") \
+	X(TYPE_HANDLE, "HANDLE") \
 	X(TYPE_asset_slot_load_status_t, "asset_slot_load_status_t") \
 	X(TYPE_bitmap_format_t, "bitmap_format_t") \
 	X(TYPE_subtexture_data_t, "subtexture_data_t") \
 	X(TYPE_asset_slot_t, "asset_slot_t") \
-	X(TYPE_texture2D_t, "texture2D_t") \
 	X(TYPE_shader_t, "shader_t") \
 	X(TYPE_material_data_t, "material_data_t") \
-	X(TYPE_asset_handle_t, "asset_handle_t") \
 	X(TYPE_bitmap_t, "bitmap_t") \
 	X(TYPE_vulkan_image_t, "vulkan_image_t") \
 	X(TYPE_texture_atlas_t, "texture_atlas_t") \
@@ -117,7 +137,6 @@
 	X(TYPE_material_archetype_t, "material_archetype_t") \
 	X(TYPE_material_instance_t, "material_instance_t") \
 	X(TYPE_stored_material_type_t, "stored_material_type_t") \
-	X(TYPE_jfd_package_entry_t, "jfd_package_entry_t") \
 	X(TYPE_asset_manager_t, "asset_manager_t") \
 	X(TYPE_texture_atlas_registry_t, "texture_atlas_registry_t") \
 	X(TYPE_asset_manager_asset_file_data_t, "asset_manager_asset_file_data_t") \
@@ -152,11 +171,6 @@
 	X(TYPE_vulkan_staging_info_t, "vulkan_staging_info_t") \
 	X(TYPE_VkFence, "VkFence") \
 	X(TYPE_vulkan_staging_buffer_t, "vulkan_staging_buffer_t") \
-	X(TYPE_renderer_effect_application_flags_t, "renderer_effect_application_flags_t") \
-	X(TYPE_render_pipeline_blending_mode_t, "render_pipeline_blending_mode_t") \
-	X(TYPE_render_pipeline_blending_equation_t, "render_pipeline_blending_equation_t") \
-	X(TYPE_render_pipeline_depth_function_t, "render_pipeline_depth_function_t") \
-	X(TYPE_render_pipeline_state_t, "render_pipeline_state_t") \
 	X(TYPE_VkPhysicalDevice, "VkPhysicalDevice") \
 	X(TYPE_VkPhysicalDeviceProperties, "VkPhysicalDeviceProperties") \
 	X(TYPE_VkPhysicalDeviceMemoryProperties, "VkPhysicalDeviceMemoryProperties") \
@@ -304,6 +318,14 @@ typedef struct type_info_data_mapping
 const static memory_arena_footer_t GENERATED_DEFAULT_memory_arena_footer_t = {};
 const static memory_arena_t GENERATED_DEFAULT_memory_arena_t = {};
 const static scratch_arena_t GENERATED_DEFAULT_scratch_arena_t = {};
+const static jfd_file_header_t GENERATED_DEFAULT_jfd_file_header_t = {};
+const static jfd_package_chunk_header_t GENERATED_DEFAULT_jfd_package_chunk_header_t = {};
+const static jfd_chunk_data_t GENERATED_DEFAULT_jfd_chunk_data_t = {};
+const static jfd_package_entry_t GENERATED_DEFAULT_jfd_package_entry_t = {};
+const static asset_file_header_t GENERATED_DEFAULT_asset_file_header_t = {};
+const static asset_file_table_of_contents_t GENERATED_DEFAULT_asset_file_table_of_contents_t = {};
+const static asset_file_package_entry_t GENERATED_DEFAULT_asset_file_package_entry_t = {};
+const static packer_state_t GENERATED_DEFAULT_packer_state_t = {};
 const static dynarray_header_t GENERATED_DEFAULT_dynarray_header_t = {};
 const static file_t GENERATED_DEFAULT_file_t = {};
 const static mapped_file_t GENERATED_DEFAULT_mapped_file_t = {};
@@ -346,6 +368,14 @@ const static entity_manager_t GENERATED_DEFAULT_entity_manager_t = {};
 const static input_data_t GENERATED_DEFAULT_input_data_t = {};
 const static client_data_t GENERATED_DEFAULT_client_data_t = {};
 const static game_state_t GENERATED_DEFAULT_game_state_t = {};
+const static render_geometry_instance_t GENERATED_DEFAULT_render_geometry_instance_t = {};
+const static render_geometry_batch_t GENERATED_DEFAULT_render_geometry_batch_t = {};
+const static render_group_t GENERATED_DEFAULT_render_group_t = {};
+const static draw_frame_t GENERATED_DEFAULT_draw_frame_t = {};
+const static sys_file_check_event_data_t GENERATED_DEFAULT_sys_file_check_event_data_t = {};
+const static file_watcher_sys_watch_data_t GENERATED_DEFAULT_file_watcher_sys_watch_data_t = {};
+const static sys_file_check_event_data_t GENERATED_DEFAULT_sys_file_check_event_data_t = {};
+const static file_watcher_sys_watch_data_t GENERATED_DEFAULT_file_watcher_sys_watch_data_t = {};
 const static asset_handle_t GENERATED_DEFAULT_asset_handle_t = {};
 const static bitmap_t GENERATED_DEFAULT_bitmap_t = {};
 const static texture2D_t GENERATED_DEFAULT_texture2D_t = {};
@@ -370,7 +400,6 @@ const static vulkan_allocator_t GENERATED_DEFAULT_vulkan_allocator_t = {};
 const static vulkan_buffer_t GENERATED_DEFAULT_vulkan_buffer_t = {};
 const static vulkan_staging_info_t GENERATED_DEFAULT_vulkan_staging_info_t = {};
 const static vulkan_staging_buffer_t GENERATED_DEFAULT_vulkan_staging_buffer_t = {};
-const static render_pipeline_state_t GENERATED_DEFAULT_render_pipeline_state_t = {};
 const static swapchain_info_t GENERATED_DEFAULT_swapchain_info_t = {};
 const static vulkan_sampler_info_t GENERATED_DEFAULT_vulkan_sampler_info_t = {};
 const static vulkan_image_info_t GENERATED_DEFAULT_vulkan_image_info_t = {};
@@ -431,6 +460,171 @@ struct type_info_struct_scratch_arena_t {
 			type_info_member_t parent;
 			type_info_member_t base;
 			type_info_member_t used;
+		}members;
+	};
+};
+
+struct type_info_struct_jfd_file_header_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t magic_value;
+			type_info_member_t version;
+			type_info_member_t flags;
+			type_info_member_t entry_count;
+		}members;
+	};
+};
+
+struct type_info_struct_jfd_package_chunk_header_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t magic_value;
+			type_info_member_t total_entry_size;
+			type_info_member_t asset_type;
+			type_info_member_t filename_size;
+			type_info_member_t entry_data_size;
+		}members;
+	};
+};
+
+struct type_info_struct_jfd_chunk_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t chunk_header;
+			type_info_member_t filename_data;
+			type_info_member_t asset_entry_data;
+		}members;
+	};
+};
+
+struct type_info_struct_jfd_package_entry_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t entry_header;
+			type_info_member_t data_offset;
+			type_info_member_t filename;
+			type_info_member_t asset_data;
+		}members;
+	};
+};
+
+struct type_info_struct_asset_file_header_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t magic_value;
+			type_info_member_t version;
+			type_info_member_t flags;
+			type_info_member_t offset_to_table_of_contents;
+		}members;
+	};
+};
+
+struct type_info_struct_asset_file_table_of_contents_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t magic_value;
+			type_info_member_t reserved0;
+			type_info_member_t entry_count;
+			type_info_member_t package_segment_size;
+			type_info_member_t reserved;
+		}members;
+	};
+};
+
+struct type_info_struct_asset_file_package_entry_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t name;
+			type_info_member_t filepath;
+			type_info_member_t entry_data;
+			type_info_member_t ID;
+			type_info_member_t file_ID;
+			type_info_member_t type;
+			type_info_member_t data_offset_from_start_of_file;
+		}members;
+	};
+};
+
+struct type_info_struct_packer_state_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[13];
+		struct {
+			type_info_member_t resource_dir_path;
+			type_info_member_t output_dir;
+			type_info_member_t packed_file_name;
+			type_info_member_t file_extension;
+			type_info_member_t packer_arena;
+			type_info_member_t asset_file_handle;
+			type_info_member_t header;
+			type_info_member_t data;
+			type_info_member_t table_of_contents;
+			type_info_member_t entries;
+			type_info_member_t next_entry_to_write;
+			type_info_member_t next_entry_ID;
+			type_info_member_t entry_count;
 		}members;
 	};
 };
@@ -1306,6 +1500,194 @@ struct type_info_struct_game_state_t {
 	};
 };
 
+struct type_info_struct_render_geometry_instance_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t transform;
+			type_info_member_t color;
+			type_info_member_t uv_min;
+			type_info_member_t uv_max;
+			type_info_member_t texture_index;
+			type_info_member_t camera_index;
+		}members;
+	};
+};
+
+struct type_info_struct_render_geometry_batch_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t camera_data;
+			type_info_member_t is_valid;
+			type_info_member_t primitive_count;
+			type_info_member_t master_array_start_offset;
+			type_info_member_t material_instance;
+			type_info_member_t instances;
+			type_info_member_t next_buffer;
+		}members;
+	};
+};
+
+struct type_info_struct_render_group_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[8];
+		struct {
+			type_info_member_t ID;
+			type_info_member_t material_archetype;
+			type_info_member_t textures;
+			type_info_member_t current_texture_count;
+			type_info_member_t master_batch_array;
+			type_info_member_t total_primitive_count;
+			type_info_member_t cached_buffer;
+			type_info_member_t first_buffer;
+		}members;
+	};
+};
+
+struct type_info_struct_state {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t cached_camera_ID;
+			type_info_member_t active_render_layer;
+			type_info_member_t active_render_group;
+			type_info_member_t active_camera;
+			type_info_member_t active_shader;
+			type_info_member_t active_material;
+			type_info_member_t active_pipeline_state;
+		}members;
+	};
+};
+
+struct type_info_struct_draw_frame_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t used_render_groups;
+			type_info_member_t used_render_group_count;
+			type_info_member_t used_camera;
+			type_info_member_t used_camera_count;
+			type_info_member_t state;
+		}members;
+	};
+};
+
+struct type_info_struct_sys_file_check_event_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[5];
+		struct {
+			type_info_member_t file_data;
+			type_info_member_t last_move_cookie;
+			type_info_member_t inotify_handle;
+			type_info_member_t filename;
+			type_info_member_t old_filename;
+		}members;
+	};
+};
+
+struct type_info_struct_file_watcher_sys_watch_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t inotify_instance;
+			type_info_member_t inotify_data;
+			type_info_member_t inotify_bytes_read;
+			type_info_member_t inotify_cursor;
+			type_info_member_t directory_data;
+			type_info_member_t directory_data_count;
+		}members;
+	};
+};
+
+struct type_info_struct_sys_file_check_event_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[7];
+		struct {
+			type_info_member_t filename;
+			type_info_member_t old_filename;
+			type_info_member_t bytes_returned;
+			type_info_member_t overlapped_data;
+			type_info_member_t file_handle;
+			type_info_member_t notify_data;
+			type_info_member_t read_failed;
+		}members;
+	};
+};
+
+struct type_info_struct_file_watcher_sys_watch_data_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t directory_data;
+			type_info_member_t directory_data_count;
+		}members;
+	};
+};
+
 struct type_info_struct_asset_handle_t {
 	const char *name;
 	u32 type;
@@ -1805,34 +2187,6 @@ struct type_info_struct_vulkan_staging_buffer_t {
 			type_info_member_t buffer;
 			type_info_member_t submitted;
 			type_info_member_t upload_complete_fence;
-		}members;
-	};
-};
-
-struct type_info_struct_render_pipeline_state_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[13];
-		struct {
-			type_info_member_t blend_enabled;
-			type_info_member_t src_color_blend_mode;
-			type_info_member_t dst_color_blend_mode;
-			type_info_member_t src_alpha_blend_mode;
-			type_info_member_t dst_alpha_blend_mode;
-			type_info_member_t color_blend_op;
-			type_info_member_t alpha_blend_op;
-			type_info_member_t depth_testing_enabled;
-			type_info_member_t depth_writing_enabled;
-			type_info_member_t depth_func;
-			type_info_member_t stencil_enabled;
-			type_info_member_t stencil_state;
-			type_info_member_t stencil_keep;
 		}members;
 	};
 };
@@ -2381,101 +2735,6 @@ struct type_info_enum_vulkan_allocation_usage_type_t {
 	};
 };
 
-struct type_info_enum_renderer_effect_application_flags_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t REAF_None;
-			type_info_member_t REAF_Bloom;
-			type_info_member_t REAF_Emmision;
-			type_info_member_t REAF_Vignette;
-			type_info_member_t REAF_FilmGrain;
-			type_info_member_t REAF_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_render_pipeline_blending_mode_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[13];
-		struct {
-			type_info_member_t RBM_Invalid;
-			type_info_member_t RBM_Zero;
-			type_info_member_t RBM_One;
-			type_info_member_t RBM_Constant;
-			type_info_member_t RBM_SrcColor;
-			type_info_member_t RBM_OneMinusSrcColor;
-			type_info_member_t RBM_DstColor;
-			type_info_member_t RBM_OneMinusDstColor;
-			type_info_member_t RBM_SrcAlpha;
-			type_info_member_t RBM_OneMinusSrcAlpha;
-			type_info_member_t RBM_DstAlpha;
-			type_info_member_t RBM_OneMinusDstAlpha;
-			type_info_member_t RBM_Count;
-		}members;
-	};
-};
-
-struct type_info_enum_render_pipeline_blending_equation_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t RBE_Invalid;
-			type_info_member_t RBE_Add;
-			type_info_member_t RBE_Subtract;
-			type_info_member_t RBE_ReverseSubtract;
-			type_info_member_t RBE_Min;
-			type_info_member_t RBE_Max;
-		}members;
-	};
-};
-
-struct type_info_enum_render_pipeline_depth_function_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[10];
-		struct {
-			type_info_member_t RDF_Invalid;
-			type_info_member_t RDF_Never;
-			type_info_member_t RDF_Always;
-			type_info_member_t RDF_Greater;
-			type_info_member_t RDF_Less;
-			type_info_member_t RDF_Equal;
-			type_info_member_t RDF_NotEqual;
-			type_info_member_t RDF_LessOrEqual;
-			type_info_member_t RDF_GreaterOrEqual;
-			type_info_member_t RDF_Count;
-		}members;
-	};
-};
-
 
 const static type_info_struct_memory_arena_footer_t type_info_struct_memory_arena_footer_t_const_data = {
 	.name = "memory_arena_footer_t",
@@ -2522,6 +2781,147 @@ const static type_info_struct_scratch_arena_t type_info_struct_scratch_arena_t_c
 		.parent = {.name = "parent", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.parent)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), parent))},
 		.base = {.name = "base", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.base)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), base))},
 		.used = {.name = "used", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_scratch_arena_t.used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_scratch_arena_t), used))},
+	}
+};
+
+const static type_info_struct_jfd_file_header_t type_info_struct_jfd_file_header_t_const_data = {
+	.name = "jfd_file_header_t",
+	.type = TYPE_jfd_file_header_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_jfd_file_header_t),
+	.member_count = 4,
+	.members = {
+		.magic_value = {.name = "magic_value", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_file_header_t.magic_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_file_header_t), magic_value))},
+		.version = {.name = "version", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_file_header_t.version)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_file_header_t), version))},
+		.flags = {.name = "flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_file_header_t.flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_file_header_t), flags))},
+		.entry_count = {.name = "entry_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_file_header_t.entry_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_file_header_t), entry_count))},
+	}
+};
+
+const static type_info_struct_jfd_package_chunk_header_t type_info_struct_jfd_package_chunk_header_t_const_data = {
+	.name = "jfd_package_chunk_header_t",
+	.type = TYPE_jfd_package_chunk_header_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_jfd_package_chunk_header_t),
+	.member_count = 5,
+	.members = {
+		.magic_value = {.name = "magic_value", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_package_chunk_header_t.magic_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_package_chunk_header_t), magic_value))},
+		.total_entry_size = {.name = "total_entry_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_package_chunk_header_t.total_entry_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_package_chunk_header_t), total_entry_size))},
+		.asset_type = {.name = "asset_type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_package_chunk_header_t.asset_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_package_chunk_header_t), asset_type))},
+		.filename_size = {.name = "filename_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_package_chunk_header_t.filename_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_package_chunk_header_t), filename_size))},
+		.entry_data_size = {.name = "entry_data_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_package_chunk_header_t.entry_data_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_package_chunk_header_t), entry_data_size))},
+	}
+};
+
+const static type_info_struct_jfd_chunk_data_t type_info_struct_jfd_chunk_data_t_const_data = {
+	.name = "jfd_chunk_data_t",
+	.type = TYPE_jfd_chunk_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_jfd_chunk_data_t),
+	.member_count = 3,
+	.members = {
+		.chunk_header = {.name = "chunk_header", .type = TYPE_jfd_package_chunk_header_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_chunk_data_t.chunk_header)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_chunk_data_t), chunk_header))},
+		.filename_data = {.name = "filename_data", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_chunk_data_t.filename_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_chunk_data_t), filename_data))},
+		.asset_entry_data = {.name = "asset_entry_data", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_chunk_data_t.asset_entry_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_chunk_data_t), asset_entry_data))},
+	}
+};
+
+const static type_info_struct_jfd_package_entry_t type_info_struct_jfd_package_entry_t_const_data = {
+	.name = "jfd_package_entry_t",
+	.type = TYPE_jfd_package_entry_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_jfd_package_entry_t),
+	.member_count = 4,
+	.members = {
+		.entry_header = {.name = "entry_header", .type = TYPE_jfd_package_chunk_header_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_package_entry_t.entry_header)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_package_entry_t), entry_header))},
+		.data_offset = {.name = "data_offset", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_package_entry_t.data_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_package_entry_t), data_offset))},
+		.filename = {.name = "filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_package_entry_t.filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_package_entry_t), filename))},
+		.asset_data = {.name = "asset_data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_jfd_package_entry_t.asset_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_jfd_package_entry_t), asset_data))},
+	}
+};
+
+const static type_info_struct_asset_file_header_t type_info_struct_asset_file_header_t_const_data = {
+	.name = "asset_file_header_t",
+	.type = TYPE_asset_file_header_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_asset_file_header_t),
+	.member_count = 4,
+	.members = {
+		.magic_value = {.name = "magic_value", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_header_t.magic_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_header_t), magic_value))},
+		.version = {.name = "version", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_header_t.version)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_header_t), version))},
+		.flags = {.name = "flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_header_t.flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_header_t), flags))},
+		.offset_to_table_of_contents = {.name = "offset_to_table_of_contents", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_header_t.offset_to_table_of_contents)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_header_t), offset_to_table_of_contents))},
+	}
+};
+
+const static type_info_struct_asset_file_table_of_contents_t type_info_struct_asset_file_table_of_contents_t_const_data = {
+	.name = "asset_file_table_of_contents_t",
+	.type = TYPE_asset_file_table_of_contents_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_asset_file_table_of_contents_t),
+	.member_count = 5,
+	.members = {
+		.magic_value = {.name = "magic_value", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_table_of_contents_t.magic_value)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_table_of_contents_t), magic_value))},
+		.reserved0 = {.name = "reserved0", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_table_of_contents_t.reserved0)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_table_of_contents_t), reserved0))},
+		.entry_count = {.name = "entry_count", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_table_of_contents_t.entry_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_table_of_contents_t), entry_count))},
+		.package_segment_size = {.name = "package_segment_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_table_of_contents_t.package_segment_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_table_of_contents_t), package_segment_size))},
+		.reserved = {.name = "reserved", .type = TYPE_u64, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_table_of_contents_t.reserved)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_table_of_contents_t), reserved))},
+	}
+};
+
+const static type_info_struct_asset_file_package_entry_t type_info_struct_asset_file_package_entry_t_const_data = {
+	.name = "asset_file_package_entry_t",
+	.type = TYPE_asset_file_package_entry_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_asset_file_package_entry_t),
+	.member_count = 7,
+	.members = {
+		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_package_entry_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_package_entry_t), name))},
+		.filepath = {.name = "filepath", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_package_entry_t.filepath)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_package_entry_t), filepath))},
+		.entry_data = {.name = "entry_data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_package_entry_t.entry_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_package_entry_t), entry_data))},
+		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_package_entry_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_package_entry_t), ID))},
+		.file_ID = {.name = "file_ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_package_entry_t.file_ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_package_entry_t), file_ID))},
+		.type = {.name = "type", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_package_entry_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_package_entry_t), type))},
+		.data_offset_from_start_of_file = {.name = "data_offset_from_start_of_file", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_file_package_entry_t.data_offset_from_start_of_file)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_file_package_entry_t), data_offset_from_start_of_file))},
+	}
+};
+
+const static type_info_struct_packer_state_t type_info_struct_packer_state_t_const_data = {
+	.name = "packer_state_t",
+	.type = TYPE_packer_state_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_packer_state_t),
+	.member_count = 13,
+	.members = {
+		.resource_dir_path = {.name = "resource_dir_path", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.resource_dir_path)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), resource_dir_path))},
+		.output_dir = {.name = "output_dir", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.output_dir)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), output_dir))},
+		.packed_file_name = {.name = "packed_file_name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.packed_file_name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), packed_file_name))},
+		.file_extension = {.name = "file_extension", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.file_extension)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), file_extension))},
+		.packer_arena = {.name = "packer_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.packer_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), packer_arena))},
+		.asset_file_handle = {.name = "asset_file_handle", .type = TYPE_file_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.asset_file_handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), asset_file_handle))},
+		.header = {.name = "header", .type = TYPE_string_builder_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.header)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), header))},
+		.data = {.name = "data", .type = TYPE_string_builder_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), data))},
+		.table_of_contents = {.name = "table_of_contents", .type = TYPE_string_builder_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.table_of_contents)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), table_of_contents))},
+		.entries = {.name = "entries", .type = TYPE_asset_file_package_entry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.entries)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), entries))},
+		.next_entry_to_write = {.name = "next_entry_to_write", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.next_entry_to_write)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), next_entry_to_write))},
+		.next_entry_ID = {.name = "next_entry_ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.next_entry_ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), next_entry_ID))},
+		.entry_count = {.name = "entry_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_packer_state_t.entry_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_packer_state_t), entry_count))},
 	}
 };
 
@@ -3270,6 +3670,167 @@ const static type_info_struct_game_state_t type_info_struct_game_state_t_const_d
 	}
 };
 
+const static type_info_struct_render_geometry_instance_t type_info_struct_render_geometry_instance_t_const_data = {
+	.name = "render_geometry_instance_t",
+	.type = TYPE_render_geometry_instance_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_render_geometry_instance_t),
+	.member_count = 6,
+	.members = {
+		.transform = {.name = "transform", .type = TYPE_mat4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.transform)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), transform))},
+		.color = {.name = "color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), color))},
+		.uv_min = {.name = "uv_min", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.uv_min)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), uv_min))},
+		.uv_max = {.name = "uv_max", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.uv_max)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), uv_max))},
+		.texture_index = {.name = "texture_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.texture_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), texture_index))},
+		.camera_index = {.name = "camera_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_instance_t.camera_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_instance_t), camera_index))},
+	}
+};
+
+const static type_info_struct_render_geometry_batch_t type_info_struct_render_geometry_batch_t_const_data = {
+	.name = "render_geometry_batch_t",
+	.type = TYPE_render_geometry_batch_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_render_geometry_batch_t),
+	.member_count = 7,
+	.members = {
+		.camera_data = {.name = "camera_data", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.camera_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), camera_data))},
+		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), is_valid))},
+		.primitive_count = {.name = "primitive_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.primitive_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), primitive_count))},
+		.master_array_start_offset = {.name = "master_array_start_offset", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.master_array_start_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), master_array_start_offset))},
+		.material_instance = {.name = "material_instance", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.material_instance)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), material_instance))},
+		.instances = {.name = "instances", .type = TYPE_render_geometry_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.instances)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), instances))},
+		.next_buffer = {.name = "next_buffer", .type = TYPE_render_geometry_batch_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_geometry_batch_t.next_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_geometry_batch_t), next_buffer))},
+	}
+};
+
+const static type_info_struct_render_group_t type_info_struct_render_group_t_const_data = {
+	.name = "render_group_t",
+	.type = TYPE_render_group_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_render_group_t),
+	.member_count = 8,
+	.members = {
+		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), ID))},
+		.material_archetype = {.name = "material_archetype", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.material_archetype)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), material_archetype))},
+		.textures = {.name = "textures", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.textures)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), textures))},
+		.current_texture_count = {.name = "current_texture_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.current_texture_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), current_texture_count))},
+		.master_batch_array = {.name = "master_batch_array", .type = TYPE_render_geometry_instance_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.master_batch_array)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), master_batch_array))},
+		.total_primitive_count = {.name = "total_primitive_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.total_primitive_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), total_primitive_count))},
+		.cached_buffer = {.name = "cached_buffer", .type = TYPE_render_geometry_batch_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.cached_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), cached_buffer))},
+		.first_buffer = {.name = "first_buffer", .type = TYPE_render_geometry_batch_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_group_t.first_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_group_t), first_buffer))},
+	}
+};
+
+const static type_info_struct_state type_info_struct_state_const_data = {
+	.name = "state",
+	.type = TYPE_state,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_draw_frame_t.state),
+	.member_count = 7,
+	.members = {
+		.cached_camera_ID = {.name = "cached_camera_ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.cached_camera_ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), cached_camera_ID))},
+		.active_render_layer = {.name = "active_render_layer", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_render_layer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_render_layer))},
+		.active_render_group = {.name = "active_render_group", .type = TYPE_render_group_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_render_group)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_render_group))},
+		.active_camera = {.name = "active_camera", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_camera)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_camera))},
+		.active_shader = {.name = "active_shader", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_shader))},
+		.active_material = {.name = "active_material", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_material)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_material))},
+		.active_pipeline_state = {.name = "active_pipeline_state", .type = TYPE_render_pipeline_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state.active_pipeline_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t.state), active_pipeline_state))},
+	}
+};
+
+const static type_info_struct_draw_frame_t type_info_struct_draw_frame_t_const_data = {
+	.name = "draw_frame_t",
+	.type = TYPE_draw_frame_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_draw_frame_t),
+	.member_count = 5,
+	.members = {
+		.used_render_groups = {.name = "used_render_groups", .type = TYPE_render_group_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_render_groups)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_render_groups))},
+		.used_render_group_count = {.name = "used_render_group_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_render_group_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_render_group_count))},
+		.used_camera = {.name = "used_camera", .type = TYPE_render_camera_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_camera)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_camera))},
+		.used_camera_count = {.name = "used_camera_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.used_camera_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), used_camera_count))},
+		.state = {.name = "state", .type = TYPE_state, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_draw_frame_t), state))},
+	}
+};
+
+const static type_info_struct_sys_file_check_event_data_t type_info_struct_sys_file_check_event_data_t_const_data = {
+	.name = "sys_file_check_event_data_t",
+	.type = TYPE_sys_file_check_event_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_sys_file_check_event_data_t),
+	.member_count = 5,
+	.members = {
+		.file_data = {.name = "file_data", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.file_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), file_data))},
+		.last_move_cookie = {.name = "last_move_cookie", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.last_move_cookie)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), last_move_cookie))},
+		.inotify_handle = {.name = "inotify_handle", .type = TYPE_sys_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.inotify_handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), inotify_handle))},
+		.filename = {.name = "filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), filename))},
+		.old_filename = {.name = "old_filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.old_filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), old_filename))},
+	}
+};
+
+const static type_info_struct_file_watcher_sys_watch_data_t type_info_struct_file_watcher_sys_watch_data_t_const_data = {
+	.name = "file_watcher_sys_watch_data_t",
+	.type = TYPE_file_watcher_sys_watch_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_file_watcher_sys_watch_data_t),
+	.member_count = 6,
+	.members = {
+		.inotify_instance = {.name = "inotify_instance", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t.inotify_instance)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t), inotify_instance))},
+		.inotify_data = {.name = "inotify_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t.inotify_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t), inotify_data))},
+		.inotify_bytes_read = {.name = "inotify_bytes_read", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t.inotify_bytes_read)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t), inotify_bytes_read))},
+		.inotify_cursor = {.name = "inotify_cursor", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t.inotify_cursor)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t), inotify_cursor))},
+		.directory_data = {.name = "directory_data", .type = TYPE_sys_file_check_event_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t.directory_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t), directory_data))},
+		.directory_data_count = {.name = "directory_data_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t.directory_data_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t), directory_data_count))},
+	}
+};
+
+const static type_info_struct_sys_file_check_event_data_t type_info_struct_sys_file_check_event_data_t_const_data = {
+	.name = "sys_file_check_event_data_t",
+	.type = TYPE_sys_file_check_event_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_sys_file_check_event_data_t),
+	.member_count = 7,
+	.members = {
+		.filename = {.name = "filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), filename))},
+		.old_filename = {.name = "old_filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.old_filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), old_filename))},
+		.bytes_returned = {.name = "bytes_returned", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.bytes_returned)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), bytes_returned))},
+		.overlapped_data = {.name = "overlapped_data", .type = TYPE_OVERLAPPED, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.overlapped_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), overlapped_data))},
+		.file_handle = {.name = "file_handle", .type = TYPE_HANDLE, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.file_handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), file_handle))},
+		.notify_data = {.name = "notify_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.notify_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), notify_data))},
+		.read_failed = {.name = "read_failed", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t.read_failed)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sys_file_check_event_data_t), read_failed))},
+	}
+};
+
+const static type_info_struct_file_watcher_sys_watch_data_t type_info_struct_file_watcher_sys_watch_data_t_const_data = {
+	.name = "file_watcher_sys_watch_data_t",
+	.type = TYPE_file_watcher_sys_watch_data_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_file_watcher_sys_watch_data_t),
+	.member_count = 2,
+	.members = {
+		.directory_data = {.name = "directory_data", .type = TYPE_sys_file_check_event_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t.directory_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t), directory_data))},
+		.directory_data_count = {.name = "directory_data_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t.directory_data_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_file_watcher_sys_watch_data_t), directory_data_count))},
+	}
+};
+
 const static type_info_struct_asset_handle_t type_info_struct_asset_handle_t_const_data = {
 	.name = "asset_handle_t",
 	.type = TYPE_asset_handle_t,
@@ -3698,31 +4259,6 @@ const static type_info_struct_vulkan_staging_buffer_t type_info_struct_vulkan_st
 	}
 };
 
-const static type_info_struct_render_pipeline_state_t type_info_struct_render_pipeline_state_t_const_data = {
-	.name = "render_pipeline_state_t",
-	.type = TYPE_render_pipeline_state_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_render_pipeline_state_t),
-	.member_count = 13,
-	.members = {
-		.blend_enabled = {.name = "blend_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.blend_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), blend_enabled))},
-		.src_color_blend_mode = {.name = "src_color_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.src_color_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), src_color_blend_mode))},
-		.dst_color_blend_mode = {.name = "dst_color_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.dst_color_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), dst_color_blend_mode))},
-		.src_alpha_blend_mode = {.name = "src_alpha_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.src_alpha_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), src_alpha_blend_mode))},
-		.dst_alpha_blend_mode = {.name = "dst_alpha_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.dst_alpha_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), dst_alpha_blend_mode))},
-		.color_blend_op = {.name = "color_blend_op", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.color_blend_op)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), color_blend_op))},
-		.alpha_blend_op = {.name = "alpha_blend_op", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.alpha_blend_op)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), alpha_blend_op))},
-		.depth_testing_enabled = {.name = "depth_testing_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.depth_testing_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), depth_testing_enabled))},
-		.depth_writing_enabled = {.name = "depth_writing_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.depth_writing_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), depth_writing_enabled))},
-		.depth_func = {.name = "depth_func", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.depth_func)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), depth_func))},
-		.stencil_enabled = {.name = "stencil_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_enabled))},
-		.stencil_state = {.name = "stencil_state", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_state))},
-		.stencil_keep = {.name = "stencil_keep", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_keep)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_keep))},
-	}
-};
-
 const static type_info_struct_swapchain_info_t type_info_struct_swapchain_info_t_const_data = {
 	.name = "swapchain_info_t",
 	.type = TYPE_swapchain_info_t,
@@ -4116,73 +4652,6 @@ const static type_info_enum_vulkan_allocation_usage_type_t type_info_enum_vulkan
 		.VULKAN_MEMORY_USAGE_GPU_TO_CPU = {.name = "VULKAN_MEMORY_USAGE_GPU_TO_CPU", .type = TYPE_vulkan_allocation_usage_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(VULKAN_MEMORY_USAGE_GPU_TO_CPU), .offset = VULKAN_MEMORY_USAGE_GPU_TO_CPU},
 	}
 };
-const static type_info_enum_renderer_effect_application_flags_t type_info_enum_renderer_effect_application_flags_t_const_data = {
-	.name = "renderer_effect_application_flags_t",
-	.type = TYPE_renderer_effect_application_flags_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 6,
-	.members = {
-		.REAF_None = {.name = "REAF_None", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_None), .offset = REAF_None},
-		.REAF_Bloom = {.name = "REAF_Bloom", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Bloom), .offset = REAF_Bloom},
-		.REAF_Emmision = {.name = "REAF_Emmision", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Emmision), .offset = REAF_Emmision},
-		.REAF_Vignette = {.name = "REAF_Vignette", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Vignette), .offset = REAF_Vignette},
-		.REAF_FilmGrain = {.name = "REAF_FilmGrain", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_FilmGrain), .offset = REAF_FilmGrain},
-		.REAF_Count = {.name = "REAF_Count", .type = TYPE_renderer_effect_application_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(REAF_Count), .offset = REAF_Count},
-	}
-};
-const static type_info_enum_render_pipeline_blending_mode_t type_info_enum_render_pipeline_blending_mode_t_const_data = {
-	.name = "render_pipeline_blending_mode_t",
-	.type = TYPE_render_pipeline_blending_mode_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 13,
-	.members = {
-		.RBM_Invalid = {.name = "RBM_Invalid", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Invalid), .offset = RBM_Invalid},
-		.RBM_Zero = {.name = "RBM_Zero", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Zero), .offset = RBM_Zero},
-		.RBM_One = {.name = "RBM_One", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_One), .offset = RBM_One},
-		.RBM_Constant = {.name = "RBM_Constant", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Constant), .offset = RBM_Constant},
-		.RBM_SrcColor = {.name = "RBM_SrcColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_SrcColor), .offset = RBM_SrcColor},
-		.RBM_OneMinusSrcColor = {.name = "RBM_OneMinusSrcColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusSrcColor), .offset = RBM_OneMinusSrcColor},
-		.RBM_DstColor = {.name = "RBM_DstColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_DstColor), .offset = RBM_DstColor},
-		.RBM_OneMinusDstColor = {.name = "RBM_OneMinusDstColor", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusDstColor), .offset = RBM_OneMinusDstColor},
-		.RBM_SrcAlpha = {.name = "RBM_SrcAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_SrcAlpha), .offset = RBM_SrcAlpha},
-		.RBM_OneMinusSrcAlpha = {.name = "RBM_OneMinusSrcAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusSrcAlpha), .offset = RBM_OneMinusSrcAlpha},
-		.RBM_DstAlpha = {.name = "RBM_DstAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_DstAlpha), .offset = RBM_DstAlpha},
-		.RBM_OneMinusDstAlpha = {.name = "RBM_OneMinusDstAlpha", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_OneMinusDstAlpha), .offset = RBM_OneMinusDstAlpha},
-		.RBM_Count = {.name = "RBM_Count", .type = TYPE_render_pipeline_blending_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBM_Count), .offset = RBM_Count},
-	}
-};
-const static type_info_enum_render_pipeline_blending_equation_t type_info_enum_render_pipeline_blending_equation_t_const_data = {
-	.name = "render_pipeline_blending_equation_t",
-	.type = TYPE_render_pipeline_blending_equation_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 6,
-	.members = {
-		.RBE_Invalid = {.name = "RBE_Invalid", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Invalid), .offset = RBE_Invalid},
-		.RBE_Add = {.name = "RBE_Add", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Add), .offset = RBE_Add},
-		.RBE_Subtract = {.name = "RBE_Subtract", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Subtract), .offset = RBE_Subtract},
-		.RBE_ReverseSubtract = {.name = "RBE_ReverseSubtract", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_ReverseSubtract), .offset = RBE_ReverseSubtract},
-		.RBE_Min = {.name = "RBE_Min", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Min), .offset = RBE_Min},
-		.RBE_Max = {.name = "RBE_Max", .type = TYPE_render_pipeline_blending_equation_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RBE_Max), .offset = RBE_Max},
-	}
-};
-const static type_info_enum_render_pipeline_depth_function_t type_info_enum_render_pipeline_depth_function_t_const_data = {
-	.name = "render_pipeline_depth_function_t",
-	.type = TYPE_render_pipeline_depth_function_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 10,
-	.members = {
-		.RDF_Invalid = {.name = "RDF_Invalid", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Invalid), .offset = RDF_Invalid},
-		.RDF_Never = {.name = "RDF_Never", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Never), .offset = RDF_Never},
-		.RDF_Always = {.name = "RDF_Always", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Always), .offset = RDF_Always},
-		.RDF_Greater = {.name = "RDF_Greater", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Greater), .offset = RDF_Greater},
-		.RDF_Less = {.name = "RDF_Less", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Less), .offset = RDF_Less},
-		.RDF_Equal = {.name = "RDF_Equal", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Equal), .offset = RDF_Equal},
-		.RDF_NotEqual = {.name = "RDF_NotEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_NotEqual), .offset = RDF_NotEqual},
-		.RDF_LessOrEqual = {.name = "RDF_LessOrEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_LessOrEqual), .offset = RDF_LessOrEqual},
-		.RDF_GreaterOrEqual = {.name = "RDF_GreaterOrEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_GreaterOrEqual), .offset = RDF_GreaterOrEqual},
-		.RDF_Count = {.name = "RDF_Count", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Count), .offset = RDF_Count},
-	}
-};
 enum memory_arena_footer_t_member_list_enum {
 	TYPE_MEMORY_ARENA_FOOTER_T_MEMBER_last_base,
 	TYPE_MEMORY_ARENA_FOOTER_T_MEMBER_last_used,
@@ -4202,6 +4671,75 @@ enum scratch_arena_t_member_list_enum {
 	TYPE_SCRATCH_ARENA_T_MEMBER_parent,
 	TYPE_SCRATCH_ARENA_T_MEMBER_base,
 	TYPE_SCRATCH_ARENA_T_MEMBER_used,
+};
+
+enum jfd_file_header_t_member_list_enum {
+	TYPE_JFD_FILE_HEADER_T_MEMBER_magic_value,
+	TYPE_JFD_FILE_HEADER_T_MEMBER_version,
+	TYPE_JFD_FILE_HEADER_T_MEMBER_flags,
+	TYPE_JFD_FILE_HEADER_T_MEMBER_entry_count,
+};
+
+enum jfd_package_chunk_header_t_member_list_enum {
+	TYPE_JFD_PACKAGE_CHUNK_HEADER_T_MEMBER_magic_value,
+	TYPE_JFD_PACKAGE_CHUNK_HEADER_T_MEMBER_total_entry_size,
+	TYPE_JFD_PACKAGE_CHUNK_HEADER_T_MEMBER_asset_type,
+	TYPE_JFD_PACKAGE_CHUNK_HEADER_T_MEMBER_filename_size,
+	TYPE_JFD_PACKAGE_CHUNK_HEADER_T_MEMBER_entry_data_size,
+};
+
+enum jfd_chunk_data_t_member_list_enum {
+	TYPE_JFD_CHUNK_DATA_T_MEMBER_chunk_header,
+	TYPE_JFD_CHUNK_DATA_T_MEMBER_filename_data,
+	TYPE_JFD_CHUNK_DATA_T_MEMBER_asset_entry_data,
+};
+
+enum jfd_package_entry_t_member_list_enum {
+	TYPE_JFD_PACKAGE_ENTRY_T_MEMBER_entry_header,
+	TYPE_JFD_PACKAGE_ENTRY_T_MEMBER_data_offset,
+	TYPE_JFD_PACKAGE_ENTRY_T_MEMBER_filename,
+	TYPE_JFD_PACKAGE_ENTRY_T_MEMBER_asset_data,
+};
+
+enum asset_file_header_t_member_list_enum {
+	TYPE_ASSET_FILE_HEADER_T_MEMBER_magic_value,
+	TYPE_ASSET_FILE_HEADER_T_MEMBER_version,
+	TYPE_ASSET_FILE_HEADER_T_MEMBER_flags,
+	TYPE_ASSET_FILE_HEADER_T_MEMBER_offset_to_table_of_contents,
+};
+
+enum asset_file_table_of_contents_t_member_list_enum {
+	TYPE_ASSET_FILE_TABLE_OF_CONTENTS_T_MEMBER_magic_value,
+	TYPE_ASSET_FILE_TABLE_OF_CONTENTS_T_MEMBER_reserved0,
+	TYPE_ASSET_FILE_TABLE_OF_CONTENTS_T_MEMBER_entry_count,
+	TYPE_ASSET_FILE_TABLE_OF_CONTENTS_T_MEMBER_package_segment_size,
+	TYPE_ASSET_FILE_TABLE_OF_CONTENTS_T_MEMBER_reserved,
+};
+
+enum asset_file_package_entry_t_member_list_enum {
+	TYPE_ASSET_FILE_PACKAGE_ENTRY_T_MEMBER_name,
+	TYPE_ASSET_FILE_PACKAGE_ENTRY_T_MEMBER_filepath,
+	TYPE_ASSET_FILE_PACKAGE_ENTRY_T_MEMBER_entry_data,
+	TYPE_ASSET_FILE_PACKAGE_ENTRY_T_MEMBER_ID,
+	TYPE_ASSET_FILE_PACKAGE_ENTRY_T_MEMBER_file_ID,
+	TYPE_ASSET_FILE_PACKAGE_ENTRY_T_MEMBER_type,
+	TYPE_ASSET_FILE_PACKAGE_ENTRY_T_MEMBER_data_offset_from_start_of_file,
+};
+
+enum packer_state_t_member_list_enum {
+	TYPE_PACKER_STATE_T_MEMBER_resource_dir_path,
+	TYPE_PACKER_STATE_T_MEMBER_output_dir,
+	TYPE_PACKER_STATE_T_MEMBER_packed_file_name,
+	TYPE_PACKER_STATE_T_MEMBER_file_extension,
+	TYPE_PACKER_STATE_T_MEMBER_packer_arena,
+	TYPE_PACKER_STATE_T_MEMBER_asset_file_handle,
+	TYPE_PACKER_STATE_T_MEMBER_header,
+	TYPE_PACKER_STATE_T_MEMBER_data,
+	TYPE_PACKER_STATE_T_MEMBER_table_of_contents,
+	TYPE_PACKER_STATE_T_MEMBER_entries,
+	TYPE_PACKER_STATE_T_MEMBER_next_entry_to_write,
+	TYPE_PACKER_STATE_T_MEMBER_next_entry_ID,
+	TYPE_PACKER_STATE_T_MEMBER_entry_count,
 };
 
 enum dynarray_header_t_member_list_enum {
@@ -4571,6 +5109,86 @@ enum game_state_t_member_list_enum {
 	TYPE_GAME_STATE_T_MEMBER_connected_client_count,
 };
 
+enum render_geometry_instance_t_member_list_enum {
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_transform,
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_color,
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_uv_min,
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_uv_max,
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_texture_index,
+	TYPE_RENDER_GEOMETRY_INSTANCE_T_MEMBER_camera_index,
+};
+
+enum render_geometry_batch_t_member_list_enum {
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_camera_data,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_is_valid,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_primitive_count,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_master_array_start_offset,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_material_instance,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_instances,
+	TYPE_RENDER_GEOMETRY_BATCH_T_MEMBER_next_buffer,
+};
+
+enum render_group_t_member_list_enum {
+	TYPE_RENDER_GROUP_T_MEMBER_ID,
+	TYPE_RENDER_GROUP_T_MEMBER_material_archetype,
+	TYPE_RENDER_GROUP_T_MEMBER_textures,
+	TYPE_RENDER_GROUP_T_MEMBER_current_texture_count,
+	TYPE_RENDER_GROUP_T_MEMBER_master_batch_array,
+	TYPE_RENDER_GROUP_T_MEMBER_total_primitive_count,
+	TYPE_RENDER_GROUP_T_MEMBER_cached_buffer,
+	TYPE_RENDER_GROUP_T_MEMBER_first_buffer,
+};
+
+enum state_member_list_enum {
+	TYPE_STATE_MEMBER_cached_camera_ID,
+	TYPE_STATE_MEMBER_active_render_layer,
+	TYPE_STATE_MEMBER_active_render_group,
+	TYPE_STATE_MEMBER_active_camera,
+	TYPE_STATE_MEMBER_active_shader,
+	TYPE_STATE_MEMBER_active_material,
+	TYPE_STATE_MEMBER_active_pipeline_state,
+};
+
+enum draw_frame_t_member_list_enum {
+	TYPE_DRAW_FRAME_T_MEMBER_used_render_groups,
+	TYPE_DRAW_FRAME_T_MEMBER_used_render_group_count,
+	TYPE_DRAW_FRAME_T_MEMBER_used_camera,
+	TYPE_DRAW_FRAME_T_MEMBER_used_camera_count,
+	TYPE_DRAW_FRAME_T_MEMBER_state,
+};
+
+enum sys_file_check_event_data_t_member_list_enum {
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_file_data,
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_last_move_cookie,
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_inotify_handle,
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_filename,
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_old_filename,
+};
+
+enum file_watcher_sys_watch_data_t_member_list_enum {
+	TYPE_FILE_WATCHER_SYS_WATCH_DATA_T_MEMBER_inotify_instance,
+	TYPE_FILE_WATCHER_SYS_WATCH_DATA_T_MEMBER_inotify_data,
+	TYPE_FILE_WATCHER_SYS_WATCH_DATA_T_MEMBER_inotify_bytes_read,
+	TYPE_FILE_WATCHER_SYS_WATCH_DATA_T_MEMBER_inotify_cursor,
+	TYPE_FILE_WATCHER_SYS_WATCH_DATA_T_MEMBER_directory_data,
+	TYPE_FILE_WATCHER_SYS_WATCH_DATA_T_MEMBER_directory_data_count,
+};
+
+enum sys_file_check_event_data_t_member_list_enum {
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_filename,
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_old_filename,
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_bytes_returned,
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_overlapped_data,
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_file_handle,
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_notify_data,
+	TYPE_SYS_FILE_CHECK_EVENT_DATA_T_MEMBER_read_failed,
+};
+
+enum file_watcher_sys_watch_data_t_member_list_enum {
+	TYPE_FILE_WATCHER_SYS_WATCH_DATA_T_MEMBER_directory_data,
+	TYPE_FILE_WATCHER_SYS_WATCH_DATA_T_MEMBER_directory_data_count,
+};
+
 enum asset_handle_t_member_list_enum {
 	TYPE_ASSET_HANDLE_T_MEMBER_is_valid,
 	TYPE_ASSET_HANDLE_T_MEMBER_type,
@@ -4772,22 +5390,6 @@ enum vulkan_staging_buffer_t_member_list_enum {
 	TYPE_VULKAN_STAGING_BUFFER_T_MEMBER_buffer,
 	TYPE_VULKAN_STAGING_BUFFER_T_MEMBER_submitted,
 	TYPE_VULKAN_STAGING_BUFFER_T_MEMBER_upload_complete_fence,
-};
-
-enum render_pipeline_state_t_member_list_enum {
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_blend_enabled,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_src_color_blend_mode,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_dst_color_blend_mode,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_src_alpha_blend_mode,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_dst_alpha_blend_mode,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_color_blend_op,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_alpha_blend_op,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_testing_enabled,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_writing_enabled,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_depth_func,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_enabled,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_state,
-	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_keep,
 };
 
 enum swapchain_info_t_member_list_enum {
@@ -5033,53 +5635,6 @@ enum vulkan_allocation_usage_type_t_member_list_enum {
 	TYPE_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_GPU_TO_CPU,
 };
 
-enum renderer_effect_application_flags_t_member_list_enum {
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None,
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom,
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision,
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette,
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain,
-	TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count,
-};
-
-enum render_pipeline_blending_mode_t_member_list_enum {
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha,
-	TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count,
-};
-
-enum render_pipeline_blending_equation_t_member_list_enum {
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid,
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add,
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract,
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract,
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min,
-	TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max,
-};
-
-enum render_pipeline_depth_function_t_member_list_enum {
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual,
-	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count,
-};
-
 #define GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X) \
 	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_INVALID, "FILE_EXT_INVALID") \
 	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_TTF, "FILE_EXT_TTF") \
@@ -5204,41 +5759,6 @@ enum render_pipeline_depth_function_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_CPU_ONLY, "VULKAN_MEMORY_USAGE_CPU_ONLY") \
 	X(TYPE_ENUM_LOOKUP_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_CPU_TO_GPU, "VULKAN_MEMORY_USAGE_CPU_TO_GPU") \
 	X(TYPE_ENUM_LOOKUP_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_GPU_TO_CPU, "VULKAN_MEMORY_USAGE_GPU_TO_CPU") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, "REAF_None") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, "REAF_Bloom") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, "REAF_Emmision") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette, "REAF_Vignette") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain, "REAF_FilmGrain") \
-	X(TYPE_ENUM_LOOKUP_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count, "REAF_Count") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid, "RBM_Invalid") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero, "RBM_Zero") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One, "RBM_One") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant, "RBM_Constant") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor, "RBM_SrcColor") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor, "RBM_OneMinusSrcColor") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor, "RBM_DstColor") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor, "RBM_OneMinusDstColor") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha, "RBM_SrcAlpha") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha, "RBM_OneMinusSrcAlpha") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha, "RBM_DstAlpha") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha, "RBM_OneMinusDstAlpha") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count, "RBM_Count") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid, "RBE_Invalid") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add, "RBE_Add") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract, "RBE_Subtract") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract, "RBE_ReverseSubtract") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min, "RBE_Min") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max, "RBE_Max") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid, "RDF_Invalid") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never, "RDF_Never") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, "RDF_Always") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater, "RDF_Greater") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less, "RDF_Less") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal, "RDF_Equal") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, "RDF_NotEqual") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual, "RDF_LessOrEqual") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, "RDF_GreaterOrEqual") \
-	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count, "RDF_Count") \
 
  
 enum type_info_enum_member_mapping_t {
@@ -5257,12 +5777,23 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "memory_arena_t", .type = TYPE_memory_arena_t, .size = sizeof(memory_arena_t), .struct_info = (type_info_struct_t*)&type_info_struct_memory_arena_t_const_data},
 	{.name = "u8", .type = TYPE_u8, .size = sizeof(u8*), .struct_info = NULL},
 	{.name = "scratch_arena_t", .type = TYPE_scratch_arena_t, .size = sizeof(scratch_arena_t), .struct_info = (type_info_struct_t*)&type_info_struct_scratch_arena_t_const_data},
+	{.name = "jfd_file_header_t", .type = TYPE_jfd_file_header_t, .size = sizeof(jfd_file_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_jfd_file_header_t_const_data},
+	{.name = "jfd_package_chunk_header_t", .type = TYPE_jfd_package_chunk_header_t, .size = sizeof(jfd_package_chunk_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_jfd_package_chunk_header_t_const_data},
+	{.name = "jfd_chunk_data_t", .type = TYPE_jfd_chunk_data_t, .size = sizeof(jfd_chunk_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_jfd_chunk_data_t_const_data},
+	{.name = "string_t", .type = TYPE_string_t, .size = sizeof(string_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_t_const_data},
+	{.name = "jfd_package_entry_t", .type = TYPE_jfd_package_entry_t, .size = sizeof(jfd_package_entry_t), .struct_info = (type_info_struct_t*)&type_info_struct_jfd_package_entry_t_const_data},
+	{.name = "asset_file_header_t", .type = TYPE_asset_file_header_t, .size = sizeof(asset_file_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_file_header_t_const_data},
+	{.name = "s64", .type = TYPE_s64, .size = sizeof(s64), .struct_info = NULL},
+	{.name = "asset_file_table_of_contents_t", .type = TYPE_asset_file_table_of_contents_t, .size = sizeof(asset_file_table_of_contents_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_file_table_of_contents_t_const_data},
+	{.name = "asset_type_t", .type = TYPE_asset_type_t, .size = sizeof(asset_type_t), .struct_info = NULL},
+	{.name = "asset_file_package_entry_t", .type = TYPE_asset_file_package_entry_t, .size = sizeof(asset_file_package_entry_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_file_package_entry_t_const_data},
+	{.name = "file_t", .type = TYPE_file_t, .size = sizeof(file_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_t_const_data},
+	{.name = "string_builder_t", .type = TYPE_string_builder_t, .size = sizeof(string_builder_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_t_const_data},
+	{.name = "packer_state_t", .type = TYPE_packer_state_t, .size = sizeof(packer_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_packer_state_t_const_data},
 	{.name = "dynarray_header_t", .type = TYPE_dynarray_header_t, .size = sizeof(dynarray_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_dynarray_header_t_const_data},
 	{.name = "file_extension_t", .type = TYPE_file_extension_t, .size = sizeof(file_extension_t), .struct_info = NULL},
 	{.name = "sys_handle_t", .type = TYPE_sys_handle_t, .size = sizeof(sys_handle_t), .struct_info = NULL},
-	{.name = "string_t", .type = TYPE_string_t, .size = sizeof(string_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_t_const_data},
 	{.name = "bool8", .type = TYPE_bool8, .size = sizeof(bool8), .struct_info = NULL},
-	{.name = "file_t", .type = TYPE_file_t, .size = sizeof(file_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_t_const_data},
 	{.name = "mapped_file_t", .type = TYPE_mapped_file_t, .size = sizeof(mapped_file_t), .struct_info = (type_info_struct_t*)&type_info_struct_mapped_file_t_const_data},
 	{.name = "file_data_t", .type = TYPE_file_data_t, .size = sizeof(file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_data_t_const_data},
 	{.name = "overlap_io_data_t", .type = TYPE_overlap_io_data_t, .size = sizeof(overlap_io_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_overlap_io_data_t_const_data},
@@ -5272,7 +5803,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "file_watcher_change_event_t", .type = TYPE_file_watcher_change_event_t, .size = sizeof(file_watcher_change_event_t), .struct_info = NULL},
 	{.name = "file_watcher_recorded_change_t", .type = TYPE_file_watcher_recorded_change_t, .size = sizeof(file_watcher_recorded_change_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_watcher_recorded_change_t_const_data},
 	{.name = "file_watcher_callback_pfn_t", .type = TYPE_file_watcher_callback_pfn_t, .size = sizeof(file_watcher_callback_pfn_t*), .struct_info = NULL},
-	{.name = "file_watcher_sys_watch_data_t", .type = TYPE_file_watcher_sys_watch_data_t, .size = sizeof(file_watcher_sys_watch_data_t), .struct_info = NULL},
+	{.name = "file_watcher_sys_watch_data_t", .type = TYPE_file_watcher_sys_watch_data_t, .size = sizeof(file_watcher_sys_watch_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_watcher_sys_watch_data_t_const_data},
 	{.name = "file_watcher_t", .type = TYPE_file_watcher_t, .size = sizeof(file_watcher_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_watcher_t_const_data},
 	{.name = "threadpool_t", .type = TYPE_threadpool_t, .size = sizeof(threadpool_t), .struct_info = (type_info_struct_t*)&type_info_struct_threadpool_t_const_data},
 	{.name = "global_context_t", .type = TYPE_global_context_t, .size = sizeof(global_context_t), .struct_info = (type_info_struct_t*)&type_info_struct_global_context_t_const_data},
@@ -5300,7 +5831,6 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "program_flag_t", .type = TYPE_program_flag_t, .size = sizeof(program_flag_t), .struct_info = (type_info_struct_t*)&type_info_struct_program_flag_t_const_data},
 	{.name = "program_flag_state_t", .type = TYPE_program_flag_state_t, .size = sizeof(program_flag_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_program_flag_state_t_const_data},
 	{.name = "string_builder_buffer_t", .type = TYPE_string_builder_buffer_t, .size = sizeof(string_builder_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_buffer_t_const_data},
-	{.name = "string_builder_t", .type = TYPE_string_builder_t, .size = sizeof(string_builder_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_t_const_data},
 	{.name = "sys_thread_handle_t", .type = TYPE_sys_thread_handle_t, .size = sizeof(sys_thread_handle_t), .struct_info = NULL},
 	{.name = "sys_thread_t", .type = TYPE_sys_thread_t, .size = sizeof(sys_thread_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_thread_t_const_data},
 	{.name = "sys_mutex_handle_t", .type = TYPE_sys_mutex_handle_t, .size = sizeof(sys_mutex_handle_t), .struct_info = NULL},
@@ -5328,15 +5858,26 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "SDL_Window", .type = TYPE_SDL_Window, .size = sizeof(SDL_Window*), .struct_info = NULL},
 	{.name = "sockaddr_in_t", .type = TYPE_sockaddr_in_t, .size = sizeof(sockaddr_in_t), .struct_info = NULL},
 	{.name = "game_state_t", .type = TYPE_game_state_t, .size = sizeof(game_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_state_t_const_data},
-	{.name = "asset_type_t", .type = TYPE_asset_type_t, .size = sizeof(asset_type_t), .struct_info = NULL},
+	{.name = "render_geometry_instance_t", .type = TYPE_render_geometry_instance_t, .size = sizeof(render_geometry_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_geometry_instance_t_const_data},
+	{.name = "render_camera_t", .type = TYPE_render_camera_t, .size = sizeof(render_camera_t), .struct_info = NULL},
+	{.name = "asset_handle_t", .type = TYPE_asset_handle_t, .size = sizeof(asset_handle_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_handle_t_const_data},
+	{.name = "render_geometry_batch_t", .type = TYPE_render_geometry_batch_t, .size = sizeof(render_geometry_batch_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_geometry_batch_t_const_data},
+	{.name = "texture2D_t", .type = TYPE_texture2D_t, .size = sizeof(texture2D_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture2D_t_const_data},
+	{.name = "render_group_t", .type = TYPE_render_group_t, .size = sizeof(render_group_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_group_t_const_data},
+	{.name = "render_pipeline_state_t", .type = TYPE_render_pipeline_state_t, .size = sizeof(render_pipeline_state_t), .struct_info = NULL},
+	{.name = "state", .type = TYPE_state, .size = sizeof(decltype(GENERATED_DEFAULT_draw_frame_t.state)), .struct_info = (type_info_struct_t*)&type_info_struct_state_const_data},
+	{.name = "draw_frame_t", .type = TYPE_draw_frame_t, .size = sizeof(draw_frame_t), .struct_info = (type_info_struct_t*)&type_info_struct_draw_frame_t_const_data},
+	{.name = "vulkan_render_context_t", .type = TYPE_vulkan_render_context_t, .size = sizeof(vulkan_render_context_t*), .struct_info = NULL},
+	{.name = "vulkan_render_frame_state_t", .type = TYPE_vulkan_render_frame_state_t, .size = sizeof(vulkan_render_frame_state_t*), .struct_info = NULL},
+	{.name = "sys_file_check_event_data_t", .type = TYPE_sys_file_check_event_data_t, .size = sizeof(sys_file_check_event_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_file_check_event_data_t_const_data},
+	{.name = "OVERLAPPED", .type = TYPE_OVERLAPPED, .size = sizeof(OVERLAPPED), .struct_info = NULL},
+	{.name = "HANDLE", .type = TYPE_HANDLE, .size = sizeof(HANDLE), .struct_info = NULL},
 	{.name = "asset_slot_load_status_t", .type = TYPE_asset_slot_load_status_t, .size = sizeof(asset_slot_load_status_t), .struct_info = NULL},
 	{.name = "bitmap_format_t", .type = TYPE_bitmap_format_t, .size = sizeof(bitmap_format_t), .struct_info = NULL},
 	{.name = "subtexture_data_t", .type = TYPE_subtexture_data_t, .size = sizeof(subtexture_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_subtexture_data_t_const_data},
 	{.name = "asset_slot_t", .type = TYPE_asset_slot_t, .size = sizeof(asset_slot_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_slot_t_const_data},
-	{.name = "texture2D_t", .type = TYPE_texture2D_t, .size = sizeof(texture2D_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture2D_t_const_data},
 	{.name = "shader_t", .type = TYPE_shader_t, .size = sizeof(shader_t), .struct_info = (type_info_struct_t*)&type_info_struct_shader_t_const_data},
 	{.name = "material_data_t", .type = TYPE_material_data_t, .size = sizeof(material_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_data_t_const_data},
-	{.name = "asset_handle_t", .type = TYPE_asset_handle_t, .size = sizeof(asset_handle_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_handle_t_const_data},
 	{.name = "bitmap_t", .type = TYPE_bitmap_t, .size = sizeof(bitmap_t), .struct_info = (type_info_struct_t*)&type_info_struct_bitmap_t_const_data},
 	{.name = "vulkan_image_t", .type = TYPE_vulkan_image_t, .size = sizeof(vulkan_image_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_image_t_const_data},
 	{.name = "texture_atlas_t", .type = TYPE_texture_atlas_t, .size = sizeof(texture_atlas_t), .struct_info = NULL},
@@ -5344,7 +5885,6 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "material_archetype_t", .type = TYPE_material_archetype_t, .size = sizeof(material_archetype_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_archetype_t_const_data},
 	{.name = "material_instance_t", .type = TYPE_material_instance_t, .size = sizeof(material_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_instance_t_const_data},
 	{.name = "stored_material_type_t", .type = TYPE_stored_material_type_t, .size = sizeof(stored_material_type_t), .struct_info = NULL},
-	{.name = "jfd_package_entry_t", .type = TYPE_jfd_package_entry_t, .size = sizeof(jfd_package_entry_t*), .struct_info = NULL},
 	{.name = "asset_manager_t", .type = TYPE_asset_manager_t, .size = sizeof(asset_manager_t*), .struct_info = NULL},
 	{.name = "texture_atlas_registry_t", .type = TYPE_texture_atlas_registry_t, .size = sizeof(texture_atlas_registry_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture_atlas_registry_t_const_data},
 	{.name = "asset_manager_asset_file_data_t", .type = TYPE_asset_manager_asset_file_data_t, .size = sizeof(asset_manager_asset_file_data_t), .struct_info = NULL},
@@ -5379,11 +5919,6 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "vulkan_staging_info_t", .type = TYPE_vulkan_staging_info_t, .size = sizeof(vulkan_staging_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_staging_info_t_const_data},
 	{.name = "VkFence", .type = TYPE_VkFence, .size = sizeof(VkFence), .struct_info = NULL},
 	{.name = "vulkan_staging_buffer_t", .type = TYPE_vulkan_staging_buffer_t, .size = sizeof(vulkan_staging_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_staging_buffer_t_const_data},
-	{.name = "renderer_effect_application_flags_t", .type = TYPE_renderer_effect_application_flags_t, .size = sizeof(renderer_effect_application_flags_t), .struct_info = NULL},
-	{.name = "render_pipeline_blending_mode_t", .type = TYPE_render_pipeline_blending_mode_t, .size = sizeof(render_pipeline_blending_mode_t), .struct_info = NULL},
-	{.name = "render_pipeline_blending_equation_t", .type = TYPE_render_pipeline_blending_equation_t, .size = sizeof(render_pipeline_blending_equation_t), .struct_info = NULL},
-	{.name = "render_pipeline_depth_function_t", .type = TYPE_render_pipeline_depth_function_t, .size = sizeof(render_pipeline_depth_function_t), .struct_info = NULL},
-	{.name = "render_pipeline_state_t", .type = TYPE_render_pipeline_state_t, .size = sizeof(render_pipeline_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_pipeline_state_t_const_data},
 	{.name = "VkPhysicalDevice", .type = TYPE_VkPhysicalDevice, .size = sizeof(VkPhysicalDevice), .struct_info = NULL},
 	{.name = "VkPhysicalDeviceProperties", .type = TYPE_VkPhysicalDeviceProperties, .size = sizeof(VkPhysicalDeviceProperties), .struct_info = NULL},
 	{.name = "VkPhysicalDeviceMemoryProperties", .type = TYPE_VkPhysicalDeviceMemoryProperties, .size = sizeof(VkPhysicalDeviceMemoryProperties), .struct_info = NULL},
@@ -5545,41 +6080,6 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "VULKAN_MEMORY_USAGE_CPU_ONLY", .member_enum = TYPE_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_CPU_ONLY, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_allocation_usage_type_t_const_data},
 	{.name = "VULKAN_MEMORY_USAGE_CPU_TO_GPU", .member_enum = TYPE_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_CPU_TO_GPU, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_allocation_usage_type_t_const_data},
 	{.name = "VULKAN_MEMORY_USAGE_GPU_TO_CPU", .member_enum = TYPE_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_GPU_TO_CPU, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_allocation_usage_type_t_const_data},
-	{.name = "REAF_None", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_None, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Bloom", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Bloom, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Emmision", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Emmision, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Vignette", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Vignette, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_FilmGrain", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_FilmGrain, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "REAF_Count", .member_enum = TYPE_RENDERER_EFFECT_APPLICATION_FLAGS_T_MEMBER_REAF_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_renderer_effect_application_flags_t_const_data},
-	{.name = "RBM_Invalid", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_Zero", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Zero, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_One", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_One, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_Constant", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Constant, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_SrcColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusSrcColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_DstColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusDstColor", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstColor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_SrcAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_SrcAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusSrcAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusSrcAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_DstAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_DstAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_OneMinusDstAlpha", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_OneMinusDstAlpha, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBM_Count", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_MODE_T_MEMBER_RBM_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_mode_t_const_data},
-	{.name = "RBE_Invalid", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Add", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Add, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Subtract", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Subtract, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_ReverseSubtract", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_ReverseSubtract, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Min", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Min, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RBE_Max", .member_enum = TYPE_RENDER_PIPELINE_BLENDING_EQUATION_T_MEMBER_RBE_Max, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_blending_equation_t_const_data},
-	{.name = "RDF_Invalid", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Never", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Never, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Always", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Greater", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Greater, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Less", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Less, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Equal", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Equal, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_NotEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_LessOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_LessOrEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_GreaterOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
-	{.name = "RDF_Count", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
 };
 
 

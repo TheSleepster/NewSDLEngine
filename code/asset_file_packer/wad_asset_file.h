@@ -8,6 +8,8 @@
 
 #define ASSET_FILE_PACKER_H
 #include <c_base.h>
+CODE_GEN_IGNORE_FILE()
+
 #include <c_types.h>
 #include <c_math.h>
 #include <c_globals.h>

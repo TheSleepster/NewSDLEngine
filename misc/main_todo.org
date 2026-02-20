@@ -5,7 +5,7 @@
 - [X] Clear the screen
 - [X] Swapbuffers command
 - [X] Handle window resizing
-- [ ] Shaders and descriptor pools
+- [X] Shaders and descriptor pools
 - [ ] Allocating and handling descriptor sets
 
 - [ ] Memory Allocation tracker

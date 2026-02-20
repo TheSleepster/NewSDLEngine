@@ -5,7 +5,9 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <vk_backend_core.h>
-#include <r_render_group.h>
+#include <vk_backend_shader.h>
+#include <c_string.h>
+#include <c_file_api.h>
 
 void vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context);
 void vk_backend_create_framebuffers(vulkan_context_t *vulkan_context);
@@ -1456,6 +1458,263 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
 
 /*
 =============
+vk_backend_create_descriptor_pool
+=============
+*/
+
+void
+vk_backend_create_descriptor_pool(vulkan_context_t *vulkan_context)
+{
+    #define MAX_POOL_SET_TYPES (5)
+
+    // NOTE(Sleepster): This is 10 for now...
+    // https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDescriptorType.html
+    VkDescriptorPoolSize sizes[MAX_POOL_SET_TYPES];
+    sizes[0] = {
+        .type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        .descriptorCount = 4000,
+    };
+    sizes[1] = {
+        .type            = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+        .descriptorCount = 2000,
+    };
+    sizes[2] = {
+        .type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptorCount = 2000,
+    };
+    sizes[3] = {
+        .type            = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+        .descriptorCount = 200,
+    };
+    sizes[4] = {
+        .type            = VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,
+        .descriptorCount = 200,
+    };
+
+    VkDescriptorPoolCreateInfo pool_create_info = {
+        .sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
+        .maxSets       = 100000,
+        .poolSizeCount = MAX_POOL_SET_TYPES,
+        .pPoolSizes    = sizes
+    };   
+    vkAssert(vkCreateDescriptorPool(vulkan_context->device, 
+                                   &pool_create_info, 
+                                    vulkan_context->cpu_allocation_callbacks, 
+                                   &vulkan_context->first_descriptor_pool));
+}
+
+/*
+=============
+vk_backend_create_render_pipeline
+=============
+*/
+
+// TODO(Sleepster): This will have to get moved out, we need MUCH more infrastructure to correctly support pipeline objects
+// the idea originally was to rely on dynamic state to make it so that we can simply just change the blending modes and everything
+// else at runtime. However, this isn't an option without requiring Vulkan 1.3 and VK_EXT_DYNAMIC_STATE3, which I'm not going
+// to do. So, the idea is now that instead of the shader owning a single pipeline we will instead store 2 items:
+//
+// 1.) A hash table for each of the pipelines that use the shader. With each version of the pipeline state being the key into 
+//     the table.
+//
+// 2.) An array of occupied indices in the hash table for easy iteration over loaded pipelines.
+//
+// This also only creates a GRAPHICS pipeline. Bad.
+void
+vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, bool8 wireframe)
+{
+    VkPipelineRasterizationStateCreateInfo rasterization_state = {
+        .sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+        .depthClampEnable        = false,
+        .rasterizerDiscardEnable = false,
+        .polygonMode             = wireframe ? VK_POLYGON_MODE_LINE : VK_POLYGON_MODE_FILL,
+        .lineWidth               = 1.0f,
+        .cullMode                = VK_CULL_MODE_BACK_BIT,
+        .frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+        .depthBiasEnable         = false,
+        .depthBiasConstantFactor = 0.0f,
+        .depthBiasClamp          = 0.0f,
+        .depthBiasSlopeFactor    = 0.0f,
+    };
+
+    VkPipelineMultisampleStateCreateInfo multisampling_state = {
+        .sType                 = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+        .sampleShadingEnable   = false,
+        .rasterizationSamples  = VK_SAMPLE_COUNT_1_BIT,
+        .minSampleShading      = 1.0f,
+        .pSampleMask           = 0,
+        .alphaToCoverageEnable = false,
+        .alphaToOneEnable      = false,
+    };
+
+    VkPipelineDepthStencilStateCreateInfo depth_stencil = {
+        .sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+        .depthTestEnable       = true,
+        .depthWriteEnable      = true,
+        .depthCompareOp        = VK_COMPARE_OP_LESS,
+        .depthBoundsTestEnable = false,
+        .stencilTestEnable     = false,
+    };
+
+    VkPipelineColorBlendAttachmentState blend_settings = {
+        .blendEnable         = true,
+        .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+        .dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+        .colorBlendOp        = VK_BLEND_OP_ADD,
+        .srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+        .dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+        .alphaBlendOp        = VK_BLEND_OP_ADD,
+        .colorWriteMask      = VK_COLOR_COMPONENT_R_BIT|VK_COLOR_COMPONENT_G_BIT|VK_COLOR_COMPONENT_B_BIT|VK_COLOR_COMPONENT_A_BIT
+    };
+
+    VkPipelineColorBlendStateCreateInfo color_blend_state = {
+        .sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+        .logicOpEnable   = true,
+        .logicOp         = VK_LOGIC_OP_COPY,
+        .attachmentCount = 1,
+        .pAttachments    = &blend_settings
+    };
+
+    VkDynamicState dynamic_state[] = {
+        VK_DYNAMIC_STATE_VIEWPORT,
+        VK_DYNAMIC_STATE_SCISSOR,
+        VK_DYNAMIC_STATE_LINE_WIDTH,
+    };
+
+    VkPipelineDynamicStateCreateInfo dynamic_state_data = {
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+        .pDynamicStates    = dynamic_state,
+        .dynamicStateCount = ArrayCount(dynamic_state)
+    };
+
+    // NOTE(Sleepster): Vertex Attribute stuff
+    VkVertexInputAttributeDescription attributes[] = {
+        [0] = {
+            .binding  = 0,
+            .format   = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .location = 0,
+            .offset   = offsetof(vertex_t, vPosition)
+        },
+        [1] = {
+            .binding  = 0,
+            .format   = VK_FORMAT_R32G32_SFLOAT, 
+            .location = 1,
+            .offset   = offsetof(vertex_t, vCorner)
+        },
+        [2] = {
+            .binding = 0,
+            .format   = VK_FORMAT_R32G32_SFLOAT, 
+            .location = 2,
+            .offset   = offsetof(vertex_t, vPadding)
+        },
+    };
+
+    VkVertexInputBindingDescription vertex_input_desc = {
+        .binding   = 0,
+        .stride    = sizeof(vertex_t),
+        .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
+    };
+
+    // NOTE(Sleepster): Vertex Attribute stuff
+    VkPipelineVertexInputStateCreateInfo vertex_input_state = {
+        .sType                           =  VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+        .vertexBindingDescriptionCount   =  1,
+        .pVertexBindingDescriptions      = &vertex_input_desc,
+        .vertexAttributeDescriptionCount =  ArrayCount(attributes),
+        .pVertexAttributeDescriptions    =  attributes,
+    };
+
+    VkPipelineInputAssemblyStateCreateInfo assembly_state = {
+        .sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+        .topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+        .primitiveRestartEnable = false,
+    };
+
+    VkPipelineLayoutCreateInfo pipeline_layout_info = {
+        .sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .setLayoutCount         = shader->descriptor_set_count,
+        .pSetLayouts            = shader->layouts,
+        .pushConstantRangeCount = shader->push_constant_count,
+        .pPushConstantRanges    = shader->push_constants,
+    };
+
+    vkAssert(vkCreatePipelineLayout(vulkan_context->device,
+                                   &pipeline_layout_info,
+                                    vulkan_context->cpu_allocation_callbacks,
+                                   &shader->pipeline_layout));
+
+    VkPipelineShaderStageCreateInfo stage_create_infos[MAX_VULKAN_SHADER_STAGES]; 
+    for(u32 stage_index = 0;
+        stage_index < shader->stage_count;
+        ++stage_index)
+    {
+        vulkan_shader_stage_t *stage = shader->stages + stage_index;
+        stage_create_infos[stage_index]   = stage->pipeline_stage_create_info;
+    }
+
+    VkViewport viewport = {
+        .x        =  (float32)0.0f,
+        .y        =  (float32)vulkan_context->current_window_height,
+        .width    =  (float32)vulkan_context->current_window_width,
+        .height   = -(float32)vulkan_context->current_window_height,
+        .minDepth =  0.0f,
+        .maxDepth =  1.0f
+    };
+
+    VkRect2D scissor = {
+        .extent = {
+            .width  = vulkan_context->current_window_width,
+            .height = vulkan_context->current_window_height
+        },
+    };
+
+    VkPipelineViewportStateCreateInfo viewport_info = {
+        .sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+        .viewportCount = 1,
+        .pViewports    = &viewport,
+        .pScissors     = &scissor,
+        .scissorCount  = 1
+    };
+
+    VkGraphicsPipelineCreateInfo pipeline_create_info = {
+        .sType               =  VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+        .pStages             =  stage_create_infos,
+        .stageCount          =  shader->stage_count,
+        .pVertexInputState   = &vertex_input_state,
+        .pInputAssemblyState = &assembly_state,
+        .pViewportState      = &viewport_info,
+        .pRasterizationState = &rasterization_state,
+        .pMultisampleState   = &multisampling_state,
+        .pDepthStencilState  = &depth_stencil,
+        .pColorBlendState    = &color_blend_state,
+        .pDynamicState       = &dynamic_state_data,
+        .layout              =  shader->pipeline_layout,
+        .renderPass          =  vulkan_context->primary_renderpass,
+        .subpass             =  0,
+        .basePipelineHandle  =  VK_NULL_HANDLE,
+        .basePipelineIndex   = -1,
+    };
+
+    VkResult success = vkCreateGraphicsPipelines(vulkan_context->device,
+                                                 VK_NULL_HANDLE,
+                                                 1,
+                                                &pipeline_create_info,
+                                                 vulkan_context->cpu_allocation_callbacks,
+                                                &shader->pipeline);
+    if(!vk_backend_result_is_success(success))
+    {
+        log_fatal("Failure to create the Vulkan Graphics Pipeline... Error: '%s'...\n", 
+                  vk_backend_vulkan_result_string(success, true));
+    }
+    else
+    {
+        log_info("Vulkan Graphics Pipeline created...\n");
+    }
+}
+
+/*
+=============
 vk_backend_init
 =============
 */
@@ -1504,6 +1763,14 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
 
     // NOTE(Sleepster): Generate the main vertex, index, and instanced_rendering buffers
     vk_backend_create_render_buffers(vulkan_context);
+
+    // NOTE(Sleepster): Generate the descriptor pools 
+    vk_backend_create_descriptor_pool(vulkan_context);
+
+    string_t shader_source = STR("shader_binaries/test_shader.spv");
+    string_t file_data     = c_file_read_entirety(shader_source);
+    vulkan_shader_t shader = vk_backend_shader_create(vulkan_context, file_data);
+    (void)shader;
 
     c_arena_destroy(&vulkan_context->initialization_arena);
     log_info("----- Vulkan backend initialized -----\n");
