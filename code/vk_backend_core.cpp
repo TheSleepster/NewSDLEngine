@@ -1296,7 +1296,7 @@ vk_backend_create_framebuffers(vulkan_context_t *vulkan_context)
 {
     vulkan_context->framebuffers = c_arena_push_array(&vulkan_context->swapchain_arena, VkFramebuffer, vulkan_context->swapchain.image_count);
     for(u32 frame_index = 0;
-        frame_index < MAX_FRAMES_IN_FLIGHT;
+        frame_index < vulkan_context->swapchain.image_count;
         ++frame_index)
     {
         VkImageView attachments[] = {
@@ -1766,11 +1766,6 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
 
     // NOTE(Sleepster): Generate the descriptor pools 
     vk_backend_create_descriptor_pool(vulkan_context);
-
-    string_t shader_source = STR("shader_binaries/test_shader.spv");
-    string_t file_data     = c_file_read_entirety(shader_source);
-    vulkan_shader_t shader = vk_backend_shader_create(vulkan_context, file_data);
-    (void)shader;
 
     c_arena_destroy(&vulkan_context->initialization_arena);
     log_info("----- Vulkan backend initialized -----\n");

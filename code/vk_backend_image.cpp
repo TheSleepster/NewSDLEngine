@@ -84,10 +84,10 @@ vk_backend_image_destroy(vulkan_context_t *vulkan_context, vulkan_image_t *image
     {
         vk_allocator_free_block(&vulkan_context->vulkan_allocator, image->allocation.parent_block);
     }
+    vkDestroyImage(vulkan_context->device, image->handle, vulkan_context->cpu_allocation_callbacks);
 #else
     vmaDestroyImage(vulkan_context->vulkan_allocator, image->handle, image->gpu_memory);
 #endif
-    vkDestroyImage(vulkan_context->device, image->handle, vulkan_context->cpu_allocation_callbacks);
 }
 
 /*

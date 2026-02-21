@@ -738,7 +738,17 @@ s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_at
             atlas->atlas_cursor_x = atlas_cursor_x + bitmap_width;
         }
         c_dynarray_clear(atlas->textures_to_merge);
-        vk_backend_image_create(vulkan_context, &atlas->texture);
+    
+        vulkan_image_info_t info = {};
+        info.data           = atlas->bitmap_data->pixels;
+        info.width          = atlas->bitmap_data->width;
+        info.height         = atlas->bitmap_data->height;
+        info.type           = VK_IMAGE_TYPE_2D;
+        info.mip_count      = 1;
+        info.sample_count   = 1;
+        info.initial_layout = VK_IMAGE_LAYOUT_UNDEFINED;;
+
+        atlas->texture.gpu_data = vk_backend_image_create(vulkan_context, &info);
     }
     else
     {

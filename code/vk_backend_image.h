@@ -8,8 +8,8 @@
 
 #define VK_BACKEND_IMAGE_H
 #include <vulkan/vulkan.h>
-
 #include <c_types.h>
+#include <c_string.h>
 
 #include <vk_backend_allocator.h>
 
@@ -33,14 +33,16 @@ struct vulkan_sampler_info_t
 
 struct vulkan_image_info_t
 {
-    u32 width;
-    u32 height; 
-    u32 usage;
-    u32 sample_count;
-    u32 mip_count;
-    u32 type;
-    u32 format;
-    u32 initial_layout;
+    u32      width;
+    u32      height; 
+    u32      usage;
+    u32      sample_count;
+    u32      mip_count;
+    u32      type;
+    u32      format;
+    u32      initial_layout;
+
+    string_t data;
 };
 
 struct vulkan_image_t
