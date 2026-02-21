@@ -32,6 +32,10 @@
 #include <asset_file_packer/jfd_asset_file.h>
 #include <meta/GENERATED_program_RTTI.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_PNG
+#include <stb/stb_image.h>
+
 /*===============================
   ========== TEXTURES ===========
   =============================== */
@@ -746,7 +750,9 @@ s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_at
         info.type           = VK_IMAGE_TYPE_2D;
         info.mip_count      = 1;
         info.sample_count   = 1;
-        info.initial_layout = VK_IMAGE_LAYOUT_UNDEFINED;;
+        info.initial_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+        info.usage          = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        info.format         = VK_FORMAT_R32G32B32A32_SFLOAT;
 
         atlas->texture.gpu_data = vk_backend_image_create(vulkan_context, &info);
     }

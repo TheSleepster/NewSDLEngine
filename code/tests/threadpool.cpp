@@ -66,26 +66,31 @@ main(void)
     threadpool_t *threadpool = Alloc(threadpool_t);
     c_threadpool_init(threadpool);
 
-    for(u32 job_index = 0;
-        job_index < 10000;
-        ++job_index)
+    for(u32 index = 0;
+        index < 100000;
+        ++index)
     {
-        test_data *data = (test_data*)malloc(sizeof(test_data));
-        data->thread_id     = job_index;
-        data->threadpool    = threadpool;
-        data->jobs_produced = false;
-        data->parent_id     = job_index;
-        c_threadpool_add_task(threadpool, data, &test_callback, TPTP_High);
+        for(u32 job_index = 0;
+            job_index < 10000;
+            ++job_index)
+        {
+            test_data *data = (test_data*)malloc(sizeof(test_data));
+            data->thread_id     = job_index;
+            data->threadpool    = threadpool;
+            data->jobs_produced = false;
+            data->parent_id     = job_index;
+            c_threadpool_add_task(threadpool, data, &test_callback, TPTP_High);
+        }
+        u64 last_tsc = SDL_GetPerformanceCounter();
+        c_threadpool_flush_task_queues(threadpool);
+
+        u64 current_tsc = SDL_GetPerformanceCounter();
+        u64 delta_tsc   = current_tsc - last_tsc;
+        last_tsc        = current_tsc;
+
+        float32 delta_time = (float32)(((float64)delta_tsc) / (float64)perf_count_freq);
+        log_info("FINISHED... Time taken: '%.2f' seconds...\n", delta_time);
     }
-    u64 last_tsc = SDL_GetPerformanceCounter();
-    c_threadpool_flush_task_queues(threadpool);
-
-    u64 current_tsc = SDL_GetPerformanceCounter();
-    u64 delta_tsc   = current_tsc - last_tsc;
-    last_tsc        = current_tsc;
-
-    float32 delta_time = (float32)(((float64)delta_tsc) / (float64)perf_count_freq);
-    log_info("FINISHED... Time taken: '%.2f' seconds...\n", delta_time);
 
     return(0);
 }

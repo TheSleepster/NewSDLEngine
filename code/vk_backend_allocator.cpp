@@ -243,6 +243,8 @@ vk_allocator_get_or_create_block
 =============
 */
 
+// TODO(Sleepster): There are many problems with this allocator. It's not actually bump allocating each block like you'd want.
+// It is instead just handing you the WHOLE BLOCK like you'd want if it was unique
 vulkan_allocation_block_t*
 vk_allocator_get_or_create_block(vulkan_allocator_t *allocator,
                                  u32                 memory_index,

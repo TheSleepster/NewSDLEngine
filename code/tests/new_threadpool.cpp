@@ -1,4 +1,4 @@
-/* ========================================================================
+/* =======================================================================
    $File: new_threadpool.cpp $
    $Date: February 08 2026 07:29 pm $
    $Revision: $
@@ -21,8 +21,8 @@
 #include <c_memory_arena.cpp>
 
 // TODO(Sleepster): 
-// - [ ] A manner with which to run work in batches and get the results of that completed work back from the threadpool
 // - [X] Work stealing
+// - [ ] A manner with which to run work in batches and get the results of that completed work back from the threadpool
 // - [ ] parallel_for should allow threads to instead add work to themselves in parallel
 
 #define MAX_WORK_ORDERS  (10000)
@@ -31,7 +31,7 @@
 
 typedef void work_order_fn(void *data);
 
-struct alignas(CACHE_LINE) work_order_t
+struct work_order_t
 {
     void           *data;
     work_order_fn  *function;
@@ -98,12 +98,13 @@ threadpool_init(threadpool_data_t *threadpool, u32 max_threads, u32 thread_alloc
         ZeroStruct(*thread);
 
         thread_allocator_t *allocator = &thread->allocator;
-        allocator->buffer  = AllocArray(byte, thread_allocator_size);
+        allocator->buffer  = (byte*)sys_allocate_memory(thread_allocator_size);
         allocator->size    = thread_allocator_size;
+
         thread->is_started = start_instantly;
         thread->threadpool = threadpool;
-
-        thread->handle = SDL_CreateThread(thread_proc_entry, null, thread);
+        thread->thread_id  = thread_index;
+        thread->handle     = SDL_CreateThread(thread_proc_entry, null, thread);
     }
 }
 
@@ -149,13 +150,12 @@ thread_push_work_order(worker_thread_t *thread, LambdaType lambda)
     work_order_t new_work_order = {}; 
     void *data = 0;
 
-    u32 allocation_size = Align8(sizeof(LambdaType));
+    u32 allocation_size = Align(sizeof(LambdaType), 64);
 
-    u32 used_offset = AtomicAdd(&thread->allocator.used, allocation_size); 
+    u32 used_offset = AtomicExchangeAdd32(&thread->allocator.used, allocation_size); 
     if(used_offset <= thread->allocator.size)
     {
-        data = thread->allocator.buffer + thread->allocator.used;
-        thread->allocator.used += allocation_size;
+        data = thread->allocator.buffer + used_offset;
     }
 
     Assert(data != null);
@@ -203,6 +203,7 @@ thread_pop_work_order(worker_thread_t *thread)
 
     u32 current_head = AtomicLoad(&thread->work_avaliable.head);
     u32 current_tail = AtomicLoad(&thread->work_avaliable.tail);
+
     if(current_head != current_tail)
     {
         u32 last_head = (current_head - 1) % MAX_WORK_ORDERS;
@@ -316,7 +317,7 @@ main(void)
     c_global_context_init();
 
     u64 perf_count_freq = SDL_GetPerformanceFrequency();
-    threadpool_data_t *threadpool = Alloc(threadpool_data_t);
+    threadpool_data_t *threadpool = (threadpool_data_t*)AllocSize(Align(sizeof(threadpool_data_t), 64));
 
     // TODO(Sleepster): sys_get_thread_count()
     u32 thread_count = sys_get_cpu_count() - 1;

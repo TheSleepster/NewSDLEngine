@@ -12,6 +12,11 @@
 
 #define DYNARRAY_HEADER_DEBUG_ID (0xC0FFEE)
 
+// TODO(Sleepster): 
+// - [ ] Replace this with an STB style header file
+// - [ ] Allow the user to specify custom allocate/free/resize functions
+// - [ ] Allow the user to assign an "on_resize" callback
+
 typedef struct dynarray_header 
 {
     u32   flags;

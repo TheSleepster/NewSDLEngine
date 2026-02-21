@@ -89,46 +89,17 @@ void
 vk_backend_buffer_copy_buffer(vulkan_context_t *vulkan_context,
                               vulkan_buffer_t  *source_buffer,
                               vulkan_buffer_t  *destination_buffer,
+                              VkCommandBuffer   scratch_buffer,
                               u64               source_offset,
                               u64               source_copy_size,
                               u64               destination_offset)
 {
-    VkCommandBuffer scratch_buffer;
-    VkCommandBufferAllocateInfo command_buffer_allocate_info = {
-        .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-        .commandPool        = vulkan_context->graphics_command_pool,
-        .commandBufferCount = 1,
-        .level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY
-    };
-    vkAssert(vkAllocateCommandBuffers(vulkan_context->device, &command_buffer_allocate_info, &scratch_buffer));
-
-    VkCommandBufferBeginInfo begin_info = {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
-    };
-    vkBeginCommandBuffer(scratch_buffer, &begin_info);
-
     VkBufferCopy copy_range = {};
     copy_range.srcOffset = source_offset;
     copy_range.dstOffset = destination_offset;
     copy_range.size      = source_copy_size;
 
     vkCmdCopyBuffer(scratch_buffer, source_buffer->handle, destination_buffer->handle, 1, &copy_range);
-    vkEndCommandBuffer(scratch_buffer);
-
-    VkSubmitInfo submit_info = {
-        .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-        .commandBufferCount = 1,
-        .pCommandBuffers    = &scratch_buffer
-    };
-
-    vkAssert(vkQueueSubmit(vulkan_context->graphics_queue, 1, &submit_info, 0));
-    vkAssert(vkQueueWaitIdle(vulkan_context->graphics_queue));
-
-    vkFreeCommandBuffers(vulkan_context->device, 
-                         vulkan_context->graphics_command_pool, 
-                         1, 
-                        &scratch_buffer);
     destination_buffer->used = source_copy_size;
 }
 
@@ -160,7 +131,7 @@ vk_backend_buffer_resize
 
 // TODO(Sleepster): Maybe optimize this so that if both buffers are HOST_VISIBLE it's just a memcpy, but meh
 void
-vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, u64 new_size)
+vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, VkCommandBuffer command_buffer, u64 new_size)
 {
     Assert(buffer->handle);
     Assert(new_size > buffer->size);
@@ -170,7 +141,7 @@ vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buff
                                                           buffer->allocation.allocation_type, 
                                                           buffer->allocation.parent_block->is_transient, 
                                                           buffer->allocation.parent_block->is_unique);
-    vk_backend_buffer_copy_buffer(vulkan_context, buffer, &new_buffer, 0, buffer->size, 0);
+    vk_backend_buffer_copy_buffer(vulkan_context, buffer, &new_buffer, command_buffer, 0, buffer->size, 0);
     vk_backend_buffer_destroy(vulkan_context, buffer);
 
     *buffer = new_buffer;

@@ -239,8 +239,9 @@ typedef struct material_instance
 
     // TODO(Sleepster): Does this even serve a purpose??? 
     u32                           renderer_effect_flags;
-
     u32                           shader_uniform_count;
+
+    render_pipeline_state_t       pipeline_state;
 #if 0
     VkDescriptorSet               sets[];
 #endif 

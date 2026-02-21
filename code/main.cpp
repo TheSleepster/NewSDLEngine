@@ -73,9 +73,9 @@ int
 main(int argc, char **argv)
 {
     game_state_t            *state          = Alloc(game_state_t);
+    asset_manager_t         *asset_manager  = Alloc(asset_manager_t);
 #if 0
     vulkan_render_context_t *render_context = Alloc(vulkan_render_context_t);
-    asset_manager_t         *asset_manager  = Alloc(asset_manager_t);
     render_state_t          *render_state   = Alloc(render_state_t);
 #endif
 
@@ -94,12 +94,25 @@ main(int argc, char **argv)
 
         vulkan_context_t context = {};
         vk_backend_init(&context, state->window);
-#if 0
         c_threadpool_init(&global_context->main_threadpool);
 
         s_asset_manager_init(asset_manager);
         s_asset_manager_load_asset_file(asset_manager, STR("asset_data.jfd"));
 
+        asset_manager->vulkan_context = &context;
+
+        asset_handle_t default_texture  = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
+        asset_handle_t default_shader   = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_shader"));
+        asset_handle_t default_material = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_material_archetype"));
+        (void)default_shader;
+        (void)default_material;
+
+        texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32, 32);
+        s_texture_atlas_add_texture(atlas, &default_texture);
+        s_texture_atlas_pack_added_textures(&context, atlas);
+
+        s_nt_socket_api_init(state, argc, argv);
+#if 0
         render_context->window = state->window;
         r_renderer_init(render_context, render_state, state->window_size);
 

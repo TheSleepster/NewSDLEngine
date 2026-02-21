@@ -57,6 +57,7 @@ void
 vk_backend_buffer_copy_buffer(vulkan_context_t *vulkan_context,
                               vulkan_buffer_t  *source_buffer,
                               vulkan_buffer_t  *destination_buffer,
+                              VkCommandBuffer   scratch_buffer,
                               u64               source_offset,
                               u64               source_copy_size,
                               u64               destination_offset);
@@ -67,7 +68,7 @@ vk_backend_buffer_copy_data(vulkan_buffer_t *buffer,
                             u64              offset);
 
 void                    vk_backend_buffer_destroy(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
-void                    vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, u64 new_size);
+void                    vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, VkCommandBuffer command_buffer, u64 new_size);
 vulkan_staging_buffer_t vk_backend_staging_buffer_create(vulkan_context_t *vulkan_context, u64 size, VkBufferUsageFlags usage_flags, vulkan_allocation_usage_type_t memory_type);
 void                    vk_backend_buffer_upload_staged_data(vulkan_context_t *vulkan_context, VkCommandBuffer command_buffer, vulkan_buffer_t *target_buffer);
 void                    vk_backend_buffer_flush_staging_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer   command_buffer);

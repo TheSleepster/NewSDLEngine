@@ -142,90 +142,92 @@ struct swapchain_info_t
 
 struct vulkan_context_t 
 {
-    memory_arena_t                     initialization_arena;
-    memory_arena_t                     swapchain_arena;
-    memory_arena_t                     permanent_arena;
-    memory_arena_t                     frame_arena;
+    memory_arena_t                      initialization_arena;
+    memory_arena_t                      swapchain_arena;
+    memory_arena_t                      permanent_arena;
+    memory_arena_t                      frame_arena;
 
-    SDL_Window                        *window;
-    u32                                current_window_width;
-    u32                                current_window_height;
-    u32                                last_window_width;
-    u32                                last_window_height;
-    u64                                window_size_generation;
-    u64                                last_window_size_generation;
+    SDL_Window                         *window;
+    u32                                 current_window_width;
+    u32                                 current_window_height;
+    u32                                 last_window_width;
+    u32                                 last_window_height;
+    u64                                 window_size_generation;
+    u64                                 last_window_size_generation;
 
-    u32                                current_frame_index;
-    u32                                current_image_index;
+    u32                                 current_frame_index;
+    u32                                 current_image_index;
 
-    VkInstance                         instance;
-    VkSurfaceKHR                       render_surface;
+    VkInstance                          instance;
+    VkSurfaceKHR                        render_surface;
 
-    VkDebugUtilsMessengerEXT           debug_messenger;
-    VkAllocationCallbacks             *cpu_allocation_callbacks;
+    VkDebugUtilsMessengerEXT            debug_messenger;
+    VkAllocationCallbacks              *cpu_allocation_callbacks;
 #if 0
-    VmaAllocator                       vulkan_allocator;
+    VmaAllocator                        vulkan_allocator;
 #else
-    vulkan_allocator_t                 vulkan_allocator;
+    vulkan_allocator_t                  vulkan_allocator;
 #endif
 
-    gpu_info_t                         gpu;
-    VkDevice                           device;
+    gpu_info_t                          gpu;
+    VkDevice                            device;
 
-    s32                                graphics_queue_family_idx;
-    s32                                present_queue_family_idx;
-    s32                                transfer_queue_family_idx;
-    s32                                compute_queue_family_idx;
+    s32                                 graphics_queue_family_idx;
+    s32                                 present_queue_family_idx;
+    s32                                 transfer_queue_family_idx;
+    s32                                 compute_queue_family_idx;
 
-    VkCommandPool                      graphics_command_pool;
+    VkCommandPool                       graphics_command_pool;
 
-    VkQueue	                           graphics_queue;
-    VkQueue                            present_queue;
-    VkQueue                            transfer_queue;
-    VkQueue                            compute_queue;
+    VkQueue	                            graphics_queue;
+    VkQueue                             present_queue;
+    VkQueue                             transfer_queue;
+    VkQueue                             compute_queue;
 
-    VkFormat                           depth_format;
-    swapchain_info_t                   swapchain;
-    VkImage                           *swapchain_images;
-    VkImageView                       *swapchain_views;
-    vulkan_image_t                     depth_buffer;
+    VkFormat                            depth_format;
+    swapchain_info_t                    swapchain;
+    VkImage                            *swapchain_images;
+    VkImageView                        *swapchain_views;
+    vulkan_image_t                      depth_buffer;
 
-    bool32                             rebuilding_swapchain;
+    bool32                              rebuilding_swapchain;
 
-    VkCommandBuffer                   *frame_command_buffers;
-    bool32                            *frame_command_buffer_recorded;
-    VkFence                           *frame_command_buffer_fences;
+    VkCommandBuffer                    *frame_command_buffers;
+    bool32                             *frame_command_buffer_recorded;
+    VkFence                            *frame_command_buffer_fences;
 
-    VkSemaphore                       *swapchain_image_acquired_semaphores;
-    VkSemaphore                       *render_complete_semaphores;
+    VkSemaphore                        *swapchain_image_acquired_semaphores;
+    VkSemaphore                        *render_complete_semaphores;
 
-    VkFence                           *image_render_idle_fences;
-    VkFence                          **image_in_flight_fences;
+    VkFence                            *image_render_idle_fences;
+    VkFence                           **image_in_flight_fences;
+ 
+    VkFence                           **image_in_flight_fence;
+    VkFence                            *image_render_idle_fence;
+    VkSemaphore                        *render_complete_semaphore;
+    VkSemaphore                        *image_acquired_semaphore;
+    VkCommandBuffer                    *render_command_buffer;
+    VkFramebuffer                      *render_framebuffer;
 
-    VkFence                          **image_in_flight_fence;
-    VkFence                           *image_render_idle_fence;
-    VkSemaphore                       *render_complete_semaphore;
-    VkSemaphore                       *image_acquired_semaphore;
-    VkCommandBuffer                   *render_command_buffer;
-    VkFramebuffer                     *render_framebuffer;
+    VkDescriptorPool                    first_descriptor_pool;
 
-    VkDescriptorPool                   first_descriptor_pool;
-
-    VkRenderPass                       primary_renderpass;
-    VkFramebuffer                     *framebuffers;
+    VkRenderPass                        primary_renderpass;
+    VkFramebuffer                      *framebuffers;
 
     // NOTE(Sleepster): We don't really need these, they're static and only modified when created. 
-    vulkan_buffer_t                    main_vertex_buffer;
-    vulkan_buffer_t                    main_index_buffer;
-    vulkan_buffer_t                    main_instance_buffer[MAX_FRAMES_IN_FLIGHT];
-    vulkan_buffer_t                    frame_render_buffer[MAX_FRAMES_IN_FLIGHT];
+    vulkan_buffer_t                     main_vertex_buffer;
+    vulkan_buffer_t                     main_index_buffer;
+    vulkan_buffer_t                     main_instance_buffer[MAX_FRAMES_IN_FLIGHT];
+    vulkan_buffer_t                     frame_render_buffer[MAX_FRAMES_IN_FLIGHT];
+
+    vulkan_buffer_t                     scratch_buffer;
 
     // NOTE(Sleepster): Each staging buffer is a large singular buffer with which we stage by incrementing the offset value of the buffer
     // and later uploading at once when we flush the buffer. However, if the buffer gets full before the designated "flush" time, then we
     // flush it ourselves
-    vulkan_staging_buffer_t           staging_buffers[MAX_FRAMES_IN_FLIGHT];
-    DynArray_t(vulkan_staging_info_t) staging_infos;
-    u32                               next_staging_info;
+    vulkan_staging_buffer_t             staging_buffers[MAX_FRAMES_IN_FLIGHT];
+    DynArray_t(vulkan_staging_info_t)   staging_infos;
+    u32                                 next_staging_info;
 };
 
 #define vkAssert(result) ({                                                \
@@ -244,6 +246,9 @@ void        vk_backend_render_frame(vulkan_context_t *vulkan_context);
 
 struct vulkan_shader_t;
 void        vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, bool8 wireframe);
+
+VkCommandBuffer vk_backend_get_and_begin_scratch_command_buffer(vulkan_context_t *vulkan_context, bool8 is_primary);
+void            vk_backend_submit_and_release_scratch_command_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer *command_buffer);
 
 #endif // VK_BACKEND_CORE_H
 

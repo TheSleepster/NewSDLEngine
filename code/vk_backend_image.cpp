@@ -9,6 +9,44 @@
 
 /*
 =============
+vk_backend_image_update_from_buffer
+=============
+*/
+
+void
+vk_backend_image_update_from_buffer(vulkan_context_t *vulkan_context, 
+                                    vulkan_image_t   *image, 
+                                    vulkan_buffer_t  *buffer, 
+                                    VkCommandBuffer   command_buffer)
+{
+    VkBufferImageCopy copy_data = {
+        .bufferOffset      = 0,
+        .bufferRowLength   = 0,
+        .bufferImageHeight = 0,
+        .imageSubresource = {
+            .layerCount     = 1,
+            .baseArrayLayer = 0,
+            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+            .mipLevel       = 0,
+        },
+        .imageExtent = {
+            .depth  = 1,
+            .width  = image->width,
+            .height = image->height
+        }
+    };
+
+    // TODO(Sleepster): Should be configurable 
+    vkCmdCopyBufferToImage(command_buffer, 
+                           buffer->handle, 
+                           image->handle, 
+                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+                           1, 
+                           &copy_data);
+}
+
+/*
+=============
 vk_backend_image_create
 =============
 */
@@ -54,6 +92,35 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
         Expect(false, "Failed to bind the memory for this image...\n");
     }
 
+    if(image_info->data.data != null)
+    {
+        VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
+        vk_backend_image_change_layout(vulkan_context, &result, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, scratch_buffer);
+
+        // TODO(Sleepster): This is wastful since the allocation from the allocator is too big and gives us the WHOLE block
+        // even when we just want to bump allocate from it...
+        if(vulkan_context->scratch_buffer.size < result.allocation.allocation_size)
+        {
+            //vk_backend_buffer_resize(vulkan_context, &vulkan_context->scratch_buffer, scratch_buffer, result.allocation.allocation_size);
+        }
+        // TODO(Sleepster): For now we assume 32bit colors... bad...
+        u32 allocation_size = (image_info->width * image_info->height) * 4;
+        vulkan_buffer_t copy_buffer = vk_backend_buffer_create(vulkan_context, 
+                                                               allocation_size, 
+                                                               VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
+                                                               VULKAN_MEMORY_USAGE_CPU_TO_GPU, 
+                                                               false, 
+                                                               false);
+
+        vk_backend_buffer_copy_data(&vulkan_context->scratch_buffer, image_info->data.data, image_info->data.count, 0);
+        vk_backend_image_update_from_buffer(vulkan_context, &result, &copy_buffer, scratch_buffer);
+
+        // TODO(Sleepster): might wanna handle this more gracefully. Should we just let the image info tell us what the FINAL format should be?
+        vk_backend_image_change_layout(vulkan_context, &result, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, scratch_buffer);
+        vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_buffer);
+
+        vk_backend_buffer_destroy(vulkan_context, &copy_buffer);
+    }
 #if 0
     VmaAllocationCreateInfo alloc_create_info = {};
     alloc_create_info.usage = VMA_MEMORY_USAGE_AUTO;

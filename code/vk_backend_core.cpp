@@ -203,6 +203,57 @@ vk_backend_vulkan_result_string(VkResult result, bool8 get_extended)
 
 /*
 =============
+vk_backend_get_scratch_command_buffer
+=============
+*/
+
+VkCommandBuffer
+vk_backend_get_and_begin_scratch_command_buffer(vulkan_context_t *vulkan_context, bool8 is_primary)
+{
+    VkCommandBuffer result;
+    VkCommandBufferAllocateInfo command_buffer_allocate_info = {
+        .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .commandPool        = vulkan_context->graphics_command_pool,
+        .commandBufferCount = 1,
+        .level              = is_primary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY
+    };
+    vkAssert(vkAllocateCommandBuffers(vulkan_context->device, &command_buffer_allocate_info, &result));
+
+    VkCommandBufferBeginInfo begin_info = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
+    };
+    vkBeginCommandBuffer(result, &begin_info);
+
+    return(result);
+}
+
+/*
+=============
+vk_backend_release_scratch_command_buffer
+=============
+*/
+
+void
+vk_backend_submit_and_release_scratch_command_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer *command_buffer)
+{
+    vkEndCommandBuffer(*command_buffer);
+    VkSubmitInfo submit_info = {
+        .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .commandBufferCount = 1,
+        .pCommandBuffers    = command_buffer
+    };
+
+    vkAssert(vkQueueSubmit(vulkan_context->graphics_queue, 1, &submit_info, 0));
+    vkAssert(vkQueueWaitIdle(vulkan_context->graphics_queue));
+    vkFreeCommandBuffers(vulkan_context->device, 
+                         vulkan_context->graphics_command_pool, 
+                         1, 
+                         command_buffer);
+}
+
+/*
+=============
 vk_backend_find_memory_index
 =============
 */
@@ -1358,6 +1409,8 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
     vulkan_context->main_vertex_buffer   = vk_backend_buffer_create(vulkan_context, sizeof(vertex_t) * 4,                       vertex_buffer_usage_bits, VULKAN_MEMORY_USAGE_GPU_ONLY, false, false);
     vulkan_context->main_index_buffer    = vk_backend_buffer_create(vulkan_context, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, index_buffer_usage_bits,  VULKAN_MEMORY_USAGE_GPU_ONLY, false, false);
     vulkan_context->staging_infos        = c_dynarray_create(vulkan_staging_info_t);
+
+    vulkan_context->scratch_buffer       = vk_backend_buffer_create(vulkan_context, MB(10), VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT,  VULKAN_MEMORY_USAGE_CPU_TO_GPU, false, false);
 
     // NOTE(Sleepster): Create the frame-based buffers 
     for(u32 index = 0;
