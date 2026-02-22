@@ -7,6 +7,7 @@
 #include <vk_backend_core.h>
 #include <vk_backend_allocator.h>
 
+internal_api u64 get_device_heap_size(void *device, u32 memory_index);
 /*
 =============
 find_memory_index
@@ -276,14 +277,16 @@ vk_allocator_get_or_create_block(vulkan_allocator_t *allocator,
 
     ZeroStruct(*valid_block);
 
+    u32 block_allocation_size = get_device_heap_size(allocator->gpu_info, memory_index);
+
     valid_block->DEBUG_id     = VK_ALLOCATOR_DEBUG_ID;
-    valid_block->block_size   = allocator->default_block_size > allocation_size ? allocator->default_block_size : allocation_size;
+    valid_block->block_size   = block_allocation_size;
     valid_block->memory_index = memory_index;
 
     VkMemoryAllocateInfo info = {};
     info.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     info.memoryTypeIndex = memory_index;
-    info.allocationSize  = Max(valid_block->block_size, allocation_size);
+    info.allocationSize  = block_allocation_size;
     vkAllocateMemory(allocator->device, &info, allocator->cpu_allocation_callbacks, &valid_block->memory);
     Assert(valid_block->memory);
 
@@ -345,7 +348,9 @@ get_device_heap_size(void *device, u32 memory_index)
 {
     u64 result = 0;
     gpu_info_t *gpu_info = (gpu_info_t*)device;
-    result = gpu_info->memory_properties.memoryHeaps[memory_index].size;
+    u32 heap_index = gpu_info->memory_properties.memoryTypes[memory_index].heapIndex;
+    
+    result = gpu_info->memory_properties.memoryHeaps[heap_index].size;
 
     return(result);
 }
@@ -407,7 +412,7 @@ vk_allocator_allocate(vulkan_allocator_t            *allocator,
     valid_block->allocation_type  = type;
 
     result.parent_block    = valid_block;
-    result.allocation_size = allocation_size;
+    result.allocation_size = requirements->size;
     result.offset          = offset;
     result.mapped_data     = valid_block->persistent_mapped_ptr + offset;
     result.allocation_type = type;
