@@ -47,6 +47,32 @@ vk_backend_image_update_from_buffer(vulkan_context_t *vulkan_context,
 
 /*
 =============
+vk_backend_image_update_data
+=============
+*/
+void
+vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *image, VkMemoryRequirements memory_requirements)
+{
+    vulkan_image_info_t *image_info = &image->info;
+
+    VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
+    vk_backend_image_change_layout(vulkan_context, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, scratch_buffer);
+    vulkan_buffer_t copy_buffer = vk_backend_buffer_create(vulkan_context, 
+                                                           memory_requirements.size,
+                                                           VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
+                                                           VULKAN_MEMORY_USAGE_CPU_TO_GPU); 
+
+    vk_backend_buffer_copy_data(&copy_buffer, image_info->data.data, image_info->data.count, 0);
+    vk_backend_image_update_from_buffer(vulkan_context, image, &copy_buffer, scratch_buffer);
+
+    vk_backend_image_change_layout(vulkan_context, image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, scratch_buffer);
+    vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_buffer);
+
+    vk_backend_buffer_destroy(vulkan_context, &copy_buffer);
+}
+
+/*
+=============
 vk_backend_image_create
 =============
 */
@@ -83,10 +109,8 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
     vkGetImageMemoryRequirements(vulkan_context->device, result.handle, &memory_requirements);
     result.allocation = vk_allocator_allocate(&vulkan_context->vulkan_allocator, 
                                               &memory_requirements, 
-                                              VULKAN_MEMORY_USAGE_GPU_ONLY, 
-                                              false, 
-                                              false);
-    VkResult code = vkBindImageMemory(vulkan_context->device, result.handle, result.allocation.parent_block->memory, result.allocation.offset);
+                                              VULKAN_MEMORY_USAGE_GPU_ONLY);
+    VkResult code = vkBindImageMemory(vulkan_context->device, result.handle, result.allocation.memory, result.allocation.offset);
     if(!vk_backend_result_is_success(code))
     {
         Expect(false, "Failed to bind the memory for this image...\n");
@@ -94,33 +118,9 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
 
     if(image_info->data.data != null)
     {
-        VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
-        vk_backend_image_change_layout(vulkan_context, &result, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, scratch_buffer);
-
-        // TODO(Sleepster): This is wastful since the allocation from the allocator is too big and gives us the WHOLE block
-        // even when we just want to bump allocate from it...
-        if(vulkan_context->scratch_buffer.size < result.allocation.allocation_size)
-        {
-            //vk_backend_buffer_resize(vulkan_context, &vulkan_context->scratch_buffer, scratch_buffer, result.allocation.allocation_size);
-        }
-        // TODO(Sleepster): For now we assume 32bit colors... bad...
-        u32 allocation_size = (image_info->width * image_info->height) * 4;
-        vulkan_buffer_t copy_buffer = vk_backend_buffer_create(vulkan_context, 
-                                                               allocation_size, 
-                                                               VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
-                                                               VULKAN_MEMORY_USAGE_CPU_TO_GPU, 
-                                                               false, 
-                                                               false);
-
-        vk_backend_buffer_copy_data(&vulkan_context->scratch_buffer, image_info->data.data, image_info->data.count, 0);
-        vk_backend_image_update_from_buffer(vulkan_context, &result, &copy_buffer, scratch_buffer);
-
-        // TODO(Sleepster): might wanna handle this more gracefully. Should we just let the image info tell us what the FINAL format should be?
-        vk_backend_image_change_layout(vulkan_context, &result, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, scratch_buffer);
-        vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_buffer);
-
-        vk_backend_buffer_destroy(vulkan_context, &copy_buffer);
+        vk_backend_image_update_data(vulkan_context, &result, memory_requirements);
     }
+
 #if 0
     VmaAllocationCreateInfo alloc_create_info = {};
     alloc_create_info.usage = VMA_MEMORY_USAGE_AUTO;
@@ -145,12 +145,8 @@ void
 vk_backend_image_destroy(vulkan_context_t *vulkan_context, vulkan_image_t *image)
 {
     Assert(image);
-    Assert(image->allocation.parent_block);
 #if 1
-    if(image->allocation.parent_block->is_unique)
-    {
-        vk_allocator_free_block(&vulkan_context->vulkan_allocator, image->allocation.parent_block);
-    }
+    vk_allocator_free(&vulkan_context->vulkan_allocator, &image->allocation);
     vkDestroyImage(vulkan_context->device, image->handle, vulkan_context->cpu_allocation_callbacks);
 #else
     vmaDestroyImage(vulkan_context->vulkan_allocator, image->handle, image->gpu_memory);

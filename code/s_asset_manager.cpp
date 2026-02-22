@@ -323,8 +323,9 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
     // Right now my assumption is that if you want to make use of this material, you should just load the shader now
     // rather than wait for way later to load it when we're rendering. Seems bad to delay it that long... But who knows
     // Maybe this is bad and that's a better idea.
-    archetype.ID            = c_fnv_hash_value(archetype.name.data, archetype.name.count);
-    archetype.shader_handle = s_asset_manager_acquire_asset_handle(asset_manager, archetype.shader_binary_name);
+    archetype.ID              = c_fnv_hash_value(archetype.name.data, archetype.name.count);
+    archetype.shader_handle   = s_asset_manager_acquire_asset_handle(asset_manager, archetype.shader_binary_name);
+    vk_backend_allocate_descriptor_sets(asset_manager->vulkan_context, &archetype);
 
     result.material_type      = SMT_Archetype;
     result.archetype          = archetype;
@@ -752,9 +753,16 @@ s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_at
         info.sample_count   = 1;
         info.initial_layout = VK_IMAGE_LAYOUT_UNDEFINED;
         info.usage          = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-        info.format         = VK_FORMAT_R32G32B32A32_SFLOAT;
+        info.format         = VK_FORMAT_R8G8B8A8_SRGB;
 
-        atlas->texture.gpu_data = vk_backend_image_create(vulkan_context, &info);
+        if(atlas->texture.gpu_data.handle == null)
+        {
+            atlas->texture.gpu_data = vk_backend_image_create(vulkan_context, &info);
+        }
+        else
+        {
+            vk_backend_image_update_data(vulkan_context, &atlas->texture.gpu_data, atlas->texture.gpu_data.allocation.memory_requirements);
+        }
     }
     else
     {

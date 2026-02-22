@@ -63,6 +63,7 @@ struct vulkan_image_t
 };
 
 vulkan_image_t vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *image_info);
+void           vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *image, VkMemoryRequirements memory_requirements);
 void           vk_backend_image_destroy(vulkan_context_t *vulkan_context, vulkan_image_t *image);
 void           vk_backend_image_change_layout(vulkan_context_t *vulkan_context,  vulkan_image_t *image, VkImageLayout new_layout, VkCommandBuffer command_buffer);
 VkSampler      vk_backend_sampler_create(vulkan_context_t *vulkan_context, vulkan_sampler_info_t *info);

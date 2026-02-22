@@ -127,233 +127,9 @@ vk_allocator_destroy
 void
 vk_allocator_destroy(vulkan_allocator_t *allocator)
 {
-    vk_allocator_reset(allocator);
-    vk_allocator_clear_free_list(allocator);
     c_arena_destroy(&allocator->block_allocator);
 }
 
-/*
-=============
-vk_allocator_free_block
-=============
-*/
-
-void
-vk_allocator_free_block(vulkan_allocator_t        *allocator,
-                        vulkan_allocation_block_t *block_to_free)
-{
-    Assert(block_to_free->DEBUG_id == VK_ALLOCATOR_DEBUG_ID);
-
-    block_to_free->used = 0;
-
-    vulkan_allocation_block_t *next_block = block_to_free->next_block;
-    vulkan_allocation_block_t *prev_block = block_to_free->prev_block;
-
-    if(prev_block) prev_block->next_block = next_block;
-    if(next_block) next_block->prev_block = prev_block;
-
-    if(allocator->first_free_block == null)
-    {
-        allocator->first_free_block = block_to_free;
-    }
-    else
-    {
-        block_to_free->next_block   = allocator->first_free_block;
-        allocator->first_free_block = block_to_free;
-    }
-}
-
-/*
-=============
-vk_allocator_clear_free_list
-=============
-*/
-
-void
-vk_allocator_clear_free_list(vulkan_allocator_t *allocator)
-{
-    for(vulkan_allocation_block_t *current_block = allocator->first_free_block;
-        current_block;
-        current_block = current_block->next_block)
-    {
-        if(current_block->persistent_mapped_ptr)
-        {
-            vkUnmapMemory(allocator->device, current_block->memory);
-            current_block->persistent_mapped_ptr = null;
-        }
-
-        current_block->memory_index = -1;
-        vkFreeMemory(allocator->device, current_block->memory, allocator->cpu_allocation_callbacks);
-    }
-}
-
-/*
-=============
-vk_allocator_clear_transient_blocks
-=============
-*/
-
-void
-vk_allocator_clear_transient_blocks(vulkan_allocator_t *allocator)
-{
-    for(vulkan_allocation_block_t *current_block = allocator->first_transient_block;
-        current_block;
-        current_block = current_block->next_block)
-    {
-        current_block->used = 0;
-        vk_allocator_free_block(allocator, current_block);
-    }
-}
-
-/*
-=============
-vk_allocator_reset
-=============
-*/
-
-void
-vk_allocator_reset(vulkan_allocator_t *allocator)
-{
-    for(vulkan_allocation_block_t *current_block = allocator->first_allocated_block;
-        current_block;
-        current_block = current_block->next_block)
-    {
-        vk_allocator_free_block(allocator, current_block);
-    }
-
-    for(vulkan_allocation_block_t *current_block = allocator->first_transient_block;
-        current_block;
-        current_block = current_block->next_block)
-    {
-        vk_allocator_free_block(allocator, current_block);
-    }
-
-    vk_allocator_clear_free_list(allocator);
-
-    allocator->first_allocated_block = null;
-    allocator->last_allocated_block  = null;
-    allocator->first_transient_block = null;
-    allocator->last_transient_block  = null;
-    allocator->first_free_block      = null;
-    c_arena_reset(&allocator->block_allocator);
-}
-
-/*
-=============
-vk_allocator_get_or_create_block
-=============
-*/
-
-// TODO(Sleepster): There are many problems with this allocator. It's not actually bump allocating each block like you'd want.
-// It is instead just handing you the WHOLE BLOCK like you'd want if it was unique
-vulkan_allocation_block_t*
-vk_allocator_get_or_create_block(vulkan_allocator_t *allocator,
-                                 u32                 memory_index,
-                                 u32                 allocation_size,
-                                 bool8               temporary_allocation)
-{
-    vulkan_allocation_block_t *valid_block = null;
-    for(vulkan_allocation_block_t *current_block = allocator->first_free_block;
-        current_block;
-        current_block = current_block->next_block)
-    {
-        if((s32)current_block->memory_index == -1 && !current_block->is_unique)
-        {
-            vulkan_allocation_block_t *prev_block = current_block->prev_block;
-            vulkan_allocation_block_t *next_block = current_block->next_block;
-
-            valid_block = current_block;
-
-            if(prev_block) prev_block->next_block = next_block;
-            if(next_block) next_block->prev_block = prev_block;
-
-            break;
-        }
-    }
-    if(valid_block == null)
-    {
-        valid_block = c_arena_push_struct(&allocator->block_allocator, vulkan_allocation_block_t);
-    }
-
-    ZeroStruct(*valid_block);
-
-    u32 block_allocation_size = get_device_heap_size(allocator->gpu_info, memory_index);
-
-    valid_block->DEBUG_id     = VK_ALLOCATOR_DEBUG_ID;
-    valid_block->block_size   = block_allocation_size;
-    valid_block->memory_index = memory_index;
-
-    VkMemoryAllocateInfo info = {};
-    info.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    info.memoryTypeIndex = memory_index;
-    info.allocationSize  = block_allocation_size;
-    vkAllocateMemory(allocator->device, &info, allocator->cpu_allocation_callbacks, &valid_block->memory);
-    Assert(valid_block->memory);
-
-    gpu_info_t *gpu_info = (gpu_info_t *)allocator->gpu_info;
-    VkMemoryPropertyFlags flags = gpu_info->memory_properties.memoryTypes[memory_index].propertyFlags;
-
-    // NOTE(Sleepster): 
-    // "Keeping your memory persistently mapped is generally OK in Vulkan. You don't need to unmap it before using its data on the GPU."
-    // https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/memory_mapping.html
-    valid_block->memory_flags = flags;
-    if(flags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
-    {
-        vkMapMemory(allocator->device, valid_block->memory, 0, valid_block->block_size, 0, (void**)&valid_block->persistent_mapped_ptr);
-    }
-
-    // NOTE(Sleepster): Chain the new block
-    if(temporary_allocation)
-    {
-        if(allocator->first_transient_block == null)
-        {
-            allocator->first_transient_block = valid_block;
-        }
-
-        if(allocator->last_transient_block != null)
-        {
-            allocator->last_transient_block->next_block = valid_block;
-            valid_block->prev_block = allocator->last_transient_block;
-            valid_block->next_block = null;
-        }
-        allocator->last_transient_block = valid_block;
-    }
-    else
-    {
-        if(allocator->first_allocated_block == null)
-        {
-            allocator->first_allocated_block = valid_block;
-        }
-
-        if(allocator->last_allocated_block != null)
-        {
-            allocator->last_allocated_block->next_block = valid_block;
-            valid_block->prev_block = allocator->last_allocated_block;
-            valid_block->next_block = null;
-        }
-        allocator->last_allocated_block = valid_block;
-    }
-
-    return(valid_block);
-}
-
-/*
-=============
-get_device_heap_size
-=============
-*/
-
-internal_api u64
-get_device_heap_size(void *device, u32 memory_index)
-{
-    u64 result = 0;
-    gpu_info_t *gpu_info = (gpu_info_t*)device;
-    u32 heap_index = gpu_info->memory_properties.memoryTypes[memory_index].heapIndex;
-    
-    result = gpu_info->memory_properties.memoryHeaps[heap_index].size;
-
-    return(result);
-}
 
 /*
 =============
@@ -364,9 +140,7 @@ vk_allocator_allocate
 vulkan_allocation_info_t
 vk_allocator_allocate(vulkan_allocator_t            *allocator, 
                       VkMemoryRequirements          *requirements, 
-                      vulkan_allocation_usage_type_t type,
-                      bool8                          use_unique_block,
-                      bool8                          temporary_allocation)
+                      vulkan_allocation_usage_type_t type)
 {
     vulkan_allocation_info_t result = {};
 
@@ -375,47 +149,49 @@ vk_allocator_allocate(vulkan_allocator_t            *allocator,
     {
         Expect(false, "Failed to find the correct memory index for this allocation...\n");
     }
-    u32 allocation_size = Align(requirements->size, requirements->alignment);
-
-    vulkan_allocation_block_t *valid_block = null;
-    if(!use_unique_block)
+    VkMemoryAllocateInfo memory_allocation_info = {};
+    memory_allocation_info.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memory_allocation_info.memoryTypeIndex = memory_index;
+    memory_allocation_info.allocationSize  = requirements->size;
+    VkResult code = vkAllocateMemory(allocator->device, &memory_allocation_info, allocator->cpu_allocation_callbacks, &result.memory);
+    if(!vk_backend_result_is_success(code))
     {
-        vulkan_allocation_block_t *first_block = temporary_allocation ? 
-                                                 allocator->first_transient_block : 
-                                                 allocator->first_allocated_block;
-        for(vulkan_allocation_block_t *current_block = first_block;
-            current_block;
-            current_block = current_block->next_block)
-        {
-            if(current_block->memory_index == (u32)memory_index)
-            {
-                if(current_block->block_size - current_block->used >= allocation_size)
-                {
-                    valid_block = current_block;
-                    break;
-                }
-            }
-        }
+        Expect(false, "Failed to allocate memory for the depth buffer...\n");
     }
-    if(valid_block == null)
-    {
-        valid_block = vk_allocator_get_or_create_block(allocator, memory_index, allocation_size, temporary_allocation);
-        valid_block->is_unique = use_unique_block;
-    }
-    Assert(valid_block->DEBUG_id == VK_ALLOCATOR_DEBUG_ID);
-    u32 offset = Align(valid_block->used, requirements->alignment);
 
-    valid_block->used             = offset + requirements->size;
-    valid_block->is_transient     = temporary_allocation;
-    valid_block->is_unique        = use_unique_block;
-    valid_block->parent_allocator = allocator;
-    valid_block->allocation_type  = type;
-
-    result.parent_block    = valid_block;
     result.allocation_size = requirements->size;
-    result.offset          = offset;
-    result.mapped_data     = valid_block->persistent_mapped_ptr + offset;
     result.allocation_type = type;
+    result.offset          = 0;
+
+    gpu_info_t *gpu_info = (gpu_info_t *)allocator->gpu_info;
+    VkMemoryPropertyFlags flags = gpu_info->memory_properties.memoryTypes[memory_index].propertyFlags;
+    result.allocation_flags     = flags;
+    result.memory_requirements  = *requirements;
+
+    // NOTE(Sleepster): 
+    // "Keeping your memory persistently mapped is generally OK in Vulkan. You don't need to unmap it before using its data on the GPU."
+    // https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/memory_mapping.html
+    if(flags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
+    {
+        vkMapMemory(allocator->device, result.memory, 0, result.allocation_size, 0, (void**)&result.mapped_data);
+    }
 
     return(result);
+}
+
+/*
+=============
+vk_allocator_free
+=============
+*/
+
+void
+vk_allocator_free(vulkan_allocator_t *allocator, vulkan_allocation_info_t *info)
+{
+    if(info->allocation_flags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
+    {
+        vkUnmapMemory(allocator->device, info->memory);
+    }
+    vkFreeMemory(allocator->device, info->memory, allocator->cpu_allocation_callbacks);
+    ZeroStruct(*info);
 }

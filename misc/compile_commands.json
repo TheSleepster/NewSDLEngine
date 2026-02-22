@@ -50,11 +50,11 @@
       "-o",
       "../build/s_asset_manager.o"
     ],
-    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
+    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
     "output": "../build/s_asset_manager.o"
   },
   {
-    "file": "vk_backend_allocator.cpp",
+    "file": "vk_backend_core.cpp",
     "arguments": [
       "clang++",
       "-g",
@@ -94,17 +94,17 @@
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
       "-MT",
-      "../build/vk_backend_allocator.o",
+      "../build/vk_backend_core.o",
       "-MMD",
       "-MP",
       "-MF",
-      "../build/vk_backend_allocator.d",
+      "../build/vk_backend_core.d",
       "-c",
-      "vk_backend_allocator.cpp",
+      "vk_backend_core.cpp",
       "-o",
-      "../build/vk_backend_allocator.o"
+      "../build/vk_backend_core.o"
     ],
-    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
-    "output": "../build/vk_backend_allocator.o"
+    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
+    "output": "../build/vk_backend_core.o"
   }
 ]

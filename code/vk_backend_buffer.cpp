@@ -17,9 +17,7 @@ vulkan_buffer_t
 vk_backend_buffer_create(vulkan_context_t              *vulkan_context, 
                          u64                            buffer_size, 
                          VkBufferUsageFlags             usage_flags, 
-                         vulkan_allocation_usage_type_t usage_type,
-                         bool8                          transient_allocation,
-                         bool8                          use_unique)
+                         vulkan_allocation_usage_type_t usage_type)
 {
     Assert(buffer_size > 0);
 
@@ -41,10 +39,8 @@ vk_backend_buffer_create(vulkan_context_t              *vulkan_context,
     vkGetBufferMemoryRequirements(vulkan_context->device, result.handle, &memory_requirements);
     result.allocation = vk_allocator_allocate(&vulkan_context->vulkan_allocator, 
                                               &memory_requirements, 
-                                               usage_type,
-                                               false,
-                                               false);
-    VkResult code = vkBindBufferMemory(vulkan_context->device, result.handle, result.allocation.parent_block->memory, result.allocation.offset);
+                                               usage_type);
+    VkResult code = vkBindBufferMemory(vulkan_context->device, result.handle, result.allocation.memory, result.allocation.offset);
     if(!vk_backend_result_is_success(code))
     {
         Expect(false, "Failed to bind the memory for this GPU buffer...\n");
@@ -70,10 +66,7 @@ void
 vk_backend_buffer_destroy(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer)
 {
     Assert(buffer);
-    if(buffer->allocation.parent_block->is_unique)
-    {
-        vk_allocator_free_block(&vulkan_context->vulkan_allocator, buffer->allocation.parent_block);
-    }
+    vk_allocator_free(&vulkan_context->vulkan_allocator, &buffer->allocation);
     vkDestroyBuffer(vulkan_context->device, buffer->handle, vulkan_context->cpu_allocation_callbacks);
 }
 
@@ -138,9 +131,7 @@ vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buff
     vulkan_buffer_t new_buffer = vk_backend_buffer_create(vulkan_context, 
                                                           new_size, 
                                                           buffer->usage_flags, 
-                                                          buffer->allocation.allocation_type, 
-                                                          buffer->allocation.parent_block->is_transient, 
-                                                          buffer->allocation.parent_block->is_unique);
+                                                          buffer->allocation.allocation_type);
     vk_backend_buffer_copy_buffer(vulkan_context, buffer, &new_buffer, command_buffer, 0, buffer->size, 0);
     vk_backend_buffer_destroy(vulkan_context, buffer);
 
@@ -164,7 +155,7 @@ vulkan_staging_buffer_t
 vk_backend_staging_buffer_create(vulkan_context_t *vulkan_context, u64 size, VkBufferUsageFlags usage_flags, vulkan_allocation_usage_type_t memory_type)
 {
     vulkan_staging_buffer_t result;
-    result.buffer    = vk_backend_buffer_create(vulkan_context, size, usage_flags, memory_type, false, false);
+    result.buffer    = vk_backend_buffer_create(vulkan_context, size, usage_flags, memory_type);
     result.submitted = false;
 
     VkFenceCreateInfo fence_info = {};

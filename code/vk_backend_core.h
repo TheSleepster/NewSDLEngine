@@ -23,6 +23,8 @@
 #include <vk_backend_buffer.h>
 #include <vk_backend_allocator.h>
 
+typedef struct material_archetype material_archetype_t;
+
 constexpr u32 MAX_FRAMES_IN_FLIGHT         = 3;
 constexpr u64 MAX_VULKAN_INDEX_BUFFER_SIZE = 600000;
 constexpr u64 MAX_VULKAN_INSTANCES         = MAX_VULKAN_INDEX_BUFFER_SIZE / 6;
@@ -247,8 +249,9 @@ void        vk_backend_render_frame(vulkan_context_t *vulkan_context);
 struct vulkan_shader_t;
 void        vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, bool8 wireframe);
 
-VkCommandBuffer vk_backend_get_and_begin_scratch_command_buffer(vulkan_context_t *vulkan_context, bool8 is_primary);
-void            vk_backend_submit_and_release_scratch_command_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer *command_buffer);
+VkCommandBuffer  vk_backend_get_and_begin_scratch_command_buffer(vulkan_context_t *vulkan_context, bool8 is_primary);
+void             vk_backend_submit_and_release_scratch_command_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer *command_buffer);
+void             vk_backend_allocate_descriptor_sets(vulkan_context_t *vulkan_context, material_archetype_t *archetype);
 
 #endif // VK_BACKEND_CORE_H
 

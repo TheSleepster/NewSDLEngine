@@ -263,6 +263,7 @@ typedef struct material_archetype
     string_t            shader_binary_name;
     asset_handle_t      shader_handle;
 
+    VkDescriptorSet     descriptors[MAX_DESCRIPTOR_SET_BINDINGS];
     material_instance_t base_instance;
 }material_archetype_t;
 

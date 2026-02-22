@@ -50,9 +50,7 @@ vulkan_buffer_t
 vk_backend_buffer_create(vulkan_context_t              *vulkan_context, 
                          u64                            buffer_size, 
                          VkBufferUsageFlags             usage_flags, 
-                         vulkan_allocation_usage_type_t usage_type,
-                         bool8                          transient_allocation,
-                         bool8                          use_unique);
+                         vulkan_allocation_usage_type_t usage_type);
 void
 vk_backend_buffer_copy_buffer(vulkan_context_t *vulkan_context,
                               vulkan_buffer_t  *source_buffer,

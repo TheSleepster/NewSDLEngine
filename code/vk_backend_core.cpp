@@ -9,6 +9,8 @@
 #include <c_string.h>
 #include <c_file_api.h>
 
+#include <s_asset_manager.h>
+
 void vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context);
 void vk_backend_create_framebuffers(vulkan_context_t *vulkan_context);
 void vk_backend_destroy_framebuffers(vulkan_context_t *vulkan_context);
@@ -199,6 +201,26 @@ vk_backend_vulkan_result_string(VkResult result, bool8 get_extended)
         case VK_ERROR_UNKNOWN:
             return !get_extended ? "VK_ERROR_UNKNOWN" : "VK_ERROR_UNKNOWN An unknown error has occurred; either the application has provided invalid input, or an implementation failure has occurred.";
     }
+}
+
+/*
+=============
+vk_backend_allocate_descriptor_sets
+=============
+*/
+
+void
+vk_backend_allocate_descriptor_sets(vulkan_context_t *vulkan_context, material_archetype_t *archetype)
+{
+    vulkan_shader_t *shader = &archetype->shader_handle.shader->shader_data;
+
+    VkDescriptorSetAllocateInfo info = {};
+    info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    info.descriptorPool     = vulkan_context->first_descriptor_pool;
+    info.descriptorSetCount = shader->descriptor_set_count;
+    info.pSetLayouts        = shader->layouts;
+
+    vkAssert(vkAllocateDescriptorSets(vulkan_context->device, &info, archetype->descriptors));
 }
 
 /*
@@ -1196,10 +1218,8 @@ vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context)
 #if 1
         image->allocation = vk_allocator_allocate(&vulkan_context->vulkan_allocator, 
                                                                     &memory_requirements, 
-                                                                     VULKAN_MEMORY_USAGE_GPU_ONLY, 
-                                                                     false, 
-                                                                     false);
-        VkResult code = vkBindImageMemory(vulkan_context->device, image->handle, image->allocation.parent_block->memory, image->allocation.offset);
+                                                                     VULKAN_MEMORY_USAGE_GPU_ONLY);
+        VkResult code = vkBindImageMemory(vulkan_context->device, image->handle, image->allocation.memory, image->allocation.offset);
         if(!vk_backend_result_is_success(code))
         {
             Expect(false, "Failed to bind the memory for the depth buffer...\n");
@@ -1406,11 +1426,11 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
                                                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
                                                                             VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 
-    vulkan_context->main_vertex_buffer   = vk_backend_buffer_create(vulkan_context, sizeof(vertex_t) * 4,                       vertex_buffer_usage_bits, VULKAN_MEMORY_USAGE_GPU_ONLY, false, false);
-    vulkan_context->main_index_buffer    = vk_backend_buffer_create(vulkan_context, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, index_buffer_usage_bits,  VULKAN_MEMORY_USAGE_GPU_ONLY, false, false);
+    vulkan_context->main_vertex_buffer   = vk_backend_buffer_create(vulkan_context, sizeof(vertex_t) * 4,                       vertex_buffer_usage_bits, VULKAN_MEMORY_USAGE_GPU_ONLY);
+    vulkan_context->main_index_buffer    = vk_backend_buffer_create(vulkan_context, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, index_buffer_usage_bits,  VULKAN_MEMORY_USAGE_GPU_ONLY);
     vulkan_context->staging_infos        = c_dynarray_create(vulkan_staging_info_t);
 
-    vulkan_context->scratch_buffer       = vk_backend_buffer_create(vulkan_context, MB(10), VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT,  VULKAN_MEMORY_USAGE_CPU_TO_GPU, false, false);
+    vulkan_context->scratch_buffer       = vk_backend_buffer_create(vulkan_context, MB(10), VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT,  VULKAN_MEMORY_USAGE_CPU_TO_GPU);
 
     // NOTE(Sleepster): Create the frame-based buffers 
     for(u32 index = 0;
@@ -1420,9 +1440,7 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
         vulkan_context->frame_render_buffer[index] = vk_backend_buffer_create(vulkan_context, 
                                                                               MB(128), 
                                                                               VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
-                                                                              VULKAN_MEMORY_USAGE_GPU_ONLY, 
-                                                                              false, 
-                                                                              false);
+                                                                              VULKAN_MEMORY_USAGE_GPU_ONLY); 
         vulkan_context->staging_buffers[index] = vk_backend_staging_buffer_create(vulkan_context,
                                                                                   MB(128),
                                                                                   VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
