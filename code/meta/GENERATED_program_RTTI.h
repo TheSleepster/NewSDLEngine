@@ -21,205 +21,224 @@
 #define Assert(cond) if(!(cond)) { fprintf(stderr, "FILE: [%s], FUNCTION: '%s', LINE: '%d': Assertion failed:...\n", __FILE__, __FUNCTION__, __LINE__); AssertBreak;}
 #endif
 
+#ifndef Max
+#define Max(A, B) (((A) > (B)) ? (A) : (B))
+#endif
+
+ 
+constexpr uint64_t 
+fnv_hash_constexpr(const char* str, u64 hash = 14695981039346656037ull) 
+{
+    return *str ? fnv_hash_constexpr(str + 1, (hash ^ (u64)(unsigned char)*str) * 1099511628211ull) : hash;
+}
+
+template<typename T>
+constexpr uint64_t 
+type_id_impl()
+{
+    return(fnv_hash_constexpr(__PRETTY_FUNCTION__));
+}
+
+template<typename T>
+constexpr uint64_t 
+type_id_from_ptr(T*) { return type_id_impl<T>(); }
+
+#define type_id(x) type_id_from_ptr((__typeof__(x)*)nullptr)
 #define GENERATED_PROGRAM_TYPE_LIST(X) \
-	X(TYPE_byte, "byte") \
-	X(TYPE_u64, "u64") \
-	X(TYPE_memory_arena_footer_t, "memory_arena_footer_t") \
-	X(TYPE_bool32, "bool32") \
-	X(TYPE_u32, "u32") \
-	X(TYPE_memory_arena_t, "memory_arena_t") \
-	X(TYPE_u8, "u8") \
-	X(TYPE_scratch_arena_t, "scratch_arena_t") \
-	X(TYPE_dynarray_header_t, "dynarray_header_t") \
-	X(TYPE_file_extension_t, "file_extension_t") \
-	X(TYPE_sys_handle_t, "sys_handle_t") \
-	X(TYPE_string_t, "string_t") \
-	X(TYPE_bool8, "bool8") \
-	X(TYPE_file_t, "file_t") \
-	X(TYPE_mapped_file_t, "mapped_file_t") \
-	X(TYPE_file_data_t, "file_data_t") \
-	X(TYPE_overlap_io_data_t, "overlap_io_data_t") \
-	X(TYPE_visit_files_pfn_t, "visit_files_pfn_t") \
-	X(TYPE_void, "void") \
-	X(TYPE_visit_file_data_t, "visit_file_data_t") \
-	X(TYPE_file_watcher_change_event_t, "file_watcher_change_event_t") \
-	X(TYPE_file_watcher_recorded_change_t, "file_watcher_recorded_change_t") \
-	X(TYPE_file_watcher_callback_pfn_t, "file_watcher_callback_pfn_t") \
-	X(TYPE_file_watcher_sys_watch_data_t, "file_watcher_sys_watch_data_t") \
-	X(TYPE_file_watcher_t, "file_watcher_t") \
-	X(TYPE_threadpool_t, "threadpool_t") \
-	X(TYPE_global_context_t, "global_context_t") \
-	X(TYPE_hash_table_allocation_flags_t, "hash_table_allocation_flags_t") \
-	X(TYPE_hash_table_header_t, "hash_table_header_t") \
-	X(TYPE_debug_log_level_t, "debug_log_level_t") \
-	X(TYPE_float32, "float32") \
-	X(TYPE_vec2_t, "vec2_t") \
-	X(TYPE_vec3_t, "vec3_t") \
-	X(TYPE___m128, "__m128") \
-	X(TYPE_vec4_t, "vec4_t") \
-	X(TYPE_s32, "s32") \
-	X(TYPE___m128i, "__m128i") \
-	X(TYPE_ivec4_t, "ivec4_t") \
-	X(TYPE_ivec3_t, "ivec3_t") \
-	X(TYPE_ivec2_t, "ivec2_t") \
-	X(TYPE_mat4_t, "mat4_t") \
-	X(TYPE_mat3_t, "mat3_t") \
-	X(TYPE_mat2_t, "mat2_t") \
-	X(TYPE_rectangle2_t, "rectangle2_t") \
-	X(TYPE_raytest_t, "raytest_t") \
-	X(TYPE_arg_type_t, "arg_type_t") \
-	X(TYPE_char, "char") \
-	X(TYPE_program_flag_data_t, "program_flag_data_t") \
-	X(TYPE_program_flag_t, "program_flag_t") \
-	X(TYPE_program_flag_state_t, "program_flag_state_t") \
-	X(TYPE_string_builder_buffer_t, "string_builder_buffer_t") \
-	X(TYPE_string_builder_t, "string_builder_t") \
-	X(TYPE_sys_thread_handle_t, "sys_thread_handle_t") \
-	X(TYPE_sys_thread_t, "sys_thread_t") \
-	X(TYPE_sys_mutex_handle_t, "sys_mutex_handle_t") \
-	X(TYPE_sys_mutex_t, "sys_mutex_t") \
-	X(TYPE_sys_semaphore_handle_t, "sys_semaphore_handle_t") \
-	X(TYPE_sys_semaphore_t, "sys_semaphore_t") \
-	X(TYPE_job_priority_t, "job_priority_t") \
-	X(TYPE_threadpool_callback_t, "threadpool_callback_t") \
-	X(TYPE_threadpool_queue_entry_t, "threadpool_queue_entry_t") \
-	X(TYPE_threadpool_queue_t, "threadpool_queue_t") \
-	X(TYPE_preprocessor_token_type_t, "preprocessor_token_type_t") \
-	X(TYPE_token_data_t, "token_data_t") \
-	X(TYPE_tokenizer_t, "tokenizer_t") \
-	X(TYPE_za_allocation_tag_t, "za_allocation_tag_t") \
-	X(TYPE_zone_allocator_block_t, "zone_allocator_block_t") \
-	X(TYPE_zone_allocator_t, "zone_allocator_t") \
-	X(TYPE_entity_type, "entity_type") \
-	X(TYPE_entity_flags, "entity_flags") \
-	X(TYPE_entity_t, "entity_t") \
-	X(TYPE_entity_manager_t, "entity_manager_t") \
-	X(TYPE_input_data_t, "input_data_t") \
-	X(TYPE_sockaddr_storage, "sockaddr_storage") \
-	X(TYPE_socklen_t, "socklen_t") \
-	X(TYPE_client_data_t, "client_data_t") \
-	X(TYPE_SDL_Window, "SDL_Window") \
-	X(TYPE_sockaddr_in_t, "sockaddr_in_t") \
-	X(TYPE_game_state_t, "game_state_t") \
-	X(TYPE_asset_type_t, "asset_type_t") \
-	X(TYPE_asset_slot_load_status_t, "asset_slot_load_status_t") \
-	X(TYPE_bitmap_format_t, "bitmap_format_t") \
-	X(TYPE_subtexture_data_t, "subtexture_data_t") \
-	X(TYPE_asset_slot_t, "asset_slot_t") \
-	X(TYPE_texture2D_t, "texture2D_t") \
-	X(TYPE_shader_t, "shader_t") \
-	X(TYPE_material_data_t, "material_data_t") \
-	X(TYPE_asset_handle_t, "asset_handle_t") \
-	X(TYPE_bitmap_t, "bitmap_t") \
-	X(TYPE_vulkan_image_t, "vulkan_image_t") \
-	X(TYPE_texture_atlas_t, "texture_atlas_t") \
-	X(TYPE_vulkan_shader_t, "vulkan_shader_t") \
-	X(TYPE_render_pipeline_state_t, "render_pipeline_state_t") \
-	X(TYPE_material_archetype_t, "material_archetype_t") \
-	X(TYPE_material_instance_t, "material_instance_t") \
-	X(TYPE_VkDescriptorSet, "VkDescriptorSet") \
-	X(TYPE_stored_material_type_t, "stored_material_type_t") \
-	X(TYPE_jfd_package_entry_t, "jfd_package_entry_t") \
-	X(TYPE_asset_manager_t, "asset_manager_t") \
-	X(TYPE_texture_atlas_registry_t, "texture_atlas_registry_t") \
-	X(TYPE_asset_manager_asset_file_data_t, "asset_manager_asset_file_data_t") \
-	X(TYPE_controller_type_t, "controller_type_t") \
-	X(TYPE_input_mouse_buttons_t, "input_mouse_buttons_t") \
-	X(TYPE_action_button_t, "action_button_t") \
-	X(TYPE_keyboard_controller_data_t, "keyboard_controller_data_t") \
-	X(TYPE_s16, "s16") \
-	X(TYPE_analog_button_t, "analog_button_t") \
-	X(TYPE_SDL_Gamepad, "SDL_Gamepad") \
-	X(TYPE_SDL_Joystick, "SDL_Joystick") \
-	X(TYPE_gamepad_controller_data_t, "gamepad_controller_data_t") \
-	X(TYPE_input_controller_t, "input_controller_t") \
-	X(TYPE_game_action_binding_type_t, "game_action_binding_type_t") \
-	X(TYPE_game_action_binding_t, "game_action_binding_t") \
-	X(TYPE_game_action_t, "game_action_t") \
-	X(TYPE_packet_type_t, "packet_type_t") \
-	X(TYPE_payload, "payload") \
-	X(TYPE_packet_t, "packet_t") \
-	X(TYPE_constant_buffer_t, "constant_buffer_t") \
-	X(TYPE_render_instance_t, "render_instance_t") \
-	X(TYPE_image_type_t, "image_type_t") \
-	X(TYPE_image_create_info_t, "image_create_info_t") \
-	X(TYPE_image_t, "image_t") \
-	X(TYPE_render_target_attachment_load_operations_t, "render_target_attachment_load_operations_t") \
-	X(TYPE_render_target_attachment_store_operations_t, "render_target_attachment_store_operations_t") \
-	X(TYPE_VkImageLayout, "VkImageLayout") \
-	X(TYPE_VkClearValue, "VkClearValue") \
-	X(TYPE_render_target_create_info_t, "render_target_create_info_t") \
-	X(TYPE_VkFramebuffer, "VkFramebuffer") \
-	X(TYPE_VkRenderPass, "VkRenderPass") \
-	X(TYPE_render_target_t, "render_target_t") \
-	X(TYPE_render_command_type_t, "render_command_type_t") \
-	X(TYPE_render_command_t, "render_command_t") \
-	X(TYPE_render_command_list_t, "render_command_list_t") \
-	X(TYPE_renderer_state_t, "renderer_state_t") \
-	X(TYPE_vulkan_allocation_usage_type_t, "vulkan_allocation_usage_type_t") \
-	X(TYPE_VkDeviceSize, "VkDeviceSize") \
-	X(TYPE_VkMemoryPropertyFlags, "VkMemoryPropertyFlags") \
-	X(TYPE_VkMemoryRequirements, "VkMemoryRequirements") \
-	X(TYPE_VkDeviceMemory, "VkDeviceMemory") \
-	X(TYPE_vulkan_allocation_info_t, "vulkan_allocation_info_t") \
-	X(TYPE_VkAllocationCallbacks, "VkAllocationCallbacks") \
-	X(TYPE_VkDevice, "VkDevice") \
-	X(TYPE_vulkan_allocation_block_t, "vulkan_allocation_block_t") \
-	X(TYPE_vulkan_allocator_t, "vulkan_allocator_t") \
-	X(TYPE_VkBuffer, "VkBuffer") \
-	X(TYPE_VkBufferUsageFlags, "VkBufferUsageFlags") \
-	X(TYPE_vulkan_buffer_t, "vulkan_buffer_t") \
-	X(TYPE_vulkan_staging_info_t, "vulkan_staging_info_t") \
-	X(TYPE_VkFence, "VkFence") \
-	X(TYPE_vulkan_staging_buffer_t, "vulkan_staging_buffer_t") \
-	X(TYPE_renderer_effect_application_flags_t, "renderer_effect_application_flags_t") \
-	X(TYPE_render_pipeline_blending_mode_t, "render_pipeline_blending_mode_t") \
-	X(TYPE_render_pipeline_blending_equation_t, "render_pipeline_blending_equation_t") \
-	X(TYPE_render_pipeline_depth_function_t, "render_pipeline_depth_function_t") \
-	X(TYPE_VkPhysicalDevice, "VkPhysicalDevice") \
-	X(TYPE_VkPhysicalDeviceProperties, "VkPhysicalDeviceProperties") \
-	X(TYPE_VkPhysicalDeviceMemoryProperties, "VkPhysicalDeviceMemoryProperties") \
-	X(TYPE_VkSurfaceCapabilitiesKHR, "VkSurfaceCapabilitiesKHR") \
-	X(TYPE_VkSwapchainKHR, "VkSwapchainKHR") \
-	X(TYPE_VkPresentModeKHR, "VkPresentModeKHR") \
-	X(TYPE_VkSurfaceFormatKHR, "VkSurfaceFormatKHR") \
-	X(TYPE_VkExtent2D, "VkExtent2D") \
-	X(TYPE_swapchain_info_t, "swapchain_info_t") \
-	X(TYPE_VkInstance, "VkInstance") \
-	X(TYPE_VkSurfaceKHR, "VkSurfaceKHR") \
-	X(TYPE_VkDebugUtilsMessengerEXT, "VkDebugUtilsMessengerEXT") \
-	X(TYPE_gpu_info_t, "gpu_info_t") \
-	X(TYPE_VkCommandPool, "VkCommandPool") \
-	X(TYPE_VkQueue, "VkQueue") \
-	X(TYPE_VkFormat, "VkFormat") \
-	X(TYPE_VkImage, "VkImage") \
-	X(TYPE_VkImageView, "VkImageView") \
-	X(TYPE_VkCommandBuffer, "VkCommandBuffer") \
-	X(TYPE_VkSemaphore, "VkSemaphore") \
-	X(TYPE_VkDescriptorPool, "VkDescriptorPool") \
-	X(TYPE_vulkan_sampler_info_t, "vulkan_sampler_info_t") \
-	X(TYPE_vulkan_image_info_t, "vulkan_image_info_t") \
-	X(TYPE_VkSampler, "VkSampler") \
-	X(TYPE_VkShaderModule, "VkShaderModule") \
-	X(TYPE_VkPipelineShaderStageCreateInfo, "VkPipelineShaderStageCreateInfo") \
-	X(TYPE_vulkan_shader_stage_t, "vulkan_shader_stage_t") \
-	X(TYPE_VkDescriptorSetLayout, "VkDescriptorSetLayout") \
-	X(TYPE_VkPushConstantRange, "VkPushConstantRange") \
-	X(TYPE_VkPipelineBindPoint, "VkPipelineBindPoint") \
-	X(TYPE_VkPipelineLayout, "VkPipelineLayout") \
-	X(TYPE_VkPipeline, "VkPipeline") \
+	X(TYPE_byte, type_id(byte), "byte") \
+	X(TYPE_u64, type_id(u64), "u64") \
+	X(TYPE_memory_arena_footer_t, type_id(memory_arena_footer_t), "memory_arena_footer_t") \
+	X(TYPE_bool32, type_id(bool32), "bool32") \
+	X(TYPE_u32, type_id(u32), "u32") \
+	X(TYPE_memory_arena_t, type_id(memory_arena_t), "memory_arena_t") \
+	X(TYPE_u8, type_id(u8), "u8") \
+	X(TYPE_scratch_arena_t, type_id(scratch_arena_t), "scratch_arena_t") \
+	X(TYPE_dynarray_header_t, type_id(dynarray_header_t), "dynarray_header_t") \
+	X(TYPE_file_extension_t, type_id(file_extension_t), "file_extension_t") \
+	X(TYPE_sys_handle_t, type_id(sys_handle_t), "sys_handle_t") \
+	X(TYPE_string_t, type_id(string_t), "string_t") \
+	X(TYPE_bool8, type_id(bool8), "bool8") \
+	X(TYPE_file_t, type_id(file_t), "file_t") \
+	X(TYPE_mapped_file_t, type_id(mapped_file_t), "mapped_file_t") \
+	X(TYPE_file_data_t, type_id(file_data_t), "file_data_t") \
+	X(TYPE_overlap_io_data_t, type_id(overlap_io_data_t), "overlap_io_data_t") \
+	X(TYPE_visit_files_pfn_t, type_id(visit_files_pfn_t), "visit_files_pfn_t") \
+	X(TYPE_void, type_id(void), "void") \
+	X(TYPE_visit_file_data_t, type_id(visit_file_data_t), "visit_file_data_t") \
+	X(TYPE_file_watcher_change_event_t, type_id(file_watcher_change_event_t), "file_watcher_change_event_t") \
+	X(TYPE_file_watcher_recorded_change_t, type_id(file_watcher_recorded_change_t), "file_watcher_recorded_change_t") \
+	X(TYPE_file_watcher_callback_pfn_t, type_id(file_watcher_callback_pfn_t), "file_watcher_callback_pfn_t") \
+	X(TYPE_file_watcher_sys_watch_data_t, type_id(file_watcher_sys_watch_data_t), "file_watcher_sys_watch_data_t") \
+	X(TYPE_file_watcher_t, type_id(file_watcher_t), "file_watcher_t") \
+	X(TYPE_threadpool_t, type_id(threadpool_t), "threadpool_t") \
+	X(TYPE_global_context_t, type_id(global_context_t), "global_context_t") \
+	X(TYPE_hash_table_allocation_flags_t, type_id(hash_table_allocation_flags_t), "hash_table_allocation_flags_t") \
+	X(TYPE_hash_table_header_t, type_id(hash_table_header_t), "hash_table_header_t") \
+	X(TYPE_debug_log_level_t, type_id(debug_log_level_t), "debug_log_level_t") \
+	X(TYPE_float32, type_id(float32), "float32") \
+	X(TYPE_vec2_t, type_id(vec2_t), "vec2_t") \
+	X(TYPE_vec3_t, type_id(vec3_t), "vec3_t") \
+	X(TYPE___m128, type_id(__m128), "__m128") \
+	X(TYPE_vec4_t, type_id(vec4_t), "vec4_t") \
+	X(TYPE_s32, type_id(s32), "s32") \
+	X(TYPE___m128i, type_id(__m128i), "__m128i") \
+	X(TYPE_ivec4_t, type_id(ivec4_t), "ivec4_t") \
+	X(TYPE_ivec3_t, type_id(ivec3_t), "ivec3_t") \
+	X(TYPE_ivec2_t, type_id(ivec2_t), "ivec2_t") \
+	X(TYPE_mat4_t, type_id(mat4_t), "mat4_t") \
+	X(TYPE_mat3_t, type_id(mat3_t), "mat3_t") \
+	X(TYPE_mat2_t, type_id(mat2_t), "mat2_t") \
+	X(TYPE_rectangle2_t, type_id(rectangle2_t), "rectangle2_t") \
+	X(TYPE_raytest_t, type_id(raytest_t), "raytest_t") \
+	X(TYPE_arg_type_t, type_id(arg_type_t), "arg_type_t") \
+	X(TYPE_char, type_id(char), "char") \
+	X(TYPE_program_flag_data_t, type_id(program_flag_data_t), "program_flag_data_t") \
+	X(TYPE_program_flag_t, type_id(program_flag_t), "program_flag_t") \
+	X(TYPE_program_flag_state_t, type_id(program_flag_state_t), "program_flag_state_t") \
+	X(TYPE_string_builder_buffer_t, type_id(string_builder_buffer_t), "string_builder_buffer_t") \
+	X(TYPE_string_builder_t, type_id(string_builder_t), "string_builder_t") \
+	X(TYPE_sys_thread_handle_t, type_id(sys_thread_handle_t), "sys_thread_handle_t") \
+	X(TYPE_sys_thread_t, type_id(sys_thread_t), "sys_thread_t") \
+	X(TYPE_sys_mutex_handle_t, type_id(sys_mutex_handle_t), "sys_mutex_handle_t") \
+	X(TYPE_sys_mutex_t, type_id(sys_mutex_t), "sys_mutex_t") \
+	X(TYPE_sys_semaphore_handle_t, type_id(sys_semaphore_handle_t), "sys_semaphore_handle_t") \
+	X(TYPE_sys_semaphore_t, type_id(sys_semaphore_t), "sys_semaphore_t") \
+	X(TYPE_job_priority_t, type_id(job_priority_t), "job_priority_t") \
+	X(TYPE_threadpool_callback_t, type_id(threadpool_callback_t), "threadpool_callback_t") \
+	X(TYPE_threadpool_queue_entry_t, type_id(threadpool_queue_entry_t), "threadpool_queue_entry_t") \
+	X(TYPE_threadpool_queue_t, type_id(threadpool_queue_t), "threadpool_queue_t") \
+	X(TYPE_preprocessor_token_type_t, type_id(preprocessor_token_type_t), "preprocessor_token_type_t") \
+	X(TYPE_token_data_t, type_id(token_data_t), "token_data_t") \
+	X(TYPE_tokenizer_t, type_id(tokenizer_t), "tokenizer_t") \
+	X(TYPE_za_allocation_tag_t, type_id(za_allocation_tag_t), "za_allocation_tag_t") \
+	X(TYPE_zone_allocator_block_t, type_id(zone_allocator_block_t), "zone_allocator_block_t") \
+	X(TYPE_zone_allocator_t, type_id(zone_allocator_t), "zone_allocator_t") \
+	X(TYPE_entity_type, type_id(entity_type), "entity_type") \
+	X(TYPE_entity_flags, type_id(entity_flags), "entity_flags") \
+	X(TYPE_entity_t, type_id(entity_t), "entity_t") \
+	X(TYPE_entity_manager_t, type_id(entity_manager_t), "entity_manager_t") \
+	X(TYPE_input_data_t, type_id(input_data_t), "input_data_t") \
+	X(TYPE_sockaddr_storage, type_id(sockaddr_storage), "sockaddr_storage") \
+	X(TYPE_socklen_t, type_id(socklen_t), "socklen_t") \
+	X(TYPE_client_data_t, type_id(client_data_t), "client_data_t") \
+	X(TYPE_SDL_Window, type_id(SDL_Window), "SDL_Window") \
+	X(TYPE_sockaddr_in_t, type_id(sockaddr_in_t), "sockaddr_in_t") \
+	X(TYPE_game_state_t, type_id(game_state_t), "game_state_t") \
+	X(TYPE_asset_type_t, type_id(asset_type_t), "asset_type_t") \
+	X(TYPE_asset_slot_load_status_t, type_id(asset_slot_load_status_t), "asset_slot_load_status_t") \
+	X(TYPE_bitmap_format_t, type_id(bitmap_format_t), "bitmap_format_t") \
+	X(TYPE_subtexture_data_t, type_id(subtexture_data_t), "subtexture_data_t") \
+	X(TYPE_asset_slot_t, type_id(asset_slot_t), "asset_slot_t") \
+	X(TYPE_texture2D_t, type_id(texture2D_t), "texture2D_t") \
+	X(TYPE_shader_t, type_id(shader_t), "shader_t") \
+	X(TYPE_material_data_t, type_id(material_data_t), "material_data_t") \
+	X(TYPE_asset_handle_t, type_id(asset_handle_t), "asset_handle_t") \
+	X(TYPE_bitmap_t, type_id(bitmap_t), "bitmap_t") \
+	X(TYPE_vulkan_image_t, type_id(vulkan_image_t), "vulkan_image_t") \
+	X(TYPE_texture_atlas_t, type_id(texture_atlas_t), "texture_atlas_t") \
+	X(TYPE_vulkan_shader_t, type_id(vulkan_shader_t), "vulkan_shader_t") \
+	X(TYPE_render_pipeline_state_t, type_id(render_pipeline_state_t), "render_pipeline_state_t") \
+	X(TYPE_material_archetype_t, type_id(material_archetype_t), "material_archetype_t") \
+	X(TYPE_material_instance_t, type_id(material_instance_t), "material_instance_t") \
+	X(TYPE_VkDescriptorSet, type_id(VkDescriptorSet), "VkDescriptorSet") \
+	X(TYPE_stored_material_type_t, type_id(stored_material_type_t), "stored_material_type_t") \
+	X(TYPE_jfd_package_entry_t, type_id(jfd_package_entry_t), "jfd_package_entry_t") \
+	X(TYPE_asset_manager_t, type_id(asset_manager_t), "asset_manager_t") \
+	X(TYPE_texture_atlas_registry_t, type_id(texture_atlas_registry_t), "texture_atlas_registry_t") \
+	X(TYPE_asset_manager_asset_file_data_t, type_id(asset_manager_asset_file_data_t), "asset_manager_asset_file_data_t") \
+	X(TYPE_controller_type_t, type_id(controller_type_t), "controller_type_t") \
+	X(TYPE_input_mouse_buttons_t, type_id(input_mouse_buttons_t), "input_mouse_buttons_t") \
+	X(TYPE_action_button_t, type_id(action_button_t), "action_button_t") \
+	X(TYPE_keyboard_controller_data_t, type_id(keyboard_controller_data_t), "keyboard_controller_data_t") \
+	X(TYPE_s16, type_id(s16), "s16") \
+	X(TYPE_analog_button_t, type_id(analog_button_t), "analog_button_t") \
+	X(TYPE_SDL_Gamepad, type_id(SDL_Gamepad), "SDL_Gamepad") \
+	X(TYPE_SDL_Joystick, type_id(SDL_Joystick), "SDL_Joystick") \
+	X(TYPE_gamepad_controller_data_t, type_id(gamepad_controller_data_t), "gamepad_controller_data_t") \
+	X(TYPE_input_controller_t, type_id(input_controller_t), "input_controller_t") \
+	X(TYPE_game_action_binding_type_t, type_id(game_action_binding_type_t), "game_action_binding_type_t") \
+	X(TYPE_game_action_binding_t, type_id(game_action_binding_t), "game_action_binding_t") \
+	X(TYPE_game_action_t, type_id(game_action_t), "game_action_t") \
+	X(TYPE_packet_type_t, type_id(packet_type_t), "packet_type_t") \
+	X(TYPE_payload, type_id(packet_t::payload), "payload") \
+	X(TYPE_packet_t, type_id(packet_t), "packet_t") \
+	X(TYPE_constant_buffer_t, type_id(constant_buffer_t), "constant_buffer_t") \
+	X(TYPE_render_instance_t, type_id(render_instance_t), "render_instance_t") \
+	X(TYPE_image_type_t, type_id(image_type_t), "image_type_t") \
+	X(TYPE_image_create_info_t, type_id(image_create_info_t), "image_create_info_t") \
+	X(TYPE_image_t, type_id(image_t), "image_t") \
+	X(TYPE_render_target_attachment_load_operations_t, type_id(render_target_attachment_load_operations_t), "render_target_attachment_load_operations_t") \
+	X(TYPE_render_target_attachment_store_operations_t, type_id(render_target_attachment_store_operations_t), "render_target_attachment_store_operations_t") \
+	X(TYPE_VkImageLayout, type_id(VkImageLayout), "VkImageLayout") \
+	X(TYPE_VkClearValue, type_id(VkClearValue), "VkClearValue") \
+	X(TYPE_render_target_create_info_t, type_id(render_target_create_info_t), "render_target_create_info_t") \
+	X(TYPE_VkFramebuffer, type_id(VkFramebuffer), "VkFramebuffer") \
+	X(TYPE_VkRenderPass, type_id(VkRenderPass), "VkRenderPass") \
+	X(TYPE_render_target_t, type_id(render_target_t), "render_target_t") \
+	X(TYPE_render_command_type_t, type_id(render_command_type_t), "render_command_type_t") \
+	X(TYPE_render_command_t, type_id(render_command_t), "render_command_t") \
+	X(TYPE_render_command_list_t, type_id(render_command_list_t), "render_command_list_t") \
+	X(TYPE_renderer_state_t, type_id(renderer_state_t), "renderer_state_t") \
+	X(TYPE_vulkan_allocation_usage_type_t, type_id(vulkan_allocation_usage_type_t), "vulkan_allocation_usage_type_t") \
+	X(TYPE_VkDeviceSize, type_id(VkDeviceSize), "VkDeviceSize") \
+	X(TYPE_VkMemoryPropertyFlags, type_id(VkMemoryPropertyFlags), "VkMemoryPropertyFlags") \
+	X(TYPE_VkMemoryRequirements, type_id(VkMemoryRequirements), "VkMemoryRequirements") \
+	X(TYPE_VkDeviceMemory, type_id(VkDeviceMemory), "VkDeviceMemory") \
+	X(TYPE_vulkan_allocation_info_t, type_id(vulkan_allocation_info_t), "vulkan_allocation_info_t") \
+	X(TYPE_VkAllocationCallbacks, type_id(VkAllocationCallbacks), "VkAllocationCallbacks") \
+	X(TYPE_VkDevice, type_id(VkDevice), "VkDevice") \
+	X(TYPE_vulkan_allocation_block_t, type_id(vulkan_allocation_block_t), "vulkan_allocation_block_t") \
+	X(TYPE_vulkan_allocator_t, type_id(vulkan_allocator_t), "vulkan_allocator_t") \
+	X(TYPE_VkBuffer, type_id(VkBuffer), "VkBuffer") \
+	X(TYPE_VkBufferUsageFlags, type_id(VkBufferUsageFlags), "VkBufferUsageFlags") \
+	X(TYPE_vulkan_buffer_t, type_id(vulkan_buffer_t), "vulkan_buffer_t") \
+	X(TYPE_vulkan_staging_info_t, type_id(vulkan_staging_info_t), "vulkan_staging_info_t") \
+	X(TYPE_VkFence, type_id(VkFence), "VkFence") \
+	X(TYPE_vulkan_staging_buffer_t, type_id(vulkan_staging_buffer_t), "vulkan_staging_buffer_t") \
+	X(TYPE_renderer_effect_application_flags_t, type_id(renderer_effect_application_flags_t), "renderer_effect_application_flags_t") \
+	X(TYPE_render_pipeline_blending_mode_t, type_id(render_pipeline_blending_mode_t), "render_pipeline_blending_mode_t") \
+	X(TYPE_render_pipeline_blending_equation_t, type_id(render_pipeline_blending_equation_t), "render_pipeline_blending_equation_t") \
+	X(TYPE_render_pipeline_depth_function_t, type_id(render_pipeline_depth_function_t), "render_pipeline_depth_function_t") \
+	X(TYPE_VkPhysicalDevice, type_id(VkPhysicalDevice), "VkPhysicalDevice") \
+	X(TYPE_VkPhysicalDeviceProperties, type_id(VkPhysicalDeviceProperties), "VkPhysicalDeviceProperties") \
+	X(TYPE_VkPhysicalDeviceMemoryProperties, type_id(VkPhysicalDeviceMemoryProperties), "VkPhysicalDeviceMemoryProperties") \
+	X(TYPE_VkSurfaceCapabilitiesKHR, type_id(VkSurfaceCapabilitiesKHR), "VkSurfaceCapabilitiesKHR") \
+	X(TYPE_VkSwapchainKHR, type_id(VkSwapchainKHR), "VkSwapchainKHR") \
+	X(TYPE_VkPresentModeKHR, type_id(VkPresentModeKHR), "VkPresentModeKHR") \
+	X(TYPE_VkSurfaceFormatKHR, type_id(VkSurfaceFormatKHR), "VkSurfaceFormatKHR") \
+	X(TYPE_VkExtent2D, type_id(VkExtent2D), "VkExtent2D") \
+	X(TYPE_swapchain_info_t, type_id(swapchain_info_t), "swapchain_info_t") \
+	X(TYPE_VkInstance, type_id(VkInstance), "VkInstance") \
+	X(TYPE_VkSurfaceKHR, type_id(VkSurfaceKHR), "VkSurfaceKHR") \
+	X(TYPE_VkDebugUtilsMessengerEXT, type_id(VkDebugUtilsMessengerEXT), "VkDebugUtilsMessengerEXT") \
+	X(TYPE_gpu_info_t, type_id(gpu_info_t), "gpu_info_t") \
+	X(TYPE_VkCommandPool, type_id(VkCommandPool), "VkCommandPool") \
+	X(TYPE_VkQueue, type_id(VkQueue), "VkQueue") \
+	X(TYPE_VkFormat, type_id(VkFormat), "VkFormat") \
+	X(TYPE_VkImage, type_id(VkImage), "VkImage") \
+	X(TYPE_VkImageView, type_id(VkImageView), "VkImageView") \
+	X(TYPE_VkCommandBuffer, type_id(VkCommandBuffer), "VkCommandBuffer") \
+	X(TYPE_VkSemaphore, type_id(VkSemaphore), "VkSemaphore") \
+	X(TYPE_VkDescriptorPool, type_id(VkDescriptorPool), "VkDescriptorPool") \
+	X(TYPE_vulkan_sampler_info_t, type_id(vulkan_sampler_info_t), "vulkan_sampler_info_t") \
+	X(TYPE_vulkan_image_info_t, type_id(vulkan_image_info_t), "vulkan_image_info_t") \
+	X(TYPE_VkSampler, type_id(VkSampler), "VkSampler") \
+	X(TYPE_VkShaderModule, type_id(VkShaderModule), "VkShaderModule") \
+	X(TYPE_VkPipelineShaderStageCreateInfo, type_id(VkPipelineShaderStageCreateInfo), "VkPipelineShaderStageCreateInfo") \
+	X(TYPE_vulkan_shader_stage_t, type_id(vulkan_shader_stage_t), "vulkan_shader_stage_t") \
+	X(TYPE_VkDescriptorSetLayout, type_id(VkDescriptorSetLayout), "VkDescriptorSetLayout") \
+	X(TYPE_VkPushConstantRange, type_id(VkPushConstantRange), "VkPushConstantRange") \
+	X(TYPE_VkPipelineBindPoint, type_id(VkPipelineBindPoint), "VkPipelineBindPoint") \
+	X(TYPE_VkPipelineLayout, type_id(VkPipelineLayout), "VkPipelineLayout") \
+	X(TYPE_VkPipeline, type_id(VkPipeline), "VkPipeline") \
 
 
 enum GENERATED_program_type_t { 
-#define X(enum, string) enum,  
+#define X(enum, typename_hash, string) enum,  
 GENERATED_PROGRAM_TYPE_LIST(X)
 #undef X
 };
 
-
-#ifndef Max
-#define Max(A, B) (((A) > (B)) ? (A) : (B)) 
-#endif
 
 #define META_STRUCT_TYPE_LIST(X) \
     X(META_STRUCT_TYPE_Struct, "struct") \
@@ -6153,11 +6172,11 @@ c_meta_get_type_string_from_enum(GENERATED_program_type_t type_enum)
     string_t result = {};
     switch(type_enum)
     {
-#define X(enum, string)           \
-        case enum:                \
-        {                         \
-            result = STR(string); \
-            goto exit;            \
+#define X(enum, typename_hash, string) \
+        case enum:                     \
+        {                              \
+            result = STR(string);      \
+            goto exit;                 \
         }break;                   
 
     GENERATED_PROGRAM_TYPE_LIST(X)
@@ -6172,7 +6191,7 @@ GENERATED_program_type_t
 c_meta_get_type_enum_from_string(string_t type_string)
 {
     GENERATED_program_type_t result = (GENERATED_program_type_t)0;
-#define X(enum, string)                                           \
+#define X(enum, typename_hash, string)                            \
     if(memcmp(string, type_string.data, sizeof(string) - 1) == 0) \
     {                                                             \
         result = enum;                                            \
@@ -6180,6 +6199,27 @@ c_meta_get_type_enum_from_string(string_t type_string)
     }
     GENERATED_PROGRAM_TYPE_LIST(X)
 #undef X
+
+exit:
+    return(result);
+}
+
+const type_info_t* 
+c_meta_get_type_info_from_type_enum(GENERATED_program_type_t type_enum)
+{
+    const type_info_t *result = null;
+    switch(type_enum)
+    {
+#define X(enum, typename_hash, string) \
+        case enum: \
+        { \
+            result = &GENERATED_type_table[enum]; \
+            goto exit; \
+        }break;
+        
+        GENERATED_PROGRAM_TYPE_LIST(X)
+#undef X
+    }
 
 exit:
     return(result);
@@ -6429,6 +6469,58 @@ c_meta_get_enum_type_info_from_member_string(string_t name)
         result = GENERATED_enum_member_name_to_type_info_table[enum_mapping].type_info_ptr;
     }
 
+    return(result);
+}
+
+// TODO(Sleepster): Both of these are awful, but switch-case statements are off the table since the compiler doesn't
+// actually make typedef mean what you think it means... So we have to do this. I don't think this is slow, but we may
+// have to sort the tables at compile time and binary search through them later on.
+GENERATED_program_type_t
+c_meta_get_type_enum_from_id(u64 id)
+{
+    GENERATED_program_type_t result = TYPE_byte;
+    #define X(enum_val, hash, string) { hash, string, enum_val },
+    static const struct { u64 id; const char* name; int index; } table[] = {
+        GENERATED_PROGRAM_TYPE_LIST(X)
+    };
+    #undef X
+
+    for (u32 index = 0; 
+         index < ArrayCount(table); 
+         ++index) 
+    {
+        if (table[index].id == id) 
+        {
+            result = (GENERATED_program_type_t)table[index].index;
+            goto exit;
+        }
+    }
+exit:
+    return(result);
+}
+
+const type_info_t*
+c_meta_get_type_info_from_id(u64 id)
+{
+    const type_info_t *result = null;
+
+    #define X(enum_val, hash, string) { hash, string, enum_val },
+    static const struct { u64 id; const char* name; int index; } table[] = {
+        GENERATED_PROGRAM_TYPE_LIST(X)
+    };
+    #undef X
+
+    for (u32 index = 0; 
+         index < ArrayCount(table); 
+         ++index) 
+    {
+        if (table[index].id == id) 
+        {
+            result = &GENERATED_type_table[table[index].index];
+            goto exit;
+        }
+    }
+exit:
     return(result);
 }
 #endif

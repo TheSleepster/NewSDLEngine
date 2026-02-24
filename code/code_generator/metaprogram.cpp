@@ -887,7 +887,7 @@ get_canonical_type_name(metatype_data_t *type_info)
 }
 
 internal_api string_t 
-build_struct_access_name(meta_struct_t *structure, u32 max_depth, u32 *current_depth)
+build_struct_access_name(meta_struct_t *structure, u32 max_depth, u32 *current_depth, bool8 cpp_style)
 {
     Assert(current_depth != null);
 
@@ -898,11 +898,19 @@ build_struct_access_name(meta_struct_t *structure, u32 max_depth, u32 *current_d
     if(structure->parent)
     {
         // NOTE(Sleepster): We are down the stack, keep working up to the root. 
-        parent_string = build_struct_access_name(structure->parent, max_depth, current_depth);
+        parent_string = build_struct_access_name(structure->parent, max_depth, current_depth, cpp_style);
         if(*current_depth < max_depth)
         {
             // NOTE(Sleepster): Append ourselves if we are less than the depth
-            result          = c_string_sprintf(buffer, 1024, ".%.*s", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            if(cpp_style)
+            {
+                result = c_string_sprintf(buffer, 1024, "::%.*s", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            }
+            else
+            {
+                result = c_string_sprintf(buffer, 1024, ".%.*s", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
+            }
+
             *current_depth += 1;
         }
     }
@@ -942,6 +950,30 @@ generate_type_information(ast_file_data_t *ast)
     c_string_builder_append_data(type_enum_builder, STR("#define Assert(cond) if(!(cond)) { fprintf(stderr, \"FILE: [%s], FUNCTION: '%s', LINE: '%d': Assertion failed:...\\n\", __FILE__, __FUNCTION__, __LINE__); AssertBreak;}\n"));
     c_string_builder_sprintf(type_enum_builder, "#endif\n\n");
 
+    c_string_builder_sprintf(type_enum_builder, "#ifndef Max\n");
+    c_string_builder_sprintf(type_enum_builder, "#define Max(A, B) (((A) > (B)) ? (A) : (B))\n");
+    c_string_builder_sprintf(type_enum_builder, "#endif\n\n");
+
+    c_string_builder_sprintf(type_enum_builder, R"( 
+constexpr uint64_t 
+fnv_hash_constexpr(const char* str, u64 hash = 14695981039346656037ull) 
+{
+    return *str ? fnv_hash_constexpr(str + 1, (hash ^ (u64)(unsigned char)*str) * 1099511628211ull) : hash;
+}
+
+template<typename T>
+constexpr uint64_t 
+type_id_impl()
+{
+    return(fnv_hash_constexpr(__PRETTY_FUNCTION__));
+}
+
+template<typename T>
+constexpr uint64_t 
+type_id_from_ptr(T*) { return type_id_impl<T>(); }
+
+#define type_id(x) type_id_from_ptr((__typeof__(x)*)nullptr)
+)");
 
     c_string_builder_sprintf(type_enum_builder, "#define GENERATED_PROGRAM_TYPE_LIST(X) \\\n");
 
@@ -949,14 +981,30 @@ generate_type_information(ast_file_data_t *ast)
     c_dynarray_for(state.type_table, type_index)
     {
         registry_type_t *type = c_dynarray_get_ptr(state.type_table, type_index);
-        c_string_builder_sprintf(type_enum_builder, "\tX(TYPE_%.*s, \"%.*s\") \\\n", 
+
+        string_t full_typename = type->canonical_name;
+        if(type->metadata)
+        {
+            if(type->metadata->parent)
+            {
+                u32 current_depth = 0;
+                full_typename = build_struct_access_name(type->metadata, type->metadata->nesting_depth, &current_depth, true);
+            }
+        }
+
+        char buffer[4096] = {};
+        sprintf(buffer, "type_id(%.*s)", 
+                full_typename.count, C_STR(full_typename));
+
+        c_string_builder_sprintf(type_enum_builder, "\tX(TYPE_%.*s, %s, \"%.*s\") \\\n", 
                                  type->canonical_name.count, C_STR(type->canonical_name),
+                                 buffer,
                                  type->canonical_name.count, C_STR(type->canonical_name));
     }
 
     c_string_builder_sprintf(type_enum_builder, "\n\n");
     c_string_builder_sprintf(type_enum_builder, "enum GENERATED_program_type_t { \n");
-    c_string_builder_sprintf(type_enum_builder, "#define X(enum, string) enum,  \n");
+    c_string_builder_sprintf(type_enum_builder, "#define X(enum, typename_hash, string) enum,  \n");
     c_string_builder_sprintf(type_enum_builder, "GENERATED_PROGRAM_TYPE_LIST(X)\n");
     c_string_builder_sprintf(type_enum_builder, "#undef X\n");
     c_string_builder_sprintf(type_enum_builder, "};\n\n");
@@ -964,10 +1012,6 @@ generate_type_information(ast_file_data_t *ast)
     // NOTE(Sleepster): Generate the functions that map the type string to the index that the correct type data occupies. 
     // TODO(Sleepster): Maybe we should just stuff all this into a header, I just don't want to depend on another file right now 
     c_string_builder_sprintf(type_enum_builder, R"(
-#ifndef Max
-#define Max(A, B) (((A) > (B)) ? (A) : (B)) 
-#endif
-
 #define META_STRUCT_TYPE_LIST(X) \
     X(META_STRUCT_TYPE_Struct, "struct") \
     X(META_STRUCT_TYPE_Union,  "union") \
@@ -1155,7 +1199,7 @@ typedef struct type_info_data_mapping
 
             // NOTE(Sleepster): Get the nested name 
             u32 current_depth = 0;
-            string_t nested_name = build_struct_access_name(structure, structure->nesting_depth, &current_depth);
+            string_t nested_name = build_struct_access_name(structure, structure->nesting_depth, &current_depth, false);
             string_t appending   = STR("GENERATED_DEFAULT_");
             nested_name = c_string_concat(&global_context->temporary_arena, appending, nested_name);
 
@@ -1302,7 +1346,7 @@ GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
         if(type->type_kind == META_TYPE_KIND_Struct && type->metadata)
         {
             u32 current_depth = 0;
-            string_t nested_name = build_struct_access_name(type->metadata, type->metadata->nesting_depth - 1, &current_depth);
+            string_t nested_name = build_struct_access_name(type->metadata, type->metadata->nesting_depth - 1, &current_depth, false);
             nested_name = c_string_concat(&global_context->temporary_arena, nested_name, STR("."));
             nested_name = c_string_concat(&global_context->temporary_arena, nested_name, type->canonical_name);
 
@@ -1398,11 +1442,11 @@ c_meta_get_type_string_from_enum(GENERATED_program_type_t type_enum)
     string_t result = {};
     switch(type_enum)
     {
-#define X(enum, string)           \
-        case enum:                \
-        {                         \
-            result = STR(string); \
-            goto exit;            \
+#define X(enum, typename_hash, string) \
+        case enum:                     \
+        {                              \
+            result = STR(string);      \
+            goto exit;                 \
         }break;                   
 
     GENERATED_PROGRAM_TYPE_LIST(X)
@@ -1417,7 +1461,7 @@ GENERATED_program_type_t
 c_meta_get_type_enum_from_string(string_t type_string)
 {
     GENERATED_program_type_t result = (GENERATED_program_type_t)0;
-#define X(enum, string)                                           \
+#define X(enum, typename_hash, string)                            \
     if(memcmp(string, type_string.data, sizeof(string) - 1) == 0) \
     {                                                             \
         result = enum;                                            \
@@ -1425,6 +1469,27 @@ c_meta_get_type_enum_from_string(string_t type_string)
     }
     GENERATED_PROGRAM_TYPE_LIST(X)
 #undef X
+
+exit:
+    return(result);
+}
+
+const type_info_t* 
+c_meta_get_type_info_from_type_enum(GENERATED_program_type_t type_enum)
+{
+    const type_info_t *result = null;
+    switch(type_enum)
+    {
+#define X(enum, typename_hash, string) \
+        case enum: \
+        { \
+            result = &GENERATED_type_table[enum]; \
+            goto exit; \
+        }break;
+        
+        GENERATED_PROGRAM_TYPE_LIST(X)
+#undef X
+    }
 
 exit:
     return(result);
@@ -1674,6 +1739,58 @@ c_meta_get_enum_type_info_from_member_string(string_t name)
         result = GENERATED_enum_member_name_to_type_info_table[enum_mapping].type_info_ptr;
     }
 
+    return(result);
+}
+
+// TODO(Sleepster): Both of these are awful, but switch-case statements are off the table since the compiler doesn't
+// actually make typedef mean what you think it means... So we have to do this. I don't think this is slow, but we may
+// have to sort the tables at compile time and binary search through them later on.
+GENERATED_program_type_t
+c_meta_get_type_enum_from_id(u64 id)
+{
+    GENERATED_program_type_t result = TYPE_byte;
+    #define X(enum_val, hash, string) { hash, string, enum_val },
+    static const struct { u64 id; const char* name; int index; } table[] = {
+        GENERATED_PROGRAM_TYPE_LIST(X)
+    };
+    #undef X
+
+    for (u32 index = 0; 
+         index < ArrayCount(table); 
+         ++index) 
+    {
+        if (table[index].id == id) 
+        {
+            result = (GENERATED_program_type_t)table[index].index;
+            goto exit;
+        }
+    }
+exit:
+    return(result);
+}
+
+const type_info_t*
+c_meta_get_type_info_from_id(u64 id)
+{
+    const type_info_t *result = null;
+
+    #define X(enum_val, hash, string) { hash, string, enum_val },
+    static const struct { u64 id; const char* name; int index; } table[] = {
+        GENERATED_PROGRAM_TYPE_LIST(X)
+    };
+    #undef X
+
+    for (u32 index = 0; 
+         index < ArrayCount(table); 
+         ++index) 
+    {
+        if (table[index].id == id) 
+        {
+            result = &GENERATED_type_table[table[index].index];
+            goto exit;
+        }
+    }
+exit:
     return(result);
 }
 )");
