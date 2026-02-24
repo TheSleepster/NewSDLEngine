@@ -51,9 +51,12 @@ vk_backend_image_update_data
 =============
 */
 void
-vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *image, VkMemoryRequirements memory_requirements)
+vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *image)
 {
     vulkan_image_info_t *image_info = &image->info;
+
+    VkMemoryRequirements memory_requirements;
+    vkGetImageMemoryRequirements(vulkan_context->device, image->handle, &memory_requirements);
 
     VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
     vk_backend_image_change_layout(vulkan_context, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, scratch_buffer);
@@ -118,7 +121,7 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
 
     if(image_info->data.data != null)
     {
-        vk_backend_image_update_data(vulkan_context, &result, memory_requirements);
+        vk_backend_image_update_data(vulkan_context, &result);
     }
 
 #if 0

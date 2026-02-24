@@ -23,6 +23,7 @@
 #include <vk_backend_buffer.h>
 #include <vk_backend_allocator.h>
 
+struct image_t;
 typedef struct material_archetype material_archetype_t;
 
 constexpr u32 MAX_FRAMES_IN_FLIGHT         = 3;
@@ -232,6 +233,8 @@ struct vulkan_context_t
     u32                                 next_staging_info;
 };
 
+struct vulkan_shader_t;
+
 #define vkAssert(result) ({                                                \
     if(!vk_backend_result_is_success(result))                              \
     {                                                                      \
@@ -245,13 +248,28 @@ const char *vk_backend_vulkan_result_string(VkResult result, bool8 get_extended)
 bool8       vk_backend_result_is_success(VkResult result);
 void        vk_backend_handle_window_resize(vulkan_context_t *vulkan_context, vec2_t window_size);
 void        vk_backend_render_frame(vulkan_context_t *vulkan_context);
-
-struct vulkan_shader_t;
 void        vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, bool8 wireframe);
 
 VkCommandBuffer  vk_backend_get_and_begin_scratch_command_buffer(vulkan_context_t *vulkan_context, bool8 is_primary);
 void             vk_backend_submit_and_release_scratch_command_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer *command_buffer);
 void             vk_backend_allocate_descriptor_sets(vulkan_context_t *vulkan_context, material_archetype_t *archetype);
 
+VkFramebuffer
+vk_backend_framebuffer_create(vulkan_context_t  *vulkan_context, 
+                              VkRenderPass       renderpass,
+                              image_t           *attachments,
+                              u32                attachment_count, 
+                              u32                width,
+                              u32                height);
+
+VkRenderPass
+vk_backend_renderpass_create(vulkan_context_t    *vulkan_context, 
+                             image_t             *attachments,
+                             u32                  attachment_count,
+                             VkImageLayout       *initial_layouts,
+                             VkImageLayout       *final_layouts,
+                             VkAttachmentLoadOp  *load_operations,
+                             VkAttachmentStoreOp *store_operations,
+                             VkImageLayout       *attachment_types);
 #endif // VK_BACKEND_CORE_H
 

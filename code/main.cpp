@@ -253,6 +253,81 @@ main(int argc, char **argv)
                 r_vulkan_end_frame(render_context, render_state, gcv_tick_rate);
 
             }
+
+
+            renderer_state_t renderer_state = {};
+            
+            render_image_t game_texture = s_renderer_create_texture(renderer_state, 320, 180, TFMT_RGBA32);
+            render_image_t game_depth   = s_renderer_create_texture(renderer_state, 320, 180, TFMT_DEPTH32);
+
+            render_image_t images[] = {
+                game_texture,
+                game_depth
+            };
+            render_target_create_info info = {};
+            info.render_targets      = images;
+            info.render_target_count = ArrayCount(images);
+
+            // NOTE(Sleepster): Create the game render_target 
+            render_target_t game_render_target = s_renderer_create_render_target(renderer_state, &info);
+
+            render_command_list_t *command_list = r_cmd_get_command_list(renderer_state);
+            r_cmd_set_active_render_target(command_list, game_render_target);
+
+            material_archetype_t *basic_material = s_asset_get_material_archetype(asset_manager, STR("basic_material.m_arch"));
+            material_instance_t  *vibrant_basic  = s_asset_get_material_instance(asset_manager, STR("basic_vibrant.m_inst"));
+            shader_t             *combo_shader   = s_asset_get_shader(asset_manager, STR("combo_shader.spv"));
+            asset_handle_t        player_texture = s_asset_get_texture(asset_manager, STR("Player"));
+
+            // NOTE(Sleepster): Gives back a CPU side buffer for the data you want to fill... 
+            constant_buffer_t *constant_data = s_asset_material_get_constant_data(basic_material);
+
+            r_cmd_set_active_material(command_list, basic_material);
+            r_cmd_begin_render_group(command_list);
+
+            r_cmd_draw_texture(command_list, vec2(200, 200), vec2(20, 20), vec4(1, 1, 1, 1), &player_texture);
+            r_cmd_draw_texture(command_list, vec2(100, 220), vec2(20, 20), vec4(1, 1, 1, 1), &player_texture);
+            r_cmd_draw_texture(command_list, vec2(200, 260), vec2(20, 20), vec4(1, 1, 1, 1), &player_texture);
+            r_cmd_draw_texture(command_list, vec2(190, 360), vec2(20, 20), vec4(1, 1, 1, 1), &player_texture);
+
+            r_cmd_end_render_group(command_list);
+
+            // NOTE(Sleepster): Create the ui_render_target 
+            render_image_t ui_texture   = s_renderer_create_texture(renderer_state, 1920, 1080, TFMT_RGBA32);
+            render_image_t ui_images[] = {
+                ui_texture,
+            };
+            render_target_create_info uiinfo = {};
+            info.render_targets      = ui_images;
+            info.render_target_count = ArrayCount(ui_images);
+            render_target_t ui_render_target = s_renderer_create_render_target(renderer_state, &uiinfo);
+
+            r_cmd_set_active_render_target(command_list, ui);
+            r_cmd_set_active_material(command_list, vibrant_basic);
+
+            asset_handle_t ui_texture = s_asset_get_texture(asset_manager, STR("UI Overlay"));
+            r_cmd_begin_render_group(command_list);
+            r_cmd_draw_texture(command_list, vec2(1920 * 0.5, 1060), vec2(20, 60), vec4(1, 1, 1, 1), ui_texture);
+            r_cmd_end_render_group(command_list);
+
+
+            // NOTE(Sleepster): Mix the two 
+            render_image_t game_texture_upscaled = s_renderer_create_texture(renderer_state, 1920, 1080, TFMT_RGBA32);
+            render_image_t game_texture_upscaled_images[] = {
+                game_texture_upscaled,
+            };
+            render_target_create_info combo_info = {};
+            info.render_targets      = game_texture_upscaled_images;
+            info.render_target_count = ArrayCount(game_texture_upscaled_images);
+
+            render_target_t s_renderer_create_render_target(renderer_state, &combo_info);
+
+            // NOTE(Sleepster): target, source, offsetx, offsety, width, height, sampling 
+            r_cmd_texture_blit(game_texture_upscaled_images, game_texture, 0, 0, 320, 180, TFMT_Nearest);
+
+            // combine down here with a special shader, maybe blit the 320x180 texture to full res.
+            r_cmd_set_shader(command_list, combination_shader);
+            r_cmd_
 #if 0
             float32 alpha = (dt_accumulator / gcv_tick_rate);
 #endif

@@ -5,9 +5,11 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <vk_backend_core.h>
+#include <s_renderer.h>
 #include <vk_backend_shader.h>
 #include <c_string.h>
 #include <c_file_api.h>
+#include <s_renderer.h>
 
 #include <s_asset_manager.h>
 
@@ -1418,8 +1420,8 @@ vk_backend_create_render_buffers
 void
 vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
 {
-    VkBufferUsageFlagBits vertex_buffer_usage_bits = (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT| 
-                                                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
+    VkBufferUsageFlagBits vertex_buffer_usage_bits = (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | 
+                                                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT  |
                                                                              VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 
     VkBufferUsageFlagBits index_buffer_usage_bits = (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | 
@@ -1429,8 +1431,6 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
     vulkan_context->main_vertex_buffer   = vk_backend_buffer_create(vulkan_context, sizeof(vertex_t) * 4,                       vertex_buffer_usage_bits, VULKAN_MEMORY_USAGE_GPU_ONLY);
     vulkan_context->main_index_buffer    = vk_backend_buffer_create(vulkan_context, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, index_buffer_usage_bits,  VULKAN_MEMORY_USAGE_GPU_ONLY);
     vulkan_context->staging_infos        = c_dynarray_create(vulkan_staging_info_t);
-
-    vulkan_context->scratch_buffer       = vk_backend_buffer_create(vulkan_context, MB(10), VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT,  VULKAN_MEMORY_USAGE_CPU_TO_GPU);
 
     // NOTE(Sleepster): Create the frame-based buffers 
     for(u32 index = 0;
@@ -1786,6 +1786,159 @@ vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shade
 
 /*
 =============
+vk_backend_create_renderpass
+=============
+*/
+
+VkRenderPass
+vk_backend_renderpass_create(vulkan_context_t    *vulkan_context, 
+                             image_t             *attachments,
+                             u32                  attachment_count,
+                             VkImageLayout       *initial_layouts,
+                             VkImageLayout       *final_layouts,
+                             VkAttachmentLoadOp  *load_operations,
+                             VkAttachmentStoreOp *store_operations,
+                             VkImageLayout       *attachment_types)
+{
+    VkRenderPass result = null;
+
+    u32 color_attachment_count    = 0;
+    bool32 depth_attachment_found = false;
+
+    VkAttachmentDescription attachment_descs[MAX_RENDER_TARGET_ATTACHMENTS] = {};
+    VkAttachmentReference   attachment_refs[MAX_RENDER_TARGET_ATTACHMENTS]  = {};
+
+    VkAttachmentReference   color_attachments[MAX_RENDER_TARGET_ATTACHMENTS] = {};
+    VkAttachmentReference   depth_attachment = {};
+    for(u32 attachment_index = 0;
+        attachment_index < attachment_count;
+        ++attachment_index)
+    {
+        VkAttachmentDescription *attachment       =  attachment_descs + attachment_index;
+        VkAttachmentReference   *attachment_ref   =  attachment_refs  + attachment_index;
+        vulkan_image_t          *image_attachment = &(attachments     + attachment_index)->vulkan_image;
+
+        VkImageLayout            initial_layout   = initial_layouts[attachment_index];
+        VkImageLayout            final_layout     = final_layouts[attachment_index];
+        VkImageLayout            attachment_type  = attachment_types[attachment_index];
+        VkAttachmentLoadOp       load_operation   = load_operations[attachment_index];
+        VkAttachmentStoreOp      store_operation  = store_operations[attachment_index];
+
+        // NOTE(Sleepster): We don't support Multisampling.
+        attachment->format         = image_attachment->internal_format;
+        attachment->samples        = VK_SAMPLE_COUNT_1_BIT;
+        attachment->loadOp         = load_operation;
+        attachment->storeOp        = store_operation;
+        attachment->stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachment->stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachment->initialLayout  = initial_layout;
+        attachment->finalLayout    = final_layout;
+
+        attachment_ref->attachment = attachment_index;
+        attachment_ref->layout     = attachment_type;
+
+        if(image_attachment->internal_format != VK_FORMAT_D24_UNORM_S8_UINT &&
+           image_attachment->internal_format != VK_FORMAT_D32_SFLOAT_S8_UINT)
+        {
+            color_attachments[color_attachment_count++] = attachment_refs[attachment_index];
+        }
+        else if(image_attachment->internal_format == VK_FORMAT_D24_UNORM_S8_UINT || 
+                image_attachment->internal_format == VK_FORMAT_D32_SFLOAT_S8_UINT)
+        {
+            Assert(!depth_attachment_found);
+
+            depth_attachment = *attachment_ref;
+            depth_attachment_found = true;
+        }
+    }
+
+    // TODO(Sleepster): Maybe we need to allow some more of these too be modifiable? For now I don't see a reason.
+    // For now, we know we'll never need multisampling (at least right now we won't). We MAY need preserved attachments
+    // in the future, but I'm not gonna deal with that right now
+    VkSubpassDescription subpass_desc    = {};
+    subpass_desc.pipelineBindPoint       = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass_desc.colorAttachmentCount    = color_attachment_count;
+    subpass_desc.pColorAttachments       = color_attachments; 
+    subpass_desc.pDepthStencilAttachment = depth_attachment_found ? &depth_attachment : null;
+    // NOTE(Sleepster): These supply imput to the shader
+    subpass_desc.inputAttachmentCount    = 0;
+    subpass_desc.pInputAttachments       = null;
+    // NOTE(Sleepster): Multisampling resolution 
+    subpass_desc.pResolveAttachments     = null;
+    // NOTE(Sleepster): Items that should be preserved between subpasses and future renderpasses
+    subpass_desc.preserveAttachmentCount = 0;
+    subpass_desc.pPreserveAttachments    = null;
+
+    // TODO(Sleepster): Does this need to exist? Do we need to allow this to be customizable?
+    VkSubpassDependency primary_subpass_deps = {};
+    primary_subpass_deps.srcSubpass      = VK_SUBPASS_EXTERNAL;
+    primary_subpass_deps.dstSubpass      = null;
+    primary_subpass_deps.srcStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    primary_subpass_deps.srcAccessMask   = 0;
+    primary_subpass_deps.dstStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    primary_subpass_deps.dstAccessMask   = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    primary_subpass_deps.dependencyFlags = 0;
+
+    VkRenderPassCreateInfo renderpass_info = {};
+    renderpass_info.sType           =  VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderpass_info.attachmentCount =  attachment_count;
+    renderpass_info.pAttachments    =  attachment_descs;
+    renderpass_info.subpassCount    =  1;
+    renderpass_info.pSubpasses      = &subpass_desc;
+    renderpass_info.dependencyCount =  1;
+    renderpass_info.pDependencies   = &primary_subpass_deps;
+    renderpass_info.pNext           =  null;
+    renderpass_info.flags           =  0;
+
+    vkAssert(vkCreateRenderPass(vulkan_context->device, &renderpass_info, vulkan_context->cpu_allocation_callbacks, &result));
+
+    return(result);
+}
+
+/*
+=============
+vk_backend_create_framebuffer
+=============
+*/
+
+VkFramebuffer
+vk_backend_framebuffer_create(vulkan_context_t  *vulkan_context, 
+                              VkRenderPass       renderpass,
+                              image_t           *attachments,
+                              u32                attachment_count, 
+                              u32                width,
+                              u32                height)
+{
+    VkFramebuffer result = null;
+
+    VkImageView views[10] = {};
+    for(u32 attachment_index = 0;
+        attachment_index < attachment_count;
+        ++attachment_index)
+    {
+        vulkan_image_t *image   = &(attachments + attachment_index)->vulkan_image;
+        views[attachment_index] = image->view;
+    }
+
+    VkFramebufferCreateInfo info = {};
+    info.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    info.renderPass      = renderpass;
+    info.pAttachments    = views;
+    info.attachmentCount = attachment_count;
+    info.width           = width;
+    info.height          = height;
+    info.layers          = 1;
+
+    vkAssert(vkCreateFramebuffer(vulkan_context->device, 
+                                &info, 
+                                 vulkan_context->cpu_allocation_callbacks, 
+                                &result));
+
+    return(result);
+}
+
+/*
+=============
 vk_backend_init
 =============
 */
@@ -1817,7 +1970,7 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
     // NOTE(Sleepster): Create the command pools for our context's buffers
     vk_backend_create_command_pools(vulkan_context);
 
-    // NOTE(Sleepster): Create the comamnd buffers for the rendering in the engine 
+    // NOTE(Sleepster): Create the comamand buffers for the rendering in the engine 
     vk_backend_create_command_buffers(vulkan_context);
 
     // NOTE(Sleepster): Create the image acquisition and rendering completion semaphore objects, do the same for the fences

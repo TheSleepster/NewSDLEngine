@@ -27,6 +27,7 @@
 #include <s_input_manager.h>
 #include <s_nt_networking.h>
 #include <s_asset_manager.h>
+#include <s_renderer.h>
 //
 
 #include <asset_file_packer/jfd_asset_file.h>
@@ -325,6 +326,9 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
     // Maybe this is bad and that's a better idea.
     archetype.ID              = c_fnv_hash_value(archetype.name.data, archetype.name.count);
     archetype.shader_handle   = s_asset_manager_acquire_asset_handle(asset_manager, archetype.shader_binary_name);
+
+     
+    // TODO(Sleepster): Do we want to make a frontend wrapper around this??? I don't really know what to do here... 
     vk_backend_allocate_descriptor_sets(asset_manager->vulkan_context, &archetype);
 
     result.material_type      = SMT_Archetype;
@@ -744,6 +748,7 @@ s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_at
         }
         c_dynarray_clear(atlas->textures_to_merge);
     
+        // TODO(Sleepster): Create a wrapper for this
         vulkan_image_info_t info = {};
         info.data           = atlas->bitmap_data->pixels;
         info.width          = atlas->bitmap_data->width;
@@ -761,7 +766,7 @@ s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_at
         }
         else
         {
-            vk_backend_image_update_data(vulkan_context, &atlas->texture.gpu_data, atlas->texture.gpu_data.allocation.memory_requirements);
+            vk_backend_image_update_data(vulkan_context, &atlas->texture.gpu_data);
         }
     }
     else

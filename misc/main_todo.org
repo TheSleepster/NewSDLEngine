@@ -6,7 +6,10 @@
 - [X] Swapbuffers command
 - [X] Handle window resizing
 - [X] Shaders and descriptor pools
-- [ ] Allocating and handling descriptor sets
+- [X] Allocating and handling descriptor sets
+- [ ] Arena allocator should allow the user to set it's growing status. That way, if the user wants to use
+      the allocator on other threads, then we can safely do so. Right now with the way the arenas grow, it
+      is not safe to use these on multiple threads.
 
 - [ ] Memory Allocation tracker
 - [ ] Image manager like idSoftware's in DOOM3 BFG
