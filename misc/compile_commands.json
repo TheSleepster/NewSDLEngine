@@ -1,6 +1,6 @@
 [
   {
-    "file": "s_asset_manager.cpp",
+    "file": "main.cpp",
     "arguments": [
       "clang++",
       "-g",
@@ -42,17 +42,17 @@
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
       "-MT",
-      "../build/s_asset_manager.o",
+      "../build/main.o",
       "-MMD",
       "-MP",
       "-MF",
-      "../build/s_asset_manager.d",
+      "../build/main.d",
       "-c",
-      "s_asset_manager.cpp",
+      "main.cpp",
       "-o",
-      "../build/s_asset_manager.o"
+      "../build/main.o"
     ],
     "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/s_asset_manager.o"
+    "output": "../build/main.o"
   }
 ]

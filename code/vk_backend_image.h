@@ -65,9 +65,20 @@ struct vulkan_image_t
 vulkan_image_t vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *image_info);
 void           vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *image);
 void           vk_backend_image_destroy(vulkan_context_t *vulkan_context, vulkan_image_t *image);
-void           vk_backend_image_change_layout(vulkan_context_t *vulkan_context,  vulkan_image_t *image, VkImageLayout new_layout, VkCommandBuffer command_buffer);
 VkSampler      vk_backend_sampler_create(vulkan_context_t *vulkan_context, vulkan_sampler_info_t *info);
 void           vk_backend_sampler_destroy(vulkan_context_t *vulkan_context, VkSampler sampler);
+
+void
+vk_backend_image_change_layout(vulkan_context_t       *vulkan_context, 
+                               VkCommandBuffer         command_buffer,
+                               VkImage                 image, 
+                               VkImageLayout           current_layout,
+                               VkImageLayout           target_layout, 
+                               VkPipelineStageFlags    src_stage_flag,
+                               VkPipelineStageFlags    dst_stage_flag,
+                               VkAccessFlags           src_access_flags,
+                               VkAccessFlags           dst_access_flags,
+                               VkImageSubresourceRange range);
 
 #endif // VK_BACKEND_IMAGE_H
 

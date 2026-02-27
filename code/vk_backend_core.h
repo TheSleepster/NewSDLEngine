@@ -30,6 +30,7 @@ constexpr u32 MAX_FRAMES_IN_FLIGHT         = 3;
 constexpr u64 MAX_VULKAN_INDEX_BUFFER_SIZE = 600000;
 constexpr u64 MAX_VULKAN_INSTANCES         = MAX_VULKAN_INDEX_BUFFER_SIZE / 6;
 constexpr u32 MAX_VULKAN_SHADER_STAGES     = 10;
+constexpr u32 SWAPCHAIN_MAX_IMAGES         = 10;
 
 constexpr s32 g_device_extension_count = 1;
 static const char *g_device_extensions[g_device_extension_count] = {
@@ -188,9 +189,11 @@ struct vulkan_context_t
     VkQueue                             compute_queue;
 
     VkFormat                            depth_format;
+    VkSurfaceFormatKHR                  swapchain_format;
     swapchain_info_t                    swapchain;
     VkImage                            *swapchain_images;
     VkImageView                        *swapchain_views;
+    VkImageLayout                      *swapchain_image_layouts;
     vulkan_image_t                      depth_buffer;
 
     bool32                              rebuilding_swapchain;
@@ -234,6 +237,7 @@ struct vulkan_context_t
 };
 
 struct vulkan_shader_t;
+struct renderer_state_t;
 
 #define vkAssert(result) ({                                                \
     if(!vk_backend_result_is_success(result))                              \
@@ -249,6 +253,10 @@ bool8       vk_backend_result_is_success(VkResult result);
 void        vk_backend_handle_window_resize(vulkan_context_t *vulkan_context, vec2_t window_size);
 void        vk_backend_render_frame(vulkan_context_t *vulkan_context);
 void        vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, bool8 wireframe);
+void        vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *renderer_state);
+void        vk_backend_renderpass_destroy(vulkan_context_t *vulkan_context, VkRenderPass renderpass);
+void        vk_backend_framebuffer_destroy(vulkan_context_t *vulkan_context, VkFramebuffer framebuffer);
+void        vk_backend_renderpass_destroy(vulkan_context_t *vulkan_context, VkRenderPass renderpass);
 
 VkCommandBuffer  vk_backend_get_and_begin_scratch_command_buffer(vulkan_context_t *vulkan_context, bool8 is_primary);
 void             vk_backend_submit_and_release_scratch_command_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer *command_buffer);

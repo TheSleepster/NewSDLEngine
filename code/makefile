@@ -211,7 +211,7 @@ $(VMA_OBJ): $(SRC_DIR)/vk_vma_implementation.cpp | $(BUILD_DIR)
 # Link objects to executable (Include VMA_OBJ)
 $(GAME_OUT): $(GAME_OBJS) $(VMA_OBJ) | $(BUILD_DIR)
 	@echo Linking game executable: $@ ...
-	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(LDFLAGS) $(GAME_OBJS) $(VMA_OBJ) $(GAME_EXTERNAL_LIBRARIES) -o $@
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) -fuse-ld=lld $(LDFLAGS) $(GAME_OBJS) $(VMA_OBJ) $(GAME_EXTERNAL_LIBRARIES) -o $@
 
 clean:
 	-rm -rf $(BUILD_DIR)

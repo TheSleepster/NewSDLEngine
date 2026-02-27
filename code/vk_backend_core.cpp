@@ -995,6 +995,8 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
     VkPresentModeKHR   present_mode     = vk_backend_choose_present_mode(vulkan_context->gpu.valid_present_modes);
     VkExtent2D         swapchain_extent = vk_backend_choose_swapchain_extent(&vulkan_context->gpu.surface_capabilities, vulkan_context->window);
 
+    vulkan_context->swapchain_format = surface_format;
+
     s32 width;
     s32 height;
     Assert(SDL_GetWindowSizeInPixels(vulkan_context->window, &width, &height));
@@ -1012,7 +1014,7 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
         .imageColorSpace  = surface_format.colorSpace,
         .imageExtent      = swapchain_extent,
         .imageArrayLayers = 1,
-        .imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT 
+        .imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT
     };
 
     if(vulkan_context->graphics_queue_family_idx != vulkan_context->present_queue_family_idx)
@@ -1042,8 +1044,9 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
     vkAssert(vkGetSwapchainImagesKHR(vulkan_context->device, vulkan_context->swapchain.handle, &num_images, null));
     Expect(num_images > 0, "vkGetSwapchainImagesKHR returned a value of zero...\n");
 
-    vulkan_context->swapchain_images = c_arena_push_array(&vulkan_context->swapchain_arena, VkImage,     num_images);
-    vulkan_context->swapchain_views  = c_arena_push_array(&vulkan_context->swapchain_arena, VkImageView, num_images);
+    vulkan_context->swapchain_images        = c_arena_push_array(&vulkan_context->swapchain_arena,        VkImage,       num_images);
+    vulkan_context->swapchain_views         = c_arena_push_array(&vulkan_context->swapchain_arena,        VkImageView,   num_images);
+    vulkan_context->swapchain_image_layouts = c_arena_push_array(&vulkan_context->swapchain_arena, VkImageLayout, num_images);
     
     vkAssert(vkGetSwapchainImagesKHR(vulkan_context->device, vulkan_context->swapchain.handle, &num_images, vulkan_context->swapchain_images));
     Expect(num_images > 0, "vkGetSwapchainImagesKHR returned a value of zero...\n");
@@ -1070,6 +1073,7 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
         view_info.subresourceRange.layerCount     = 1;
 
         vkAssert(vkCreateImageView(vulkan_context->device, &view_info, vulkan_context->cpu_allocation_callbacks, &vulkan_context->swapchain_views[image_index]));
+        vulkan_context->swapchain_image_layouts[image_index] = VK_IMAGE_LAYOUT_UNDEFINED;
     }
 }
 
@@ -1356,6 +1360,30 @@ vk_backend_create_renderpasses(vulkan_context_t *vulkan_context)
                                &renderpass_create_info, 
                                 vulkan_context->cpu_allocation_callbacks, 
                                &vulkan_context->primary_renderpass));
+}
+
+void
+vk_backend_begin_renderpass(vulkan_context_t *vulkan_context, 
+                            VkRenderPass renderpass, 
+                            VkFramebuffer framebuffer, 
+                            u32           attachment_count,
+                            VkClearValue *clear_values)
+{
+    VkRenderPassBeginInfo renderpass_info = {};
+    renderpass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderpass_info.renderPass  = renderpass;
+    renderpass_info.framebuffer = framebuffer;
+    renderpass_info.renderArea = {
+        .offset.x = 0,
+        .offset.y = 0,
+        .extent.width  = vulkan_context->current_window_width,
+        .extent.height = vulkan_context->current_window_height
+    };
+
+    renderpass_info.clearValueCount = attachment_count;
+    renderpass_info.pClearValues    = clear_values;
+
+    vkCmdBeginRenderPass(*vulkan_context->render_command_buffer, &renderpass_info, VK_SUBPASS_CONTENTS_INLINE);
 }
 
 /*
@@ -1895,9 +1923,15 @@ vk_backend_renderpass_create(vulkan_context_t    *vulkan_context,
     return(result);
 }
 
+void
+vk_backend_renderpass_destroy(vulkan_context_t *vulkan_context, VkRenderPass renderpass)
+{
+    vkDestroyRenderPass(vulkan_context->device, renderpass, vulkan_context->cpu_allocation_callbacks);
+}
+
 /*
 =============
-vk_backend_create_framebuffer
+vk_backend_ramebuffer_create
 =============
 */
 
@@ -1935,6 +1969,18 @@ vk_backend_framebuffer_create(vulkan_context_t  *vulkan_context,
                                 &result));
 
     return(result);
+}
+
+/*
+=============
+vk_backend_framebuffer_destroy
+=============
+*/
+
+void
+vk_backend_framebuffer_destroy(vulkan_context_t *vulkan_context, VkFramebuffer framebuffer)
+{
+    vkDestroyFramebuffer(vulkan_context->device, framebuffer, vulkan_context->cpu_allocation_callbacks);
 }
 
 /*
@@ -2002,7 +2048,7 @@ vk_backend_render_frame
 */
 
 void
-vk_backend_render_frame(vulkan_context_t *vulkan_context)
+vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *renderer_state)
 {
     bool32 window_resize = (vulkan_context->window_size_generation != vulkan_context->last_window_size_generation);
     if(window_resize || vulkan_context->rebuilding_swapchain)
@@ -2044,6 +2090,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context)
     };
     vkAssert(vkBeginCommandBuffer(*vulkan_context->render_command_buffer, &begin_info));
 
+#if 0
     VkRenderPassBeginInfo renderpass_info = {};
     renderpass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderpass_info.renderPass  =  vulkan_context->primary_renderpass;
@@ -2068,10 +2115,170 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context)
     renderpass_info.pClearValues    = clear_values;
     
     vkCmdBeginRenderPass(*vulkan_context->render_command_buffer, &renderpass_info, VK_SUBPASS_CONTENTS_INLINE);
+#endif
+    if(renderer_state->current_window_size_generation != renderer_state->last_window_size_generation)
+    {
+        s_renderer_resize_render_targets(renderer_state, renderer_state->window_size);
+    }
 
     // render commands here
+    for(u32 command_list_index = 0;
+        command_list_index < renderer_state->command_list_count;
+        ++command_list_index)
+    {
+        render_command_list_t *command_list = renderer_state->command_lists + command_list_index;
+        for(u32 command_index = 0;
+            command_index < command_list->command_count;
+            ++command_index)
+        {
+            render_command_t *command = command_list->commands + command_index;
+            switch(command->header.command_type)
+            {
+                case RCT_BindRenderTarget:
+                {
+                    render_command_bind_render_target_t *rt_command = (render_command_bind_render_target_t*)command;
+                    if(command_list->active_render_target)
+                    {
+                        vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
+                        command_list->active_render_target = null;
+                    }
+                    vk_backend_begin_renderpass(vulkan_context, 
+                                                rt_command->render_target->renderpass, 
+                                                rt_command->render_target->framebuffer,
+                                                rt_command->render_target->attachment_count,
+                                                rt_command->render_target->clear_values);
+                    command_list->active_render_target = rt_command->render_target;
+                }break;
+                case RCT_BeginRenderGroup:
+                {
+                }break;
+                case RCT_DrawRectangle:
+                {
+                }break;
+                case RCT_EndRenderGroup:
+                {
+                }break;
+                case RCT_PresentFrame:
+                {
+                    vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
+
+                    // blit
+                    image_t *src_color_buffer      = command_list->active_render_target->primary_color_buffer;
+                    VkImage  present_image         = vulkan_context->swapchain_images[vulkan_context->current_image_index];
+                    VkImageLayout swapchain_layout = vulkan_context->swapchain_image_layouts[vulkan_context->current_image_index];
+
+                    command_list->active_render_target = null;
+
+                    // NOTE(Sleepster): We only ever care about the color buffer since the swapchain image is just a color buffer 
+                    VkImageSubresourceRange src_range = {
+                        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                        .baseArrayLayer = 0,
+                        .baseMipLevel   = 0,
+                        .layerCount     = 1,
+                        .levelCount     = 1,
+                    };
+
+                    VkImageSubresourceRange dst_range = {
+                        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                        .baseMipLevel   = 0,
+                        .levelCount     = 1,
+                        .baseArrayLayer = 0,
+                        .layerCount     = 1,
+                    };
+
+                    // NOTE(Sleepster): transition the color buffer to TRANSFER_SRC 
+                    vk_backend_image_change_layout(vulkan_context, 
+                                                  *vulkan_context->render_command_buffer,
+                                                   src_color_buffer->vulkan_image.handle,
+                                                   src_color_buffer->vulkan_image.layout,
+                                                   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                                                   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                                   0,
+                                                   0,
+                                                   src_range);
+                    src_color_buffer->vulkan_image.layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+
+                    // NOTE(Sleepster): transition the swapchain image to TRANSFER_DST 
+                    vk_backend_image_change_layout(vulkan_context, 
+                                                  *vulkan_context->render_command_buffer,
+                                                   present_image,
+                                                   swapchain_layout,
+                                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                                   VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                                   0,
+                                                   0,
+                                                   dst_range);
+
+                    // NOTE(Sleepster): Do the blit 
+                    VkImageBlit blit_region = {
+                        .srcSubresource.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                        .srcSubresource.mipLevel       = 0,
+                        .srcSubresource.baseArrayLayer = 0,
+                        .srcSubresource.layerCount     = 1,
+                        .srcOffsets[0] = (VkOffset3D){0, 0, 0},
+                        .srcOffsets[1] = (VkOffset3D){(s32)src_color_buffer->vulkan_image.width, (s32)src_color_buffer->vulkan_image.height, 1},
+
+                        .dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                        .dstSubresource.mipLevel = 0, 
+                        .dstSubresource.baseArrayLayer = 0,
+                        .dstSubresource.layerCount = 1,
+
+                        .dstOffsets[0] = (VkOffset3D){0, 0, 0},
+                        .dstOffsets[1] = (VkOffset3D){(s32)vulkan_context->current_window_width, (s32)vulkan_context->current_window_height, 1},
+                    };
+                    vkCmdBlitImage(*vulkan_context->render_command_buffer,
+                                   src_color_buffer->vulkan_image.handle,
+                                   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                                   present_image,
+                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                   1,
+                                   &blit_region,
+                                   VK_FILTER_NEAREST);
+
+                    // NOTE(Sleepster): Transfer the images back to what they were before the blit 
+                    vk_backend_image_change_layout(vulkan_context, 
+                                                  *vulkan_context->render_command_buffer,
+                                                   src_color_buffer->vulkan_image.handle,
+                                                   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                                                   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                                   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                                   0,
+                                                   0,
+                                                   src_range);
+
+                    vk_backend_image_change_layout(vulkan_context, 
+                                                   *vulkan_context->render_command_buffer,
+                                                   present_image,
+                                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                                   VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                                   VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                                   0,
+                                                   0,
+                                                   dst_range);
+                    src_color_buffer->vulkan_image.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+                    vulkan_context->swapchain_image_layouts[vulkan_context->current_image_index] = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+                }break;
+                default: {InvalidCodePath;}break;
+            }
+        }
+
+        command_list->bind_material_command_count       = 0;
+        command_list->bind_render_target_command_count  = 0;
+        command_list->bind_shader_command_count         = 0;
+        command_list->draw_instance_command_count       = 0;
+        command_list->command_count                     = 0;
+
+        c_arena_reset(&command_list->transient_arena);
+    }
+    renderer_state->command_list_count = 0;
     
+#if 0
     vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
+#endif
     vkEndCommandBuffer(*vulkan_context->render_command_buffer);
 
     vkAssert(vkResetFences(vulkan_context->device, 1, vulkan_context->image_render_idle_fence));

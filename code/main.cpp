@@ -29,6 +29,7 @@
 #endif
 
 #include <vk_backend_core.h>
+#include <s_renderer.h>
 
 #include <s_nt_networking.h>
 #include <s_input_manager.h>
@@ -40,7 +41,7 @@
 //#include <meta/GENERATED_program_RTTI.h>
 
 internal_api void
-c_process_window_events(SDL_Window *window, vulkan_context_t *vulkan_context, input_manager_t *input_manager)
+c_process_window_events(SDL_Window *window, renderer_state_t *renderer_state, input_manager_t *input_manager)
 {
     SDL_Event event;
     while(SDL_PollEvent(&event))
@@ -63,7 +64,7 @@ c_process_window_events(SDL_Window *window, vulkan_context_t *vulkan_context, in
 #if 0
                 r_vulkan_on_resize(render_context, g_window_size);
 #endif
-                vk_backend_handle_window_resize(vulkan_context, g_window_size);
+                s_renderer_handle_window_resize(renderer_state, g_window_size);
             }break;
         }
     }
@@ -149,11 +150,40 @@ main(int argc, char **argv)
         float32 delta_time     = 0;
         float64 dt_accumulator = 0.0f;
 
+        renderer_state_t renderer_state = {};
+        s_renderer_state_init(&renderer_state, &context);
+
+        image_create_info_t image_info = {};
+        image_info.image_type       = IMAGE_TYPE_ColorAttachment;
+        image_info.format           = BMF_RGBA32;
+        image_info.width            = 1920;
+        image_info.height           = 1080;
+
+        image_t color_buffer = s_renderer_image_create(&renderer_state, &image_info);
+
+        render_target_attachment_info_t color_attachment = {};
+        color_attachment.attachment      = &color_buffer;
+        color_attachment.attachment_type = IMAGE_TYPE_ColorAttachment;
+        color_attachment.initial_layout  = IMAGE_TYPE_Undefined;
+        color_attachment.final_layout    = IMAGE_TYPE_ColorAttachment;
+        color_attachment.load_operation  = RTALO_Clear;
+        color_attachment.store_operation = RTASO_Store;
+
+        color_attachment.clear_value.clear_color.float_color = vec4(0.4, 0.6, 1.0, 1.0);
+
+        render_target_create_info_t target_info = {};
+        target_info.attachments      = &color_attachment;
+        target_info.attachment_count = 1;
+        target_info.width            = 1920;
+        target_info.height           = 1080;
+        render_target_t *test_target = s_renderer_render_target_create(&renderer_state, &target_info);
+        (void)test_target;
+
         g_running = true;
         while(g_running)
         {
             s_im_reset_controller_states(&input_manager);
-            c_process_window_events(state->window, &context, &input_manager);
+            c_process_window_events(state->window, &renderer_state, &input_manager);
 
             state->input_axis = {};
             if(s_im_is_keyboard_key_down(game_controller, SDL_SCANCODE_W))
@@ -215,7 +245,17 @@ main(int argc, char **argv)
                 dt_accumulator -= gcv_tick_rate;
             }
 
-            vk_backend_render_frame(&context);
+            render_command_list_t *command_list = s_renderer_get_command_list(&renderer_state);
+            r_cmd_bind_render_target(command_list, test_target);
+            r_cmd_begin_render_group(command_list);
+
+            r_cmd_draw_rectangle(command_list, vec2(100, 100), vec2(20, 20), vec4(1, 1, 1, 1), 0.0f);
+
+            r_cmd_end_render_group(command_list);
+            r_cmd_present(command_list);
+
+
+            vk_backend_render_frame(&context, &renderer_state);
 #if 0
             if(r_vulkan_begin_frame(render_context, render_state, gcv_tick_rate))
             {
@@ -254,8 +294,6 @@ main(int argc, char **argv)
 
             }
 
-
-            renderer_state_t renderer_state = {};
             
             render_image_t game_texture = s_renderer_create_texture(renderer_state, 320, 180, TFMT_RGBA32);
             render_image_t game_depth   = s_renderer_create_texture(renderer_state, 320, 180, TFMT_DEPTH32);

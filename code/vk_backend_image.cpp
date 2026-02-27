@@ -55,11 +55,28 @@ vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *i
 {
     vulkan_image_info_t *image_info = &image->info;
 
+    VkImageSubresourceRange src_range = {
+        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+        .baseArrayLayer = 0,
+        .baseMipLevel   = 0,
+        .layerCount     = 1,
+        .levelCount     = 1,
+    };
     VkMemoryRequirements memory_requirements;
     vkGetImageMemoryRequirements(vulkan_context->device, image->handle, &memory_requirements);
 
     VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
-    vk_backend_image_change_layout(vulkan_context, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, scratch_buffer);
+    vk_backend_image_change_layout(vulkan_context, 
+                                   scratch_buffer,
+                                   image->handle, 
+                                   image->layout,
+                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+                                   VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                   0,
+                                   VK_ACCESS_TRANSFER_WRITE_BIT,
+                                   src_range);
+
     vulkan_buffer_t copy_buffer = vk_backend_buffer_create(vulkan_context, 
                                                            memory_requirements.size,
                                                            VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
@@ -68,10 +85,87 @@ vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *i
     vk_backend_buffer_copy_data(&copy_buffer, image_info->data.data, image_info->data.count, 0);
     vk_backend_image_update_from_buffer(vulkan_context, image, &copy_buffer, scratch_buffer);
 
-    vk_backend_image_change_layout(vulkan_context, image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, scratch_buffer);
+    vk_backend_image_change_layout(vulkan_context, 
+                                   scratch_buffer,
+                                   image->handle, 
+                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                   VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
+                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                   VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+                                   VK_ACCESS_TRANSFER_WRITE_BIT,
+                                   VK_ACCESS_SHADER_READ_BIT,
+                                   src_range);
     vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_buffer);
 
     vk_backend_buffer_destroy(vulkan_context, &copy_buffer);
+}
+
+internal_api bool8
+is_image_format_depth_format(vulkan_image_t *image)
+{
+    bool8 result = false;
+
+    return(result);
+}
+
+internal_api bool8
+is_image_format_stencil_format(vulkan_image_t *image)
+{
+    bool8 result = false;
+
+    return(result);
+}
+
+/*
+=============
+vk_backend_image_create_view
+=============
+*/
+
+void
+vk_backend_image_create_view(vulkan_context_t *vulkan_context, vulkan_image_t *image)
+{
+    VkImageAspectFlags aspect_mask = {};
+    bool8 is_depth_format   = is_image_format_depth_format(image);
+    bool8 is_stencil_format = is_image_format_stencil_format(image);
+    if(aspect_mask == 0) 
+    {
+        if(is_depth_format && is_stencil_format) aspect_mask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+        else if(is_depth_format)                 aspect_mask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        else if(is_stencil_format)               aspect_mask = VK_IMAGE_ASPECT_STENCIL_BIT;
+        else                                     aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
+    }
+
+    VkImageViewCreateInfo view_create_info = {
+        .sType    = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+        .image    = image->handle,
+        .viewType = VK_IMAGE_VIEW_TYPE_2D,
+        .format   = image->internal_format,
+        .subresourceRange = {
+            .aspectMask     = aspect_mask,
+            .baseMipLevel   = 0,
+            .levelCount     = 1,
+            .baseArrayLayer = 0,
+            .layerCount     = 1
+        },
+    };
+    vkAssert(vkCreateImageView(vulkan_context->device, 
+                              &view_create_info, 
+                               vulkan_context->cpu_allocation_callbacks, 
+                              &image->view));
+}
+
+
+/*
+=============
+vk_backend_image_destroy_view
+=============
+*/
+
+void
+vk_backend_image_destroy_view(vulkan_context_t *vulkan_context, vulkan_image_t *image)
+{
+    vkDestroyImageView(vulkan_context->device, image->view, vulkan_context->cpu_allocation_callbacks);
 }
 
 /*
@@ -102,8 +196,11 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
     info.tiling        = VK_IMAGE_TILING_OPTIMAL;
     info.initialLayout = (VkImageLayout)image_info->initial_layout;
     info.usage         = image_info->usage;
-    info.samples       = (VkSampleCountFlagBits)image_info->sample_count;
+    info.samples       = (VkSampleCountFlagBits)VK_SAMPLE_COUNT_1_BIT;
     info.sharingMode   = VK_SHARING_MODE_EXCLUSIVE;
+
+    result.internal_format = (VkFormat)image_info->format;
+    result.layout          = (VkImageLayout)image_info->initial_layout;
 
     vkAssert(vkCreateImage(vulkan_context->device, &info, vulkan_context->cpu_allocation_callbacks, &result.handle));
 
@@ -124,15 +221,7 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
         vk_backend_image_update_data(vulkan_context, &result);
     }
 
-#if 0
-    VmaAllocationCreateInfo alloc_create_info = {};
-    alloc_create_info.usage = VMA_MEMORY_USAGE_AUTO;
-    alloc_create_info.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
-    alloc_create_info.priority = 1.0f;
-
-    vmaCreateImage(vulkan_context->vulkan_allocator, &info, &alloc_create_info, &result.handle, &result.gpu_memory, null);
-#endif
-
+    vk_backend_image_create_view(vulkan_context, &result);
     return(result);
 }
 
@@ -148,12 +237,10 @@ void
 vk_backend_image_destroy(vulkan_context_t *vulkan_context, vulkan_image_t *image)
 {
     Assert(image);
-#if 1
+
+    vk_backend_image_destroy_view(vulkan_context, image);
     vk_allocator_free(&vulkan_context->vulkan_allocator, &image->allocation);
     vkDestroyImage(vulkan_context->device, image->handle, vulkan_context->cpu_allocation_callbacks);
-#else
-    vmaDestroyImage(vulkan_context->vulkan_allocator, image->handle, image->gpu_memory);
-#endif
 }
 
 /*
@@ -164,56 +251,33 @@ vk_backend_image_change_layout
 
 // TODO(Sleepster): Compute shaders will need to be able too see this stuff too
 void
-vk_backend_image_change_layout(vulkan_context_t *vulkan_context, 
-                               vulkan_image_t   *image, 
-                               VkImageLayout     new_layout, 
-                               VkCommandBuffer   command_buffer)
+vk_backend_image_change_layout(vulkan_context_t       *vulkan_context, 
+                               VkCommandBuffer         command_buffer,
+                               VkImage                 image, 
+                               VkImageLayout           current_layout,
+                               VkImageLayout           target_layout, 
+                               VkPipelineStageFlags    src_stage_flag,
+                               VkPipelineStageFlags    dst_stage_flag,
+                               VkAccessFlags           src_access_flags,
+                               VkAccessFlags           dst_access_flags,
+                               VkImageSubresourceRange range)
 {
     VkImageMemoryBarrier barrier = {};
-    barrier.sType     = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrier.oldLayout = (VkImageLayout)image->info.initial_layout;
-    barrier.newLayout = new_layout;
-    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    barrier.image               = image->handle;
-    barrier.subresourceRange.levelCount = 1;
-    barrier.subresourceRange.layerCount = 1;
-    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-	barrier.srcAccessMask = 0;
-	barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-    VkPipelineStageFlags source_stage = 0;
-    VkPipelineStageFlags dest_stage   = 0;
-    if(image->info.initial_layout == VK_IMAGE_LAYOUT_UNDEFINED && new_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
-    {
-        barrier.srcAccessMask = 0;
-        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-        // NOTE(Sleepster): Essentially "don't care where it is, just copy it" 
-        source_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-        dest_stage   = VK_PIPELINE_STAGE_TRANSFER_BIT;
-    }
-    else if(image->info.initial_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && new_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-    {
-        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-        // NOTE(Sleepster): Copy from the stage, to the fragment shader 
-        source_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-        dest_stage   = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT;
-    }
-    else
-    {
-        Expect(false, "Unsupported image transition at the moment...\n");
-    }
+    barrier.sType                = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout            = current_layout;
+    barrier.newLayout            = target_layout;
+    barrier.srcQueueFamilyIndex  = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex  = VK_QUEUE_FAMILY_IGNORED;
+    barrier.image                = image;
+	barrier.srcAccessMask        = src_access_flags;
+	barrier.dstAccessMask        = dst_access_flags;
+    barrier.subresourceRange     = range;
 
     vkCmdPipelineBarrier(command_buffer, 
-                         source_stage, 
-                         dest_stage, 
+                         src_stage_flag, 
+                         dst_stage_flag, 
                          0, 0, 0, 0, 0, 1, 
                         &barrier);
-
-    image->info.initial_layout = new_layout;
 }
 
 /*

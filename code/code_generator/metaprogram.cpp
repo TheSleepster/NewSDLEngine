@@ -33,12 +33,12 @@
 typedef struct meta_struct meta_struct_t;
 
 // TODO(Sleepster): 
-// - [ ] Parse #if 0 blocks inside of structures.
+// - [X] Parse #if 0 blocks inside of structures.
 // - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
 // - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
-// - [ ] Make a function that takes in the member string and returns to us the member enum for the item,
+// - [X] Make a function that takes in the member string and returns to us the member enum for the item,
 //       with  that also make a function capable of taking in the member enum and returning the member data
-// - [ ] Compile time hash table stored in the header that allows us to map every member name to the type_info_t* for the item is a member of
+// - [X] Compile time hash table stored in the header that allows us to map every member name to the type_info_t* for the item is a member of
 //       c_meta_get_member_info_by_enum(structure, enum);
 // - [ ] Make it easier for people to use certain bits of the RTTI without having to include the entire chain of parsed
 //       headers. It's very annoying to use the RTTI currently.
