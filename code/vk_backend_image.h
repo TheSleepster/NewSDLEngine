@@ -10,6 +10,7 @@
 #include <vulkan/vulkan.h>
 #include <c_types.h>
 #include <c_string.h>
+#include <c_math.h>
 
 #include <vk_backend_allocator.h>
 
@@ -90,8 +91,15 @@ void
 vk_backend_image_blit(vulkan_context_t       *vulkan_context, 
                       vulkan_image_t         *source_image, 
                       vulkan_image_t         *destination_image, 
+                      vec2_t                  source_offset,
+                      vec2_t                  source_blit_size,
+                      vec2_t                  destination_offset,
+                      vec2_t                  destination_size,
+                      VkImageLayout           source_initial_layout,
+                      VkImageLayout           destination_initial_layout,
                       VkImageSubresourceRange source_range, 
                       VkImageSubresourceRange destination_range);
+
 
 #endif // VK_BACKEND_IMAGE_H
 

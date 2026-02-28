@@ -344,7 +344,7 @@ void
 r_cmd_blit_render_target(render_command_list_t *command_list, render_command_blit_info_t *blit_info)
 {
     render_command_blit_render_target_t *cmd = (render_command_blit_render_target_t*)(command_list->commands + command_list->command_count++);
-    cmd->header.command_type =  RCT_BlitToRenderTarget;
+    cmd->header.command_type =  RCT_BlitRenderTarget;
     cmd->info                = *blit_info;
 }
 

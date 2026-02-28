@@ -276,15 +276,22 @@ main(int argc, char **argv)
             }
 
             render_command_list_t *command_list = s_renderer_get_command_list(&renderer_state);
+            r_cmd_bind_render_target(command_list, game_target);
             r_cmd_bind_render_target(command_list, test_target);
 
             r_cmd_begin_render_group(command_list);
             r_cmd_draw_rectangle(command_list, vec2(100, 100), vec2(20, 20), vec4(1, 1, 1, 1), 0.0f);
             r_cmd_end_render_group(command_list);
 
-#if 0 
-            r_cmd_blit_render_target(command_list, test_target, game_target);
-#endif
+            render_command_blit_info_t blit_info = {
+                .source             = game_target,
+                .destination        = test_target,
+                .source_offset      = {0, 0},
+                .source_size        = vec2(game_target->create_info.width, game_target->create_info.height),
+                .destination_offset = vec2(0, 0),
+                .destination_size   = vec2(game_target->create_info.width, game_target->create_info.height),
+            };
+            r_cmd_blit_render_target(command_list, &blit_info);
 
             r_cmd_begin_render_group(command_list);
             r_cmd_draw_rectangle(command_list, vec2(100, 100), vec2(20, 20), vec4(0, 0, 1, 1), 0.0f);

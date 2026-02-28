@@ -136,7 +136,7 @@ enum render_command_type_t
     RCT_BindMaterial,
     RCT_BindShader,
     RCT_EndRenderGroup,
-    RCT_BlitToRenderTarget,
+    RCT_BlitRenderTarget,
     RCT_PresentFrame,
 
     RCT_Count
@@ -362,7 +362,7 @@ void r_cmd_clear_render_target(render_command_list_t *command_list, render_targe
 void r_cmd_bind_render_target(render_command_list_t *command_list, render_target_t *render_target);
 void r_cmd_begin_render_group(render_command_list_t *command_list);
 void r_cmd_end_render_group(render_command_list_t *command_list);
-void r_cmd_blit_render_target(render_command_list_t *command_list, render_target_t *source, render_target_t *destination);
+void r_cmd_blit_render_target(render_command_list_t *command_list, render_command_blit_info_t *blit_info);
 void r_cmd_present(render_command_list_t *command_list);
 
 void

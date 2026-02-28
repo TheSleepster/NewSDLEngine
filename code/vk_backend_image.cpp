@@ -359,7 +359,89 @@ void
 vk_backend_image_blit(vulkan_context_t       *vulkan_context, 
                       vulkan_image_t         *source_image, 
                       vulkan_image_t         *destination_image, 
+                      vec2_t                  source_offset,
+                      vec2_t                  source_blit_size,
+                      vec2_t                  destination_offset,
+                      vec2_t                  destination_size,
+                      VkImageLayout           source_initial_layout,
+                      VkImageLayout           destination_initial_layout,
                       VkImageSubresourceRange source_range, 
                       VkImageSubresourceRange destination_range)
 {
+    // NOTE(Sleepster): transition the color buffer to TRANSFER_SRC 
+    vk_backend_image_change_layout(vulkan_context, 
+                                   *vulkan_context->render_command_buffer,
+                                   source_image->handle,
+                                   source_initial_layout,
+                                   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                                   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                   0,
+                                   0,
+                                   source_range);
+    source_image->layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+
+    // NOTE(Sleepster): transition the swapchain image to TRANSFER_DST 
+    vk_backend_image_change_layout(vulkan_context, 
+                                   *vulkan_context->render_command_buffer,
+                                   destination_image->handle,
+                                   destination_initial_layout,
+                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                   VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                   0,
+                                   0,
+                                   destination_range);
+    destination_image->layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+
+    // NOTE(Sleepster): Do the blit 
+    VkImageBlit blit_region = {
+        .srcSubresource.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+        .srcSubresource.mipLevel       = 0,
+        .srcSubresource.baseArrayLayer = 0,
+        .srcSubresource.layerCount     = 1,
+        .srcOffsets[0] = (VkOffset3D){(s32)source_offset.x,    (s32)source_offset.y,    0},
+        .srcOffsets[1] = (VkOffset3D){(s32)source_blit_size.x, (s32)source_blit_size.y, 1},
+
+        .dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+        .dstSubresource.mipLevel = 0, 
+        .dstSubresource.baseArrayLayer = 0,
+        .dstSubresource.layerCount = 1,
+
+        .dstOffsets[0] = (VkOffset3D){(s32)destination_offset.x, (s32)destination_offset.y, 0},
+        .dstOffsets[1] = (VkOffset3D){(s32)destination_size.x,   (s32)destination_size.y,   1},
+    };
+    vkCmdBlitImage(*vulkan_context->render_command_buffer,
+                   source_image->handle,
+                   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                   destination_image->handle,
+                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                   1,
+                   &blit_region,
+                   VK_FILTER_NEAREST);
+
+    // NOTE(Sleepster): Transfer the images back to what they were before the blit 
+    vk_backend_image_change_layout(vulkan_context, 
+                                   *vulkan_context->render_command_buffer,
+                                   source_image->handle,
+                                   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                                   source_initial_layout,
+                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                   0,
+                                   0,
+                                   source_range);
+    source_image->layout = source_initial_layout;
+
+    vk_backend_image_change_layout(vulkan_context, 
+                                   *vulkan_context->render_command_buffer,
+                                   destination_image->handle,
+                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                   destination_initial_layout,
+                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                   VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                   0,
+                                   0,
+                                   destination_range);
+    destination_image->layout = destination_initial_layout;
 }

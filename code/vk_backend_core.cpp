@@ -1377,12 +1377,21 @@ vk_backend_create_renderpasses(vulkan_context_t *vulkan_context)
                                &vulkan_context->primary_renderpass));
 }
 
+/*
+=============
+vk_backend_begin_renderpass
+=============
+*/
+
+// TODO(Sleepster): Offset?
 void
 vk_backend_begin_renderpass(vulkan_context_t *vulkan_context, 
-                            VkRenderPass renderpass, 
-                            VkFramebuffer framebuffer, 
-                            u32           attachment_count,
-                            VkClearValue *clear_values)
+                            u32               width,
+                            u32               height,
+                            VkRenderPass      renderpass, 
+                            VkFramebuffer     framebuffer, 
+                            u32               attachment_count,
+                            VkClearValue     *clear_values)
 {
     VkRenderPassBeginInfo renderpass_info = {};
     renderpass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -1391,8 +1400,8 @@ vk_backend_begin_renderpass(vulkan_context_t *vulkan_context,
     renderpass_info.renderArea = {
         .offset.x = 0,
         .offset.y = 0,
-        .extent.width  = vulkan_context->current_window_width,
-        .extent.height = vulkan_context->current_window_height
+        .extent.width  = width,
+        .extent.height = height 
     };
 
     renderpass_info.clearValueCount = attachment_count;
@@ -2062,6 +2071,27 @@ vk_backend_render_frame
 =============
 */
 
+internal_api VkImageAspectFlags
+image_type_to_vulkan_aspect(u32 image_type)
+{
+    VkImageAspectFlags result = 0;
+    switch(image_type)
+    {
+        case IMAGE_TYPE_ColorAttachment:
+        case IMAGE_TYPE_ShaderReadOnly:
+        {
+            result = VK_IMAGE_ASPECT_COLOR_BIT;
+        }break;
+        case IMAGE_TYPE_DepthStencilAttachment:
+        case IMAGE_TYPE_DepthStencilReadOnly:
+        {
+            result = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+        }break;
+    }
+
+    return(result);
+}
+
 void
 vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *renderer_state)
 {
@@ -2157,7 +2187,12 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
                         command_list->active_render_target = null;
                     }
+                    u32 width  = rt_command->render_target->create_info.width;
+                    u32 height = rt_command->render_target->create_info.height;
+
                     vk_backend_begin_renderpass(vulkan_context, 
+                                                width,
+                                                height,
                                                 rt_command->render_target->renderpass, 
                                                 rt_command->render_target->framebuffer,
                                                 rt_command->render_target->attachment_count,
@@ -2173,14 +2208,55 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_EndRenderGroup:
                 {
                 }break;
-                case RCT_BlitToRenderTarget:
+                case RCT_BlitRenderTarget:
                 {
+                    render_command_blit_render_target_t *cmd = (render_command_blit_render_target_t*)command;
+                    render_command_blit_info_t *info         = &cmd->info;
+
+                    for(u32 attachment_index = 0;
+                        attachment_index < info->source->attachment_count;
+                        ++attachment_index)
+                    {
+                        render_target_attachment_info_t *source_attachment      = info->source->attachment_info      + attachment_index;
+                        render_target_attachment_info_t *destination_attachment = info->destination->attachment_info + attachment_index;
+                        if(source_attachment && destination_attachment)
+                        {
+                            VkImageAspectFlags source_aspect      = image_type_to_vulkan_aspect(source_attachment->attachment->create_jnfo.image_type);
+                            VkImageAspectFlags destination_aspect = image_type_to_vulkan_aspect(source_attachment->attachment->create_jnfo.image_type);
+
+                            VkImageSubresourceRange source_range = {
+                                .aspectMask     = source_aspect,
+                                .baseArrayLayer = 0,
+                                .baseMipLevel   = 0,
+                                .layerCount     = 1,
+                                .levelCount     = 1,
+                            };
+
+                            VkImageSubresourceRange destination_range = {
+                                .aspectMask     = destination_aspect,
+                                .baseMipLevel   = 0,
+                                .levelCount     = 1,
+                                .baseArrayLayer = 0,
+                                .layerCount     = 1,
+                            };
+
+                            vk_backend_image_blit(vulkan_context, 
+                                                  &source_attachment->attachment->vulkan_image, 
+                                                  &destination_attachment->attachment->vulkan_image, 
+                                                  info->source_offset,
+                                                  info->source_size,
+                                                  info->destination_offset,
+                                                  info->destination_size,
+                                                  source_attachment->attachment->vulkan_image.layout,
+                                                  destination_attachment->attachment->vulkan_image.layout,
+                                                  source_range,
+                                                  destination_range);
+                        }
+                    }
                 }break;
                 case RCT_PresentFrame:
                 {
                     render_command_present_frame_t *present_cmd = (render_command_present_frame_t*)command;
-
-                    // NOTE(Sleepster): 
                     vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
 
                     // blit
