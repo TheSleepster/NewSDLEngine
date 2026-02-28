@@ -338,4 +338,5 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                       VkImageSubresourceRange source_range, 
                       VkImageSubresourceRange destination_range)
 {
+    
 }
