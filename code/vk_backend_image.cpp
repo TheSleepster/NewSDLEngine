@@ -245,6 +245,30 @@ vk_backend_image_destroy(vulkan_context_t *vulkan_context, vulkan_image_t *image
 
 /*
 =============
+vk_backend_image_init_from_image_handle
+=============
+*/
+
+vulkan_image_t
+vk_backend_image_init_from_image_handle(vulkan_context_t    *vulkan_context, 
+                                        VkImage              image, 
+                                        VkImageView         *view,
+                                        vulkan_image_info_t *info)
+{
+    vulkan_image_t result  = {};
+    result.info            = *info;
+    result.width           = info->width;
+    result.height          = info->height;
+    result.handle          = image;
+    result.layout          = (VkImageLayout)info->initial_layout;
+    result.internal_format = (VkFormat)info->format;
+    result.view            = view != null ? *view : null;
+
+    return(result);
+}
+
+/*
+=============
 vk_backend_image_change_layout
 =============
 */
@@ -333,10 +357,9 @@ vk_backend_image_blit
 
 void
 vk_backend_image_blit(vulkan_context_t       *vulkan_context, 
-                      VkImage                 source_image, 
-                      VkImage                 destination_image, 
+                      vulkan_image_t         *source_image, 
+                      vulkan_image_t         *destination_image, 
                       VkImageSubresourceRange source_range, 
                       VkImageSubresourceRange destination_range)
 {
-    
 }

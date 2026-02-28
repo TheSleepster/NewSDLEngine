@@ -273,6 +273,7 @@ struct render_command_blit_render_target_t
 struct render_command_present_frame_t
 {
     render_command_header_t header;
+    render_target_t        *presentation_target;
 };
 
 struct render_command_t
@@ -312,6 +313,7 @@ struct render_command_list_t
     u32               bind_material_command_count;
 
     render_target_t  *active_render_target;
+    bool32            presenting;
 };
 
 // TODO(Sleepster): Maybe one day we'll have to have this store backend related function pointers like:

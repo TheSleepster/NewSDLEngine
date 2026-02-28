@@ -142,6 +142,10 @@ struct swapchain_info_t
     VkSurfaceFormatKHR format;
     VkExtent2D         extent;
     u32                image_count;
+
+    VkImage            *images;
+    VkImageView        *views;
+    VkImageLayout      *image_layouts;
 };
 
 struct vulkan_context_t 
@@ -191,9 +195,8 @@ struct vulkan_context_t
     VkFormat                            depth_format;
     VkSurfaceFormatKHR                  swapchain_format;
     swapchain_info_t                    swapchain;
-    VkImage                            *swapchain_images;
-    VkImageView                        *swapchain_views;
-    VkImageLayout                      *swapchain_image_layouts;
+
+    vulkan_image_t                     *swapchain_image_data;
     vulkan_image_t                      depth_buffer;
 
     bool32                              rebuilding_swapchain;

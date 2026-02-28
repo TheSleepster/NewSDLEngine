@@ -308,9 +308,13 @@ s_renderer_get_command_list(renderer_state_t *renderer_state)
 void
 r_cmd_bind_render_target(render_command_list_t *command_list, render_target_t *render_target)
 {
+    Assert(!command_list->presenting);
+
     render_command_bind_render_target_t *bind_target = (render_command_bind_render_target_t*)(command_list->commands + command_list->command_count++);
-    bind_target->render_target       = render_target;
-    bind_target->header.command_type = RCT_BindRenderTarget;
+    bind_target->render_target         = render_target;
+    bind_target->header.command_type   = RCT_BindRenderTarget;
+
+    command_list->active_render_target = render_target;
 }
 
 // NOTE(Sleepster): You don't need to call this if the render target's load operation is a clear.
@@ -382,4 +386,8 @@ r_cmd_present(render_command_list_t *command_list)
 {
     render_command_present_frame_t *present = (render_command_present_frame_t*)(command_list->commands + command_list->command_count++);
     present->header.command_type = RCT_PresentFrame;
+    present->presentation_target  = command_list->active_render_target;
+
+    command_list->active_render_target = null;
+    command_list->presenting = true;
 }

@@ -80,5 +80,18 @@ vk_backend_image_change_layout(vulkan_context_t       *vulkan_context,
                                VkAccessFlags           dst_access_flags,
                                VkImageSubresourceRange range);
 
+vulkan_image_t
+vk_backend_image_init_from_image_handle(vulkan_context_t    *vulkan_context, 
+                                        VkImage              image, 
+                                        VkImageView         *view,
+                                        vulkan_image_info_t *info);
+
+void
+vk_backend_image_blit(vulkan_context_t       *vulkan_context, 
+                      vulkan_image_t         *source_image, 
+                      vulkan_image_t         *destination_image, 
+                      VkImageSubresourceRange source_range, 
+                      VkImageSubresourceRange destination_range);
+
 #endif // VK_BACKEND_IMAGE_H
 
