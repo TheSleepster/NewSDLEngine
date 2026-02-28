@@ -74,24 +74,27 @@ s_renderer_resize_render_targets(renderer_state_t *renderer_state, vec2_t window
         ++render_target_index)
     {
         render_target_t *render_target = renderer_state->render_targets + render_target_index;
-        render_target->create_info.width  = window_size.x;
-        render_target->create_info.height = window_size.y;
-        for(u32 attachment_index = 0;
-            attachment_index < render_target->attachment_count;
-            ++attachment_index)
+        if(render_target->resize_with_window)
         {
-            render_target_attachment_info_t *attachment = render_target->attachment_info + attachment_index;
-            image_create_info_t info = attachment->attachment->create_jnfo;
-            info.width  = window_size.x;
-            info.height = window_size.y;
+            render_target->create_info.width  = window_size.x;
+            render_target->create_info.height = window_size.y;
+            for(u32 attachment_index = 0;
+                attachment_index < render_target->attachment_count;
+                ++attachment_index)
+            {
+                render_target_attachment_info_t *attachment = render_target->attachment_info + attachment_index;
+                image_create_info_t info = attachment->attachment->create_jnfo;
+                info.width  = window_size.x;
+                info.height = window_size.y;
 
-            s_renderer_image_destroy(renderer_state, attachment->attachment);
+                s_renderer_image_destroy(renderer_state, attachment->attachment);
 
-            *attachment->attachment = s_renderer_image_create(renderer_state, &info);
+                *attachment->attachment = s_renderer_image_create(renderer_state, &info);
+            }
+
+            s_renderer_render_target_destroy(renderer_state, render_target);
+            s_renderer_render_target_create(renderer_state, &render_target->create_info);
         }
-
-        s_renderer_render_target_destroy(renderer_state, render_target);
-        s_renderer_render_target_create(renderer_state, &render_target->create_info);
     }
 
     renderer_state->last_window_size_generation += 1;
@@ -170,8 +173,9 @@ s_renderer_render_target_create(renderer_state_t *renderer_state, render_target_
     }
     Assert(result);
 
-    result->attachment_count =  create_info->attachment_count;
-    result->create_info      = *create_info;
+    result->attachment_count   =  create_info->attachment_count;
+    result->create_info        = *create_info;
+    result->resize_with_window =  create_info->resize_with_window;
 
     image_t             image_attachments[MAX_RENDER_TARGET_ATTACHMENTS] = {};
     VkImageLayout       initial_layouts[MAX_RENDER_TARGET_ATTACHMENTS]   = {};
@@ -330,6 +334,14 @@ r_cmd_end_render_group(render_command_list_t *command_list)
 {
     render_command_end_render_group_t *end_rendergroup = (render_command_end_render_group_t*)(command_list->commands + command_list->command_count++);
     end_rendergroup->header.command_type = RCT_EndRenderGroup;
+}
+
+void
+r_cmd_blit_render_target(render_command_list_t *command_list, render_command_blit_info_t *blit_info)
+{
+    render_command_blit_render_target_t *cmd = (render_command_blit_render_target_t*)(command_list->commands + command_list->command_count++);
+    cmd->header.command_type =  RCT_BlitToRenderTarget;
+    cmd->info                = *blit_info;
 }
 
 void

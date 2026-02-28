@@ -159,6 +159,13 @@ main(int argc, char **argv)
         image_info.width            = 1920;
         image_info.height           = 1080;
 
+        image_create_info_t game_texture_info = {};
+        image_info.image_type       = IMAGE_TYPE_ColorAttachment;
+        image_info.format           = BMF_RGBA32;
+        image_info.width            = 320;
+        image_info.height           = 180;
+
+        // NOTE(Sleepster): Test blit image 
         image_t color_buffer = s_renderer_image_create(&renderer_state, &image_info);
 
         render_target_attachment_info_t color_attachment = {};
@@ -172,12 +179,36 @@ main(int argc, char **argv)
         color_attachment.clear_value.clear_color.float_color = vec4(0.4, 0.6, 1.0, 1.0);
 
         render_target_create_info_t target_info = {};
-        target_info.attachments      = &color_attachment;
-        target_info.attachment_count = 1;
-        target_info.width            = 1920;
-        target_info.height           = 1080;
+        target_info.attachments        = &color_attachment;
+        target_info.attachment_count   = 1;
+        target_info.width              = 1920;
+        target_info.height             = 1080;
+        target_info.resize_with_window = true;
         render_target_t *test_target = s_renderer_render_target_create(&renderer_state, &target_info);
-        (void)test_target;
+
+        // NOTE(Sleepster): Game Texture 
+        image_t game_texture = s_renderer_image_create(&renderer_state, &game_texture_info);
+
+        render_target_attachment_info_t game_buffer_attachment = {};
+        game_buffer_attachment.attachment      = &game_texture;
+        game_buffer_attachment.attachment_type = IMAGE_TYPE_ColorAttachment;
+        game_buffer_attachment.initial_layout  = IMAGE_TYPE_Undefined;
+        game_buffer_attachment.final_layout    = IMAGE_TYPE_ColorAttachment;
+        game_buffer_attachment.load_operation  = RTALO_Load;
+        game_buffer_attachment.store_operation = RTASO_Store;
+
+        game_buffer_attachment.clear_value.clear_color.float_color = vec4(1.0, 0.0, 0.0, 1.0);
+
+
+        render_target_create_info_t game_target_info = {};
+        game_target_info.resize_with_window = false;
+        game_target_info.attachments        = &game_buffer_attachment;
+        game_target_info.attachment_count   = 1;
+        game_target_info.width              = 320;
+        game_target_info.height             = 180;
+
+        render_target_t *game_target = s_renderer_render_target_create(&renderer_state, &game_target_info);
+        (void)game_target;
 
         g_running = true;
         while(g_running)
@@ -246,15 +277,23 @@ main(int argc, char **argv)
             }
 
             render_command_list_t *command_list = s_renderer_get_command_list(&renderer_state);
-            r_cmd_bind_render_target(command_list, test_target);
+            r_cmd_bind_render_target(command_list, game_target);
+
             r_cmd_begin_render_group(command_list);
-
             r_cmd_draw_rectangle(command_list, vec2(100, 100), vec2(20, 20), vec4(1, 1, 1, 1), 0.0f);
-
             r_cmd_end_render_group(command_list);
+
+            r_cmd_blit_render_target(command_list, test_target, game_target);
+            r_cmd_bind_render_target(command_list, test_target);
+#if 0
+            r_cmd_begin_render_group(command_list);
+            r_cmd_draw_rectangle(command_list, vec2(100, 100), vec2(20, 20), vec4(0, 0, 1, 1), 0.0f);
+            r_cmd_end_render_group(command_list);
+#endif
+
             r_cmd_present(command_list);
 
-
+            r_cmd_bind_render_target(command_list, game_target);
             vk_backend_render_frame(&context, &renderer_state);
 #if 0
             if(r_vulkan_begin_frame(render_context, render_state, gcv_tick_rate))

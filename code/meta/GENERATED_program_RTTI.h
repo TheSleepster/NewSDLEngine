@@ -1859,10 +1859,11 @@ struct type_info_struct_render_target_create_info_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[4];
+		type_info_member_t member_array[5];
 		struct {
 			type_info_member_t attachments;
 			type_info_member_t attachment_count;
+			type_info_member_t resize_with_window;
 			type_info_member_t width;
 			type_info_member_t height;
 		}members;
@@ -1878,9 +1879,10 @@ struct type_info_struct_render_target_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[9];
+		type_info_member_t member_array[10];
 		struct {
 			type_info_member_t ID;
+			type_info_member_t resize_with_window;
 			type_info_member_t create_info;
 			type_info_member_t framebuffer;
 			type_info_member_t renderpass;
@@ -4301,10 +4303,11 @@ const static type_info_struct_render_target_create_info_t type_info_struct_rende
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_render_target_create_info_t),
-	.member_count = 4,
+	.member_count = 5,
 	.members = {
 		.attachments = {.name = "attachments", .type = TYPE_render_target_attachment_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_target_create_info_t.attachments)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_target_create_info_t), attachments))},
 		.attachment_count = {.name = "attachment_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_target_create_info_t.attachment_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_target_create_info_t), attachment_count))},
+		.resize_with_window = {.name = "resize_with_window", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_target_create_info_t.resize_with_window)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_target_create_info_t), resize_with_window))},
 		.width = {.name = "width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_target_create_info_t.width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_target_create_info_t), width))},
 		.height = {.name = "height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_target_create_info_t.height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_target_create_info_t), height))},
 	}
@@ -4317,9 +4320,10 @@ const static type_info_struct_render_target_t type_info_struct_render_target_t_c
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_render_target_t),
-	.member_count = 9,
+	.member_count = 10,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_target_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_target_t), ID))},
+		.resize_with_window = {.name = "resize_with_window", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_target_t.resize_with_window)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_target_t), resize_with_window))},
 		.create_info = {.name = "create_info", .type = TYPE_render_target_create_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_target_t.create_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_target_t), create_info))},
 		.framebuffer = {.name = "framebuffer", .type = TYPE_VkFramebuffer, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_target_t.framebuffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_target_t), framebuffer))},
 		.renderpass = {.name = "renderpass", .type = TYPE_VkRenderPass, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_target_t.renderpass)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_target_t), renderpass))},
@@ -5834,12 +5838,14 @@ enum render_target_attachment_info_t_member_list_enum {
 enum render_target_create_info_t_member_list_enum {
 	TYPE_RENDER_TARGET_CREATE_INFO_T_MEMBER_attachments,
 	TYPE_RENDER_TARGET_CREATE_INFO_T_MEMBER_attachment_count,
+	TYPE_RENDER_TARGET_CREATE_INFO_T_MEMBER_resize_with_window,
 	TYPE_RENDER_TARGET_CREATE_INFO_T_MEMBER_width,
 	TYPE_RENDER_TARGET_CREATE_INFO_T_MEMBER_height,
 };
 
 enum render_target_t_member_list_enum {
 	TYPE_RENDER_TARGET_T_MEMBER_ID,
+	TYPE_RENDER_TARGET_T_MEMBER_resize_with_window,
 	TYPE_RENDER_TARGET_T_MEMBER_create_info,
 	TYPE_RENDER_TARGET_T_MEMBER_framebuffer,
 	TYPE_RENDER_TARGET_T_MEMBER_renderpass,

@@ -98,6 +98,7 @@ struct render_target_create_info_t
 {
     render_target_attachment_info_t *attachments;
     u32                              attachment_count;
+    bool32                           resize_with_window;
 
     u32                              width;
     u32                              height;
@@ -106,6 +107,7 @@ struct render_target_create_info_t
 struct render_target_t
 {
     u32                             ID;
+    bool32                          resize_with_window;
     render_target_create_info_t     create_info; 
 
     VkFramebuffer                   framebuffer;
@@ -134,6 +136,7 @@ enum render_command_type_t
     RCT_BindMaterial,
     RCT_BindShader,
     RCT_EndRenderGroup,
+    RCT_BlitToRenderTarget,
     RCT_PresentFrame,
 
     RCT_Count
@@ -246,6 +249,27 @@ struct render_command_end_render_group_t
     render_command_header_t header;
 };
 
+// NOTE(Sleepster):
+// For this function, we will blit each of the render targets from their indices in the source_target to their indices in the desination target.
+// Meaning that an attachment that is in slot 0 of the source target will be blit to slot 0 of the destination target. 
+// If that slot in the destination target does not exist, we will skip it preventing a crash.
+struct render_command_blit_info_t
+{
+    render_target_t *source;
+    render_target_t *destination;
+    
+    vec2_t           source_offset;
+    vec2_t           destination_offset;
+    vec2_t           source_size;
+    vec2_t           destination_size;
+};
+
+struct render_command_blit_render_target_t
+{
+    render_command_header_t    header;
+    render_command_blit_info_t info;
+};
+
 struct render_command_present_frame_t
 {
     render_command_header_t header;
@@ -265,6 +289,7 @@ struct render_command_t
         render_command_bind_material_t          bind_material;
         render_command_bind_shader_t            bind_shader;
         render_command_end_render_group_t       end_render_group;
+        render_command_blit_render_target_t     blit_render_target;
         render_command_present_frame_t          present_frame;
     };
 };
@@ -335,6 +360,7 @@ void r_cmd_clear_render_target(render_command_list_t *command_list, render_targe
 void r_cmd_bind_render_target(render_command_list_t *command_list, render_target_t *render_target);
 void r_cmd_begin_render_group(render_command_list_t *command_list);
 void r_cmd_end_render_group(render_command_list_t *command_list);
+void r_cmd_blit_render_target(render_command_list_t *command_list, render_target_t *source, render_target_t *destination);
 void r_cmd_present(render_command_list_t *command_list);
 
 void

@@ -323,3 +323,19 @@ vk_backend_sampler_destroy(vulkan_context_t *vulkan_context, VkSampler sampler)
 {
     vkDestroySampler(vulkan_context->device, sampler, vulkan_context->cpu_allocation_callbacks);
 }
+
+
+/*
+=============
+vk_backend_image_blit
+=============
+*/
+
+void
+vk_backend_image_blit(vulkan_context_t       *vulkan_context, 
+                      VkImage                 source_image, 
+                      VkImage                 destination_image, 
+                      VkImageSubresourceRange source_range, 
+                      VkImageSubresourceRange destination_range)
+{
+}

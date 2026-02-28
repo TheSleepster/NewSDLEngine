@@ -2158,8 +2158,12 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_EndRenderGroup:
                 {
                 }break;
+                case RCT_BlitToRenderTarget:
+                {
+                }break;
                 case RCT_PresentFrame:
                 {
+                    // NOTE(Sleepster): 
                     vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
 
                     // blit
