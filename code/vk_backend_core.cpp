@@ -2209,7 +2209,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 {
                 }break;
                 case RCT_BlitRenderTarget:
-                {
+                {    
                     render_command_blit_render_target_t *cmd = (render_command_blit_render_target_t*)command;
                     render_command_blit_info_t *info         = &cmd->info;
 
