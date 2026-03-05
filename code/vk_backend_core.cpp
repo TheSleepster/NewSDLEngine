@@ -2135,38 +2135,35 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
     };
     vkAssert(vkBeginCommandBuffer(*vulkan_context->render_command_buffer, &begin_info));
 
-#if 0
-    VkRenderPassBeginInfo renderpass_info = {};
-    renderpass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderpass_info.renderPass  =  vulkan_context->primary_renderpass;
-    renderpass_info.framebuffer = *vulkan_context->render_framebuffer;
-    renderpass_info.renderArea = {
-        .offset.x = 0,
-        .offset.y = 0,
-        .extent.width = vulkan_context->current_window_width,
-        .extent.height = vulkan_context->current_window_height
-    };
-
-    VkClearValue clear_values[2] = {};
-    clear_values[0].color.float32[0] = 0.4;
-    clear_values[0].color.float32[1] = 0.3;
-    clear_values[0].color.float32[2] = 0.8;
-    clear_values[0].color.float32[3] = 1.0;
-
-    clear_values[1].depthStencil.depth   = 0.0;
-    clear_values[1].depthStencil.stencil = 0;
-
-    renderpass_info.clearValueCount = 2;
-    renderpass_info.pClearValues    = clear_values;
-    
-    vkCmdBeginRenderPass(*vulkan_context->render_command_buffer, &renderpass_info, VK_SUBPASS_CONTENTS_INLINE);
-#endif
     if(renderer_state->current_window_size_generation != renderer_state->last_window_size_generation)
     {
         s_renderer_resize_render_targets(renderer_state, renderer_state->window_size);
     }
 
-    // render commands here
+    // NOTE(Sleepster): Observe Render Commands  
+    for(u32 command_list_index = 0;
+        command_list_index < renderer_state->command_list_count;
+        ++command_list_index)
+    {
+        render_command_list_t *command_list = renderer_state->command_lists + command_list_index;
+        for(u32 command_index = 0;
+            command_index < command_list->command_count;
+            ++command_index)
+        {
+            render_command_t *command = command_list->commands + command_index;
+            switch(command->header.command_type)
+            {
+                case RCT_BindRenderTarget:
+                {
+                    render_command_bind_render_target_t *cmd = (render_command_bind_render_target_t*)command;
+                    (void)cmd;
+                }break;
+            }
+        }
+    }
+
+
+    // NOTE(Sleepster): Execute Render Commands  
     for(u32 command_list_index = 0;
         command_list_index < renderer_state->command_list_count;
         ++command_list_index)
@@ -2213,6 +2210,12 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     render_command_blit_render_target_t *cmd = (render_command_blit_render_target_t*)command;
                     render_command_blit_info_t *info         = &cmd->info;
 
+                    render_target_t *render_target = command_list->active_render_target;
+                    if(render_target)
+                    {
+                        vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
+                    }
+
                     for(u32 attachment_index = 0;
                         attachment_index < info->source->attachment_count;
                         ++attachment_index)
@@ -2251,6 +2254,17 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                                                   destination_attachment->attachment->vulkan_image.layout,
                                                   source_range,
                                                   destination_range);
+                        }
+
+                        if(render_target)
+                        {
+                            vk_backend_begin_renderpass(vulkan_context, 
+                                                        render_target->create_info.width,
+                                                        render_target->create_info.height,
+                                                        render_target->renderpass, 
+                                                        render_target->framebuffer,
+                                                        render_target->attachment_count,
+                                                        render_target->clear_values);
                         }
                     }
                 }break;
@@ -2374,11 +2388,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
     }
     renderer_state->command_list_count = 0;
     
-#if 0
-    vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
-#endif
     vkEndCommandBuffer(*vulkan_context->render_command_buffer);
-
     vkAssert(vkResetFences(vulkan_context->device, 1, vulkan_context->image_render_idle_fence));
 
     VkPipelineStageFlags stage_flags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};

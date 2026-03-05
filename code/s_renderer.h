@@ -41,8 +41,8 @@ struct image_create_info_t
     string_t data;
     u32      width;
     u32      height;
-    u32      image_type;
     u32      format;
+    u32      image_type;
 };
 
 // NOTE(Sleepster): The asset manager should track the actual asset file data. The renderer
@@ -79,17 +79,19 @@ struct clear_value_t
     }clear_color;
 };
 
+enum render_target_attachment_permissions_t
+{
+    RTAT_InvalidAttachment   = BIT(0),
+    RTAT_ReadAttachment      = BIT(1),
+    RTAT_WriteAttachment     = BIT(2),
+    RTAT_ReadWriteAttachment = RTAT_ReadAttachment|RTAT_WriteAttachment,
+};
+
 struct render_target_attachment_info_t
 {
-    image_t      *attachment;
     u32           ID;
     u32           attachment_type;
-
-    u32           initial_layout;
-    u32           final_layout;
-
-    u32           load_operation;
-    u32           store_operation;
+    image_t      *attachment;
 
     clear_value_t clear_value;
 };
@@ -345,6 +347,9 @@ struct renderer_state_t
 
     render_target_t        render_targets[MAX_RENDER_TARGETS];
     u32                    render_target_count;
+#if 0 
+    DynArray_t(render_target_attachment_info_t) attachments;
+#endif
 };
 
 void             s_renderer_state_init(renderer_state_t *renderer_state, void *render_context);
@@ -357,6 +362,7 @@ image_t                s_renderer_image_create(renderer_state_t *render_state, i
 void                   s_renderer_image_destroy(renderer_state_t *renderer_state, image_t *image);
 void                   s_renderer_image_update_data(void *backend_context, image_t *image);
 render_command_list_t* s_renderer_get_command_list(renderer_state_t *renderer_state);
+void                   s_renderer_reset_command_list(render_command_list_t *command_list);
 
 void r_cmd_clear_render_target(render_command_list_t *command_list, render_target_t *render_target);
 void r_cmd_bind_render_target(render_command_list_t *command_list, render_target_t *render_target);

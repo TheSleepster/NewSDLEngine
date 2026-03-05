@@ -155,6 +155,7 @@ render_target_t*
 s_renderer_render_target_create(renderer_state_t *renderer_state, render_target_create_info_t *create_info)
 {
     render_target_t *result = null;
+#if 0
     for(u32 render_target_index = 0;
         render_target_index < MAX_RENDER_TARGETS;
         ++render_target_index)
@@ -259,6 +260,7 @@ s_renderer_render_target_create(renderer_state_t *renderer_state, render_target_
                                                        create_info->attachment_count, 
                                                        create_info->width, 
                                                        create_info->height);
+#endif
     return(result);
 }
 
