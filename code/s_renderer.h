@@ -22,127 +22,10 @@ constexpr u32 MAX_COMMAND_LISTS    = 1000;
 constexpr u32 MAX_CONSTANT_BUFFERS = 1000;
 constexpr u32 MAX_RENDER_TARGETS   = 100;
 
-enum image_type_t
-{
-    IMAGE_TYPE_Undefined              = 0,
-    IMAGE_TYPE_General                = 1,
-    IMAGE_TYPE_ColorAttachment        = 2,
-    IMAGE_TYPE_DepthStencilAttachment = 3,
-    IMAGE_TYPE_DepthStencilReadOnly   = 4,
-    IMAGE_TYPE_ShaderReadOnly         = 5,
-    IMAGE_TYPE_TransferSrcImage       = 6,
-    IMAGE_TYPE_TransferDstImage       = 7,
-    IMAGE_TYPE_Preinitialized         = 8,
-    IMAGE_TYPE_PresentSRC             = 1000001002,
-};
-
-struct image_create_info_t
-{
-    string_t data;
-    u32      width;
-    u32      height;
-    u32      format;
-    u32      image_type;
-};
-
-// NOTE(Sleepster): The asset manager should track the actual asset file data. The renderer
-// is in charge of tracking rendering-related GPU resources. Meaning, this is fine here.
-struct image_t
-{
-    image_create_info_t create_jnfo;
-    union {
-        vulkan_image_t vulkan_image;
-    };
-};
-
-enum render_target_attachment_load_operations_t
-{
-    RTALO_Load     = 0,
-    RTALO_Clear    = 1,
-    RTALO_DontCare = 2
-};
-
-enum render_target_attachment_store_operations_t
-{
-    RTASO_Store    = 0,
-    RTASO_DontCare = 1
-};
-
-struct clear_value_t
-{
-    float32 clear_depth;
-    u32     clear_stencil;
-    union {
-        vec4_t  float_color;
-        ivec4_t int_color;
-        u32     uint_color[4];
-    }clear_color;
-};
-
-enum render_target_attachment_permissions_t
-{
-    RTAT_InvalidAttachment   = BIT(0),
-    RTAT_ReadAttachment      = BIT(1),
-    RTAT_WriteAttachment     = BIT(2),
-    RTAT_ReadWriteAttachment = RTAT_ReadAttachment|RTAT_WriteAttachment,
-};
-
-struct render_target_attachment_info_t
-{
-    u32           ID;
-    u32           attachment_type;
-    image_t      *attachment;
-
-    clear_value_t clear_value;
-};
-
-struct render_target_create_info_t
-{
-    render_target_attachment_info_t *attachments;
-    u32                              attachment_count;
-    bool32                           resize_with_window;
-
-    u32                              width;
-    u32                              height;
-};
-
-struct render_target_t
-{
-    u32                             ID;
-    bool32                          resize_with_window;
-    render_target_create_info_t     create_info; 
-
-    VkFramebuffer                   framebuffer;
-    VkRenderPass                    renderpass;
-
-    image_t                        *primary_color_buffer;
-    image_t                        *depth_buffer;
-
-    render_target_attachment_info_t attachment_info[MAX_RENDER_TARGET_ATTACHMENTS];
-    u32                             attachment_count;
-
-    VkClearValue                    clear_values[MAX_RENDER_TARGET_ATTACHMENTS];
-};
-
-enum render_command_type_t
-{
-    RCT_Invalid,
-
-    RCT_ClearRenderTarget,
-    RCT_BeginRenderGroup,
-    RCT_DrawRectangle,
-    RCT_DrawBitmap,
-    RCT_UpdateTexture,
-    RCT_UpdateBuffer,
-    RCT_BindRenderTarget,
-    RCT_BindMaterial,
-    RCT_BindShader,
-    RCT_EndRenderGroup,
-    RCT_BlitRenderTarget,
-    RCT_PresentFrame,
-
-    RCT_Count
-};
+////////////////////
+// RENDER COMMAND STUFF
+////////////////////
+struct render_target_t;
 
 // NOTE(Sleepster): The memory for each of these is transient, don't rely 
 // on them sticking around between frames...
@@ -171,6 +54,26 @@ struct geometry_data_t
     vec2_t  size;
     vec4_t  render_color;
     float32 rotation;
+};
+
+enum render_command_type_t
+{
+    RCT_Invalid,
+
+    RCT_ClearRenderTarget,
+    RCT_BeginRenderGroup,
+    RCT_DrawRectangle,
+    RCT_DrawBitmap,
+    RCT_UpdateTexture,
+    RCT_UpdateBuffer,
+    RCT_BindRenderTarget,
+    RCT_BindMaterial,
+    RCT_BindShader,
+    RCT_EndRenderGroup,
+    RCT_BlitRenderTarget,
+    RCT_PresentFrame,
+
+    RCT_Count
 };
 
 struct render_command_header_t
@@ -318,11 +221,127 @@ struct render_command_list_t
     bool32            presenting;
 };
 
+////////////////////
+// RENDER TARGETS 
+////////////////////
+
+enum render_target_attachment_type_t 
+{
+    RTAT_Undefined              = 0,
+    RTAT_ColorAttachment        = 1,
+    RTAT_DepthStencilAttachment = 2,
+};
+
+enum render_target_attachment_load_operations_t
+{
+    RTALO_Load     = 0,
+    RTALO_Clear    = 1,
+    RTALO_DontCare = 2
+};
+
+enum render_target_attachment_store_operations_t
+{
+    RTASO_Store    = 0,
+    RTASO_DontCare = 1
+};
+
+struct clear_value_t
+{
+    float32 clear_depth;
+    u32     clear_stencil;
+    union {
+        vec4_t  float_color;
+        ivec4_t int_color;
+        u32     uint_color[4];
+    }clear_color;
+};
+
+enum render_target_attachment_permissions_t
+{
+    RTAT_InvalidAttachment   = BIT(0),
+    RTAT_ReadAttachment      = BIT(1),
+    RTAT_WriteAttachment     = BIT(2),
+    RTAT_ReadWriteAttachment = RTAT_ReadAttachment|RTAT_WriteAttachment,
+};
+
+struct render_target_attachment_info_t
+{
+    u32           ID;
+    u32           attachment_type;
+    image_t      *attachment;
+
+    clear_value_t clear_value;
+};
+
+struct render_target_create_info_t
+{
+    render_target_attachment_info_t *attachments;
+    u32                              attachment_count;
+    bool32                           resize_with_window;
+
+    u32                              width;
+    u32                              height;
+};
+
+struct render_target_t
+{
+    u32                             ID;
+    bool32                          resize_with_window;
+    render_target_create_info_t     create_info; 
+
+    VkFramebuffer                   framebuffer;
+    VkRenderPass                    renderpass;
+
+    image_t                        *primary_color_buffer;
+    image_t                        *depth_buffer;
+
+    render_target_attachment_info_t attachment_info[MAX_RENDER_TARGET_ATTACHMENTS];
+    u32                             attachment_count;
+
+    VkClearValue                    clear_values[MAX_RENDER_TARGET_ATTACHMENTS];
+};
+
+////////////////////
+// RENDER TARGETS 
+////////////////////
+
+constexpr u32 FRAME_GRAPH_MAX_RENDERPASSES = 10;
+
+struct render_frame_graph_renderpass_desc_t
+{
+};
+
+struct render_frame_graph_pass_desc_t
+{
+    image_t                             *attachments[MAX_RENDER_TARGET_ATTACHMENTS];
+    render_frame_graph_renderpass_desc_t renderpass_descs[FRAME_GRAPH_MAX_RENDERPASSES];
+    u32                                  next_renderpass_id;
+};
+
+struct render_frame_graph_renderpass_t
+{
+};
+
+struct render_frame_graph_desc_t
+{
+};
+
+struct render_frame_graph_t
+{
+    render_frame_graph_renderpass_t renderpasses[FRAME_GRAPH_MAX_RENDERPASSES];
+    u32                             renderpass_count;
+};
+
 // TODO(Sleepster): Maybe one day we'll have to have this store backend related function pointers like:
 //
 // renderer_state->r_backend_create_bitmap(...);
 //
 // But for now we're good.
+
+////////////////////
+// Renderer State 
+////////////////////
+
 struct renderer_state_t
 {
     memory_arena_t         renderer_arena;
@@ -351,6 +370,8 @@ struct renderer_state_t
     DynArray_t(render_target_attachment_info_t) attachments;
 #endif
 };
+
+struct image_create_info_t;
 
 void             s_renderer_state_init(renderer_state_t *renderer_state, void *render_context);
 void             s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_size);

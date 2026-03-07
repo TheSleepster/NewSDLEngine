@@ -15,6 +15,7 @@
 
 #include <vk_backend_core.h>
 #include <s_asset_manager.h>
+#include <r_render_image.h>
 #include <s_renderer.h>
 
 internal_api VkFormat
@@ -98,57 +99,6 @@ s_renderer_resize_render_targets(renderer_state_t *renderer_state, vec2_t window
     }
 
     renderer_state->last_window_size_generation += 1;
-}
-
-image_t 
-s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info)
-{
-    image_t result = {};
-    result.create_jnfo = *image_create_info;
-
-    VkImageUsageFlags usage_flags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-    if(image_create_info->image_type == IMAGE_TYPE_ColorAttachment)
-    {
-        usage_flags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    }
-    else if(image_create_info->image_type == IMAGE_TYPE_DepthStencilAttachment)
-    {
-        usage_flags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-    }
-    vulkan_context_t *vulkan_context = (vulkan_context_t*)render_state->render_context;
-    
-    // NOTE(Sleepster): Only 2D images
-    vulkan_image_info_t info = {};
-    info.type           = VK_IMAGE_TYPE_2D;
-    info.width          = image_create_info->width;
-    info.height         = image_create_info->height;
-    info.data           = image_create_info->data;
-    info.format         = vulkan_context->swapchain_format.format;
-    info.initial_layout = VK_IMAGE_LAYOUT_UNDEFINED;
-    info.mip_count      = 1;
-    info.sample_count   = 1;
-    info.usage          = usage_flags;
-
-    // NOTE(Sleepster): Override the depth format... 
-    if(image_create_info->image_type == IMAGE_TYPE_DepthStencilAttachment)
-    {
-        info.format = vulkan_context->depth_format;
-    }
-
-    result.vulkan_image = vk_backend_image_create(vulkan_context, &info);
-    return(result);
-}
-
-void
-s_renderer_image_destroy(renderer_state_t *renderer_state, image_t *image)
-{
-    vk_backend_image_destroy((vulkan_context_t *)renderer_state->render_context, &image->vulkan_image);
-}
-
-void
-s_renderer_image_update_data(void *backend_context, image_t *image)
-{
-    vk_backend_image_update_data((vulkan_context_t*)backend_context, &image->vulkan_image);
 }
 
 render_target_t*
@@ -276,6 +226,16 @@ s_renderer_render_target_destroy(renderer_state_t *renderer_state, render_target
     render_target->ID = INVALID_ID;
     renderer_state->render_target_count--;
 }
+
+void
+s_renderer_frame_graph_desc_init(render_frame_graph_desc_t *frame_graph_desc)
+{
+    ZeroStruct(*frame_graph_desc);
+}
+
+/////////////////////////
+// COMMAND LISTS
+/////////////////////////
 
 internal_api void
 s_renderer_command_list_init(render_command_list_t *list)

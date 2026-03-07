@@ -29,6 +29,7 @@
 #endif
 
 #include <vk_backend_core.h>
+#include <r_render_image.h>
 #include <s_renderer.h>
 
 #include <s_nt_networking.h>
@@ -153,6 +154,54 @@ main(int argc, char **argv)
         renderer_state_t renderer_state = {};
         s_renderer_state_init(&renderer_state, &context);
 
+        image_create_info_t primary_game_color_buffer_create_info = {
+            .width  = 320,
+            .height = 180,
+            .format  = BMF_RGBA32
+        };
+
+        image_create_info_t primary_game_depth_buffer_create_info = {
+            .width  = 320,
+            .height = 180,
+            .format = BMF_D32_SFLOAT 
+        };
+
+        image_t game_color_buffer = s_renderer_image_create(&renderer_state, &primary_game_color_buffer_create_info);
+        image_t game_depth_buffer = s_renderer_image_create(&renderer_state, &primary_game_depth_buffer_create_info);
+        (void) game_color_buffer;
+        (void) game_depth_buffer;
+
+#if 0
+        render_frame_graph_desc_t game_frame_graph = s_renderer_frame_graph_desc_init(renderer_state);
+
+        // NOTE(Sleepster): Lightmap pass 
+        renderpass_desc_t lightmap_renderpass = s_renderer_renderpass_desc_init(renderer_state);
+        s_renderer_renderpass_attach_image(&lightmap_renderpass, lightmap_color_buffer);
+
+        u32 lightmap_renderpassID = s_renderer_attach_renderpass(&game_frame_graph, &lightmap_renderpass);
+
+        // NOTE(Sleepster): Game pass 
+        renderpass_desc_t game_object_renderpass = s_renderer_renderpass_desc_init(renderer_state);
+        s_renderer_renderpass_attach_image(&game_object_renderpass, &game_color_buffer,     RenderPassAttachmentColorBuffer);
+        s_renderer_renderpass_attach_image(&game_object_renderpass, &game_depth_buffer,     RenderPassAttachmentDepthBuffer);
+        s_renderer_renderpass_attach_image(&game_object_renderpass, &lightmap_color_buffer, RenderPassAttachmentShaderSampled);
+
+        u32 game_object_renderpassID = s_renderer_attach_renderpass(&game_frame_graph, &game_object_renderpass);
+
+        // NOTE(Sleepster): PostFX pass
+        renderpass_desc_t postfx_renderpass = s_renderer_renderpass_desc_init(renderer_state);
+        s_renderer_renderpass_attach_image(&postfx_renderpass, &game_color_buffer,   RenderPassAttachmentShaderSampled);
+        s_renderer_renderpass_attach_image(&postfx_renderpass, &postfx_color_buffer, RenderPassAttachmentColorBuffer);
+
+        u32 postfx_renderpassID = s_renderer_attach_renderpass(&game_frame_graph, &postfx_renderpass);
+
+        s_renderer_construct_frame_graph(renderer_state, &game_frame_graph);
+
+        ...
+
+        r_cmd_begin_renderpass(command_list, game_object_renderpassID);
+        ... // other draw commands
+#endif
         g_running = true;
         while(g_running)
         {
@@ -226,7 +275,7 @@ main(int argc, char **argv)
             delta_tsc   = current_tsc - last_tsc;
             last_tsc    = current_tsc;
 
-            delta_time    = (float32)(((float64)delta_tsc) / (float64)perf_count_freq);
+            delta_time  = (float32)(((float64)delta_tsc) / (float64)perf_count_freq);
 
             //float32 delta_time_ms = delta_time * 1000.0f;
             //printf("delta time: '%.02f'...\n", delta_time_ms);

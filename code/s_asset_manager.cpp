@@ -28,6 +28,7 @@
 #include <s_nt_networking.h>
 #include <s_asset_manager.h>
 #include <s_renderer.h>
+#include <r_render_image.h>
 //
 
 #include <asset_file_packer/jfd_asset_file.h>
