@@ -227,10 +227,68 @@ s_renderer_render_target_destroy(renderer_state_t *renderer_state, render_target
     renderer_state->render_target_count--;
 }
 
+/////////////////////////
+// FRAME GRAPH 
+/////////////////////////
+
+// NOTE(Sleepster):
+// Realistically, we don't need these first two functions, we just have them in case you want
+// to be able to do more when it comes to initialization like using DynamicArrays or memory
+// arenas.
+
 void
-s_renderer_frame_graph_desc_init(render_frame_graph_desc_t *frame_graph_desc)
+s_renderer_frame_graph_desc_init(render_frame_graph_desc_t *desc)
 {
-    ZeroStruct(*frame_graph_desc);
+    ZeroStruct(*desc);
+}
+
+void
+s_renderer_renderpass_desc_init(renderpass_desc_t *desc)
+{
+    ZeroStruct(*desc);
+}
+
+void
+s_renderer_renderpass_attach_image(renderpass_desc_t *renderpass, image_t *image, renderpass_attachment_type_t type)
+{
+    renderpass_attachment_t *attachment = renderpass->attachments + renderpass->attachment_count++;
+    attachment->image = image;
+    attachment->type  = type;
+}
+
+void
+s_renderer_frame_graph_attach_renderpass(render_frame_graph_desc_t *frame_graph, renderpass_desc_t *renderpass_desc)
+{
+    renderpass_desc_t *new_desc = frame_graph->renderpass_descs + frame_graph->renderpass_count++;
+    memcpy(new_desc, renderpass_desc, sizeof(renderpass_desc_t));
+}
+
+internal_api void
+construct_frame_graph_renderpass(frame_graph_renderpass_t *renderpass, renderpass_desc_t *desc, u32 ID)
+{
+    renderpass->ID = ID;
+    for(u32 attachment_index = 0;
+        attachment_index < desc->attachment_count;
+        ++attachment_index)
+    {
+        renderpass_attachment_t *attachment = desc->attachments + attachment_index;
+        (void)attachment;
+    }
+}
+
+void
+s_renderer_frame_graph_construct(renderer_state_t *renderer_state, render_frame_graph_desc_t *frame_graph_desc)
+{
+    render_frame_graph_t *frame_graph = Alloc(render_frame_graph_t);
+    for(u32 renderpass_desc_index = 0;
+        renderpass_desc_index < frame_graph_desc->renderpass_count;
+        ++renderpass_desc_index)
+    {
+        renderpass_desc_t        *renderpass_desc = frame_graph_desc->renderpass_descs + renderpass_desc_index;
+        frame_graph_renderpass_t *renderpass      = frame_graph->renderpasses          + renderpass_desc_index;
+
+        construct_frame_graph_renderpass(renderpass, renderpass_desc, renderpass_desc_index);
+    }
 }
 
 /////////////////////////

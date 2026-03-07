@@ -305,42 +305,55 @@ struct render_target_t
 // RENDER TARGETS 
 ////////////////////
 
-constexpr u32 FRAME_GRAPH_MAX_RENDERPASSES = 10;
+const u32 FRAME_GRAPH_MAX_RENDERPASSES = 10;
 
-struct render_frame_graph_renderpass_desc_t
+enum renderpass_attachment_type_t
 {
+    RenderpassAttachmentRead      = BIT(0),
+    RenderpassAttachmentWrite     = BIT(1),
+    RenderpassAttachmentReadWrite = RenderpassAttachmentRead|RenderpassAttachmentWrite,
 };
 
-struct render_frame_graph_pass_desc_t
+struct renderpass_attachment_t
 {
-    image_t                             *attachments[MAX_RENDER_TARGET_ATTACHMENTS];
-    render_frame_graph_renderpass_desc_t renderpass_descs[FRAME_GRAPH_MAX_RENDERPASSES];
-    u32                                  next_renderpass_id;
+    renderpass_attachment_type_t type;
+    image_t                     *image;
 };
 
-struct render_frame_graph_renderpass_t
+struct renderpass_desc_t
 {
+    renderpass_attachment_t attachments[MAX_RENDER_TARGET_ATTACHMENTS];
+    u32                     attachment_count;
 };
 
-struct render_frame_graph_desc_t
+struct render_frame_graph_desc_t 
 {
+    renderpass_desc_t renderpass_descs[FRAME_GRAPH_MAX_RENDERPASSES];
+    u32               renderpass_count;
 };
 
-struct render_frame_graph_t
+struct frame_graph_renderpass_t 
 {
-    render_frame_graph_renderpass_t renderpasses[FRAME_GRAPH_MAX_RENDERPASSES];
-    u32                             renderpass_count;
+    u32           ID;
+    VkRenderPass  renderpass_handle;
+    VkFramebuffer framebuffer_handle;
 };
+
+struct render_frame_graph_t 
+{
+    frame_graph_renderpass_t renderpasses[FRAME_GRAPH_MAX_RENDERPASSES];
+    u32                      renderpass_count;
+};
+
+////////////////////
+// Renderer State 
+////////////////////
 
 // TODO(Sleepster): Maybe one day we'll have to have this store backend related function pointers like:
 //
 // renderer_state->r_backend_create_bitmap(...);
 //
 // But for now we're good.
-
-////////////////////
-// Renderer State 
-////////////////////
 
 struct renderer_state_t
 {
