@@ -18,23 +18,6 @@
 #include <r_render_image.h>
 #include <s_renderer.h>
 
-internal_api VkFormat
-bitmap_format_to_vulkan_format(u32 bitmap_format)
-{
-    VkFormat result = VK_FORMAT_R8G8B8_SRGB;
-    switch(bitmap_format)
-    {
-        case BMF_R8:         {result = VK_FORMAT_R8_SRGB;      }break;
-        case BMF_G8:         {result = VK_FORMAT_R8_SRGB;      }break;
-        case BMF_B8:         {result = VK_FORMAT_R8_SRGB;      }break;
-        case BMF_RGB24:      {result = VK_FORMAT_R8G8B8_SRGB;  }break;
-        case BMF_RGBA32:     {result = VK_FORMAT_R8G8B8A8_SRGB;}break;
-        case BMF_D32_SFLOAT: {result = VK_FORMAT_D32_SFLOAT;   }break;
-    }
-
-    return(result);
-}
-
 void
 s_renderer_state_init(renderer_state_t *renderer_state, void *render_context)
 {
@@ -44,14 +27,6 @@ s_renderer_state_init(renderer_state_t *renderer_state, void *render_context)
 
     renderer_state->command_lists    = c_arena_push_array(&renderer_state->renderer_arena, render_command_list_t, MAX_COMMAND_LISTS);
     renderer_state->constant_buffers = c_arena_push_array(&renderer_state->renderer_arena, constant_buffer_t,     MAX_CONSTANT_BUFFERS);
-
-    for(u32 render_target_index = 0;
-        render_target_index < MAX_RENDER_TARGETS;
-        ++render_target_index)
-    {
-        render_target_t *render_target = renderer_state->render_targets + render_target_index;
-        render_target->ID = INVALID_ID;
-    }
 
     renderer_state->render_context  = render_context;
 }
@@ -70,6 +45,7 @@ s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_
 void
 s_renderer_resize_render_targets(renderer_state_t *renderer_state, vec2_t window_size)
 {
+#if 0
     for(u32 render_target_index = 0;
         render_target_index < renderer_state->render_target_count;
         ++render_target_index)
@@ -84,7 +60,7 @@ s_renderer_resize_render_targets(renderer_state_t *renderer_state, vec2_t window
                 ++attachment_index)
             {
                 render_target_attachment_info_t *attachment = render_target->attachment_info + attachment_index;
-                image_create_info_t info = attachment->attachment->create_jnfo;
+                image_create_info_t info = attachment->attachment->create_info;
                 info.width  = window_size.x;
                 info.height = window_size.y;
 
@@ -97,6 +73,7 @@ s_renderer_resize_render_targets(renderer_state_t *renderer_state, vec2_t window
             s_renderer_render_target_create(renderer_state, &render_target->create_info);
         }
     }
+#endif
 
     renderer_state->last_window_size_generation += 1;
 }
@@ -217,6 +194,7 @@ s_renderer_render_target_create(renderer_state_t *renderer_state, render_target_
 void
 s_renderer_render_target_destroy(renderer_state_t *renderer_state, render_target_t *render_target)
 {
+#if 0
     Assert(renderer_state->render_target_count > 0);
 
     vulkan_context_t *vulkan_context = (vulkan_context_t *)renderer_state->render_context;
@@ -225,6 +203,7 @@ s_renderer_render_target_destroy(renderer_state_t *renderer_state, render_target
 
     render_target->ID = INVALID_ID;
     renderer_state->render_target_count--;
+#endif
 }
 
 /////////////////////////
@@ -249,46 +228,173 @@ s_renderer_renderpass_desc_init(renderpass_desc_t *desc)
 }
 
 void
-s_renderer_renderpass_attach_image(renderpass_desc_t *renderpass, image_t *image, renderpass_attachment_type_t type)
+s_renderer_renderpass_attach_image(renderpass_desc_t           *renderpass, 
+                                   image_t                     *image, 
+                                   renderpass_attachment_type_t type, 
+                                   clear_value_t                clear_value)
 {
     renderpass_attachment_t *attachment = renderpass->attachments + renderpass->attachment_count++;
-    attachment->image = image;
-    attachment->type  = type;
+    attachment->image       = image;
+    attachment->type        = type;
+    attachment->clear_value = clear_value;
 }
 
-void
+u32
 s_renderer_frame_graph_attach_renderpass(render_frame_graph_desc_t *frame_graph, renderpass_desc_t *renderpass_desc)
 {
-    renderpass_desc_t *new_desc = frame_graph->renderpass_descs + frame_graph->renderpass_count++;
+    u32 ID = frame_graph->renderpass_count;
+    renderpass_desc_t *new_desc = frame_graph->renderpass_descs + ID;
+
+    frame_graph->renderpass_count++;
     memcpy(new_desc, renderpass_desc, sizeof(renderpass_desc_t));
+
+    return(ID);
+}
+
+internal_api VkImageLayout
+get_vulkan_layout_from_attachment(renderpass_attachment_t *attachment)
+{
+    image_t *image = attachment->image;
+
+    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
+    switch(image->create_info.format)
+    {
+        case BMF_R8:
+        case BMF_B8:
+        case BMF_G8:
+        case BMF_RGB24:
+        case BMF_RGBA32:
+        {
+            result = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        }break;
+        case BMF_D32_SFLOAT_S8_UINT:
+        case BMF_D24_SFLOAT_S8:
+        case BMF_D32_SFLOAT:
+        {
+            // NOTE(Sleepster): D32 is still a depth stencil anyway 
+            result = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        }break;
+    }
+
+    return(result);
+}
+
+internal_api true_inline VkAttachmentLoadOp
+get_load_operation(renderpass_attachment_type_t type)
+{
+    VkAttachmentLoadOp result = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    if(type == RenderpassAttachmentRead || type == RenderpassAttachmentReadWrite)
+    {
+        result = VK_ATTACHMENT_LOAD_OP_LOAD;
+    }
+
+    return(result);
+}
+
+
+// NOTE(Sleepster): This is pointless right now, but we may want to expand the abilities here.
+internal_api true_inline VkAttachmentStoreOp
+get_store_operation(renderpass_attachment_type_t type)
+{
+    VkAttachmentStoreOp result = VK_ATTACHMENT_STORE_OP_STORE;
+    return(result);
+}
+
+internal_api true_inline VkImageLayout
+get_attachment_type(renderpass_attachment_t *attachment)
+{
+    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
+    switch(attachment->image->create_info.format)
+    {
+        case BMF_R8:
+        case BMF_B8:
+        case BMF_G8:
+        case BMF_RGB24:
+        case BMF_RGBA32:
+        {
+            result = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        }break;
+        case BMF_D32_SFLOAT_S8_UINT:
+        case BMF_D24_SFLOAT_S8:
+        case BMF_D32_SFLOAT:
+        {
+            result = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        }break;
+    }
+
+    return(result);
 }
 
 internal_api void
-construct_frame_graph_renderpass(frame_graph_renderpass_t *renderpass, renderpass_desc_t *desc, u32 ID)
+construct_frame_graph_renderpass(vulkan_context_t *vulkan_context, frame_graph_renderpass_t *renderpass, renderpass_desc_t *desc, u32 ID)
 {
-    renderpass->ID = ID;
+    renderpass->ID               = ID;
+    renderpass->width            = desc->attachments->image->create_info.width;
+    renderpass->height           = desc->attachments->image->create_info.height;
+    renderpass->attachment_count = desc->attachment_count;
+
+    image_t             image_attachments[MAX_RENDER_TARGET_ATTACHMENTS] = {};
+    VkImageLayout       initial_layouts[MAX_RENDER_TARGET_ATTACHMENTS]   = {};
+    VkImageLayout       final_layouts[MAX_RENDER_TARGET_ATTACHMENTS]     = {};
+    VkAttachmentLoadOp  load_operations[MAX_RENDER_TARGET_ATTACHMENTS]   = {};
+    VkAttachmentStoreOp store_operations[MAX_RENDER_TARGET_ATTACHMENTS]  = {};
+    VkImageLayout       attachment_types[MAX_RENDER_TARGET_ATTACHMENTS]  = {};
+
     for(u32 attachment_index = 0;
         attachment_index < desc->attachment_count;
         ++attachment_index)
     {
-        renderpass_attachment_t *attachment = desc->attachments + attachment_index;
-        (void)attachment;
+        renderpass_attachment_t *attachment_data = desc->attachments + attachment_index;
+        image_t                 *image           = image_attachments + attachment_index;
+
+        initial_layouts[attachment_index]  = VK_IMAGE_LAYOUT_UNDEFINED;
+        final_layouts[attachment_index]    = get_vulkan_layout_from_attachment(attachment_data);
+        load_operations[attachment_index]  = get_load_operation(attachment_data->type);
+        store_operations[attachment_index] = get_store_operation(attachment_data->type);
+        attachment_types[attachment_index] = get_attachment_type(attachment_data);
+
+        renderpass->attachment_clear_values[attachment_index] = attachment_data->clear_value;
+        memcpy(image, attachment_data->image, sizeof(image_t));
     }
+
+    renderpass->renderpass_handle = vk_backend_renderpass_create(vulkan_context,
+                                                                 image_attachments,
+                                                                 desc->attachment_count,
+                                                                 initial_layouts,
+                                                                 final_layouts,
+                                                                 load_operations,
+                                                                 store_operations,
+                                                                 attachment_types);
+
+    renderpass->framebuffer_handle = vk_backend_framebuffer_create(vulkan_context,
+                                                                   renderpass->renderpass_handle,
+                                                                   image_attachments,
+                                                                   desc->attachment_count,
+                                                                   image_attachments[0].create_info.width,
+                                                                   image_attachments[0].create_info.height);
 }
 
-void
+// TODO(Sleepster): 
+// Realistically when we do this for real, we'll want to construct a dependancy tree for each of the
+// attachments to know when and where the attachments are actually being used in ways that require their
+// store / load operations to be differ.
+render_frame_graph_t
 s_renderer_frame_graph_construct(renderer_state_t *renderer_state, render_frame_graph_desc_t *frame_graph_desc)
 {
-    render_frame_graph_t *frame_graph = Alloc(render_frame_graph_t);
+    render_frame_graph_t result = {};
+
+    vulkan_context_t *vulkan_context = (vulkan_context_t*)renderer_state->render_context;
     for(u32 renderpass_desc_index = 0;
         renderpass_desc_index < frame_graph_desc->renderpass_count;
         ++renderpass_desc_index)
     {
         renderpass_desc_t        *renderpass_desc = frame_graph_desc->renderpass_descs + renderpass_desc_index;
-        frame_graph_renderpass_t *renderpass      = frame_graph->renderpasses          + renderpass_desc_index;
+        frame_graph_renderpass_t *renderpass      = result.renderpasses                + renderpass_desc_index;
 
-        construct_frame_graph_renderpass(renderpass, renderpass_desc, renderpass_desc_index);
+        construct_frame_graph_renderpass(vulkan_context, renderpass, renderpass_desc, renderpass_desc_index);
     }
+
+    return(result);
 }
 
 /////////////////////////
@@ -325,6 +431,7 @@ s_renderer_get_command_list(renderer_state_t *renderer_state)
     return(result);
 }
 
+#if 0
 void
 r_cmd_bind_render_target(render_command_list_t *command_list, render_target_t *render_target)
 {
@@ -366,6 +473,23 @@ r_cmd_blit_render_target(render_command_list_t *command_list, render_command_bli
     render_command_blit_render_target_t *cmd = (render_command_blit_render_target_t*)(command_list->commands + command_list->command_count++);
     cmd->header.command_type =  RCT_BlitRenderTarget;
     cmd->info                = *blit_info;
+}
+#endif
+
+void
+r_cmd_renderpass_begin(render_command_list_t *command_list, render_frame_graph_t *frame_graph, u32 renderpassID)
+{
+    render_command_begin_renderpass_t *cmd = (render_command_begin_renderpass_t*)(command_list->commands + command_list->command_count++);
+    cmd->header.command_type = RCT_BeginRenderpass;
+    cmd->frame_graph         = frame_graph;
+    cmd->ID                  = renderpassID;
+}
+
+void
+r_cmd_renderpass_end(render_command_list_t *command_list)
+{
+    render_command_end_renderpass_t *cmd = (render_command_end_renderpass_t*)(command_list->commands + command_list->command_count++);
+    cmd->header.command_type = RCT_EndRenderpass;
 }
 
 void

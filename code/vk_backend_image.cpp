@@ -100,18 +100,30 @@ vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *i
     vk_backend_buffer_destroy(vulkan_context, &copy_buffer);
 }
 
-internal_api bool8
-is_image_format_depth_format(vulkan_image_t *image)
+bool8
+vk_backend_is_image_format_depth_format(vulkan_image_t *image)
 {
     bool8 result = false;
+    if(image->internal_format == VK_FORMAT_D16_UNORM || 
+       image->internal_format == VK_FORMAT_D24_UNORM_S8_UINT ||
+       image->internal_format == VK_FORMAT_D32_SFLOAT_S8_UINT ||
+       image->internal_format == VK_FORMAT_D32_SFLOAT)
+    {
+        result = true;
+    }
 
     return(result);
 }
 
-internal_api bool8
-is_image_format_stencil_format(vulkan_image_t *image)
+bool8
+vk_backend_is_image_format_stencil_format(vulkan_image_t *image)
 {
     bool8 result = false;
+    if(image->internal_format == VK_FORMAT_D24_UNORM_S8_UINT  ||
+       image->internal_format == VK_FORMAT_D32_SFLOAT_S8_UINT)
+    {
+        result = true;
+    }
 
     return(result);
 }
@@ -126,8 +138,8 @@ void
 vk_backend_image_create_view(vulkan_context_t *vulkan_context, vulkan_image_t *image)
 {
     VkImageAspectFlags aspect_mask = {};
-    bool8 is_depth_format   = is_image_format_depth_format(image);
-    bool8 is_stencil_format = is_image_format_stencil_format(image);
+    bool8 is_depth_format   = vk_backend_is_image_format_depth_format(image);
+    bool8 is_stencil_format = vk_backend_is_image_format_stencil_format(image);
     if(aspect_mask == 0) 
     {
         if(is_depth_format && is_stencil_format) aspect_mask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;

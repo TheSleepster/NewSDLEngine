@@ -69,6 +69,8 @@ typedef enum bitmap_format
     BMF_G8,
     BMF_RGBA32,
     BMF_RGB24,
+    BMF_D24_SFLOAT_S8,
+    BMF_D32_SFLOAT_S8_UINT,
     BMF_D32_SFLOAT,
     BMF_Count,
 }bitmap_format_t;

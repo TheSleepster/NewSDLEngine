@@ -25,6 +25,8 @@ constexpr u32 MAX_RENDER_TARGETS   = 100;
 ////////////////////
 // RENDER COMMAND STUFF
 ////////////////////
+struct render_frame_graph_t;
+
 struct render_target_t;
 
 // NOTE(Sleepster): The memory for each of these is transient, don't rely 
@@ -62,15 +64,15 @@ enum render_command_type_t
 
     RCT_ClearRenderTarget,
     RCT_BeginRenderGroup,
+    RCT_EndRenderGroup,
+    RCT_BeginRenderpass,
+    RCT_EndRenderpass,
     RCT_DrawRectangle,
     RCT_DrawBitmap,
     RCT_UpdateTexture,
     RCT_UpdateBuffer,
-    RCT_BindRenderTarget,
     RCT_BindMaterial,
     RCT_BindShader,
-    RCT_EndRenderGroup,
-    RCT_BlitRenderTarget,
     RCT_PresentFrame,
 
     RCT_Count
@@ -81,21 +83,24 @@ struct render_command_header_t
     render_command_type_t command_type;
 };
 
-struct render_command_clear_render_target_t 
-{
-    render_command_header_t header;
-    render_target_t        *render_target;
-};
-
-struct render_command_bind_render_target_t
-{
-    render_command_header_t header;
-    u32                     render_groupID;
-
-    render_target_t        *render_target;
-};
-
 struct render_command_begin_render_group_t
+{
+    render_command_header_t header;
+};
+
+struct render_command_end_render_group_t
+{
+    render_command_header_t header;
+};
+
+struct render_command_begin_renderpass_t
+{
+    render_command_header_t header;
+    render_frame_graph_t   *frame_graph;
+    u32                     ID;
+};
+
+struct render_command_end_renderpass_t
 {
     render_command_header_t header;
 };
@@ -149,11 +154,6 @@ struct render_command_bind_shader_t
     asset_handle_t          shader;
 };
 
-struct render_command_end_render_group_t
-{
-    render_command_header_t header;
-};
-
 // NOTE(Sleepster):
 // For this function, we will blit each of the render targets from their indices in the source_target to their indices in the desination target.
 // Meaning that an attachment that is in slot 0 of the source target will be blit to slot 0 of the destination target. 
@@ -185,17 +185,16 @@ struct render_command_t
 {
     render_command_header_t header;
     union {
-        render_command_clear_render_target_t    clear_render_target;
-        render_command_bind_render_target_t     bind_render_target; 
         render_command_begin_render_group_t     begin_render_group;
+        render_command_end_render_group_t       end_render_group;
+        render_command_begin_renderpass_t       begin_renderpass;
+        render_command_end_renderpass_t         end_renderpass;
         render_command_draw_rectangle_t         draw_rectangle;
         render_command_draw_bitmap_t            draw_texture;
         render_command_update_constant_buffer_t update_constant_buffer;
         render_command_update_texture_t         update_texture_contents;
         render_command_bind_material_t          bind_material;
         render_command_bind_shader_t            bind_shader;
-        render_command_end_render_group_t       end_render_group;
-        render_command_blit_render_target_t     blit_render_target;
         render_command_present_frame_t          present_frame;
     };
 };
@@ -318,6 +317,7 @@ struct renderpass_attachment_t
 {
     renderpass_attachment_type_t type;
     image_t                     *image;
+    clear_value_t                clear_value;
 };
 
 struct renderpass_desc_t
@@ -337,6 +337,12 @@ struct frame_graph_renderpass_t
     u32           ID;
     VkRenderPass  renderpass_handle;
     VkFramebuffer framebuffer_handle;
+
+    u32           width;
+    u32           height;
+    u32           attachment_count;
+
+    clear_value_t attachment_clear_values[MAX_RENDER_TARGET_ATTACHMENTS];
 };
 
 struct render_frame_graph_t 
@@ -377,9 +383,9 @@ struct renderer_state_t
     u32                    current_window_size_generation;
     u32                    last_window_size_generation;
 
+#if 0 
     render_target_t        render_targets[MAX_RENDER_TARGETS];
     u32                    render_target_count;
-#if 0 
     DynArray_t(render_target_attachment_info_t) attachments;
 #endif
 };
@@ -398,8 +404,17 @@ void                   s_renderer_image_update_data(void *backend_context, image
 render_command_list_t* s_renderer_get_command_list(renderer_state_t *renderer_state);
 void                   s_renderer_reset_command_list(render_command_list_t *command_list);
 
-void r_cmd_clear_render_target(render_command_list_t *command_list, render_target_t *render_target);
-void r_cmd_bind_render_target(render_command_list_t *command_list, render_target_t *render_target);
+
+void s_renderer_frame_graph_desc_init(render_frame_graph_desc_t *desc);
+void s_renderer_renderpass_desc_init(renderpass_desc_t *desc);
+void s_renderer_renderpass_attach_image(renderpass_desc_t *renderpass, image_t *image, renderpass_attachment_type_t type, clear_value_t clear_value);
+u32  s_renderer_frame_graph_attach_renderpass(render_frame_graph_desc_t *frame_graph, renderpass_desc_t *renderpass_desc);
+render_frame_graph_t s_renderer_frame_graph_construct(renderer_state_t *renderer_state, render_frame_graph_desc_t *frame_graph_desc);
+
+internal_api void construct_frame_graph_renderpass(vulkan_context_t *vulkan_context, frame_graph_renderpass_t *renderpass, renderpass_desc_t *desc, u32 ID);
+
+void r_cmd_renderpass_begin(render_command_list_t *command_list, render_frame_graph_t *frame_graph, u32 renderpassID);
+void r_cmd_renderpass_end(render_command_list_t *command_list);
 void r_cmd_begin_render_group(render_command_list_t *command_list);
 void r_cmd_end_render_group(render_command_list_t *command_list);
 void r_cmd_blit_render_target(render_command_list_t *command_list, render_command_blit_info_t *blit_info);

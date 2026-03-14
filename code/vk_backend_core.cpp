@@ -1891,13 +1891,14 @@ vk_backend_renderpass_create(vulkan_context_t    *vulkan_context,
         attachment_ref->attachment = attachment_index;
         attachment_ref->layout     = attachment_type;
 
-        if(image_attachment->internal_format != VK_FORMAT_D24_UNORM_S8_UINT &&
-           image_attachment->internal_format != VK_FORMAT_D32_SFLOAT_S8_UINT)
+        bool8 is_depth_format   = vk_backend_is_image_format_depth_format(image_attachment);
+        bool8 is_stencil_format = vk_backend_is_image_format_stencil_format(image_attachment);
+        if(!is_depth_format &&
+           !is_stencil_format)
         {
             color_attachments[color_attachment_count++] = attachment_refs[attachment_index];
         }
-        else if(image_attachment->internal_format == VK_FORMAT_D24_UNORM_S8_UINT || 
-                image_attachment->internal_format == VK_FORMAT_D32_SFLOAT_S8_UINT)
+        else if(is_depth_format)
         {
             Assert(!depth_attachment_found);
 
@@ -2116,33 +2117,11 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
     };
     vkAssert(vkBeginCommandBuffer(*vulkan_context->render_command_buffer, &begin_info));
 
+    // TODO(Sleepster): Why is this here???
     if(renderer_state->current_window_size_generation != renderer_state->last_window_size_generation)
     {
         s_renderer_resize_render_targets(renderer_state, renderer_state->window_size);
     }
-
-    // NOTE(Sleepster): Observe Render Commands  
-    for(u32 command_list_index = 0;
-        command_list_index < renderer_state->command_list_count;
-        ++command_list_index)
-    {
-        render_command_list_t *command_list = renderer_state->command_lists + command_list_index;
-        for(u32 command_index = 0;
-            command_index < command_list->command_count;
-            ++command_index)
-        {
-            render_command_t *command = command_list->commands + command_index;
-            switch(command->header.command_type)
-            {
-                case RCT_BindRenderTarget:
-                {
-                    render_command_bind_render_target_t *cmd = (render_command_bind_render_target_t*)command;
-                    (void)cmd;
-                }break;
-            }
-        }
-    }
-
 
     // NOTE(Sleepster): Execute Render Commands  
     for(u32 command_list_index = 0;
@@ -2155,7 +2134,65 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
             ++command_index)
         {
             render_command_t *command = command_list->commands + command_index;
-            (void)command;
+            switch(command->header.command_type)
+            {
+                case RCT_BeginRenderpass:
+                {
+                    render_command_begin_renderpass_t *cmd = (render_command_begin_renderpass_t*)command;
+                    frame_graph_renderpass_t *renderpass = cmd->frame_graph->renderpasses + cmd->ID;
+
+                    VkClearValue clear_values[MAX_RENDER_TARGET_ATTACHMENTS];
+                    for(u32 attachment_index = 0;
+                        attachment_index < renderpass->attachment_count;
+                        ++attachment_index)
+                    {
+                        clear_value_t *value      = renderpass->attachment_clear_values;
+                        VkClearValue *clear_value = clear_values + attachment_index;
+
+                        memcpy((void*)&clear_value->color, 
+                               (void*)&value->clear_color, 
+                               sizeof(float32) * 4);
+                    }
+
+                    vk_backend_begin_renderpass(vulkan_context, 
+                                                renderpass->width, 
+                                                renderpass->height, 
+                                                renderpass->renderpass_handle, 
+                                                renderpass->framebuffer_handle, 
+                                                renderpass->attachment_count,
+                                                clear_values);
+                }break;
+                case RCT_EndRenderpass:
+                {
+                    vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
+                }break;
+                case RCT_PresentFrame:
+                {
+                    vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
+                    VkImageSubresourceRange dst_range = {
+                        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                        .baseMipLevel   = 0,
+                        .levelCount     = 1,
+                        .baseArrayLayer = 0,
+                        .layerCount     = 1,
+                    };
+
+                    if(backbuffer->layout != VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
+                    {
+                        vk_backend_image_change_layout(vulkan_context, 
+                                                       *vulkan_context->render_command_buffer,
+                                                       backbuffer->handle,
+                                                       backbuffer->layout,
+                                                       VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                                                       VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                                       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                                       0,
+                                                       0,
+                                                       dst_range);
+                        backbuffer->layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+                    }
+                }break;
+            }
         }
 
         command_list->presenting                       = false;
@@ -2168,7 +2205,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
         c_arena_reset(&command_list->transient_arena);
     }
     renderer_state->command_list_count = 0;
-    
+
     vkEndCommandBuffer(*vulkan_context->render_command_buffer);
     vkAssert(vkResetFences(vulkan_context->device, 1, vulkan_context->image_render_idle_fence));
 

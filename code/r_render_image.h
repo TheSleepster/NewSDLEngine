@@ -22,7 +22,7 @@ struct image_create_info_t
 // is in charge of tracking rendering-related GPU resources. Meaning, this is fine here.
 struct image_t
 {
-    image_create_info_t create_jnfo;
+    image_create_info_t create_info;
     union {
         vulkan_image_t vulkan_image;
     };
@@ -33,6 +33,8 @@ image_t s_renderer_image_create(renderer_state_t *render_state, image_create_inf
 void    s_renderer_image_destroy(renderer_state_t *renderer_state, image_t *image);
 void    s_renderer_image_update_data(void *backend_context, image_t *image);
 
+VkFormat          s_renderer_bitmap_format_to_vulkan_format(u32 bitmap_format);
+VkImageUsageFlags s_renderer_image_usage_flags_from_image_format(image_create_info_t *image_create_info);
 
 #endif // R_RENDER_IMAGE_H
 

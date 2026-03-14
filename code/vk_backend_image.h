@@ -100,6 +100,9 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                       VkImageSubresourceRange source_range, 
                       VkImageSubresourceRange destination_range);
 
+bool8 vk_backend_is_image_format_stencil_format(vulkan_image_t *image);
+bool8 vk_backend_is_image_format_depth_format(vulkan_image_t *image);
+
 
 #endif // VK_BACKEND_IMAGE_H
 

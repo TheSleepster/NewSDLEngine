@@ -2071,8 +2071,8 @@ main(void)
     defer(c_string_builder_deinit(&state.struct_info_builder));
     defer(c_string_builder_deinit(&state.struct_static_def_builder));
 
-    c_hash_table_init(&state.type_table_hash, 9187);
-    memset(state.type_table_hash.data, -1, sizeof(s64) * 9187);
+    c_hash_table_init(&state.type_table_hash, 18371);
+    memset(state.type_table_hash.data, -1, sizeof(s64) * 18371);
 
 #if 1 
     visit_file_data_t visit_info = c_directory_create_visit_data(generate_file_metadata, false, null);
