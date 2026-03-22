@@ -2414,8 +2414,36 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                                 }break;
                                 case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
                                 {
-                                    (void)image_count;
-                                    (void)image_infos;
+                                    VkDescriptorImageInfo *image_info = image_infos + image_count;
+                                    VkWriteDescriptorSet   *write     = writes + write_count++;
+
+                                    for(u32 image_index = 0;
+                                        image_index < binding->descriptor_count;
+                                        ++image_index)
+                                    {
+                                        image_t *image = command_list->image_shader_params[image_count + image_index]; 
+                                        if(image)
+                                        {
+                                            vulkan_image_t *vulkan_data = &image->vulkan_image;
+
+                                            image_info->imageLayout = vulkan_data->layout;
+                                            image_info->imageView   = vulkan_data->view;
+                                            image_info->sampler     = vulkan_data->sampler;
+                                        }
+                                        else
+                                        {
+                                            image_info[image_index] = image_info[0];
+                                        }
+                                    }
+
+                                    write->sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                                    write->dstSet          = descriptor_set;
+                                    write->dstBinding      = binding_count++;
+                                    write->descriptorCount = binding->descriptor_count;
+                                    write->descriptorType  = binding->type;
+                                    write->pImageInfo      = image_info;
+
+                                    image_count += binding->descriptor_count;
                                 }break;
                             }
                         }

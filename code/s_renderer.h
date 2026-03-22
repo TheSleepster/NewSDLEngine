@@ -17,10 +17,11 @@
 
 constexpr u32 MAX_RENDER_TARGET_ATTACHMENTS = 10;
 
-constexpr u32 MAX_RENDER_COMMANDS  = 10000;
-constexpr u32 MAX_COMMAND_LISTS    = 1000;
-constexpr u32 MAX_CONSTANT_BUFFERS = 1000;
-constexpr u32 MAX_RENDER_TARGETS   = 100;
+constexpr u32 MAX_RENDER_COMMANDS     = 10000;
+constexpr u32 MAX_COMMAND_LISTS       = 1000;
+constexpr u32 MAX_CONSTANT_BUFFERS    = 1000;
+constexpr u32 MAX_RENDER_TARGETS      = 100;
+constexpr u32 MAX_SHADER_IMAGE_PARAMS = 16;
 
 ////////////////////
 // GPU BUFFERS 
@@ -235,6 +236,9 @@ struct render_command_list_t
 
     renderpass_t     *active_renderpass;
     bool32            presenting;
+
+    image_t          *image_shader_params[MAX_SHADER_IMAGE_PARAMS];
+    u32               image_count;
 };
 
 ////////////////////

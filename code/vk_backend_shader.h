@@ -24,6 +24,7 @@ struct vulkan_shader_binding_t
     VkDescriptorType           type;
     uniform_constant_buffer_t *cpu_buffer;
     u64                        buffer_hash_index;
+    u32                        descriptor_count;
     string_t                   name;
 
 };

@@ -2161,7 +2161,7 @@ struct type_info_struct_render_command_list_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[17];
+		type_info_member_t member_array[19];
 		struct {
 			type_info_member_t is_initialized;
 			type_info_member_t renderer_state;
@@ -2180,6 +2180,8 @@ struct type_info_struct_render_command_list_t {
 			type_info_member_t active_shader_program;
 			type_info_member_t active_renderpass;
 			type_info_member_t presenting;
+			type_info_member_t image_shader_params;
+			type_info_member_t image_count;
 		}members;
 	};
 };
@@ -2539,12 +2541,13 @@ struct type_info_struct_vulkan_shader_binding_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[4];
+		type_info_member_t member_array[5];
 		struct {
 			type_info_member_t type;
 			type_info_member_t cpu_buffer;
-			type_info_member_t name;
 			type_info_member_t buffer_hash_index;
+			type_info_member_t descriptor_count;
+			type_info_member_t name;
 		}members;
 	};
 };
@@ -4650,7 +4653,7 @@ const static type_info_struct_render_command_list_t type_info_struct_render_comm
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_render_command_list_t),
-	.member_count = 17,
+	.member_count = 19,
 	.members = {
 		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), is_initialized))},
 		.renderer_state = {.name = "renderer_state", .type = TYPE_renderer_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.renderer_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), renderer_state))},
@@ -4669,6 +4672,8 @@ const static type_info_struct_render_command_list_t type_info_struct_render_comm
 		.active_shader_program = {.name = "active_shader_program", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.active_shader_program)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), active_shader_program))},
 		.active_renderpass = {.name = "active_renderpass", .type = TYPE_renderpass_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.active_renderpass)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), active_renderpass))},
 		.presenting = {.name = "presenting", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.presenting)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), presenting))},
+		.image_shader_params = {.name = "image_shader_params", .type = TYPE_image_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.image_shader_params)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), image_shader_params))},
+		.image_count = {.name = "image_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.image_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), image_count))},
 	}
 };
 
@@ -4977,12 +4982,13 @@ const static type_info_struct_vulkan_shader_binding_t type_info_struct_vulkan_sh
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_binding_t),
-	.member_count = 4,
+	.member_count = 5,
 	.members = {
 		.type = {.name = "type", .type = TYPE_VkDescriptorType, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), type))},
 		.cpu_buffer = {.name = "cpu_buffer", .type = TYPE_uniform_constant_buffer_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.cpu_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), cpu_buffer))},
+		.buffer_hash_index = {.name = "buffer_hash_index", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.buffer_hash_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), buffer_hash_index))},
+		.descriptor_count = {.name = "descriptor_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.descriptor_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), descriptor_count))},
 		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), name))},
-		.buffer_hash_index = {.name = "buffer_hash_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.buffer_hash_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), buffer_hash_index))},
 	}
 };
 
@@ -6117,6 +6123,8 @@ enum render_command_list_t_member_list_enum {
 	TYPE_RENDER_COMMAND_LIST_T_MEMBER_active_shader_program,
 	TYPE_RENDER_COMMAND_LIST_T_MEMBER_active_renderpass,
 	TYPE_RENDER_COMMAND_LIST_T_MEMBER_presenting,
+	TYPE_RENDER_COMMAND_LIST_T_MEMBER_image_shader_params,
+	TYPE_RENDER_COMMAND_LIST_T_MEMBER_image_count,
 };
 
 enum clear_color_member_list_enum {
@@ -6276,8 +6284,9 @@ enum vulkan_shader_stage_t_member_list_enum {
 enum vulkan_shader_binding_t_member_list_enum {
 	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_type,
 	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_cpu_buffer,
-	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_name,
 	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_buffer_hash_index,
+	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_descriptor_count,
+	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_name,
 };
 
 enum vulkan_shader_t_member_list_enum {
