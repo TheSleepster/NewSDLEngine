@@ -45,13 +45,6 @@ vk_backend_buffer_create(vulkan_context_t              *vulkan_context,
     {
         Expect(false, "Failed to bind the memory for this GPU buffer...\n");
     }
-#if 0
-    VmaAllocationCreateInfo allocation_info = {};
-    allocation_info.usage    = VMA_MEMORY_USAGE_AUTO;
-    allocation_info.flags    = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
-    allocation_info.priority = 1.0f;
-    vmaCreateBuffer(vulkan_context->vulkan_allocator, &info, &allocation_info, &result.handle, &result.gpu_memory, &result.allocation_info);
-#endif
 
     return(result);
 }
@@ -103,16 +96,32 @@ vk_backend_buffer_copy_data
 */
 
 void
-vk_backend_buffer_copy_data(vulkan_buffer_t *buffer,
-                            void            *data,
-                            u64              copy_size,
-                            u64              offset)
+vk_backend_buffer_copy_data(vulkan_context_t *vulkan_context,
+                            vulkan_buffer_t  *buffer,
+                            void             *data,
+                            u64               copy_size,
+                            u64               offset)
 {
-    Assert(buffer->allocation.allocation_type != VULKAN_MEMORY_USAGE_GPU_ONLY);
     Assert(buffer->allocation.mapped_data != null);
     Assert(buffer->allocation.allocation_size - offset >= copy_size);
+    Assert(data != null);
 
-    memcpy(buffer->allocation.mapped_data, data, copy_size);
+    if(buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_CPU_TO_GPU ||
+       buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_CPU_ONLY)
+    {
+        // NOTE(Sleepster): Data is persistently mapped by the vulkan allocator... 
+        memcpy(buffer->allocation.mapped_data, data, copy_size);
+    }
+    else if(buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_GPU_ONLY ||
+            buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_GPU_TO_CPU)
+    {
+        vk_backend_buffer_stage_data(vulkan_context, (byte*)data, copy_size, buffer);
+    }
+    else
+    {
+        InvalidCodePath;
+    }
+
     buffer->used += copy_size;
 }
 
@@ -136,6 +145,45 @@ vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buff
     vk_backend_buffer_destroy(vulkan_context, buffer);
 
     *buffer = new_buffer;
+}
+
+
+/*
+=============
+vk_backend_buffer_map
+=============
+*/
+
+void*
+vk_backend_buffer_map(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, u32 offset, u32 size)
+{
+    void *result = null;
+
+    Assert(!buffer->is_mapped);
+    Assert(buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_CPU_TO_GPU);
+
+    vkAssert(vkMapMemory(vulkan_context->device, buffer->allocation.memory, offset, size, 0, &result));
+
+    // TODO(Sleepster): Eventually wrap these operations (buffer->is_mapped) in an AtomicCompareExchange()... 
+    buffer->is_mapped = true;
+
+    return(result);
+}
+
+/*
+=============
+vk_backend_buffer_unmap
+=============
+*/
+
+void
+vk_backend_buffer_unmap(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer)
+{
+    Assert(buffer->is_mapped);
+    vkUnmapMemory(vulkan_context->device, buffer->allocation.memory);
+
+    // TODO(Sleepster): Same as above. 
+    buffer->is_mapped = false;
 }
 
 /*
@@ -209,7 +257,7 @@ vk_backend_buffer_upload_staged_data(vulkan_context_t *vulkan_context, VkCommand
         {
             Expect(false, "Size of transfer buffer exceeded...\n");
         }
-        vk_backend_buffer_copy_data(buffer, info->data_to_upload, info->upload_size, buffer->used);
+        vk_backend_buffer_copy_data(vulkan_context, buffer, info->data_to_upload, info->upload_size, buffer->used);
 
         info->staging_buffer_offset = buffer->used;
         buffer->used               += info->upload_size;

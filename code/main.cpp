@@ -1,5 +1,5 @@
 /* ========================================================================
-   $File: main.cpp $
+   $File: main.c $
    $Date: November 28 2025 06:40 pm $
    $Revision: $
    $Creator: Justin Lewis $
@@ -42,7 +42,7 @@
 //#include <meta/GENERATED_program_RTTI.h>
 
 internal_api void
-c_process_window_events(SDL_Window *window, renderer_state_t *renderer_state, input_manager_t *input_manager)
+process_window_events(SDL_Window *window, renderer_state_t *renderer_state, input_manager_t *input_manager)
 {
     SDL_Event event;
     while(SDL_PollEvent(&event))
@@ -105,38 +105,16 @@ main(int argc, char **argv)
 
         asset_handle_t default_texture  = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
         asset_handle_t default_shader   = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_shader"));
+        asset_handle_t basic_traiangle  = s_asset_manager_acquire_asset_handle(asset_manager, STR("basic_triangle"));
         asset_handle_t default_material = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_material_archetype"));
         (void)default_shader;
         (void)default_material;
 
-        texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32, 32);
+        texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32_SRGB, 32);
         s_texture_atlas_add_texture(atlas, &default_texture);
         s_texture_atlas_pack_added_textures(&context, atlas);
 
         s_nt_socket_api_init(state, argc, argv);
-#if 0
-        render_context->window = state->window;
-        r_renderer_init(render_context, render_state, state->window_size);
-
-        asset_manager->render_context = render_context;
-        render_context->default_texture  = Alloc(asset_handle_t);
-        *render_context->default_texture = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
-
-        render_context->default_shader  = Alloc(asset_handle_t);
-        *render_context->default_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_shader"));
-
-        render_context->default_material  = Alloc(asset_handle_t);
-        *render_context->default_material = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_material_archetype"));
-
-        r_vulkan_make_gpu_texture(render_context, &render_context->default_texture->slot->texture);
-        r_render_state_init(render_state, render_context);
-
-        s_nt_socket_api_init(state, argc, argv);
-
-        texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32, 32);
-        s_texture_atlas_add_texture(atlas, render_context->default_texture);
-        s_texture_atlas_pack_added_textures(render_context, atlas);
-#endif
 
         input_manager_t input_manager = {};
         s_im_init_input_manager(&input_manager);
@@ -157,7 +135,7 @@ main(int argc, char **argv)
         image_create_info_t primary_game_color_buffer_create_info = {
             .width  = 320,
             .height = 180,
-            .format  = BMF_RGBA32
+            .format = BMF_BGRA32_UNORM
         };
 
         image_create_info_t primary_game_depth_buffer_create_info = {
@@ -169,31 +147,59 @@ main(int argc, char **argv)
         image_t game_color_buffer = s_renderer_image_create(&renderer_state, &primary_game_color_buffer_create_info);
         image_t game_depth_buffer = s_renderer_image_create(&renderer_state, &primary_game_depth_buffer_create_info);
 
-        render_frame_graph_desc_t game_frame_graph = {};
-        s_renderer_frame_graph_desc_init(&game_frame_graph);
-
-        // NOTE(Sleepster): Game pass 
-        renderpass_desc_t game_object_renderpass = {};
-        s_renderer_renderpass_desc_init(&game_object_renderpass);
-
         clear_value_t color_buffer_clear_value = {
-            .clear_color = {.float_color = {1.0f, 0.4f, 0.8f}},
+            .clear_color = {.float_color = {0.3f, 0.4f, 0.6f}},
         };
 
         clear_value_t depth_buffer_clear_value = {
             .clear_depth = 0.0f
         };
-        s_renderer_renderpass_attach_image(&game_object_renderpass, &game_color_buffer, RenderpassAttachmentWrite, color_buffer_clear_value);
-        s_renderer_renderpass_attach_image(&game_object_renderpass, &game_depth_buffer, RenderpassAttachmentWrite, depth_buffer_clear_value);
 
-        u32 game_object_renderpassID = s_renderer_frame_graph_attach_renderpass(&game_frame_graph, &game_object_renderpass);
-        render_frame_graph_t frame_graph = s_renderer_frame_graph_construct(&renderer_state, &game_frame_graph);
+        renderpass_desc_t game_renderpass_desc = {
+            .render_width           = 320,
+            .render_height          = 180,
+            .resize_with_window     = false,
+            .color_attachment_count = 1,
+            .color_attachments = {
+                [0] = {
+                    .access          = RenderpassAttachmentAccessWrite,
+                    .load_operation  = RenderpassAttachmentLoadOperationClear,
+                    .store_operation = RenderpassAttachmentStoreOperationStore,
+
+                    .image           = &game_color_buffer,
+                    .clear_value     = color_buffer_clear_value
+                },
+            },
+            .depth_stencil_attachment = {
+                .access          = RenderpassAttachmentAccessWrite,
+                .load_operation  = RenderpassAttachmentLoadOperationClear,
+                .store_operation = RenderpassAttachmentStoreOperationDontCare,
+
+                .image           = &game_depth_buffer,
+                .clear_value     = depth_buffer_clear_value
+            },
+        };
+
+        u32 game_renderpass_ID = s_renderer_build_renderpass(&renderer_state, &game_renderpass_desc);
+
+        render_vertex_t vertices[] = {
+            [0] = {
+                .vPosition = vec4( 0.5, -0.5, 0.0, 1.0),
+            },
+            [1] = {
+                .vPosition = vec4( 0.0,  0.5, 0.0, 1.0),
+            },
+            [2] = {
+                .vPosition = vec4(-0.5, -0.5, 0.0, 1.0),
+            },
+        };
+        render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(&renderer_state, RenderBufferUsage_Dynamic, vertices, sizeof(vertices));
 
         g_running = true;
         while(g_running)
         {
             s_im_reset_controller_states(&input_manager);
-            c_process_window_events(state->window, &renderer_state, &input_manager);
+            process_window_events(state->window, &renderer_state, &input_manager);
 
             state->input_axis = {};
             if(s_im_is_keyboard_key_down(game_controller, SDL_SCANCODE_W))
@@ -227,7 +233,7 @@ main(int argc, char **argv)
                 client->input_data_buffer[client->input_data_head] = input_data;
                 client->input_data_head = (client->input_data_head + 1) % MAX_BUFFERED_INPUTS;
 
-                // TODO(Sleepster): If we have any input packets form the host, reconcile here... 
+                // NOTE(Sleepster): If we have any input packets from the host, reconcile here... 
                 // If we are the host update the client's players...
                 s_nt_client_check_packets(state);
                 s_nt_client_send_packets(state);
@@ -256,10 +262,78 @@ main(int argc, char **argv)
             }
 
             render_command_list_t *command_list = s_renderer_get_command_list(&renderer_state);
-            r_cmd_renderpass_begin(command_list, &frame_graph, game_object_renderpassID);
-            r_cmd_renderpass_end(command_list);
+            r_cmd_renderpass_begin(command_list, game_renderpass_ID);
+            r_cmd_bind_vertex_buffer(command_list, &vertex_buffer);
+            r_cmd_use_shader_program(command_list, basic_traiangle);
 
-            r_cmd_present(command_list);
+            r_cmd_set_viewport(command_list, vec2(0, 180), vec2(320, -180));
+            r_cmd_set_scissor(command_list,  vec2(0, 0),   vec2(320,    180));
+
+            vec4_t color = {0.0, 1.0, 0.0, 1.0};
+            r_cmd_update_push_constants(command_list, 0, sizeof(vec4_t), &color);
+            r_cmd_draw(command_list, 0, 3);
+
+            r_cmd_renderpass_end(command_list);
+            r_cmd_present(command_list, &game_color_buffer);
+
+#if 0
+            // TODO(Sleepster):  
+            // Implement a hash table inside of renderer_state_t. This hash table will take the name of the uniform buffer object / SSBO
+            // and return us an poiner to the constant_buffer_t. This pointer is just the constant_buffer_t itself from inside the hash table
+            // This can be done like so:
+            
+            constant_buffer_t *light_buffer = r_renderer_get_constant_buffer(renderer_state, STR("light_buffer"));
+
+            // Through doing this, it means that if other shaders need to access the data within "light_buffer" we have the pointer for quick access, allowing
+            // the hash lookup to only have to ever be performed a single time. Updating then becomes extremely easy:
+
+            point_light_t *lights = ...;
+            r_cmd_update_buffer_contents(light_buffer, lights, sizeof(point_light_t) * light_count);
+
+            // This is copied to the cpu side buffer, then is staged later when we call execute a command similar to that of idRenderProgManager::CommitCurrent
+            // which will move the data to the gpu by mapping the buffer, copying the cpu side data and writing the amount into the correct offset, then finally
+            // unmapping the gpu buffer.
+            //
+            // After that, we will do the exact same methods of descriptor writing and allocating.
+            //
+            // In the case of shader local uniforms, they will go through the same hash lookup and treated exactly as though they were global, their data
+            // would simply just be written to the ubo exactly the same. Therefore the notion of "shared" and "local" descriptors is now gone.
+
+            // init time
+            asset_handle_t game_material     = s_asset_manager_get_material(asset_manager, STR("game_basic_material"));
+            asset_handle_t lightmap_material = s_asset_manager_get_material(asset_manager, STR("lightmap_material"));
+
+            // this should be able to be accessed across many shaders...
+            constant_buffer_t *light_buffer = s_material_get_constant_buffer(renderer_state, STR("light_buffer"));
+
+            point_light_t *lights = ...;
+            r_cmd_update_buffer_contents(light_buffer, lights, sizeof(point_light_t) * light_count);
+
+            // render time
+            render_command_list_t *command_list = s_renderer_get_command_list(&renderer_state);
+            r_cmd_renderpass_begin(command_list, game_renderpass_ID);
+           
+            // If this is an archetype, we use the base instance
+            // If this is an instance, we use the instance data
+            //
+            // This needs to somehow know about the light buffer as well.
+            //
+            // In this case, we would give this instance's RenderIntensityUBO as the descriptor somehow...
+            r_cmd_bind_material(&game_basic_material);
+
+            // This is then a LOCAL constant buffer.
+            constant_buffer_t *game_material_camera_matrices = r_material_get_constant_buffer(game_basic_material, STR("CameraMatricesUBO"));
+            r_cmd_update_buffer_contents(game_material_camera_matrices, ); 
+            r_cmd_draw(...);
+
+            // This is an entirely different archetype, and thus a completely different shader...
+            r_cmd_bind_material(&game_lightmap_material);
+            constant_buffer_t *game_lightmap_vibrance_data = r_material_get_constant_buffer(&game_lightmap_material, STR("VibranceDataUBO"));
+            r_cmd_draw(...);
+
+            r_cmd_renderpass_end(command_list);
+            r_cmd_present(command_list, &game_color_buffer);
+#endif
 
             vk_backend_render_frame(&context, &renderer_state);
             c_global_context_reset_temporary_data();

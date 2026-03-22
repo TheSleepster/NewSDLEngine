@@ -77,12 +77,13 @@ vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *i
                                    VK_ACCESS_TRANSFER_WRITE_BIT,
                                    src_range);
 
+    // TODO(Sleepster): Why aren't we just using a staging buffer here???? We have staging buffers...
     vulkan_buffer_t copy_buffer = vk_backend_buffer_create(vulkan_context, 
                                                            memory_requirements.size,
                                                            VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
                                                            VULKAN_MEMORY_USAGE_CPU_TO_GPU); 
 
-    vk_backend_buffer_copy_data(&copy_buffer, image_info->data.data, image_info->data.count, 0);
+    vk_backend_buffer_copy_data(vulkan_context, &copy_buffer, image_info->data.data, image_info->data.count, 0);
     vk_backend_image_update_from_buffer(vulkan_context, image, &copy_buffer, scratch_buffer);
 
     vk_backend_image_change_layout(vulkan_context, 
@@ -377,6 +378,7 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                       vec2_t                  destination_size,
                       VkImageLayout           source_initial_layout,
                       VkImageLayout           destination_initial_layout,
+                      VkImageLayout           destination_final_layout,
                       VkImageSubresourceRange source_range, 
                       VkImageSubresourceRange destination_range)
 {
@@ -449,7 +451,7 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                                    *vulkan_context->render_command_buffer,
                                    destination_image->handle,
                                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                   destination_initial_layout,
+                                   destination_final_layout,
                                    VK_PIPELINE_STAGE_TRANSFER_BIT,
                                    VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
                                    0,

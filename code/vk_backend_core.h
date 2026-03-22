@@ -32,13 +32,15 @@ constexpr u64 MAX_VULKAN_INSTANCES         = MAX_VULKAN_INDEX_BUFFER_SIZE / 6;
 constexpr u32 MAX_VULKAN_SHADER_STAGES     = 10;
 constexpr u32 SWAPCHAIN_MAX_IMAGES         = 10;
 
+constexpr u32 MAX_DESCRIPTOR_SETS          = 16384; 
+
 constexpr s32 g_device_extension_count = 1;
 static const char *g_device_extensions[g_device_extension_count] = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
 // NOTE(Sleepster): Used for rendering
-struct alignas(16) vertex_t
+struct alignas(16) render_vertex_t
 {
     vec4_t vPosition;
     vec2_t vCorner;
@@ -222,6 +224,14 @@ struct vulkan_context_t
 
     VkRenderPass                        primary_renderpass;
     VkFramebuffer                      *framebuffers;
+
+    // NOTE(Sleepster): Constant Buffers update into here. Essentially, a memory arena.
+    vulkan_buffer_t                     constant_buffer_data;
+    // NOTE(Sleepster): The staging buffers copy from the above constant_buffer_data into these in a single command. 
+    vulkan_buffer_t                     shader_uniform_buffers[MAX_FRAMES_IN_FLIGHT];
+
+    VkDescriptorPool                    descriptor_pools[MAX_FRAMES_IN_FLIGHT];
+    VkDescriptorSet                     descriptor_sets[MAX_FRAMES_IN_FLIGHT][MAX_DESCRIPTOR_SETS];
 
     // NOTE(Sleepster): We don't really need these, they're static and only modified when created. 
     vulkan_buffer_t                     main_vertex_buffer;

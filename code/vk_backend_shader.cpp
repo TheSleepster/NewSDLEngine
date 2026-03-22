@@ -7,6 +7,8 @@
 #include <vk_backend_shader.h>
 #include <spirv_reflect.h>
 
+#include <s_renderer.h>
+
 VkDescriptorType 
 vk_backend_spv_reflect_to_vulkan_descriptor(SpvReflectDescriptorType spv_type)
 {
@@ -171,6 +173,17 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
             set_binding->descriptorType     = vk_backend_spv_reflect_to_vulkan_descriptor(binding->descriptor_type);
             set_binding->descriptorCount    = binding->count;
             set_binding->pImmutableSamplers = null;
+
+            vulkan_shader_binding_t *shader_binding = result.bindings + binding_index;
+            Assert(shader_binding);
+            
+            // TODO(Sleepster): For now we just assume that the size of the hahs table won't arbitrarily change
+            // Bad.
+            shader_binding->type               = set_binding->descriptorType;
+            shader_binding->name               = STR(binding->name);
+            shader_binding->cpu_buffer         = null;
+            shader_binding->buffer_hash_index  = c_fnv_hash_value(shader_binding->name.data, shader_binding->name.count);
+            shader_binding->buffer_hash_index %= MAX_CONSTANT_BUFFERS;
         }
 
         VkDescriptorSetLayoutCreateInfo layout_create_info = {

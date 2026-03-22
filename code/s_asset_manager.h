@@ -19,6 +19,7 @@
 #include <c_threadpool.h>
 #include <c_dynarray.h>
 
+#include <r_render_image.h>
 #include <vk_backend_image.h>
 #include <vk_backend_shader.h>
 
@@ -67,7 +68,9 @@ typedef enum bitmap_format
     BMF_R8,
     BMF_B8,
     BMF_G8,
-    BMF_RGBA32,
+    BMF_RGBA32_SRGB,
+    BMF_RGBA32_UNORM,
+    BMF_BGRA32_UNORM,
     BMF_RGB24,
     BMF_D24_SFLOAT_S8,
     BMF_D32_SFLOAT_S8_UINT,
@@ -115,9 +118,9 @@ typedef struct bitmap
 
 typedef struct texture2D
 {
-    u64               ID;
-    bitmap_t          bitmap;
-    vulkan_image_t    gpu_data;
+    u64      ID;
+    bitmap_t bitmap;
+    image_t  gpu_data;
 }texture2D_t;
 
 typedef struct subtexture_data
@@ -247,10 +250,6 @@ typedef struct material_instance
     u32                           shader_uniform_count;
 
     render_pipeline_state_t       pipeline_state;
-#if 0
-    VkDescriptorSet               sets[];
-#endif 
-
     material_archetype_t         *archetype;
 }material_instance_t;
 
@@ -343,6 +342,7 @@ typedef struct asset_catalog
 
     // TODO(Sleepster): Should this be a * to asset_slots?
     HashTable_t(asset_slot_t) asset_lookup;
+    DynArray_t(asset_slot_t*) loaded_assets;
 }asset_catalog_t;
 
 // TODO(Sleepster): thread safety

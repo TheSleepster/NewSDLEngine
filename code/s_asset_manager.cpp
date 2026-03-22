@@ -115,7 +115,7 @@ s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 n
     Assert(pixel_count > 0);
 
     result.ID     = name_hash;
-    result.bitmap = s_asset_bitmap_init(pixels, width, height, channels, BMF_RGBA32);
+    result.bitmap = s_asset_bitmap_init(pixels, width, height, channels, BMF_RGBA32_SRGB);
     return(result);
 }
 
@@ -230,7 +230,6 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
 
                         const type_info_t *type_data = c_meta_get_type_info_by_name(STR("render_pipeline_state_t"));
                         material_file_parse_block_data(filename, state_data, tokenizer, type_data, token);
-
                     }
                     else
                     {
@@ -761,13 +760,13 @@ s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_at
         info.usage          = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
         info.format         = VK_FORMAT_R8G8B8A8_SRGB;
 
-        if(atlas->texture.gpu_data.handle == null)
+        if(atlas->texture.gpu_data.vulkan_image.handle == null)
         {
-            atlas->texture.gpu_data = vk_backend_image_create(vulkan_context, &info);
+            atlas->texture.gpu_data.vulkan_image = vk_backend_image_create(vulkan_context, &info);
         }
         else
         {
-            vk_backend_image_update_data(vulkan_context, &atlas->texture.gpu_data);
+            vk_backend_image_update_data(vulkan_context, &atlas->texture.gpu_data.vulkan_image);
         }
     }
     else

@@ -12,8 +12,10 @@
 #include <s_renderer.h>
 
 #include <r_render_image.h>
-
 #include <s_asset_manager.h>
+
+#define MAX_POOL_SET_TYPES (5)
+
 
 void vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context);
 void vk_backend_create_framebuffers(vulkan_context_t *vulkan_context);
@@ -1467,10 +1469,51 @@ vk_backend_destroy_framebuffers(vulkan_context_t *vulkan_context)
 
 /*
 =============
+vk_backend_create_backend_buffers
+=============
+*/
+
+void
+vk_backend_create_backend_buffers(vulkan_context_t *vulkan_context)
+{
+    // NOTE(Sleepster): Create the staging buffers
+    {
+        // TODO(Sleepster): Maybe actually use these... 
+        for(u32 frame_index = 0;
+            frame_index < MAX_FRAMES_IN_FLIGHT;
+            ++frame_index)
+        {
+            vulkan_context->staging_buffers[frame_index] = vk_backend_staging_buffer_create(vulkan_context, 
+                                                                                            MB(16), 
+                                                                                            VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+                                                                                            VULKAN_MEMORY_USAGE_CPU_TO_GPU);
+        }
+    }
+
+    // NOTE(Sleepster): Create the shader uniform buffers 
+    {  
+        // TODO(Sleepster): For now, just the staging buffer for the uniform data. We should swap to proper staging buffers 
+        vulkan_context->constant_buffer_data = vk_backend_buffer_create(vulkan_context, MB(16), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VULKAN_MEMORY_USAGE_CPU_TO_GPU);
+
+        for(u32 frame_index = 0;
+            frame_index < MAX_FRAMES_IN_FLIGHT;
+            ++frame_index)
+        {
+            vulkan_context->shader_uniform_buffers[frame_index] = vk_backend_buffer_create(vulkan_context, 
+                                                                                           MB(16), 
+                                                                                           VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT|VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                                                           VULKAN_MEMORY_USAGE_GPU_ONLY);
+        }
+    }
+}
+
+/*
+=============
 vk_backend_create_render_buffers
 =============
 */
 
+#if 0
 void
 vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
 {
@@ -1482,7 +1525,7 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
                                                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
                                                                             VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
 
-    vulkan_context->main_vertex_buffer   = vk_backend_buffer_create(vulkan_context, sizeof(vertex_t) * 4,                       vertex_buffer_usage_bits, VULKAN_MEMORY_USAGE_GPU_ONLY);
+    vulkan_context->main_vertex_buffer   = vk_backend_buffer_create(vulkan_context, sizeof(render_vertex_t) * 4,                vertex_buffer_usage_bits, VULKAN_MEMORY_USAGE_GPU_ONLY);
     vulkan_context->main_index_buffer    = vk_backend_buffer_create(vulkan_context, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, index_buffer_usage_bits,  VULKAN_MEMORY_USAGE_GPU_ONLY);
     vulkan_context->staging_infos        = c_dynarray_create(vulkan_staging_info_t);
 
@@ -1501,7 +1544,7 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
                                                                                   VULKAN_MEMORY_USAGE_CPU_TO_GPU);
     }
     // NOTE(Sleepster): Fill vertex buffer
-    vertex_t vertices[] = {
+    render_vertex_t vertices[] = {
         [0] = {
             .vPosition = {0.5, -0.5, 0.0, 1.0},
             .vCorner   = {1.0, 1.0}
@@ -1580,6 +1623,7 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
     vkAssert(vkQueueSubmit(vulkan_context->graphics_queue, 1, &submit_info, 0));
     vkAssert(vkQueueWaitIdle(vulkan_context->graphics_queue));
 }
+#endif
 
 /*
 =============
@@ -1590,8 +1634,6 @@ vk_backend_create_descriptor_pool
 void
 vk_backend_create_descriptor_pool(vulkan_context_t *vulkan_context)
 {
-    #define MAX_POOL_SET_TYPES (5)
-
     // NOTE(Sleepster): This is 10 for now...
     // https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDescriptorType.html
     VkDescriptorPoolSize sizes[MAX_POOL_SET_TYPES];
@@ -1719,25 +1761,25 @@ vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shade
             .binding  = 0,
             .format   = VK_FORMAT_R32G32B32A32_SFLOAT,
             .location = 0,
-            .offset   = offsetof(vertex_t, vPosition)
+            .offset   = offsetof(render_vertex_t, vPosition)
         },
         [1] = {
             .binding  = 0,
             .format   = VK_FORMAT_R32G32_SFLOAT, 
             .location = 1,
-            .offset   = offsetof(vertex_t, vCorner)
+            .offset   = offsetof(render_vertex_t, vCorner)
         },
         [2] = {
             .binding = 0,
             .format   = VK_FORMAT_R32G32_SFLOAT, 
             .location = 2,
-            .offset   = offsetof(vertex_t, vPadding)
+            .offset   = offsetof(render_vertex_t, vPadding)
         },
     };
 
     VkVertexInputBindingDescription vertex_input_desc = {
         .binding   = 0,
-        .stride    = sizeof(vertex_t),
+        .stride    = sizeof(render_vertex_t),
         .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
     };
 
@@ -2058,8 +2100,11 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
     // NOTE(Sleepster): Generate the programs framebuffers 
     vk_backend_create_framebuffers(vulkan_context);
 
+#if 0
     // NOTE(Sleepster): Generate the main vertex, index, and instanced_rendering buffers
     vk_backend_create_render_buffers(vulkan_context);
+#endif
+    vk_backend_create_backend_buffers(vulkan_context);
 
     // NOTE(Sleepster): Generate the descriptor pools 
     vk_backend_create_descriptor_pool(vulkan_context);
@@ -2120,7 +2165,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
     // TODO(Sleepster): Why is this here???
     if(renderer_state->current_window_size_generation != renderer_state->last_window_size_generation)
     {
-        s_renderer_resize_render_targets(renderer_state, renderer_state->window_size);
+        //s_renderer_resize_render_targets(renderer_state, renderer_state->window_size);
     }
 
     // NOTE(Sleepster): Execute Render Commands  
@@ -2139,11 +2184,11 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_BeginRenderpass:
                 {
                     render_command_begin_renderpass_t *cmd = (render_command_begin_renderpass_t*)command;
-                    frame_graph_renderpass_t *renderpass = cmd->frame_graph->renderpasses + cmd->ID;
+                    renderpass_t *renderpass = renderer_state->renderpasses + cmd->ID;
 
                     VkClearValue clear_values[MAX_RENDER_TARGET_ATTACHMENTS];
                     for(u32 attachment_index = 0;
-                        attachment_index < renderpass->attachment_count;
+                        attachment_index < renderpass->total_attachment_count;
                         ++attachment_index)
                     {
                         clear_value_t *value      = renderpass->attachment_clear_values;
@@ -2155,21 +2200,123 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     }
 
                     vk_backend_begin_renderpass(vulkan_context, 
-                                                renderpass->width, 
-                                                renderpass->height, 
+                                                renderpass->render_width, 
+                                                renderpass->render_height, 
                                                 renderpass->renderpass_handle, 
                                                 renderpass->framebuffer_handle, 
-                                                renderpass->attachment_count,
+                                                renderpass->total_attachment_count,
                                                 clear_values);
                 }break;
                 case RCT_EndRenderpass:
                 {
                     vkCmdEndRenderPass(*vulkan_context->render_command_buffer);
                 }break;
+                case RCT_BindVertexBuffer:
+                {
+                    render_command_bind_vertex_buffer_t *cmd = (render_command_bind_vertex_buffer_t*)command;
+
+                    VkDeviceSize offset = 0;
+                    vkCmdBindVertexBuffers(*vulkan_context->render_command_buffer, 0, 1, &cmd->buffer->buffer.handle, &offset); 
+
+                    command_list->active_vertex_buffer = cmd->buffer;
+                }break;
+                case RCT_BindIndexBuffer:
+                {
+                    render_command_bind_index_buffer_t *cmd = (render_command_bind_index_buffer_t*)command;
+
+                    VkDeviceSize offset = 0;
+                    vkCmdBindIndexBuffer(*vulkan_context->render_command_buffer, cmd->buffer->buffer.handle, offset, VK_INDEX_TYPE_UINT32); 
+                    
+                    command_list->active_index_buffer = cmd->buffer;
+                }break;
+                case RCT_BindShader:
+                {
+                    render_command_bind_shader_t *cmd = (render_command_bind_shader_t*)command;
+
+                    vkCmdBindPipeline(*vulkan_context->render_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, cmd->shader.shader->shader_data.pipeline);
+
+                    command_list->active_shader_program = &cmd->shader;
+                }break;
+                case RCT_SetViewport:
+                {
+                    render_command_set_viewport_t *cmd = (render_command_set_viewport_t*)command;
+                    VkViewport viewport = {
+                        .x        = cmd->offset.x,
+                        .y        = cmd->offset.y,
+                        .width    = cmd->size.x,
+                        .height   = cmd->size.y,
+                        .minDepth = 0.0,
+                        .maxDepth = 1.0
+                    };
+
+                    vkCmdSetViewport(*vulkan_context->render_command_buffer, 0, 1, &viewport);
+                    command_list->active_viewport_command = command;
+                }break;
+                case RCT_SetScissor:
+                {
+                    render_command_set_scissor_t *cmd = (render_command_set_scissor_t*)command;
+                    VkRect2D scissor = {
+                        .offset = {
+                            (s32)cmd->offset.x,
+                            (s32)cmd->offset.y
+                        },
+                        .extent = {
+                            (u32)cmd->size.x,
+                            (u32)cmd->size.y,
+                        }
+                    };
+
+                    vkCmdSetScissor(*vulkan_context->render_command_buffer, 0, 1, &scissor);
+                    command_list->active_scissor_command = command;
+                }break;
+                case RCT_UpdatePushConstants:
+                {
+                    Assert(command_list->active_shader_program);
+                    render_command_update_push_constant_t *cmd = (render_command_update_push_constant_t *)command;
+
+                    vulkan_shader_t *shader = &command_list->active_shader_program->shader->shader_data;
+                    if(shader->push_constant_count > 0 && shader->push_constant_count == 1)
+                    {
+                        VkShaderStageFlags flags = shader->push_constants[0].stageFlags;
+                        vkCmdPushConstants(*vulkan_context->render_command_buffer, shader->pipeline_layout, flags, cmd->offset, cmd->size, cmd->data);
+                    }
+                    else
+                    {
+                        log_fatal("Failure. This shader lacks push constants...\n");
+                    }
+                }break;
+                case RCT_DrawBatch:
+                {
+                    Assert(command_list->active_vertex_buffer);
+                    //Assert(command_list->active_index_buffer);
+                    Assert(command_list->active_shader_program);
+                    Assert(command_list->active_viewport_command);
+                    Assert(command_list->active_scissor_command);
+
+                    render_command_draw_t *cmd = (render_command_draw_t*)command;
+                    u32 vertex_count  = cmd->vertices_to_draw;
+                    u32 vertex_offset = cmd->offset;
+
+                    vkCmdDraw(*vulkan_context->render_command_buffer, vertex_count, 1, vertex_offset, 0);
+                }break;
                 case RCT_PresentFrame:
                 {
+                    render_command_present_frame_t *cmd = (render_command_present_frame_t *)command;
+                    image_t *source            = cmd->presentation_source;
                     vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
-                    VkImageSubresourceRange dst_range = {
+
+                    Assert(!vk_backend_is_image_format_stencil_format(&source->vulkan_image) && 
+                           !vk_backend_is_image_format_depth_format(&source->vulkan_image));
+
+                    VkImageSubresourceRange source_range = {
+                        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                        .baseArrayLayer = 0,
+                        .baseMipLevel   = 0,
+                        .layerCount     = 1,
+                        .levelCount     = 1,
+                    };
+
+                    VkImageSubresourceRange destination_range = {
                         .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
                         .baseMipLevel   = 0,
                         .levelCount     = 1,
@@ -2177,25 +2324,28 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         .layerCount     = 1,
                     };
 
-                    if(backbuffer->layout != VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
-                    {
-                        vk_backend_image_change_layout(vulkan_context, 
-                                                       *vulkan_context->render_command_buffer,
-                                                       backbuffer->handle,
-                                                       backbuffer->layout,
-                                                       VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                                                       VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                                       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                                                       0,
-                                                       0,
-                                                       dst_range);
-                        backbuffer->layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-                    }
+                    vk_backend_image_blit(vulkan_context,
+                                         &source->vulkan_image,
+                                          backbuffer,
+                                          vec2(0, 0),
+                                          vec2(source->vulkan_image.width, source->vulkan_image.height),
+                                          vec2(0, 0),
+                                          vec2(backbuffer->width, backbuffer->height),
+                                          VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                                          VK_IMAGE_LAYOUT_UNDEFINED,
+                                          VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                                          source_range,
+                                          destination_range);
                 }break;
             }
         }
 
         command_list->presenting                       = false;
+        command_list->active_vertex_buffer             = null;
+        command_list->active_index_buffer              = null;
+        command_list->active_shader_program            = null;
+        command_list->active_viewport_command          = null;
+        command_list->active_scissor_command           = null;
         command_list->bind_material_command_count      = 0;
         command_list->bind_render_target_command_count = 0;
         command_list->bind_shader_command_count        = 0;
@@ -2205,6 +2355,32 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
         c_arena_reset(&command_list->transient_arena);
     }
     renderer_state->command_list_count = 0;
+
+    // NOTE(Sleepster): 
+    // Change the layout of the swapchain image if we must.
+    vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
+    VkImageSubresourceRange dst_range = {
+        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+        .baseMipLevel   = 0,
+        .levelCount     = 1,
+        .baseArrayLayer = 0,
+        .layerCount     = 1,
+    };
+
+    if(backbuffer->layout != VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
+    {
+        vk_backend_image_change_layout(vulkan_context, 
+                                       *vulkan_context->render_command_buffer,
+                                       backbuffer->handle,
+                                       backbuffer->layout,
+                                       VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                                       VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                       0,
+                                       0,
+                                       dst_range);
+        backbuffer->layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    }
 
     vkEndCommandBuffer(*vulkan_context->render_command_buffer);
     vkAssert(vkResetFences(vulkan_context->device, 1, vulkan_context->image_render_idle_fence));

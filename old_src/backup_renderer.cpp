@@ -93,3 +93,221 @@
 
             r_cmd_present(command_list);
 
+//////////////////////////////
+/////////////////
+/// NEW 
+
+// NOTE(Sleepster):
+// Realistically, we don't need these first two functions, we just have them in case you want
+// to be able to do more when it comes to initialization like using DynamicArrays or memory
+// arenas.
+
+void
+s_renderer_frame_graph_desc_init(render_frame_graph_desc_t *desc)
+{
+    ZeroStruct(*desc);
+}
+
+void
+s_renderer_renderpass_desc_init(renderpass_desc_t *desc)
+{
+    ZeroStruct(*desc);
+}
+
+void
+s_renderer_renderpass_append_color_image(renderpass_desc_t           *renderpass, 
+                                         image_t                     *image, 
+                                         renderpass_attachment_type_t type, 
+                                         clear_value_t                clear_value)
+{
+    renderpass_attachment_t *attachment = renderpass->color_attachments + renderpass->color_attachment_count++;
+    attachment->image       = image;
+    attachment->type        = type;
+    attachment->clear_value = clear_value;
+}
+
+void
+s_renderer_renderpas_attach_depth_image(renderpass_desc_t           *renderpass,
+                                        image_t                     *image,
+                                        renderpass_attachment_type_t type,
+                                        clear_value_t                clear_value)
+{
+    renderpass_attachment_t *attachment = &renderpass->depth_attachment;
+    ++renderpass->total_attachment_count;
+    
+    attachment->image       = image;
+    attachment->type        = type;
+    attachment->clear_value = clear_value;
+}
+
+void
+s_renderer_renderpas_attach_stencil_image(renderpass_desc_t           *renderpass,
+                                          image_t                     *image,
+                                          renderpass_attachment_type_t type,
+                                          clear_value_t                clear_value)
+{
+    renderpass_attachment_t *attachment = &renderpass->stencil_attachment;
+    ++renderpass->total_attachment_count;
+    
+    attachment->image       = image;
+    attachment->type        = type;
+    attachment->clear_value = clear_value;
+}
+
+u32
+s_renderer_frame_graph_attach_renderpass(render_frame_graph_desc_t *frame_graph, renderpass_desc_t *renderpass_desc)
+{
+    u32 ID = frame_graph->renderpass_count;
+    renderpass_desc_t *new_desc = frame_graph->renderpass_descs + ID;
+
+    frame_graph->renderpass_count++;
+    memcpy(new_desc, renderpass_desc, sizeof(renderpass_desc_t));
+
+    return(ID);
+}
+
+internal_api VkImageLayout
+get_vulkan_layout_from_attachment(renderpass_attachment_t *attachment)
+{
+    image_t *image = attachment->image;
+
+    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
+    switch(image->create_info.format)
+    {
+        case BMF_R8:
+        case BMF_B8:
+        case BMF_G8:
+        case BMF_RGB24:
+        case BMF_RGBA32:
+        {
+            result = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        }break;
+        case BMF_D32_SFLOAT_S8_UINT:
+        case BMF_D24_SFLOAT_S8:
+        case BMF_D32_SFLOAT:
+        {
+            // NOTE(Sleepster): D32 is still a depth stencil anyway 
+            result = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        }break;
+    }
+
+    return(result);
+}
+
+internal_api true_inline VkAttachmentLoadOp
+get_load_operation(renderpass_attachment_type_t type)
+{
+    VkAttachmentLoadOp result = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    if(type == RenderpassAttachmentRead || type == RenderpassAttachmentReadWrite)
+    {
+        result = VK_ATTACHMENT_LOAD_OP_LOAD;
+    }
+
+    return(result);
+}
+
+
+// NOTE(Sleepster): This is pointless right now, but we may want to expand the abilities here.
+internal_api true_inline VkAttachmentStoreOp
+get_store_operation(renderpass_attachment_type_t type)
+{
+    VkAttachmentStoreOp result = VK_ATTACHMENT_STORE_OP_STORE;
+    return(result);
+}
+
+internal_api true_inline VkImageLayout
+get_attachment_type(renderpass_attachment_t *attachment)
+{
+    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
+    switch(attachment->image->create_info.format)
+    {
+        case BMF_R8:
+        case BMF_B8:
+        case BMF_G8:
+        case BMF_RGB24:
+        case BMF_RGBA32:
+        {
+            result = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        }break;
+        case BMF_D32_SFLOAT_S8_UINT:
+        case BMF_D24_SFLOAT_S8:
+        case BMF_D32_SFLOAT:
+        {
+            result = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        }break;
+    }
+
+    return(result);
+}
+
+internal_api void
+construct_frame_graph_renderpass(vulkan_context_t *vulkan_context, frame_graph_renderpass_t *renderpass, renderpass_desc_t *desc, u32 ID)
+{
+    renderpass->ID               = ID;
+    renderpass->width            = desc->attachments->image->create_info.width;
+    renderpass->height           = desc->attachments->image->create_info.height;
+    renderpass->attachment_count = desc->attachment_count;
+
+    image_t             image_attachments[MAX_RENDER_TARGET_ATTACHMENTS] = {};
+    VkImageLayout       initial_layouts[MAX_RENDER_TARGET_ATTACHMENTS]   = {};
+    VkImageLayout       final_layouts[MAX_RENDER_TARGET_ATTACHMENTS]     = {};
+    VkAttachmentLoadOp  load_operations[MAX_RENDER_TARGET_ATTACHMENTS]   = {};
+    VkAttachmentStoreOp store_operations[MAX_RENDER_TARGET_ATTACHMENTS]  = {};
+    VkImageLayout       attachment_types[MAX_RENDER_TARGET_ATTACHMENTS]  = {};
+
+    for(u32 attachment_index = 0;
+        attachment_index < desc->attachment_count;
+        ++attachment_index)
+    {
+        renderpass_attachment_t *attachment_data = desc->attachments + attachment_index;
+        image_t                 *image           = image_attachments + attachment_index;
+
+        initial_layouts[attachment_index]  = VK_IMAGE_LAYOUT_UNDEFINED;
+        final_layouts[attachment_index]    = get_vulkan_layout_from_attachment(attachment_data);
+        load_operations[attachment_index]  = get_load_operation(attachment_data->type);
+        store_operations[attachment_index] = get_store_operation(attachment_data->type);
+        attachment_types[attachment_index] = get_attachment_type(attachment_data);
+
+        renderpass->attachment_clear_values[attachment_index] = attachment_data->clear_value;
+        memcpy(image, attachment_data->image, sizeof(image_t));
+    }
+
+    renderpass->renderpass_handle = vk_backend_renderpass_create(vulkan_context,
+                                                                 image_attachments,
+                                                                 desc->attachment_count,
+                                                                 initial_layouts,
+                                                                 final_layouts,
+                                                                 load_operations,
+                                                                 store_operations,
+                                                                 attachment_types);
+
+    renderpass->framebuffer_handle = vk_backend_framebuffer_create(vulkan_context,
+                                                                   renderpass->renderpass_handle,
+                                                                   image_attachments,
+                                                                   desc->attachment_count,
+                                                                   image_attachments[0].create_info.width,
+                                                                   image_attachments[0].create_info.height);
+}
+
+// TODO(Sleepster): 
+// Realistically when we do this for real, we'll want to construct a dependancy tree for each of the
+// attachments to know when and where the attachments are actually being used in ways that require their
+// store / load operations to be differ.
+render_frame_graph_t
+s_renderer_frame_graph_construct(renderer_state_t *renderer_state, render_frame_graph_desc_t *frame_graph_desc)
+{
+    render_frame_graph_t result = {};
+
+    vulkan_context_t *vulkan_context = (vulkan_context_t*)renderer_state->render_context;
+    for(u32 renderpass_desc_index = 0;
+        renderpass_desc_index < frame_graph_desc->renderpass_count;
+        ++renderpass_desc_index)
+    {
+        renderpass_desc_t        *renderpass_desc = frame_graph_desc->renderpass_descs + renderpass_desc_index;
+        frame_graph_renderpass_t *renderpass      = result.renderpasses                + renderpass_desc_index;
+
+        construct_frame_graph_renderpass(vulkan_context, renderpass, renderpass_desc, renderpass_desc_index);
+    }
+
+    return(result);
+}

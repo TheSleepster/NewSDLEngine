@@ -97,6 +97,7 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                       vec2_t                  destination_size,
                       VkImageLayout           source_initial_layout,
                       VkImageLayout           destination_initial_layout,
+                      VkImageLayout           destination_final_layout,
                       VkImageSubresourceRange source_range, 
                       VkImageSubresourceRange destination_range);
 

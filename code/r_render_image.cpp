@@ -17,7 +17,9 @@ s_renderer_bitmap_format_to_vulkan_format(u32 bitmap_format)
         case BMF_G8:                 {result = VK_FORMAT_R8_SRGB;           }break;
         case BMF_B8:                 {result = VK_FORMAT_R8_SRGB;           }break;
         case BMF_RGB24:              {result = VK_FORMAT_R8G8B8_SRGB;       }break;
-        case BMF_RGBA32:             {result = VK_FORMAT_R8G8B8A8_SRGB;     }break;
+        case BMF_RGBA32_SRGB:        {result = VK_FORMAT_R8G8B8A8_SRGB;     }break;
+        case BMF_RGBA32_UNORM:       {result = VK_FORMAT_R8G8B8A8_UNORM;    }break;
+        case BMF_BGRA32_UNORM:       {result = VK_FORMAT_B8G8R8A8_UNORM;    }break;
         case BMF_D32_SFLOAT:         {result = VK_FORMAT_D32_SFLOAT;        }break;
         case BMF_D32_SFLOAT_S8_UINT: {result = VK_FORMAT_D32_SFLOAT_S8_UINT;}break;
     }
@@ -35,7 +37,9 @@ s_renderer_image_usage_flags_from_image_format(image_create_info_t *image_create
         case BMF_B8:
         case BMF_G8:
         case BMF_RGB24:
-        case BMF_RGBA32:
+        case BMF_BGRA32_UNORM:
+        case BMF_RGBA32_UNORM:
+        case BMF_RGBA32_SRGB:
         {
             result |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
         }break;

@@ -213,6 +213,12 @@ struct {                                     \
 })
 
 #ifdef HASH_TABLE_IMPLEMENTATION
+
+#ifndef AllocSize
+# include <stdlib.h>
+# define AllocSize(size) malloc(size)
+#endif
+
 HASH_API
 C_HASH_TABLE_ALLOCATE_IMPL(c_hash_table_default_alloc_impl)
 {

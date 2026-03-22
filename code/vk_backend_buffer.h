@@ -10,20 +10,17 @@
 #include <vulkan/vulkan.h>
 #include <vk_backend_allocator.h>
 
+// TODO(Sleepster): Thread safety...
 struct vulkan_buffer_t
 {
     VkBuffer                 handle;
+    bool32                   is_mapped;
 
     u64                      size;
     u64                      used;
     u64                      offset;
     VkBufferUsageFlags       usage_flags;
-#if 1
     vulkan_allocation_info_t allocation;
-#else
-    VmaAllocationInfo allocation_info;
-    VmaAllocation     gpu_memory;
-#endif
 };
 
 // NOTE(Sleepster): We can build a list of these infos so that they can all be uploaded at once
@@ -60,13 +57,17 @@ vk_backend_buffer_copy_buffer(vulkan_context_t *vulkan_context,
                               u64               source_copy_size,
                               u64               destination_offset);
 void
-vk_backend_buffer_copy_data(vulkan_buffer_t *buffer,
-                            void            *data,
-                            u64              copy_size,
-                            u64              offset);
+vk_backend_buffer_copy_data(vulkan_context_t *vulkan_context,
+                            vulkan_buffer_t  *buffer,
+                            void             *data,
+                            u64               copy_size,
+                            u64               offset);
 
 void                    vk_backend_buffer_destroy(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
 void                    vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, VkCommandBuffer command_buffer, u64 new_size);
+void*                   vk_backend_buffer_map(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, u32 offset, u32 size);
+void                    vk_backend_buffer_unmap(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
+
 vulkan_staging_buffer_t vk_backend_staging_buffer_create(vulkan_context_t *vulkan_context, u64 size, VkBufferUsageFlags usage_flags, vulkan_allocation_usage_type_t memory_type);
 void                    vk_backend_buffer_upload_staged_data(vulkan_context_t *vulkan_context, VkCommandBuffer command_buffer, vulkan_buffer_t *target_buffer);
 void                    vk_backend_buffer_flush_staging_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer   command_buffer);
