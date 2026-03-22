@@ -1627,12 +1627,12 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
 
 /*
 =============
-vk_backend_create_descriptor_pool
+vk_backend_create_descriptor_pools
 =============
 */
 
 void
-vk_backend_create_descriptor_pool(vulkan_context_t *vulkan_context)
+vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
 {
     // NOTE(Sleepster): This is 10 for now...
     // https://registry.khronos.org/VulkanSC/specs/1.0-extensions/man/html/VkDescriptorType.html
@@ -1665,10 +1665,23 @@ vk_backend_create_descriptor_pool(vulkan_context_t *vulkan_context)
         .poolSizeCount = MAX_POOL_SET_TYPES,
         .pPoolSizes    = sizes
     };   
+#if 0
     vkAssert(vkCreateDescriptorPool(vulkan_context->device, 
                                    &pool_create_info, 
                                     vulkan_context->cpu_allocation_callbacks, 
                                    &vulkan_context->first_descriptor_pool));
+#else
+    for(u32 index = 0;
+        index < MAX_FRAMES_IN_FLIGHT;
+        ++index)
+    {
+        vkAssert(vkCreateDescriptorPool(vulkan_context->device, 
+                                        &pool_create_info, 
+                                        vulkan_context->cpu_allocation_callbacks, 
+                                        &vulkan_context->descriptor_pools[index]));
+    }
+#endif
+
 }
 
 /*
@@ -2107,10 +2120,26 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
     vk_backend_create_backend_buffers(vulkan_context);
 
     // NOTE(Sleepster): Generate the descriptor pools 
-    vk_backend_create_descriptor_pool(vulkan_context);
+    vk_backend_create_descriptor_pools(vulkan_context);
 
     c_arena_destroy(&vulkan_context->initialization_arena);
     log_info("----- Vulkan backend initialized -----\n");
+}
+
+/*
+=============
+vk_backend_append_uniform_constant_buffer_data
+=============
+*/
+
+void*
+vk_backend_append_uniform_constant_buffer_data(vulkan_context_t *vulkan_context, void *user_data, u32 data_size, u32 *offset_out)
+{
+    void *result = null;
+    *offset_out = vulkan_context->constant_buffer_data.used;
+    result = vk_backend_buffer_append_data(vulkan_context, &vulkan_context->constant_buffer_data, user_data, data_size);
+
+    return(result);
 }
 
 /*
@@ -2156,11 +2185,32 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
     }
     *vulkan_context->image_in_flight_fence = vulkan_context->image_render_idle_fence;
     vulkan_context->current_image_index    = image_index;
+
+    // NOTE(Sleepster): If there is new uniform data... stage it.
+    if(vulkan_context->constant_buffer_data.used > 0)
+    {
+        VkCommandBuffer scratch_command_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
+        vk_backend_buffer_copy_buffer(vulkan_context, 
+                                     &vulkan_context->constant_buffer_data, 
+                                     &vulkan_context->shader_uniform_buffers[vulkan_context->current_frame_index],
+                                      scratch_command_buffer,
+                                      0,
+                                      vulkan_context->constant_buffer_data.used,
+                                      0);
+        vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
+
+        // TODO(Sleepster): Perhaps wait on a semaphore instead of this... 
+        vkDeviceWaitIdle(vulkan_context->device);
+    }
+
     // TODO(Sleepster): Multithreading is important... This is not good for that... 
     VkCommandBufferBeginInfo begin_info = {
         .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
     };
     vkAssert(vkBeginCommandBuffer(*vulkan_context->render_command_buffer, &begin_info));
+
+    vkAssert(vkResetDescriptorPool(vulkan_context->device, vulkan_context->descriptor_pools[vulkan_context->current_frame_index], 0));
+    vulkan_context->descriptor_count = 0;
 
     // TODO(Sleepster): Why is this here???
     if(renderer_state->current_window_size_generation != renderer_state->last_window_size_generation)
@@ -2178,12 +2228,14 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
             command_index < command_list->command_count;
             ++command_index)
         {
+            Expect(command_list->presenting == false, "Command was ordered to be executed after presentation has been ordered... this is an error...\n");
+
             render_command_t *command = command_list->commands + command_index;
             switch(command->header.command_type)
             {
                 case RCT_BeginRenderpass:
                 {
-                    render_command_begin_renderpass_t *cmd = (render_command_begin_renderpass_t*)command;
+                    render_command_begin_renderpass_t *cmd = (render_command_begin_renderpass_t*)command->data;
                     renderpass_t *renderpass = renderer_state->renderpasses + cmd->ID;
 
                     VkClearValue clear_values[MAX_RENDER_TARGET_ATTACHMENTS];
@@ -2213,7 +2265,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 }break;
                 case RCT_BindVertexBuffer:
                 {
-                    render_command_bind_vertex_buffer_t *cmd = (render_command_bind_vertex_buffer_t*)command;
+                    render_command_bind_vertex_buffer_t *cmd = (render_command_bind_vertex_buffer_t*)command->data;
 
                     VkDeviceSize offset = 0;
                     vkCmdBindVertexBuffers(*vulkan_context->render_command_buffer, 0, 1, &cmd->buffer->buffer.handle, &offset); 
@@ -2222,7 +2274,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 }break;
                 case RCT_BindIndexBuffer:
                 {
-                    render_command_bind_index_buffer_t *cmd = (render_command_bind_index_buffer_t*)command;
+                    render_command_bind_index_buffer_t *cmd = (render_command_bind_index_buffer_t*)command->data;
 
                     VkDeviceSize offset = 0;
                     vkCmdBindIndexBuffer(*vulkan_context->render_command_buffer, cmd->buffer->buffer.handle, offset, VK_INDEX_TYPE_UINT32); 
@@ -2231,7 +2283,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 }break;
                 case RCT_BindShader:
                 {
-                    render_command_bind_shader_t *cmd = (render_command_bind_shader_t*)command;
+                    render_command_bind_shader_t *cmd = (render_command_bind_shader_t*)command->data;
 
                     vkCmdBindPipeline(*vulkan_context->render_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, cmd->shader.shader->shader_data.pipeline);
 
@@ -2239,7 +2291,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 }break;
                 case RCT_SetViewport:
                 {
-                    render_command_set_viewport_t *cmd = (render_command_set_viewport_t*)command;
+                    render_command_set_viewport_t *cmd = (render_command_set_viewport_t*)command->data;
                     VkViewport viewport = {
                         .x        = cmd->offset.x,
                         .y        = cmd->offset.y,
@@ -2254,7 +2306,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 }break;
                 case RCT_SetScissor:
                 {
-                    render_command_set_scissor_t *cmd = (render_command_set_scissor_t*)command;
+                    render_command_set_scissor_t *cmd = (render_command_set_scissor_t*)command->data;
                     VkRect2D scissor = {
                         .offset = {
                             (s32)cmd->offset.x,
@@ -2272,7 +2324,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_UpdatePushConstants:
                 {
                     Assert(command_list->active_shader_program);
-                    render_command_update_push_constant_t *cmd = (render_command_update_push_constant_t *)command;
+                    render_command_update_push_constant_t *cmd = (render_command_update_push_constant_t *)command->data;
 
                     vulkan_shader_t *shader = &command_list->active_shader_program->shader->shader_data;
                     if(shader->push_constant_count > 0 && shader->push_constant_count == 1)
@@ -2285,6 +2337,15 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         log_fatal("Failure. This shader lacks push constants...\n");
                     }
                 }break;
+                case RCT_UpdateUniformConstantBuffer:
+                {
+                    render_command_update_uniform_constant_buffer_t *cmd = (render_command_update_uniform_constant_buffer_t*)command->data;
+                    uniform_constant_buffer_t *buffer = c_hash_table_get_value_ptr_at_index(&renderer_state->constant_buffer_hash, cmd->uniform_hash_index);
+                    (void)buffer;
+
+                    s32 x = 0;
+                    (void)x;
+                }break;
                 case RCT_DrawBatch:
                 {
                     Assert(command_list->active_vertex_buffer);
@@ -2293,7 +2354,77 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     Assert(command_list->active_viewport_command);
                     Assert(command_list->active_scissor_command);
 
-                    render_command_draw_t *cmd = (render_command_draw_t*)command;
+                    vulkan_shader_t *shader = &command_list->active_shader_program->shader->shader_data;
+
+                    VkDescriptorPool descriptor_pool = vulkan_context->descriptor_pools[vulkan_context->current_frame_index];
+                    if(shader->descriptor_set_count > 0)
+                    {
+                        VkDescriptorSetAllocateInfo info = {
+                            .sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+                            .descriptorPool     = descriptor_pool,
+                            .descriptorSetCount = 1,
+                            .pSetLayouts        = shader->layouts 
+                        };
+
+                        vkAssert(vkAllocateDescriptorSets(vulkan_context->device, 
+                                                          &info, 
+                                                          &vulkan_context->descriptor_sets[vulkan_context->current_frame_index][vulkan_context->descriptor_count]));
+                        VkDescriptorSet descriptor_set = vulkan_context->descriptor_sets[vulkan_context->current_frame_index][vulkan_context->descriptor_count]; 
+                        ++vulkan_context->descriptor_count;
+
+                        s32 write_count   = 0;
+                        s32 buffer_count  = 0;
+                        s32	image_count   = 0;
+                        s32 binding_count = 0;
+
+                        VkWriteDescriptorSet   writes[MAX_DESCRIPTOR_SET_WRITES]       = {};
+                        VkDescriptorBufferInfo buffer_infos[MAX_DESCRIPTOR_SET_WRITES] = {};
+                        VkDescriptorImageInfo  image_infos[MAX_DESCRIPTOR_SET_WRITES]  = {};
+
+                        vulkan_buffer_t *current_uniform_buffer = &vulkan_context->shader_uniform_buffers[vulkan_context->current_frame_index];
+
+                        for(u32 binding_index = 0;
+                            binding_index < shader->binding_count;
+                            ++binding_index)
+                        {
+                            vulkan_shader_binding_t *binding = shader->bindings + binding_index;
+                            switch(binding->type)
+                            {
+                                case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+                                case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+                                {
+                                    VkWriteDescriptorSet   *write       = writes + write_count++;
+                                    VkDescriptorBufferInfo *buffer_info = buffer_infos + buffer_count++;
+                                    
+                                    // TODO(Sleepster):  is_dirty... only update if we need too...
+                                    uniform_constant_buffer_t *constant_buffer = c_hash_table_get_value_ptr_at_index(&renderer_state->constant_buffer_hash, 
+                                                                                                                      binding->buffer_hash_index);
+                                    buffer_info->buffer = current_uniform_buffer->handle;
+                                    buffer_info->offset = constant_buffer->offset;
+                                    buffer_info->range  = constant_buffer->size;
+
+                                    write->sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                                    write->dstSet          = descriptor_set;
+                                    write->dstBinding      = binding_count++;
+                                    write->descriptorCount = 1;
+                                    write->descriptorType  = binding->type;
+                                    write->pBufferInfo     = buffer_info;
+                                }break;
+                                {
+                                }break;
+                                case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+                                {
+                                    (void)image_count;
+                                    (void)image_infos;
+                                }break;
+                            }
+                        }
+
+                        vkUpdateDescriptorSets(vulkan_context->device, write_count, writes, 0, null);
+                        vkCmdBindDescriptorSets(*vulkan_context->render_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader->pipeline_layout, 0, 1, &descriptor_set, 0, null);
+                    }
+
+                    render_command_draw_t *cmd = (render_command_draw_t*)command->data;
                     u32 vertex_count  = cmd->vertices_to_draw;
                     u32 vertex_offset = cmd->offset;
 
@@ -2301,7 +2432,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 }break;
                 case RCT_PresentFrame:
                 {
-                    render_command_present_frame_t *cmd = (render_command_present_frame_t *)command;
+                    render_command_present_frame_t *cmd = (render_command_present_frame_t *)command->data;
                     image_t *source            = cmd->presentation_source;
                     vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
 
@@ -2336,6 +2467,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                                           VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
                                           source_range,
                                           destination_range);
+
+                    command_list->presenting = true;
                 }break;
             }
         }
@@ -2351,8 +2484,6 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
         command_list->bind_shader_command_count        = 0;
         command_list->draw_instance_command_count      = 0;
         command_list->command_count                    = 0;
-
-        c_arena_reset(&command_list->transient_arena);
     }
     renderer_state->command_list_count = 0;
 
@@ -2420,6 +2551,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
     c_arena_reset(&vulkan_context->frame_arena);
     vulkan_context->current_frame_index = (vulkan_context->current_frame_index + 1) % MAX_FRAMES_IN_FLIGHT;
+    vulkan_context->constant_buffer_data.used = 0;
 }
 
 /*

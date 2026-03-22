@@ -184,6 +184,8 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
             shader_binding->cpu_buffer         = null;
             shader_binding->buffer_hash_index  = c_fnv_hash_value(shader_binding->name.data, shader_binding->name.count);
             shader_binding->buffer_hash_index %= MAX_CONSTANT_BUFFERS;
+
+            ++result.binding_count;
         }
 
         VkDescriptorSetLayoutCreateInfo layout_create_info = {

@@ -216,7 +216,7 @@ s_renderer_build_renderpass(renderer_state_t *renderer_state, renderpass_desc_t 
         renderpass->attachment_clear_values[color_attachment_index] = color_attachment->clear_value;
     }
 
-    renderpass->has_depth_stencil_attachment = is_depth_attachment_valid(&renderpass_desc->depth_stencil_attachment);
+   renderpass->has_depth_stencil_attachment = is_depth_attachment_valid(&renderpass_desc->depth_stencil_attachment);
     if(renderpass->has_depth_stencil_attachment)
     {
         renderpass_attachment_t *depth_stencil_attachment = &renderpass_desc->depth_stencil_attachment;
@@ -337,6 +337,32 @@ s_renderer_render_buffer_create(renderer_state_t *renderer_state, void *data, u3
     return(result);
 }
 
+
+/////////////////////////
+// UNIFORM BUFFERS 
+/////////////////////////
+
+// NOTE(Sleepster): 
+// This currently can't fail... even if you mess up the uniform buffer name... 
+// perhaps that's a bad thing in all honesty...
+uniform_constant_buffer_t*
+s_renderer_get_constant_buffer(renderer_state_t *renderer_state, string_t uniform_name)
+{
+    uniform_constant_buffer_t *result = null;
+    result = c_hash_table_get_value_ptr(&renderer_state->constant_buffer_hash, uniform_name);
+    if(result)
+    {
+        result->uniform_hash_index  = c_fnv_hash_value(uniform_name.data, uniform_name.count);
+        result->uniform_hash_index %= MAX_CONSTANT_BUFFERS;
+    }
+    else
+    {
+        log_fatal("Idk how, but there's no place for this constant_buffer...\n");
+    }
+
+    return(result);
+}
+
 /////////////////////////
 // COMMAND LISTS
 /////////////////////////
@@ -353,13 +379,15 @@ s_renderer_command_list_init(render_command_list_t *list)
     if(list->is_initialized == false)
     {
         list->transient_arena = c_arena_create(MB(10));
-        list->command_arena   = c_arena_create((sizeof(render_command_t) * MAX_RENDER_COMMANDS) * 2);
-        list->commands        = c_arena_push_array(&list->command_arena, render_command_t, MAX_RENDER_COMMANDS);
+        list->command_arena   = c_arena_create(MB(30));
     }
     else
     {
         c_arena_reset(&list->transient_arena);
+        c_arena_reset(&list->command_arena);
     }
+
+    list->commands = c_arena_push_array(&list->command_arena, render_command_t, MAX_RENDER_COMMANDS);
     list->is_initialized = true;
 }
 
@@ -375,10 +403,12 @@ s_renderer_get_command_list(renderer_state_t *renderer_state)
     render_command_list_t *result = null;
     result = renderer_state->command_lists + renderer_state->command_list_count++;
     Assert(renderer_state->command_list_count < MAX_COMMAND_LISTS);
+    result->renderer_state = renderer_state;
 
     s_renderer_command_list_init(result);
     Assert(result->is_initialized == true);
     Assert(result->transient_arena.is_initialized == true);
+    Assert(result->command_arena.is_initialized   == true);
 
     return(result);
 }
@@ -401,9 +431,13 @@ r_cmd_renderpass_begin
 void
 r_cmd_renderpass_begin(render_command_list_t *command_list, u32 renderpassID)
 {
-    render_command_begin_renderpass_t *cmd = (render_command_begin_renderpass_t*)(command_list->commands + command_list->command_count++);
-    cmd->header.command_type = RCT_BeginRenderpass;
-    cmd->ID                  = renderpassID;
+    render_command_t *command = s_renderer_get_next_command(command_list);
+    render_command_begin_renderpass_t *begin_renderpass = c_arena_push_struct(&command_list->command_arena, 
+                                                                               render_command_begin_renderpass_t);
+    begin_renderpass->ID = renderpassID;
+
+    command->header.command_type = RCT_BeginRenderpass;
+    command->data                = begin_renderpass;
 }
 
 
@@ -416,8 +450,8 @@ r_cmd_renderpass_end
 void
 r_cmd_renderpass_end(render_command_list_t *command_list)
 {
-    render_command_end_renderpass_t *cmd = (render_command_end_renderpass_t*)(command_list->commands + command_list->command_count++);
-    cmd->header.command_type = RCT_EndRenderpass;
+    render_command_t *command = s_renderer_get_next_command(command_list);
+    command->header.command_type = RCT_EndRenderpass;
 }
 
 
@@ -434,12 +468,17 @@ r_cmd_draw_rectangle(render_command_list_t *command_list,
                      vec4_t                 render_color, 
                      float32                rotation)
 {
-    render_command_draw_rectangle_t *draw_rect = (render_command_draw_rectangle_t*)(command_list->commands + command_list->command_count++);
-    draw_rect->header.command_type    = RCT_DrawRectangle;
+    render_command_t *command = s_renderer_get_next_command(command_list);
+    render_command_draw_rectangle_t *draw_rect = c_arena_push_struct(&command_list->command_arena, 
+                                                                      render_command_draw_rectangle_t);
+
     draw_rect->quad_data.position     = position;
     draw_rect->quad_data.size         = size;
     draw_rect->quad_data.render_color = render_color;
     draw_rect->quad_data.rotation     = rotation;
+
+    command->header.command_type = RCT_DrawRectangle;
+    command->data                = draw_rect;
 }
 
 /*
@@ -456,13 +495,18 @@ r_cmd_draw_bitmap(render_command_list_t *command_list,
                   float32                rotation,
                   asset_handle_t         bitmap_handle)
 {
-    render_command_draw_bitmap_t *draw_bitmap = (render_command_draw_bitmap_t*)(command_list->commands + command_list->command_count++);
-    draw_bitmap->header.command_type    = RCT_DrawBitmap;
+    render_command_t *command = s_renderer_get_next_command(command_list);
+    render_command_draw_bitmap_t *draw_bitmap = c_arena_push_struct(&command_list->command_arena, 
+                                                                     render_command_draw_bitmap_t);
+    
     draw_bitmap->quad_data.position     = position;
     draw_bitmap->quad_data.size         = size;
     draw_bitmap->quad_data.render_color = render_color;
     draw_bitmap->quad_data.rotation     = rotation;
     draw_bitmap->bitmap                 = bitmap_handle;
+
+    command->data = draw_bitmap;
+    command->header.command_type = RCT_DrawBitmap;
 }
 
 /*
@@ -474,9 +518,14 @@ r_cmd_renderpass_end
 void
 r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t program)
 {
-    render_command_bind_shader_t *bind_shader = (render_command_bind_shader_t*)(command_list->commands + command_list->command_count++);
-    bind_shader->header.command_type = RCT_BindShader;
+    render_command_t *command = s_renderer_get_next_command(command_list);
+    render_command_bind_shader_t *bind_shader = c_arena_push_struct(&command_list->command_arena, 
+                                                                     render_command_bind_shader_t);
+
     bind_shader->shader = program;
+
+    command->header.command_type = RCT_BindShader;
+    command->data = bind_shader;
 }
 
 /*
@@ -488,11 +537,14 @@ r_cmd_bind_vertex_buffer
 void
 r_cmd_bind_vertex_buffer(render_command_list_t *command_list, render_buffer_t *buffer)
 {
-    render_command_bind_vertex_buffer_t *bind_vertex_buffer = (render_command_bind_vertex_buffer_t*)(command_list->commands + command_list->command_count++);
+    render_command_t *command = s_renderer_get_next_command(command_list);
+    render_command_bind_vertex_buffer_t *bind_vertex_buffer = c_arena_push_struct(&command_list->command_arena, 
+                                                                                   render_command_bind_vertex_buffer_t);
     Assert(buffer->type == RenderBufferType_VertexBuffer);
-
-    bind_vertex_buffer->header.command_type = RCT_BindVertexBuffer;
     bind_vertex_buffer->buffer = buffer; 
+
+    command->header.command_type = RCT_BindVertexBuffer;
+    command->data = bind_vertex_buffer;
 }
 
 /*
@@ -504,11 +556,15 @@ r_cmd_bind_index_buffer
 void
 r_cmd_bind_index_buffer(render_command_list_t *command_list, render_buffer_t *buffer)
 {
-    render_command_bind_index_buffer_t *bind_index_buffer = (render_command_bind_index_buffer_t*)(command_list->commands + command_list->command_count++);
-    Assert(buffer->type == RenderBufferType_IndexBuffer);
+    render_command_t *command = s_renderer_get_next_command(command_list);
+    render_command_bind_index_buffer_t *bind_index_buffer = c_arena_push_struct(&command_list->command_arena, 
+                                                                                  render_command_bind_index_buffer_t);
 
-    bind_index_buffer->header.command_type = RCT_BindVertexBuffer;
+    Assert(buffer->type == RenderBufferType_IndexBuffer);
     bind_index_buffer->buffer = buffer; 
+
+    command->header.command_type = RCT_BindIndexBuffer;
+    command->data = bind_index_buffer;
 }
 
 
@@ -521,10 +577,14 @@ r_cmd_bind_vertex_buffer
 void
 r_cmd_draw(render_command_list_t *command_list, u32 offset, u32 num_vertices)
 {
-    render_command_draw_t *draw = (render_command_draw_t*)(command_list->commands + command_list->command_count++);
-    draw->header.command_type = RCT_DrawBatch;
-    draw->vertices_to_draw    = num_vertices;
-    draw->offset              = offset;
+    render_command_t *command   = s_renderer_get_next_command(command_list);
+    render_command_draw_t *draw = c_arena_push_struct(&command_list->command_arena, 
+                                                       render_command_draw_t);
+    draw->vertices_to_draw = num_vertices;
+    draw->offset           = offset;
+
+    command->header.command_type = RCT_DrawBatch;
+    command->data = draw;
 }
 
 /*
@@ -536,10 +596,14 @@ r_cmd_set_viewport
 void
 r_cmd_set_viewport(render_command_list_t *command_list, vec2_t offset, vec2_t size)
 {
-    render_command_set_viewport_t *set_viewport = (render_command_set_viewport_t *)(command_list->commands + command_list->command_count++);
-    set_viewport->header.command_type = RCT_SetViewport;
-    set_viewport->size                = size;
-    set_viewport->offset              = offset;
+    render_command_t *command  = s_renderer_get_next_command(command_list);
+    render_command_set_viewport_t *set_viewport = c_arena_push_struct(&command_list->command_arena, 
+                                                                       render_command_set_viewport_t);
+    set_viewport->size   = size;
+    set_viewport->offset = offset;
+
+    command->header.command_type = RCT_SetViewport;
+    command->data = set_viewport;
 }
 
 /*
@@ -551,10 +615,14 @@ r_cmd_set_scissor
 void
 r_cmd_set_scissor(render_command_list_t *command_list, vec2_t offset, vec2_t size)
 {
-    render_command_set_scissor_t *set_scissor = (render_command_set_scissor_t *)(command_list->commands + command_list->command_count++);
-    set_scissor->header.command_type = RCT_SetScissor;
-    set_scissor->size                = size;
-    set_scissor->offset              = offset;
+    render_command_t *command  = s_renderer_get_next_command(command_list);
+    render_command_set_scissor_t *set_scissor = c_arena_push_struct(&command_list->command_arena, 
+                                                                     render_command_set_scissor_t);
+    set_scissor->size   = size;
+    set_scissor->offset = offset;
+
+    command->header.command_type = RCT_SetScissor;
+    command->data = set_scissor;
 }
 
 /*
@@ -567,25 +635,65 @@ void
 r_cmd_update_push_constants(render_command_list_t *command_list, u32 offset, u32 size, void *data) 
 {
     Assert(size <= 128);
-    render_command_update_push_constant_t *update_constant = (render_command_update_push_constant_t *)(command_list->commands + command_list->command_count++);
 
-    update_constant->header.command_type = RCT_UpdatePushConstants;
+    render_command_t *command  = s_renderer_get_next_command(command_list);
+    render_command_update_push_constant_t *update_constant = c_arena_push_struct(&command_list->command_arena, 
+                                                                                  render_command_update_push_constant_t);
     update_constant->data   = data;
     update_constant->size   = size;
     update_constant->offset = offset;
+
+    command->header.command_type = RCT_UpdatePushConstants;
+    command->data = update_constant;
 }
 
 /*
 =============
-r_cmd_draw_bitmap
+r_cmd_update_push_constants
 =============
 */
 
-// NOTE(Sleepster): The cake is a lie. This does not actually present, but rather blits to the swapchain image
+void
+r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_constant_buffer_t *buffer, void *data, u32 data_size)
+{
+    render_command_t *command  = s_renderer_get_next_command(command_list);
+    render_command_update_uniform_constant_buffer_t *update_buffer_contents = c_arena_push_struct(&command_list->command_arena, 
+                                                                                                   render_command_update_uniform_constant_buffer_t);
+    update_buffer_contents->constant_data_size = data_size;
+
+    // TODO(Sleepster): Abstract this... 
+    vulkan_context_t *vulkan_context = (vulkan_context_t*)command_list->renderer_state->render_context;
+    update_buffer_contents->uniform_hash_index         = buffer->uniform_hash_index;
+    update_buffer_contents->backend_uniform_buffer_ptr = vk_backend_append_uniform_constant_buffer_data(vulkan_context, 
+                                                                                                        data, 
+                                                                                                        data_size, 
+                                                                                                       &buffer->offset);
+    buffer->mapped_data = update_buffer_contents->backend_uniform_buffer_ptr;
+    buffer->size        = data_size;
+
+    command->header.command_type = RCT_UpdateUniformConstantBuffer;
+    command->data                = update_buffer_contents;
+}
+
+/*
+=============
+r_cmd_present
+=============
+*/
+
+// NOTE(Sleepster): 
+// The cake is a lie. This does not actually present, but rather blits to the swapchain image,
+// which is later presented when appropriate
+//
+// Also, when you call this command any commands after this is called, are an error.
 void
 r_cmd_present(render_command_list_t *command_list, image_t *presentation_source)
 {
-    render_command_present_frame_t *present = (render_command_present_frame_t*)(command_list->commands + command_list->command_count++);
-    present->header.command_type = RCT_PresentFrame;
+    render_command_t *command  = s_renderer_get_next_command(command_list);
+    render_command_present_frame_t *present = c_arena_push_struct(&command_list->command_arena, 
+                                                                   render_command_present_frame_t);
     present->presentation_source = presentation_source;
+
+    command->header.command_type = RCT_PresentFrame;
+    command->data = present;
 }

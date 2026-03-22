@@ -65,6 +65,25 @@ vk_backend_buffer_destroy(vulkan_context_t *vulkan_context, vulkan_buffer_t *buf
 
 /*
 =============
+vk_backend_buffer_append_data
+=============
+*/
+
+void*
+vk_backend_buffer_append_data(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, void *data, u32 size)
+{
+    Assert(buffer->allocation.mapped_data != null);
+    void *result = null;
+
+    void *mapped_data = buffer->allocation.mapped_data + buffer->used;
+    memcpy(mapped_data, data, size);
+    buffer->used += size;
+
+    return(result);
+}
+
+/*
+=============
 vk_backend_buffer_copy_buffer
 =============
 */
@@ -95,6 +114,18 @@ vk_backend_buffer_copy_data
 =============
 */
 
+// TODO(Sleepster): 
+// This function just sucks... we can't account for offset in here so I don't know why we even both passing it.
+// and even if we could, we would want to offset from the start of the buffer or from the buffer->used offset? Meaning
+// Would we want:
+//
+// buffer->used + offset
+//
+// or 
+//
+// buffer->mapped_data + offset
+//
+// either case, this is dumb...
 void
 vk_backend_buffer_copy_data(vulkan_context_t *vulkan_context,
                             vulkan_buffer_t  *buffer,
@@ -109,8 +140,10 @@ vk_backend_buffer_copy_data(vulkan_context_t *vulkan_context,
     if(buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_CPU_TO_GPU ||
        buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_CPU_ONLY)
     {
+        byte *mapped_data = buffer->allocation.mapped_data;
+
         // NOTE(Sleepster): Data is persistently mapped by the vulkan allocator... 
-        memcpy(buffer->allocation.mapped_data, data, copy_size);
+        memcpy(mapped_data + offset, data, copy_size);
     }
     else if(buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_GPU_ONLY ||
             buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_GPU_TO_CPU)
@@ -147,6 +180,10 @@ vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buff
     *buffer = new_buffer;
 }
 
+// TODO(Sleepster):  
+//
+// Mapping functionality is just completely unnecessary since CPU accessable buffers are persistently
+// mapped so these are just completely redundant...
 
 /*
 =============

@@ -23,9 +23,8 @@ struct vulkan_shader_binding_t
 {
     VkDescriptorType           type;
     uniform_constant_buffer_t *cpu_buffer;
+    u64                        buffer_hash_index;
     string_t                   name;
-
-    u32                        buffer_hash_index;
 
 };
 
@@ -50,6 +49,7 @@ struct vulkan_shader_t
     VkPipeline              pipeline;
 
     vulkan_shader_binding_t bindings[MAX_DESCRIPTOR_SET_BINDINGS];
+    u32                     binding_count;
 };
 
 vulkan_shader_t vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_source);

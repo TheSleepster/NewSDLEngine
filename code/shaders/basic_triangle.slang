@@ -10,12 +10,20 @@ struct VertexOutput_t
     float4 vOutPosition : SV_POSITION;
 };
 
+struct CameraMatrices_t
+{
+    float4x4 ViewMatrix;
+    float4x4 ProjectionMatrix;
+};
+
+ConstantBuffer<CameraMatrices_t> CameraMatrices;
+
 [shader("vertex")]
 VertexOutput_t
 VSMain(VertexInput_t input)
 {
     VertexOutput_t result;
-    result.vOutPosition = float4(input.vPosition.x, input.vPosition.y, input.vPosition.zw);
+    result.vOutPosition = mul(CameraMatrices.ProjectionMatrix, mul(CameraMatrices.ViewMatrix, input.vPosition));
 
     return(result);
 }

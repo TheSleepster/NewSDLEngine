@@ -43,6 +43,8 @@ struct vulkan_staging_buffer_t
     VkFence         upload_complete_fence;
 };
 
+void* vk_backend_buffer_append_data(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, void *data, u32 size);
+
 vulkan_buffer_t
 vk_backend_buffer_create(vulkan_context_t              *vulkan_context, 
                          u64                            buffer_size, 

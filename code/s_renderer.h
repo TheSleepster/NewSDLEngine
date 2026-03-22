@@ -62,8 +62,7 @@ struct uniform_constant_buffer_t
     void *mapped_data;
     u32   size;
     u32   offset;
-
-    void *buffer_handle;
+    u64   uniform_hash_index;
 };
 
 // TODO(Sleepster): Handle layer data here.
@@ -92,21 +91,19 @@ enum render_command_type_t
     RCT_Invalid,
 
     RCT_ClearRenderTarget,
-    RCT_BeginRenderGroup,
-    RCT_EndRenderGroup,
     RCT_BeginRenderpass,
     RCT_EndRenderpass,
     RCT_DrawRectangle,
     RCT_DrawBitmap,
     RCT_UpdateTexture,
-    RCT_UpdateBuffer,
+    RCT_UpdateUniformConstantBuffer,
+    RCT_UpdatePushConstants,
     RCT_BindMaterial,
     RCT_BindShader,
     RCT_BindVertexBuffer,
     RCT_BindIndexBuffer,
     RCT_SetViewport,
     RCT_SetScissor,
-    RCT_UpdatePushConstants,
     RCT_DrawBatch,
     RCT_PresentFrame,
 
@@ -118,30 +115,13 @@ struct render_command_header_t
     render_command_type_t command_type;
 };
 
-struct render_command_begin_render_group_t
-{
-    render_command_header_t header;
-};
-
-struct render_command_end_render_group_t
-{
-    render_command_header_t header;
-};
-
 struct render_command_begin_renderpass_t
 {
-    render_command_header_t header;
-    u32                     ID;
-};
-
-struct render_command_end_renderpass_t
-{
-    render_command_header_t header;
+    u32 ID;
 };
 
 struct render_command_draw_bitmap_t
 {
-    render_command_header_t header;
     u32                     instanceID;
 
     geometry_data_t         quad_data;
@@ -150,114 +130,81 @@ struct render_command_draw_bitmap_t
 
 struct render_command_draw_rectangle_t
 {
-    render_command_header_t header;
     u32                     instanceID;
 
     geometry_data_t         quad_data;
 };
 
-struct render_command_update_uniform_constant_buffer_t
-{
-    render_command_header_t   header;
-    u32                       bufferID;
-
-    uniform_constant_buffer_t buffer;
-};
-
 struct render_command_bind_vertex_buffer_t
 {
-    render_command_header_t header;
     render_buffer_t        *buffer;
 };
 
 struct render_command_bind_index_buffer_t
 {
-    render_command_header_t header;
     render_buffer_t        *buffer;
 };
 
 struct render_command_update_texture_t
 {
-    render_command_header_t   header;
-
     asset_handle_t            bitmap;
     uniform_constant_buffer_t buffer;
 };
 
 struct render_command_bind_material_t
 {
-    render_command_header_t header;
-    u32                     materialID;
-
-    asset_handle_t          material;
+    u32            materialID;
+    asset_handle_t material;
 };
 
 struct render_command_bind_shader_t
 {
-    render_command_header_t header;
-    u32                     shaderID;
+    u32            shaderID;
 
-    asset_handle_t          shader;
+    asset_handle_t shader;
 };
 
 struct render_command_draw_t 
 {
-    render_command_header_t header;
-    u32                     vertices_to_draw;
-    u32                     offset;
+    u32 vertices_to_draw;
+    u32 offset;
 };
 
 struct render_command_set_viewport_t
 {
-    render_command_header_t header;
-    vec2_t                  size;
-    vec2_t                  offset; 
+    vec2_t size;
+    vec2_t offset; 
 };
 
 struct render_command_set_scissor_t
 {
-    render_command_header_t header;
-    vec2_t                  offset;
-    vec2_t                  size;
+    vec2_t offset;
+    vec2_t size;
 };
 
 struct render_command_update_push_constant_t
 {
-    render_command_header_t header;
-    void                   *data;
-    u32                     size;
-    u32                     offset;
+    void *data;
+    u32   size;
+    u32   offset;
+};
+
+struct render_command_update_uniform_constant_buffer_t
+{
+    void *backend_uniform_buffer_ptr;
+    u64   uniform_hash_index;
+    u32   constant_data_size;
 };
 
 struct render_command_present_frame_t
 {
-    render_command_header_t header;
-    image_t                *presentation_source;
+    image_t *presentation_source;
 };
 
 struct render_command_t
 {
     render_command_header_t header;
     void                   *data;
-    union {
-        render_command_begin_render_group_t             begin_render_group;
-        render_command_end_render_group_t               end_render_group;
-        render_command_begin_renderpass_t               begin_renderpass;
-        render_command_end_renderpass_t                 end_renderpass;
-        render_command_draw_rectangle_t                 draw_rectangle;
-        render_command_draw_bitmap_t                    draw_texture;
-        render_command_bind_vertex_buffer_t             bind_vertex_buffer;
-        render_command_bind_index_buffer_t              bind_index_buffer;
-        render_command_update_uniform_constant_buffer_t update_constant_buffer;
-        render_command_update_texture_t                 update_texture_contents;
-        render_command_bind_material_t                  bind_material;
-        render_command_bind_shader_t                    bind_shader;
-        render_command_set_viewport_t                   set_viewport;
-        render_command_set_scissor_t                    set_scissor;
-        render_command_update_push_constant_t           update_push_constants;
-        render_command_draw_t                           draw;
-        render_command_present_frame_t                  present_frame;
-    };
 };
 
 // NOTE(Sleepster): For some stupid fucking reason this has to be heap allocated instead of 
@@ -265,6 +212,7 @@ struct render_command_t
 struct render_command_list_t
 {
     bool8             is_initialized;
+    renderer_state_t *renderer_state;
     // NOTE(Sleepster): Everything within this is reset once all commands are executed 
     memory_arena_t    transient_arena;
     memory_arena_t    command_arena;
@@ -414,6 +362,8 @@ void             s_renderer_handle_window_resize(renderer_state_t *renderer_stat
 void             s_renderer_resize_render_targets(renderer_state_t *renderer_state, vec2_t window_size);
 u32              s_renderer_build_renderpass(renderer_state_t *renderer_state, renderpass_desc_t *renderpass_desc);
 
+uniform_constant_buffer_t* s_renderer_get_constant_buffer(renderer_state_t *renderer_state, string_t uniform_name);
+
             render_buffer_t s_renderer_render_buffer_create(renderer_state_t *renderer_state, void *data, u32 size, render_buffer_type_t type, render_buffer_usage_t usage);
 true_inline render_buffer_t s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_usage_t usage, void *data, u32 size);
 true_inline render_buffer_t s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_usage_t usage, void *data, u32 size);
@@ -435,6 +385,7 @@ void r_cmd_draw(render_command_list_t *command_list, u32 offset, u32 num_vertice
 void r_cmd_set_scissor(render_command_list_t *command_list, vec2_t offset, vec2_t size);
 void r_cmd_set_viewport(render_command_list_t *command_list, vec2_t offset, vec2_t size);
 void r_cmd_update_push_constants(render_command_list_t *command_list, u32 offset, u32 size, void *data);
+void r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_constant_buffer_t *buffer, void *data, u32 data_size);
 void r_cmd_present(render_command_list_t *command_list, image_t *presentation_source);
 
 void

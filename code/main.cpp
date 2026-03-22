@@ -184,16 +184,17 @@ main(int argc, char **argv)
 
         render_vertex_t vertices[] = {
             [0] = {
-                .vPosition = vec4( 0.5, -0.5, 0.0, 1.0),
+                .vPosition = vec4( 80, -45, 0.0, 1.0),
             },
             [1] = {
-                .vPosition = vec4( 0.0,  0.5, 0.0, 1.0),
+                .vPosition = vec4( 0.0, 80, 0.0, 1.0),
             },
             [2] = {
-                .vPosition = vec4(-0.5, -0.5, 0.0, 1.0),
+                .vPosition = vec4(-80, -45, 0.0, 1.0),
             },
         };
         render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(&renderer_state, RenderBufferUsage_Dynamic, vertices, sizeof(vertices));
+        uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(&renderer_state, STR("CameraMatrices"));
 
         g_running = true;
         while(g_running)
@@ -266,8 +267,19 @@ main(int argc, char **argv)
             r_cmd_bind_vertex_buffer(command_list, &vertex_buffer);
             r_cmd_use_shader_program(command_list, basic_traiangle);
 
+            struct camera_matrices {
+                mat4_t view_matrix;
+                mat4_t projection_matrix;
+            }camera_matrix_buffer_data;
+
+            camera_matrix_buffer_data = {
+                .view_matrix       = mat4_identity(),
+                .projection_matrix = mat4_RHGL_ortho(-160, 160, -90, 90, -1, 1)
+            };
+            r_cmd_update_buffer_contents(command_list, camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
+
             r_cmd_set_viewport(command_list, vec2(0, 180), vec2(320, -180));
-            r_cmd_set_scissor(command_list,  vec2(0, 0),   vec2(320,    180));
+            r_cmd_set_scissor(command_list,  vec2(0, 0),   vec2(320,  180));
 
             vec4_t color = {0.0, 1.0, 0.0, 1.0};
             r_cmd_update_push_constants(command_list, 0, sizeof(vec4_t), &color);

@@ -130,6 +130,26 @@ s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 na
     result.ID          = name_hash;
     slot->ID           = name_hash;
     result.shader_data = vk_backend_shader_create(asset_manager->vulkan_context, slot->package_entry->asset_data);
+    // TODO(Sleepster): 
+    //
+    // Some functionality to just add the item to a string table might be extremely useful for debug builds where you add strings to the table
+    // but never actually directly use them in a shader or somsething... might be worth persuing in the future.
+#if 0
+    for(u32 binding_index = 0;
+        binding_index < result.shader_data.binding_count;
+        ++binding_index)
+    {
+        vulkan_shader_binding_t *binding = result.shader_data.bindings + binding_index;
+        switch(binding->type)
+        {
+            case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+            case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+            {
+                c_hash_table_insert_pair(asset_manager->renderer_state->constant_buffer_hash, binding->name, null);
+            }break;
+        }
+    }
+#endif
 
     return(result);
 }
@@ -329,7 +349,7 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
 
      
     // TODO(Sleepster): Do we want to make a frontend wrapper around this??? I don't really know what to do here... 
-    vk_backend_allocate_descriptor_sets(asset_manager->vulkan_context, &archetype);
+    //vk_backend_allocate_descriptor_sets(asset_manager->vulkan_context, &archetype);
 
     result.material_type      = SMT_Archetype;
     result.archetype          = archetype;

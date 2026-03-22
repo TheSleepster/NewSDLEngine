@@ -33,6 +33,7 @@ constexpr u32 MAX_VULKAN_SHADER_STAGES     = 10;
 constexpr u32 SWAPCHAIN_MAX_IMAGES         = 10;
 
 constexpr u32 MAX_DESCRIPTOR_SETS          = 16384; 
+constexpr u32 MAX_DESCRIPTOR_SET_WRITES    = 32;
 
 constexpr s32 g_device_extension_count = 1;
 static const char *g_device_extensions[g_device_extension_count] = {
@@ -232,6 +233,7 @@ struct vulkan_context_t
 
     VkDescriptorPool                    descriptor_pools[MAX_FRAMES_IN_FLIGHT];
     VkDescriptorSet                     descriptor_sets[MAX_FRAMES_IN_FLIGHT][MAX_DESCRIPTOR_SETS];
+    u32                                 descriptor_count;
 
     // NOTE(Sleepster): We don't really need these, they're static and only modified when created. 
     vulkan_buffer_t                     main_vertex_buffer;
@@ -274,6 +276,8 @@ void        vk_backend_renderpass_destroy(vulkan_context_t *vulkan_context, VkRe
 VkCommandBuffer  vk_backend_get_and_begin_scratch_command_buffer(vulkan_context_t *vulkan_context, bool8 is_primary);
 void             vk_backend_submit_and_release_scratch_command_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer *command_buffer);
 void             vk_backend_allocate_descriptor_sets(vulkan_context_t *vulkan_context, material_archetype_t *archetype);
+
+void* vk_backend_append_uniform_constant_buffer_data(vulkan_context_t *vulkan_context, void *user_data, u32 data_size, u32 *offset_out);
 
 VkFramebuffer
 vk_backend_framebuffer_create(vulkan_context_t  *vulkan_context, 
