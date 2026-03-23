@@ -2412,7 +2412,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 {
                     render_command_bind_shader_t *cmd = (render_command_bind_shader_t*)command->data;
 
-                    vkCmdBindPipeline(*vulkan_context->render_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, cmd->shader.shader->shader_data.pipeline);
+                    vkCmdBindPipeline(*vulkan_context->render_command_buffer, cmd->shader.shader->shader_data.pipeline_type, cmd->shader.shader->shader_data.pipeline);
 
                     command_list->active_shader_program = &cmd->shader;
                 }break;

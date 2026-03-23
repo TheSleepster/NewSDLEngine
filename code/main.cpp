@@ -290,7 +290,7 @@ main(int argc, char **argv)
             r_cmd_set_viewport(command_list, vec2(0, 180), vec2(320, -180));
             r_cmd_set_scissor(command_list,  vec2(0, 0),   vec2(320,  180));
 
-            vec4_t color = {0.0, 1.0, 0.0, 1.0};
+            vec4_t color = {1.0, 0.6, 0.8, 1.0};
             r_cmd_update_push_constants(command_list, 0, sizeof(vec4_t), &color);
             r_cmd_draw_indexed(command_list, 6, 0, 1, 0);
 

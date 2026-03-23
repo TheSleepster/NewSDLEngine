@@ -200,7 +200,19 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
                                              layout));
     }
 
-    vk_backend_create_render_pipeline(vulkan_context, &result, false);
+    if(result.pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
+    {
+        vk_backend_create_render_pipeline(vulkan_context, &result, false);
+    }
+    else if(result.pipeline_type == VK_PIPELINE_BIND_POINT_COMPUTE)
+    {
+        VkComputePipelineCreateInfo pipeline_info = {};
+        pipeline_info.sType  = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+        pipeline_info.layout = result.pipeline_layout;
+        pipeline_info.stage  = result.stages->pipeline_stage_create_info;
+
+        vkAssert(vkCreateComputePipelines(vulkan_context->device, null, 1, &pipeline_info, null, &result.pipeline));
+    }
 
     return(result);
 }

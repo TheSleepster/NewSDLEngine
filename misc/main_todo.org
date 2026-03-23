@@ -1,5 +1,32 @@
 #+title: NewSDLEngine
 * IMMEDIATE TODO
+- [X] Index buffer support
+- [-] Expanded draw command capabilities (in the future, draw_indirect...)
+- [X] Automatically bind the renderpasses "read attachments" as shader sampled textures
+- [X] blit_image command
+- [-] Compute shader support (in theory, but we can't test it...)
+- [ ] Shader pipeline cache for different GL_States
+- [ ] CLEANUP
+- [ ] MORE CLEANUP (specifically with the vk_backend_buffer functionality... it's REALLY bad...)
+- [ ] CLEANUP TODOs
+
+** Buffer rework
+- [ ] We must be able to stage data more effectively
+- [ ] Some entity to manage buffers, allowing us to control things like all data being staged before the frame.
+- [ ] Better support for both CPU mapped buffers and GPU exclusive buffers.
+
+** GPU Resource Manager
+the goal of this item is very simple, just allow us to control and
+monitor gpu data in a way that is managed rather than
+spontaneous. A perfect example is buffer staging and image
+updates. Image updates and buffer updating should be performed
+right before calling the main backend render
+functions. Simple. These are meant to make sure the data is
+sorted, managed, and appropriately handled without direct control.
+
+- [ ] Track and handle buffer data
+- [ ] Track and handle image data
+
 * Next Milestone:
 - [X] Vulkan GPU memory allocator
 - [X] Clear the screen
@@ -7,53 +34,31 @@
 - [X] Handle window resizing
 - [X] Shaders and descriptor pools
 - [X] Allocating and handling descriptor sets
-- [ ] Arena allocator should allow the user to set it's growing status. That way, if the user wants to use
-      the allocator on other threads, then we can safely do so. Right now with the way the arenas grow, it
-      is not safe to use these on multiple threads.
+- [X] Create our own custom GPU image format. Something like idImage
 
-- [ ] Memory Allocation tracker
-- [ ] Image manager like idSoftware's in DOOM3 BFG
-- [ ] Image manager should have the ability to provide "scratch images"
-- [ ] Create our own custom GPU image format. Something like idImage
-
-- [ ] We need to completely rework descriptors and how they function. Right now, everything in the shader
+- [X] We need to completely rework descriptors and how they function. Right now, everything in the shader
       revolves around the shader, which is not right. We need to have the shader / material_archetype own it's
       descriptor_set_layout and have some sort of global descriptor manager that controls and allocates us data
       for these descriptors in accordance to the set layout stored within the shader. 
 
-- [ ] We should migrate from whatever you want to call this asscan system to a "constant_buffer" system. This way,
+- [X] We should migrate from whatever you want to call this asscan system to a "constant_buffer" system. This way,
       we can allow the user to just give us data into the constant buffer and we'll just update it as the time comes
       in the vulkan renderer.
-
-- [ ] Proper test suite that allows us to actually get REAL benchmarking data
+- [ ] Image manager like idSoftware's in DOOM3 BFG
+- [ ] Image manager should have the ability to provide "scratch images" like our "scratch buffer" approach
 
 ** Materials
-- [ ] A program to take whatever the material file looks like and transform it into a binary blob.
-      This way, parsing it and loading it is WAY faster. The asset file packer can probably do this.
-      We should also give the engine the ability to do this for the sake of asset hot reloading.
-- [ ] Perhaps some kind of "constant_buffer" object that maps the name of a buffer / uniform object inside a shader
-      to some CPU side data that we can access easily.
-
-- [ ] Perhaps we need a standard for autodetecting special
-      uniforms. For example, the engine wants to know if you have camera
-      matrices in your shader, how many and what textures you have,
-      whether you have instance data in there, or whatever else. If we
-      want to automatically infer this information then we may need a
-      standard like prefixing "camera" ubos with "Camera" and textures
-      with "Texture" and so on.
-
-- [ ] Introduce safeguards for when updating descriptor sets. For
-      example, if the user tries to add more than one texture to a
-      shader's descriptor, but that descriptor is only an array with 1
-      element, we should warn the user and return.
-
-- [ ] Shaders should store their texture uniform, camera uniforms, and other important information for easy access and updating
-- [ ] Shaders should "cache" special uniforms like "camera uniforms" "texture array uniforms"
-- [ ] Instead of cacheing uniforms, we should just use "constant buffers"
+- [X] Instead of cacheing uniforms, we should just use "constant buffers"
 - [X] Establish the concept of a material
 - [X] Default texture should always be in slot 0, make our texture array in the shader 0 indexed (we went with -1)
 - [X] Materials. Materials should store what shader / blending states are needed for a given set of objects.
       (shader, blend modes, depth state, textures, camera data, etc.)
+- [X] Perhaps some kind of "constant_buffer" object that maps the name of a buffer / uniform object inside a shader
+      to some CPU side data that we can access easily.
+- [ ] A program to take whatever the material file looks like and transform it into a binary blob.
+      This way, parsing it and loading it is WAY faster. The asset file packer can probably do this.
+      We should also give the engine the ability to do this for the sake of asset hot reloading.
+
 ** Create a very early version of the new batch renderer
 - [X] LAYERS. Use the depth buffer.
 - [X] A buffer for the texture array, this is largely the same as what
@@ -72,8 +77,8 @@
 - [ ] Clean up the code and allow for easy toggling of Debug macros
 *** Upgrading the damn renderer
 - [X] Take a look at instancing, upload 4 vertices and 6 indices at
-  the program's start. Create a vertex buffer, an index buffer, and an
-  INSTANCE info buffer. The reason for this dramatic shit is this:
+      the program's start. Create a vertex buffer, an index buffer, and an
+      INSTANCE info buffer. The reason for this dramatic shit is this:
   - Instead of uploading a ton of vertices and grouping them in a
     complicated manner, we just have a few simple buffers for each of
     the information sets we need that are normally unique per
@@ -82,11 +87,10 @@
           will contain a "camera_index" into this buffer. Making the
           accesssing of this data easy and the rendering with many
           different camera easier to manage than the current system.
-
+- [X] Better method of applying uniform data
 - [ ] Indirect drawing
 - [ ] Seperate Transparent and Opaque geometry
 - [ ] Compute shader support
-- [X] Better method of applying uniform data
 - [ ] Support for multiple renderpasses, restore the renderer to it's full glory. (lights, particle systems, etc.)
 - [ ] Dynamic state expansion, add support for dynamic blend modes, dynamic depth state, dynamic stencil states, line widths, etc.
       (https://docs.vulkan.org/spec/latest/chapters/pipelines.html#VkDynamicState)
@@ -128,8 +132,8 @@
  - [X] Some method of organizing and tracking what elements should be applied to bound shaders, bound descriptor sets (maybe shaders should just auto bind
        these by default??), and other important state that can just be linked together simply
  - [X] Restore our old "frames in flight logic", We are actually just going through each of the swapchain images as fast as we can rather than "triple buffering"
- - [X] (??) r_vulkan_types.h && r_vulkan_api.h (??) for easy including of just the vulkan type information and just the API functions
- - [ ] Refactor "r_vulkan_begin_frame" and "r_vulkan_end_frame"
+ - [X] r_vulkan_types.h && r_vulkan_api.h for easy including of just the vulkan type information and just the API functions
+ - [X] Refactor "r_vulkan_begin_frame" and "r_vulkan_end_frame"
   IMAGE TRANSITION STUFF
     - [ ] The image should store the informationa about it's current format, layout, baseMipLevel, aspectMask, etc.
     - [ ] The function itself should just take a parameterized list of information you want the image to actually transform into
@@ -140,14 +144,14 @@
         (items like sync objects, framebuffers, command_buffers, etc.)
 
 * Drawing API (frontend renderer)
- - [ ] (??) Backend API structure that contains the necessary Vulkan-render API function pointers for use with both the asset manager and the frontend renderer
+ - [ ] Backend API structure that contains the necessary Vulkan-render API function pointers for use with both the asset manager and the frontend renderer
  - [ ] Functions like r_vulkan_swapchain_get_next_image_index() should instead inform the render_context that actions need to be performed rather than just doing them.
        This would allow the renderer to handle these issues when it actually is meant too, which may reduce the chance of bugs arising
 * Asset System TODOs
+- [X] Textures and other assets should store a "generation" ID that tells us whether it has been updated
 - [ ] Multithreading!
 - [ ] Refine the system to use atomic reference counting for asset releasing.
 - [ ] Modify all asset deletion so that we only delete the asset at the END of the game frame]
-- [X] Textures and other assets should store a "generation" ID that tells us whether it has been updated
 - [ ] Have the catalog of a specific asset type keep track of what assets are loaded. This way we can simply loop over all assets that are loaded
 ** Textures
 - [ ] Renderer's create Texture function only takes in pixels. The rest of the data is stored on the texture_t object
@@ -166,7 +170,7 @@
 - [X] Fix the memory leak inside of the asset file packer
 - [X] Switch to a more sane "chunk based" file format. Where the header stays almost exactly how it is, but the assets are moved into "chunks".
 - [X] Find out why the hell it's taking so long to pack
-- [ ] (???) Prebuild atlas' and store them as part of the .wad file so that we don't have to deal with the dynamic atlasing at runtime
+- [ ] Prebuild atlas' and store them as part of the .wad file so that we don't have to deal with the dynamic atlasing at runtime
       Each "chunk" should tell us the actual asset size and contain a bunch of information about the data. This also makes the table of contents less responsible
       for stuff and makes parsing easier since we can just go through each chunk for the information relating to an asset.
 - [ ] Assets should store the information about themselves inside the asset file, ex: textures should store their w/h/c setup. Wav files should store their channel_count, sample_count, etc.
@@ -182,23 +186,25 @@
 - [X] Support Enums as well.
 
   (This is done for enums)
-- [/] The ability to get the parent structure from the name of a member. (this might be impossible.)
+- [-] The ability to get the parent structure from the name of a member. (this might be impossible.)
       This might be impossible simply do to the fact that we can have the same member in many different structs.
       We can have token.data, bitmap.data, texture.data, etc. So how can we know which type_info_struct_t we want???
 * Core stuff
+- [X] Input flag parser
+- [X] Type safe hash tables
+- [X] Allow us to set the custom allocator for the hash tables
+- [X] The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal state
 - [ ] Fix the c_string_read_* functions.
 - [ ] Why are we using Malloc with our dynamic arrays
 - [ ] Compile the core into a single library. c_data.lib or something. then have c_base.h import all the core headers
 - [ ] Convert Dynarray.cpp and Dynarray.h into an STB style library like the hash_tables
-- [X] Input flag parser
-- [X] Type safe hash tables
-- [X] Allow us to set the custom allocator for the hash tables
 - [ ] Spintf for our custom strings.
 - [ ] Modify the file and sys_file APIs so that they work properly as one would expect. IE, sys_file_open returns a file_t, have it initialize the file's name and other easy things
 - [ ] Complete malloc replacement (thread safe heap allocator)
-- [X] The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal state
 - [ ] The ability to dump the contents of a memory arena to a file, this is probably pretty useful...
 - [ ] Any function in the string.cpp file that allocates memory should be reordered like the file API
+- [ ] Proper test suite that allows us to actually get REAL benchmarking data
+- [ ] Memory Allocation tracker
 - [ ] We need a proper timing API. Something that can just be attached to a program as a header or lib 
       and timing record information about the process and certain subblocks. 
 - [ ] Vulkan style memory allocation for functions that would allocate
@@ -208,6 +214,9 @@
       buffer with the data. Optionally, have an "I don't really care what
       happens to this memory LMAO" function that just uses the core lib's
       internal allocator.
+- [ ] Arena allocator should allow the user to set it's growing status. That way, if the user wants to use
+      the allocator on other threads, then we can safely do so. Right now with the way the arenas grow, it
+      is not safe to use these on multiple threads.
 * Multithreading
 - [ ] Maybe just rebuild the whole system... it seems that this model isn't actually any good anymore
 - [ ] Fix the thread/synchronization API. It is bad. Why do we do it that way.
@@ -222,3 +231,21 @@
 - [ ] Sys mutex lock and unlock on windows should change the boolean for if it is locked, this is already done on Linux
 * Platform
 - [X] Function to get current working directory Windows (https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getcurrentdirectory)
+
+* Archive
+** This is just stuff I don't think I really need anymore, but don't want to delete them in case I DO actually want them and I was wrong
+- [ ] Perhaps we need a standard for autodetecting special
+      uniforms. For example, the engine wants to know if you have camera
+      matrices in your shader, how many and what textures you have,
+      whether you have instance data in there, or whatever else. If we
+      want to automatically infer this information then we may need a
+      standard like prefixing "camera" ubos with "Camera" and textures
+      with "Texture" and so on.
+
+- [ ] Introduce safeguards for when updating descriptor sets. For
+      example, if the user tries to add more than one texture to a
+      shader's descriptor, but that descriptor is only an array with 1
+      element, we should warn the user and return.
+
+- [ ] (?) Shaders should store their texture uniform, camera uniforms, and other important information for easy access and updating
+- [ ] (X Don't need this) Shaders should "cache" special uniforms like "camera uniforms" "texture array uniforms"
