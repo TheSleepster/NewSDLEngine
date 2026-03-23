@@ -187,13 +187,21 @@ main(int argc, char **argv)
                 .vPosition = vec4( 80, -45, 0.0, 1.0),
             },
             [1] = {
-                .vPosition = vec4( 0.0, 80, 0.0, 1.0),
+                .vPosition = vec4( 80,  45, 0.0, 1.0),
             },
             [2] = {
-                .vPosition = vec4(-80, -45, 0.0, 1.0),
+                .vPosition = vec4(-80,  45, 0.0, 1.0),
             },
+            [3] = {
+                .vPosition = vec4(-80, -45, 0.0, 1.0),
+            }
         };
         render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(&renderer_state, RenderBufferUsage_Dynamic, vertices, sizeof(vertices));
+        u32 indices[] = {
+            0, 1, 2, 2, 3, 0
+        };
+        render_buffer_t index_buffer = s_renderer_index_buffer_create(&renderer_state, RenderBufferUsage_Dynamic, indices, sizeof(indices));
+
         uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(&renderer_state, STR("CameraMatrices"));
 
         g_running = true;
@@ -265,6 +273,7 @@ main(int argc, char **argv)
             render_command_list_t *command_list = s_renderer_get_command_list(&renderer_state);
             r_cmd_renderpass_begin(command_list, game_renderpass_ID);
             r_cmd_bind_vertex_buffer(command_list, &vertex_buffer);
+            r_cmd_bind_index_buffer(command_list, &index_buffer);
             r_cmd_use_shader_program(command_list, basic_traiangle);
 
             struct camera_matrices {
@@ -283,7 +292,7 @@ main(int argc, char **argv)
 
             vec4_t color = {0.0, 1.0, 0.0, 1.0};
             r_cmd_update_push_constants(command_list, 0, sizeof(vec4_t), &color);
-            r_cmd_draw(command_list, 0, 3);
+            r_cmd_draw_indexed(command_list, 6, 0, 1, 0);
 
             r_cmd_renderpass_end(command_list);
             r_cmd_present(command_list, &game_color_buffer);

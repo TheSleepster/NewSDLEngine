@@ -96,7 +96,6 @@ enum render_command_type_t
     RCT_EndRenderpass,
     RCT_DrawRectangle,
     RCT_DrawBitmap,
-    RCT_UpdateTexture,
     RCT_UpdateUniformConstantBuffer,
     RCT_UpdatePushConstants,
     RCT_BindMaterial,
@@ -105,7 +104,10 @@ enum render_command_type_t
     RCT_BindIndexBuffer,
     RCT_SetViewport,
     RCT_SetScissor,
-    RCT_DrawBatch,
+    RCT_BindTexture,
+    RCT_Draw,
+    RCT_DrawIndexed,
+    RCT_BlitImage,
     RCT_PresentFrame,
 
     RCT_Count
@@ -165,12 +167,6 @@ struct render_command_bind_shader_t
     asset_handle_t shader;
 };
 
-struct render_command_draw_t 
-{
-    u32 vertices_to_draw;
-    u32 offset;
-};
-
 struct render_command_set_viewport_t
 {
     vec2_t size;
@@ -195,6 +191,33 @@ struct render_command_update_uniform_constant_buffer_t
     void *backend_uniform_buffer_ptr;
     u64   uniform_hash_index;
     u32   constant_data_size;
+};
+
+struct render_command_bind_texture_t 
+{
+    image_t *texture;
+};
+
+struct render_command_draw_t 
+{
+    u32 vertices_to_draw;
+    u32 vertex_offset;
+
+    u32 indices_to_draw;
+    u32 index_offset;
+
+    u32 instance_count;
+    u32 first_instance;
+};
+
+struct render_command_blit_image_t
+{
+    image_t *source_image;
+    image_t *dest_image;
+    vec2_t   source_offset;
+    vec2_t   source_size;
+    vec2_t   dest_offset;
+    vec2_t   dest_size;
 };
 
 struct render_command_present_frame_t
@@ -371,7 +394,6 @@ uniform_constant_buffer_t* s_renderer_get_constant_buffer(renderer_state_t *rend
             render_buffer_t s_renderer_render_buffer_create(renderer_state_t *renderer_state, void *data, u32 size, render_buffer_type_t type, render_buffer_usage_t usage);
 true_inline render_buffer_t s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_usage_t usage, void *data, u32 size);
 true_inline render_buffer_t s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_usage_t usage, void *data, u32 size);
-            void            r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t program);
 
 image_t                s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info);
 void                   s_renderer_image_destroy(renderer_state_t *renderer_state, image_t *image);
@@ -385,11 +407,15 @@ void r_cmd_begin_render_group(render_command_list_t *command_list);
 void r_cmd_end_render_group(render_command_list_t *command_list);
 void r_cmd_bind_vertex_buffer(render_command_list_t *command_list, render_buffer_t *buffer);
 void r_cmd_bind_index_buffer(render_command_list_t *command_list, render_buffer_t *buffer);
-void r_cmd_draw(render_command_list_t *command_list, u32 offset, u32 num_vertices);
 void r_cmd_set_scissor(render_command_list_t *command_list, vec2_t offset, vec2_t size);
 void r_cmd_set_viewport(render_command_list_t *command_list, vec2_t offset, vec2_t size);
 void r_cmd_update_push_constants(render_command_list_t *command_list, u32 offset, u32 size, void *data);
+void r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t program);
 void r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_constant_buffer_t *buffer, void *data, u32 data_size);
+void r_cmd_bind_texture(render_command_list_t *command_list, asset_handle_t *asset_handle);
+void r_cmd_draw(render_command_list_t *command_list, u32 vertex_count, u32 vertex_offset, u32 instance_count, u32 first_instance);
+void r_cmd_draw_indexed(render_command_list_t *command_list, u32 index_count, u32 index_offset, u32 instance_count, u32 first_instance);
+void r_cmd_blit_image(render_command_list_t *command_list, image_t *source_image, image_t *dest_image, vec2_t source_offset, vec2_t source_blit_size, vec2_t dest_offset, vec2_t dest_blit_size);
 void r_cmd_present(render_command_list_t *command_list, image_t *presentation_source);
 
 void

@@ -101,6 +101,12 @@ vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *i
     vk_backend_buffer_destroy(vulkan_context, &copy_buffer);
 }
 
+/*
+=============
+vk_backend_is_image_format_depth_format
+=============
+*/
+
 bool8
 vk_backend_is_image_format_depth_format(vulkan_image_t *image)
 {
@@ -115,6 +121,12 @@ vk_backend_is_image_format_depth_format(vulkan_image_t *image)
 
     return(result);
 }
+
+/*
+=============
+vk_backend_is_image_format_stencil_format
+=============
+*/
 
 bool8
 vk_backend_is_image_format_stencil_format(vulkan_image_t *image)
@@ -149,6 +161,7 @@ vk_backend_image_create_view(vulkan_context_t *vulkan_context, vulkan_image_t *i
         else                                     aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
     }
 
+    image->aspect_mask = aspect_mask;
     VkImageViewCreateInfo view_create_info = {
         .sType    = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
         .image    = image->handle,
@@ -360,7 +373,6 @@ vk_backend_sampler_destroy(vulkan_context_t *vulkan_context, VkSampler sampler)
 {
     vkDestroySampler(vulkan_context->device, sampler, vulkan_context->cpu_allocation_callbacks);
 }
-
 
 /*
 =============

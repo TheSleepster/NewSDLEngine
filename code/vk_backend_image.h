@@ -54,11 +54,9 @@ struct vulkan_image_t
     VkSampler                sampler;
     VkImageLayout            layout;
     VkFormat                 internal_format;
-#if 1
+    VkImageAspectFlags       aspect_mask;
     vulkan_allocation_info_t allocation;
-#else
-    VmaAllocation            gpu_memory;
-#endif
+
     u32                      width;
     u32                      height;
 };
@@ -103,7 +101,6 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
 
 bool8 vk_backend_is_image_format_stencil_format(vulkan_image_t *image);
 bool8 vk_backend_is_image_format_depth_format(vulkan_image_t *image);
-
 
 #endif // VK_BACKEND_IMAGE_H
 

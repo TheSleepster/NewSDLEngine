@@ -567,26 +567,6 @@ r_cmd_bind_index_buffer(render_command_list_t *command_list, render_buffer_t *bu
     command->data = bind_index_buffer;
 }
 
-
-/*
-=============
-r_cmd_bind_vertex_buffer
-=============
-*/
-
-void
-r_cmd_draw(render_command_list_t *command_list, u32 offset, u32 num_vertices)
-{
-    render_command_t *command   = s_renderer_get_next_command(command_list);
-    render_command_draw_t *draw = c_arena_push_struct(&command_list->command_arena, 
-                                                       render_command_draw_t);
-    draw->vertices_to_draw = num_vertices;
-    draw->offset           = offset;
-
-    command->header.command_type = RCT_DrawBatch;
-    command->data = draw;
-}
-
 /*
 =============
 r_cmd_set_viewport
@@ -673,6 +653,106 @@ r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_consta
 
     command->header.command_type = RCT_UpdateUniformConstantBuffer;
     command->data                = update_buffer_contents;
+}
+
+
+/*
+=============
+r_cmd_bind_texture
+=============
+*/
+
+void
+r_cmd_bind_texture(render_command_list_t *command_list, asset_handle_t *asset_handle)
+{
+    Assert(asset_handle->type == AT_Bitmap);
+    render_command_t *command  = s_renderer_get_next_command(command_list);
+    render_command_bind_texture_t *bind_texture = c_arena_push_struct(&command_list->command_arena, 
+                                                                       render_command_bind_texture_t);
+    bind_texture->texture = &asset_handle->texture->gpu_data;
+
+    command->header.command_type = RCT_BindTexture;
+    command->data = bind_texture;
+}
+
+
+/*
+=============
+r_cmd_draw
+=============
+*/
+
+void
+r_cmd_draw(render_command_list_t *command_list, 
+           u32                    vertex_count, 
+           u32                    vertex_offset, 
+           u32                    instance_count, 
+           u32                    first_instance)
+{
+    render_command_t *command   = s_renderer_get_next_command(command_list);
+    render_command_draw_t *draw = c_arena_push_struct(&command_list->command_arena, 
+                                                       render_command_draw_t);
+    draw->vertices_to_draw = vertex_count;
+    draw->vertex_offset    = vertex_offset;
+    draw->instance_count   = instance_count;
+    draw->first_instance   = first_instance;
+
+    command->header.command_type = RCT_Draw;
+    command->data = draw;
+}
+
+/*
+=============
+r_cmd_draw_indexed
+=============
+*/
+
+void
+r_cmd_draw_indexed(render_command_list_t *command_list, 
+                   u32                    index_count, 
+                   u32                    index_offset, 
+                   u32                    instance_count, 
+                   u32                    first_instance)
+{
+    render_command_t *command   = s_renderer_get_next_command(command_list);
+    render_command_draw_t *draw = c_arena_push_struct(&command_list->command_arena, 
+                                                       render_command_draw_t);
+    draw->indices_to_draw  = index_count;
+    draw->index_offset     = index_offset;
+    draw->instance_count   = instance_count;
+    draw->first_instance   = first_instance;
+
+    command->header.command_type = RCT_DrawIndexed;
+    command->data = draw;
+}
+
+/*
+=============
+r_cmd_present
+=============
+*/
+
+void
+r_cmd_blit_image(render_command_list_t *command_list, 
+                 image_t               *source_image, 
+                 image_t               *dest_image, 
+                 vec2_t                 source_offset, 
+                 vec2_t                 source_blit_size, 
+                 vec2_t                 dest_offset, 
+                 vec2_t                 dest_blit_size)
+{
+    render_command_t *command   = s_renderer_get_next_command(command_list);
+    render_command_blit_image_t *blit_image = c_arena_push_struct(&command_list->command_arena, 
+                                                                  render_command_blit_image_t);
+    blit_image->source_image  = source_image;
+    blit_image->dest_image    = dest_image;
+    blit_image->source_offset = source_offset;
+    blit_image->source_size   = source_blit_size;
+    blit_image->dest_offset   = dest_offset;
+    blit_image->dest_size     = dest_blit_size;
+
+    command->header.command_type = RCT_BlitImage;
+    command->data = blit_image;
 }
 
 /*

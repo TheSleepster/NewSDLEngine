@@ -2142,6 +2142,113 @@ vk_backend_append_uniform_constant_buffer_data(vulkan_context_t *vulkan_context,
     return(result);
 }
 
+void
+vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context, 
+                                  renderer_state_t *renderer_state, 
+                                  render_command_list_t *command_list)
+{
+    // NOTE(Sleepster): 
+    //
+    // This is all related to committing descriptor data to the GPU
+    vulkan_shader_t *shader = &command_list->active_shader_program->shader->shader_data;
+
+    VkDescriptorPool descriptor_pool = vulkan_context->descriptor_pools[vulkan_context->current_frame_index];
+    if(shader->descriptor_set_count > 0)
+    {
+        VkDescriptorSetAllocateInfo info = {
+            .sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+            .descriptorPool     = descriptor_pool,
+            .descriptorSetCount = 1,
+            .pSetLayouts        = shader->layouts 
+        };
+
+        vkAssert(vkAllocateDescriptorSets(vulkan_context->device, 
+                                          &info, 
+                                          &vulkan_context->descriptor_sets[vulkan_context->current_frame_index][vulkan_context->descriptor_count]));
+        VkDescriptorSet descriptor_set = vulkan_context->descriptor_sets[vulkan_context->current_frame_index][vulkan_context->descriptor_count]; 
+        ++vulkan_context->descriptor_count;
+
+        s32 write_count   = 0;
+        s32 buffer_count  = 0;
+        s32	image_count   = 0;
+        s32 binding_count = 0;
+
+        VkWriteDescriptorSet   writes[MAX_DESCRIPTOR_SET_WRITES]       = {};
+        VkDescriptorBufferInfo buffer_infos[MAX_DESCRIPTOR_SET_WRITES] = {};
+        VkDescriptorImageInfo  image_infos[MAX_DESCRIPTOR_SET_WRITES]  = {};
+
+        vulkan_buffer_t *current_uniform_buffer = &vulkan_context->shader_uniform_buffers[vulkan_context->current_frame_index];
+
+        for(u32 binding_index = 0;
+            binding_index < shader->binding_count;
+            ++binding_index)
+        {
+            vulkan_shader_binding_t *binding = shader->bindings + binding_index;
+            switch(binding->type)
+            {
+                case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+                case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+                {
+                    VkWriteDescriptorSet   *write       = writes + write_count++;
+                    VkDescriptorBufferInfo *buffer_info = buffer_infos + buffer_count++;
+
+                    // TODO(Sleepster):  is_dirty... only update if we need too...
+                    uniform_constant_buffer_t *constant_buffer = c_hash_table_get_value_ptr_at_index(&renderer_state->constant_buffer_hash, 
+                                                                                                     binding->buffer_hash_index);
+                    buffer_info->buffer = current_uniform_buffer->handle;
+                    buffer_info->offset = constant_buffer->offset;
+                    buffer_info->range  = constant_buffer->size;
+
+                    write->sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                    write->dstSet          = descriptor_set;
+                    write->dstBinding      = binding_count++;
+                    write->descriptorCount = 1;
+                    write->descriptorType  = binding->type;
+                    write->pBufferInfo     = buffer_info;
+                }break;
+                {
+                }break;
+                case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+                {
+                    VkDescriptorImageInfo *image_info = image_infos + image_count;
+                    VkWriteDescriptorSet   *write     = writes + write_count++;
+
+                    for(u32 image_index = 0;
+                        image_index < binding->descriptor_count;
+                        ++image_index)
+                    {
+                        image_t *image = command_list->image_shader_params[image_count + image_index]; 
+                        if(image)
+                        {
+                            vulkan_image_t *vulkan_data = &image->vulkan_image;
+
+                            image_info->imageLayout = vulkan_data->layout;
+                            image_info->imageView   = vulkan_data->view;
+                            image_info->sampler     = vulkan_data->sampler;
+                        }
+                        else
+                        {
+                            image_info[image_index] = image_info[0];
+                        }
+                    }
+
+                    write->sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                    write->dstSet          = descriptor_set;
+                    write->dstBinding      = binding_count++;
+                    write->descriptorCount = binding->descriptor_count;
+                    write->descriptorType  = binding->type;
+                    write->pImageInfo      = image_info;
+
+                    image_count += binding->descriptor_count;
+                }break;
+            }
+        }
+
+        vkUpdateDescriptorSets(vulkan_context->device, write_count, writes, 0, null);
+        vkCmdBindDescriptorSets(*vulkan_context->render_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader->pipeline_layout, 0, 1, &descriptor_set, 0, null);
+    }
+}
+
 /*
 =============
 vk_backend_render_frame
@@ -2238,6 +2345,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     render_command_begin_renderpass_t *cmd = (render_command_begin_renderpass_t*)command->data;
                     renderpass_t *renderpass = renderer_state->renderpasses + cmd->ID;
 
+                    // NOTE(Sleepster): Initialize the clear values... 
                     VkClearValue clear_values[MAX_RENDER_TARGET_ATTACHMENTS];
                     for(u32 attachment_index = 0;
                         attachment_index < renderpass->total_attachment_count;
@@ -2258,6 +2366,25 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                                                 renderpass->framebuffer_handle, 
                                                 renderpass->total_attachment_count,
                                                 clear_values);
+                    // NOTE(Sleepster): 
+                    //
+                    // Bind the "Read" or "ReadWrite" access textures for the shader
+                    for(u32 color_attachment_index = 0;
+                        color_attachment_index < renderpass->color_attachment_count;
+                        ++color_attachment_index)
+                    {
+                        renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
+                        if(attachment->access == RenderpassAttachmentAccessRead || 
+                           attachment->access == RenderpassAttachmentAccessReadWrite)
+                        {
+                            // NOTE(Sleepster): 
+                            // This assert is here so that we can catch instances where the caller's intent may have unintended consequences,
+                            // like for example wanting to bind the "gbuffer" texture in slot 0, and thinking you're doing that 
+                            // by default when this is in fact NOT the behavior.
+                            Assert(command_list->image_count == 0);
+                            command_list->image_shader_params[command_list->image_count++] = attachment->image;
+                        }
+                    }
                 }break;
                 case RCT_EndRenderpass:
                 {
@@ -2337,138 +2464,93 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         log_fatal("Failure. This shader lacks push constants...\n");
                     }
                 }break;
-                case RCT_UpdateUniformConstantBuffer:
+                case RCT_BindTexture:
                 {
-                    render_command_update_uniform_constant_buffer_t *cmd = (render_command_update_uniform_constant_buffer_t*)command->data;
-                    uniform_constant_buffer_t *buffer = c_hash_table_get_value_ptr_at_index(&renderer_state->constant_buffer_hash, cmd->uniform_hash_index);
-                    (void)buffer;
-
-                    s32 x = 0;
-                    (void)x;
+                    render_command_bind_texture_t *cmd = (render_command_bind_texture_t*)command->data;
+                    command_list->image_shader_params[command_list->image_count++] = cmd->texture;
                 }break;
-                case RCT_DrawBatch:
+                case RCT_Draw:
                 {
                     Assert(command_list->active_vertex_buffer);
-                    //Assert(command_list->active_index_buffer);
                     Assert(command_list->active_shader_program);
                     Assert(command_list->active_viewport_command);
                     Assert(command_list->active_scissor_command);
 
-                    vulkan_shader_t *shader = &command_list->active_shader_program->shader->shader_data;
-
-                    VkDescriptorPool descriptor_pool = vulkan_context->descriptor_pools[vulkan_context->current_frame_index];
-                    if(shader->descriptor_set_count > 0)
-                    {
-                        VkDescriptorSetAllocateInfo info = {
-                            .sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-                            .descriptorPool     = descriptor_pool,
-                            .descriptorSetCount = 1,
-                            .pSetLayouts        = shader->layouts 
-                        };
-
-                        vkAssert(vkAllocateDescriptorSets(vulkan_context->device, 
-                                                          &info, 
-                                                          &vulkan_context->descriptor_sets[vulkan_context->current_frame_index][vulkan_context->descriptor_count]));
-                        VkDescriptorSet descriptor_set = vulkan_context->descriptor_sets[vulkan_context->current_frame_index][vulkan_context->descriptor_count]; 
-                        ++vulkan_context->descriptor_count;
-
-                        s32 write_count   = 0;
-                        s32 buffer_count  = 0;
-                        s32	image_count   = 0;
-                        s32 binding_count = 0;
-
-                        VkWriteDescriptorSet   writes[MAX_DESCRIPTOR_SET_WRITES]       = {};
-                        VkDescriptorBufferInfo buffer_infos[MAX_DESCRIPTOR_SET_WRITES] = {};
-                        VkDescriptorImageInfo  image_infos[MAX_DESCRIPTOR_SET_WRITES]  = {};
-
-                        vulkan_buffer_t *current_uniform_buffer = &vulkan_context->shader_uniform_buffers[vulkan_context->current_frame_index];
-
-                        for(u32 binding_index = 0;
-                            binding_index < shader->binding_count;
-                            ++binding_index)
-                        {
-                            vulkan_shader_binding_t *binding = shader->bindings + binding_index;
-                            switch(binding->type)
-                            {
-                                case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-                                case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-                                {
-                                    VkWriteDescriptorSet   *write       = writes + write_count++;
-                                    VkDescriptorBufferInfo *buffer_info = buffer_infos + buffer_count++;
-                                    
-                                    // TODO(Sleepster):  is_dirty... only update if we need too...
-                                    uniform_constant_buffer_t *constant_buffer = c_hash_table_get_value_ptr_at_index(&renderer_state->constant_buffer_hash, 
-                                                                                                                      binding->buffer_hash_index);
-                                    buffer_info->buffer = current_uniform_buffer->handle;
-                                    buffer_info->offset = constant_buffer->offset;
-                                    buffer_info->range  = constant_buffer->size;
-
-                                    write->sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                                    write->dstSet          = descriptor_set;
-                                    write->dstBinding      = binding_count++;
-                                    write->descriptorCount = 1;
-                                    write->descriptorType  = binding->type;
-                                    write->pBufferInfo     = buffer_info;
-                                }break;
-                                {
-                                }break;
-                                case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-                                {
-                                    VkDescriptorImageInfo *image_info = image_infos + image_count;
-                                    VkWriteDescriptorSet   *write     = writes + write_count++;
-
-                                    for(u32 image_index = 0;
-                                        image_index < binding->descriptor_count;
-                                        ++image_index)
-                                    {
-                                        image_t *image = command_list->image_shader_params[image_count + image_index]; 
-                                        if(image)
-                                        {
-                                            vulkan_image_t *vulkan_data = &image->vulkan_image;
-
-                                            image_info->imageLayout = vulkan_data->layout;
-                                            image_info->imageView   = vulkan_data->view;
-                                            image_info->sampler     = vulkan_data->sampler;
-                                        }
-                                        else
-                                        {
-                                            image_info[image_index] = image_info[0];
-                                        }
-                                    }
-
-                                    write->sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-                                    write->dstSet          = descriptor_set;
-                                    write->dstBinding      = binding_count++;
-                                    write->descriptorCount = binding->descriptor_count;
-                                    write->descriptorType  = binding->type;
-                                    write->pImageInfo      = image_info;
-
-                                    image_count += binding->descriptor_count;
-                                }break;
-                            }
-                        }
-
-                        vkUpdateDescriptorSets(vulkan_context->device, write_count, writes, 0, null);
-                        vkCmdBindDescriptorSets(*vulkan_context->render_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader->pipeline_layout, 0, 1, &descriptor_set, 0, null);
-                    }
+                    vk_backend_commit_descriptor_data(vulkan_context, renderer_state, command_list);
 
                     render_command_draw_t *cmd = (render_command_draw_t*)command->data;
-                    u32 vertex_count  = cmd->vertices_to_draw;
-                    u32 vertex_offset = cmd->offset;
+                    vkCmdDraw(*vulkan_context->render_command_buffer, 
+                              cmd->vertices_to_draw, 
+                              cmd->instance_count, 
+                              cmd->vertex_offset, 
+                              cmd->first_instance);
+                    command_list->image_count = 0;
+                }break;
+                case RCT_DrawIndexed:
+                {
+                    Assert(command_list->active_vertex_buffer);
+                    Assert(command_list->active_index_buffer);
+                    Assert(command_list->active_shader_program);
+                    Assert(command_list->active_viewport_command);
+                    Assert(command_list->active_scissor_command);
 
-                    vkCmdDraw(*vulkan_context->render_command_buffer, vertex_count, 1, vertex_offset, 0);
+                    vk_backend_commit_descriptor_data(vulkan_context, renderer_state, command_list);
+
+                    render_command_draw_t *cmd = (render_command_draw_t*)command->data;
+                    vkCmdDrawIndexed(*vulkan_context->render_command_buffer, 
+                                     cmd->indices_to_draw, 
+                                     cmd->instance_count, 
+                                     cmd->index_offset, 
+                                     cmd->vertex_offset, 
+                                     cmd->first_instance);
+                    command_list->image_count = 0;
+                }break;
+                case RCT_BlitImage:
+                {
+                    render_command_blit_image_t *cmd = (render_command_blit_image_t*)command->data;
+
+                    VkImageSubresourceRange source_range = {
+                        .aspectMask     = cmd->source_image->vulkan_image.aspect_mask,
+                        .baseArrayLayer = 0,
+                        .baseMipLevel   = 0,
+                        .layerCount     = 1,
+                        .levelCount     = 1,
+                    };
+
+                    VkImageSubresourceRange destination_range = {
+                        .aspectMask     = cmd->source_image->vulkan_image.aspect_mask,
+                        .baseMipLevel   = 0,
+                        .baseArrayLayer = 0,
+                        .levelCount     = 1,
+                        .layerCount     = 1,
+                    };
+
+                    vk_backend_image_blit(vulkan_context,
+                                         &cmd->source_image->vulkan_image,
+                                         &cmd->dest_image->vulkan_image,
+                                          cmd->source_offset,
+                                          cmd->source_size,
+                                          cmd->dest_offset,
+                                          cmd->dest_size,
+                                          cmd->source_image->vulkan_image.layout,
+                                          cmd->dest_image->vulkan_image.layout,
+                                          cmd->dest_image->vulkan_image.layout,
+                                          source_range,
+                                          destination_range);
                 }break;
                 case RCT_PresentFrame:
                 {
                     render_command_present_frame_t *cmd = (render_command_present_frame_t *)command->data;
-                    image_t *source            = cmd->presentation_source;
+                    image_t        *source     = cmd->presentation_source;
                     vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
 
+                    Assert(source);
+                    Assert(backbuffer);
                     Assert(!vk_backend_is_image_format_stencil_format(&source->vulkan_image) && 
                            !vk_backend_is_image_format_depth_format(&source->vulkan_image));
 
                     VkImageSubresourceRange source_range = {
-                        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                        .aspectMask     = source->vulkan_image.aspect_mask,
                         .baseArrayLayer = 0,
                         .baseMipLevel   = 0,
                         .layerCount     = 1,
@@ -2478,8 +2560,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     VkImageSubresourceRange destination_range = {
                         .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
                         .baseMipLevel   = 0,
-                        .levelCount     = 1,
                         .baseArrayLayer = 0,
+                        .levelCount     = 1,
                         .layerCount     = 1,
                     };
 
