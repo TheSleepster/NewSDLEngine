@@ -4,6 +4,11 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+// TODO(Sleepster): 
+// - [X] Work stealing
+// - [X] parallel_for should allow threads to instead add work to themselves in parallel
+// - [X] Work Order Fences 
+// - [X] A manner with which to run work in batches and get the results of that completed work back from the threadpool
 #include <SDL3/SDL.h>
 
 #define MATH_IMPLEMENTATION
@@ -11,7 +16,7 @@
 #include <c_intrinsics.h>
 #include <c_math.h>
 
-#include <c_globals.cpp>
+#include <c_global_context.cpp>
 #include <c_string.cpp>
 
 #include <p_platform_data.h>
@@ -20,35 +25,39 @@
 #include <sys_linux.cpp>
 #include <c_memory_arena.cpp>
 
-// TODO(Sleepster): 
-// - [X] Work stealing
-// - [ ] A manner with which to run work in batches and get the results of that completed work back from the threadpool
-// - [ ] parallel_for should allow threads to instead add work to themselves in parallel
-
 #define MAX_WORK_ORDERS  (10000)
 #define MAX_THREAD_COUNT (42)
 #define CACHE_LINE       (64)
 
 typedef void work_order_fn(void *data);
 
+struct work_completion_fence_t
+{
+    volatile u32 pending;
+};
+
+// NOTE(Sleepster): 32 bytes
 struct work_order_t
 {
-    void           *data;
-    work_order_fn  *function;
+    void                    *data;
+    work_order_fn           *function;
+    work_completion_fence_t *fence;
+    u64                      __padding;
 };
 
 struct work_list_t 
 {
-    work_order_t    work_orders[MAX_WORK_ORDERS];
-    u32             head;
-    u32             tail;
+    work_order_t            work_orders[MAX_WORK_ORDERS];
+    alignas(CACHE_LINE) u32 head;
+    alignas(CACHE_LINE) u32 tail;
 };
 
 struct thread_allocator_t
 {
-    byte             *buffer;
-    u32               size;
-    volatile u32      used;
+    byte *buffer;
+
+    alignas(CACHE_LINE) u32          size;
+    alignas(CACHE_LINE) volatile u32 used;
 };
 
 struct threadpool_data_t;
@@ -70,14 +79,21 @@ struct worker_thread_t
 struct threadpool_data_t
 {
     sys_semaphore_t work_avaliable_semaphore;
-    sys_semaphore_t work_completed_semaphore;
-
     worker_thread_t workers[MAX_THREAD_COUNT];
-    volatile u32    threads_flushed;
-
-    volatile u32    next_worker_index;
     u32             thread_count;
+
+    alignas(CACHE_LINE) volatile u32 threads_flushed;
+    alignas(CACHE_LINE) volatile u32 next_worker_index;
 };
+
+
+#define parallel_for_FIFO(threadpool, iterator, max_iterations, work_completed_fence_ptr, lambda) \
+    for(u32 iterator = max_iterations; iterator > 0; --iterator)  \
+        threadpool_push_work_order(threadpool, lambda, work_completed_fence_ptr)                  
+
+#define parallel_for_LIFO(threadpool, iterator, max_iterations, work_completed_fence_ptr, lambda) \
+    for(u32 iterator = 0; iterator < max_iterations; ++iterator)  \
+        threadpool_push_work_order(threadpool, lambda, work_completed_fence_ptr)                  
 
 int thread_proc_entry(void *user_data);
 bool8 thread_steal_work_order(worker_thread_t *theif_thread);
@@ -88,7 +104,6 @@ threadpool_init(threadpool_data_t *threadpool, u32 max_threads, u32 thread_alloc
     ZeroStruct(*threadpool);
     threadpool->thread_count = max_threads;
     threadpool->work_avaliable_semaphore = sys_semaphore_create(0, max_threads);
-    threadpool->work_completed_semaphore = sys_semaphore_create(0, max_threads);
 
     for(u32 thread_index = 0;
         thread_index < max_threads;
@@ -133,6 +148,19 @@ threadpool_flush_work_orders(threadpool_data_t *threadpool)
     {
         thread_steal_work_order(&this_thread);
     }
+    threadpool->threads_flushed = 0;
+}
+
+void
+threadpool_wait_on_fence(threadpool_data_t *threadpool, work_completion_fence_t *fence)
+{
+    worker_thread_t this_thread = {};
+    this_thread.is_started = true;
+    this_thread.threadpool = threadpool;
+    while(fence->pending > 0)
+    {
+        thread_steal_work_order(&this_thread);
+    }
 }
 
 template <typename LambdaType>
@@ -145,7 +173,7 @@ invoker(void *lambda_data)
 
 template <typename LambdaType>
 void
-thread_push_work_order(worker_thread_t *thread, LambdaType lambda)
+thread_push_work_order(worker_thread_t *thread, LambdaType lambda, work_completion_fence_t *fence)
 {
     work_order_t new_work_order = {}; 
     void *data = 0;
@@ -160,9 +188,10 @@ thread_push_work_order(worker_thread_t *thread, LambdaType lambda)
 
     Assert(data != null);
     memcpy(data, &lambda, sizeof(LambdaType));
+
     new_work_order.data     = data;
     new_work_order.function = invoker<LambdaType>;
-
+    new_work_order.fence    = fence;
     for(;;)
     {
         u32 original_next_head_index = thread->work_avaliable.head;
@@ -188,12 +217,16 @@ thread_push_work_order(worker_thread_t *thread, LambdaType lambda)
 
 template <typename LambdaType>
 true_inline void
-threadpool_push_work_order(threadpool_data_t *threadpool, LambdaType lambda)
+threadpool_push_work_order(threadpool_data_t *threadpool, LambdaType lambda, work_completion_fence_t *fence)
 {
     worker_thread_t *thread = threadpool->workers + threadpool->next_worker_index;
     threadpool->next_worker_index = (threadpool->next_worker_index + 1) % threadpool->thread_count;
+    if(fence)
+    {
+        AtomicIncrement(&fence->pending);
+    }
 
-    thread_push_work_order(thread, lambda);
+    thread_push_work_order(thread, lambda, fence);
 }
 
 bool8 
@@ -214,6 +247,10 @@ thread_pop_work_order(worker_thread_t *thread)
         {
             work_order_t *work_order = thread->work_avaliable.work_orders + last_head;
             work_order->function(work_order->data);
+            if(work_order->fence)
+            {
+                AtomicDecrement(&work_order->fence->pending);
+            }
 
             ReadWriteBarrier;
         }
@@ -237,8 +274,10 @@ thread_steal_work_order(worker_thread_t *theif_thread)
         thread_index < theif_thread->threadpool->thread_count;
         ++thread_index)
     {
+        if(thread_index == theif_thread->thread_id) continue;
+
         worker_thread_t *target_thread = theif_thread->threadpool->workers + thread_index;
-        u32 work_orders_left = target_thread->work_avaliable.head - target_thread->work_avaliable.tail; 
+        u32 work_orders_left = Max(target_thread->work_avaliable.head - target_thread->work_avaliable.tail, 0); 
         if(work_orders_left > highest_work_order_count)
         {
             highest_work_order_count = work_orders_left;
@@ -260,6 +299,10 @@ thread_steal_work_order(worker_thread_t *theif_thread)
         {
             work_order_t *work_order = target_thread->work_avaliable.work_orders + next_entry_todo;
             work_order->function(work_order->data);
+            if(work_order->fence)
+            {
+                AtomicDecrement(&work_order->fence->pending);
+            }
 
             ReadWriteBarrier;
         }
@@ -297,19 +340,15 @@ thread_proc_entry(void *user_data)
 sleep:
             AtomicIncrement(&thread->threadpool->threads_flushed);
             sys_semaphore_wait(&thread->threadpool->work_avaliable_semaphore, 0);
+
+            // NOTE(Sleepster): When the thread wakes up, reset it's state.
+            thread->allocator.used = 0;
+            AtomicDecrement(&thread->threadpool->threads_flushed);
         }
     }
     
     return(0);
 }
-
-#define parallel_for_FIFO(threadpool, iterator, max_iterations, lambda) \
-    for(u32 iterator = max_iterations; iterator > 0; --iterator)  \
-        threadpool_push_work_order(threadpool, lambda)                  
-
-#define parallel_for_LIFO(threadpool, iterator, max_iterations, lambda) \
-    for(u32 iterator = 0; iterator < max_iterations; ++iterator)  \
-        threadpool_push_work_order(threadpool, lambda)                  
 
 int
 main(void) 
@@ -323,7 +362,8 @@ main(void)
     u32 thread_count = sys_get_cpu_count() - 1;
     threadpool_init(threadpool, thread_count, MB(200), false);
 
-    parallel_for_FIFO(threadpool, work_index, MAX_WORK_ORDERS, [=]() {
+    work_completion_fence_t matrix_fence = {};
+    parallel_for_FIFO(threadpool, work_index, MAX_WORK_ORDERS, &matrix_fence, [=]() {
         vec3_t rotation_vector = vec3(1.0, 0.3, 0.0);
         mat4_t matrix          = mat4_identity();
         mat4_t translation_mat = mat4_make_translation(vec3(100, 100, 0));
@@ -344,7 +384,11 @@ main(void)
 
     threadpool_start(threadpool);
     u64 last_tsc = SDL_GetPerformanceCounter();
+#if 0
     threadpool_flush_work_orders(threadpool);
+#else
+    threadpool_wait_on_fence(threadpool, &matrix_fence);
+#endif
 
     u64 current_tsc = SDL_GetPerformanceCounter();
     u64 delta_tsc   = current_tsc - last_tsc;
