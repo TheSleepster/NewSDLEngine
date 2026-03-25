@@ -13,7 +13,7 @@
 
 #include <c_base.h>
 #include <c_types.h>
-#include <c_globals.h>
+#include <c_global_context.h>
 #include <c_math.h>
 #include <c_string.h>
 #include <c_dynarray.h>
@@ -35,9 +35,57 @@ constexpr u32 SWAPCHAIN_MAX_IMAGES         = 10;
 constexpr u32 MAX_DESCRIPTOR_SETS          = 16384; 
 constexpr u32 MAX_DESCRIPTOR_SET_WRITES    = 32;
 
-constexpr s32 g_device_extension_count = 1;
-static const char *g_device_extensions[g_device_extension_count] = {
+// NOTE(Sleepster): 
+//
+// These store the default behavior of the API as constants.
+global_variable const char *g_device_extensions[] = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
+
+global_variable const VkDynamicState g_pipeline_dynamic_states[] = {
+    VK_DYNAMIC_STATE_VIEWPORT,
+    VK_DYNAMIC_STATE_SCISSOR,
+    VK_DYNAMIC_STATE_LINE_WIDTH,
+};
+
+// These items are used to create a default version of every shader loaded, that way you have an interface beyond
+// that of just simply higher-level materials. Materials would fill these out and make the states different as
+// needed.
+//
+// The idea is that if it's a shader that's never been loaded, we have no idea what the state of the pipeline should be.
+// So, we just use these defaults instead.
+global_variable constexpr VkPipelineRasterizationStateCreateInfo g_pipeline_default_rasterization_state = {
+        .sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+        .depthClampEnable        = false,
+        .rasterizerDiscardEnable = false,
+        .polygonMode             = VK_POLYGON_MODE_FILL,
+        .lineWidth               = 1.0f,
+        .cullMode                = VK_CULL_MODE_BACK_BIT,
+        .frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE,
+        .depthBiasEnable         = false,
+        .depthBiasConstantFactor = 0.0f,
+        .depthBiasClamp          = 0.0f,
+        .depthBiasSlopeFactor    = 0.0f,
+};
+
+global_variable constexpr VkPipelineDepthStencilStateCreateInfo g_pipeline_default_depth_stencil_state = {
+    .sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+    .depthTestEnable       = true,
+    .depthWriteEnable      = true,
+    .depthCompareOp        = VK_COMPARE_OP_LESS,
+    .depthBoundsTestEnable = false,
+    .stencilTestEnable     = false,
+};
+
+global_variable constexpr VkPipelineColorBlendAttachmentState g_pipeline_default_blend_settings = {
+    .blendEnable         = true,
+    .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+    .dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+    .colorBlendOp        = VK_BLEND_OP_ADD,
+    .srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+    .dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+    .alphaBlendOp        = VK_BLEND_OP_ADD,
+    .colorWriteMask      = VK_COLOR_COMPONENT_R_BIT|VK_COLOR_COMPONENT_G_BIT|VK_COLOR_COMPONENT_B_BIT|VK_COLOR_COMPONENT_A_BIT
 };
 
 // NOTE(Sleepster): Used for rendering
@@ -174,11 +222,7 @@ struct vulkan_context_t
 
     VkDebugUtilsMessengerEXT            debug_messenger;
     VkAllocationCallbacks              *cpu_allocation_callbacks;
-#if 0
-    VmaAllocator                        vulkan_allocator;
-#else
     vulkan_allocator_t                  vulkan_allocator;
-#endif
 
     gpu_info_t                          gpu;
     VkDevice                            device;
@@ -267,7 +311,7 @@ const char *vk_backend_vulkan_result_string(VkResult result, bool8 get_extended)
 bool8       vk_backend_result_is_success(VkResult result);
 void        vk_backend_handle_window_resize(vulkan_context_t *vulkan_context, vec2_t window_size);
 void        vk_backend_render_frame(vulkan_context_t *vulkan_context);
-void        vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, bool8 wireframe);
+VkPipeline  vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, const VkPipelineRasterizationStateCreateInfo *rasterization_state, const VkPipelineDepthStencilStateCreateInfo *depth_stencil_state, const VkPipelineColorBlendAttachmentState *blend_settings, VkPipelineVertexInputStateCreateInfo *pipeline_vertex_input_state);
 void        vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *renderer_state);
 void        vk_backend_renderpass_destroy(vulkan_context_t *vulkan_context, VkRenderPass renderpass);
 void        vk_backend_framebuffer_destroy(vulkan_context_t *vulkan_context, VkFramebuffer framebuffer);

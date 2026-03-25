@@ -5,7 +5,7 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <p_platform_data.h>
-#include <c_globals.h>
+#include <c_global_context.h>
 
 #if !defined(OS_DEFINITION_FILE)
 #define OS_DEFINITION_FILE

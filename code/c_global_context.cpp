@@ -4,7 +4,7 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-#include <c_globals.h>
+#include <c_global_context.h>
 #include <c_math.h>
 
 vec2_t g_window_size = {};

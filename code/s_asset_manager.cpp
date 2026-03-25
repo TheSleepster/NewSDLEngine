@@ -9,7 +9,7 @@
 #include <c_base.h>
 #include <c_types.h>
 #include <c_log.h>
-#include <c_globals.h>
+#include <c_global_context.h>
 #include <c_memory_arena.h>
 #include <c_zone_allocator.h>
 #include <c_file_api.h>
@@ -346,10 +346,6 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
     // Maybe this is bad and that's a better idea.
     archetype.ID              = c_fnv_hash_value(archetype.name.data, archetype.name.count);
     archetype.shader_handle   = s_asset_manager_acquire_asset_handle(asset_manager, archetype.shader_binary_name);
-
-     
-    // TODO(Sleepster): Do we want to make a frontend wrapper around this??? I don't really know what to do here... 
-    //vk_backend_allocate_descriptor_sets(asset_manager->vulkan_context, &archetype);
 
     result.material_type      = SMT_Archetype;
     result.archetype          = archetype;

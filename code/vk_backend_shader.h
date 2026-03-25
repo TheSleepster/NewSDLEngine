@@ -11,7 +11,8 @@
 
 struct uniform_constant_buffer_t;
 
-#define MAX_DESCRIPTOR_SET_BINDINGS (5)
+constexpr u32 MAX_DESCRIPTOR_SET_BINDINGS  = 5;
+constexpr u32 MAX_SHADER_PIPELINE_COUNT    = 1021;
 
 struct vulkan_shader_stage_t
 {
@@ -22,7 +23,6 @@ struct vulkan_shader_stage_t
 struct vulkan_shader_binding_t
 {
     VkDescriptorType           type;
-    uniform_constant_buffer_t *cpu_buffer;
     u64                        buffer_hash_index;
     u32                        descriptor_count;
     string_t                   name;
@@ -31,26 +31,33 @@ struct vulkan_shader_binding_t
 
 struct vulkan_shader_t 
 {
-    u32                     shader_id;
-    string_t                source;
-    memory_arena_t          shader_arena;
+    u32                                  shader_id;
+    string_t                             source;
+    memory_arena_t                       shader_arena;
 
     // NOTE(Sleepster): Layouts for each of the descriptor sets in the shader 
-    VkDescriptorSetLayout  *layouts;
-    u32                     descriptor_set_count;
+    VkDescriptorSetLayout               *layouts;
+    u32                                  descriptor_set_count;
 
-    VkPushConstantRange    *push_constants;
-    u32                     push_constant_count;
+    VkPushConstantRange                 *push_constants;
+    u32                                  push_constant_count;
 
-    vulkan_shader_stage_t  *stages;
-    u32                     stage_count;
+    vulkan_shader_stage_t               *stages;
+    u32                                  stage_count;
     
-    VkPipelineBindPoint     pipeline_type;
-    VkPipelineLayout        pipeline_layout;
-    VkPipeline              pipeline;
+    VkPipelineBindPoint                  pipeline_type;
+    VkPipelineLayout                     pipeline_layout;
+    VkVertexInputBindingDescription      vertex_buffer_binding_desc[4];
+    VkVertexInputAttributeDescription    buffer_attributes[12];
+    VkPipelineVertexInputStateCreateInfo pipeline_vertex_input_state;
+    VkPipeline                           pipeline;
 
-    vulkan_shader_binding_t bindings[MAX_DESCRIPTOR_SET_BINDINGS];
-    u32                     binding_count;
+    HashTable_t(VkPipeline)              pipeline_hash;
+    u32                                  used_pipeline_indices[MAX_SHADER_PIPELINE_COUNT];
+    u32                                  used_pipeline_count;
+
+    vulkan_shader_binding_t              bindings[MAX_DESCRIPTOR_SET_BINDINGS];
+    u32                                  binding_count;
 };
 
 vulkan_shader_t vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_source);

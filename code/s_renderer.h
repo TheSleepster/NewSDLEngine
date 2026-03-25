@@ -366,6 +366,8 @@ struct renderer_state_t
     render_command_list_t                 *command_lists;
     u32                                    command_list_count;
 
+    // TODO(Sleepster): 
+    // For these costant buffers, we MUST support alignment...
     HashTable_t(uniform_constant_buffer_t) constant_buffer_hash;
     u32                                    used_constant_buffers;
 

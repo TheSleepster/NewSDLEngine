@@ -50,7 +50,7 @@ _log(debug_log_level_t log_level,
         "\033[31m",                // LOG_ERROR:   Red
         "\033[1m\033[101m\033[30m" // LOG_FATAL:   Bold, bright red bg, true black text
     };
-    bool8 is_error = (log_level > SL_LOG_INFO);
+    bool8 is_error = (log_level >= SL_LOG_ERROR);
 
     char buffer[32000];
     memset(buffer, 0, sizeof(buffer));
@@ -73,6 +73,9 @@ _log(debug_log_level_t log_level,
                 line, 
                 function, 
                 buffer);
+
+        fprintf(stderr, "%s", out_buffer);
+        AssertBreak;
     }
     else
     {
@@ -81,10 +84,9 @@ _log(debug_log_level_t log_level,
                 color_schemes[log_level], 
                 info_strings[log_level], 
                 buffer);
-    }
 
-    if(is_error) fprintf(stderr, "%s", out_buffer);
-    else         fprintf(stdout, "%s", out_buffer);
+        fprintf(stdout, "%s", out_buffer);
+    }
 }
 
 #endif // C_LOG_H

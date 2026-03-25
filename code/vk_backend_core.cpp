@@ -328,7 +328,7 @@ vk_backend_check_physical_device_support(gpu_info_t *info)
 {
     bool8 result = true;
 
-    s32 required_exts  = g_device_extension_count;
+    s32 required_exts  = ArrayCount(g_device_extensions);
     s32 exts_available = 0;
     for(s32 required_index = 0;
         required_index < required_exts;
@@ -765,7 +765,7 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
     device_create_info.queueCreateInfoCount    =  index_count;
     device_create_info.pQueueCreateInfos       =  queue_create_infos;
     device_create_info.pEnabledFeatures        = &device_features;
-    device_create_info.enabledExtensionCount   =  g_device_extension_count;
+    device_create_info.enabledExtensionCount   =  ArrayCount(g_device_extensions);
     device_create_info.ppEnabledExtensionNames =  g_device_extensions;
     vkAssert(vkCreateDevice(vulkan_context->gpu.device,
                             &device_create_info,
@@ -1699,24 +1699,15 @@ vk_backend_create_render_pipeline
 //     the table.
 //
 // 2.) An array of occupied indices in the hash table for easy iteration over loaded pipelines.
-//
-// This also only creates a GRAPHICS pipeline. Bad.
-void
-vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, bool8 wireframe)
+VkPipeline
+vk_backend_create_render_pipeline(vulkan_context_t                             *vulkan_context, 
+                                  vulkan_shader_t                              *shader, 
+                                  const VkPipelineRasterizationStateCreateInfo *rasterization_state,
+                                  const VkPipelineDepthStencilStateCreateInfo  *depth_stencil_state,
+                                  const VkPipelineColorBlendAttachmentState    *blend_settings,
+                                  VkPipelineVertexInputStateCreateInfo         *pipeline_vertex_input_state)
 {
-    VkPipelineRasterizationStateCreateInfo rasterization_state = {
-        .sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-        .depthClampEnable        = false,
-        .rasterizerDiscardEnable = false,
-        .polygonMode             = wireframe ? VK_POLYGON_MODE_LINE : VK_POLYGON_MODE_FILL,
-        .lineWidth               = 1.0f,
-        .cullMode                = VK_CULL_MODE_BACK_BIT,
-        .frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE,
-        .depthBiasEnable         = false,
-        .depthBiasConstantFactor = 0.0f,
-        .depthBiasClamp          = 0.0f,
-        .depthBiasSlopeFactor    = 0.0f,
-    };
+    VkPipeline result = {};
 
     VkPipelineMultisampleStateCreateInfo multisampling_state = {
         .sType                 = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
@@ -1728,81 +1719,18 @@ vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shade
         .alphaToOneEnable      = false,
     };
 
-    VkPipelineDepthStencilStateCreateInfo depth_stencil = {
-        .sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-        .depthTestEnable       = true,
-        .depthWriteEnable      = true,
-        .depthCompareOp        = VK_COMPARE_OP_LESS,
-        .depthBoundsTestEnable = false,
-        .stencilTestEnable     = false,
-    };
-
-    VkPipelineColorBlendAttachmentState blend_settings = {
-        .blendEnable         = true,
-        .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-        .dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-        .colorBlendOp        = VK_BLEND_OP_ADD,
-        .srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-        .dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-        .alphaBlendOp        = VK_BLEND_OP_ADD,
-        .colorWriteMask      = VK_COLOR_COMPONENT_R_BIT|VK_COLOR_COMPONENT_G_BIT|VK_COLOR_COMPONENT_B_BIT|VK_COLOR_COMPONENT_A_BIT
-    };
-
     VkPipelineColorBlendStateCreateInfo color_blend_state = {
         .sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
         .logicOpEnable   = true,
         .logicOp         = VK_LOGIC_OP_COPY,
         .attachmentCount = 1,
-        .pAttachments    = &blend_settings
-    };
-
-    VkDynamicState dynamic_state[] = {
-        VK_DYNAMIC_STATE_VIEWPORT,
-        VK_DYNAMIC_STATE_SCISSOR,
-        VK_DYNAMIC_STATE_LINE_WIDTH,
+        .pAttachments    = blend_settings
     };
 
     VkPipelineDynamicStateCreateInfo dynamic_state_data = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-        .pDynamicStates    = dynamic_state,
-        .dynamicStateCount = ArrayCount(dynamic_state)
-    };
-
-    // NOTE(Sleepster): Vertex Attribute stuff
-    VkVertexInputAttributeDescription attributes[] = {
-        [0] = {
-            .binding  = 0,
-            .format   = VK_FORMAT_R32G32B32A32_SFLOAT,
-            .location = 0,
-            .offset   = offsetof(render_vertex_t, vPosition)
-        },
-        [1] = {
-            .binding  = 0,
-            .format   = VK_FORMAT_R32G32_SFLOAT, 
-            .location = 1,
-            .offset   = offsetof(render_vertex_t, vCorner)
-        },
-        [2] = {
-            .binding = 0,
-            .format   = VK_FORMAT_R32G32_SFLOAT, 
-            .location = 2,
-            .offset   = offsetof(render_vertex_t, vPadding)
-        },
-    };
-
-    VkVertexInputBindingDescription vertex_input_desc = {
-        .binding   = 0,
-        .stride    = sizeof(render_vertex_t),
-        .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
-    };
-
-    // NOTE(Sleepster): Vertex Attribute stuff
-    VkPipelineVertexInputStateCreateInfo vertex_input_state = {
-        .sType                           =  VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-        .vertexBindingDescriptionCount   =  1,
-        .pVertexBindingDescriptions      = &vertex_input_desc,
-        .vertexAttributeDescriptionCount =  ArrayCount(attributes),
-        .pVertexAttributeDescriptions    =  attributes,
+        .pDynamicStates    = g_pipeline_dynamic_states,
+        .dynamicStateCount = ArrayCount(g_pipeline_dynamic_states)
     };
 
     VkPipelineInputAssemblyStateCreateInfo assembly_state = {
@@ -1811,26 +1739,13 @@ vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shade
         .primitiveRestartEnable = false,
     };
 
-    VkPipelineLayoutCreateInfo pipeline_layout_info = {
-        .sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-        .setLayoutCount         = shader->descriptor_set_count,
-        .pSetLayouts            = shader->layouts,
-        .pushConstantRangeCount = shader->push_constant_count,
-        .pPushConstantRanges    = shader->push_constants,
-    };
-
-    vkAssert(vkCreatePipelineLayout(vulkan_context->device,
-                                   &pipeline_layout_info,
-                                    vulkan_context->cpu_allocation_callbacks,
-                                   &shader->pipeline_layout));
-
     VkPipelineShaderStageCreateInfo stage_create_infos[MAX_VULKAN_SHADER_STAGES]; 
     for(u32 stage_index = 0;
         stage_index < shader->stage_count;
         ++stage_index)
     {
-        vulkan_shader_stage_t *stage = shader->stages + stage_index;
-        stage_create_infos[stage_index]   = stage->pipeline_stage_create_info;
+        vulkan_shader_stage_t *stage    = shader->stages + stage_index;
+        stage_create_infos[stage_index] = stage->pipeline_stage_create_info;
     }
 
     VkViewport viewport = {
@@ -1861,12 +1776,12 @@ vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shade
         .sType               =  VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
         .pStages             =  stage_create_infos,
         .stageCount          =  shader->stage_count,
-        .pVertexInputState   = &vertex_input_state,
+        .pVertexInputState   =  pipeline_vertex_input_state,
         .pInputAssemblyState = &assembly_state,
         .pViewportState      = &viewport_info,
-        .pRasterizationState = &rasterization_state,
+        .pRasterizationState =  rasterization_state,
         .pMultisampleState   = &multisampling_state,
-        .pDepthStencilState  = &depth_stencil,
+        .pDepthStencilState  =  depth_stencil_state,
         .pColorBlendState    = &color_blend_state,
         .pDynamicState       = &dynamic_state_data,
         .layout              =  shader->pipeline_layout,
@@ -1881,7 +1796,7 @@ vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shade
                                                  1,
                                                 &pipeline_create_info,
                                                  vulkan_context->cpu_allocation_callbacks,
-                                                &shader->pipeline);
+                                                &result);
     if(!vk_backend_result_is_success(success))
     {
         log_fatal("Failure to create the Vulkan Graphics Pipeline... Error: '%s'...\n", 
@@ -1891,6 +1806,8 @@ vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shade
     {
         log_info("Vulkan Graphics Pipeline created...\n");
     }
+
+    return(result);
 }
 
 /*
@@ -2113,10 +2030,6 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
     // NOTE(Sleepster): Generate the programs framebuffers 
     vk_backend_create_framebuffers(vulkan_context);
 
-#if 0
-    // NOTE(Sleepster): Generate the main vertex, index, and instanced_rendering buffers
-    vk_backend_create_render_buffers(vulkan_context);
-#endif
     vk_backend_create_backend_buffers(vulkan_context);
 
     // NOTE(Sleepster): Generate the descriptor pools 
@@ -2133,10 +2046,14 @@ vk_backend_append_uniform_constant_buffer_data
 */
 
 void*
-vk_backend_append_uniform_constant_buffer_data(vulkan_context_t *vulkan_context, void *user_data, u32 data_size, u32 *offset_out)
+vk_backend_append_uniform_constant_buffer_data(vulkan_context_t *vulkan_context, void *user_data, u32 data_size_init, u32 *offset_out)
 {
     void *result = null;
     *offset_out = vulkan_context->constant_buffer_data.used;
+
+    // NOTE(Sleepster): We just use the minStorageBufferOffsetAlignment since it's probably bigger than uniform buffer alignment requirements...
+    // if it isn't? Crap.
+    u32 data_size = Align(data_size_init, vulkan_context->gpu.properties.limits.minStorageBufferOffsetAlignment);
     result = vk_backend_buffer_append_data(vulkan_context, &vulkan_context->constant_buffer_data, user_data, data_size);
 
     return(result);

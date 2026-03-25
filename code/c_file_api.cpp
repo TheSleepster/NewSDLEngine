@@ -7,7 +7,7 @@
 #include <c_file_api.h>
 #include <c_string.h>
 
-#include <c_globals.h>
+#include <c_global_context.h>
 #include <p_platform_data.h>
 
 // NOTE(Sleepster): Errors from these calls are handled internally 

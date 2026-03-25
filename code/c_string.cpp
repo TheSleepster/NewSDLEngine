@@ -10,7 +10,7 @@
 
 #include <c_string.h>
 #include <c_math.h>
-#include <c_globals.h>
+#include <c_global_context.h>
 
 #include <c_file_api.h>
 #include <c_file_watcher.h>
@@ -138,7 +138,7 @@ c_string_sub_from_left(string_t string, u32 index)
 {
     string_t result;
     result.data  = string.data;
-    result.count = string.count - (index - 1);
+    result.count = index;
 
     return(result);
 }

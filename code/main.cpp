@@ -16,7 +16,7 @@
 #include <c_dynarray.h>
 #include <c_threadpool.h>
 #include <c_log.h>
-#include <c_globals.h>
+#include <c_global_context.h>
 #include <c_zone_allocator.h>
 #include <c_program_flag_handler.h>
 #include <c_tokenizer.h>
@@ -104,10 +104,9 @@ main(int argc, char **argv)
         asset_manager->vulkan_context = &context;
 
         asset_handle_t default_texture  = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
-        asset_handle_t default_shader   = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_shader"));
-        asset_handle_t basic_traiangle  = s_asset_manager_acquire_asset_handle(asset_manager, STR("basic_triangle"));
+        //asset_handle_t default_shader   = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_shader"));
+        asset_handle_t basic_triangle   = s_asset_manager_acquire_asset_handle(asset_manager, STR("basic_triangle"));
         asset_handle_t default_material = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_material_archetype"));
-        (void)default_shader;
         (void)default_material;
 
         texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32_SRGB, 32);
@@ -274,7 +273,7 @@ main(int argc, char **argv)
             r_cmd_renderpass_begin(command_list, game_renderpass_ID);
             r_cmd_bind_vertex_buffer(command_list, &vertex_buffer);
             r_cmd_bind_index_buffer(command_list, &index_buffer);
-            r_cmd_use_shader_program(command_list, basic_traiangle);
+            r_cmd_use_shader_program(command_list, basic_triangle);
 
             struct camera_matrices {
                 mat4_t view_matrix;

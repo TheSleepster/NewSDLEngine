@@ -5,7 +5,7 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <c_tokenizer.h>
-#include <c_globals.h>
+#include <c_global_context.h>
 
 bool8
 c_tokenizer_token_alphabetical(char A)

@@ -257,6 +257,9 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_VkPushConstantRange, type_id(VkPushConstantRange), "VkPushConstantRange") \
 	X(TYPE_VkPipelineBindPoint, type_id(VkPipelineBindPoint), "VkPipelineBindPoint") \
 	X(TYPE_VkPipelineLayout, type_id(VkPipelineLayout), "VkPipelineLayout") \
+	X(TYPE_VkVertexInputBindingDescription, type_id(VkVertexInputBindingDescription), "VkVertexInputBindingDescription") \
+	X(TYPE_VkVertexInputAttributeDescription, type_id(VkVertexInputAttributeDescription), "VkVertexInputAttributeDescription") \
+	X(TYPE_VkPipelineVertexInputStateCreateInfo, type_id(VkPipelineVertexInputStateCreateInfo), "VkPipelineVertexInputStateCreateInfo") \
 	X(TYPE_VkPipeline, type_id(VkPipeline), "VkPipeline") \
 
 
@@ -467,7 +470,6 @@ const static vulkan_image_info_t GENERATED_DEFAULT_vulkan_image_info_t = {};
 const static vulkan_image_t GENERATED_DEFAULT_vulkan_image_t = {};
 const static vulkan_shader_stage_t GENERATED_DEFAULT_vulkan_shader_stage_t = {};
 const static vulkan_shader_binding_t GENERATED_DEFAULT_vulkan_shader_binding_t = {};
-const static vulkan_shader_t GENERATED_DEFAULT_vulkan_shader_t = {};
 
 struct type_info_struct_memory_arena_footer_t {
 	const char *name;
@@ -2588,42 +2590,12 @@ struct type_info_struct_vulkan_shader_binding_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[5];
+		type_info_member_t member_array[4];
 		struct {
 			type_info_member_t type;
-			type_info_member_t cpu_buffer;
 			type_info_member_t buffer_hash_index;
 			type_info_member_t descriptor_count;
 			type_info_member_t name;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_shader_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[14];
-		struct {
-			type_info_member_t shader_id;
-			type_info_member_t source;
-			type_info_member_t shader_arena;
-			type_info_member_t layouts;
-			type_info_member_t descriptor_set_count;
-			type_info_member_t push_constants;
-			type_info_member_t push_constant_count;
-			type_info_member_t stages;
-			type_info_member_t stage_count;
-			type_info_member_t pipeline_type;
-			type_info_member_t pipeline_layout;
-			type_info_member_t pipeline;
-			type_info_member_t bindings;
-			type_info_member_t binding_count;
 		}members;
 	};
 };
@@ -5067,39 +5039,12 @@ const static type_info_struct_vulkan_shader_binding_t type_info_struct_vulkan_sh
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_binding_t),
-	.member_count = 5,
+	.member_count = 4,
 	.members = {
 		.type = {.name = "type", .type = TYPE_VkDescriptorType, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), type))},
-		.cpu_buffer = {.name = "cpu_buffer", .type = TYPE_uniform_constant_buffer_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.cpu_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), cpu_buffer))},
 		.buffer_hash_index = {.name = "buffer_hash_index", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.buffer_hash_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), buffer_hash_index))},
 		.descriptor_count = {.name = "descriptor_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.descriptor_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), descriptor_count))},
 		.name = {.name = "name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t.name)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_binding_t), name))},
-	}
-};
-
-const static type_info_struct_vulkan_shader_t type_info_struct_vulkan_shader_t_const_data = {
-	.name = "vulkan_shader_t",
-	.type = TYPE_vulkan_shader_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_vulkan_shader_t),
-	.member_count = 14,
-	.members = {
-		.shader_id = {.name = "shader_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.shader_id)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), shader_id))},
-		.source = {.name = "source", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.source)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), source))},
-		.shader_arena = {.name = "shader_arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.shader_arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), shader_arena))},
-		.layouts = {.name = "layouts", .type = TYPE_VkDescriptorSetLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.layouts)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), layouts))},
-		.descriptor_set_count = {.name = "descriptor_set_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.descriptor_set_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), descriptor_set_count))},
-		.push_constants = {.name = "push_constants", .type = TYPE_VkPushConstantRange, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.push_constants)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), push_constants))},
-		.push_constant_count = {.name = "push_constant_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.push_constant_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), push_constant_count))},
-		.stages = {.name = "stages", .type = TYPE_vulkan_shader_stage_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.stages)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), stages))},
-		.stage_count = {.name = "stage_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.stage_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), stage_count))},
-		.pipeline_type = {.name = "pipeline_type", .type = TYPE_VkPipelineBindPoint, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.pipeline_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), pipeline_type))},
-		.pipeline_layout = {.name = "pipeline_layout", .type = TYPE_VkPipelineLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.pipeline_layout)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), pipeline_layout))},
-		.pipeline = {.name = "pipeline", .type = TYPE_VkPipeline, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.pipeline)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), pipeline))},
-		.bindings = {.name = "bindings", .type = TYPE_vulkan_shader_binding_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.bindings)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), bindings))},
-		.binding_count = {.name = "binding_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_shader_t.binding_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_shader_t), binding_count))},
 	}
 };
 
@@ -6388,27 +6333,9 @@ enum vulkan_shader_stage_t_member_list_enum {
 
 enum vulkan_shader_binding_t_member_list_enum {
 	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_type,
-	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_cpu_buffer,
 	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_buffer_hash_index,
 	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_descriptor_count,
 	TYPE_VULKAN_SHADER_BINDING_T_MEMBER_name,
-};
-
-enum vulkan_shader_t_member_list_enum {
-	TYPE_VULKAN_SHADER_T_MEMBER_shader_id,
-	TYPE_VULKAN_SHADER_T_MEMBER_source,
-	TYPE_VULKAN_SHADER_T_MEMBER_shader_arena,
-	TYPE_VULKAN_SHADER_T_MEMBER_layouts,
-	TYPE_VULKAN_SHADER_T_MEMBER_descriptor_set_count,
-	TYPE_VULKAN_SHADER_T_MEMBER_push_constants,
-	TYPE_VULKAN_SHADER_T_MEMBER_push_constant_count,
-	TYPE_VULKAN_SHADER_T_MEMBER_stages,
-	TYPE_VULKAN_SHADER_T_MEMBER_stage_count,
-	TYPE_VULKAN_SHADER_T_MEMBER_pipeline_type,
-	TYPE_VULKAN_SHADER_T_MEMBER_pipeline_layout,
-	TYPE_VULKAN_SHADER_T_MEMBER_pipeline,
-	TYPE_VULKAN_SHADER_T_MEMBER_bindings,
-	TYPE_VULKAN_SHADER_T_MEMBER_binding_count,
 };
 
 enum file_extension_t_member_list_enum {
@@ -7002,7 +6929,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "asset_handle_t", .type = TYPE_asset_handle_t, .size = sizeof(asset_handle_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_handle_t_const_data},
 	{.name = "bitmap_t", .type = TYPE_bitmap_t, .size = sizeof(bitmap_t), .struct_info = (type_info_struct_t*)&type_info_struct_bitmap_t_const_data},
 	{.name = "texture_atlas_t", .type = TYPE_texture_atlas_t, .size = sizeof(texture_atlas_t), .struct_info = NULL},
-	{.name = "vulkan_shader_t", .type = TYPE_vulkan_shader_t, .size = sizeof(vulkan_shader_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_shader_t_const_data},
+	{.name = "vulkan_shader_t", .type = TYPE_vulkan_shader_t, .size = sizeof(vulkan_shader_t), .struct_info = NULL},
 	{.name = "render_pipeline_state_t", .type = TYPE_render_pipeline_state_t, .size = sizeof(render_pipeline_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_pipeline_state_t_const_data},
 	{.name = "material_archetype_t", .type = TYPE_material_archetype_t, .size = sizeof(material_archetype_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_archetype_t_const_data},
 	{.name = "material_instance_t", .type = TYPE_material_instance_t, .size = sizeof(material_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_instance_t_const_data},
@@ -7121,6 +7048,9 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "VkPushConstantRange", .type = TYPE_VkPushConstantRange, .size = sizeof(VkPushConstantRange*), .struct_info = NULL},
 	{.name = "VkPipelineBindPoint", .type = TYPE_VkPipelineBindPoint, .size = sizeof(VkPipelineBindPoint), .struct_info = NULL},
 	{.name = "VkPipelineLayout", .type = TYPE_VkPipelineLayout, .size = sizeof(VkPipelineLayout), .struct_info = NULL},
+	{.name = "VkVertexInputBindingDescription", .type = TYPE_VkVertexInputBindingDescription, .size = sizeof(VkVertexInputBindingDescription), .struct_info = NULL},
+	{.name = "VkVertexInputAttributeDescription", .type = TYPE_VkVertexInputAttributeDescription, .size = sizeof(VkVertexInputAttributeDescription), .struct_info = NULL},
+	{.name = "VkPipelineVertexInputStateCreateInfo", .type = TYPE_VkPipelineVertexInputStateCreateInfo, .size = sizeof(VkPipelineVertexInputStateCreateInfo), .struct_info = NULL},
 	{.name = "VkPipeline", .type = TYPE_VkPipeline, .size = sizeof(VkPipeline), .struct_info = NULL},
 };
 

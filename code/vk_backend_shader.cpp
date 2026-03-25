@@ -4,10 +4,19 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-#include <vk_backend_shader.h>
 #include <spirv_reflect.h>
 
+#include <vk_backend_shader.h>
 #include <s_renderer.h>
+
+internal_api
+C_HASH_TABLE_ALLOCATE_IMPL(shader_arena_allocate)
+{
+    void *result = null;
+    result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
+
+    return(result);
+}
 
 VkDescriptorType 
 vk_backend_spv_reflect_to_vulkan_descriptor(SpvReflectDescriptorType spv_type)
@@ -56,6 +65,133 @@ vk_backend_spv_shader_stage_to_vulkan_stage(SpvReflectShaderStageFlagBits spv_st
     return(result);
 }
 
+internal_api u32 
+vk_backend_get_vk_format_size(VkFormat format)
+{
+    switch(format)
+    {
+        // 8-bit
+        case VK_FORMAT_R8_UNORM:
+        case VK_FORMAT_R8_SNORM:
+        case VK_FORMAT_R8_UINT:
+        case VK_FORMAT_R8_SINT:
+        {
+            return(1);
+        }break;
+
+        case VK_FORMAT_R8G8_UNORM:
+        case VK_FORMAT_R8G8_SNORM:
+        case VK_FORMAT_R8G8_UINT:
+        case VK_FORMAT_R8G8_SINT:
+        {
+            return(2);
+        }break;
+
+        case VK_FORMAT_R8G8B8A8_UNORM:
+        case VK_FORMAT_R8G8B8A8_SNORM:
+        case VK_FORMAT_R8G8B8A8_UINT:
+        case VK_FORMAT_R8G8B8A8_SINT:
+        case VK_FORMAT_R8G8B8A8_SRGB:
+        case VK_FORMAT_B8G8R8A8_UNORM:
+        case VK_FORMAT_B8G8R8A8_SRGB:
+        {
+            return(4);
+        }break;
+
+        // 16-bit
+        case VK_FORMAT_R16_UNORM:
+        case VK_FORMAT_R16_SNORM:
+        case VK_FORMAT_R16_UINT:
+        case VK_FORMAT_R16_SINT:
+        case VK_FORMAT_R16_SFLOAT:
+        {
+            return(2);
+        }break;
+
+        case VK_FORMAT_R16G16_UNORM:
+        case VK_FORMAT_R16G16_SNORM:
+        case VK_FORMAT_R16G16_UINT:
+        case VK_FORMAT_R16G16_SINT:
+        case VK_FORMAT_R16G16_SFLOAT:
+        {
+            return(4);
+        }break;
+
+        case VK_FORMAT_R16G16B16A16_UNORM:
+        case VK_FORMAT_R16G16B16A16_SNORM:
+        case VK_FORMAT_R16G16B16A16_UINT:
+        case VK_FORMAT_R16G16B16A16_SINT:
+        case VK_FORMAT_R16G16B16A16_SFLOAT:
+        {
+            return(8);
+        }break;
+
+        // 32-bit
+        case VK_FORMAT_R32_UINT:
+        case VK_FORMAT_R32_SINT:
+        case VK_FORMAT_R32_SFLOAT:
+        {
+            return(4);
+        }break;
+
+        case VK_FORMAT_R32G32_UINT:
+        case VK_FORMAT_R32G32_SINT:
+        case VK_FORMAT_R32G32_SFLOAT:
+        {
+            return(8);
+        }break;
+
+        case VK_FORMAT_R32G32B32_UINT:
+        case VK_FORMAT_R32G32B32_SINT:
+        case VK_FORMAT_R32G32B32_SFLOAT:
+        {
+            return(12);
+        }break;
+
+        case VK_FORMAT_R32G32B32A32_UINT:
+        case VK_FORMAT_R32G32B32A32_SINT:
+        case VK_FORMAT_R32G32B32A32_SFLOAT:
+        {
+            return(16);
+        }break;
+
+        // 64-bit
+        case VK_FORMAT_R64_UINT:
+        case VK_FORMAT_R64_SINT:
+        case VK_FORMAT_R64_SFLOAT:
+        {
+            return(8);
+        }break;
+
+        case VK_FORMAT_R64G64_UINT:
+        case VK_FORMAT_R64G64_SINT:
+        case VK_FORMAT_R64G64_SFLOAT:
+        {
+            return(16);
+        }break;
+
+        case VK_FORMAT_R64G64B64_UINT:
+        case VK_FORMAT_R64G64B64_SINT:
+        case VK_FORMAT_R64G64B64_SFLOAT:
+        {
+            return(24);
+        }break;
+
+        case VK_FORMAT_R64G64B64A64_UINT:
+        case VK_FORMAT_R64G64B64A64_SINT:
+        case VK_FORMAT_R64G64B64A64_SFLOAT:
+        {
+            return(32);
+        }break;
+
+        default:
+        {
+            Expect(false, "Unhandled VkFormat in vk_backend_get_vk_format_size");
+            return(0);
+        }break;
+    }
+}
+
 vulkan_shader_t
 vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_source)
 {
@@ -91,17 +227,93 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
 
     bool8 is_compute_shader = false;
 
-    // NOTE(Sleepster): Iterate the entry points 
+    // NOTE(Sleepster): Iterate the entry points
+    //
+    // The goal here is to set the stage flags for each of the shader modules, extract the push constants on per-stage basis,
+    // and create the shader module for this specific shader stage.
     VkShaderStageFlags set_stage_flags[MAX_DESCRIPTOR_SET_BINDINGS] = {};
     for(u32 entry_index = 0;
         entry_index < module.entry_point_count;
         ++entry_index)
     {
-        SpvReflectEntryPoint  *entry_point         = module.entry_points + entry_index;
+        SpvReflectEntryPoint  *entry_point        = module.entry_points + entry_index;
         VkShaderStageFlags     current_stage_type = vk_backend_spv_shader_stage_to_vulkan_stage(entry_point->shader_stage);
         vulkan_shader_stage_t *stage_info         = result.stages + entry_index;
 
+        // NOTE(Sleepster): 
+        // If it's a compute shader, mark it as such. 
+        // If it's a vertex shader, extract the vertex buffer information
         if(current_stage_type == VK_SHADER_STAGE_COMPUTE_BIT) is_compute_shader = true;
+        if(current_stage_type == VK_SHADER_STAGE_VERTEX_BIT)
+        {
+            VkVertexInputBindingDescription *current_vertex_buffer     = null;
+            VkVertexInputRate                current_buffer_input_rate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+            u32 buffer_attribute_count       = 0;
+            u32 current_vertex_buffer_stride = 0;
+
+            s32 vertex_buffer_count = -1;
+            string_t current_structure_name = {};
+            for(u32 index = 0;
+                index < entry_point->input_variable_count;
+                ++index)
+            {
+                SpvReflectInterfaceVariable *interface = entry_point->input_variables[index];
+                if((interface->decoration_flags & SPV_REFLECT_DECORATION_BUILT_IN) == 0)
+                {
+                    string_t fullname = STR(interface->name);
+                    u32      member_access_token = c_string_find_first_char_from_left(fullname,  '.');
+
+                    string_t structure_name = c_string_sub_from_left(fullname,  member_access_token);
+                    string_t member_name    = c_string_sub_from_right(fullname, member_access_token);
+                    if(!c_string_compare(structure_name, current_structure_name))
+                    {
+                        if(current_vertex_buffer)
+                        {
+                            current_vertex_buffer->stride    = current_vertex_buffer_stride;
+                            current_vertex_buffer->binding   = vertex_buffer_count;
+                            current_vertex_buffer->inputRate = current_buffer_input_rate;
+
+                            current_vertex_buffer_stride = 0;
+                        }
+
+                        current_buffer_input_rate = member_name.data[0] == 'i' ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX;
+                        current_structure_name    = structure_name;
+                        vertex_buffer_count++;
+                    }
+                    current_vertex_buffer = result.vertex_buffer_binding_desc + vertex_buffer_count;
+
+                    VkFormat attrib_format = (VkFormat)interface->format;
+                    VkVertexInputAttributeDescription *attribute = result.buffer_attributes + buffer_attribute_count;
+                    attribute->binding  = vertex_buffer_count;
+                    attribute->location = buffer_attribute_count;
+                    attribute->offset   = current_vertex_buffer_stride;
+                    attribute->format   = attrib_format;
+
+                    current_vertex_buffer_stride += vk_backend_get_vk_format_size(attrib_format);
+                    ++buffer_attribute_count;
+                }
+            }
+
+            // NOTE(Sleepster): 
+            // We have to fill in the data right here before we're finished and set the pipeline_vertex_input_state, 
+            // otherwise we just miss the final buffer. 
+            if(current_vertex_buffer)
+            {
+                current_vertex_buffer->stride    = current_vertex_buffer_stride;
+                current_vertex_buffer->binding   = vertex_buffer_count;
+                current_vertex_buffer->inputRate = current_buffer_input_rate;
+            }
+
+            // NOTE(Sleepster): This is stored so that we can create pipelines as needed later on... 
+            result.pipeline_vertex_input_state = {
+                .sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+                .vertexBindingDescriptionCount   = (u32)(vertex_buffer_count + 1),
+                .pVertexBindingDescriptions      = result.vertex_buffer_binding_desc,
+                .vertexAttributeDescriptionCount = buffer_attribute_count,
+                .pVertexAttributeDescriptions    = result.buffer_attributes,
+            };
+        }
 
         // NOTE(Sleepster): Set the push constant's stage flags and range data 
         for(u32 push_constant_index = 0;
@@ -126,7 +338,6 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
 
         result.pipeline_type = is_compute_shader ? VK_PIPELINE_BIND_POINT_COMPUTE : 
                                                    VK_PIPELINE_BIND_POINT_GRAPHICS;
-
         VkShaderModuleCreateInfo create_info = {};
         create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         create_info.pCode    = (u32*)shader_source.data;
@@ -142,6 +353,26 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
             .module = stage_info->handle,
             .pName  = entry_point->name
         };
+    }
+
+    // NOTE(Sleepster): 
+    // Graphics pipelines need a complete hash of pipeline data,
+    // while compute shaders are fine with just one.
+    if(result.pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
+    {
+        c_hash_table_init(&result.pipeline_hash, 
+                          MAX_SHADER_PIPELINE_COUNT, 
+                          &result.shader_arena,
+                          shader_arena_allocate,
+                          null);
+    }
+    else
+    {
+        c_hash_table_init(&result.pipeline_hash, 
+                          1, 
+                          &result.shader_arena,
+                          shader_arena_allocate,
+                          null);
     }
 
     // NOTE(Sleepster): This should be fine for getting the descriptor set data for now.
@@ -177,12 +408,10 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
             vulkan_shader_binding_t *shader_binding = result.bindings + binding_index;
             Assert(shader_binding);
             
-            // TODO(Sleepster): For now we just assume that the size of the hahs table won't arbitrarily change
-            // Bad.
+            // NOTE(Sleepster): For now we know that the size of the hash table for our constant buffers won't arbitrarily change
             shader_binding->type               = set_binding->descriptorType;
             shader_binding->name               = STR(binding->name);
             shader_binding->descriptor_count   = binding->count;
-            shader_binding->cpu_buffer         = null;
             shader_binding->buffer_hash_index  = c_fnv_hash_value(shader_binding->name.data, shader_binding->name.count);
             shader_binding->buffer_hash_index %= MAX_CONSTANT_BUFFERS;
 
@@ -200,9 +429,35 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
                                              layout));
     }
 
+    // NOTE(Sleepster): 
+    // Create the pipeline layout here, it's easy to just do it in place and doesn't really
+    // cause problems.
+    VkPipelineLayoutCreateInfo pipeline_layout_info = {
+        .sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .setLayoutCount         = result.descriptor_set_count,
+        .pSetLayouts            = result.layouts,
+        .pushConstantRangeCount = result.push_constant_count,
+        .pPushConstantRanges    = result.push_constants,
+    };
+    vkAssert(vkCreatePipelineLayout(vulkan_context->device,
+                                   &pipeline_layout_info,
+                                    vulkan_context->cpu_allocation_callbacks,
+                                   &result.pipeline_layout));
+
     if(result.pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
     {
-        vk_backend_create_render_pipeline(vulkan_context, &result, false);
+        // vertex input binding description
+        // rasterization state
+        // multisampliing_state
+        // depth_stencil_state
+        // blend settings
+        // color blend state
+        result.pipeline = vk_backend_create_render_pipeline(vulkan_context, 
+                                                            &result, 
+                                                            &g_pipeline_default_rasterization_state, 
+                                                            &g_pipeline_default_depth_stencil_state,
+                                                            &g_pipeline_default_blend_settings,
+                                                            &result.pipeline_vertex_input_state);
     }
     else if(result.pipeline_type == VK_PIPELINE_BIND_POINT_COMPUTE)
     {
@@ -211,7 +466,7 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
         pipeline_info.layout = result.pipeline_layout;
         pipeline_info.stage  = result.stages->pipeline_stage_create_info;
 
-        vkAssert(vkCreateComputePipelines(vulkan_context->device, null, 1, &pipeline_info, null, &result.pipeline));
+        vkAssert(vkCreateComputePipelines(vulkan_context->device, null, 1, &pipeline_info, null, &result.pipeline_hash.data[0]));
     }
 
     return(result);
