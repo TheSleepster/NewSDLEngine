@@ -105,6 +105,8 @@ enum render_command_type_t
     RCT_SetViewport,
     RCT_SetScissor,
     RCT_BindTexture,
+    RCT_SetRenderState,
+    RCT_ResetRenderState,
     RCT_Draw,
     RCT_DrawIndexed,
     RCT_BlitImage,
@@ -198,6 +200,11 @@ struct render_command_bind_texture_t
     image_t *texture;
 };
 
+struct render_command_set_pipeline_state_t
+{
+    render_pipeline_state_t pipeline_state;
+};
+
 struct render_command_draw_t 
 {
     u32 vertices_to_draw;
@@ -235,33 +242,35 @@ struct render_command_t
 // just stored normally like a normal object. My compiler is an autistic chimp
 struct render_command_list_t
 {
-    bool8             is_initialized;
-    renderer_state_t *renderer_state;
+    bool8                   is_initialized;
+    renderer_state_t       *renderer_state;
     // NOTE(Sleepster): Everything within this is reset once all commands are executed 
-    memory_arena_t    transient_arena;
-    memory_arena_t    command_arena;
+    memory_arena_t          transient_arena;
+    memory_arena_t          command_arena;
 
-    render_command_t *commands;
-    u32               command_count;
+    render_command_t       *commands;
+    u32                     command_count;
 
-    u32               draw_instance_command_count;
-    u32               bind_shader_command_count;
-    u32               bind_render_target_command_count;
-    u32               bind_material_command_count;
+    u32                     draw_instance_command_count;
+    u32                     bind_shader_command_count;
+    u32                     bind_render_target_command_count;
+    u32                     bind_material_command_count;
 
-    render_buffer_t  *active_vertex_buffer;
-    render_buffer_t  *active_index_buffer;
+    render_pipeline_state_t active_render_state;
 
-    render_command_t *active_scissor_command;
-    render_command_t *active_viewport_command;
+    render_buffer_t        *active_vertex_buffer;
+    render_buffer_t        *active_index_buffer;
 
-    asset_handle_t   *active_shader_program;
+    render_command_t       *active_scissor_command;
+    render_command_t       *active_viewport_command;
 
-    renderpass_t     *active_renderpass;
-    bool32            presenting;
+    asset_handle_t         *active_shader_program;
 
-    image_t          *image_shader_params[MAX_SHADER_IMAGE_PARAMS];
-    u32               image_count;
+    renderpass_t           *active_renderpass;
+    bool32                  presenting;
+
+    image_t                *image_shader_params[MAX_SHADER_IMAGE_PARAMS];
+    u32                     image_count;
 };
 
 ////////////////////
@@ -415,6 +424,8 @@ void r_cmd_update_push_constants(render_command_list_t *command_list, u32 offset
 void r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t program);
 void r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_constant_buffer_t *buffer, void *data, u32 data_size);
 void r_cmd_bind_texture(render_command_list_t *command_list, asset_handle_t *asset_handle);
+void r_cmd_reset_render_state(render_command_list_t *command_list, render_pipeline_state_t *render_pipeline_state);
+void r_cmd_set_render_state(render_command_list_t *command_list, render_pipeline_state_t *render_pipeline_state);
 void r_cmd_draw(render_command_list_t *command_list, u32 vertex_count, u32 vertex_offset, u32 instance_count, u32 first_instance);
 void r_cmd_draw_indexed(render_command_list_t *command_list, u32 index_count, u32 index_offset, u32 instance_count, u32 first_instance);
 void r_cmd_blit_image(render_command_list_t *command_list, image_t *source_image, image_t *dest_image, vec2_t source_offset, vec2_t source_blit_size, vec2_t dest_offset, vec2_t dest_blit_size);

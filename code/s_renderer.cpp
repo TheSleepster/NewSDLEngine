@@ -387,8 +387,9 @@ s_renderer_command_list_init(render_command_list_t *list)
         c_arena_reset(&list->command_arena);
     }
 
-    list->commands = c_arena_push_array(&list->command_arena, render_command_t, MAX_RENDER_COMMANDS);
-    list->is_initialized = true;
+    list->commands            = c_arena_push_array(&list->command_arena, render_command_t, MAX_RENDER_COMMANDS);
+    list->active_render_state = g_pipeline_default_state_key;
+    list->is_initialized      = true;
 }
 
 /*
@@ -655,7 +656,6 @@ r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_consta
     command->data                = update_buffer_contents;
 }
 
-
 /*
 =============
 r_cmd_bind_texture
@@ -675,6 +675,37 @@ r_cmd_bind_texture(render_command_list_t *command_list, asset_handle_t *asset_ha
     command->data = bind_texture;
 }
 
+/*
+=============
+r_cmd_set_render_state
+=============
+*/
+
+void
+r_cmd_set_render_state(render_command_list_t *command_list, render_pipeline_state_t *render_pipeline_state)
+{
+    render_command_t *command  = s_renderer_get_next_command(command_list);
+    render_command_set_pipeline_state_t *set_render_state = c_arena_push_struct(&command_list->command_arena, 
+                                                                                render_command_set_pipeline_state_t);
+    set_render_state->pipeline_state = *render_pipeline_state;
+
+    command->header.command_type = RCT_SetRenderState;
+    command->data = set_render_state;
+}
+
+
+/*
+=============
+r_cmd_reset_render_state
+=============
+*/
+
+void
+r_cmd_reset_render_state(render_command_list_t *command_list, render_pipeline_state_t *render_pipeline_state)
+{
+    render_command_t *command  = s_renderer_get_next_command(command_list);
+    command->header.command_type = RCT_ResetRenderState;
+}
 
 /*
 =============

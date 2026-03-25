@@ -50,6 +50,8 @@ struct vulkan_shader_t
     VkVertexInputBindingDescription      vertex_buffer_binding_desc[4];
     VkVertexInputAttributeDescription    buffer_attributes[12];
     VkPipelineVertexInputStateCreateInfo pipeline_vertex_input_state;
+    VkPipeline                           default_pipeline;
+
     VkPipeline                           pipeline;
 
     HashTable_t(VkPipeline)              pipeline_hash;

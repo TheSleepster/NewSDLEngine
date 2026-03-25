@@ -2329,7 +2329,10 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 {
                     render_command_bind_shader_t *cmd = (render_command_bind_shader_t*)command->data;
 
-                    vkCmdBindPipeline(*vulkan_context->render_command_buffer, cmd->shader.shader->shader_data.pipeline_type, cmd->shader.shader->shader_data.pipeline);
+                    u64 hash_index = (c_fnv_hash_value((u8*)&command_list->active_render_state, sizeof(render_pipeline_state_t))) % MAX_SHADER_PIPELINE_COUNT;
+
+                    VkPipeline shader_pipeline = cmd->shader.shader->shader_data.pipeline_hash.data[hash_index];
+                    vkCmdBindPipeline(*vulkan_context->render_command_buffer, cmd->shader.shader->shader_data.pipeline_type, shader_pipeline);
 
                     command_list->active_shader_program = &cmd->shader;
                 }break;
@@ -2385,6 +2388,15 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 {
                     render_command_bind_texture_t *cmd = (render_command_bind_texture_t*)command->data;
                     command_list->image_shader_params[command_list->image_count++] = cmd->texture;
+                }break;
+                case RCT_SetRenderState:
+                {
+                    render_command_set_pipeline_state_t *cmd = (render_command_set_pipeline_state_t*)command->data;
+                    command_list->active_render_state = cmd->pipeline_state;
+                }break;
+                case RCT_ResetRenderState:
+                {
+                    command_list->active_render_state = g_pipeline_default_state_key;
                 }break;
                 case RCT_Draw:
                 {

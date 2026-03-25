@@ -5,7 +5,7 @@
 - [X] Automatically bind the renderpasses "read attachments" as shader sampled textures
 - [X] blit_image command
 - [-] Compute shader support (in theory, but we can't test it...)
-- [ ] Shader pipeline cache for different GL_States
+- [X] Shader pipeline cache for different GL_States
 - [ ] CLEANUP
 - [ ] MORE CLEANUP (specifically with the vk_backend_buffer functionality... it's REALLY bad...)
 - [ ] CLEANUP TODOs

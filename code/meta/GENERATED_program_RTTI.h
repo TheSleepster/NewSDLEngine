@@ -186,6 +186,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_render_command_update_push_constant_t, type_id(render_command_update_push_constant_t), "render_command_update_push_constant_t") \
 	X(TYPE_render_command_update_uniform_constant_buffer_t, type_id(render_command_update_uniform_constant_buffer_t), "render_command_update_uniform_constant_buffer_t") \
 	X(TYPE_render_command_bind_texture_t, type_id(render_command_bind_texture_t), "render_command_bind_texture_t") \
+	X(TYPE_render_command_set_pipeline_state_t, type_id(render_command_set_pipeline_state_t), "render_command_set_pipeline_state_t") \
 	X(TYPE_render_command_draw_t, type_id(render_command_draw_t), "render_command_draw_t") \
 	X(TYPE_render_command_blit_image_t, type_id(render_command_blit_image_t), "render_command_blit_image_t") \
 	X(TYPE_render_command_present_frame_t, type_id(render_command_present_frame_t), "render_command_present_frame_t") \
@@ -449,6 +450,7 @@ const static render_command_set_scissor_t GENERATED_DEFAULT_render_command_set_s
 const static render_command_update_push_constant_t GENERATED_DEFAULT_render_command_update_push_constant_t = {};
 const static render_command_update_uniform_constant_buffer_t GENERATED_DEFAULT_render_command_update_uniform_constant_buffer_t = {};
 const static render_command_bind_texture_t GENERATED_DEFAULT_render_command_bind_texture_t = {};
+const static render_command_set_pipeline_state_t GENERATED_DEFAULT_render_command_set_pipeline_state_t = {};
 const static render_command_draw_t GENERATED_DEFAULT_render_command_draw_t = {};
 const static render_command_blit_image_t GENERATED_DEFAULT_render_command_blit_image_t = {};
 const static render_command_present_frame_t GENERATED_DEFAULT_render_command_present_frame_t = {};
@@ -2125,6 +2127,22 @@ struct type_info_struct_render_command_bind_texture_t {
 	};
 };
 
+struct type_info_struct_render_command_set_pipeline_state_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[1];
+		struct {
+			type_info_member_t pipeline_state;
+		}members;
+	};
+};
+
 struct type_info_struct_render_command_draw_t {
 	const char *name;
 	u32 type;
@@ -2209,7 +2227,7 @@ struct type_info_struct_render_command_list_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[19];
+		type_info_member_t member_array[20];
 		struct {
 			type_info_member_t is_initialized;
 			type_info_member_t renderer_state;
@@ -2221,6 +2239,7 @@ struct type_info_struct_render_command_list_t {
 			type_info_member_t bind_shader_command_count;
 			type_info_member_t bind_render_target_command_count;
 			type_info_member_t bind_material_command_count;
+			type_info_member_t active_render_state;
 			type_info_member_t active_vertex_buffer;
 			type_info_member_t active_index_buffer;
 			type_info_member_t active_scissor_command;
@@ -3041,7 +3060,7 @@ struct type_info_enum_render_command_type_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[20];
+		type_info_member_t member_array[22];
 		struct {
 			type_info_member_t RCT_Invalid;
 			type_info_member_t RCT_ClearRenderTarget;
@@ -3058,6 +3077,8 @@ struct type_info_enum_render_command_type_t {
 			type_info_member_t RCT_SetViewport;
 			type_info_member_t RCT_SetScissor;
 			type_info_member_t RCT_BindTexture;
+			type_info_member_t RCT_SetRenderState;
+			type_info_member_t RCT_ResetRenderState;
 			type_info_member_t RCT_Draw;
 			type_info_member_t RCT_DrawIndexed;
 			type_info_member_t RCT_BlitImage;
@@ -4639,6 +4660,19 @@ const static type_info_struct_render_command_bind_texture_t type_info_struct_ren
 	}
 };
 
+const static type_info_struct_render_command_set_pipeline_state_t type_info_struct_render_command_set_pipeline_state_t_const_data = {
+	.name = "render_command_set_pipeline_state_t",
+	.type = TYPE_render_command_set_pipeline_state_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_render_command_set_pipeline_state_t),
+	.member_count = 1,
+	.members = {
+		.pipeline_state = {.name = "pipeline_state", .type = TYPE_render_pipeline_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_set_pipeline_state_t.pipeline_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_set_pipeline_state_t), pipeline_state))},
+	}
+};
+
 const static type_info_struct_render_command_draw_t type_info_struct_render_command_draw_t_const_data = {
 	.name = "render_command_draw_t",
 	.type = TYPE_render_command_draw_t,
@@ -4709,7 +4743,7 @@ const static type_info_struct_render_command_list_t type_info_struct_render_comm
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_render_command_list_t),
-	.member_count = 19,
+	.member_count = 20,
 	.members = {
 		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), is_initialized))},
 		.renderer_state = {.name = "renderer_state", .type = TYPE_renderer_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.renderer_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), renderer_state))},
@@ -4721,6 +4755,7 @@ const static type_info_struct_render_command_list_t type_info_struct_render_comm
 		.bind_shader_command_count = {.name = "bind_shader_command_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.bind_shader_command_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), bind_shader_command_count))},
 		.bind_render_target_command_count = {.name = "bind_render_target_command_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.bind_render_target_command_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), bind_render_target_command_count))},
 		.bind_material_command_count = {.name = "bind_material_command_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.bind_material_command_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), bind_material_command_count))},
+		.active_render_state = {.name = "active_render_state", .type = TYPE_render_pipeline_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.active_render_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), active_render_state))},
 		.active_vertex_buffer = {.name = "active_vertex_buffer", .type = TYPE_render_buffer_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.active_vertex_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), active_vertex_buffer))},
 		.active_index_buffer = {.name = "active_index_buffer", .type = TYPE_render_buffer_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.active_index_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), active_index_buffer))},
 		.active_scissor_command = {.name = "active_scissor_command", .type = TYPE_render_command_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_list_t.active_scissor_command)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_list_t), active_scissor_command))},
@@ -5344,7 +5379,7 @@ const static type_info_enum_render_command_type_t type_info_enum_render_command_
 	.name = "render_command_type_t",
 	.type = TYPE_render_command_type_t,
 	.kind = META_TYPE_KIND_Enum,
-	.member_count = 20,
+	.member_count = 22,
 	.members = {
 		.RCT_Invalid = {.name = "RCT_Invalid", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_Invalid), .offset = RCT_Invalid},
 		.RCT_ClearRenderTarget = {.name = "RCT_ClearRenderTarget", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_ClearRenderTarget), .offset = RCT_ClearRenderTarget},
@@ -5361,6 +5396,8 @@ const static type_info_enum_render_command_type_t type_info_enum_render_command_
 		.RCT_SetViewport = {.name = "RCT_SetViewport", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_SetViewport), .offset = RCT_SetViewport},
 		.RCT_SetScissor = {.name = "RCT_SetScissor", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_SetScissor), .offset = RCT_SetScissor},
 		.RCT_BindTexture = {.name = "RCT_BindTexture", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_BindTexture), .offset = RCT_BindTexture},
+		.RCT_SetRenderState = {.name = "RCT_SetRenderState", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_SetRenderState), .offset = RCT_SetRenderState},
+		.RCT_ResetRenderState = {.name = "RCT_ResetRenderState", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_ResetRenderState), .offset = RCT_ResetRenderState},
 		.RCT_Draw = {.name = "RCT_Draw", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_Draw), .offset = RCT_Draw},
 		.RCT_DrawIndexed = {.name = "RCT_DrawIndexed", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_DrawIndexed), .offset = RCT_DrawIndexed},
 		.RCT_BlitImage = {.name = "RCT_BlitImage", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_BlitImage), .offset = RCT_BlitImage},
@@ -6127,6 +6164,10 @@ enum render_command_bind_texture_t_member_list_enum {
 	TYPE_RENDER_COMMAND_BIND_TEXTURE_T_MEMBER_texture,
 };
 
+enum render_command_set_pipeline_state_t_member_list_enum {
+	TYPE_RENDER_COMMAND_SET_PIPELINE_STATE_T_MEMBER_pipeline_state,
+};
+
 enum render_command_draw_t_member_list_enum {
 	TYPE_RENDER_COMMAND_DRAW_T_MEMBER_vertices_to_draw,
 	TYPE_RENDER_COMMAND_DRAW_T_MEMBER_vertex_offset,
@@ -6165,6 +6206,7 @@ enum render_command_list_t_member_list_enum {
 	TYPE_RENDER_COMMAND_LIST_T_MEMBER_bind_shader_command_count,
 	TYPE_RENDER_COMMAND_LIST_T_MEMBER_bind_render_target_command_count,
 	TYPE_RENDER_COMMAND_LIST_T_MEMBER_bind_material_command_count,
+	TYPE_RENDER_COMMAND_LIST_T_MEMBER_active_render_state,
 	TYPE_RENDER_COMMAND_LIST_T_MEMBER_active_vertex_buffer,
 	TYPE_RENDER_COMMAND_LIST_T_MEMBER_active_index_buffer,
 	TYPE_RENDER_COMMAND_LIST_T_MEMBER_active_scissor_command,
@@ -6545,6 +6587,8 @@ enum render_command_type_t_member_list_enum {
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_SetViewport,
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_SetScissor,
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_BindTexture,
+	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_SetRenderState,
+	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_ResetRenderState,
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Draw,
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_DrawIndexed,
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_BlitImage,
@@ -6772,6 +6816,8 @@ enum render_pipeline_depth_function_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_SetViewport, "RCT_SetViewport") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_SetScissor, "RCT_SetScissor") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_BindTexture, "RCT_BindTexture") \
+	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_SetRenderState, "RCT_SetRenderState") \
+	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_ResetRenderState, "RCT_ResetRenderState") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Draw, "RCT_Draw") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_DrawIndexed, "RCT_DrawIndexed") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_BlitImage, "RCT_BlitImage") \
@@ -6977,6 +7023,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "render_command_update_push_constant_t", .type = TYPE_render_command_update_push_constant_t, .size = sizeof(render_command_update_push_constant_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_update_push_constant_t_const_data},
 	{.name = "render_command_update_uniform_constant_buffer_t", .type = TYPE_render_command_update_uniform_constant_buffer_t, .size = sizeof(render_command_update_uniform_constant_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_update_uniform_constant_buffer_t_const_data},
 	{.name = "render_command_bind_texture_t", .type = TYPE_render_command_bind_texture_t, .size = sizeof(render_command_bind_texture_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_bind_texture_t_const_data},
+	{.name = "render_command_set_pipeline_state_t", .type = TYPE_render_command_set_pipeline_state_t, .size = sizeof(render_command_set_pipeline_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_set_pipeline_state_t_const_data},
 	{.name = "render_command_draw_t", .type = TYPE_render_command_draw_t, .size = sizeof(render_command_draw_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_draw_t_const_data},
 	{.name = "render_command_blit_image_t", .type = TYPE_render_command_blit_image_t, .size = sizeof(render_command_blit_image_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_blit_image_t_const_data},
 	{.name = "render_command_present_frame_t", .type = TYPE_render_command_present_frame_t, .size = sizeof(render_command_present_frame_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_present_frame_t_const_data},
@@ -7201,6 +7248,8 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "RCT_SetViewport", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_SetViewport, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
 	{.name = "RCT_SetScissor", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_SetScissor, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
 	{.name = "RCT_BindTexture", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_BindTexture, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
+	{.name = "RCT_SetRenderState", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_SetRenderState, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
+	{.name = "RCT_ResetRenderState", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_ResetRenderState, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
 	{.name = "RCT_Draw", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Draw, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
 	{.name = "RCT_DrawIndexed", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_DrawIndexed, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
 	{.name = "RCT_BlitImage", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_BlitImage, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},

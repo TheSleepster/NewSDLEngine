@@ -446,18 +446,21 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
 
     if(result.pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
     {
-        // vertex input binding description
-        // rasterization state
-        // multisampliing_state
-        // depth_stencil_state
-        // blend settings
-        // color blend state
-        result.pipeline = vk_backend_create_render_pipeline(vulkan_context, 
-                                                            &result, 
-                                                            &g_pipeline_default_rasterization_state, 
-                                                            &g_pipeline_default_depth_stencil_state,
-                                                            &g_pipeline_default_blend_settings,
-                                                            &result.pipeline_vertex_input_state);
+        // NOTE(Sleepster): Create the base pipeline for the pipeline hash. 
+        string_t pipeline_key_data = {
+            .data  = (u8*)&g_pipeline_default_state_key,
+            .count = sizeof(g_pipeline_default_state_key)
+        };
+        u64 pipeline_state_hash = c_fnv_hash_value(pipeline_key_data.data, pipeline_key_data.count);
+        pipeline_state_hash %= MAX_SHADER_PIPELINE_COUNT; 
+
+        result.pipeline_hash.data[pipeline_state_hash] = vk_backend_create_render_pipeline(vulkan_context, 
+                                                                                           &result, 
+                                                                                           &g_pipeline_default_rasterization_state, 
+                                                                                           &g_pipeline_default_depth_stencil_state,
+                                                                                           &g_pipeline_default_blend_settings,
+                                                                                           &result.pipeline_vertex_input_state);
+        result.default_pipeline = result.pipeline_hash.data[pipeline_state_hash];
     }
     else if(result.pipeline_type == VK_PIPELINE_BIND_POINT_COMPUTE)
     {
