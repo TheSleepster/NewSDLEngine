@@ -72,7 +72,7 @@ void  sys_file_watcher_process_changes(file_watcher_t *watcher, bool8 *changed);
 /*===========================================
   ============== MULTITHREADING =============
   ===========================================*/
-s32             sys_get_cpu_count();
+s32             sys_get_thread_count();
 sys_semaphore_t sys_semaphore_create(s32 initial_thread_count, s32 max_thread_count);
 void            sys_semaphore_close(sys_semaphore_t *semaphore);
 void            sys_semaphore_wait(sys_semaphore_t *semaphore, u64 wait_duration_ms);

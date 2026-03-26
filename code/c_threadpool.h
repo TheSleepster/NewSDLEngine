@@ -1,70 +1,106 @@
 #if !defined(C_THREADPOOL_H)
 /* ========================================================================
    $File: c_threadpool.h $
-   $Date: December 04 2025 04:48 pm $
+   $Date: March 26 2026 04:41 am $
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
 
 #define C_THREADPOOL_H
-#include <c_intrinsics.h>
+
 #include <c_base.h>
 #include <c_types.h>
-
 #include <p_platform_data.h>
 
-#define MAX_QUEUE_ENTRIES            (10000)
-#define THREADPOOL_ENTRY_BUFFER_SIZE (256)
+#define MAX_WORK_ORDERS  (10000)
+#define MAX_THREAD_COUNT (42)
+#define CACHE_LINE       (64)
 
-typedef void threadpool_callback_t(void *user_data);
+// NOTE(Sleepster): 
+// By default this threadpool uses LIFO queueing due to the Chase-Lev style 
+// queueing and work queue stealing
 
-enum job_priority_t 
+typedef void work_order_fn(void *data);
+
+struct work_completion_fence_t
 {
-    TPTP_Invalid,
-    TPTP_Low,
-    TPTP_High,
-    TPTP_Count
+    volatile u32 pending;
 };
 
-// NOTE(Sleepster): This buffer is an extra 2MB per threadpool... It's fine.
-struct threadpool_queue_entry_t
+struct work_order_t
 {
-    bool8                  is_valid;
-    // TODO(Sleepster): Why is this here???? 
-    byte                   entry_buffer[THREADPOOL_ENTRY_BUFFER_SIZE];
-
-    void                  *user_data;
-    threadpool_callback_t *callback;
+    void                    *data;
+    work_order_fn           *function;
+    work_completion_fence_t *fence;
+    u64                      __padding;
 };
 
-struct threadpool_queue_t
+struct work_list_t 
 {
-    volatile u32 completion_goal;
-    volatile u32 entries_completed;
+    work_order_t work_orders[MAX_WORK_ORDERS];
 
-    volatile u32 next_entry_to_write;
-    volatile u32 next_entry_to_read;
+    alignas(CACHE_LINE) u32 head;
+    alignas(CACHE_LINE) u32 tail;
+};
 
-    threadpool_queue_entry_t entries[MAX_QUEUE_ENTRIES];
+struct thread_allocator_t
+{
+    byte *buffer;
+
+    alignas(CACHE_LINE) u32          size;
+    alignas(CACHE_LINE) volatile u32 used;
+};
+
+struct threadpool_t;
+struct worker_thread_t
+{
+    u32                thread_id;
+    sys_thread_t       handle;
+
+    work_list_t        work_avaliable;
+    thread_allocator_t allocator;
+    threadpool_t      *threadpool;
+
+    alignas(CACHE_LINE) volatile u32    total_work_orders;
+    alignas(CACHE_LINE) volatile bool32 is_started;
+    alignas(CACHE_LINE) volatile bool32 should_exit;
+
 };
 
 struct threadpool_t
 {
-    bool8           is_initialized;
+    sys_semaphore_t work_avaliable_semaphore;
+    worker_thread_t workers[MAX_THREAD_COUNT];
+    u32             thread_count;
 
-    sys_semaphore_t semaphore;
-    u32             threads_awake;
-    u32             max_threads;
-    
-    threadpool_queue_t high_priority_queue;
-    threadpool_queue_t low_priority_queue;
+    alignas(CACHE_LINE) volatile u32 threads_flushed;
+    alignas(CACHE_LINE) volatile u32 next_worker_index;
 };
 
-void  c_threadpool_init(threadpool_t *pool);
-bool8 c_threadpool_add_task(threadpool_t *threadpool, void *user_data, threadpool_callback_t *callback, u32 priority);
-bool8 c_threadpool_perform_next_task(threadpool_queue_t *queue);
-void  c_threadpool_flush_queue(threadpool_queue_t *queue);
-void  c_threadpool_flush_task_queues(threadpool_t *threadpool);
+/*===========================================
+  ============= FUNCATION API ===============
+  ===========================================*/
+
+void c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocator_size, bool8 start_instantly);
+void c_threadpool_start(threadpool_t *threadpool);
+void c_threadpool_flush_work_orders(threadpool_t *threadpool);
+void c_threadpool_wait_on_fence(threadpool_t *threadpool, work_completion_fence_t *fence);
+
+template <typename LambdaType>
+void c_threadpool_push_work_order(threadpool_t *threadpool, LambdaType lambda, work_completion_fence_t *fence);
+
+/*===========================================
+  ================= MACROS ==================
+  ===========================================*/
+
+#define parallel_for_FIFO(threadpool, iterator, max_iterations, work_completed_fence_ptr, lambda) \
+    for(u32 iterator = max_iterations; iterator > 0; --iterator)  \
+        c_threadpool_push_work_order(threadpool, lambda, work_completed_fence_ptr)                  
+
+// NOTE(Sleepster): This is by default first in last out. 
+#define parallel_for(threadpool, iterator, max_iterations, work_completed_fence_ptr, lambda) \
+    for(u32 iterator = 0; iterator < max_iterations; ++iterator)  \
+        c_threadpool_push_work_order(threadpool, lambda, work_completed_fence_ptr)                  
 
 #endif // C_THREADPOOL_H
 

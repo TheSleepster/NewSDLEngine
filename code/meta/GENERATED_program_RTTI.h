@@ -103,10 +103,12 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_sys_mutex_t, type_id(sys_mutex_t), "sys_mutex_t") \
 	X(TYPE_sys_semaphore_handle_t, type_id(sys_semaphore_handle_t), "sys_semaphore_handle_t") \
 	X(TYPE_sys_semaphore_t, type_id(sys_semaphore_t), "sys_semaphore_t") \
-	X(TYPE_job_priority_t, type_id(job_priority_t), "job_priority_t") \
-	X(TYPE_threadpool_callback_t, type_id(threadpool_callback_t), "threadpool_callback_t") \
-	X(TYPE_threadpool_queue_entry_t, type_id(threadpool_queue_entry_t), "threadpool_queue_entry_t") \
-	X(TYPE_threadpool_queue_t, type_id(threadpool_queue_t), "threadpool_queue_t") \
+	X(TYPE_work_completion_fence_t, type_id(work_completion_fence_t), "work_completion_fence_t") \
+	X(TYPE_work_order_fn, type_id(work_order_fn), "work_order_fn") \
+	X(TYPE_work_order_t, type_id(work_order_t), "work_order_t") \
+	X(TYPE_work_list_t, type_id(work_list_t), "work_list_t") \
+	X(TYPE_thread_allocator_t, type_id(thread_allocator_t), "thread_allocator_t") \
+	X(TYPE_worker_thread_t, type_id(worker_thread_t), "worker_thread_t") \
 	X(TYPE_preprocessor_token_type_t, type_id(preprocessor_token_type_t), "preprocessor_token_type_t") \
 	X(TYPE_token_data_t, type_id(token_data_t), "token_data_t") \
 	X(TYPE_tokenizer_t, type_id(tokenizer_t), "tokenizer_t") \
@@ -400,9 +402,8 @@ const static string_builder_t GENERATED_DEFAULT_string_builder_t = {};
 const static sys_thread_t GENERATED_DEFAULT_sys_thread_t = {};
 const static sys_mutex_t GENERATED_DEFAULT_sys_mutex_t = {};
 const static sys_semaphore_t GENERATED_DEFAULT_sys_semaphore_t = {};
-const static threadpool_queue_entry_t GENERATED_DEFAULT_threadpool_queue_entry_t = {};
-const static threadpool_queue_t GENERATED_DEFAULT_threadpool_queue_t = {};
-const static threadpool_t GENERATED_DEFAULT_threadpool_t = {};
+const static work_completion_fence_t GENERATED_DEFAULT_work_completion_fence_t = {};
+const static work_order_t GENERATED_DEFAULT_work_order_t = {};
 const static token_data_t GENERATED_DEFAULT_token_data_t = {};
 const static tokenizer_t GENERATED_DEFAULT_tokenizer_t = {};
 const static zone_allocator_block_t GENERATED_DEFAULT_zone_allocator_block_t = {};
@@ -1164,7 +1165,23 @@ struct type_info_struct_sys_semaphore_t {
 	};
 };
 
-struct type_info_struct_threadpool_queue_entry_t {
+struct type_info_struct_work_completion_fence_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[1];
+		struct {
+			type_info_member_t pending;
+		}members;
+	};
+};
+
+struct type_info_struct_work_order_t {
 	const char *name;
 	u32 type;
 	u32 kind;
@@ -1175,51 +1192,10 @@ struct type_info_struct_threadpool_queue_entry_t {
 	union {
 		type_info_member_t member_array[4];
 		struct {
-			type_info_member_t is_valid;
-			type_info_member_t entry_buffer;
-			type_info_member_t user_data;
-			type_info_member_t callback;
-		}members;
-	};
-};
-
-struct type_info_struct_threadpool_queue_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[5];
-		struct {
-			type_info_member_t completion_goal;
-			type_info_member_t entries_completed;
-			type_info_member_t next_entry_to_write;
-			type_info_member_t next_entry_to_read;
-			type_info_member_t entries;
-		}members;
-	};
-};
-
-struct type_info_struct_threadpool_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[6];
-		struct {
-			type_info_member_t is_initialized;
-			type_info_member_t semaphore;
-			type_info_member_t threads_awake;
-			type_info_member_t max_threads;
-			type_info_member_t high_priority_queue;
-			type_info_member_t low_priority_queue;
+			type_info_member_t data;
+			type_info_member_t function;
+			type_info_member_t fence;
+			type_info_member_t __padding;
 		}members;
 	};
 };
@@ -2728,25 +2704,6 @@ struct type_info_enum_arg_type_t {
 	};
 };
 
-struct type_info_enum_job_priority_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[4];
-		struct {
-			type_info_member_t TPTP_Invalid;
-			type_info_member_t TPTP_Low;
-			type_info_member_t TPTP_High;
-			type_info_member_t TPTP_Count;
-		}members;
-	};
-};
-
 struct type_info_enum_preprocessor_token_type_t {
 	const char *name;
 	u32 type;
@@ -3850,54 +3807,32 @@ const static type_info_struct_sys_semaphore_t type_info_struct_sys_semaphore_t_c
 	}
 };
 
-const static type_info_struct_threadpool_queue_entry_t type_info_struct_threadpool_queue_entry_t_const_data = {
-	.name = "threadpool_queue_entry_t",
-	.type = TYPE_threadpool_queue_entry_t,
+const static type_info_struct_work_completion_fence_t type_info_struct_work_completion_fence_t_const_data = {
+	.name = "work_completion_fence_t",
+	.type = TYPE_work_completion_fence_t,
 	.kind = META_TYPE_KIND_Struct,
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_threadpool_queue_entry_t),
+	.element_size = sizeof(GENERATED_DEFAULT_work_completion_fence_t),
+	.member_count = 1,
+	.members = {
+		.pending = {.name = "pending", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_work_completion_fence_t.pending)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_work_completion_fence_t), pending))},
+	}
+};
+
+const static type_info_struct_work_order_t type_info_struct_work_order_t_const_data = {
+	.name = "work_order_t",
+	.type = TYPE_work_order_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_work_order_t),
 	.member_count = 4,
 	.members = {
-		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), is_valid))},
-		.entry_buffer = {.name = "entry_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.entry_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), entry_buffer))},
-		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.user_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), user_data))},
-		.callback = {.name = "callback", .type = TYPE_threadpool_callback_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t.callback)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_entry_t), callback))},
-	}
-};
-
-const static type_info_struct_threadpool_queue_t type_info_struct_threadpool_queue_t_const_data = {
-	.name = "threadpool_queue_t",
-	.type = TYPE_threadpool_queue_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_threadpool_queue_t),
-	.member_count = 5,
-	.members = {
-		.completion_goal = {.name = "completion_goal", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.completion_goal)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), completion_goal))},
-		.entries_completed = {.name = "entries_completed", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.entries_completed)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), entries_completed))},
-		.next_entry_to_write = {.name = "next_entry_to_write", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.next_entry_to_write)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), next_entry_to_write))},
-		.next_entry_to_read = {.name = "next_entry_to_read", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.next_entry_to_read)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), next_entry_to_read))},
-		.entries = {.name = "entries", .type = TYPE_threadpool_queue_entry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_queue_t.entries)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_queue_t), entries))},
-	}
-};
-
-const static type_info_struct_threadpool_t type_info_struct_threadpool_t_const_data = {
-	.name = "threadpool_t",
-	.type = TYPE_threadpool_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_threadpool_t),
-	.member_count = 6,
-	.members = {
-		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), is_initialized))},
-		.semaphore = {.name = "semaphore", .type = TYPE_sys_semaphore_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.semaphore)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), semaphore))},
-		.threads_awake = {.name = "threads_awake", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.threads_awake)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), threads_awake))},
-		.max_threads = {.name = "max_threads", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.max_threads)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), max_threads))},
-		.high_priority_queue = {.name = "high_priority_queue", .type = TYPE_threadpool_queue_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.high_priority_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), high_priority_queue))},
-		.low_priority_queue = {.name = "low_priority_queue", .type = TYPE_threadpool_queue_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_threadpool_t.low_priority_queue)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_threadpool_t), low_priority_queue))},
+		.data = {.name = "data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_work_order_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_work_order_t), data))},
+		.function = {.name = "function", .type = TYPE_work_order_fn, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_work_order_t.function)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_work_order_t), function))},
+		.fence = {.name = "fence", .type = TYPE_work_completion_fence_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_work_order_t.fence)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_work_order_t), fence))},
+		.__padding = {.name = "__padding", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_work_order_t.__padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_work_order_t), __padding))},
 	}
 };
 
@@ -5157,18 +5092,6 @@ const static type_info_enum_arg_type_t type_info_enum_arg_type_t_const_data = {
 		.FLAG_TYPE_STRING = {.name = "FLAG_TYPE_STRING", .type = TYPE_arg_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FLAG_TYPE_STRING), .offset = FLAG_TYPE_STRING},
 	}
 };
-const static type_info_enum_job_priority_t type_info_enum_job_priority_t_const_data = {
-	.name = "job_priority_t",
-	.type = TYPE_job_priority_t,
-	.kind = META_TYPE_KIND_Enum,
-	.member_count = 4,
-	.members = {
-		.TPTP_Invalid = {.name = "TPTP_Invalid", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_Invalid), .offset = TPTP_Invalid},
-		.TPTP_Low = {.name = "TPTP_Low", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_Low), .offset = TPTP_Low},
-		.TPTP_High = {.name = "TPTP_High", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_High), .offset = TPTP_High},
-		.TPTP_Count = {.name = "TPTP_Count", .type = TYPE_job_priority_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TPTP_Count), .offset = TPTP_Count},
-	}
-};
 const static type_info_enum_preprocessor_token_type_t type_info_enum_preprocessor_token_type_t_const_data = {
 	.name = "preprocessor_token_type_t",
 	.type = TYPE_preprocessor_token_type_t,
@@ -5813,28 +5736,15 @@ enum sys_semaphore_t_member_list_enum {
 	TYPE_SYS_SEMAPHORE_T_MEMBER_handle,
 };
 
-enum threadpool_queue_entry_t_member_list_enum {
-	TYPE_THREADPOOL_QUEUE_ENTRY_T_MEMBER_is_valid,
-	TYPE_THREADPOOL_QUEUE_ENTRY_T_MEMBER_entry_buffer,
-	TYPE_THREADPOOL_QUEUE_ENTRY_T_MEMBER_user_data,
-	TYPE_THREADPOOL_QUEUE_ENTRY_T_MEMBER_callback,
+enum work_completion_fence_t_member_list_enum {
+	TYPE_WORK_COMPLETION_FENCE_T_MEMBER_pending,
 };
 
-enum threadpool_queue_t_member_list_enum {
-	TYPE_THREADPOOL_QUEUE_T_MEMBER_completion_goal,
-	TYPE_THREADPOOL_QUEUE_T_MEMBER_entries_completed,
-	TYPE_THREADPOOL_QUEUE_T_MEMBER_next_entry_to_write,
-	TYPE_THREADPOOL_QUEUE_T_MEMBER_next_entry_to_read,
-	TYPE_THREADPOOL_QUEUE_T_MEMBER_entries,
-};
-
-enum threadpool_t_member_list_enum {
-	TYPE_THREADPOOL_T_MEMBER_is_initialized,
-	TYPE_THREADPOOL_T_MEMBER_semaphore,
-	TYPE_THREADPOOL_T_MEMBER_threads_awake,
-	TYPE_THREADPOOL_T_MEMBER_max_threads,
-	TYPE_THREADPOOL_T_MEMBER_high_priority_queue,
-	TYPE_THREADPOOL_T_MEMBER_low_priority_queue,
+enum work_order_t_member_list_enum {
+	TYPE_WORK_ORDER_T_MEMBER_data,
+	TYPE_WORK_ORDER_T_MEMBER_function,
+	TYPE_WORK_ORDER_T_MEMBER_fence,
+	TYPE_WORK_ORDER_T_MEMBER___padding,
 };
 
 enum token_data_t_member_list_enum {
@@ -6428,13 +6338,6 @@ enum arg_type_t_member_list_enum {
 	TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_STRING,
 };
 
-enum job_priority_t_member_list_enum {
-	TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Invalid,
-	TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Low,
-	TYPE_JOB_PRIORITY_T_MEMBER_TPTP_High,
-	TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Count,
-};
-
 enum preprocessor_token_type_t_member_list_enum {
 	TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Invalid,
 	TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Semicolon,
@@ -6703,10 +6606,6 @@ enum render_pipeline_depth_function_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_U64, "FLAG_TYPE_U64") \
 	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_FLOAT32, "FLAG_TYPE_FLOAT32") \
 	X(TYPE_ENUM_LOOKUP_ARG_TYPE_T_MEMBER_FLAG_TYPE_STRING, "FLAG_TYPE_STRING") \
-	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_Invalid, "TPTP_Invalid") \
-	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_Low, "TPTP_Low") \
-	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_High, "TPTP_High") \
-	X(TYPE_ENUM_LOOKUP_JOB_PRIORITY_T_MEMBER_TPTP_Count, "TPTP_Count") \
 	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Invalid, "TT_Invalid") \
 	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Semicolon, "TT_Semicolon") \
 	X(TYPE_ENUM_LOOKUP_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Colon, "TT_Colon") \
@@ -6907,7 +6806,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "file_watcher_callback_pfn_t", .type = TYPE_file_watcher_callback_pfn_t, .size = sizeof(file_watcher_callback_pfn_t*), .struct_info = NULL},
 	{.name = "file_watcher_sys_watch_data_t", .type = TYPE_file_watcher_sys_watch_data_t, .size = sizeof(file_watcher_sys_watch_data_t), .struct_info = NULL},
 	{.name = "file_watcher_t", .type = TYPE_file_watcher_t, .size = sizeof(file_watcher_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_watcher_t_const_data},
-	{.name = "threadpool_t", .type = TYPE_threadpool_t, .size = sizeof(threadpool_t), .struct_info = (type_info_struct_t*)&type_info_struct_threadpool_t_const_data},
+	{.name = "threadpool_t", .type = TYPE_threadpool_t, .size = sizeof(threadpool_t), .struct_info = NULL},
 	{.name = "global_context_t", .type = TYPE_global_context_t, .size = sizeof(global_context_t), .struct_info = (type_info_struct_t*)&type_info_struct_global_context_t_const_data},
 	{.name = "hash_table_allocation_flags_t", .type = TYPE_hash_table_allocation_flags_t, .size = sizeof(hash_table_allocation_flags_t), .struct_info = NULL},
 	{.name = "hash_table_header_t", .type = TYPE_hash_table_header_t, .size = sizeof(hash_table_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_hash_table_header_t_const_data},
@@ -6940,10 +6839,12 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "sys_mutex_t", .type = TYPE_sys_mutex_t, .size = sizeof(sys_mutex_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_mutex_t_const_data},
 	{.name = "sys_semaphore_handle_t", .type = TYPE_sys_semaphore_handle_t, .size = sizeof(sys_semaphore_handle_t), .struct_info = NULL},
 	{.name = "sys_semaphore_t", .type = TYPE_sys_semaphore_t, .size = sizeof(sys_semaphore_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_semaphore_t_const_data},
-	{.name = "job_priority_t", .type = TYPE_job_priority_t, .size = sizeof(job_priority_t), .struct_info = NULL},
-	{.name = "threadpool_callback_t", .type = TYPE_threadpool_callback_t, .size = sizeof(threadpool_callback_t*), .struct_info = NULL},
-	{.name = "threadpool_queue_entry_t", .type = TYPE_threadpool_queue_entry_t, .size = sizeof(threadpool_queue_entry_t), .struct_info = (type_info_struct_t*)&type_info_struct_threadpool_queue_entry_t_const_data},
-	{.name = "threadpool_queue_t", .type = TYPE_threadpool_queue_t, .size = sizeof(threadpool_queue_t), .struct_info = (type_info_struct_t*)&type_info_struct_threadpool_queue_t_const_data},
+	{.name = "work_completion_fence_t", .type = TYPE_work_completion_fence_t, .size = sizeof(work_completion_fence_t), .struct_info = (type_info_struct_t*)&type_info_struct_work_completion_fence_t_const_data},
+	{.name = "work_order_fn", .type = TYPE_work_order_fn, .size = sizeof(work_order_fn*), .struct_info = NULL},
+	{.name = "work_order_t", .type = TYPE_work_order_t, .size = sizeof(work_order_t), .struct_info = (type_info_struct_t*)&type_info_struct_work_order_t_const_data},
+	{.name = "work_list_t", .type = TYPE_work_list_t, .size = sizeof(work_list_t), .struct_info = NULL},
+	{.name = "thread_allocator_t", .type = TYPE_thread_allocator_t, .size = sizeof(thread_allocator_t), .struct_info = NULL},
+	{.name = "worker_thread_t", .type = TYPE_worker_thread_t, .size = sizeof(worker_thread_t), .struct_info = NULL},
 	{.name = "preprocessor_token_type_t", .type = TYPE_preprocessor_token_type_t, .size = sizeof(preprocessor_token_type_t), .struct_info = NULL},
 	{.name = "token_data_t", .type = TYPE_token_data_t, .size = sizeof(token_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_token_data_t_const_data},
 	{.name = "tokenizer_t", .type = TYPE_tokenizer_t, .size = sizeof(tokenizer_t), .struct_info = (type_info_struct_t*)&type_info_struct_tokenizer_t_const_data},
@@ -7135,10 +7036,6 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "FLAG_TYPE_U64", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_U64, .type_info_ptr = (const type_info_struct*)&type_info_enum_arg_type_t_const_data},
 	{.name = "FLAG_TYPE_FLOAT32", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_FLOAT32, .type_info_ptr = (const type_info_struct*)&type_info_enum_arg_type_t_const_data},
 	{.name = "FLAG_TYPE_STRING", .member_enum = TYPE_ARG_TYPE_T_MEMBER_FLAG_TYPE_STRING, .type_info_ptr = (const type_info_struct*)&type_info_enum_arg_type_t_const_data},
-	{.name = "TPTP_Invalid", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_job_priority_t_const_data},
-	{.name = "TPTP_Low", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Low, .type_info_ptr = (const type_info_struct*)&type_info_enum_job_priority_t_const_data},
-	{.name = "TPTP_High", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_High, .type_info_ptr = (const type_info_struct*)&type_info_enum_job_priority_t_const_data},
-	{.name = "TPTP_Count", .member_enum = TYPE_JOB_PRIORITY_T_MEMBER_TPTP_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_job_priority_t_const_data},
 	{.name = "TT_Invalid", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
 	{.name = "TT_Semicolon", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Semicolon, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},
 	{.name = "TT_Colon", .member_enum = TYPE_PREPROCESSOR_TOKEN_TYPE_T_MEMBER_TT_Colon, .type_info_ptr = (const type_info_struct*)&type_info_enum_preprocessor_token_type_t_const_data},

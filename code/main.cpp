@@ -22,12 +22,6 @@
 #include <c_tokenizer.h>
 #include <p_platform_data.h>
 
-#if 0
-#include <r_vulkan_types.h>
-#include <r_vulkan_core.h>
-#include <r_render_group.h>
-#endif
-
 #include <vk_backend_core.h>
 #include <r_render_image.h>
 #include <s_renderer.h>
@@ -96,7 +90,10 @@ main(int argc, char **argv)
 
         vulkan_context_t context = {};
         vk_backend_init(&context, state->window);
-        c_threadpool_init(&global_context->main_threadpool);
+
+        // TODO(Sleepster): The count will need to be adjusted in the future. But this is fine for now 
+        u32 thread_count = sys_get_thread_count() - 1;
+        c_threadpool_init(&global_context->main_threadpool, thread_count, MB(10), true);
 
         s_asset_manager_init(asset_manager);
         s_asset_manager_load_asset_file(asset_manager, STR("asset_data.jfd"));

@@ -1174,8 +1174,6 @@ MATH_API vec4_t
 vec4_create(float32 A)
 {
     vec4_t result;
-    // TODO(Sleepster): Perhaps make this a 32 bit -> 128bit SIMD function???
-    // (128bit load)
     result.SSE = _mm_set_ps1(A);
 
     return(result);

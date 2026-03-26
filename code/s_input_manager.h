@@ -85,8 +85,7 @@ typedef struct input_controller
     bool8             is_valid;
     bool8             is_analog;
     controller_type_t type;
-    union
-    {
+    union {
         keyboard_controller_data_t keyboard;
         gamepad_controller_data_t  gamepad;
     };

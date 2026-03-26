@@ -482,7 +482,7 @@ sys_get_proc_address(void *library, string_t procedure)
    ======== MULTITHREADING FUNCTIONS =========
    ===========================================*/
 s32
-sys_get_cpu_count()
+sys_get_thread_count()
 {
     SYSTEM_INFO system_info;
     GetSystemInfo(&system_info);

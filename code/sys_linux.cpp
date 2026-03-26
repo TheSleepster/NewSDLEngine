@@ -529,7 +529,7 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 #include <SDL3/SDL.h>
 
 s32
-sys_get_cpu_count()
+sys_get_thread_count()
 {
     s32 result = 0;
     result = SDL_GetNumLogicalCPUCores();
