@@ -161,6 +161,7 @@ struct vulkan_context_t
     u64                                 window_size_generation;
     u64                                 last_window_size_generation;
 
+    u64                                 frame_tsc;
     u32                                 current_frame_index;
     u32                                 current_image_index;
 
@@ -212,8 +213,6 @@ struct vulkan_context_t
     VkCommandBuffer                    *render_command_buffer;
     VkFramebuffer                      *render_framebuffer;
 
-    VkDescriptorPool                    first_descriptor_pool;
-
     VkRenderPass                        primary_renderpass;
     VkFramebuffer                      *framebuffers;
 
@@ -226,20 +225,15 @@ struct vulkan_context_t
     VkDescriptorSet                     descriptor_sets[MAX_FRAMES_IN_FLIGHT][MAX_DESCRIPTOR_SETS];
     u32                                 descriptor_count;
 
-    // NOTE(Sleepster): We don't really need these, they're static and only modified when created. 
-    vulkan_buffer_t                     main_vertex_buffer;
-    vulkan_buffer_t                     main_index_buffer;
-    vulkan_buffer_t                     main_instance_buffer[MAX_FRAMES_IN_FLIGHT];
-    vulkan_buffer_t                     frame_render_buffer[MAX_FRAMES_IN_FLIGHT];
-
-    vulkan_buffer_t                     scratch_buffer;
-
     // NOTE(Sleepster): Each staging buffer is a large singular buffer with which we stage by incrementing the offset value of the buffer
     // and later uploading at once when we flush the buffer. However, if the buffer gets full before the designated "flush" time, then we
     // flush it ourselves
     vulkan_staging_buffer_t             staging_buffers[MAX_FRAMES_IN_FLIGHT];
     DynArray_t(vulkan_staging_info_t)   staging_infos;
     u32                                 next_staging_info;
+
+    VkCommandPool                       staging_command_pool;
+    VkFence                             staging_fences;
 };
 
 // NOTE(Sleepster): 

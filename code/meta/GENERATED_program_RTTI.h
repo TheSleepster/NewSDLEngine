@@ -188,6 +188,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_render_command_update_push_constant_t, type_id(render_command_update_push_constant_t), "render_command_update_push_constant_t") \
 	X(TYPE_render_command_update_uniform_constant_buffer_t, type_id(render_command_update_uniform_constant_buffer_t), "render_command_update_uniform_constant_buffer_t") \
 	X(TYPE_render_command_bind_texture_t, type_id(render_command_bind_texture_t), "render_command_bind_texture_t") \
+	X(TYPE_render_command_dispatch_compute_t, type_id(render_command_dispatch_compute_t), "render_command_dispatch_compute_t") \
 	X(TYPE_render_command_set_pipeline_state_t, type_id(render_command_set_pipeline_state_t), "render_command_set_pipeline_state_t") \
 	X(TYPE_render_command_draw_t, type_id(render_command_draw_t), "render_command_draw_t") \
 	X(TYPE_render_command_blit_image_t, type_id(render_command_blit_image_t), "render_command_blit_image_t") \
@@ -451,6 +452,7 @@ const static render_command_set_scissor_t GENERATED_DEFAULT_render_command_set_s
 const static render_command_update_push_constant_t GENERATED_DEFAULT_render_command_update_push_constant_t = {};
 const static render_command_update_uniform_constant_buffer_t GENERATED_DEFAULT_render_command_update_uniform_constant_buffer_t = {};
 const static render_command_bind_texture_t GENERATED_DEFAULT_render_command_bind_texture_t = {};
+const static render_command_dispatch_compute_t GENERATED_DEFAULT_render_command_dispatch_compute_t = {};
 const static render_command_set_pipeline_state_t GENERATED_DEFAULT_render_command_set_pipeline_state_t = {};
 const static render_command_draw_t GENERATED_DEFAULT_render_command_draw_t = {};
 const static render_command_blit_image_t GENERATED_DEFAULT_render_command_blit_image_t = {};
@@ -2103,6 +2105,24 @@ struct type_info_struct_render_command_bind_texture_t {
 	};
 };
 
+struct type_info_struct_render_command_dispatch_compute_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t invoke_x;
+			type_info_member_t invoke_y;
+			type_info_member_t invoke_z;
+		}members;
+	};
+};
+
 struct type_info_struct_render_command_set_pipeline_state_t {
 	const char *name;
 	u32 type;
@@ -2385,7 +2405,7 @@ struct type_info_struct_vulkan_buffer_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[7];
+		type_info_member_t member_array[8];
 		struct {
 			type_info_member_t handle;
 			type_info_member_t is_mapped;
@@ -2394,6 +2414,7 @@ struct type_info_struct_vulkan_buffer_t {
 			type_info_member_t offset;
 			type_info_member_t usage_flags;
 			type_info_member_t allocation;
+			type_info_member_t last_used_timestamp;
 		}members;
 	};
 };
@@ -3017,7 +3038,7 @@ struct type_info_enum_render_command_type_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[22];
+		type_info_member_t member_array[23];
 		struct {
 			type_info_member_t RCT_Invalid;
 			type_info_member_t RCT_ClearRenderTarget;
@@ -3038,6 +3059,7 @@ struct type_info_enum_render_command_type_t {
 			type_info_member_t RCT_ResetRenderState;
 			type_info_member_t RCT_Draw;
 			type_info_member_t RCT_DrawIndexed;
+			type_info_member_t RCT_DispatchCompute;
 			type_info_member_t RCT_BlitImage;
 			type_info_member_t RCT_PresentFrame;
 			type_info_member_t RCT_Count;
@@ -4595,6 +4617,21 @@ const static type_info_struct_render_command_bind_texture_t type_info_struct_ren
 	}
 };
 
+const static type_info_struct_render_command_dispatch_compute_t type_info_struct_render_command_dispatch_compute_t_const_data = {
+	.name = "render_command_dispatch_compute_t",
+	.type = TYPE_render_command_dispatch_compute_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_render_command_dispatch_compute_t),
+	.member_count = 3,
+	.members = {
+		.invoke_x = {.name = "invoke_x", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_dispatch_compute_t.invoke_x)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_dispatch_compute_t), invoke_x))},
+		.invoke_y = {.name = "invoke_y", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_dispatch_compute_t.invoke_y)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_dispatch_compute_t), invoke_y))},
+		.invoke_z = {.name = "invoke_z", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_command_dispatch_compute_t.invoke_z)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_command_dispatch_compute_t), invoke_z))},
+	}
+};
+
 const static type_info_struct_render_command_set_pipeline_state_t type_info_struct_render_command_set_pipeline_state_t_const_data = {
 	.name = "render_command_set_pipeline_state_t",
 	.type = TYPE_render_command_set_pipeline_state_t,
@@ -4836,7 +4873,7 @@ const static type_info_struct_vulkan_buffer_t type_info_struct_vulkan_buffer_t_c
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_vulkan_buffer_t),
-	.member_count = 7,
+	.member_count = 8,
 	.members = {
 		.handle = {.name = "handle", .type = TYPE_VkBuffer, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_t.handle)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_t), handle))},
 		.is_mapped = {.name = "is_mapped", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_t.is_mapped)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_t), is_mapped))},
@@ -4845,6 +4882,7 @@ const static type_info_struct_vulkan_buffer_t type_info_struct_vulkan_buffer_t_c
 		.offset = {.name = "offset", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_t.offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_t), offset))},
 		.usage_flags = {.name = "usage_flags", .type = TYPE_VkBufferUsageFlags, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_t.usage_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_t), usage_flags))},
 		.allocation = {.name = "allocation", .type = TYPE_vulkan_allocation_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_t.allocation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_t), allocation))},
+		.last_used_timestamp = {.name = "last_used_timestamp", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_buffer_t.last_used_timestamp)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_buffer_t), last_used_timestamp))},
 	}
 };
 
@@ -5302,7 +5340,7 @@ const static type_info_enum_render_command_type_t type_info_enum_render_command_
 	.name = "render_command_type_t",
 	.type = TYPE_render_command_type_t,
 	.kind = META_TYPE_KIND_Enum,
-	.member_count = 22,
+	.member_count = 23,
 	.members = {
 		.RCT_Invalid = {.name = "RCT_Invalid", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_Invalid), .offset = RCT_Invalid},
 		.RCT_ClearRenderTarget = {.name = "RCT_ClearRenderTarget", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_ClearRenderTarget), .offset = RCT_ClearRenderTarget},
@@ -5323,6 +5361,7 @@ const static type_info_enum_render_command_type_t type_info_enum_render_command_
 		.RCT_ResetRenderState = {.name = "RCT_ResetRenderState", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_ResetRenderState), .offset = RCT_ResetRenderState},
 		.RCT_Draw = {.name = "RCT_Draw", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_Draw), .offset = RCT_Draw},
 		.RCT_DrawIndexed = {.name = "RCT_DrawIndexed", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_DrawIndexed), .offset = RCT_DrawIndexed},
+		.RCT_DispatchCompute = {.name = "RCT_DispatchCompute", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_DispatchCompute), .offset = RCT_DispatchCompute},
 		.RCT_BlitImage = {.name = "RCT_BlitImage", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_BlitImage), .offset = RCT_BlitImage},
 		.RCT_PresentFrame = {.name = "RCT_PresentFrame", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_PresentFrame), .offset = RCT_PresentFrame},
 		.RCT_Count = {.name = "RCT_Count", .type = TYPE_render_command_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RCT_Count), .offset = RCT_Count},
@@ -6074,6 +6113,12 @@ enum render_command_bind_texture_t_member_list_enum {
 	TYPE_RENDER_COMMAND_BIND_TEXTURE_T_MEMBER_texture,
 };
 
+enum render_command_dispatch_compute_t_member_list_enum {
+	TYPE_RENDER_COMMAND_DISPATCH_COMPUTE_T_MEMBER_invoke_x,
+	TYPE_RENDER_COMMAND_DISPATCH_COMPUTE_T_MEMBER_invoke_y,
+	TYPE_RENDER_COMMAND_DISPATCH_COMPUTE_T_MEMBER_invoke_z,
+};
+
 enum render_command_set_pipeline_state_t_member_list_enum {
 	TYPE_RENDER_COMMAND_SET_PIPELINE_STATE_T_MEMBER_pipeline_state,
 };
@@ -6199,6 +6244,7 @@ enum vulkan_buffer_t_member_list_enum {
 	TYPE_VULKAN_BUFFER_T_MEMBER_offset,
 	TYPE_VULKAN_BUFFER_T_MEMBER_usage_flags,
 	TYPE_VULKAN_BUFFER_T_MEMBER_allocation,
+	TYPE_VULKAN_BUFFER_T_MEMBER_last_used_timestamp,
 };
 
 enum vulkan_staging_info_t_member_list_enum {
@@ -6494,6 +6540,7 @@ enum render_command_type_t_member_list_enum {
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_ResetRenderState,
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Draw,
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_DrawIndexed,
+	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_DispatchCompute,
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_BlitImage,
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_PresentFrame,
 	TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Count,
@@ -6719,6 +6766,7 @@ enum render_pipeline_depth_function_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_ResetRenderState, "RCT_ResetRenderState") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Draw, "RCT_Draw") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_DrawIndexed, "RCT_DrawIndexed") \
+	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_DispatchCompute, "RCT_DispatchCompute") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_BlitImage, "RCT_BlitImage") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_PresentFrame, "RCT_PresentFrame") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Count, "RCT_Count") \
@@ -6924,6 +6972,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "render_command_update_push_constant_t", .type = TYPE_render_command_update_push_constant_t, .size = sizeof(render_command_update_push_constant_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_update_push_constant_t_const_data},
 	{.name = "render_command_update_uniform_constant_buffer_t", .type = TYPE_render_command_update_uniform_constant_buffer_t, .size = sizeof(render_command_update_uniform_constant_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_update_uniform_constant_buffer_t_const_data},
 	{.name = "render_command_bind_texture_t", .type = TYPE_render_command_bind_texture_t, .size = sizeof(render_command_bind_texture_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_bind_texture_t_const_data},
+	{.name = "render_command_dispatch_compute_t", .type = TYPE_render_command_dispatch_compute_t, .size = sizeof(render_command_dispatch_compute_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_dispatch_compute_t_const_data},
 	{.name = "render_command_set_pipeline_state_t", .type = TYPE_render_command_set_pipeline_state_t, .size = sizeof(render_command_set_pipeline_state_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_set_pipeline_state_t_const_data},
 	{.name = "render_command_draw_t", .type = TYPE_render_command_draw_t, .size = sizeof(render_command_draw_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_draw_t_const_data},
 	{.name = "render_command_blit_image_t", .type = TYPE_render_command_blit_image_t, .size = sizeof(render_command_blit_image_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_blit_image_t_const_data},
@@ -7149,6 +7198,7 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "RCT_ResetRenderState", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_ResetRenderState, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
 	{.name = "RCT_Draw", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Draw, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
 	{.name = "RCT_DrawIndexed", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_DrawIndexed, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
+	{.name = "RCT_DispatchCompute", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_DispatchCompute, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
 	{.name = "RCT_BlitImage", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_BlitImage, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
 	{.name = "RCT_PresentFrame", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_PresentFrame, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},
 	{.name = "RCT_Count", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Count, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},

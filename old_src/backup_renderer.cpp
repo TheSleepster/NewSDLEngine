@@ -5,6 +5,71 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 
+////////////////////////
+/// mock renderer
+////////////////////////
+
+
+#if 0
+            // TODO(Sleepster):  
+            // Implement a hash table inside of renderer_state_t. This hash table will take the name of the uniform buffer object / SSBO
+            // and return us an poiner to the constant_buffer_t. This pointer is just the constant_buffer_t itself from inside the hash table
+            // This can be done like so:
+            
+            constant_buffer_t *light_buffer = r_renderer_get_constant_buffer(renderer_state, STR("light_buffer"));
+
+            // Through doing this, it means that if other shaders need to access the data within "light_buffer" we have the pointer for quick access, allowing
+            // the hash lookup to only have to ever be performed a single time. Updating then becomes extremely easy:
+
+            point_light_t *lights = ...;
+            r_cmd_update_buffer_contents(light_buffer, lights, sizeof(point_light_t) * light_count);
+
+            // This is copied to the cpu side buffer, then is staged later when we call execute a command similar to that of idRenderProgManager::CommitCurrent
+            // which will move the data to the gpu by mapping the buffer, copying the cpu side data and writing the amount into the correct offset, then finally
+            // unmapping the gpu buffer.
+            //
+            // After that, we will do the exact same methods of descriptor writing and allocating.
+            //
+            // In the case of shader local uniforms, they will go through the same hash lookup and treated exactly as though they were global, their data
+            // would simply just be written to the ubo exactly the same. Therefore the notion of "shared" and "local" descriptors is now gone.
+
+            // init time
+            asset_handle_t game_material     = s_asset_manager_get_material(asset_manager, STR("game_basic_material"));
+            asset_handle_t lightmap_material = s_asset_manager_get_material(asset_manager, STR("lightmap_material"));
+
+            // this should be able to be accessed across many shaders...
+            constant_buffer_t *light_buffer = s_material_get_constant_buffer(renderer_state, STR("light_buffer"));
+
+            point_light_t *lights = ...;
+            r_cmd_update_buffer_contents(light_buffer, lights, sizeof(point_light_t) * light_count);
+
+            // render time
+            render_command_list_t *command_list = s_renderer_get_command_list(&renderer_state);
+            r_cmd_renderpass_begin(command_list, game_renderpass_ID);
+           
+            // If this is an archetype, we use the base instance
+            // If this is an instance, we use the instance data
+            //
+            // This needs to somehow know about the light buffer as well.
+            //
+            // In this case, we would give this instance's RenderIntensityUBO as the descriptor somehow...
+            r_cmd_bind_material(&game_basic_material);
+
+            // This is then a LOCAL constant buffer.
+            constant_buffer_t *game_material_camera_matrices = r_material_get_constant_buffer(game_basic_material, STR("CameraMatricesUBO"));
+            r_cmd_update_buffer_contents(game_material_camera_matrices, ); 
+            r_cmd_draw(...);
+
+            // This is an entirely different archetype, and thus a completely different shader...
+            r_cmd_bind_material(&game_lightmap_material);
+            constant_buffer_t *game_lightmap_vibrance_data = r_material_get_constant_buffer(&game_lightmap_material, STR("VibranceDataUBO"));
+            r_cmd_draw(...);
+
+            r_cmd_renderpass_end(command_list);
+            r_cmd_present(command_list, &game_color_buffer);
+#endif
+
+
 
         // NOTE(Sleepster): Test blit image 
         image_create_info_t image_info = {};
@@ -311,3 +376,6 @@ s_renderer_frame_graph_construct(renderer_state_t *renderer_state, render_frame_
 
     return(result);
 }
+
+////////////
+/////

@@ -70,6 +70,7 @@ main(int argc, char **argv)
 {
     game_state_t            *state          = Alloc(game_state_t);
     asset_manager_t         *asset_manager  = Alloc(asset_manager_t);
+    vulkan_context_t        *vulkan_context = Alloc(vulkan_context_t);
 #if 0
     vulkan_render_context_t *render_context = Alloc(vulkan_render_context_t);
     render_state_t          *render_state   = Alloc(render_state_t);
@@ -87,9 +88,7 @@ main(int argc, char **argv)
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
         }
         c_global_context_init();
-
-        vulkan_context_t context = {};
-        vk_backend_init(&context, state->window);
+        vk_backend_init(vulkan_context, state->window);
 
         // TODO(Sleepster): The count will need to be adjusted in the future. But this is fine for now 
         u32 thread_count = sys_get_thread_count() - 1;
@@ -98,7 +97,7 @@ main(int argc, char **argv)
         s_asset_manager_init(asset_manager);
         s_asset_manager_load_asset_file(asset_manager, STR("asset_data.jfd"));
 
-        asset_manager->vulkan_context = &context;
+        asset_manager->vulkan_context = vulkan_context;
 
         asset_handle_t default_texture  = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
         //asset_handle_t default_shader   = s_asset_manager_acquire_asset_handle(asset_manager, STR("test_shader"));
@@ -108,7 +107,7 @@ main(int argc, char **argv)
 
         texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32_SRGB, 32);
         s_texture_atlas_add_texture(atlas, &default_texture);
-        s_texture_atlas_pack_added_textures(&context, atlas);
+        s_texture_atlas_pack_added_textures(vulkan_context, atlas);
 
         s_nt_socket_api_init(state, argc, argv);
 
@@ -126,7 +125,7 @@ main(int argc, char **argv)
         float64 dt_accumulator = 0.0f;
 
         renderer_state_t renderer_state = {};
-        s_renderer_state_init(&renderer_state, &context);
+        s_renderer_state_init(&renderer_state, vulkan_context);
 
         image_create_info_t primary_game_color_buffer_create_info = {
             .width  = 320,
@@ -177,7 +176,6 @@ main(int argc, char **argv)
         };
 
         u32 game_renderpass_ID = s_renderer_build_renderpass(&renderer_state, &game_renderpass_desc);
-
         render_vertex_t vertices[] = {
             [0] = {
                 .vPosition = vec4( 80, -45, 0.0, 1.0),
@@ -197,7 +195,6 @@ main(int argc, char **argv)
             0, 1, 2, 2, 3, 0
         };
         render_buffer_t index_buffer = s_renderer_index_buffer_create(&renderer_state, RenderBufferUsage_Dynamic, indices, sizeof(indices));
-
         uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(&renderer_state, STR("CameraMatrices"));
 
         g_running = true;
@@ -293,66 +290,7 @@ main(int argc, char **argv)
             r_cmd_renderpass_end(command_list);
             r_cmd_present(command_list, &game_color_buffer);
 
-#if 0
-            // TODO(Sleepster):  
-            // Implement a hash table inside of renderer_state_t. This hash table will take the name of the uniform buffer object / SSBO
-            // and return us an poiner to the constant_buffer_t. This pointer is just the constant_buffer_t itself from inside the hash table
-            // This can be done like so:
-            
-            constant_buffer_t *light_buffer = r_renderer_get_constant_buffer(renderer_state, STR("light_buffer"));
-
-            // Through doing this, it means that if other shaders need to access the data within "light_buffer" we have the pointer for quick access, allowing
-            // the hash lookup to only have to ever be performed a single time. Updating then becomes extremely easy:
-
-            point_light_t *lights = ...;
-            r_cmd_update_buffer_contents(light_buffer, lights, sizeof(point_light_t) * light_count);
-
-            // This is copied to the cpu side buffer, then is staged later when we call execute a command similar to that of idRenderProgManager::CommitCurrent
-            // which will move the data to the gpu by mapping the buffer, copying the cpu side data and writing the amount into the correct offset, then finally
-            // unmapping the gpu buffer.
-            //
-            // After that, we will do the exact same methods of descriptor writing and allocating.
-            //
-            // In the case of shader local uniforms, they will go through the same hash lookup and treated exactly as though they were global, their data
-            // would simply just be written to the ubo exactly the same. Therefore the notion of "shared" and "local" descriptors is now gone.
-
-            // init time
-            asset_handle_t game_material     = s_asset_manager_get_material(asset_manager, STR("game_basic_material"));
-            asset_handle_t lightmap_material = s_asset_manager_get_material(asset_manager, STR("lightmap_material"));
-
-            // this should be able to be accessed across many shaders...
-            constant_buffer_t *light_buffer = s_material_get_constant_buffer(renderer_state, STR("light_buffer"));
-
-            point_light_t *lights = ...;
-            r_cmd_update_buffer_contents(light_buffer, lights, sizeof(point_light_t) * light_count);
-
-            // render time
-            render_command_list_t *command_list = s_renderer_get_command_list(&renderer_state);
-            r_cmd_renderpass_begin(command_list, game_renderpass_ID);
-           
-            // If this is an archetype, we use the base instance
-            // If this is an instance, we use the instance data
-            //
-            // This needs to somehow know about the light buffer as well.
-            //
-            // In this case, we would give this instance's RenderIntensityUBO as the descriptor somehow...
-            r_cmd_bind_material(&game_basic_material);
-
-            // This is then a LOCAL constant buffer.
-            constant_buffer_t *game_material_camera_matrices = r_material_get_constant_buffer(game_basic_material, STR("CameraMatricesUBO"));
-            r_cmd_update_buffer_contents(game_material_camera_matrices, ); 
-            r_cmd_draw(...);
-
-            // This is an entirely different archetype, and thus a completely different shader...
-            r_cmd_bind_material(&game_lightmap_material);
-            constant_buffer_t *game_lightmap_vibrance_data = r_material_get_constant_buffer(&game_lightmap_material, STR("VibranceDataUBO"));
-            r_cmd_draw(...);
-
-            r_cmd_renderpass_end(command_list);
-            r_cmd_present(command_list, &game_color_buffer);
-#endif
-
-            vk_backend_render_frame(&context, &renderer_state);
+            vk_backend_render_frame(vulkan_context, &renderer_state);
             c_global_context_reset_temporary_data();
 
             current_tsc = SDL_GetPerformanceCounter();

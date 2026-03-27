@@ -21,6 +21,9 @@ struct vulkan_buffer_t
     u64                      offset;
     VkBufferUsageFlags       usage_flags;
     vulkan_allocation_info_t allocation;
+
+    // NOTE(Sleepster): This should be modified and managed by the buffer_manager 
+    u32                      last_used_timestamp;
 };
 
 // NOTE(Sleepster): We can build a list of these infos so that they can all be uploaded at once

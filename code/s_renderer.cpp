@@ -358,6 +358,7 @@ s_renderer_get_constant_buffer(renderer_state_t *renderer_state, string_t unifor
     else
     {
         log_fatal("Idk how, but there's no place for this constant_buffer...\n");
+        InvalidCodePath;
     }
 
     return(result);
@@ -784,6 +785,26 @@ r_cmd_blit_image(render_command_list_t *command_list,
 
     command->header.command_type = RCT_BlitImage;
     command->data = blit_image;
+}
+
+/*
+=============
+r_cmd_dispatch_compute
+=============
+*/
+
+void
+r_cmd_dispatch_compute(render_command_list_t *command_list, u32 invoke_x, u32 invoke_y, u32 invoke_z)
+{
+    render_command_t *command   = s_renderer_get_next_command(command_list);
+    render_command_dispatch_compute_t *dispath_compute = c_arena_push_struct(&command_list->command_arena, 
+                                                                             render_command_dispatch_compute_t);
+    dispath_compute->invoke_x = invoke_x;
+    dispath_compute->invoke_y = invoke_y;
+    dispath_compute->invoke_z = invoke_z;
+
+    command->header.command_type = RCT_DispatchCompute;
+    command->data                = dispath_compute;
 }
 
 /*

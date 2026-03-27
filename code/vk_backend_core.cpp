@@ -211,26 +211,6 @@ vk_backend_vulkan_result_string(VkResult result, bool8 get_extended)
 
 /*
 =============
-vk_backend_allocate_descriptor_sets
-=============
-*/
-
-void
-vk_backend_allocate_descriptor_sets(vulkan_context_t *vulkan_context, material_archetype_t *archetype)
-{
-    vulkan_shader_t *shader = &archetype->shader_handle.shader->shader_data;
-
-    VkDescriptorSetAllocateInfo info = {};
-    info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    info.descriptorPool     = vulkan_context->first_descriptor_pool;
-    info.descriptorSetCount = shader->descriptor_set_count;
-    info.pSetLayouts        = shader->layouts;
-
-    vkAssert(vkAllocateDescriptorSets(vulkan_context->device, &info, archetype->descriptors));
-}
-
-/*
-=============
 vk_backend_get_scratch_command_buffer
 =============
 */
@@ -1477,33 +1457,29 @@ void
 vk_backend_create_backend_buffers(vulkan_context_t *vulkan_context)
 {
     // NOTE(Sleepster): Create the staging buffers
+    // TODO(Sleepster): Maybe actually use these... 
+    for(u32 frame_index = 0;
+        frame_index < MAX_FRAMES_IN_FLIGHT;
+        ++frame_index)
     {
-        // TODO(Sleepster): Maybe actually use these... 
-        for(u32 frame_index = 0;
-            frame_index < MAX_FRAMES_IN_FLIGHT;
-            ++frame_index)
-        {
-            vulkan_context->staging_buffers[frame_index] = vk_backend_staging_buffer_create(vulkan_context, 
-                                                                                            MB(16), 
-                                                                                            VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
-                                                                                            VULKAN_MEMORY_USAGE_CPU_TO_GPU);
-        }
+        vulkan_context->staging_buffers[frame_index] = vk_backend_staging_buffer_create(vulkan_context, 
+                                                                                        MB(16), 
+                                                                                        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+                                                                                        VULKAN_MEMORY_USAGE_CPU_TO_GPU);
     }
 
     // NOTE(Sleepster): Create the shader uniform buffers 
-    {  
-        // TODO(Sleepster): For now, just the staging buffer for the uniform data. We should swap to proper staging buffers 
-        vulkan_context->constant_buffer_data = vk_backend_buffer_create(vulkan_context, MB(16), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VULKAN_MEMORY_USAGE_CPU_TO_GPU);
+    // TODO(Sleepster): For now, just the staging buffer for the uniform data. We should swap to proper staging buffers 
+    vulkan_context->constant_buffer_data = vk_backend_buffer_create(vulkan_context, MB(16), VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VULKAN_MEMORY_USAGE_CPU_TO_GPU);
 
-        for(u32 frame_index = 0;
-            frame_index < MAX_FRAMES_IN_FLIGHT;
-            ++frame_index)
-        {
-            vulkan_context->shader_uniform_buffers[frame_index] = vk_backend_buffer_create(vulkan_context, 
-                                                                                           MB(16), 
-                                                                                           VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT|VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                                                                                           VULKAN_MEMORY_USAGE_GPU_ONLY);
-        }
+    for(u32 frame_index = 0;
+        frame_index < MAX_FRAMES_IN_FLIGHT;
+        ++frame_index)
+    {
+        vulkan_context->shader_uniform_buffers[frame_index] = vk_backend_buffer_create(vulkan_context, 
+                                                                                       MB(16), 
+                                                                                       VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT|VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                                                                       VULKAN_MEMORY_USAGE_GPU_ONLY);
     }
 }
 
@@ -2030,6 +2006,7 @@ vk_backend_init(vulkan_context_t *vulkan_context, SDL_Window *window)
     // NOTE(Sleepster): Generate the programs framebuffers 
     vk_backend_create_framebuffers(vulkan_context);
 
+    // NOTE(Sleepster): Initialize the staging buffers and the per-frame GPU uniform buffers
     vk_backend_create_backend_buffers(vulkan_context);
 
     // NOTE(Sleepster): Generate the descriptor pools 
@@ -2175,6 +2152,9 @@ vk_backend_render_frame
 void
 vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *renderer_state)
 {
+    // NOTE(Sleepster): This is for measuring how long GPU resources have been unused. 
+    vulkan_context->frame_tsc = rdtsc();
+
     bool32 window_resize = (vulkan_context->window_size_generation != vulkan_context->last_window_size_generation);
     if(window_resize || vulkan_context->rebuilding_swapchain)
     {
@@ -2328,11 +2308,16 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_BindShader:
                 {
                     render_command_bind_shader_t *cmd = (render_command_bind_shader_t*)command->data;
+                    vulkan_shader_t *shader = &cmd->shader.shader->shader_data;
 
-                    u64 hash_index = (c_fnv_hash_value((u8*)&command_list->active_render_state, sizeof(render_pipeline_state_t))) % MAX_SHADER_PIPELINE_COUNT;
+                    u64 hash_index = 0;
+                    if(shader->pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
+                    {
+                        hash_index = (c_fnv_hash_value((u8*)&command_list->active_render_state, sizeof(render_pipeline_state_t))) % MAX_SHADER_PIPELINE_COUNT;
+                    }
 
-                    VkPipeline shader_pipeline = cmd->shader.shader->shader_data.pipeline_hash.data[hash_index];
-                    vkCmdBindPipeline(*vulkan_context->render_command_buffer, cmd->shader.shader->shader_data.pipeline_type, shader_pipeline);
+                    VkPipeline shader_pipeline = shader->pipeline_hash.data[hash_index];
+                    vkCmdBindPipeline(*vulkan_context->render_command_buffer, shader->pipeline_type, shader_pipeline);
 
                     command_list->active_shader_program = &cmd->shader;
                 }break;
@@ -2397,6 +2382,11 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_ResetRenderState:
                 {
                     command_list->active_render_state = g_pipeline_default_state_key;
+                }break;
+                case RCT_DispatchCompute:
+                {
+                    render_command_dispatch_compute_t *cmd = ( render_command_dispatch_compute_t*)command->data;
+                    vkCmdDispatch(*vulkan_context->render_command_buffer, cmd->invoke_x, cmd->invoke_y, cmd->invoke_z);
                 }break;
                 case RCT_Draw:
                 {

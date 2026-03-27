@@ -109,6 +109,7 @@ enum render_command_type_t
     RCT_ResetRenderState,
     RCT_Draw,
     RCT_DrawIndexed,
+    RCT_DispatchCompute,
     RCT_BlitImage,
     RCT_PresentFrame,
 
@@ -198,6 +199,13 @@ struct render_command_update_uniform_constant_buffer_t
 struct render_command_bind_texture_t 
 {
     image_t *texture;
+};
+
+struct render_command_dispatch_compute_t
+{
+    u32 invoke_x;
+    u32 invoke_y;
+    u32 invoke_z;
 };
 
 struct render_command_set_pipeline_state_t
@@ -375,8 +383,6 @@ struct renderer_state_t
     render_command_list_t                 *command_lists;
     u32                                    command_list_count;
 
-    // TODO(Sleepster): 
-    // For these costant buffers, we MUST support alignment...
     HashTable_t(uniform_constant_buffer_t) constant_buffer_hash;
     u32                                    used_constant_buffers;
 
@@ -428,6 +434,7 @@ void r_cmd_reset_render_state(render_command_list_t *command_list, render_pipeli
 void r_cmd_set_render_state(render_command_list_t *command_list, render_pipeline_state_t *render_pipeline_state);
 void r_cmd_draw(render_command_list_t *command_list, u32 vertex_count, u32 vertex_offset, u32 instance_count, u32 first_instance);
 void r_cmd_draw_indexed(render_command_list_t *command_list, u32 index_count, u32 index_offset, u32 instance_count, u32 first_instance);
+void r_cmd_dispatch_compute(render_command_list_t *command_list, u32 invoke_x, u32 invoke_y, u32 invoke_z);
 void r_cmd_blit_image(render_command_list_t *command_list, image_t *source_image, image_t *dest_image, vec2_t source_offset, vec2_t source_blit_size, vec2_t dest_offset, vec2_t dest_blit_size);
 void r_cmd_present(render_command_list_t *command_list, image_t *presentation_source);
 
