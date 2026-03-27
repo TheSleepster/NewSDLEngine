@@ -5,7 +5,7 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <r_render_image.h>
-#include <s_renderer.h>
+#include <s_render_RHI.h>
 
 VkFormat
 s_renderer_bitmap_format_to_vulkan_format(u32 bitmap_format)

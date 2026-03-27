@@ -27,7 +27,7 @@
 #include <s_input_manager.h>
 #include <s_nt_networking.h>
 #include <s_asset_manager.h>
-#include <s_renderer.h>
+#include <s_render_RHI.h>
 #include <r_render_image.h>
 //
 

@@ -7,7 +7,7 @@
 #include <spirv_reflect.h>
 
 #include <vk_backend_shader.h>
-#include <s_renderer.h>
+#include <s_render_RHI.h>
 
 internal_api
 C_HASH_TABLE_ALLOCATE_IMPL(shader_arena_allocate)

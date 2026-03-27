@@ -24,7 +24,7 @@
 
 #include <vk_backend_core.h>
 #include <r_render_image.h>
-#include <s_renderer.h>
+#include <s_render_RHI.h>
 
 #include <s_nt_networking.h>
 #include <s_input_manager.h>
@@ -56,9 +56,7 @@ process_window_events(SDL_Window *window, renderer_state_t *renderer_state, inpu
 
                 g_window_size.x = (float32)window_x;
                 g_window_size.y = (float32)window_y;
-#if 0
-                r_vulkan_on_resize(render_context, g_window_size);
-#endif
+
                 s_renderer_handle_window_resize(renderer_state, g_window_size);
             }break;
         }
@@ -71,10 +69,7 @@ main(int argc, char **argv)
     game_state_t            *state          = Alloc(game_state_t);
     asset_manager_t         *asset_manager  = Alloc(asset_manager_t);
     vulkan_context_t        *vulkan_context = Alloc(vulkan_context_t);
-#if 0
-    vulkan_render_context_t *render_context = Alloc(vulkan_render_context_t);
-    render_state_t          *render_state   = Alloc(render_state_t);
-#endif
+    renderer_state_t        *renderer_state = Alloc(renderer_state_t);
 
     state->window_size = vec2(600, 600);
     if(SDL_Init(SDL_INIT_VIDEO))
@@ -124,8 +119,7 @@ main(int argc, char **argv)
         float32 delta_time     = 0;
         float64 dt_accumulator = 0.0f;
 
-        renderer_state_t renderer_state = {};
-        s_renderer_state_init(&renderer_state, vulkan_context);
+        s_renderer_state_init(renderer_state, vulkan_context);
 
         image_create_info_t primary_game_color_buffer_create_info = {
             .width  = 320,
@@ -139,8 +133,8 @@ main(int argc, char **argv)
             .format = BMF_D32_SFLOAT_S8_UINT 
         };
 
-        image_t game_color_buffer = s_renderer_image_create(&renderer_state, &primary_game_color_buffer_create_info);
-        image_t game_depth_buffer = s_renderer_image_create(&renderer_state, &primary_game_depth_buffer_create_info);
+        image_t game_color_buffer = s_renderer_image_create(renderer_state, &primary_game_color_buffer_create_info);
+        image_t game_depth_buffer = s_renderer_image_create(renderer_state, &primary_game_depth_buffer_create_info);
 
         clear_value_t color_buffer_clear_value = {
             .clear_color = {.float_color = {0.3f, 0.4f, 0.6f}},
@@ -175,7 +169,7 @@ main(int argc, char **argv)
             },
         };
 
-        u32 game_renderpass_ID = s_renderer_build_renderpass(&renderer_state, &game_renderpass_desc);
+        u32 game_renderpass_ID = s_renderer_build_renderpass(renderer_state, &game_renderpass_desc);
         render_vertex_t vertices[] = {
             [0] = {
                 .vPosition = vec4( 80, -45, 0.0, 1.0),
@@ -190,18 +184,18 @@ main(int argc, char **argv)
                 .vPosition = vec4(-80, -45, 0.0, 1.0),
             }
         };
-        render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(&renderer_state, RenderBufferUsage_Dynamic, vertices, sizeof(vertices));
+        render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, RenderBufferUsage_Dynamic, vertices, sizeof(vertices));
         u32 indices[] = {
             0, 1, 2, 2, 3, 0
         };
-        render_buffer_t index_buffer = s_renderer_index_buffer_create(&renderer_state, RenderBufferUsage_Dynamic, indices, sizeof(indices));
-        uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(&renderer_state, STR("CameraMatrices"));
+        render_buffer_t index_buffer = s_renderer_index_buffer_create(renderer_state, RenderBufferUsage_Dynamic, indices, sizeof(indices));
+        uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
 
         g_running = true;
         while(g_running)
         {
             s_im_reset_controller_states(&input_manager);
-            process_window_events(state->window, &renderer_state, &input_manager);
+            process_window_events(state->window, renderer_state, &input_manager);
 
             state->input_axis = {};
             if(s_im_is_keyboard_key_down(game_controller, SDL_SCANCODE_W))
@@ -263,7 +257,7 @@ main(int argc, char **argv)
                 dt_accumulator -= gcv_tick_rate;
             }
 
-            render_command_list_t *command_list = s_renderer_get_command_list(&renderer_state);
+            render_command_list_t *command_list = s_renderer_get_command_list(renderer_state);
             r_cmd_renderpass_begin(command_list, game_renderpass_ID);
             r_cmd_bind_vertex_buffer(command_list, &vertex_buffer);
             r_cmd_bind_index_buffer(command_list, &index_buffer);
@@ -290,7 +284,7 @@ main(int argc, char **argv)
             r_cmd_renderpass_end(command_list);
             r_cmd_present(command_list, &game_color_buffer);
 
-            vk_backend_render_frame(vulkan_context, &renderer_state);
+            vk_backend_render_frame(vulkan_context, renderer_state);
             c_global_context_reset_temporary_data();
 
             current_tsc = SDL_GetPerformanceCounter();

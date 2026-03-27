@@ -5,11 +5,10 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <vk_backend_core.h>
-#include <s_renderer.h>
+#include <s_render_RHI.h>
 #include <vk_backend_shader.h>
 #include <c_string.h>
 #include <c_file_api.h>
-#include <s_renderer.h>
 
 #include <r_render_image.h>
 #include <s_asset_manager.h>

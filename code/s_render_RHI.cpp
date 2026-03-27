@@ -16,7 +16,7 @@
 #include <vk_backend_core.h>
 #include <s_asset_manager.h>
 #include <r_render_image.h>
-#include <s_renderer.h>
+#include <s_render_RHI.h>
 
 /*
 =============
