@@ -5,6 +5,7 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <c_global_context.h>
+#include <c_threadpool.h>
 #include <c_math.h>
 
 vec2_t g_window_size = {};
@@ -22,7 +23,6 @@ c_global_context_init()
     Assert(global_context != null);
 
     // TODO(Sleepster): why the hell is this an undefined reference????
-    //c_threadpool_init(&global_context->main_threadpool);
     global_context->is_initialized = true;
 }
 

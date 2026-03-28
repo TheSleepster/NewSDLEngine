@@ -52,6 +52,19 @@ s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_
     renderer_state->window_size                     = window_size;
     renderer_state->last_window_size_generation     = renderer_state->current_window_size_generation;
     renderer_state->current_window_size_generation += 1;
+
+    for(u32 renderpass_index = 0;
+        renderpass_index < renderer_state->renderpass_count;
+        ++renderpass_index)
+    {
+        renderpass_t *renderpass = renderer_state->renderpasses + renderpass_index;
+        if(renderpass->resize_with_window)
+        {
+            renderpass->create_info.render_width = renderer_state->window_size.x;
+            renderpass->create_info.render_width = renderer_state->window_size.y;
+            renderpass->ID = s_renderer_build_renderpass(renderer_state, &renderpass->create_info);
+        }
+    }
 }
 
 /*

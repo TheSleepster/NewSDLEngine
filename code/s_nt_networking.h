@@ -7,6 +7,7 @@
    ======================================================================== */
 
 #define S_NT_NETWORKING_H
+#if 0
 #include <g_game_state.h>
 #include <g_entity.h>
 
@@ -41,5 +42,5 @@ void  s_nt_init_client_data(game_state_t *state, char *host_ip, u32 port);
 void  s_nt_client_check_packets(game_state_t *state);
 void  s_nt_client_send_packets(game_state_t *state);
 
+#endif
 #endif // S_NT_NETWORKING_H
-

@@ -14,20 +14,24 @@
 
 typedef struct vec2 vec2_t;
 
-extern vec2_t g_window_size;
-extern bool8 g_running; 
-
-constexpr float32 gcv_tick_rate = 1.0f / 60.0f;
+struct renderer_state_t;
+typedef struct asset_manager  asset_manager_t;
+typedef struct input_manager  input_manager_t;
 
 typedef struct global_context
 {
-    bool8          is_initialized;
-    bool8          running;
+    bool8             is_initialized;
+    bool8             running;
+
+    threadpool_t      main_threadpool;
+    renderer_state_t *renderer_state;
+    asset_manager_t  *asset_manager;
+    input_manager_t  *input_manager;
+
     // NOTE(Sleepster): Persistent allocations... Use sparingly... 
-    memory_arena_t context_arena;
+    memory_arena_t    context_arena;
     // NOTE(Sleepster): Resets with each call to gc_reset_temporary_data() 
-    memory_arena_t temporary_arena;
-    threadpool_t   main_threadpool;
+    memory_arena_t    temporary_arena;
 }global_context_t;
 
 void c_global_context_init();

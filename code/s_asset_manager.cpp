@@ -22,8 +22,6 @@
 // TODO(Sleepster): This is annoying. We need to figure out a better way of allowing people to use the RTTI in chunks.
 //                  So that we don't have to include essentially every parsed header...
 #include <c_program_flag_handler.h>
-#include <g_game_state.h>
-#include <g_entity.h>
 #include <s_input_manager.h>
 #include <s_nt_networking.h>
 #include <s_asset_manager.h>

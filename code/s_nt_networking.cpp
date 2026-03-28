@@ -4,6 +4,7 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#if 0
 #include <s_nt_networking.h>
 #include <stdio.h>
 
@@ -278,3 +279,4 @@ s_nt_client_send_packets(game_state_t *state)
         }
     }
 }
+#endif

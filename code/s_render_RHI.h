@@ -345,9 +345,10 @@ struct renderpass_desc_t
 
 struct renderpass_t 
 {
-    u32           ID;
-    VkRenderPass  renderpass_handle;
-    VkFramebuffer framebuffer_handle;
+    u32               ID;
+    renderpass_desc_t create_info;
+    VkRenderPass      renderpass_handle;
+    VkFramebuffer     framebuffer_handle;
 
     renderpass_attachment_t depth_stencil_attachment;
     renderpass_attachment_t color_attachments[MAX_RENDER_TARGET_ATTACHMENTS];
@@ -375,6 +376,8 @@ struct renderpass_t
 
 struct renderer_state_t
 {
+    SDL_Window                            *window;
+
     memory_arena_t                         renderer_arena;
     memory_arena_t                         transient_arena;
 
