@@ -40,6 +40,15 @@ sys_align_to_page_size(u32 size)
     return(result);
 }
 
+// TODO(Sleepster): 
+// mmap is actually NOTHING like VirtualAlloc()... mmap will just map all the memory like this. Ideally we just use:
+//
+// MAP_ANONYMOUS | PROT_NONE
+//
+// So as to map the data into the virtual memory space, but not actually put it in physical memory (like MEM_RESERVE|MEM_COMMIT)
+// and then just use mprotect() to actually MAP the pages into physical memory as needed (mimics MEM_COMMIT).
+//
+// But, this needs more work.
 void*
 sys_allocate_memory(usize allocation_size)
 {
@@ -58,6 +67,10 @@ sys_allocate_memory(usize allocation_size)
     return(data);
 }
 
+// TODO(Sleepster): 
+// Again, mmap is weird. You can't just pass the virtual address and say "give me more memory off of this base address" 
+// because... idk unix stuff? Again, this is behavior that Windows actually supports better. AS for how to replicate on Unix?
+// idk yet...
 void*
 sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
 {

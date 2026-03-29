@@ -172,8 +172,8 @@ struct render_command_bind_shader_t
 
 struct render_command_set_viewport_t
 {
-    vec2_t size;
     vec2_t offset; 
+    vec2_t size;
 };
 
 struct render_command_set_scissor_t
@@ -414,6 +414,7 @@ uniform_constant_buffer_t* s_renderer_get_constant_buffer(renderer_state_t *rend
             render_buffer_t s_renderer_render_buffer_create(renderer_state_t *renderer_state, void *data, u32 size, render_buffer_type_t type, render_buffer_usage_t usage);
 true_inline render_buffer_t s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_usage_t usage, void *data, u32 size);
 true_inline render_buffer_t s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_usage_t usage, void *data, u32 size);
+true_inline void            s_renderer_render_buffer_copy_data(renderer_state_t *renderer_state, render_buffer_t *buffer, void *data, u32 size, u32 offset);
 
 image_t                s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info);
 void                   s_renderer_image_destroy(renderer_state_t *renderer_state, image_t *image);
@@ -440,6 +441,8 @@ void r_cmd_draw_indexed(render_command_list_t *command_list, u32 index_count, u3
 void r_cmd_dispatch_compute(render_command_list_t *command_list, u32 invoke_x, u32 invoke_y, u32 invoke_z);
 void r_cmd_blit_image(render_command_list_t *command_list, image_t *source_image, image_t *dest_image, vec2_t source_offset, vec2_t source_blit_size, vec2_t dest_offset, vec2_t dest_blit_size);
 void r_cmd_present(render_command_list_t *command_list, image_t *presentation_source);
+
+void s_renderer_execute_backend_commands(renderer_state_t *renderer_state);
 
 void
 r_cmd_draw_rectangle(render_command_list_t *command_list, 

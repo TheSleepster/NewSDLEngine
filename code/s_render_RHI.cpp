@@ -27,7 +27,6 @@ s_renderer_state_init
 void
 s_renderer_state_init(renderer_state_t *renderer_state, void *render_context)
 {
-    ZeroStruct(*renderer_state);
     renderer_state->renderer_arena  = c_arena_create(MB(100));
     renderer_state->transient_arena = c_arena_create(MB(100));
 
@@ -49,7 +48,9 @@ s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_
     vulkan_context_t *vulkan_context = (vulkan_context_t *)renderer_state->render_context;
     vk_backend_handle_window_resize(vulkan_context, window_size);
 
-    renderer_state->window_size                     = window_size;
+    renderer_state->window_size.x = window_size.x;
+    renderer_state->window_size.y = window_size.y;
+
     renderer_state->last_window_size_generation     = renderer_state->current_window_size_generation;
     renderer_state->current_window_size_generation += 1;
 
@@ -60,11 +61,40 @@ s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_
         renderpass_t *renderpass = renderer_state->renderpasses + renderpass_index;
         if(renderpass->resize_with_window)
         {
+            for(u32 color_attachment_index = 0;
+                color_attachment_index < renderpass->color_attachment_count;
+                ++color_attachment_index)
+            {
+                renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
+                image_create_info_t *info = &attachment->image->create_info;
+                info->width  = renderer_state->window_size.x;
+                info->height = renderer_state->window_size.y;
+
+                s_renderer_image_destroy(renderer_state, attachment->image);
+                *attachment->image = s_renderer_image_create(renderer_state, info);
+            }
+
+            if(renderpass->has_depth_stencil_attachment)
+            {
+                image_create_info_t *info = &renderpass->depth_stencil_attachment.image->create_info;
+                info->width  = renderer_state->window_size.x;
+                info->height = renderer_state->window_size.y;
+
+                s_renderer_image_destroy(renderer_state, renderpass->depth_stencil_attachment.image);
+                *renderpass->depth_stencil_attachment.image = s_renderer_image_create(renderer_state, info);
+            }
+
             renderpass->create_info.render_width = renderer_state->window_size.x;
             renderpass->create_info.render_width = renderer_state->window_size.y;
             renderpass->ID = s_renderer_build_renderpass(renderer_state, &renderpass->create_info);
         }
     }
+}
+
+void
+s_renderer_execute_backend_commands(renderer_state_t *renderer_state)
+{
+    vk_backend_render_frame((vulkan_context_t*)renderer_state->render_context, renderer_state);
 }
 
 /*
@@ -350,6 +380,17 @@ s_renderer_render_buffer_create(renderer_state_t *renderer_state, void *data, u3
     return(result);
 }
 
+/*
+=============
+s_renderer_render_buffer_copy_data
+=============
+*/
+
+true_inline void
+s_renderer_render_buffer_copy_data(renderer_state_t *renderer_state, render_buffer_t *buffer, void *data, u32 size, u32 offset)
+{
+    vk_backend_buffer_copy_data((vulkan_context_t*)renderer_state->render_context, &buffer->buffer, data, size, offset);
+}
 
 /////////////////////////
 // UNIFORM BUFFERS 
@@ -594,8 +635,8 @@ r_cmd_set_viewport(render_command_list_t *command_list, vec2_t offset, vec2_t si
     render_command_t *command  = s_renderer_get_next_command(command_list);
     render_command_set_viewport_t *set_viewport = c_arena_push_struct(&command_list->command_arena, 
                                                                        render_command_set_viewport_t);
-    set_viewport->size   = size;
-    set_viewport->offset = offset;
+    set_viewport->size   = vec2(size.x, size.y);
+    set_viewport->offset = vec2(offset.x, offset.y);
 
     command->header.command_type = RCT_SetViewport;
     command->data = set_viewport;

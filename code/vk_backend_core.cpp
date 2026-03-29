@@ -2323,11 +2323,16 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_SetViewport:
                 {
                     render_command_set_viewport_t *cmd = (render_command_set_viewport_t*)command->data;
+
+                    VkPhysicalDeviceLimits *limits = &vulkan_context->gpu.properties.limits;
+                    s32 device_max_width  = limits->maxViewportDimensions[0];
+                    s32 device_max_height = limits->maxViewportDimensions[1];
+
                     VkViewport viewport = {
                         .x        = cmd->offset.x,
                         .y        = cmd->offset.y,
-                        .width    = cmd->size.x,
-                        .height   = cmd->size.y,
+                        .width    = (float32)(Clamp((s32)cmd->size.x, -device_max_width,  device_max_width)),
+                        .height   = (float32)(Clamp((s32)cmd->size.y, -device_max_height, device_max_height)),
                         .minDepth = 0.0,
                         .maxDepth = 1.0
                     };

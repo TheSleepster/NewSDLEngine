@@ -35,8 +35,8 @@
 
 void game_main(void);
 
-internal_api void
-process_window_events(SDL_Window *window, renderer_state_t *renderer_state, input_manager_t *input_manager)
+void
+process_window_events(renderer_state_t *renderer_state, input_manager_t *input_manager)
 {
     SDL_Event event;
     while(SDL_PollEvent(&event))
@@ -52,12 +52,9 @@ process_window_events(SDL_Window *window, renderer_state_t *renderer_state, inpu
             {
                 s32 window_x = 0;
                 s32 window_y = 0;
-                SDL_GetWindowSizeInPixels(window, &window_x, &window_y);
+                SDL_GetWindowSizeInPixels(renderer_state->window, &window_x, &window_y);
 
-                g_window_size.x = (float32)window_x;
-                g_window_size.y = (float32)window_y;
-
-                s_renderer_handle_window_resize(renderer_state, g_window_size);
+                s_renderer_handle_window_resize(renderer_state, vec2(window_x, window_y));
             }break;
         }
     }
@@ -66,9 +63,16 @@ process_window_events(SDL_Window *window, renderer_state_t *renderer_state, inpu
 int
 main(int argc, char **argv)
 {
-    vulkan_context_t *vulkan_context = Alloc(vulkan_context_t);
+    c_global_context_init();
+    global_context->renderer_state = c_arena_push_struct(&global_context->context_arena, renderer_state_t);
+    global_context->asset_manager  = c_arena_push_struct(&global_context->context_arena, asset_manager_t);
+    global_context->input_manager  = c_arena_push_struct(&global_context->context_arena, input_manager_t);
 
-    global_context->renderer_state->window_size = vec2(600, 600);
+    global_context->renderer_state->render_context = c_arena_push_struct(&global_context->context_arena, vulkan_context_t);
+    global_context->asset_manager->vulkan_context  = (vulkan_context_t*)global_context->renderer_state->render_context; 
+    vulkan_context_t *vulkan_context = (vulkan_context_t*)global_context->renderer_state->render_context;
+
+    global_context->renderer_state->window_size = vec2(2560, 1440);
     if(SDL_Init(SDL_INIT_VIDEO))
     {
         global_context->renderer_state->window = SDL_CreateWindow("Vulkan...", 
@@ -79,7 +83,6 @@ main(int argc, char **argv)
         {
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
         }
-        c_global_context_init();
         vk_backend_init(vulkan_context, global_context->renderer_state->window);
 
         // TODO(Sleepster): The count will need to be adjusted in the future. But this is fine for now 
@@ -88,14 +91,16 @@ main(int argc, char **argv)
 
         s_asset_manager_init(global_context->asset_manager);
         s_asset_manager_load_asset_file(global_context->asset_manager, STR("asset_data.jfd"));
-        global_context->asset_manager->vulkan_context = vulkan_context;
 
         s_im_init_input_manager(global_context->input_manager);
         s_renderer_state_init(global_context->renderer_state, vulkan_context);
 
         global_context->running = true;
-        game_main();
-        // call game main
+        while(global_context->running)
+        {
+            // TODO(Sleepster): Eventually hot reloading... 
+            game_main();
+        }
     }
     else
     {

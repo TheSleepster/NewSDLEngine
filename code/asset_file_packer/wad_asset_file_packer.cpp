@@ -14,7 +14,7 @@
 #include <c_base.h>
 #include <c_types.h>
 #include <c_math.h>
-#include <c_globals.h>
+#include <c_global_context.h>
 #include <c_log.h>
 #include <c_string.h>
 #include <c_file_api.h>
@@ -28,7 +28,7 @@
 
 #include <s_asset_manager.h>
 
-#include <c_globals.cpp>
+#include <c_global_context.cpp>
 #include <c_zone_allocator.cpp>
 #include <c_memory_arena.cpp>
 #include <c_string.cpp>

@@ -12,7 +12,7 @@ CODE_GEN_IGNORE_FILE()
 
 #include <c_types.h>
 #include <c_math.h>
-#include <c_globals.h>
+#include <c_global_context.h>
 #include <c_log.h>
 #include <c_string.h>
 #include <c_file_api.h>

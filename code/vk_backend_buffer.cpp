@@ -140,10 +140,10 @@ vk_backend_buffer_copy_data(vulkan_context_t *vulkan_context,
     if(buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_CPU_TO_GPU ||
        buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_CPU_ONLY)
     {
-        byte *mapped_data = buffer->allocation.mapped_data;
+        byte *mapped_data = buffer->allocation.mapped_data + buffer->allocation.offset;
 
         // NOTE(Sleepster): Data is persistently mapped by the vulkan allocator... 
-        memcpy(mapped_data + offset, data, copy_size);
+        memcpy((mapped_data) + offset, data, copy_size);
     }
     else if(buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_GPU_ONLY ||
             buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_GPU_TO_CPU)

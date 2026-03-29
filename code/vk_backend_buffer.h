@@ -29,7 +29,7 @@ struct vulkan_buffer_t
 // NOTE(Sleepster): We can build a list of these infos so that they can all be uploaded at once
 // right before rendering so that we can limit the amount of pipeline barriers and waits. Waiting on
 // one barrier and set of sync objects instead of many duplicate fences and commands.
-struct vulkan_staging_info_t
+struct vulkan_staging_info_t 
 {
     vulkan_buffer_t *target_buffer;
     byte            *data_to_upload;
@@ -46,13 +46,6 @@ struct vulkan_staging_buffer_t
     VkFence         upload_complete_fence;
 };
 
-void* vk_backend_buffer_append_data(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, void *data, u32 size);
-
-vulkan_buffer_t
-vk_backend_buffer_create(vulkan_context_t              *vulkan_context, 
-                         u64                            buffer_size, 
-                         VkBufferUsageFlags             usage_flags, 
-                         vulkan_allocation_usage_type_t usage_type);
 void
 vk_backend_buffer_copy_buffer(vulkan_context_t *vulkan_context,
                               vulkan_buffer_t  *source_buffer,
@@ -68,10 +61,13 @@ vk_backend_buffer_copy_data(vulkan_context_t *vulkan_context,
                             u64               copy_size,
                             u64               offset);
 
-void                    vk_backend_buffer_destroy(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
-void                    vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, VkCommandBuffer command_buffer, u64 new_size);
-void*                   vk_backend_buffer_map(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, u32 offset, u32 size);
-void                    vk_backend_buffer_unmap(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
+vulkan_buffer_t vk_backend_buffer_create(vulkan_context_t *vulkan_context, u64 buffer_size, VkBufferUsageFlags usage_flags, vulkan_allocation_usage_type_t usage_type);
+void            vk_backend_buffer_destroy(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
+void            vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, VkCommandBuffer command_buffer, u64 new_size);
+void*           vk_backend_buffer_map(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, u32 offset, u32 size);
+void            vk_backend_buffer_unmap(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
+void*           vk_backend_buffer_append_data(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, void *data, u32 size);
+
 
 vulkan_staging_buffer_t vk_backend_staging_buffer_create(vulkan_context_t *vulkan_context, u64 size, VkBufferUsageFlags usage_flags, vulkan_allocation_usage_type_t memory_type);
 void                    vk_backend_buffer_upload_staged_data(vulkan_context_t *vulkan_context, VkCommandBuffer command_buffer, vulkan_buffer_t *target_buffer);
