@@ -294,14 +294,14 @@ game_main(void)
             mat4_t projection_matrix;
         }camera_matrix_buffer_data;
 
-        s32 window_width  = Max(renderer_state->window_size.x, 10);
-        s32 window_height = Max(renderer_state->window_size.y, 10);
+        s32 window_width  = Max(game_renderpass_desc.render_width, 10);
+        s32 window_height = Max(game_renderpass_desc.render_height, 10);
 
-        s32 half_window_width  = renderer_state->window_size.x * 0.5;
-        s32 half_window_height = renderer_state->window_size.y * 0.5;
+        s32 half_window_width  = game_renderpass_desc.render_width  * 0.5;
+        s32 half_window_height = game_renderpass_desc.render_height * 0.5;
         camera_matrix_buffer_data = {
             .view_matrix       = mat4_identity(),
-            .projection_matrix = mat4_RHGL_ortho(-half_window_width, half_window_height, -half_window_width, half_window_height, -1, 1)
+            .projection_matrix = mat4_RHGL_ortho(-half_window_width, half_window_width, -half_window_height, half_window_height, -1, 1)
         };
         r_cmd_update_buffer_contents(command_list, camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
 

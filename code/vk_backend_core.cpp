@@ -2099,8 +2099,6 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                     write->descriptorType  = binding->type;
                     write->pBufferInfo     = buffer_info;
                 }break;
-                {
-                }break;
                 case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
                 {
                     VkDescriptorImageInfo *image_info = image_infos + image_count;

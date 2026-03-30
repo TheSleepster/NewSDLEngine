@@ -15,6 +15,8 @@
 - [ ] Some entity to manage buffers, allowing us to control things like all data being staged before the frame.
 - [ ] Better support for both CPU mapped buffers and GPU exclusive buffers.
 
+⌄ Kinda goes with the below here ⌄  
+
 ** GPU Resource Manager
 the goal of this item is very simple, just allow us to control and
 monitor gpu data in a way that is managed rather than
