@@ -147,7 +147,7 @@ draw_entity(game_state_t *game_state, vec2_t position, vec2_t size)
     game_state->vertex_count += 4;
 }
 
-void
+int
 game_main(void)
 {
     game_state_t game_state = {};
@@ -225,8 +225,8 @@ game_main(void)
         index_offset += 4;
     }
 
-    render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, RenderBufferUsage_Dynamic, null,    sizeof(render_vertex_t) * (4 * MAX_ENTITIES));
-    render_buffer_t index_buffer  = s_renderer_index_buffer_create(renderer_state,  RenderBufferUsage_Dynamic, indices, (sizeof(u32) * (6 * MAX_ENTITIES)));
+    render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, RenderBufferAllocationTypeGPUOnly, null,    sizeof(render_vertex_t) * (4 * MAX_ENTITIES));
+    render_buffer_t index_buffer  = s_renderer_index_buffer_create(renderer_state,  RenderBufferAllocationTypeGPUOnly, indices, (sizeof(u32) * (6 * MAX_ENTITIES)));
     game_state.vertex_data        = c_arena_push_array(&renderer_state->renderer_arena, render_vertex_t, 4 * 10000);
 
     uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
@@ -277,10 +277,11 @@ game_main(void)
             vec2_t size     = entity->size;
 
             entity->rotation += 0.001;
-
             draw_entity(&game_state, position, size);
         }
-        s_renderer_render_buffer_copy_data(renderer_state, &vertex_buffer, game_state.vertex_data, game_state.vertex_count * sizeof(render_vertex_t), 0);
+        // TODO(Sleepster): This should just be a command, we can store the vertex data for this buffer using a transient frame allocator and just bind the data
+        // later on.
+        s_renderer_render_buffer_copy_data(renderer_state, &vertex_buffer, game_state.vertex_data, Align16(game_state.vertex_count * sizeof(render_vertex_t)), 0);
         game_state.vertex_count = 0;
 
         render_command_list_t *command_list = s_renderer_get_command_list(renderer_state);
@@ -319,5 +320,5 @@ game_main(void)
         vertex_buffer.buffer.used = 0;
     }
 
-    return;
+    return(0);
 }

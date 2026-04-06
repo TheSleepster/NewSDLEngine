@@ -311,9 +311,9 @@ s_renderer_vertex_buffer_create
 */
 
 true_inline render_buffer_t
-s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_usage_t usage, void *data, u32 size)
+s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, void *data, u32 size)
 {
-    render_buffer_t result = s_renderer_render_buffer_create(renderer_state, data, size, RenderBufferType_VertexBuffer, usage);
+    render_buffer_t result = s_renderer_render_buffer_create(renderer_state, data, size, RenderBufferType_VertexBuffer, memory_type);
     return(result);
 }
 
@@ -324,9 +324,9 @@ s_renderer_index_buffer_create
 */
 
 true_inline render_buffer_t
-s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_usage_t usage, void *data, u32 size)
+s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, void *data, u32 size)
 {
-    render_buffer_t result = s_renderer_render_buffer_create(renderer_state, data, size, RenderBufferType_IndexBuffer, usage);
+    render_buffer_t result = s_renderer_render_buffer_create(renderer_state, data, size, RenderBufferType_IndexBuffer, memory_type);
     return(result);
 }
 
@@ -337,33 +337,36 @@ s_renderer_render_buffer_create
 */
 
 render_buffer_t
-s_renderer_render_buffer_create(renderer_state_t *renderer_state, void *data, u32 size, render_buffer_type_t type, render_buffer_usage_t usage)
+s_renderer_render_buffer_create(renderer_state_t           *renderer_state, 
+                                void                       *data, 
+                                u32                         size, 
+                                render_buffer_type_t        buffer_type, 
+                                render_buffer_memory_type_t allocation_type)
 {
     render_buffer_t result = {};
-    result.type   = type;
-    result.size   = size;
-    result.usage  = usage;
-    result.offset = 0;
+    result.type            = buffer_type;
+    result.size            = size;
+    result.allocation_type = allocation_type;
 
     VkBufferUsageFlags             usage_flags      = (VkBufferUsageFlagBits)0;
     vulkan_allocation_usage_type_t allocation_flags = (vulkan_allocation_usage_type_t)0;
+    Assert(buffer_type != RenderBufferType_Invalid);
 
-    // TODO(Sleepster): I'm lazy, but later make a "vk_backend_vertex_buffer_create()" and "vk_backend_index_buffer_create()"
-    Assert(type != RenderBufferType_Invalid);
-    if(type == RenderBufferType_IndexBuffer)
+    usage_flags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+    if(buffer_type == RenderBufferType_IndexBuffer)
     {
         usage_flags |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
     }
-    else if (type == RenderBufferType_VertexBuffer)
+    else if (buffer_type == RenderBufferType_VertexBuffer)
     {
         usage_flags |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
     }
 
-    if(usage == RenderBufferUsage_Dynamic)
+    if(allocation_type == RenderBufferAllocationTypeMapped)
     {
         allocation_flags = VULKAN_MEMORY_USAGE_CPU_TO_GPU; 
     }
-    else if(usage == RenderBufferUsage_Static)
+    else if(allocation_type == RenderBufferAllocationTypeGPUOnly)
     {
         allocation_flags = VULKAN_MEMORY_USAGE_GPU_ONLY;
     }

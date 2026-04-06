@@ -18,32 +18,11 @@ struct vulkan_buffer_t
 
     u64                      size;
     u64                      used;
-    u64                      offset;
     VkBufferUsageFlags       usage_flags;
     vulkan_allocation_info_t allocation;
 
     // NOTE(Sleepster): This should be modified and managed by the buffer_manager 
     u32                      last_used_timestamp;
-};
-
-// NOTE(Sleepster): We can build a list of these infos so that they can all be uploaded at once
-// right before rendering so that we can limit the amount of pipeline barriers and waits. Waiting on
-// one barrier and set of sync objects instead of many duplicate fences and commands.
-struct vulkan_staging_info_t 
-{
-    vulkan_buffer_t *target_buffer;
-    byte            *data_to_upload;
-    u64              upload_size;
-
-    // NOTE(Sleepster): Written to us by the uploader 
-    u64              staging_buffer_offset;
-};
-
-struct vulkan_staging_buffer_t
-{
-    vulkan_buffer_t buffer;
-    bool32          submitted;
-    VkFence         upload_complete_fence;
 };
 
 void
@@ -68,6 +47,25 @@ void*           vk_backend_buffer_map(vulkan_context_t *vulkan_context, vulkan_b
 void            vk_backend_buffer_unmap(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
 void*           vk_backend_buffer_append_data(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, void *data, u32 size);
 
+// NOTE(Sleepster): We can build a list of these infos so that they can all be uploaded at once
+// right before rendering so that we can limit the amount of pipeline barriers and waits. Waiting on
+// one barrier and set of sync objects instead of many duplicate fences and commands.
+struct vulkan_staging_info_t 
+{
+    vulkan_buffer_t *target_buffer;
+    u64              upload_size;
+    u64              target_offset;
+
+    // NOTE(Sleepster): Written to us by the uploader 
+    u64              staging_buffer_offset;
+};
+
+struct vulkan_staging_buffer_t
+{
+    vulkan_buffer_t buffer;
+    bool32          submitted;
+    VkFence         upload_complete_fence;
+};
 
 vulkan_staging_buffer_t vk_backend_staging_buffer_create(vulkan_context_t *vulkan_context, u64 size, VkBufferUsageFlags usage_flags, vulkan_allocation_usage_type_t memory_type);
 void                    vk_backend_buffer_upload_staged_data(vulkan_context_t *vulkan_context, VkCommandBuffer command_buffer, vulkan_buffer_t *target_buffer);

@@ -34,21 +34,19 @@ enum render_buffer_type_t
     RenderBufferType_IndexBuffer  = BIT(2),
 };
 
-enum render_buffer_usage_t 
+enum render_buffer_memory_type_t
 {
-    RenderBufferUsage_Dynamic = BIT(0),
-    RenderBufferUsage_Static  = BIT(1)
+    RenderBufferAllocationTypeMapped  = BIT(0),
+    RenderBufferAllocationTypeGPUOnly = BIT(1)
 };
 
 struct render_buffer_t
 {
-    render_buffer_type_t  type;
-    render_buffer_usage_t usage;
+    render_buffer_type_t        type;
+    render_buffer_memory_type_t allocation_type;
+    u32                         size;
 
-    u32                   size;
-    u32                   offset;
-
-    vulkan_buffer_t       buffer;
+    vulkan_buffer_t             buffer;
 };
 
 ////////////////////
@@ -411,9 +409,9 @@ u32              s_renderer_build_renderpass(renderer_state_t *renderer_state, r
 
 uniform_constant_buffer_t* s_renderer_get_constant_buffer(renderer_state_t *renderer_state, string_t uniform_name);
 
-            render_buffer_t s_renderer_render_buffer_create(renderer_state_t *renderer_state, void *data, u32 size, render_buffer_type_t type, render_buffer_usage_t usage);
-true_inline render_buffer_t s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_usage_t usage, void *data, u32 size);
-true_inline render_buffer_t s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_usage_t usage, void *data, u32 size);
+            render_buffer_t s_renderer_render_buffer_create(renderer_state_t *renderer_state, void *data, u32 size, render_buffer_type_t buffer_type, render_buffer_memory_type_t allocation_type);
+true_inline render_buffer_t s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t usage, void *data, u32 size);
+true_inline render_buffer_t s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t usage, void *data, u32 size);
 true_inline void            s_renderer_render_buffer_copy_data(renderer_state_t *renderer_state, render_buffer_t *buffer, void *data, u32 size, u32 offset);
 
 image_t                s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info);

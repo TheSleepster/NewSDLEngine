@@ -23,7 +23,6 @@ vk_backend_buffer_create(vulkan_context_t              *vulkan_context,
 
     vulkan_buffer_t result = {};
     result.size                  = buffer_size;
-    result.offset                = 0;
     result.used                  = 0;
     result.usage_flags           = usage_flags;
 
@@ -115,7 +114,7 @@ vk_backend_buffer_copy_data
 */
 
 // TODO(Sleepster): 
-// This function just sucks... we can't account for offset in here so I don't know why we even both passing it.
+// This function just sucks... we can't account for offset in here so I don't know why we even bother passing it.
 // and even if we could, we would want to offset from the start of the buffer or from the buffer->used offset? Meaning
 // Would we want:
 //
@@ -133,13 +132,13 @@ vk_backend_buffer_copy_data(vulkan_context_t *vulkan_context,
                             u64               copy_size,
                             u64               offset)
 {
-    Assert(buffer->allocation.mapped_data != null);
     Assert(buffer->allocation.allocation_size - offset >= copy_size);
     Assert(data != null);
 
     if(buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_CPU_TO_GPU ||
        buffer->allocation.allocation_type == VULKAN_MEMORY_USAGE_CPU_ONLY)
     {
+        Assert(buffer->allocation.mapped_data != null);
         byte *mapped_data = buffer->allocation.mapped_data + buffer->allocation.offset;
 
         // NOTE(Sleepster): Data is persistently mapped by the vulkan allocator... 
@@ -223,6 +222,10 @@ vk_backend_buffer_unmap(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffe
     buffer->is_mapped = false;
 }
 
+//////////////////////////
+// OLD STAGING BUFFER API
+//////////////////////////
+
 /*
 =============
 vk_backend_staging_buffer_create
@@ -256,14 +259,28 @@ vk_backend_buffer_stage_data
 =============
 */
 
-// NOTE(Sleepster): You have to align this yourself
+// TODO(Sleepster): Bounds check and dynamic resizing.
 void
 vk_backend_buffer_stage_data(vulkan_context_t *vulkan_context, byte *data, u64 data_size, vulkan_buffer_t *target_buffer)
 {
+    Assert(target_buffer);
+    Assert(data);
+    Assert(data_size > 0);
+
+    vulkan_staging_buffer_t *staging_buffer = vulkan_context->staging_buffers + vulkan_context->current_frame_index;
+    vulkan_buffer_t         *buffer_handle  = &staging_buffer->buffer;
+
+
+    // NOTE(Sleepster): You have to align upload_size yourself
     vulkan_staging_info_t staging_info = {};
-    staging_info.data_to_upload = data;
-    staging_info.upload_size    = data_size;
-    staging_info.target_buffer  = target_buffer;
+    staging_info.upload_size           = data_size;
+    staging_info.target_buffer         = target_buffer;
+    staging_info.staging_buffer_offset = buffer_handle->used;
+    staging_info.target_offset         = target_buffer->used;
+
+    // NOTE(Sleepster): This buffer is persistently mapped so it's all fine. 
+    memcpy(buffer_handle->allocation.mapped_data + buffer_handle->used, data, data_size);
+    buffer_handle->used += data_size;
 
     c_dynarray_push(vulkan_context->staging_infos, staging_info);
 }
@@ -277,8 +294,7 @@ vk_backend_buffer_upload_staged_data
 void
 vk_backend_buffer_upload_staged_data(vulkan_context_t *vulkan_context, VkCommandBuffer command_buffer) 
 {
-    vulkan_staging_buffer_t *staging_buffer = vulkan_context->staging_buffers + vulkan_context->current_frame_index;
-    vulkan_buffer_t         *buffer         = &staging_buffer->buffer;
+#if 0
     c_dynarray_for(vulkan_context->staging_infos, info_index)
     {
         vulkan_staging_info_t *info = c_dynarray_get_ptr(vulkan_context->staging_infos, info_index);
@@ -299,6 +315,7 @@ vk_backend_buffer_upload_staged_data(vulkan_context_t *vulkan_context, VkCommand
         info->staging_buffer_offset = buffer->used;
         buffer->used               += info->upload_size;
     }    
+#endif
 }
 
 /*
@@ -319,15 +336,13 @@ vk_backend_buffer_flush_staging_buffer(vulkan_context_t *vulkan_context,
 
         VkBufferCopy region = {
             .srcOffset = info->staging_buffer_offset,
-            .dstOffset = info->target_buffer->used,
+            .dstOffset = info->target_offset,
             .size      = info->upload_size,
         };
 
         vkCmdCopyBuffer(command_buffer, staging_buffer->buffer.handle, info->target_buffer->handle, 1, &region);
-        info->target_buffer->used += info->upload_size;
     }
     staging_buffer->buffer.used   = 0;
-    staging_buffer->buffer.offset = 0;
     staging_buffer->submitted     = true;
     
     c_dynarray_clear(vulkan_context->staging_infos);

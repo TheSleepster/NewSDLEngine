@@ -33,7 +33,7 @@
 #include <asset_file_packer/jfd_asset_file.h>
 //#include <meta/GENERATED_program_RTTI.h>
 
-void game_main(void);
+int game_main(void);
 
 void
 process_window_events(renderer_state_t *renderer_state, input_manager_t *input_manager)
@@ -99,11 +99,22 @@ main(int argc, char **argv)
         while(global_context->running)
         {
             // TODO(Sleepster): Eventually hot reloading... 
-            game_main();
+            s32 value = game_main();
+            if(value == -1) 
+            {
+                // this is where we would reset and flush ALL state and reload the game DLL
+            }
+            else if(value == 0)
+            {
+                global_context->running = false;
+                break;
+            }
         }
     }
     else
     {
-        Assert(false);
+        Expect(false, "Could not initialize SDL... SDL_Init failed with error: '%s'...\n", SDL_GetError());
     }
+
+    return(0);
 }
