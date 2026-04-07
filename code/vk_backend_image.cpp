@@ -97,7 +97,6 @@ vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *i
                                    VK_ACCESS_SHADER_READ_BIT,
                                    src_range);
     vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_buffer);
-
     vk_backend_buffer_destroy(vulkan_context, &copy_buffer);
 }
 

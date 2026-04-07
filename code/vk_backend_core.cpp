@@ -2155,7 +2155,11 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
     if(window_resize || vulkan_context->rebuilding_swapchain)
     {
         vk_backend_swapchain_rebuild(vulkan_context);
-            
+
+        VkCommandBuffer scratch_command_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
+        vk_backend_buffer_flush_staging_buffer(vulkan_context, scratch_command_buffer);
+        vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
+
         // NOTE(Sleepster): Reset the staging buffer... 
         vulkan_staging_buffer_t *staging_buffer = vulkan_context->staging_buffers + vulkan_context->current_frame_index;
         staging_buffer->buffer.used = 0;

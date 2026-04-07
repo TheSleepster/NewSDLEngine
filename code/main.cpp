@@ -225,8 +225,8 @@ game_main(void)
         index_offset += 4;
     }
 
-    render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, RenderBufferAllocationTypeGPUOnly, null,    sizeof(render_vertex_t) * (4 * MAX_ENTITIES));
-    render_buffer_t index_buffer  = s_renderer_index_buffer_create(renderer_state,  RenderBufferAllocationTypeGPUOnly, indices, (sizeof(u32) * (6 * MAX_ENTITIES)));
+    render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, RenderBufferAllocationTypeMapped, null,    sizeof(render_vertex_t) * (4 * MAX_ENTITIES));
+    render_buffer_t index_buffer  = s_renderer_index_buffer_create(renderer_state,  RenderBufferAllocationTypeMapped, indices, (sizeof(u32) * (6 * MAX_ENTITIES)));
     game_state.vertex_data        = c_arena_push_array(&renderer_state->renderer_arena, render_vertex_t, 4 * 10000);
 
     uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
