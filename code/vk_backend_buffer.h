@@ -68,7 +68,6 @@ struct vulkan_staging_buffer_t
 };
 
 vulkan_staging_buffer_t vk_backend_staging_buffer_create(vulkan_context_t *vulkan_context, u64 size, VkBufferUsageFlags usage_flags, vulkan_allocation_usage_type_t memory_type);
-void                    vk_backend_buffer_upload_staged_data(vulkan_context_t *vulkan_context, VkCommandBuffer command_buffer, vulkan_buffer_t *target_buffer);
 void                    vk_backend_buffer_flush_staging_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer   command_buffer);
 void                    vk_backend_buffer_stage_data(vulkan_context_t *vulkan_context, byte *data, u64 data_size, vulkan_buffer_t *target_buffer);
 

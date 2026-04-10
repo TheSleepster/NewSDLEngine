@@ -36,6 +36,16 @@
 #define STBI_ONLY_PNG
 #include <stb/stb_image.h>
 
+internal_api
+C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
+{
+    void *result = null;
+    result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
+
+    return(result);
+}
+
+
 /*===============================
   ========== TEXTURES ===========
   =============================== */
@@ -351,6 +361,343 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
     return(result);
 }
 
+/*===========================================
+  ================ FONT DATA  ===============
+  ===========================================*/
+u32
+s_UTF8_convert_UTF32(u8 *character)
+{
+    u32 result = 0;
+    u8  continuation_bytes = UTF8_trailing_bytes[character[0]];
+    if(continuation_bytes + 1 < 1000)
+    {
+        u32 utf32_char = character[0] & UTF8_initial_bytemask[continuation_bytes];
+        for(s32 byte = 1;
+            byte < continuation_bytes;
+            ++byte)
+        {
+            utf32_char  = utf32_char << 6;
+            utf32_char |= character[byte] & 0x3F;
+        }
+
+        if(utf32_char > UTF32_MAX_CHARACTER) utf32_char = UTF32_REPLACEMENT_CHARACTER;
+
+        result = utf32_char;
+    }
+    return(result);
+}
+
+bool8
+s_asset_font_set_unknown_character(dynamic_render_font_varient_t *varient, u32 UTF32_index)
+{
+    bool8 result = false;
+    
+    u32 glyph_index = FT_Get_Char_Index(varient->parent_font->font_face, UTF32_index);
+    if(glyph_index)
+    {
+        varient->default_unknown_character = glyph_index;
+        result = true;
+    }
+
+    return(result);
+}
+
+dynamic_render_font_page_t*
+s_asset_font_create_new_page(asset_manager_t *asset_manager, dynamic_render_font_varient_t *varient, memory_arena_t *arena)
+{
+    dynamic_render_font_page_t *new_page = null; 
+    new_page = c_arena_push_struct(arena, dynamic_render_font_page_t);
+    Assert(new_page);
+
+    new_page->parent_font = varient->parent_font;
+    new_page->font_atlas  = s_texture_atlas_create(asset_manager, 4096, 4, BMF_RGB24_UNORM, 0);
+    new_page->varient     = varient;
+    c_hash_table_init(&new_page->glyphs, 
+                      2087, 
+                      arena, 
+                     &asset_manager_hash_arena_allocate, 
+                      null);
+
+    return(new_page);
+}
+
+dynamic_render_font_varient_t*
+s_asset_font_create_new_varient(asset_manager_t *asset_manager, dynamic_render_font_t *font, u32 font_size)
+{
+    dynamic_render_font_varient_t *result = c_arena_push_struct(&font->font_arena, dynamic_render_font_varient_t);
+    result->font_size   = font_size;
+    result->parent_font = font;
+    result->first_page  = s_asset_font_create_new_page(asset_manager, result, &font->font_arena);
+
+    FT_Error error = FT_Set_Pixel_Sizes(font->font_face, 0, font_size);
+    Assert(error == 0);
+
+    float64 font_scale_to_pixels = font->font_face->size->metrics.y_scale / (64.0 * 65536.0);
+    result->pixel_size    = font_scale_to_pixels;
+    result->line_spacing  =  (s64)floor(font_scale_to_pixels * font->font_face->height    + 0.5);
+    result->max_ascender  =  (s64)floor(font_scale_to_pixels * font->font_face->bbox.yMax + 0.5);
+    result->max_descender = -(s64)floor(font_scale_to_pixels * font->font_face->bbox.yMin + 0.5);
+
+    // NOTE(Sleepster): Using 'm' as the baseline character
+    u32 glyph_index = FT_Get_Char_Index(font->font_face, 'm');
+    if(glyph_index)
+    {
+        FT_Load_Glyph(font->font_face, glyph_index, FT_LOAD_DEFAULT);
+        result->y_center_offset = (s32)(0.5f * FT_ROUND(font->font_face->glyph->metrics.horiBearingY) + 0.5f);
+    }
+
+    glyph_index = FT_Get_Char_Index(font->font_face, 'M');
+    if(glyph_index)
+    {
+        FT_Load_Glyph(font->font_face, glyph_index, FT_LOAD_DEFAULT);
+        result->em_width = FT_ROUND(font->font_face->glyph->metrics.width);
+    }
+
+    glyph_index = FT_Get_Char_Index(font->font_face, 'T');
+    if(glyph_index)
+    {
+        FT_Load_Glyph(font->font_face, glyph_index, FT_LOAD_DEFAULT);
+        result->typical_ascender = FT_ROUND(font->font_face->glyph->metrics.horiBearingY);
+    }
+
+    glyph_index = FT_Get_Char_Index(font->font_face, 'g');
+    if(glyph_index)
+    {
+        FT_Load_Glyph(font->font_face, glyph_index, FT_LOAD_DEFAULT);
+        result->typical_descender = FT_ROUND(font->font_face->glyph->metrics.horiBearingY - font->font_face->glyph->metrics.height);
+    }
+
+    error = FT_Select_Charmap(font->font_face, FT_ENCODING_UNICODE);
+    if(error)
+    {
+        log_error("Failure to set the charmap to unicode.... supplied font does not support Unicode...\n");
+    }
+
+    bool8 success = s_asset_font_set_unknown_character(result,        0xfffd); // Replacement character
+    if(!success) success = s_asset_font_set_unknown_character(result, 0x2022); // bullet char
+    if(!success) success = s_asset_font_set_unknown_character(result, (u32)'?');
+    if(!success) log_warning("Unable to set the unknown character for this font...\n");
+
+    c_dynarray_push(font->varients, result);
+
+    return(result);
+}
+
+dynamic_render_font_t 
+s_asset_font_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
+{
+    dynamic_render_font_t result = {};
+    slot->ID  = name_hash;
+    if(!FT_New_Memory_Face(asset_manager->freetype_handle, 
+                          slot->package_entry->asset_data.data, 
+                          slot->package_entry->asset_data.count, 
+                          0, 
+                         &result.font_face))
+    {
+        result.font_arena = c_arena_create(MB(10));
+        result.varients   = c_dynarray_create(dynamic_render_font_varient_t*);
+    }
+    else
+    { 
+        log_error("Failure to load font: '%.*s'...\n",
+                  slot->name.count, slot->name.data);
+    }
+
+    return(result);
+}
+
+dynamic_render_font_varient_t*
+s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t *font_handle, u32 font_size)
+{
+    Assert(font_handle->type == AT_Font);
+    dynamic_render_font_varient_t *result = null;
+
+    if(font_handle->is_valid)
+    {
+        dynamic_render_font_t *font = font_handle->dynamic_render_font;
+        c_dynarray_for(font->varients, varient_index)
+        {
+            dynamic_render_font_varient_t *varient = font->varients[varient_index];
+            if(varient->font_size == font_size)
+            {
+                result = varient;
+            }
+        }
+
+        if(result == null)
+        {
+            result = s_asset_font_create_new_varient(asset_manager, font, font_size);
+        }
+    }
+
+    return(result);
+}
+
+glyph_metric_t*
+s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
+                         dynamic_render_font_varient_t *varient,
+                         byte                          *codepoint)
+{
+    glyph_metric_t *result = null;
+
+    u32 codepoint_UTF32 = s_UTF8_convert_UTF32(codepoint);
+    string_t codepoint_data = {
+        .data  = (byte*)&codepoint_UTF32,
+        .count = sizeof(u32),
+    };
+
+    dynamic_render_font_page_t *last_page = null;
+    dynamic_render_font_page_t *our_page  = null;
+
+    for(dynamic_render_font_page_t *current_page = varient->first_page;
+        current_page;
+        current_page = current_page->next_page)
+    {
+        glyph_metric_t *found = c_hash_table_get_value(&current_page->glyphs, codepoint_data);
+        if(found)
+        {
+            result   = found;
+            our_page = current_page;
+
+            break;
+        }
+
+        last_page = current_page;
+    }
+
+    if(result == null)
+    {
+        Assert(last_page);
+        if(!last_page->is_full)
+        {
+            glyph_metric_t *new_glyph = c_arena_push_struct(&varient->parent_font->font_arena, glyph_metric_t);
+            c_hash_table_insert_pair(&last_page->glyphs, codepoint_data, new_glyph);
+
+            our_page = last_page;
+        }
+        else
+        {
+            last_page->next_page = s_asset_font_create_new_page(asset_manager, 
+                                                                varient, 
+                                                               &varient->parent_font->font_arena);
+            our_page = last_page->next_page;
+        }
+    }
+    Assert(our_page);
+    Assert(our_page->is_full == false);
+
+    result = c_hash_table_get_value(&our_page->glyphs, codepoint_data);
+    if(result->is_fetched == false)
+    {
+        result->is_fetched = true;
+        
+        dynamic_render_font_t *parent = varient->parent_font;
+
+        temporary_glyph_t *temp_glyph = our_page->temporary_glyphs + our_page->temporary_glyph_count++;
+        temp_glyph->utf32_codepoint = codepoint_UTF32;
+        temp_glyph->cursor_x = our_page->atlas_cursor_x;
+        temp_glyph->cursor_x = our_page->atlas_cursor_y;
+        temp_glyph->metrics  = result;
+
+        u32 glyph_index = FT_Get_Char_Index(parent->font_face, codepoint_UTF32);
+        FT_Load_Glyph(parent->font_face, glyph_index, FT_LOAD_NO_SCALE);
+
+        FT_Fixed advance = 0;
+        FT_Get_Advance(parent->font_face, glyph_index, FT_LOAD_NO_SCALE, &advance);
+
+        // NOTE(Sleepster): These are in font units (e.g., 2048 units per EM)
+        temp_glyph->glyph_width  = parent->font_face->glyph->metrics.width;
+        temp_glyph->glyph_height = parent->font_face->glyph->metrics.height;
+        if(temp_glyph->glyph_height > our_page->tallest_y)
+        {
+            our_page->tallest_y = temp_glyph->glyph_height;
+        }
+
+        // NOTE(Sleepster): This is for multithreaded atlas writing later. 
+        our_page->atlas_cursor_x += (advance >> 16);
+        if(our_page->atlas_cursor_x >= 4096)
+        {
+            our_page->atlas_cursor_x  = 0;
+            our_page->atlas_cursor_y += our_page->tallest_y;
+        }
+
+        if(our_page->atlas_cursor_y + our_page->tallest_y >= 4096)
+        {
+            our_page->is_full = true;
+        }
+
+        if(!our_page->is_dirty)
+        {
+            font_manager_t *font_manager = &asset_manager->font_manager;
+
+            our_page->is_dirty = true;
+            font_manager->pages_to_update[font_manager->pages_queued++] = our_page;
+        }
+
+        // NOTE(Sleepster): This glyph should not be loaded yet... If it is? Weird...
+        Assert(result->is_valid == false);
+    }
+
+    return(result);
+}
+
+void
+s_asset_font_load_glyph(dynamic_render_font_varient_t *varient, 
+                        dynamic_render_font_page_t    *page, 
+                        temporary_glyph_t             *temp_glyph)
+{
+    glyph_metric_t *metrics = temp_glyph->metrics;
+    FT_Face font_face = page->parent_font->font_face;
+
+    FT_Error error = FT_Set_Pixel_Sizes(font_face, 0, varient->font_size);
+    Assert(!error);
+
+    u32 glyph_index = FT_Get_Char_Index(font_face, temp_glyph->utf32_codepoint);
+    if(!glyph_index)
+    {
+        log_warning("UTF32 character '%d' cannot be found...\n", temp_glyph->utf32_codepoint);
+        glyph_index = varient->default_unknown_character;
+    }
+
+    error = FT_Load_Glyph(font_face, glyph_index, FT_LOAD_RENDER);
+    assert(!error);
+
+    s32 glyph_width   = font_face->glyph->bitmap.width;
+    s32 row_height    = font_face->glyph->bitmap.rows;
+
+    metrics->offset_x   = (s16)(font_face->glyph->bitmap_left);
+    metrics->offset_y   = (s16)(row_height - font_face->glyph->bitmap_top);
+    metrics->advance    = (s16)(font_face->glyph->advance.x >> 6);
+    metrics->ascent     = (s16)(font_face->glyph->metrics.horiBearingY >> 6);
+
+    metrics->atlas_offset = vec2((float32)temp_glyph->cursor_x / (float32)4096,
+                                 (float32)temp_glyph->cursor_y / (float32)4096);
+
+    metrics->atlas_size = vec2((float32)glyph_width / (float32)4096,
+                               (float32)row_height  / (float32)4096);
+
+    bitmap_t *atlas_bitmap = page->font_atlas->bitmap_data;
+    for(s32 row = 0;
+        row < row_height;
+        ++row)
+    {
+        for(s32 column = 0;
+            column < glyph_width;
+            ++column)
+        {
+            u8  source = font_face->glyph->bitmap.buffer[(row_height - 1 - row) * font_face->glyph->bitmap.pitch + column];
+            u8 *dest   = (u8*)atlas_bitmap->pixels.data + ((temp_glyph->cursor_y + row) * 4096 + (temp_glyph->cursor_x + column)) * 4;
+
+            dest[0] = source;
+            dest[1] = source;
+            dest[2] = source;
+            dest[3] = source;
+        }
+    }
+
+    metrics->is_valid = true;
+}
+
 /*===============================
   ========= ASSET DATA ==========
   =============================== */
@@ -378,25 +725,24 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
     {
         case AT_Bitmap:
         {
-            slot->texture   = s_asset_texture_create(asset_manager, slot, name_hash);
+            slot->texture = s_asset_texture_create(asset_manager, slot, name_hash);
             log_info("Loading texture data for bitmap: '%s'...\n", C_STR(handle->slot->name));
         }break;
         case AT_Shader:
         {
-            slot->shader   = s_asset_shader_create(asset_manager, slot, name_hash);
+            slot->shader = s_asset_shader_create(asset_manager, slot, name_hash);
             log_info("Loading shader data for: '%s'...\n", C_STR(handle->slot->name));
         }break;
         case AT_Material:
         {
             slot->material.material_type = SMT_Archetype; 
-
-            slot->material   = s_asset_material_create(asset_manager, slot, name_hash);
+            slot->material = s_asset_material_create(asset_manager, slot, name_hash);
             log_info("Loading material data for: '%s'...\n", C_STR(handle->slot->name));
         }break;
         case AT_Font:
         {
-            log_warning("Not loading font... not currently supported...\n");
-            //handle->found = &slot->font;
+            slot->dynamic_render_font = s_asset_font_create(asset_manager, slot, name_hash);
+            log_info("Loading font data for: '%s'...\n", C_STR(handle->slot->name));
         }break;
         case AT_Sound:
         {
@@ -410,15 +756,6 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
     AtomicIncrement32(&slot->package_generation);
 }
 
-internal_api
-C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
-{
-    void *result = null;
-    result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
-
-    return(result);
-}
-
 // ===============================
 // ========== ASSET MANAGER ======
 // ===============================
@@ -430,13 +767,16 @@ s_asset_manager_init(asset_manager_t *asset_manager)
     Assert(asset_manager->is_initialized == false);
     stbi_set_flip_vertically_on_load(0);
 
+    FT_Init_FreeType(&asset_manager->freetype_handle);
+    Expect(asset_manager->freetype_handle != null, "Failure to initialize freetype...\n");
+
     asset_manager->manager_arena   = c_arena_create(MB(100));
     asset_manager->asset_allocator = c_za_create(GB(1));
     for(u32 catalog_index = 1;
         catalog_index < AT_Count;
         ++catalog_index)
     {
-        asset_catalog *catalog = asset_manager->asset_catalogs + catalog_index;
+        asset_catalog_t *catalog = asset_manager->asset_catalogs + catalog_index;
         catalog->asset_manager = asset_manager;
         c_hash_table_init(&catalog->asset_lookup, 
                            ASSET_CATALOG_MAX_LOOKUPS, 
@@ -463,6 +803,61 @@ s_asset_manager_init(asset_manager_t *asset_manager)
     asset_manager->sound_catalog    = asset_manager->asset_catalogs + AT_Sound;
 
     asset_manager->is_initialized = true;
+}
+
+void
+s_asset_manager_update(asset_manager_t *asset_manager)
+{
+    for(u32 atlas_index = 0;
+        atlas_index < asset_manager->atlas_registry.current_atlas_count;
+        ++atlas_index)
+    {
+        texture_atlas_t *atlas = asset_manager->atlas_registry.atlases + atlas_index;
+        if(atlas->merge_counter > 0)
+        {
+            s_texture_atlas_pack_added_textures(asset_manager, atlas);
+        }
+    }
+
+    font_manager_t *font_manager = &asset_manager->font_manager;
+    for(u32 page_index = 0;
+        page_index < font_manager->pages_queued;
+        ++page_index)
+    {
+        dynamic_render_font_page_t *page = font_manager->pages_to_update[page_index];
+        if(page->is_dirty)
+        {
+            for(u32 glyph_index = 0;
+                glyph_index < page->temporary_glyph_count;
+                ++glyph_index)
+            {
+                temporary_glyph_t *glyph = page->temporary_glyphs + glyph_index;
+                s_asset_font_load_glyph(page->varient, page, glyph);
+            }
+
+            if(page->font_atlas->texture.gpu_data.vulkan_image.handle)
+            {
+                s_renderer_image_update_data(asset_manager->vulkan_context, &page->font_atlas->texture.gpu_data);
+            }
+            else
+            {
+                vulkan_image_info_t info = {};
+                info.data           = page->font_atlas->texture.bitmap.pixels;
+                info.width          = 4096;
+                info.height         = 4096;
+                info.type           = VK_IMAGE_TYPE_2D;
+                info.mip_count      = 1;
+                info.sample_count   = 1;
+                info.initial_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+                info.usage          = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+                info.format         = VK_FORMAT_R8G8B8A8_UNORM;
+
+                page->font_atlas->texture.gpu_data.vulkan_image = vk_backend_image_create(asset_manager->vulkan_context, &info);
+            }
+            page->is_dirty = false;
+            page->temporary_glyph_count = 0;
+        }
+    }
 }
 
 bool8
@@ -522,18 +917,23 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
                                                       entry->entry_header->filename_size, 
                                                       data_offset, 
                                                      &asset_file->init_arena);
+
             entry->asset_data.count = entry->entry_header->entry_data_size;
             entry->data_offset   = data_offset + entry->filename.count;
             current_file_offset += entry->entry_header->total_entry_size;
              
             c_hash_table_insert_pair(&asset_file->entry_hash, entry->filename, (s32)entry_index);
             c_hash_table_insert_pair(&asset_manager->asset_name_to_file, entry->filename, (s32)asset_file->ID);
-            u64 hash_value = c_hash_table_value_from_key(entry->filename.data, entry->filename.count, asset_manager->asset_name_to_file.header.max_entries);
+            u64 hash_value = c_hash_table_value_from_key(entry->filename.data, 
+                                                         entry->filename.count, 
+                                                         asset_manager->asset_name_to_file.header.max_entries);
 
-            log_debug("Inserting asset with name: '%s' with a name length of: '%d' into the name_to_file hash with file_index: '%d' hash_value: '%llu'...\n", C_STR(entry->filename), entry->filename.count, asset_file->ID, hash_value);
+            log_debug("Inserting asset with name: '%s' with a name length of: '%d' into the name_to_file hash with file_index: '%d' hash_value: '%llu'...\n", 
+                      C_STR(entry->filename), entry->filename.count, asset_file->ID, hash_value);
 
             asset_catalog_t *catalog = asset_manager->asset_catalogs + entry->entry_header->asset_type;
             asset_slot_t    *slot    = c_hash_table_get_value_ptr(&catalog->asset_lookup, entry->filename);
+
             Assert(entry->entry_header->asset_type == catalog->catalog_type);
             Assert(slot);
 
@@ -578,10 +978,10 @@ s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot
 {
     switch(slot->type)
     {
-        case AT_Bitmap:   {handle->texture       = &slot->texture; }break;
-        case AT_Shader:   {handle->shader        = &slot->shader;  }break;
-        case AT_Material: {handle->material_info = &slot->material;}break;
-        //case AT_Font:     {}break;
+        case AT_Bitmap:   {handle->texture             = &slot->texture;            }break;
+        case AT_Shader:   {handle->shader              = &slot->shader;             }break;
+        case AT_Material: {handle->material_info       = &slot->material;           }break;
+        case AT_Font:     {handle->dynamic_render_font = &slot->dynamic_render_font;}break;
         //case AT_Sound:    {}break;
     }
 }
@@ -613,12 +1013,13 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
 
         result.type = (asset_type_t)entry->entry_header->asset_type;
         result.slot = slot;
-        result.owner_asset_file_index         = file_index;
-        result.is_valid                       = true;
+        result.owner_asset_file_index = file_index;
+        result.is_valid               = true;
         if(result.slot->slot_state == ASLS_Unloaded)
         {
             // NOTE(Sleepster): If unloaded, get the data 
             s_asset_manager_load_asset_data(asset_manager, &result, hash_value);
+            c_dynarray_push(catalog->loaded_assets, slot);
         }
         else if(result.slot->slot_state == ASLS_Loaded)
         {
@@ -695,8 +1096,9 @@ s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_hand
 }
 
 void
-s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_atlas_t *atlas)
+s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atlas_t *atlas)
 {
+    vulkan_context_t *vulkan_context = asset_manager->vulkan_context;
     Assert(atlas->is_valid);
 
     if(atlas->merge_counter > 0)
@@ -762,7 +1164,7 @@ s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_at
         }
         c_dynarray_clear(atlas->textures_to_merge);
     
-        // TODO(Sleepster): Create a wrapper for this
+        // TODO(Sleepster): Replace this with the image_t stuff
         vulkan_image_info_t info = {};
         info.data           = atlas->bitmap_data->pixels;
         info.width          = atlas->bitmap_data->width;
@@ -788,3 +1190,53 @@ s_texture_atlas_pack_added_textures(vulkan_context_t *vulkan_context, texture_at
         log_info("There are no textures to pack currently...\n");
     }
 }
+
+shader_t*
+s_asset_get_shader_from_handle(asset_handle_t *handle) 
+{
+    shader_t *result = null;
+    result = &handle->slot->shader;
+
+    return(result);
+}
+
+texture2D_t*
+s_asset_get_texture_from_handle(asset_handle_t *handle) 
+{
+    texture2D_t *result = null;
+    result = &handle->slot->texture;;
+
+    return(result);
+}
+
+material_data_t*
+s_asset_get_material_data_from_handle(asset_handle_t *handle)
+{
+    material_data_t *result = null;
+    result = &handle->slot->material;
+
+    return(result);
+}
+
+material_archetype_t*
+s_asset_get_material_archetype_from_handle(asset_handle_t *handle) 
+{
+    Assert(handle->material_info->material_type == SMT_Archetype);
+
+    material_archetype_t *result = null;
+    result = &handle->slot->material.archetype;
+
+    return(result);
+}
+
+material_instance_t*
+s_asset_get_material_instance_from_handle(asset_handle_t *handle)
+{
+    Assert(handle->material_info->material_type == SMT_Instance);
+
+    material_instance_t *result = null;
+    result = &handle->material_info->instance;
+
+    return(result);
+}
+

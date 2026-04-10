@@ -42,6 +42,7 @@ struct vulkan_image_info_t
     u32      type;
     u32      format;
     u32      initial_layout;
+    u32      sampler_type;
 
     string_t data;
 };

@@ -15,7 +15,8 @@
 typedef struct vec2 vec2_t;
 
 struct renderer_state_t;
-typedef struct asset_manager  asset_manager_t;
+struct asset_manager_t;
+
 typedef struct input_manager  input_manager_t;
 
 typedef struct global_context

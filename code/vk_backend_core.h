@@ -40,7 +40,7 @@ struct alignas(16) render_vertex_t
 {
     vec4_t vPosition;
     vec4_t vColor;
-    vec2_t vCorner;
+    vec2_t vTexCoord;
     vec2_t vPadding;
 };
 

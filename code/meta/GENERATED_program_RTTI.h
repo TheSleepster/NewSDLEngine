@@ -129,6 +129,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_texture2D_t, type_id(texture2D_t), "texture2D_t") \
 	X(TYPE_shader_t, type_id(shader_t), "shader_t") \
 	X(TYPE_material_data_t, type_id(material_data_t), "material_data_t") \
+	X(TYPE_dynamic_render_font_t, type_id(dynamic_render_font_t), "dynamic_render_font_t") \
 	X(TYPE_asset_handle_t, type_id(asset_handle_t), "asset_handle_t") \
 	X(TYPE_bitmap_t, type_id(bitmap_t), "bitmap_t") \
 	X(TYPE_texture_atlas_t, type_id(texture_atlas_t), "texture_atlas_t") \
@@ -138,8 +139,17 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_material_instance_t, type_id(material_instance_t), "material_instance_t") \
 	X(TYPE_VkDescriptorSet, type_id(VkDescriptorSet), "VkDescriptorSet") \
 	X(TYPE_stored_material_type_t, type_id(stored_material_type_t), "stored_material_type_t") \
+	X(TYPE_glyph_metric_t, type_id(glyph_metric_t), "glyph_metric_t") \
+	X(TYPE_temporary_glyph_t, type_id(temporary_glyph_t), "temporary_glyph_t") \
+	X(TYPE_dynamic_render_font_varient_t, type_id(dynamic_render_font_varient_t), "dynamic_render_font_varient_t") \
+	X(TYPE_s64, type_id(s64), "s64") \
+	X(TYPE_dynamic_render_font_page_t, type_id(dynamic_render_font_page_t), "dynamic_render_font_page_t") \
+	X(TYPE_FT_Face, type_id(FT_Face), "FT_Face") \
 	X(TYPE_jfd_package_entry_t, type_id(jfd_package_entry_t), "jfd_package_entry_t") \
+	X(TYPE_texture_manager_t, type_id(texture_manager_t), "texture_manager_t") \
+	X(TYPE_font_manager_t, type_id(font_manager_t), "font_manager_t") \
 	X(TYPE_texture_atlas_registry_t, type_id(texture_atlas_registry_t), "texture_atlas_registry_t") \
+	X(TYPE_FT_Library, type_id(FT_Library), "FT_Library") \
 	X(TYPE_asset_manager_asset_file_data_t, type_id(asset_manager_asset_file_data_t), "asset_manager_asset_file_data_t") \
 	X(TYPE_controller_type_t, type_id(controller_type_t), "controller_type_t") \
 	X(TYPE_input_mouse_buttons_t, type_id(input_mouse_buttons_t), "input_mouse_buttons_t") \
@@ -407,7 +417,12 @@ const static shader_t GENERATED_DEFAULT_shader_t = {};
 const static material_instance_t GENERATED_DEFAULT_material_instance_t = {};
 const static material_archetype_t GENERATED_DEFAULT_material_archetype_t = {};
 const static material_data_t GENERATED_DEFAULT_material_data_t = {};
+const static glyph_metric_t GENERATED_DEFAULT_glyph_metric_t = {};
+const static temporary_glyph_t GENERATED_DEFAULT_temporary_glyph_t = {};
+const static dynamic_render_font_varient_t GENERATED_DEFAULT_dynamic_render_font_varient_t = {};
 const static asset_slot_t GENERATED_DEFAULT_asset_slot_t = {};
+const static texture_manager_t GENERATED_DEFAULT_texture_manager_t = {};
+const static font_manager_t GENERATED_DEFAULT_font_manager_t = {};
 const static texture_atlas_registry_t GENERATED_DEFAULT_texture_atlas_registry_t = {};
 const static action_button_t GENERATED_DEFAULT_action_button_t = {};
 const static keyboard_controller_data_t GENERATED_DEFAULT_keyboard_controller_data_t = {};
@@ -1306,7 +1321,7 @@ struct type_info_struct_asset_handle_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[8];
+		type_info_member_t member_array[9];
 		struct {
 			type_info_member_t is_valid;
 			type_info_member_t type;
@@ -1316,6 +1331,7 @@ struct type_info_struct_asset_handle_t {
 			type_info_member_t texture;
 			type_info_member_t shader;
 			type_info_member_t material_info;
+			type_info_member_t dynamic_render_font;
 		}members;
 	};
 };
@@ -1458,6 +1474,80 @@ struct type_info_struct_material_data_t {
 	};
 };
 
+struct type_info_struct_glyph_metric_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[10];
+		struct {
+			type_info_member_t is_valid;
+			type_info_member_t is_fetched;
+			type_info_member_t advance;
+			type_info_member_t ascent;
+			type_info_member_t width;
+			type_info_member_t height;
+			type_info_member_t offset_x;
+			type_info_member_t offset_y;
+			type_info_member_t atlas_offset;
+			type_info_member_t atlas_size;
+		}members;
+	};
+};
+
+struct type_info_struct_temporary_glyph_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t utf32_codepoint;
+			type_info_member_t metrics;
+			type_info_member_t glyph_width;
+			type_info_member_t glyph_height;
+			type_info_member_t cursor_x;
+			type_info_member_t cursor_y;
+		}members;
+	};
+};
+
+struct type_info_struct_dynamic_render_font_varient_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[13];
+		struct {
+			type_info_member_t font_size;
+			type_info_member_t pixel_size;
+			type_info_member_t line_spacing;
+			type_info_member_t max_ascender;
+			type_info_member_t max_descender;
+			type_info_member_t y_center_offset;
+			type_info_member_t typical_ascender;
+			type_info_member_t typical_descender;
+			type_info_member_t em_width;
+			type_info_member_t default_unknown_character;
+			type_info_member_t default_utf32_unknown_character;
+			type_info_member_t parent_font;
+			type_info_member_t first_page;
+		}members;
+	};
+};
+
 struct type_info_struct_asset_slot_t {
 	const char *name;
 	u32 type;
@@ -1467,7 +1557,7 @@ struct type_info_struct_asset_slot_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[11];
+		type_info_member_t member_array[12];
 		struct {
 			type_info_member_t ID;
 			type_info_member_t slot_state;
@@ -1478,8 +1568,43 @@ struct type_info_struct_asset_slot_t {
 			type_info_member_t package_generation;
 			type_info_member_t ref_counter;
 			type_info_member_t texture;
+			type_info_member_t dynamic_render_font;
 			type_info_member_t shader;
 			type_info_member_t material;
+		}members;
+	};
+};
+
+struct type_info_struct_texture_manager_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t atlases;
+			type_info_member_t current_atlas_count;
+		}members;
+	};
+};
+
+struct type_info_struct_font_manager_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t pages_to_update;
+			type_info_member_t pages_queued;
 		}members;
 	};
 };
@@ -2386,7 +2511,7 @@ struct type_info_struct_vulkan_image_info_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[9];
+		type_info_member_t member_array[10];
 		struct {
 			type_info_member_t width;
 			type_info_member_t height;
@@ -2396,6 +2521,7 @@ struct type_info_struct_vulkan_image_info_t {
 			type_info_member_t type;
 			type_info_member_t format;
 			type_info_member_t initial_layout;
+			type_info_member_t sampler_type;
 			type_info_member_t data;
 		}members;
 	};
@@ -2685,7 +2811,7 @@ struct type_info_enum_bitmap_format_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[12];
+		type_info_member_t member_array[13];
 		struct {
 			type_info_member_t BMF_Invalid;
 			type_info_member_t BMF_R8;
@@ -2694,7 +2820,8 @@ struct type_info_enum_bitmap_format_t {
 			type_info_member_t BMF_RGBA32_SRGB;
 			type_info_member_t BMF_RGBA32_UNORM;
 			type_info_member_t BMF_BGRA32_UNORM;
-			type_info_member_t BMF_RGB24;
+			type_info_member_t BMF_RGB24_UNORM;
+			type_info_member_t BMF_RGB24_SRGB;
 			type_info_member_t BMF_D24_SFLOAT_S8;
 			type_info_member_t BMF_D32_SFLOAT_S8_UINT;
 			type_info_member_t BMF_D32_SFLOAT;
@@ -3746,7 +3873,7 @@ const static type_info_struct_asset_handle_t type_info_struct_asset_handle_t_con
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_asset_handle_t),
-	.member_count = 8,
+	.member_count = 9,
 	.members = {
 		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), is_valid))},
 		.type = {.name = "type", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), type))},
@@ -3756,6 +3883,7 @@ const static type_info_struct_asset_handle_t type_info_struct_asset_handle_t_con
 		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), texture))},
 		.shader = {.name = "shader", .type = TYPE_shader_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), shader))},
 		.material_info = {.name = "material_info", .type = TYPE_material_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.material_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), material_info))},
+		.dynamic_render_font = {.name = "dynamic_render_font", .type = TYPE_dynamic_render_font_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.dynamic_render_font)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), dynamic_render_font))},
 	}
 };
 
@@ -3876,6 +4004,71 @@ const static type_info_struct_material_data_t type_info_struct_material_data_t_c
 	}
 };
 
+const static type_info_struct_glyph_metric_t type_info_struct_glyph_metric_t_const_data = {
+	.name = "glyph_metric_t",
+	.type = TYPE_glyph_metric_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_glyph_metric_t),
+	.member_count = 10,
+	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), is_valid))},
+		.is_fetched = {.name = "is_fetched", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.is_fetched)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), is_fetched))},
+		.advance = {.name = "advance", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.advance)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), advance))},
+		.ascent = {.name = "ascent", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.ascent)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), ascent))},
+		.width = {.name = "width", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), width))},
+		.height = {.name = "height", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), height))},
+		.offset_x = {.name = "offset_x", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.offset_x)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), offset_x))},
+		.offset_y = {.name = "offset_y", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.offset_y)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), offset_y))},
+		.atlas_offset = {.name = "atlas_offset", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.atlas_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), atlas_offset))},
+		.atlas_size = {.name = "atlas_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.atlas_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), atlas_size))},
+	}
+};
+
+const static type_info_struct_temporary_glyph_t type_info_struct_temporary_glyph_t_const_data = {
+	.name = "temporary_glyph_t",
+	.type = TYPE_temporary_glyph_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_temporary_glyph_t),
+	.member_count = 6,
+	.members = {
+		.utf32_codepoint = {.name = "utf32_codepoint", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_temporary_glyph_t.utf32_codepoint)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_temporary_glyph_t), utf32_codepoint))},
+		.metrics = {.name = "metrics", .type = TYPE_glyph_metric_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_temporary_glyph_t.metrics)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_temporary_glyph_t), metrics))},
+		.glyph_width = {.name = "glyph_width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_temporary_glyph_t.glyph_width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_temporary_glyph_t), glyph_width))},
+		.glyph_height = {.name = "glyph_height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_temporary_glyph_t.glyph_height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_temporary_glyph_t), glyph_height))},
+		.cursor_x = {.name = "cursor_x", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_temporary_glyph_t.cursor_x)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_temporary_glyph_t), cursor_x))},
+		.cursor_y = {.name = "cursor_y", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_temporary_glyph_t.cursor_y)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_temporary_glyph_t), cursor_y))},
+	}
+};
+
+const static type_info_struct_dynamic_render_font_varient_t type_info_struct_dynamic_render_font_varient_t_const_data = {
+	.name = "dynamic_render_font_varient_t",
+	.type = TYPE_dynamic_render_font_varient_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_dynamic_render_font_varient_t),
+	.member_count = 13,
+	.members = {
+		.font_size = {.name = "font_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.font_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), font_size))},
+		.pixel_size = {.name = "pixel_size", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.pixel_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), pixel_size))},
+		.line_spacing = {.name = "line_spacing", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.line_spacing)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), line_spacing))},
+		.max_ascender = {.name = "max_ascender", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.max_ascender)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), max_ascender))},
+		.max_descender = {.name = "max_descender", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.max_descender)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), max_descender))},
+		.y_center_offset = {.name = "y_center_offset", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.y_center_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), y_center_offset))},
+		.typical_ascender = {.name = "typical_ascender", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.typical_ascender)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), typical_ascender))},
+		.typical_descender = {.name = "typical_descender", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.typical_descender)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), typical_descender))},
+		.em_width = {.name = "em_width", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.em_width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), em_width))},
+		.default_unknown_character = {.name = "default_unknown_character", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.default_unknown_character)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), default_unknown_character))},
+		.default_utf32_unknown_character = {.name = "default_utf32_unknown_character", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.default_utf32_unknown_character)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), default_utf32_unknown_character))},
+		.parent_font = {.name = "parent_font", .type = TYPE_dynamic_render_font_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.parent_font)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), parent_font))},
+		.first_page = {.name = "first_page", .type = TYPE_dynamic_render_font_page_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t.first_page)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_dynamic_render_font_varient_t), first_page))},
+	}
+};
+
 const static type_info_struct_asset_slot_t type_info_struct_asset_slot_t_const_data = {
 	.name = "asset_slot_t",
 	.type = TYPE_asset_slot_t,
@@ -3883,7 +4076,7 @@ const static type_info_struct_asset_slot_t type_info_struct_asset_slot_t_const_d
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_asset_slot_t),
-	.member_count = 11,
+	.member_count = 12,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), ID))},
 		.slot_state = {.name = "slot_state", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.slot_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), slot_state))},
@@ -3894,8 +4087,37 @@ const static type_info_struct_asset_slot_t type_info_struct_asset_slot_t_const_d
 		.package_generation = {.name = "package_generation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.package_generation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), package_generation))},
 		.ref_counter = {.name = "ref_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.ref_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), ref_counter))},
 		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), texture))},
+		.dynamic_render_font = {.name = "dynamic_render_font", .type = TYPE_dynamic_render_font_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.dynamic_render_font)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), dynamic_render_font))},
 		.shader = {.name = "shader", .type = TYPE_shader_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), shader))},
 		.material = {.name = "material", .type = TYPE_material_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.material)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), material))},
+	}
+};
+
+const static type_info_struct_texture_manager_t type_info_struct_texture_manager_t_const_data = {
+	.name = "texture_manager_t",
+	.type = TYPE_texture_manager_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_texture_manager_t),
+	.member_count = 2,
+	.members = {
+		.atlases = {.name = "atlases", .type = TYPE_texture_atlas_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_manager_t.atlases)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_manager_t), atlases))},
+		.current_atlas_count = {.name = "current_atlas_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_texture_manager_t.current_atlas_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_texture_manager_t), current_atlas_count))},
+	}
+};
+
+const static type_info_struct_font_manager_t type_info_struct_font_manager_t_const_data = {
+	.name = "font_manager_t",
+	.type = TYPE_font_manager_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_font_manager_t),
+	.member_count = 2,
+	.members = {
+		.pages_to_update = {.name = "pages_to_update", .type = TYPE_dynamic_render_font_page_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_font_manager_t.pages_to_update)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_font_manager_t), pages_to_update))},
+		.pages_queued = {.name = "pages_queued", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_font_manager_t.pages_queued)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_font_manager_t), pages_queued))},
 	}
 };
 
@@ -4661,7 +4883,7 @@ const static type_info_struct_vulkan_image_info_t type_info_struct_vulkan_image_
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_vulkan_image_info_t),
-	.member_count = 9,
+	.member_count = 10,
 	.members = {
 		.width = {.name = "width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), width))},
 		.height = {.name = "height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), height))},
@@ -4671,6 +4893,7 @@ const static type_info_struct_vulkan_image_info_t type_info_struct_vulkan_image_
 		.type = {.name = "type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), type))},
 		.format = {.name = "format", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), format))},
 		.initial_layout = {.name = "initial_layout", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.initial_layout)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), initial_layout))},
+		.sampler_type = {.name = "sampler_type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.sampler_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), sampler_type))},
 		.data = {.name = "data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), data))},
 	}
 };
@@ -4882,7 +5105,7 @@ const static type_info_enum_bitmap_format_t type_info_enum_bitmap_format_t_const
 	.name = "bitmap_format_t",
 	.type = TYPE_bitmap_format_t,
 	.kind = META_TYPE_KIND_Enum,
-	.member_count = 12,
+	.member_count = 13,
 	.members = {
 		.BMF_Invalid = {.name = "BMF_Invalid", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_Invalid), .offset = BMF_Invalid},
 		.BMF_R8 = {.name = "BMF_R8", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_R8), .offset = BMF_R8},
@@ -4891,7 +5114,8 @@ const static type_info_enum_bitmap_format_t type_info_enum_bitmap_format_t_const
 		.BMF_RGBA32_SRGB = {.name = "BMF_RGBA32_SRGB", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_RGBA32_SRGB), .offset = BMF_RGBA32_SRGB},
 		.BMF_RGBA32_UNORM = {.name = "BMF_RGBA32_UNORM", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_RGBA32_UNORM), .offset = BMF_RGBA32_UNORM},
 		.BMF_BGRA32_UNORM = {.name = "BMF_BGRA32_UNORM", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_BGRA32_UNORM), .offset = BMF_BGRA32_UNORM},
-		.BMF_RGB24 = {.name = "BMF_RGB24", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_RGB24), .offset = BMF_RGB24},
+		.BMF_RGB24_UNORM = {.name = "BMF_RGB24_UNORM", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_RGB24_UNORM), .offset = BMF_RGB24_UNORM},
+		.BMF_RGB24_SRGB = {.name = "BMF_RGB24_SRGB", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_RGB24_SRGB), .offset = BMF_RGB24_SRGB},
 		.BMF_D24_SFLOAT_S8 = {.name = "BMF_D24_SFLOAT_S8", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_D24_SFLOAT_S8), .offset = BMF_D24_SFLOAT_S8},
 		.BMF_D32_SFLOAT_S8_UINT = {.name = "BMF_D32_SFLOAT_S8_UINT", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_D32_SFLOAT_S8_UINT), .offset = BMF_D32_SFLOAT_S8_UINT},
 		.BMF_D32_SFLOAT = {.name = "BMF_D32_SFLOAT", .type = TYPE_bitmap_format_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(BMF_D32_SFLOAT), .offset = BMF_D32_SFLOAT},
@@ -5468,6 +5692,7 @@ enum asset_handle_t_member_list_enum {
 	TYPE_ASSET_HANDLE_T_MEMBER_texture,
 	TYPE_ASSET_HANDLE_T_MEMBER_shader,
 	TYPE_ASSET_HANDLE_T_MEMBER_material_info,
+	TYPE_ASSET_HANDLE_T_MEMBER_dynamic_render_font,
 };
 
 enum bitmap_t_member_list_enum {
@@ -5524,6 +5749,44 @@ enum material_data_t_member_list_enum {
 	TYPE_MATERIAL_DATA_T_MEMBER_instance,
 };
 
+enum glyph_metric_t_member_list_enum {
+	TYPE_GLYPH_METRIC_T_MEMBER_is_valid,
+	TYPE_GLYPH_METRIC_T_MEMBER_is_fetched,
+	TYPE_GLYPH_METRIC_T_MEMBER_advance,
+	TYPE_GLYPH_METRIC_T_MEMBER_ascent,
+	TYPE_GLYPH_METRIC_T_MEMBER_width,
+	TYPE_GLYPH_METRIC_T_MEMBER_height,
+	TYPE_GLYPH_METRIC_T_MEMBER_offset_x,
+	TYPE_GLYPH_METRIC_T_MEMBER_offset_y,
+	TYPE_GLYPH_METRIC_T_MEMBER_atlas_offset,
+	TYPE_GLYPH_METRIC_T_MEMBER_atlas_size,
+};
+
+enum temporary_glyph_t_member_list_enum {
+	TYPE_TEMPORARY_GLYPH_T_MEMBER_utf32_codepoint,
+	TYPE_TEMPORARY_GLYPH_T_MEMBER_metrics,
+	TYPE_TEMPORARY_GLYPH_T_MEMBER_glyph_width,
+	TYPE_TEMPORARY_GLYPH_T_MEMBER_glyph_height,
+	TYPE_TEMPORARY_GLYPH_T_MEMBER_cursor_x,
+	TYPE_TEMPORARY_GLYPH_T_MEMBER_cursor_y,
+};
+
+enum dynamic_render_font_varient_t_member_list_enum {
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_font_size,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_pixel_size,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_line_spacing,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_max_ascender,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_max_descender,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_y_center_offset,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_typical_ascender,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_typical_descender,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_em_width,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_default_unknown_character,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_default_utf32_unknown_character,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_parent_font,
+	TYPE_DYNAMIC_RENDER_FONT_VARIENT_T_MEMBER_first_page,
+};
+
 enum asset_slot_t_member_list_enum {
 	TYPE_ASSET_SLOT_T_MEMBER_ID,
 	TYPE_ASSET_SLOT_T_MEMBER_slot_state,
@@ -5534,8 +5797,19 @@ enum asset_slot_t_member_list_enum {
 	TYPE_ASSET_SLOT_T_MEMBER_package_generation,
 	TYPE_ASSET_SLOT_T_MEMBER_ref_counter,
 	TYPE_ASSET_SLOT_T_MEMBER_texture,
+	TYPE_ASSET_SLOT_T_MEMBER_dynamic_render_font,
 	TYPE_ASSET_SLOT_T_MEMBER_shader,
 	TYPE_ASSET_SLOT_T_MEMBER_material,
+};
+
+enum texture_manager_t_member_list_enum {
+	TYPE_TEXTURE_MANAGER_T_MEMBER_atlases,
+	TYPE_TEXTURE_MANAGER_T_MEMBER_current_atlas_count,
+};
+
+enum font_manager_t_member_list_enum {
+	TYPE_FONT_MANAGER_T_MEMBER_pages_to_update,
+	TYPE_FONT_MANAGER_T_MEMBER_pages_queued,
 };
 
 enum texture_atlas_registry_t_member_list_enum {
@@ -5888,6 +6162,7 @@ enum vulkan_image_info_t_member_list_enum {
 	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_type,
 	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_format,
 	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_initial_layout,
+	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_sampler_type,
 	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_data,
 };
 
@@ -6029,7 +6304,8 @@ enum bitmap_format_t_member_list_enum {
 	TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGBA32_SRGB,
 	TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGBA32_UNORM,
 	TYPE_BITMAP_FORMAT_T_MEMBER_BMF_BGRA32_UNORM,
-	TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGB24,
+	TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGB24_UNORM,
+	TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGB24_SRGB,
 	TYPE_BITMAP_FORMAT_T_MEMBER_BMF_D24_SFLOAT_S8,
 	TYPE_BITMAP_FORMAT_T_MEMBER_BMF_D32_SFLOAT_S8_UINT,
 	TYPE_BITMAP_FORMAT_T_MEMBER_BMF_D32_SFLOAT,
@@ -6261,7 +6537,8 @@ enum render_pipeline_depth_function_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_RGBA32_SRGB, "BMF_RGBA32_SRGB") \
 	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_RGBA32_UNORM, "BMF_RGBA32_UNORM") \
 	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_BGRA32_UNORM, "BMF_BGRA32_UNORM") \
-	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_RGB24, "BMF_RGB24") \
+	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_RGB24_UNORM, "BMF_RGB24_UNORM") \
+	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_RGB24_SRGB, "BMF_RGB24_SRGB") \
 	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_D24_SFLOAT_S8, "BMF_D24_SFLOAT_S8") \
 	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_D32_SFLOAT_S8_UINT, "BMF_D32_SFLOAT_S8_UINT") \
 	X(TYPE_ENUM_LOOKUP_BITMAP_FORMAT_T_MEMBER_BMF_D32_SFLOAT, "BMF_D32_SFLOAT") \
@@ -6454,6 +6731,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "texture2D_t", .type = TYPE_texture2D_t, .size = sizeof(texture2D_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture2D_t_const_data},
 	{.name = "shader_t", .type = TYPE_shader_t, .size = sizeof(shader_t), .struct_info = (type_info_struct_t*)&type_info_struct_shader_t_const_data},
 	{.name = "material_data_t", .type = TYPE_material_data_t, .size = sizeof(material_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_data_t_const_data},
+	{.name = "dynamic_render_font_t", .type = TYPE_dynamic_render_font_t, .size = sizeof(dynamic_render_font_t), .struct_info = NULL},
 	{.name = "asset_handle_t", .type = TYPE_asset_handle_t, .size = sizeof(asset_handle_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_handle_t_const_data},
 	{.name = "bitmap_t", .type = TYPE_bitmap_t, .size = sizeof(bitmap_t), .struct_info = (type_info_struct_t*)&type_info_struct_bitmap_t_const_data},
 	{.name = "texture_atlas_t", .type = TYPE_texture_atlas_t, .size = sizeof(texture_atlas_t), .struct_info = NULL},
@@ -6463,8 +6741,17 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "material_instance_t", .type = TYPE_material_instance_t, .size = sizeof(material_instance_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_instance_t_const_data},
 	{.name = "VkDescriptorSet", .type = TYPE_VkDescriptorSet, .size = sizeof(VkDescriptorSet), .struct_info = NULL},
 	{.name = "stored_material_type_t", .type = TYPE_stored_material_type_t, .size = sizeof(stored_material_type_t), .struct_info = NULL},
+	{.name = "glyph_metric_t", .type = TYPE_glyph_metric_t, .size = sizeof(glyph_metric_t), .struct_info = (type_info_struct_t*)&type_info_struct_glyph_metric_t_const_data},
+	{.name = "temporary_glyph_t", .type = TYPE_temporary_glyph_t, .size = sizeof(temporary_glyph_t), .struct_info = (type_info_struct_t*)&type_info_struct_temporary_glyph_t_const_data},
+	{.name = "dynamic_render_font_varient_t", .type = TYPE_dynamic_render_font_varient_t, .size = sizeof(dynamic_render_font_varient_t), .struct_info = (type_info_struct_t*)&type_info_struct_dynamic_render_font_varient_t_const_data},
+	{.name = "s64", .type = TYPE_s64, .size = sizeof(s64), .struct_info = NULL},
+	{.name = "dynamic_render_font_page_t", .type = TYPE_dynamic_render_font_page_t, .size = sizeof(dynamic_render_font_page_t*), .struct_info = NULL},
+	{.name = "FT_Face", .type = TYPE_FT_Face, .size = sizeof(FT_Face), .struct_info = NULL},
 	{.name = "jfd_package_entry_t", .type = TYPE_jfd_package_entry_t, .size = sizeof(jfd_package_entry_t*), .struct_info = NULL},
+	{.name = "texture_manager_t", .type = TYPE_texture_manager_t, .size = sizeof(texture_manager_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture_manager_t_const_data},
+	{.name = "font_manager_t", .type = TYPE_font_manager_t, .size = sizeof(font_manager_t), .struct_info = (type_info_struct_t*)&type_info_struct_font_manager_t_const_data},
 	{.name = "texture_atlas_registry_t", .type = TYPE_texture_atlas_registry_t, .size = sizeof(texture_atlas_registry_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture_atlas_registry_t_const_data},
+	{.name = "FT_Library", .type = TYPE_FT_Library, .size = sizeof(FT_Library), .struct_info = NULL},
 	{.name = "asset_manager_asset_file_data_t", .type = TYPE_asset_manager_asset_file_data_t, .size = sizeof(asset_manager_asset_file_data_t), .struct_info = NULL},
 	{.name = "controller_type_t", .type = TYPE_controller_type_t, .size = sizeof(controller_type_t), .struct_info = NULL},
 	{.name = "input_mouse_buttons_t", .type = TYPE_input_mouse_buttons_t, .size = sizeof(input_mouse_buttons_t), .struct_info = NULL},
@@ -6666,7 +6953,8 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "BMF_RGBA32_SRGB", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGBA32_SRGB, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
 	{.name = "BMF_RGBA32_UNORM", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGBA32_UNORM, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
 	{.name = "BMF_BGRA32_UNORM", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_BGRA32_UNORM, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
-	{.name = "BMF_RGB24", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGB24, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
+	{.name = "BMF_RGB24_UNORM", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGB24_UNORM, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
+	{.name = "BMF_RGB24_SRGB", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_RGB24_SRGB, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
 	{.name = "BMF_D24_SFLOAT_S8", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_D24_SFLOAT_S8, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
 	{.name = "BMF_D32_SFLOAT_S8_UINT", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_D32_SFLOAT_S8_UINT, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},
 	{.name = "BMF_D32_SFLOAT", .member_enum = TYPE_BITMAP_FORMAT_T_MEMBER_BMF_D32_SFLOAT, .type_info_ptr = (const type_info_struct*)&type_info_enum_bitmap_format_t_const_data},

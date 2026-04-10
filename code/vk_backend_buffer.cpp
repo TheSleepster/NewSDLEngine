@@ -290,39 +290,6 @@ vk_backend_buffer_stage_data(vulkan_context_t *vulkan_context, byte *data, u64 d
 
 /*
 =============
-vk_backend_buffer_upload_staged_data
-=============
-*/
-
-void
-vk_backend_buffer_upload_staged_data(vulkan_context_t *vulkan_context, VkCommandBuffer command_buffer) 
-{
-#if 0
-    c_dynarray_for(vulkan_context->staging_infos, info_index)
-    {
-        vulkan_staging_info_t *info = c_dynarray_get_ptr(vulkan_context->staging_infos, info_index);
-        if(info->upload_size > buffer->size) 
-        {
-            Expect(false, 
-                   "Requested upload size of: '%lu' for staging buffer of size: '%lu' is not a valid request...\n", 
-                   info->upload_size, buffer->size);
-        }
-
-        u64 new_offset = buffer->used + info->upload_size;
-        if(new_offset > buffer->size)
-        {
-            Expect(false, "Size of transfer buffer exceeded...\n");
-        }
-        vk_backend_buffer_copy_data(vulkan_context, buffer, info->data_to_upload, info->upload_size, buffer->used);
-
-        info->staging_buffer_offset = buffer->used;
-        buffer->used               += info->upload_size;
-    }    
-#endif
-}
-
-/*
-=============
 vk_backend_buffer_flush_staging_buffer
 =============
 */
@@ -334,7 +301,7 @@ vk_backend_buffer_flush_staging_buffer(vulkan_context_t *vulkan_context,
     vulkan_staging_buffer_t *staging_buffer = vulkan_context->staging_buffers + vulkan_context->current_frame_index;
 
     dynarray_header_t *header = _dynarray_header(vulkan_context->staging_infos);
-    if(header->indices_used > 0) 
+    if(header && header->indices_used > 0) 
     {
         c_dynarray_for(vulkan_context->staging_infos, info_index)
         {

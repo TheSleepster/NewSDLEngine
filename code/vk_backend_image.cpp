@@ -247,6 +247,20 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
     }
 
     vk_backend_image_create_view(vulkan_context, &result);
+    vulkan_sampler_info_t sampler_info = {
+        .anisotropy_enabled = false,
+        .compare_enabled    = false,
+        .max_anisotropy     = 1,
+        .min_filter         = VK_FILTER_NEAREST,
+        .mag_filter         = VK_FILTER_NEAREST,
+        .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+        .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+
+        .use_normalized_coordinates = true,
+    };
+    
+    result.sampler = vk_backend_sampler_create(vulkan_context, &sampler_info);
+
     return(result);
 }
 
@@ -353,8 +367,8 @@ vk_backend_sampler_create(vulkan_context_t *vulkan_context, vulkan_sampler_info_
     create_info.borderColor             = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK;
     create_info.compareEnable           = info->compare_enabled;
     create_info.compareOp               = (VkCompareOp)info->compare_operation;
-    create_info.unnormalizedCoordinates = !info->use_normalized_coordinates;
-    create_info.mipmapMode              = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    create_info.unnormalizedCoordinates = info->use_normalized_coordinates;
+    create_info.mipmapMode              = VK_SAMPLER_MIPMAP_MODE_NEAREST;
 
     vkAssert(vkCreateSampler(vulkan_context->device, &create_info, vulkan_context->cpu_allocation_callbacks, &result));
 

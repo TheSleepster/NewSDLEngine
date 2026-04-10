@@ -2212,8 +2212,6 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
     }
 
     vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
-    // TODO(Sleepster): Perhaps wait on a semaphore instead of this... 
-    vkDeviceWaitIdle(vulkan_context->device);
 
     // TODO(Sleepster): Multithreading is important... This is not good for that... 
     VkCommandBufferBeginInfo begin_info = {
@@ -2380,6 +2378,33 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_BindTexture:
                 {
                     render_command_bind_texture_t *cmd = (render_command_bind_texture_t*)command->data;
+                    if(cmd->texture->vulkan_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+                    {
+                        // TODO(Sleepster): This is awful and brings sadness to families across the world... Too bad I don't care... 
+                        VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
+                        VkImageSubresourceRange source_range = {
+                            .aspectMask     = cmd->texture->vulkan_image.aspect_mask,
+                            .baseArrayLayer = 0,
+                            .baseMipLevel   = 0,
+                            .layerCount     = 1,
+                            .levelCount     = 1,
+                        };
+                        vk_backend_image_change_layout(vulkan_context, 
+                                                       scratch_buffer,
+                                                       cmd->texture->vulkan_image.handle, 
+                                                       cmd->texture->vulkan_image.layout,
+                                                       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
+                                                       VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                                       VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                                                       VK_ACCESS_TRANSFER_WRITE_BIT,
+                                                       VK_ACCESS_SHADER_READ_BIT,
+                                                       source_range);
+                        cmd->texture->vulkan_image.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+                        vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_buffer);
+                        vkDeviceWaitIdle(vulkan_context->device);
+                    }
+
                     command_list->image_shader_params[command_list->image_count++] = cmd->texture;
                 }break;
                 case RCT_SetRenderState:

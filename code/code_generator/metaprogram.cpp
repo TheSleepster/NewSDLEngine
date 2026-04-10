@@ -33,6 +33,12 @@
 typedef struct meta_struct meta_struct_t;
 
 // TODO(Sleepster): 
+// - [ ] Support namespaces and C++ style class::function() notation
+// - [ ] Better error handling and reporting
+// - [ ] Make the data be printed to a file by default instead of just stdout... printing to stdout makes
+//       debug message reporting nearly impossible.
+//
+//
 // - [X] Parse #if 0 blocks inside of structures.
 // - [ ] Arrays that are sized with defined constants "thing_t things[MAX_THINGS]" doesn't work. (line 412)
 // - [ ] Array size is not being set (This is because I don't want to rewrite C utilities like strtol() to use length based strings)
@@ -351,6 +357,14 @@ typedef struct ast_state
     u32                         type_count;
 }ast_state_t;
 
+typedef enum member_parse_error
+{
+    MPE_NestedStructure = -3,
+    MPE_AnonymousMember = -2,
+    MPE_NamespacedType  = -1,
+    MPE_Okay            =  0,
+}member_parse_error_t;
+
 internal_api token_data_t check_define_data(ast_file_data_t *file, token_data_t token);
 
 static ast_state_t state;
@@ -534,13 +548,13 @@ get_registered_type(metatype_data_t *type_info)
     return(result);
 }
 
-internal_api bool8
+internal_api s8
 parse_member_data(ast_file_data_t *file_data, 
                   meta_struct_t   *structure, 
                   meta_member_t   *member,
                   token_data_t     token)
 {
-    bool8 result = true;
+    s8 result = MPE_Okay;
         
     metatype_data_t *type_info = &member->type_info;
 
@@ -602,7 +616,7 @@ parse_member_data(ast_file_data_t *file_data,
             peeking = c_tokenizer_peek_token(&file_data->tokenizer);
             if(peeking.type == TT_OpeningBrace)
             {
-                result = false;
+                result = MPE_AnonymousMember;
                 return(result);
             }
 
@@ -613,7 +627,7 @@ parse_member_data(ast_file_data_t *file_data,
         else if(peeking.type == TT_OpeningBrace)
         {
             // NOTE(Sleepster): This is a nested structure 
-            result = false;
+            result = MPE_NestedStructure;
             return(result);
         }
     }
@@ -646,7 +660,14 @@ parse_member_data(ast_file_data_t *file_data,
 
     // NOTE(Sleepster): Name
     member->name = token.string;
-    Expect(token.type == TT_Identifier, "Name token was not an TT_Identifier...\n");
+    if(token.type != TT_Identifier)
+    {
+        if(token.type == TT_Colon)
+        {
+            result = MPE_NamespacedType;
+            return(result);
+        }
+    }
 
     // NOTE(Sleepster): Check if this is an array... 
     token = c_tokenizer_get_next_token(&file_data->tokenizer);
@@ -754,12 +775,13 @@ parse_structure(ast_file_data *file_data,
 
                 // NOTE(Sleepster): If we return true, this is a valid member.
                 //                  If we return false, this is a nested struct
-                if(parse_member_data(file_data, structure_info, &member, token))
+                s8 error = parse_member_data(file_data, structure_info, &member, token);
+                if(error == MPE_Okay)
                 {
                     c_dynarray_push(structure_info->members, member);
                     structure_info->member_count++;
                 }
-                else
+                else if(error == MPE_NestedStructure || error == MPE_AnonymousMember)
                 {
                     meta_struct_t *nested_struct = parse_structure(file_data, token, ++current_nesting_depth, structure_info);
                     if(!nested_struct) break;
@@ -799,6 +821,11 @@ parse_structure(ast_file_data *file_data,
                             insert_type_information(&nested_struct->type_data, nested_struct, false);
                         }
                     }
+                }
+                else
+                {
+                    // NOTE(Sleepster): Do not do anything with this type as it is namespaced... Just eat the line and continue. 
+                    c_tokenizer_eat_lines(&file_data->tokenizer, 1);
                 }
             }break;
             case TT_OpeningParen:

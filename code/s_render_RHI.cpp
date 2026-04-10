@@ -114,7 +114,8 @@ s_renderer_vulkan_attachment_type(renderpass_attachment_t *attachment)
         case BMF_R8:
         case BMF_B8:
         case BMF_G8:
-        case BMF_RGB24:
+        case BMF_RGB24_SRGB:
+        case BMF_RGB24_UNORM:
         case BMF_RGBA32_SRGB:
         case BMF_RGBA32_UNORM:
         case BMF_BGRA32_UNORM:

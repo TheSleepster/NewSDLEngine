@@ -6,12 +6,11 @@
 - [X] blit_image command
 - [-] Compute shader support (in theory, but we can't test it...)
 - [X] Shader pipeline cache for different GL_States
-- [ ] CLEANUP
-- [ ] MORE CLEANUP (specifically with the vk_backend_buffer functionality... it's REALLY bad...)
+- [X] MORE CLEANUP (specifically with the vk_backend_buffer functionality... it's REALLY bad...)
 - [ ] CLEANUP TODOs
 
 ** Buffer rework
-- [ ] We must be able to stage data more effectively
+- [X] We must be able to stage data more effectively
 - [ ] Some entity to manage buffers, allowing us to control things like all data being staged before the frame.
 - [ ] Better support for both CPU mapped buffers and GPU exclusive buffers.
 
