@@ -10,12 +10,46 @@
 #include <c_string.h>
 #include <vk_backend_image.h>
 
+// NOTE(Sleepster): 
+// The invalid states are meant to help us know if the create_info is 
+// valid or should be ignored completely. 
+enum render_image_filter_type_t 
+{
+    ImageFilterType_Invalid,
+    ImageFilterType_Nearest,
+    ImageFilterType_Linear,
+};
+
+enum render_image_wrapping_type_t 
+{
+    ImageWrapping_Invalid,
+    ImageWrapping_ClampToEdge,
+    ImageWrapping_ClampToBorder,
+    ImageWrapping_Repeat,
+};
+
+struct sampler_create_info_t
+{
+    render_image_filter_type_t   filtering;
+    bool32                       anisotropy_enabled;
+    u32                          max_anisotropy;
+
+    render_image_wrapping_type_t wrapu;
+    render_image_wrapping_type_t wrapv;
+
+    bool32                       compare_ops_enabled;
+    u32                          compare_operation;
+
+    bool32                       use_normalized_coordinates;
+};
+
 struct image_create_info_t
 {
-    string_t data;
-    u32      width;
-    u32      height;
-    u32      format;
+    string_t               data;
+    u32                    width;
+    u32                    height;
+    u32                    format;
+    sampler_create_info_t  sampler_info;
 };
 
 // NOTE(Sleepster): The asset manager should track the actual asset file data. The renderer

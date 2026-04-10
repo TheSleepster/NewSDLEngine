@@ -118,6 +118,9 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_za_allocation_tag_t, type_id(za_allocation_tag_t), "za_allocation_tag_t") \
 	X(TYPE_zone_allocator_block_t, type_id(zone_allocator_block_t), "zone_allocator_block_t") \
 	X(TYPE_zone_allocator_t, type_id(zone_allocator_t), "zone_allocator_t") \
+	X(TYPE_render_image_filter_type_t, type_id(render_image_filter_type_t), "render_image_filter_type_t") \
+	X(TYPE_render_image_wrapping_type_t, type_id(render_image_wrapping_type_t), "render_image_wrapping_type_t") \
+	X(TYPE_sampler_create_info_t, type_id(sampler_create_info_t), "sampler_create_info_t") \
 	X(TYPE_image_create_info_t, type_id(image_create_info_t), "image_create_info_t") \
 	X(TYPE_vulkan_image_t, type_id(vulkan_image_t), "vulkan_image_t") \
 	X(TYPE_image_t, type_id(image_t), "image_t") \
@@ -407,6 +410,7 @@ const static token_data_t GENERATED_DEFAULT_token_data_t = {};
 const static tokenizer_t GENERATED_DEFAULT_tokenizer_t = {};
 const static zone_allocator_block_t GENERATED_DEFAULT_zone_allocator_block_t = {};
 const static zone_allocator_t GENERATED_DEFAULT_zone_allocator_t = {};
+const static sampler_create_info_t GENERATED_DEFAULT_sampler_create_info_t = {};
 const static image_create_info_t GENERATED_DEFAULT_image_create_info_t = {};
 const static image_t GENERATED_DEFAULT_image_t = {};
 const static asset_handle_t GENERATED_DEFAULT_asset_handle_t = {};
@@ -1276,6 +1280,29 @@ struct type_info_struct_zone_allocator_t {
 	};
 };
 
+struct type_info_struct_sampler_create_info_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[8];
+		struct {
+			type_info_member_t filtering;
+			type_info_member_t anisotropy_enabled;
+			type_info_member_t max_anisotropy;
+			type_info_member_t wrapu;
+			type_info_member_t wrapv;
+			type_info_member_t compare_ops_enabled;
+			type_info_member_t compare_operation;
+			type_info_member_t use_normalized_coordinates;
+		}members;
+	};
+};
+
 struct type_info_struct_image_create_info_t {
 	const char *name;
 	u32 type;
@@ -1285,12 +1312,13 @@ struct type_info_struct_image_create_info_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[4];
+		type_info_member_t member_array[5];
 		struct {
 			type_info_member_t data;
 			type_info_member_t width;
 			type_info_member_t height;
 			type_info_member_t format;
+			type_info_member_t sampler_info;
 		}members;
 	};
 };
@@ -2521,8 +2549,8 @@ struct type_info_struct_vulkan_image_info_t {
 			type_info_member_t type;
 			type_info_member_t format;
 			type_info_member_t initial_layout;
-			type_info_member_t sampler_type;
 			type_info_member_t data;
+			type_info_member_t sampler_info;
 		}members;
 	};
 };
@@ -2754,6 +2782,43 @@ struct type_info_enum_za_allocation_tag_t {
 			type_info_member_t ZA_TAG_FONT;
 			type_info_member_t ZA_TAG_PURGELEVEL;
 			type_info_member_t ZA_TAG_CACHE;
+		}members;
+	};
+};
+
+struct type_info_enum_render_image_filter_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t ImageFilterType_Invalid;
+			type_info_member_t ImageFilterType_Nearest;
+			type_info_member_t ImageFilterType_Linear;
+		}members;
+	};
+};
+
+struct type_info_enum_render_image_wrapping_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t ImageWrapping_Invalid;
+			type_info_member_t ImageWrapping_ClampToEdge;
+			type_info_member_t ImageWrapping_ClampToBorder;
+			type_info_member_t ImageWrapping_Repeat;
 		}members;
 	};
 };
@@ -3836,6 +3901,26 @@ const static type_info_struct_zone_allocator_t type_info_struct_zone_allocator_t
 	}
 };
 
+const static type_info_struct_sampler_create_info_t type_info_struct_sampler_create_info_t_const_data = {
+	.name = "sampler_create_info_t",
+	.type = TYPE_sampler_create_info_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_sampler_create_info_t),
+	.member_count = 8,
+	.members = {
+		.filtering = {.name = "filtering", .type = TYPE_render_image_filter_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sampler_create_info_t.filtering)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sampler_create_info_t), filtering))},
+		.anisotropy_enabled = {.name = "anisotropy_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sampler_create_info_t.anisotropy_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sampler_create_info_t), anisotropy_enabled))},
+		.max_anisotropy = {.name = "max_anisotropy", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sampler_create_info_t.max_anisotropy)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sampler_create_info_t), max_anisotropy))},
+		.wrapu = {.name = "wrapu", .type = TYPE_render_image_wrapping_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sampler_create_info_t.wrapu)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sampler_create_info_t), wrapu))},
+		.wrapv = {.name = "wrapv", .type = TYPE_render_image_wrapping_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sampler_create_info_t.wrapv)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sampler_create_info_t), wrapv))},
+		.compare_ops_enabled = {.name = "compare_ops_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sampler_create_info_t.compare_ops_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sampler_create_info_t), compare_ops_enabled))},
+		.compare_operation = {.name = "compare_operation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sampler_create_info_t.compare_operation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sampler_create_info_t), compare_operation))},
+		.use_normalized_coordinates = {.name = "use_normalized_coordinates", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sampler_create_info_t.use_normalized_coordinates)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_sampler_create_info_t), use_normalized_coordinates))},
+	}
+};
+
 const static type_info_struct_image_create_info_t type_info_struct_image_create_info_t_const_data = {
 	.name = "image_create_info_t",
 	.type = TYPE_image_create_info_t,
@@ -3843,12 +3928,13 @@ const static type_info_struct_image_create_info_t type_info_struct_image_create_
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_image_create_info_t),
-	.member_count = 4,
+	.member_count = 5,
 	.members = {
 		.data = {.name = "data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), data))},
 		.width = {.name = "width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), width))},
 		.height = {.name = "height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), height))},
 		.format = {.name = "format", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), format))},
+		.sampler_info = {.name = "sampler_info", .type = TYPE_sampler_create_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.sampler_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), sampler_info))},
 	}
 };
 
@@ -4872,7 +4958,7 @@ const static type_info_struct_vulkan_sampler_info_t type_info_struct_vulkan_samp
 		.max_anisotropy = {.name = "max_anisotropy", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t.max_anisotropy)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t), max_anisotropy))},
 		.compare_enabled = {.name = "compare_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t.compare_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t), compare_enabled))},
 		.compare_operation = {.name = "compare_operation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t.compare_operation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t), compare_operation))},
-		.use_normalized_coordinates = {.name = "use_normalized_coordinates", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t.use_normalized_coordinates)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t), use_normalized_coordinates))},
+		.use_normalized_coordinates = {.name = "use_normalized_coordinates", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t.use_normalized_coordinates)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t), use_normalized_coordinates))},
 	}
 };
 
@@ -4893,8 +4979,8 @@ const static type_info_struct_vulkan_image_info_t type_info_struct_vulkan_image_
 		.type = {.name = "type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), type))},
 		.format = {.name = "format", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), format))},
 		.initial_layout = {.name = "initial_layout", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.initial_layout)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), initial_layout))},
-		.sampler_type = {.name = "sampler_type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.sampler_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), sampler_type))},
 		.data = {.name = "data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), data))},
+		.sampler_info = {.name = "sampler_info", .type = TYPE_vulkan_sampler_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.sampler_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), sampler_info))},
 	}
 };
 
@@ -5069,6 +5155,29 @@ const static type_info_enum_za_allocation_tag_t type_info_enum_za_allocation_tag
 		.ZA_TAG_FONT = {.name = "ZA_TAG_FONT", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_FONT), .offset = ZA_TAG_FONT},
 		.ZA_TAG_PURGELEVEL = {.name = "ZA_TAG_PURGELEVEL", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_PURGELEVEL), .offset = ZA_TAG_PURGELEVEL},
 		.ZA_TAG_CACHE = {.name = "ZA_TAG_CACHE", .type = TYPE_za_allocation_tag_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ZA_TAG_CACHE), .offset = ZA_TAG_CACHE},
+	}
+};
+const static type_info_enum_render_image_filter_type_t type_info_enum_render_image_filter_type_t_const_data = {
+	.name = "render_image_filter_type_t",
+	.type = TYPE_render_image_filter_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 3,
+	.members = {
+		.ImageFilterType_Invalid = {.name = "ImageFilterType_Invalid", .type = TYPE_render_image_filter_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageFilterType_Invalid), .offset = ImageFilterType_Invalid},
+		.ImageFilterType_Nearest = {.name = "ImageFilterType_Nearest", .type = TYPE_render_image_filter_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageFilterType_Nearest), .offset = ImageFilterType_Nearest},
+		.ImageFilterType_Linear = {.name = "ImageFilterType_Linear", .type = TYPE_render_image_filter_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageFilterType_Linear), .offset = ImageFilterType_Linear},
+	}
+};
+const static type_info_enum_render_image_wrapping_type_t type_info_enum_render_image_wrapping_type_t_const_data = {
+	.name = "render_image_wrapping_type_t",
+	.type = TYPE_render_image_wrapping_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 4,
+	.members = {
+		.ImageWrapping_Invalid = {.name = "ImageWrapping_Invalid", .type = TYPE_render_image_wrapping_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageWrapping_Invalid), .offset = ImageWrapping_Invalid},
+		.ImageWrapping_ClampToEdge = {.name = "ImageWrapping_ClampToEdge", .type = TYPE_render_image_wrapping_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageWrapping_ClampToEdge), .offset = ImageWrapping_ClampToEdge},
+		.ImageWrapping_ClampToBorder = {.name = "ImageWrapping_ClampToBorder", .type = TYPE_render_image_wrapping_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageWrapping_ClampToBorder), .offset = ImageWrapping_ClampToBorder},
+		.ImageWrapping_Repeat = {.name = "ImageWrapping_Repeat", .type = TYPE_render_image_wrapping_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageWrapping_Repeat), .offset = ImageWrapping_Repeat},
 	}
 };
 const static type_info_enum_asset_type_t type_info_enum_asset_type_t_const_data = {
@@ -5671,11 +5780,23 @@ enum zone_allocator_t_member_list_enum {
 	TYPE_ZONE_ALLOCATOR_T_MEMBER_cursor,
 };
 
+enum sampler_create_info_t_member_list_enum {
+	TYPE_SAMPLER_CREATE_INFO_T_MEMBER_filtering,
+	TYPE_SAMPLER_CREATE_INFO_T_MEMBER_anisotropy_enabled,
+	TYPE_SAMPLER_CREATE_INFO_T_MEMBER_max_anisotropy,
+	TYPE_SAMPLER_CREATE_INFO_T_MEMBER_wrapu,
+	TYPE_SAMPLER_CREATE_INFO_T_MEMBER_wrapv,
+	TYPE_SAMPLER_CREATE_INFO_T_MEMBER_compare_ops_enabled,
+	TYPE_SAMPLER_CREATE_INFO_T_MEMBER_compare_operation,
+	TYPE_SAMPLER_CREATE_INFO_T_MEMBER_use_normalized_coordinates,
+};
+
 enum image_create_info_t_member_list_enum {
 	TYPE_IMAGE_CREATE_INFO_T_MEMBER_data,
 	TYPE_IMAGE_CREATE_INFO_T_MEMBER_width,
 	TYPE_IMAGE_CREATE_INFO_T_MEMBER_height,
 	TYPE_IMAGE_CREATE_INFO_T_MEMBER_format,
+	TYPE_IMAGE_CREATE_INFO_T_MEMBER_sampler_info,
 };
 
 enum image_t_member_list_enum {
@@ -6162,8 +6283,8 @@ enum vulkan_image_info_t_member_list_enum {
 	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_type,
 	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_format,
 	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_initial_layout,
-	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_sampler_type,
 	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_data,
+	TYPE_VULKAN_IMAGE_INFO_T_MEMBER_sampler_info,
 };
 
 enum vulkan_image_t_member_list_enum {
@@ -6274,6 +6395,19 @@ enum za_allocation_tag_t_member_list_enum {
 	TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_FONT,
 	TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_PURGELEVEL,
 	TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_CACHE,
+};
+
+enum render_image_filter_type_t_member_list_enum {
+	TYPE_RENDER_IMAGE_FILTER_TYPE_T_MEMBER_ImageFilterType_Invalid,
+	TYPE_RENDER_IMAGE_FILTER_TYPE_T_MEMBER_ImageFilterType_Nearest,
+	TYPE_RENDER_IMAGE_FILTER_TYPE_T_MEMBER_ImageFilterType_Linear,
+};
+
+enum render_image_wrapping_type_t_member_list_enum {
+	TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_Invalid,
+	TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_ClampToEdge,
+	TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_ClampToBorder,
+	TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_Repeat,
 };
 
 enum asset_type_t_member_list_enum {
@@ -6516,6 +6650,13 @@ enum render_pipeline_depth_function_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_FONT, "ZA_TAG_FONT") \
 	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_PURGELEVEL, "ZA_TAG_PURGELEVEL") \
 	X(TYPE_ENUM_LOOKUP_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_CACHE, "ZA_TAG_CACHE") \
+	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_FILTER_TYPE_T_MEMBER_ImageFilterType_Invalid, "ImageFilterType_Invalid") \
+	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_FILTER_TYPE_T_MEMBER_ImageFilterType_Nearest, "ImageFilterType_Nearest") \
+	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_FILTER_TYPE_T_MEMBER_ImageFilterType_Linear, "ImageFilterType_Linear") \
+	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_Invalid, "ImageWrapping_Invalid") \
+	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_ClampToEdge, "ImageWrapping_ClampToEdge") \
+	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_ClampToBorder, "ImageWrapping_ClampToBorder") \
+	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_Repeat, "ImageWrapping_Repeat") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Invalid, "AT_Invalid") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Bitmap, "AT_Bitmap") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Shader, "AT_Shader") \
@@ -6720,6 +6861,9 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "za_allocation_tag_t", .type = TYPE_za_allocation_tag_t, .size = sizeof(za_allocation_tag_t), .struct_info = NULL},
 	{.name = "zone_allocator_block_t", .type = TYPE_zone_allocator_block_t, .size = sizeof(zone_allocator_block_t), .struct_info = (type_info_struct_t*)&type_info_struct_zone_allocator_block_t_const_data},
 	{.name = "zone_allocator_t", .type = TYPE_zone_allocator_t, .size = sizeof(zone_allocator_t), .struct_info = (type_info_struct_t*)&type_info_struct_zone_allocator_t_const_data},
+	{.name = "render_image_filter_type_t", .type = TYPE_render_image_filter_type_t, .size = sizeof(render_image_filter_type_t), .struct_info = NULL},
+	{.name = "render_image_wrapping_type_t", .type = TYPE_render_image_wrapping_type_t, .size = sizeof(render_image_wrapping_type_t), .struct_info = NULL},
+	{.name = "sampler_create_info_t", .type = TYPE_sampler_create_info_t, .size = sizeof(sampler_create_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_sampler_create_info_t_const_data},
 	{.name = "image_create_info_t", .type = TYPE_image_create_info_t, .size = sizeof(image_create_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_image_create_info_t_const_data},
 	{.name = "vulkan_image_t", .type = TYPE_vulkan_image_t, .size = sizeof(vulkan_image_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_image_t_const_data},
 	{.name = "image_t", .type = TYPE_image_t, .size = sizeof(image_t), .struct_info = (type_info_struct_t*)&type_info_struct_image_t_const_data},
@@ -6932,6 +7076,13 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "ZA_TAG_FONT", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_FONT, .type_info_ptr = (const type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
 	{.name = "ZA_TAG_PURGELEVEL", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_PURGELEVEL, .type_info_ptr = (const type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
 	{.name = "ZA_TAG_CACHE", .member_enum = TYPE_ZA_ALLOCATION_TAG_T_MEMBER_ZA_TAG_CACHE, .type_info_ptr = (const type_info_struct*)&type_info_enum_za_allocation_tag_t_const_data},
+	{.name = "ImageFilterType_Invalid", .member_enum = TYPE_RENDER_IMAGE_FILTER_TYPE_T_MEMBER_ImageFilterType_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_filter_type_t_const_data},
+	{.name = "ImageFilterType_Nearest", .member_enum = TYPE_RENDER_IMAGE_FILTER_TYPE_T_MEMBER_ImageFilterType_Nearest, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_filter_type_t_const_data},
+	{.name = "ImageFilterType_Linear", .member_enum = TYPE_RENDER_IMAGE_FILTER_TYPE_T_MEMBER_ImageFilterType_Linear, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_filter_type_t_const_data},
+	{.name = "ImageWrapping_Invalid", .member_enum = TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_wrapping_type_t_const_data},
+	{.name = "ImageWrapping_ClampToEdge", .member_enum = TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_ClampToEdge, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_wrapping_type_t_const_data},
+	{.name = "ImageWrapping_ClampToBorder", .member_enum = TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_ClampToBorder, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_wrapping_type_t_const_data},
+	{.name = "ImageWrapping_Repeat", .member_enum = TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_Repeat, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_wrapping_type_t_const_data},
 	{.name = "AT_Invalid", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Bitmap", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Bitmap, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Shader", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Shader, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},

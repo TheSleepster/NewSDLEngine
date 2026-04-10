@@ -247,6 +247,7 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
     }
 
     vk_backend_image_create_view(vulkan_context, &result);
+#if 0 
     vulkan_sampler_info_t sampler_info = {
         .anisotropy_enabled = false,
         .compare_enabled    = false,
@@ -258,8 +259,31 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
 
         .use_normalized_coordinates = true,
     };
-    
     result.sampler = vk_backend_sampler_create(vulkan_context, &sampler_info);
+#else
+    if(image_info->sampler_info)
+    {
+        string_t sampler_data = {
+            .data  = (byte*)image_info->sampler_info,
+            .count = sizeof(vulkan_sampler_info_t)
+        };
+        VkSampler sampler = c_hash_table_get_value(&vulkan_context->image_samplers, sampler_data);
+        if(sampler == VK_NULL_HANDLE)
+        {
+            sampler = vk_backend_sampler_create(vulkan_context, image_info->sampler_info);
+            Assert(sampler);
+
+            c_hash_table_insert_pair(&vulkan_context->image_samplers, sampler_data, sampler);
+        }
+        Assert(sampler);
+
+        result.sampler = sampler;
+    }
+    else
+    {
+        result.sampler = vulkan_context->default_nearest_sampler;
+    }
+#endif
 
     return(result);
 }

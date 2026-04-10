@@ -4,6 +4,8 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_PNG
 #include <stb/stb_image.h>
 
 #include <c_base.h>
@@ -31,10 +33,6 @@
 
 #include <asset_file_packer/jfd_asset_file.h>
 #include <meta/GENERATED_program_RTTI.h>
-
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_ONLY_PNG
-#include <stb/stb_image.h>
 
 internal_api
 C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
@@ -841,6 +839,17 @@ s_asset_manager_update(asset_manager_t *asset_manager)
             }
             else
             {
+                vulkan_sampler_info_t sampler_info = {
+                    .min_filter                 = VK_FILTER_LINEAR,
+                    .mag_filter                 = VK_FILTER_LINEAR,
+                    .wrapu                      = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                    .wrapv                      = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                    .anisotropy_enabled         = true,
+                    .max_anisotropy             = 4,
+                    .compare_enabled            = false,
+                    .use_normalized_coordinates = false,
+                };
+
                 vulkan_image_info_t info = {};
                 info.data           = page->font_atlas->texture.bitmap.pixels;
                 info.width          = 4096;
@@ -851,6 +860,7 @@ s_asset_manager_update(asset_manager_t *asset_manager)
                 info.initial_layout = VK_IMAGE_LAYOUT_UNDEFINED;
                 info.usage          = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
                 info.format         = VK_FORMAT_R8G8B8A8_UNORM;
+                info.sampler_info   = &sampler_info;
 
                 page->font_atlas->texture.gpu_data.vulkan_image = vk_backend_image_create(asset_manager->vulkan_context, &info);
             }

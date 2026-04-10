@@ -1599,6 +1599,15 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
 }
 #endif
 
+
+C_HASH_TABLE_ALLOCATE_IMPL(memory_arena_hash_allocate)
+{
+    void *result = null;
+    result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
+
+    return(result);
+}
+
 /*
 =============
 vk_backend_create_descriptor_pools
@@ -1639,12 +1648,7 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
         .poolSizeCount = MAX_POOL_SET_TYPES,
         .pPoolSizes    = sizes
     };   
-#if 0
-    vkAssert(vkCreateDescriptorPool(vulkan_context->device, 
-                                   &pool_create_info, 
-                                    vulkan_context->cpu_allocation_callbacks, 
-                                   &vulkan_context->first_descriptor_pool));
-#else
+
     for(u32 index = 0;
         index < MAX_FRAMES_IN_FLIGHT;
         ++index)
@@ -1654,8 +1658,52 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
                                         vulkan_context->cpu_allocation_callbacks, 
                                         &vulkan_context->descriptor_pools[index]));
     }
-#endif
 
+    // NOTE(Sleepster): Initialize the sampler hash table. 
+    c_hash_table_init(&vulkan_context->image_samplers, 
+                       1024, 
+                      &vulkan_context->permanent_arena, 
+                       memory_arena_hash_allocate,
+                       null);
+
+    vulkan_sampler_info_t nearest_sampler_info = {
+        .anisotropy_enabled = false,
+        .compare_enabled    = false,
+        .max_anisotropy     = 1,
+        .min_filter         = VK_FILTER_NEAREST,
+        .mag_filter         = VK_FILTER_NEAREST,
+        .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+        .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+
+        .use_normalized_coordinates = true,
+    };
+
+    vulkan_sampler_info_t linear_sampler_info = {
+        .anisotropy_enabled = true,
+        .compare_enabled    = false,
+        .max_anisotropy     = 4,
+        .min_filter         = VK_FILTER_LINEAR,
+        .mag_filter         = VK_FILTER_LINEAR,
+        .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+        .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+
+        .use_normalized_coordinates = false,
+    };
+    vulkan_context->default_nearest_sampler = vk_backend_sampler_create(vulkan_context, &nearest_sampler_info);
+    vulkan_context->default_linear_sampler  = vk_backend_sampler_create(vulkan_context, &linear_sampler_info);
+
+    string_t nearest_sampler_data = {
+        .data  = (byte*)&nearest_sampler_data,
+        .count = sizeof(vulkan_sampler_info_t)
+    };
+
+    string_t linear_sampler_data = {
+        .data  = (byte*)&linear_sampler_data,
+        .count = sizeof(vulkan_sampler_info_t)
+    };
+
+    c_hash_table_insert_pair(&vulkan_context->image_samplers, nearest_sampler_data, vulkan_context->default_nearest_sampler);
+    c_hash_table_insert_pair(&vulkan_context->image_samplers, linear_sampler_data,  vulkan_context->default_linear_sampler);
 }
 
 /*

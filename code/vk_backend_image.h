@@ -28,8 +28,7 @@ struct vulkan_sampler_info_t
     bool32 compare_enabled;
     u32    compare_operation;
 
-    u32    use_normalized_coordinates;
-
+    bool32 use_normalized_coordinates;
 };
 
 struct vulkan_image_info_t
@@ -42,9 +41,9 @@ struct vulkan_image_info_t
     u32      type;
     u32      format;
     u32      initial_layout;
-    u32      sampler_type;
-
     string_t data;
+
+    vulkan_sampler_info_t *sampler_info;
 };
 
 struct vulkan_image_t
