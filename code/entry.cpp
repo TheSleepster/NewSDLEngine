@@ -90,7 +90,6 @@ main(int argc, char **argv)
         c_threadpool_init(&global_context->main_threadpool, thread_count, MB(10), true);
 
         s_asset_manager_init(global_context->asset_manager);
-        s_asset_manager_load_asset_file(global_context->asset_manager, STR("asset_data.jfd"));
 
         s_im_init_input_manager(global_context->input_manager);
         s_renderer_state_init(global_context->renderer_state, vulkan_context);

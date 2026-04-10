@@ -33,10 +33,10 @@ s_renderer_bitmap_format_to_vulkan_format(u32 bitmap_format)
 }
 
 VkImageUsageFlags
-s_renderer_image_usage_flags_from_image_format(image_create_info_t *image_create_info)
+s_renderer_image_usage_flags_from_image_format(bitmap_format_t format)
 {
     VkImageUsageFlags result = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-    switch(image_create_info->format)
+    switch(format)
     {
         case BMF_R8:
         case BMF_B8:
@@ -98,15 +98,31 @@ sampler_filter_type_to_vk_filter(render_image_filter_type_t filter)
     return(result);
 }
 
+internal_api VkImageLayout
+get_image_layout_from_usage(render_image_usage_t usage)
+{
+    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
+    switch(usage)
+    {
+        // TODO(Sleepster): Maybe handle more cases? 
+        case ImageUsage_SampledTexture:
+        {
+            result = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        }break;
+    }
+
+    return(result);
+}
+
 image_t 
 s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info)
 {
     image_t result = {};
     result.create_info = *image_create_info;
 
-    VkImageUsageFlags usage_flags = s_renderer_image_usage_flags_from_image_format(image_create_info);
+    VkImageUsageFlags usage_flags = s_renderer_image_usage_flags_from_image_format((bitmap_format_t)image_create_info->format);
     vulkan_context_t *vulkan_context = (vulkan_context_t*)render_state->render_context;
-    
+
     // NOTE(Sleepster): Only 2D images
     vulkan_image_info_t info = {};
     info.type           = VK_IMAGE_TYPE_2D;
@@ -152,6 +168,22 @@ s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *ima
 #endif
 
     result.vulkan_image = vk_backend_image_create(vulkan_context, &info);
+    return(result);
+}
+
+image_t 
+s_renderer_image_create_from_bitmap(bitmap_t *bitmap)
+{
+    image_t result;
+    image_create_info_t info = {};
+    info.width          = bitmap->width;
+    info.height         = bitmap->height;
+    info.data           = bitmap->pixels;
+    info.format         = bitmap->format;
+    info.usage          = ImageUsage_SampledTexture;
+
+    result = s_renderer_image_create(global_context->renderer_state, &info);
+
     return(result);
 }
 

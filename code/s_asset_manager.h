@@ -40,12 +40,12 @@ typedef struct shader             shader_t;
 typedef struct material_archetype material_archetype_t;
 typedef struct material_instance  material_instance_t;
 typedef struct material_data      material_data_t;
-
 typedef struct jfd_package_entry  jfd_package_entry_t;
 typedef struct jfd_file_header    jfd_file_header_t;
 
 struct asset_manager_t;
 struct dynamic_render_font_t;
+struct asset_catalog_t;
 
 typedef enum asset_type
 {
@@ -102,6 +102,10 @@ typedef struct asset_handle
     subtexture_data_t *subtexture_data;
     asset_slot_t      *slot;
 
+    // TODO(Sleepster): 
+    // Not happy about these.. These should ONLY be used to signal loading or unloading of an asset's data
+    asset_manager_t   *asset_manager;
+    asset_catalog_t   *catalog;
     union {
         texture2D_t           *texture;
         shader_t              *shader;
@@ -114,6 +118,7 @@ typedef struct asset_handle
   ================= TEXTURES ================
   ===========================================*/
 
+// TODO(Sleepster): For now we just assume all bitmaps want NEAREST filtering... might not actually be the case.
 typedef struct bitmap
 {
     u32      width;
@@ -483,6 +488,8 @@ struct asset_catalog_t
     asset_type_t              catalog_type;
     asset_manager_t          *asset_manager;
 
+    asset_handle_t            default_asset;
+
     // TODO(Sleepster): Should this be a * to asset_slots?
     HashTable_t(asset_slot_t) asset_lookup;
     DynArray_t(asset_slot_t*) loaded_assets;
@@ -507,6 +514,7 @@ struct texture_atlas_registry_t
     u32             current_atlas_count;
 };
 
+// TODO(Sleepster): Default assets.
 struct asset_manager_t
 {
     bool8                           is_initialized;
@@ -547,8 +555,9 @@ struct asset_manager_t
 
 void  s_asset_manager_init(asset_manager_t *asset_manager);
 void  s_asset_manager_update(asset_manager_t *asset_manager);
+void s_asset_manager_queue_asset_load(asset_manager_t *asset_manager, asset_slot_t *slot);
 
-bool8           s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath);
+bool8          s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath);
 asset_handle_t s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name);
 
 texture_atlas_t* s_texture_atlas_create(asset_manager_t *asset_manager, u32 size, u32 channel_count, u32 format, u32 initial_subtexture_count);
@@ -556,6 +565,8 @@ void s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture
 void s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atlas_t *atlas);
 
 true_inline void s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot_t *slot);
+
+internal_api asset_slot_t * s_asset_manager_get_asset_slot(asset_catalog_t *catalog, string_t name);
 
 shader_t*             s_asset_get_shader_from_handle(asset_handle_t *handle);
 texture2D_t*          s_asset_get_texture_from_handle(asset_handle_t *handle);

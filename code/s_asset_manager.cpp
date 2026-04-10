@@ -120,8 +120,10 @@ s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 n
     Assert(pixel_data != null);
     Assert(pixel_count > 0);
 
-    result.ID     = name_hash;
-    result.bitmap = s_asset_bitmap_init(pixels, width, height, channels, BMF_RGBA32_SRGB);
+    result.ID       = name_hash;
+    result.bitmap   = s_asset_bitmap_init(pixels, width, height, channels, BMF_RGBA32_SRGB);
+    result.gpu_data = s_renderer_image_create_from_bitmap(&result.bitmap);
+
     return(result);
 }
 
@@ -537,103 +539,105 @@ s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
                          byte                          *codepoint)
 {
     glyph_metric_t *result = null;
-
-    u32 codepoint_UTF32 = s_UTF8_convert_UTF32(codepoint);
-    string_t codepoint_data = {
-        .data  = (byte*)&codepoint_UTF32,
-        .count = sizeof(u32),
-    };
-
-    dynamic_render_font_page_t *last_page = null;
-    dynamic_render_font_page_t *our_page  = null;
-
-    for(dynamic_render_font_page_t *current_page = varient->first_page;
-        current_page;
-        current_page = current_page->next_page)
+    if(varient)
     {
-        glyph_metric_t *found = c_hash_table_get_value(&current_page->glyphs, codepoint_data);
-        if(found)
-        {
-            result   = found;
-            our_page = current_page;
+        u32 codepoint_UTF32 = s_UTF8_convert_UTF32(codepoint);
+        string_t codepoint_data = {
+            .data  = (byte*)&codepoint_UTF32,
+            .count = sizeof(u32),
+        };
 
-            break;
+        dynamic_render_font_page_t *last_page = null;
+        dynamic_render_font_page_t *our_page  = null;
+
+        for(dynamic_render_font_page_t *current_page = varient->first_page;
+            current_page;
+            current_page = current_page->next_page)
+        {
+            glyph_metric_t *found = c_hash_table_get_value(&current_page->glyphs, codepoint_data);
+            if(found)
+            {
+                result   = found;
+                our_page = current_page;
+
+                break;
+            }
+
+            last_page = current_page;
         }
 
-        last_page = current_page;
-    }
-
-    if(result == null)
-    {
-        Assert(last_page);
-        if(!last_page->is_full)
+        if(result == null)
         {
-            glyph_metric_t *new_glyph = c_arena_push_struct(&varient->parent_font->font_arena, glyph_metric_t);
-            c_hash_table_insert_pair(&last_page->glyphs, codepoint_data, new_glyph);
+            Assert(last_page);
+            if(!last_page->is_full)
+            {
+                glyph_metric_t *new_glyph = c_arena_push_struct(&varient->parent_font->font_arena, glyph_metric_t);
+                c_hash_table_insert_pair(&last_page->glyphs, codepoint_data, new_glyph);
 
-            our_page = last_page;
+                our_page = last_page;
+            }
+            else
+            {
+                last_page->next_page = s_asset_font_create_new_page(asset_manager, 
+                                                                    varient, 
+                                                                    &varient->parent_font->font_arena);
+                our_page = last_page->next_page;
+            }
         }
-        else
+        Assert(our_page);
+        Assert(our_page->is_full == false);
+
+        result = c_hash_table_get_value(&our_page->glyphs, codepoint_data);
+        if(result->is_fetched == false)
         {
-            last_page->next_page = s_asset_font_create_new_page(asset_manager, 
-                                                                varient, 
-                                                               &varient->parent_font->font_arena);
-            our_page = last_page->next_page;
+            result->is_fetched = true;
+
+            dynamic_render_font_t *parent = varient->parent_font;
+
+            temporary_glyph_t *temp_glyph = our_page->temporary_glyphs + our_page->temporary_glyph_count++;
+            temp_glyph->utf32_codepoint = codepoint_UTF32;
+            temp_glyph->cursor_x = our_page->atlas_cursor_x;
+            temp_glyph->cursor_x = our_page->atlas_cursor_y;
+            temp_glyph->metrics  = result;
+
+            u32 glyph_index = FT_Get_Char_Index(parent->font_face, codepoint_UTF32);
+            FT_Load_Glyph(parent->font_face, glyph_index, FT_LOAD_NO_SCALE);
+
+            FT_Fixed advance = 0;
+            FT_Get_Advance(parent->font_face, glyph_index, FT_LOAD_NO_SCALE, &advance);
+
+            // NOTE(Sleepster): These are in font units (e.g., 2048 units per EM)
+            temp_glyph->glyph_width  = parent->font_face->glyph->metrics.width;
+            temp_glyph->glyph_height = parent->font_face->glyph->metrics.height;
+            if(temp_glyph->glyph_height > our_page->tallest_y)
+            {
+                our_page->tallest_y = temp_glyph->glyph_height;
+            }
+
+            // NOTE(Sleepster): This is for multithreaded atlas writing later. 
+            our_page->atlas_cursor_x += (advance >> 16);
+            if(our_page->atlas_cursor_x >= 4096)
+            {
+                our_page->atlas_cursor_x  = 0;
+                our_page->atlas_cursor_y += our_page->tallest_y;
+            }
+
+            if(our_page->atlas_cursor_y + our_page->tallest_y >= 4096)
+            {
+                our_page->is_full = true;
+            }
+
+            if(!our_page->is_dirty)
+            {
+                font_manager_t *font_manager = &asset_manager->font_manager;
+
+                our_page->is_dirty = true;
+                font_manager->pages_to_update[font_manager->pages_queued++] = our_page;
+            }
+
+            // NOTE(Sleepster): This glyph should not be loaded yet... If it is? Weird...
+            Assert(result->is_valid == false);
         }
-    }
-    Assert(our_page);
-    Assert(our_page->is_full == false);
-
-    result = c_hash_table_get_value(&our_page->glyphs, codepoint_data);
-    if(result->is_fetched == false)
-    {
-        result->is_fetched = true;
-        
-        dynamic_render_font_t *parent = varient->parent_font;
-
-        temporary_glyph_t *temp_glyph = our_page->temporary_glyphs + our_page->temporary_glyph_count++;
-        temp_glyph->utf32_codepoint = codepoint_UTF32;
-        temp_glyph->cursor_x = our_page->atlas_cursor_x;
-        temp_glyph->cursor_x = our_page->atlas_cursor_y;
-        temp_glyph->metrics  = result;
-
-        u32 glyph_index = FT_Get_Char_Index(parent->font_face, codepoint_UTF32);
-        FT_Load_Glyph(parent->font_face, glyph_index, FT_LOAD_NO_SCALE);
-
-        FT_Fixed advance = 0;
-        FT_Get_Advance(parent->font_face, glyph_index, FT_LOAD_NO_SCALE, &advance);
-
-        // NOTE(Sleepster): These are in font units (e.g., 2048 units per EM)
-        temp_glyph->glyph_width  = parent->font_face->glyph->metrics.width;
-        temp_glyph->glyph_height = parent->font_face->glyph->metrics.height;
-        if(temp_glyph->glyph_height > our_page->tallest_y)
-        {
-            our_page->tallest_y = temp_glyph->glyph_height;
-        }
-
-        // NOTE(Sleepster): This is for multithreaded atlas writing later. 
-        our_page->atlas_cursor_x += (advance >> 16);
-        if(our_page->atlas_cursor_x >= 4096)
-        {
-            our_page->atlas_cursor_x  = 0;
-            our_page->atlas_cursor_y += our_page->tallest_y;
-        }
-
-        if(our_page->atlas_cursor_y + our_page->tallest_y >= 4096)
-        {
-            our_page->is_full = true;
-        }
-
-        if(!our_page->is_dirty)
-        {
-            font_manager_t *font_manager = &asset_manager->font_manager;
-
-            our_page->is_dirty = true;
-            font_manager->pages_to_update[font_manager->pages_queued++] = our_page;
-        }
-
-        // NOTE(Sleepster): This glyph should not be loaded yet... If it is? Weird...
-        Assert(result->is_valid == false);
     }
 
     return(result);
@@ -708,10 +712,9 @@ s_asset_font_load_glyph(dynamic_render_font_varient_t *varient,
 //
 // Like what the fuck???
 void
-s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *handle, u64 name_hash)
+s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
-    asset_slot_t *slot = handle->slot;
-    Assert(slot->slot_state == ASLS_Unloaded || slot->slot_state == ASLS_ShouldReload);
+    Assert(slot->slot_state == ASLS_LoadQueued);
     slot->package_entry->asset_data = c_file_read_from_offset(&slot->owner_asset_file, 
                                                               slot->package_entry->asset_data.count,
                                                               slot->package_entry->data_offset, 
@@ -724,23 +727,23 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
         case AT_Bitmap:
         {
             slot->texture = s_asset_texture_create(asset_manager, slot, name_hash);
-            log_info("Loading texture data for bitmap: '%s'...\n", C_STR(handle->slot->name));
+            log_info("Loading texture data for bitmap: '%s'...\n", C_STR(slot->name));
         }break;
         case AT_Shader:
         {
             slot->shader = s_asset_shader_create(asset_manager, slot, name_hash);
-            log_info("Loading shader data for: '%s'...\n", C_STR(handle->slot->name));
+            log_info("Loading shader data for: '%s'...\n", C_STR(slot->name));
         }break;
         case AT_Material:
         {
             slot->material.material_type = SMT_Archetype; 
             slot->material = s_asset_material_create(asset_manager, slot, name_hash);
-            log_info("Loading material data for: '%s'...\n", C_STR(handle->slot->name));
+            log_info("Loading material data for: '%s'...\n", C_STR(slot->name));
         }break;
         case AT_Font:
         {
             slot->dynamic_render_font = s_asset_font_create(asset_manager, slot, name_hash);
-            log_info("Loading font data for: '%s'...\n", C_STR(handle->slot->name));
+            log_info("Loading font data for: '%s'...\n", C_STR(slot->name));
         }break;
         case AT_Sound:
         {
@@ -748,7 +751,6 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
             //handle->sound = &slot->sound;
         }break;
     }
-    s_asset_manager_set_handle_asset_data_pointer(handle, slot);
 
     slot->slot_state = ASLS_Loaded;
     AtomicIncrement32(&slot->package_generation);
@@ -758,7 +760,47 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_handle_t *
 // ========== ASSET MANAGER ======
 // ===============================
 
-// TODO(Sleepster): Generate default assets 
+internal_api asset_handle_t 
+asset_catalog_load_default_asset(asset_catalog_t *catalog)
+{
+    asset_handle_t result = {};
+
+    string_t default_asset_name;
+    switch(catalog->catalog_type)
+    {
+        case AT_Bitmap:
+        {
+            default_asset_name = STR("null_sprite");
+        }break;
+        case AT_Shader:
+        {
+            default_asset_name = STR("basic_triangle");
+        }break;
+        case AT_Material:
+        {
+            default_asset_name = STR("test_material_archetype");
+        }break;
+        case AT_Font:
+        {
+            default_asset_name = STR("LiberationMono_Regular");
+        }break;
+    }
+    Assert(catalog->asset_manager);
+
+    u64 entry_count = catalog->asset_manager->asset_name_to_file.header.max_entries;
+    u64 hash_value  = c_hash_table_value_from_key(default_asset_name.data, 
+                                                  default_asset_name.count, 
+                                                  entry_count);
+
+    result.slot = s_asset_manager_get_asset_slot(catalog, default_asset_name);
+    result.slot->slot_state = ASLS_LoadQueued;
+
+    s_asset_manager_load_asset_data(catalog->asset_manager, result.slot, hash_value);
+    s_asset_manager_set_handle_asset_data_pointer(&result, result.slot);
+
+    return(result);
+}
+
 void
 s_asset_manager_init(asset_manager_t *asset_manager)
 {
@@ -770,6 +812,22 @@ s_asset_manager_init(asset_manager_t *asset_manager)
 
     asset_manager->manager_arena   = c_arena_create(MB(100));
     asset_manager->asset_allocator = c_za_create(GB(1));
+
+    c_hash_table_init(&asset_manager->asset_name_to_file, 
+                       ASSET_CATALOG_MAX_LOOKUPS, 
+                      &asset_manager->manager_arena, 
+                       asset_manager_hash_arena_allocate,
+                       null);
+
+    // NOTE(Sleepster): Initializing all entries to -1 
+    memset(asset_manager->asset_name_to_file.data, -1, sizeof(s32) * ASSET_CATALOG_MAX_LOOKUPS);
+
+    asset_manager->texture_catalog  = asset_manager->asset_catalogs + AT_Bitmap;
+    asset_manager->shader_catalog   = asset_manager->asset_catalogs + AT_Shader;
+    asset_manager->material_catalog = asset_manager->asset_catalogs + AT_Material;
+    asset_manager->font_catalog     = asset_manager->asset_catalogs + AT_Font;
+    asset_manager->sound_catalog    = asset_manager->asset_catalogs + AT_Sound;
+
     for(u32 catalog_index = 1;
         catalog_index < AT_Count;
         ++catalog_index)
@@ -781,24 +839,24 @@ s_asset_manager_init(asset_manager_t *asset_manager)
                           &asset_manager->manager_arena, 
                            asset_manager_hash_arena_allocate,
                            null);
-        catalog->catalog_type = (asset_type_t)(catalog_index);
+
+        catalog->catalog_type  = (asset_type_t)catalog_index;
 
         Assert(catalog->catalog_type < AT_Count);
         Assert(catalog->catalog_type > AT_Invalid);
     }
-    c_hash_table_init(&asset_manager->asset_name_to_file, 
-                       ASSET_CATALOG_MAX_LOOKUPS, 
-                      &asset_manager->manager_arena, 
-                       asset_manager_hash_arena_allocate,
-                       null);
-    // NOTE(Sleepster): Initializing all entries to -1 
-    memset(asset_manager->asset_name_to_file.data, -1, sizeof(s32) * ASSET_CATALOG_MAX_LOOKUPS);
+    s_asset_manager_load_asset_file(asset_manager, STR("asset_data.jfd"));
 
-    asset_manager->texture_catalog  = asset_manager->asset_catalogs + AT_Bitmap;
-    asset_manager->shader_catalog   = asset_manager->asset_catalogs + AT_Shader;
-    asset_manager->material_catalog = asset_manager->asset_catalogs + AT_Material;
-    asset_manager->font_catalog     = asset_manager->asset_catalogs + AT_Font;
-    asset_manager->sound_catalog    = asset_manager->asset_catalogs + AT_Sound;
+    for(u32 catalog_index = 1;
+        catalog_index < AT_Count;
+        ++catalog_index)
+    {
+        asset_catalog_t *catalog = asset_manager->asset_catalogs + catalog_index;
+        if(catalog->catalog_type != AT_Sound)
+        {
+            catalog->default_asset = asset_catalog_load_default_asset(catalog);
+        }
+    }
 
     asset_manager->is_initialized = true;
 }
@@ -816,6 +874,22 @@ s_asset_manager_update(asset_manager_t *asset_manager)
             s_texture_atlas_pack_added_textures(asset_manager, atlas);
         }
     }
+
+    // TODO(Sleepster): Unload queue...
+    for(u32 queued_load_index = 0;
+        queued_load_index < asset_manager->load_queue_size;
+        ++queued_load_index)
+    {
+        asset_slot_t *slot_to_load = asset_manager->asset_load_queue[queued_load_index];
+        asset_catalog_t *catalog = asset_manager->asset_catalogs + slot_to_load->type;
+
+        s_asset_manager_load_asset_data(asset_manager, slot_to_load, slot_to_load->ID);
+        c_dynarray_push(catalog->loaded_assets, slot_to_load);
+
+        slot_to_load->slot_state = ASLS_Loaded;
+        slot_to_load = null;
+    }
+    asset_manager->load_queue_size = 0;
 
     font_manager_t *font_manager = &asset_manager->font_manager;
     for(u32 page_index = 0;
@@ -873,7 +947,6 @@ s_asset_manager_update(asset_manager_t *asset_manager)
 bool8
 s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath)
 {
-    Assert(asset_manager->is_initialized);
     Assert(asset_manager->loaded_file_count + 1 <= ASSET_MANAGER_MAX_ASSET_FILES);
     
     bool8 result = true; 
@@ -996,6 +1069,13 @@ s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot
     }
 }
 
+void
+s_asset_manager_queue_asset_load(asset_manager_t *asset_manager, asset_slot_t *slot)
+{
+    asset_manager->asset_load_queue[asset_manager->load_queue_size++] = slot;
+    slot->slot_state = ASLS_LoadQueued;
+}
+
 asset_handle_t
 s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name)
 {
@@ -1021,6 +1101,25 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
 
         asset_slot_t *slot = s_asset_manager_get_asset_slot(catalog, name);
 
+        result.slot     = slot;
+        result.slot->ID = hash_value;
+
+        result.type          = slot->type;
+        result.asset_manager = asset_manager;
+        if(result.slot->slot_state == ASLS_Loaded)
+        {
+            result.owner_asset_file_index = file_index;
+            result.is_valid               = true;
+
+            // NOTE(Sleepster): If loaded, just set the handle pointers 
+            s_asset_manager_set_handle_asset_data_pointer(&result, slot);
+        }
+        else if(result.slot->slot_state == ASLS_Unloaded)
+        {
+            // NOTE(Sleepster): Otherwise, load it. 
+            s_asset_manager_queue_asset_load(asset_manager, slot);
+        }
+#if 0
         result.type = (asset_type_t)entry->entry_header->asset_type;
         result.slot = slot;
         result.owner_asset_file_index = file_index;
@@ -1038,6 +1137,7 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
         }
 
         Assert(result.slot->slot_state != ASLS_Invalid);
+#endif
     }
     else
     {
@@ -1098,7 +1198,6 @@ void
 s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle)
 {
     Assert(texture_handle);
-    Assert(texture_handle->is_valid);
     Assert(texture_handle->type == AT_Bitmap);
 
     c_dynarray_push(atlas->textures_to_merge, texture_handle);
@@ -1120,59 +1219,62 @@ s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atla
 
         c_dynarray_for(atlas->textures_to_merge, texture_index)
         {
-            asset_handle_t *asset        =  atlas->textures_to_merge[texture_index];
-            bitmap_t       *asset_bitmap = &asset->slot->texture.bitmap;
-
-            u32 padding = 1;
-            u32 bitmap_width       = asset_bitmap->width;
-            u32 bitmap_height      = asset_bitmap->height;
-            u32 bitmap_channels    = asset_bitmap->channels;
-            string_t bitmap_pixels = asset_bitmap->pixels;
-
-            Assert(asset_bitmap->channels == atlas->bitmap_data->channels);
-
-            // NOTE(Sleepster): Wrap to next y if needed. 
-            if((atlas->atlas_cursor_x + bitmap_width) >= atlas_height)
+            asset_handle_t *asset =  atlas->textures_to_merge[texture_index];
+            if(asset->slot->slot_state == ASLS_Loaded)
             {
-                atlas->atlas_cursor_x  = 0;
-                atlas->atlas_cursor_y += atlas->tallest_y;
+                bitmap_t *asset_bitmap = &asset->slot->texture.bitmap;
+
+                u32 padding = 1;
+                u32 bitmap_width       = asset_bitmap->width;
+                u32 bitmap_height      = asset_bitmap->height;
+                u32 bitmap_channels    = asset_bitmap->channels;
+                string_t bitmap_pixels = asset_bitmap->pixels;
+
+                Assert(asset_bitmap->channels == atlas->bitmap_data->channels);
+
+                // NOTE(Sleepster): Wrap to next y if needed. 
+                if((atlas->atlas_cursor_x + bitmap_width) >= atlas_height)
+                {
+                    atlas->atlas_cursor_x  = 0;
+                    atlas->atlas_cursor_y += atlas->tallest_y;
+                }
+                if(bitmap_height > atlas->tallest_y) atlas->tallest_y = bitmap_height;
+
+                u32 atlas_cursor_x = atlas->atlas_cursor_x + padding;
+                u32 atlas_cursor_y = atlas->atlas_cursor_y + padding;
+
+                // NOTE(Sleepster): Copy by row. 
+                for(u32 row_index = 0;
+                    row_index < bitmap_height;
+                    ++row_index)
+                {
+                    u32 atlas_bitmap_offset  = ((atlas_cursor_y + row_index) * atlas_width + atlas_cursor_x) * atlas_channels;
+                    byte *atlas_pixel_offset = atlas_pixels.data + atlas_bitmap_offset;
+
+                    u32 bitmap_offset = (row_index * bitmap_width) * bitmap_channels;
+                    byte *bitmap_data_offset = bitmap_pixels.data + bitmap_offset;
+
+                    memcpy(atlas_pixel_offset, bitmap_data_offset, bitmap_width * bitmap_channels);
+                }
+
+                vec2_t uv_min = vec2(atlas_cursor_x, atlas_cursor_y);
+                vec2_t uv_max = vec2(atlas_cursor_x + bitmap_width, atlas_cursor_y + bitmap_height);
+
+                // NOTE(Sleepster): Create the subtexture, let the owner of the sprite know this is the new texture we will draw it from. 
+                subtexture_data_t *subtexture = atlas->packed_subtextures + atlas->packed_subtexture_count;
+                asset->subtexture_data = subtexture;
+
+                subtexture->uv_min                 = uv_min;
+                subtexture->uv_max                 = uv_max;
+                subtexture->offset                 = uv_min;
+                subtexture->size                   = vec2(bitmap_width, bitmap_height);
+                subtexture->atlas_subtexture_index = atlas->packed_subtexture_count++;
+                subtexture->atlas                  = atlas;
+
+                atlas->atlas_cursor_x = atlas_cursor_x + bitmap_width;
+                c_dynarray_remove_element(atlas->textures_to_merge, texture_index);
             }
-            if(bitmap_height > atlas->tallest_y) atlas->tallest_y = bitmap_height;
-
-            u32 atlas_cursor_x = atlas->atlas_cursor_x + padding;
-            u32 atlas_cursor_y = atlas->atlas_cursor_y + padding;
-
-            // NOTE(Sleepster): Copy by row. 
-            for(u32 row_index = 0;
-                row_index < bitmap_height;
-                ++row_index)
-            {
-                u32 atlas_bitmap_offset  = ((atlas_cursor_y + row_index) * atlas_width + atlas_cursor_x) * atlas_channels;
-                byte *atlas_pixel_offset = atlas_pixels.data + atlas_bitmap_offset;
-
-                u32 bitmap_offset = (row_index * bitmap_width) * bitmap_channels;
-                byte *bitmap_data_offset = bitmap_pixels.data + bitmap_offset;
-
-                memcpy(atlas_pixel_offset, bitmap_data_offset, bitmap_width * bitmap_channels);
-            }
-
-            vec2_t uv_min = vec2(atlas_cursor_x, atlas_cursor_y);
-            vec2_t uv_max = vec2(atlas_cursor_x + bitmap_width, atlas_cursor_y + bitmap_height);
-
-            // NOTE(Sleepster): Create the subtexture, let the owner of the sprite know this is the new texture we will draw it from. 
-            subtexture_data_t *subtexture = atlas->packed_subtextures + atlas->packed_subtexture_count;
-            asset->subtexture_data = subtexture;
-
-            subtexture->uv_min                 = uv_min;
-            subtexture->uv_max                 = uv_max;
-            subtexture->offset                 = uv_min;
-            subtexture->size                   = vec2(bitmap_width, bitmap_height);
-            subtexture->atlas_subtexture_index = atlas->packed_subtexture_count++;
-            subtexture->atlas                  = atlas;
-
-            atlas->atlas_cursor_x = atlas_cursor_x + bitmap_width;
         }
-        c_dynarray_clear(atlas->textures_to_merge);
     
         // TODO(Sleepster): Replace this with the image_t stuff
         vulkan_image_info_t info = {};

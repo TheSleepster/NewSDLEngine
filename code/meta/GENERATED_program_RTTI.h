@@ -120,6 +120,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_zone_allocator_t, type_id(zone_allocator_t), "zone_allocator_t") \
 	X(TYPE_render_image_filter_type_t, type_id(render_image_filter_type_t), "render_image_filter_type_t") \
 	X(TYPE_render_image_wrapping_type_t, type_id(render_image_wrapping_type_t), "render_image_wrapping_type_t") \
+	X(TYPE_render_image_usage_t, type_id(render_image_usage_t), "render_image_usage_t") \
 	X(TYPE_sampler_create_info_t, type_id(sampler_create_info_t), "sampler_create_info_t") \
 	X(TYPE_image_create_info_t, type_id(image_create_info_t), "image_create_info_t") \
 	X(TYPE_vulkan_image_t, type_id(vulkan_image_t), "vulkan_image_t") \
@@ -129,6 +130,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_bitmap_format_t, type_id(bitmap_format_t), "bitmap_format_t") \
 	X(TYPE_subtexture_data_t, type_id(subtexture_data_t), "subtexture_data_t") \
 	X(TYPE_asset_slot_t, type_id(asset_slot_t), "asset_slot_t") \
+	X(TYPE_asset_catalog_t, type_id(asset_catalog_t), "asset_catalog_t") \
 	X(TYPE_texture2D_t, type_id(texture2D_t), "texture2D_t") \
 	X(TYPE_shader_t, type_id(shader_t), "shader_t") \
 	X(TYPE_material_data_t, type_id(material_data_t), "material_data_t") \
@@ -1312,12 +1314,13 @@ struct type_info_struct_image_create_info_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[5];
+		type_info_member_t member_array[6];
 		struct {
 			type_info_member_t data;
 			type_info_member_t width;
 			type_info_member_t height;
 			type_info_member_t format;
+			type_info_member_t usage;
 			type_info_member_t sampler_info;
 		}members;
 	};
@@ -1349,13 +1352,15 @@ struct type_info_struct_asset_handle_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[9];
+		type_info_member_t member_array[11];
 		struct {
 			type_info_member_t is_valid;
 			type_info_member_t type;
 			type_info_member_t owner_asset_file_index;
 			type_info_member_t subtexture_data;
 			type_info_member_t slot;
+			type_info_member_t asset_manager;
+			type_info_member_t catalog;
 			type_info_member_t texture;
 			type_info_member_t shader;
 			type_info_member_t material_info;
@@ -2823,6 +2828,24 @@ struct type_info_enum_render_image_wrapping_type_t {
 	};
 };
 
+struct type_info_enum_render_image_usage_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t ImageUsage_Invalid;
+			type_info_member_t ImageUsage_RenderpassAttachment;
+			type_info_member_t ImageUsage_SampledTexture;
+		}members;
+	};
+};
+
 struct type_info_enum_asset_type_t {
 	const char *name;
 	u32 type;
@@ -3928,12 +3951,13 @@ const static type_info_struct_image_create_info_t type_info_struct_image_create_
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_image_create_info_t),
-	.member_count = 5,
+	.member_count = 6,
 	.members = {
 		.data = {.name = "data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), data))},
 		.width = {.name = "width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.width)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), width))},
 		.height = {.name = "height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.height)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), height))},
 		.format = {.name = "format", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.format)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), format))},
+		.usage = {.name = "usage", .type = TYPE_render_image_usage_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.usage)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), usage))},
 		.sampler_info = {.name = "sampler_info", .type = TYPE_sampler_create_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_create_info_t.sampler_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_create_info_t), sampler_info))},
 	}
 };
@@ -3959,13 +3983,15 @@ const static type_info_struct_asset_handle_t type_info_struct_asset_handle_t_con
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_asset_handle_t),
-	.member_count = 9,
+	.member_count = 11,
 	.members = {
 		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), is_valid))},
 		.type = {.name = "type", .type = TYPE_asset_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), type))},
 		.owner_asset_file_index = {.name = "owner_asset_file_index", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.owner_asset_file_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), owner_asset_file_index))},
 		.subtexture_data = {.name = "subtexture_data", .type = TYPE_subtexture_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.subtexture_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), subtexture_data))},
 		.slot = {.name = "slot", .type = TYPE_asset_slot_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.slot)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), slot))},
+		.asset_manager = {.name = "asset_manager", .type = TYPE_asset_manager_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.asset_manager)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), asset_manager))},
+		.catalog = {.name = "catalog", .type = TYPE_asset_catalog_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.catalog)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), catalog))},
 		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), texture))},
 		.shader = {.name = "shader", .type = TYPE_shader_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), shader))},
 		.material_info = {.name = "material_info", .type = TYPE_material_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_handle_t.material_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_handle_t), material_info))},
@@ -5180,6 +5206,17 @@ const static type_info_enum_render_image_wrapping_type_t type_info_enum_render_i
 		.ImageWrapping_Repeat = {.name = "ImageWrapping_Repeat", .type = TYPE_render_image_wrapping_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageWrapping_Repeat), .offset = ImageWrapping_Repeat},
 	}
 };
+const static type_info_enum_render_image_usage_t type_info_enum_render_image_usage_t_const_data = {
+	.name = "render_image_usage_t",
+	.type = TYPE_render_image_usage_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 3,
+	.members = {
+		.ImageUsage_Invalid = {.name = "ImageUsage_Invalid", .type = TYPE_render_image_usage_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageUsage_Invalid), .offset = ImageUsage_Invalid},
+		.ImageUsage_RenderpassAttachment = {.name = "ImageUsage_RenderpassAttachment", .type = TYPE_render_image_usage_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageUsage_RenderpassAttachment), .offset = ImageUsage_RenderpassAttachment},
+		.ImageUsage_SampledTexture = {.name = "ImageUsage_SampledTexture", .type = TYPE_render_image_usage_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(ImageUsage_SampledTexture), .offset = ImageUsage_SampledTexture},
+	}
+};
 const static type_info_enum_asset_type_t type_info_enum_asset_type_t_const_data = {
 	.name = "asset_type_t",
 	.type = TYPE_asset_type_t,
@@ -5796,6 +5833,7 @@ enum image_create_info_t_member_list_enum {
 	TYPE_IMAGE_CREATE_INFO_T_MEMBER_width,
 	TYPE_IMAGE_CREATE_INFO_T_MEMBER_height,
 	TYPE_IMAGE_CREATE_INFO_T_MEMBER_format,
+	TYPE_IMAGE_CREATE_INFO_T_MEMBER_usage,
 	TYPE_IMAGE_CREATE_INFO_T_MEMBER_sampler_info,
 };
 
@@ -5810,6 +5848,8 @@ enum asset_handle_t_member_list_enum {
 	TYPE_ASSET_HANDLE_T_MEMBER_owner_asset_file_index,
 	TYPE_ASSET_HANDLE_T_MEMBER_subtexture_data,
 	TYPE_ASSET_HANDLE_T_MEMBER_slot,
+	TYPE_ASSET_HANDLE_T_MEMBER_asset_manager,
+	TYPE_ASSET_HANDLE_T_MEMBER_catalog,
 	TYPE_ASSET_HANDLE_T_MEMBER_texture,
 	TYPE_ASSET_HANDLE_T_MEMBER_shader,
 	TYPE_ASSET_HANDLE_T_MEMBER_material_info,
@@ -6410,6 +6450,12 @@ enum render_image_wrapping_type_t_member_list_enum {
 	TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_Repeat,
 };
 
+enum render_image_usage_t_member_list_enum {
+	TYPE_RENDER_IMAGE_USAGE_T_MEMBER_ImageUsage_Invalid,
+	TYPE_RENDER_IMAGE_USAGE_T_MEMBER_ImageUsage_RenderpassAttachment,
+	TYPE_RENDER_IMAGE_USAGE_T_MEMBER_ImageUsage_SampledTexture,
+};
+
 enum asset_type_t_member_list_enum {
 	TYPE_ASSET_TYPE_T_MEMBER_AT_Invalid,
 	TYPE_ASSET_TYPE_T_MEMBER_AT_Bitmap,
@@ -6657,6 +6703,9 @@ enum render_pipeline_depth_function_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_ClampToEdge, "ImageWrapping_ClampToEdge") \
 	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_ClampToBorder, "ImageWrapping_ClampToBorder") \
 	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_Repeat, "ImageWrapping_Repeat") \
+	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_USAGE_T_MEMBER_ImageUsage_Invalid, "ImageUsage_Invalid") \
+	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_USAGE_T_MEMBER_ImageUsage_RenderpassAttachment, "ImageUsage_RenderpassAttachment") \
+	X(TYPE_ENUM_LOOKUP_RENDER_IMAGE_USAGE_T_MEMBER_ImageUsage_SampledTexture, "ImageUsage_SampledTexture") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Invalid, "AT_Invalid") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Bitmap, "AT_Bitmap") \
 	X(TYPE_ENUM_LOOKUP_ASSET_TYPE_T_MEMBER_AT_Shader, "AT_Shader") \
@@ -6863,6 +6912,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "zone_allocator_t", .type = TYPE_zone_allocator_t, .size = sizeof(zone_allocator_t), .struct_info = (type_info_struct_t*)&type_info_struct_zone_allocator_t_const_data},
 	{.name = "render_image_filter_type_t", .type = TYPE_render_image_filter_type_t, .size = sizeof(render_image_filter_type_t), .struct_info = NULL},
 	{.name = "render_image_wrapping_type_t", .type = TYPE_render_image_wrapping_type_t, .size = sizeof(render_image_wrapping_type_t), .struct_info = NULL},
+	{.name = "render_image_usage_t", .type = TYPE_render_image_usage_t, .size = sizeof(render_image_usage_t), .struct_info = NULL},
 	{.name = "sampler_create_info_t", .type = TYPE_sampler_create_info_t, .size = sizeof(sampler_create_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_sampler_create_info_t_const_data},
 	{.name = "image_create_info_t", .type = TYPE_image_create_info_t, .size = sizeof(image_create_info_t), .struct_info = (type_info_struct_t*)&type_info_struct_image_create_info_t_const_data},
 	{.name = "vulkan_image_t", .type = TYPE_vulkan_image_t, .size = sizeof(vulkan_image_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_image_t_const_data},
@@ -6872,6 +6922,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "bitmap_format_t", .type = TYPE_bitmap_format_t, .size = sizeof(bitmap_format_t), .struct_info = NULL},
 	{.name = "subtexture_data_t", .type = TYPE_subtexture_data_t, .size = sizeof(subtexture_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_subtexture_data_t_const_data},
 	{.name = "asset_slot_t", .type = TYPE_asset_slot_t, .size = sizeof(asset_slot_t), .struct_info = (type_info_struct_t*)&type_info_struct_asset_slot_t_const_data},
+	{.name = "asset_catalog_t", .type = TYPE_asset_catalog_t, .size = sizeof(asset_catalog_t*), .struct_info = NULL},
 	{.name = "texture2D_t", .type = TYPE_texture2D_t, .size = sizeof(texture2D_t), .struct_info = (type_info_struct_t*)&type_info_struct_texture2D_t_const_data},
 	{.name = "shader_t", .type = TYPE_shader_t, .size = sizeof(shader_t), .struct_info = (type_info_struct_t*)&type_info_struct_shader_t_const_data},
 	{.name = "material_data_t", .type = TYPE_material_data_t, .size = sizeof(material_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_material_data_t_const_data},
@@ -7083,6 +7134,9 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "ImageWrapping_ClampToEdge", .member_enum = TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_ClampToEdge, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_wrapping_type_t_const_data},
 	{.name = "ImageWrapping_ClampToBorder", .member_enum = TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_ClampToBorder, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_wrapping_type_t_const_data},
 	{.name = "ImageWrapping_Repeat", .member_enum = TYPE_RENDER_IMAGE_WRAPPING_TYPE_T_MEMBER_ImageWrapping_Repeat, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_wrapping_type_t_const_data},
+	{.name = "ImageUsage_Invalid", .member_enum = TYPE_RENDER_IMAGE_USAGE_T_MEMBER_ImageUsage_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_usage_t_const_data},
+	{.name = "ImageUsage_RenderpassAttachment", .member_enum = TYPE_RENDER_IMAGE_USAGE_T_MEMBER_ImageUsage_RenderpassAttachment, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_usage_t_const_data},
+	{.name = "ImageUsage_SampledTexture", .member_enum = TYPE_RENDER_IMAGE_USAGE_T_MEMBER_ImageUsage_SampledTexture, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_image_usage_t_const_data},
 	{.name = "AT_Invalid", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Bitmap", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Bitmap, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},
 	{.name = "AT_Shader", .member_enum = TYPE_ASSET_TYPE_T_MEMBER_AT_Shader, .type_info_ptr = (const type_info_struct*)&type_info_enum_asset_type_t_const_data},

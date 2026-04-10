@@ -433,7 +433,7 @@ s_renderer_command_list_init
 */
 
 internal_api void
-s_renderer_command_list_init(render_command_list_t *list)
+s_renderer_command_list_init(renderer_state_t *renderer_state, render_command_list_t *list)
 {
     if(list->is_initialized == false)
     {
@@ -446,9 +446,16 @@ s_renderer_command_list_init(render_command_list_t *list)
         c_arena_reset(&list->command_arena);
     }
 
-    list->commands            = c_arena_push_array(&list->command_arena, render_command_t, MAX_RENDER_COMMANDS);
-    list->active_render_state = g_pipeline_default_state_key;
+    Assert(global_context);
+    Assert(global_context->renderer_state);
+    asset_catalog_t *texture_catalog = global_context->asset_manager->texture_catalog;
+
+    list->commands               = c_arena_push_array(&list->command_arena, render_command_t, MAX_RENDER_COMMANDS);
+    list->active_render_state    = g_pipeline_default_state_key;
+    list->image_shader_params[0] = &texture_catalog->default_asset.texture->gpu_data;
+
     list->is_initialized      = true;
+
 }
 
 /*
@@ -465,7 +472,7 @@ s_renderer_get_command_list(renderer_state_t *renderer_state)
     Assert(renderer_state->command_list_count < MAX_COMMAND_LISTS);
     result->renderer_state = renderer_state;
 
-    s_renderer_command_list_init(result);
+    s_renderer_command_list_init(renderer_state, result);
     Assert(result->is_initialized == true);
     Assert(result->transient_arena.is_initialized == true);
     Assert(result->command_arena.is_initialized   == true);
@@ -576,13 +583,26 @@ r_cmd_renderpass_end
 */
 
 void
-r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t program)
+r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t asset_handle)
 {
     render_command_t *command = s_renderer_get_next_command(command_list);
     render_command_bind_shader_t *bind_shader = c_arena_push_struct(&command_list->command_arena, 
                                                                      render_command_bind_shader_t);
 
-    bind_shader->shader = program;
+    asset_slot_load_status_t load_status = asset_handle.slot->slot_state; 
+    if(load_status != ASLS_Loaded)
+    {
+        if(load_status == ASLS_Unloaded)
+        {
+            // signal for load
+        }
+        // apply a default texture
+        bind_shader->shader = asset_handle.catalog->default_asset;
+    }
+    else if(load_status == ASLS_Loaded)
+    {
+        bind_shader->shader = asset_handle;
+    }
 
     command->header.command_type = RCT_BindShader;
     command->data = bind_shader;
@@ -717,18 +737,49 @@ r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_consta
 
 /*
 =============
-r_cmd_bind_texture
+r_cmd_bind_texture_from_handle
 =============
 */
 
 void
-r_cmd_bind_texture(render_command_list_t *command_list, asset_handle_t *asset_handle)
+r_cmd_bind_texture_from_handle(render_command_list_t *command_list, asset_handle_t *asset_handle)
 {
     Assert(asset_handle->type == AT_Bitmap);
     render_command_t *command  = s_renderer_get_next_command(command_list);
     render_command_bind_texture_t *bind_texture = c_arena_push_struct(&command_list->command_arena, 
                                                                        render_command_bind_texture_t);
-    bind_texture->texture = &asset_handle->texture->gpu_data;
+    asset_slot_load_status_t load_status = asset_handle->slot->slot_state; 
+    if(load_status != ASLS_Loaded)
+    {
+        if(load_status == ASLS_Unloaded)
+        {
+            // signal for load
+        }
+        // apply a default texture
+        bind_texture->texture = &asset_handle->catalog->default_asset.texture->gpu_data;
+    }
+    else if(load_status == ASLS_Loaded)
+    {
+        bind_texture->texture = &asset_handle->texture->gpu_data;
+    }
+
+    command->header.command_type = RCT_BindTexture;
+    command->data = bind_texture;
+}
+
+/*
+=============
+r_cmd_bind_texture_image
+=============
+*/
+
+void
+r_cmd_bind_texture_image(render_command_list_t *command_list, texture2D_t *texture)
+{
+    render_command_t *command  = s_renderer_get_next_command(command_list);
+    render_command_bind_texture_t *bind_texture = c_arena_push_struct(&command_list->command_arena, 
+                                                                       render_command_bind_texture_t);
+    bind_texture->texture = &texture->gpu_data;
 
     command->header.command_type = RCT_BindTexture;
     command->data = bind_texture;

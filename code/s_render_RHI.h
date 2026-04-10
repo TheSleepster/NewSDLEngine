@@ -164,7 +164,6 @@ struct render_command_bind_material_t
 struct render_command_bind_shader_t
 {
     u32            shaderID;
-
     asset_handle_t shader;
 };
 
@@ -431,7 +430,8 @@ void r_cmd_set_viewport(render_command_list_t *command_list, vec2_t offset, vec2
 void r_cmd_update_push_constants(render_command_list_t *command_list, u32 offset, u32 size, void *data);
 void r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t program);
 void r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_constant_buffer_t *buffer, void *data, u32 data_size);
-void r_cmd_bind_texture(render_command_list_t *command_list, asset_handle_t *asset_handle);
+void r_cmd_bind_texture_image(render_command_list_t *command_list, texture2D_t *texture);
+void r_cmd_bind_texture_from_handle(render_command_list_t *command_list, asset_handle_t *asset_handle);
 void r_cmd_reset_render_state(render_command_list_t *command_list, render_pipeline_state_t *render_pipeline_state);
 void r_cmd_set_render_state(render_command_list_t *command_list, render_pipeline_state_t *render_pipeline_state);
 void r_cmd_draw(render_command_list_t *command_list, u32 vertex_count, u32 vertex_offset, u32 instance_count, u32 first_instance);

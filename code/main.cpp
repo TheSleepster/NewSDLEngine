@@ -142,7 +142,8 @@ entity_render(game_state_t *game_state, render_command_list_t *command_list, ent
             texture_handle.type = AT_Bitmap;
             texture_handle.texture = &entity->sprite->subtexture_data->atlas->texture;
 
-            r_cmd_bind_texture(command_list, &texture_handle);
+            r_cmd_bind_texture_image(command_list, texture_handle.texture);
+
             float32 tbottom = data->uv_max.y;
             float32 ttop    = data->uv_min.y;
             float32 tleft   = data->uv_min.x;

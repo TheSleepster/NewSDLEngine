@@ -2151,8 +2151,8 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                     VkDescriptorImageInfo *image_info = image_infos + image_count;
                     VkWriteDescriptorSet   *write     = writes + write_count++;
 
-                    for(u32 image_index = 0;
-                        image_index < binding->descriptor_count;
+                    for(u32 image_index = 1;
+                        image_index <= binding->descriptor_count;
                         ++image_index)
                     {
                         image_t *image = command_list->image_shader_params[image_count + image_index]; 
@@ -2166,7 +2166,36 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                         }
                         else
                         {
-                            image_info[image_index] = image_info[0];
+                            image_t *image = command_list->image_shader_params[0];
+                            if(image->vulkan_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+                            {
+                                VkCommandBuffer scratch_command_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
+                                VkImageSubresourceRange src_range = {
+                                    .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                                    .baseArrayLayer = 0,
+                                    .baseMipLevel   = 0,
+                                    .layerCount     = 1,
+                                    .levelCount     = 1,
+                                };
+                                vk_backend_image_change_layout(vulkan_context,
+                                                               scratch_command_buffer,
+                                                               image->vulkan_image.handle,
+                                                               image->vulkan_image.layout,
+                                                               VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                                               VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                                               VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                                                               VK_ACCESS_TRANSFER_WRITE_BIT,
+                                                               VK_ACCESS_SHADER_READ_BIT,
+                                                               src_range);
+                                image->vulkan_image.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                                vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
+                            }
+
+                            vulkan_image_t *vulkan_data = &image->vulkan_image;
+
+                            image_info->imageLayout = vulkan_data->layout;
+                            image_info->imageView   = vulkan_data->view;
+                            image_info->sampler     = vulkan_data->sampler;
                         }
                     }
 
@@ -2358,7 +2387,6 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 {
                     render_command_bind_shader_t *cmd = (render_command_bind_shader_t*)command->data;
                     vulkan_shader_t *shader = &cmd->shader.shader->shader_data;
-
                     u64 hash_index = 0;
                     if(shader->pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
                     {

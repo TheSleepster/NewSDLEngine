@@ -28,6 +28,13 @@ enum render_image_wrapping_type_t
     ImageWrapping_Repeat,
 };
 
+enum render_image_usage_t 
+{
+    ImageUsage_Invalid,
+    ImageUsage_RenderpassAttachment,
+    ImageUsage_SampledTexture,
+};
+
 struct sampler_create_info_t
 {
     render_image_filter_type_t   filtering;
@@ -49,6 +56,7 @@ struct image_create_info_t
     u32                    width;
     u32                    height;
     u32                    format;
+    render_image_usage_t   usage;
     sampler_create_info_t  sampler_info;
 };
 
@@ -62,8 +70,11 @@ struct image_t
     };
 };
 
+typedef struct bitmap bitmap_t;
 struct renderer_state_t;
+
 image_t s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info);
+image_t  s_renderer_image_create_from_bitmap(bitmap_t *bitmap);
 void    s_renderer_image_destroy(renderer_state_t *renderer_state, image_t *image);
 void    s_renderer_image_update_data(void *backend_context, image_t *image);
 
