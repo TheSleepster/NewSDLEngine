@@ -64,6 +64,7 @@ struct image_create_info_t
 // is in charge of tracking rendering-related GPU resources. Meaning, this is fine here.
 struct image_t
 {
+    u32                 ID;
     image_create_info_t create_info;
     union {
         vulkan_image_t vulkan_image;

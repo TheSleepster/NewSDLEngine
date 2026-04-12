@@ -363,18 +363,20 @@ struct glyph_metric_t
 
     vec2_t atlas_offset;
     vec2_t atlas_size;
+
+    texture_atlas_t *owner_atlas;
 };
 
 struct temporary_glyph_t
 {
-    u32             utf32_codepoint;
-    glyph_metric_t *metrics;
+    u32              utf32_codepoint;
+    glyph_metric_t  *metrics;
 
-    u32             glyph_width;
-    u32             glyph_height;
+    u32              glyph_width;
+    u32              glyph_height;
 
-    u32             cursor_x;
-    u32             cursor_y;
+    u32              cursor_x;
+    u32              cursor_y;
 };
 
 struct dynamic_render_font_page_t 
@@ -389,7 +391,7 @@ struct dynamic_render_font_page_t
 
     // NOTE(Sleepster): 
     // These are a "transient glyph". They're meant to store intermediate information related
-    // to the glyph so that it can be loaded and appended into the atlas at the end of the frame...
+    // to the glyph so that it can be loaded and appended into the atlas at the end of the frame in parallel...
     temporary_glyph_t              temporary_glyphs[MAX_CACHED_TEMPORARY_FONT_GLYPHS];
     u32                            temporary_glyph_count;
 

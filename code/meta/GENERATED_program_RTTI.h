@@ -170,7 +170,9 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_game_action_binding_t, type_id(game_action_binding_t), "game_action_binding_t") \
 	X(TYPE_game_action_t, type_id(game_action_t), "game_action_t") \
 	X(TYPE_render_buffer_type_t, type_id(render_buffer_type_t), "render_buffer_type_t") \
+	X(TYPE_render_buffer_advance_rate_t, type_id(render_buffer_advance_rate_t), "render_buffer_advance_rate_t") \
 	X(TYPE_render_buffer_memory_type_t, type_id(render_buffer_memory_type_t), "render_buffer_memory_type_t") \
+	X(TYPE_render_buffer_desc_t, type_id(render_buffer_desc_t), "render_buffer_desc_t") \
 	X(TYPE_vulkan_buffer_t, type_id(vulkan_buffer_t), "vulkan_buffer_t") \
 	X(TYPE_render_buffer_t, type_id(render_buffer_t), "render_buffer_t") \
 	X(TYPE_uniform_constant_buffer_t, type_id(uniform_constant_buffer_t), "uniform_constant_buffer_t") \
@@ -437,6 +439,7 @@ const static gamepad_controller_data_t GENERATED_DEFAULT_gamepad_controller_data
 const static input_controller_t GENERATED_DEFAULT_input_controller_t = {};
 const static game_action_binding_t GENERATED_DEFAULT_game_action_binding_t = {};
 const static game_action_t GENERATED_DEFAULT_game_action_t = {};
+const static render_buffer_desc_t GENERATED_DEFAULT_render_buffer_desc_t = {};
 const static render_buffer_t GENERATED_DEFAULT_render_buffer_t = {};
 const static uniform_constant_buffer_t GENERATED_DEFAULT_uniform_constant_buffer_t = {};
 const static render_instance_t GENERATED_DEFAULT_render_instance_t = {};
@@ -1335,8 +1338,9 @@ struct type_info_struct_image_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[2];
+		type_info_member_t member_array[3];
 		struct {
+			type_info_member_t ID;
 			type_info_member_t create_info;
 			type_info_member_t vulkan_image;
 		}members;
@@ -1516,7 +1520,7 @@ struct type_info_struct_glyph_metric_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[10];
+		type_info_member_t member_array[11];
 		struct {
 			type_info_member_t is_valid;
 			type_info_member_t is_fetched;
@@ -1528,6 +1532,7 @@ struct type_info_struct_glyph_metric_t {
 			type_info_member_t offset_y;
 			type_info_member_t atlas_offset;
 			type_info_member_t atlas_size;
+			type_info_member_t owner_atlas;
 		}members;
 	};
 };
@@ -1794,6 +1799,27 @@ struct type_info_struct_game_action_t {
 	};
 };
 
+struct type_info_struct_render_buffer_desc_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t type;
+			type_info_member_t allocation_type;
+			type_info_member_t advance_rate;
+			type_info_member_t buffer_capacity;
+			type_info_member_t element_size;
+			type_info_member_t initial_data;
+		}members;
+	};
+};
+
 struct type_info_struct_render_buffer_t {
 	const char *name;
 	u32 type;
@@ -1803,11 +1829,13 @@ struct type_info_struct_render_buffer_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[4];
+		type_info_member_t member_array[6];
 		struct {
 			type_info_member_t type;
 			type_info_member_t allocation_type;
-			type_info_member_t size;
+			type_info_member_t buffer_capacity;
+			type_info_member_t buffer_element_size;
+			type_info_member_t buffer_elements_used;
 			type_info_member_t buffer;
 		}members;
 	};
@@ -3013,6 +3041,23 @@ struct type_info_enum_render_buffer_type_t {
 	};
 };
 
+struct type_info_enum_render_buffer_advance_rate_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t RenderBufferAdvanceRate_PerElement;
+			type_info_member_t RenderBufferAdvanceRate_PerInstance;
+		}members;
+	};
+};
+
 struct type_info_enum_render_buffer_memory_type_t {
 	const char *name;
 	u32 type;
@@ -3969,8 +4014,9 @@ const static type_info_struct_image_t type_info_struct_image_t_const_data = {
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_image_t),
-	.member_count = 2,
+	.member_count = 3,
 	.members = {
+		.ID = {.name = "ID", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_t), ID))},
 		.create_info = {.name = "create_info", .type = TYPE_image_create_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_t.create_info)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_t), create_info))},
 		.vulkan_image = {.name = "vulkan_image", .type = TYPE_vulkan_image_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_image_t.vulkan_image)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_image_t), vulkan_image))},
 	}
@@ -4123,7 +4169,7 @@ const static type_info_struct_glyph_metric_t type_info_struct_glyph_metric_t_con
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_glyph_metric_t),
-	.member_count = 10,
+	.member_count = 11,
 	.members = {
 		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.is_valid)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), is_valid))},
 		.is_fetched = {.name = "is_fetched", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.is_fetched)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), is_fetched))},
@@ -4135,6 +4181,7 @@ const static type_info_struct_glyph_metric_t type_info_struct_glyph_metric_t_con
 		.offset_y = {.name = "offset_y", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.offset_y)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), offset_y))},
 		.atlas_offset = {.name = "atlas_offset", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.atlas_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), atlas_offset))},
 		.atlas_size = {.name = "atlas_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.atlas_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), atlas_size))},
+		.owner_atlas = {.name = "owner_atlas", .type = TYPE_texture_atlas_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_glyph_metric_t.owner_atlas)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_glyph_metric_t), owner_atlas))},
 	}
 };
 
@@ -4361,6 +4408,24 @@ const static type_info_struct_game_action_t type_info_struct_game_action_t_const
 	}
 };
 
+const static type_info_struct_render_buffer_desc_t type_info_struct_render_buffer_desc_t_const_data = {
+	.name = "render_buffer_desc_t",
+	.type = TYPE_render_buffer_desc_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_render_buffer_desc_t),
+	.member_count = 6,
+	.members = {
+		.type = {.name = "type", .type = TYPE_render_buffer_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_desc_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_desc_t), type))},
+		.allocation_type = {.name = "allocation_type", .type = TYPE_render_buffer_memory_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_desc_t.allocation_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_desc_t), allocation_type))},
+		.advance_rate = {.name = "advance_rate", .type = TYPE_render_buffer_advance_rate_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_desc_t.advance_rate)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_desc_t), advance_rate))},
+		.buffer_capacity = {.name = "buffer_capacity", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_desc_t.buffer_capacity)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_desc_t), buffer_capacity))},
+		.element_size = {.name = "element_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_desc_t.element_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_desc_t), element_size))},
+		.initial_data = {.name = "initial_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_desc_t.initial_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_desc_t), initial_data))},
+	}
+};
+
 const static type_info_struct_render_buffer_t type_info_struct_render_buffer_t_const_data = {
 	.name = "render_buffer_t",
 	.type = TYPE_render_buffer_t,
@@ -4368,11 +4433,13 @@ const static type_info_struct_render_buffer_t type_info_struct_render_buffer_t_c
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_render_buffer_t),
-	.member_count = 4,
+	.member_count = 6,
 	.members = {
 		.type = {.name = "type", .type = TYPE_render_buffer_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_t.type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_t), type))},
 		.allocation_type = {.name = "allocation_type", .type = TYPE_render_buffer_memory_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_t.allocation_type)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_t), allocation_type))},
-		.size = {.name = "size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_t.size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_t), size))},
+		.buffer_capacity = {.name = "buffer_capacity", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_t.buffer_capacity)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_t), buffer_capacity))},
+		.buffer_element_size = {.name = "buffer_element_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_t.buffer_element_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_t), buffer_element_size))},
+		.buffer_elements_used = {.name = "buffer_elements_used", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_t.buffer_elements_used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_t), buffer_elements_used))},
 		.buffer = {.name = "buffer", .type = TYPE_vulkan_buffer_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_buffer_t.buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_buffer_t), buffer))},
 	}
 };
@@ -5328,6 +5395,16 @@ const static type_info_enum_render_buffer_type_t type_info_enum_render_buffer_ty
 		.RenderBufferType_IndexBuffer = {.name = "RenderBufferType_IndexBuffer", .type = TYPE_render_buffer_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RenderBufferType_IndexBuffer), .offset = RenderBufferType_IndexBuffer},
 	}
 };
+const static type_info_enum_render_buffer_advance_rate_t type_info_enum_render_buffer_advance_rate_t_const_data = {
+	.name = "render_buffer_advance_rate_t",
+	.type = TYPE_render_buffer_advance_rate_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 2,
+	.members = {
+		.RenderBufferAdvanceRate_PerElement = {.name = "RenderBufferAdvanceRate_PerElement", .type = TYPE_render_buffer_advance_rate_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RenderBufferAdvanceRate_PerElement), .offset = RenderBufferAdvanceRate_PerElement},
+		.RenderBufferAdvanceRate_PerInstance = {.name = "RenderBufferAdvanceRate_PerInstance", .type = TYPE_render_buffer_advance_rate_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RenderBufferAdvanceRate_PerInstance), .offset = RenderBufferAdvanceRate_PerInstance},
+	}
+};
 const static type_info_enum_render_buffer_memory_type_t type_info_enum_render_buffer_memory_type_t_const_data = {
 	.name = "render_buffer_memory_type_t",
 	.type = TYPE_render_buffer_memory_type_t,
@@ -5838,6 +5915,7 @@ enum image_create_info_t_member_list_enum {
 };
 
 enum image_t_member_list_enum {
+	TYPE_IMAGE_T_MEMBER_ID,
 	TYPE_IMAGE_T_MEMBER_create_info,
 	TYPE_IMAGE_T_MEMBER_vulkan_image,
 };
@@ -5921,6 +5999,7 @@ enum glyph_metric_t_member_list_enum {
 	TYPE_GLYPH_METRIC_T_MEMBER_offset_y,
 	TYPE_GLYPH_METRIC_T_MEMBER_atlas_offset,
 	TYPE_GLYPH_METRIC_T_MEMBER_atlas_size,
+	TYPE_GLYPH_METRIC_T_MEMBER_owner_atlas,
 };
 
 enum temporary_glyph_t_member_list_enum {
@@ -6029,10 +6108,21 @@ enum game_action_t_member_list_enum {
 	TYPE_GAME_ACTION_T_MEMBER_name,
 };
 
+enum render_buffer_desc_t_member_list_enum {
+	TYPE_RENDER_BUFFER_DESC_T_MEMBER_type,
+	TYPE_RENDER_BUFFER_DESC_T_MEMBER_allocation_type,
+	TYPE_RENDER_BUFFER_DESC_T_MEMBER_advance_rate,
+	TYPE_RENDER_BUFFER_DESC_T_MEMBER_buffer_capacity,
+	TYPE_RENDER_BUFFER_DESC_T_MEMBER_element_size,
+	TYPE_RENDER_BUFFER_DESC_T_MEMBER_initial_data,
+};
+
 enum render_buffer_t_member_list_enum {
 	TYPE_RENDER_BUFFER_T_MEMBER_type,
 	TYPE_RENDER_BUFFER_T_MEMBER_allocation_type,
-	TYPE_RENDER_BUFFER_T_MEMBER_size,
+	TYPE_RENDER_BUFFER_T_MEMBER_buffer_capacity,
+	TYPE_RENDER_BUFFER_T_MEMBER_buffer_element_size,
+	TYPE_RENDER_BUFFER_T_MEMBER_buffer_elements_used,
 	TYPE_RENDER_BUFFER_T_MEMBER_buffer,
 };
 
@@ -6527,6 +6617,11 @@ enum render_buffer_type_t_member_list_enum {
 	TYPE_RENDER_BUFFER_TYPE_T_MEMBER_RenderBufferType_IndexBuffer,
 };
 
+enum render_buffer_advance_rate_t_member_list_enum {
+	TYPE_RENDER_BUFFER_ADVANCE_RATE_T_MEMBER_RenderBufferAdvanceRate_PerElement,
+	TYPE_RENDER_BUFFER_ADVANCE_RATE_T_MEMBER_RenderBufferAdvanceRate_PerInstance,
+};
+
 enum render_buffer_memory_type_t_member_list_enum {
 	TYPE_RENDER_BUFFER_MEMORY_TYPE_T_MEMBER_RenderBufferAllocationTypeMapped,
 	TYPE_RENDER_BUFFER_MEMORY_TYPE_T_MEMBER_RenderBufferAllocationTypeGPUOnly,
@@ -6753,6 +6848,8 @@ enum render_pipeline_depth_function_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_RENDER_BUFFER_TYPE_T_MEMBER_RenderBufferType_Invalid, "RenderBufferType_Invalid") \
 	X(TYPE_ENUM_LOOKUP_RENDER_BUFFER_TYPE_T_MEMBER_RenderBufferType_VertexBuffer, "RenderBufferType_VertexBuffer") \
 	X(TYPE_ENUM_LOOKUP_RENDER_BUFFER_TYPE_T_MEMBER_RenderBufferType_IndexBuffer, "RenderBufferType_IndexBuffer") \
+	X(TYPE_ENUM_LOOKUP_RENDER_BUFFER_ADVANCE_RATE_T_MEMBER_RenderBufferAdvanceRate_PerElement, "RenderBufferAdvanceRate_PerElement") \
+	X(TYPE_ENUM_LOOKUP_RENDER_BUFFER_ADVANCE_RATE_T_MEMBER_RenderBufferAdvanceRate_PerInstance, "RenderBufferAdvanceRate_PerInstance") \
 	X(TYPE_ENUM_LOOKUP_RENDER_BUFFER_MEMORY_TYPE_T_MEMBER_RenderBufferAllocationTypeMapped, "RenderBufferAllocationTypeMapped") \
 	X(TYPE_ENUM_LOOKUP_RENDER_BUFFER_MEMORY_TYPE_T_MEMBER_RenderBufferAllocationTypeGPUOnly, "RenderBufferAllocationTypeGPUOnly") \
 	X(TYPE_ENUM_LOOKUP_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Invalid, "RCT_Invalid") \
@@ -6962,7 +7059,9 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "game_action_binding_t", .type = TYPE_game_action_binding_t, .size = sizeof(game_action_binding_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_action_binding_t_const_data},
 	{.name = "game_action_t", .type = TYPE_game_action_t, .size = sizeof(game_action_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_action_t_const_data},
 	{.name = "render_buffer_type_t", .type = TYPE_render_buffer_type_t, .size = sizeof(render_buffer_type_t), .struct_info = NULL},
+	{.name = "render_buffer_advance_rate_t", .type = TYPE_render_buffer_advance_rate_t, .size = sizeof(render_buffer_advance_rate_t), .struct_info = NULL},
 	{.name = "render_buffer_memory_type_t", .type = TYPE_render_buffer_memory_type_t, .size = sizeof(render_buffer_memory_type_t), .struct_info = NULL},
+	{.name = "render_buffer_desc_t", .type = TYPE_render_buffer_desc_t, .size = sizeof(render_buffer_desc_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_buffer_desc_t_const_data},
 	{.name = "vulkan_buffer_t", .type = TYPE_vulkan_buffer_t, .size = sizeof(vulkan_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_vulkan_buffer_t_const_data},
 	{.name = "render_buffer_t", .type = TYPE_render_buffer_t, .size = sizeof(render_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_buffer_t_const_data},
 	{.name = "uniform_constant_buffer_t", .type = TYPE_uniform_constant_buffer_t, .size = sizeof(uniform_constant_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_uniform_constant_buffer_t_const_data},
@@ -7184,6 +7283,8 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "RenderBufferType_Invalid", .member_enum = TYPE_RENDER_BUFFER_TYPE_T_MEMBER_RenderBufferType_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_buffer_type_t_const_data},
 	{.name = "RenderBufferType_VertexBuffer", .member_enum = TYPE_RENDER_BUFFER_TYPE_T_MEMBER_RenderBufferType_VertexBuffer, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_buffer_type_t_const_data},
 	{.name = "RenderBufferType_IndexBuffer", .member_enum = TYPE_RENDER_BUFFER_TYPE_T_MEMBER_RenderBufferType_IndexBuffer, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_buffer_type_t_const_data},
+	{.name = "RenderBufferAdvanceRate_PerElement", .member_enum = TYPE_RENDER_BUFFER_ADVANCE_RATE_T_MEMBER_RenderBufferAdvanceRate_PerElement, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_buffer_advance_rate_t_const_data},
+	{.name = "RenderBufferAdvanceRate_PerInstance", .member_enum = TYPE_RENDER_BUFFER_ADVANCE_RATE_T_MEMBER_RenderBufferAdvanceRate_PerInstance, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_buffer_advance_rate_t_const_data},
 	{.name = "RenderBufferAllocationTypeMapped", .member_enum = TYPE_RENDER_BUFFER_MEMORY_TYPE_T_MEMBER_RenderBufferAllocationTypeMapped, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_buffer_memory_type_t_const_data},
 	{.name = "RenderBufferAllocationTypeGPUOnly", .member_enum = TYPE_RENDER_BUFFER_MEMORY_TYPE_T_MEMBER_RenderBufferAllocationTypeGPUOnly, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_buffer_memory_type_t_const_data},
 	{.name = "RCT_Invalid", .member_enum = TYPE_RENDER_COMMAND_TYPE_T_MEMBER_RCT_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_command_type_t_const_data},

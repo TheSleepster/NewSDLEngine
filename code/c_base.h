@@ -162,30 +162,32 @@ CODE_GEN_IGNORE_FILE()
 #define Align8(value)  ((value + 7)  & ~7)
 #define Align16(value) ((value + 15) & ~15)
 
+#define BIT(x) (1 << x)
+
 #include "c_types.h"
 
-global_variable s8  S8_MIN  = (s8) 0x80;
-global_variable s16 S16_MIN = (s16)0x8000;
-global_variable s32 S32_MIN = (s32)0x80000000;
-global_variable s64 S64_MIN = (s64)0x8000000000000000llu;
+const global_variable s8  S8_MIN  = (s8) 0x80;
+const global_variable s16 S16_MIN = (s16)0x8000;
+const global_variable s32 S32_MIN = (s32)0x80000000;
+const global_variable s64 S64_MIN = (s64)0x8000000000000000llu;
 
-global_variable s8  S8_MAX  = (s8) 0x7f;
-global_variable s16 S16_MAX = (s16)0x7ffff;
-global_variable s32 S32_MAX = (s32)0x7ffffffff;
-global_variable s64 S64_MAX = (s64)0x7fffffffffffffffllu;
+const global_variable s8  S8_MAX  = (s8) 0x7f;
+const global_variable s16 S16_MAX = (s16)0x7ffff;
+const global_variable s32 S32_MAX = (s32)0x7ffffffff;
+const global_variable s64 S64_MAX = (s64)0x7fffffffffffffffllu;
 
-global_variable u8  U8_MIN  = (u8) 0x00;
-global_variable u16 U16_MIN = (u16)0x0000;
-global_variable u32 U32_MIN = (u32)0x00000000;
-global_variable u64 U64_MIN = (u64)0x0000000000000000llu;
+const global_variable u8  U8_MIN  = (u8) 0x00;
+const global_variable u16 U16_MIN = (u16)0x0000;
+const global_variable u32 U32_MIN = (u32)0x00000000;
+const global_variable u64 U64_MIN = (u64)0x0000000000000000llu;
 
-global_variable u8  U8_MAX  = (u8) 0xff;
-global_variable u16 U16_MAX = (u16)0xfffff;
-global_variable u32 U32_MAX = (u32)0xffffffff;
-global_variable u64 U64_MAX = (u64)0xFFFFFFFFllu;
+const global_variable u8  U8_MAX  = (u8) 0xff;
+const global_variable u16 U16_MAX = (u16)0xfffff;
+const global_variable u32 U32_MAX = (u32)0xffffffff;
+const global_variable u64 U64_MAX = (u64)0xFFFFFFFFllu;
 
-global_variable float32 machine_epsilon_f32 = 1.1920929e-7f;
-global_variable float64 machine_epsilon_f64 = 2.220446e-16;
+const global_variable float32 machine_epsilon_f32 = 1.1920929e-7f;
+const global_variable float64 machine_epsilon_f64 = 2.220446e-16;
 
 typedef void void_func(void);
 
@@ -259,8 +261,6 @@ privDefer<F> defer_func(F f) {
 #define DEFER_3(x)    DEFER_2(x, __COUNTER__)
 #define defer(code)   auto DEFER_3(_defer_) = defer_func([&](){code;})
 #endif
-
-#define BIT(x) (1 << x)
 
 #endif // C_BASE_H
 

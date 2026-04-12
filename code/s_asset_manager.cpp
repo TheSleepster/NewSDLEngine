@@ -697,7 +697,8 @@ s_asset_font_load_glyph(dynamic_render_font_varient_t *varient,
         }
     }
 
-    metrics->is_valid = true;
+    metrics->owner_atlas = page->font_atlas;
+    metrics->is_valid    = true;
 }
 
 /*===============================

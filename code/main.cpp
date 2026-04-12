@@ -88,6 +88,58 @@ struct game_state_t
     u32                 game_renderpass_ID;
 };
 
+void
+draw_textured_quad_ex(game_state_t          *game_state,
+                      render_command_list_t *command_list,
+                      vec2_t                 position,
+                      vec2_t                 render_size,
+                      vec4_t                 render_color,
+                      vec2_t                 uv_min,
+                      vec2_t                 uv_max,
+                      texture2D_t           *texture)
+{
+    render_vertex_t *vertex_pointer = game_state->vertex_data + game_state->vertex_count;
+
+    render_vertex_t *bottom_right = vertex_pointer + 0;
+    render_vertex_t *top_right    = vertex_pointer + 1;
+    render_vertex_t *top_left     = vertex_pointer + 2;
+    render_vertex_t *bottom_left  = vertex_pointer + 3;
+
+    float32 top    = position.y + render_size.y;
+    float32 bottom = position.y;
+    float32 left   = position.x;
+    float32 right  = position.x + render_size.x;
+
+    bottom_left->vPosition  = vec4(left,  bottom, 0, 1);
+    bottom_right->vPosition = vec4(right, bottom, 0, 1);
+    top_left->vPosition     = vec4(left,  top,    0, 1);
+    top_right->vPosition    = vec4(right, top,    0, 1);
+
+    bottom_left->vColor  = vec4(1.0, 1.0, 1.0, 1.0);
+    bottom_right->vColor = vec4(1.0, 1.0, 1.0, 1.0);
+    top_left->vColor     = vec4(1.0, 1.0, 1.0, 1.0);
+    top_right->vColor    = vec4(1.0, 1.0, 1.0, 1.0);
+    if(texture)
+    {
+        if(!s_renderer_is_texture_bound(command_list, texture))
+        {
+        r_cmd_bind_texture_image(command_list, texture);
+        }
+
+        float32 tbottom = uv_max.y;
+        float32 ttop    = uv_min.y;
+        float32 tleft   = uv_min.x;
+        float32 tright  = uv_max.x;
+
+        bottom_left->vTexCoord  = vec2(tleft,  tbottom);
+        bottom_right->vTexCoord = vec2(tright, tbottom);
+        top_left->vTexCoord     = vec2(tleft,  ttop);
+        top_right->vTexCoord    = vec2(tright, ttop);
+    }
+
+    game_state->vertex_count += 4;
+}
+
 entity_t*
 entity_create(game_state_t *game_state)
 {
@@ -110,53 +162,35 @@ entity_create(game_state_t *game_state)
 void
 entity_render(game_state_t *game_state, render_command_list_t *command_list, entity_t *entity)
 {
-    render_vertex_t *vertex_pointer = game_state->vertex_data + game_state->vertex_count;
-
-    render_vertex_t *bottom_right = vertex_pointer + 0;
-    render_vertex_t *top_right    = vertex_pointer + 1;
-    render_vertex_t *top_left     = vertex_pointer + 2;
-    render_vertex_t *bottom_left  = vertex_pointer + 3;
-
-    float32 top    = entity->render_position.y + entity->size.y;
-    float32 bottom = entity->render_position.y;
-    float32 left   = entity->render_position.x;
-    float32 right  = entity->render_position.x + entity->size.x;
-
-    bottom_left->vPosition  = vec4(left,  bottom, 0, 1);
-    bottom_right->vPosition = vec4(right, bottom, 0, 1);
-    top_left->vPosition     = vec4(left,  top,    0, 1);
-    top_right->vPosition    = vec4(right, top,    0, 1);
-
-    bottom_left->vColor  = vec4(1.0, 1.0, 1.0, 1.0);
-    bottom_right->vColor = vec4(1.0, 1.0, 1.0, 1.0);
-    top_left->vColor     = vec4(1.0, 1.0, 1.0, 1.0);
-    top_right->vColor    = vec4(1.0, 1.0, 1.0, 1.0);
+    texture2D_t *texture = null;
+    vec2_t       uv_min  = vec2_zero();
+    vec2_t       uv_max  = vec2_zero();
 
     if(entity->e_flags & EF_HasSprite)
     {
-        // TODO(Sleepster): This should be two different valid code paths for if the sprite is atlased or not  
         subtexture_data_t *data = entity->sprite->subtexture_data;
         if(data)
         {
-            asset_handle_t texture_handle = {};
-            texture_handle.type = AT_Bitmap;
-            texture_handle.texture = &entity->sprite->subtexture_data->atlas->texture;
-
-            r_cmd_bind_texture_image(command_list, texture_handle.texture);
-
-            float32 tbottom = data->uv_max.y;
-            float32 ttop    = data->uv_min.y;
-            float32 tleft   = data->uv_min.x;
-            float32 tright  = data->uv_max.x;
-
-            bottom_left->vTexCoord  = vec2(tleft,  tbottom);
-            bottom_right->vTexCoord = vec2(tright, tbottom);
-            top_left->vTexCoord     = vec2(tleft,  ttop);
-            top_right->vTexCoord    = vec2(tright, ttop);
+            texture = &data->atlas->texture;
+            uv_min  =  data->uv_min;
+            uv_max  =  data->uv_max;
+        }
+        else
+        {
+            texture = entity->sprite->texture;
+            uv_min  = vec2(0.0f, 0.0f);
+            uv_max  = vec2(1.0f, 1.0f);
         }
     }
-
-    game_state->vertex_count += 4;
+    
+    draw_textured_quad_ex(game_state, 
+                          command_list, 
+                          entity->position, 
+                          entity->size, 
+                          vec4(1.0, 1.0, 1.0, 1.0),
+                          uv_min,
+                          uv_max,
+                          texture);
 }
 
 int
@@ -221,7 +255,7 @@ game_main(void)
     };
 
     u32 game_renderpass_ID = s_renderer_build_renderpass(renderer_state, &game_renderpass_desc);
-    u32 *indices = c_arena_push_array(&renderer_state->renderer_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
+    u32 *indices = c_arena_push_array(&renderer_state->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
     u32  index_offset = 0;
     for(u32 index = 0;
         index < 60000;
@@ -237,9 +271,19 @@ game_main(void)
         index_offset += 4;
     }
 
-    render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, RenderBufferAllocationTypeMapped, null,     sizeof(render_vertex_t) * (4 * MAX_ENTITIES));
-    render_buffer_t index_buffer  = s_renderer_index_buffer_create(renderer_state,  RenderBufferAllocationTypeMapped, indices, (sizeof(u32) * (6 * MAX_ENTITIES)));
-    game_state.vertex_data        = c_arena_push_array(&renderer_state->renderer_arena, render_vertex_t, 4 * 10000);
+    render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, 
+                                                                    RenderBufferAllocationTypeMapped, 
+                                                                    sizeof(render_vertex_t), 
+                                                                    RenderBufferAdvanceRate_PerElement, 
+                                                                    null, 
+                                                                    sizeof(render_vertex_t) * (4 * MAX_ENTITIES));
+    render_buffer_t index_buffer  = s_renderer_index_buffer_create(renderer_state,  
+                                                                   RenderBufferAllocationTypeMapped, 
+                                                                   sizeof(u32),
+                                                                   indices, 
+                                                                   (sizeof(u32) * (6 * MAX_ENTITIES)));
+
+    game_state.vertex_data = c_arena_push_array(&renderer_state->renderer_arena, render_vertex_t, 4 * 10000);
 
     uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
     asset_handle_t basic_triangle = s_asset_manager_acquire_asset_handle(asset_manager, STR("basic_triangle"));

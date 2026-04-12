@@ -34,17 +34,38 @@ enum render_buffer_type_t
     RenderBufferType_IndexBuffer  = BIT(2),
 };
 
+enum render_buffer_advance_rate_t 
+{
+    RenderBufferAdvanceRate_PerElement  = BIT(0),
+    RenderBufferAdvanceRate_PerInstance = BIT(1),
+};
+
 enum render_buffer_memory_type_t
 {
     RenderBufferAllocationTypeMapped  = BIT(0),
     RenderBufferAllocationTypeGPUOnly = BIT(1)
 };
 
+struct render_buffer_desc_t
+{
+    render_buffer_type_t         type;
+    render_buffer_memory_type_t  allocation_type;
+    render_buffer_advance_rate_t advance_rate;
+
+    u64                          buffer_capacity;
+    u32                          element_size;
+
+    void                        *initial_data;
+};
+
 struct render_buffer_t
 {
     render_buffer_type_t        type;
     render_buffer_memory_type_t allocation_type;
-    u32                         size;
+
+    u32                         buffer_capacity;
+    u32                         buffer_element_size;
+    u32                         buffer_elements_used;
 
     vulkan_buffer_t             buffer;
 };
@@ -408,15 +429,16 @@ u32              s_renderer_build_renderpass(renderer_state_t *renderer_state, r
 
 uniform_constant_buffer_t* s_renderer_get_constant_buffer(renderer_state_t *renderer_state, string_t uniform_name);
 
-            render_buffer_t s_renderer_render_buffer_create(renderer_state_t *renderer_state, void *data, u32 size, render_buffer_type_t buffer_type, render_buffer_memory_type_t allocation_type);
-true_inline render_buffer_t s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t usage, void *data, u32 size);
-true_inline render_buffer_t s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t usage, void *data, u32 size);
+            render_buffer_t s_renderer_render_buffer_create(renderer_state_t *renderer_state, render_buffer_desc_t *buffer_desc);
+true_inline render_buffer_t s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, u32 element_size, render_buffer_advance_rate_t rate, void *data, u32 size);
+true_inline render_buffer_t s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, u32 element_size, void *data, u32 size);
 true_inline void            s_renderer_render_buffer_copy_data(renderer_state_t *renderer_state, render_buffer_t *buffer, void *data, u32 size, u32 offset);
 
 image_t                s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info);
 void                   s_renderer_image_destroy(renderer_state_t *renderer_state, image_t *image);
 void                   s_renderer_image_update_data(void *backend_context, image_t *image);
 render_command_list_t* s_renderer_get_command_list(renderer_state_t *renderer_state);
+bool8                  s_renderer_is_texture_bound(render_command_list_t *command_list, texture2D_t *texture);
 void                   s_renderer_reset_command_list(render_command_list_t *command_list);
 
 void r_cmd_renderpass_begin(render_command_list_t *command_list, u32 renderpassID);

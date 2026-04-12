@@ -118,6 +118,7 @@ image_t
 s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info)
 {
     image_t result = {};
+    result.ID          = c_fnv_hash_value((byte*)image_create_info, sizeof(image_create_info_t));
     result.create_info = *image_create_info;
 
     VkImageUsageFlags usage_flags = s_renderer_image_usage_flags_from_image_format((bitmap_format_t)image_create_info->format);

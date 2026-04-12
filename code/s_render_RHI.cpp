@@ -312,9 +312,16 @@ s_renderer_vertex_buffer_create
 */
 
 true_inline render_buffer_t
-s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, void *data, u32 size)
+s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, u32 element_size, render_buffer_advance_rate_t rate, void *data, u32 size)
 {
-    render_buffer_t result = s_renderer_render_buffer_create(renderer_state, data, size, RenderBufferType_VertexBuffer, memory_type);
+    render_buffer_desc_t buffer_desc = {
+        .type = RenderBufferType_VertexBuffer,
+        .allocation_type = memory_type,
+        .buffer_capacity = size,
+        .element_size    = element_size,
+        .initial_data    = data
+    };
+    render_buffer_t result = s_renderer_render_buffer_create(renderer_state, &buffer_desc);
     return(result);
 }
 
@@ -325,9 +332,16 @@ s_renderer_index_buffer_create
 */
 
 true_inline render_buffer_t
-s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, void *data, u32 size)
+s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, u32 element_size, void *data, u32 size)
 {
-    render_buffer_t result = s_renderer_render_buffer_create(renderer_state, data, size, RenderBufferType_IndexBuffer, memory_type);
+    render_buffer_desc_t buffer_desc = {
+        .type = RenderBufferType_IndexBuffer,
+        .allocation_type = memory_type,
+        .buffer_capacity = size,
+        .element_size    = element_size,
+        .initial_data    = data
+    };
+    render_buffer_t result = s_renderer_render_buffer_create(renderer_state, &buffer_desc);
     return(result);
 }
 
@@ -339,15 +353,14 @@ s_renderer_render_buffer_create
 
 render_buffer_t
 s_renderer_render_buffer_create(renderer_state_t           *renderer_state, 
-                                void                       *data, 
-                                u32                         size, 
-                                render_buffer_type_t        buffer_type, 
-                                render_buffer_memory_type_t allocation_type)
+                                render_buffer_desc_t       *buffer_desc)
 {
     render_buffer_t result = {};
-    result.type            = buffer_type;
-    result.size            = size;
-    result.allocation_type = allocation_type;
+    result.type            = buffer_desc->type;
+    result.buffer_capacity = buffer_desc->buffer_capacity;
+    result.allocation_type = buffer_desc->allocation_type;
+
+    render_buffer_type_t buffer_type = buffer_desc->type;
 
     VkBufferUsageFlags             usage_flags      = (VkBufferUsageFlagBits)0;
     vulkan_allocation_usage_type_t allocation_flags = (vulkan_allocation_usage_type_t)0;
@@ -363,22 +376,22 @@ s_renderer_render_buffer_create(renderer_state_t           *renderer_state,
         usage_flags |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
     }
 
-    if(allocation_type == RenderBufferAllocationTypeMapped)
+    if(buffer_desc->allocation_type == RenderBufferAllocationTypeMapped)
     {
         allocation_flags = VULKAN_MEMORY_USAGE_CPU_TO_GPU; 
     }
-    else if(allocation_type == RenderBufferAllocationTypeGPUOnly)
+    else if(buffer_desc->allocation_type == RenderBufferAllocationTypeGPUOnly)
     {
         allocation_flags = VULKAN_MEMORY_USAGE_GPU_ONLY;
     }
 
     result.buffer = vk_backend_buffer_create((vulkan_context_t *)renderer_state->render_context, 
-                                             size,
+                                             buffer_desc->buffer_capacity,
                                              usage_flags,
                                              allocation_flags);
-    if(data != null && size > 0)
+    if(buffer_desc->initial_data != null && buffer_desc->buffer_capacity > 0)
     {
-        vk_backend_buffer_copy_data((vulkan_context_t*)renderer_state->render_context, &result.buffer, data, size, 0);
+        vk_backend_buffer_copy_data((vulkan_context_t*)renderer_state->render_context, &result.buffer, buffer_desc->initial_data, buffer_desc->buffer_capacity, 0);
     }
 
     return(result);
@@ -480,11 +493,42 @@ s_renderer_get_command_list(renderer_state_t *renderer_state)
     return(result);
 }
 
+/*
+=============
+s_renderer_get_next_command
+=============
+*/
+
 internal_api true_inline render_command_t*
 s_renderer_get_next_command(render_command_list_t *command_list)
 {
     render_command_t *result = null;
     result = command_list->commands + command_list->command_count++;
+
+    return(result);
+}
+
+/*
+=============
+s_renderer_is_texture_bound
+=============
+*/
+
+bool8
+s_renderer_is_texture_bound(render_command_list_t *command_list, texture2D_t *texture)
+{
+    bool8 result = false;
+    for(u32 bound_textures_index = 0;
+        bound_textures_index < command_list->image_count;
+        ++bound_textures_index)
+    {
+        image_t *image = command_list->image_shader_params[bound_textures_index];
+        if(image->ID == texture->gpu_data.ID)
+        {
+            result = true;
+            break;
+        }
+    }
 
     return(result);
 }
