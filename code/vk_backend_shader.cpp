@@ -196,7 +196,7 @@ vulkan_shader_t
 vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_source)
 {
     vulkan_shader_t result = {};
-    result.shader_arena = c_arena_create(MB(5));
+    result.shader_arena = c_arena_create(MB(10));
 
     SpvReflectShaderModule module;
     SpvReflectResult error = spvReflectCreateShaderModule(shader_source.count, shader_source.data, &module);
@@ -249,6 +249,11 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
             VkVertexInputBindingDescription *current_vertex_buffer     = null;
             VkVertexInputRate                current_buffer_input_rate = VK_VERTEX_INPUT_RATE_VERTEX;
 
+            const u32 MAX_BUFFER_BINDING_DESCS = 4;
+            const u32 MAX_BUFFER_ATTRIBUTES    = 12;
+            result.vertex_buffer_binding_descs = c_arena_push_array(&result.shader_arena, VkVertexInputBindingDescription,   MAX_BUFFER_BINDING_DESCS);
+            result.buffer_attributes           = c_arena_push_array(&result.shader_arena, VkVertexInputAttributeDescription, MAX_BUFFER_ATTRIBUTES);
+
             u32 buffer_attribute_count       = 0;
             u32 current_vertex_buffer_stride = 0;
 
@@ -280,8 +285,10 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
                         current_buffer_input_rate = member_name.data[0] == 'i' ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX;
                         current_structure_name    = structure_name;
                         vertex_buffer_count++;
+
+                        Assert(vertex_buffer_count <= (s32)MAX_BUFFER_BINDING_DESCS);
                     }
-                    current_vertex_buffer = result.vertex_buffer_binding_desc + vertex_buffer_count;
+                    current_vertex_buffer = result.vertex_buffer_binding_descs + vertex_buffer_count;
 
                     VkFormat attrib_format = (VkFormat)interface->format;
                     VkVertexInputAttributeDescription *attribute = result.buffer_attributes + buffer_attribute_count;
@@ -292,6 +299,8 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
 
                     current_vertex_buffer_stride += vk_backend_get_vk_format_size(attrib_format);
                     ++buffer_attribute_count;
+
+                    Assert(buffer_attribute_count <= MAX_BUFFER_ATTRIBUTES);
                 }
             }
 
@@ -309,7 +318,7 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
             result.pipeline_vertex_input_state = {
                 .sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
                 .vertexBindingDescriptionCount   = (u32)(vertex_buffer_count + 1),
-                .pVertexBindingDescriptions      = result.vertex_buffer_binding_desc,
+                .pVertexBindingDescriptions      = result.vertex_buffer_binding_descs,
                 .vertexAttributeDescriptionCount = buffer_attribute_count,
                 .pVertexAttributeDescriptions    = result.buffer_attributes,
             };
@@ -454,6 +463,7 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
         u64 pipeline_state_hash = c_fnv_hash_value(pipeline_key_data.data, pipeline_key_data.count);
         pipeline_state_hash %= MAX_SHADER_PIPELINE_COUNT; 
 
+        result.shader_id = pipeline_state_hash;
         result.pipeline_hash.data[pipeline_state_hash] = vk_backend_create_render_pipeline(vulkan_context, 
                                                                                            &result, 
                                                                                            &g_pipeline_default_rasterization_state, 

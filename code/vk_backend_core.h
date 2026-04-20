@@ -35,15 +35,6 @@ constexpr u32 SWAPCHAIN_MAX_IMAGES         = 10;
 constexpr u32 MAX_DESCRIPTOR_SETS          = 16384; 
 constexpr u32 MAX_DESCRIPTOR_SET_WRITES    = 32;
 
-// NOTE(Sleepster): Used for rendering
-struct alignas(16) render_vertex_t
-{
-    vec4_t vPosition;
-    vec4_t vColor;
-    vec2_t vTexCoord;
-    vec2_t vPadding;
-};
-
 typedef enum renderer_effect_application_flags
 {
     REAF_None,
@@ -85,17 +76,14 @@ typedef enum render_pipeline_blending_equation
 
 typedef enum render_pipeline_depth_function
 {
-    RDF_Invalid,
     RDF_Never,
-    RDF_Always,
-
-    RDF_Greater,
     RDF_Less,
     RDF_Equal,
-    RDF_NotEqual,
     RDF_LessOrEqual,
+    RDF_Greater,
+    RDF_NotEqual,
     RDF_GreaterOrEqual,
-    RDF_Count
+    RDF_Always,
 }render_pipeline_depth_function_t;
 
 typedef struct render_pipeline_state
@@ -298,6 +286,8 @@ global_variable constexpr render_pipeline_state_t g_pipeline_default_state_key =
 
 struct vulkan_shader_t;
 struct renderer_state_t;
+struct renderpass_t;
+struct renderpass_desc_t;
 
 #define vkAssert(result) ({                                                \
     if(!vk_backend_result_is_success(result))                              \
@@ -317,6 +307,7 @@ void        vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_s
 void        vk_backend_renderpass_destroy(vulkan_context_t *vulkan_context, VkRenderPass renderpass);
 void        vk_backend_framebuffer_destroy(vulkan_context_t *vulkan_context, VkFramebuffer framebuffer);
 void        vk_backend_renderpass_destroy(vulkan_context_t *vulkan_context, VkRenderPass renderpass);
+u32         vk_backend_initialize_RHI_renderpass(renderer_state_t *renderer_state, renderpass_desc_t *renderpass_desc, renderpass_t *renderpass);
 
 VkCommandBuffer  vk_backend_get_and_begin_scratch_command_buffer(vulkan_context_t *vulkan_context, bool8 is_primary);
 void             vk_backend_submit_and_release_scratch_command_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer *command_buffer);

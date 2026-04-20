@@ -388,6 +388,7 @@ struct dynamic_render_font_page_t
     dynamic_render_font_varient_t *varient;
     texture_atlas_t               *font_atlas;
     HashTable_t(glyph_metric_t*)   glyphs;
+    u32                            loaded_glyph_count;
 
     // NOTE(Sleepster): 
     // These are a "transient glyph". They're meant to store intermediate information related
@@ -409,7 +410,7 @@ struct dynamic_render_font_varient_t
 {
     u32                         font_size;
 
-    s64                         pixel_size;
+    float64                     size_to_pixels;
     s64                         line_spacing;
     s64                         max_ascender;
     s64                         max_descender;

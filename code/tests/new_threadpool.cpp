@@ -19,11 +19,15 @@
 #include <c_global_context.cpp>
 #include <c_string.cpp>
 
+#include <c_memory_arena.cpp>
+#include <c_file_api.cpp>
+#include <c_file_watcher.cpp>
+#include <c_zone_allocator.cpp>
+
 #include <p_platform_data.h>
 #include <c_memory_arena.h>
 
 #include <sys_linux.cpp>
-#include <c_memory_arena.cpp>
 #include <c_threadpool.cpp>
 
 int

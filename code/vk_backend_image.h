@@ -41,6 +41,7 @@ struct vulkan_image_info_t
     u32      type;
     u32      format;
     u32      initial_layout;
+    u32      final_layout;
     string_t data;
 
     vulkan_sampler_info_t *sampler_info;
@@ -53,6 +54,8 @@ struct vulkan_image_t
     VkImageView              view;
     VkSampler                sampler;
     VkImageLayout            layout;
+    VkImageLayout            renderpass_initial_layout;
+    VkImageLayout            renderpass_final_layout;
     VkFormat                 internal_format;
     VkImageAspectFlags       aspect_mask;
     vulkan_allocation_info_t allocation;
@@ -101,6 +104,9 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
 
 bool8 vk_backend_is_image_format_stencil_format(vulkan_image_t *image);
 bool8 vk_backend_is_image_format_depth_format(vulkan_image_t *image);
+
+void vk_backend_transfer_image_to_intial_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image);
+void vk_backend_transfer_image_to_final_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image);
 
 #endif // VK_BACKEND_IMAGE_H
 

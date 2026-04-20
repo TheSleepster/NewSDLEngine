@@ -4,13 +4,13 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#define DYNARRAY_IMPLEMENTATION
+
 #include <c_base.h>
 #include <c_types.h>
+#include <c_string.h>
 #include <c_math.h>
 #include <c_dynarray.h>
-
-#include <c_dynarray_impl.cpp>
-#include <p_platform_data.cpp>
 
 #define ITERATIONS (20)
 

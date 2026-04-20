@@ -7,6 +7,8 @@
 #include <vk_backend_buffer.h>
 #include <vk_backend_core.h>
 
+// TODO(Sleepster): vk_backend_buffer_reset();
+
 /*
 =============
 vk_backend_buffer_create
@@ -72,10 +74,14 @@ void*
 vk_backend_buffer_append_data(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, void *data, u32 size)
 {
     Assert(buffer->allocation.mapped_data != null);
-    void *result = null;
+    Assert(size <= buffer->allocation.allocation_size);
+    if(buffer->allocation.mapped_data + buffer->used >= buffer->allocation.mapped_data + buffer->allocation.allocation_size)
+    {
+        buffer->used = 0;
+    }
+    void *result = buffer->allocation.mapped_data + buffer->used;
 
-    void *mapped_data = buffer->allocation.mapped_data + buffer->used;
-    memcpy(mapped_data, data, size);
+    memcpy(result, data, size);
     buffer->used += size;
 
     return(result);
@@ -270,7 +276,7 @@ vk_backend_buffer_stage_data(vulkan_context_t *vulkan_context, byte *data, u64 d
     vulkan_staging_buffer_t *staging_buffer = vulkan_context->staging_buffers + vulkan_context->current_frame_index;
     vulkan_buffer_t         *buffer_handle  = &staging_buffer->buffer;
 
-    dynarray_header_t *header = _dynarray_header(vulkan_context->staging_infos);
+    dynarray_header_t *header = c_dynarray_header(vulkan_context->staging_infos);
     (void)header;
 
     // NOTE(Sleepster): You have to align upload_size yourself
@@ -285,7 +291,7 @@ vk_backend_buffer_stage_data(vulkan_context_t *vulkan_context, byte *data, u64 d
     buffer_handle->used += data_size;
 
     c_dynarray_push(vulkan_context->staging_infos, staging_info);
-    header = _dynarray_header(vulkan_context->staging_infos);
+    header = c_dynarray_header(vulkan_context->staging_infos);
 }
 
 /*
@@ -300,7 +306,7 @@ vk_backend_buffer_flush_staging_buffer(vulkan_context_t *vulkan_context,
 {
     vulkan_staging_buffer_t *staging_buffer = vulkan_context->staging_buffers + vulkan_context->current_frame_index;
 
-    dynarray_header_t *header = _dynarray_header(vulkan_context->staging_infos);
+    dynarray_header_t *header = c_dynarray_header(vulkan_context->staging_infos);
     if(header && header->indices_used > 0) 
     {
         c_dynarray_for(vulkan_context->staging_infos, info_index)

@@ -29,9 +29,9 @@ constexpr u32 MAX_SHADER_IMAGE_PARAMS = 16;
 
 enum render_buffer_type_t
 {
-    RenderBufferType_Invalid      = BIT(0),
-    RenderBufferType_VertexBuffer = BIT(1),
-    RenderBufferType_IndexBuffer  = BIT(2),
+    RenderBufferType_Invalid             = BIT(0),
+    RenderBufferType_VertexBuffer        = BIT(1),
+    RenderBufferType_IndexBuffer         = BIT(2),
 };
 
 enum render_buffer_advance_rate_t 
@@ -62,10 +62,13 @@ struct render_buffer_t
 {
     render_buffer_type_t        type;
     render_buffer_memory_type_t allocation_type;
+    u64                         constant_buffer_hash_ID;
+    u64                         buffer_ID;
 
     u32                         buffer_capacity;
     u32                         buffer_element_size;
     u32                         buffer_elements_used;
+    u32                         working_offset;
 
     vulkan_buffer_t             buffer;
 };
@@ -85,6 +88,7 @@ struct uniform_constant_buffer_t
     u64   uniform_hash_index;
 };
 
+#if 0
 // TODO(Sleepster): Handle layer data here.
 // Layers should be seperate from Z in case we do a 2.5D game
 struct render_instance_t
@@ -105,6 +109,7 @@ struct geometry_data_t
     vec4_t  render_color;
     float32 rotation;
 };
+#endif
 
 enum render_command_type_t
 {
@@ -113,22 +118,21 @@ enum render_command_type_t
     RCT_ClearRenderTarget,
     RCT_BeginRenderpass,
     RCT_EndRenderpass,
-    RCT_DrawRectangle,
-    RCT_DrawBitmap,
     RCT_UpdateUniformConstantBuffer,
     RCT_UpdatePushConstants,
+    RCT_UpdateBufferContents,
     RCT_BindMaterial,
+    RCT_BindTexture,
     RCT_BindShader,
     RCT_BindVertexBuffer,
     RCT_BindIndexBuffer,
     RCT_SetViewport,
     RCT_SetScissor,
-    RCT_BindTexture,
     RCT_SetRenderState,
     RCT_ResetRenderState,
+    RCT_DispatchCompute,
     RCT_Draw,
     RCT_DrawIndexed,
-    RCT_DispatchCompute,
     RCT_BlitImage,
     RCT_PresentFrame,
 
@@ -145,19 +149,9 @@ struct render_command_begin_renderpass_t
     u32 ID;
 };
 
-struct render_command_draw_bitmap_t
+struct render_command_end_renderpass_t
 {
-    u32                     instanceID;
-
-    geometry_data_t         quad_data;
-    asset_handle_t          bitmap;
-};
-
-struct render_command_draw_rectangle_t
-{
-    u32                     instanceID;
-
-    geometry_data_t         quad_data;
+    u32 ID;
 };
 
 struct render_command_bind_vertex_buffer_t
@@ -209,9 +203,18 @@ struct render_command_update_push_constant_t
 
 struct render_command_update_uniform_constant_buffer_t
 {
-    void *backend_uniform_buffer_ptr;
-    u64   uniform_hash_index;
-    u32   constant_data_size;
+    void                      *backend_uniform_buffer_ptr;
+    uniform_constant_buffer_t *buffer;
+    u64                        uniform_hash_index;
+    u32                        constant_data_size;
+    u32                        constant_buffer_offset;
+};
+
+struct render_command_update_render_buffer_contents_t
+{
+    render_buffer_t *buffer;
+    u32              offset;
+    u32              data_size;
 };
 
 struct render_command_bind_texture_t 
@@ -233,14 +236,24 @@ struct render_command_set_pipeline_state_t
 
 struct render_command_draw_t 
 {
-    u32 vertices_to_draw;
-    u32 vertex_offset;
+// NOTE(Sleepster): 
+// Since the command lists are deferred, we must store additional information related to the draw call. Such as
+// what the current offset into the vertex buffer is (as all vertex buffers will be merged into one MASSIVE buffer
+// so the GPU can source data from it efficiently) and what descriptors are used at the time of the draw.
 
-    u32 indices_to_draw;
-    u32 index_offset;
+    image_t *bound_images;
+    u32      bound_image_count;
 
-    u32 instance_count;
-    u32 first_instance;
+    u32      backend_vertex_buffer_offset;
+
+    u32      vertices_to_draw;
+    u32      vertex_offset;
+
+    u32      indices_to_draw;
+    u32      index_offset;
+
+    u32      instance_count;
+    u32      first_instance;
 };
 
 struct render_command_blit_image_t
@@ -268,35 +281,42 @@ struct render_command_t
 // just stored normally like a normal object. My compiler is an autistic chimp
 struct render_command_list_t
 {
-    bool8                   is_initialized;
-    renderer_state_t       *renderer_state;
+    bool8                         is_initialized;
+    renderer_state_t             *renderer_state;
     // NOTE(Sleepster): Everything within this is reset once all commands are executed 
-    memory_arena_t          transient_arena;
-    memory_arena_t          command_arena;
+    memory_arena_t                transient_arena;
+    memory_arena_t                command_arena;
 
-    render_command_t       *commands;
-    u32                     command_count;
+    render_command_t             *commands;
+    u32                           command_count;
 
-    u32                     draw_instance_command_count;
-    u32                     bind_shader_command_count;
-    u32                     bind_render_target_command_count;
-    u32                     bind_material_command_count;
+    u32                           draw_instance_command_count;
+    u32                           bind_shader_command_count;
+    u32                           bind_render_target_command_count;
+    u32                           bind_material_command_count;
 
-    render_pipeline_state_t active_render_state;
+    render_pipeline_state_t       active_render_state;
 
-    render_buffer_t        *active_vertex_buffer;
-    render_buffer_t        *active_index_buffer;
+    DynArray_t(render_buffer_t*)  active_vertex_buffers;
+    u32                           vertex_buffer_count;
 
-    render_command_t       *active_scissor_command;
-    render_command_t       *active_viewport_command;
+    render_buffer_t              *active_index_buffer;
+    render_command_t             *active_scissor_command;
+    render_command_t             *active_viewport_command;
+    asset_handle_t               *active_shader_program;
 
-    asset_handle_t         *active_shader_program;
+    u32                          vertex_offset;
+    u32                          instance_offset;
+    u32                          index_offset;
 
-    renderpass_t           *active_renderpass;
-    bool32                  presenting;
+    renderpass_t                *active_renderpass;
+    bool32                       presenting;
 
-    image_t                *image_shader_params[MAX_SHADER_IMAGE_PARAMS];
-    u32                     image_count;
+    image_t                     *image_shader_params[MAX_SHADER_IMAGE_PARAMS];
+    u32                          image_count;
+
+    u32                          image_ids_to_bind[MAX_SHADER_IMAGE_PARAMS];
+    u32                          bound_image_count;
 };
 
 ////////////////////
@@ -426,6 +446,7 @@ void             s_renderer_state_init(renderer_state_t *renderer_state, void *r
 void             s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_size);
 void             s_renderer_resize_render_targets(renderer_state_t *renderer_state, vec2_t window_size);
 u32              s_renderer_build_renderpass(renderer_state_t *renderer_state, renderpass_desc_t *renderpass_desc);
+true_inline void s_renderer_resize_renderpass(renderer_state_t *renderer_state, renderpass_t *renderpass);
 
 uniform_constant_buffer_t* s_renderer_get_constant_buffer(renderer_state_t *renderer_state, string_t uniform_name);
 
@@ -450,8 +471,9 @@ void r_cmd_bind_index_buffer(render_command_list_t *command_list, render_buffer_
 void r_cmd_set_scissor(render_command_list_t *command_list, vec2_t offset, vec2_t size);
 void r_cmd_set_viewport(render_command_list_t *command_list, vec2_t offset, vec2_t size);
 void r_cmd_update_push_constants(render_command_list_t *command_list, u32 offset, u32 size, void *data);
+void r_cmd_update_buffer_contents(render_command_list_t *command_list, render_buffer_t *buffer, void *data, u32 data_size);
 void r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t program);
-void r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_constant_buffer_t *buffer, void *data, u32 data_size);
+void r_cmd_update_constant_buffer(render_command_list_t *command_list, uniform_constant_buffer_t *buffer, void *data, u32 data_size);
 void r_cmd_bind_texture_image(render_command_list_t *command_list, texture2D_t *texture);
 void r_cmd_bind_texture_from_handle(render_command_list_t *command_list, asset_handle_t *asset_handle);
 void r_cmd_reset_render_state(render_command_list_t *command_list, render_pipeline_state_t *render_pipeline_state);
@@ -463,20 +485,6 @@ void r_cmd_blit_image(render_command_list_t *command_list, image_t *source_image
 void r_cmd_present(render_command_list_t *command_list, image_t *presentation_source);
 
 void s_renderer_execute_backend_commands(renderer_state_t *renderer_state);
-
-void
-r_cmd_draw_rectangle(render_command_list_t *command_list, 
-                     vec2_t                 position, 
-                     vec2_t                 size, 
-                     vec4_t                 render_color, 
-                     float32                rotation);
-void
-r_cmd_draw_bitmap(render_command_list_t *command_list, 
-                  vec2_t                 position, 
-                  vec2_t                 size, 
-                  vec4_t                 render_color, 
-                  float32                rotation,
-                  asset_handle_t         bitmap_handle);
 
 #endif // S_RENDERER_H
 

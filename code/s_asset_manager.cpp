@@ -4,6 +4,7 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#define DYNARRAY_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_PNG
 #include <stb/stb_image.h>
@@ -17,8 +18,8 @@
 #include <c_file_api.h>
 #include <c_file_watcher.h>
 #include <c_string.h>
-#include <c_hash_table.h>
 #include <c_dynarray.h>
+#include <c_hash_table.h>
 #include <c_tokenizer.h>
 
 // TODO(Sleepster): This is annoying. We need to figure out a better way of allowing people to use the RTTI in chunks.
@@ -64,7 +65,6 @@ s_asset_bitmap_create(asset_manager_t *asset_manager,
 
     u32   pixel_count = width * height * channels;
     byte *pixel_data  = c_za_push_array(asset_manager->asset_allocator, byte, pixel_count, ZA_TAG_STATIC);
-
     result.pixels = {
         .data  = pixel_data,
         .count = pixel_count
@@ -138,6 +138,7 @@ s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 na
     result.ID          = name_hash;
     slot->ID           = name_hash;
     result.shader_data = vk_backend_shader_create(asset_manager->vulkan_context, slot->package_entry->asset_data);
+    result.shader_data.DEBUG_name = slot->name; 
     // TODO(Sleepster): 
     //
     // Some functionality to just add the item to a string table might be extremely useful for debug builds where you add strings to the table
@@ -433,10 +434,10 @@ s_asset_font_create_new_varient(asset_manager_t *asset_manager, dynamic_render_f
     Assert(error == 0);
 
     float64 font_scale_to_pixels = font->font_face->size->metrics.y_scale / (64.0 * 65536.0);
-    result->pixel_size    = font_scale_to_pixels;
-    result->line_spacing  =  (s64)floor(font_scale_to_pixels * font->font_face->height    + 0.5);
-    result->max_ascender  =  (s64)floor(font_scale_to_pixels * font->font_face->bbox.yMax + 0.5);
-    result->max_descender = -(s64)floor(font_scale_to_pixels * font->font_face->bbox.yMin + 0.5);
+    result->size_to_pixels = font_scale_to_pixels;
+    result->line_spacing   =  (s64)floor(font_scale_to_pixels * font->font_face->height    + 0.5);
+    result->max_ascender   =  (s64)floor(font_scale_to_pixels * font->font_face->bbox.yMax + 0.5);
+    result->max_descender  = -(s64)floor(font_scale_to_pixels * font->font_face->bbox.yMin + 0.5);
 
     // NOTE(Sleepster): Using 'm' as the baseline character
     u32 glyph_index = FT_Get_Char_Index(font->font_face, 'm');
@@ -494,7 +495,7 @@ s_asset_font_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name
                           0, 
                          &result.font_face))
     {
-        result.font_arena = c_arena_create(MB(10));
+        result.font_arena = c_arena_create(MB(100));
         result.varients   = c_dynarray_create(dynamic_render_font_varient_t*);
     }
     else
@@ -597,25 +598,30 @@ s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
             temporary_glyph_t *temp_glyph = our_page->temporary_glyphs + our_page->temporary_glyph_count++;
             temp_glyph->utf32_codepoint = codepoint_UTF32;
             temp_glyph->cursor_x = our_page->atlas_cursor_x;
-            temp_glyph->cursor_x = our_page->atlas_cursor_y;
+            temp_glyph->cursor_y = our_page->atlas_cursor_y;
             temp_glyph->metrics  = result;
 
             u32 glyph_index = FT_Get_Char_Index(parent->font_face, codepoint_UTF32);
-            FT_Load_Glyph(parent->font_face, glyph_index, FT_LOAD_NO_SCALE);
+            FT_Load_Glyph(parent->font_face, glyph_index, FT_LOAD_DEFAULT);
 
             FT_Fixed advance = 0;
             FT_Get_Advance(parent->font_face, glyph_index, FT_LOAD_NO_SCALE, &advance);
 
-            // NOTE(Sleepster): These are in font units (e.g., 2048 units per EM)
-            temp_glyph->glyph_width  = parent->font_face->glyph->metrics.width;
-            temp_glyph->glyph_height = parent->font_face->glyph->metrics.height;
+            FT_Glyph_Metrics *ft_metrics = &parent->font_face->glyph->metrics;
+
+            // NOTE(Sleepster): 
+            // Shift right 6 to convert these values to pixels. 
+            // Freetype stores them weirdly and uses 26.6 fixed-point pixel metrics.
+            temp_glyph->glyph_width  = (u32)(ft_metrics->width  >> 6);
+            temp_glyph->glyph_height = (u32)(ft_metrics->height >> 6);
             if(temp_glyph->glyph_height > our_page->tallest_y)
             {
                 our_page->tallest_y = temp_glyph->glyph_height;
             }
 
             // NOTE(Sleepster): This is for multithreaded atlas writing later. 
-            our_page->atlas_cursor_x += (advance >> 16);
+            const float32 padding = 2;
+            our_page->atlas_cursor_x += temp_glyph->glyph_width + padding;
             if(our_page->atlas_cursor_x >= 4096)
             {
                 our_page->atlas_cursor_x  = 0;
@@ -671,6 +677,8 @@ s_asset_font_load_glyph(dynamic_render_font_varient_t *varient,
     metrics->offset_y   = (s16)(row_height - font_face->glyph->bitmap_top);
     metrics->advance    = (s16)(font_face->glyph->advance.x >> 6);
     metrics->ascent     = (s16)(font_face->glyph->metrics.horiBearingY >> 6);
+    metrics->width      = glyph_width;
+    metrics->height     = row_height;
 
     metrics->atlas_offset = vec2((float32)temp_glyph->cursor_x / (float32)4096,
                                  (float32)temp_glyph->cursor_y / (float32)4096);
@@ -687,7 +695,7 @@ s_asset_font_load_glyph(dynamic_render_font_varient_t *varient,
             column < glyph_width;
             ++column)
         {
-            u8  source = font_face->glyph->bitmap.buffer[(row_height - 1 - row) * font_face->glyph->bitmap.pitch + column];
+            u8  source = font_face->glyph->bitmap.buffer[row * font_face->glyph->bitmap.pitch + column];
             u8 *dest   = (u8*)atlas_bitmap->pixels.data + ((temp_glyph->cursor_y + row) * 4096 + (temp_glyph->cursor_x + column)) * 4;
 
             dest[0] = source;
@@ -793,7 +801,8 @@ asset_catalog_load_default_asset(asset_catalog_t *catalog)
                                                   default_asset_name.count, 
                                                   entry_count);
 
-    result.slot = s_asset_manager_get_asset_slot(catalog, default_asset_name);
+    result.slot    = s_asset_manager_get_asset_slot(catalog, default_asset_name);
+    result.catalog = catalog;
     result.slot->slot_state = ASLS_LoadQueued;
 
     s_asset_manager_load_asset_data(catalog->asset_manager, result.slot, hash_value);
@@ -853,7 +862,8 @@ s_asset_manager_init(asset_manager_t *asset_manager)
         ++catalog_index)
     {
         asset_catalog_t *catalog = asset_manager->asset_catalogs + catalog_index;
-        if(catalog->catalog_type != AT_Sound)
+        if(catalog->catalog_type != AT_Sound && 
+           catalog->catalog_type != AT_Material)
         {
             catalog->default_asset = asset_catalog_load_default_asset(catalog);
         }
@@ -906,8 +916,11 @@ s_asset_manager_update(asset_manager_t *asset_manager)
             {
                 temporary_glyph_t *glyph = page->temporary_glyphs + glyph_index;
                 s_asset_font_load_glyph(page->varient, page, glyph);
+
+                ++page->loaded_glyph_count;
             }
 
+            // NOTE(Sleepster): All of this needs to be replaced...
             if(page->font_atlas->texture.gpu_data.vulkan_image.handle)
             {
                 s_renderer_image_update_data(asset_manager->vulkan_context, &page->font_atlas->texture.gpu_data);
@@ -937,12 +950,15 @@ s_asset_manager_update(asset_manager_t *asset_manager)
                 info.format         = VK_FORMAT_R8G8B8A8_UNORM;
                 info.sampler_info   = &sampler_info;
 
+                // NOTE(Sleepster): We should hash the create info inside the renderer create image function 
                 page->font_atlas->texture.gpu_data.vulkan_image = vk_backend_image_create(asset_manager->vulkan_context, &info);
+                page->font_atlas->texture.gpu_data.ID = c_fnv_hash_value((byte*)&info, sizeof(vulkan_image_info_t));
             }
             page->is_dirty = false;
             page->temporary_glyph_count = 0;
         }
     }
+    font_manager->pages_queued = 0;
 }
 
 bool8
@@ -1107,19 +1123,20 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
 
         result.type          = slot->type;
         result.asset_manager = asset_manager;
+        result.catalog       = catalog;
         if(result.slot->slot_state == ASLS_Loaded)
         {
+            // NOTE(Sleepster): If loaded, just set basic stuff 
             result.owner_asset_file_index = file_index;
             result.is_valid               = true;
-
-            // NOTE(Sleepster): If loaded, just set the handle pointers 
-            s_asset_manager_set_handle_asset_data_pointer(&result, slot);
         }
         else if(result.slot->slot_state == ASLS_Unloaded)
         {
             // NOTE(Sleepster): Otherwise, load it. 
             s_asset_manager_queue_asset_load(asset_manager, slot);
         }
+
+        s_asset_manager_set_handle_asset_data_pointer(&result, slot);
 #if 0
         result.type = (asset_type_t)entry->entry_header->asset_type;
         result.slot = slot;
@@ -1291,7 +1308,9 @@ s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atla
 
         if(atlas->texture.gpu_data.vulkan_image.handle == null)
         {
+            // TODO(Sleepster): REALLY replace this stuff because this is bad and stupid...
             atlas->texture.gpu_data.vulkan_image = vk_backend_image_create(vulkan_context, &info);
+            atlas->texture.gpu_data.ID = c_fnv_hash_value((byte*)&info, sizeof(vulkan_image_info_t));
         }
         else
         {

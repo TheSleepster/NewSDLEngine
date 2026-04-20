@@ -30,9 +30,10 @@ enum render_image_wrapping_type_t
 
 enum render_image_usage_t 
 {
-    ImageUsage_Invalid,
-    ImageUsage_RenderpassAttachment,
-    ImageUsage_SampledTexture,
+    ImageUsage_Invalid              = BIT(0),
+    ImageUsage_RenderpassAttachment = BIT(1),
+    ImageUsage_SampledTexture       = BIT(2),
+    ImageUsage_BlitSource           = BIT(3),
 };
 
 struct sampler_create_info_t

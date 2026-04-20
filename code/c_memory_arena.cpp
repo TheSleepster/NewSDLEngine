@@ -29,7 +29,7 @@ void
 c_arena_destroy(memory_arena_t *arena)
 {
     c_arena_reset(arena);
-    sys_free_memory(arena->base, arena->block_size);
+    sys_free_memory(arena->base, arena->block_size + sizeof(memory_arena_footer_t));
 
     ZeroStruct(*arena);
 }
@@ -48,6 +48,7 @@ c_arena_push_size(memory_arena_t *arena, u64 size_init)
 {
     Assert(arena->is_initialized == true);
     Assert(size_init > 0);
+    Assert(arena->used <= arena->block_size);
     
     byte *result = null;
 
@@ -66,7 +67,6 @@ c_arena_push_size(memory_arena_t *arena, u64 size_init)
 
         size += sizeof(memory_arena_footer_t);
         u64 new_block_size = size > (arena->block_size + sizeof(memory_arena_footer_t)) ? size : arena->block_size;
-        size -= sizeof(memory_arena_footer_t);
 
         arena->block_size = new_block_size - sizeof(memory_arena_footer_t);
         arena->base       = (byte *)sys_allocate_memory(new_block_size);
@@ -112,7 +112,7 @@ void
 c_arena_free_last_block(memory_arena_t *arena)
 {
     u8 *block_to_free  = (u8*)arena->base;
-    u64 free_size      = arena->block_size;
+    u64 free_size      = arena->block_size + sizeof(memory_arena_footer_t);
 
     memset(arena->base, 0, arena->used);
 
@@ -145,7 +145,7 @@ c_arena_begin_temporary_memory(memory_arena_t *arena)
     scratch_arena_t result;
     result.parent = arena;
     result.used   = arena->used;
-    result.base   = (u8*)arena->base + arena->used;
+    result.base   = (u8*)arena->base;
 
     arena->scratch_arena_count += 1;
 

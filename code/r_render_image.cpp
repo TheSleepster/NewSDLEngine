@@ -98,21 +98,72 @@ sampler_filter_type_to_vk_filter(render_image_filter_type_t filter)
     return(result);
 }
 
-internal_api VkImageLayout
-get_image_layout_from_usage(render_image_usage_t usage)
+internal_api bool8
+is_depth_format(bitmap_format_t format)
 {
-    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
-    switch(usage)
+    bool8 result = false;
+    switch(format)
     {
-        // TODO(Sleepster): Maybe handle more cases? 
-        case ImageUsage_SampledTexture:
+        case BMF_D32_SFLOAT_S8_UINT:
+        case BMF_D24_SFLOAT_S8:
+        case BMF_D32_SFLOAT:
         {
-            result = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            result = true;
         }break;
     }
 
     return(result);
 }
+
+internal_api VkImageLayout
+get_image_initial_layout_from_usage(render_image_usage_t usage, bitmap_format_t format)
+{
+    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
+    if(usage != ImageUsage_Invalid)
+    {
+        if(usage & ImageUsage_SampledTexture)
+        {
+            result = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        }
+        else if(usage & ImageUsage_RenderpassAttachment)
+        {
+            if(!is_depth_format(format))
+            {
+                result = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            }
+            else
+            {
+                result = VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL;
+            }
+        }
+        else
+        {
+            log_warning("This usage is currently not handled yet returning undefined...\n");
+        }
+    }
+
+    return(result);
+}
+
+internal_api VkImageLayout
+get_image_final_layout_from_usage(render_image_usage_t usage, bitmap_format_t format)
+{
+    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
+    if(usage != ImageUsage_Invalid)
+    {
+        if(usage & ImageUsage_BlitSource)
+        {
+            result = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        }
+        else
+        {
+            log_warning("This usage is currently not handled yet returning undefined...\n");
+        }
+    }
+
+    return(result);
+}
+
 
 image_t 
 s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info)
@@ -124,6 +175,9 @@ s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *ima
     VkImageUsageFlags usage_flags = s_renderer_image_usage_flags_from_image_format((bitmap_format_t)image_create_info->format);
     vulkan_context_t *vulkan_context = (vulkan_context_t*)render_state->render_context;
 
+    VkImageLayout initial_layout = get_image_initial_layout_from_usage(image_create_info->usage, (bitmap_format_t)image_create_info->format);
+    VkImageLayout final_layout  = get_image_final_layout_from_usage(image_create_info->usage, (bitmap_format_t)image_create_info->format);
+
     // NOTE(Sleepster): Only 2D images
     vulkan_image_info_t info = {};
     info.type           = VK_IMAGE_TYPE_2D;
@@ -131,7 +185,8 @@ s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *ima
     info.height         = image_create_info->height;
     info.data           = image_create_info->data;
     info.format         = s_renderer_bitmap_format_to_vulkan_format(image_create_info->format);
-    info.initial_layout = VK_IMAGE_LAYOUT_UNDEFINED;
+    info.initial_layout = initial_layout;
+    info.final_layout   = (final_layout != VK_IMAGE_LAYOUT_UNDEFINED) ? final_layout : initial_layout;
     info.mip_count      = 1;
     info.sample_count   = 1;
     info.usage          = usage_flags;

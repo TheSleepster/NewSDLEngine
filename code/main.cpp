@@ -29,6 +29,16 @@
 
 void process_window_events(renderer_state_t *renderer_state, input_manager_t *input_manager);
 
+// NOTE(Sleepster): Used for rendering
+struct alignas(16) immediate_vertex_t
+{
+    vec4_t vPosition;
+    vec4_t vColor;
+    vec2_t vTexCoord;
+    vec2_t vPadding;
+};
+
+
 #define MAX_ENTITIES (100000)
 
 enum entity_type 
@@ -82,28 +92,28 @@ struct game_state_t
     render_buffer_t     vertex_buffer;
     render_buffer_t     index_buffer;
 
-    render_vertex_t    *vertex_data;
+    immediate_vertex_t *vertex_data;
     u32                 vertex_count;
 
     u32                 game_renderpass_ID;
 };
 
 void
-draw_textured_quad_ex(game_state_t          *game_state,
-                      render_command_list_t *command_list,
-                      vec2_t                 position,
-                      vec2_t                 render_size,
-                      vec4_t                 render_color,
-                      vec2_t                 uv_min,
-                      vec2_t                 uv_max,
-                      texture2D_t           *texture)
+immediate_quad_ex(game_state_t          *game_state,
+                  render_command_list_t *command_list,
+                  vec2_t                 position,
+                  vec2_t                 render_size,
+                  vec4_t                 render_color,
+                  vec2_t                 uv_min,
+                  vec2_t                 uv_max,
+                  texture2D_t           *texture)
 {
-    render_vertex_t *vertex_pointer = game_state->vertex_data + game_state->vertex_count;
+    immediate_vertex_t *vertex_pointer = game_state->vertex_data + game_state->vertex_count;
 
-    render_vertex_t *bottom_right = vertex_pointer + 0;
-    render_vertex_t *top_right    = vertex_pointer + 1;
-    render_vertex_t *top_left     = vertex_pointer + 2;
-    render_vertex_t *bottom_left  = vertex_pointer + 3;
+    immediate_vertex_t *bottom_right = vertex_pointer + 0;
+    immediate_vertex_t *top_right    = vertex_pointer + 1;
+    immediate_vertex_t *top_left     = vertex_pointer + 2;
+    immediate_vertex_t *bottom_left  = vertex_pointer + 3;
 
     float32 top    = position.y + render_size.y;
     float32 bottom = position.y;
@@ -123,7 +133,7 @@ draw_textured_quad_ex(game_state_t          *game_state,
     {
         if(!s_renderer_is_texture_bound(command_list, texture))
         {
-        r_cmd_bind_texture_image(command_list, texture);
+            r_cmd_bind_texture_image(command_list, texture);
         }
 
         float32 tbottom = uv_max.y;
@@ -138,6 +148,52 @@ draw_textured_quad_ex(game_state_t          *game_state,
     }
 
     game_state->vertex_count += 4;
+}
+
+// TODO(Sleepster): Eventually game_state will not manage the immediate rendering state... so this will be much prettier 
+void
+draw_text(render_command_list_t *command_list, 
+          game_state_t          *game_state,
+          asset_manager_t       *asset_manager,
+          asset_handle_t        *font_handle,
+          string_t               render_string, 
+          vec2_t                 position, 
+          vec4_t                 text_color,
+          u32                    font_size)
+{
+    Assert(font_handle);
+    Assert(font_handle->type == AT_Font);
+
+    dynamic_render_font_varient_t *varient = s_asset_font_acquire_font_at_size(asset_manager, 
+                                                                               font_handle, 
+                                                                               font_size);
+    vec2_t render_position = position;
+    for(u32 character_index = 0;
+        character_index < render_string.count;
+        ++character_index)
+    {
+        u8 *character = render_string.data + character_index;
+        Assert(*character > 0);
+
+        glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
+        if(metrics->is_valid)
+        {
+            immediate_quad_ex(game_state, 
+                              command_list, 
+                              vec2_subtract(render_position, vec2(0, metrics->offset_y)),
+                              vec2(metrics->width, metrics->height),
+                              text_color,
+                              metrics->atlas_offset,
+                              vec2_add(metrics->atlas_offset, metrics->atlas_size),
+                             &metrics->owner_atlas->texture);
+
+            render_position.x += metrics->advance;
+        }
+        else
+        {
+            log_info("Glyph data for character: '%c' is not valid yet...\n", *character);
+        }
+    }
 }
 
 entity_t*
@@ -183,14 +239,14 @@ entity_render(game_state_t *game_state, render_command_list_t *command_list, ent
         }
     }
     
-    draw_textured_quad_ex(game_state, 
-                          command_list, 
-                          entity->position, 
-                          entity->size, 
-                          vec4(1.0, 1.0, 1.0, 1.0),
-                          uv_min,
-                          uv_max,
-                          texture);
+    immediate_quad_ex(game_state, 
+                      command_list, 
+                      entity->position, 
+                      entity->size, 
+                      vec4(1.0, 1.0, 1.0, 1.0),
+                      uv_min,
+                      uv_max,
+                      texture);
 }
 
 int
@@ -206,21 +262,7 @@ game_main(void)
     game_state.controller = s_im_get_primary_controller(global_context->input_manager);
     game_state.entity_manager = c_arena_push_struct(&global_context->context_arena, entity_manager_t);
 
-    image_create_info_t primary_game_color_buffer_create_info = {
-        .width  = 320,
-        .height = 180,
-        .format = BMF_BGRA32_UNORM
-    };
-
-    image_create_info_t primary_game_depth_buffer_create_info = {
-        .width  = 320,
-        .height = 180,
-        .format = BMF_D32_SFLOAT_S8_UINT 
-    };
-
-    image_t game_color_buffer = s_renderer_image_create(renderer_state, &primary_game_color_buffer_create_info);
-    image_t game_depth_buffer = s_renderer_image_create(renderer_state, &primary_game_depth_buffer_create_info);
-
+    // NOTE(Sleepster): Clear colors 
     clear_value_t color_buffer_clear_value = {
         .clear_color = {.float_color = {0.3f, 0.4f, 0.6f, 1.0f}},
     };
@@ -229,32 +271,103 @@ game_main(void)
         .clear_depth = 0.0f
     };
 
-    renderpass_desc_t game_renderpass_desc = {
-        .render_width           = 320,
-        .render_height          = 180,
-        .resize_with_window     = false,
-        .color_attachment_count = 1,
-        .color_attachments = {
-            [0] = {
+    // NOTE(Sleepster): Game Renderpass
+    renderpass_desc_t game_renderpass_desc;
+    image_t           game_color_buffer;
+    {
+        image_create_info_t primary_game_color_buffer_create_info = {
+            .width  = 320,
+            .height = 180,
+            .format = BMF_BGRA32_UNORM,
+            .usage  = (render_image_usage_t)(ImageUsage_RenderpassAttachment|ImageUsage_BlitSource)
+        };
+
+        image_create_info_t primary_game_depth_buffer_create_info = {
+            .width  = 320,
+            .height = 180,
+            .format = BMF_D32_SFLOAT_S8_UINT,
+            .usage  = ImageUsage_RenderpassAttachment
+        };
+
+                game_color_buffer = s_renderer_image_create(renderer_state, &primary_game_color_buffer_create_info);
+        image_t game_depth_buffer = s_renderer_image_create(renderer_state, &primary_game_depth_buffer_create_info);
+
+        game_renderpass_desc = {
+            .render_width           = 320,
+            .render_height          = 180,
+            .resize_with_window     = false,
+            .color_attachment_count = 1,
+            .color_attachments = {
+                [0] = {
+                    .access          = RenderpassAttachmentAccessWrite,
+                    .load_operation  = RenderpassAttachmentLoadOperationClear,
+                    .store_operation = RenderpassAttachmentStoreOperationStore,
+
+                    .image           = &game_color_buffer,
+                    .clear_value     =  color_buffer_clear_value
+                },
+            },
+            .depth_stencil_attachment = {
                 .access          = RenderpassAttachmentAccessWrite,
                 .load_operation  = RenderpassAttachmentLoadOperationClear,
-                .store_operation = RenderpassAttachmentStoreOperationStore,
+                .store_operation = RenderpassAttachmentStoreOperationDontCare,
 
-                .image           = &game_color_buffer,
-                .clear_value     = color_buffer_clear_value
+                .image           = &game_depth_buffer,
+                .clear_value     =  depth_buffer_clear_value
             },
-        },
-        .depth_stencil_attachment = {
-            .access          = RenderpassAttachmentAccessWrite,
-            .load_operation  = RenderpassAttachmentLoadOperationClear,
-            .store_operation = RenderpassAttachmentStoreOperationDontCare,
+        };
+    }
 
-            .image           = &game_depth_buffer,
-            .clear_value     = depth_buffer_clear_value
-        },
-    };
+    // NOTE(Sleepster): Fullscreen Renderpass
+    renderpass_desc_t fullscreen_renderpass_desc;
+    image_t           fullscreen_color_buffer;
+    {
+        image_create_info_t fullscreen_color_buffer_create_info = {
+            .width  = (u32)renderer_state->window_size.x,
+            .height = (u32)renderer_state->window_size.y,
+            .format = BMF_BGRA32_UNORM,
+            .usage  = ImageUsage_RenderpassAttachment,
+        };
 
-    u32 game_renderpass_ID = s_renderer_build_renderpass(renderer_state, &game_renderpass_desc);
+        image_create_info_t fullscreen_depth_buffer_create_info = {
+            .width  = (u32)renderer_state->window_size.x,
+            .height = (u32)renderer_state->window_size.y,
+            .format = BMF_D32_SFLOAT_S8_UINT,
+            .usage  = ImageUsage_RenderpassAttachment,
+        };
+
+                fullscreen_color_buffer = s_renderer_image_create(renderer_state, &fullscreen_color_buffer_create_info);
+        image_t fullscreen_depth_buffer = s_renderer_image_create(renderer_state, &fullscreen_depth_buffer_create_info);
+
+        fullscreen_renderpass_desc = {
+            .render_width           = (u32)renderer_state->window_size.x,
+            .render_height          = (u32)renderer_state->window_size.y,
+            .resize_with_window     = true,
+            .color_attachment_count = 1,
+            .color_attachments = {
+                [0] = {
+                    .access          = RenderpassAttachmentAccessWrite,
+                    .load_operation  = RenderpassAttachmentLoadOperationLoad,
+                    .store_operation = RenderpassAttachmentStoreOperationStore,
+
+                    .image           = &fullscreen_color_buffer,
+                    .clear_value     =  color_buffer_clear_value
+                },
+            },
+            .depth_stencil_attachment = {
+                .access          = RenderpassAttachmentAccessWrite,
+                .load_operation  = RenderpassAttachmentLoadOperationClear,
+                .store_operation = RenderpassAttachmentStoreOperationDontCare,
+
+                .image           = &fullscreen_depth_buffer,
+                .clear_value     =  depth_buffer_clear_value
+            },
+        };
+    }
+
+    u32 game_renderpass_id       = s_renderer_build_renderpass(renderer_state, &game_renderpass_desc);
+    u32 fullscreen_renderpass_id = s_renderer_build_renderpass(renderer_state, &fullscreen_renderpass_desc);
+
     u32 *indices = c_arena_push_array(&renderer_state->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
     u32  index_offset = 0;
     for(u32 index = 0;
@@ -273,33 +386,30 @@ game_main(void)
 
     render_buffer_t vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, 
                                                                     RenderBufferAllocationTypeMapped, 
-                                                                    sizeof(render_vertex_t), 
+                                                                    sizeof(immediate_vertex_t), 
                                                                     RenderBufferAdvanceRate_PerElement, 
                                                                     null, 
-                                                                    sizeof(render_vertex_t) * (4 * MAX_ENTITIES));
+                                                                    sizeof(immediate_vertex_t) * (4 * MAX_ENTITIES));
     render_buffer_t index_buffer  = s_renderer_index_buffer_create(renderer_state,  
                                                                    RenderBufferAllocationTypeMapped, 
                                                                    sizeof(u32),
                                                                    indices, 
                                                                    (sizeof(u32) * (6 * MAX_ENTITIES)));
 
-    game_state.vertex_data = c_arena_push_array(&renderer_state->renderer_arena, render_vertex_t, 4 * 10000);
+    game_state.vertex_data = c_arena_push_array(&renderer_state->renderer_arena, immediate_vertex_t, 4 * 10000);
 
     uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
     asset_handle_t basic_triangle = s_asset_manager_acquire_asset_handle(asset_manager, STR("basic_triangle"));
+    asset_handle_t font_shader    = s_asset_manager_acquire_asset_handle(asset_manager, STR("font_shader"));
     asset_handle_t player_sprite  = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
     asset_handle_t basic_font     = s_asset_manager_acquire_asset_handle(asset_manager, STR("LiberationMono_Regular"));
-
-    dynamic_render_font_varient_t *font_data = s_asset_font_acquire_font_at_size(asset_manager, &basic_font, 16);
-
-    u8 character = 'A';
-    glyph_metric_t *metric = s_asset_font_fetch_glyph(asset_manager, font_data, &character);
-    (void)metric;
 
     entity_t *player =  entity_create(&game_state);
     player->sprite   = &player_sprite;
     player->e_flags |= EF_HasSprite;
-    player->size = vec2(20, 20);
+
+    player->position = vec2(0, 40);
+    player->size     = vec2(20, 20);
 
     texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32_SRGB, 32);
     s_texture_atlas_add_texture(atlas, &player_sprite);
@@ -353,64 +463,106 @@ game_main(void)
 
             dt_accumulator -= TICK_RATE;
         }
-
         float32 alpha = (float32)(dt_accumulator / TICK_RATE);
-        render_command_list_t *command_list = s_renderer_get_command_list(renderer_state);
-        for(u32 entity_index = 0;
-            entity_index < game_state.entity_manager->active_entities;
-            ++entity_index)
-        {
-            entity_t *entity = game_state.entity_manager->entities + entity_index;
-            Assert(entity->e_flags & EF_Valid);
-
-            player->render_position = vec2_lerp(player->last_position, player->position, alpha);
-            entity_render(&game_state, command_list, entity);
-        }
-
-        // TODO(Sleepster): This should just be a command, we can store the vertex data for this buffer using a transient frame allocator and just bind the data
-        // later on.
-        s_renderer_render_buffer_copy_data(renderer_state, &vertex_buffer, game_state.vertex_data, Align16(game_state.vertex_count * sizeof(render_vertex_t)), 0);
-
-        r_cmd_renderpass_begin(command_list, game_renderpass_ID);
-        r_cmd_bind_vertex_buffer(command_list, &vertex_buffer);
-        r_cmd_bind_index_buffer(command_list, &index_buffer);
-        r_cmd_use_shader_program(command_list, basic_triangle);
 
         struct camera_matrices {
             mat4_t view_matrix;
             mat4_t projection_matrix;
         }camera_matrix_buffer_data;
 
-        s32 window_width  = Max(game_renderpass_desc.render_width, 10);
-        s32 window_height = Max(game_renderpass_desc.render_height, 10);
+        // NOTE(Sleepster): Game renderpass
+        render_command_list_t *command_list = s_renderer_get_command_list(renderer_state);
+        {
+            for(u32 entity_index = 0;
+                entity_index < game_state.entity_manager->active_entities;
+                ++entity_index)
+            {
+                entity_t *entity = game_state.entity_manager->entities + entity_index;
+                Assert(entity->e_flags & EF_Valid);
 
-        camera_matrix_buffer_data = {
-            .view_matrix       = mat4_identity(),
-            .projection_matrix = mat4_RHGL_ortho(-160, 160, -90, 90, -1, 1)
-        };
-        r_cmd_update_buffer_contents(command_list, camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
+                player->render_position = vec2_lerp(player->last_position, player->position, alpha);
+                entity_render(&game_state, command_list, entity);
+            }
 
-        r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
-        r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
+            r_cmd_update_buffer_contents(command_list, &vertex_buffer, game_state.vertex_data, game_state.vertex_count * sizeof(immediate_vertex_t));
 
-        r_cmd_draw_indexed(command_list, game_state.entity_manager->active_entities * 6, 0, 1, 0);
+            r_cmd_renderpass_begin(command_list,    game_renderpass_id);
+            r_cmd_bind_vertex_buffer(command_list, &vertex_buffer);
+            r_cmd_bind_index_buffer(command_list,  &index_buffer);
+            r_cmd_use_shader_program(command_list,  basic_triangle);
 
-        r_cmd_renderpass_end(command_list);
-        r_cmd_present(command_list, &game_color_buffer);
+            s32 window_width  = Max(game_renderpass_desc.render_width, 10);
+            s32 window_height = Max(game_renderpass_desc.render_height, 10);
+
+            camera_matrix_buffer_data = {
+                .view_matrix       = mat4_identity(),
+                .projection_matrix = mat4_RHGL_ortho(-160, 160, -90, 90, -1, 1)
+            };
+            r_cmd_update_constant_buffer(command_list, camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
+
+            r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
+            r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
+
+            r_cmd_draw_indexed(command_list, game_state.entity_manager->active_entities * 6, 0, 1, 0);
+            r_cmd_renderpass_end(command_list);
+
+            game_state.vertex_count = 0;
+        }
+
+        // NOTE(Sleepster): Fullscreen Renderpass 
+        {
+            r_cmd_blit_image(command_list, 
+                             &game_color_buffer, 
+                             &fullscreen_color_buffer, 
+                             vec2(0, 0), 
+                             vec2(game_color_buffer.create_info.width, game_color_buffer.create_info.height), 
+                             vec2(0, 0),
+                             vec2(fullscreen_color_buffer.create_info.width, fullscreen_color_buffer.create_info.height));
+
+            r_cmd_renderpass_begin(command_list, fullscreen_renderpass_id);
+            s32 window_width  = Max(renderer_state->window_size.x, 10);
+            s32 window_height = Max(renderer_state->window_size.y, 10);
+
+            s32 half_window_width  = window_width  * 0.5f;
+            s32 half_window_height = window_height * 0.5f;
+
+            camera_matrix_buffer_data = {
+                .view_matrix       = mat4_identity(),
+                .projection_matrix = mat4_RHGL_ortho(-half_window_width, half_window_width, -half_window_height, half_window_height, -1, 1)
+            };
+            r_cmd_update_constant_buffer(command_list, camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
+
+            render_pipeline_state_t font_state = {};
+            font_state.blend_enabled = false;
+            font_state.src_alpha_blend_mode = RBM_SrcAlpha;
+            font_state.dst_alpha_blend_mode = RBM_OneMinusSrcAlpha;
+            r_cmd_set_render_state(command_list, &font_state);
+
+            r_cmd_use_shader_program(command_list, font_shader);
+            r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
+            r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
+            draw_text(command_list, &game_state, asset_manager, &basic_font, STR("This is a test string..."), vec2(-100, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), 32);
+
+            r_cmd_update_buffer_contents(command_list, &vertex_buffer, game_state.vertex_data, game_state.vertex_count * sizeof(immediate_vertex_t));
+            r_cmd_draw_indexed(command_list, (game_state.vertex_count * 0.25f) * 6, 0, 1, 0);
+
+            r_cmd_renderpass_end(command_list);
+        }
+        r_cmd_present(command_list, &fullscreen_color_buffer);
 
         s_renderer_execute_backend_commands(renderer_state);
         s_asset_manager_update(asset_manager);
 
         c_global_context_reset_temporary_data();
-
-        game_state.vertex_count   = 0;
+        game_state.vertex_count = 0;
         vertex_buffer.buffer.used = 0;
+        vertex_buffer.buffer_elements_used = 0;
 
         current_tsc = SDL_GetPerformanceCounter();
         delta_tsc   = current_tsc - last_tsc;
         last_tsc    = current_tsc;
 
-        delta_time    = (float32)(((float64)delta_tsc) / (float64)perf_count_freq);
+        delta_time = (float32)(((float64)delta_tsc) / (float64)perf_count_freq);
     }
 
     return(0);

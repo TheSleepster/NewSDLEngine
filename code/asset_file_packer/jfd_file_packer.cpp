@@ -8,6 +8,7 @@
 
 #define HASH_TABLE_IMPLEMENTATION
 #define MATH_IMPLEMENTATION
+#define DYNARRAY_IMPLEMENTATION 
 #include <c_base.h>
 #include <c_types.h>
 #include <c_math.h>
@@ -29,7 +30,6 @@
 #include <c_zone_allocator.cpp>
 #include <c_memory_arena.cpp>
 #include <c_string.cpp>
-#include <c_dynarray_impl.cpp>
 #include <c_file_api.cpp>
 #include <c_file_watcher.cpp>
 #include <c_threadpool.cpp>

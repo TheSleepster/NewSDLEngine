@@ -9,8 +9,10 @@
 #include <p_platform_data.h>
 #include <p_platform_data.cpp>
 
+#define DYNARRAY_IMPLEMENTATION 
+#include <c_dynarray.h>
+
 #include <c_string.cpp>
-#include <c_dynarray_impl.cpp>
 #include <c_global_context.cpp>
 #include <c_memory_arena.cpp>
 #include <c_file_api.cpp>

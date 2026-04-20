@@ -388,7 +388,7 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
     u32 cursor = 0;
     DynArray_t(string_t) directories = c_dynarray_create(string_t);
     c_dynarray_push(directories, filepath);
-    dynarray_header_t *header = (dynarray_header_t*)_dynarray_header(directories); 
+    dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(directories); 
 
     while(cursor < header->size)
     {

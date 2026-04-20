@@ -32,6 +32,7 @@ struct vulkan_shader_binding_t
 struct vulkan_shader_t 
 {
     u32                                  shader_id;
+    string_t                             DEBUG_name;
     string_t                             source;
     memory_arena_t                       shader_arena;
 
@@ -47,8 +48,8 @@ struct vulkan_shader_t
     
     VkPipelineBindPoint                  pipeline_type;
     VkPipelineLayout                     pipeline_layout;
-    VkVertexInputBindingDescription      vertex_buffer_binding_desc[4];
-    VkVertexInputAttributeDescription    buffer_attributes[12];
+    VkVertexInputBindingDescription     *vertex_buffer_binding_descs;
+    VkVertexInputAttributeDescription   *buffer_attributes;
     VkPipelineVertexInputStateCreateInfo pipeline_vertex_input_state;
     VkPipeline                           default_pipeline;
 

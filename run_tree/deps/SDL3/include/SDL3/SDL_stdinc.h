@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2025 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -253,12 +253,6 @@ void *alloca(size_t);
 
 /**
  * Macro useful for building other macros with strings in them.
- *
- * For example:
- *
- * ```c
- * #define LOG_ERROR(X) OutputDebugString(SDL_STRINGIFY_ARG(__FUNCTION__) ": " X "\n")`
- * ```
  *
  * \param arg the text to turn into a string literal.
  *
@@ -1191,7 +1185,7 @@ typedef struct SDL_alignment_test
     void *b;
 } SDL_alignment_test;
 SDL_COMPILE_TIME_ASSERT(struct_alignment, sizeof(SDL_alignment_test) == (2 * sizeof(void *)));
-SDL_COMPILE_TIME_ASSERT(two_s_complement, (int)~(int)0 == (int)(-1));
+SDL_COMPILE_TIME_ASSERT(two_s_complement, SDL_static_cast(int, ~SDL_static_cast(int, 0)) == SDL_static_cast(int, -1));
 #endif /* DOXYGEN_SHOULD_IGNORE_THIS */
 /** \endcond */
 
@@ -1802,6 +1796,8 @@ extern SDL_DECLSPEC void SDLCALL SDL_DestroyEnvironment(SDL_Environment *env);
 /**
  * Get the value of a variable in the environment.
  *
+ * The name of the variable is case sensitive on all platforms.
+ *
  * This function uses SDL's cached copy of the environment and is thread-safe.
  *
  * \param name the name of the variable to get.
@@ -1819,6 +1815,11 @@ extern SDL_DECLSPEC const char * SDLCALL SDL_getenv(const char *name);
  *
  * This function bypasses SDL's cached copy of the environment and is not
  * thread-safe.
+ *
+ * On some platforms, this may make case-insensitive matches, while other
+ * platforms are case-sensitive. It is best to be precise with strings used
+ * for queries through this interface. SDL_getenv is always case-sensitive,
+ * however.
  *
  * \param name the name of the variable to get.
  * \returns a pointer to the value of the variable or NULL if it can't be
@@ -2667,7 +2668,7 @@ extern SDL_DECLSPEC void * SDLCALL SDL_memset4(void *dst, Uint32 val, size_t dwo
  * \since This macro is available since SDL 3.2.0.
  *
  * \sa SDL_zero
- * \sa SDL_zeroa
+ * \sa SDL_zerop
  */
 #define SDL_zeroa(x) SDL_memset((x), 0, sizeof((x)))
 
@@ -5821,6 +5822,8 @@ typedef struct SDL_iconv_data_t *SDL_iconv_t;
  * \returns a handle that must be freed with SDL_iconv_close, or
  *          SDL_ICONV_ERROR on failure.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL 3.2.0.
  *
  * \sa SDL_iconv
@@ -5835,6 +5838,8 @@ extern SDL_DECLSPEC SDL_iconv_t SDLCALL SDL_iconv_open(const char *tocode,
  *
  * \param cd The character set conversion handle.
  * \returns 0 on success, or -1 on failure.
+ *
+ * \threadsafety It is safe to call this function from any thread.
  *
  * \since This function is available since SDL 3.2.0.
  *
@@ -5874,6 +5879,8 @@ extern SDL_DECLSPEC int SDLCALL SDL_iconv_close(SDL_iconv_t cd);
  * \param outbytesleft The number of bytes in the output buffer.
  * \returns the number of conversions on success, or a negative error code.
  *
+ * \threadsafety Do not use the same SDL_iconv_t from two threads at once.
+ *
  * \since This function is available since SDL 3.2.0.
  *
  * \sa SDL_iconv_open
@@ -5909,6 +5916,8 @@ extern SDL_DECLSPEC size_t SDLCALL SDL_iconv(SDL_iconv_t cd, const char **inbuf,
  * \param inbytesleft the size of the input string _in bytes_.
  * \returns a new string, converted to the new encoding, or NULL on error.
  *
+ * \threadsafety It is safe to call this function from any thread.
+ *
  * \since This function is available since SDL 3.2.0.
  *
  * \sa SDL_iconv_open
@@ -5932,6 +5941,8 @@ extern SDL_DECLSPEC char * SDLCALL SDL_iconv_string(const char *tocode,
  * \param S the string to convert.
  * \returns a new string, converted to the new encoding, or NULL on error.
  *
+ * \threadsafety It is safe to call this macro from any thread.
+ *
  * \since This macro is available since SDL 3.2.0.
  */
 #define SDL_iconv_utf8_locale(S)    SDL_iconv_string("", "UTF-8", S, SDL_strlen(S)+1)
@@ -5946,9 +5957,11 @@ extern SDL_DECLSPEC char * SDLCALL SDL_iconv_string(const char *tocode,
  * \param S the string to convert.
  * \returns a new string, converted to the new encoding, or NULL on error.
  *
+ * \threadsafety It is safe to call this macro from any thread.
+ *
  * \since This macro is available since SDL 3.2.0.
  */
-#define SDL_iconv_utf8_ucs2(S)      (Uint16 *)SDL_iconv_string("UCS-2", "UTF-8", S, SDL_strlen(S)+1)
+#define SDL_iconv_utf8_ucs2(S)      SDL_reinterpret_cast(Uint16 *, SDL_iconv_string("UCS-2", "UTF-8", S, SDL_strlen(S)+1))
 
 /**
  * Convert a UTF-8 string to UCS-4.
@@ -5960,9 +5973,11 @@ extern SDL_DECLSPEC char * SDLCALL SDL_iconv_string(const char *tocode,
  * \param S the string to convert.
  * \returns a new string, converted to the new encoding, or NULL on error.
  *
+ * \threadsafety It is safe to call this macro from any thread.
+ *
  * \since This macro is available since SDL 3.2.0.
  */
-#define SDL_iconv_utf8_ucs4(S)      (Uint32 *)SDL_iconv_string("UCS-4", "UTF-8", S, SDL_strlen(S)+1)
+#define SDL_iconv_utf8_ucs4(S)      SDL_reinterpret_cast(Uint32 *, SDL_iconv_string("UCS-4", "UTF-8", S, SDL_strlen(S)+1))
 
 /**
  * Convert a wchar_t string to UTF-8.
@@ -5974,9 +5989,11 @@ extern SDL_DECLSPEC char * SDLCALL SDL_iconv_string(const char *tocode,
  * \param S the string to convert.
  * \returns a new string, converted to the new encoding, or NULL on error.
  *
+ * \threadsafety It is safe to call this macro from any thread.
+ *
  * \since This macro is available since SDL 3.2.0.
  */
-#define SDL_iconv_wchar_utf8(S)     SDL_iconv_string("UTF-8", "WCHAR_T", (char *)S, (SDL_wcslen(S)+1)*sizeof(wchar_t))
+#define SDL_iconv_wchar_utf8(S)     SDL_iconv_string("UTF-8", "WCHAR_T", SDL_reinterpret_cast(const char *, S), (SDL_wcslen(S)+1)*sizeof(wchar_t))
 
 
 /* force builds using Clang's static analysis tools to use literal C runtime

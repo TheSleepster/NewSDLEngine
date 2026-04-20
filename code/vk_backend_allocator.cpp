@@ -163,6 +163,8 @@ vk_allocator_allocate(vulkan_allocator_t            *allocator,
     result.allocation_type = type;
     result.offset          = 0;
 
+    Assert(result.allocation_size > 0);
+
     gpu_info_t *gpu_info = (gpu_info_t *)allocator->gpu_info;
     VkMemoryPropertyFlags flags = gpu_info->memory_properties.memoryTypes[memory_index].propertyFlags;
     result.allocation_flags     = flags;
@@ -173,7 +175,7 @@ vk_allocator_allocate(vulkan_allocator_t            *allocator,
     // https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/memory_mapping.html
     if(flags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
     {
-        vkMapMemory(allocator->device, result.memory, 0, result.allocation_size, 0, (void**)&result.mapped_data);
+        vkAssert(vkMapMemory(allocator->device, result.memory, 0, result.allocation_size, 0, (void**)&result.mapped_data));
     }
 
     return(result);

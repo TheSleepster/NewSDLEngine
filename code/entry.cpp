@@ -63,14 +63,23 @@ process_window_events(renderer_state_t *renderer_state, input_manager_t *input_m
 int
 main(int argc, char **argv)
 {
+    int linked   = SDL_GetVersion();
+    int compiled = SDL_VERSION;
+
+    SDL_Log("We compiled against SDL version %d.%d.%d ...\n",
+            SDL_VERSIONNUM_MAJOR(compiled),
+            SDL_VERSIONNUM_MINOR(compiled),
+            SDL_VERSIONNUM_MICRO(compiled));
+
+    SDL_Log("But we are linking against SDL version %d.%d.%d.\n",
+            SDL_VERSIONNUM_MAJOR(linked),
+            SDL_VERSIONNUM_MINOR(linked),
+            SDL_VERSIONNUM_MICRO(linked));
+
     c_global_context_init();
     global_context->renderer_state = c_arena_push_struct(&global_context->context_arena, renderer_state_t);
     global_context->asset_manager  = c_arena_push_struct(&global_context->context_arena, asset_manager_t);
     global_context->input_manager  = c_arena_push_struct(&global_context->context_arena, input_manager_t);
-
-    global_context->renderer_state->render_context = c_arena_push_struct(&global_context->context_arena, vulkan_context_t);
-    global_context->asset_manager->vulkan_context  = (vulkan_context_t*)global_context->renderer_state->render_context; 
-    vulkan_context_t *vulkan_context = (vulkan_context_t*)global_context->renderer_state->render_context;
 
     global_context->renderer_state->window_size = vec2(2560, 1440);
     if(SDL_Init(SDL_INIT_VIDEO))
@@ -83,6 +92,11 @@ main(int argc, char **argv)
         {
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
         }
+
+        global_context->renderer_state->render_context = c_arena_push_struct(&global_context->context_arena, vulkan_context_t);
+        global_context->asset_manager->vulkan_context  = (vulkan_context_t*)global_context->renderer_state->render_context; 
+        vulkan_context_t *vulkan_context = (vulkan_context_t*)global_context->renderer_state->render_context;
+
         vk_backend_init(vulkan_context, global_context->renderer_state->window);
 
         // TODO(Sleepster): The count will need to be adjusted in the future. But this is fine for now 

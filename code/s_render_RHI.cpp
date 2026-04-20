@@ -30,7 +30,7 @@ s_renderer_state_init(renderer_state_t *renderer_state, void *render_context)
     renderer_state->renderer_arena  = c_arena_create(MB(100));
     renderer_state->transient_arena = c_arena_create(MB(100));
 
-    renderer_state->command_lists    = c_arena_push_array(&renderer_state->renderer_arena, render_command_list_t, MAX_COMMAND_LISTS);
+    renderer_state->command_lists   = c_arena_push_array(&renderer_state->renderer_arena, render_command_list_t, MAX_COMMAND_LISTS);
     c_hash_table_init(&renderer_state->constant_buffer_hash, MAX_CONSTANT_BUFFERS);
 
     renderer_state->render_context  = render_context;
@@ -84,9 +84,13 @@ s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_
                 *renderpass->depth_stencil_attachment.image = s_renderer_image_create(renderer_state, info);
             }
 
-            renderpass->create_info.render_width = renderer_state->window_size.x;
-            renderpass->create_info.render_width = renderer_state->window_size.y;
-            renderpass->ID = s_renderer_build_renderpass(renderer_state, &renderpass->create_info);
+            renderpass->create_info.render_width  = renderer_state->window_size.x;
+            renderpass->create_info.render_height = renderer_state->window_size.y;
+            if(renderpass->create_info.color_attachment_count > 0)
+            {
+                s_renderer_resize_renderpass(renderer_state, renderpass);
+                log_info("renderpass with ID: '%u' rebuilt with the current window size...\n", renderpass->ID);
+            }
         }
     }
 }
@@ -95,100 +99,6 @@ void
 s_renderer_execute_backend_commands(renderer_state_t *renderer_state)
 {
     vk_backend_render_frame((vulkan_context_t*)renderer_state->render_context, renderer_state);
-}
-
-/*
-=============
-s_renderer_vulkan_attachment_type
-=============
-*/
-
-internal_api true_inline VkImageLayout
-s_renderer_vulkan_attachment_type(renderpass_attachment_t *attachment)
-{
-    image_t *image = attachment->image;
-
-    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
-    switch(image->create_info.format)
-    {
-        case BMF_R8:
-        case BMF_B8:
-        case BMF_G8:
-        case BMF_RGB24_SRGB:
-        case BMF_RGB24_UNORM:
-        case BMF_RGBA32_SRGB:
-        case BMF_RGBA32_UNORM:
-        case BMF_BGRA32_UNORM:
-        {
-            result = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        }break;
-        case BMF_D32_SFLOAT_S8_UINT:
-        case BMF_D24_SFLOAT_S8:
-        case BMF_D32_SFLOAT:
-        {
-            // NOTE(Sleepster): D32 is still a depth stencil anyway 
-            result = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        }break;
-    }
-
-    return(result);
-}
-
-/*
-=============
-s_renderer_vulkan_load_op
-=============
-*/
-
-internal_api true_inline VkAttachmentLoadOp
-s_renderer_vulkan_load_op(renderpass_attachment_load_operation_t load_op)
-{
-    Assert(load_op != RenderpassAttachmentLoadOperationInvalid);
-
-    VkAttachmentLoadOp result = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    if(load_op == RenderpassAttachmentLoadOperationLoad)
-    {
-        result = VK_ATTACHMENT_LOAD_OP_LOAD;
-    }
-
-    return(result);
-}
-
-/*
-=============
-s_renderer_vulkan_store_op
-=============
-*/
-
-// NOTE(Sleepster): This is pointless right now, but we may want to expand the abilities here.
-internal_api true_inline VkAttachmentStoreOp
-s_renderer_vulkan_store_op(renderpass_attachment_store_operation_t store_op)
-{
-    VkAttachmentStoreOp result = VK_ATTACHMENT_STORE_OP_STORE;
-    if(store_op == RenderpassAttachmentStoreOperationDontCare)
-    {
-        result = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    }
-
-    return(result);
-}
-
-/*
-=============
-is_depth_attachment_valid
-=============
-*/
-
-internal_api true_inline bool8
-is_depth_attachment_valid(renderpass_attachment_t *depth_attachment)
-{
-    bool8 result = true;
-    if(depth_attachment->image == null)
-    {
-        result = false;
-    }
-
-    return(result);
 }
 
 /*
@@ -204,11 +114,12 @@ s_renderer_build_renderpass(renderer_state_t *renderer_state, renderpass_desc_t 
     renderpass_t *renderpass = renderer_state->renderpasses + renderer_state->renderpass_count;
     Assert(renderpass);
     
-    renderpass->render_width           = renderpass_desc->render_width;
-    renderpass->render_height          = renderpass_desc->render_height;
-    renderpass->color_attachment_count = renderpass_desc->color_attachment_count;
-    renderpass->resize_with_window     = renderpass_desc->resize_with_window;
-    renderpass->ID                     = renderer_state->renderpass_count++;
+    renderpass->create_info            = *renderpass_desc;
+    renderpass->render_width           =  renderpass_desc->render_width;
+    renderpass->render_height          =  renderpass_desc->render_height;
+    renderpass->color_attachment_count =  renderpass_desc->color_attachment_count;
+    renderpass->resize_with_window     =  renderpass_desc->resize_with_window;
+    renderpass->ID                     =  renderer_state->renderpass_count++;
 
     result = renderpass->ID;
 
@@ -226,79 +137,18 @@ s_renderer_build_renderpass(renderer_state_t *renderer_state, renderpass_desc_t 
            &renderpass_desc->depth_stencil_attachment, 
             sizeof(renderpass_attachment_t));
 
-    vulkan_context_t *context = (vulkan_context_t *)renderer_state->render_context;
-
-    // TODO(Sleepster): 
-    // We obviously don't want to put raw vulkan code in here because that's stupid... 
-    // however, we have no choice right now
-    image_t             image_attachments[MAX_RENDER_TARGET_ATTACHMENTS] = {};
-    VkImageLayout       initial_layouts[MAX_RENDER_TARGET_ATTACHMENTS]   = {};
-    VkImageLayout       final_layouts[MAX_RENDER_TARGET_ATTACHMENTS]     = {};
-    VkAttachmentLoadOp  load_operations[MAX_RENDER_TARGET_ATTACHMENTS]   = {};
-    VkAttachmentStoreOp store_operations[MAX_RENDER_TARGET_ATTACHMENTS]  = {};
-    VkImageLayout       attachment_types[MAX_RENDER_TARGET_ATTACHMENTS]  = {};
-
-    u32 attachment_count = renderpass_desc->color_attachment_count;
-    for(u32 color_attachment_index = 0;
-        color_attachment_index < renderpass_desc->color_attachment_count;
-        ++color_attachment_index)
-    {
-        renderpass_attachment_t *color_attachment = renderpass_desc->color_attachments + color_attachment_index;
-        Assert(color_attachment->load_operation  != RenderpassAttachmentLoadOperationInvalid);
-        Assert(color_attachment->store_operation != RenderpassAttachmentStoreOperationInvalid);
-
-        VkImageLayout initial_layout = color_attachment->image->vulkan_image.layout;
-        VkImageLayout final_layout   = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-        image_attachments[color_attachment_index] = *color_attachment->image;
-        initial_layouts[color_attachment_index]   = initial_layout;
-        final_layouts[color_attachment_index]     = final_layout;
-        load_operations[color_attachment_index]   = s_renderer_vulkan_load_op(color_attachment->load_operation);
-        store_operations[color_attachment_index]  = s_renderer_vulkan_store_op(color_attachment->store_operation);
-        attachment_types[color_attachment_index]  = s_renderer_vulkan_attachment_type(color_attachment);
-
-        renderpass->attachment_clear_values[color_attachment_index] = color_attachment->clear_value;
-    }
-
-   renderpass->has_depth_stencil_attachment = is_depth_attachment_valid(&renderpass_desc->depth_stencil_attachment);
-    if(renderpass->has_depth_stencil_attachment)
-    {
-        renderpass_attachment_t *depth_stencil_attachment = &renderpass_desc->depth_stencil_attachment;
-        u32 attachment_index = renderpass_desc->color_attachment_count;
-        Assert(attachment_index < MAX_RENDER_TARGET_ATTACHMENTS);
-
-        ++attachment_count;
-
-        VkImageLayout initial_layout = depth_stencil_attachment->image->vulkan_image.layout;
-        VkImageLayout final_layout   = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-        image_attachments[attachment_index] = *depth_stencil_attachment->image;
-        initial_layouts[attachment_index]   = initial_layout;
-        final_layouts[attachment_index]     = final_layout;
-        load_operations[attachment_index]   = s_renderer_vulkan_load_op(depth_stencil_attachment->load_operation);
-        store_operations[attachment_index]  = s_renderer_vulkan_store_op(depth_stencil_attachment->store_operation);
-        attachment_types[attachment_index]  = s_renderer_vulkan_attachment_type(depth_stencil_attachment);
-
-        renderpass->attachment_clear_values[attachment_index] = depth_stencil_attachment->clear_value;
-    }
-
-    renderpass->renderpass_handle = vk_backend_renderpass_create(context,
-                                                                 image_attachments,
-                                                                 attachment_count,
-                                                                 initial_layouts,
-                                                                 final_layouts,
-                                                                 load_operations,
-                                                                 store_operations,
-                                                                 attachment_types);
-    renderpass->framebuffer_handle = vk_backend_framebuffer_create(context,
-                                                                   renderpass->renderpass_handle, 
-                                                                   image_attachments,
-                                                                   attachment_count,
-                                                                   renderpass->render_width,
-                                                                   renderpass->render_height);
+    u32 attachment_count = vk_backend_initialize_RHI_renderpass(renderer_state, renderpass_desc, renderpass);
     renderpass->total_attachment_count = attachment_count;
 
     return(result);
+}
+
+true_inline void
+s_renderer_resize_renderpass(renderer_state_t *renderer_state, renderpass_t *renderpass)
+{
+    vk_backend_initialize_RHI_renderpass(renderer_state, &renderpass->create_info, renderpass);
+    renderpass->render_width  = renderpass->create_info.render_width;
+    renderpass->render_height = renderpass->create_info.render_height;
 }
 
 /////////////////////////
@@ -356,9 +206,11 @@ s_renderer_render_buffer_create(renderer_state_t           *renderer_state,
                                 render_buffer_desc_t       *buffer_desc)
 {
     render_buffer_t result = {};
-    result.type            = buffer_desc->type;
-    result.buffer_capacity = buffer_desc->buffer_capacity;
-    result.allocation_type = buffer_desc->allocation_type;
+    result.buffer_ID           = c_fnv_hash_value((byte*)buffer_desc, sizeof(render_buffer_desc_t));
+    result.type                = buffer_desc->type;
+    result.buffer_capacity     = buffer_desc->buffer_capacity;
+    result.buffer_element_size = buffer_desc->element_size;
+    result.allocation_type     = buffer_desc->allocation_type;
 
     render_buffer_type_t buffer_type = buffer_desc->type;
 
@@ -416,6 +268,10 @@ s_renderer_render_buffer_copy_data(renderer_state_t *renderer_state, render_buff
 // NOTE(Sleepster): 
 // This currently can't fail... even if you mess up the uniform buffer name... 
 // perhaps that's a bad thing in all honesty...
+//
+// We could perhaps do what we do for assets and shader parameters where we preload
+// the name of the item into the hash table so that if you ask for a constant buffer that literally
+// doesn't exist and can't exist, it's a reasonable error.
 uniform_constant_buffer_t*
 s_renderer_get_constant_buffer(renderer_state_t *renderer_state, string_t uniform_name)
 {
@@ -452,11 +308,17 @@ s_renderer_command_list_init(renderer_state_t *renderer_state, render_command_li
     {
         list->transient_arena = c_arena_create(MB(10));
         list->command_arena   = c_arena_create(MB(30));
+
+        list->active_vertex_buffers = c_dynarray_create(render_buffer_t *);
     }
     else
     {
         c_arena_reset(&list->transient_arena);
         c_arena_reset(&list->command_arena);
+
+        c_dynarray_clear(list->active_vertex_buffers);
+        memset(list->image_ids_to_bind,   0, sizeof(u32)      * MAX_SHADER_IMAGE_PARAMS);
+        memset(list->image_shader_params, 0, sizeof(image_t*) * MAX_SHADER_IMAGE_PARAMS);
     }
 
     Assert(global_context);
@@ -519,11 +381,11 @@ s_renderer_is_texture_bound(render_command_list_t *command_list, texture2D_t *te
 {
     bool8 result = false;
     for(u32 bound_textures_index = 0;
-        bound_textures_index < command_list->image_count;
+        bound_textures_index < command_list->bound_image_count;
         ++bound_textures_index)
     {
-        image_t *image = command_list->image_shader_params[bound_textures_index];
-        if(image->ID == texture->gpu_data.ID)
+        u32 image_id = command_list->image_ids_to_bind[bound_textures_index];
+        if(image_id == texture->gpu_data.ID)
         {
             result = true;
             break;
@@ -542,6 +404,8 @@ r_cmd_renderpass_begin
 void
 r_cmd_renderpass_begin(render_command_list_t *command_list, u32 renderpassID)
 {
+    Assert(command_list->active_renderpass == null);
+
     render_command_t *command = s_renderer_get_next_command(command_list);
     render_command_begin_renderpass_t *begin_renderpass = c_arena_push_struct(&command_list->command_arena, 
                                                                                render_command_begin_renderpass_t);
@@ -549,6 +413,8 @@ r_cmd_renderpass_begin(render_command_list_t *command_list, u32 renderpassID)
 
     command->header.command_type = RCT_BeginRenderpass;
     command->data                = begin_renderpass;
+
+    command_list->active_renderpass = command_list->renderer_state->renderpasses + renderpassID;
 }
 
 
@@ -558,71 +424,28 @@ r_cmd_renderpass_end
 =============
 */
 
+// TODO(Sleepster): 
+// This is probably a problem. Not really sure why we're actually operating on command list here when it could 
+// be accessed from multiple threads
 void
 r_cmd_renderpass_end(render_command_list_t *command_list)
 {
+    Assert(command_list->active_renderpass != null);
+
     render_command_t *command = s_renderer_get_next_command(command_list);
+    render_command_end_renderpass_t *end_renderpass = c_arena_push_struct(&command_list->command_arena, 
+                                                                           render_command_end_renderpass_t);
+    end_renderpass->ID = command_list->active_renderpass->ID;
+
     command->header.command_type = RCT_EndRenderpass;
-}
+    command->data                = end_renderpass;
 
-
-/*
-=============
-r_cmd_draw_rectangle
-=============
-*/
-
-void
-r_cmd_draw_rectangle(render_command_list_t *command_list, 
-                     vec2_t                 position, 
-                     vec2_t                 size, 
-                     vec4_t                 render_color, 
-                     float32                rotation)
-{
-    render_command_t *command = s_renderer_get_next_command(command_list);
-    render_command_draw_rectangle_t *draw_rect = c_arena_push_struct(&command_list->command_arena, 
-                                                                      render_command_draw_rectangle_t);
-
-    draw_rect->quad_data.position     = position;
-    draw_rect->quad_data.size         = size;
-    draw_rect->quad_data.render_color = render_color;
-    draw_rect->quad_data.rotation     = rotation;
-
-    command->header.command_type = RCT_DrawRectangle;
-    command->data                = draw_rect;
+    command_list->active_renderpass = null;
 }
 
 /*
 =============
-r_cmd_draw_bitmap
-=============
-*/
-
-void
-r_cmd_draw_bitmap(render_command_list_t *command_list, 
-                  vec2_t                 position, 
-                  vec2_t                 size, 
-                  vec4_t                 render_color, 
-                  float32                rotation,
-                  asset_handle_t         bitmap_handle)
-{
-    render_command_t *command = s_renderer_get_next_command(command_list);
-    render_command_draw_bitmap_t *draw_bitmap = c_arena_push_struct(&command_list->command_arena, 
-                                                                     render_command_draw_bitmap_t);
-    
-    draw_bitmap->quad_data.position     = position;
-    draw_bitmap->quad_data.size         = size;
-    draw_bitmap->quad_data.render_color = render_color;
-    draw_bitmap->quad_data.rotation     = rotation;
-    draw_bitmap->bitmap                 = bitmap_handle;
-
-    command->data = draw_bitmap;
-    command->header.command_type = RCT_DrawBitmap;
-}
-
-/*
-=============
-r_cmd_renderpass_end
+r_cmd_use_shader_program
 =============
 */
 
@@ -636,6 +459,7 @@ r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t ass
     asset_slot_load_status_t load_status = asset_handle.slot->slot_state; 
     if(load_status != ASLS_Loaded)
     {
+        Assert(asset_handle.catalog);
         if(load_status == ASLS_Unloaded)
         {
             // signal for load
@@ -650,6 +474,71 @@ r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t ass
 
     command->header.command_type = RCT_BindShader;
     command->data = bind_shader;
+}
+
+/*
+=============
+r_cmd_bind_texture_from_handle
+=============
+*/
+
+void
+r_cmd_bind_texture_from_handle(render_command_list_t *command_list, asset_handle_t *asset_handle)
+{
+    Assert(asset_handle->type == AT_Bitmap);
+
+    render_command_t *command  = s_renderer_get_next_command(command_list);
+    render_command_bind_texture_t *bind_texture = c_arena_push_struct(&command_list->command_arena, 
+                                                                       render_command_bind_texture_t);
+    asset_slot_load_status_t load_status = asset_handle->slot->slot_state; 
+    if(load_status != ASLS_Loaded)
+    {
+        if(load_status == ASLS_Unloaded)
+        {
+            // signal for load
+        }
+        // apply a default texture
+        bind_texture->texture = &asset_handle->catalog->default_asset.texture->gpu_data;
+        Assert(bind_texture->texture->ID != 0);
+    }
+    else if(load_status == ASLS_Loaded)
+    {
+        bind_texture->texture = &asset_handle->texture->gpu_data;
+    }
+
+    command->header.command_type = RCT_BindTexture;
+    command->data = bind_texture;
+
+    command_list->image_ids_to_bind[command_list->bound_image_count++] = bind_texture->texture->ID;
+}
+
+/*
+=============
+r_cmd_bind_texture_image
+=============
+*/
+
+void
+r_cmd_bind_texture_image(render_command_list_t *command_list, texture2D_t *texture)
+{
+    Assert(texture);
+
+    if(texture->gpu_data.ID > 0)
+    {
+        render_command_t *command  = s_renderer_get_next_command(command_list);
+        render_command_bind_texture_t *bind_texture = c_arena_push_struct(&command_list->command_arena, 
+                                                                           render_command_bind_texture_t);
+        bind_texture->texture = &texture->gpu_data;
+
+        command->header.command_type = RCT_BindTexture;
+        command->data = bind_texture;
+
+        command_list->image_ids_to_bind[command_list->bound_image_count++] = bind_texture->texture->ID;
+    }
+    else
+    {
+        log_warning("Attempting to bind a texture where it's ID == 0. This may be intentional...\n");
+    }
 }
 
 /*
@@ -753,12 +642,12 @@ r_cmd_update_push_constants(render_command_list_t *command_list, u32 offset, u32
 
 /*
 =============
-r_cmd_update_push_constants
+r_cmd_update_constant_buffer
 =============
 */
 
 void
-r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_constant_buffer_t *buffer, void *data, u32 data_size)
+r_cmd_update_constant_buffer(render_command_list_t *command_list, uniform_constant_buffer_t *buffer, void *data, u32 data_size)
 {
     render_command_t *command  = s_renderer_get_next_command(command_list);
     render_command_update_uniform_constant_buffer_t *update_buffer_contents = c_arena_push_struct(&command_list->command_arena, 
@@ -767,11 +656,14 @@ r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_consta
 
     // TODO(Sleepster): Abstract this... 
     vulkan_context_t *vulkan_context = (vulkan_context_t*)command_list->renderer_state->render_context;
+    update_buffer_contents->buffer                     = buffer;
     update_buffer_contents->uniform_hash_index         = buffer->uniform_hash_index;
     update_buffer_contents->backend_uniform_buffer_ptr = vk_backend_append_uniform_constant_buffer_data(vulkan_context, 
                                                                                                         data, 
                                                                                                         data_size, 
                                                                                                        &buffer->offset);
+    update_buffer_contents->constant_buffer_offset = buffer->offset;
+
     buffer->mapped_data = update_buffer_contents->backend_uniform_buffer_ptr;
     buffer->size        = data_size;
 
@@ -781,52 +673,27 @@ r_cmd_update_buffer_contents(render_command_list_t *command_list, uniform_consta
 
 /*
 =============
-r_cmd_bind_texture_from_handle
+r_cmd_update_buffer_contents
 =============
 */
 
 void
-r_cmd_bind_texture_from_handle(render_command_list_t *command_list, asset_handle_t *asset_handle)
-{
-    Assert(asset_handle->type == AT_Bitmap);
-    render_command_t *command  = s_renderer_get_next_command(command_list);
-    render_command_bind_texture_t *bind_texture = c_arena_push_struct(&command_list->command_arena, 
-                                                                       render_command_bind_texture_t);
-    asset_slot_load_status_t load_status = asset_handle->slot->slot_state; 
-    if(load_status != ASLS_Loaded)
-    {
-        if(load_status == ASLS_Unloaded)
-        {
-            // signal for load
-        }
-        // apply a default texture
-        bind_texture->texture = &asset_handle->catalog->default_asset.texture->gpu_data;
-    }
-    else if(load_status == ASLS_Loaded)
-    {
-        bind_texture->texture = &asset_handle->texture->gpu_data;
-    }
-
-    command->header.command_type = RCT_BindTexture;
-    command->data = bind_texture;
-}
-
-/*
-=============
-r_cmd_bind_texture_image
-=============
-*/
-
-void
-r_cmd_bind_texture_image(render_command_list_t *command_list, texture2D_t *texture)
+r_cmd_update_buffer_contents(render_command_list_t *command_list, render_buffer_t *buffer, void *data, u32 data_size)
 {
     render_command_t *command  = s_renderer_get_next_command(command_list);
-    render_command_bind_texture_t *bind_texture = c_arena_push_struct(&command_list->command_arena, 
-                                                                       render_command_bind_texture_t);
-    bind_texture->texture = &texture->gpu_data;
+    render_command_update_render_buffer_contents_t *update_buffer_contents = c_arena_push_struct(&command_list->command_arena, 
+                                                                                                  render_command_update_render_buffer_contents_t);
+    update_buffer_contents->data_size = data_size;
+    update_buffer_contents->offset    = buffer->buffer_elements_used;
+    update_buffer_contents->buffer    = buffer;
 
-    command->header.command_type = RCT_BindTexture;
-    command->data = bind_texture;
+    buffer->buffer_elements_used += (data_size / buffer->buffer_element_size);
+
+    vulkan_context_t *vulkan_context = (vulkan_context_t*)command_list->renderer_state->render_context;
+    vk_backend_buffer_append_data(vulkan_context, &buffer->buffer, data, data_size);
+
+    command->data = update_buffer_contents; 
+    command->header.command_type = RCT_UpdateBufferContents;
 }
 
 /*
@@ -884,6 +751,8 @@ r_cmd_draw(render_command_list_t *command_list,
 
     command->header.command_type = RCT_Draw;
     command->data = draw;
+
+    command_list->bound_image_count = 0;
 }
 
 /*
@@ -909,11 +778,13 @@ r_cmd_draw_indexed(render_command_list_t *command_list,
 
     command->header.command_type = RCT_DrawIndexed;
     command->data = draw;
+
+    command_list->bound_image_count = 0;
 }
 
 /*
 =============
-r_cmd_present
+r_cmd_blit_image
 =============
 */
 
@@ -938,6 +809,19 @@ r_cmd_blit_image(render_command_list_t *command_list,
 
     command->header.command_type = RCT_BlitImage;
     command->data = blit_image;
+}
+
+/*
+=============
+r_cmd_clear_image
+=============
+*/
+
+// TODO(Sleepster): This function
+void
+r_cmd_clear_image()
+{
+    Expect(false, "This function is not implemented...\n");
 }
 
 /*

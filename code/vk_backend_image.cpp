@@ -208,6 +208,8 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
     result.info   = *image_info;
     result.width  =  image_info->width;
     result.height =  image_info->height;
+    result.renderpass_initial_layout = (VkImageLayout)image_info->initial_layout;
+    result.renderpass_final_layout   = (VkImageLayout)image_info->final_layout;
 
     VkImageCreateInfo info = {};
     info.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -219,13 +221,13 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
     info.arrayLayers   = 1;
     info.format        = (VkFormat)image_info->format;
     info.tiling        = VK_IMAGE_TILING_OPTIMAL;
-    info.initialLayout = (VkImageLayout)image_info->initial_layout;
+    info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     info.usage         = image_info->usage;
     info.samples       = (VkSampleCountFlagBits)VK_SAMPLE_COUNT_1_BIT;
     info.sharingMode   = VK_SHARING_MODE_EXCLUSIVE;
 
     result.internal_format = (VkFormat)image_info->format;
-    result.layout          = (VkImageLayout)image_info->initial_layout;
+    result.layout          = VK_IMAGE_LAYOUT_UNDEFINED;
 
     vkAssert(vkCreateImage(vulkan_context->device, &info, vulkan_context->cpu_allocation_callbacks, &result.handle));
 
@@ -329,6 +331,67 @@ vk_backend_image_init_from_image_handle(vulkan_context_t    *vulkan_context,
 
     return(result);
 }
+
+/*
+=============
+vk_backend_transfer_image_to_intial_layout
+=============
+*/
+
+void
+vk_backend_transfer_image_to_intial_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image)
+{
+    VkImageSubresourceRange range = {
+        .aspectMask     = image->aspect_mask,
+        .baseArrayLayer = 0,
+        .baseMipLevel   = 0,
+        .layerCount     = 1,
+        .levelCount     = 1,
+    };
+    vk_backend_image_change_layout(vulkan_context, 
+                                   render_command_buffer,
+                                   image->handle, 
+                                   image->layout,
+                                   image->renderpass_initial_layout,
+                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                   VK_ACCESS_TRANSFER_WRITE_BIT,
+                                   VK_ACCESS_COLOR_ATTACHMENT_READ_BIT|VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+                                   range);
+
+    image->layout = image->renderpass_initial_layout;
+}
+
+/*
+=============
+vk_backend_transfer_image_to_final_layout
+=============
+*/
+
+void
+vk_backend_transfer_image_to_final_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image)
+{
+    VkImageSubresourceRange range = {
+        .aspectMask     = image->aspect_mask,
+        .baseArrayLayer = 0,
+        .baseMipLevel   = 0,
+        .layerCount     = 1,
+        .levelCount     = 1,
+    };
+    vk_backend_image_change_layout(vulkan_context, 
+                                   render_command_buffer,
+                                   image->handle, 
+                                   image->layout,
+                                   image->renderpass_final_layout,
+                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                   VK_ACCESS_TRANSFER_WRITE_BIT,
+                                   VK_ACCESS_COLOR_ATTACHMENT_READ_BIT|VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+                                   range);
+
+    image->layout = image->renderpass_final_layout;
+}
+
 
 /*
 =============
@@ -457,22 +520,27 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                                    destination_range);
     destination_image->layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 
+    vec2_t clamped_source_blit_size = vec2(Min(source_blit_size.x, source_image->info.width), 
+                                           Min(source_blit_size.y, source_image->info.height));
+    vec2_t clamped_dest_blit_size   = vec2(Min(destination_size.x, destination_image->width), 
+                                           Min(destination_size.y, destination_image->height));
+
     // NOTE(Sleepster): Do the blit 
     VkImageBlit blit_region = {
         .srcSubresource.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
         .srcSubresource.mipLevel       = 0,
         .srcSubresource.baseArrayLayer = 0,
         .srcSubresource.layerCount     = 1,
-        .srcOffsets[0] = (VkOffset3D){(s32)source_offset.x,    (s32)source_offset.y,    0},
-        .srcOffsets[1] = (VkOffset3D){(s32)source_blit_size.x, (s32)source_blit_size.y, 1},
+        .srcOffsets[0] = (VkOffset3D){(s32)source_offset.x,            (s32)source_offset.y,            0},
+        .srcOffsets[1] = (VkOffset3D){(s32)clamped_source_blit_size.x, (s32)clamped_source_blit_size.y, 1},
 
         .dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
         .dstSubresource.mipLevel = 0, 
         .dstSubresource.baseArrayLayer = 0,
         .dstSubresource.layerCount = 1,
 
-        .dstOffsets[0] = (VkOffset3D){(s32)destination_offset.x, (s32)destination_offset.y, 0},
-        .dstOffsets[1] = (VkOffset3D){(s32)destination_size.x,   (s32)destination_size.y,   1},
+        .dstOffsets[0] = (VkOffset3D){(s32)destination_offset.x,     (s32)destination_offset.y,     0},
+        .dstOffsets[1] = (VkOffset3D){(s32)clamped_dest_blit_size.x, (s32)clamped_dest_blit_size.y, 1},
     };
     vkCmdBlitImage(*vulkan_context->render_command_buffer,
                    source_image->handle,
