@@ -415,11 +415,10 @@ struct renderpass_t
 struct renderer_state_t
 {
     SDL_Window                            *window;
+    backend_renderer_t                    *render_context;
 
     memory_arena_t                         renderer_arena;
     memory_arena_t                         transient_arena;
-
-    void                                  *render_context;
 
     render_command_list_t                 *command_lists;
     u32                                    command_list_count;
@@ -438,11 +437,28 @@ struct renderer_state_t
 
     renderpass_t                           renderpasses[100];
     u32                                    renderpass_count;
+
+    void            backend_initialize(SDL_Window *window);
+    void            backend_handle_window_resize(vec2_t window_size);
+    void            backend_render_frame();
+
+    render_buffer_t backend_buffer_create(render_buffer_desc_t *buffer_desc);
+    void            backend_buffer_copy_data(render_buffer_t *buffer, void *data, u32 size, u32 offset);
+    void            backend_buffer_append_data(render_buffer_t *buffer, void *data, u32 data_size);
+    void*           backend_constant_buffer_append_data(void *data, u32 data_size, u32 *buffer_offset_out);
+
+    u32             backend_renderpass_initialize(renderpass_desc_t *desc, renderpass_t *renderpass);
+
+    void            backend_image_create(image_create_info_t *create_info, image_t *image);
+    void            backend_image_destroy(image_t *image);
+    void            backend_image_update_contents(image_t *image);
+
+    void            backend_shader_create(shader_t *shader, string_t shader_source);
 };
 
 struct image_create_info_t;
 
-void             s_renderer_state_init(renderer_state_t *renderer_state, void *render_context);
+void             s_renderer_state_init(renderer_state_t *renderer_state, backend_renderer_t *render_context);
 void             s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_size);
 void             s_renderer_resize_render_targets(renderer_state_t *renderer_state, vec2_t window_size);
 u32              s_renderer_build_renderpass(renderer_state_t *renderer_state, renderpass_desc_t *renderpass_desc);

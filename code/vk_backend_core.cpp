@@ -12,6 +12,7 @@
 
 #include <r_render_image.h>
 #include <s_asset_manager.h>
+#include <s_render_RHI.h>
 
 #define MAX_POOL_SET_TYPES (5)
 
@@ -3040,13 +3041,27 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
 /*
 =============
-vk_backend_handle_window_resize
+renderer_state_t::backend_initialize
 =============
 */
 
-void
-vk_backend_handle_window_resize(vulkan_context_t *vulkan_context, vec2_t window_size)
+void renderer_state_t::
+backend_initialize(SDL_Window *window)
 {
+    vk_backend_init(this->render_context, window);
+}
+
+/*
+=============
+renderer_state_t::backend_handle_window_resize
+=============
+*/
+
+void renderer_state_t::
+backend_handle_window_resize(vec2_t window_size)
+{
+    vulkan_context_t *vulkan_context = this->render_context;
+
     vulkan_context->last_window_width  = vulkan_context->current_window_width;
     vulkan_context->last_window_height = vulkan_context->current_window_height;
 
@@ -3054,4 +3069,217 @@ vk_backend_handle_window_resize(vulkan_context_t *vulkan_context, vec2_t window_
     vulkan_context->current_window_height = window_size.y;
 
     ++vulkan_context->window_size_generation;
+}
+
+/*
+=============
+renderer_state_t::backend_render_frame
+=============
+*/
+
+void renderer_state_t::
+backend_render_frame()
+{
+    vk_backend_render_frame(this->render_context, this);
+}
+
+/*
+=============
+renderer_state_t::backend_buffer_create
+=============
+*/
+
+render_buffer_t renderer_state_t::
+backend_buffer_create(render_buffer_desc_t *buffer_desc)
+{
+    render_buffer_t buffer;
+
+    buffer.buffer_ID           = c_fnv_hash_value((byte*)buffer_desc, sizeof(render_buffer_desc_t));
+    buffer.type                = buffer_desc->type;
+    buffer.buffer_capacity     = buffer_desc->buffer_capacity;
+    buffer.buffer_element_size = buffer_desc->element_size;
+    buffer.allocation_type     = buffer_desc->allocation_type;
+
+    VkBufferUsageFlags             usage_flags      = (VkBufferUsageFlagBits)0;
+    vulkan_allocation_usage_type_t allocation_flags = (vulkan_allocation_usage_type_t)0;
+    Assert(buffer_desc->type != RenderBufferType_Invalid);
+
+    usage_flags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+    if(buffer_desc->type == RenderBufferType_IndexBuffer)
+    {
+        usage_flags |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+    }
+    else if (buffer_desc->type == RenderBufferType_VertexBuffer)
+    {
+        usage_flags |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+    }
+
+    if(buffer_desc->allocation_type == RenderBufferAllocationTypeMapped)
+    {
+        allocation_flags = VULKAN_MEMORY_USAGE_CPU_TO_GPU; 
+    }
+    else if(buffer_desc->allocation_type == RenderBufferAllocationTypeGPUOnly)
+    {
+        allocation_flags = VULKAN_MEMORY_USAGE_GPU_ONLY;
+    }
+
+    buffer.buffer = vk_backend_buffer_create(this->render_context, 
+                                             buffer_desc->buffer_capacity,
+                                             usage_flags,
+                                             allocation_flags);
+
+    return(buffer);
+}
+
+/*
+=============
+renderer_state_t::backend_buffer_copy_data
+=============
+*/
+
+void renderer_state_t::
+backend_buffer_copy_data(render_buffer_t *buffer, void *data, u32 size, u32 offset)
+{
+    vk_backend_buffer_copy_data(this->render_context, &buffer->buffer, data, size, offset);
+}
+
+/*
+=============
+renderer_state_t::backend_constant_buffer_append_data
+=============
+*/
+
+void* renderer_state_t::
+backend_constant_buffer_append_data(void *data, u32 data_size, u32 *buffer_offset_out)
+{
+    void *result = null;
+    result = vk_backend_append_uniform_constant_buffer_data(this->render_context, data, data_size, buffer_offset_out);
+
+    return(result);
+}
+
+/*
+=============
+renderer_state_t::backend_buffer_append_data
+=============
+*/
+
+void renderer_state_t::
+backend_buffer_append_data(render_buffer_t *buffer, void *data, u32 data_size)
+{
+    vk_backend_buffer_append_data(this->render_context, &buffer->buffer, data, data_size);
+}
+
+/*
+=============
+renderer_state_t::backend_renderpass_initialize
+=============
+*/
+
+u32 renderer_state_t::
+backend_renderpass_initialize(renderpass_desc_t *desc, renderpass_t *renderpass)
+{
+    u32 result = INVALID_ID;
+    result = vk_backend_initialize_RHI_renderpass(this, desc, renderpass);
+
+    return(result);
+}
+
+/*
+=============
+renderer_state_t::backend_image_create
+=============
+*/
+
+void renderer_state_t::
+backend_image_create(image_create_info_t *create_info, image_t *image)
+{
+    image->ID = c_fnv_hash_value((byte*)create_info, sizeof(image_create_info_t));
+
+    VkImageUsageFlags usage_flags = vk_image_usage_flags_from_image_format(create_info->format);
+    VkImageLayout initial_layout  = vk_get_image_initial_layout_from_usage((u32)create_info->usage, create_info->format);
+    VkImageLayout final_layout    = vk_get_image_final_layout_from_usage((u32)create_info->usage, create_info->format);
+
+    // NOTE(Sleepster): Only 2D images
+    vulkan_image_info_t info = {};
+    info.type           = VK_IMAGE_TYPE_2D;
+    info.width          = create_info->width;
+    info.height         = create_info->height;
+    info.data           = create_info->data;
+    info.format         = vk_bitmap_format_to_vulkan_format(create_info->format);
+    info.initial_layout = initial_layout;
+    info.final_layout   = (final_layout != VK_IMAGE_LAYOUT_UNDEFINED) ? final_layout : initial_layout;
+    info.mip_count      = 1;
+    info.sample_count   = 1;
+    info.usage          = usage_flags;
+
+    vulkan_sampler_info_t sampler_info;
+    if(vk_sampler_info_is_valid(create_info))
+    {
+        // TODO(Sleepster): For now compare operations are disabled. I don't want to deal with them right now... 
+        sampler_create_info_t *image_sampler = &create_info->sampler_info;
+        VkFilter filter = vk_sampler_filter_type_to_vk_filter(image_sampler->filtering);
+
+        sampler_info = {
+            .anisotropy_enabled = image_sampler->anisotropy_enabled,
+            .max_anisotropy     = image_sampler->max_anisotropy,
+            .compare_enabled    = false,
+            .compare_operation  = 0,
+            .min_filter         = filter,
+            .mag_filter         = filter,
+            .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+            .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+
+            .use_normalized_coordinates = image_sampler->use_normalized_coordinates
+        };
+
+        info.sampler_info = &sampler_info;
+    }
+
+    // TODO(Sleepster): Maybe we need this???
+#if 0
+    // NOTE(Sleepster): Override the depth format... 
+    if(usage_flags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
+    {
+       info.format = vulkan_context->depth_format;
+    }
+#endif
+
+    image->vulkan_image = vk_backend_image_create(this->render_context, &info);
+}
+
+/*
+=============
+renderer_state_t::backend_image_destroy
+=============
+*/
+
+void renderer_state_t::
+backend_image_destroy(image_t *image)
+{
+    vk_backend_image_destroy(this->render_context, &image->vulkan_image);
+}
+
+/*
+=============
+renderer_state_t::backend_image_update_contents
+=============
+*/
+
+void renderer_state_t::
+backend_image_update_contents(image_t *image)
+{
+    vk_backend_image_update_data(this->render_context, &image->vulkan_image);
+}
+
+/*
+=============
+renderer_state_t::backend_shader_create
+=============
+*/
+
+void renderer_state_t::
+backend_shader_create(shader_t *shader, string_t shader_source)
+{
+    shader->shader_data = vk_backend_shader_create(this->render_context, shader_source);
 }

@@ -25,7 +25,7 @@ s_renderer_state_init
 */
 
 void
-s_renderer_state_init(renderer_state_t *renderer_state, void *render_context)
+s_renderer_state_init(renderer_state_t *renderer_state, backend_renderer_t *render_context)
 {
     renderer_state->renderer_arena  = c_arena_create(MB(100));
     renderer_state->transient_arena = c_arena_create(MB(100));
@@ -45,8 +45,7 @@ s_renderer_handle_window_resize
 void
 s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_size)
 {
-    vulkan_context_t *vulkan_context = (vulkan_context_t *)renderer_state->render_context;
-    vk_backend_handle_window_resize(vulkan_context, window_size);
+    renderer_state->backend_handle_window_resize(window_size);
 
     renderer_state->window_size.x = window_size.x;
     renderer_state->window_size.y = window_size.y;
@@ -98,7 +97,7 @@ s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_
 void
 s_renderer_execute_backend_commands(renderer_state_t *renderer_state)
 {
-    vk_backend_render_frame((vulkan_context_t*)renderer_state->render_context, renderer_state);
+    renderer_state->backend_render_frame();
 }
 
 /*
@@ -137,7 +136,7 @@ s_renderer_build_renderpass(renderer_state_t *renderer_state, renderpass_desc_t 
            &renderpass_desc->depth_stencil_attachment, 
             sizeof(renderpass_attachment_t));
 
-    u32 attachment_count = vk_backend_initialize_RHI_renderpass(renderer_state, renderpass_desc, renderpass);
+    u32 attachment_count = renderer_state->backend_renderpass_initialize(renderpass_desc, renderpass);
     renderpass->total_attachment_count = attachment_count;
 
     return(result);
@@ -146,7 +145,8 @@ s_renderer_build_renderpass(renderer_state_t *renderer_state, renderpass_desc_t 
 true_inline void
 s_renderer_resize_renderpass(renderer_state_t *renderer_state, renderpass_t *renderpass)
 {
-    vk_backend_initialize_RHI_renderpass(renderer_state, &renderpass->create_info, renderpass);
+    renderer_state->backend_renderpass_initialize(&renderpass->create_info, renderpass);
+
     renderpass->render_width  = renderpass->create_info.render_width;
     renderpass->render_height = renderpass->create_info.render_height;
 }
@@ -206,44 +206,10 @@ s_renderer_render_buffer_create(renderer_state_t           *renderer_state,
                                 render_buffer_desc_t       *buffer_desc)
 {
     render_buffer_t result = {};
-    result.buffer_ID           = c_fnv_hash_value((byte*)buffer_desc, sizeof(render_buffer_desc_t));
-    result.type                = buffer_desc->type;
-    result.buffer_capacity     = buffer_desc->buffer_capacity;
-    result.buffer_element_size = buffer_desc->element_size;
-    result.allocation_type     = buffer_desc->allocation_type;
-
-    render_buffer_type_t buffer_type = buffer_desc->type;
-
-    VkBufferUsageFlags             usage_flags      = (VkBufferUsageFlagBits)0;
-    vulkan_allocation_usage_type_t allocation_flags = (vulkan_allocation_usage_type_t)0;
-    Assert(buffer_type != RenderBufferType_Invalid);
-
-    usage_flags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-    if(buffer_type == RenderBufferType_IndexBuffer)
-    {
-        usage_flags |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-    }
-    else if (buffer_type == RenderBufferType_VertexBuffer)
-    {
-        usage_flags |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-    }
-
-    if(buffer_desc->allocation_type == RenderBufferAllocationTypeMapped)
-    {
-        allocation_flags = VULKAN_MEMORY_USAGE_CPU_TO_GPU; 
-    }
-    else if(buffer_desc->allocation_type == RenderBufferAllocationTypeGPUOnly)
-    {
-        allocation_flags = VULKAN_MEMORY_USAGE_GPU_ONLY;
-    }
-
-    result.buffer = vk_backend_buffer_create((vulkan_context_t *)renderer_state->render_context, 
-                                             buffer_desc->buffer_capacity,
-                                             usage_flags,
-                                             allocation_flags);
+    result = renderer_state->backend_buffer_create(buffer_desc);
     if(buffer_desc->initial_data != null && buffer_desc->buffer_capacity > 0)
     {
-        vk_backend_buffer_copy_data((vulkan_context_t*)renderer_state->render_context, &result.buffer, buffer_desc->initial_data, buffer_desc->buffer_capacity, 0);
+        renderer_state->backend_buffer_copy_data(&result, buffer_desc->initial_data, buffer_desc->buffer_capacity, 0);
     }
 
     return(result);
@@ -258,7 +224,7 @@ s_renderer_render_buffer_copy_data
 true_inline void
 s_renderer_render_buffer_copy_data(renderer_state_t *renderer_state, render_buffer_t *buffer, void *data, u32 size, u32 offset)
 {
-    vk_backend_buffer_copy_data((vulkan_context_t*)renderer_state->render_context, &buffer->buffer, data, size, offset);
+    renderer_state->backend_buffer_copy_data(buffer, data, size, offset);
 }
 
 /////////////////////////
@@ -655,13 +621,11 @@ r_cmd_update_constant_buffer(render_command_list_t *command_list, uniform_consta
     update_buffer_contents->constant_data_size = data_size;
 
     // TODO(Sleepster): Abstract this... 
-    vulkan_context_t *vulkan_context = (vulkan_context_t*)command_list->renderer_state->render_context;
     update_buffer_contents->buffer                     = buffer;
     update_buffer_contents->uniform_hash_index         = buffer->uniform_hash_index;
-    update_buffer_contents->backend_uniform_buffer_ptr = vk_backend_append_uniform_constant_buffer_data(vulkan_context, 
-                                                                                                        data, 
-                                                                                                        data_size, 
-                                                                                                       &buffer->offset);
+    update_buffer_contents->backend_uniform_buffer_ptr = command_list->renderer_state->backend_constant_buffer_append_data(data, 
+                                                                                                                           data_size, 
+                                                                                                                          &buffer->offset);
     update_buffer_contents->constant_buffer_offset = buffer->offset;
 
     buffer->mapped_data = update_buffer_contents->backend_uniform_buffer_ptr;
@@ -688,9 +652,7 @@ r_cmd_update_buffer_contents(render_command_list_t *command_list, render_buffer_
     update_buffer_contents->buffer    = buffer;
 
     buffer->buffer_elements_used += (data_size / buffer->buffer_element_size);
-
-    vulkan_context_t *vulkan_context = (vulkan_context_t*)command_list->renderer_state->render_context;
-    vk_backend_buffer_append_data(vulkan_context, &buffer->buffer, data, data_size);
+    command_list->renderer_state->backend_buffer_append_data(buffer, data, data_size);
 
     command->data = update_buffer_contents; 
     command->header.command_type = RCT_UpdateBufferContents;

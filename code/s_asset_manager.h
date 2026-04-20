@@ -553,7 +553,7 @@ struct asset_manager_t
 
     font_manager_t                  font_manager;
 
-    vulkan_context_t               *vulkan_context;
+    renderer_state_t               *renderer_state;
 };
 
 void  s_asset_manager_init(asset_manager_t *asset_manager);

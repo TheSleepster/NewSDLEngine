@@ -209,6 +209,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_VkFramebuffer, type_id(VkFramebuffer), "VkFramebuffer") \
 	X(TYPE_renderpass_t, type_id(renderpass_t), "renderpass_t") \
 	X(TYPE_SDL_Window, type_id(SDL_Window), "SDL_Window") \
+	X(TYPE_backend_renderer_t, type_id(backend_renderer_t), "backend_renderer_t") \
 	X(TYPE_render_command_list_t, type_id(render_command_list_t), "render_command_list_t") \
 	X(TYPE_vulkan_allocation_usage_type_t, type_id(vulkan_allocation_usage_type_t), "vulkan_allocation_usage_type_t") \
 	X(TYPE_VkDeviceSize, type_id(VkDeviceSize), "VkDeviceSize") \
@@ -6933,6 +6934,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "VkFramebuffer", .type = TYPE_VkFramebuffer, .size = sizeof(VkFramebuffer), .struct_info = NULL},
 	{.name = "renderpass_t", .type = TYPE_renderpass_t, .size = sizeof(renderpass_t), .struct_info = (type_info_struct_t*)&type_info_struct_renderpass_t_const_data},
 	{.name = "SDL_Window", .type = TYPE_SDL_Window, .size = sizeof(SDL_Window*), .struct_info = NULL},
+	{.name = "backend_renderer_t", .type = TYPE_backend_renderer_t, .size = sizeof(backend_renderer_t*), .struct_info = NULL},
 	{.name = "render_command_list_t", .type = TYPE_render_command_list_t, .size = sizeof(render_command_list_t*), .struct_info = NULL},
 	{.name = "vulkan_allocation_usage_type_t", .type = TYPE_vulkan_allocation_usage_type_t, .size = sizeof(vulkan_allocation_usage_type_t), .struct_info = NULL},
 	{.name = "VkDeviceSize", .type = TYPE_VkDeviceSize, .size = sizeof(VkDeviceSize), .struct_info = NULL},

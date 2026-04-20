@@ -137,28 +137,8 @@ s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 na
     shader_t result;
     result.ID          = name_hash;
     slot->ID           = name_hash;
-    result.shader_data = vk_backend_shader_create(asset_manager->vulkan_context, slot->package_entry->asset_data);
-    result.shader_data.DEBUG_name = slot->name; 
-    // TODO(Sleepster): 
-    //
-    // Some functionality to just add the item to a string table might be extremely useful for debug builds where you add strings to the table
-    // but never actually directly use them in a shader or somsething... might be worth persuing in the future.
-#if 0
-    for(u32 binding_index = 0;
-        binding_index < result.shader_data.binding_count;
-        ++binding_index)
-    {
-        vulkan_shader_binding_t *binding = result.shader_data.bindings + binding_index;
-        switch(binding->type)
-        {
-            case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-            case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-            {
-                c_hash_table_insert_pair(asset_manager->renderer_state->constant_buffer_hash, binding->name, null);
-            }break;
-        }
-    }
-#endif
+
+    asset_manager->renderer_state->backend_shader_create(&result, slot->package_entry->asset_data);
 
     return(result);
 }
@@ -920,39 +900,31 @@ s_asset_manager_update(asset_manager_t *asset_manager)
                 ++page->loaded_glyph_count;
             }
 
-            // NOTE(Sleepster): All of this needs to be replaced...
-            if(page->font_atlas->texture.gpu_data.vulkan_image.handle)
+            if(page->font_atlas->texture.gpu_data.ID != 0)
             {
-                s_renderer_image_update_data(asset_manager->vulkan_context, &page->font_atlas->texture.gpu_data);
+                s_renderer_image_update_data(asset_manager->renderer_state, &page->font_atlas->texture.gpu_data);
             }
             else
             {
-                vulkan_sampler_info_t sampler_info = {
-                    .min_filter                 = VK_FILTER_LINEAR,
-                    .mag_filter                 = VK_FILTER_LINEAR,
-                    .wrapu                      = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-                    .wrapv                      = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                sampler_create_info_t sampler_info = {
+                    .filtering                  = ImageFilterType_Linear,
                     .anisotropy_enabled         = true,
                     .max_anisotropy             = 4,
-                    .compare_enabled            = false,
+                    .wrapu                      = ImageWrapping_ClampToEdge,
+                    .wrapv                      = ImageWrapping_ClampToEdge,
+                    .compare_ops_enabled        = false,
                     .use_normalized_coordinates = false,
                 };
 
-                vulkan_image_info_t info = {};
-                info.data           = page->font_atlas->texture.bitmap.pixels;
-                info.width          = 4096;
-                info.height         = 4096;
-                info.type           = VK_IMAGE_TYPE_2D;
-                info.mip_count      = 1;
-                info.sample_count   = 1;
-                info.initial_layout = VK_IMAGE_LAYOUT_UNDEFINED;
-                info.usage          = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-                info.format         = VK_FORMAT_R8G8B8A8_UNORM;
-                info.sampler_info   = &sampler_info;
-
-                // NOTE(Sleepster): We should hash the create info inside the renderer create image function 
-                page->font_atlas->texture.gpu_data.vulkan_image = vk_backend_image_create(asset_manager->vulkan_context, &info);
-                page->font_atlas->texture.gpu_data.ID = c_fnv_hash_value((byte*)&info, sizeof(vulkan_image_info_t));
+                image_create_info_t info = {
+                    .data         = page->font_atlas->texture.bitmap.pixels,
+                    .width        = 4096,
+                    .height       = 4096,
+                    .format       = BMF_RGBA32_UNORM,
+                    .usage        = ImageUsage_SampledTexture,
+                    .sampler_info = sampler_info
+                };
+                asset_manager->renderer_state->backend_image_create(&info, &page->font_atlas->texture.gpu_data);
             }
             page->is_dirty = false;
             page->temporary_glyph_count = 0;
@@ -1225,7 +1197,6 @@ s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_hand
 void
 s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atlas_t *atlas)
 {
-    vulkan_context_t *vulkan_context = asset_manager->vulkan_context;
     Assert(atlas->is_valid);
 
     if(atlas->merge_counter > 0)
@@ -1293,28 +1264,22 @@ s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atla
                 c_dynarray_remove_element(atlas->textures_to_merge, texture_index);
             }
         }
-    
-        // TODO(Sleepster): Replace this with the image_t stuff
-        vulkan_image_info_t info = {};
-        info.data           = atlas->bitmap_data->pixels;
-        info.width          = atlas->bitmap_data->width;
-        info.height         = atlas->bitmap_data->height;
-        info.type           = VK_IMAGE_TYPE_2D;
-        info.mip_count      = 1;
-        info.sample_count   = 1;
-        info.initial_layout = VK_IMAGE_LAYOUT_UNDEFINED;
-        info.usage          = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-        info.format         = VK_FORMAT_R8G8B8A8_SRGB;
+
+        image_create_info_t info = {
+            .data   = atlas->bitmap_data->pixels,
+            .width  = atlas->bitmap_data->width,
+            .height = atlas->bitmap_data->height,
+            .format = BMF_RGBA32_SRGB,
+            .usage  = ImageUsage_SampledTexture,
+        };
 
         if(atlas->texture.gpu_data.vulkan_image.handle == null)
         {
-            // TODO(Sleepster): REALLY replace this stuff because this is bad and stupid...
-            atlas->texture.gpu_data.vulkan_image = vk_backend_image_create(vulkan_context, &info);
-            atlas->texture.gpu_data.ID = c_fnv_hash_value((byte*)&info, sizeof(vulkan_image_info_t));
+            asset_manager->renderer_state->backend_image_create(&info, &atlas->texture.gpu_data);
         }
         else
         {
-            vk_backend_image_update_data(vulkan_context, &atlas->texture.gpu_data.vulkan_image);
+            asset_manager->renderer_state->backend_image_update_contents(&atlas->texture.gpu_data);
         }
     }
     else

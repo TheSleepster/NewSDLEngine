@@ -7,6 +7,162 @@
 #include <vk_backend_core.h>
 #include <vk_backend_image.h>
 
+#include <s_asset_manager.h>
+
+VkFormat
+vk_bitmap_format_to_vulkan_format(u32 bitmap_format)
+{
+    VkFormat result = VK_FORMAT_R8G8B8_SRGB;
+    switch(bitmap_format)
+    {
+        case BMF_R8:                 {result = VK_FORMAT_R8_SRGB;           }break;
+        case BMF_G8:                 {result = VK_FORMAT_R8_SRGB;           }break;
+        case BMF_B8:                 {result = VK_FORMAT_R8_SRGB;           }break;
+        case BMF_RGB24_SRGB:         {result = VK_FORMAT_R8G8B8_SRGB;       }break;
+        case BMF_RGB24_UNORM:        {result = VK_FORMAT_R8G8B8_UNORM;      }break;
+        case BMF_RGBA32_SRGB:        {result = VK_FORMAT_R8G8B8A8_SRGB;     }break;
+        case BMF_RGBA32_UNORM:       {result = VK_FORMAT_R8G8B8A8_UNORM;    }break;
+        case BMF_BGRA32_UNORM:       {result = VK_FORMAT_B8G8R8A8_UNORM;    }break;
+        case BMF_D32_SFLOAT:         {result = VK_FORMAT_D32_SFLOAT;        }break;
+        case BMF_D32_SFLOAT_S8_UINT: {result = VK_FORMAT_D32_SFLOAT_S8_UINT;}break;
+    }
+
+    return(result);
+}
+
+VkImageUsageFlags
+vk_image_usage_flags_from_image_format(u32 format)
+{
+    VkImageUsageFlags result = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    switch(format)
+    {
+        case BMF_R8:
+        case BMF_B8:
+        case BMF_G8:
+        case BMF_RGB24_SRGB:
+        case BMF_RGB24_UNORM:
+        case BMF_BGRA32_UNORM:
+        case BMF_RGBA32_UNORM:
+        case BMF_RGBA32_SRGB:
+        {
+            result |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        }break;
+        case BMF_D32_SFLOAT_S8_UINT:
+        case BMF_D24_SFLOAT_S8:
+        case BMF_D32_SFLOAT:
+        {
+            result |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+        }break;
+    }
+    
+    return(result);
+}
+
+bool8 
+vk_sampler_info_is_valid(image_create_info_t *create_info)
+{
+    bool8 result = true;
+    if(create_info->sampler_info.filtering == ImageFilterType_Invalid ||
+       create_info->sampler_info.wrapu     == ImageWrapping_Invalid   || 
+       create_info->sampler_info.wrapv     == ImageWrapping_Invalid)
+    {
+        result = false;
+    }
+
+    return(result);
+}
+
+VkFilter
+vk_sampler_filter_type_to_vk_filter(u32 filter)
+{
+    VkFilter result;
+    switch(filter)
+    {
+        case ImageFilterType_Nearest:
+        {
+            result = VK_FILTER_NEAREST;
+        }break;
+        case ImageFilterType_Linear:
+        {
+            result = VK_FILTER_LINEAR;
+        }break;
+        default:
+        {
+            result = VK_FILTER_NEAREST;
+            InvalidCodePath;
+        }break;
+    }
+
+    return(result);
+}
+
+bool8
+vk_is_depth_format(u32 format)
+{
+    bool8 result = false;
+    switch(format)
+    {
+        case BMF_D32_SFLOAT_S8_UINT:
+        case BMF_D24_SFLOAT_S8:
+        case BMF_D32_SFLOAT:
+        {
+            result = true;
+        }break;
+    }
+
+    return(result);
+}
+
+VkImageLayout
+vk_get_image_initial_layout_from_usage(u32 usage, u32 format)
+{
+    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
+    if(usage != ImageUsage_Invalid)
+    {
+        if(usage & ImageUsage_SampledTexture)
+        {
+            result = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        }
+        else if(usage & ImageUsage_RenderpassAttachment)
+        {
+            if(!vk_is_depth_format(format))
+            {
+                result = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            }
+            else
+            {
+                result = VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL;
+            }
+        }
+        else
+        {
+            log_warning("This usage is currently not handled yet returning undefined...\n");
+        }
+    }
+
+    return(result);
+}
+
+VkImageLayout
+vk_get_image_final_layout_from_usage(u32 usage, u32 format)
+{
+    VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
+    if(usage != ImageUsage_Invalid)
+    {
+        if(usage & ImageUsage_BlitSource)
+        {
+            result = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        }
+        else
+        {
+            log_warning("This usage is currently not handled yet returning undefined...\n");
+        }
+    }
+
+    return(result);
+}
+
+
 /*
 =============
 vk_backend_image_update_from_buffer

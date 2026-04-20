@@ -94,10 +94,10 @@ main(int argc, char **argv)
         }
 
         global_context->renderer_state->render_context = c_arena_push_struct(&global_context->context_arena, vulkan_context_t);
-        global_context->asset_manager->vulkan_context  = (vulkan_context_t*)global_context->renderer_state->render_context; 
+        global_context->asset_manager->renderer_state  = global_context->renderer_state; 
         vulkan_context_t *vulkan_context = (vulkan_context_t*)global_context->renderer_state->render_context;
 
-        vk_backend_init(vulkan_context, global_context->renderer_state->window);
+        global_context->renderer_state->backend_initialize(global_context->renderer_state->window);
 
         // TODO(Sleepster): The count will need to be adjusted in the future. But this is fine for now 
         u32 thread_count = sys_get_thread_count() - 1;

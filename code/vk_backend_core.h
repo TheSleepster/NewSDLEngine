@@ -229,6 +229,8 @@ struct vulkan_context_t
     VkSampler                           default_linear_sampler;
 };
 
+typedef vulkan_context_t backend_renderer_t;
+
 // NOTE(Sleepster): 
 //
 // These store the default behavior of the API as constants.

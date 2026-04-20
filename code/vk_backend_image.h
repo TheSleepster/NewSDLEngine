@@ -14,7 +14,9 @@
 
 #include <vk_backend_allocator.h>
 
+struct image_create_info_t;
 struct vulkan_context_t;
+
 struct vulkan_sampler_info_t
 {
     u32    min_filter;
@@ -108,5 +110,13 @@ bool8 vk_backend_is_image_format_depth_format(vulkan_image_t *image);
 void vk_backend_transfer_image_to_intial_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image);
 void vk_backend_transfer_image_to_final_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image);
 
+VkFormat          vk_bitmap_format_to_vulkan_format(u32 bitmap_format);
+VkImageUsageFlags vk_image_usage_flags_from_image_format(u32 format);
+bool8             vk_sampler_info_is_valid(image_create_info_t *create_info);
+VkFilter          vk_sampler_filter_type_to_vk_filter(u32 filter);
+bool8             vk_is_depth_format(u32 format);
+VkImageLayout     vk_get_image_initial_layout_from_usage(u32 usage, u32 format);
+VkImageLayout     vk_get_image_final_layout_from_usage(u32 usage, u32 format);
+     
 #endif // VK_BACKEND_IMAGE_H
 
