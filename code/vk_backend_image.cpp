@@ -305,6 +305,8 @@ vk_backend_image_create_view
 void
 vk_backend_image_create_view(vulkan_context_t *vulkan_context, vulkan_image_t *image)
 {
+    Assert(image->is_valid);
+
     VkImageAspectFlags aspect_mask = {};
     bool8 is_depth_format   = vk_backend_is_image_format_depth_format(image);
     bool8 is_stencil_format = vk_backend_is_image_format_stencil_format(image);
@@ -330,6 +332,8 @@ vk_backend_image_create_view(vulkan_context_t *vulkan_context, vulkan_image_t *i
             .layerCount     = 1
         },
     };
+
+    Assert(image->view == VK_NULL_HANDLE);
     vkAssert(vkCreateImageView(vulkan_context->device, 
                               &view_create_info, 
                                vulkan_context->cpu_allocation_callbacks, 
@@ -346,7 +350,10 @@ vk_backend_image_destroy_view
 void
 vk_backend_image_destroy_view(vulkan_context_t *vulkan_context, vulkan_image_t *image)
 {
+    Expect(image->view != VK_NULL_HANDLE, "This image view is not valid...\n");
     vkDestroyImageView(vulkan_context->device, image->view, vulkan_context->cpu_allocation_callbacks);
+
+    image->view = null;
 }
 
 /*
@@ -385,6 +392,7 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
     result.internal_format = (VkFormat)image_info->format;
     result.layout          = VK_IMAGE_LAYOUT_UNDEFINED;
 
+    Assert(result.handle == VK_NULL_HANDLE);
     vkAssert(vkCreateImage(vulkan_context->device, &info, vulkan_context->cpu_allocation_callbacks, &result.handle));
 
     // NOTE(Sleepster): Allocation 
@@ -404,21 +412,8 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
         vk_backend_image_update_data(vulkan_context, &result);
     }
 
+    result.is_valid = true;
     vk_backend_image_create_view(vulkan_context, &result);
-#if 0 
-    vulkan_sampler_info_t sampler_info = {
-        .anisotropy_enabled = false,
-        .compare_enabled    = false,
-        .max_anisotropy     = 1,
-        .min_filter         = VK_FILTER_NEAREST,
-        .mag_filter         = VK_FILTER_NEAREST,
-        .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-        .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-
-        .use_normalized_coordinates = true,
-    };
-    result.sampler = vk_backend_sampler_create(vulkan_context, &sampler_info);
-#else
     if(image_info->sampler_info)
     {
         string_t sampler_data = {
@@ -441,7 +436,6 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
     {
         result.sampler = vulkan_context->default_nearest_sampler;
     }
-#endif
 
     return(result);
 }
@@ -458,10 +452,19 @@ void
 vk_backend_image_destroy(vulkan_context_t *vulkan_context, vulkan_image_t *image)
 {
     Assert(image);
+    Assert(image->is_valid);
+    Assert(image->handle);
 
-    vk_backend_image_destroy_view(vulkan_context, image);
+    if(image->view)
+    {
+        vk_backend_image_destroy_view(vulkan_context, image);
+        image->view     = null;
+    }
+
     vk_allocator_free(&vulkan_context->vulkan_allocator, &image->allocation);
     vkDestroyImage(vulkan_context->device, image->handle, vulkan_context->cpu_allocation_callbacks);
+    image->handle   = null;
+    image->is_valid = false;
 }
 
 /*

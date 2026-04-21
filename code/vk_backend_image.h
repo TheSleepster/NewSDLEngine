@@ -51,6 +51,7 @@ struct vulkan_image_info_t
 
 struct vulkan_image_t
 {
+    bool8                    is_valid;
     vulkan_image_info_t      info;
     VkImage                  handle;
     VkImageView              view;

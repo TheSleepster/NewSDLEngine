@@ -65,10 +65,12 @@ s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_
                 ++color_attachment_index)
             {
                 renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
+
                 image_create_info_t *info = &attachment->image->create_info;
                 info->width  = renderer_state->window_size.x;
                 info->height = renderer_state->window_size.y;
 
+                Assert(attachment->image->vulkan_image.is_valid == true);
                 s_renderer_image_destroy(renderer_state, attachment->image);
                 *attachment->image = s_renderer_image_create(renderer_state, info);
             }
@@ -79,6 +81,7 @@ s_renderer_handle_window_resize(renderer_state_t *renderer_state, vec2_t window_
                 info->width  = renderer_state->window_size.x;
                 info->height = renderer_state->window_size.y;
 
+                Assert(renderpass->depth_stencil_attachment.image->vulkan_image.is_valid == true);
                 s_renderer_image_destroy(renderer_state, renderpass->depth_stencil_attachment.image);
                 *renderpass->depth_stencil_attachment.image = s_renderer_image_create(renderer_state, info);
             }

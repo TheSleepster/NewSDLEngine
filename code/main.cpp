@@ -274,6 +274,7 @@ game_main(void)
     // NOTE(Sleepster): Game Renderpass
     renderpass_desc_t game_renderpass_desc;
     image_t           game_color_buffer;
+    image_t           game_depth_buffer;
     {
         image_create_info_t primary_game_color_buffer_create_info = {
             .width  = 320,
@@ -289,8 +290,8 @@ game_main(void)
             .usage  = ImageUsage_RenderpassAttachment
         };
 
-                game_color_buffer = s_renderer_image_create(renderer_state, &primary_game_color_buffer_create_info);
-        image_t game_depth_buffer = s_renderer_image_create(renderer_state, &primary_game_depth_buffer_create_info);
+        game_color_buffer = s_renderer_image_create(renderer_state, &primary_game_color_buffer_create_info);
+        game_depth_buffer = s_renderer_image_create(renderer_state, &primary_game_depth_buffer_create_info);
 
         game_renderpass_desc = {
             .render_width           = 320,
@@ -321,6 +322,7 @@ game_main(void)
     // NOTE(Sleepster): Fullscreen Renderpass
     renderpass_desc_t fullscreen_renderpass_desc;
     image_t           fullscreen_color_buffer;
+    image_t           fullscreen_depth_buffer;
     {
         image_create_info_t fullscreen_color_buffer_create_info = {
             .width  = (u32)renderer_state->window_size.x,
@@ -336,8 +338,8 @@ game_main(void)
             .usage  = ImageUsage_RenderpassAttachment,
         };
 
-                fullscreen_color_buffer = s_renderer_image_create(renderer_state, &fullscreen_color_buffer_create_info);
-        image_t fullscreen_depth_buffer = s_renderer_image_create(renderer_state, &fullscreen_depth_buffer_create_info);
+        fullscreen_color_buffer = s_renderer_image_create(renderer_state, &fullscreen_color_buffer_create_info);
+        fullscreen_depth_buffer = s_renderer_image_create(renderer_state, &fullscreen_depth_buffer_create_info);
 
         fullscreen_renderpass_desc = {
             .render_width           = (u32)renderer_state->window_size.x,

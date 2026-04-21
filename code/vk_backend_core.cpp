@@ -1059,6 +1059,7 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
         view_info.subresourceRange.baseArrayLayer = 0;
         view_info.subresourceRange.layerCount     = 1;
 
+        Assert(vulkan_context->swapchain.views[image_index] == VK_NULL_HANDLE);
         vkAssert(vkCreateImageView(vulkan_context->device, &view_info, vulkan_context->cpu_allocation_callbacks, &vulkan_context->swapchain.views[image_index]));
         
         vulkan_image_info_t info = {
@@ -1092,7 +1093,11 @@ vk_backend_swapchain_destroy(vulkan_context_t *vulkan_context)
         view_index < MAX_FRAMES_IN_FLIGHT;
         ++view_index)
     {
-        vkDestroyImageView(vulkan_context->device, vulkan_context->swapchain.views[view_index], vulkan_context->cpu_allocation_callbacks);
+        VkImageView view = vulkan_context->swapchain.views[view_index];
+
+        Expect(view != VK_NULL_HANDLE, "This image view is not valid...\n");
+        vkDestroyImageView(vulkan_context->device, view, vulkan_context->cpu_allocation_callbacks);
+        vulkan_context->swapchain.views[view_index] = VK_NULL_HANDLE;
     }
 
     ZeroMemory(vulkan_context->swapchain.views, sizeof(VkImageView) * MAX_FRAMES_IN_FLIGHT);
@@ -1123,6 +1128,10 @@ vk_backend_swapchain_rebuild(vulkan_context_t *vulkan_context)
         vk_backend_destroy_framebuffers(vulkan_context);
 
         c_arena_reset(&vulkan_context->swapchain_arena);
+        vulkan_context->swapchain.images        = null; 
+        vulkan_context->swapchain.views         = null;
+        vulkan_context->swapchain.image_layouts = null;
+        vulkan_context->swapchain_image_data    = null;
 
         vk_backend_swapchain_create(vulkan_context);
         vk_backend_create_depth_buffer(vulkan_context);
@@ -1219,6 +1228,7 @@ vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context)
         info.samples       = VK_SAMPLE_COUNT_1_BIT;
         info.sharingMode   = VK_SHARING_MODE_EXCLUSIVE;
 
+        Assert(image->handle == VK_NULL_HANDLE);
         vkAssert(vkCreateImage(vulkan_context->device, &info, vulkan_context->cpu_allocation_callbacks, &image->handle));
 
         VkMemoryRequirements memory_requirements;
@@ -1265,13 +1275,16 @@ vk_backend_create_depth_buffer(vulkan_context_t *vulkan_context)
         view_info.image    = image->handle;
         view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
         view_info.format   = image->internal_format;
-        view_info.subresourceRange.aspectMask   = VK_IMAGE_ASPECT_DEPTH_BIT;
+        view_info.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_DEPTH_BIT;
         view_info.subresourceRange.baseMipLevel   = 0;
         view_info.subresourceRange.levelCount     = 1;
         view_info.subresourceRange.baseArrayLayer = 0;
         view_info.subresourceRange.layerCount     = 1;
 
+        Assert(image->view == VK_NULL_HANDLE);
         vkAssert(vkCreateImageView(vulkan_context->device, &view_info, vulkan_context->cpu_allocation_callbacks, &image->view));
+
+        image->is_valid = true;
     }
 }
 
@@ -2153,7 +2166,7 @@ internal_api true_inline bool8
 is_depth_attachment_valid(renderpass_attachment_t *depth_attachment)
 {
     bool8 result = true;
-    if(depth_attachment->image == null)
+    if(depth_attachment->image->vulkan_image.handle == null)
     {
         result = false;
     }
@@ -3247,6 +3260,7 @@ backend_image_create(image_create_info_t *create_info, image_t *image)
     }
 #endif
 
+    Assert(image->vulkan_image.is_valid == false);
     image->vulkan_image = vk_backend_image_create(this->render_context, &info);
 }
 
@@ -3259,6 +3273,8 @@ renderer_state_t::backend_image_destroy
 void renderer_state_t::
 backend_image_destroy(image_t *image)
 {
+    Assert(image->vulkan_image.is_valid == true);
+    Expect(image->vulkan_image.handle, "This image does not have a valid handle...\n");
     vk_backend_image_destroy(this->render_context, &image->vulkan_image);
 }
 
