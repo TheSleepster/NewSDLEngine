@@ -155,7 +155,7 @@ DYNARRAY_API void  _dynarray_remove_impl(void **array, u32 element_size, u32 ind
 #define c_dynarray_clear(d_array) ({                                            \
     dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(d_array); \
     Expect(header != null, "Invalid d_array header...\n");                      \
-    memset(d_array, 0, header->capacity * sizeof(*d_array));                    \
+    ZeroMemory(d_array, header->capacity * sizeof(*d_array));                   \
     header->indices_used = 0;                                                   \
 })
 
@@ -218,7 +218,7 @@ _dynarray_grow_impl(void **array, u32 element_size, u32 new_capacity)
     u64 new_size = new_capacity     * element_size;
 
     result = realloc(base, (element_size * new_capacity) + sizeof(dynarray_header_t));
-    memset((byte*)result + sizeof(dynarray_header_t) + old_size, 0, new_size - old_size);
+    ZeroMemory((byte*)result + sizeof(dynarray_header_t) + old_size, new_size - old_size);
     
     result = (byte*)result + sizeof(dynarray_header_t);
     *array = result;

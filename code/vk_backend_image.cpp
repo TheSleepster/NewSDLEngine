@@ -527,6 +527,8 @@ vk_backend_transfer_image_to_final_layout
 void
 vk_backend_transfer_image_to_final_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image)
 {
+    Assert(image->aspect_mask != 0);
+
     VkImageSubresourceRange range = {
         .aspectMask     = image->aspect_mask,
         .baseArrayLayer = 0,
@@ -730,5 +732,5 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                                    0,
                                    0,
                                    destination_range);
-    destination_image->layout = destination_initial_layout;
+    destination_image->layout = destination_final_layout;
 }

@@ -189,7 +189,7 @@ parse_member(token_data_t         structure_name,
                 }
 
                 // NOTE(Sleepster): format the const definition information 
-                memset(buffer, 0, sizeof(buffer));
+                ZeroMemory(buffer, sizeof(buffer));
                 length = sprintf(buffer, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .offset = offsetof(%.*s, %.*s), .size = sizeof(%.*s)},\n",
                                  element_identifier.string.count,   C_STR(element_identifier.string),    // initialized name
                                  element_identifier.string.count,   C_STR(element_identifier.string),    // .name
@@ -260,7 +260,7 @@ parse_structure(tokenizer_t *tokenized_data, token_data_t structure_type_token)
     c_string_builder_append_data(&local_type_info_builder, test_string);
 
     // NOTE(Sleepster): Do the same thing for the const definition 
-    memset(buffer, 0, sizeof(buffer));
+    ZeroMemory(buffer, sizeof(buffer));
 
     length = sprintf(buffer, "const static type_info_%.*s type_info_%.*s = {\n\t.name = \"%.*s\",\n\t.type = TYPE_%.*s,\n", 
                      struct_name_token.string.count, C_STR(struct_name_token.string),
@@ -408,7 +408,7 @@ generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
     };
     c_string_builder_append_data(&enum_info_builder, test_string);
 
-    memset(buffer, 0, sizeof(buffer));
+    ZeroMemory(buffer, sizeof(buffer));
 
     length = sprintf(buffer, "const static type_info_enum_%.*s type_info_enum_%.*s = {\n\t.name = \"%.*s\",\n\t.type = TYPE_%.*s,\n", 
                      enum_name_token.string.count, C_STR(enum_name_token.string),
@@ -429,7 +429,7 @@ generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
         {
             case TT_Identifier:
             {
-                memset(buffer, 0, sizeof(buffer));
+                ZeroMemory(buffer, sizeof(buffer));
 
                 length = sprintf(buffer, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .offset = %.*s, .size = 0},\n",
                                  token.string.count,           C_STR(token.string),            // initialized name
@@ -457,7 +457,7 @@ generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
             }break;
             case TT_ClosingBrace:
             {
-                memset(buffer, 0, sizeof(buffer));
+                ZeroMemory(buffer, sizeof(buffer));
 
                 length = sprintf(buffer, "\t.member_count = %d,\n\t.members = {\n", member_count);
                 test_string = {

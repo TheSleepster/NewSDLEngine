@@ -124,7 +124,7 @@ c_za_alloc(zone_allocator_t *zone, u64 size_init, za_allocation_tag_t tag)
     zone->cursor               = base_block->next_block;
 
     result = (byte*)base_block + sizeof(zone_allocator_block_t);
-    memset(result, 0, size - sizeof(zone_allocator_block_t));
+    ZeroMemory(result, size - sizeof(zone_allocator_block_t));
 
     log_info("Zone Allocated: %d bytes...\n", size);
     sys_mutex_unlock(&zone->mutex);

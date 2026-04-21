@@ -739,7 +739,7 @@ sys_file_watcher_issue_check(file_watcher_t *watcher, sys_file_check_event_data_
         notify_flags |= FILE_NOTIFY_CHANGE_SECURITY | FILE_NOTIFY_CHANGE_ATTRIBUTES;
     }
 
-    memset(&directory_data->overlapped_data, 0, sizeof(OVERLAPPED));
+    ZeroMemory(&directory_data->overlapped_data, sizeof(OVERLAPPED));
     BOOL success = ReadDirectoryChangesW(directory_data->file_handle,
                                          directory_data->notify_data,
                                          KB(10),

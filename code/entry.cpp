@@ -80,10 +80,16 @@ main(int argc, char **argv)
     global_context->renderer_state = c_arena_push_struct(&global_context->context_arena, renderer_state_t);
     global_context->asset_manager  = c_arena_push_struct(&global_context->context_arena, asset_manager_t);
     global_context->input_manager  = c_arena_push_struct(&global_context->context_arena, input_manager_t);
-
-    global_context->renderer_state->window_size = vec2(2560, 1440);
     if(SDL_Init(SDL_INIT_VIDEO))
     {
+        s32            display_count = 0;
+        SDL_DisplayID *display_ids   = SDL_GetDisplays(&display_count);
+        Expect(display_ids, "Failure to call SDL_GetDisplays... error: '%s'", SDL_GetError());
+
+        const SDL_DisplayMode *display_data = SDL_GetCurrentDisplayMode(display_ids[0]);
+        Expect(display_data, "Could not get the display_mode... error: '%s'...\n", SDL_GetError());
+
+        global_context->renderer_state->window_size = vec2(display_data->w, display_data->h);
         global_context->renderer_state->window = SDL_CreateWindow("Vulkan...", 
                                                   global_context->renderer_state->window_size.x,
                                                   global_context->renderer_state->window_size.y, 

@@ -310,7 +310,7 @@ game_main(void)
             .depth_stencil_attachment = {
                 .access          = RenderpassAttachmentAccessWrite,
                 .load_operation  = RenderpassAttachmentLoadOperationClear,
-                .store_operation = RenderpassAttachmentStoreOperationDontCare,
+                .store_operation = RenderpassAttachmentStoreOperationStore,
 
                 .image           = &game_depth_buffer,
                 .clear_value     =  depth_buffer_clear_value
@@ -357,7 +357,7 @@ game_main(void)
             .depth_stencil_attachment = {
                 .access          = RenderpassAttachmentAccessWrite,
                 .load_operation  = RenderpassAttachmentLoadOperationClear,
-                .store_operation = RenderpassAttachmentStoreOperationDontCare,
+                .store_operation = RenderpassAttachmentStoreOperationStore,
 
                 .image           = &fullscreen_depth_buffer,
                 .clear_value     =  depth_buffer_clear_value

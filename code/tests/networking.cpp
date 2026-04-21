@@ -66,7 +66,7 @@ init_network_data(char *ip_addr, char *port, bool8 client)
 
     u32 ai_flags = client ? 0 : AI_PASSIVE;
 
-    memset(&hints, 0, sizeof hints); 
+    ZeroMemory(&hints, sizeof hints); 
     hints.ai_family   = AF_INET6;     
     hints.ai_socktype = SOCK_STREAM;     
     hints.ai_flags    = ai_flags;

@@ -104,7 +104,7 @@ c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 
 void
 c_arena_clear_block(memory_arena_t *arena)
 {
-    memset(arena->base, 0, arena->used);    
+    ZeroMemory(arena->base, arena->used);    
     arena->used = 0;
 }
 
@@ -114,7 +114,7 @@ c_arena_free_last_block(memory_arena_t *arena)
     u8 *block_to_free  = (u8*)arena->base;
     u64 free_size      = arena->block_size + sizeof(memory_arena_footer_t);
 
-    memset(arena->base, 0, arena->used);
+    ZeroMemory(arena->base, arena->used);
 
     memory_arena_footer_t *footer = c_arena_get_footer(arena);
     arena->base       = footer->last_base;
@@ -134,7 +134,7 @@ c_arena_reset(memory_arena_t *arena)
         c_arena_free_last_block(arena);
     }
     Assert(arena->base);
-    memset(arena->base, 0, arena->used);
+    ZeroMemory(arena->base, arena->used);
 
     arena->used = 0;
 }

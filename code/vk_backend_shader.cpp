@@ -374,6 +374,7 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
                           &result.shader_arena,
                           shader_arena_allocate,
                           null);
+        ZeroMemory(result.pipeline_hash.data, sizeof(VkPipeline) * MAX_SHADER_PIPELINE_COUNT);
     }
     else
     {

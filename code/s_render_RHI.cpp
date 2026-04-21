@@ -283,8 +283,8 @@ s_renderer_command_list_init(renderer_state_t *renderer_state, render_command_li
         c_arena_reset(&list->command_arena);
 
         c_dynarray_clear(list->active_vertex_buffers);
-        memset(list->image_ids_to_bind,   0, sizeof(u32)      * MAX_SHADER_IMAGE_PARAMS);
-        memset(list->image_shader_params, 0, sizeof(image_t*) * MAX_SHADER_IMAGE_PARAMS);
+        ZeroMemory(list->image_ids_to_bind,   sizeof(u32)      * MAX_SHADER_IMAGE_PARAMS);
+        ZeroMemory(list->image_shader_params, sizeof(image_t*) * MAX_SHADER_IMAGE_PARAMS);
     }
 
     Assert(global_context);

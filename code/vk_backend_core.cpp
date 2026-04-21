@@ -1074,6 +1074,8 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
                                                                    vulkan_context->swapchain.images[image_index], 
                                                                   &vulkan_context->swapchain.views[image_index], 
                                                                   &info);
+        swapchain_image->renderpass_final_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        swapchain_image->aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
     }
 }
 
@@ -2982,7 +2984,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
         .baseArrayLayer = 0,
         .layerCount     = 1,
     };
-
+    
     if(backbuffer->layout != VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
     {
         vk_backend_image_change_layout(vulkan_context, 
@@ -2990,9 +2992,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                                        backbuffer->handle,
                                        backbuffer->layout,
                                        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                                       VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                                       0,
+                                       VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                       VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                                       VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
                                        0,
                                        dst_range);
         backbuffer->layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;

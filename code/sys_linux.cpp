@@ -68,6 +68,8 @@ sys_allocate_memory(usize allocation_size)
 #else
     u32 true_allocation = sys_align_to_page_size(allocation_size);
     void *data = malloc(true_allocation);
+    
+    ZeroMemory(data, true_allocation);
     Assert(data != null);
 #endif
 
