@@ -11,7 +11,10 @@
 
 struct uniform_constant_buffer_t;
 
+constexpr u32 MAX_PUSH_CONSTANTS           = 10;
 constexpr u32 MAX_DESCRIPTOR_SET_BINDINGS  = 5;
+constexpr u32 MAX_BUFFER_BINDING_DESCS     = 4;
+constexpr u32 MAX_BUFFER_ATTRIBUTES        = 12;
 constexpr u32 MAX_SHADER_PIPELINE_COUNT    = 1021;
 
 struct vulkan_shader_stage_t
@@ -63,7 +66,8 @@ struct vulkan_shader_t
     u32                                  binding_count;
 };
 
-vulkan_shader_t vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_source);
+vulkan_shader_t vk_backend_shader_create_spirv_reflect(vulkan_context_t *vulkan_context, string_t shader_source);
+vulkan_shader_t vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_t shader_source);
 
 #endif // VK_BACKEND_SHADER_H
 

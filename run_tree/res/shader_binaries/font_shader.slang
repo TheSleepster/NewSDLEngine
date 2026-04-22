@@ -1,5 +1,5 @@
 // VERTEX
-struct vInput_t
+struct vVertexInput_t
 {
     float4 vPosition : POSITION;
     float4 vColor    : TEXCOORD0;
@@ -24,14 +24,13 @@ ConstantBuffer<uCameraMatrices_t> CameraMatrices;
 
 [shader("vertex")]
 VertexOutput_t
-VSMain(vInput_t Input)
+VSMain(vVertexInput_t Input)
 {
     VertexOutput_t result;
-    
     float4 vPositionFloored = floor(Input.vPosition);
 
     result.vOutPosition = mul(CameraMatrices.ProjectionMatrix, mul(CameraMatrices.ViewMatrix, vPositionFloored));
-    result.vOutColor    = Input.vColor + (float4(Input.vPadding, 0, 0) * float4(0.001));
+    result.vOutColor    = Input.vColor;
     result.vOutTexCoord = Input.vTexCoord;
 
     return(result);
@@ -51,10 +50,10 @@ PSMain(VertexOutput_t VertexOutput)
 {
     PixelOutput_t result;
     
-    float4 TextureColor = TextureSampler.SampleLevel(VertexOutput.vOutTexCoord, 0.0);
-    if(TextureColor.a == 0.0) discard;
+    float4 TextureColor = TextureSampler.Sample(VertexOutput.vOutTexCoord);
+    if(TextureColor.a <= 0.3) discard;
 
-    result.vFragColor   = TextureColor * VertexOutput.vOutColor;
-        
+    result.vFragColor = float4(VertexOutput.vOutColor.rgb, TextureColor.a);
+
     return(result);
 }

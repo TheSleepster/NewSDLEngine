@@ -3299,5 +3299,9 @@ renderer_state_t::backend_shader_create
 void renderer_state_t::
 backend_shader_create(shader_t *shader, string_t shader_source)
 {
-    shader->shader_data = vk_backend_shader_create(this->render_context, shader_source);
+#if 0
+    shader->shader_data = vk_backend_shader_create_spirv_reflect(this->render_context, shader_source);
+#else 
+    shader->shader_data = vk_backend_shader_create_slang_reflect(this->render_context, shader_source);
+#endif
 }

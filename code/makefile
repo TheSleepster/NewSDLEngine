@@ -86,7 +86,7 @@ GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
 VMA_OBJ   = $(BUILD_DIR)/vk_vma_implementation$(OBJ_EXT)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
-GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/msdfgen/build/ -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static -lfreetype -lvulkan -lspirv_reflect
+GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/msdfgen/build/ -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static -lfreetype -lvulkan -lspirv_reflect -lslang -lslang-compiler
 
 # Tests
 # Use patsubst to strip 'tests/' pefix and add 'test_' prefix for output
@@ -100,6 +100,10 @@ PREPROCESSOR_OUT = $(BUILD_DIR)/preprocessor$(EXE_EXT)
 # Code Generator 
 CODE_GENERATOR_SRC = code_generator/metaprogram.cpp
 CODE_GENERATOR_OUT = $(BUILD_DIR)/metaprogram$(EXE_EXT)
+
+# Slang reflector
+SLANG_REFLECTOR_SRC = code_generator/slang_reflector.cpp
+SLANG_REFLECTOR_OUT = $(BUILD_DIR)/slang_reflector$(EXE_EXT)
 
 # Packers
 WAD_ASSET_FILE_PACKER_SRC = asset_file_packer/wad_asset_file_packer.cpp
@@ -122,8 +126,8 @@ JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
 # --------------------------------------------
 .PHONY: all shaders clean run_preprocessor
 
-all: $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) do_codegen $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
-
+all: $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(SLANG_REFLECTOR_OUT) do_codegen $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
+ 
 # Create Build Directory
 $(BUILD_DIR):
 	$(call MKDIR,$(BUILD_DIR))
@@ -159,6 +163,17 @@ $(CODE_GENERATOR_OUT): $(CODE_GENERATOR_SRC) | $(BUILD_DIR)
 	$(SILENT)$(CODE_GENERATOR_OUT) > $@
 
 do_codegen:       ../code/meta/GENERATED_program_RTTI.h
+
+# -------------------------------------------------------------------------
+# Slang Reflector 
+# -------------------------------------------------------------------------
+
+$(SLANG_REFLECTOR_OUT): $(SLANG_REFLECTOR_SRC) | $(BUILD_DIR)
+	@echo [BUILDING SLANG REFLECTOR] $@
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+		-MT $@ -MMD -MP -MF $(BUILD_DIR)/slang_reflector.d \
+		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
+
 # -------------------------------------------------------------------------
 # Shaders 
 # -------------------------------------------------------------------------

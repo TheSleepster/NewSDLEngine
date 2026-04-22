@@ -192,11 +192,17 @@ const global_variable float64 machine_epsilon_f64 = 2.220446e-16;
 typedef void void_func(void);
 
 #ifdef ASSERT_ENABLED
-#define AssertBreak       (*(char*)0 = 0)
-
+#define AssertBreak             (*(char*)0 = 0)
 #define StaticAssert(cond, msg) static_assert(cond, msg) 
-#define Expect(cond, ...) if(!(cond)) { log_fatal("FILE: [%s], FUNCTION: '%s', LINE: '%d':\t", __FILE__, __FUNCTION__, __LINE__); fprintf(stderr, ##__VA_ARGS__); getchar(); AssertBreak;}
-#define Assert(cond)      if(!(cond)) { log_fatal("FILE: [%s], FUNCTION: '%s', LINE: '%d': Assertion failed:...\n", __FILE__, __FUNCTION__, __LINE__); AssertBreak;}
+
+#define Assert(cond) if(!(cond)) { log_fatal("FILE: [%s], FUNCTION: '%s', LINE: '%d': Assertion failed:...\n", __FILE__, __FUNCTION__, __LINE__); AssertBreak;}
+#define Expect(cond, fmt, ...)                                              \
+    do {                                                                    \
+        if(!(cond)) {                                                       \
+            log_fatal("FILE: [%s], FUNCTION: '%s', LINE: '%d':\n" fmt "\n", \
+                      __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__);     \
+        }                                                                   \
+    }while(0);
 #else
 #define StaticAssert(cond, msg)
 #define Expect(cond, ...)

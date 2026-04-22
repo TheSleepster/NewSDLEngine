@@ -112,7 +112,11 @@ VISIT_FILES(gather_all_asset_file_entries)
     if(c_string_compare(file_ext,      STR(".ttf"))) type = AT_Font;
     else if(c_string_compare(file_ext, STR(".wav"))) type = AT_Sound;
     else if(c_string_compare(file_ext, STR(".png"))) type = AT_Bitmap;
+#if 0
     else if(c_string_compare(file_ext, STR(".spv"))) type = AT_Shader;
+#else
+    else if(c_string_compare(file_ext, STR(".slang"))) type = AT_Shader;
+#endif 
     else if(c_string_compare(file_ext, STR(".m_arch"))) type = AT_Material;
     else if(c_string_compare(file_ext, STR(".m_inst"))) type = AT_Material;
     if(type != AT_Invalid)

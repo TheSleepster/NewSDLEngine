@@ -9,6 +9,8 @@
 #include <vk_backend_shader.h>
 #include <s_render_RHI.h>
 
+#include <c_tokenizer.h>
+
 internal_api
 C_HASH_TABLE_ALLOCATE_IMPL(shader_arena_allocate)
 {
@@ -193,7 +195,7 @@ vk_backend_get_vk_format_size(VkFormat format)
 }
 
 vulkan_shader_t
-vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_source)
+vk_backend_shader_create_spirv_reflect(vulkan_context_t *vulkan_context, string_t shader_source)
 {
     vulkan_shader_t result = {};
     result.shader_arena = c_arena_create(MB(10));
@@ -249,8 +251,6 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
             VkVertexInputBindingDescription *current_vertex_buffer     = null;
             VkVertexInputRate                current_buffer_input_rate = VK_VERTEX_INPUT_RATE_VERTEX;
 
-            const u32 MAX_BUFFER_BINDING_DESCS = 4;
-            const u32 MAX_BUFFER_ATTRIBUTES    = 12;
             result.vertex_buffer_binding_descs = c_arena_push_array(&result.shader_arena, VkVertexInputBindingDescription,   MAX_BUFFER_BINDING_DESCS);
             result.buffer_attributes           = c_arena_push_array(&result.shader_arena, VkVertexInputAttributeDescription, MAX_BUFFER_ATTRIBUTES);
 
@@ -442,6 +442,686 @@ vk_backend_shader_create(vulkan_context_t *vulkan_context, string_t shader_sourc
     // NOTE(Sleepster): 
     // Create the pipeline layout here, it's easy to just do it in place and doesn't really
     // cause problems.
+    VkPipelineLayoutCreateInfo pipeline_layout_info = {
+        .sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .setLayoutCount         = result.descriptor_set_count,
+        .pSetLayouts            = result.layouts,
+        .pushConstantRangeCount = result.push_constant_count,
+        .pPushConstantRanges    = result.push_constants,
+    };
+    vkAssert(vkCreatePipelineLayout(vulkan_context->device,
+                                   &pipeline_layout_info,
+                                    vulkan_context->cpu_allocation_callbacks,
+                                   &result.pipeline_layout));
+
+    if(result.pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
+    {
+        // NOTE(Sleepster): Create the base pipeline for the pipeline hash. 
+        string_t pipeline_key_data = {
+            .data  = (u8*)&g_pipeline_default_state_key,
+            .count = sizeof(g_pipeline_default_state_key)
+        };
+        u64 pipeline_state_hash = c_fnv_hash_value(pipeline_key_data.data, pipeline_key_data.count);
+        pipeline_state_hash %= MAX_SHADER_PIPELINE_COUNT; 
+
+        result.shader_id = pipeline_state_hash;
+        result.pipeline_hash.data[pipeline_state_hash] = vk_backend_create_render_pipeline(vulkan_context, 
+                                                                                           &result, 
+                                                                                           &g_pipeline_default_rasterization_state, 
+                                                                                           &g_pipeline_default_depth_stencil_state,
+                                                                                           &g_pipeline_default_blend_settings,
+                                                                                           &result.pipeline_vertex_input_state);
+        result.default_pipeline = result.pipeline_hash.data[pipeline_state_hash];
+    }
+    else if(result.pipeline_type == VK_PIPELINE_BIND_POINT_COMPUTE)
+    {
+        VkComputePipelineCreateInfo pipeline_info = {};
+        pipeline_info.sType  = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+        pipeline_info.layout = result.pipeline_layout;
+        pipeline_info.stage  = result.stages->pipeline_stage_create_info;
+
+        vkAssert(vkCreateComputePipelines(vulkan_context->device, null, 1, &pipeline_info, null, &result.pipeline_hash.data[0]));
+    }
+
+    return(result);
+}
+
+#include <slang/slang.h>
+#include <slang/slang-com-ptr.h>
+
+static Slang::ComPtr<slang::IGlobalSession> global_session;
+
+internal_api VkShaderStageFlagBits 
+slang_stage_to_vk_stage(SlangStage stage)
+{
+    VkShaderStageFlagBits result = VK_SHADER_STAGE_ALL;
+    switch(stage)
+    {
+        case SLANG_STAGE_VERTEX:         { result =  VK_SHADER_STAGE_VERTEX_BIT;                  }break;
+        case SLANG_STAGE_FRAGMENT:       { result =  VK_SHADER_STAGE_FRAGMENT_BIT;                }break;
+        case SLANG_STAGE_COMPUTE:        { result =  VK_SHADER_STAGE_COMPUTE_BIT;                 }break;
+        case SLANG_STAGE_GEOMETRY:       { result =  VK_SHADER_STAGE_GEOMETRY_BIT;                }break;
+        case SLANG_STAGE_HULL:           { result =  VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;    }break;
+        case SLANG_STAGE_DOMAIN:         { result =  VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT; }break;
+        case SLANG_STAGE_MISS:           { result =  VK_SHADER_STAGE_MISS_BIT_KHR;                }break;
+        case SLANG_STAGE_CLOSEST_HIT:    { result =  VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;         }break;
+        case SLANG_STAGE_RAY_GENERATION: { result =  VK_SHADER_STAGE_RAYGEN_BIT_KHR;              }break;
+        case SLANG_STAGE_ANY_HIT:        { result =  VK_SHADER_STAGE_ANY_HIT_BIT_KHR;             }break;
+        case SLANG_STAGE_INTERSECTION:   { result =  VK_SHADER_STAGE_INTERSECTION_BIT_KHR;        }break;
+        case SLANG_STAGE_MESH:           { result =  VK_SHADER_STAGE_MESH_BIT_EXT;                }break;
+        case SLANG_STAGE_AMPLIFICATION:  { result =  VK_SHADER_STAGE_TASK_BIT_EXT;                }break;
+        default:                         { InvalidCodePath;                                       }break;
+    }
+
+    return(result);
+}
+
+internal_api VkDescriptorType
+slang_type_to_vulkan_type(slang::TypeReflection *type)
+{
+    VkDescriptorType result = VK_DESCRIPTOR_TYPE_MAX_ENUM;
+
+    slang::TypeReflection::Kind kind = type->getKind();
+    if(kind == slang::TypeReflection::Kind::ConstantBuffer)
+    {
+        result = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    }
+    else if(kind == slang::TypeReflection::Kind::SamplerState)
+    {
+        result = VK_DESCRIPTOR_TYPE_SAMPLER;
+    }
+    else if(kind == slang::TypeReflection::Kind::Resource)
+    {
+        SlangResourceAccess access     = type->getResourceAccess();
+        SlangResourceShape  dimensions = type->getResourceShape();
+        SlangResourceShape  base       = (SlangResourceShape)(dimensions & SLANG_RESOURCE_BASE_SHAPE_MASK);
+
+        bool8 is_combined_sampler    = (dimensions & SLANG_BINDING_TYPE_COMBINED_TEXTURE_SAMPLER) != 0;
+        bool8 is_read_write_accessed = (access == SLANG_RESOURCE_ACCESS_READ_WRITE ||
+                                       access == SLANG_RESOURCE_ACCESS_RASTER_ORDERED);
+        if(base == SLANG_STRUCTURED_BUFFER || base == SLANG_BYTE_ADDRESS_BUFFER)
+        {
+            result = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        }
+        else if(is_combined_sampler)
+        {
+            result = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        }
+        else if(is_read_write_accessed)
+        {
+            result = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        }
+        else
+        {
+            result = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        }
+    }
+
+    return(result);
+}
+
+internal_api slang::ParameterCategory
+slang_binding_category(slang::TypeReflection *type)
+{
+    slang::ParameterCategory result = slang::ParameterCategory::None;
+
+    slang::TypeReflection::Kind kind = type->getKind();
+    if (kind == slang::TypeReflection::Kind::ConstantBuffer ||
+        kind == slang::TypeReflection::Kind::ParameterBlock)
+    {
+        result = slang::ParameterCategory::ConstantBuffer;
+    }
+    else if (kind == slang::TypeReflection::Kind::SamplerState)
+    {
+        result = slang::ParameterCategory::SamplerState;
+    }
+    else if(kind == slang::TypeReflection::Kind::Resource)
+    {
+        SlangResourceAccess access = type->getResourceAccess();
+        if (access == SLANG_RESOURCE_ACCESS_READ_WRITE ||
+            access == SLANG_RESOURCE_ACCESS_RASTER_ORDERED)
+        {
+            result = slang::ParameterCategory::UnorderedAccess;
+        }
+        else
+        {
+            result = slang::ParameterCategory::ShaderResource;
+        }
+    }
+    else
+    {
+        InvalidCodePath;
+    }
+
+    return(result);
+}
+
+internal_api VkFormat 
+slang_type_to_vulkan_format(slang::TypeReflection *type_data, slang::TypeLayoutReflection *type_layout)
+{
+    VkFormat result = VK_FORMAT_UNDEFINED;
+
+    Assert(type_layout);
+    Assert(type_data);
+
+    slang::TypeReflection::Kind type_kind = type_data->getKind();
+    slang::TypeReflection::ScalarType scalar = slang::TypeReflection::ScalarType::None;
+
+    // NOTE(Sleepster): 4 wide is 128 bytes (or float4) 
+    u32 scalar_width = 1;
+
+    if(type_kind == slang::TypeReflection::Kind::Scalar)
+    {
+        scalar = type_data->getScalarType();
+    }
+    else if(type_kind == slang::TypeReflection::Kind::Vector)
+    {
+        scalar = type_data->getElementType()->getScalarType();
+        scalar_width = (u32)type_data->getElementCount();
+    }
+    else
+    {
+        // NOTE(Sleepster): If it's neither a scalar or a vector, why are we here? 
+        InvalidCodePath;
+    }
+
+    if(scalar == slang::TypeReflection::ScalarType::Float32)
+    {
+        switch(scalar_width)
+        {
+            case 1: { result = VK_FORMAT_R32_SFLOAT;          }break;
+            case 2: { result = VK_FORMAT_R32G32_SFLOAT;       }break;
+            case 3: { result = VK_FORMAT_R32G32B32_SFLOAT;    }break;
+            case 4: { result = VK_FORMAT_R32G32B32A32_SFLOAT; }break;
+        }
+    }
+    else if(scalar == slang::TypeReflection::ScalarType::Float16)
+    {
+        switch(scalar_width)
+        {
+            case 1: { result = VK_FORMAT_R16_SFLOAT;          }break;
+            case 2: { result = VK_FORMAT_R16G16_SFLOAT;       }break;
+            case 3: { result = VK_FORMAT_R16G16B16_SFLOAT;    }break;
+            case 4: { result = VK_FORMAT_R16G16B16A16_SFLOAT; }break;
+        }
+    }
+    else if(scalar == slang::TypeReflection::ScalarType::Int32)
+    {
+        switch(scalar_width)
+        {
+            case 1: { result = VK_FORMAT_R32_SINT;          }break;
+            case 2: { result = VK_FORMAT_R32G32_SINT;       }break;
+            case 3: { result = VK_FORMAT_R32G32B32_SINT;    }break;
+            case 4: { result = VK_FORMAT_R32G32B32A32_SINT; }break;
+        }
+    }
+    else if(scalar == slang::TypeReflection::ScalarType::UInt32)
+    {
+        switch(scalar_width)
+        {
+            case 1: { result = VK_FORMAT_R32_UINT;          }break;
+            case 2: { result = VK_FORMAT_R32G32_UINT;       }break;
+            case 3: { result = VK_FORMAT_R32G32B32_UINT;    }break;
+            case 4: { result = VK_FORMAT_R32G32B32A32_UINT; }break;
+        }
+    }
+    else if(scalar == slang::TypeReflection::ScalarType::Int16)
+    {
+        switch(scalar_width)
+        {
+            case 1: { result = VK_FORMAT_R16_SINT;          }break;
+            case 2: { result = VK_FORMAT_R16G16_SINT;       }break;
+            case 3: { result = VK_FORMAT_R16G16B16_SINT;    }break;
+            case 4: { result = VK_FORMAT_R16G16B16A16_SINT; }break;
+        }
+    }
+    else if(scalar == slang::TypeReflection::ScalarType::UInt16)
+    {
+        switch(scalar_width)
+        {
+            case 1: { result = VK_FORMAT_R16_UINT;          }break;
+            case 2: { result = VK_FORMAT_R16G16_UINT;       }break;
+            case 3: { result = VK_FORMAT_R16G16B16_UINT;    }break;
+            case 4: { result = VK_FORMAT_R16G16B16A16_UINT; }break;
+        }
+    }
+    else if(scalar == slang::TypeReflection::ScalarType::Int8)
+    {
+        switch(scalar_width)
+        {
+            case 1: { result = VK_FORMAT_R8_SINT;       }break;
+            case 2: { result = VK_FORMAT_R8G8_SINT;     }break;
+            case 3: { result = VK_FORMAT_R8G8B8_SINT;   }break;
+            case 4: { result = VK_FORMAT_R8G8B8A8_SINT; }break;
+        }
+    }
+    else if(scalar == slang::TypeReflection::ScalarType::UInt8)
+    {
+        switch(scalar_width)
+        {
+            case 1: { result = VK_FORMAT_R8_UINT;       }break;
+            case 2: { result = VK_FORMAT_R8G8_UINT;     }break;
+            case 3: { result = VK_FORMAT_R8G8B8_UINT;   }break;
+            case 4: { result = VK_FORMAT_R8G8B8A8_UINT; }break;
+        }
+    }
+
+    return(result);
+}
+
+vulkan_shader_t
+vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_t shader_source)
+{
+    vulkan_shader_t result = {};
+    result.shader_arena = c_arena_create(MB(10));
+
+    // NOTE(Sleepster): Create global session if it's invalid 
+    if(global_session == nullptr)
+    {
+        if(SLANG_FAILED(slang::createGlobalSession(global_session.writeRef())))
+        {
+            log_fatal("Could not create the slang::IGlobalSession");
+        }
+        else
+        {
+            log_info("Slang IGlobalSession created successfully...\n");
+        }
+    }
+
+    // NOTE(Sleepster): Set the compilation target information 
+    slang::TargetDesc target_desc = {};
+    target_desc.format  = SLANG_SPIRV;
+    target_desc.profile = global_session->findProfile("sm_6_3");
+    target_desc.flags   = SLANG_TARGET_FLAG_GENERATE_SPIRV_DIRECTLY;
+
+    // NOTE(Sleepster): Setup the session's compilation flags and other information 
+    slang::SessionDesc session_desc = {};
+    session_desc.targets     = &target_desc;
+    session_desc.targetCount = 1;
+
+    slang::CompilerOptionEntry options[3] = {};
+    options[0].name              = slang::CompilerOptionName::MatrixLayoutColumn;
+    options[0].value.kind        = slang::CompilerOptionValueKind::Int;
+    options[0].value.intValue0   = 1;
+
+    options[1].name              = slang::CompilerOptionName::Optimization;
+    options[1].value.kind        = slang::CompilerOptionValueKind::Int;
+    options[1].value.intValue0   = SLANG_OPTIMIZATION_LEVEL_NONE;
+
+    options[2].name              = slang::CompilerOptionName::DebugInformation;
+    options[2].value.kind        = slang::CompilerOptionValueKind::Int;
+    options[2].value.intValue0   = SLANG_DEBUG_INFO_LEVEL_STANDARD;
+
+    session_desc.compilerOptionEntries     = options;
+    session_desc.compilerOptionEntryCount  = 3;
+
+    // NOTE(Sleepster): Create a child session from the global session 
+    Slang::ComPtr<slang::ISession> session = {};
+    Expect(!SLANG_FAILED(global_session->createSession(session_desc, session.writeRef())), "Failed to create the Slang::ISession");
+
+    Slang::ComPtr<slang::IBlob> diagnostics;
+    slang::IModule *shader_module = session->loadModuleFromSourceString("fucking hate this shit", null, (char*)shader_source.data, diagnostics.writeRef());
+    if(diagnostics && diagnostics->getBufferSize() > 0)
+    {
+        log_error("[SLANG]: %s\n", (const char *)diagnostics->getBufferPointer());
+    }
+
+    s32 entry_point_count = shader_module->getDefinedEntryPointCount();
+    Expect(entry_point_count > 0, "This file contains no entry_points...\n");
+    if(entry_point_count > 0)
+    {
+        result.stages = c_arena_push_array(&result.shader_arena, vulkan_shader_stage_t, entry_point_count);
+    }
+    
+    Slang::ComPtr<slang::IEntryPoint> entry_points[10];
+    slang::IComponentType*            components[10 + 1];
+
+    components[0] = shader_module;
+
+    for(s32 entry_index = 0;
+        entry_index < entry_point_count;
+        ++entry_index)
+    {
+        Assert(!SLANG_FAILED(shader_module->getDefinedEntryPoint(entry_index, entry_points[entry_index].writeRef())));
+        components[entry_index + 1] = entry_points[entry_index].get();
+    }
+
+    Slang::ComPtr<slang::IComponentType> shader_program;
+    Assert(!SLANG_FAILED(session->createCompositeComponentType(components, (SlangInt)(entry_point_count + 1), shader_program.writeRef(), diagnostics.writeRef())));
+
+    Slang::ComPtr<slang::IComponentType> linked_program;
+    Assert(!SLANG_FAILED(shader_program->link(linked_program.writeRef(), diagnostics.writeRef())));
+
+    slang::ProgramLayout *layout = linked_program->getLayout(0);
+    Assert(layout);
+
+    bool8 is_compute_shader = false;
+    result.stage_count = entry_point_count;
+
+    result.push_constant_count  = 0;
+    result.descriptor_set_count = 0;
+
+    VkShaderStageFlags descriptor_set_stage_flags[MAX_DESCRIPTOR_SET_BINDINGS] = {};
+
+    s32 unique_descriptor_sets[MAX_DESCRIPTOR_SET_BINDINGS];
+    memset(unique_descriptor_sets, -1, sizeof(s32) * MAX_DESCRIPTOR_SET_BINDINGS);
+
+    u32                unique_set_count    = 0;
+    u32                push_constant_count = 0;
+
+    u32 param_count = layout->getParameterCount();
+    for(u32 param_index = 0;
+        param_index < param_count;
+        ++param_index)
+    {
+        slang::VariableLayoutReflection *variable  = layout->getParameterByIndex(param_index);
+        slang::TypeReflection           *type_data = variable->getTypeLayout()->getType();
+        if(variable->getCategory() != slang::ParameterCategory::PushConstantBuffer)
+        {
+            slang::ParameterCategory binding_category = slang_binding_category(type_data);
+            u32 set = (u32)variable->getBindingSpace(binding_category);
+
+            bool8 found = false;
+            for(u32 set_binding_index = 0;
+                set_binding_index < MAX_DESCRIPTOR_SET_BINDINGS;
+                ++set_binding_index)
+            {
+                if((u32)unique_descriptor_sets[set_binding_index] == set)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if(!found)
+            {
+                Assert(unique_set_count <= MAX_DESCRIPTOR_SET_BINDINGS);
+
+                unique_descriptor_sets[unique_set_count] = set;
+                ++unique_set_count;
+            }
+        }
+        else
+        {
+            ++push_constant_count;
+        }
+    }
+
+    result.push_constant_count  = push_constant_count;
+    result.descriptor_set_count = unique_set_count;
+    result.stage_count          = entry_point_count;
+    if(result.descriptor_set_count > 0)
+    {
+        result.layouts = c_arena_push_array(&result.shader_arena, VkDescriptorSetLayout, result.descriptor_set_count);
+        Assert(result.layouts);
+    }
+
+    if(result.push_constant_count > 0)
+    {
+        result.push_constants = c_arena_push_array(&result.shader_arena, VkPushConstantRange,   result.push_constant_count);
+        Assert(result.push_constants);
+    }
+    Assert(result.stages);
+
+    Slang::ComPtr<slang::IBlob>     *kernels  = c_arena_push_array(&result.shader_arena, Slang::ComPtr<slang::IBlob>,     entry_point_count);
+    Slang::ComPtr<slang::IMetadata> *metadata = c_arena_push_array(&result.shader_arena, Slang::ComPtr<slang::IMetadata>, entry_point_count);
+    for(s32 entry_index = 0;
+        entry_index < entry_point_count;
+        ++entry_index)
+    {
+        slang::EntryPointLayout *entry_point_layout = layout->getEntryPointByIndex(entry_index);
+        VkShaderStageFlags       shader_stage       = slang_stage_to_vk_stage(layout->getEntryPointByIndex(entry_index)->getStage());
+        vulkan_shader_stage_t   *stage_info         = result.stages + entry_index;
+
+        Slang::ComPtr<slang::IBlob>     kernel = kernels[entry_index];
+        Slang::ComPtr<slang::IMetadata> meta   = metadata[entry_index];
+
+        SlangResult success = linked_program->getEntryPointCode(entry_index, 0, kernel.writeRef(), diagnostics.writeRef());
+        Assert(!SLANG_FAILED(success));
+
+        if(!diagnostics || diagnostics->getBufferSize() == 0)
+        {
+            success = linked_program->getEntryPointMetadata(entry_index, 0, meta.writeRef(), diagnostics.writeRef());
+            Assert(!SLANG_FAILED(success));
+
+            // NOTE(Sleepster): If this is a vertex shader, extract the vertex buffer data... 
+            if(shader_stage == VK_SHADER_STAGE_COMPUTE_BIT) is_compute_shader = true;
+            if(shader_stage == VK_SHADER_STAGE_VERTEX_BIT)
+            {
+                result.vertex_buffer_binding_descs = c_arena_push_array(&result.shader_arena, VkVertexInputBindingDescription,   MAX_BUFFER_BINDING_DESCS);
+                result.buffer_attributes           = c_arena_push_array(&result.shader_arena, VkVertexInputAttributeDescription, MAX_BUFFER_ATTRIBUTES);
+
+                u32  buffer_attribute_count       =  0;
+                u32  current_vertex_buffer_stride =  0;
+                s32  vertex_buffer_count          = -1;
+                string_t current_structure_name   = {};
+                VkVertexInputBindingDescription *current_vertex_buffer = null;
+
+                VkVertexInputRate current_buffer_input_rate = VK_VERTEX_INPUT_RATE_VERTEX;
+                for(u32 param_index = 0;
+                    param_index < param_count;
+                    ++param_index)
+                {
+                    slang::VariableLayoutReflection *variable = entry_point_layout->getParameterByIndex(param_index);
+                    slang::ParameterCategory         category = variable->getCategory();
+                    if(category == slang::ParameterCategory::VaryingInput ||
+                       category == slang::ParameterCategory::Mixed)
+                    {
+                        slang::TypeLayoutReflection *type_layout = variable->getTypeLayout();
+                        slang::TypeReflection       *type_data   = type_layout->getType();
+
+                        if(type_data->getKind() == slang::TypeReflection::Kind::Struct)
+                        {
+                            string_t structure_name = STR(type_layout->getName());
+                            if(!c_string_compare(structure_name, current_structure_name))
+                            {
+                                if(current_vertex_buffer)
+                                {
+                                    current_vertex_buffer->stride    = current_vertex_buffer_stride;
+                                    current_vertex_buffer->binding   = (u32)vertex_buffer_count;
+                                    current_vertex_buffer->inputRate = current_buffer_input_rate;
+
+                                    current_vertex_buffer_stride = 0;
+                                    current_structure_name = c_string_make_copy(&global_context->temporary_arena, structure_name);
+                                }
+                                current_buffer_input_rate = structure_name.data[0] == 'i' ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX;
+                                current_structure_name    = structure_name;
+                                vertex_buffer_count++;
+
+                                Assert(vertex_buffer_count < (s32)MAX_BUFFER_BINDING_DESCS);
+                            }
+                            current_vertex_buffer = result.vertex_buffer_binding_descs + vertex_buffer_count;
+
+                            u32 field_count = type_data->getFieldCount();
+                            for(u32 field_index = 0;
+                                field_index < field_count;
+                                ++field_index)
+                            {
+                                slang::VariableLayoutReflection *member = type_layout->getFieldByIndex(field_index);
+                                slang::ParameterCategory category = member->getCategory();
+                                if(category == slang::ParameterCategory::VaryingInput)
+                                {
+                                    VkFormat attrib_format = slang_type_to_vulkan_format(member->getType(), member->getTypeLayout());
+                                    VkVertexInputAttributeDescription *attribute = result.buffer_attributes + buffer_attribute_count;
+                                    attribute->binding  = vertex_buffer_count;
+                                    attribute->location = (u32)member->getOffset(slang::ParameterCategory::VaryingInput);
+                                    attribute->offset   = current_vertex_buffer_stride;
+                                    attribute->format   = attrib_format;
+
+                                    current_vertex_buffer_stride += vk_backend_get_vk_format_size(attrib_format);
+                                    ++buffer_attribute_count;
+
+                                    Assert(buffer_attribute_count <= MAX_BUFFER_ATTRIBUTES);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // NOTE(Sleepster): 
+                // We have to fill in the data right here before we're finished and set the pipeline_vertex_input_state, 
+                // otherwise we just miss the final buffer. 
+                if(current_vertex_buffer)
+                {
+                    current_vertex_buffer->stride    = current_vertex_buffer_stride;
+                    current_vertex_buffer->binding   = vertex_buffer_count;
+                    current_vertex_buffer->inputRate = current_buffer_input_rate;
+                }
+
+                // NOTE(Sleepster): This is stored so that we can create pipelines as needed later on... 
+                result.pipeline_vertex_input_state = {
+                    .sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+                    .vertexBindingDescriptionCount   = (u32)(vertex_buffer_count + 1),
+                    .pVertexBindingDescriptions      = result.vertex_buffer_binding_descs,
+                    .vertexAttributeDescriptionCount = buffer_attribute_count,
+                    .pVertexAttributeDescriptions    = result.buffer_attributes,
+                };
+            }
+
+            // NOTE(Sleepster): Extract the push constant data from this stage
+            u32 push_constant_index = 0;
+            for(u32 param_index = 0;
+                param_index < param_count; 
+                ++param_index)
+            {
+                slang::VariableLayoutReflection *variable = layout->getParameterByIndex(param_index);
+                if(variable->getCategory() == slang::ParameterCategory::PushConstantBuffer)
+                {
+                    slang::TypeLayoutReflection *type_layout = variable->getTypeLayout();
+                    VkPushConstantRange         *range       = result.push_constants + push_constant_index;
+
+                    range->offset      = (u32)variable->getOffset(slang::ParameterCategory::Uniform);
+                    range->size        = (u32)type_layout->getSize(slang::ParameterCategory::Uniform);
+                    range->stageFlags |= shader_stage;
+
+                    ++push_constant_index;
+                }
+            }
+
+            // NOTE(Sleepster): Set the descriptor set stage flags 
+            for(u32 descriptor_set_index = 0;
+                descriptor_set_index < result.descriptor_set_count;
+                ++descriptor_set_index)
+            {
+                descriptor_set_stage_flags[descriptor_set_index] |= shader_stage;
+            }
+
+            size_t kernel_size = kernel->getBufferSize();
+
+            VkShaderModuleCreateInfo create_info = {};
+            create_info.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+            create_info.pCode    = (const u32*)kernel->getBufferPointer();
+            create_info.codeSize = kernel_size;
+
+            vkAssert(vkCreateShaderModule(vulkan_context->device,
+                                          &create_info,
+                                          vulkan_context->cpu_allocation_callbacks,
+                                          &stage_info->handle));
+
+            stage_info->pipeline_stage_create_info = (VkPipelineShaderStageCreateInfo) {
+                .sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+                .stage  = (VkShaderStageFlagBits)shader_stage,
+                .module = stage_info->handle,
+                .pName  = "main" 
+            };
+
+            result.pipeline_type = is_compute_shader ? VK_PIPELINE_BIND_POINT_COMPUTE : 
+                                                       VK_PIPELINE_BIND_POINT_GRAPHICS;
+        }
+        else
+        {
+            log_error("[SLANG]: Failed to emit spirv for entry point: '%s'...\n",
+                      entry_point_layout->getName());
+        }
+    }
+
+    // NOTE(Sleepster): Extract the descriptor set layout information 
+    for(u32 descriptor_set_index = 0;
+        descriptor_set_index < result.descriptor_set_count;
+        ++descriptor_set_index)
+    {
+        u32                current_set = unique_descriptor_sets[descriptor_set_index];
+        VkShaderStageFlags stage_flags = descriptor_set_stage_flags[descriptor_set_index];
+
+        u32 binding_count = 0;
+        VkDescriptorSetLayoutBinding bindings[MAX_DESCRIPTOR_SET_BINDINGS] = {}; 
+
+        for(u32 param_index = 0;
+            param_index < param_count;
+            ++param_index)
+        {
+            slang::VariableLayoutReflection *variable = layout->getParameterByIndex(param_index);
+            slang::TypeReflection *type_data          = variable->getTypeLayout()->getType();
+            slang::ParameterCategory binding_category = slang_binding_category(type_data);
+
+            VkDescriptorSetLayoutBinding *binding = bindings + binding_count;
+
+            if(variable->getCategory() != slang::ParameterCategory::PushConstantBuffer && 
+          (u32)variable->getBindingSpace(binding_category) == current_set              &&
+               binding_category != slang::ParameterCategory::None)
+            {
+                VkDescriptorType descriptor_type = slang_type_to_vulkan_type(type_data);
+                Assert(descriptor_type != VK_DESCRIPTOR_TYPE_MAX_ENUM);
+
+                u32 descriptor_count = 1;
+                if(type_data->getKind() == slang::TypeReflection::Kind::Array)
+                {
+                    size_t elem_count  = type_data->getElementCount();
+                    descriptor_count   = elem_count;
+                }
+
+
+                u32 binding_index = (u32)variable->getOffset(binding_category);
+                binding->binding            = binding_index;
+                binding->descriptorType     = descriptor_type;
+                binding->descriptorCount    = descriptor_count;
+                binding->stageFlags         = stage_flags;
+                binding->pImmutableSamplers = null;
+
+                vulkan_shader_binding_t *shader_binding = result.bindings + binding_index;
+                shader_binding->type               = descriptor_type;
+                shader_binding->descriptor_count   = descriptor_count;
+                shader_binding->name               = STR(variable->getName());
+                shader_binding->buffer_hash_index  = c_fnv_hash_value(shader_binding->name.data, shader_binding->name.count);
+                shader_binding->buffer_hash_index %= MAX_CONSTANT_BUFFERS;
+
+                ++result.binding_count;
+                ++binding_count;
+            }
+        }
+
+        VkDescriptorSetLayoutCreateInfo layout_create_info = {
+            .sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+            .bindingCount = binding_count,
+            .pBindings    = bindings,
+        };
+        vkAssert(vkCreateDescriptorSetLayout(vulkan_context->device,
+                                             &layout_create_info,
+                                              null,
+                                              result.layouts + descriptor_set_index));
+    }
+
+    // NOTE(Sleepster): 
+    // Graphics pipelines need a complete hash of pipeline data,
+    // while compute shaders are fine with just one.
+    if(result.pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
+    {
+        c_hash_table_init(&result.pipeline_hash, 
+                          MAX_SHADER_PIPELINE_COUNT, 
+                          &result.shader_arena,
+                          shader_arena_allocate,
+                          null);
+        ZeroMemory(result.pipeline_hash.data, sizeof(VkPipeline) * MAX_SHADER_PIPELINE_COUNT);
+    }
+    else
+    {
+        c_hash_table_init(&result.pipeline_hash, 
+                          1, 
+                          &result.shader_arena,
+                          shader_arena_allocate,
+                          null);
+    }
+
     VkPipelineLayoutCreateInfo pipeline_layout_info = {
         .sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
         .setLayoutCount         = result.descriptor_set_count,

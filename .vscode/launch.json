@@ -66,6 +66,16 @@
             "terminal": "integrated",
         },
         {
+            "name": "slang_reflector",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/slang_reflector",
+            "cwd": "${workspaceFolder}/code",
+            "stopOnEntry": false,
+            "terminal": "integrated",
+        },
+
+        {
             "name": "test_dynarray",
             "type": "lldb",
             "request": "launch",

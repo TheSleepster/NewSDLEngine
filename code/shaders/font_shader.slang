@@ -30,7 +30,7 @@ VSMain(vVertexInput_t Input)
     float4 vPositionFloored = floor(Input.vPosition);
 
     result.vOutPosition = mul(CameraMatrices.ProjectionMatrix, mul(CameraMatrices.ViewMatrix, vPositionFloored));
-    result.vOutColor    = Input.vColor;
+    result.vOutColor    = Input.vColor + (float4(Input.vPadding, 0, 0) * float4(0.001));
     result.vOutTexCoord = Input.vTexCoord;
 
     return(result);

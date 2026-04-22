@@ -1,20 +1,17 @@
 #+title: NewSDLEngine
-* IMMEDIATE TODO
-- [X] Index buffer support
-- [-] Expanded draw command capabilities (in the future, draw_indirect...)
-- [X] Automatically bind the renderpasses "read attachments" as shader sampled textures
-- [X] blit_image command
-- [-] Compute shader support (in theory, but we can't test it...)
-- [X] Shader pipeline cache for different GL_States
-- [X] MORE CLEANUP (specifically with the vk_backend_buffer functionality... it's REALLY bad...)
-- [ ] CLEANUP TODOs
 
-** Buffer rework
-- [X] We must be able to stage data more effectively
-- [ ] Some entity to manage buffers, allowing us to control things like all data being staged before the frame.
-- [ ] Better support for both CPU mapped buffers and GPU exclusive buffers.
+** IMMEDIATE TODO
+- [ ] Slang shader reflector tool. Slang reflect sucks ass we're replacing it... We have to use a tool
+      like Slang Reflect because we want to move from loading spv from the disk, to instead just loading 
+      the raw .slang shaders into the asset file and compile it live. This is for reasons of compatibility and
+      quicker hotreloading in the future.
 
-⌄ Kinda goes with the below here ⌄  
+- [ ] Debug macros for toggling certain slowdown points such as Assert() and Expect()
+- [ ] Separate debug macros for Vulkan Validation Layers
+- [ ] Makefile setting for these macros
+- [ ] File watcher with asset hotreloading (using some sort of sys_create_process() to start the jfd_file_packer)
+- [ ] Possibly seperate the "main" and the "entry" files so that they are ".so" and ".exe" files. Game DLL hot reloading.
+- [ ] Replace malloc inside of the Linux sys_allocate and sys_free functions. It sucks.
 
 ** GPU Resource Manager
 the goal of this item is very simple, just allow us to control and
@@ -27,6 +24,11 @@ sorted, managed, and appropriately handled without direct control.
 
 - [ ] Track and handle buffer data
 - [ ] Track and handle image data
+- [ ] Some entity to manage buffers, allowing us to control things like all data being staged before the frame.
+- [ ] Better support for both CPU mapped buffers and GPU exclusive buffers.
+- [ ] Image manager like idSoftware's in DOOM3 BFG
+- [ ] Image manager should have the ability to provide "scratch images" like our "scratch buffer" approach
+- [ ] Perhaps change how we're using single use scratch buffers all over the place. See if that's really bad.
 
 * Next Milestone:
 - [X] Vulkan GPU memory allocator
@@ -45,8 +47,16 @@ sorted, managed, and appropriately handled without direct control.
 - [X] We should migrate from whatever you want to call this asscan system to a "constant_buffer" system. This way,
       we can allow the user to just give us data into the constant buffer and we'll just update it as the time comes
       in the vulkan renderer.
-- [ ] Image manager like idSoftware's in DOOM3 BFG
-- [ ] Image manager should have the ability to provide "scratch images" like our "scratch buffer" approach
+- [X] Index buffer support
+- [-] Expanded draw command capabilities (in the future, draw_indirect...)
+- [X] Automatically bind the renderpasses "read attachments" as shader sampled textures
+- [X] blit_image command
+- [-] Compute shader support (in theory, but we can't test it...)
+- [X] Shader pipeline cache for different GL_States
+- [X] MORE CLEANUP (specifically with the vk_backend_buffer functionality... it's REALLY bad...)
+- [X] CLEANUP TODOs
+
+- [X] We must be able to stage data more effectively
 
 ** Materials
 - [X] Instead of cacheing uniforms, we should just use "constant buffers"
@@ -152,11 +162,11 @@ sorted, managed, and appropriately handled without direct control.
 - [X] Textures and other assets should store a "generation" ID that tells us whether it has been updated
 - [ ] Multithreading!
 - [ ] Refine the system to use atomic reference counting for asset releasing.
-- [ ] Modify all asset deletion so that we only delete the asset at the END of the game frame]
-- [ ] Have the catalog of a specific asset type keep track of what assets are loaded. This way we can simply loop over all assets that are loaded
+- [X] Modify all asset deletion so that we only delete the asset at the END of the game frame]
+- [X] Have the catalog of a specific asset type keep track of what assets are loaded. This way we can simply loop over all assets that are loaded
 ** Textures
 - [ ] Renderer's create Texture function only takes in pixels. The rest of the data is stored on the texture_t object
-- [ ] Actually make the "generation_ID" mean something
+- [X] Actually make the "generation_ID" mean something
 - [ ] PNG Decoder
 ** Fonts
 - [ ] Create a temporary glyph storage method, that way we can store what glyphs need to be added over the frame and add them at all at once at the end of the frame
@@ -198,7 +208,7 @@ sorted, managed, and appropriately handled without direct control.
 - [ ] Fix the c_string_read_* functions.
 - [ ] Why are we using Malloc with our dynamic arrays
 - [ ] Compile the core into a single library. c_data.lib or something. then have c_base.h import all the core headers
-- [ ] Convert Dynarray.cpp and Dynarray.h into an STB style library like the hash_tables
+- [X] Convert Dynarray.cpp and Dynarray.h into an STB style library like the hash_tables
 - [ ] Spintf for our custom strings.
 - [ ] Modify the file and sys_file APIs so that they work properly as one would expect. IE, sys_file_open returns a file_t, have it initialize the file's name and other easy things
 - [ ] Complete malloc replacement (thread safe heap allocator)
@@ -219,13 +229,13 @@ sorted, managed, and appropriately handled without direct control.
       the allocator on other threads, then we can safely do so. Right now with the way the arenas grow, it
       is not safe to use these on multiple threads.
 * Multithreading
-- [ ] Maybe just rebuild the whole system... it seems that this model isn't actually any good anymore
-- [ ] Fix the thread/synchronization API. It is bad. Why do we do it that way.
-- [ ] A manner with which to run work in batches and get the results of that completed work back from the threadpool
-- [ ] sys_semaphore_signal (instead of release...)
-- [ ] Work stealing
-- [ ] Improvement to adding work_orders to the queue of each thread, currently the locking makes us slow
-- [ ] Sync API should have sys_mutex_lock() which will block. As well as sys_mutex_try_lock()
+- [X] Maybe just rebuild the whole system... it seems that this model isn't actually any good anymore
+- [X] Fix the thread/synchronization API. It is bad. Why do we do it that way.
+- [X] A manner with which to run work in batches and get the results of that completed work back from the threadpool
+- [X] sys_semaphore_signal (instead of release...)
+- [X] Work stealing
+- [X] Improvement to adding work_orders to the queue of each thread, currently the locking makes us slow
+- [X] Sync API should have sys_mutex_lock() which will block. As well as sys_mutex_try_lock()
       which won't block. The seperation is valuable.
 - [ ] We should add other debug values to the mutexes, semaphores, and threads.
       Items like DEBUG_name, thread_id, redudant lock counter, etc. would be very helpful.
