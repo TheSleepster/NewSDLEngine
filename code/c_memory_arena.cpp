@@ -8,7 +8,6 @@
 
 #include <c_memory_arena.h>
 #include <p_platform_data.h>
-#include <string.h>
 
 memory_arena_t
 c_arena_create(u64 block_size)

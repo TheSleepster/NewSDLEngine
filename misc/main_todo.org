@@ -1,17 +1,25 @@
 #+title: NewSDLEngine
 
 ** IMMEDIATE TODO
-- [ ] Slang shader reflector tool. Slang reflect sucks ass we're replacing it... We have to use a tool
+- [ ] We need a proper timing API. Something that can just be attached to a program as a header or lib 
+      and timing record information about the process and certain subblocks. 
+- [ ] Memory Allocation tracker
+- [ ] Complete malloc replacement (thread safe heap allocator), meant for use where c_za_alloc() is currently used.
+- [ ] Arena allocator should allow the user to set it's growing status. That way, if the user wants to use
+      the allocator on other threads, then we can safely do so. Right now with the way the arenas grow, it
+      is not safe to use these on multiple threads.
+
+- [ ] Replace malloc inside of the Linux sys_allocate and sys_free functions. It sucks.
+- [ ] File watcher with asset hotreloading (using some sort of sys_create_process() to start the jfd_file_packer)
+- [ ] Possibly seperate the "main" and the "entry" files so that they are ".so" and ".exe" files. Game DLL hot reloading.
+- [ ] Separate debug macros for Vulkan Validation Layers
+- [ ] Debug macros for toggling certain slowdown points such as Assert() and Expect()
+- [ ] Makefile setting for these macros
+
+- [X] Slang shader reflector tool. Slang reflect sucks ass we're replacing it... We have to use a tool
       like Slang Reflect because we want to move from loading spv from the disk, to instead just loading 
       the raw .slang shaders into the asset file and compile it live. This is for reasons of compatibility and
       quicker hotreloading in the future.
-
-- [ ] Debug macros for toggling certain slowdown points such as Assert() and Expect()
-- [ ] Separate debug macros for Vulkan Validation Layers
-- [ ] Makefile setting for these macros
-- [ ] File watcher with asset hotreloading (using some sort of sys_create_process() to start the jfd_file_packer)
-- [ ] Possibly seperate the "main" and the "entry" files so that they are ".so" and ".exe" files. Game DLL hot reloading.
-- [ ] Replace malloc inside of the Linux sys_allocate and sys_free functions. It sucks.
 
 ** GPU Resource Manager
 the goal of this item is very simple, just allow us to control and
@@ -211,13 +219,9 @@ sorted, managed, and appropriately handled without direct control.
 - [X] Convert Dynarray.cpp and Dynarray.h into an STB style library like the hash_tables
 - [ ] Spintf for our custom strings.
 - [ ] Modify the file and sys_file APIs so that they work properly as one would expect. IE, sys_file_open returns a file_t, have it initialize the file's name and other easy things
-- [ ] Complete malloc replacement (thread safe heap allocator)
 - [ ] The ability to dump the contents of a memory arena to a file, this is probably pretty useful...
 - [ ] Any function in the string.cpp file that allocates memory should be reordered like the file API
 - [ ] Proper test suite that allows us to actually get REAL benchmarking data
-- [ ] Memory Allocation tracker
-- [ ] We need a proper timing API. Something that can just be attached to a program as a header or lib 
-      and timing record information about the process and certain subblocks. 
 - [ ] Vulkan style memory allocation for functions that would allocate
       memory within the core lib. The core should have a "get_read_size"
       or something to get the SIZE of the allocation and allow the user to
@@ -225,9 +229,6 @@ sorted, managed, and appropriately handled without direct control.
       buffer with the data. Optionally, have an "I don't really care what
       happens to this memory LMAO" function that just uses the core lib's
       internal allocator.
-- [ ] Arena allocator should allow the user to set it's growing status. That way, if the user wants to use
-      the allocator on other threads, then we can safely do so. Right now with the way the arenas grow, it
-      is not safe to use these on multiple threads.
 * Multithreading
 - [X] Maybe just rebuild the whole system... it seems that this model isn't actually any good anymore
 - [X] Fix the thread/synchronization API. It is bad. Why do we do it that way.
