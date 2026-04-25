@@ -10,12 +10,11 @@ SANITIZERS_ON   ?=
 # --------------------------------------------
 # OS & Directories
 # --------------------------------------------
-# Assuming Makefile is IN the code directory
 SRC_DIR    = .
 SHADER_DIR = shaders
-# Output goes up one level and into build
 BUILD_DIR  = ../build
 ASSET_DIR  = ../run_tree/res
+MISC_DIR   = ../misc
 
 # --------------------------------------------
 # Dependency Tracking Flags
@@ -89,9 +88,8 @@ GAME_INCLUDES           = $(COMMON_INCLUDES)
 GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/msdfgen/build/ -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static -lfreetype -lvulkan -lspirv_reflect -lslang -lslang-compiler
 
 # Tests
-# Use patsubst to strip 'tests/' pefix and add 'test_' prefix for output
-TESTS_SRC = $(wildcard tests/*.cpp)
-TESTS_OUT = $(patsubst tests/%.cpp,$(BUILD_DIR)/test_%$(EXE_EXT),$(TESTS_SRC))
+TESTS_SRC = tests/test_manager.cpp
+TESTS_OUT = $(BUILD_DIR)/test_manager$(EXE_EXT)
 
 # Preprocessor 
 PREPROCESSOR_SRC = code_generator/preprocessor.cpp
@@ -115,6 +113,23 @@ SHADER_OUTPUTS := $(patsubst $(SHADER_DIR)/%.slang,../run_tree/res/shader_binari
 SLANG_FLAGS    := -target spirv -matrix-layout-column-major -I$(SHADER_DIR) -O0 -g -profile sm_6_3
 
 # --------------------------------------------
+# Sandbox / clangd
+# --------------------------------------------
+SANDBOX_SRC       = $(wildcard sandbox/*.cpp)
+SANDBOX_OUT       = $(patsubst sandbox/%.cpp,$(BUILD_DIR)/sandbox_%$(EXE_EXT),$(SANDBOX_SRC))
+SANDBOX_GAME_SRCS = $(filter $(SRC_DIR)/c_%.cpp $(SRC_DIR)/p_%.cpp,$(ALL_SRCS))
+
+CLANGD_DIR            = $(MISC_DIR)/clangd
+CLANGD_CORE_SRCS      = $(SANDBOX_GAME_SRCS)
+CLANGD_SANDBOX_SRCS   = $(SANDBOX_SRC)
+CLANGD_CORE_STAMPS    = $(patsubst $(SRC_DIR)/%.cpp,$(CLANGD_DIR)/%.stamp,$(CLANGD_CORE_SRCS))
+CLANGD_SANDBOX_STAMPS = $(patsubst sandbox/%.cpp,$(CLANGD_DIR)/sandbox_%.stamp,$(CLANGD_SANDBOX_SRCS))
+CLANGD_SANDBOX_UNITY  = $(patsubst sandbox/%.cpp,$(CLANGD_DIR)/sandbox_%_unity.cpp,$(CLANGD_SANDBOX_SRCS))
+
+# Prevent Make from auto-deleting the clangd unity files (also suppresses the rm spam)
+.PRECIOUS: $(CLANGD_SANDBOX_UNITY)
+
+# --------------------------------------------
 # Set the Outputs
 # --------------------------------------------
 GAME_OUT                  = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
@@ -124,13 +139,17 @@ JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
 # --------------------------------------------
 # Build Instructions
 # --------------------------------------------
-.PHONY: all shaders clean run_preprocessor
+.PHONY: all shaders clean run_preprocessor sandbox clangd-db
 
-all: $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(SLANG_REFLECTOR_OUT) do_codegen $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests
- 
+all: $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(SLANG_REFLECTOR_OUT) do_codegen $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests sandbox clangd-db 
+
 # Create Build Directory
 $(BUILD_DIR):
 	$(call MKDIR,$(BUILD_DIR))
+
+# Create clangd directory
+$(CLANGD_DIR):
+	$(call MKDIR,$(CLANGD_DIR))
 
 # -------------------------------------------------------------------------
 # Preprocessor - Build and Run BEFORE everything else
@@ -189,12 +208,79 @@ shaders: $(SHADER_OUTPUTS)
 # -------------------------------------------------------------------------
 tests: $(TESTS_OUT)
 
-# Note: We use $* to get the stem (filename without extension) for the .d file
-$(BUILD_DIR)/test_%$(EXE_EXT): tests/%.cpp | do_codegen $(BUILD_DIR)
+$(TESTS_OUT): $(TESTS_SRC) | do_codegen $(BUILD_DIR)
 	@echo [TEST] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
-		$(DEPFLAGS) \
+		-MT $@ -MMD -MP -MF $(BUILD_DIR)/test_manager.d \
 		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
+
+# -------------------------------------------------------------------------
+# Sandbox
+# -------------------------------------------------------------------------
+sandbox: $(SANDBOX_OUT)
+
+# The unity file only depends on the sandbox source itself.
+# Core source changes are tracked via the -MMD dep file on the executable,
+# so they trigger a recompile without unnecessarily regenerating this file.
+$(BUILD_DIR)/sandbox_%_unity.cpp: sandbox/%.cpp | $(BUILD_DIR)
+	@{ \
+		echo '// AUTO-GENERATED UNITY FILE'; \
+		echo '#define UNITY_BUILD'; \
+		echo '#define MATH_IMPLEMENTATION'; \
+		echo '#define HASH_TABLE_IMPLEMENTATION'; \
+		echo '#define DYNARRAY_IMPLEMENTATION'; \
+		for file in $(SANDBOX_GAME_SRCS); do \
+			echo "#include \"$$(basename $$file)\""; \
+		done; \
+		echo '#include "sandbox/$*.cpp"'; \
+	} > $@
+
+$(BUILD_DIR)/sandbox_%$(EXE_EXT): $(BUILD_DIR)/sandbox_%_unity.cpp | do_codegen $(BUILD_DIR)
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+		-MT $@ -MMD -MP -MF $(BUILD_DIR)/sandbox_$*.d \
+		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
+
+# -------------------------------------------------------------------------
+# Clangd
+# -------------------------------------------------------------------------
+clangd-db: $(MISC_DIR)/compile_commands.json
+
+# Core source files: compile each directly so clangd gets an entry per file
+$(CLANGD_DIR)/%.stamp: $(SRC_DIR)/%.cpp | $(CLANGD_DIR)
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+		-DUNITY_BUILD -DMATH_IMPLEMENTATION -DHASH_TABLE_IMPLEMENTATION -DDYNARRAY_IMPLEMENTATION \
+		-MT $@ -MMD -MP -MF $(CLANGD_DIR)/$*.d \
+		-MJ $(CLANGD_DIR)/$*.json \
+		-fsyntax-only $<
+	@touch $@
+
+# The clangd unity file only depends on the sandbox source itself, same reasoning as above.
+$(CLANGD_DIR)/sandbox_%_unity.cpp: sandbox/%.cpp | $(CLANGD_DIR)
+	@{ \
+		echo '// AUTO-GENERATED CLANGD UNITY FILE'; \
+		echo '#define UNITY_BUILD'; \
+		echo '#define MATH_IMPLEMENTATION'; \
+		echo '#define HASH_TABLE_IMPLEMENTATION'; \
+		echo '#define DYNARRAY_IMPLEMENTATION'; \
+		for file in $(CLANGD_CORE_SRCS); do \
+			echo "#include \"$$(basename $$file)\""; \
+		done; \
+		echo '#include "sandbox/$*.cpp"'; \
+	} > $@
+
+# Sandbox stamps: compile the unity file so all engine types are visible,
+# but emit the JSON entry pointing at the sandbox source so clangd maps it correctly
+$(CLANGD_DIR)/sandbox_%.stamp: sandbox/%.cpp $(CLANGD_DIR)/sandbox_%_unity.cpp | $(CLANGD_DIR)
+	@echo [SANDBOX] $<
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+		-MT $@ -MMD -MP -MF $(CLANGD_DIR)/sandbox_$*.d \
+		-MJ $(CLANGD_DIR)/sandbox_$*.json \
+		-fsyntax-only $(CLANGD_DIR)/sandbox_$*_unity.cpp
+	@touch $@
+
+# Combine all per-file JSON fragments into a single compile_commands.json
+$(MISC_DIR)/compile_commands.json: $(CLANGD_CORE_STAMPS) $(CLANGD_SANDBOX_STAMPS)
+	@(printf '[\n'; cat $(CLANGD_DIR)/*.json | sed '$$s/,$$//'; printf ']\n') > $@
 
 # -------------------------------------------------------------------------
 # Asset file builder 
@@ -240,3 +326,5 @@ clean:
 # Instead of manually listing files, we include ALL .d files found in the build folder.
 # This works for tests, packers, and game objects automatically.
 -include $(wildcard $(BUILD_DIR)/*.d)
+# Per-file clangd dependency tracking
+-include $(wildcard $(CLANGD_DIR)/*.d)

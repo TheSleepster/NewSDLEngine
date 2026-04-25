@@ -26,6 +26,7 @@ typedef struct mapped_file      mapped_file_t;
 typedef struct file_data        file_data_t;
 typedef struct file_watcher     file_watcher_t;
 typedef struct visit_file_data  visit_file_data_t;
+typedef struct sockaddr_in      sockaddr_in_t;
 
 /*===========================================
   ============== OS MEMORY API ==============
@@ -86,7 +87,11 @@ void            sys_mutex_free(sys_mutex_t *mutex);
 bool8           sys_mutex_lock(sys_mutex_t *mutex, bool8 should_block);
 bool8           sys_mutex_unlock(sys_mutex_t *mutex);
 
-typedef struct sockaddr_in sockaddr_in_t;
+/*===========================================
+  ================ MULTIPROCESS =============
+  ===========================================*/
+
+bool8 sys_create_process();
 
 #endif // P_PLATFORM_DATA_H
 

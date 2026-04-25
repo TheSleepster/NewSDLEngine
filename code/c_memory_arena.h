@@ -53,7 +53,7 @@ void           c_arena_reset(memory_arena_t *arena);
 /*===========================================
   ============= SCRATCH ARENAS  =============
   ===========================================*/
-inline scratch_arena_t c_arena_begin_temporary_memeory(memory_arena_t *arena);
+inline scratch_arena_t c_arena_begin_temporary_memory(memory_arena_t *arena);
 inline void            c_arena_end_temporary_memory(scratch_arena_t *scratch_arena);
 
 #endif // C_MEMORY_ARENA_H

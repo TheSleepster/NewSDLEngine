@@ -1,6 +1,7 @@
 #+title: NewSDLEngine
 
 ** IMMEDIATE TODO
+- [ ] Proper test suite that allows us to actually get REAL benchmarking data
 - [ ] We need a proper timing API. Something that can just be attached to a program as a header or lib 
       and timing record information about the process and certain subblocks. 
 - [ ] Memory Allocation tracker
@@ -221,7 +222,6 @@ sorted, managed, and appropriately handled without direct control.
 - [ ] Modify the file and sys_file APIs so that they work properly as one would expect. IE, sys_file_open returns a file_t, have it initialize the file's name and other easy things
 - [ ] The ability to dump the contents of a memory arena to a file, this is probably pretty useful...
 - [ ] Any function in the string.cpp file that allocates memory should be reordered like the file API
-- [ ] Proper test suite that allows us to actually get REAL benchmarking data
 - [ ] Vulkan style memory allocation for functions that would allocate
       memory within the core lib. The core should have a "get_read_size"
       or something to get the SIZE of the allocation and allow the user to

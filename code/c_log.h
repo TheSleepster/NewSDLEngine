@@ -43,7 +43,7 @@ _log(debug_log_level_t log_level,
     const char *info_strings[]  = {"[DEBUG]: ", "[TRACE]: ", "[INFO]: ", "[WARNING]:", "[NON-FATAL ERROR]: ", "[FATAL ERROR]: "};
     const char *color_schemes[] =
     {
-        "\033[94m",                // LOG_DEBUG: Bright Blue
+        "\033[94m",                // LOG_DEBUG:   Bright Blue
         "\033[36m",                // LOG_TRACE:   Teal
         "\033[32m",                // LOG_INFO:    Green
         "\033[33m",                // LOG_WARNING: Yellow
