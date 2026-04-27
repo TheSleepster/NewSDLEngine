@@ -1473,13 +1473,12 @@ void
 vk_backend_create_backend_buffers(vulkan_context_t *vulkan_context)
 {
     // NOTE(Sleepster): Create the staging buffers
-    // TODO(Sleepster): Maybe actually use these... 
     for(u32 frame_index = 0;
         frame_index < MAX_FRAMES_IN_FLIGHT;
         ++frame_index)
     {
         vulkan_context->staging_buffers[frame_index] = vk_backend_staging_buffer_create(vulkan_context, 
-                                                                                        MB(200), 
+                                                                                        MB(100), 
                                                                                         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
                                                                                         VULKAN_MEMORY_USAGE_CPU_TO_GPU);
     }
@@ -1639,15 +1638,15 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
     VkDescriptorPoolSize sizes[MAX_POOL_SET_TYPES];
     sizes[0] = {
         .type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-        .descriptorCount = 4000,
+        .descriptorCount = 400,
     };
     sizes[1] = {
         .type            = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-        .descriptorCount = 2000,
+        .descriptorCount = 200,
     };
     sizes[2] = {
         .type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-        .descriptorCount = 2000,
+        .descriptorCount = 200,
     };
     sizes[3] = {
         .type            = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
@@ -1661,7 +1660,7 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
     VkDescriptorPoolCreateInfo pool_create_info = {
         .sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
         .flags         = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-        .maxSets       = 100000,
+        .maxSets       = 1000,
         .poolSizeCount = MAX_POOL_SET_TYPES,
         .pPoolSizes    = sizes
     };   

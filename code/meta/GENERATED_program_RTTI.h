@@ -1592,7 +1592,7 @@ struct type_info_struct_asset_slot_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[12];
+		type_info_member_t member_array[13];
 		struct {
 			type_info_member_t ID;
 			type_info_member_t slot_state;
@@ -1602,6 +1602,7 @@ struct type_info_struct_asset_slot_t {
 			type_info_member_t package_entry;
 			type_info_member_t package_generation;
 			type_info_member_t ref_counter;
+			type_info_member_t loaded_asset_index;
 			type_info_member_t texture;
 			type_info_member_t dynamic_render_font;
 			type_info_member_t shader;
@@ -4165,7 +4166,7 @@ const static type_info_struct_asset_slot_t type_info_struct_asset_slot_t_const_d
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_asset_slot_t),
-	.member_count = 12,
+	.member_count = 13,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), ID))},
 		.slot_state = {.name = "slot_state", .type = TYPE_asset_slot_load_status_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.slot_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), slot_state))},
@@ -4175,6 +4176,7 @@ const static type_info_struct_asset_slot_t type_info_struct_asset_slot_t_const_d
 		.package_entry = {.name = "package_entry", .type = TYPE_jfd_package_entry_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.package_entry)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), package_entry))},
 		.package_generation = {.name = "package_generation", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.package_generation)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), package_generation))},
 		.ref_counter = {.name = "ref_counter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.ref_counter)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), ref_counter))},
+		.loaded_asset_index = {.name = "loaded_asset_index", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.loaded_asset_index)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), loaded_asset_index))},
 		.texture = {.name = "texture", .type = TYPE_texture2D_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.texture)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), texture))},
 		.dynamic_render_font = {.name = "dynamic_render_font", .type = TYPE_dynamic_render_font_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.dynamic_render_font)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), dynamic_render_font))},
 		.shader = {.name = "shader", .type = TYPE_shader_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_asset_slot_t.shader)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_asset_slot_t), shader))},
@@ -5908,6 +5910,7 @@ enum asset_slot_t_member_list_enum {
 	TYPE_ASSET_SLOT_T_MEMBER_package_entry,
 	TYPE_ASSET_SLOT_T_MEMBER_package_generation,
 	TYPE_ASSET_SLOT_T_MEMBER_ref_counter,
+	TYPE_ASSET_SLOT_T_MEMBER_loaded_asset_index,
 	TYPE_ASSET_SLOT_T_MEMBER_texture,
 	TYPE_ASSET_SLOT_T_MEMBER_dynamic_render_font,
 	TYPE_ASSET_SLOT_T_MEMBER_shader,

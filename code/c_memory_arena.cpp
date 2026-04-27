@@ -14,13 +14,14 @@ c_arena_create(u64 block_size)
 {
     memory_arena_t result = {};
 
-    block_size            = Align16(block_size);
+    block_size            = block_size - sizeof(memory_arena_footer_t);
     result.base           = (byte*)sys_allocate_memory(block_size);
     result.used           = 0;
     result.block_size     = block_size;
     result.block_counter += 1;
     result.is_initialized = true;
 
+    Assert(result.base);
     return(result);
 }
 

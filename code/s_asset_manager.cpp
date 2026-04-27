@@ -1118,6 +1118,8 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
         {
             // NOTE(Sleepster): If unloaded, get the data 
             s_asset_manager_load_asset_data(asset_manager, &result, hash_value);
+
+            slot->loaded_asset_index = c_dynarray_header(catalog->loaded_assets).indices_used;
             c_dynarray_push(catalog->loaded_assets, slot);
         }
         else if(result.slot->slot_state == ASLS_Loaded)

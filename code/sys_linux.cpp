@@ -54,7 +54,7 @@ sys_align_to_page_size(u32 size)
 void*
 sys_allocate_memory(usize allocation_size)
 {
-#if 0
+#if 1
     u32 true_allocation = sys_align_to_page_size(allocation_size);
     void *data = mmap(0, true_allocation, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
     if(data == MAP_FAILED)
@@ -82,7 +82,8 @@ sys_allocate_memory(usize allocation_size)
 void*
 sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
 {
-#if 0
+#if 1
+    Assert(base);
     errno = 0;
     
     u32 true_allocation = sys_align_to_page_size(allocation_size);
@@ -106,7 +107,8 @@ sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
 void
 sys_free_memory(void *data, usize free_size)
 {
-#if 0
+#if 1
+    Assert(data);
     if(munmap(data, free_size) == -1)
     {
         int error = errno;

@@ -63,8 +63,8 @@ process_window_events(renderer_state_t *renderer_state, input_manager_t *input_m
 int
 main(int argc, char **argv)
 {
-    int linked   = SDL_GetVersion();
-    int compiled = SDL_VERSION;
+    const int linked   = SDL_GetVersion();
+    const int compiled = SDL_VERSION;
 
     SDL_Log("We compiled against SDL version %d.%d.%d ...\n",
             SDL_VERSIONNUM_MAJOR(compiled),
@@ -91,9 +91,9 @@ main(int argc, char **argv)
 
         global_context->renderer_state->window_size = vec2(display_data->w, display_data->h);
         global_context->renderer_state->window = SDL_CreateWindow("Vulkan...", 
-                                                  global_context->renderer_state->window_size.x,
-                                                  global_context->renderer_state->window_size.y, 
-                                                  SDL_WINDOW_VULKAN|SDL_WINDOW_RESIZABLE);
+                                                 global_context->renderer_state->window_size.x,
+                                                 global_context->renderer_state->window_size.y, 
+                                                 SDL_WINDOW_VULKAN|SDL_WINDOW_RESIZABLE);
         if(global_context->renderer_state->window == null)
         {
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
@@ -106,8 +106,8 @@ main(int argc, char **argv)
         global_context->renderer_state->backend_initialize(global_context->renderer_state->window);
 
         // TODO(Sleepster): The count will need to be adjusted in the future. But this is fine for now 
-        u32 thread_count = sys_get_thread_count() - 1;
-        c_threadpool_init(&global_context->main_threadpool, thread_count, MB(10), true);
+        //u32 thread_count = sys_get_thread_count() - 1;
+        //c_threadpool_init(&global_context->main_threadpool, thread_count, MB(10), true);
 
         s_asset_manager_init(global_context->asset_manager);
 

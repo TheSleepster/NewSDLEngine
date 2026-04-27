@@ -448,7 +448,10 @@ typedef struct asset_slot
 
     // NOTE(Sleepster): Should only be modified using atomic_* functions 
     volatile u32             package_generation;
+    // NOTE(Sleepster): Handles automatically increment and decrement this 
     volatile u32             ref_counter;
+    // NOTE(Sleepster): This is here for access when reloading/unloading the asset. 
+    volatile u32             loaded_asset_index;
     union {
         texture2D_t           texture;
         dynamic_render_font_t dynamic_render_font;

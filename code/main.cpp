@@ -255,9 +255,9 @@ game_main(void)
     game_state_t game_state = {};
     srand(rdtsc());
 
-    input_manager_t *input_manager   = global_context->input_manager;
+    input_manager_t  *input_manager  = global_context->input_manager;
     renderer_state_t *renderer_state = global_context->renderer_state;
-    asset_manager_t *asset_manager   = global_context->asset_manager;
+    asset_manager_t  *asset_manager  = global_context->asset_manager;
 
     game_state.controller = s_im_get_primary_controller(global_context->input_manager);
     game_state.entity_manager = c_arena_push_struct(&global_context->context_arena, entity_manager_t);
