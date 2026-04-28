@@ -3141,6 +3141,10 @@ backend_buffer_create(render_buffer_desc_t *buffer_desc)
                                              buffer_desc->buffer_capacity,
                                              usage_flags,
                                              allocation_flags);
+    if(buffer.buffer.is_mapped)
+    {
+        buffer.mapped_data = buffer.buffer.allocation.mapped_data;
+    }
 
     return(buffer);
 }

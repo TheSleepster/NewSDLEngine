@@ -47,6 +47,11 @@ vk_backend_buffer_create(vulkan_context_t              *vulkan_context,
         Expect(false, "Failed to bind the memory for this GPU buffer...\n");
     }
 
+    if(result.allocation.mapped_data)
+    {
+        result.is_mapped = true;
+    }
+
     return(result);
 }
 

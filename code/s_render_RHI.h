@@ -23,6 +23,17 @@ constexpr u32 MAX_CONSTANT_BUFFERS    = 1000;
 constexpr u32 MAX_RENDER_TARGETS      = 100;
 constexpr u32 MAX_SHADER_IMAGE_PARAMS = 16;
 
+// TODO(Sleepster): Get this cancer out of here!
+// NOTE(Sleepster): Used for rendering
+struct alignas(16) immediate_vertex_t
+{
+    vec4_t vPosition;
+    vec4_t vColor;
+    vec2_t vTexCoord;
+    vec2_t vPadding;
+};
+
+
 ////////////////////
 // GPU BUFFERS 
 ////////////////////
@@ -70,7 +81,10 @@ struct render_buffer_t
     u32                         buffer_elements_used;
     u32                         working_offset;
 
-    vulkan_buffer_t             buffer;
+    byte                       *mapped_data;
+    union {
+        vulkan_buffer_t         buffer;
+    };
 };
 
 ////////////////////
@@ -406,11 +420,12 @@ struct renderpass_t
 // Renderer State 
 ////////////////////
 
-// TODO(Sleepster): Maybe one day we'll have to have this store backend related function pointers like:
-//
-// renderer_state->r_backend_create_bitmap(...);
-//
-// But for now we're good.
+// TODO(Sleepster): Remove this...
+struct camera_matrices_t
+{
+    mat4_t view_matrix;
+    mat4_t projection_matrix;
+};
 
 struct renderer_state_t
 {
