@@ -33,7 +33,6 @@ struct alignas(16) immediate_vertex_t
     vec2_t vPadding;
 };
 
-
 ////////////////////
 // GPU BUFFERS 
 ////////////////////
@@ -69,6 +68,9 @@ struct render_buffer_desc_t
     void                        *initial_data;
 };
 
+// TODO(Sleepster): 
+// Clean this structure up. we have WAYYYYYYYY to many ways of tracking the same thing,
+// the same thing being that of the amount used within the buffer.
 struct render_buffer_t
 {
     render_buffer_type_t        type;
@@ -85,6 +87,24 @@ struct render_buffer_t
     union {
         vulkan_buffer_t         buffer;
     };
+};
+
+struct vertex_buffer_t
+{
+    render_buffer_t  buffer;
+
+    byte            *vertex_data;
+    u32              max_vertices;
+    u32              vertex_count;
+};
+
+struct index_buffer_t
+{
+    render_buffer_t buffer;
+    
+    byte           *index_data;
+    u32             max_indices;
+    u32             index_count;
 };
 
 ////////////////////
@@ -482,7 +502,7 @@ true_inline void s_renderer_resize_renderpass(renderer_state_t *renderer_state, 
 uniform_constant_buffer_t* s_renderer_get_constant_buffer(renderer_state_t *renderer_state, string_t uniform_name);
 
             render_buffer_t s_renderer_render_buffer_create(renderer_state_t *renderer_state, render_buffer_desc_t *buffer_desc);
-true_inline render_buffer_t s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, u32 element_size, render_buffer_advance_rate_t rate, void *data, u32 size);
+true_inline vertex_buffer_t s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, render_buffer_advance_rate_t rate, byte* vertex_buffer_data, u32 vertex_size, u32 max_vertices);
 true_inline render_buffer_t s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, u32 element_size, void *data, u32 size);
 true_inline void            s_renderer_render_buffer_copy_data(renderer_state_t *renderer_state, render_buffer_t *buffer, void *data, u32 size, u32 offset);
 
@@ -516,6 +536,10 @@ void r_cmd_blit_image(render_command_list_t *command_list, image_t *source_image
 void r_cmd_present(render_command_list_t *command_list, image_t *presentation_source);
 
 void s_renderer_execute_backend_commands(renderer_state_t *renderer_state);
+
+// NOTE(Sleepster): Aliases for operator overloading...
+true_inline void r_cmd_update_buffer_contents(render_command_list_t *command_list, vertex_buffer_t *buffer);
+true_inline void r_cmd_bind_vertex_buffer(render_command_list_t *command_list, vertex_buffer_t *buffer);
 
 #endif // S_RENDERER_H
 

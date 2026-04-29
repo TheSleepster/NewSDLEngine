@@ -78,7 +78,7 @@ struct ui_state_t
     u32                               parent_stack_top;
 
     u32                               interface_framebuffer;
-    render_buffer_t                   vertex_buffer;
+    vertex_buffer_t                   vertex_buffer;
     render_buffer_t                   index_buffer;
 
     immediate_vertex_t               *vertices;
@@ -168,14 +168,6 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name)
 }
 
 void
-draw_rect(ui_state_t *ui_state,
-          vec2_t      position,
-          vec2_t      render_size,
-          vec4_t      render_color)
-{
-}
-
-void
 ui_state_update_widget_state(ui_state_t *ui_state)
 {
     widget_t *current_widget = ui_state->first_widget;
@@ -251,10 +243,7 @@ ui_state_render_widgets(ui_state_t *ui_state)
     r_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
     r_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
 
-    r_cmd_update_buffer_contents(command_list, 
-                                &ui_state->vertex_buffer, 
-                                ui_state->vertices, 
-                                ui_state->vertex_count * sizeof(immediate_vertex_t));
+    r_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
 
     s32 window_width  = Max(renderer_state->window_size.x, 10);
     s32 window_height = Max(renderer_state->window_size.y, 10);
@@ -320,9 +309,9 @@ ui_state_init(ui_state_t *ui_state,
     ui_state->interface_framebuffer = renderpass_ID;
     ui_state->vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, 
                                                               RenderBufferAllocationTypeMapped,
-                                                              sizeof(immediate_vertex_t),
                                                               RenderBufferAdvanceRate_PerElement,
                                                               null,
+                                                              sizeof(immediate_vertex_t),
                                                               sizeof(immediate_vertex_t) * MAX_WIDGETS);
     ui_state->index_buffer = s_renderer_index_buffer_create(renderer_state, 
                                                             RenderBufferAllocationTypeGPUOnly,

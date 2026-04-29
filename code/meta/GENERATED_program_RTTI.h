@@ -238,6 +238,8 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_render_buffer_memory_type_t, type_id(render_buffer_memory_type_t), "render_buffer_memory_type_t") \
 	X(TYPE_render_buffer_desc_t, type_id(render_buffer_desc_t), "render_buffer_desc_t") \
 	X(TYPE_render_buffer_t, type_id(render_buffer_t), "render_buffer_t") \
+	X(TYPE_vertex_buffer_t, type_id(vertex_buffer_t), "vertex_buffer_t") \
+	X(TYPE_index_buffer_t, type_id(index_buffer_t), "index_buffer_t") \
 	X(TYPE_uniform_constant_buffer_t, type_id(uniform_constant_buffer_t), "uniform_constant_buffer_t") \
 	X(TYPE_render_command_type_t, type_id(render_command_type_t), "render_command_type_t") \
 	X(TYPE_render_command_header_t, type_id(render_command_header_t), "render_command_header_t") \
@@ -454,6 +456,8 @@ const static vulkan_shader_stage_t GENERATED_DEFAULT_vulkan_shader_stage_t = {};
 const static vulkan_shader_binding_t GENERATED_DEFAULT_vulkan_shader_binding_t = {};
 const static render_buffer_desc_t GENERATED_DEFAULT_render_buffer_desc_t = {};
 const static render_buffer_t GENERATED_DEFAULT_render_buffer_t = {};
+const static vertex_buffer_t GENERATED_DEFAULT_vertex_buffer_t = {};
+const static index_buffer_t GENERATED_DEFAULT_index_buffer_t = {};
 const static uniform_constant_buffer_t GENERATED_DEFAULT_uniform_constant_buffer_t = {};
 const static render_command_header_t GENERATED_DEFAULT_render_command_header_t = {};
 const static render_command_begin_renderpass_t GENERATED_DEFAULT_render_command_begin_renderpass_t = {};
@@ -2108,6 +2112,44 @@ struct type_info_struct_render_buffer_t {
 			type_info_member_t working_offset;
 			type_info_member_t mapped_data;
 			type_info_member_t buffer;
+		}members;
+	};
+};
+
+struct type_info_struct_vertex_buffer_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t buffer;
+			type_info_member_t vertex_data;
+			type_info_member_t max_vertices;
+			type_info_member_t vertex_count;
+		}members;
+	};
+};
+
+struct type_info_struct_index_buffer_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t buffer;
+			type_info_member_t index_data;
+			type_info_member_t max_indices;
+			type_info_member_t index_count;
 		}members;
 	};
 };
@@ -4631,6 +4673,38 @@ const static type_info_struct_render_buffer_t type_info_struct_render_buffer_t_c
 	}
 };
 
+const static type_info_struct_vertex_buffer_t type_info_struct_vertex_buffer_t_const_data = {
+	.name = "vertex_buffer_t",
+	.type = TYPE_vertex_buffer_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_vertex_buffer_t),
+	.member_count = 4,
+	.members = {
+		.buffer = {.name = "buffer", .type = TYPE_render_buffer_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vertex_buffer_t.buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vertex_buffer_t), buffer))},
+		.vertex_data = {.name = "vertex_data", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vertex_buffer_t.vertex_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vertex_buffer_t), vertex_data))},
+		.max_vertices = {.name = "max_vertices", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vertex_buffer_t.max_vertices)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vertex_buffer_t), max_vertices))},
+		.vertex_count = {.name = "vertex_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vertex_buffer_t.vertex_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_vertex_buffer_t), vertex_count))},
+	}
+};
+
+const static type_info_struct_index_buffer_t type_info_struct_index_buffer_t_const_data = {
+	.name = "index_buffer_t",
+	.type = TYPE_index_buffer_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_index_buffer_t),
+	.member_count = 4,
+	.members = {
+		.buffer = {.name = "buffer", .type = TYPE_render_buffer_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_index_buffer_t.buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_index_buffer_t), buffer))},
+		.index_data = {.name = "index_data", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_index_buffer_t.index_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_index_buffer_t), index_data))},
+		.max_indices = {.name = "max_indices", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_index_buffer_t.max_indices)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_index_buffer_t), max_indices))},
+		.index_count = {.name = "index_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_index_buffer_t.index_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_index_buffer_t), index_count))},
+	}
+};
+
 const static type_info_struct_uniform_constant_buffer_t type_info_struct_uniform_constant_buffer_t_const_data = {
 	.name = "uniform_constant_buffer_t",
 	.type = TYPE_uniform_constant_buffer_t,
@@ -6163,6 +6237,20 @@ enum render_buffer_t_member_list_enum {
 	TYPE_RENDER_BUFFER_T_MEMBER_buffer,
 };
 
+enum vertex_buffer_t_member_list_enum {
+	TYPE_VERTEX_BUFFER_T_MEMBER_buffer,
+	TYPE_VERTEX_BUFFER_T_MEMBER_vertex_data,
+	TYPE_VERTEX_BUFFER_T_MEMBER_max_vertices,
+	TYPE_VERTEX_BUFFER_T_MEMBER_vertex_count,
+};
+
+enum index_buffer_t_member_list_enum {
+	TYPE_INDEX_BUFFER_T_MEMBER_buffer,
+	TYPE_INDEX_BUFFER_T_MEMBER_index_data,
+	TYPE_INDEX_BUFFER_T_MEMBER_max_indices,
+	TYPE_INDEX_BUFFER_T_MEMBER_index_count,
+};
+
 enum uniform_constant_buffer_t_member_list_enum {
 	TYPE_UNIFORM_CONSTANT_BUFFER_T_MEMBER_mapped_data,
 	TYPE_UNIFORM_CONSTANT_BUFFER_T_MEMBER_size,
@@ -7010,6 +7098,8 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "render_buffer_memory_type_t", .type = TYPE_render_buffer_memory_type_t, .size = sizeof(render_buffer_memory_type_t), .struct_info = NULL},
 	{.name = "render_buffer_desc_t", .type = TYPE_render_buffer_desc_t, .size = sizeof(render_buffer_desc_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_buffer_desc_t_const_data},
 	{.name = "render_buffer_t", .type = TYPE_render_buffer_t, .size = sizeof(render_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_buffer_t_const_data},
+	{.name = "vertex_buffer_t", .type = TYPE_vertex_buffer_t, .size = sizeof(vertex_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_vertex_buffer_t_const_data},
+	{.name = "index_buffer_t", .type = TYPE_index_buffer_t, .size = sizeof(index_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_index_buffer_t_const_data},
 	{.name = "uniform_constant_buffer_t", .type = TYPE_uniform_constant_buffer_t, .size = sizeof(uniform_constant_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_uniform_constant_buffer_t_const_data},
 	{.name = "render_command_type_t", .type = TYPE_render_command_type_t, .size = sizeof(render_command_type_t), .struct_info = NULL},
 	{.name = "render_command_header_t", .type = TYPE_render_command_header_t, .size = sizeof(render_command_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_render_command_header_t_const_data},

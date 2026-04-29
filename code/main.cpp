@@ -82,19 +82,16 @@ struct game_state_t
     image_t             fullscreen_color_buffer;
     image_t             fullscreen_depth_buffer;
 
-    render_buffer_t     vertex_buffer;
+    vertex_buffer_t     vertex_buffer;
     render_buffer_t     index_buffer;
-
-    immediate_vertex_t *vertex_data;
-    u32                 vertex_count;
 
     u32                 game_renderpass_ID;
     u32                 fullscreen_renderpass_ID; 
 };
 
 void
-immediate_quad_ex(game_state_t          *game_state,
-                  render_command_list_t *command_list,
+immediate_quad_ex(render_command_list_t *command_list,
+                  vertex_buffer_t       *buffer,
                   vec2_t                 position,
                   vec2_t                 render_size,
                   vec4_t                 render_color,
@@ -102,7 +99,7 @@ immediate_quad_ex(game_state_t          *game_state,
                   vec2_t                 uv_max,
                   texture2D_t           *texture)
 {
-    immediate_vertex_t *vertex_pointer = game_state->vertex_data + game_state->vertex_count;
+    immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)buffer->vertex_data + buffer->vertex_count);
 
     immediate_vertex_t *bottom_right = vertex_pointer + 0;
     immediate_vertex_t *top_right    = vertex_pointer + 1;
@@ -141,7 +138,24 @@ immediate_quad_ex(game_state_t          *game_state,
         top_right->vTexCoord    = vec2(tright, ttop);
     }
 
-    game_state->vertex_count += 4;
+    buffer->vertex_count += 4;
+}
+
+inline void
+immediate_rect(render_command_list_t *command_list,
+               vertex_buffer_t       *buffer,
+               vec2_t                 position,
+               vec2_t                 render_size,
+               vec4_t                 render_color)
+{
+    immediate_quad_ex(command_list, 
+                      buffer,
+                      position, 
+                      render_size, 
+                      render_color,
+                      vec2_zero(), 
+                      vec2_zero(), 
+                      null);
 }
 
 // TODO(Sleepster): Eventually game_state will not manage the immediate rendering state... so this will be much prettier 
@@ -172,8 +186,8 @@ draw_text(render_command_list_t *command_list,
         glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
         if(metrics->is_valid)
         {
-            immediate_quad_ex(game_state, 
-                              command_list, 
+            immediate_quad_ex(command_list,
+                             &game_state->vertex_buffer,
                               vec2_subtract(render_position, vec2(0, metrics->offset_y)),
                               vec2(metrics->width, metrics->height),
                               text_color,
@@ -233,8 +247,8 @@ entity_render(game_state_t *game_state, render_command_list_t *command_list, ent
         }
     }
     
-    immediate_quad_ex(game_state, 
-                      command_list, 
+    immediate_quad_ex(command_list,
+                     &game_state->vertex_buffer, 
                       entity->position, 
                       entity->size, 
                       vec4(1.0, 1.0, 1.0, 1.0),
@@ -380,19 +394,19 @@ game_main(void)
         index_offset += 4;
     }
 
+    const u32 VERTEX_BUFFER_SIZE = 4 * 10000;
+    immediate_vertex_t *vertices = c_arena_push_array(&renderer_state->renderer_arena, immediate_vertex_t, VERTEX_BUFFER_SIZE);
     game_state.vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, 
                                                                RenderBufferAllocationTypeMapped, 
-                                                               sizeof(immediate_vertex_t), 
                                                                RenderBufferAdvanceRate_PerElement, 
-                                                               null, 
-                                                               sizeof(immediate_vertex_t) * (4 * MAX_ENTITIES));
+                                                               (byte*)vertices, 
+                                                               sizeof(immediate_vertex_t), 
+                                                               VERTEX_BUFFER_SIZE);
     game_state.index_buffer  = s_renderer_index_buffer_create(renderer_state,  
                                                               RenderBufferAllocationTypeGPUOnly, 
                                                               sizeof(u32),
                                                               indices, 
                                                               (sizeof(u32) * (6 * MAX_ENTITIES)));
-
-    game_state.vertex_data = c_arena_push_array(&renderer_state->renderer_arena, immediate_vertex_t, 4 * 10000);
 
     uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
     asset_handle_t basic_triangle = s_asset_manager_acquire_asset_handle(asset_manager, STR("basic_triangle"));
@@ -475,7 +489,7 @@ game_main(void)
                 entity_render(&game_state, command_list, entity);
             }
 
-            r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer, game_state.vertex_data, game_state.vertex_count * sizeof(immediate_vertex_t));
+            r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer);
 
             r_cmd_renderpass_begin(command_list,    game_state.game_renderpass_ID);
             r_cmd_bind_vertex_buffer(command_list, &game_state.vertex_buffer);
@@ -497,7 +511,7 @@ game_main(void)
             r_cmd_draw_indexed(command_list, game_state.entity_manager->active_entities * 6, 0, 1, 0);
             r_cmd_renderpass_end(command_list);
 
-            game_state.vertex_count = 0;
+            game_state.vertex_buffer.vertex_count = 0;
         }
 
         // NOTE(Sleepster): Fullscreen Renderpass 
@@ -534,8 +548,8 @@ game_main(void)
             r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
             draw_text(command_list, &game_state, asset_manager, &basic_font, STR("This is a test string..."), vec2(-100, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), 32);
 
-            r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer, game_state.vertex_data, game_state.vertex_count * sizeof(immediate_vertex_t));
-            r_cmd_draw_indexed(command_list, (game_state.vertex_count * 0.25f) * 6, 0, 1, 0);
+            r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer);
+            r_cmd_draw_indexed(command_list, (game_state.vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
 
             r_cmd_renderpass_end(command_list);
         }
@@ -545,9 +559,11 @@ game_main(void)
         s_asset_manager_update(asset_manager);
 
         c_global_context_reset_temporary_data();
-        game_state.vertex_count = 0;
-        game_state.vertex_buffer.buffer.used = 0;
-        game_state.vertex_buffer.buffer_elements_used = 0;
+        game_state.vertex_buffer.vertex_count = 0;
+
+        // TODO(Sleepster): This is absolutely stupid... 
+        game_state.vertex_buffer.buffer.buffer.used = 0;
+        game_state.vertex_buffer.buffer.buffer_elements_used = 0;
 
         current_tsc = SDL_GetPerformanceCounter();
         delta_tsc   = current_tsc - last_tsc;

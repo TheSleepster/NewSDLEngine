@@ -164,17 +164,28 @@ s_renderer_vertex_buffer_create
 =============
 */
 
-true_inline render_buffer_t
-s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, u32 element_size, render_buffer_advance_rate_t rate, void *data, u32 size)
+true_inline vertex_buffer_t
+s_renderer_vertex_buffer_create(renderer_state_t            *renderer_state, 
+                                render_buffer_memory_type_t  memory_type, 
+                                render_buffer_advance_rate_t rate, 
+                                byte                        *vertex_buffer_data,
+                                u32                          vertex_size, 
+                                u32                          max_vertices)
 {
+    vertex_buffer_t result;
     render_buffer_desc_t buffer_desc = {
         .type = RenderBufferType_VertexBuffer,
         .allocation_type = memory_type,
-        .buffer_capacity = size,
-        .element_size    = element_size,
-        .initial_data    = data
+        .buffer_capacity = vertex_size * max_vertices,
+        .element_size    = vertex_size,
+        .initial_data    = 0 
     };
-    render_buffer_t result = s_renderer_render_buffer_create(renderer_state, &buffer_desc);
+
+     result.buffer = s_renderer_render_buffer_create(renderer_state, &buffer_desc);
+     result.vertex_count = 0;
+     result.max_vertices = max_vertices;
+     result.vertex_data  = vertex_buffer_data;
+
     return(result);
 }
 
@@ -529,6 +540,12 @@ r_cmd_bind_vertex_buffer(render_command_list_t *command_list, render_buffer_t *b
     command->data = bind_vertex_buffer;
 }
 
+true_inline void 
+r_cmd_bind_vertex_buffer(render_command_list_t *command_list, vertex_buffer_t *buffer)
+{
+    r_cmd_bind_vertex_buffer(command_list, &buffer->buffer);
+}
+
 /*
 =============
 r_cmd_bind_index_buffer
@@ -659,6 +676,13 @@ r_cmd_update_buffer_contents(render_command_list_t *command_list, render_buffer_
 
     command->data = update_buffer_contents; 
     command->header.command_type = RCT_UpdateBufferContents;
+}
+
+// TODO(Sleepster): I don't feel good about this... this feels like a good way to blow something up and not know
+true_inline void
+r_cmd_update_buffer_contents(render_command_list_t *command_list, vertex_buffer_t *buffer)
+{
+    r_cmd_update_buffer_contents(command_list, &buffer->buffer, buffer->vertex_data, buffer->vertex_count * buffer->buffer.buffer_element_size);
 }
 
 /*
