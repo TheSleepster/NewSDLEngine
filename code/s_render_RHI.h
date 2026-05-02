@@ -475,12 +475,13 @@ struct renderer_state_t
 
     void            backend_initialize(SDL_Window *window);
     void            backend_handle_window_resize(vec2_t window_size);
-    void            backend_render_frame();
+    void            backend_render_frame(void);
 
     render_buffer_t backend_buffer_create(render_buffer_desc_t *buffer_desc);
     void            backend_buffer_copy_data(render_buffer_t *buffer, void *data, u32 size, u32 offset);
     void            backend_buffer_append_data(render_buffer_t *buffer, void *data, u32 data_size);
     void*           backend_constant_buffer_append_data(void *data, u32 data_size, u32 *buffer_offset_out);
+    void            backend_buffer_reset(render_buffer_t *buffer);
 
     u32             backend_renderpass_initialize(renderpass_desc_t *desc, renderpass_t *renderpass);
 
@@ -505,6 +506,8 @@ uniform_constant_buffer_t* s_renderer_get_constant_buffer(renderer_state_t *rend
 true_inline vertex_buffer_t s_renderer_vertex_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, render_buffer_advance_rate_t rate, byte* vertex_buffer_data, u32 vertex_size, u32 max_vertices);
 true_inline render_buffer_t s_renderer_index_buffer_create(renderer_state_t *renderer_state, render_buffer_memory_type_t memory_type, u32 element_size, void *data, u32 size);
 true_inline void            s_renderer_render_buffer_copy_data(renderer_state_t *renderer_state, render_buffer_t *buffer, void *data, u32 size, u32 offset);
+true_inline void            s_renderer_buffer_reset(renderer_state_t *renderer_state, render_buffer_t *buffer);
+true_inline void            s_renderer_buffer_reset(renderer_state_t *renderer_state, vertex_buffer_t *buffer);
 
 image_t                s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info);
 void                   s_renderer_image_destroy(renderer_state_t *renderer_state, image_t *image);

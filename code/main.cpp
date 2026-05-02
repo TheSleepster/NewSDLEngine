@@ -22,10 +22,12 @@
 #include <p_platform_data.h>
 
 #include <r_render_image.h>
+#include <r_immediate_rendering.h>
 #include <s_render_RHI.h>
 
 #include <s_input_manager.h>
 #include <s_asset_manager.h>
+#include <s_ui_core.h>
 
 #define MAX_ENTITIES (100000)
 
@@ -89,121 +91,6 @@ struct game_state_t
     u32                 fullscreen_renderpass_ID; 
 };
 
-void
-immediate_quad_ex(render_command_list_t *command_list,
-                  vertex_buffer_t       *buffer,
-                  vec2_t                 position,
-                  vec2_t                 render_size,
-                  vec4_t                 render_color,
-                  vec2_t                 uv_min,
-                  vec2_t                 uv_max,
-                  texture2D_t           *texture)
-{
-    immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)buffer->vertex_data + buffer->vertex_count);
-
-    immediate_vertex_t *bottom_right = vertex_pointer + 0;
-    immediate_vertex_t *top_right    = vertex_pointer + 1;
-    immediate_vertex_t *top_left     = vertex_pointer + 2;
-    immediate_vertex_t *bottom_left  = vertex_pointer + 3;
-
-    float32 top    = position.y + render_size.y;
-    float32 bottom = position.y;
-    float32 left   = position.x;
-    float32 right  = position.x + render_size.x;
-
-    bottom_left->vPosition  = vec4(left,  bottom, 0, 1);
-    bottom_right->vPosition = vec4(right, bottom, 0, 1);
-    top_left->vPosition     = vec4(left,  top,    0, 1);
-    top_right->vPosition    = vec4(right, top,    0, 1);
-
-    bottom_left->vColor  = vec4(1.0, 1.0, 1.0, 1.0);
-    bottom_right->vColor = vec4(1.0, 1.0, 1.0, 1.0);
-    top_left->vColor     = vec4(1.0, 1.0, 1.0, 1.0);
-    top_right->vColor    = vec4(1.0, 1.0, 1.0, 1.0);
-    if(texture)
-    {
-        if(!s_renderer_is_texture_bound(command_list, texture))
-        {
-            r_cmd_bind_texture_image(command_list, texture);
-        }
-
-        float32 tbottom = uv_max.y;
-        float32 ttop    = uv_min.y;
-        float32 tleft   = uv_min.x;
-        float32 tright  = uv_max.x;
-
-        bottom_left->vTexCoord  = vec2(tleft,  tbottom);
-        bottom_right->vTexCoord = vec2(tright, tbottom);
-        top_left->vTexCoord     = vec2(tleft,  ttop);
-        top_right->vTexCoord    = vec2(tright, ttop);
-    }
-
-    buffer->vertex_count += 4;
-}
-
-inline void
-immediate_rect(render_command_list_t *command_list,
-               vertex_buffer_t       *buffer,
-               vec2_t                 position,
-               vec2_t                 render_size,
-               vec4_t                 render_color)
-{
-    immediate_quad_ex(command_list, 
-                      buffer,
-                      position, 
-                      render_size, 
-                      render_color,
-                      vec2_zero(), 
-                      vec2_zero(), 
-                      null);
-}
-
-// TODO(Sleepster): Eventually game_state will not manage the immediate rendering state... so this will be much prettier 
-void
-draw_text(render_command_list_t *command_list, 
-          game_state_t          *game_state,
-          asset_manager_t       *asset_manager,
-          asset_handle_t        *font_handle,
-          string_t               render_string, 
-          vec2_t                 position, 
-          vec4_t                 text_color,
-          u32                    font_size)
-{
-    Assert(font_handle);
-    Assert(font_handle->type == AT_Font);
-
-    dynamic_render_font_varient_t *varient = s_asset_font_acquire_font_at_size(asset_manager, 
-                                                                               font_handle, 
-                                                                               font_size);
-    vec2_t render_position = position;
-    for(u32 character_index = 0;
-        character_index < render_string.count;
-        ++character_index)
-    {
-        u8 *character = render_string.data + character_index;
-        Assert(*character > 0);
-
-        glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
-        if(metrics->is_valid)
-        {
-            immediate_quad_ex(command_list,
-                             &game_state->vertex_buffer,
-                              vec2_subtract(render_position, vec2(0, metrics->offset_y)),
-                              vec2(metrics->width, metrics->height),
-                              text_color,
-                              metrics->atlas_offset,
-                              vec2_add(metrics->atlas_offset, metrics->atlas_size),
-                             &metrics->owner_atlas->texture);
-
-            render_position.x += metrics->advance;
-        }
-        else
-        {
-            log_info("Glyph data for character: '%c' is not valid yet...\n", *character);
-        }
-    }
-}
-
 entity_t*
 entity_create(game_state_t *game_state)
 {
@@ -266,6 +153,7 @@ game_main(void)
     input_manager_t  *input_manager  = global_context->input_manager;
     renderer_state_t *renderer_state = global_context->renderer_state;
     asset_manager_t  *asset_manager  = global_context->asset_manager;
+    ui_state_t       *main_ui        = Alloc(ui_state_t);
 
     game_state.controller = s_im_get_primary_controller(global_context->input_manager);
     game_state.entity_manager = c_arena_push_struct(&global_context->context_arena, entity_manager_t);
@@ -378,6 +266,8 @@ game_main(void)
     game_state.game_renderpass_ID       = s_renderer_build_renderpass(renderer_state, &game_renderpass_desc);
     game_state.fullscreen_renderpass_ID = s_renderer_build_renderpass(renderer_state, &fullscreen_renderpass_desc);
 
+    ui_state_init(main_ui, asset_manager, renderer_state, game_state.fullscreen_renderpass_ID);
+
     u32 *indices = c_arena_push_array(&renderer_state->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
     u32  index_offset = 0;
     for(u32 index = 0;
@@ -418,7 +308,7 @@ game_main(void)
     player->sprite   = &player_sprite;
     player->e_flags |=  EF_HasSprite;
 
-    player->position = vec2(0, 40);
+    player->position = vec2(0,  40);
     player->size     = vec2(20, 20);
 
     texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32_SRGB, 32);
@@ -436,6 +326,7 @@ game_main(void)
     while(global_context->running)
     {
         process_window_events(global_context->renderer_state, input_manager);
+        ui_state_begin_frame(main_ui);
 
         vec2_t input_axis = {};
         if(s_im_is_keyboard_key_down(game_state.controller, SDL_SCANCODE_W))
@@ -474,6 +365,13 @@ game_main(void)
             dt_accumulator -= TICK_RATE;
         }
         float32 alpha = (float32)(dt_accumulator / TICK_RATE);
+
+        widget_t *main_panel = ui_widget_panel(main_ui, STR("Test panel..."), vec2(20, 20), vec4(1.0, 1.0, 1.0, 1.0));
+        ui_widget_push_parent(main_ui, main_panel);
+    
+        ui_widget_button(main_ui, STR("Test button..."), vec2(20, 20), vec4(0.6, 0.6, 0.6, 1.0), vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0));
+
+        ui_widget_pop_parent(main_ui);
 
         // NOTE(Sleepster): Game renderpass
         render_command_list_t *command_list = s_renderer_get_command_list(renderer_state);
@@ -546,24 +444,29 @@ game_main(void)
             r_cmd_use_shader_program(command_list, font_shader);
             r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
             r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
-            draw_text(command_list, &game_state, asset_manager, &basic_font, STR("This is a test string..."), vec2(-100, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), 32);
+
+            immediate_text(command_list, 
+                          &game_state.vertex_buffer, 
+                           asset_manager, 
+                          &basic_font, 
+                          STR("This is a test string..."), 
+                          vec2(-200, -100), 
+                          vec4(1.0f, 1.0f, 1.0f, 1.0f), 32);
 
             r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer);
             r_cmd_draw_indexed(command_list, (game_state.vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
 
             r_cmd_renderpass_end(command_list);
         }
+
+        ui_state_end_frame(main_ui);
         r_cmd_present(command_list, &game_state.fullscreen_color_buffer);
 
         s_renderer_execute_backend_commands(renderer_state);
+        s_renderer_buffer_reset(renderer_state, &game_state.vertex_buffer);
+
         s_asset_manager_update(asset_manager);
-
         c_global_context_reset_temporary_data();
-        game_state.vertex_buffer.vertex_count = 0;
-
-        // TODO(Sleepster): This is absolutely stupid... 
-        game_state.vertex_buffer.buffer.buffer.used = 0;
-        game_state.vertex_buffer.buffer.buffer_elements_used = 0;
 
         current_tsc = SDL_GetPerformanceCounter();
         delta_tsc   = current_tsc - last_tsc;

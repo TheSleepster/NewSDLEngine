@@ -1,9 +1,10 @@
 #+title: NewSDLEngine
 
 ** IMMEDIATE TODO
+- [ ] Simple shader preprocessor. It won't do anything insane, all it will do is look for "#include <file>" directives and handle them, spitting the processed file into the build directory.
+- [ ] IMGUI interface...
 - [ ] File watcher with asset hotreloading (using some sort of sys_create_process() to start the jfd_file_packer)
 - [ ] Possibly seperate the "main" and the "entry" files so that they are ".so" and ".exe" files. Game DLL hot reloading.
-- [ ] IMGUI interface...
 - [ ] Separate debug macros for Vulkan Validation Layers
 - [ ] Debug macros for toggling certain slowdown points such as Assert() and Expect()
 - [ ] Makefile setting for these macros

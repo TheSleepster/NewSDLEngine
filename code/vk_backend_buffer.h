@@ -46,13 +46,14 @@ void            vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulka
 void*           vk_backend_buffer_map(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, u32 offset, u32 size);
 void            vk_backend_buffer_unmap(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer);
 void*           vk_backend_buffer_append_data(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, void *data, u32 size);
+void            vk_backend_buffer_reset(vulkan_buffer_t *buffer);
 
 // NOTE(Sleepster): We can build a list of these infos so that they can all be uploaded at once
 // right before rendering so that we can limit the amount of pipeline barriers and waits. Waiting on
 // one barrier and set of sync objects instead of many duplicate fences and commands.
 struct vulkan_staging_info_t 
 {
-    vulkan_buffer_t *target_buffer;
+    VkBuffer         target_buffer;
     u64              upload_size;
     u64              target_offset;
 

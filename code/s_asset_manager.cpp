@@ -30,6 +30,7 @@
 #include <s_asset_manager.h>
 #include <s_render_RHI.h>
 #include <r_render_image.h>
+#include <s_ui_core.h>
 //
 
 #include <asset_file_packer/jfd_asset_file.h>

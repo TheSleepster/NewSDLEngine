@@ -10,7 +10,7 @@
 #include <p_platform_data.h>
 
 memory_arena_t
-c_arena_create(u64 block_size)
+c_arena_create(u64 block_size) 
 {
     memory_arena_t result = {};
 

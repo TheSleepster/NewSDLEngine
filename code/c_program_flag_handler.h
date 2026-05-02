@@ -192,7 +192,7 @@ c_program_flag_parse_args(s32 argc, char **argv)
     bool32 success = true;
     if(argc < 2) 
     {
-        log_error("No arguments...\n");
+        log_warning("No arguments...\n");
         c_program_flag_print_flag_list();
         exit(-1);
     }

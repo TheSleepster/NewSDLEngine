@@ -241,6 +241,35 @@ s_renderer_render_buffer_copy_data(renderer_state_t *renderer_state, render_buff
     renderer_state->backend_buffer_copy_data(buffer, data, size, offset);
 }
 
+
+/*
+=============
+s_renderer_buffer_reset
+=============
+*/
+
+true_inline void
+s_renderer_buffer_reset(renderer_state_t *renderer_state, render_buffer_t *buffer)
+{
+    buffer->buffer_elements_used = 0;
+    buffer->working_offset       = 0;
+
+    renderer_state->backend_buffer_reset(buffer);
+}
+
+/*
+=============
+s_renderer_buffer_reset
+=============
+*/
+
+true_inline void
+s_renderer_buffer_reset(renderer_state_t *renderer_state, vertex_buffer_t *buffer)
+{
+    buffer->vertex_count = 0;
+    s_renderer_buffer_reset(renderer_state, &buffer->buffer);
+}
+
 /////////////////////////
 // UNIFORM BUFFERS 
 /////////////////////////

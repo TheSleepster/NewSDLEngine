@@ -107,16 +107,11 @@ sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
 void
 sys_free_memory(void *data, usize free_size)
 {
-#if 1
-    Assert(data);
     if(munmap(data, free_size) == -1)
     {
         int error = errno;
         log_fatal("munmap failed... error: (%s), code: '%d'...\n", strerror(error), error);
     }
-#else
-    free(data);
-#endif
 }
 
 //////////////////////

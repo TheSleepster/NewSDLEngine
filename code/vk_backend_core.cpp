@@ -3091,8 +3091,8 @@ renderer_state_t::backend_render_frame
 =============
 */
 
-void renderer_state_t::
-backend_render_frame()
+true_inline void renderer_state_t::
+backend_render_frame(void)
 {
     vk_backend_render_frame(this->render_context, this);
 }
@@ -3155,7 +3155,7 @@ renderer_state_t::backend_buffer_copy_data
 =============
 */
 
-void renderer_state_t::
+true_inline void renderer_state_t::
 backend_buffer_copy_data(render_buffer_t *buffer, void *data, u32 size, u32 offset)
 {
     vk_backend_buffer_copy_data(this->render_context, &buffer->buffer, data, size, offset);
@@ -3167,7 +3167,7 @@ renderer_state_t::backend_constant_buffer_append_data
 =============
 */
 
-void* renderer_state_t::
+true_inline void* renderer_state_t::
 backend_constant_buffer_append_data(void *data, u32 data_size, u32 *buffer_offset_out)
 {
     void *result = null;
@@ -3182,10 +3182,16 @@ renderer_state_t::backend_buffer_append_data
 =============
 */
 
-void renderer_state_t::
+true_inline void renderer_state_t::
 backend_buffer_append_data(render_buffer_t *buffer, void *data, u32 data_size)
 {
     vk_backend_buffer_append_data(this->render_context, &buffer->buffer, data, data_size);
+}
+
+true_inline void renderer_state_t::
+backend_buffer_reset(render_buffer_t *buffer)
+{
+    vk_backend_buffer_reset(&buffer->buffer);
 }
 
 /*
@@ -3194,7 +3200,7 @@ renderer_state_t::backend_renderpass_initialize
 =============
 */
 
-u32 renderer_state_t::
+true_inline u32 renderer_state_t::
 backend_renderpass_initialize(renderpass_desc_t *desc, renderpass_t *renderpass)
 {
     u32 result = INVALID_ID;
@@ -3273,7 +3279,7 @@ renderer_state_t::backend_image_destroy
 =============
 */
 
-void renderer_state_t::
+true_inline void renderer_state_t::
 backend_image_destroy(image_t *image)
 {
     Assert(image->vulkan_image.is_valid == true);
@@ -3287,7 +3293,7 @@ renderer_state_t::backend_image_update_contents
 =============
 */
 
-void renderer_state_t::
+true_inline void renderer_state_t::
 backend_image_update_contents(image_t *image)
 {
     vk_backend_image_update_data(this->render_context, &image->vulkan_image);
@@ -3299,7 +3305,7 @@ renderer_state_t::backend_shader_create
 =============
 */
 
-void renderer_state_t::
+true_inline void renderer_state_t::
 backend_shader_create(shader_t *shader, string_t shader_source)
 {
 #if 0

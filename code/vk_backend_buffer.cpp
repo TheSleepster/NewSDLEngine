@@ -7,8 +7,6 @@
 #include <vk_backend_buffer.h>
 #include <vk_backend_core.h>
 
-// TODO(Sleepster): vk_backend_buffer_reset();
-
 /*
 =============
 vk_backend_buffer_create
@@ -233,6 +231,18 @@ vk_backend_buffer_unmap(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffe
     buffer->is_mapped = false;
 }
 
+/*
+=============
+vk_backend_buffer_unmap
+=============
+*/
+
+true_inline void
+vk_backend_buffer_reset(vulkan_buffer_t *buffer)
+{
+    buffer->used = 0;
+}
+
 //////////////////////////
 // OLD STAGING BUFFER API
 //////////////////////////
@@ -281,13 +291,10 @@ vk_backend_buffer_stage_data(vulkan_context_t *vulkan_context, byte *data, u64 d
     vulkan_staging_buffer_t *staging_buffer = vulkan_context->staging_buffers + vulkan_context->current_frame_index;
     vulkan_buffer_t         *buffer_handle  = &staging_buffer->buffer;
 
-    dynarray_header_t *header = c_dynarray_header(vulkan_context->staging_infos);
-    (void)header;
-
     // NOTE(Sleepster): You have to align upload_size yourself
     vulkan_staging_info_t staging_info = {};
     staging_info.upload_size           = data_size;
-    staging_info.target_buffer         = target_buffer;
+    staging_info.target_buffer         = target_buffer->handle;
     staging_info.staging_buffer_offset = buffer_handle->used;
     staging_info.target_offset         = target_buffer->used;
 
@@ -296,7 +303,6 @@ vk_backend_buffer_stage_data(vulkan_context_t *vulkan_context, byte *data, u64 d
     buffer_handle->used += data_size;
 
     c_dynarray_push(vulkan_context->staging_infos, staging_info);
-    header = c_dynarray_header(vulkan_context->staging_infos);
 }
 
 /*
@@ -325,7 +331,7 @@ vk_backend_buffer_flush_staging_buffer(vulkan_context_t *vulkan_context,
                 .size      = info->upload_size,
             };
 
-            vkCmdCopyBuffer(command_buffer, staging_buffer->buffer.handle, info->target_buffer->handle, 1, &region);
+            vkCmdCopyBuffer(command_buffer, staging_buffer->buffer.handle, info->target_buffer, 1, &region);
         }
         staging_buffer->buffer.used   = 0;
         staging_buffer->submitted     = true;

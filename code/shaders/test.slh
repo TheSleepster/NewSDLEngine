@@ -1,0 +1,4 @@
+struct TESTSTRUCTURE {
+    float4 apples;
+    float2 oranges;
+};

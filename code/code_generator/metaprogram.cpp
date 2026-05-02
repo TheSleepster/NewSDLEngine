@@ -825,7 +825,12 @@ parse_structure(ast_file_data *file_data,
                 }
                 else
                 {
-                    // NOTE(Sleepster): Do not do anything with this type as it is namespaced... Just eat the line and continue. 
+                    // NOTE(Sleepster): Do not do anything with this type as it is namespaced... Warn the user, then just eat the line and continue.
+#if 0
+                    // TODO(Sleepster): WE CANT LOG ANYTHING BECAUSE EVERYTHING JUST GETS WRITTEN TO stdout!!!
+                    log_warning("Found member element: '%.*s' within the structure: '%.*s'... This element is not valid and will not be parsed...\n",
+                                token.string.count, C_STR(token.string), structure_type.string.count, C_STR(structure_type.string));
+#endif
                     c_tokenizer_eat_lines(&file_data->tokenizer, 1);
                 }
             }break;
