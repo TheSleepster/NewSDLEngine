@@ -123,8 +123,11 @@ file_t
 sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overlapping_io)
 {
     file_t result = {};
-    result.file_name = c_string_get_filename_from_path(filepath);
-    result.filepath  = filepath;
+    result.file_name   = c_string_get_filename_from_path(filepath);
+    result.filepath    = filepath;
+    result.file_name   = c_string_get_filename_from_path(filepath);
+    result.for_writing = for_writing;
+    result.overlapping = overlapping_io;
 
     s32 flags = 0;
     if(for_writing)
@@ -760,7 +763,7 @@ sys_file_watcher_add_path(file_watcher_t *watcher, string_t path)
     if(directory)
     {
         directory->file_data      = sys_file_open(path, false, false, false).handle;
-        directory->filename       = c_string_make_copy(&watcher->watcher_arena, c_string_get_filename_from_path(path));
+        directory->filename       = c_string_get_filename_from_path(path);
         directory->inotify_handle = inotify_add_watch(watcher->sys_watch_data.inotify_instance, C_STR(filepath), flags);
         if(directory->inotify_handle == -1)
         {

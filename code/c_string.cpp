@@ -704,7 +704,6 @@ c_string_builder_append_data(string_builder_t *builder, string_t data)
     memcpy(buffer_data, data.data, data.count);
 
     current_buffer->bytes_used += data.count;
-
     builder->bytes_used += data.count;
 }
 

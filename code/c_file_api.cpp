@@ -130,7 +130,7 @@ c_file_read_entirety(string_t            filepath,
     file_t file_data = c_file_open(filepath, false);
     Assert(file_data.handle != INVALID_FILE_HANDLE);
 
-    s64 file_size    = c_file_get_size(&file_data);
+    s64 file_size = c_file_get_size(&file_data);
     result = c_file_read(&file_data, file_size, arena, zone, tag, true);
     if(result.data == null)
     {
