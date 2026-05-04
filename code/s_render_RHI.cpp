@@ -103,6 +103,26 @@ s_renderer_execute_backend_commands(renderer_state_t *renderer_state)
     renderer_state->backend_render_frame();
 }
 
+internal_api void 
+s_renderer_renderpass_key(renderpass_key_t *key, renderpass_t *renderpass, renderpass_desc_t *renderpass_desc)
+{
+    u32 attachment_count = 0;
+    for(u32 attachment_index = 0;
+        attachment_index < renderpass_desc->color_attachment_count;
+        ++attachment_index)
+    {
+        renderpass_attachment_t *attachment = renderpass_desc->color_attachments + attachment_index;
+        key->attachment_formats[attachment_index] = (bitmap_format_t)attachment->image->create_info.format;
+
+        ++attachment_count;
+    }
+
+    if(renderpass->has_depth_stencil_attachment)
+    {
+        key->attachment_formats[attachment_count] = (bitmap_format_t)renderpass_desc->depth_stencil_attachment.image->create_info.format;
+    }
+}
+
 /*
 =============
 s_renderer_build_renderpass
@@ -140,6 +160,8 @@ s_renderer_build_renderpass(renderer_state_t *renderer_state, renderpass_desc_t 
             sizeof(renderpass_attachment_t));
 
     u32 attachment_count = renderer_state->backend_renderpass_initialize(renderpass_desc, renderpass);
+    s_renderer_renderpass_key(&renderpass->renderpass_key, renderpass, renderpass_desc);
+
     renderpass->total_attachment_count = attachment_count;
 
     return(result);
@@ -338,8 +360,8 @@ s_renderer_command_list_init(renderer_state_t *renderer_state, render_command_li
     list->active_render_state    = g_pipeline_default_state_key;
     list->image_shader_params[0] = &texture_catalog->default_asset.texture->gpu_data;
 
-    list->is_initialized      = true;
-
+    //list->backend_command_buffer = renderer_state->backend_get_command_buffer(list);
+    list->is_initialized = true;
 }
 
 /*
@@ -349,12 +371,14 @@ s_renderer_get_command_list
 */
 
 render_command_list_t*
-s_renderer_get_command_list(renderer_state_t *renderer_state)
+s_renderer_get_command_list(renderer_state_t *renderer_state, command_list_type_t type)
 {
     render_command_list_t *result = null;
     result = renderer_state->command_lists + renderer_state->command_list_count++;
     Assert(renderer_state->command_list_count < MAX_COMMAND_LISTS);
-    result->renderer_state = renderer_state;
+
+    result->renderer_state    = renderer_state;
+    result->command_list_type = type;
 
     s_renderer_command_list_init(renderer_state, result);
     Assert(result->is_initialized == true);
@@ -414,6 +438,7 @@ void
 r_cmd_renderpass_begin(render_command_list_t *command_list, u32 renderpassID)
 {
     Assert(command_list->active_renderpass == null);
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
 
     render_command_t *command = s_renderer_get_next_command(command_list);
     render_command_begin_renderpass_t *begin_renderpass = c_arena_push_struct(&command_list->command_arena, 
@@ -440,6 +465,7 @@ void
 r_cmd_renderpass_end(render_command_list_t *command_list)
 {
     Assert(command_list->active_renderpass != null);
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
 
     render_command_t *command = s_renderer_get_next_command(command_list);
     render_command_end_renderpass_t *end_renderpass = c_arena_push_struct(&command_list->command_arena, 
@@ -461,6 +487,8 @@ r_cmd_use_shader_program
 void
 r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t asset_handle)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
     render_command_t *command = s_renderer_get_next_command(command_list);
     render_command_bind_shader_t *bind_shader = c_arena_push_struct(&command_list->command_arena, 
                                                                      render_command_bind_shader_t);
@@ -494,6 +522,7 @@ r_cmd_bind_texture_from_handle
 void
 r_cmd_bind_texture_from_handle(render_command_list_t *command_list, asset_handle_t *asset_handle)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
     Assert(asset_handle->type == AT_Bitmap);
 
     render_command_t *command  = s_renderer_get_next_command(command_list);
@@ -530,6 +559,7 @@ r_cmd_bind_texture_image
 void
 r_cmd_bind_texture_image(render_command_list_t *command_list, texture2D_t *texture)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
     Assert(texture);
 
     if(texture->gpu_data.ID > 0)
@@ -559,6 +589,8 @@ r_cmd_bind_vertex_buffer
 void
 r_cmd_bind_vertex_buffer(render_command_list_t *command_list, render_buffer_t *buffer)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
     render_command_t *command = s_renderer_get_next_command(command_list);
     render_command_bind_vertex_buffer_t *bind_vertex_buffer = c_arena_push_struct(&command_list->command_arena, 
                                                                                    render_command_bind_vertex_buffer_t);
@@ -572,6 +604,7 @@ r_cmd_bind_vertex_buffer(render_command_list_t *command_list, render_buffer_t *b
 true_inline void 
 r_cmd_bind_vertex_buffer(render_command_list_t *command_list, vertex_buffer_t *buffer)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
     r_cmd_bind_vertex_buffer(command_list, &buffer->buffer);
 }
 
@@ -584,6 +617,8 @@ r_cmd_bind_index_buffer
 void
 r_cmd_bind_index_buffer(render_command_list_t *command_list, render_buffer_t *buffer)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
     render_command_t *command = s_renderer_get_next_command(command_list);
     render_command_bind_index_buffer_t *bind_index_buffer = c_arena_push_struct(&command_list->command_arena, 
                                                                                   render_command_bind_index_buffer_t);
@@ -604,6 +639,8 @@ r_cmd_set_viewport
 void
 r_cmd_set_viewport(render_command_list_t *command_list, vec2_t offset, vec2_t size)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
     render_command_t *command  = s_renderer_get_next_command(command_list);
     render_command_set_viewport_t *set_viewport = c_arena_push_struct(&command_list->command_arena, 
                                                                        render_command_set_viewport_t);
@@ -623,6 +660,8 @@ r_cmd_set_scissor
 void
 r_cmd_set_scissor(render_command_list_t *command_list, vec2_t offset, vec2_t size)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
     render_command_t *command  = s_renderer_get_next_command(command_list);
     render_command_set_scissor_t *set_scissor = c_arena_push_struct(&command_list->command_arena, 
                                                                      render_command_set_scissor_t);
@@ -723,6 +762,8 @@ r_cmd_set_render_state
 void
 r_cmd_set_render_state(render_command_list_t *command_list, render_pipeline_state_t *render_pipeline_state)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
     render_command_t *command  = s_renderer_get_next_command(command_list);
     render_command_set_pipeline_state_t *set_render_state = c_arena_push_struct(&command_list->command_arena, 
                                                                                 render_command_set_pipeline_state_t);
@@ -759,6 +800,8 @@ r_cmd_draw(render_command_list_t *command_list,
            u32                    instance_count, 
            u32                    first_instance)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
     render_command_t *command   = s_renderer_get_next_command(command_list);
     render_command_draw_t *draw = c_arena_push_struct(&command_list->command_arena, 
                                                        render_command_draw_t);
@@ -786,6 +829,8 @@ r_cmd_draw_indexed(render_command_list_t *command_list,
                    u32                    instance_count, 
                    u32                    first_instance)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
     render_command_t *command   = s_renderer_get_next_command(command_list);
     render_command_draw_t *draw = c_arena_push_struct(&command_list->command_arena, 
                                                        render_command_draw_t);
@@ -815,6 +860,8 @@ r_cmd_blit_image(render_command_list_t *command_list,
                  vec2_t                 dest_offset, 
                  vec2_t                 dest_blit_size)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
     render_command_t *command   = s_renderer_get_next_command(command_list);
     render_command_blit_image_t *blit_image = c_arena_push_struct(&command_list->command_arena, 
                                                                   render_command_blit_image_t);
@@ -851,6 +898,8 @@ r_cmd_dispatch_compute
 void
 r_cmd_dispatch_compute(render_command_list_t *command_list, u32 invoke_x, u32 invoke_y, u32 invoke_z)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_COMPUTE);
+
     render_command_t *command   = s_renderer_get_next_command(command_list);
     render_command_dispatch_compute_t *dispath_compute = c_arena_push_struct(&command_list->command_arena, 
                                                                              render_command_dispatch_compute_t);
@@ -876,6 +925,8 @@ r_cmd_present
 void
 r_cmd_present(render_command_list_t *command_list, image_t *presentation_source)
 {
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
     render_command_t *command  = s_renderer_get_next_command(command_list);
     render_command_present_frame_t *present = c_arena_push_struct(&command_list->command_arena, 
                                                                    render_command_present_frame_t);

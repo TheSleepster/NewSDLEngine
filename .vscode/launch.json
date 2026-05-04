@@ -71,7 +71,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/slang_reflector",
             "cwd": "${workspaceFolder}/code",
-            "args": ["shader_directory_path=../code/shaders", "shader_output_dir=../run_tree/res/shader_binaries/"],
+            "args": ["--shader_directory_path=../code/shaders", "--shader_output_dir=../run_tree/res/shader_binaries/"],
             "stopOnEntry": false,
             "terminal": "integrated",
         },

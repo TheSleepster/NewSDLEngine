@@ -142,7 +142,7 @@ ui_state_render_widgets(ui_state_t *ui_state)
     asset_manager_t  *asset_manager  = ui_state->asset_manager;
     (void)asset_manager;
 
-    render_command_list_t *command_list = s_renderer_get_command_list(renderer_state);
+    render_command_list_t *command_list = s_renderer_get_command_list(renderer_state, RENDER_COMMAND_LIST_TYPE_GRAPHICS);
 
     widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
@@ -233,7 +233,7 @@ ui_state_init(ui_state_t       *ui_state,
     ui_state->asset_manager = asset_manager;
     ui_state->interface_framebuffer = renderpass_ID;
 
-    ui_state->widget_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("basic_triangle"));
+    ui_state->widget_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_rectangle"));
 
     u32 *indices = c_arena_push_array(&renderer_state->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
     u32  index_offset = 0;

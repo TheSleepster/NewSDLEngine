@@ -466,11 +466,12 @@ vk_backend_shader_create_spirv_reflect(vulkan_context_t *vulkan_context, string_
 
         result.shader_id = pipeline_state_hash;
         result.pipeline_hash.data[pipeline_state_hash] = vk_backend_create_render_pipeline(vulkan_context, 
-                                                                                           &result, 
-                                                                                           &g_pipeline_default_rasterization_state, 
-                                                                                           &g_pipeline_default_depth_stencil_state,
-                                                                                           &g_pipeline_default_blend_settings,
-                                                                                           &result.pipeline_vertex_input_state);
+                                                                                          &result, 
+                                                                                           vulkan_context->primary_renderpass,
+                                                                                          &g_pipeline_default_rasterization_state, 
+                                                                                          &g_pipeline_default_depth_stencil_state,
+                                                                                          &g_pipeline_default_blend_settings,
+                                                                                          &result.pipeline_vertex_input_state);
         result.default_pipeline = result.pipeline_hash.data[pipeline_state_hash];
     }
     else if(result.pipeline_type == VK_PIPELINE_BIND_POINT_COMPUTE)
@@ -1030,7 +1031,7 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
         }
         else
         {
-            log_error("[SLANG]: Failed to emit spirv for entry point: '%s'...\n",
+            log_error("\n[SLANG]: Failed to emit spirv for entry point: '%s'...\n",
                       entry_point_layout->getName());
         }
     }
@@ -1146,11 +1147,12 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
 
         result.shader_id = pipeline_state_hash;
         result.pipeline_hash.data[pipeline_state_hash] = vk_backend_create_render_pipeline(vulkan_context, 
-                                                                                           &result, 
-                                                                                           &g_pipeline_default_rasterization_state, 
-                                                                                           &g_pipeline_default_depth_stencil_state,
-                                                                                           &g_pipeline_default_blend_settings,
-                                                                                           &result.pipeline_vertex_input_state);
+                                                                                          &result, 
+                                                                                           vulkan_context->primary_renderpass,
+                                                                                          &g_pipeline_default_rasterization_state, 
+                                                                                          &g_pipeline_default_depth_stencil_state,
+                                                                                          &g_pipeline_default_blend_settings,
+                                                                                          &result.pipeline_vertex_input_state);
         result.default_pipeline = result.pipeline_hash.data[pipeline_state_hash];
     }
     else if(result.pipeline_type == VK_PIPELINE_BIND_POINT_COMPUTE)

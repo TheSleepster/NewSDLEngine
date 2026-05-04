@@ -160,7 +160,7 @@ game_main(void)
 
     // NOTE(Sleepster): Clear colors 
     clear_value_t color_buffer_clear_value = {
-        .clear_color = {.float_color = {0.3f, 0.4f, 0.6f, 1.0f}},
+        .clear_color = {.float_color = {0.1f, 0.1f, 0.8f, 1.0f}},
     };
 
     clear_value_t depth_buffer_clear_value = {
@@ -175,7 +175,7 @@ game_main(void)
         image_create_info_t primary_game_color_buffer_create_info = {
             .width  = 320,
             .height = 180,
-            .format = BMF_BGRA32_UNORM,
+            .format = BMF_RGBA32_UNORM,
             .usage  = (render_image_usage_t)(ImageUsage_RenderpassAttachment|ImageUsage_BlitSource)
         };
 
@@ -223,7 +223,7 @@ game_main(void)
         image_create_info_t fullscreen_color_buffer_create_info = {
             .width  = (u32)renderer_state->window_size.x,
             .height = (u32)renderer_state->window_size.y,
-            .format = BMF_BGRA32_UNORM,
+            .format = BMF_RGBA32_UNORM,
             .usage  = ImageUsage_RenderpassAttachment,
         };
 
@@ -299,8 +299,8 @@ game_main(void)
                                                               (sizeof(u32) * (6 * MAX_ENTITIES)));
 
     uniform_constant_buffer_t *camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
-    asset_handle_t basic_triangle = s_asset_manager_acquire_asset_handle(asset_manager, STR("basic_triangle"));
-    asset_handle_t font_shader    = s_asset_manager_acquire_asset_handle(asset_manager, STR("font_shader"));
+    asset_handle_t basic_triangle = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_textured_unnormalized"));
+    asset_handle_t font_shader    = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_font"));
     asset_handle_t player_sprite  = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
     asset_handle_t basic_font     = s_asset_manager_acquire_asset_handle(asset_manager, STR("LiberationMono_Regular"));
 
@@ -374,7 +374,7 @@ game_main(void)
         ui_widget_pop_parent(main_ui);
 
         // NOTE(Sleepster): Game renderpass
-        render_command_list_t *command_list = s_renderer_get_command_list(renderer_state);
+        render_command_list_t *command_list = s_renderer_get_command_list(renderer_state, RENDER_COMMAND_LIST_TYPE_GRAPHICS);
         {
             for(u32 entity_index = 0;
                 entity_index < game_state.entity_manager->active_entities;

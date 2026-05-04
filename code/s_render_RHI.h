@@ -311,6 +311,12 @@ struct render_command_t
     void                   *data;
 };
 
+enum command_list_type_t 
+{
+    RENDER_COMMAND_LIST_TYPE_GRAPHICS,
+    RENDER_COMMAND_LIST_TYPE_COMPUTE,
+};
+
 // NOTE(Sleepster): For some stupid fucking reason this has to be heap allocated instead of 
 // just stored normally like a normal object. My compiler is an autistic chimp
 struct render_command_list_t
@@ -351,6 +357,9 @@ struct render_command_list_t
 
     u32                          image_ids_to_bind[MAX_SHADER_IMAGE_PARAMS];
     u32                          bound_image_count;
+
+    command_list_type_t          command_list_type;
+    backend_command_buffer_t     backend_command_buffer;
 };
 
 ////////////////////
@@ -415,25 +424,33 @@ struct renderpass_desc_t
     u32                     color_attachment_count;
 };
 
+struct renderpass_key_t
+{
+    bitmap_format_t attachment_formats[MAX_RENDER_TARGET_ATTACHMENTS];
+};
+
 struct renderpass_t 
 {
-    u32               ID;
-    renderpass_desc_t create_info;
-    VkRenderPass      renderpass_handle;
-    VkFramebuffer     framebuffer_handle;
+    u32                          ID;
 
-    renderpass_attachment_t depth_stencil_attachment;
-    renderpass_attachment_t color_attachments[MAX_RENDER_TARGET_ATTACHMENTS];
-    u32                     color_attachment_count;
-    u32                     total_attachment_count;
+    renderpass_key_t             renderpass_key;
+    renderpass_desc_t            create_info;
 
-    u32           render_width;
-    u32           render_height;
+    backend_renderpass_handle_t  renderpass_handle;
+    backend_framebuffer_handle_t framebuffer_handle;
 
-    clear_value_t attachment_clear_values[MAX_RENDER_TARGET_ATTACHMENTS];
+    renderpass_attachment_t      depth_stencil_attachment;
+    renderpass_attachment_t      color_attachments[MAX_RENDER_TARGET_ATTACHMENTS];
+    u32                          color_attachment_count;
+    u32                          total_attachment_count;
 
-    bool8         has_depth_stencil_attachment;
-    bool8         resize_with_window;
+    u32                          render_width;
+    u32                          render_height;
+
+    clear_value_t                attachment_clear_values[MAX_RENDER_TARGET_ATTACHMENTS];
+
+    bool8                        has_depth_stencil_attachment;
+    bool8                        resize_with_window;
 };
 
 ////////////////////
@@ -473,6 +490,8 @@ struct renderer_state_t
     renderpass_t                           renderpasses[100];
     u32                                    renderpass_count;
 
+    render_command_present_frame_t        *present_command;
+
     void            backend_initialize(SDL_Window *window);
     void            backend_handle_window_resize(vec2_t window_size);
     void            backend_render_frame(void);
@@ -490,6 +509,8 @@ struct renderer_state_t
     void            backend_image_update_contents(image_t *image);
 
     void            backend_shader_create(shader_t *shader, string_t shader_source);
+
+    backend_command_buffer_t backend_get_command_buffer(render_command_list_t *command_list);
 };
 
 struct image_create_info_t;
@@ -512,7 +533,7 @@ true_inline void            s_renderer_buffer_reset(renderer_state_t *renderer_s
 image_t                s_renderer_image_create(renderer_state_t *render_state, image_create_info_t *image_create_info);
 void                   s_renderer_image_destroy(renderer_state_t *renderer_state, image_t *image);
 void                   s_renderer_image_update_data(void *backend_context, image_t *image);
-render_command_list_t* s_renderer_get_command_list(renderer_state_t *renderer_state);
+render_command_list_t* s_renderer_get_command_list(renderer_state_t *renderer_state, command_list_type_t type);
 bool8                  s_renderer_is_texture_bound(render_command_list_t *command_list, texture2D_t *texture);
 void                   s_renderer_reset_command_list(render_command_list_t *command_list);
 

@@ -106,8 +106,8 @@ main(int argc, char **argv)
         global_context->renderer_state->backend_initialize(global_context->renderer_state->window);
 
         // TODO(Sleepster): The count will need to be adjusted in the future. But this is fine for now 
-        //u32 thread_count = sys_get_thread_count() - 1;
-        //c_threadpool_init(&global_context->main_threadpool, thread_count, MB(10), true);
+        u32 thread_count = sys_get_thread_count() - 4;
+        c_threadpool_init(&global_context->main_threadpool, thread_count, MB(10), true);
 
         s_asset_manager_init(global_context->asset_manager);
 

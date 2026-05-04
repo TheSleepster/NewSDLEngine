@@ -15,13 +15,12 @@
 #include <c_dynarray.h>
 #include <c_program_flag_handler.h>
 
+#include <c_global_context.cpp>
+#include <c_file_api.cpp>
 #include <p_platform_data.cpp>
 #include <c_memory_arena.cpp>
 #include <c_zone_allocator.cpp>
 #include <c_string.cpp>
-#include <c_global_context.cpp>
-#include <c_file_api.cpp>
-#include <c_file_watcher.cpp>
 #include <c_threadpool.cpp>
 #include <c_tokenizer.cpp>
 
@@ -47,7 +46,8 @@ VISIT_FILES(shader_file_callback)
     string_t fullname = visit_file_data->fullname;
     string_t filename = visit_file_data->filename;
     string_t file_ext = c_string_get_file_ext_from_path(filename);
-    if(c_string_compare(file_ext, STR(".slang")))
+    if(c_string_compare(file_ext, STR(".slang")) || 
+       c_string_compare(file_ext, STR(".slm")))
     {
         c_threadpool_push_work_order(&global_context->main_threadpool, [file_manager, filename, fullname]() {
              string_t *file_data = c_hash_table_get_value_ptr(&file_manager->loaded_files, filename);
@@ -109,7 +109,7 @@ VISIT_FILES(shader_file_callback)
 
              c_string_builder_append_data(&module.new_file_builder, STR("#line 1 \""));
              c_string_builder_append_data(&module.new_file_builder, filename);
-             c_string_builder_append_data(&module.new_file_builder, STR("\n"));
+             c_string_builder_append_data(&module.new_file_builder, STR("\"\n"));
              c_string_builder_append_data(&module.new_file_builder, module.source_file);
 
              string_t output_file = c_string_concat(&global_context->temporary_arena, file_manager->output_directory, filename);
@@ -129,15 +129,16 @@ main(int argc, char **argv)
     u32 thread_count = sys_get_thread_count();
     c_threadpool_init(&global_context->main_threadpool, thread_count, MB(1), true);
 
-    char  **shader_directory = c_program_flag_add_string("shader_directory_path", "shaders/", "This is the location that the preprocessor will search for shaders when a #include directive is found.\n");
-    char  **output_directory = c_program_flag_add_string("shader_output_dir", "../build/", "This is the output location");
-    bool32 *help             = c_program_flag_add_bool32("help", false, "Displays the help message...\n");
+    char  **shader_directory = c_program_flag_add_string("-shader_directory_path", "shaders/", "This is the location that the preprocessor will search for shaders when a #include directive is found.\n");
+    char  **output_directory = c_program_flag_add_string("-shader_output_dir", "../build/", "This is the output location");
+    bool32 *help             = c_program_flag_add_bool32("-help", false, "Displays the help message...\n");
     if(argc > 1)
     {
         c_program_flag_parse_args(argc, argv);
         if(*help == true)
         {
             c_program_flag_print_flag_list();
+            return(0);
         }
     }
     

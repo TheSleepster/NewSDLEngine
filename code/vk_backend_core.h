@@ -170,6 +170,7 @@ struct vulkan_context_t
     s32                                 compute_queue_family_idx;
 
     VkCommandPool                       graphics_command_pool;
+    VkCommandPool                       compute_command_pool;
 
     VkQueue	                            graphics_queue;
     VkQueue                             present_queue;
@@ -230,6 +231,9 @@ struct vulkan_context_t
 };
 
 typedef vulkan_context_t backend_renderer_t;
+typedef VkCommandBuffer  backend_command_buffer_t;
+typedef VkRenderPass     backend_renderpass_handle_t;
+typedef VkFramebuffer    backend_framebuffer_handle_t;
 
 // NOTE(Sleepster): 
 //
@@ -304,7 +308,7 @@ const char *vk_backend_vulkan_result_string(VkResult result, bool8 get_extended)
 bool8       vk_backend_result_is_success(VkResult result);
 void        vk_backend_handle_window_resize(vulkan_context_t *vulkan_context, vec2_t window_size);
 void        vk_backend_render_frame(vulkan_context_t *vulkan_context);
-VkPipeline  vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, const VkPipelineRasterizationStateCreateInfo *rasterization_state, const VkPipelineDepthStencilStateCreateInfo *depth_stencil_state, const VkPipelineColorBlendAttachmentState *blend_settings, VkPipelineVertexInputStateCreateInfo *pipeline_vertex_input_state);
+VkPipeline  vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, VkRenderPass renderpass, const VkPipelineRasterizationStateCreateInfo *rasterization_state, const VkPipelineDepthStencilStateCreateInfo *depth_stencil_state, const VkPipelineColorBlendAttachmentState *blend_settings, VkPipelineVertexInputStateCreateInfo *pipeline_vertex_input_state);
 void        vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *renderer_state);
 void        vk_backend_renderpass_destroy(vulkan_context_t *vulkan_context, VkRenderPass renderpass);
 void        vk_backend_framebuffer_destroy(vulkan_context_t *vulkan_context, VkFramebuffer framebuffer);

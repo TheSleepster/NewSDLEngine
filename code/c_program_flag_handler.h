@@ -277,7 +277,7 @@ next:
         if(!arg_found) 
         {
             log_error("Argument '%s' not found...\n", arg_string);
-            c_program_flag_print_flag_list();
+            exit(-1);
         }
     }
 

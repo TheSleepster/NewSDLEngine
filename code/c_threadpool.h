@@ -9,6 +9,7 @@
 #define C_THREADPOOL_H
 
 #include <c_base.h>
+#include <c_intrinsics.h>
 #include <c_types.h>
 #include <p_platform_data.h>
 
@@ -87,7 +88,7 @@ void c_threadpool_flush_work_orders(threadpool_t *threadpool);
 void c_threadpool_wait_on_fence(threadpool_t *threadpool, work_completion_fence_t *fence);
 
 template <typename LambdaType>
-void c_threadpool_push_work_order(threadpool_t *threadpool, LambdaType lambda, work_completion_fence_t *fence);
+true_inline void c_threadpool_push_work_order(threadpool_t *threadpool, LambdaType lambda, work_completion_fence_t *fence);
 
 /*===========================================
   ================= MACROS ==================
@@ -101,6 +102,94 @@ void c_threadpool_push_work_order(threadpool_t *threadpool, LambdaType lambda, w
 #define parallel_for(threadpool, iterator, max_iterations, work_completed_fence_ptr, lambda) \
     for(u32 iterator = 0; iterator < max_iterations; ++iterator)  \
         c_threadpool_push_work_order(threadpool, lambda, work_completed_fence_ptr)                  
+
+// NOTE(Sleepster): 
+// C++ is stupid and is an awfully designed language... I would much rather NOT have these here, but I lack any choice in the matter.
+
+/*
+=============
+invoke
+=============
+*/
+
+template <typename LambdaType>
+internal_api void
+invoke(void *lambda_data)
+{
+    LambdaType *lambda = static_cast<LambdaType*>(lambda_data);
+    (*lambda)();
+}
+
+/*
+=============
+c_threadpool_push_work_order
+=============
+*/
+
+template <typename LambdaType>
+internal_api void
+c_threadpool_push_work_order(worker_thread_t *thread, LambdaType lambda, work_completion_fence_t *fence)
+{
+    work_order_t new_work_order = {}; 
+    void *data = 0;
+
+    u32 allocation_size = Align(sizeof(LambdaType), 64);
+
+    u32 used_offset = AtomicExchangeAdd32(&thread->allocator.used, allocation_size); 
+    if(used_offset <= thread->allocator.size)
+    {
+        data = thread->allocator.buffer + used_offset;
+    }
+
+    Assert(data != null);
+    memcpy(data, &lambda, sizeof(LambdaType));
+
+    new_work_order.data     = data;
+    new_work_order.function = invoke<LambdaType>;
+    new_work_order.fence    = fence;
+    for(;;)
+    {
+        u32 original_next_head_index = thread->work_avaliable.head;
+        u32 next_head_index          = (original_next_head_index + 1) % MAX_WORK_ORDERS;
+
+        u32 next_entry = AtomicCompareExchange32(&thread->work_avaliable.head,
+                                                 next_head_index,
+                                                 original_next_head_index);
+        if(next_entry == original_next_head_index)
+        {
+            thread->work_avaliable.work_orders[next_entry] = new_work_order;
+            AtomicIncrement32(&thread->total_work_orders);
+            if(thread->is_started)
+            {
+                sys_semaphore_release(&thread->threadpool->work_avaliable_semaphore, 1);
+            }
+
+            ReadWriteBarrier;
+            break;
+        }
+    }
+}
+
+/*
+=============
+c_threadpool_push_work_order
+=============
+*/
+
+template <typename LambdaType>
+true_inline void
+c_threadpool_push_work_order(threadpool_t *threadpool, LambdaType lambda, work_completion_fence_t *fence)
+{
+    worker_thread_t *thread = threadpool->workers + threadpool->next_worker_index;
+    threadpool->next_worker_index = (threadpool->next_worker_index + 1) % threadpool->thread_count;
+    if(fence)
+    {
+        AtomicIncrement(&fence->pending);
+    }
+
+    c_threadpool_push_work_order(thread, lambda, fence);
+}
+
 
 #endif // C_THREADPOOL_H
 

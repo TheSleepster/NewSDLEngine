@@ -262,43 +262,6 @@ vk_backend_submit_and_release_scratch_command_buffer(vulkan_context_t *vulkan_co
 
 /*
 =============
-vk_backend_find_memory_index
-=============
-*/
-
-s32 
-vk_backend_find_memory_index(vulkan_context_t *vulkan_context,
-                             u32               type_filter, 
-                             u32               property_flags)
-{
-    s32 result = -1;
-
-    VkPhysicalDeviceMemoryProperties memory_properties;
-    vkGetPhysicalDeviceMemoryProperties(vulkan_context->gpu.device, &memory_properties);
-
-    for(u32 memory_index = 0;
-        memory_index < memory_properties.memoryTypeCount;
-        ++memory_index)
-    
-    {
-        if((type_filter & (1 << memory_index)) && 
-          ((memory_properties.memoryTypes[memory_index].propertyFlags & property_flags) == property_flags))
-        {
-            result = memory_index;
-            break;
-        }
-    }
-
-    if(result == -1)
-    {
-        log_error("Failure to find a valid memory type...\n");
-    }
-
-    return(result);
-}
-
-/*
-=============
 vk_backend_check_physical_device_support
 =============
 */
@@ -803,19 +766,26 @@ vk_backend_create_sync_objects(vulkan_context_t *vulkan_context)
 
 /*
 =============
-vk_backend_create_command_buffers
+vk_backend_create_command_pools
 =============
 */
 
 void
 vk_backend_create_command_pools(vulkan_context_t *vulkan_context)
 {
-    VkCommandPoolCreateInfo command_pool_create_info = {};
-    command_pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    command_pool_create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    command_pool_create_info.queueFamilyIndex = vulkan_context->graphics_queue_family_idx;
+    VkCommandPoolCreateInfo graphics_command_pool_create_info = {};
+    graphics_command_pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    graphics_command_pool_create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    graphics_command_pool_create_info.queueFamilyIndex = vulkan_context->graphics_queue_family_idx;
 
-    vkAssert(vkCreateCommandPool(vulkan_context->device, &command_pool_create_info, null, &vulkan_context->graphics_command_pool));
+    vkAssert(vkCreateCommandPool(vulkan_context->device, &graphics_command_pool_create_info, null, &vulkan_context->graphics_command_pool));
+
+    VkCommandPoolCreateInfo compute_command_pool_create_info = {};
+    compute_command_pool_create_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    compute_command_pool_create_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    compute_command_pool_create_info.queueFamilyIndex = vulkan_context->compute_queue_family_idx;
+
+    vkAssert(vkCreateCommandPool(vulkan_context->device, &compute_command_pool_create_info, null, &vulkan_context->compute_command_pool));
 }
 
 /*
@@ -863,6 +833,7 @@ vk_backend_choose_surface_format(DynArray_t(VkSurfaceFormatKHR) formats)
 
     if(c_dynarray_count(formats) == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
     {
+        log_warning("No valid formats found... Defaulting to Normalized SRGB");
         result.format     = VK_FORMAT_B8G8R8A8_UNORM;
         result.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     }
@@ -873,7 +844,7 @@ vk_backend_choose_surface_format(DynArray_t(VkSurfaceFormatKHR) formats)
             ++format_index) 
         {
             VkSurfaceFormatKHR format = formats[format_index];
-            if(format.format == VK_FORMAT_B8G8R8A8_UNORM && 
+            if(format.format == VK_FORMAT_B8G8R8A8_SRGB && 
                format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) 
             {
                 result = format;
@@ -1731,6 +1702,7 @@ vk_backend_create_pipeline_from_render_state
 VkPipeline
 vk_backend_create_pipeline_from_render_state(vulkan_context_t        *vulkan_context,
                                              vulkan_shader_t         *shader,
+                                             VkRenderPass             renderpass,
                                              render_pipeline_state_t *state)
 {
     Assert(shader->shader_id > 0);
@@ -1772,6 +1744,7 @@ vk_backend_create_pipeline_from_render_state(vulkan_context_t        *vulkan_con
 
     result = vk_backend_create_render_pipeline(vulkan_context, 
                                                shader, 
+                                               renderpass,
                                               &rasterization_state, 
                                               &depth_stencil_state,
                                               &blend_settings,
@@ -1798,6 +1771,7 @@ vk_backend_create_render_pipeline
 VkPipeline
 vk_backend_create_render_pipeline(vulkan_context_t                             *vulkan_context, 
                                   vulkan_shader_t                              *shader, 
+                                  VkRenderPass                                  renderpass,
                                   const VkPipelineRasterizationStateCreateInfo *rasterization_state,
                                   const VkPipelineDepthStencilStateCreateInfo  *depth_stencil_state,
                                   const VkPipelineColorBlendAttachmentState    *blend_settings,
@@ -1882,7 +1856,7 @@ vk_backend_create_render_pipeline(vulkan_context_t                             *
         .pColorBlendState    = &color_blend_state,
         .pDynamicState       = &dynamic_state_data,
         .layout              =  shader->pipeline_layout,
-        .renderPass          =  vulkan_context->primary_renderpass,
+        .renderPass          =  renderpass,
         .subpass             =  0,
         .basePipelineHandle  =  VK_NULL_HANDLE,
         .basePipelineIndex   = -1,
@@ -2641,9 +2615,12 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                             command_list->image_shader_params[command_list->image_count++] = attachment->image;
                         }
                     }
+
+                    command_list->active_renderpass = renderpass;
                 }break;
                 case RCT_EndRenderpass:
                 {
+                    Assert(command_list->active_renderpass != null);
                     vkCmdEndRenderPass(render_command_buffer);
 
                     render_command_end_renderpass_t *cmd = (render_command_end_renderpass_t*)command->data;
@@ -2670,6 +2647,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                             vk_backend_transfer_image_to_final_layout(vulkan_context, render_command_buffer, image);
                         }
                     }
+
+                    command_list->active_renderpass = null;
                 }break;
                 case RCT_BindVertexBuffer:
                 {
@@ -2678,7 +2657,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     VkDeviceSize offset = 0;
                     vkCmdBindVertexBuffers(render_command_buffer, 0, 1, &cmd->buffer->buffer.handle, &offset); 
-                    
+
                     c_dynarray_push(command_list->active_vertex_buffers, cmd->buffer);
                     ++command_list->vertex_buffer_count;
                 }break;
@@ -2689,17 +2668,27 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     VkDeviceSize offset = 0;
                     vkCmdBindIndexBuffer(render_command_buffer, cmd->buffer->buffer.handle, offset, VK_INDEX_TYPE_UINT32); 
-                    
+
                     command_list->active_index_buffer = cmd->buffer;
                 }break;
                 case RCT_BindShader:
                 {
+                    Assert(command_list->active_renderpass != null);
+
                     render_command_bind_shader_t *cmd = (render_command_bind_shader_t*)command->data;
                     vulkan_shader_t *shader = &cmd->shader.shader->shader_data;
                     u64 hash_index = 0;
                     if(shader->pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
                     {
-                        hash_index = (c_fnv_hash_value((u8*)&command_list->active_render_state, sizeof(render_pipeline_state_t))) % MAX_SHADER_PIPELINE_COUNT;
+                        struct shader_pipeline_key_t {
+                            renderpass_key_t        renderpass;
+                            render_pipeline_state_t pipeline_state;
+                        }pipeline_key;
+
+                        pipeline_key.pipeline_state = command_list->active_render_state;
+                        pipeline_key.renderpass     = command_list->active_renderpass->renderpass_key;
+
+                        hash_index = (c_fnv_hash_value((u8*)&pipeline_key, sizeof(shader_pipeline_key_t))) % MAX_SHADER_PIPELINE_COUNT;
                     }
 
                     // TODO(Sleepster): Maybe we don't want to touch the stuff accessed by the command_list... threading issues.
@@ -2707,8 +2696,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     if(shader_pipeline == VK_NULL_HANDLE)
                     {
                         shader->pipeline_hash.data[hash_index] = vk_backend_create_pipeline_from_render_state(vulkan_context, 
-                                                                                                             shader, 
-                                                                                                             &command_list->active_render_state);
+                                                                                                              shader, 
+                                                                                                              command_list->active_renderpass->renderpass_handle,
+                                                                                                              &command_list->active_render_state);
                         shader_pipeline = shader->pipeline_hash.data[hash_index];
                     }
 
@@ -2901,8 +2891,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     };
 
                     vk_backend_image_blit(vulkan_context,
-                                         &cmd->source_image->vulkan_image,
-                                         &cmd->dest_image->vulkan_image,
+                                          &cmd->source_image->vulkan_image,
+                                          &cmd->dest_image->vulkan_image,
                                           cmd->source_offset,
                                           cmd->source_size,
                                           cmd->dest_offset,
@@ -2916,44 +2906,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_PresentFrame:
                 {
                     render_command_present_frame_t *cmd = (render_command_present_frame_t *)command->data;
-                    image_t        *source     = cmd->presentation_source;
-                    vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
-
-                    Assert(source);
-                    Assert(backbuffer);
-                    Assert(!vk_backend_is_image_format_stencil_format(&source->vulkan_image) && 
-                           !vk_backend_is_image_format_depth_format(&source->vulkan_image));
-
-                    VkImageSubresourceRange source_range = {
-                        .aspectMask     = source->vulkan_image.aspect_mask,
-                        .baseArrayLayer = 0,
-                        .baseMipLevel   = 0,
-                        .layerCount     = 1,
-                        .levelCount     = 1,
-                    };
-
-                    VkImageSubresourceRange destination_range = {
-                        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-                        .baseMipLevel   = 0,
-                        .baseArrayLayer = 0,
-                        .levelCount     = 1,
-                        .layerCount     = 1,
-                    };
-
-                    vk_backend_image_blit(vulkan_context,
-                                         &source->vulkan_image,
-                                          backbuffer,
-                                          vec2(0, 0),
-                                          vec2(source->vulkan_image.width, source->vulkan_image.height),
-                                          vec2(0, 0),
-                                          vec2(backbuffer->width, backbuffer->height),
-                                          VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                                          VK_IMAGE_LAYOUT_UNDEFINED,
-                                          VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                                          source_range,
-                                          destination_range);
-
-                    command_list->presenting = true;
+                    renderer_state->present_command = cmd;
                 }break;
             }
         }
@@ -2984,7 +2937,48 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
         c_dynarray_clear(command_list->active_vertex_buffers);
     }
+
+    if(renderer_state->present_command)
+    {
+        image_t        *source     = renderer_state->present_command->presentation_source;
+        vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
+
+        Assert(source);
+        Assert(backbuffer);
+        Assert(!vk_backend_is_image_format_stencil_format(&source->vulkan_image) && 
+               !vk_backend_is_image_format_depth_format(&source->vulkan_image));
+
+        VkImageSubresourceRange source_range = {
+            .aspectMask     = source->vulkan_image.aspect_mask,
+            .baseArrayLayer = 0,
+            .baseMipLevel   = 0,
+            .layerCount     = 1,
+            .levelCount     = 1,
+        };
+
+        VkImageSubresourceRange destination_range = {
+            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseMipLevel   = 0,
+            .baseArrayLayer = 0,
+            .levelCount     = 1,
+            .layerCount     = 1,
+        };
+
+        vk_backend_image_blit(vulkan_context,
+                              &source->vulkan_image,
+                              backbuffer,
+                              vec2(0, 0),
+                              vec2(source->vulkan_image.width, source->vulkan_image.height),
+                              vec2(0, 0),
+                              vec2(backbuffer->width, backbuffer->height),
+                              VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                              VK_IMAGE_LAYOUT_UNDEFINED,
+                              VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                              source_range,
+                              destination_range);
+    }
     renderer_state->command_list_count = 0;
+    renderer_state->present_command    = null;
 
     // NOTE(Sleepster): 
     // Change the layout of the swapchain image if we must.
@@ -3313,4 +3307,36 @@ backend_shader_create(shader_t *shader, string_t shader_source)
 #else 
     shader->shader_data = vk_backend_shader_create_slang_reflect(this->render_context, shader_source);
 #endif
+}
+
+
+/*
+=============
+renderer_state_t::backend_get_command_buffer
+=============
+*/
+
+true_inline backend_command_buffer_t renderer_state_t::
+backend_get_command_buffer(render_command_list_t *command_list)
+{
+    VkCommandBuffer result = VK_NULL_HANDLE;
+
+    vulkan_context_t *vulkan_context = this->render_context;
+    if(command_list->backend_command_buffer == VK_NULL_HANDLE)
+    {
+        if(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS)
+        {
+            VkCommandBuffer graphics_command_buffer = *vulkan_context->render_command_buffer;
+            (void)graphics_command_buffer;
+        }
+        else
+        {
+        }
+    }
+    else
+    {
+        result = command_list->backend_command_buffer;
+    }
+
+    return(result);
 }

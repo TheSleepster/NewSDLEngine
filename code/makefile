@@ -1,6 +1,5 @@
 CXX      = clang++
 CC       = clang
-SLANGC   = slangc
 
 SILENT          ?=
 DEBUG_BUILD     ?=
@@ -107,10 +106,21 @@ SLANG_REFLECTOR_OUT = $(BUILD_DIR)/slang_reflector$(EXE_EXT)
 WAD_ASSET_FILE_PACKER_SRC = asset_file_packer/wad_asset_file_packer.cpp
 JFD_ASSET_FILE_PACKER_SRC = asset_file_packer/jfd_file_packer.cpp
 
-# Shaders
-SHADERS_SRC    := $(wildcard $(SHADER_DIR)/*.slang)
-SHADER_OUTPUTS := $(patsubst $(SHADER_DIR)/%.slang,../run_tree/res/shader_binaries/%.spv,$(SHADERS_SRC))
-SLANG_FLAGS    := -target spirv -matrix-layout-column-major -I$(SHADER_DIR) -O0 -g -profile sm_6_3
+# Shader source files - .slang are entry points, .slh are headers.
+# Both are tracked: a change to any .slh triggers a full reflector run
+# (all shaders recompile) since the reflector is a single invocation and
+# cannot emit per-shader dependency files the way clang emits -MMD .d files.
+SHADER_FILES := $(wildcard $(SHADER_DIR)/*.slang) $(wildcard $(SHADER_DIR)/*.slh)
+
+# Asset files - tracked recursively for change detection.
+# shader_binaries/ is excluded from the file list to avoid a cycle: the shader
+# step writes there, and if those files were in ASSET_FILES the packer would
+# re-trigger the shader step endlessly. Instead, assets.stamp depends directly
+# on shaders.stamp so the packer still reruns whenever shaders are rebuilt.
+# assets.stamp itself is excluded so it doesn't appear in its own dep list.
+ASSET_FILES := $(shell find $(ASSET_DIR) -type f \
+                  -not -path "$(ASSET_DIR)/shader_binaries/*" \
+                  -not -name "assets.stamp")
 
 # --------------------------------------------
 # Sandbox / clangd
@@ -139,9 +149,9 @@ JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
 # --------------------------------------------
 # Build Instructions
 # --------------------------------------------
-.PHONY: all shaders clean run_preprocessor sandbox clangd-db
+.PHONY: all shaders clean run_preprocessor sandbox clangd-db pack_assets
 
-all: $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(SLANG_REFLECTOR_OUT) do_codegen $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests sandbox clangd-db 
+all: $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(SLANG_REFLECTOR_OUT) do_codegen $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests sandbox clangd-db pack_assets
 
 # Create Build Directory
 $(BUILD_DIR):
@@ -194,14 +204,35 @@ $(SLANG_REFLECTOR_OUT): $(SLANG_REFLECTOR_SRC) | $(BUILD_DIR)
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
 
 # -------------------------------------------------------------------------
-# Shaders 
+# Shaders
+# Stamp-based: only re-runs when a .slang or .slh file changes, or the
+# reflector binary is rebuilt. A .slh change triggers a full recompile of
+# all shaders since the reflector is a single invocation with no per-shader
+# dep file output.
 # -------------------------------------------------------------------------
-shaders: $(SHADER_OUTPUTS)
+shaders: $(BUILD_DIR)/shaders.stamp
 
-../run_tree/res/shader_binaries/%.spv: $(SHADER_DIR)/%.slang
-	$(SILENT)$(call MKDIR,$(dir $@))
-	$(SLANGC) $< $(SLANG_FLAGS) -o $@
-	@echo [SHADERS]: $< to $@
+$(BUILD_DIR)/shaders.stamp: $(SHADER_FILES) $(SLANG_REFLECTOR_OUT) | $(BUILD_DIR)
+	@echo [SHADERS] Running slang reflector...
+	$(SILENT)cd ../code && $(CURDIR)/$(SLANG_REFLECTOR_OUT) \
+		--shader_directory_path=../code/shaders \
+		--shader_output_dir=../run_tree/res/shader_binaries/
+	@touch $@
+
+# -------------------------------------------------------------------------
+# Asset Packing
+# Stamp-based: reruns when any asset file changes, the packer is rebuilt,
+# or shaders are recompiled (via shaders.stamp dependency).
+# shader_binaries/ is excluded from ASSET_FILES to avoid a cycle, but
+# shaders.stamp is listed as an explicit prerequisite so the packer still
+# reruns whenever new .spv files are written.
+# -------------------------------------------------------------------------
+pack_assets: $(BUILD_DIR)/assets.stamp
+
+$(BUILD_DIR)/assets.stamp: $(ASSET_FILES) $(JFD_ASSET_FILE_PACKER_OUT) $(BUILD_DIR)/shaders.stamp | $(BUILD_DIR)
+	@echo [ASSETS] Packing assets...
+	$(SILENT)cd $(ASSET_DIR) && $(CURDIR)/$(JFD_ASSET_FILE_PACKER_OUT)
+	@touch $@
 
 # -------------------------------------------------------------------------
 # Tests 

@@ -54,7 +54,6 @@ sys_align_to_page_size(u32 size)
 void*
 sys_allocate_memory(usize allocation_size)
 {
-#if 1
     u32 true_allocation = sys_align_to_page_size(allocation_size);
     void *data = mmap(0, true_allocation, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
     if(data == MAP_FAILED)
@@ -64,25 +63,17 @@ sys_allocate_memory(usize allocation_size)
 
         data = null;
     }
-#else
-    u32 true_allocation = sys_align_to_page_size(allocation_size);
-    void *data = malloc(true_allocation);
-    
-    ZeroMemory(data, true_allocation);
-    Assert(data != null);
-#endif
 
     return(data);
 }
 
 // TODO(Sleepster): 
 // Again, mmap is weird. You can't just pass the virtual address and say "give me more memory off of this base address" 
-// because... idk unix stuff? Again, this is behavior that Windows actually supports better. AS for how to replicate on Unix?
+// because... idk unix stuff? Again, this is behavior that Windows actually supports better. As for how to replicate on Unix?
 // idk yet...
 void*
 sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
 {
-#if 1
     Assert(base);
     errno = 0;
     
@@ -95,11 +86,6 @@ sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
 
         result = null;
     }
-#else
-    u32 true_allocation = sys_align_to_page_size(allocation_size);
-    void *result = realloc(base, true_allocation);
-    Assert(result != null);
-#endif
 
     return(result);
 }
@@ -125,7 +111,6 @@ sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overl
     file_t result = {};
     result.file_name   = c_string_get_filename_from_path(filepath);
     result.filepath    = filepath;
-    result.file_name   = c_string_get_filename_from_path(filepath);
     result.for_writing = for_writing;
     result.overlapping = overlapping_io;
 
