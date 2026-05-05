@@ -10,6 +10,27 @@
 - [ ] Debug macros for toggling certain slowdown points such as Assert() and Expect()
 - [ ] Makefile setting for these macros
 
+- [ ] Bug inside the metaprogram... It seems to hate this:
+```cpp
+union clear_value_t
+{
+    struct clear_depth_stencil_t {
+        float32 depth;
+        u32     stencil;
+    }clear_depth_stencil;
+
+    union clear_color_t {
+        vec4_t  float_color;
+        ivec4_t int_color;
+        u32     uint_color[4];
+    }clear_color;
+};
+```
+    Error reported is:
+    ./meta/GENERATED_program_RTTI.h:7351:120: error: no member named 'clear_color' in 'clear_value_t::clear_color_t'
+     7351 |         {.name = "clear_color", .type = TYPE_clear_color, .size = sizeof(decltype(GENERATED_DEFAULT_clear_value_t.clear_color.clear_color)), .struct_info = (type_info_struct_t*)&type_info_struct_clear_color_const_data},
+          |                                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^
+
 *** IN THE FUTURE
 - [ ] We need a proper timing API. Something that can just be attached to a program as a header or lib 
       and timing record information about the process and certain subblocks. 

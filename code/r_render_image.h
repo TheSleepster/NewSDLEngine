@@ -15,25 +15,27 @@
 // valid or should be ignored completely. 
 enum render_image_filter_type_t 
 {
-    ImageFilterType_Invalid,
-    ImageFilterType_Nearest,
-    ImageFilterType_Linear,
+    IMAGE_FILTER_TYPE_INVALID,
+    IMAGE_FILTER_TYPE_NEAREST,
+    IMAGE_FILTER_TYPE_LINEAR,
 };
 
 enum render_image_wrapping_type_t 
 {
-    ImageWrapping_Invalid,
-    ImageWrapping_ClampToEdge,
-    ImageWrapping_ClampToBorder,
-    ImageWrapping_Repeat,
+    IMAGE_WRAPPING_INVALID,
+    IMAGE_WRAPPING_CLAMP_TO_EDGE,
+    IMAGE_WRAPPING_CLAMP_TO_BORDER,
+    IMAGE_WRAPPING_REPEAT,
 };
 
 enum render_image_usage_t 
 {
-    ImageUsage_Invalid              = BIT(0),
-    ImageUsage_RenderpassAttachment = BIT(1),
-    ImageUsage_SampledTexture       = BIT(2),
-    ImageUsage_BlitSource           = BIT(3),
+    IMAGE_USAGE_INVALID                     = BIT(0),
+    IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT = BIT(1),
+    IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT = BIT(2),
+    IMAGE_USAGE_SHADER_SAMPLED_IMAGE        = BIT(3),
+    IMAGE_USAGE_BLIT_SOURCE                 = BIT(4),
+    IMAGE_USAGE_BLIT_DESTINATION            = BIT(5),
 };
 
 struct sampler_create_info_t

@@ -27,7 +27,7 @@ s_renderer_image_create_from_bitmap(bitmap_t *bitmap)
     info.height         = bitmap->height;
     info.data           = bitmap->pixels;
     info.format         = bitmap->format;
-    info.usage          = ImageUsage_SampledTexture;
+    info.usage          = IMAGE_USAGE_SHADER_SAMPLED_IMAGE;
 
     result = s_renderer_image_create(global_context->renderer_state, &info);
 

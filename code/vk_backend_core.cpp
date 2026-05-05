@@ -2453,6 +2453,62 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
 
 /*
 =============
+vk_backend_perform_image_blit
+=============
+*/
+
+void
+vk_backend_perform_image_blit(vulkan_context_t *vulkan_context, 
+                              VkCommandBuffer   render_command_buffer, 
+                              vulkan_image_t   *source, 
+                              vulkan_image_t   *destination,
+                              vec2_t            source_offset,
+                              vec2_t            source_size,
+                              vec2_t            destination_offset,
+                              vec2_t            destination_size)
+{
+    if(source->layout != source->renderpass_initial_layout)
+    {
+        vk_backend_transfer_image_to_intial_layout(vulkan_context, render_command_buffer, source);
+    }
+
+    if(destination->layout != destination->renderpass_initial_layout)
+    {
+        vk_backend_transfer_image_to_intial_layout(vulkan_context, render_command_buffer, destination);
+    }
+
+    VkImageSubresourceRange source_range = {
+        .aspectMask     = source->aspect_mask,
+        .baseArrayLayer = 0,
+        .baseMipLevel   = 0,
+        .layerCount     = 1,
+        .levelCount     = 1,
+    };
+
+    VkImageSubresourceRange destination_range = {
+        .aspectMask     = source->aspect_mask,
+        .baseMipLevel   = 0,
+        .baseArrayLayer = 0,
+        .levelCount     = 1,
+        .layerCount     = 1,
+    };
+
+    vk_backend_image_blit(vulkan_context,
+                          source,
+                          destination,
+                          source_offset,
+                          source_size,
+                          destination_offset,
+                          destination_size,
+                          source->layout,
+                          destination->layout,
+                          destination->layout,
+                          source_range,
+                          destination_range);
+}
+
+/*
+=============
 vk_backend_render_frame
 =============
 */
@@ -2559,11 +2615,11 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         attachment_index < renderpass->total_attachment_count;
                         ++attachment_index)
                     {
-                        clear_value_t *value      = renderpass->attachment_clear_values;
+                        clear_value_t *value      = renderpass->attachment_clear_values + attachment_index;
                         VkClearValue *clear_value = clear_values + attachment_index;
 
                         memcpy((void*)&clear_value->color, 
-                               (void*)&value->clear_color, 
+                               (void*)&value->float_color, 
                                sizeof(float32) * 4);
                     }
 
@@ -2649,6 +2705,54 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     }
 
                     command_list->active_renderpass = null;
+                }break;
+                case RCT_BlitRenderpass:
+                {
+                    render_command_blit_renderpass_t *cmd = (render_command_blit_renderpass_t*)command->data;
+                    renderpass_t *source = cmd->source;
+                    renderpass_t *dest   = cmd->destination;
+
+                    // TODO(Sleepster): 
+                    // This is a separate render command because We will need to perform some mutex / semaphore sync stuff to stop the 
+                    // modiciation of the renderpass anywhere else while we do this complete copy.
+
+                    for(u32 render_attachment_index = 0;
+                        render_attachment_index < source->color_attachment_count;
+                        ++render_attachment_index)
+                    {
+                        renderpass_attachment_t *source_attachment      = source->color_attachments + render_attachment_index;
+                        renderpass_attachment_t *destination_attachment = dest->color_attachments   + render_attachment_index;
+
+                        vec2_t source_blit_size = vec2(source_attachment->image->create_info.width,
+                                                       source_attachment->image->create_info.height);
+                        vec2_t destination_blit_size = vec2(dest->render_width, dest->render_height);
+                        vk_backend_perform_image_blit(vulkan_context, 
+                                                      render_command_buffer, 
+                                                      &source_attachment->image->vulkan_image,
+                                                      &destination_attachment->image->vulkan_image,
+                                                      vec2_zero(),
+                                                      source_blit_size,
+                                                      vec2_zero(),
+                                                      destination_blit_size);
+                    }
+
+                    if(source->has_depth_stencil_attachment)
+                    {
+                        renderpass_attachment_t *source_depth      = &source->depth_stencil_attachment;
+                        renderpass_attachment_t *destination_depth = &dest->depth_stencil_attachment;
+
+                        vec2_t source_blit_size = vec2(source_depth->image->create_info.width,
+                                                       source_depth->image->create_info.height);
+                        vec2_t destination_blit_size = vec2(dest->render_width, dest->render_height);
+                        vk_backend_perform_image_blit(vulkan_context, 
+                                                      render_command_buffer, 
+                                                     &source_depth->image->vulkan_image,
+                                                     &destination_depth->image->vulkan_image,
+                                                      vec2_zero(),
+                                                      source_blit_size,
+                                                      vec2_zero(),
+                                                      destination_blit_size);
+                    }
                 }break;
                 case RCT_BindVertexBuffer:
                 {
@@ -2863,45 +2967,14 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_BlitImage:
                 {
                     render_command_blit_image_t *cmd = (render_command_blit_image_t*)command->data;
-
-                    if(cmd->source_image->vulkan_image.layout != cmd->source_image->vulkan_image.renderpass_initial_layout)
-                    {
-                        vk_backend_transfer_image_to_intial_layout(vulkan_context, render_command_buffer, &cmd->source_image->vulkan_image);
-                    }
-
-                    if(cmd->dest_image->vulkan_image.layout != cmd->dest_image->vulkan_image.renderpass_initial_layout)
-                    {
-                        vk_backend_transfer_image_to_intial_layout(vulkan_context, render_command_buffer, &cmd->dest_image->vulkan_image);
-                    }
-
-                    VkImageSubresourceRange source_range = {
-                        .aspectMask     = cmd->source_image->vulkan_image.aspect_mask,
-                        .baseArrayLayer = 0,
-                        .baseMipLevel   = 0,
-                        .layerCount     = 1,
-                        .levelCount     = 1,
-                    };
-
-                    VkImageSubresourceRange destination_range = {
-                        .aspectMask     = cmd->source_image->vulkan_image.aspect_mask,
-                        .baseMipLevel   = 0,
-                        .baseArrayLayer = 0,
-                        .levelCount     = 1,
-                        .layerCount     = 1,
-                    };
-
-                    vk_backend_image_blit(vulkan_context,
-                                          &cmd->source_image->vulkan_image,
-                                          &cmd->dest_image->vulkan_image,
-                                          cmd->source_offset,
-                                          cmd->source_size,
-                                          cmd->dest_offset,
-                                          cmd->dest_size,
-                                          cmd->source_image->vulkan_image.layout,
-                                          cmd->dest_image->vulkan_image.layout,
-                                          cmd->dest_image->vulkan_image.layout,
-                                          source_range,
-                                          destination_range);
+                    vk_backend_perform_image_blit(vulkan_context, 
+                                                  render_command_buffer, 
+                                                 &cmd->source_image->vulkan_image,
+                                                 &cmd->dest_image->vulkan_image,
+                                                  cmd->source_offset,
+                                                  cmd->source_size,
+                                                  cmd->dest_offset,
+                                                  cmd->dest_size);
                 }break;
                 case RCT_PresentFrame:
                 {
@@ -2971,7 +3044,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                               vec2(source->vulkan_image.width, source->vulkan_image.height),
                               vec2(0, 0),
                               vec2(backbuffer->width, backbuffer->height),
-                              VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                              source->vulkan_image.layout,
                               VK_IMAGE_LAYOUT_UNDEFINED,
                               VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
                               source_range,

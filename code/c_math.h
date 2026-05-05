@@ -617,11 +617,11 @@ MATH_API vec2_t       rect2_get_vector_depth(rectangle2_t rect);
   ============== DEFINITIONS ================
   ===========================================*/
 
+#ifdef MATH_IMPLEMENTATION
+
 /*===========================================
   ============= FLOAT32 FUNCTIONS ===========
   ===========================================*/
-
-#ifdef MATH_IMPLEMENTATION
 
 MATH_API true_inline float32
 f32_lerp(float32 A, float32 B, float32 T)

@@ -136,7 +136,7 @@ entity_render(game_state_t *game_state, render_command_list_t *command_list, ent
     
     immediate_quad_ex(command_list,
                      &game_state->vertex_buffer, 
-                      entity->position, 
+                      vec2_expand_vec3(entity->position, 0.0f), 
                       entity->size, 
                       vec4(1.0, 1.0, 1.0, 1.0),
                       uv_min,
@@ -160,11 +160,12 @@ game_main(void)
 
     // NOTE(Sleepster): Clear colors 
     clear_value_t color_buffer_clear_value = {
-        .clear_color = {.float_color = {0.1f, 0.1f, 0.8f, 1.0f}},
+        .float_color = {0.1f, 0.1f, 0.8f, 1.0f},
     };
 
     clear_value_t depth_buffer_clear_value = {
-        .clear_depth = 0.0f
+        .depth   = 1.0f,
+        .stencil = 0
     };
 
     // NOTE(Sleepster): Game Renderpass
@@ -176,14 +177,14 @@ game_main(void)
             .width  = 320,
             .height = 180,
             .format = BMF_RGBA32_UNORM,
-            .usage  = (render_image_usage_t)(ImageUsage_RenderpassAttachment|ImageUsage_BlitSource)
+            .usage  = IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT
         };
 
         image_create_info_t primary_game_depth_buffer_create_info = {
             .width  = 320,
             .height = 180,
             .format = BMF_D32_SFLOAT_S8_UINT,
-            .usage  = ImageUsage_RenderpassAttachment
+            .usage  = IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT 
         };
 
         game_state.game_color_buffer = s_renderer_image_create(renderer_state, &primary_game_color_buffer_create_info);
@@ -224,14 +225,14 @@ game_main(void)
             .width  = (u32)renderer_state->window_size.x,
             .height = (u32)renderer_state->window_size.y,
             .format = BMF_RGBA32_UNORM,
-            .usage  = ImageUsage_RenderpassAttachment,
+            .usage  = (render_image_usage_t)(IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT|IMAGE_USAGE_BLIT_SOURCE),
         };
 
         image_create_info_t fullscreen_depth_buffer_create_info = {
             .width  = (u32)renderer_state->window_size.x,
             .height = (u32)renderer_state->window_size.y,
             .format = BMF_D32_SFLOAT_S8_UINT,
-            .usage  = ImageUsage_RenderpassAttachment,
+            .usage  = IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT,
         };
 
         game_state.fullscreen_color_buffer = s_renderer_image_create(renderer_state, &fullscreen_color_buffer_create_info);
@@ -369,7 +370,7 @@ game_main(void)
         widget_t *main_panel = ui_widget_panel(main_ui, STR("Test panel..."), vec2(20, 20), vec4(1.0, 1.0, 1.0, 1.0));
         ui_widget_push_parent(main_ui, main_panel);
     
-        ui_widget_button(main_ui, STR("Test button..."), vec2(20, 20), vec4(0.6, 0.6, 0.6, 1.0), vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0));
+        ui_widget_button(main_ui, STR("Test button..."), vec2(20, 20), vec4(1.0, 0.6, 0.6, 1.0), vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0));
 
         ui_widget_pop_parent(main_ui);
 
@@ -414,14 +415,7 @@ game_main(void)
 
         // NOTE(Sleepster): Fullscreen Renderpass 
         {
-            r_cmd_blit_image(command_list, 
-                             &game_state.game_color_buffer, 
-                             &game_state.fullscreen_color_buffer, 
-                             vec2(0, 0), 
-                             vec2(game_state.game_color_buffer.create_info.width, game_state.game_color_buffer.create_info.height), 
-                             vec2(0, 0),
-                             vec2(game_state.fullscreen_color_buffer.create_info.width, game_state.fullscreen_color_buffer.create_info.height));
-
+            r_cmd_blit_renderpass(command_list, game_state.game_renderpass_ID, game_state.fullscreen_renderpass_ID);
             r_cmd_renderpass_begin(command_list, game_state.fullscreen_renderpass_ID);
             s32 window_width  = Max(renderer_state->window_size.x, 10);
             s32 window_height = Max(renderer_state->window_size.y, 10);
@@ -450,7 +444,7 @@ game_main(void)
                            asset_manager, 
                           &basic_font, 
                           STR("This is a test string..."), 
-                          vec2(-200, -100), 
+                          vec3(-200, -100, 0.0f), 
                           vec4(1.0f, 1.0f, 1.0f, 1.0f), 32);
 
             r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer);

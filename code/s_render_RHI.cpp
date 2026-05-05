@@ -876,6 +876,38 @@ r_cmd_blit_image(render_command_list_t *command_list,
     command->data = blit_image;
 }
 
+
+/*
+=============
+r_cmd_blit_renderpass
+=============
+*/
+
+void
+r_cmd_blit_renderpass(render_command_list_t *command_list, u32 source_ID, u32 destination_ID)
+{
+    Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
+    render_command_t *command   = s_renderer_get_next_command(command_list);
+    render_command_blit_renderpass_t *blit_renderpass = c_arena_push_struct(&command_list->command_arena, 
+                                                                            render_command_blit_renderpass_t);
+    
+    renderpass_t *source      = command_list->renderer_state->renderpasses + source_ID;
+    renderpass_t *destination = command_list->renderer_state->renderpasses + destination_ID;
+
+    Expect(source->total_attachment_count == destination->total_attachment_count, 
+           "Renderpasses must have the same attachment count in order to command a blit...\n");
+
+    Expect(source->has_depth_stencil_attachment == destination->has_depth_stencil_attachment, 
+           "Renderpasses must both have the same KINDS of renderpass attachments, in this case one of them is missing a depth attachment...\n");
+
+    blit_renderpass->source      = source;
+    blit_renderpass->destination = destination;
+    command->header.command_type = RCT_BlitRenderpass;
+
+    command->data = blit_renderpass;
+}
+
 /*
 =============
 r_cmd_clear_image

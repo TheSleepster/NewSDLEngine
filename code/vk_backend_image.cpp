@@ -62,9 +62,9 @@ bool8
 vk_sampler_info_is_valid(image_create_info_t *create_info)
 {
     bool8 result = true;
-    if(create_info->sampler_info.filtering == ImageFilterType_Invalid ||
-       create_info->sampler_info.wrapu     == ImageWrapping_Invalid   || 
-       create_info->sampler_info.wrapv     == ImageWrapping_Invalid)
+    if(create_info->sampler_info.filtering == IMAGE_FILTER_TYPE_INVALID ||
+       create_info->sampler_info.wrapu     == IMAGE_WRAPPING_INVALID    || 
+       create_info->sampler_info.wrapv     == IMAGE_WRAPPING_INVALID)
     {
         result = false;
     }
@@ -78,11 +78,11 @@ vk_sampler_filter_type_to_vk_filter(u32 filter)
     VkFilter result;
     switch(filter)
     {
-        case ImageFilterType_Nearest:
+        case IMAGE_FILTER_TYPE_NEAREST:
         {
             result = VK_FILTER_NEAREST;
         }break;
-        case ImageFilterType_Linear:
+        case IMAGE_FILTER_TYPE_LINEAR:
         {
             result = VK_FILTER_LINEAR;
         }break;
@@ -117,26 +117,23 @@ VkImageLayout
 vk_get_image_initial_layout_from_usage(u32 usage, u32 format)
 {
     VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
-    if(usage != ImageUsage_Invalid)
+    if(usage != IMAGE_USAGE_INVALID)
     {
-        if(usage & ImageUsage_SampledTexture)
+        if(usage & IMAGE_USAGE_SHADER_SAMPLED_IMAGE)
         {
             result = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         }
-        else if(usage & ImageUsage_RenderpassAttachment)
+        else if(usage & IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT)
         {
-            if(!vk_is_depth_format(format))
-            {
-                result = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-            }
-            else
-            {
-                result = VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL;
-            }
+            result = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        }
+        else if(usage & IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT)
+        {
+            result = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         }
         else
         {
-            log_warning("This usage is currently not handled yet returning undefined...\n");
+            log_warning("This initial usage is currently not handled yet returning undefined...\n");
         }
     }
 
@@ -147,15 +144,15 @@ VkImageLayout
 vk_get_image_final_layout_from_usage(u32 usage, u32 format)
 {
     VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
-    if(usage != ImageUsage_Invalid)
+    if(usage != IMAGE_USAGE_INVALID)
     {
-        if(usage & ImageUsage_BlitSource)
+        if(usage & IMAGE_USAGE_BLIT_SOURCE)
         {
             result = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
         }
         else
         {
-            log_warning("This usage is currently not handled yet returning undefined...\n");
+            result = VK_IMAGE_LAYOUT_GENERAL;
         }
     }
 
@@ -182,7 +179,7 @@ vk_backend_image_update_from_buffer(vulkan_context_t *vulkan_context,
         .imageSubresource = {
             .layerCount     = 1,
             .baseArrayLayer = 0,
-            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+            .aspectMask     = image->aspect_mask,
             .mipLevel       = 0,
         },
         .imageExtent = {
@@ -212,7 +209,7 @@ vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *i
     vulkan_image_info_t *image_info = &image->info;
 
     VkImageSubresourceRange src_range = {
-        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+        .aspectMask     = image->aspect_mask,
         .baseArrayLayer = 0,
         .baseMipLevel   = 0,
         .layerCount     = 1,
@@ -242,6 +239,7 @@ vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *i
     vk_backend_buffer_copy_data(vulkan_context, &copy_buffer, image_info->data.data, image_info->data.count, 0);
     vk_backend_image_update_from_buffer(vulkan_context, image, &copy_buffer, scratch_buffer);
 
+    // TODO(Sleepster): Why do we just assume GRAPHICS here? SHADER_READ_ONLY???
     vk_backend_image_change_layout(vulkan_context, 
                                    scratch_buffer,
                                    image->handle, 
@@ -407,13 +405,13 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
         Expect(false, "Failed to bind the memory for this image...\n");
     }
 
+    result.is_valid = true;
+    vk_backend_image_create_view(vulkan_context, &result);
     if(image_info->data.data != null)
     {
         vk_backend_image_update_data(vulkan_context, &result);
     }
 
-    result.is_valid = true;
-    vk_backend_image_create_view(vulkan_context, &result);
     if(image_info->sampler_info)
     {
         string_t sampler_data = {
@@ -637,6 +635,33 @@ vk_backend_sampler_destroy(vulkan_context_t *vulkan_context, VkSampler sampler)
 
 /*
 =============
+vk_get_image_pipeline_stage_flags
+=============
+*/
+
+VkPipelineStageFlags
+vk_get_image_pipeline_stage_flags(vulkan_image_t *image)
+{
+    VkPipelineStageFlags result = 0;
+    if(image->aspect_mask & VK_IMAGE_ASPECT_COLOR_BIT)
+    {
+        result |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT; 
+    }
+    else if((image->aspect_mask & VK_IMAGE_ASPECT_DEPTH_BIT) ||
+            (image->aspect_mask & VK_IMAGE_ASPECT_STENCIL_BIT))
+    {
+        result |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    }
+    else
+    {
+        InvalidCodePath;
+    }
+
+    return(result);
+}
+
+/*
+=============
 vk_backend_image_blit
 =============
 */
@@ -655,13 +680,15 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                       VkImageSubresourceRange source_range, 
                       VkImageSubresourceRange destination_range)
 {
+    VkPipelineStageFlags source_pipeline_stage_flags = vk_get_image_pipeline_stage_flags(source_image);
+
     // NOTE(Sleepster): transition the color buffer to TRANSFER_SRC 
     vk_backend_image_change_layout(vulkan_context, 
                                    *vulkan_context->render_command_buffer,
                                    source_image->handle,
                                    source_initial_layout,
                                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                                   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                   source_pipeline_stage_flags,
                                    VK_PIPELINE_STAGE_TRANSFER_BIT,
                                    0,
                                    0,
@@ -688,14 +715,14 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
 
     // NOTE(Sleepster): Do the blit 
     VkImageBlit blit_region = {
-        .srcSubresource.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+        .srcSubresource.aspectMask     = source_range.aspectMask,
         .srcSubresource.mipLevel       = 0,
         .srcSubresource.baseArrayLayer = 0,
         .srcSubresource.layerCount     = 1,
         .srcOffsets[0] = (VkOffset3D){(s32)source_offset.x,            (s32)source_offset.y,            0},
         .srcOffsets[1] = (VkOffset3D){(s32)clamped_source_blit_size.x, (s32)clamped_source_blit_size.y, 1},
 
-        .dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+        .dstSubresource.aspectMask = destination_range.aspectMask,
         .dstSubresource.mipLevel = 0, 
         .dstSubresource.baseArrayLayer = 0,
         .dstSubresource.layerCount = 1,
@@ -719,7 +746,7 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                                    source_initial_layout,
                                    VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                   source_pipeline_stage_flags,
                                    0,
                                    0,
                                    source_range);

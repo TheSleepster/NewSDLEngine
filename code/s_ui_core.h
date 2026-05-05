@@ -17,6 +17,7 @@
 
 constexpr u32 MAX_PARENT_WIDGETS = 256;
 constexpr u32 MAX_WIDGETS        = 1024;
+constexpr u32 MAX_WIDGET_LAYERS  = 32;
 
 struct interaction_data_t 
 {
@@ -39,18 +40,19 @@ struct widget_t
 {
     u64          ID;
     string_t     widget_text;
-    bool8        toggled;
+    bool32       toggled;
+    float32      parent_stack_depth;
     
-    vec2_t       position;
+    vec3_t       expected_position;
+    vec3_t       position;
     vec2_t       render_size;
-    vec4_t       render_color;
 
+    vec4_t       render_color;
     vec4_t       idle_color;
     vec4_t       hovered_color;
     vec4_t       active_color;
 
     vec2_t       minimum_render_size;
-    vec2_t       expected_position;
 
     rectangle2_t widget_rect;
 

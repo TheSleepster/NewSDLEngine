@@ -43,6 +43,21 @@ ui_widget_get_top_parent(ui_state_t *ui_state)
     return(result);
 }
 
+internal_api true_inline float32
+ui_widget_determine_depth(ui_state_t *ui_state)
+{
+    float32 result = 0.0f;
+    float32 near_value = -1;
+    float32 far_value  =  1;
+
+    float32 depth_step        = (far_value - near_value) / MAX_WIDGET_LAYERS;
+    float32 layer_depth_value = (near_value + (ui_state->parent_stack_top * depth_step)) * -1.0f;
+
+    result = layer_depth_value;
+
+    return(result);
+}
+
 true_inline void
 ui_state_begin_frame(ui_state_t *ui_state)
 {
@@ -96,7 +111,7 @@ ui_state_update_widget_state(ui_state_t *ui_state)
                 current_widget->render_size = vec2(largest_width, total_height);
 
                 // NOTE(Sleepster): Setting the children's position based off the offset of the parent 
-                float32 placement_cursor = 0.0;
+                float32 placement_cursor = 0.0f;
 
                 current_child = current_widget->first_child;
                 Assert(current_child);
@@ -120,6 +135,7 @@ ui_state_update_widget_state(ui_state_t *ui_state)
                 current_widget->render_size = current_widget->minimum_render_size;
             }
 
+            current_widget->position = current_widget->expected_position;
             current_widget = current_widget->next_sibling;
         }while(current_widget != ui_state->first_widget);
     }
@@ -229,8 +245,8 @@ ui_state_init(ui_state_t       *ui_state,
                        widget_hash_table_allocate_impl,
                        null);
 
-    ui_state->renderer      = renderer_state;
-    ui_state->asset_manager = asset_manager;
+    ui_state->renderer              = renderer_state;
+    ui_state->asset_manager         = asset_manager;
     ui_state->interface_framebuffer = renderpass_ID;
 
     ui_state->widget_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_rectangle"));
@@ -278,9 +294,11 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name)
 
     ++ui_state->widget_count;
 
-    result->widget_text = widget_name;
-    result->ID          = ui_widget_hash(ui_state, result);
-    widget_t *parent    = ui_widget_get_top_parent(ui_state);
+    result->widget_text        = widget_name;
+    result->ID                 = ui_widget_hash(ui_state, result);
+    result->parent_stack_depth = ui_widget_determine_depth(ui_state);
+
+    widget_t *parent = ui_widget_get_top_parent(ui_state);
     if(parent != null)
     {
         if(parent->first_child)
@@ -329,8 +347,8 @@ widget_t*
 ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, vec4_t background_color)
 {
     widget_t *widget = ui_widget_create(ui_state, widget_name);
-    widget->position     = position;
-    widget->render_color = background_color;
+    widget->expected_position = vec2_expand_vec3(position, widget->parent_stack_depth);
+    widget->render_color      = background_color;
 
     return(widget);
 }

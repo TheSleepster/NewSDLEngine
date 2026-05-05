@@ -9,7 +9,7 @@
 void
 immediate_quad_ex(render_command_list_t *command_list,
                   vertex_buffer_t       *buffer,
-                  vec2_t                 position,
+                  vec3_t                 position,
                   vec2_t                 render_size,
                   vec4_t                 render_color,
                   vec2_t                 uv_min,
@@ -29,15 +29,15 @@ immediate_quad_ex(render_command_list_t *command_list,
     float32 left   = position.x;
     float32 right  = position.x + render_size.x;
 
-    bottom_left->vPosition  = vec4(left,  bottom, 0, 1);
-    bottom_right->vPosition = vec4(right, bottom, 0, 1);
-    top_left->vPosition     = vec4(left,  top,    0, 1);
-    top_right->vPosition    = vec4(right, top,    0, 1);
+    bottom_left->vPosition  = vec4(left,  bottom, position.z, 1);
+    bottom_right->vPosition = vec4(right, bottom, position.z, 1);
+    top_left->vPosition     = vec4(left,  top,    position.z, 1);
+    top_right->vPosition    = vec4(right, top,    position.z, 1);
 
-    bottom_left->vColor  = vec4(1.0, 1.0, 1.0, 1.0);
-    bottom_right->vColor = vec4(1.0, 1.0, 1.0, 1.0);
-    top_left->vColor     = vec4(1.0, 1.0, 1.0, 1.0);
-    top_right->vColor    = vec4(1.0, 1.0, 1.0, 1.0);
+    bottom_left->vColor  = render_color;
+    bottom_right->vColor = render_color;
+    top_left->vColor     = render_color;
+    top_right->vColor    = render_color;
     if(texture)
     {
         if(!s_renderer_is_texture_bound(command_list, texture))
@@ -62,7 +62,7 @@ immediate_quad_ex(render_command_list_t *command_list,
 void
 immediate_rect(render_command_list_t *command_list,
                vertex_buffer_t       *buffer,
-               vec2_t                 position,
+               vec3_t                 position,
                vec2_t                 render_size,
                vec4_t                 render_color)
 {
@@ -82,7 +82,7 @@ immediate_text(render_command_list_t *command_list,
                asset_manager_t       *asset_manager,
                asset_handle_t        *font_handle,
                string_t               render_string, 
-               vec2_t                 position, 
+               vec3_t                 position, 
                vec4_t                 text_color,
                u32                    font_size)
 {
@@ -92,7 +92,7 @@ immediate_text(render_command_list_t *command_list,
     dynamic_render_font_varient_t *varient = s_asset_font_acquire_font_at_size(asset_manager, 
                                                                                font_handle, 
                                                                                font_size);
-    vec2_t render_position = position;
+    vec2_t render_position = position.xy;
     for(u32 character_index = 0;
         character_index < render_string.count;
         ++character_index)
@@ -105,7 +105,7 @@ immediate_text(render_command_list_t *command_list,
         {
             immediate_quad_ex(command_list,
                               vertex_buffer,
-                              vec2_subtract(render_position, vec2(0, metrics->offset_y)),
+                              vec2_expand_vec3(vec2_subtract(render_position, vec2(0, metrics->offset_y)), position.z),
                               vec2(metrics->width, metrics->height),
                               text_color,
                               metrics->atlas_offset,

@@ -23,8 +23,7 @@ constexpr u32 MAX_CONSTANT_BUFFERS    = 1000;
 constexpr u32 MAX_RENDER_TARGETS      = 100;
 constexpr u32 MAX_SHADER_IMAGE_PARAMS = 16;
 
-// TODO(Sleepster): Get this cancer out of here!
-// NOTE(Sleepster): Used for rendering
+// TODO(Sleepster): Used for rendering, temporary and will be removed.
 struct alignas(16) immediate_vertex_t
 {
     vec4_t vPosition;
@@ -168,6 +167,7 @@ enum render_command_type_t
     RCT_Draw,
     RCT_DrawIndexed,
     RCT_BlitImage,
+    RCT_BlitRenderpass,
     RCT_PresentFrame,
 
     RCT_Count
@@ -190,12 +190,12 @@ struct render_command_end_renderpass_t
 
 struct render_command_bind_vertex_buffer_t
 {
-    render_buffer_t        *buffer;
+    render_buffer_t *buffer;
 };
 
 struct render_command_bind_index_buffer_t
 {
-    render_buffer_t        *buffer;
+    render_buffer_t *buffer;
 };
 
 struct render_command_update_texture_t
@@ -300,6 +300,12 @@ struct render_command_blit_image_t
     vec2_t   dest_size;
 };
 
+struct render_command_blit_renderpass_t
+{
+    renderpass_t *source;
+    renderpass_t *destination;
+};
+
 struct render_command_present_frame_t
 {
     image_t *presentation_source;
@@ -317,8 +323,6 @@ enum command_list_type_t
     RENDER_COMMAND_LIST_TYPE_COMPUTE,
 };
 
-// NOTE(Sleepster): For some stupid fucking reason this has to be heap allocated instead of 
-// just stored normally like a normal object. My compiler is an autistic chimp
 struct render_command_list_t
 {
     bool8                         is_initialized;
@@ -366,15 +370,17 @@ struct render_command_list_t
 // RENDER TARGETS 
 ////////////////////
 
-struct clear_value_t
+union clear_value_t
 {
-    float32 clear_depth;
-    u32     clear_stencil;
     union {
         vec4_t  float_color;
         ivec4_t int_color;
         u32     uint_color[4];
-    }clear_color;
+        struct {
+            float32 depth;
+            u32     stencil;
+        };
+    };
 };
 
 enum renderpass_attachment_access_t
@@ -557,6 +563,7 @@ void r_cmd_draw(render_command_list_t *command_list, u32 vertex_count, u32 verte
 void r_cmd_draw_indexed(render_command_list_t *command_list, u32 index_count, u32 index_offset, u32 instance_count, u32 first_instance);
 void r_cmd_dispatch_compute(render_command_list_t *command_list, u32 invoke_x, u32 invoke_y, u32 invoke_z);
 void r_cmd_blit_image(render_command_list_t *command_list, image_t *source_image, image_t *dest_image, vec2_t source_offset, vec2_t source_blit_size, vec2_t dest_offset, vec2_t dest_blit_size);
+void r_cmd_blit_renderpass(render_command_list_t *command_list, u32 source_ID, u32 destination_ID);
 void r_cmd_present(render_command_list_t *command_list, image_t *presentation_source);
 
 void s_renderer_execute_backend_commands(renderer_state_t *renderer_state);

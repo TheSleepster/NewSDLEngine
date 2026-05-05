@@ -14,9 +14,9 @@
 #include <s_render_RHI.h>
 #include <s_asset_manager.h>
 
-void immediate_quad_ex(render_command_list_t *command_list, vertex_buffer_t *buffer, vec2_t position, vec2_t render_size, vec4_t render_color, vec2_t uv_min, vec2_t uv_max, texture2D_t *texture);
-void immediate_rect(render_command_list_t *command_list, vertex_buffer_t *buffer, vec2_t position, vec2_t render_size, vec4_t render_color);
-void immediate_text(render_command_list_t *command_list, vertex_buffer_t *vertex_buffer, asset_manager_t *asset_manager, asset_handle_t *asset_handle, string_t render_string, vec2_t position, vec4_t text_color, u32 font_size);
+void immediate_quad_ex(render_command_list_t *command_list, vertex_buffer_t *buffer, vec3_t position, vec2_t render_size, vec4_t render_color, vec2_t uv_min, vec2_t uv_max, texture2D_t *texture);
+void immediate_rect(render_command_list_t *command_list, vertex_buffer_t *buffer, vec3_t position, vec2_t render_size, vec4_t render_color);
+void immediate_text(render_command_list_t *command_list, vertex_buffer_t *vertex_buffer, asset_manager_t *asset_manager, asset_handle_t *asset_handle, string_t render_string, vec3_t position, vec4_t text_color, u32 font_size);
 
 #endif // R_IMMEDIATE_RENDERING_H
 

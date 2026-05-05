@@ -908,11 +908,11 @@ s_asset_manager_update(asset_manager_t *asset_manager)
             else
             {
                 sampler_create_info_t sampler_info = {
-                    .filtering                  = ImageFilterType_Linear,
+                    .filtering                  = IMAGE_FILTER_TYPE_LINEAR,
                     .anisotropy_enabled         = true,
                     .max_anisotropy             = 4,
-                    .wrapu                      = ImageWrapping_ClampToEdge,
-                    .wrapv                      = ImageWrapping_ClampToEdge,
+                    .wrapu                      = IMAGE_WRAPPING_CLAMP_TO_EDGE,
+                    .wrapv                      = IMAGE_WRAPPING_CLAMP_TO_EDGE,
                     .compare_ops_enabled        = false,
                     .use_normalized_coordinates = false,
                 };
@@ -922,7 +922,7 @@ s_asset_manager_update(asset_manager_t *asset_manager)
                     .width        = 4096,
                     .height       = 4096,
                     .format       = BMF_RGBA32_UNORM,
-                    .usage        = ImageUsage_SampledTexture,
+                    .usage        = IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
                     .sampler_info = sampler_info
                 };
                 asset_manager->renderer_state->backend_image_create(&info, &page->font_atlas->texture.gpu_data);
@@ -1273,7 +1273,7 @@ s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atla
             .width  = atlas->bitmap_data->width,
             .height = atlas->bitmap_data->height,
             .format = BMF_RGBA32_SRGB,
-            .usage  = ImageUsage_SampledTexture,
+            .usage  = IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
         };
 
         if(atlas->texture.gpu_data.vulkan_image.handle == null)
