@@ -32,6 +32,13 @@ struct alignas(16) immediate_vertex_t
     vec2_t vPadding;
 };
 
+// TODO(Sleepster): Remove this...
+struct camera_matrices_t
+{
+    mat4_t view_matrix;
+    mat4_t projection_matrix;
+};
+
 ////////////////////
 // GPU BUFFERS 
 ////////////////////
@@ -462,13 +469,6 @@ struct renderpass_t
 ////////////////////
 // Renderer State 
 ////////////////////
-
-// TODO(Sleepster): Remove this...
-struct camera_matrices_t
-{
-    mat4_t view_matrix;
-    mat4_t projection_matrix;
-};
 
 struct renderer_state_t
 {

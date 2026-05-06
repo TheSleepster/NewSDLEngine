@@ -267,7 +267,7 @@ game_main(void)
     game_state.game_renderpass_ID       = s_renderer_build_renderpass(renderer_state, &game_renderpass_desc);
     game_state.fullscreen_renderpass_ID = s_renderer_build_renderpass(renderer_state, &fullscreen_renderpass_desc);
 
-    ui_state_init(main_ui, asset_manager, renderer_state, game_state.fullscreen_renderpass_ID);
+    ui_state_init(main_ui, input_manager, asset_manager, renderer_state, game_state.fullscreen_renderpass_ID);
 
     u32 *indices = c_arena_push_array(&renderer_state->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
     u32  index_offset = 0;
@@ -326,7 +326,9 @@ game_main(void)
     //float32 delta_time_ms = 0;
     while(global_context->running)
     {
+        s_im_reset_controller_states(input_manager);
         process_window_events(global_context->renderer_state, input_manager);
+
         ui_state_begin_frame(main_ui);
 
         vec2_t input_axis = {};
@@ -367,10 +369,25 @@ game_main(void)
         }
         float32 alpha = (float32)(dt_accumulator / TICK_RATE);
 
-        widget_t *main_panel = ui_widget_panel(main_ui, STR("Test panel..."), vec2(20, 20), vec4(1.0, 1.0, 1.0, 1.0));
-        ui_widget_push_parent(main_ui, main_panel);
-    
-        ui_widget_button(main_ui, STR("Test button..."), vec2(20, 20), vec4(1.0, 0.6, 0.6, 1.0), vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0));
+        ui_signal_t main_panel = ui_widget_panel(main_ui, STR("Test panel..."), vec2(20, 20), vec4(0.4, 0.4, 0.4, 0.6));
+        ui_widget_push_parent(main_ui, main_panel.widget);
+
+        ui_signal_t signal = ui_widget_button(main_ui, STR("Test button..."), vec2(20, 20), vec4(1.0, 0.6, 0.6, 1.0), vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0));
+        if(signal.just_clicked)
+        {
+            main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
+        }
+
+        if(main_panel.widget->toggled)
+        {
+            for(u32 index = 0;
+                index < 4;
+                ++index)
+            {
+                ui_widget_seed(main_ui, index);
+                ui_widget_button(main_ui, STR("Test button..."), vec2(20, 20), vec4(1.0, 0.6, 0.6, 1.0), vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0));
+            }
+        }
 
         ui_widget_pop_parent(main_ui);
 

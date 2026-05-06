@@ -19,7 +19,7 @@
 extern vec2_t g_window_size;
 
 #define MAX_INPUT_CONTROLLERS 4
-#define SDL_SCANCODE_MAX (SDL_SCANCODE_COUNT + 5)
+#define MAX_KEYBOARD_BUTTONS (SDL_SCANCODE_COUNT + 5)
 
 typedef enum controller_type
 {
@@ -50,7 +50,7 @@ typedef struct action_button
 
 typedef struct keyboard_controller_data
 {
-    action_button_t input[SDL_SCANCODE_MAX + SDL_MOUSE_BUTTON_COUNT];
+    action_button_t input[MAX_KEYBOARD_BUTTONS];
 
     vec2_t          current_mouse_pos;
     vec2_t          last_mouse_pos;
@@ -138,6 +138,8 @@ void                s_im_initialize_keyboard_controller(input_manager_t *input_m
 input_controller_t* s_im_get_primary_controller(input_manager_t *input_manager);
 input_controller_t* s_im_get_controller_at_index(input_manager_t *input_manager, s32 index);
 input_controller_t* s_im_get_active_controller(input_manager_t *input_manager);
+void                s_im_set_active_controller(input_manager_t *input_manager, u32 controller_index);
+void                s_im_set_primary_controller(input_manager_t *input_manager, u32 controller_index);
 bool8               s_im_is_shift_key_down(input_controller_t *controller);
 bool8               s_im_is_control_key_down(input_controller_t *controller);
 bool8               s_im_is_alt_key_down(input_controller_t *controller);
@@ -145,7 +147,7 @@ bool8               s_im_is_alt_key_down(input_controller_t *controller);
 /*==============================================
   =============== KEYBOARD INPUT ===============
   ==============================================*/
-vec2_t s_im_transform_mouse_data(input_controller_t *controller, mat4_t view_matrix, mat4_t projection_matrix);
+vec2_t s_im_transform_mouse_data(input_controller_t *controller, vec2_t surface_size, mat4_t view_matrix, mat4_t projection_matrix);
 
 bool8  s_im_is_keyboard_key_pressed(input_controller_t *controller, s32 key_index);
 bool8  s_im_is_keyboard_key_down(input_controller_t *controller, s32 key_index);
@@ -154,7 +156,7 @@ void   s_im_consume_keyboard_key_press(input_controller_t *controller, s32 key_i
 void   s_im_consume_keyboard_key_down(input_controller_t *controller, s32 key_index);
 void   s_im_consume_keyboard_key_release(input_controller_t *controller, s32 key_index);
 
-inline action_button_t* s_im_get_key_state(input_controller_t *controller, s32 key_index);
+action_button_t* s_im_get_key_state(input_controller_t *controller, s32 key_index);
 
 /*=============================================
   =============== GAMEPAD INPUT ===============

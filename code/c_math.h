@@ -601,17 +601,20 @@ MATH_API mat4_t mat4_inverse_ortho(mat4_t orthographic_projection);
   ==============================================*/
 
 MATH_API rectangle2_t rect2_create(vec2_t position, vec2_t size);
-MATH_API rectangle2_t rect2_minkowski_sum(rectangle2_t A, rectangle2_t B);
-MATH_API rectangle2_t rect2_minkowski_difference(rectangle2_t A, rectangle2_t B);
-MATH_API void         rect2_shift_by(rectangle2_t *rect, vec2_t shift);
 MATH_API vec2_t       rect2_get_size(rectangle2_t rect);
 MATH_API vec2_t       rect2_get_position(rectangle2_t rect);
-MATH_API bool8        rect2_vec2_SAT(rectangle2_t rect, vec2_t point);
-MATH_API bool8        rect2_AABB_SAT(rectangle2_t A, rectangle2_t B);
+MATH_API void         rect2_shift_by(rectangle2_t *rect, vec2_t shift);
+
+// NOTE(Sleepster): Minkowski collision helpers
+MATH_API rectangle2_t rect2_minkowski_sum(rectangle2_t A, rectangle2_t B);
+MATH_API rectangle2_t rect2_minkowski_difference(rectangle2_t A, rectangle2_t B);
 MATH_API raytest_t    rect2_ray_test(vec2_t position, vec2_t magnitude, rectangle2_t bounding_box) ;
 MATH_API raytest_t    rect2_sweep_test(rectangle2_t moving_rect, vec2_t velocity, rectangle2_t static_rect);
 MATH_API vec2_t       rect2_get_vector_depth(rectangle2_t rect);
 
+// NOTE(Sleepster): AABB 
+MATH_API bool8        rect2_AABB_SAT(rectangle2_t A, rectangle2_t B);
+MATH_API bool8        rect2_point_in_rect(rectangle2_t rect, vec2_t point);
 
 /*===========================================
   ============== DEFINITIONS ================
@@ -2232,7 +2235,7 @@ rect2_get_position(rectangle2_t rect)
 }
 
 MATH_API bool8
-rect2_vec2_SAT(rectangle2_t rect, vec2_t point)
+rect2_point_in_rect(rectangle2_t rect, vec2_t point)
 {
     return (point.x >= rect.min.x && point.x <= rect.max.x && 
             point.y >= rect.min.y && point.y <= rect.max.y);

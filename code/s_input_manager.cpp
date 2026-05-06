@@ -107,15 +107,14 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
         {
             input_controller_t *controller = s_im_get_primary_controller(input_manager);
             Assert(controller->type == IM_CONTROLLER_KEYBOARD);
-
             u32 key_index = event->button.button + SDL_SCANCODE_COUNT;
 
             action_button_t *button = controller->keyboard.input + key_index;
-            button->is_down     = event->button.down;
-            button->is_pressed  = event->button.down  == true;
-            button->is_released = event->button.down  == false;
+            button->half_transition_counter += 1;
 
-            button->half_transition_counter += event->button.clicks;
+            button->is_pressed  =  event->button.down;
+            button->is_released = !event->button.down;
+            button->is_down     =  event->button.down;
         }break;
         case SDL_EVENT_MOUSE_WHEEL: 
         {
@@ -160,10 +159,11 @@ s_im_reset_controller_states(input_manager_t *input_manager)
                 case IM_CONTROLLER_KEYBOARD:
                 {
                     for(u32 key_index = 0;
-                        key_index < SDL_SCANCODE_MAX + SDL_MOUSE_BUTTON_COUNT;
+                        key_index < MAX_KEYBOARD_BUTTONS;
                         ++key_index)
                     {
                         action_button_t *button = controller->keyboard.input + key_index;
+
                         button->half_transition_counter = 0;
                         button->is_pressed  = false;
                         button->is_released = false;
@@ -242,19 +242,34 @@ s_im_get_active_controller(input_manager_t *input_manager)
 
     return(result);
 }
+
+void
+s_im_set_active_controller(input_manager_t *input_manager, u32 controller_index)
+{
+    input_manager->active_controller_index = controller_index;
+}
+
+void
+s_im_set_primary_controller(input_manager_t *input_manager, u32 controller_index)
+{
+    input_manager->primary_controller_index = controller_index;
+}
+
 /*==============================================
   =============== KEYBOARD INPUT ===============
   ==============================================*/
 
 vec2_t
 s_im_transform_mouse_data(input_controller_t *controller,
-                                     mat4_t             view_matrix,
-                                     mat4_t             projection_matrix)
+                          vec2_t              surface_size,    
+                          mat4_t              view_matrix,
+                          mat4_t              projection_matrix)
 {
+    Assert(controller->is_analog == false);
     vec2_t result = {};
 
     vec2_t mouse_pos   = controller->keyboard.current_mouse_pos;
-    vec2_t window_size = g_window_size;
+    vec2_t window_size = surface_size;
     vec4_t ndc_pos     = vec4((mouse_pos.x / (window_size.x * 0.5f)) - 1.0f, 1.0f - (mouse_pos.y / (window_size.y * 0.5f)), 0.0f, 1.0f);
 
     mat4_t inverse_projection = mat4_invert(projection_matrix);
@@ -360,7 +375,7 @@ s_im_is_alt_key_down(input_controller_t *controller)
     return(result);
 }
 
-inline action_button_t*
+action_button_t*
 s_im_get_key_state(input_controller_t *controller, s32 key_index)
 {
     action_button_t *button = controller->keyboard.input + key_index;

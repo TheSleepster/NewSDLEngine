@@ -54,6 +54,7 @@ typedef C_HASH_TABLE_FREE_IMPL(c_hash_table_free_fn_t);
 
 HASH_API u64 c_hash_table_value_from_key(byte *key, u32 key_size, u32 max_table_entries);
 HASH_API u64 c_fnv_hash_value(byte *key, u32 key_size);
+HASH_API u64 c_combine_hashes(u64 A, u64 B);
 
 HASH_API     C_HASH_TABLE_ALLOCATE_IMPL(c_hash_table_default_alloc_impl);
 HASH_API     C_HASH_TABLE_FREE_IMPL(c_hash_table_default_free_impl);
@@ -266,7 +267,7 @@ c_hash_table_value_from_key(byte *key, u32 key_size, u32 max_table_entries)
 }
 
 HASH_API u64
-c_hash_table_combine_hashes(u64 A, u64 B)
+c_combine_hashes(u64 A, u64 B)
 {
     u64 result = A * 31 + B;
     return(result);
