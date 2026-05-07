@@ -86,6 +86,12 @@ typedef enum render_pipeline_depth_function
     RDF_Always,
 }render_pipeline_depth_function_t;
 
+typedef enum render_pipeline_polygon_mode
+{
+    RENDER_PIPELINE_POLYGON_MODE_FILL,
+    RENDER_PIPELINE_POLYGON_MODE_LINE,
+}render_pipeline_polygon_mode_t;
+
 typedef struct render_pipeline_state
 {
     bool32 blend_enabled         = true;
@@ -105,6 +111,8 @@ typedef struct render_pipeline_state
     bool32 stencil_enabled       = false;
     u32    stencil_state         = 0;
     u32    stencil_keep          = 0;
+
+    u32    polygon_mode          = 0;
 }render_pipeline_state_t;
 
 struct gpu_info_t 

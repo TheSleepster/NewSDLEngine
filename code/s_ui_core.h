@@ -93,6 +93,7 @@ struct widget_t
 {
     u64             ID;
     u32             widget_flags;
+    u32             layout_style;
     widget_state_t *state;
 
     string_t        widget_text;
@@ -131,8 +132,6 @@ struct ui_state_t
 
     u64                               hot_widget_ID;
     u64                               active_widget_ID;
-
-    u32                               layout_style;
 
     // NOTE(Sleepster): Persists between frames... 
     memory_arena_t                    persistent_data_arena;
@@ -177,6 +176,7 @@ void      ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *c
 
 true_inline void ui_state_begin_frame(ui_state_t *ui_state);
 true_inline void ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list);
+true_inline void ui_widget_set_parent_layout(ui_state_t *ui_state, u32 layout_style);
 true_inline void ui_widget_push_parent(ui_state_t *ui_state, widget_t *widget);
 true_inline void ui_widget_pop_parent(ui_state_t *ui_state);
 true_inline void ui_widget_seed(ui_state_t *ui_state, u64 index);

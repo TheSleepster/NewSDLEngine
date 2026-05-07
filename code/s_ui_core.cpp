@@ -27,6 +27,53 @@ ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list)
     ui_state_render_widgets(ui_state, command_list);
 }
 
+struct widget_child_size_data_t
+{
+    u32    largest_width;
+    u32    tallest_height;
+    u32    total_width;
+    u32    total_height;
+
+    vec2_t placement_cursor;
+};
+
+internal_api widget_child_size_data_t 
+process_widget_children(ui_state_t *ui_state, widget_t *parent, widget_t *first_widget, widget_t *last_widget)
+{
+    widget_child_size_data_t result = {};
+    do {
+        if(first_widget->first_child)
+        {
+            result = process_widget_children(ui_state, 
+                                             first_widget, 
+                                             first_widget->first_child, 
+                                             first_widget->last_child);
+        }
+
+        // NOTE(Sleepster): Get the widget size data 
+        result.total_width  += first_widget->state->render_size.x;
+        result.total_height += first_widget->state->render_size.y;
+
+        if(result.largest_width < first_widget->state->render_size.x)
+        {
+            result.largest_width = first_widget->state->render_size.x;
+        }
+
+        if(result.tallest_height < first_widget->state->render_size.y)
+        {
+            result.tallest_height = first_widget->state->render_size.y;
+        }
+
+        // NOTE(Sleepster): Handle the placment of the widgets 
+        float32 x_position = parent->expected_position.x;
+        float32 y_position = parent->expected_position.y;
+
+        first_widget = first_widget->next_sibling;
+    }while(first_widget != last_widget);
+
+    return(result);
+}
+
 void
 ui_state_update_widget_state(ui_state_t *ui_state)
 {
@@ -47,8 +94,11 @@ ui_state_update_widget_state(ui_state_t *ui_state)
     widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
     {
-        float32 total_height  = 0.0; 
-        float32 largest_width = 0.0;
+        float32 total_height   = 0.0f; 
+        float32 largest_width  = 0.0f;
+
+        float32 total_width    = 0.0f;
+        float32 tallest_widget = 0.0f;
         do {
             // NOTE(Sleepster): Process the children first 
             if(current_widget->first_child)
@@ -64,8 +114,10 @@ ui_state_update_widget_state(ui_state_t *ui_state)
                     current_child = current_child->next_sibling;
                 }while(current_child != current_widget->first_child);
 
-                total_height  = 0.0f;
-                largest_width = 0.0f;
+                total_width    = 0.0f;
+                total_height   = 0.0f;
+                largest_width  = 0.0f;
+                tallest_widget = 0.0f;
 
                 // NOTE(Sleepster): 
                 // Walk the list BACKWARDS to build the parent's widget and height based off it's children. 
@@ -74,18 +126,23 @@ ui_state_update_widget_state(ui_state_t *ui_state)
                 Assert(current_child);
                 do {
                     total_height += current_child->state->render_size.y;
+                    total_width  += current_child->state->render_size.x;
+
                     if(current_child->state->render_size.x > largest_width)
                     {
                         largest_width = current_child->state->render_size.x;
                     }
 
+                    if(current_child->state->render_size.y > tallest_widget)
+                    {
+                        tallest_widget = current_child->state->render_size.y;
+                    }
+
                     current_child = current_child->prev_sibling;
                 }while(current_child != current_widget->last_child);
 
-                current_widget->state->render_size  = vec2(largest_width, total_height);
-
                 // NOTE(Sleepster): Setting the children's position based off the offset of the parent 
-                float32 placement_cursor = 0.0f;
+                vec2_t placement_cursor = vec2_zero();
 
                 current_child = current_widget->first_child;
                 Assert(current_child);
@@ -93,27 +150,60 @@ ui_state_update_widget_state(ui_state_t *ui_state)
                     float32 x_position = current_widget->expected_position.x;
                     float32 y_position = current_widget->expected_position.y;
 
-                    // TODO(Sleepster): 
-                    // For now, this just grows the panel downward, but we WILL want to grow to the side perhaps
-                    current_child->expected_position.x = x_position; // + (current_child->parent_stack_depth * 5);
-                    current_child->expected_position.y = y_position - placement_cursor;
-                    current_child->expected_position.z = current_child->parent_stack_depth;
-                    placement_cursor += current_child->state->render_size.y;
+                    switch(current_widget->layout_style)
+                    {
+                        case WIDGET_LAYOUT_STYLE_VERTICAL:
+                        {
+                            current_child->expected_position.x = x_position; // + (current_child->parent_stack_depth * 5);
+                            current_child->expected_position.y = y_position - placement_cursor.y;
+                            current_child->expected_position.z = current_child->parent_stack_depth;
 
+                            placement_cursor.y += current_child->state->render_size.y;
+                        }break;
+                        case WIDGET_LAYOUT_STYLE_HORIZONTAL:
+                        {
+                            current_child->expected_position.x = x_position + placement_cursor.x; // + (current_child->parent_stack_depth * 5);
+                            current_child->expected_position.y = y_position;
+                            current_child->expected_position.z = current_child->parent_stack_depth;
+
+                            placement_cursor.x += current_child->state->render_size.x;
+                        }break;
+                    }
                     current_child->state->position    = current_child->expected_position;
                     current_child->state->widget_rect = rect2_create(current_child->state->position.xy, current_child->state->render_size);
 
                     current_child = current_child->next_sibling;
                 }while(current_child != current_widget->first_child);
+
+                if(current_widget->layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
+                {
+                    placement_cursor = vec2(largest_width, placement_cursor.y);
+                }
+                else
+                {
+                    placement_cursor = vec2(placement_cursor.x, tallest_widget);
+                }
+
+                current_widget->state->render_size = placement_cursor;
             }
             else
             {
-                current_widget->state->render_size = current_widget->minimum_render_size;
+                current_widget->state->render_size.x = total_width;
+                current_widget->state->render_size.y = total_height;
             }
 
-            current_widget->state->position = vec3(current_widget->expected_position.x, 
-                                                   current_widget->expected_position.y - total_height, 
-                                                   current_widget->parent_stack_depth);
+            if(current_widget->layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
+            {
+                current_widget->state->position = vec3(current_widget->expected_position.x, 
+                                                       current_widget->expected_position.y - total_height, 
+                                                       current_widget->parent_stack_depth);
+            }
+            else
+            {
+                current_widget->state->position = vec3(current_widget->expected_position.x, 
+                                                       current_widget->expected_position.y, 
+                                                       current_widget->parent_stack_depth);
+            }
             current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy, current_widget->state->render_size);
 
             current_widget = current_widget->next_sibling;
@@ -124,12 +214,6 @@ ui_state_update_widget_state(ui_state_t *ui_state)
         log_warning("Called ui_state_update_widget_state on an empty ui_state_t... there are no widgets attached!!!\n");
     }
 }
-
-
-// NOTE(Sleepster): 
-//
-// NONE OF THESE WIDGETS WILL RENDER SINCE ALL OUR SHADERS SPECIFICALLY WANT A TEXTURE...
-
 
 void
 ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_list)
@@ -270,6 +354,40 @@ ui_state_init(ui_state_t       *ui_state,
 // NOTE(Sleepster): Widget functions
 
 true_inline void
+ui_widget_push_parent(ui_state_t *ui_state, widget_t *widget)
+{
+    Assert(ui_state->parent_stack_top + 1 <= MAX_PARENT_WIDGETS);
+    ui_state->parent_stack[ui_state->parent_stack_top++] = widget;
+}
+
+true_inline void
+ui_widget_pop_parent(ui_state_t *ui_state)
+{
+    Assert(ui_state->parent_stack_top > 1);
+    --ui_state->parent_stack_top;
+}
+
+true_inline widget_t*
+ui_widget_get_top_parent(ui_state_t *ui_state)
+{
+    widget_t *result = null;
+
+    if(ui_state->parent_stack_top > 1)
+    {
+        result = ui_state->parent_stack[ui_state->parent_stack_top - 1];
+    }
+
+    return(result);
+}
+
+true_inline void
+ui_widget_set_parent_layout(ui_state_t *ui_state, u32 layout_style)
+{
+    widget_t *parent = ui_widget_get_top_parent(ui_state);
+    parent->layout_style = layout_style;
+}
+
+true_inline void
 ui_widget_set_font_color(ui_state_t *ui_state, vec4_t color)
 {
     ui_state->current_font_color = color;
@@ -302,32 +420,6 @@ ui_widget_hash(ui_state_t *ui_state, widget_t *widget)
     return(result);
 }
 
-true_inline void
-ui_widget_push_parent(ui_state_t *ui_state, widget_t *widget)
-{
-    Assert(ui_state->parent_stack_top + 1 <= MAX_PARENT_WIDGETS);
-    ui_state->parent_stack[ui_state->parent_stack_top++] = widget;
-}
-
-true_inline void
-ui_widget_pop_parent(ui_state_t *ui_state)
-{
-    Assert(ui_state->parent_stack_top > 1);
-    --ui_state->parent_stack_top;
-}
-
-true_inline widget_t*
-ui_widget_get_top_parent(ui_state_t *ui_state)
-{
-    widget_t *result = null;
-
-    if(ui_state->parent_stack_top > 1)
-    {
-        result = ui_state->parent_stack[ui_state->parent_stack_top - 1];
-    }
-
-    return(result);
-}
 
 internal_api true_inline float32
 ui_widget_determine_depth(ui_state_t *ui_state)
@@ -506,12 +598,36 @@ ui_widget_draw_demo_layout(ui_state_t *ui_state)
     {
         ui_widget_parent(panel_widget))
         {
-            ui_widget_button();
-            ui_widget_textbox();
-            ui_widget_button();
-            ui_widget_slider();
-            ui_widget_checkbox();
+            signal_t button_signal = ui_widget_button();
+            ui_widget_parent(signal->widget)
+            {
+                ui_widget_set_parent_layout(WIDGET_LAYOUT_STYLE_HORIZONTAL);
+                ui_widget_label();
+            }
+            ui_widget_pop_parent();
+
+            if(ui_clicked(button_signal))
+            {
+                window_expanded = true;
+            }
+
+            if(dropdown_allowed)
+            {
+                ui_state_layout(WIDGET_LAYOUT_STYLE_VERTICAL);
+
+                signal_t start_button = ui_widget_labeled_button("start");
+                signal_t play_button = ui_widget_labeled_button("play");
+                signal_t save_button = ui_widget_labeled_button("save");
+                signal_t quit_button = ui_widget_labeled_button("quit");
+
+                if(ui_clicked(start_button))
+                {
+                    // do thing...
+                }
+                // ...
+            }
         }
+        ui_widget_pop_parent();
     }
 }
 #endif

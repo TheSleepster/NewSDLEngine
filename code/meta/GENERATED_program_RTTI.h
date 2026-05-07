@@ -241,6 +241,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_render_pipeline_blending_mode_t, type_id(render_pipeline_blending_mode_t), "render_pipeline_blending_mode_t") \
 	X(TYPE_render_pipeline_blending_equation_t, type_id(render_pipeline_blending_equation_t), "render_pipeline_blending_equation_t") \
 	X(TYPE_render_pipeline_depth_function_t, type_id(render_pipeline_depth_function_t), "render_pipeline_depth_function_t") \
+	X(TYPE_render_pipeline_polygon_mode_t, type_id(render_pipeline_polygon_mode_t), "render_pipeline_polygon_mode_t") \
 	X(TYPE_VkPhysicalDevice, type_id(VkPhysicalDevice), "VkPhysicalDevice") \
 	X(TYPE_VkPhysicalDeviceProperties, type_id(VkPhysicalDeviceProperties), "VkPhysicalDeviceProperties") \
 	X(TYPE_VkPhysicalDeviceMemoryProperties, type_id(VkPhysicalDeviceMemoryProperties), "VkPhysicalDeviceMemoryProperties") \
@@ -2457,10 +2458,11 @@ struct type_info_struct_widget_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[16];
+		type_info_member_t member_array[17];
 		struct {
 			type_info_member_t ID;
 			type_info_member_t widget_flags;
+			type_info_member_t layout_style;
 			type_info_member_t state;
 			type_info_member_t widget_text;
 			type_info_member_t toggled;
@@ -2590,7 +2592,7 @@ struct type_info_struct_render_pipeline_state_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[13];
+		type_info_member_t member_array[14];
 		struct {
 			type_info_member_t blend_enabled;
 			type_info_member_t src_color_blend_mode;
@@ -2605,6 +2607,7 @@ struct type_info_struct_render_pipeline_state_t {
 			type_info_member_t stencil_enabled;
 			type_info_member_t stencil_state;
 			type_info_member_t stencil_keep;
+			type_info_member_t polygon_mode;
 		}members;
 	};
 };
@@ -3467,6 +3470,23 @@ struct type_info_enum_render_pipeline_depth_function_t {
 			type_info_member_t RDF_NotEqual;
 			type_info_member_t RDF_GreaterOrEqual;
 			type_info_member_t RDF_Always;
+		}members;
+	};
+};
+
+struct type_info_enum_render_pipeline_polygon_mode_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t RENDER_PIPELINE_POLYGON_MODE_FILL;
+			type_info_member_t RENDER_PIPELINE_POLYGON_MODE_LINE;
 		}members;
 	};
 };
@@ -5133,10 +5153,11 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_widget_t),
-	.member_count = 16,
+	.member_count = 17,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), ID))},
 		.widget_flags = {.name = "widget_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_flags))},
+		.layout_style = {.name = "layout_style", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.layout_style)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), layout_style))},
 		.state = {.name = "state", .type = TYPE_widget_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), state))},
 		.widget_text = {.name = "widget_text", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_text)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_text))},
 		.toggled = {.name = "toggled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.toggled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), toggled))},
@@ -5248,7 +5269,7 @@ const static type_info_struct_render_pipeline_state_t type_info_struct_render_pi
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_render_pipeline_state_t),
-	.member_count = 13,
+	.member_count = 14,
 	.members = {
 		.blend_enabled = {.name = "blend_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.blend_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), blend_enabled))},
 		.src_color_blend_mode = {.name = "src_color_blend_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.src_color_blend_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), src_color_blend_mode))},
@@ -5263,6 +5284,7 @@ const static type_info_struct_render_pipeline_state_t type_info_struct_render_pi
 		.stencil_enabled = {.name = "stencil_enabled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_enabled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_enabled))},
 		.stencil_state = {.name = "stencil_state", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_state))},
 		.stencil_keep = {.name = "stencil_keep", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.stencil_keep)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), stencil_keep))},
+		.polygon_mode = {.name = "polygon_mode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_render_pipeline_state_t.polygon_mode)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_render_pipeline_state_t), polygon_mode))},
 	}
 };
 
@@ -5877,6 +5899,16 @@ const static type_info_enum_render_pipeline_depth_function_t type_info_enum_rend
 		.RDF_NotEqual = {.name = "RDF_NotEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_NotEqual), .offset = RDF_NotEqual},
 		.RDF_GreaterOrEqual = {.name = "RDF_GreaterOrEqual", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_GreaterOrEqual), .offset = RDF_GreaterOrEqual},
 		.RDF_Always = {.name = "RDF_Always", .type = TYPE_render_pipeline_depth_function_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RDF_Always), .offset = RDF_Always},
+	}
+};
+const static type_info_enum_render_pipeline_polygon_mode_t type_info_enum_render_pipeline_polygon_mode_t_const_data = {
+	.name = "render_pipeline_polygon_mode_t",
+	.type = TYPE_render_pipeline_polygon_mode_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 2,
+	.members = {
+		.RENDER_PIPELINE_POLYGON_MODE_FILL = {.name = "RENDER_PIPELINE_POLYGON_MODE_FILL", .type = TYPE_render_pipeline_polygon_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RENDER_PIPELINE_POLYGON_MODE_FILL), .offset = RENDER_PIPELINE_POLYGON_MODE_FILL},
+		.RENDER_PIPELINE_POLYGON_MODE_LINE = {.name = "RENDER_PIPELINE_POLYGON_MODE_LINE", .type = TYPE_render_pipeline_polygon_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RENDER_PIPELINE_POLYGON_MODE_LINE), .offset = RENDER_PIPELINE_POLYGON_MODE_LINE},
 	}
 };
 enum memory_arena_footer_t_member_list_enum {
@@ -6654,6 +6686,7 @@ enum ui_signal_t_member_list_enum {
 enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_ID,
 	TYPE_WIDGET_T_MEMBER_widget_flags,
+	TYPE_WIDGET_T_MEMBER_layout_style,
 	TYPE_WIDGET_T_MEMBER_state,
 	TYPE_WIDGET_T_MEMBER_widget_text,
 	TYPE_WIDGET_T_MEMBER_toggled,
@@ -6726,6 +6759,7 @@ enum render_pipeline_state_t_member_list_enum {
 	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_enabled,
 	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_state,
 	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_stencil_keep,
+	TYPE_RENDER_PIPELINE_STATE_T_MEMBER_polygon_mode,
 };
 
 enum swapchain_info_t_member_list_enum {
@@ -7121,6 +7155,11 @@ enum render_pipeline_depth_function_t_member_list_enum {
 	TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always,
 };
 
+enum render_pipeline_polygon_mode_t_member_list_enum {
+	TYPE_RENDER_PIPELINE_POLYGON_MODE_T_MEMBER_RENDER_PIPELINE_POLYGON_MODE_FILL,
+	TYPE_RENDER_PIPELINE_POLYGON_MODE_T_MEMBER_RENDER_PIPELINE_POLYGON_MODE_LINE,
+};
+
 #define GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X) \
 	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_INVALID, "FILE_EXT_INVALID") \
 	X(TYPE_ENUM_LOOKUP_FILE_EXTENSION_T_MEMBER_FILE_EXT_TTF, "FILE_EXT_TTF") \
@@ -7351,6 +7390,8 @@ enum render_pipeline_depth_function_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, "RDF_NotEqual") \
 	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, "RDF_GreaterOrEqual") \
 	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, "RDF_Always") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_POLYGON_MODE_T_MEMBER_RENDER_PIPELINE_POLYGON_MODE_FILL, "RENDER_PIPELINE_POLYGON_MODE_FILL") \
+	X(TYPE_ENUM_LOOKUP_RENDER_PIPELINE_POLYGON_MODE_T_MEMBER_RENDER_PIPELINE_POLYGON_MODE_LINE, "RENDER_PIPELINE_POLYGON_MODE_LINE") \
 
  
 enum type_info_enum_member_mapping_t {
@@ -7557,6 +7598,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "render_pipeline_blending_mode_t", .type = TYPE_render_pipeline_blending_mode_t, .size = sizeof(render_pipeline_blending_mode_t), .struct_info = NULL},
 	{.name = "render_pipeline_blending_equation_t", .type = TYPE_render_pipeline_blending_equation_t, .size = sizeof(render_pipeline_blending_equation_t), .struct_info = NULL},
 	{.name = "render_pipeline_depth_function_t", .type = TYPE_render_pipeline_depth_function_t, .size = sizeof(render_pipeline_depth_function_t), .struct_info = NULL},
+	{.name = "render_pipeline_polygon_mode_t", .type = TYPE_render_pipeline_polygon_mode_t, .size = sizeof(render_pipeline_polygon_mode_t), .struct_info = NULL},
 	{.name = "VkPhysicalDevice", .type = TYPE_VkPhysicalDevice, .size = sizeof(VkPhysicalDevice), .struct_info = NULL},
 	{.name = "VkPhysicalDeviceProperties", .type = TYPE_VkPhysicalDeviceProperties, .size = sizeof(VkPhysicalDeviceProperties), .struct_info = NULL},
 	{.name = "VkPhysicalDeviceMemoryProperties", .type = TYPE_VkPhysicalDeviceMemoryProperties, .size = sizeof(VkPhysicalDeviceMemoryProperties), .struct_info = NULL},
@@ -7831,6 +7873,8 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "RDF_NotEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_NotEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
 	{.name = "RDF_GreaterOrEqual", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_GreaterOrEqual, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
 	{.name = "RDF_Always", .member_enum = TYPE_RENDER_PIPELINE_DEPTH_FUNCTION_T_MEMBER_RDF_Always, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_depth_function_t_const_data},
+	{.name = "RENDER_PIPELINE_POLYGON_MODE_FILL", .member_enum = TYPE_RENDER_PIPELINE_POLYGON_MODE_T_MEMBER_RENDER_PIPELINE_POLYGON_MODE_FILL, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_polygon_mode_t_const_data},
+	{.name = "RENDER_PIPELINE_POLYGON_MODE_LINE", .member_enum = TYPE_RENDER_PIPELINE_POLYGON_MODE_T_MEMBER_RENDER_PIPELINE_POLYGON_MODE_LINE, .type_info_ptr = (const type_info_struct*)&type_info_enum_render_pipeline_polygon_mode_t_const_data},
 };
 
 
