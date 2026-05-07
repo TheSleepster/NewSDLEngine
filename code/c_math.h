@@ -2142,12 +2142,12 @@ mat4_RHDX_ortho(float32 left,
 
     result.elements[0][0] = 2.0f / (right - left);
     result.elements[1][1] = 2.0f / (top - bottom);
-    result.elements[2][2] = 2.0f / (near - far);
+    result.elements[2][2] = 1.0f / (far - near);
     result.elements[3][3] = 1.0f;
 
     result.elements[3][0] = (left + right) / (left - right);
     result.elements[3][1] = (bottom + top) / (bottom - top);
-    result.elements[3][2] = (near + far) / (near - far);
+    result.elements[3][2] = -near / (far - near); 
 
     return(result);
 }

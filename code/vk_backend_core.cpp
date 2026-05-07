@@ -2764,6 +2764,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     c_dynarray_push(command_list->active_vertex_buffers, cmd->buffer);
                     ++command_list->vertex_buffer_count;
+
+                    // TODO(Sleepster): Maybe this number should be stored and modified on an individual buffer basis
+                    command_list->vertex_offset = 0;
                 }break;
                 case RCT_BindIndexBuffer:
                 {
@@ -2774,6 +2777,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     vkCmdBindIndexBuffer(render_command_buffer, cmd->buffer->buffer.handle, offset, VK_INDEX_TYPE_UINT32); 
 
                     command_list->active_index_buffer = cmd->buffer;
+                    command_list->index_offset        = 0;
                 }break;
                 case RCT_BindShader:
                 {

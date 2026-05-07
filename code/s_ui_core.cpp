@@ -21,10 +21,10 @@ ui_state_begin_frame(ui_state_t *ui_state)
 }
 
 true_inline void
-ui_state_end_frame(ui_state_t *ui_state)
+ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list)
 {
     ui_state_update_widget_state(ui_state);
-    ui_state_render_widgets(ui_state);
+    ui_state_render_widgets(ui_state, command_list);
 }
 
 void
@@ -37,7 +37,7 @@ ui_state_update_widget_state(ui_state_t *ui_state)
 
     ui_state->current_camera = {
         .view_matrix       = mat4_identity(),
-        .projection_matrix = mat4_RHGL_ortho(-half_width, half_width, -half_height, half_height, -1, 1)
+        .projection_matrix = mat4_RHDX_ortho(-half_width, half_width, -half_height, half_height, 0.0f, 1.0f)
     };
 
     ui_state->mouse_position = s_im_transform_mouse_data(ui_state->ui_controller, 
@@ -47,6 +47,8 @@ ui_state_update_widget_state(ui_state_t *ui_state)
     widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
     {
+        float32 total_height  = 0.0; 
+        float32 largest_width = 0.0;
         do {
             // NOTE(Sleepster): Process the children first 
             if(current_widget->first_child)
@@ -62,8 +64,8 @@ ui_state_update_widget_state(ui_state_t *ui_state)
                     current_child = current_child->next_sibling;
                 }while(current_child != current_widget->first_child);
 
-                float32 total_height  = 0.0; 
-                float32 largest_width = 0.0;
+                total_height  = 0.0f;
+                largest_width = 0.0f;
 
                 // NOTE(Sleepster): 
                 // Walk the list BACKWARDS to build the parent's widget and height based off it's children. 
@@ -80,7 +82,7 @@ ui_state_update_widget_state(ui_state_t *ui_state)
                     current_child = current_child->prev_sibling;
                 }while(current_child != current_widget->last_child);
 
-                current_widget->state->render_size = vec2(largest_width, total_height);
+                current_widget->state->render_size  = vec2(largest_width, total_height);
 
                 // NOTE(Sleepster): Setting the children's position based off the offset of the parent 
                 float32 placement_cursor = 0.0f;
@@ -93,8 +95,9 @@ ui_state_update_widget_state(ui_state_t *ui_state)
 
                     // TODO(Sleepster): 
                     // For now, this just grows the panel downward, but we WILL want to grow to the side perhaps
-                    current_child->expected_position.x = x_position; // + (current_child->parent_stack_depth * 20);
+                    current_child->expected_position.x = x_position; // + (current_child->parent_stack_depth * 5);
                     current_child->expected_position.y = y_position - placement_cursor;
+                    current_child->expected_position.z = current_child->parent_stack_depth;
                     placement_cursor += current_child->state->render_size.y;
 
                     current_child->state->position    = current_child->expected_position;
@@ -109,7 +112,7 @@ ui_state_update_widget_state(ui_state_t *ui_state)
             }
 
             current_widget->state->position = vec3(current_widget->expected_position.x, 
-                                                   current_widget->expected_position.y - current_widget->state->render_size.y, 
+                                                   current_widget->expected_position.y - total_height, 
                                                    current_widget->parent_stack_depth);
             current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy, current_widget->state->render_size);
 
@@ -129,13 +132,11 @@ ui_state_update_widget_state(ui_state_t *ui_state)
 
 
 void
-ui_state_render_widgets(ui_state_t *ui_state)
+ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_list)
 {
     renderer_state_t *renderer_state = ui_state->renderer;
     asset_manager_t  *asset_manager  = ui_state->asset_manager;
     (void)asset_manager;
-
-    render_command_list_t *command_list = s_renderer_get_command_list(renderer_state, RENDER_COMMAND_LIST_TYPE_GRAPHICS);
 
     widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
@@ -168,7 +169,6 @@ ui_state_render_widgets(ui_state_t *ui_state)
             current_widget = current_widget->next_sibling;
         }while(current_widget != ui_state->first_widget);
 
-        r_cmd_renderpass_begin(command_list, ui_state->interface_framebuffer);
         r_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
         r_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
         r_cmd_use_shader_program(command_list, ui_state->widget_shader);
@@ -184,8 +184,6 @@ ui_state_render_widgets(ui_state_t *ui_state)
         r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
 
         r_cmd_draw_indexed(command_list, ui_state->widget_count * 6, 0, 1, 0);
-        r_cmd_renderpass_end(command_list);
-
         s_renderer_buffer_reset(ui_state->renderer, &ui_state->vertex_buffer);
     }
     else
@@ -223,6 +221,8 @@ ui_state_init(ui_state_t       *ui_state,
     ui_state->asset_manager         = asset_manager;
     ui_state->interface_framebuffer = renderpass_ID;
     ui_state->parent_stack_top      = 1;
+    ui_state->hot_widget_ID         = INVALID_ID;
+    ui_state->active_widget_ID      = INVALID_ID;
 
     ui_state->default_font_color = vec4_create(1.0);
     ui_state->default_font_size  = 16;
@@ -333,20 +333,39 @@ internal_api true_inline float32
 ui_widget_determine_depth(ui_state_t *ui_state)
 {
     float32 result = 0.0f;
-    float32 near_value = -1;
-    float32 far_value  =  1;
-
-    float32 depth_step        = (far_value - near_value) / MAX_WIDGET_LAYERS;
-    float32 layer_depth_value = (near_value + (ui_state->parent_stack_top * depth_step)) * -1.0f;
+    float32 layer_depth_value = 1.0f - 2.0f * ((float32)ui_state->parent_stack_top / (float32)(MAX_WIDGET_LAYERS - 1));
 
     result = layer_depth_value;
 
     return(result);
 }
 
+void
+ui_widget_append(widget_t **first_node, widget_t **last_node, widget_t *widget)
+{
+    if(*first_node)
+    {
+        widget_t *old_last = *last_node;
+
+        widget->prev_sibling   = old_last;
+        widget->next_sibling   = *first_node;
+        old_last->next_sibling = widget;
+
+         *last_node = widget;
+        (*first_node)->prev_sibling = widget;
+    }
+    else
+    {
+        *first_node = widget;
+        *last_node  = widget;
+
+        (*first_node)->next_sibling = widget;
+        (*last_node)->prev_sibling  = widget;
+    }
+}
 
 widget_t*
-ui_widget_create(ui_state_t *ui_state, string_t widget_name)
+ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
 {
     widget_t *result = c_arena_push_struct(&ui_state->widget_arena, widget_t);
     ZeroStruct(*result);
@@ -354,54 +373,20 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name)
     ++ui_state->widget_count;
 
     result->widget_text        = widget_name;
+    result->widget_flags       = widget_flags;
     result->ID                 = ui_widget_hash(ui_state, result);
     result->parent_stack_depth = ui_widget_determine_depth(ui_state);
     result->state              = ui_state->widget_states.data + result->ID;
 
+    // NOTE(Sleepster): NEXT AND PREVIOUS ARE BROKEN... 
     widget_t *parent = ui_widget_get_top_parent(ui_state);
     if(parent != null)
     {
-        if(parent->first_child)
-        {
-            widget_t *last_widget = parent->last_child;
-
-            parent->last_child   = result;
-            result->prev_sibling = last_widget;
-            result->next_sibling = parent->first_child;
-
-            last_widget->next_sibling = result;
-            last_widget->prev_sibling = result;
-        }
-        else
-        {
-            parent->first_child = result;
-            parent->last_child  = result;
-
-            parent->first_child->next_sibling = result;
-            parent->last_child->prev_sibling  = result;
-        }
+        ui_widget_append(&parent->first_child, &parent->last_child, result);
     }
     else
     {
-        if(ui_state->first_widget)
-        {
-            widget_t *last_widget = ui_state->last_widget; 
-
-            ui_state->last_widget     = result;
-            result->prev_sibling      = last_widget;
-            result->next_sibling      = ui_state->first_widget;
-
-            last_widget->next_sibling = result;
-            last_widget->prev_sibling = result;
-        }
-        else
-        {
-            ui_state->first_widget = result;
-            ui_state->last_widget  = result;
-
-            ui_state->first_widget->next_sibling = result;
-            ui_state->last_widget->prev_sibling  = result;
-        }
+        ui_widget_append(&ui_state->first_widget, &ui_state->last_widget, result);
     }
 
     return(result);
@@ -413,22 +398,55 @@ ui_widget_get_signals(ui_state_t *ui_state, widget_t *widget)
     ui_signal_t result = {};
     result.widget = widget;
 
-    action_button_t *left_mouse  = s_im_get_key_state(ui_state->ui_controller, SDL_LEFT_MOUSE);
-    action_button_t *right_mouse = s_im_get_key_state(ui_state->ui_controller, SDL_RIGHT_MOUSE);
-
     widget_state_t *widget_state = ui_state->widget_states.data + widget->ID;
     Assert(widget_state);
 
-    result.is_hot = rect2_point_in_rect(widget_state->widget_rect, ui_state->mouse_position);
-    if(result.is_hot)
+    bool8 is_hot = rect2_point_in_rect(widget_state->widget_rect, ui_state->mouse_position);
+    if(is_hot)
     {
-        result.is_active         = left_mouse->is_down || left_mouse->is_pressed;
-        result.is_held           = left_mouse->is_down;
-        result.just_released     = left_mouse->is_released;
-        result.just_clicked      = left_mouse->is_pressed;
-        result.is_double_clicked = left_mouse->half_transition_counter  >= 2;
+        action_button_t *left_mouse  = s_im_get_key_state(ui_state->ui_controller, SDL_LEFT_MOUSE);
+        action_button_t *right_mouse = s_im_get_key_state(ui_state->ui_controller, SDL_RIGHT_MOUSE);
 
-        result.is_right_clicked = right_mouse->is_pressed;
+        ui_state->hot_widget_ID = widget->ID;
+
+        result.signal_flags |= UI_SIGNAL_FLAG_HOVERING;
+
+        bool8 is_active         = left_mouse->is_down || left_mouse->is_pressed;
+        bool8 is_held           = left_mouse->is_down;
+        bool8 just_released     = left_mouse->is_released;
+        bool8 just_clicked      = left_mouse->is_pressed;
+        bool8 is_double_clicked = left_mouse->half_transition_counter  >= 2;
+
+        bool8 is_right_clicked = right_mouse->is_pressed;
+        if(is_active)
+        {
+            result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DRAGGING; 
+        }
+
+        if(is_held)
+        {
+            result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DRAGGING; 
+        }
+
+        if(just_released)
+        {
+            result.signal_flags |= UI_SIGNAL_FLAG_RELEASED; 
+        }
+
+        if(just_clicked)
+        {
+            result.signal_flags |= UI_SIGNAL_FLAG_CLICKED; 
+        }
+
+        if(is_double_clicked)
+        {
+            result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOUBLE_CLICKED;
+        }
+
+        if(is_right_clicked)
+        {
+            result.signal_flags |= UI_SIGNAL_FLAG_RIGHT_CLICKED;
+        }
     }
 
     return(result);
@@ -437,7 +455,7 @@ ui_widget_get_signals(ui_state_t *ui_state, widget_t *widget)
 ui_signal_t
 ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, vec4_t background_color)
 {
-    widget_t *widget = ui_widget_create(ui_state, widget_name);
+    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_IDLE_COLOR);
     widget->expected_position   = vec2_expand_vec3(position, widget->parent_stack_depth);
     widget->state->render_color = background_color;
     widget->toggled             = widget->state->toggled;
@@ -447,9 +465,14 @@ ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, vec
 }
 
 ui_signal_t
-ui_widget_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, vec4_t idle_color, vec4_t hovered_color, vec4_t active_color)
+ui_widget_button(ui_state_t *ui_state, 
+                 string_t    widget_name, 
+                 vec2_t      minimum_size, 
+                 vec4_t      idle_color, 
+                 vec4_t      hovered_color, 
+                 vec4_t      active_color)
 {
-    widget_t *widget = ui_widget_create(ui_state, widget_name);
+    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_CLICKABLE_BUTTON);
     widget->minimum_render_size = minimum_size;
     widget->idle_color          = idle_color;
     widget->hovered_color       = hovered_color;
@@ -457,12 +480,12 @@ ui_widget_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size
     widget->state->render_color = idle_color;
 
     ui_signal_t result = ui_widget_get_signals(ui_state, widget);
-    if(result.is_hot)
+    if(ui_hovered(result))
     {
         widget->state->render_color = hovered_color;
     }
     
-    if(result.is_active)
+    if(ui_down(result))
     {
         widget->state->render_color = widget->active_color;
     }

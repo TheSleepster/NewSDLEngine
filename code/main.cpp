@@ -136,7 +136,7 @@ entity_render(game_state_t *game_state, render_command_list_t *command_list, ent
     
     immediate_quad_ex(command_list,
                      &game_state->vertex_buffer, 
-                      vec2_expand_vec3(entity->position, 0.0f), 
+                      vec2_expand_vec3(entity->position, 0.8f), 
                       entity->size, 
                       vec4(1.0, 1.0, 1.0, 1.0),
                       uv_min,
@@ -373,7 +373,7 @@ game_main(void)
         ui_widget_push_parent(main_ui, main_panel.widget);
 
         ui_signal_t signal = ui_widget_button(main_ui, STR("Test button..."), vec2(20, 20), vec4(1.0, 0.6, 0.6, 1.0), vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0));
-        if(signal.just_clicked)
+        if(ui_pressed(signal))
         {
             main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
         }
@@ -417,7 +417,7 @@ game_main(void)
 
             camera_matrices_t camera_matrix_buffer_data = {
                 .view_matrix       = mat4_identity(),
-                .projection_matrix = mat4_RHGL_ortho(-160, 160, -90, 90, -1, 1)
+                .projection_matrix = mat4_RHDX_ortho(-160, 160, -90, 90, -1, 1)
             };
             r_cmd_update_constant_buffer(command_list, camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
 
@@ -442,7 +442,7 @@ game_main(void)
 
             camera_matrices_t camera_matrix_buffer_data = {
                 .view_matrix       = mat4_identity(),
-                .projection_matrix = mat4_RHGL_ortho(-half_window_width, half_window_width, -half_window_height, half_window_height, -1, 1)
+                .projection_matrix = mat4_RHDX_ortho(-half_window_width, half_window_width, -half_window_height, half_window_height, -1, 1)
             };
             r_cmd_update_constant_buffer(command_list, camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
 
@@ -467,10 +467,10 @@ game_main(void)
             r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer);
             r_cmd_draw_indexed(command_list, (game_state.vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
 
+            ui_state_end_frame(main_ui, command_list);
+
             r_cmd_renderpass_end(command_list);
         }
-
-        ui_state_end_frame(main_ui);
         r_cmd_present(command_list, &game_state.fullscreen_color_buffer);
 
         s_renderer_execute_backend_commands(renderer_state);
