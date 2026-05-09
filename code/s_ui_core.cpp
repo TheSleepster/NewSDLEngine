@@ -33,45 +33,103 @@ struct widget_child_size_data_t
     u32    tallest_height;
     u32    total_width;
     u32    total_height;
-
     vec2_t placement_cursor;
 };
 
 internal_api widget_child_size_data_t 
-process_widget_children(ui_state_t *ui_state, widget_t *parent, widget_t *first_widget, widget_t *last_widget)
+get_hierarchy_size_data(ui_state_t *ui_state, widget_t *first_widget, widget_t *last_widget)
 {
     widget_child_size_data_t result = {};
-    do {
-        if(first_widget->first_child)
-        {
-            result = process_widget_children(ui_state, 
-                                             first_widget, 
-                                             first_widget->first_child, 
-                                             first_widget->last_child);
-        }
+    if(first_widget)
+    {
+        Assert(last_widget);
 
-        // NOTE(Sleepster): Get the widget size data 
-        result.total_width  += first_widget->state->render_size.x;
-        result.total_height += first_widget->state->render_size.y;
+        widget_t *current_widget = first_widget;
+        do {
+            current_widget->state->render_size = current_widget->minimum_render_size;
+            if(current_widget->first_child)
+            {
+                result = get_hierarchy_size_data(ui_state, 
+                                                 current_widget->first_child, 
+                                                 current_widget->last_child);
+            }
 
-        if(result.largest_width < first_widget->state->render_size.x)
-        {
-            result.largest_width = first_widget->state->render_size.x;
-        }
+            result.total_width  += current_widget->state->render_size.x;
+            result.total_height += current_widget->state->render_size.y;
+            if(result.largest_width < current_widget->state->render_size.x)
+            {
+                result.largest_width = current_widget->state->render_size.x;
+            }
 
-        if(result.tallest_height < first_widget->state->render_size.y)
-        {
-            result.tallest_height = first_widget->state->render_size.y;
-        }
+            if(result.tallest_height < current_widget->state->render_size.y)
+            {
+                result.tallest_height = current_widget->state->render_size.y;
+            }
 
-        // NOTE(Sleepster): Handle the placment of the widgets 
-        float32 x_position = parent->expected_position.x;
-        float32 y_position = parent->expected_position.y;
-
-        first_widget = first_widget->next_sibling;
-    }while(first_widget != last_widget);
+            current_widget = current_widget->next_sibling;
+        }while(current_widget != last_widget);
+    }
 
     return(result);
+}
+
+internal_api void
+place_widgets_in_hierarchy(widget_t *first_widget, widget_t *last_widget, vec2_t *parent_cursor)
+{
+    widget_t *current_widget = first_widget;
+    do {
+        current_widget->expected_position.xy = *parent_cursor;
+        current_widget->expected_position.z  =  current_widget->parent_stack_depth;
+
+        vec2_t advance;
+        if(first_widget->layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
+        {
+            advance = vec2(0.0f, current_widget->state->render_size.y);
+        }
+        else
+        {
+            advance = vec2(current_widget->state->render_size.x, 0.0f);
+        }
+
+        *parent_cursor = vec2_add(*parent_cursor, advance);
+        if(current_widget->first_child)
+        {
+            place_widgets_in_hierarchy(current_widget->first_child, current_widget->last_child, parent_cursor);
+        }
+        current_widget->state->position     = current_widget->expected_position;
+        current_widget->state->widget_rect  = rect2_create(current_widget->state->position.xy, 
+                                                           current_widget->state->render_size);
+
+        if(last_widget) current_widget = current_widget->next_sibling;
+        else            current_widget = null;
+    }while(current_widget != last_widget);
+}
+
+internal_api void
+ui_state_update_widget_hierarchy(ui_state_t *ui_state)
+{
+    widget_t *current_widget = ui_state->first_widget;
+    do {
+        // NOTE(Sleepster): Set the size of the top-most parent here 
+        widget_child_size_data_t size_data = get_hierarchy_size_data(ui_state, 
+                                                                     current_widget->first_child, 
+                                                                     current_widget->last_child);
+        if(current_widget->layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
+        {
+            current_widget->state->render_size = vec2(size_data.largest_width, 
+                                                      size_data.total_height);
+        }
+        else
+        {
+            current_widget->state->render_size = vec2(size_data.total_width, size_data.tallest_height);
+        }
+
+        // NOTE(Sleepster): Place the children in relative locations to that of the parent 
+        vec2_t placement_cursor = vec2_zero();
+        place_widgets_in_hierarchy(current_widget, null, &placement_cursor);
+
+        current_widget = current_widget->next_sibling;
+    }while(current_widget != ui_state->first_widget);
 }
 
 void
@@ -91,6 +149,9 @@ ui_state_update_widget_state(ui_state_t *ui_state)
                                                          vec2(renderpass->render_width, renderpass->render_height), 
                                                          ui_state->current_camera.view_matrix,
                                                          ui_state->current_camera.projection_matrix);
+#if 1
+    ui_state_update_widget_hierarchy(ui_state);
+#else 
     widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
     {
@@ -213,6 +274,7 @@ ui_state_update_widget_state(ui_state_t *ui_state)
     {
         log_warning("Called ui_state_update_widget_state on an empty ui_state_t... there are no widgets attached!!!\n");
     }
+#endif
 }
 
 void
@@ -475,6 +537,7 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
     if(parent != null)
     {
         ui_widget_append(&parent->first_child, &parent->last_child, result);
+        result->layout_style = parent->layout_style;
     }
     else
     {
@@ -616,9 +679,9 @@ ui_widget_draw_demo_layout(ui_state_t *ui_state)
                 ui_state_layout(WIDGET_LAYOUT_STYLE_VERTICAL);
 
                 signal_t start_button = ui_widget_labeled_button("start");
-                signal_t play_button = ui_widget_labeled_button("play");
-                signal_t save_button = ui_widget_labeled_button("save");
-                signal_t quit_button = ui_widget_labeled_button("quit");
+                signal_t play_button  = ui_widget_labeled_button("play");
+                signal_t save_button  = ui_widget_labeled_button("save");
+                signal_t quit_button  = ui_widget_labeled_button("quit");
 
                 if(ui_clicked(start_button))
                 {

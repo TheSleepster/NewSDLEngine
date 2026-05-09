@@ -70,20 +70,20 @@ struct ui_signal_t
     u32             signal_flags;
 };
 
-#define ui_pressed(signal)        ((signal).signal_flags & UI_SIGNAL_FLAG_CLICKED)
 #define ui_hovered(signal)        ((signal).signal_flags & UI_SIGNAL_FLAG_HOVERING)
+#define ui_pressed(signal)        ((signal).signal_flags & UI_SIGNAL_FLAG_CLICKED)
 #define ui_down(signal)           ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DRAGGING)
 #define ui_released(signal)       ((signal).signal_flags & UI_SIGNAL_FLAG_RELEASED)
 
 enum widget_flags_t
 {
-    UI_WIDGET_FLAG_INVALID = BIT(0),
-    UI_WIDGET_FLAG_IDLE_COLOR = BIT(1),
-    UI_WIDGET_FLAG_HOVER_COLOR = BIT(2),
-    UI_WIDGET_FLAG_ACTIVE_COLOR = BIT(3),
-    UI_WIDGET_FLAG_HAS_TEXT = BIT(4),
-    UI_WIDGET_FLAG_MOUSE_CLICKABLE = BIT(5),
-    UI_WIDGET_FLAG_HOVERABLE = BIT(6),
+    UI_WIDGET_FLAG_INVALID          = BIT(0),
+    UI_WIDGET_FLAG_IDLE_COLOR       = BIT(1),
+    UI_WIDGET_FLAG_HOVER_COLOR      = BIT(2),
+    UI_WIDGET_FLAG_ACTIVE_COLOR     = BIT(3),
+    UI_WIDGET_FLAG_HAS_TEXT         = BIT(4),
+    UI_WIDGET_FLAG_MOUSE_CLICKABLE  = BIT(5),
+    UI_WIDGET_FLAG_HOVERABLE        = BIT(6),
 
     UI_WIDGET_FLAG_CLICKABLE_BUTTON = UI_WIDGET_FLAG_HOVERABLE|UI_WIDGET_FLAG_HOVER_COLOR|UI_WIDGET_FLAG_MOUSE_CLICKABLE|UI_WIDGET_FLAG_ACTIVE_COLOR,
     UI_WIDGET_FLAG_LABLED_BUTTON    = UI_WIDGET_FLAG_CLICKABLE_BUTTON|UI_WIDGET_FLAG_HAS_TEXT
@@ -106,6 +106,13 @@ struct widget_t
     vec4_t          idle_color;
     vec4_t          hovered_color;
     vec4_t          active_color;
+
+#if 0
+    u32             max_child_width;
+    u32             max_child_height;
+    u32             total_child_width;
+    u32             total_child_height;
+#endif
 
     // NOTE(Sleepster): 
     // If this is a tree... 
