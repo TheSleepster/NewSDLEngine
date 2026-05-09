@@ -37,12 +37,11 @@ struct widget_child_size_data_t
 };
 
 internal_api widget_child_size_data_t 
-get_hierarchy_size_data(ui_state_t *ui_state, widget_t *first_widget, widget_t *last_widget)
+get_hierarchy_size_data(ui_state_t *ui_state, widget_t *first_widget)
 {
     widget_child_size_data_t result = {};
     if(first_widget)
     {
-        Assert(last_widget);
 
         widget_t *current_widget = first_widget;
         do {
@@ -50,8 +49,7 @@ get_hierarchy_size_data(ui_state_t *ui_state, widget_t *first_widget, widget_t *
             if(current_widget->first_child)
             {
                 result = get_hierarchy_size_data(ui_state, 
-                                                 current_widget->first_child, 
-                                                 current_widget->last_child);
+                                                 current_widget->first_child);
             }
 
             result.total_width  += current_widget->state->render_size.x;
@@ -67,14 +65,14 @@ get_hierarchy_size_data(ui_state_t *ui_state, widget_t *first_widget, widget_t *
             }
 
             current_widget = current_widget->next_sibling;
-        }while(current_widget != last_widget);
+        }while(current_widget != first_widget);
     }
 
     return(result);
 }
 
 internal_api void
-place_widgets_in_hierarchy(widget_t *first_widget, widget_t *last_widget, vec2_t *parent_cursor)
+place_widgets_in_hierarchy(u32 layout_style, widget_t *first_widget, widget_t *last_widget, vec2_t *parent_cursor)
 {
     widget_t *current_widget = first_widget;
     do {
@@ -82,9 +80,9 @@ place_widgets_in_hierarchy(widget_t *first_widget, widget_t *last_widget, vec2_t
         current_widget->expected_position.z  =  current_widget->parent_stack_depth;
 
         vec2_t advance;
-        if(first_widget->layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
+        if(layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
         {
-            advance = vec2(0.0f, current_widget->state->render_size.y);
+            advance = vec2(0.0f, -current_widget->state->render_size.y);
         }
         else
         {
@@ -92,17 +90,23 @@ place_widgets_in_hierarchy(widget_t *first_widget, widget_t *last_widget, vec2_t
         }
 
         *parent_cursor = vec2_add(*parent_cursor, advance);
+
         if(current_widget->first_child)
         {
-            place_widgets_in_hierarchy(current_widget->first_child, current_widget->last_child, parent_cursor);
+            vec2_t parent_relative_cursor = current_widget->expected_position.xy;
+            place_widgets_in_hierarchy(current_widget->layout_style, current_widget->first_child, current_widget->last_child, &parent_relative_cursor);
         }
-        current_widget->state->position     = current_widget->expected_position;
-        current_widget->state->widget_rect  = rect2_create(current_widget->state->position.xy, 
-                                                           current_widget->state->render_size);
+
+        current_widget->state->position = vec3(current_widget->expected_position.x,
+                                               current_widget->expected_position.y - current_widget->state->render_size.y,
+                                               current_widget->expected_position.z);
+
+        current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy, 
+                                                          current_widget->state->render_size);
 
         if(last_widget) current_widget = current_widget->next_sibling;
         else            current_widget = null;
-    }while(current_widget != last_widget);
+    }while(current_widget != first_widget && current_widget);
 }
 
 internal_api void
@@ -112,8 +116,7 @@ ui_state_update_widget_hierarchy(ui_state_t *ui_state)
     do {
         // NOTE(Sleepster): Set the size of the top-most parent here 
         widget_child_size_data_t size_data = get_hierarchy_size_data(ui_state, 
-                                                                     current_widget->first_child, 
-                                                                     current_widget->last_child);
+                                                                     current_widget->first_child);
         if(current_widget->layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
         {
             current_widget->state->render_size = vec2(size_data.largest_width, 
@@ -126,7 +129,7 @@ ui_state_update_widget_hierarchy(ui_state_t *ui_state)
 
         // NOTE(Sleepster): Place the children in relative locations to that of the parent 
         vec2_t placement_cursor = vec2_zero();
-        place_widgets_in_hierarchy(current_widget, null, &placement_cursor);
+        place_widgets_in_hierarchy(current_widget->layout_style, current_widget, null, &placement_cursor);
 
         current_widget = current_widget->next_sibling;
     }while(current_widget != ui_state->first_widget);
@@ -537,7 +540,6 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
     if(parent != null)
     {
         ui_widget_append(&parent->first_child, &parent->last_child, result);
-        result->layout_style = parent->layout_style;
     }
     else
     {
