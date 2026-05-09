@@ -371,7 +371,7 @@ game_main(void)
 
         ui_signal_t main_panel = ui_widget_panel(main_ui, STR("Test panel..."), vec2(20, 20), vec4(0.4, 0.4, 0.4, 0.6));
         ui_widget_push_parent(main_ui, main_panel.widget);
-        ui_widget_set_parent_layout(main_ui, WIDGET_LAYOUT_STYLE_HORIZONTAL);
+        ui_widget_set_parent_layout(main_ui, WIDGET_LAYOUT_STYLE_VERTICAL);
 
         ui_signal_t signal = ui_widget_button(main_ui, STR("Test button..."), vec2(20, 20), vec4(1.0, 0.6, 0.6, 1.0), vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0));
         if(ui_pressed(signal))

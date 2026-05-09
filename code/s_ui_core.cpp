@@ -280,6 +280,40 @@ ui_state_update_widget_state(ui_state_t *ui_state)
 #endif
 }
 
+internal_api void
+render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_list, widget_t *first_widget)
+{
+    widget_t *current_widget = first_widget;
+    do {
+        if(current_widget->widget_flags & UI_WIDGET_FLAG_HAS_TEXT)
+        {
+            immediate_text(command_list, 
+                          &ui_state->vertex_buffer, 
+                           ui_state->asset_manager,
+                          &ui_state->default_font,
+                           current_widget->widget_text,
+                           current_widget->state->position, 
+                           current_widget->state->render_color,
+                           ui_state->default_font_size);
+        }
+        else
+        {
+            immediate_rect(command_list,
+                           &ui_state->vertex_buffer,
+                           current_widget->state->position, 
+                           current_widget->state->render_size,
+                           current_widget->state->render_color);
+        }
+
+        if(current_widget->first_child)
+        {
+            render_widget_hierarchy(ui_state, command_list, current_widget->first_child);
+        }
+
+        current_widget = current_widget->next_sibling;
+    }while(current_widget != first_widget);
+}
+
 void
 ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_list)
 {
@@ -290,6 +324,7 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
     widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
     {
+#if 0
         do {
             Assert(current_widget);
 
@@ -317,6 +352,9 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
 
             current_widget = current_widget->next_sibling;
         }while(current_widget != ui_state->first_widget);
+#else
+        render_widget_hierarchy(ui_state, command_list, current_widget);
+#endif
 
         r_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
         r_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
@@ -646,6 +684,20 @@ ui_widget_button(ui_state_t *ui_state,
     {
         widget->state->render_color = widget->active_color;
     }
+
+    return(result);
+}
+
+ui_signal_t
+ui_widget_text(ui_state_t *ui_state, string_t widget_text, vec4_t text_color)
+{
+    widget_t *widget = ui_widget_create(ui_state, widget_text, UI_WIDGET_FLAG_HAS_TEXT|UI_WIDGET_FLAG_IDLE_COLOR);
+    widget->state->render_color = text_color;
+    widget->minimum_render_size = s_asset_font_get_string_size(ui_state->asset_manager, 
+                                                               widget_text, 
+                                                              &ui_state->default_font, 
+                                                               ui_state->current_font_size);
+    ui_signal_t result = ui_widget_get_signals(ui_state, widget);
 
     return(result);
 }

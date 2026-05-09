@@ -1419,7 +1419,7 @@ struct type_info_struct_widget_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[17];
+		type_info_member_t member_array[18];
 		struct {
 			type_info_member_t ID;
 			type_info_member_t widget_flags;
@@ -1428,6 +1428,7 @@ struct type_info_struct_widget_t {
 			type_info_member_t widget_text;
 			type_info_member_t toggled;
 			type_info_member_t parent_stack_depth;
+			type_info_member_t font_size;
 			type_info_member_t expected_position;
 			type_info_member_t minimum_render_size;
 			type_info_member_t idle_color;
@@ -4279,7 +4280,7 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_widget_t),
-	.member_count = 17,
+	.member_count = 18,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), ID))},
 		.widget_flags = {.name = "widget_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_flags))},
@@ -4288,6 +4289,7 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 		.widget_text = {.name = "widget_text", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_text)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_text))},
 		.toggled = {.name = "toggled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.toggled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), toggled))},
 		.parent_stack_depth = {.name = "parent_stack_depth", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_stack_depth)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_stack_depth))},
+		.font_size = {.name = "font_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.font_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), font_size))},
 		.expected_position = {.name = "expected_position", .type = TYPE_vec3_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.expected_position)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), expected_position))},
 		.minimum_render_size = {.name = "minimum_render_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.minimum_render_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), minimum_render_size))},
 		.idle_color = {.name = "idle_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.idle_color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), idle_color))},
@@ -6312,6 +6314,7 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_widget_text,
 	TYPE_WIDGET_T_MEMBER_toggled,
 	TYPE_WIDGET_T_MEMBER_parent_stack_depth,
+	TYPE_WIDGET_T_MEMBER_font_size,
 	TYPE_WIDGET_T_MEMBER_expected_position,
 	TYPE_WIDGET_T_MEMBER_minimum_render_size,
 	TYPE_WIDGET_T_MEMBER_idle_color,

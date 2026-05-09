@@ -515,6 +515,35 @@ s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t
     return(result);
 }
 
+vec2_t 
+s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, asset_handle_t *font_handle, u32 pixel_size)
+{
+    Assert(string.count > 0);
+    vec2_t result = vec2_zero();
+
+    dynamic_render_font_varient_t *varient = s_asset_font_acquire_font_at_size(asset_manager, 
+                                                                               font_handle, 
+                                                                               pixel_size);
+    u32 tallest_glyph = 0;
+    u32 total_width   = 0;
+    for(u32 string_index = 0;
+        string_index < string.count;
+        ++string_index)
+    {
+        u8 *character = string.data + string_index;
+        glyph_metric_t *glyph = s_asset_font_fetch_glyph(asset_manager, varient, character);
+        if(glyph->atlas_size.y > tallest_glyph)
+        {
+            tallest_glyph = glyph->atlas_size.y;
+        }
+
+        total_width += glyph->atlas_size.x;
+    }
+
+    result = vec2(total_width, tallest_glyph);
+    return(result);
+}
+
 glyph_metric_t*
 s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
                          dynamic_render_font_varient_t *varient,

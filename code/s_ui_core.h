@@ -89,6 +89,12 @@ enum widget_flags_t
     UI_WIDGET_FLAG_LABLED_BUTTON    = UI_WIDGET_FLAG_CLICKABLE_BUTTON|UI_WIDGET_FLAG_HAS_TEXT
 };
 
+enum widget_layout_style_t
+{
+    WIDGET_LAYOUT_STYLE_VERTICAL,
+    WIDGET_LAYOUT_STYLE_HORIZONTAL
+};
+
 struct widget_t
 {
     u64             ID;
@@ -99,14 +105,15 @@ struct widget_t
     string_t        widget_text;
     bool32          toggled;
     float32         parent_stack_depth;
+    u32             font_size;
     
     vec3_t          expected_position;
     vec2_t          minimum_render_size;
 
+    // TODO(Sleepster): Merge these into a "ui_theme_t" structure?
     vec4_t          idle_color;
     vec4_t          hovered_color;
     vec4_t          active_color;
-
 #if 0
     u32             max_child_width;
     u32             max_child_height;
@@ -124,12 +131,6 @@ struct widget_t
     // Chaining upon a linked list... 
     widget_t       *next_sibling;
     widget_t       *prev_sibling;
-};
-
-enum widget_layout_style_t
-{
-    WIDGET_LAYOUT_STYLE_VERTICAL,
-    WIDGET_LAYOUT_STYLE_HORIZONTAL
 };
 
 struct ui_state_t
@@ -152,6 +153,7 @@ struct ui_state_t
     camera_matrices_t                 current_camera;
     input_controller_t               *ui_controller;
 
+    // TODO(Sleepster): Merge these into a "ui_theme_t" structure?
     asset_handle_t                    widget_shader;
     asset_handle_t                    font_shader;
     asset_handle_t                    default_font;
@@ -193,6 +195,7 @@ true_inline void ui_widget_set_current_font_size(ui_state_t *ui_state, u32 font_
 widget_t*   ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags);
 ui_signal_t ui_widget_panel(ui_state_t *ui_state,  string_t widget_name, vec2_t position, vec4_t background_color);
 ui_signal_t ui_widget_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, vec4_t idle_color, vec4_t hovered_color, vec4_t active_color);
+ui_signal_t ui_widget_text(ui_state_t *ui_state, string_t widget_text, vec4_t text_color);
 
 #endif // S_UI_CORE_H
 
