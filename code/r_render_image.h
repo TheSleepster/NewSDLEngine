@@ -8,7 +8,7 @@
 
 #define R_RENDER_IMAGE_H
 #include <c_string.h>
-#include <vk_backend_image.h>
+#include <vk_backend_core.h>
 
 // NOTE(Sleepster): 
 // The invalid states are meant to help us know if the create_info is 
@@ -69,9 +69,7 @@ struct image_t
 {
     u32                 ID;
     image_create_info_t create_info;
-    union {
-        vulkan_image_t vulkan_image;
-    };
+    backend_image_t     backend_image;
 };
 
 typedef struct bitmap bitmap_t;

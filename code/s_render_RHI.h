@@ -23,15 +23,6 @@ constexpr u32 MAX_CONSTANT_BUFFERS    = 1000;
 constexpr u32 MAX_RENDER_TARGETS      = 100;
 constexpr u32 MAX_SHADER_IMAGE_PARAMS = 16;
 
-// TODO(Sleepster): Used for rendering, temporary and will be removed.
-struct alignas(16) immediate_vertex_t
-{
-    vec4_t vPosition;
-    vec4_t vColor;
-    vec2_t vTexCoord;
-    vec2_t vPadding;
-};
-
 // TODO(Sleepster): Remove this...
 struct camera_matrices_t
 {

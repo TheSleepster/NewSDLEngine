@@ -29,8 +29,9 @@
 #include <s_nt_networking.h>
 #include <s_asset_manager.h>
 #include <s_render_RHI.h>
-#include <r_render_image.h>
 #include <s_ui_core.h>
+#include <r_render_image.h>
+#include <r_immediate_rendering.h>
 //
 
 #include <asset_file_packer/jfd_asset_file.h>
@@ -1044,7 +1045,6 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
             slot->type             = (asset_type_t)entry->entry_header->asset_type;
             slot->name             = entry->filename;
             slot->package_entry    = entry;
-            slot->ref_counter      = 0;
             slot->owner_asset_file = asset_file->file_info;
         }
         asset_manager->loaded_file_count += 1;
@@ -1066,10 +1066,6 @@ s_asset_manager_get_asset_slot(asset_catalog_t *catalog, string_t name)
     if(result == null)
     {
         log_error("Failure to fetch asset '%s' from this catalog...\n", C_STR(name));
-    }
-    else
-    {
-        AtomicIncrement32(&result->ref_counter);
     }
 
     return(result);
@@ -1139,27 +1135,6 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
         }
 
         s_asset_manager_set_handle_asset_data_pointer(&result, slot);
-#if 0
-        result.type = (asset_type_t)entry->entry_header->asset_type;
-        result.slot = slot;
-        result.owner_asset_file_index = file_index;
-        result.is_valid               = true;
-        if(result.slot->slot_state == ASLS_Unloaded)
-        {
-            // NOTE(Sleepster): If unloaded, get the data 
-            s_asset_manager_load_asset_data(asset_manager, &result, hash_value);
-
-            slot->loaded_asset_index = c_dynarray_header(catalog->loaded_assets).indices_used;
-            c_dynarray_push(catalog->loaded_assets, slot);
-        }
-        else if(result.slot->slot_state == ASLS_Loaded)
-        {
-            // NOTE(Sleepster): If loaded, just set the handle pointers 
-            s_asset_manager_set_handle_asset_data_pointer(&result, slot);
-        }
-
-        Assert(result.slot->slot_state != ASLS_Invalid);
-#endif
     }
     else
     {
@@ -1294,6 +1269,9 @@ s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atla
 
                 atlas->atlas_cursor_x = atlas_cursor_x + bitmap_width;
                 c_dynarray_remove_element(atlas->textures_to_merge, texture_index);
+
+                atlas->merge_counter -= 1;
+                Assert(atlas->merge_counter >= 0);
             }
         }
 
@@ -1305,7 +1283,7 @@ s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atla
             .usage  = IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
         };
 
-        if(atlas->texture.gpu_data.vulkan_image.handle == null)
+        if(atlas->texture.gpu_data.backend_image.handle == null)
         {
             asset_manager->renderer_state->backend_image_create(&info, &atlas->texture.gpu_data);
         }

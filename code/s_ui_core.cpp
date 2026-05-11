@@ -358,20 +358,23 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
 
         r_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
         r_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
-        r_cmd_use_shader_program(command_list, ui_state->widget_shader);
 
-        r_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
+        // NOTE(Sleepster): First, draw the normal rectangle widgets
+        {
+            r_cmd_use_shader_program(command_list, ui_state->widget_shader);
+            r_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
 
-        s32 window_width  = Max(renderer_state->window_size.x, 10);
-        s32 window_height = Max(renderer_state->window_size.y, 10);
+            s32 window_width  = Max(renderer_state->window_size.x, 10);
+            s32 window_height = Max(renderer_state->window_size.y, 10);
 
-        r_cmd_update_constant_buffer(command_list, ui_state->camera_matrices_buffer, &ui_state->current_camera, sizeof(camera_matrices_t));
+            r_cmd_update_constant_buffer(command_list, ui_state->camera_matrices_buffer, &ui_state->current_camera, sizeof(camera_matrices_t));
 
-        r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
-        r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
+            r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
+            r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
 
-        r_cmd_draw_indexed(command_list, ui_state->widget_count * 6, 0, 1, 0);
-        s_renderer_buffer_reset(ui_state->renderer, &ui_state->vertex_buffer);
+            r_cmd_draw_indexed(command_list, ui_state->widget_count * 6, 0, 1, 0);
+            s_renderer_buffer_reset(ui_state->renderer, &ui_state->vertex_buffer);
+        }
     }
     else
     {

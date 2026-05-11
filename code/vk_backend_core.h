@@ -238,10 +238,18 @@ struct vulkan_context_t
     VkSampler                           default_linear_sampler;
 };
 
+struct vulkan_image_t;
+struct vulkan_shader_t;
+struct renderer_state_t;
+struct renderpass_t;
+struct renderpass_desc_t;
+
 typedef vulkan_context_t backend_renderer_t;
 typedef VkCommandBuffer  backend_command_buffer_t;
 typedef VkRenderPass     backend_renderpass_handle_t;
 typedef VkFramebuffer    backend_framebuffer_handle_t;
+typedef vulkan_image_t   backend_image_t;
+typedef vulkan_shader_t  backend_shader_t;
 
 // NOTE(Sleepster): 
 //
@@ -297,11 +305,6 @@ global_variable constexpr VkPipelineColorBlendAttachmentState g_pipeline_default
 };
 
 global_variable constexpr render_pipeline_state_t g_pipeline_default_state_key = {};
-
-struct vulkan_shader_t;
-struct renderer_state_t;
-struct renderpass_t;
-struct renderpass_desc_t;
 
 #define vkAssert(result) ({                                                \
     if(!vk_backend_result_is_success(result))                              \

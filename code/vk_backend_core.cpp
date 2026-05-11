@@ -1913,7 +1913,7 @@ vk_backend_renderpass_create(vulkan_context_t    *vulkan_context,
     {
         VkAttachmentDescription *attachment       =  attachment_descs + attachment_index;
         VkAttachmentReference   *attachment_ref   =  attachment_refs  + attachment_index;
-        vulkan_image_t          *image_attachment = &(attachments     + attachment_index)->vulkan_image;
+        vulkan_image_t          *image_attachment = &(attachments     + attachment_index)->backend_image;
 
         VkImageLayout            initial_layout   = initial_layouts[attachment_index];
         VkImageLayout            final_layout     = final_layouts[attachment_index];
@@ -2020,7 +2020,7 @@ vk_backend_framebuffer_create(vulkan_context_t  *vulkan_context,
         attachment_index < attachment_count;
         ++attachment_index)
     {
-        vulkan_image_t *image   = &(attachments + attachment_index)->vulkan_image;
+        vulkan_image_t *image   = &(attachments + attachment_index)->backend_image;
         views[attachment_index] = image->view;
     }
 
@@ -2139,7 +2139,7 @@ internal_api true_inline bool8
 is_depth_attachment_valid(renderpass_attachment_t *depth_attachment)
 {
     bool8 result = true;
-    if(depth_attachment->image->vulkan_image.handle == null)
+    if(depth_attachment->image->backend_image.handle == null)
     {
         result = false;
     }
@@ -2208,7 +2208,7 @@ vk_backend_initialize_RHI_renderpass(renderer_state_t *renderer_state, renderpas
 
         ++attachment_count;
 
-        VkImageLayout initial_layout = depth_stencil_attachment->image->vulkan_image.layout;
+        VkImageLayout initial_layout = depth_stencil_attachment->image->backend_image.layout;
         VkImageLayout final_layout   = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
         image_attachments[attachment_index] = *depth_stencil_attachment->image;
@@ -2393,7 +2393,7 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                         image_t *image = command_list->image_shader_params[image_count + image_index]; 
                         if(image)
                         {
-                            vulkan_image_t *vulkan_data = &image->vulkan_image;
+                            vulkan_image_t *vulkan_data = &image->backend_image;
 
                             image_info->imageLayout = vulkan_data->layout;
                             image_info->imageView   = vulkan_data->view;
@@ -2402,7 +2402,7 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                         else
                         {
                             image_t *image = command_list->image_shader_params[0];
-                            if(image->vulkan_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+                            if(image->backend_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
                             {
                                 VkCommandBuffer scratch_command_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
                                 VkImageSubresourceRange src_range = {
@@ -2414,19 +2414,19 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                                 };
                                 vk_backend_image_change_layout(vulkan_context,
                                                                scratch_command_buffer,
-                                                               image->vulkan_image.handle,
-                                                               image->vulkan_image.layout,
+                                                               image->backend_image.handle,
+                                                               image->backend_image.layout,
                                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                                                                VK_PIPELINE_STAGE_TRANSFER_BIT,
                                                                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
                                                                VK_ACCESS_TRANSFER_WRITE_BIT,
                                                                VK_ACCESS_SHADER_READ_BIT,
                                                                src_range);
-                                image->vulkan_image.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                                image->backend_image.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
                                 vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
                             }
 
-                            vulkan_image_t *vulkan_data = &image->vulkan_image;
+                            vulkan_image_t *vulkan_data = &image->backend_image;
 
                             image_info->imageLayout = vulkan_data->layout;
                             image_info->imageView   = vulkan_data->view;
@@ -2628,9 +2628,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         ++color_attachment_index)
                     {
                         renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
-                        if(attachment->image->vulkan_image.layout != attachment->image->vulkan_image.renderpass_initial_layout)
+                        if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_initial_layout)
                         {
-                            vulkan_image_t *image = &attachment->image->vulkan_image;
+                            vulkan_image_t *image = &attachment->image->backend_image;
                             vk_backend_transfer_image_to_intial_layout(vulkan_context, render_command_buffer, image);
                         }
                     }
@@ -2638,9 +2638,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     if(renderpass->has_depth_stencil_attachment)
                     {
                         renderpass_attachment_t *attachment = &renderpass->depth_stencil_attachment;
-                        if(attachment->image->vulkan_image.layout != attachment->image->vulkan_image.renderpass_initial_layout)
+                        if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_initial_layout)
                         {
-                            vulkan_image_t *image = &attachment->image->vulkan_image;
+                            vulkan_image_t *image = &attachment->image->backend_image;
                             vk_backend_transfer_image_to_intial_layout(vulkan_context, render_command_buffer, image);
                         }
                     }
@@ -2687,9 +2687,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         ++color_attachment_index)
                     {
                         renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
-                        if(attachment->image->vulkan_image.layout != attachment->image->vulkan_image.renderpass_final_layout)
+                        if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_final_layout)
                         {
-                            vulkan_image_t *image = &attachment->image->vulkan_image;
+                            vulkan_image_t *image = &attachment->image->backend_image;
                             vk_backend_transfer_image_to_final_layout(vulkan_context, render_command_buffer, image);
                         }
                     }
@@ -2697,9 +2697,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     if(renderpass->has_depth_stencil_attachment)
                     {
                         renderpass_attachment_t *attachment = &renderpass->depth_stencil_attachment;
-                        if(attachment->image->vulkan_image.layout != attachment->image->vulkan_image.renderpass_final_layout)
+                        if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_final_layout)
                         {
-                            vulkan_image_t *image = &attachment->image->vulkan_image;
+                            vulkan_image_t *image = &attachment->image->backend_image;
                             vk_backend_transfer_image_to_final_layout(vulkan_context, render_command_buffer, image);
                         }
                     }
@@ -2728,8 +2728,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         vec2_t destination_blit_size = vec2(dest->render_width, dest->render_height);
                         vk_backend_perform_image_blit(vulkan_context, 
                                                       render_command_buffer, 
-                                                      &source_attachment->image->vulkan_image,
-                                                      &destination_attachment->image->vulkan_image,
+                                                      &source_attachment->image->backend_image,
+                                                      &destination_attachment->image->backend_image,
                                                       vec2_zero(),
                                                       source_blit_size,
                                                       vec2_zero(),
@@ -2746,8 +2746,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         vec2_t destination_blit_size = vec2(dest->render_width, dest->render_height);
                         vk_backend_perform_image_blit(vulkan_context, 
                                                       render_command_buffer, 
-                                                     &source_depth->image->vulkan_image,
-                                                     &destination_depth->image->vulkan_image,
+                                                     &source_depth->image->backend_image,
+                                                     &destination_depth->image->backend_image,
                                                       vec2_zero(),
                                                       source_blit_size,
                                                       vec2_zero(),
@@ -2816,12 +2816,12 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 case RCT_BindTexture:
                 {
                     render_command_bind_texture_t *cmd = (render_command_bind_texture_t*)command->data;
-                    if(cmd->texture->vulkan_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+                    if(cmd->texture->backend_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
                     {
                         // TODO(Sleepster): This is awful and brings sadness to families across the world... Too bad I don't care... 
                         VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
                         VkImageSubresourceRange source_range = {
-                            .aspectMask     = cmd->texture->vulkan_image.aspect_mask,
+                            .aspectMask     = cmd->texture->backend_image.aspect_mask,
                             .baseArrayLayer = 0,
                             .baseMipLevel   = 0,
                             .layerCount     = 1,
@@ -2829,17 +2829,19 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         };
                         vk_backend_image_change_layout(vulkan_context, 
                                                        scratch_buffer,
-                                                       cmd->texture->vulkan_image.handle, 
-                                                       cmd->texture->vulkan_image.layout,
+                                                       cmd->texture->backend_image.handle, 
+                                                       cmd->texture->backend_image.layout,
                                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
                                                        VK_PIPELINE_STAGE_TRANSFER_BIT,
                                                        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
                                                        VK_ACCESS_TRANSFER_WRITE_BIT,
                                                        VK_ACCESS_SHADER_READ_BIT,
                                                        source_range);
-                        cmd->texture->vulkan_image.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                        cmd->texture->backend_image.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
                         vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_buffer);
+
+                        // TODO(Sleepster): This might be a source of issues, just in case... leaving this here 
                         vkDeviceWaitIdle(vulkan_context->device);
                     }
 
@@ -2973,8 +2975,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     render_command_blit_image_t *cmd = (render_command_blit_image_t*)command->data;
                     vk_backend_perform_image_blit(vulkan_context, 
                                                   render_command_buffer, 
-                                                 &cmd->source_image->vulkan_image,
-                                                 &cmd->dest_image->vulkan_image,
+                                                 &cmd->source_image->backend_image,
+                                                 &cmd->dest_image->backend_image,
                                                   cmd->source_offset,
                                                   cmd->source_size,
                                                   cmd->dest_offset,
@@ -3022,11 +3024,11 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
         Assert(source);
         Assert(backbuffer);
-        Assert(!vk_backend_is_image_format_stencil_format(&source->vulkan_image) && 
-               !vk_backend_is_image_format_depth_format(&source->vulkan_image));
+        Assert(!vk_backend_is_image_format_stencil_format(&source->backend_image) && 
+               !vk_backend_is_image_format_depth_format(&source->backend_image));
 
         VkImageSubresourceRange source_range = {
-            .aspectMask     = source->vulkan_image.aspect_mask,
+            .aspectMask     = source->backend_image.aspect_mask,
             .baseArrayLayer = 0,
             .baseMipLevel   = 0,
             .layerCount     = 1,
@@ -3042,13 +3044,13 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
         };
 
         vk_backend_image_blit(vulkan_context,
-                              &source->vulkan_image,
+                              &source->backend_image,
                               backbuffer,
                               vec2(0, 0),
-                              vec2(source->vulkan_image.width, source->vulkan_image.height),
+                              vec2(source->backend_image.width, source->backend_image.height),
                               vec2(0, 0),
                               vec2(backbuffer->width, backbuffer->height),
-                              source->vulkan_image.layout,
+                              source->backend_image.layout,
                               VK_IMAGE_LAYOUT_UNDEFINED,
                               VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
                               source_range,
@@ -3154,6 +3156,7 @@ backend_handle_window_resize(vec2_t window_size)
     vulkan_context->current_window_height = window_size.y;
 
     ++vulkan_context->window_size_generation;
+    vkDeviceWaitIdle(vulkan_context->device);
 }
 
 /*
@@ -3340,8 +3343,8 @@ backend_image_create(image_create_info_t *create_info, image_t *image)
     }
 #endif
 
-    Assert(image->vulkan_image.is_valid == false);
-    image->vulkan_image = vk_backend_image_create(this->render_context, &info);
+    Assert(image->backend_image.is_valid == false);
+    image->backend_image = vk_backend_image_create(this->render_context, &info);
 }
 
 /*
@@ -3353,9 +3356,9 @@ renderer_state_t::backend_image_destroy
 true_inline void renderer_state_t::
 backend_image_destroy(image_t *image)
 {
-    Assert(image->vulkan_image.is_valid == true);
-    Expect(image->vulkan_image.handle, "This image does not have a valid handle...\n");
-    vk_backend_image_destroy(this->render_context, &image->vulkan_image);
+    Assert(image->backend_image.is_valid == true);
+    Expect(image->backend_image.handle, "This image does not have a valid handle...\n");
+    vk_backend_image_destroy(this->render_context, &image->backend_image);
 }
 
 /*
@@ -3367,7 +3370,7 @@ renderer_state_t::backend_image_update_contents
 true_inline void renderer_state_t::
 backend_image_update_contents(image_t *image)
 {
-    vk_backend_image_update_data(this->render_context, &image->vulkan_image);
+    vk_backend_image_update_data(this->render_context, &image->backend_image);
 }
 
 /*

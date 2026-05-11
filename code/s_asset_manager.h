@@ -185,7 +185,7 @@ typedef struct texture_atlas
 typedef struct shader 
 {
     u64              ID;
-    vulkan_shader_t  shader_data;
+    backend_shader_t shader_data;
 }shader_t;
 
 #if 0
@@ -448,8 +448,6 @@ typedef struct asset_slot
 
     // NOTE(Sleepster): Should only be modified using atomic_* functions 
     volatile u32             package_generation;
-    // NOTE(Sleepster): Handles automatically increment and decrement this 
-    volatile u32             ref_counter;
     // NOTE(Sleepster): This is here for access when reloading/unloading the asset. 
     volatile u32             loaded_asset_index;
     union {
@@ -520,7 +518,13 @@ struct texture_atlas_registry_t
     u32             current_atlas_count;
 };
 
-// TODO(Sleepster): Default assets.
+// NOTE(Sleepster): 
+//
+// Here's the plan for allocating assets, predetermined lifetimes. We'll have a:
+// - Level lifetime asset arena
+// - Permanent lifetime asset arena
+//
+// Simple. Doesn't deal with ref-counters or anything heap related.
 struct asset_manager_t
 {
     bool8                           is_initialized;
@@ -536,7 +540,6 @@ struct asset_manager_t
     HashTable_t(s32)                asset_name_to_file;
     u32                             loaded_file_count;
 
-    // TODO(Sleepster): Actually use these... This was a good idea past me. 
     asset_slot_t                   *asset_load_queue[MAX_QUEUED_ASSETS];
     u32                             load_queue_size;
         
