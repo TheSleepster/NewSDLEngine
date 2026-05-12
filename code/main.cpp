@@ -141,6 +141,7 @@ entity_render(game_state_t *game_state, render_command_list_t *command_list, ent
                       vec4(1.0, 1.0, 1.0, 1.0),
                       uv_min,
                       uv_max,
+                      vec2_zero(),
                       texture);
 }
 
@@ -463,7 +464,9 @@ game_main(void)
                           &basic_font, 
                           STR("This is a test string..."), 
                           vec3(-200, -100, 0.0f), 
-                          vec4(1.0f, 1.0f, 1.0f, 1.0f), 32);
+                          vec4(1.0f, 1.0f, 1.0f, 1.0f), 
+                          vec2_zero(),
+                          32);
 
             r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer);
             r_cmd_draw_indexed(command_list, (game_state.vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);

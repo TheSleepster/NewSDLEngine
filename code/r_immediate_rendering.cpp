@@ -14,6 +14,7 @@ immediate_quad_ex(render_command_list_t *command_list,
                   vec4_t                 render_color,
                   vec2_t                 uv_min,
                   vec2_t                 uv_max,
+                  vec2_t                 padding,
                   texture2D_t           *texture)
 {
     immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)buffer->vertex_data + buffer->vertex_count);
@@ -38,6 +39,12 @@ immediate_quad_ex(render_command_list_t *command_list,
     bottom_right->vColor = render_color;
     top_left->vColor     = render_color;
     top_right->vColor    = render_color;
+
+    bottom_left->vPadding  = padding;
+    bottom_right->vPadding = padding;
+    top_left->vPadding     = padding;
+    top_right->vPadding    = padding;
+
     if(texture)
     {
         if(!s_renderer_is_texture_bound(command_list, texture))
@@ -64,7 +71,8 @@ immediate_rect(render_command_list_t *command_list,
                vertex_buffer_t       *buffer,
                vec3_t                 position,
                vec2_t                 render_size,
-               vec4_t                 render_color)
+               vec4_t                 render_color,
+               vec2_t                 padding)
 {
     immediate_quad_ex(command_list, 
                       buffer,
@@ -73,6 +81,7 @@ immediate_rect(render_command_list_t *command_list,
                       render_color,
                       vec2_zero(), 
                       vec2_zero(), 
+                      padding,
                       null);
 }
 
@@ -84,6 +93,7 @@ immediate_text(render_command_list_t *command_list,
                string_t               render_string, 
                vec3_t                 position, 
                vec4_t                 text_color,
+               vec2_t                 padding,
                u32                    font_size)
 {
     Assert(font_handle);
@@ -110,6 +120,7 @@ immediate_text(render_command_list_t *command_list,
                               text_color,
                               metrics->atlas_offset,
                               vec2_add(metrics->atlas_offset, metrics->atlas_size),
+                              padding,
                              &metrics->owner_atlas->texture);
 
             render_position.x += metrics->advance;
@@ -120,4 +131,3 @@ immediate_text(render_command_list_t *command_list,
         }
     }
 }
-

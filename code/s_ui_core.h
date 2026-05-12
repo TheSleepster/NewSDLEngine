@@ -81,12 +81,12 @@ enum widget_flags_t
     UI_WIDGET_FLAG_IDLE_COLOR       = BIT(1),
     UI_WIDGET_FLAG_HOVER_COLOR      = BIT(2),
     UI_WIDGET_FLAG_ACTIVE_COLOR     = BIT(3),
-    UI_WIDGET_FLAG_HAS_TEXT         = BIT(4),
-    UI_WIDGET_FLAG_MOUSE_CLICKABLE  = BIT(5),
-    UI_WIDGET_FLAG_HOVERABLE        = BIT(6),
+    UI_WIDGET_FLAG_DRAW_TEXT        = BIT(4),
+    UI_WIDGET_FLAG_DRAW_RECTANGLE   = BIT(5),
+    UI_WIDGET_FLAG_MOUSE_CLICKABLE  = BIT(6),
+    UI_WIDGET_FLAG_HOVERABLE        = BIT(7),
 
-    UI_WIDGET_FLAG_CLICKABLE_BUTTON = UI_WIDGET_FLAG_HOVERABLE|UI_WIDGET_FLAG_HOVER_COLOR|UI_WIDGET_FLAG_MOUSE_CLICKABLE|UI_WIDGET_FLAG_ACTIVE_COLOR,
-    UI_WIDGET_FLAG_LABLED_BUTTON    = UI_WIDGET_FLAG_CLICKABLE_BUTTON|UI_WIDGET_FLAG_HAS_TEXT
+    UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_HOVER_COLOR|UI_WIDGET_FLAG_ACTIVE_COLOR|UI_WIDGET_FLAG_MOUSE_CLICKABLE|UI_WIDGET_FLAG_HOVERABLE|UI_WIDGET_FLAG_DRAW_RECTANGLE
 };
 
 enum widget_layout_style_t
@@ -137,6 +137,7 @@ struct ui_state_t
 {
     // NOTE(Sleepster): Lasts one frame...
     memory_arena_t                    widget_arena;
+    u32                               section_count;
 
     u64                               hot_widget_ID;
     u64                               active_widget_ID;
@@ -155,7 +156,6 @@ struct ui_state_t
 
     // TODO(Sleepster): Merge these into a "ui_theme_t" structure?
     asset_handle_t                    widget_shader;
-    asset_handle_t                    font_shader;
     asset_handle_t                    default_font;
     u32                               default_font_size;
     vec4_t                            default_font_color;
