@@ -47,43 +47,42 @@ typedef enum renderer_effect_application_flags
 
 typedef enum render_pipeline_blending_mode
 {
-    RBM_Invalid,
-    RBM_Zero,
-    RBM_One,
-    RBM_Constant,
-
-    RBM_SrcColor,
-    RBM_OneMinusSrcColor,
-    RBM_DstColor,
-    RBM_OneMinusDstColor,
-
-    RBM_SrcAlpha,
-    RBM_OneMinusSrcAlpha,
-    RBM_DstAlpha,
-    RBM_OneMinusDstAlpha,
+    RBM_Zero                  =  0,
+    RBM_One                   =  1,
+    RBM_SrcColor              =  2,
+    RBM_OneMinusSrcColor      =  3,
+    RBM_DstColor              =  4,
+    RBM_OneMinusDstColor      =  5,
+    RBM_SrcAlpha              =  6,
+    RBM_OneMinusSrcAlpha      =  7,
+    RBM_DstAlpha              =  8,
+    RBM_OneMinusDstAlpha      =  9,
+    RBM_ConstantColor         =  10,
+    RBM_OneMinusConstantColor =  11,
+    RBM_ConstantAlpha         =  12,
+    RBM_OneMinusConstantAlpha =  13,
     RBM_Count
 }render_pipeline_blending_mode_t;
 
 typedef enum render_pipeline_blending_equation
 {
-    RBE_Invalid,
-    RBE_Add,
-    RBE_Subtract,
-    RBE_ReverseSubtract,
-    RBE_Min,
-    RBE_Max,
+    RBE_Add             =  0,
+    RBE_Subtract        =  1,
+    RBE_ReverseSubtract =  2,
+    RBE_Min             =  3,
+    RBE_Max             =  4,
 }render_pipeline_blending_equation_t;
 
 typedef enum render_pipeline_depth_function
 {
-    RDF_Never,
-    RDF_Less,
-    RDF_Equal,
-    RDF_LessOrEqual,
-    RDF_Greater,
-    RDF_NotEqual,
-    RDF_GreaterOrEqual,
-    RDF_Always,
+    RDF_Never          = 0,
+    RDF_Less           = 1,
+    RDF_Equal          = 2,
+    RDF_LessOrEqual    = 3,
+    RDF_Greater        = 4,
+    RDF_NotEqual       = 5,
+    RDF_GreaterOrEqual = 6,
+    RDF_Always         = 7,
 }render_pipeline_depth_function_t;
 
 typedef enum render_pipeline_polygon_mode
@@ -98,8 +97,8 @@ typedef struct render_pipeline_state
     u32    src_color_blend_mode  = RBM_SrcAlpha;
     u32    dst_color_blend_mode  = RBM_OneMinusSrcAlpha;
 
-    u32    src_alpha_blend_mode  = RBM_SrcAlpha;
-    u32    dst_alpha_blend_mode  = RBM_OneMinusSrcAlpha;
+    u32    src_alpha_blend_mode  = RBM_One;
+    u32    dst_alpha_blend_mode  = RBM_Zero;
 
     u32    color_blend_op        = RBE_Add;
     u32    alpha_blend_op        = RBE_Add;
@@ -296,10 +295,10 @@ global_variable constexpr VkPipelineDepthStencilStateCreateInfo g_pipeline_defau
 global_variable constexpr VkPipelineColorBlendAttachmentState g_pipeline_default_blend_settings = {
     .blendEnable         = true,
     .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-    .dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+    .dstColorBlendFactor = VK_BLEND_FACTOR_ONE,
     .colorBlendOp        = VK_BLEND_OP_ADD,
-    .srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-    .dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+    .srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE,
+    .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO,
     .alphaBlendOp        = VK_BLEND_OP_ADD,
     .colorWriteMask      = VK_COLOR_COMPONENT_R_BIT|VK_COLOR_COMPONENT_G_BIT|VK_COLOR_COMPONENT_B_BIT|VK_COLOR_COMPONENT_A_BIT
 };

@@ -268,5 +268,7 @@ privDefer<F> defer_func(F f) {
 #define defer(code)   auto DEFER_3(_defer_) = defer_func([&](){code;})
 #endif
 
+#define DeferLoop(begin, end)        for(int _i_ = ((begin), 0); !_i_; _i_ += 1, (end))
+
 #endif // C_BASE_H
 

@@ -81,10 +81,13 @@ enum widget_flags_t
     UI_WIDGET_FLAG_IDLE_COLOR       = BIT(1),
     UI_WIDGET_FLAG_HOVER_COLOR      = BIT(2),
     UI_WIDGET_FLAG_ACTIVE_COLOR     = BIT(3),
-    UI_WIDGET_FLAG_DRAW_TEXT        = BIT(4),
-    UI_WIDGET_FLAG_DRAW_RECTANGLE   = BIT(5),
-    UI_WIDGET_FLAG_MOUSE_CLICKABLE  = BIT(6),
-    UI_WIDGET_FLAG_HOVERABLE        = BIT(7),
+    UI_WIDGET_FLAG_MOUSE_CLICKABLE  = BIT(4),
+    UI_WIDGET_FLAG_HOVERABLE        = BIT(5),
+
+    UI_WIDGET_FLAG_DRAW_TEXT        = BIT(6),
+    UI_WIDGET_FLAG_DRAW_RECTANGLE   = BIT(7),
+    UI_WIDGET_FLAG_DRAW_BACKGROUND  = BIT(8),
+    UI_WIDGET_FLAG_DRAW_BORDER      = BIT(9),
 
     UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_HOVER_COLOR|UI_WIDGET_FLAG_ACTIVE_COLOR|UI_WIDGET_FLAG_MOUSE_CLICKABLE|UI_WIDGET_FLAG_HOVERABLE|UI_WIDGET_FLAG_DRAW_RECTANGLE
 };
@@ -159,12 +162,12 @@ struct ui_state_t
     asset_handle_t                    default_font;
     u32                               default_font_size;
     vec4_t                            default_font_color;
-
-    u32                               current_font_size;
-    vec4_t                            current_font_color;
+    vec4_t                            default_widget_idle_color;
+    vec4_t                            default_widget_hover_color;
+    vec4_t                            default_widget_active_color;
 
     vec2_t                            mouse_position;
-    u32                               widget_count;
+    u32                               widget_item_count;
     u64                               frame_count;
     u64                               ui_seed;
 
@@ -183,19 +186,31 @@ void      ui_state_init(ui_state_t *ui_state, input_manager_t *input_manager, as
 void      ui_state_update_widget_state(ui_state_t *ui_state);
 void      ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_list);
 
+true_inline void ui_state_set_default_widget_idle_color(ui_state_t *ui_state, vec4_t color);
+true_inline void ui_state_set_default_widget_hover_color(ui_state_t *ui_state, vec4_t color);
+true_inline void ui_state_set_default_widget_active_color(ui_state_t *ui_state, vec4_t color);
+true_inline void ui_widget_set_default_font_color(ui_state_t *ui_state, vec4_t color);
+true_inline void ui_widget_set_default_font_size(ui_state_t *ui_state, u32 font_size);
+
 true_inline void ui_state_begin_frame(ui_state_t *ui_state);
 true_inline void ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list);
 true_inline void ui_widget_set_parent_layout(ui_state_t *ui_state, u32 layout_style);
 true_inline void ui_widget_push_parent(ui_state_t *ui_state, widget_t *widget);
 true_inline void ui_widget_pop_parent(ui_state_t *ui_state);
 true_inline void ui_widget_seed(ui_state_t *ui_state, u64 index);
-true_inline void ui_widget_set_font_color(ui_state_t *ui_state, vec4_t color);
-true_inline void ui_widget_set_current_font_size(ui_state_t *ui_state, u32 font_size);
 
 widget_t*   ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags);
 ui_signal_t ui_widget_panel(ui_state_t *ui_state,  string_t widget_name, vec2_t position, vec4_t background_color);
-ui_signal_t ui_widget_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, vec4_t idle_color, vec4_t hovered_color, vec4_t active_color);
+ui_signal_t ui_widget_sized_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, u32 widget_flags);
 ui_signal_t ui_widget_text(ui_state_t *ui_state, string_t widget_text, vec4_t text_color);
+ui_signal_t ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text, vec4_t text_color);
+
+true_inline void ui_state_end_row(ui_state_t *ui_state);
+true_inline void ui_state_begin_row(ui_state_t *ui_state);
+
+#define ui_parent(state, widget) DeferLoop(ui_widget_push_parent((state), (widget)), ui_widget_pop_parent((state)))
+#define ui_row(state)            DeferLoop(ui_state_begin_row((state)), ui_state_end_row((state)))
+#define ui_column(state)         DeferLoop(ui_state_begin_column((state)), ui_state_end_column((state)))
 
 #endif // S_UI_CORE_H
 

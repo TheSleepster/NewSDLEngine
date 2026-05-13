@@ -10,12 +10,9 @@
 true_inline void
 ui_state_begin_frame(ui_state_t *ui_state)
 {
-    ui_state->widget_count     = 0;
-    ui_state->ui_seed          = 0;
-    ui_state->parent_stack_top = 1;
-
-    ui_state->current_font_size  = ui_state->default_font_size;
-    ui_state->current_font_color = ui_state->default_font_color;
+    ui_state->widget_item_count = 0;
+    ui_state->ui_seed           = 0;
+    ui_state->parent_stack_top  = 1;
 
     c_arena_reset(&ui_state->widget_arena);
 }
@@ -25,6 +22,18 @@ ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list)
 {
     ui_state_update_widget_state(ui_state);
     ui_state_render_widgets(ui_state, command_list);
+
+    ++ui_state->frame_count;
+}
+
+true_inline void
+ui_state_begin_row(ui_state_t *ui_state)
+{
+}
+
+true_inline void
+ui_state_end_row(ui_state_t *ui_state)
+{
 }
 
 struct widget_child_size_data_t
@@ -42,14 +51,24 @@ get_hierarchy_size_data(ui_state_t *ui_state, widget_t *first_widget)
     widget_child_size_data_t result = {};
     if(first_widget)
     {
-
         widget_t *current_widget = first_widget;
         do {
             current_widget->state->render_size = current_widget->minimum_render_size;
             if(current_widget->first_child)
             {
-                result = get_hierarchy_size_data(ui_state, 
-                                                 current_widget->first_child);
+                widget_child_size_data_t child_data = get_hierarchy_size_data(ui_state, 
+                                                                              current_widget->first_child);
+                result.total_width  += child_data.total_width;
+                result.total_height += child_data.total_height;
+                if(result.largest_width < child_data.largest_width)
+                {
+                    result.largest_width = child_data.largest_width;
+                }
+
+                if(result.tallest_height < child_data.tallest_height)
+                {
+                    result.tallest_height = child_data.tallest_height;
+                }
             }
 
             result.total_width  += current_widget->state->render_size.x;
@@ -154,20 +173,6 @@ ui_state_update_widget_state(ui_state_t *ui_state)
                                                          ui_state->current_camera.projection_matrix);
     ui_state_update_widget_hierarchy(ui_state);
 }
-#if 0
-        if(current_widget->widget_flags & UI_WIDGET_FLAG_HAS_TEXT)
-        {
-            immediate_text(command_list, 
-                          &ui_state->vertex_buffer, 
-                           ui_state->asset_manager,
-                          &ui_state->default_font,
-                           current_widget->widget_text,
-                           current_widget->state->position, 
-                           current_widget->state->render_color,
-                           vec2(2.0, 0.0),
-                           ui_state->default_font_size);
-        }
-#endif
 
 internal_api void
 render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_list, widget_t *first_widget)
@@ -182,6 +187,45 @@ render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_lis
                            current_widget->state->render_size,
                            current_widget->state->render_color,
                            vec2(0, 0));
+
+            ++ui_state->widget_item_count;
+        }
+
+        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
+        {
+            immediate_rect(command_list,
+                           &ui_state->vertex_buffer,
+                           current_widget->state->position, 
+                           current_widget->state->render_size,
+                           current_widget->state->render_color,
+                           vec2(0, 0));
+
+            ++ui_state->widget_item_count;
+        }
+
+        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
+        {
+            InvalidCodePath;
+        }
+
+        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BORDER)
+        {
+            InvalidCodePath;
+        }
+
+        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_TEXT)
+        {
+            immediate_text(command_list, 
+                          &ui_state->vertex_buffer, 
+                           ui_state->asset_manager,
+                          &ui_state->default_font,
+                           current_widget->widget_text,
+                           vec3_add(current_widget->state->position, vec3(0.0, 0.0, -0.01)), 
+                           ui_state->default_font_color,
+                           vec2(2.0, 0.0),
+                           ui_state->default_font_size);
+
+            ui_state->widget_item_count += current_widget->widget_text.count;
         }
 
         if(current_widget->first_child)
@@ -210,6 +254,12 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
 
         // NOTE(Sleepster): First, draw the normal rectangle widgets
         {
+            render_pipeline_state_t pipeline_state = command_list->active_render_state;
+            pipeline_state.dst_color_blend_mode  = RBM_OneMinusSrcAlpha;
+            pipeline_state.src_alpha_blend_mode  = RBM_One;
+            pipeline_state.dst_alpha_blend_mode  = RBM_Zero;
+
+            r_cmd_set_render_state(command_list, &pipeline_state);
             r_cmd_use_shader_program(command_list, ui_state->widget_shader);
             r_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
 
@@ -221,7 +271,7 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
             r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
             r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
 
-            r_cmd_draw_indexed(command_list, ui_state->widget_count * 6, 0, 1, 0);
+            r_cmd_draw_indexed(command_list, ui_state->widget_item_count * 6, 0, 1, 0);
             s_renderer_buffer_reset(ui_state->renderer, &ui_state->vertex_buffer);
         }
     }
@@ -263,8 +313,12 @@ ui_state_init(ui_state_t       *ui_state,
     ui_state->hot_widget_ID         = INVALID_ID;
     ui_state->active_widget_ID      = INVALID_ID;
 
-    ui_state->default_font_color = vec4_create(1.0);
-    ui_state->default_font_size  = 16;
+    ui_state->default_widget_idle_color   = vec4(1.0, 1.0, 1.0, 1.0);
+    ui_state->default_widget_hover_color  = vec4(1.0, 0.0, 0.0, 1.0);
+    ui_state->default_widget_active_color = vec4(0.0, 1.0, 0.0, 1.0);
+
+    ui_state->default_font_color = vec4(0.3, 0.3, 0.3, 1.0);
+    ui_state->default_font_size  = 32;
 
     ui_state->input_manager = input_manager;
     ui_state->ui_controller = s_im_get_primary_controller(input_manager);
@@ -309,6 +363,36 @@ ui_state_init(ui_state_t       *ui_state,
 // NOTE(Sleepster): Widget functions
 
 true_inline void
+ui_widget_set_default_font_color(ui_state_t *ui_state, vec4_t color)
+{
+    ui_state->default_font_color = color;
+}
+
+true_inline void
+ui_widget_set_default_widget_idle_color(ui_state_t *ui_state, vec4_t color)
+{
+    ui_state->default_widget_idle_color = color;
+}
+
+true_inline void
+ui_widget_set_default_widget_hover_color(ui_state_t *ui_state, vec4_t color)
+{
+    ui_state->default_widget_hover_color = color;
+}
+
+true_inline void
+ui_widget_set_default_widget_active_color(ui_state_t *ui_state, vec4_t color)
+{
+    ui_state->default_widget_active_color = color;
+}
+
+true_inline void
+ui_widget_set_default_font_size(ui_state_t *ui_state, u32 font_size)
+{
+    ui_state->default_font_size = font_size;
+}
+
+true_inline void
 ui_widget_push_parent(ui_state_t *ui_state, widget_t *widget)
 {
     Assert(ui_state->parent_stack_top + 1 <= MAX_PARENT_WIDGETS);
@@ -343,18 +427,6 @@ ui_widget_set_parent_layout(ui_state_t *ui_state, u32 layout_style)
 }
 
 true_inline void
-ui_widget_set_font_color(ui_state_t *ui_state, vec4_t color)
-{
-    ui_state->current_font_color = color;
-}
-
-true_inline void
-ui_widget_set_current_font_size(ui_state_t *ui_state, u32 font_size)
-{
-    ui_state->current_font_size = font_size;
-}
-
-true_inline void
 ui_widget_seed(ui_state_t *ui_state, u64 index)
 {
     u64 hash = c_fnv_hash_value((byte*)&index, sizeof(u64));
@@ -379,11 +451,7 @@ ui_widget_hash(ui_state_t *ui_state, widget_t *widget)
 internal_api true_inline float32
 ui_widget_determine_depth(ui_state_t *ui_state)
 {
-    float32 result = 0.0f;
-    float32 layer_depth_value = 1.0f - 2.0f * ((float32)ui_state->parent_stack_top / (float32)(MAX_WIDGET_LAYERS - 1));
-
-    result = layer_depth_value;
-
+    float32 result = 1.0f - 2.0f * ((float32)ui_state->parent_stack_top / (float32)(MAX_WIDGET_LAYERS - 1));
     return(result);
 }
 
@@ -416,8 +484,6 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
 {
     widget_t *result = c_arena_push_struct(&ui_state->widget_arena, widget_t);
     ZeroStruct(*result);
-
-    ++ui_state->widget_count;
 
     result->widget_text        = widget_name;
     result->widget_flags       = widget_flags;
@@ -462,9 +528,8 @@ ui_widget_get_signals(ui_state_t *ui_state, widget_t *widget)
         bool8 is_held           = left_mouse->is_down;
         bool8 just_released     = left_mouse->is_released;
         bool8 just_clicked      = left_mouse->is_pressed;
-        bool8 is_double_clicked = left_mouse->half_transition_counter  >= 2;
-
-        bool8 is_right_clicked = right_mouse->is_pressed;
+        bool8 is_double_clicked = left_mouse->half_transition_counter >= 2;
+        bool8 is_right_clicked  = right_mouse->is_pressed;
         if(is_active)
         {
             result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DRAGGING; 
@@ -512,26 +577,25 @@ ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, vec
 }
 
 ui_signal_t
-ui_widget_button(ui_state_t *ui_state, 
-                 string_t    widget_name, 
-                 vec2_t      minimum_size, 
-                 vec4_t      idle_color, 
-                 vec4_t      hovered_color, 
-                 vec4_t      active_color)
+ui_widget_sized_button(ui_state_t *ui_state, 
+                       string_t    widget_name, 
+                       vec2_t      minimum_size,
+                       u32         widget_flags)
 {
     widget_t *widget = ui_widget_create(ui_state, 
                                         widget_name, 
                                         UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON);
     widget->minimum_render_size = minimum_size;
-    widget->idle_color          = idle_color;
-    widget->hovered_color       = hovered_color;
-    widget->active_color        = active_color;
-    widget->state->render_color = idle_color;
+    widget->idle_color          = ui_state->default_widget_idle_color;
+    widget->hovered_color       = ui_state->default_widget_hover_color;
+    widget->active_color        = ui_state->default_widget_active_color;
+    widget->state->render_color = widget->idle_color;
+    widget->widget_flags       |= widget_flags;
 
     ui_signal_t result = ui_widget_get_signals(ui_state, widget);
     if(ui_hovered(result))
     {
-        widget->state->render_color = hovered_color;
+        widget->state->render_color = widget->hovered_color;
     }
     
     if(ui_down(result))
@@ -550,9 +614,23 @@ ui_widget_text(ui_state_t *ui_state, string_t widget_text, vec4_t text_color)
     widget->minimum_render_size = s_asset_font_get_string_size(ui_state->asset_manager, 
                                                                widget_text, 
                                                               &ui_state->default_font, 
-                                                               ui_state->current_font_size);
+                                                               ui_state->default_font_size);
     ui_signal_t result = ui_widget_get_signals(ui_state, widget);
 
+    return(result);
+}
+
+ui_signal_t
+ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text, vec4_t text_color)
+{
+    vec2_t text_size = s_asset_font_get_string_size(ui_state->asset_manager, 
+                                                    widget_text, 
+                                                   &ui_state->default_font, 
+                                                    ui_state->default_font_size);
+    ui_signal_t result = ui_widget_sized_button(ui_state, 
+                                                widget_text,
+                                                text_size,
+                                                UI_WIDGET_FLAG_DRAW_TEXT);
     return(result);
 }
 

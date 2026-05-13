@@ -377,8 +377,8 @@ s_renderer_get_command_list(renderer_state_t *renderer_state, command_list_type_
     result = renderer_state->command_lists + renderer_state->command_list_count++;
     Assert(renderer_state->command_list_count < MAX_COMMAND_LISTS);
 
-    result->renderer_state    = renderer_state;
-    result->command_list_type = type;
+    result->renderer_state      = renderer_state;
+    result->command_list_type   = type;
 
     s_renderer_command_list_init(renderer_state, result);
     Assert(result->is_initialized == true);

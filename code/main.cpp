@@ -370,28 +370,36 @@ game_main(void)
         }
         float32 alpha = (float32)(dt_accumulator / TICK_RATE);
 
-        ui_signal_t main_panel = ui_widget_panel(main_ui, STR("Test panel..."), vec2(20, 20), vec4(0.4, 0.4, 0.4, 0.6));
-        ui_widget_push_parent(main_ui, main_panel.widget);
-        ui_widget_set_parent_layout(main_ui, WIDGET_LAYOUT_STYLE_VERTICAL);
-
-        ui_signal_t signal = ui_widget_button(main_ui, STR("Test button..."), vec2(20, 20), vec4(1.0, 0.6, 0.6, 1.0), vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0));
-        if(ui_pressed(signal))
+        ui_signal_t main_panel = ui_widget_panel(main_ui, STR("Test panel..."), vec2(20, 20), vec4(0.4, 0.4, 0.4, 0.5));
+        ui_parent(main_ui, main_panel.widget)
         {
-            main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
-        }
+            ui_widget_set_parent_layout(main_ui, WIDGET_LAYOUT_STYLE_VERTICAL);
 
-        if(main_panel.widget->toggled)
-        {
-            for(u32 index = 0;
-                index < 4;
-                ++index)
+            ui_signal_t signal = ui_widget_sized_button(main_ui, 
+                                                        STR("Test button..."), 
+                                                        vec2(20, 20), 0);
+            if(ui_pressed(signal))
             {
-                ui_widget_seed(main_ui, index);
-                ui_widget_button(main_ui, STR("Test button..."), vec2(20, 20), vec4(1.0, 0.6, 0.6, 1.0), vec4(1.0, 0.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0));
+                main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
+            }
+
+            if(main_panel.widget->toggled)
+            {
+                for(u32 index = 0;
+                    index < 4;
+                    ++index)
+                {
+                    ui_widget_seed(main_ui, index);
+                    ui_widget_sized_button(main_ui, 
+                                           STR("Test button..."), 
+                                           vec2(20, 20), 0);
+                }
+                ui_row(main_ui) 
+                {
+                    ui_widget_labeled_button(main_ui, STR("Test Label..."), vec4(0.4, 0.4, 0.4, 1.0)); 
+                }
             }
         }
-
-        ui_widget_pop_parent(main_ui);
 
         // NOTE(Sleepster): Game renderpass
         render_command_list_t *command_list = s_renderer_get_command_list(renderer_state, RENDER_COMMAND_LIST_TYPE_GRAPHICS);

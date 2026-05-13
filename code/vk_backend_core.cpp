@@ -1734,7 +1734,7 @@ vk_backend_create_pipeline_from_render_state(vulkan_context_t        *vulkan_con
     const VkPipelineColorBlendAttachmentState blend_settings = {
         .blendEnable         = true,
         .srcColorBlendFactor = (VkBlendFactor)state->src_color_blend_mode,
-        .dstColorBlendFactor = (VkBlendFactor)state->dst_alpha_blend_mode,
+        .dstColorBlendFactor = (VkBlendFactor)state->dst_color_blend_mode,
         .colorBlendOp        = (VkBlendOp)state->color_blend_op,
         .srcAlphaBlendFactor = (VkBlendFactor)state->src_alpha_blend_mode,
         .dstAlphaBlendFactor = (VkBlendFactor)state->dst_alpha_blend_mode,
@@ -1792,7 +1792,7 @@ vk_backend_create_render_pipeline(vulkan_context_t                             *
 
     VkPipelineColorBlendStateCreateInfo color_blend_state = {
         .sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-        .logicOpEnable   = true,
+        .logicOpEnable   = VK_FALSE,
         .logicOp         = VK_LOGIC_OP_COPY,
         .attachmentCount = 1,
         .pAttachments    = blend_settings

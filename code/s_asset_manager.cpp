@@ -533,12 +533,12 @@ s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, as
     {
         u8 *character = string.data + string_index;
         glyph_metric_t *glyph = s_asset_font_fetch_glyph(asset_manager, varient, character);
-        if(glyph->atlas_size.y > tallest_glyph)
+        if(glyph->height > (s32)tallest_glyph)
         {
-            tallest_glyph = glyph->atlas_size.y;
+            tallest_glyph = glyph->height + glyph->offset_y;
         }
 
-        total_width += glyph->atlas_size.x;
+        total_width += glyph->width + (glyph->advance * 0.33);
     }
 
     result = vec2(total_width, tallest_glyph);
