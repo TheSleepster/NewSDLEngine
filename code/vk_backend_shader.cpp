@@ -521,6 +521,10 @@ internal_api VkDescriptorType
 slang_type_to_vulkan_type(slang::TypeReflection *type)
 {
     VkDescriptorType result = VK_DESCRIPTOR_TYPE_MAX_ENUM;
+    if(type->getKind() == slang::TypeReflection::Kind::Array)
+    {
+        type = type->getElementType();
+    }
 
     slang::TypeReflection::Kind kind = type->getKind();
     if(kind == slang::TypeReflection::Kind::ConstantBuffer)
@@ -566,21 +570,27 @@ slang_binding_category(slang::TypeReflection *type)
 {
     slang::ParameterCategory result = slang::ParameterCategory::None;
 
+    // NOTE(Sleepster): If it's an array, figure out what kind of array. 
+    if(type->getKind() == slang::TypeReflection::Kind::Array)
+    {
+        type = type->getElementType();
+    }
+
     slang::TypeReflection::Kind kind = type->getKind();
-    if (kind == slang::TypeReflection::Kind::ConstantBuffer ||
-        kind == slang::TypeReflection::Kind::ParameterBlock)
+    if(kind == slang::TypeReflection::Kind::ConstantBuffer ||
+       kind == slang::TypeReflection::Kind::ParameterBlock)
     {
         result = slang::ParameterCategory::ConstantBuffer;
     }
-    else if (kind == slang::TypeReflection::Kind::SamplerState)
+    else if(kind == slang::TypeReflection::Kind::SamplerState)
     {
         result = slang::ParameterCategory::SamplerState;
     }
     else if(kind == slang::TypeReflection::Kind::Resource)
     {
         SlangResourceAccess access = type->getResourceAccess();
-        if (access == SLANG_RESOURCE_ACCESS_READ_WRITE ||
-            access == SLANG_RESOURCE_ACCESS_RASTER_ORDERED)
+        if(access == SLANG_RESOURCE_ACCESS_READ_WRITE ||
+           access == SLANG_RESOURCE_ACCESS_RASTER_ORDERED)
         {
             result = slang::ParameterCategory::UnorderedAccess;
         }

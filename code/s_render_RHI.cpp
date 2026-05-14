@@ -409,10 +409,10 @@ s_renderer_is_texture_bound
 =============
 */
 
-bool8
+s32
 s_renderer_is_texture_bound(render_command_list_t *command_list, texture2D_t *texture)
 {
-    bool8 result = false;
+    s32 result = -1;
     for(u32 bound_textures_index = 0;
         bound_textures_index < command_list->bound_image_count;
         ++bound_textures_index)
@@ -420,7 +420,33 @@ s_renderer_is_texture_bound(render_command_list_t *command_list, texture2D_t *te
         u32 image_id = command_list->image_ids_to_bind[bound_textures_index];
         if(image_id == texture->gpu_data.ID)
         {
-            result = true;
+            result = bound_textures_index;
+            break;
+        }
+    }
+
+    return(result);
+}
+
+
+/*
+=============
+s_renderer_find_texture_index
+=============
+*/
+
+s32
+s_renderer_find_texture_index(render_command_list_t *command_list, u64 ID)
+{
+    s32 result = -1;
+    for(u32 bound_textures_index = 0;
+        bound_textures_index < command_list->bound_image_count;
+        ++bound_textures_index)
+    {
+        u32 image_id = command_list->image_ids_to_bind[bound_textures_index];
+        if(image_id == ID)
+        {
+            result = bound_textures_index;
             break;
         }
     }

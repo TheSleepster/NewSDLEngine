@@ -1,6 +1,6 @@
 [
   {
-    "file": "s_ui_core.cpp",
+    "file": "r_immediate_rendering.cpp",
     "arguments": [
       "/usr/bin/clang++",
       "-g",
@@ -42,17 +42,17 @@
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
       "-MT",
-      "../build/s_ui_core.o",
+      "../build/r_immediate_rendering.o",
       "-MMD",
       "-MP",
       "-MF",
-      "../build/s_ui_core.d",
+      "../build/r_immediate_rendering.d",
       "-c",
-      "s_ui_core.cpp",
+      "r_immediate_rendering.cpp",
       "-o",
-      "../build/s_ui_core.o"
+      "../build/r_immediate_rendering.o"
     ],
     "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/s_ui_core.o"
+    "output": "../build/r_immediate_rendering.o"
   }
 ]

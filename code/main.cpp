@@ -330,8 +330,6 @@ game_main(void)
         s_im_reset_controller_states(input_manager);
         process_window_events(global_context->renderer_state, input_manager);
 
-        ui_state_begin_frame(main_ui);
-
         vec2_t input_axis = {};
         if(s_im_is_keyboard_key_down(game_state.controller, SDL_SCANCODE_W))
         {
@@ -369,37 +367,6 @@ game_main(void)
             dt_accumulator -= TICK_RATE;
         }
         float32 alpha = (float32)(dt_accumulator / TICK_RATE);
-
-        ui_signal_t main_panel = ui_widget_panel(main_ui, STR("Test panel..."), vec2(20, 20), vec4(0.4, 0.4, 0.4, 0.5));
-        ui_parent(main_ui, main_panel.widget)
-        {
-            ui_widget_set_parent_layout(main_ui, WIDGET_LAYOUT_STYLE_VERTICAL);
-
-            ui_signal_t signal = ui_widget_sized_button(main_ui, 
-                                                        STR("Test button..."), 
-                                                        vec2(20, 20), 0);
-            if(ui_pressed(signal))
-            {
-                main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
-            }
-
-            if(main_panel.widget->toggled)
-            {
-                for(u32 index = 0;
-                    index < 4;
-                    ++index)
-                {
-                    ui_widget_seed(main_ui, index);
-                    ui_widget_sized_button(main_ui, 
-                                           STR("Test button..."), 
-                                           vec2(20, 20), 0);
-                }
-                ui_row(main_ui) 
-                {
-                    ui_widget_labeled_button(main_ui, STR("Test Label..."), vec4(0.4, 0.4, 0.4, 1.0)); 
-                }
-            }
-        }
 
         // NOTE(Sleepster): Game renderpass
         render_command_list_t *command_list = s_renderer_get_command_list(renderer_state, RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -471,15 +438,61 @@ game_main(void)
                            asset_manager, 
                           &basic_font, 
                           STR("This is a test string..."), 
-                          vec3(-200, -100, 0.0f), 
+                          vec3(-300, 150, 0.0f), 
                           vec4(1.0f, 1.0f, 1.0f, 1.0f), 
-                          vec2_zero(),
+                          0.0f, 
                           32);
 
             r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer);
             r_cmd_draw_indexed(command_list, (game_state.vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
 
-            ui_state_end_frame(main_ui, command_list);
+            // NOTE(Sleepster): DEBUG UI 
+            ui_frame(main_ui, command_list)
+            {
+                ui_signal_t main_panel = ui_widget_draggable_panel(main_ui, STR("Test panel..."), vec2(20, 20), 10.0f, vec2_zero(), vec4(0.4, 0.4, 0.4, 0.5));
+                ui_column(main_ui, main_panel.widget)
+                {
+                    ui_signal_t title_bar = ui_widget_panel(main_ui, STR("Title bar"), vec2(0, 0), 10.0f, vec2_zero(), vec4_zero());
+
+                    ui_signal_t open_menu_button = {};
+                    ui_row(main_ui, title_bar.widget)
+                    {
+                        open_menu_button = ui_widget_sized_button(main_ui, 
+                                                                  STR("Test button..."), 
+                                                                  vec2(20, 20), 0);
+                        ui_widget_text(main_ui, STR("[Debug Menu Information]"));
+                    }
+
+                    if(ui_pressed(open_menu_button))
+                    {
+                        main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
+                    }
+
+                    if(main_panel.widget->toggled)
+                    {
+                        ui_widget_set_default_font_size(main_ui, 24);
+                        ui_signal_t debug_menu = ui_widget_labeled_button(main_ui, STR("Enable Debug Overlay"));
+                        if(ui_pressed(debug_menu))
+                        {
+                            debug_menu.widget->state->toggled = !debug_menu.widget->state->toggled;
+                        }
+
+                        if(debug_menu.widget->state->toggled == true)
+                        {
+                            ui_column(main_ui, main_panel.widget)
+                            {
+                                ui_state_set_active_offset_x(main_ui, 20);
+                                ui_widget_labeled_button(main_ui, STR("Display Performance Counters"));
+                                ui_widget_labeled_button(main_ui, STR("Show Timing Flame Graph"));
+                                ui_widget_labeled_button(main_ui, STR("Show RAM Stats"));
+                            }
+                        }
+
+                        ui_widget_labeled_button(main_ui, STR("Enable Editor"));
+                    }
+                }
+            }
+            // NOTE(Sleepster): DEBUG UI 
 
             r_cmd_renderpass_end(command_list);
         }

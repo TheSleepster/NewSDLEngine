@@ -47,7 +47,7 @@ immediate_quad_ex(render_command_list_t *command_list,
 
     if(texture)
     {
-        if(!s_renderer_is_texture_bound(command_list, texture))
+        if(s_renderer_is_texture_bound(command_list, texture) == -1)
         {
             r_cmd_bind_texture_image(command_list, texture);
         }
@@ -93,7 +93,7 @@ immediate_text(render_command_list_t *command_list,
                string_t               render_string, 
                vec3_t                 position, 
                vec4_t                 text_color,
-               vec2_t                 padding,
+               float32                settings,
                u32                    font_size)
 {
     Assert(font_handle);
@@ -102,6 +102,7 @@ immediate_text(render_command_list_t *command_list,
     dynamic_render_font_varient_t *varient = s_asset_font_acquire_font_at_size(asset_manager, 
                                                                                font_handle, 
                                                                                font_size);
+
     vec2_t render_position = position.xy;
     for(u32 character_index = 0;
         character_index < render_string.count;
@@ -113,6 +114,25 @@ immediate_text(render_command_list_t *command_list,
         glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
         if(metrics->is_valid)
         {
+            s32 texture_index = s_renderer_is_texture_bound(command_list, &metrics->owner_atlas->texture);
+            if(texture_index == -1)
+            {
+                r_cmd_bind_texture_image(command_list, &metrics->owner_atlas->texture);
+            }
+        }
+    }
+
+    for(u32 character_index = 0;
+        character_index < render_string.count;
+        ++character_index)
+    {
+        u8 *character = render_string.data + character_index;
+        Assert(*character > 0);
+
+        glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
+        if(metrics->is_valid)
+        {
+            s32 texture_index = s_renderer_is_texture_bound(command_list, &metrics->owner_atlas->texture);
             immediate_quad_ex(command_list,
                               vertex_buffer,
                               vec2_expand_vec3(vec2_subtract(render_position, vec2(0, metrics->offset_y)), position.z),
@@ -120,7 +140,7 @@ immediate_text(render_command_list_t *command_list,
                               text_color,
                               metrics->atlas_offset,
                               vec2_add(metrics->atlas_offset, metrics->atlas_size),
-                              padding,
+                              vec2(settings, texture_index),
                              &metrics->owner_atlas->texture);
 
             render_position.x += metrics->advance;

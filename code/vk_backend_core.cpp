@@ -2383,17 +2383,20 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                 }break;
                 case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
                 {
-                    VkDescriptorImageInfo *image_info = image_infos + image_count;
-                    VkWriteDescriptorSet   *write     = writes + write_count++;
+                    VkDescriptorImageInfo *base_info = image_infos + image_count;
+                    VkWriteDescriptorSet  *write     = writes + write_count++;
 
-                    for(u32 image_index = 1;
-                        image_index <= binding->descriptor_count;
+                    for(u32 image_index = 0;
+                        image_index < binding->descriptor_count;
                         ++image_index)
                     {
-                        image_t *image = command_list->image_shader_params[image_count + image_index]; 
+                        VkDescriptorImageInfo *image_info = base_info + image_index;
+
+                        image_t *image = command_list->image_shader_params[image_index];
                         if(image)
                         {
                             vulkan_image_t *vulkan_data = &image->backend_image;
+                            vk_backend_image_ensure_shader_readonly_optimal(vulkan_context, vulkan_data);
 
                             image_info->imageLayout = vulkan_data->layout;
                             image_info->imageView   = vulkan_data->view;
@@ -2402,31 +2405,9 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                         else
                         {
                             image_t *image = command_list->image_shader_params[0];
-                            if(image->backend_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-                            {
-                                VkCommandBuffer scratch_command_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
-                                VkImageSubresourceRange src_range = {
-                                    .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-                                    .baseArrayLayer = 0,
-                                    .baseMipLevel   = 0,
-                                    .layerCount     = 1,
-                                    .levelCount     = 1,
-                                };
-                                vk_backend_image_change_layout(vulkan_context,
-                                                               scratch_command_buffer,
-                                                               image->backend_image.handle,
-                                                               image->backend_image.layout,
-                                                               VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                                                               VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                                               VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                                                               VK_ACCESS_TRANSFER_WRITE_BIT,
-                                                               VK_ACCESS_SHADER_READ_BIT,
-                                                               src_range);
-                                image->backend_image.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                                vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
-                            }
 
                             vulkan_image_t *vulkan_data = &image->backend_image;
+                            vk_backend_image_ensure_shader_readonly_optimal(vulkan_context, vulkan_data);
 
                             image_info->imageLayout = vulkan_data->layout;
                             image_info->imageView   = vulkan_data->view;
@@ -2439,7 +2420,7 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                     write->dstBinding      = binding_count++;
                     write->descriptorCount = binding->descriptor_count;
                     write->descriptorType  = binding->type;
-                    write->pImageInfo      = image_info;
+                    write->pImageInfo      = base_info;
 
                     image_count += binding->descriptor_count;
                 }break;

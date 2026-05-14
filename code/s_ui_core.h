@@ -25,9 +25,13 @@ struct widget_t;
 struct widget_state_t
 {
     u32          last_interacted_frame;
-    bool32       toggled;
+    bool8        toggled;
+    bool8        dragging;
 
+    // NOTE(Sleepster): Offset is used for dragged widgets... 
     vec3_t       position;
+    vec2_t       offset;
+
     vec2_t       render_size;
     vec4_t       render_color;
 
@@ -74,6 +78,7 @@ struct ui_signal_t
 #define ui_pressed(signal)        ((signal).signal_flags & UI_SIGNAL_FLAG_CLICKED)
 #define ui_down(signal)           ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DRAGGING)
 #define ui_released(signal)       ((signal).signal_flags & UI_SIGNAL_FLAG_RELEASED)
+#define ui_dragging(signal)       ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DRAGGING)
 
 enum widget_flags_t
 {
@@ -88,6 +93,8 @@ enum widget_flags_t
     UI_WIDGET_FLAG_DRAW_RECTANGLE   = BIT(7),
     UI_WIDGET_FLAG_DRAW_BACKGROUND  = BIT(8),
     UI_WIDGET_FLAG_DRAW_BORDER      = BIT(9),
+
+    UI_WIDGET_FLAG_LEFT_DRAGGABLE   = BIT(10),
 
     UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_HOVER_COLOR|UI_WIDGET_FLAG_ACTIVE_COLOR|UI_WIDGET_FLAG_MOUSE_CLICKABLE|UI_WIDGET_FLAG_HOVERABLE|UI_WIDGET_FLAG_DRAW_RECTANGLE
 };
@@ -113,16 +120,16 @@ struct widget_t
     vec3_t          expected_position;
     vec2_t          minimum_render_size;
 
+    u32             child_offset;
+    u32             our_offset;
+
+    float32         child_spacing;
+    vec2_t          padding;
+
     // TODO(Sleepster): Merge these into a "ui_theme_t" structure?
     vec4_t          idle_color;
     vec4_t          hovered_color;
     vec4_t          active_color;
-#if 0
-    u32             max_child_width;
-    u32             max_child_height;
-    u32             total_child_width;
-    u32             total_child_height;
-#endif
 
     // NOTE(Sleepster): 
     // If this is a tree... 
@@ -167,6 +174,9 @@ struct ui_state_t
     vec4_t                            default_widget_active_color;
 
     vec2_t                            mouse_position;
+    vec2_t                            mouse_delta;
+
+    u32                               active_widget_offset_x;
     u32                               widget_item_count;
     u64                               frame_count;
     u64                               ui_seed;
@@ -191,26 +201,37 @@ true_inline void ui_state_set_default_widget_hover_color(ui_state_t *ui_state, v
 true_inline void ui_state_set_default_widget_active_color(ui_state_t *ui_state, vec4_t color);
 true_inline void ui_widget_set_default_font_color(ui_state_t *ui_state, vec4_t color);
 true_inline void ui_widget_set_default_font_size(ui_state_t *ui_state, u32 font_size);
+true_inline void ui_state_set_active_offset_x(ui_state_t *ui_state, u32 offset);
 
 true_inline void ui_state_begin_frame(ui_state_t *ui_state);
 true_inline void ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list);
-true_inline void ui_widget_set_parent_layout(ui_state_t *ui_state, u32 layout_style);
+true_inline void ui_state_set_parent_layout(ui_state_t *ui_state, u32 layout_style);
+
+true_inline void ui_widget_set_layout(widget_t *widget, u32 layout_style);
 true_inline void ui_widget_push_parent(ui_state_t *ui_state, widget_t *widget);
 true_inline void ui_widget_pop_parent(ui_state_t *ui_state);
+true_inline void ui_widget_set_offset_x(widget_t *widget, u32 indent);
 true_inline void ui_widget_seed(ui_state_t *ui_state, u64 index);
 
 widget_t*   ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags);
-ui_signal_t ui_widget_panel(ui_state_t *ui_state,  string_t widget_name, vec2_t position, vec4_t background_color);
+ui_signal_t ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, float32 child_spacing, vec2_t padding, vec4_t background_color);
 ui_signal_t ui_widget_sized_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, u32 widget_flags);
-ui_signal_t ui_widget_text(ui_state_t *ui_state, string_t widget_text, vec4_t text_color);
-ui_signal_t ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text, vec4_t text_color);
+ui_signal_t ui_widget_text(ui_state_t *ui_state, string_t widget_text);
+ui_signal_t ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text);
+ui_signal_t ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t spacing_size);
 
+true_inline ui_signal_t ui_widget_draggable_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, float32 child_spacing, vec2_t padding, vec4_t background_color);
+
+true_inline void ui_state_begin_row(ui_state_t *ui_state, widget_t *parent);
 true_inline void ui_state_end_row(ui_state_t *ui_state);
-true_inline void ui_state_begin_row(ui_state_t *ui_state);
+true_inline void ui_state_begin_column(ui_state_t *ui_state, widget_t *parent);
+true_inline void ui_state_end_column(ui_state_t *ui_state);
 
-#define ui_parent(state, widget) DeferLoop(ui_widget_push_parent((state), (widget)), ui_widget_pop_parent((state)))
-#define ui_row(state)            DeferLoop(ui_state_begin_row((state)), ui_state_end_row((state)))
-#define ui_column(state)         DeferLoop(ui_state_begin_column((state)), ui_state_end_column((state)))
+#define ui_parent(state, widget)  DeferLoop(ui_widget_push_parent((state), (widget)), ui_widget_pop_parent((state)))
+#define ui_row(state, parent)     DeferLoop(ui_state_begin_row((state), (parent)), ui_state_end_row((state)))
+#define ui_column(state, parent)  DeferLoop(ui_state_begin_column((state), (parent)), ui_state_end_column((state)))
+
+#define ui_frame(state, command_list) DeferLoop(ui_state_begin_frame((state)), ui_state_end_frame((state), (command_list)))
 
 #endif // S_UI_CORE_H
 

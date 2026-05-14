@@ -531,7 +531,8 @@ image_t                s_renderer_image_create(renderer_state_t *render_state, i
 void                   s_renderer_image_destroy(renderer_state_t *renderer_state, image_t *image);
 void                   s_renderer_image_update_data(void *backend_context, image_t *image);
 render_command_list_t* s_renderer_get_command_list(renderer_state_t *renderer_state, command_list_type_t type);
-bool8                  s_renderer_is_texture_bound(render_command_list_t *command_list, texture2D_t *texture);
+s32                    s_renderer_is_texture_bound(render_command_list_t *command_list, texture2D_t *texture);
+s32                    s_renderer_find_texture_index(render_command_list_t *command_list, u64 ID);
 void                   s_renderer_reset_command_list(render_command_list_t *command_list);
 
 void r_cmd_renderpass_begin(render_command_list_t *command_list, u32 renderpassID);

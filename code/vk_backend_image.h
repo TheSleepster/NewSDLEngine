@@ -105,6 +105,7 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                       VkImageSubresourceRange source_range, 
                       VkImageSubresourceRange destination_range);
 
+void  vk_backend_image_ensure_shader_readonly_optimal(vulkan_context_t *vulkan_context, vulkan_image_t *image);
 bool8 vk_backend_is_image_format_stencil_format(vulkan_image_t *image);
 bool8 vk_backend_is_image_format_depth_format(vulkan_image_t *image);
 

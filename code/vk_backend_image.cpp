@@ -764,3 +764,38 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                                    destination_range);
     destination_image->layout = destination_final_layout;
 }
+
+
+/*
+=============
+vk_backend_image_ensure_shader_readonly_optimal
+=============
+*/
+
+void
+vk_backend_image_ensure_shader_readonly_optimal(vulkan_context_t *vulkan_context, vulkan_image_t *image)
+{
+    if(image->layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+    {
+        VkCommandBuffer scratch_command_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
+        VkImageSubresourceRange src_range = {
+            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseArrayLayer = 0,
+            .baseMipLevel   = 0,
+            .layerCount     = 1,
+            .levelCount     = 1,
+        };
+        vk_backend_image_change_layout(vulkan_context,
+                                       scratch_command_buffer,
+                                       image->handle,
+                                       image->layout,
+                                       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                       VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                       VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                                       VK_ACCESS_TRANSFER_WRITE_BIT,
+                                       VK_ACCESS_SHADER_READ_BIT,
+                                       src_range);
+        image->layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
+    }
+}

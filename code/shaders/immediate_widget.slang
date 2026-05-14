@@ -45,7 +45,7 @@ struct PixelOutput_t
     float4 vFragColor : SV_TARGET;
 };
 
-Sampler2D TextureSampler;
+Sampler2D TextureSamplers[4];
 
 [shader("fragment")]
 PixelOutput_t
@@ -62,7 +62,9 @@ PSMain(VertexOutput_t VertexOutput)
     // NOTE(Sleepster): Textured rectangle 
     else if(WidgetFlag == 1)
     {
-        float4 TextureColor = TextureSampler.Sample(VertexOutput.vOutTexCoord);
+        Sampler2D Texture = TextureSamplers[int(VertexOutput.vWidgetOptions.y)];
+
+        float4 TextureColor = Texture.Sample(VertexOutput.vOutTexCoord);
         if(TextureColor.a <= 0.3) discard;
 
         result.vFragColor = float4(VertexOutput.vOutColor.rgb, TextureColor.a);
@@ -70,7 +72,9 @@ PSMain(VertexOutput_t VertexOutput)
     // NOTE(Sleepster): Font Glyph 
     else if(WidgetFlag == 2)
     {
-        float4 TextureColor = TextureSampler.Sample(VertexOutput.vOutTexCoord);
+        Sampler2D Texture = TextureSamplers[int(VertexOutput.vWidgetOptions.y)];
+
+        float4 TextureColor = Texture.Sample(VertexOutput.vOutTexCoord);
         if(TextureColor.a <= 0.3) discard;
 
         result.vFragColor = float4(VertexOutput.vOutColor.rgb, TextureColor.a);
