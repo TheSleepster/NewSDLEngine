@@ -481,10 +481,12 @@ game_main(void)
                         {
                             ui_column(main_ui, main_panel.widget)
                             {
-                                ui_state_set_active_offset_x(main_ui, 20);
+                                ui_widget_set_offset_x(main_panel.widget, 20);
                                 ui_widget_labeled_button(main_ui, STR("Display Performance Counters"));
                                 ui_widget_labeled_button(main_ui, STR("Show Timing Flame Graph"));
                                 ui_widget_labeled_button(main_ui, STR("Show RAM Stats"));
+
+                                ui_widget_set_offset_x(main_panel.widget, 0);
                             }
                         }
 

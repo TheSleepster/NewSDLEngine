@@ -146,8 +146,10 @@ place_widgets_in_hierarchy(ui_state_t *ui_state,
 {
     widget_t *current_widget = first_widget;
     do {
-        current_widget->expected_position.xy = *parent_cursor;
-        current_widget->expected_position.z  =  current_widget->parent_stack_depth;
+        vec2_t widget_position = *parent_cursor;
+
+        current_widget->expected_position.xy = vec2_add(widget_position, vec2(current_widget->our_offset, 0.0f));
+        current_widget->expected_position.z  = current_widget->parent_stack_depth;
 
         float32 parent_spacing = 0.0f;
         vec2_t  parent_padding = vec2_zero();
@@ -160,13 +162,12 @@ place_widgets_in_hierarchy(ui_state_t *ui_state,
         vec2_t  advance;
         if(layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
         {
-            float32 x_advance = current_widget->our_offset;
             float32 y_advance = (current_widget->state->render_size.y + parent_spacing + parent_padding.y) * -1.0f;
-            advance = vec2(x_advance, y_advance);
+            advance = vec2(0.0, y_advance);
         }
         else
         {
-            float32 x_advance = (current_widget->state->render_size.x + parent_spacing + parent_padding.x + current_widget->our_offset);
+            float32 x_advance = (current_widget->state->render_size.x + parent_spacing + parent_padding.x);
             advance = vec2(x_advance, 0.0f);
         }
 
@@ -450,6 +451,7 @@ ui_state_init(ui_state_t       *ui_state,
 }
 
 // NOTE(Sleepster): Widget functions
+
 
 true_inline void
 ui_widget_set_default_font_color(ui_state_t *ui_state, vec4_t color)
