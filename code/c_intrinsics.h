@@ -11,7 +11,6 @@
 #include <c_types.h>
 
 /*
-  TODO:
   - MSVC native intrinsics (????)
   - ARM NEON intrinsics
   - clean this up so that we can just use the clang/gcc intrinsics for all platforms, 

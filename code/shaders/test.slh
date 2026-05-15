@@ -1,4 +1,0 @@
-struct test_structure {
-    float4 apples;
-    float2 oranges;
-};

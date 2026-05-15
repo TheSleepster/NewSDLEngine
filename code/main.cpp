@@ -449,7 +449,12 @@ game_main(void)
             // NOTE(Sleepster): DEBUG UI 
             ui_frame(main_ui, command_list)
             {
-                ui_signal_t main_panel = ui_widget_draggable_panel(main_ui, STR("Test panel..."), vec2(20, 20), 10.0f, vec2_zero(), vec4(0.4, 0.4, 0.4, 0.5));
+                ui_signal_t main_panel = ui_widget_draggable_panel(main_ui, 
+                                                                   STR("Test panel..."), 
+                                                                   vec2(20, 20), 
+                                                                   10.0f, 
+                                                                   vec2_zero(), 
+                                                                   vec4(0.4, 0.4, 0.4, 0.5));
                 ui_column(main_ui, main_panel.widget)
                 {
                     ui_signal_t title_bar = ui_widget_panel(main_ui, STR("Title bar"), vec2(0, 0), 10.0f, vec2_zero(), vec4_zero());
@@ -470,6 +475,8 @@ game_main(void)
 
                     if(main_panel.widget->toggled)
                     {
+                        ui_widget_divider(main_ui, STR("main menu divider"), vec2(main_panel.widget->state->render_size.x, 4.0));
+
                         ui_widget_set_default_font_size(main_ui, 24);
                         ui_signal_t debug_menu = ui_widget_labeled_button(main_ui, STR("Enable Debug Overlay"));
                         if(ui_pressed(debug_menu))
@@ -488,6 +495,7 @@ game_main(void)
 
                                 ui_widget_set_offset_x(main_panel.widget, 0);
                             }
+                            ui_widget_divider(main_ui, STR("Debug submenu divider"), vec2(main_panel.widget->state->render_size.x, 4.0));
                         }
 
                         ui_widget_labeled_button(main_ui, STR("Enable Editor"));

@@ -27,6 +27,10 @@ struct widget_state_t
     u32          last_interacted_frame;
     bool8        toggled;
     bool8        dragging;
+    bool8        input_begin_within_bounds;
+
+    // NOTE(Sleepster): Always between 0.0 and 1.0
+    float32      slider_value;
 
     // NOTE(Sleepster): Offset is used for dragged widgets... 
     vec3_t       position;
@@ -56,9 +60,9 @@ enum ui_signal_flags_t
     UI_SIGNAL_FLAG_RIGHT_DOUBLE_CLICKED  = BIT(8),
     UI_SIGNAL_FLAG_MIDDLE_DOUBLE_CLICKED = BIT(9),
 
-    UI_SIGNAL_FLAG_LEFT_DRAGGING         = BIT(10),
-    UI_SIGNAL_FLAG_RIGHT_DRAGGING        = BIT(11),
-    UI_SIGNAL_FLAG_MIDDLE_DRAGGING       = BIT(12),
+    UI_SIGNAL_FLAG_LEFT_DOWN             = BIT(10),
+    UI_SIGNAL_FLAG_RIGHT_DOWN            = BIT(11),
+    UI_SIGNAL_FLAG_MIDDLE_DOWN           = BIT(12),
 
     UI_SIGNAL_FLAG_OUTSIDE_BOUNDS        = BIT(13),
     UI_SIGNAL_FLAG_HOVERING              = BIT(14),
@@ -76,9 +80,9 @@ struct ui_signal_t
 
 #define ui_hovered(signal)        ((signal).signal_flags & UI_SIGNAL_FLAG_HOVERING)
 #define ui_pressed(signal)        ((signal).signal_flags & UI_SIGNAL_FLAG_CLICKED)
-#define ui_down(signal)           ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DRAGGING)
+#define ui_down(signal)           ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN)
 #define ui_released(signal)       ((signal).signal_flags & UI_SIGNAL_FLAG_RELEASED)
-#define ui_dragging(signal)       ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DRAGGING)
+#define ui_dragging(signal)       ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN)
 
 enum widget_flags_t
 {
@@ -114,6 +118,7 @@ struct widget_t
 
     string_t        widget_text;
     bool32          toggled;
+
     float32         parent_stack_depth;
     u32             font_size;
     
@@ -149,8 +154,10 @@ struct ui_state_t
     memory_arena_t                    widget_arena;
     u32                               section_count;
 
-    u64                               hot_widget_ID;
-    u64                               active_widget_ID;
+    u64                               last_hot_ID;
+    u64                               last_active_ID;
+    widget_t                         *hot_widget;
+    widget_t                         *active_widget;
 
     // NOTE(Sleepster): Persists between frames... 
     memory_arena_t                    persistent_data_arena;
@@ -202,6 +209,7 @@ true_inline void ui_state_set_default_widget_active_color(ui_state_t *ui_state, 
 true_inline void ui_widget_set_default_font_color(ui_state_t *ui_state, vec4_t color);
 true_inline void ui_widget_set_default_font_size(ui_state_t *ui_state, u32 font_size);
 true_inline void ui_state_set_active_offset_x(ui_state_t *ui_state, u32 offset);
+true_inline void ui_widget_set_flags(widget_t *widget, u32 flags);
 
 true_inline void ui_state_begin_frame(ui_state_t *ui_state);
 true_inline void ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list);
@@ -218,7 +226,9 @@ ui_signal_t ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t p
 ui_signal_t ui_widget_sized_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, u32 widget_flags);
 ui_signal_t ui_widget_text(ui_state_t *ui_state, string_t widget_text);
 ui_signal_t ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text);
-ui_signal_t ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t spacing_size);
+void        ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t spacing_size);
+void        ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size);
+void        ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size);
 
 true_inline ui_signal_t ui_widget_draggable_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, float32 child_spacing, vec2_t padding, vec4_t background_color);
 

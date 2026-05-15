@@ -15,8 +15,6 @@ ui_state_begin_frame(ui_state_t *ui_state)
     ui_state->parent_stack_top       = 1;
     ui_state->default_font_size      = 32;
     ui_state->active_widget_offset_x = 0;
-    ui_state->hot_widget_ID          = INVALID_ID;
-    ui_state->active_widget_ID       = INVALID_ID;
 
     c_arena_reset(&ui_state->widget_arena);
 }
@@ -171,9 +169,30 @@ place_widgets_in_hierarchy(ui_state_t *ui_state,
             advance = vec2(x_advance, 0.0f);
         }
 
+        vec2_t parent_top_left;
+        if((current_widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE) &&
+           (ui_state->active_widget == current_widget)                    &&
+           (current_widget->state->input_begin_within_bounds))
+        {
+            vec2_t mouse_offset = vec2_subtract(ui_state->mouse_position, current_widget->state->offset);
+            parent_top_left = mouse_offset;
+        }
+        else
+        {
+            parent_top_left = current_widget->expected_position.xy;
+        }
+
+        // NOTE(Sleepster): We have to place the parent before we can place the children, otherwise we get weird popping 
+        current_widget->state->position.xy = vec2(parent_top_left.x,
+                                                  parent_top_left.y - current_widget->state->render_size.y);
+        current_widget->state->position.z  = current_widget->parent_stack_depth;
+        current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy, 
+                                                          current_widget->state->render_size);
+
         if(current_widget->first_child)
         {
-            vec2_t parent_relative_cursor = current_widget->expected_position.xy;
+            vec2_t parent_relative_cursor = vec2(current_widget->state->position.x,
+                                                 current_widget->state->position.y + current_widget->state->render_size.y);
             place_widgets_in_hierarchy(ui_state,
                                        current_widget->layout_style, 
                                        current_widget,
@@ -182,25 +201,6 @@ place_widgets_in_hierarchy(ui_state_t *ui_state,
                                       &parent_relative_cursor);
         }
         *parent_cursor = vec2_add(*parent_cursor, advance);
-
-        if(current_widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE)
-        {
-            if(current_widget->state->dragging)
-            {
-                vec2_t mouse_offset = vec2_subtract(ui_state->mouse_position, current_widget->state->offset);
-                current_widget->state->position.xy = vec2(mouse_offset.x,
-                                                          mouse_offset.y - current_widget->state->render_size.y);
-            }
-        }
-        else
-        {
-            current_widget->state->position.xy = vec2(current_widget->expected_position.x,
-                                                      current_widget->expected_position.y - current_widget->state->render_size.y);
-        }
-
-        current_widget->state->position.z  = current_widget->parent_stack_depth;
-        current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy, 
-                                                          current_widget->state->render_size);
 
         if(last_widget) current_widget = current_widget->next_sibling;
         else            current_widget = null;
@@ -216,6 +216,11 @@ ui_state_update_widget_hierarchy(ui_state_t *ui_state)
         widget_child_size_data_t size_data = get_hierarchy_size_data(ui_state, 
                                                                      current_widget,
                                                                      current_widget->first_child);
+
+        // NOTE(Sleepster): Place the children in relative locations to that of the parent 
+        current_widget->expected_position = current_widget->state->position;
+        vec2_t placement_cursor = vec2(current_widget->expected_position.x,
+                                       current_widget->expected_position.y + current_widget->state->render_size.y);
         if(current_widget->layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
         {
             current_widget->state->render_size = vec2(size_data.largest_width, 
@@ -225,10 +230,6 @@ ui_state_update_widget_hierarchy(ui_state_t *ui_state)
         {
             current_widget->state->render_size = vec2(size_data.total_width, size_data.total_height);
         }
-
-        // NOTE(Sleepster): Place the children in relative locations to that of the parent 
-        vec2_t placement_cursor = vec2(current_widget->state->position.x,
-                                       current_widget->state->position.y + current_widget->state->render_size.y);
 
         place_widgets_in_hierarchy(ui_state,
                                    current_widget->layout_style, 
@@ -400,8 +401,8 @@ ui_state_init(ui_state_t       *ui_state,
     ui_state->asset_manager         = asset_manager;
     ui_state->interface_framebuffer = renderpass_ID;
     ui_state->parent_stack_top      = 1;
-    ui_state->hot_widget_ID         = INVALID_ID;
-    ui_state->active_widget_ID      = INVALID_ID;
+    ui_state->hot_widget            = null;
+    ui_state->active_widget         = null;
 
     ui_state->default_widget_idle_color   = vec4(1.0, 1.0, 1.0, 1.0);
     ui_state->default_widget_hover_color  = vec4(1.0, 0.0, 0.0, 1.0);
@@ -452,6 +453,11 @@ ui_state_init(ui_state_t       *ui_state,
 
 // NOTE(Sleepster): Widget functions
 
+true_inline void
+ui_widget_set_flags(widget_t *widget, u32 flags)
+{
+    widget->widget_flags |= flags;
+}
 
 true_inline void
 ui_widget_set_default_font_color(ui_state_t *ui_state, vec4_t color)
@@ -611,6 +617,73 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
     return(result);
 }
 
+internal_api void
+widget_do_button(ui_state_t *ui_state, ui_signal_t *signal)
+{
+    widget_t *widget = signal->widget;
+    if((signal->signal_flags & UI_SIGNAL_FLAG_HOVERING) && 
+       (ui_state->hot_widget == widget))
+    {
+        widget->state->last_interacted_frame = ui_state->frame_count;
+        widget->state->render_color = widget->hovered_color;
+
+        if(signal->signal_flags & UI_SIGNAL_FLAG_CLICKED)
+        {
+            widget->state->input_begin_within_bounds = true;
+        }
+
+        if(widget->state->input_begin_within_bounds && 
+          (signal->signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN) && 
+          (ui_state->active_widget == widget))
+        {
+            widget->state->render_color = widget->active_color;
+        }
+    }
+
+    if((signal->signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN) == 0)
+    {
+        widget->state->input_begin_within_bounds = false;
+    }
+}
+
+internal_api void
+widget_do_toggle_button(ui_state_t *ui_state, ui_signal_t *signal)
+{
+    widget_do_button(ui_state, signal);
+    if(signal->signal_flags & UI_SIGNAL_FLAG_CLICKED)
+    {
+        signal->widget->state->toggled = !signal->widget->state->toggled;
+    }
+    signal->widget->toggled = signal->widget->state->toggled;
+
+    if(signal->widget->toggled)
+    {
+        signal->widget->state->render_color = signal->widget->active_color;
+    }
+}
+
+internal_api void
+widget_do_draggable(ui_state_t *ui_state, ui_signal_t *signal)
+{
+    widget_t *widget = signal->widget;
+    if((signal->signal_flags & UI_SIGNAL_FLAG_HOVERING) &&
+       (ui_state->hot_widget == widget))
+    {
+        widget->state->last_interacted_frame = ui_state->frame_count;
+        if(signal->signal_flags & UI_SIGNAL_FLAG_CLICKED)
+        {
+            vec2_t offset = vec2(widget->state->position.x, widget->state->position.y + widget->state->render_size.y);
+            widget->state->offset = vec2_subtract(ui_state->mouse_position, offset);
+
+            widget->state->input_begin_within_bounds = true;
+        }
+    }
+    else
+    {
+        widget->state->input_begin_within_bounds = false;
+    }
+}
+
 ui_signal_t
 ui_widget_get_signals(ui_state_t *ui_state, widget_t *widget)
 {
@@ -620,51 +693,92 @@ ui_widget_get_signals(ui_state_t *ui_state, widget_t *widget)
     widget_state_t *widget_state = ui_state->widget_states.data + widget->ID;
     Assert(widget_state);
 
-    bool8 is_hot = rect2_point_in_rect(widget_state->widget_rect, ui_state->mouse_position);
-    if(is_hot)
+    action_button_t *left_mouse  = s_im_get_key_state(ui_state->ui_controller, SDL_LEFT_MOUSE);
+    action_button_t *right_mouse = s_im_get_key_state(ui_state->ui_controller, SDL_RIGHT_MOUSE);
+
+    bool8 is_held           = left_mouse->is_down;
+    bool8 just_released     = left_mouse->is_released;
+    bool8 just_clicked      = left_mouse->is_pressed;
+    bool8 is_double_clicked = left_mouse->half_transition_counter >= 2;
+    bool8 is_right_clicked  = right_mouse->is_pressed;
+
+    bool8 is_in_bounds = rect2_point_in_rect(widget_state->widget_rect, ui_state->mouse_position);
+    if(is_in_bounds)
     {
-        action_button_t *left_mouse  = s_im_get_key_state(ui_state->ui_controller, SDL_LEFT_MOUSE);
-        action_button_t *right_mouse = s_im_get_key_state(ui_state->ui_controller, SDL_RIGHT_MOUSE);
-
-        ui_state->hot_widget_ID = widget->ID;
-
-        result.signal_flags |= UI_SIGNAL_FLAG_HOVERING;
-
-        bool8 is_active         = left_mouse->is_down || left_mouse->is_pressed;
-        bool8 is_held           = left_mouse->is_down;
-        bool8 just_released     = left_mouse->is_released;
-        bool8 just_clicked      = left_mouse->is_pressed;
-        bool8 is_double_clicked = left_mouse->half_transition_counter >= 2;
-        bool8 is_right_clicked  = right_mouse->is_pressed;
-        if(is_active)
+        if((widget->widget_flags & UI_WIDGET_FLAG_HOVERABLE))
         {
-            result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DRAGGING; 
-            ui_state->active_widget_ID = widget->ID;
+            if(ui_state->hot_widget)
+            {
+                ui_state->last_hot_ID = ui_state->hot_widget->ID;
+            }
+
+            ui_state->hot_widget  = widget;
+            result.signal_flags |= UI_SIGNAL_FLAG_HOVERING;
         }
 
-        if(is_held)
+        if((widget->widget_flags & UI_WIDGET_FLAG_MOUSE_CLICKABLE) || (widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE)) 
         {
-            result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DRAGGING; 
+            if(just_clicked)
+            {
+                // NOTE(Sleepster): Depth comparison (widget->parent_stack_depth < ui_state->hot_widget->parent_stack_depth)
+                if(ui_state->active_widget)
+                {
+                    ui_state->last_active_ID = ui_state->active_widget->ID;
+                }
+
+                ui_state->active_widget = widget;
+            }
+
+            if(just_released)
+            {
+                ui_state->active_widget = null;
+            }
         }
 
-        if(just_released)
+        if((widget->widget_flags & UI_WIDGET_FLAG_MOUSE_CLICKABLE))
         {
-            result.signal_flags |= UI_SIGNAL_FLAG_RELEASED; 
-        }
+            if(just_clicked)
+            {
+                result.signal_flags |= UI_SIGNAL_FLAG_LEFT_CLICKED; 
+                s_im_is_keyboard_key_pressed(ui_state->ui_controller, SDL_LEFT_MOUSE);
+            }
 
-        if(just_clicked)
-        {
-            result.signal_flags |= UI_SIGNAL_FLAG_CLICKED; 
-        }
+            if(is_held)
+            {
+                result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOWN;
+                s_im_is_keyboard_key_down(ui_state->ui_controller, SDL_LEFT_MOUSE);
+            }
 
-        if(is_double_clicked)
+            if(just_released)
+            {
+                result.signal_flags |= UI_SIGNAL_FLAG_LEFT_RELEASED;
+                s_im_consume_keyboard_key_release(ui_state->ui_controller, SDL_LEFT_MOUSE);
+            }
+
+            if(is_double_clicked)
+            {
+                result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOUBLE_CLICKED;
+                s_im_is_keyboard_key_pressed(ui_state->ui_controller, SDL_LEFT_MOUSE);
+            }
+        }
+        else if((widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE))
         {
-            result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOUBLE_CLICKED;
+            if(just_clicked)
+            {
+                result.signal_flags |= UI_SIGNAL_FLAG_LEFT_CLICKED;
+                s_im_is_keyboard_key_pressed(ui_state->ui_controller, SDL_LEFT_MOUSE);
+            }
+            if(is_held)
+            {
+                result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOWN;
+                s_im_is_keyboard_key_down(ui_state->ui_controller, SDL_LEFT_MOUSE);
+            }
         }
 
         if(is_right_clicked)
         {
             result.signal_flags |= UI_SIGNAL_FLAG_RIGHT_CLICKED;
+            s_im_is_keyboard_key_pressed(ui_state->ui_controller, SDL_RIGHT_MOUSE);
         }
     }
 
@@ -700,15 +814,10 @@ ui_widget_draggable_panel(ui_state_t *ui_state,
                           vec4_t      background_color)
 {
     ui_signal_t result = ui_widget_panel(ui_state, widget_name, position, child_spacing, padding, background_color);
-    result.widget->widget_flags |= UI_WIDGET_FLAG_LEFT_DRAGGABLE;
-    if(ui_pressed(result))
-    {
-        result.widget->state->offset = vec2_subtract(ui_state->mouse_position, 
-                                                     vec2(result.widget->state->position.x, 
-                                                          result.widget->state->position.y + result.widget->state->render_size.y));
-    }
-    if(ui_dragging(result)) result.widget->state->dragging = true;
-    else                    result.widget->state->dragging = false;
+    ui_widget_set_flags(result.widget, (UI_WIDGET_FLAG_LEFT_DRAGGABLE|UI_WIDGET_FLAG_HOVERABLE));
+
+    result = ui_widget_get_signals(ui_state, result.widget);
+    widget_do_draggable(ui_state, &result);
 
     return(result);
 }
@@ -730,15 +839,7 @@ ui_widget_sized_button(ui_state_t *ui_state,
     widget->widget_flags       |= widget_flags;
 
     ui_signal_t result = ui_widget_get_signals(ui_state, widget);
-    if(ui_hovered(result))
-    {
-        widget->state->render_color = widget->hovered_color;
-    }
-    
-    if(ui_down(result))
-    {
-        widget->state->render_color = widget->active_color;
-    }
+    widget_do_button(ui_state, &result);
 
     return(result);
 }
@@ -774,15 +875,45 @@ ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text)
     return(result);
 }
 
-ui_signal_t 
+ui_signal_t
+ui_widget_toggle_box(ui_state_t *ui_state, string_t widget_text, vec2_t size)
+{
+    widget_t *widget = ui_widget_create(ui_state, 
+                                        widget_text, 
+                                        UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON);
+    widget->minimum_render_size = size;
+    widget->idle_color          = ui_state->default_widget_idle_color;
+    widget->hovered_color       = ui_state->default_widget_hover_color;
+    widget->active_color        = ui_state->default_widget_active_color;
+    widget->state->render_color = widget->idle_color;
+
+    ui_signal_t result = ui_widget_get_signals(ui_state, widget);
+    widget_do_toggle_button(ui_state, &result);
+
+    return(result);
+}
+
+void
+ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size)
+{
+    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_DRAW_RECTANGLE);
+
+    widget->minimum_render_size = size;
+    widget->state->render_color = ui_state->default_widget_idle_color;
+}
+
+void 
 ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t spacing_size)
 {
     widget_t *widget = ui_widget_create(ui_state, widget_name, 0);
-    ui_signal_t result = ui_widget_get_signals(ui_state, widget);
+    widget->minimum_render_size = spacing_size;
+    widget->state->render_color = ui_state->default_widget_idle_color;
+}
 
-    widget->minimum_render_size = spacing_size;;
-
-    return(result);
+void
+ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size)
+{
+    ui_widget_rectangle(ui_state, widget_name, size);
 }
 
 #if 0

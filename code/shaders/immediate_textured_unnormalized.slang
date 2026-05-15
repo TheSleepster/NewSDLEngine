@@ -1,5 +1,3 @@
-#include <test.slh>
-
 // VERTEX
 struct vInput_t
 {
