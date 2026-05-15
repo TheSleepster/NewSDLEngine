@@ -32,6 +32,10 @@ struct widget_state_t
     // NOTE(Sleepster): Always between 0.0 and 1.0
     float32      slider_value;
 
+    // NOTE(Sleepster): Non-normalized. 
+    u32          min_slider_value;
+    u32          max_slider_value;
+
     // NOTE(Sleepster): Offset is used for dragged widgets... 
     vec3_t       position;
     vec2_t       offset;
@@ -226,6 +230,7 @@ ui_signal_t ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t p
 ui_signal_t ui_widget_sized_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, u32 widget_flags);
 ui_signal_t ui_widget_text(ui_state_t *ui_state, string_t widget_text);
 ui_signal_t ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text);
+ui_signal_t ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_width, u32 bar_height, float32 min_value, float32 max_value);
 void        ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t spacing_size);
 void        ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size);
 void        ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size);

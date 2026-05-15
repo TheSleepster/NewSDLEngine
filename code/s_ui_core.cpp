@@ -97,6 +97,11 @@ get_hierarchy_size_data(ui_state_t *ui_state, widget_t *parent, widget_t *first_
                 }
 
                 current_widget->state->render_size = vec2(child_data.largest_width, child_data.tallest_height);
+                if(current_widget->state->render_size.x < current_widget->minimum_render_size.x ||
+                   current_widget->state->render_size.y < current_widget->minimum_render_size.y)
+                {
+                    current_widget->state->render_size = current_widget->minimum_render_size;
+                }
             }
             u32 layout_style = parent->layout_style;
 
@@ -914,6 +919,54 @@ void
 ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size)
 {
     ui_widget_rectangle(ui_state, widget_name, size);
+}
+
+ui_signal_t
+ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_width, u32 bar_height, float32 min_value, float32 max_value)
+{
+    ui_signal_t result;
+
+    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DRAW_RECTANGLE);
+    widget->minimum_render_size = vec2(bar_width, bar_height);
+    widget->state->min_slider_value = min_value;
+    widget->state->max_slider_value = max_value;
+    widget->state->render_color     = ui_state->default_widget_idle_color;
+
+    ui_signal_t slider_bar = ui_widget_get_signals(ui_state, widget);
+    ui_row(ui_state, widget)
+    {
+        ui_widget_seed(ui_state, widget->ID);
+
+        string_t box_name = c_string_concat(&global_context->temporary_arena, STR("SLIDER_BOX_"), widget_name);
+        ui_signal_t slider_button = ui_widget_sized_button(ui_state, 
+                                                           box_name, 
+                                                           vec2((float32)bar_width * 0.05f, bar_height * 1.50), 
+                                                           UI_WIDGET_FLAG_LEFT_DRAGGABLE);
+        if(ui_down(slider_button))
+        {
+            float32 move_x    = ui_state->mouse_delta.x / (float32)bar_width;
+            float32 new_value = slider_bar.widget->state->slider_value + move_x;
+
+            slider_bar.widget->state->slider_value = Clamp(new_value, 0.0f, 1.0f);
+
+            log_info("Slider value is: '%.02f'...\n", slider_bar.widget->state->slider_value);
+        }
+        widget_t *box_button = slider_button.widget;
+        float32 bar_left  = slider_bar.widget->state->position.x;
+        float32 bar_top   = slider_bar.widget->state->position.y + slider_bar.widget->state->render_size.y;
+        float32 t         = slider_bar.widget->state->slider_value;
+
+        float32 button_x  = bar_left + (bar_width * t);
+        float32 button_y  = bar_top  - (box_button->state->render_size.y * 0.5f);
+
+        float32 button_half_w = box_button->state->render_size.x * 0.5f;
+        button_x = Clamp(button_x, 
+                         bar_left, 
+                         bar_left + bar_width - button_half_w);
+        box_button->expected_position.xy = vec2(button_x, button_y);
+    }
+
+    return(result);
 }
 
 #if 0

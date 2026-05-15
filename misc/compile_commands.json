@@ -52,7 +52,7 @@
       "-o",
       "../build/s_ui_core.o"
     ],
-    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
+    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
     "output": "../build/s_ui_core.o"
   }
 ]
