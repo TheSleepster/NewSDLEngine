@@ -6,6 +6,13 @@
    ======================================================================== */
 #include <s_input_manager.h>
 
+// NOTE(Sleepster): 
+//
+// These events should instead be handled inside of the entry.cpp file and instead of directly interacting
+// with the input manager like we are now, we should instead create two things:
+//
+// 1.) An input event buffer inside the event manager that stores input events from the start of this frame
+// 2.) An api to allow us to set what keys / gamepad buttons have been pressed.
 void
 s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
 {
