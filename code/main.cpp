@@ -493,7 +493,7 @@ game_main(void)
                                 ui_widget_labeled_button(main_ui, STR("Show Timing Flame Graph"));
                                 ui_widget_labeled_button(main_ui, STR("Show RAM Stats"));
 
-                                ui_widget_float_slider_bar(main_ui, STR("Test slider..."), 100, 4, 0.0f, 100.0f);
+                                ui_widget_float_slider_bar(main_ui, STR("Test slider..."), 100, 15, 0.0f, 100.0f);
 
                                 ui_widget_set_offset_x(main_panel.widget, 0);
                             }

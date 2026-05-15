@@ -176,11 +176,10 @@ place_widgets_in_hierarchy(ui_state_t *ui_state,
 
         vec2_t parent_top_left;
         if((current_widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE) &&
-           (ui_state->active_widget == current_widget)                    &&
-           (current_widget->state->input_begin_within_bounds))
+           (ui_state->active_widget == current_widget))
         {
             vec2_t mouse_offset = vec2_subtract(ui_state->mouse_position, current_widget->state->offset);
-            parent_top_left = mouse_offset;
+            parent_top_left     = mouse_offset;
         }
         else
         {
@@ -932,7 +931,7 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
     widget->state->max_slider_value = max_value;
     widget->state->render_color     = ui_state->default_widget_idle_color;
 
-    ui_signal_t slider_bar = ui_widget_get_signals(ui_state, widget);
+    ui_signal_t slider_state = ui_widget_get_signals(ui_state, widget);
     ui_row(ui_state, widget)
     {
         ui_widget_seed(ui_state, widget->ID);
@@ -942,27 +941,52 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
                                                            box_name, 
                                                            vec2((float32)bar_width * 0.05f, bar_height * 1.50), 
                                                            UI_WIDGET_FLAG_LEFT_DRAGGABLE);
+        widget_t *box_button = slider_button.widget;
+        widget_t *slider_bar = slider_state.widget;
+
+        widget_do_draggable(ui_state, &slider_button);
         if(ui_down(slider_button))
         {
+            vec2_t predicted_position = vec2_add(box_button->state->offset, box_button->expected_position.xy);
+            vec2_t slider_max         = vec2_add(slider_bar->expected_position.xy, slider_bar->minimum_render_size);
+            vec2_t slider_min         = slider_bar->expected_position.xy;
+
+            vec2_t clamped_offset = box_button->state->offset;
+            if(predicted_position > slider_max)
+            {
+                clamped_offset = vec2_subtract(predicted_position, slider_max);
+            }
+            if(predicted_position < slider_min)
+            {
+                clamped_offset = vec2_subtract(slider_min, predicted_position);
+            }
+
+            box_button->state->offset = clamped_offset;
+
             float32 move_x    = ui_state->mouse_delta.x / (float32)bar_width;
-            float32 new_value = slider_bar.widget->state->slider_value + move_x;
+            float32 new_value = slider_bar->state->slider_value + move_x;
 
-            slider_bar.widget->state->slider_value = Clamp(new_value, 0.0f, 1.0f);
+            slider_bar->state->slider_value = Clamp(new_value, 0.0f, 1.0f);
 
-            log_info("Slider value is: '%.02f'...\n", slider_bar.widget->state->slider_value);
+            log_info("Slider value is: '%.02f'...\n", slider_bar->state->slider_value);
         }
-        widget_t *box_button = slider_button.widget;
-        float32 bar_left  = slider_bar.widget->state->position.x;
-        float32 bar_top   = slider_bar.widget->state->position.y + slider_bar.widget->state->render_size.y;
-        float32 t         = slider_bar.widget->state->slider_value;
+
+        if(ui_released(slider_button))
+        {
+            s32 x = 0;
+            (void)x;
+        }
+
+        float32 bar_left  = slider_bar->state->position.x;
+        float32 bar_top   = slider_bar->state->position.y + slider_bar->state->render_size.y;
+        float32 t         = slider_bar->state->slider_value;
 
         float32 button_x  = bar_left + (bar_width * t);
-        float32 button_y  = bar_top  - (box_button->state->render_size.y * 0.5f);
-
-        float32 button_half_w = box_button->state->render_size.x * 0.5f;
+        float32 button_y  = bar_top  + (box_button->state->render_size.y * 0.5f);
         button_x = Clamp(button_x, 
                          bar_left, 
-                         bar_left + bar_width - button_half_w);
+                         bar_left + bar_width);
+
         box_button->expected_position.xy = vec2(button_x, button_y);
     }
 

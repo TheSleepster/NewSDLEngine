@@ -426,6 +426,7 @@ MATH_API vec2_t  vec2_rotate(vec2_t A, float32 rotation);
 MATH_API vec2_t  vec2_lerp(vec2_t A, vec2_t B, real32 time);
 MATH_API vec2_t  vec2_unlerp(vec2_t A, vec2_t B, vec2_t X);
 MATH_API vec2_t  vec2_negate(vec2_t A);
+MATH_API void    vec2_clamp(vec2_t *value, vec2_t min, vec2_t max);
 
 /*===========================================
   ================= VECTOR 3 ================
@@ -447,6 +448,7 @@ MATH_API vec3_t  vec3_rotate(vec3_t A, vec3_t axis, float32 rotation);
 MATH_API vec3_t  vec3_lerp(vec3_t A, vec3_t B, real32 time);
 MATH_API vec3_t  vec3_unlerp(vec3_t A, vec3_t B, vec3_t X);
 MATH_API float32 vec3_length(vec3_t A);
+MATH_API float32 vec3_length_squared(vec3_t A);
 MATH_API float32 vec3_dot(vec3_t A, vec3_t B);
 
 /*===========================================
@@ -931,6 +933,16 @@ vec2_negate(vec2_t A)
     return(result);
 }
 
+MATH_API void 
+vec2_clamp(vec2_t *value, vec2_t min, vec2_t max)
+{
+    if(value->x < min.x) value->x = min.x;
+    if(value->x > max.x) value->x = max.x;
+
+    if(value->y < min.y) value->y = min.y;
+    if(value->y > max.y) value->y = max.y;
+}
+
 /*=====================================================
   ================= VECTOR 3 FUNCTIONS ================
   =====================================================*/
@@ -1024,6 +1036,15 @@ vec3_length(vec3_t A)
 {
     float32 result;
     result = sqrt(Square(A.x) + Square(A.y) + Square(A.z));
+
+    return(result);
+}
+
+MATH_API float32
+vec3_length_squared(vec3_t A)
+{
+    float32 result;
+    result = Square(A.x) + Square(A.y) + Square(A.z);
 
     return(result);
 }
@@ -2384,8 +2405,9 @@ rect2_get_vector_depth(rectangle2_t rect)
   ================= VECTOR 2 ================
   ===========================================*/
 
+// NOTE(Sleepster): MATH
 inline vec2_t 
-operator+(vec2_t A, vec2_t B)
+operator+(vec2_t &A, vec2_t &B)
 {
     vec2_t result;
 
@@ -2396,7 +2418,7 @@ operator+(vec2_t A, vec2_t B)
 }
 
 inline vec2_t 
-operator-(vec2_t A, vec2_t B)
+operator-(vec2_t &A, vec2_t &B)
 {
     vec2_t result;
 
@@ -2407,7 +2429,7 @@ operator-(vec2_t A, vec2_t B)
 }
 
 inline vec2_t
-operator*(vec2_t A, vec2_t B)
+operator*(vec2_t &A, vec2_t &B)
 {
     vec2_t result;
 
@@ -2418,7 +2440,7 @@ operator*(vec2_t A, vec2_t B)
 }
 
 inline vec2_t
-operator/(vec2_t A, vec2_t B)
+operator/(vec2_t &A, vec2_t &B)
 {
     vec2_t result;
 
@@ -2429,7 +2451,7 @@ operator/(vec2_t A, vec2_t B)
 }
 
 inline vec2_t
-operator+=(vec2_t A, vec2_t B)
+operator+=(vec2_t &A, vec2_t &B)
 {
     vec2_t result;
 
@@ -2440,7 +2462,7 @@ operator+=(vec2_t A, vec2_t B)
 }
 
 inline vec2_t
-operator-=(vec2_t A, vec2_t B)
+operator-=(vec2_t &A, vec2_t &B)
 {
     vec2_t result;
 
@@ -2451,7 +2473,7 @@ operator-=(vec2_t A, vec2_t B)
 }
 
 inline vec2_t 
-operator*=(vec2_t A, vec2_t B)
+operator*=(vec2_t &A, vec2_t &B)
 {
     vec2_t result;
 
@@ -2462,12 +2484,68 @@ operator*=(vec2_t A, vec2_t B)
 }
 
 inline vec2_t 
-operator/=(vec2_t A, vec2_t B)
+operator/=(vec2_t &A, vec2_t &B)
 {
     vec2_t result;
 
     result.x = A.x / B.x;
     result.y = A.y / B.y;
+
+    return(result);
+}
+
+// NOTE(Sleepster): COMPARISONS 
+inline bool8
+operator<(vec2_t &A, vec2_t &B)
+{
+    bool8 result = false;
+
+    float32 a_len = vec2_length_squared(A);
+    float32 b_len = vec2_length_squared(B);
+    if(a_len < b_len)
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+inline bool8
+operator>(vec2_t &A, vec2_t &B)
+{
+    bool8 result = false;
+
+    float32 a_len = vec2_length_squared(A);
+    float32 b_len = vec2_length_squared(B);
+    if(a_len > b_len)
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+
+inline bool8
+operator==(vec2_t &A, vec2_t &B)
+{
+    bool8 result = false;
+    if((A.x == B.x) && (A.y == B.y))
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+inline bool8
+operator!=(vec2_t &A, vec2_t &B)
+{
+    bool8 result = false;
+    if((A.x != B.x) || (A.y != B.y))
+    {
+        result = true;
+    }
 
     return(result);
 }
@@ -2476,8 +2554,9 @@ operator/=(vec2_t A, vec2_t B)
   ================= VECTOR 3 ================
   ===========================================*/
 
+// NOTE(Sleepster): MATH
 inline vec3_t 
-operator+(vec3_t A, vec3_t B)
+operator+(vec3_t &A, vec3_t &B)
 {
     vec3_t result;
 
@@ -2489,7 +2568,7 @@ operator+(vec3_t A, vec3_t B)
 }
 
 inline vec3_t 
-operator-(vec3_t A, vec3_t B)
+operator-(vec3_t &A, vec3_t &B)
 {
     vec3_t result;
 
@@ -2501,7 +2580,7 @@ operator-(vec3_t A, vec3_t B)
 }
 
 inline vec3_t
-operator*(vec3_t A, vec3_t B)
+operator*(vec3_t &A, vec3_t &B)
 {
     vec3_t result;
 
@@ -2513,7 +2592,7 @@ operator*(vec3_t A, vec3_t B)
 }
 
 inline vec3_t
-operator/(vec3_t A, vec3_t B)
+operator/(vec3_t &A, vec3_t &B)
 {
     vec3_t result;
 
@@ -2525,7 +2604,7 @@ operator/(vec3_t A, vec3_t B)
 }
 
 inline vec3_t
-operator+=(vec3_t A, vec3_t B)
+operator+=(vec3_t &A, vec3_t &B)
 {
     vec3_t result;
 
@@ -2537,7 +2616,7 @@ operator+=(vec3_t A, vec3_t B)
 }
 
 inline vec3_t
-operator-=(vec3_t A, vec3_t B)
+operator-=(vec3_t &A, vec3_t &B)
 {
     vec3_t result;
 
@@ -2549,7 +2628,7 @@ operator-=(vec3_t A, vec3_t B)
 }
 
 inline vec3_t 
-operator*=(vec3_t A, vec3_t B)
+operator*=(vec3_t &A, vec3_t &B)
 {
     vec3_t result;
 
@@ -2561,13 +2640,70 @@ operator*=(vec3_t A, vec3_t B)
 }
 
 inline vec3_t 
-operator/=(vec3_t A, vec3_t B)
+operator/=(vec3_t &A, vec3_t &B)
 {
     vec3_t result;
 
     result.x = A.x / B.x;
     result.y = A.y / B.y;
     result.z = A.z / B.z;
+
+    return(result);
+}
+
+// NOTE(Sleepster): COMPARISONS 
+inline bool8
+operator<(vec3_t &A, vec3_t &B)
+{
+    bool8 result = false;
+
+    float32 a_len = vec3_length_squared(A);
+    float32 b_len = vec3_length_squared(B);
+    if(a_len < b_len)
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+inline bool8
+operator>(vec3_t &A, vec3_t &B)
+{
+    bool8 result = false;
+
+
+    float32 a_len = vec3_length_squared(A);
+    float32 b_len = vec3_length_squared(B);
+    if(a_len > b_len)
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+
+inline bool8
+operator==(vec3_t &A, vec3_t &B)
+{
+    bool8 result = false;
+    if((A.x == B.x) && (A.y == B.y) && (A.z == B.z))
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+inline bool8
+operator!=(vec3_t &A, vec3_t &B)
+{
+    bool8 result = false;
+    if((A.x != B.x) || (A.y != B.y) || (A.z != B.z))
+    {
+        result = true;
+    }
 
     return(result);
 }
