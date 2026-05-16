@@ -14,13 +14,8 @@
 #include <s_render_RHI.h>
 #include <s_asset_manager.h>
 
-struct alignas(16) immediate_vertex_t
-{
-    vec4_t vPosition;
-    vec4_t vColor;
-    vec2_t vTexCoord;
-    vec2_t vPadding;
-};
+#include <meta/GENERATED_immediate_vertex.h>
+typedef vImmediateVertex_t immediate_vertex_t;
 
 void immediate_quad_ex(render_command_list_t *command_list, vertex_buffer_t *buffer, vec3_t position, vec2_t render_size, vec4_t render_color, vec2_t uv_min, vec2_t uv_max, vec2_t padding, texture2D_t *texture);
 void immediate_rect(render_command_list_t *command_list, vertex_buffer_t *buffer, vec3_t position, vec2_t render_size, vec4_t render_color, vec2_t padding);

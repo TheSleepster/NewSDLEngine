@@ -1,11 +1,5 @@
 // VERTEX
-struct vVertexInput_t
-{
-    float4 vPosition : POSITION;
-    float4 vColor    : TEXCOORD0;
-    float2 vTexCoord : TEXCOORD1;
-    float2 vPadding  : TEXCOORD2;
-};
+#include <immediate_vertex.slh>
 
 struct VertexOutput_t 
 {
@@ -25,7 +19,7 @@ ConstantBuffer<uCameraMatrices_t> CameraMatrices;
 
 [shader("vertex")]
 VertexOutput_t
-VSMain(vVertexInput_t Input)
+VSMain(vImmediateVertex_t Input)
 {
     VertexOutput_t result;
     float2 v2DPositionFloored = floor(Input.vPosition.xy);

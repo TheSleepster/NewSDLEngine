@@ -34,6 +34,12 @@
 typedef struct meta_struct meta_struct_t;
 
 // TODO(Sleepster): 
+//
+//  The metaprogram should be upgraded to have a public interface as well. This would simply be the main file for the
+//  executable CLI metaprogram. But other programs need to be able to use the functionality of this file to parse other
+//  C-like languages like Slang. We should also allow the metaprogram to track what line we've encountered an invaid token
+//  for easier error reporting.
+//
 // - [ ] Support namespaces and C++ style class::function() notation
 // - [ ] Better error handling and reporting
 // - [ ] Make the data be printed to a file by default instead of just stdout... printing to stdout makes
@@ -146,6 +152,7 @@ typedef enum meta_struct_type
     META_STRUCT_TYPE_Count
 }meta_struct_type_t;
 
+// TODO(Sleepster): META_TYPE_KIND_FUNCTION
 #define METATYPE_KIND_LIST(X) \
     X(META_TYPE_KIND_Primitive,    "META_TYPE_KIND_Primitive") \
     X(META_TYPE_KIND_Struct,       "META_TYPE_KIND_Struct") \

@@ -362,171 +362,30 @@ c_string_read_line(string_t *data)
     return(result);
 }
 
-// NOTE(Sleepster): Element size is in bytes
-internal_api byte*
-c_string_read_value(string_t *data, u32 element_size)
-{
-    byte *result = null;
-    result = data->data;
-    result[element_size] = '\0';
-
-    return(result);
-}
-
-s8
-c_string_read_s8(string_t data)
-{
-    s8 result = 0;
-    byte *value_string = c_string_read_value(&data, sizeof(s8));
-    result = ((s8)*value_string - (s8)0x30);
-
-    return(result);
-}
-
-s16 
-c_string_read_s16(string_t data)
-{
-    s16 result = 0;
-    byte *value_string = c_string_read_value(&data, sizeof(s16));
-
-    for(u32 index = 0;
-        index < sizeof(s16);
-        ++index)
-    {
-        result += ((s16)value_string[index] - (s16)0x30);
-    }
-
-    return(result);
-}
-
 s32 
-c_string_read_s32(string_t data)
+c_string_read_int(string_t data)
 {
     s32 result = 0;
-    byte *value_string = c_string_read_value(&data, sizeof(s32));
-
     for(u32 index = 0;
-        index < sizeof(s32);
+        index < data.count;
         ++index)
     {
-        result += ((s32)value_string[index] - (s32)0x30);
-    }
-
-    return(result);
-}
-
-s64 
-c_string_read_s64(string_t data)
-{
-    s64 result = 0;
-    byte *value_string = c_string_read_value(&data, sizeof(s64));
-
-    for(u32 index = 0;
-        index < sizeof(s64);
-        ++index)
-    {
-        result += ((s64)value_string[index] - (s64)0x30);
-    }
-
-    return(result);
-}
-
-// NOTE(Sleepster): Copy pasta from above
-u8
-c_string_read_u8(string_t data)
-{
-    u8 result = 0;
-    byte *value_string = c_string_read_value(&data, sizeof(u8));
-    result = ((u8)*value_string - (u8)0x30);
-
-    return(result);
-}
-
-u16 
-c_string_read_u16(string_t data)
-{
-    u16 result = 0;
-    byte *value_string = c_string_read_value(&data, sizeof(u16));
-
-    for(u32 index = 0;
-        index < sizeof(u16);
-        ++index)
-    {
-        result += ((u16)value_string[index] - (u16)0x30);
+        result = (result * 10) + (data.data[index] - '0');
     }
 
     return(result);
 }
 
 u32 
-c_string_read_u32(string_t data)
+c_string_read_uint(string_t data)
 {
-    u32 result = 0;
-    byte *value_string = c_string_read_value(&data, sizeof(u32));
-
+    s32 result = 0;
     for(u32 index = 0;
-        index < sizeof(u32);
+        index < data.count;
         ++index)
     {
-        result += ((u32)value_string[index] - (u32)0x30);
+        result = (result * 10) + (data.data[index] - '0');
     }
-
-    return(result);
-}
-
-u64 
-c_string_read_u64(string_t data)
-{
-    u64 result = 0;
-    byte *value_string = c_string_read_value(&data, sizeof(u64));
-
-    for(u32 index = 0;
-        index < sizeof(u64);
-        ++index)
-    {
-        result += ((u64)value_string[index] - (u64)0x30);
-    }
-
-    return(result);
-}
-
-float32 
-c_string_read_float32(string_t data)
-{
-    float32 result = 0;
-    byte *value_string = c_string_read_value(&data, sizeof(float32));
-    result = strtof((char*)value_string, null);
-
-    return(result);
-}
-
-float64 
-c_string_read_float64(string_t data)
-{
-    float64 result = 0;
-    byte *value_string = c_string_read_value(&data, sizeof(float64));
-    result = strtod((char*)value_string, null);
-
-    return(result);
-}
-
-bool8 
-c_string_read_bool8(string_t data)
-{
-    bool8 result = false;
-    byte *value_string = c_string_read_value(&data, sizeof(bool8));
-
-    result = ((bool8)*value_string);
-
-    return(result);
-}
-
-bool32 
-c_string_read_bool32(string_t data)
-{
-    bool32 result = false;
-    byte *value_string = c_string_read_value(&data, sizeof(bool32));
-    result = ((bool32)*value_string);
 
     return(result);
 }

@@ -215,8 +215,9 @@ shaders: $(BUILD_DIR)/shaders.stamp
 $(BUILD_DIR)/shaders.stamp: $(SHADER_FILES) $(SLANG_REFLECTOR_OUT) | $(BUILD_DIR)
 	@echo [SHADERS] Running slang reflector...
 	$(SILENT)cd ../code && $(CURDIR)/$(SLANG_REFLECTOR_OUT) \
-		--shader_directory_path=../code/shaders \
-		--shader_output_dir=../run_tree/res/shader_binaries/
+		--shader_input_path=../code/shaders \
+		--shader_output_dir=../run_tree/res/shader_binaries/ \
+        --metagen_c_header_output_dir=meta/
 	@touch $@
 
 # -------------------------------------------------------------------------

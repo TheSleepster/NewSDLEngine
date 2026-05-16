@@ -62,24 +62,11 @@ bool32      c_string_is_whitespace(string_t *current_line);
 bool32      c_string_is_end_of_line(string_t *current_line);
 void        c_string_eat_whitespace(string_t *current_line);
 
-// TODO(Sleepster): Yeah... They just don't work. Fix this!
 string_t    c_string_read_line(string_t *data);
 
-s8          c_string_read_s8(string_t data);
-s16         c_string_read_s16(string_t data);
-s32         c_string_read_s32(string_t data);
-s64         c_string_read_s64(string_t data);
-
-u8          c_string_read_u8(string_t data);
-u16         c_string_read_u16(string_t data);
-u32         c_string_read_u32(string_t data);
-u64         c_string_read_u64(string_t data);
-
-float32     c_string_read_float32(string_t data);
-float64     c_string_read_float64(string_t data);
-
-bool8       c_string_read_bool8(string_t data);
-bool32      c_string_read_bool32(string_t data);
+// TODO(Sleepster): Yeah... They just don't work. Fix this!
+s32         c_string_read_int(string_t data);
+u32         c_string_read_uint(string_t data);
 
 // MACROS
 #define STR(x)   (string_t){.data = (byte*)x, .count = c_string_length(x)}
