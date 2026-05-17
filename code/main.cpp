@@ -477,7 +477,7 @@ game_main(void)
                     {
                         ui_widget_divider(main_ui, STR("main menu divider"), vec2(main_panel.widget->state->render_size.x, 4.0));
 
-                        ui_widget_set_default_font_size(main_ui, 24);
+                        ui_widget_set_default_font_size(main_ui, 20);
                         ui_signal_t debug_menu = ui_widget_labeled_button(main_ui, STR("Enable Debug Overlay"));
                         if(ui_pressed(debug_menu))
                         {
@@ -488,12 +488,12 @@ game_main(void)
                         {
                             ui_column(main_ui, main_panel.widget)
                             {
-                                ui_widget_set_offset_x(main_panel.widget, 20);
+                                ui_widget_set_offset_x(main_panel.widget, 16);
                                 ui_widget_labeled_button(main_ui, STR("Display Performance Counters"));
                                 ui_widget_labeled_button(main_ui, STR("Show Timing Flame Graph"));
                                 ui_widget_labeled_button(main_ui, STR("Show RAM Stats"));
 
-                                ui_widget_float_slider_bar(main_ui, STR("Test slider..."), 100, 15, 0.0f, 100.0f);
+                                ui_widget_float_slider_bar(main_ui, STR("Test slider..."), 100, 8, 2.5f);
 
                                 ui_widget_set_offset_x(main_panel.widget, 0);
                             }

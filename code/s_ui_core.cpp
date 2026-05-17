@@ -109,14 +109,14 @@ get_hierarchy_size_data(ui_state_t *ui_state, widget_t *parent, widget_t *first_
             float32 true_height = 0.0f;
             if(layout_style == WIDGET_LAYOUT_STYLE_HORIZONTAL)
             {
-                true_width  = current_widget->state->render_size.x + parent->child_spacing + parent->padding.x + current_widget->our_offset;
+                true_width  = current_widget->state->render_size.x + parent->child_spacing + parent->padding.x + current_widget->offset_from_parent;
                 true_height = current_widget->state->render_size.y + parent->padding.y;            
 
                 result.total_width  += true_width;
             }
             else
             {
-                true_width  = current_widget->state->render_size.x + parent->padding.x + current_widget->our_offset;
+                true_width  = current_widget->state->render_size.x + parent->padding.x + current_widget->offset_from_parent;
                 true_height = current_widget->state->render_size.y + parent->child_spacing + parent->padding.y;            
 
                 result.total_height += true_height;
@@ -151,7 +151,7 @@ place_widgets_in_hierarchy(ui_state_t *ui_state,
     do {
         vec2_t widget_position = *parent_cursor;
 
-        current_widget->expected_position.xy = vec2_add(widget_position, vec2(current_widget->our_offset, 0.0f));
+        current_widget->expected_position.xy = vec2_add(widget_position, vec2(current_widget->offset_from_parent, 0.0f));
         current_widget->expected_position.z  = current_widget->parent_stack_depth;
 
         float32 parent_spacing = 0.0f;
@@ -174,17 +174,7 @@ place_widgets_in_hierarchy(ui_state_t *ui_state,
             advance = vec2(x_advance, 0.0f);
         }
 
-        vec2_t parent_top_left;
-        if((current_widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE) &&
-           (ui_state->active_widget == current_widget))
-        {
-            vec2_t mouse_offset = vec2_subtract(ui_state->mouse_position, current_widget->state->offset);
-            parent_top_left     = mouse_offset;
-        }
-        else
-        {
-            parent_top_left = current_widget->expected_position.xy;
-        }
+        vec2_t parent_top_left = current_widget->expected_position.xy + current_widget->state->offset;
 
         // NOTE(Sleepster): We have to place the parent before we can place the children, otherwise we get weird popping 
         current_widget->state->position.xy = vec2(parent_top_left.x,
@@ -265,7 +255,6 @@ ui_state_update_widget_state(ui_state_t *ui_state)
                                                          ui_state->current_camera.view_matrix,
                                                          ui_state->current_camera.projection_matrix);
     ui_state->mouse_delta = vec2_subtract(ui_state->mouse_position, last_mouse);
-
     ui_state_update_widget_hierarchy(ui_state);
 }
 
@@ -610,8 +599,8 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
     if(parent != null)
     {
         ui_widget_append(&parent->first_child, &parent->last_child, result);
-        result->layout_style = parent->layout_style;
-        result->our_offset   = parent->child_offset;
+        result->layout_style       = parent->layout_style;
+        result->offset_from_parent = parent->child_offset;
     }
     else
     {
@@ -674,17 +663,35 @@ widget_do_draggable(ui_state_t *ui_state, ui_signal_t *signal)
        (ui_state->hot_widget == widget))
     {
         widget->state->last_interacted_frame = ui_state->frame_count;
-        if(signal->signal_flags & UI_SIGNAL_FLAG_CLICKED)
+        if(signal->signal_flags & UI_SIGNAL_FLAG_CLICKED && 
+           (ui_state->active_widget == widget))
         {
-            vec2_t offset = vec2(widget->state->position.x, widget->state->position.y + widget->state->render_size.y);
-            widget->state->offset = vec2_subtract(ui_state->mouse_position, offset);
-
+            widget->state->initial_mouse_position    = ui_state->mouse_position;
             widget->state->input_begin_within_bounds = true;
+        }
+    }
+
+    if(widget->state->input_begin_within_bounds &&
+       (ui_state->active_widget == widget))
+    {
+        if(signal->signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN)
+        {
+            vec2_t mouse_delta    = vec2_subtract(ui_state->mouse_position, widget->state->initial_mouse_position);
+            widget->state->offset = mouse_delta;
+
+            widget->state->initial_mouse_position = ui_state->mouse_position;
+        }
+        else
+        {
+            widget->state->initial_mouse_position = vec2_zero();
+            widget->state->offset                 = vec2_zero();
+
+            widget->state->input_begin_within_bounds = false;
         }
     }
     else
     {
-        widget->state->input_begin_within_bounds = false;
+        widget->state->offset = vec2_zero();
     }
 }
 
@@ -714,10 +721,14 @@ ui_widget_get_signals(ui_state_t *ui_state, widget_t *widget)
             if(ui_state->hot_widget)
             {
                 ui_state->last_hot_ID = ui_state->hot_widget->ID;
+                ui_state->hot_widget  = widget;
+                result.signal_flags |= UI_SIGNAL_FLAG_HOVERING;
             }
-
-            ui_state->hot_widget  = widget;
-            result.signal_flags |= UI_SIGNAL_FLAG_HOVERING;
+            else
+            {
+                ui_state->hot_widget  = widget;
+                result.signal_flags |= UI_SIGNAL_FLAG_HOVERING;
+            }
         }
 
         if((widget->widget_flags & UI_WIDGET_FLAG_MOUSE_CLICKABLE) || (widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE)) 
@@ -728,14 +739,19 @@ ui_widget_get_signals(ui_state_t *ui_state, widget_t *widget)
                 if(ui_state->active_widget)
                 {
                     ui_state->last_active_ID = ui_state->active_widget->ID;
+                    ui_state->active_widget  = widget;
                 }
-
-                ui_state->active_widget = widget;
+                else
+                {
+                    ui_state->active_widget       = widget;
+                    ui_state->last_clicked_widget = widget;
+                } 
             }
 
             if(just_released)
             {
-                ui_state->active_widget = null;
+                ui_state->active_widget       = null;
+                ui_state->last_clicked_widget = null;
             }
         }
 
@@ -921,73 +937,40 @@ ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size)
 }
 
 ui_signal_t
-ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_width, u32 bar_height, float32 min_value, float32 max_value)
+ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_width, u32 bar_height, float32 button_scale_factor)
 {
     ui_signal_t result;
 
     widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DRAW_RECTANGLE);
     widget->minimum_render_size = vec2(bar_width, bar_height);
-    widget->state->min_slider_value = min_value;
-    widget->state->max_slider_value = max_value;
     widget->state->render_color     = ui_state->default_widget_idle_color;
 
     ui_signal_t slider_state = ui_widget_get_signals(ui_state, widget);
     ui_row(ui_state, widget)
     {
         ui_widget_seed(ui_state, widget->ID);
+        vec2_t slider_box_size = vec2((float32)bar_width * 0.1f, (float32)bar_height * button_scale_factor);
 
         string_t box_name = c_string_concat(&global_context->temporary_arena, STR("SLIDER_BOX_"), widget_name);
         ui_signal_t slider_button = ui_widget_sized_button(ui_state, 
                                                            box_name, 
-                                                           vec2((float32)bar_width * 0.05f, bar_height * 1.50), 
+                                                           slider_box_size, 
                                                            UI_WIDGET_FLAG_LEFT_DRAGGABLE);
         widget_t *box_button = slider_button.widget;
         widget_t *slider_bar = slider_state.widget;
 
         widget_do_draggable(ui_state, &slider_button);
-        if(ui_down(slider_button))
+        if(box_button->state->input_begin_within_bounds || (ui_state->last_clicked_widget == box_button))
         {
-            vec2_t predicted_position = vec2_add(box_button->state->offset, box_button->expected_position.xy);
-            vec2_t slider_max         = vec2_add(slider_bar->expected_position.xy, slider_bar->minimum_render_size);
-            vec2_t slider_min         = slider_bar->expected_position.xy;
-
-            vec2_t clamped_offset = box_button->state->offset;
-            if(predicted_position > slider_max)
-            {
-                clamped_offset = vec2_subtract(predicted_position, slider_max);
-            }
-            if(predicted_position < slider_min)
-            {
-                clamped_offset = vec2_subtract(slider_min, predicted_position);
-            }
-
-            box_button->state->offset = clamped_offset;
-
-            float32 move_x    = ui_state->mouse_delta.x / (float32)bar_width;
+            float32 move_x    = (ui_state->mouse_delta.x * 1.1) / (float32)bar_width;
             float32 new_value = slider_bar->state->slider_value + move_x;
 
             slider_bar->state->slider_value = Clamp(new_value, 0.0f, 1.0f);
-
-            log_info("Slider value is: '%.02f'...\n", slider_bar->state->slider_value);
         }
 
-        if(ui_released(slider_button))
-        {
-            s32 x = 0;
-            (void)x;
-        }
-
-        float32 bar_left  = slider_bar->state->position.x;
-        float32 bar_top   = slider_bar->state->position.y + slider_bar->state->render_size.y;
-        float32 t         = slider_bar->state->slider_value;
-
-        float32 button_x  = bar_left + (bar_width * t);
-        float32 button_y  = bar_top  + (box_button->state->render_size.y * 0.5f);
-        button_x = Clamp(button_x, 
-                         bar_left, 
-                         bar_left + bar_width);
-
-        box_button->expected_position.xy = vec2(button_x, button_y);
+        float32 remaining_width = (float32)bar_width - box_button->minimum_render_size.x;
+        box_button->state->offset.x = slider_bar->state->slider_value * remaining_width;
+        box_button->state->offset.y = (slider_box_size.y - ((float32)bar_height * (button_scale_factor * 1.3f))) * -1.0f;
     }
 
     return(result);

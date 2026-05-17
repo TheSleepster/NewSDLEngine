@@ -40,6 +40,18 @@ typedef struct meta_struct meta_struct_t;
 //  C-like languages like Slang. We should also allow the metaprogram to track what line we've encountered an invaid token
 //  for easier error reporting.
 //
+//  We also just generally need a better version of this file. One that gives us more type information. We're missing a lot from 
+//  this and many things can be improved. Such as:
+//
+//  - Better type_id() functionality. We should just use a compile time hash table instead of whatever garbage we're using now
+//  - Parse procedures and store their information
+//  - A general interface for noting and interacting with loading code
+//  - Multithreaded file parsing
+//  - Procedure type_id(). Procedures should be their own unique type.
+//  - Way to mark custom types that should be handled differently such as what we have with Hashtable_t() and DynArray_t()
+//  - A way to get type_name -> ID and vise versa
+//  - Many more... this is just what I can think of off the top of my head...
+//
 // - [ ] Support namespaces and C++ style class::function() notation
 // - [ ] Better error handling and reporting
 // - [ ] Make the data be printed to a file by default instead of just stdout... printing to stdout makes

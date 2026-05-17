@@ -247,7 +247,8 @@ VISIT_FILES(shader_file_callback)
     }
     else if(c_string_compare(file_ext, STR(".slh")))
     {
-        c_threadpool_push_work_order(&global_context->main_threadpool, [file_manager, filename, fullname] {
+        // NOTE(Sleepster): We could just use a normal "&" here but I just don't care and this is more explicit 
+        c_threadpool_push_work_order(&global_context->main_threadpool, [file_manager, filename, fullname]() {
             string_t *file_data = c_hash_table_get_value_ptr(&file_manager->loaded_files, filename);
             if(file_data->count == 0)
             {

@@ -32,13 +32,10 @@ struct widget_state_t
     // NOTE(Sleepster): Always between 0.0 and 1.0
     float32      slider_value;
 
-    // NOTE(Sleepster): Non-normalized. 
-    u32          min_slider_value;
-    u32          max_slider_value;
-
     // NOTE(Sleepster): Offset is used for dragged widgets... 
     vec3_t       position;
     vec2_t       offset;
+    vec2_t       initial_mouse_position;
 
     vec2_t       render_size;
     vec4_t       render_color;
@@ -130,7 +127,7 @@ struct widget_t
     vec2_t          minimum_render_size;
 
     u32             child_offset;
-    u32             our_offset;
+    u32             offset_from_parent;
 
     float32         child_spacing;
     vec2_t          padding;
@@ -162,6 +159,7 @@ struct ui_state_t
     u64                               last_active_ID;
     widget_t                         *hot_widget;
     widget_t                         *active_widget;
+    widget_t                         *last_clicked_widget;
 
     // NOTE(Sleepster): Persists between frames... 
     memory_arena_t                    persistent_data_arena;
@@ -230,7 +228,7 @@ ui_signal_t ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t p
 ui_signal_t ui_widget_sized_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, u32 widget_flags);
 ui_signal_t ui_widget_text(ui_state_t *ui_state, string_t widget_text);
 ui_signal_t ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text);
-ui_signal_t ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_width, u32 bar_height, float32 min_value, float32 max_value);
+ui_signal_t ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_width, u32 bar_height, float32 button_scale_factor);
 void        ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t spacing_size);
 void        ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size);
 void        ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size);
@@ -242,10 +240,9 @@ true_inline void ui_state_end_row(ui_state_t *ui_state);
 true_inline void ui_state_begin_column(ui_state_t *ui_state, widget_t *parent);
 true_inline void ui_state_end_column(ui_state_t *ui_state);
 
-#define ui_parent(state, widget)  DeferLoop(ui_widget_push_parent((state), (widget)), ui_widget_pop_parent((state)))
-#define ui_row(state, parent)     DeferLoop(ui_state_begin_row((state), (parent)), ui_state_end_row((state)))
-#define ui_column(state, parent)  DeferLoop(ui_state_begin_column((state), (parent)), ui_state_end_column((state)))
-
+#define ui_parent(state, widget)      DeferLoop(ui_widget_push_parent((state), (widget)), ui_widget_pop_parent((state)))
+#define ui_row(state, parent)         DeferLoop(ui_state_begin_row((state), (parent)), ui_state_end_row((state)))
+#define ui_column(state, parent)      DeferLoop(ui_state_begin_column((state), (parent)), ui_state_end_column((state)))
 #define ui_frame(state, command_list) DeferLoop(ui_state_begin_frame((state)), ui_state_end_frame((state), (command_list)))
 
 #endif // S_UI_CORE_H

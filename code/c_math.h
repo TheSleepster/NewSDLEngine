@@ -927,8 +927,8 @@ vec2_negate(vec2_t A)
 {
     vec2_t result;
 
-    result.x = -A.x;
-    result.y = -A.y;
+    result.x = A.x * -1.0f;
+    result.y = A.y * -1.0f;
 
     return(result);
 }
