@@ -312,6 +312,13 @@ render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_lis
             ui_state->widget_item_count += current_widget->widget_text.count;
         }
 
+        immediate_widget_data_t widget_data = {
+            .iTopLeftRadius     = ui_state->default_widget_radius_data.x,
+            .iTopRightRadius    = ui_state->default_widget_radius_data.y,
+            .iBottomLeftRadius  = ui_state->default_widget_radius_data.z,
+            .iBottomRightRadius = ui_state->default_widget_radius_data.w
+        };
+        immediate_put_data(&ui_state->instance_buffer, (byte*)&widget_data, sizeof(immediate_widget_data_t), 1);
         if(current_widget->first_child)
         {
             render_widget_hierarchy(ui_state, command_list, current_widget->first_child);
@@ -334,6 +341,7 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
         render_widget_hierarchy(ui_state, command_list, current_widget);
 
         r_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
+        r_cmd_bind_vertex_buffer(command_list, &ui_state->instance_buffer);
         r_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
 
         // NOTE(Sleepster): First, draw the normal rectangle widgets
@@ -346,6 +354,7 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
             r_cmd_set_render_state(command_list, &pipeline_state);
             r_cmd_use_shader_program(command_list, ui_state->widget_shader);
             r_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
+            r_cmd_update_buffer_contents(command_list, &ui_state->instance_buffer);
 
             s32 window_width  = Max(renderer_state->window_size.x, 10);
             s32 window_height = Max(renderer_state->window_size.y, 10);
@@ -357,6 +366,7 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
 
             r_cmd_draw_indexed(command_list, ui_state->widget_item_count * 6, 0, 1, 0);
             s_renderer_buffer_reset(ui_state->renderer, &ui_state->vertex_buffer);
+            s_renderer_buffer_reset(ui_state->renderer, &ui_state->instance_buffer);
         }
     }
     else
@@ -403,6 +413,8 @@ ui_state_init(ui_state_t       *ui_state,
 
     ui_state->default_font_color = vec4(0.0, 0.0, 0.0, 1.0);
     ui_state->default_font_size  = 32;
+
+    ui_state->default_widget_radius_data = vec4(0.4, 0.4, 0.4, 0.4);
 
     ui_state->input_manager = input_manager;
     ui_state->ui_controller = s_im_get_primary_controller(input_manager);

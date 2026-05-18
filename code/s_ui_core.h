@@ -187,6 +187,7 @@ struct ui_state_t
     vec4_t                            default_widget_idle_color;
     vec4_t                            default_widget_hover_color;
     vec4_t                            default_widget_active_color;
+    vec4_t                            default_widget_radius_data;
 
     vec2_t                            mouse_position;
     vec2_t                            mouse_delta;

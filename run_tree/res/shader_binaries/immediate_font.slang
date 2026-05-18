@@ -7,6 +7,7 @@
 #define IMMEDIATE_VERTEX_SLH
 
 
+
 struct vImmediateVertex_t
 {
     float4 vPosition : POSITION;
@@ -16,8 +17,6 @@ struct vImmediateVertex_t
 };
 
 #endif // immediate_vertex.slh
-
-
 // END OF INCLUDED FILE
 #line 1 "immediate_font.slang"
 

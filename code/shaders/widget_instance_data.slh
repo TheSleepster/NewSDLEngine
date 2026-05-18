@@ -11,8 +11,6 @@
 [MakeHeaderType]
 struct iImmediateWidgetData_t
 {
-    int   iTextureIndex      : TEXCOORD3;
-    uint  iWidgetOptions     : TEXCOORD4;
     float iTopLeftRadius     : TEXCOORD5;
     float iTopRightRadius    : TEXCOORD6;
     float iBottomLeftRadius  : TEXCOORD7;

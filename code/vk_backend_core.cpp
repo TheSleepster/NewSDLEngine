@@ -2488,6 +2488,21 @@ vk_backend_perform_image_blit(vulkan_context_t *vulkan_context,
                           destination_range);
 }
 
+internal_api void
+vk_backend_bind_command_list_vertex_buffers(VkCommandBuffer *render_command_buffer, render_command_list_t *command_list)
+{
+    VkBuffer *handles     = c_arena_push_array(&global_context->temporary_arena, VkBuffer,     command_list->vertex_buffer_count);
+    VkDeviceSize *offsets = c_arena_push_array(&global_context->temporary_arena, VkDeviceSize, command_list->vertex_buffer_count);
+    c_dynarray_for(command_list->active_vertex_buffers, buffer_index)
+    {
+        render_buffer_t *buffer = command_list->active_vertex_buffers[buffer_index];
+        handles[buffer_index] = buffer->buffer.handle;
+        offsets[buffer_index] = 0; // TODO(Sleepster): maybe allow a "per buffer" offset.
+    }
+
+    vkCmdBindVertexBuffers(*render_command_buffer, 0, command_list->vertex_buffer_count, handles, offsets); 
+}
+
 /*
 =============
 vk_backend_render_frame
@@ -2740,9 +2755,6 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     render_command_bind_vertex_buffer_t *cmd = (render_command_bind_vertex_buffer_t*)command->data;
                     Assert(cmd->buffer->type == RenderBufferType_VertexBuffer);
 
-                    VkDeviceSize offset = 0;
-                    vkCmdBindVertexBuffers(render_command_buffer, 0, 1, &cmd->buffer->buffer.handle, &offset); 
-
                     c_dynarray_push(command_list->active_vertex_buffers, cmd->buffer);
                     ++command_list->vertex_buffer_count;
 
@@ -2910,6 +2922,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     Assert(command_list->active_viewport_command);
                     Assert(command_list->active_scissor_command);
 
+                    vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
                     vk_backend_commit_descriptor_data(vulkan_context, renderer_state, command_list);
 
                     render_command_draw_t *cmd = (render_command_draw_t*)command->data;
@@ -2933,6 +2946,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     Assert(command_list->active_viewport_command);
                     Assert(command_list->active_scissor_command);
 
+                    vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
                     vk_backend_commit_descriptor_data(vulkan_context, renderer_state, command_list);
 
                     render_command_draw_t *cmd = (render_command_draw_t*)command->data;

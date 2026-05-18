@@ -7,6 +7,7 @@
 #define IMMEDIATE_VERTEX_SLH
 
 
+
 struct vImmediateVertex_t
 {
     float4 vPosition : POSITION;
@@ -16,7 +17,31 @@ struct vImmediateVertex_t
 };
 
 #endif // immediate_vertex.slh
+// END OF INCLUDED FILE
+// FROM INCLUDED FILE: ../code/shaders/widget_instance_data.slh
+#line 1 "../code/shaders/widget_instance_data.slh"
+#if !defined(WIDGET_INSTANCE_DATA_SLH)
+/* ========================================================================
+   $File: widget_vertex.slh $
+   $Date: May 17 2026 08:32 pm $
+   $Revision: $
+   $Creator: Justin Lewis $
+   ======================================================================== */
 
+#define WIDGET_INSTANCE_DATA_SLH
+
+
+struct iImmediateWidgetData_t
+{
+    float iTopLeftRadius     : TEXCOORD5;
+    float iTopRightRadius    : TEXCOORD6;
+    float iBottomLeftRadius  : TEXCOORD7;
+    float iBottomRightRadius : TEXCOORD8;
+};
+
+// NOTE(Sleepster): We need to allow declarations like enums and such... 
+
+#endif // WIDGET_INSTANCE_DATA_SLH
 
 // END OF INCLUDED FILE
 #line 1 "immediate_widget.slang"
@@ -28,6 +53,7 @@ struct VertexOutput_t
     [[vk::location(1)]] float4 vOutColor      : SV_TARGET;
     [[vk::location(2)]] float2 vOutTexCoord   : TEXCOORD3;
     [[vk::location(3)]] float2 vWidgetOptions : TEXCOORD3;
+    [[vk::location(4)]] float4 vWidgetRadius  : TEXCOORD3;
 };
 
 struct uCameraMatrices_t
@@ -40,7 +66,7 @@ ConstantBuffer<uCameraMatrices_t> CameraMatrices;
 
 [shader("vertex")]
 VertexOutput_t
-VSMain(vImmediateVertex_t Input)
+VSMain(vImmediateVertex_t Input, iImmediateWidgetData_t WidgetData)
 {
     VertexOutput_t result;
     float2 v2DPositionFloored = floor(Input.vPosition.xy);
@@ -50,6 +76,10 @@ VSMain(vImmediateVertex_t Input)
     result.vOutColor      = Input.vColor + (float4(Input.vPadding, 0, 0) * float4(0.001));
     result.vOutTexCoord   = Input.vTexCoord;
     result.vWidgetOptions = Input.vPadding;
+    result.vWidgetRadius  = float4(WidgetData.iTopLeftRadius, 
+                                   WidgetData.iTopRightRadius, 
+                                   WidgetData.iBottomLeftRadius, 
+                                   WidgetData.iBottomRightRadius);
 
     return(result);
 }
@@ -62,6 +92,13 @@ struct PixelOutput_t
 
 Sampler2D TextureSamplers[4];
 
+float 
+sdRoundedRect(float2 Position, float2 HalfSize, float Radius) 
+{
+    float2 q = abs(Position) - HalfSize + Radius;
+    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - Radius;
+}
+
 [shader("fragment")]
 PixelOutput_t
 PSMain(VertexOutput_t VertexOutput)
@@ -72,7 +109,14 @@ PSMain(VertexOutput_t VertexOutput)
     // NOTE(Sleepster): Standard rectangle 
     if(WidgetFlag == 0)
     {
-        result.vFragColor = VertexOutput.vOutColor;
+        float vUV       = VertexOutput.vOutTexCoord.x - float(0.5f);
+        float2 HalfSize = float2(0.3, 0.2);
+        float Radius    = 0.05;
+
+        float Distance = sdRoundedRect(vUV, HalfSize, Radius);
+
+        float Rectangle = smoothstep(0.005, -0.005, Distance);
+        result.vFragColor = float4(float3(Rectangle), 1.0);
     }
     // NOTE(Sleepster): Textured rectangle 
     else if(WidgetFlag == 1)

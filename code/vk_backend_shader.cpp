@@ -921,6 +921,10 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
                         slang::TypeLayoutReflection *type_layout = variable->getTypeLayout();
                         slang::TypeReflection       *type_data   = type_layout->getType();
 
+                        // NOTE(Sleepster): This is the correct way to get the location... this API sucks and it makes me think they 
+                        // kick puppies.
+                        u32 param_base_location = (u32)variable->getOffset(slang::ParameterCategory::VaryingInput);
+
                         if(type_data->getKind() == slang::TypeReflection::Kind::Struct)
                         {
                             string_t structure_name = STR(type_layout->getName());
@@ -955,7 +959,7 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
                                     VkFormat attrib_format = slang_type_to_vulkan_format(member->getType(), member->getTypeLayout());
                                     VkVertexInputAttributeDescription *attribute = result.buffer_attributes + buffer_attribute_count;
                                     attribute->binding  = vertex_buffer_count;
-                                    attribute->location = (u32)member->getOffset(slang::ParameterCategory::VaryingInput);
+                                    attribute->location = param_base_location + (u32)member->getOffset(slang::ParameterCategory::VaryingInput);
                                     attribute->offset   = current_vertex_buffer_stride;
                                     attribute->format   = attrib_format;
 
