@@ -1,0 +1,25 @@
+#if !defined(WIDGET_INSTANCE_DATA_SLH)
+/* ========================================================================
+   $File: widget_vertex.slh $
+   $Date: May 17 2026 08:32 pm $
+   $Revision: $
+   $Creator: Justin Lewis $
+   ======================================================================== */
+
+#define WIDGET_INSTANCE_DATA_SLH
+[Align(16)]
+[MakeHeaderType]
+struct iImmediateWidgetData_t
+{
+    int   iTextureIndex      : TEXCOORD3;
+    uint  iWidgetOptions     : TEXCOORD4;
+    float iTopLeftRadius     : TEXCOORD5;
+    float iTopRightRadius    : TEXCOORD6;
+    float iBottomLeftRadius  : TEXCOORD7;
+    float iBottomRightRadius : TEXCOORD8;
+};
+
+// NOTE(Sleepster): We need to allow declarations like enums and such... 
+
+#endif // WIDGET_INSTANCE_DATA_SLH
+

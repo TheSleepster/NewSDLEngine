@@ -15,7 +15,10 @@
 #include <s_asset_manager.h>
 
 #include <meta/GENERATED_immediate_vertex.h>
-typedef vImmediateVertex_t immediate_vertex_t;
+#include <meta/GENERATED_widget_instance_data.h>
+
+typedef vImmediateVertex_t     immediate_vertex_t;
+typedef iImmediateWidgetData_t immediate_widget_data_t;
 
 void immediate_quad_ex(render_command_list_t *command_list, vertex_buffer_t *buffer, vec3_t position, vec2_t render_size, vec4_t render_color, vec2_t uv_min, vec2_t uv_max, vec2_t padding, texture2D_t *texture);
 void immediate_rect(render_command_list_t *command_list, vertex_buffer_t *buffer, vec3_t position, vec2_t render_size, vec4_t render_color, vec2_t padding);

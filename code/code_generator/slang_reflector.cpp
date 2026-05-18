@@ -272,6 +272,8 @@ VISIT_FILES(shader_file_callback)
             c_string_builder_sprintf(&header_builder, "#define %.*s\n", define_filename.count, define_filename.data);
             c_string_builder_append_data(&header_builder, STR(R"(
 #include <c_math.h>
+#include <c_types.h>
+
 typedef vec2_t float2;
 typedef vec3_t float3;
 typedef vec4_t float4;
@@ -279,6 +281,10 @@ typedef vec4_t float4;
 typedef mat2_t float2x2;
 typedef mat3_t float3x3;
 typedef mat4_t float4x4;
+
+typedef uint   u32;
+typedef int    s32;
+typedef float  float32;
 
 )"));
 

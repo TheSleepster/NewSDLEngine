@@ -1,5 +1,6 @@
 // VERTEX
 #include <immediate_vertex.slh>
+#include <widget_instance_data.slh>
 
 struct VertexOutput_t 
 {

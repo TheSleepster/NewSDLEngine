@@ -203,10 +203,10 @@ s_renderer_vertex_buffer_create(renderer_state_t            *renderer_state,
         .initial_data    = 0 
     };
 
-     result.buffer = s_renderer_render_buffer_create(renderer_state, &buffer_desc);
-     result.vertex_count = 0;
-     result.max_vertices = max_vertices;
-     result.vertex_data  = vertex_buffer_data;
+    result.buffer = s_renderer_render_buffer_create(renderer_state, &buffer_desc);
+    result.vertex_count = 0;
+    result.max_vertices = max_vertices;
+    result.vertex_data  = vertex_buffer_data;
 
     return(result);
 }

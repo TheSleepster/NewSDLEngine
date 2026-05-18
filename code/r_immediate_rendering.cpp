@@ -7,6 +7,16 @@
 #include <r_immediate_rendering.h>
 
 void
+immediate_put_data(vertex_buffer_t *buffer, byte *data, u32 element_size, u32 element_count)
+{
+    byte *vertex_pointer = buffer->vertex_data + buffer->vertex_count;
+    Assert(buffer->buffer.buffer_element_size == element_size);
+    Assert(buffer->buffer.buffer_elements_used + (element_size * element_count) <= buffer->buffer.buffer_capacity);
+
+    memcpy(vertex_pointer, data, element_size * element_count);
+}
+
+void
 immediate_quad_ex(render_command_list_t *command_list,
                   vertex_buffer_t       *buffer,
                   vec3_t                 position,

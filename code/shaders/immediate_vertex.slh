@@ -1,5 +1,6 @@
 #ifndef IMMEDIATE_VERTEX_SLH
 #define IMMEDIATE_VERTEX_SLH
+
 [Align(16)]
 [MakeHeaderType]
 struct vImmediateVertex_t
@@ -11,5 +12,3 @@ struct vImmediateVertex_t
 };
 
 #endif // immediate_vertex.slh
-
-

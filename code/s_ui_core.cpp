@@ -440,6 +440,14 @@ ui_state_init(ui_state_t       *ui_state,
                                                             sizeof(u32),
                                                             indices,
                                                             sizeof(u32) * (6 * MAX_WIDGETS));
+    const u32 INSTANCE_BUFFER_SIZE = MAX_WIDGETS;
+    immediate_widget_data_t *instances = c_arena_push_array(&ui_state->persistent_data_arena, immediate_widget_data_t, INSTANCE_BUFFER_SIZE);
+    ui_state->instance_buffer = s_renderer_vertex_buffer_create(renderer_state,
+                                                                RenderBufferAllocationTypeMapped,
+                                                                RenderBufferAdvanceRate_PerInstance,
+                                                                (byte*)instances,
+                                                                sizeof(immediate_widget_data_t),
+                                                                INSTANCE_BUFFER_SIZE);
 
     ui_state->camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
 }

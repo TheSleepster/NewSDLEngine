@@ -129,6 +129,12 @@ struct widget_t
     u32             child_offset;
     u32             offset_from_parent;
 
+    // NOTE(Sleepster): Time for the best things ever!!! 
+    float32         top_left_radius;
+    float32         top_right_radius;
+    float32         bottom_right_radius;
+    float32         bottom_left_radius;
+
     float32         child_spacing;
     vec2_t          padding;
 
@@ -195,9 +201,10 @@ struct ui_state_t
 
     widget_t                         *parent_stack[MAX_PARENT_WIDGETS];
     u32                               parent_stack_top;
-
     u32                               interface_framebuffer;
+
     vertex_buffer_t                   vertex_buffer;
+    vertex_buffer_t                   instance_buffer;
     render_buffer_t                   index_buffer;
 };
 
