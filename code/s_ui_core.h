@@ -14,6 +14,7 @@
 #include <c_memory_arena.h>
 #include <s_input_manager.h>
 
+#include <r_immediate_rendering.h>
 #include <s_render_RHI.h>
 
 constexpr u32 MAX_PARENT_WIDGETS = 256;
@@ -174,7 +175,6 @@ struct ui_state_t
     renderer_state_t                 *renderer;
     asset_manager_t                  *asset_manager;
     input_manager_t                  *input_manager;
-    uniform_constant_buffer_t        *camera_matrices_buffer;
 
     camera_matrices_t                 current_camera;
     input_controller_t               *ui_controller;
@@ -205,8 +205,13 @@ struct ui_state_t
     u32                               interface_framebuffer;
 
     vertex_buffer_t                   vertex_buffer;
-    vertex_buffer_t                   instance_buffer;
     render_buffer_t                   index_buffer;
+
+    immediate_widget_data_t          *widget_instances;
+    u32                               widget_instance_count;
+
+    uniform_constant_buffer_t        *widget_instance_data;
+    uniform_constant_buffer_t        *camera_matrices_buffer;
 };
 
 void      ui_state_init(ui_state_t *ui_state, input_manager_t *input_manager, asset_manager_t *asset_manager, renderer_state_t *renderer_state, u32 renderpass_ID);

@@ -2311,7 +2311,7 @@ vk_backend_append_uniform_constant_buffer_data(vulkan_context_t *vulkan_context,
 
     // NOTE(Sleepster): We just use the minStorageBufferOffsetAlignment since it's probably bigger than uniform buffer alignment requirements...
     // if it isn't? Crap.
-    u32 data_size = Align(data_size_init, vulkan_context->gpu.properties.limits.minStorageBufferOffsetAlignment);
+    u32 data_size = Align(data_size_init, vulkan_context->gpu.properties.limits.minUniformBufferOffsetAlignment);
     result = vk_backend_buffer_append_data(vulkan_context, &vulkan_context->constant_buffer_data, user_data, data_size);
 
     return(result);

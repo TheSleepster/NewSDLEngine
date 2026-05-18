@@ -18,7 +18,7 @@ typedef uint   u32;
 typedef int    s32;
 typedef float  float32;
 
-struct alignas(16) iImmediateWidgetData_t {
+struct alignas(16) ImmediateWidgetData_t {
 	float iTopLeftRadius;
 	float iTopRightRadius;
 	float iBottomLeftRadius;

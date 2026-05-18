@@ -8,7 +8,6 @@ struct VertexOutput_t
     [[vk::location(1)]] float4 vOutColor      : SV_TARGET;
     [[vk::location(2)]] float2 vOutTexCoord   : TEXCOORD3;
     [[vk::location(3)]] float2 vWidgetOptions : TEXCOORD3;
-    [[vk::location(4)]] float4 vWidgetRadius  : TEXCOORD3;
 };
 
 struct uCameraMatrices_t
@@ -21,7 +20,7 @@ ConstantBuffer<uCameraMatrices_t> CameraMatrices;
 
 [shader("vertex")]
 VertexOutput_t
-VSMain(vImmediateVertex_t Input, iImmediateWidgetData_t WidgetData)
+VSMain(vImmediateVertex_t Input)
 {
     VertexOutput_t result;
     float2 v2DPositionFloored = floor(Input.vPosition.xy);
@@ -31,10 +30,6 @@ VSMain(vImmediateVertex_t Input, iImmediateWidgetData_t WidgetData)
     result.vOutColor      = Input.vColor + (float4(Input.vPadding, 0, 0) * float4(0.001));
     result.vOutTexCoord   = Input.vTexCoord;
     result.vWidgetOptions = Input.vPadding;
-    result.vWidgetRadius  = float4(WidgetData.iTopLeftRadius, 
-                                   WidgetData.iTopRightRadius, 
-                                   WidgetData.iBottomLeftRadius, 
-                                   WidgetData.iBottomRightRadius);
 
     return(result);
 }
@@ -46,6 +41,7 @@ struct PixelOutput_t
 };
 
 Sampler2D TextureSamplers[4];
+StructuredBuffer<ImmediateWidgetData_t> WidgetInstanceData;
 
 float 
 sdRoundedRect(float2 Position, float2 HalfSize, float Radius) 
@@ -64,9 +60,11 @@ PSMain(VertexOutput_t VertexOutput)
     // NOTE(Sleepster): Standard rectangle 
     if(WidgetFlag == 0)
     {
+        ImmediateWidgetData_t Instance = WidgetInstanceData[int(VertexOutput.vWidgetOptions.y)];
+
         float vUV       = VertexOutput.vOutTexCoord.x - float(0.5f);
         float2 HalfSize = float2(0.3, 0.2);
-        float Radius    = 0.05;
+        float Radius    = Instance.iTopLeftRadius;
 
         float Distance = sdRoundedRect(vUV, HalfSize, Radius);
 

@@ -9,7 +9,7 @@
 #define WIDGET_INSTANCE_DATA_SLH
 [Align(16)]
 [MakeHeaderType]
-struct iImmediateWidgetData_t
+struct ImmediateWidgetData_t
 {
     float iTopLeftRadius     : TEXCOORD5;
     float iTopRightRadius    : TEXCOORD6;

@@ -262,6 +262,8 @@ internal_api void
 render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_list, widget_t *first_widget)
 {
     widget_t *current_widget = first_widget;
+
+    u32 rectangle_count = 0;
     do {
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_RECTANGLE)
         {
@@ -270,9 +272,16 @@ render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_lis
                            current_widget->state->position, 
                            current_widget->state->render_size,
                            current_widget->state->render_color,
-                           vec2(0, 0));
+                           vec2(0, rectangle_count++));
 
             ++ui_state->widget_item_count;
+
+            ui_state->widget_instances[ui_state->widget_instance_count++] = {
+                .iTopLeftRadius     = ui_state->default_widget_radius_data.x,
+                .iTopRightRadius    = ui_state->default_widget_radius_data.y,
+                .iBottomLeftRadius  = ui_state->default_widget_radius_data.z,
+                .iBottomRightRadius = ui_state->default_widget_radius_data.w
+            };
         }
 
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
@@ -312,13 +321,6 @@ render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_lis
             ui_state->widget_item_count += current_widget->widget_text.count;
         }
 
-        immediate_widget_data_t widget_data = {
-            .iTopLeftRadius     = ui_state->default_widget_radius_data.x,
-            .iTopRightRadius    = ui_state->default_widget_radius_data.y,
-            .iBottomLeftRadius  = ui_state->default_widget_radius_data.z,
-            .iBottomRightRadius = ui_state->default_widget_radius_data.w
-        };
-        immediate_put_data(&ui_state->instance_buffer, (byte*)&widget_data, sizeof(immediate_widget_data_t), 1);
         if(current_widget->first_child)
         {
             render_widget_hierarchy(ui_state, command_list, current_widget->first_child);
@@ -341,7 +343,6 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
         render_widget_hierarchy(ui_state, command_list, current_widget);
 
         r_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
-        r_cmd_bind_vertex_buffer(command_list, &ui_state->instance_buffer);
         r_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
 
         // NOTE(Sleepster): First, draw the normal rectangle widgets
@@ -354,19 +355,19 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
             r_cmd_set_render_state(command_list, &pipeline_state);
             r_cmd_use_shader_program(command_list, ui_state->widget_shader);
             r_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
-            r_cmd_update_buffer_contents(command_list, &ui_state->instance_buffer);
 
             s32 window_width  = Max(renderer_state->window_size.x, 10);
             s32 window_height = Max(renderer_state->window_size.y, 10);
 
-            r_cmd_update_constant_buffer(command_list, ui_state->camera_matrices_buffer, &ui_state->current_camera, sizeof(camera_matrices_t));
+            r_cmd_update_constant_buffer(command_list, ui_state->camera_matrices_buffer, &ui_state->current_camera,   sizeof(camera_matrices_t));
+            r_cmd_update_constant_buffer(command_list, ui_state->widget_instance_data,   &ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
 
             r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
             r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
 
             r_cmd_draw_indexed(command_list, ui_state->widget_item_count * 6, 0, 1, 0);
             s_renderer_buffer_reset(ui_state->renderer, &ui_state->vertex_buffer);
-            s_renderer_buffer_reset(ui_state->renderer, &ui_state->instance_buffer);
+            ui_state->widget_instance_count = 0;
         }
     }
     else
@@ -453,14 +454,9 @@ ui_state_init(ui_state_t       *ui_state,
                                                             indices,
                                                             sizeof(u32) * (6 * MAX_WIDGETS));
     const u32 INSTANCE_BUFFER_SIZE = MAX_WIDGETS;
-    immediate_widget_data_t *instances = c_arena_push_array(&ui_state->persistent_data_arena, immediate_widget_data_t, INSTANCE_BUFFER_SIZE);
-    ui_state->instance_buffer = s_renderer_vertex_buffer_create(renderer_state,
-                                                                RenderBufferAllocationTypeMapped,
-                                                                RenderBufferAdvanceRate_PerInstance,
-                                                                (byte*)instances,
-                                                                sizeof(immediate_widget_data_t),
-                                                                INSTANCE_BUFFER_SIZE);
+    ui_state->widget_instances     = c_arena_push_array(&ui_state->persistent_data_arena, immediate_widget_data_t, INSTANCE_BUFFER_SIZE);
 
+    ui_state->widget_instance_data   = s_renderer_get_constant_buffer(renderer_state, STR("WidgetInstanceData"));
     ui_state->camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
 }
 
