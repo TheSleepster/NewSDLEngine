@@ -2497,7 +2497,7 @@ vk_backend_bind_command_list_vertex_buffers(VkCommandBuffer *render_command_buff
     {
         render_buffer_t *buffer = command_list->active_vertex_buffers[buffer_index];
         handles[buffer_index] = buffer->buffer.handle;
-        offsets[buffer_index] = 0; // TODO(Sleepster): maybe allow a "per buffer" offset.
+        offsets[buffer_index] = 000000000; // TODO(Sleepster): maybe allow a "per buffer" offset.
     }
 
     vkCmdBindVertexBuffers(*render_command_buffer, 0, command_list->vertex_buffer_count, handles, offsets); 
@@ -2937,6 +2937,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     command_list->image_count = 0;
                     command_list->bound_image_count = 0;
+
+                    c_dynarray_clear(&command_list->active_vertex_buffers);
+                    command_list->vertex_buffer_count = 0;
                 }break;
                 case RCT_DrawIndexed:
                 {
@@ -2954,7 +2957,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                                      cmd->indices_to_draw, 
                                      cmd->instance_count, 
                                      cmd->index_offset, 
-                                     cmd->vertex_offset  + command_list->vertex_offset, 
+                                     cmd->vertex_offset + command_list->vertex_offset, 
                                      0);
 
 
@@ -2964,6 +2967,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     command_list->image_count = 0;
                     command_list->bound_image_count = 0;
+
+                    c_dynarray_clear(&command_list->active_vertex_buffers);
+                    command_list->vertex_buffer_count = 0;
                 }break;
                 case RCT_BlitImage:
                 {
@@ -3008,8 +3014,6 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
         command_list->active_scissor_command  = null;
         command_list->active_viewport_command = null;
         command_list->active_shader_program   = null;
-
-        c_dynarray_clear(command_list->active_vertex_buffers);
     }
 
     if(renderer_state->present_command)

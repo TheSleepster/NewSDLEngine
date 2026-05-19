@@ -9,6 +9,8 @@ struct vImmediateVertex_t
     float4 vColor    : TEXCOORD0;
     float2 vTexCoord : TEXCOORD1;
     float2 vPadding  : TEXCOORD2;
+    float2 vSDFInfo  : SDFINFO;
+    float2 vPadding0 : PADDING0;
 };
 
 #endif // immediate_vertex.slh

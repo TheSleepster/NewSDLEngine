@@ -1,6 +1,10 @@
 #+title: NewSDLEngine
 
 ** IMMEDIATE TODO
+- [ ] Thread safe memory arenas...
+- [ ] Arena allocator should allow the user to set it's growing status. That way, if the user wants to use
+      the allocator on other threads, then we can safely do so. Right now with the way the arenas grow, it
+      is not safe to use these on multiple threads.
 - [ ] For consistency reasons, move all enums to full capitalization...
 - [X] Simple shader preprocessor. It won't do anything insane, all it will do is look for "#include <file>" directives and handle them, spitting the processed file into the build directory.
 - [ ] IMGUI interface...
@@ -36,9 +40,6 @@ union clear_value_t
       and timing record information about the process and certain subblocks. 
 - [ ] Memory Allocation tracker
 - [ ] Complete malloc replacement (thread safe heap allocator), meant for use where c_za_alloc() is currently used.
-- [ ] Arena allocator should allow the user to set it's growing status. That way, if the user wants to use
-      the allocator on other threads, then we can safely do so. Right now with the way the arenas grow, it
-      is not safe to use these on multiple threads.
 
 - [X] Replace malloc inside of the Linux sys_allocate and sys_free functions. It sucks.
 - [X] Proper test suite that allows us to actually get REAL benchmarking data

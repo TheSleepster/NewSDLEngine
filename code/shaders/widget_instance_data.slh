@@ -11,13 +11,21 @@
 [MakeHeaderType]
 struct ImmediateWidgetData_t
 {
-    float iTopLeftRadius     : TEXCOORD5;
-    float iTopRightRadius    : TEXCOORD6;
-    float iBottomLeftRadius  : TEXCOORD7;
-    float iBottomRightRadius : TEXCOORD8;
+    float2 iHalfSize        : HALF_SIZE;
+    float  iRadius          : RADIUS;
+    uint   iFlags           : WIDGET_FLAGS;
+    float4 iBorderColor     : COLOR;
+    float  iBorderThickness : THICKNESS;
+    float  iSDFSmoothness   : SMOOTHNESS;
+    float2 iPadding__       : PADDING0;
 };
 
-// NOTE(Sleepster): We need to allow declarations like enums and such... 
+enum ImmediateWidgetRenderFlags_t
+{
+    UI_WIDGET_RENDER_FLAG_DRAW_BACKGROUND = (1 << 8),
+    UI_WIDGET_RENDER_FLAG_DRAW_BORDER     = (1 << 9),
+    UI_WIDGET_RENDER_FLAG_MAKE_CIRCULAR   = (1 << 10),
+};
 
 #endif // WIDGET_INSTANCE_DATA_SLH
 

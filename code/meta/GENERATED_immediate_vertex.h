@@ -23,5 +23,7 @@ struct alignas(16) vImmediateVertex_t {
 	float4 vColor;
 	float2 vTexCoord;
 	float2 vPadding;
+	float2 vSDFInfo;
+	float2 vPadding0;
 };
 #endif // IMMEDIATE_VERTEX_SLH

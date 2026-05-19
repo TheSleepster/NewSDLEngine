@@ -25,6 +25,8 @@ immediate_quad_ex(render_command_list_t *command_list,
                   vec2_t                 uv_min,
                   vec2_t                 uv_max,
                   vec2_t                 padding,
+                  vec2_t                 sdf_info,
+                  vec2_t                 padding0,
                   texture2D_t           *texture)
 {
     immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)buffer->vertex_data + buffer->vertex_count);
@@ -55,23 +57,34 @@ immediate_quad_ex(render_command_list_t *command_list,
     top_left->vPadding     = padding;
     top_right->vPadding    = padding;
 
+    bottom_left->vPadding0  = padding0;
+    bottom_right->vPadding0 = padding0;
+    top_left->vPadding0     = padding0;
+    top_right->vPadding0    = padding0;
+
+    bottom_left->vSDFInfo  = sdf_info;
+    bottom_right->vSDFInfo = sdf_info;
+    top_left->vSDFInfo     = sdf_info;
+    top_right->vSDFInfo    = sdf_info;
+
     if(texture)
     {
         if(s_renderer_is_texture_bound(command_list, texture) == -1)
         {
             r_cmd_bind_texture_image(command_list, texture);
         }
-
-        float32 tbottom = uv_max.y;
-        float32 ttop    = uv_min.y;
-        float32 tleft   = uv_min.x;
-        float32 tright  = uv_max.x;
-
-        bottom_left->vTexCoord  = vec2(tleft,  tbottom);
-        bottom_right->vTexCoord = vec2(tright, tbottom);
-        top_left->vTexCoord     = vec2(tleft,  ttop);
-        top_right->vTexCoord    = vec2(tright, ttop);
     }
+
+    // NOTE(Sleepster): We Let you set the UVs even without a texture 
+    float32 tbottom = uv_max.y;
+    float32 ttop    = uv_min.y;
+    float32 tleft   = uv_min.x;
+    float32 tright  = uv_max.x;
+
+    bottom_left->vTexCoord  = vec2(tleft,  tbottom);
+    bottom_right->vTexCoord = vec2(tright, tbottom);
+    top_left->vTexCoord     = vec2(tleft,  ttop);
+    top_right->vTexCoord    = vec2(tright, ttop);
 
     buffer->vertex_count += 4;
 }
@@ -82,16 +95,22 @@ immediate_rect(render_command_list_t *command_list,
                vec3_t                 position,
                vec2_t                 render_size,
                vec4_t                 render_color,
-               vec2_t                 padding)
+               vec2_t                 uv_min,
+               vec2_t                 uv_max,
+               vec2_t                 padding,
+               vec2_t                 sdf_info,
+               vec2_t                 padding0)
 {
     immediate_quad_ex(command_list, 
                       buffer,
                       position, 
                       render_size, 
                       render_color,
-                      vec2_zero(), 
-                      vec2_zero(), 
+                      uv_min,
+                      uv_max,
                       padding,
+                      sdf_info,
+                      padding0,
                       null);
 }
 
@@ -151,6 +170,8 @@ immediate_text(render_command_list_t *command_list,
                               metrics->atlas_offset,
                               vec2_add(metrics->atlas_offset, metrics->atlas_size),
                               vec2(settings, texture_index),
+                              vec2_zero(),
+                              vec2_zero(),
                              &metrics->owner_atlas->texture);
 
             render_position.x += metrics->advance;

@@ -4,10 +4,10 @@
 
 struct VertexOutput_t 
 {
-    [[vk::location(0)]] float4 vOutPosition   : SV_POSITION;
-    [[vk::location(1)]] float4 vOutColor      : SV_TARGET;
-    [[vk::location(2)]] float2 vOutTexCoord   : TEXCOORD3;
-    [[vk::location(3)]] float2 vWidgetOptions : TEXCOORD3;
+    [[vk::location(0)]] float4 vOutPosition      : SV_POSITION;
+    [[vk::location(1)]] float4 vOutColor         : SV_TARGET;
+    [[vk::location(2)]] float2 vOutTexCoord      : TEXCOORD3;
+    [[vk::location(3)]] float2 vOutWidgetOptions : TEXCOORD4;
 };
 
 struct uCameraMatrices_t
@@ -26,10 +26,10 @@ VSMain(vImmediateVertex_t Input)
     float2 v2DPositionFloored = floor(Input.vPosition.xy);
     float4 vPositionFloored   = float4(v2DPositionFloored, Input.vPosition.zw);
 
-    result.vOutPosition   = mul(CameraMatrices.ProjectionMatrix, mul(CameraMatrices.ViewMatrix, vPositionFloored));
-    result.vOutColor      = Input.vColor + (float4(Input.vPadding, 0, 0) * float4(0.001));
-    result.vOutTexCoord   = Input.vTexCoord;
-    result.vWidgetOptions = Input.vPadding;
+    result.vOutPosition      = mul(CameraMatrices.ProjectionMatrix, mul(CameraMatrices.ViewMatrix, vPositionFloored));
+    result.vOutColor         = Input.vColor + (float4(Input.vPadding, 0, 0) * float4(0.001));
+    result.vOutTexCoord      = Input.vTexCoord;
+    result.vOutWidgetOptions = Input.vPadding;
 
     return(result);
 }
@@ -44,53 +44,72 @@ Sampler2D TextureSamplers[4];
 StructuredBuffer<ImmediateWidgetData_t> WidgetInstanceData;
 
 float 
-sdRoundedRect(float2 Position, float2 HalfSize, float Radius) 
+RoundedBoxSDF(float2 CenterPosition, float2 Size, float Radius) 
 {
-    float2 q = abs(Position) - HalfSize + Radius;
-    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - Radius;
+    return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
 }
 
 [shader("fragment")]
 PixelOutput_t
 PSMain(VertexOutput_t VertexOutput)
 {
-    PixelOutput_t result;
-    int WidgetFlag = int(floor(VertexOutput.vWidgetOptions.x));
+    PixelOutput_t Result;
+    int WidgetType = int(floor(VertexOutput.vOutWidgetOptions.x));
 
     // NOTE(Sleepster): Standard rectangle 
-    if(WidgetFlag == 0)
+    if(WidgetType == 0)
     {
-        ImmediateWidgetData_t Instance = WidgetInstanceData[int(VertexOutput.vWidgetOptions.y)];
+        ImmediateWidgetData_t Instance = WidgetInstanceData[int(VertexOutput.vOutWidgetOptions.y)];
+        uint WidgetFlags = Instance.iFlags;
 
-        float vUV       = VertexOutput.vOutTexCoord.x - float(0.5f);
-        float2 HalfSize = float2(0.3, 0.2);
-        float Radius    = Instance.iTopLeftRadius;
+        float2 HalfSize     = Instance.iHalfSize;
+        float  Radius       = min(Instance.iRadius, min(HalfSize.x, HalfSize.y));
+        float  EdgeSoftness = Instance.iSDFSmoothness;
 
-        float Distance = sdRoundedRect(vUV, HalfSize, Radius);
+        // NOTE(Sleepster): Base shape, an iRadius of 0.0 gives a plain rect, anything non-zero gives rounded corners
+        float  Distance    = RoundedBoxSDF(VertexOutput.vOutTexCoord, HalfSize, Radius);
+        float  OuterAlpha  = 1.0f - smoothstep(0.0f, EdgeSoftness * 2.0f, Distance);
 
-        float Rectangle = smoothstep(0.005, -0.005, Distance);
-        result.vFragColor = float4(float3(Rectangle), 1.0);
+        if(OuterAlpha <= 0.001f) discard;
+
+        float4 ColorOut = VertexOutput.vOutColor;
+
+        // NOTE(Sleepster): Border will follow whatever shape is already defined
+        if((WidgetFlags & ImmediateWidgetRenderFlags_t.UI_WIDGET_RENDER_FLAG_DRAW_BORDER) != 0)
+        {
+            float2 InnerHalfSize = max(HalfSize - Instance.iBorderThickness, float2(0.0f, 0.0f));
+            float  InnerRadius   = min(max(Radius - Instance.iBorderThickness, 0.0f), min(InnerHalfSize.x, InnerHalfSize.y));
+
+            float  InnerDist  = RoundedBoxSDF(VertexOutput.vOutTexCoord, InnerHalfSize, InnerRadius);
+            float  InnerAlpha = 1.0f - smoothstep(0.0f, EdgeSoftness * 2.0f, InnerDist);
+            float  BorderMask = saturate(OuterAlpha - InnerAlpha);
+
+            ColorOut.rgb = lerp(ColorOut.rgb, Instance.iBorderColor.rgb, BorderMask);
+        }
+
+        ColorOut.a       *= OuterAlpha;
+        Result.vFragColor = ColorOut;
     }
     // NOTE(Sleepster): Textured rectangle 
-    else if(WidgetFlag == 1)
+    else if(WidgetType == 1)
     {
-        Sampler2D Texture = TextureSamplers[int(VertexOutput.vWidgetOptions.y)];
+        Sampler2D Texture = TextureSamplers[int(VertexOutput.vOutWidgetOptions.y)];
 
         float4 TextureColor = Texture.Sample(VertexOutput.vOutTexCoord);
         if(TextureColor.a <= 0.3) discard;
 
-        result.vFragColor = float4(VertexOutput.vOutColor.rgb, TextureColor.a);
+        Result.vFragColor = float4(VertexOutput.vOutColor.rgb, TextureColor.a);
     }
     // NOTE(Sleepster): Font Glyph 
-    else if(WidgetFlag == 2)
+    else if(WidgetType == 2)
     {
-        Sampler2D Texture = TextureSamplers[int(VertexOutput.vWidgetOptions.y)];
+        Sampler2D Texture = TextureSamplers[int(VertexOutput.vOutWidgetOptions.y)];
 
         float4 TextureColor = Texture.Sample(VertexOutput.vOutTexCoord);
         if(TextureColor.a <= 0.3) discard;
 
-        result.vFragColor = float4(VertexOutput.vOutColor.rgb, TextureColor.a);
+        Result.vFragColor = float4(VertexOutput.vOutColor.rgb, TextureColor.a);
     }
 
-    return(result);
+    return(Result);
 }

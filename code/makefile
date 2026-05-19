@@ -6,27 +6,14 @@ DEBUG_BUILD     ?=
 ASSERTS_ENABLED ?=
 SANITIZERS_ON   ?=
 
-# --------------------------------------------
-# OS & Directories
-# --------------------------------------------
 SRC_DIR    = .
 SHADER_DIR = shaders
 BUILD_DIR  = ../build
 ASSET_DIR  = ../run_tree/res
 MISC_DIR   = ../misc
 
-# --------------------------------------------
-# Dependency Tracking Flags
-# --------------------------------------------
-# -MT $@  : Sets the target of the rule in the dependency file to match the output file exactly.
-# -MMD    : Generate dependency file (.d), ignoring system headers.
-# -MP     : Add dummy rules for headers (prevents errors if a header is deleted).
-# -MF ... : Explicitly specify where the .d file goes.
 DEPFLAGS = -MT $@ -MMD -MP -MF $(BUILD_DIR)/$*.d
 
-# --------------------------------------------
-# Project OS settings
-# --------------------------------------------
 ifeq ($(OS),Windows_NT)
     OS_DEFINE = -DOS_WINDOWS=1
     PLATFORM_LIBS = -lopengl32 -luser32 -lgdi32 -lwinmm -lshell32 -lole32 -luuid -lversion -ladvapi32 -lsetupapi -lcfgmgr32 -loleaut32 -limm32 -lWs2_32
@@ -57,74 +44,46 @@ else
     endif
 endif
 
-# --------------------------------------------
-# Build Flags
-# --------------------------------------------
 BUILD_TYPE ?= debug
 
-# Sanitizers 
-#
-# -fsanitize=thread,undefined,address -fno-omit-frame-pointer -O1
-PROJECT_COMMON_COMPILER_FLAGS = -std=c++11 -flto -fno-rtti -mavx2 -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
+# NOTE(Sleepster): To enable sanitizers: -fsanitize=thread,undefined,address -fno-omit-frame-pointer -O1
+PROJECT_COMMON_COMPILER_FLAGS = -std=c++11 -Wno-nullability-completeness -flto -fno-rtti -mavx2 -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
 BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FLAGS) 
 
-# --------------------------------------------
-# Set Input Files
-# --------------------------------------------
 COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I. -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/vulkan/VMA/ -I../run_tree/deps/vulkan/spirv_reflect/include/ -I../run_tree/deps/Freetype/include/
 
-# Core Game Sources
 ALL_SRCS  = $(wildcard $(SRC_DIR)/*.cpp)
 
-# Filter out vk_vma_implementation so it isn't compiled as C++11. We also filter out the sys_ files
+# NOTE(Sleepster): vk_vma_implementation and sys_ files are excluded here and handled separately
 GAME_SRCS = $(filter-out $(SRC_DIR)/sys_% $(SRC_DIR)/vk_vma_implementation.cpp,$(ALL_SRCS))
 GAME_OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%$(OBJ_EXT),$(GAME_SRCS))
-
-# Define the specific VMA object file
 VMA_OBJ   = $(BUILD_DIR)/vk_vma_implementation$(OBJ_EXT)
 
 GAME_INCLUDES           = $(COMMON_INCLUDES) 
 GAME_EXTERNAL_LIBRARIES = $(PLATFORM_LIBS) -L../run_tree/deps/msdfgen/build/ -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static -lfreetype -lvulkan -lspirv_reflect -lslang -lslang-compiler
 
-# Tests
 TESTS_SRC = tests/test_manager.cpp
 TESTS_OUT = $(BUILD_DIR)/test_manager$(EXE_EXT)
 
-# Preprocessor 
 PREPROCESSOR_SRC = code_generator/preprocessor.cpp
 PREPROCESSOR_OUT = $(BUILD_DIR)/preprocessor$(EXE_EXT)
 
-# Code Generator 
 CODE_GENERATOR_SRC = code_generator/metaprogram.cpp
 CODE_GENERATOR_OUT = $(BUILD_DIR)/metaprogram$(EXE_EXT)
 
-# Slang reflector
 SLANG_REFLECTOR_SRC = code_generator/slang_reflector.cpp
 SLANG_REFLECTOR_OUT = $(BUILD_DIR)/slang_reflector$(EXE_EXT)
 
-# Packers
 WAD_ASSET_FILE_PACKER_SRC = asset_file_packer/wad_asset_file_packer.cpp
 JFD_ASSET_FILE_PACKER_SRC = asset_file_packer/jfd_file_packer.cpp
 
-# Shader source files - .slang are entry points, .slh are headers.
-# Both are tracked: a change to any .slh triggers a full reflector run
-# (all shaders recompile) since the reflector is a single invocation and
-# cannot emit per-shader dependency files the way clang emits -MMD .d files.
 SHADER_FILES := $(wildcard $(SHADER_DIR)/*.slang) $(wildcard $(SHADER_DIR)/*.slh)
 
-# Asset files - tracked recursively for change detection.
-# shader_binaries/ is excluded from the file list to avoid a cycle: the shader
-# step writes there, and if those files were in ASSET_FILES the packer would
-# re-trigger the shader step endlessly. Instead, assets.stamp depends directly
-# on shaders.stamp so the packer still reruns whenever shaders are rebuilt.
-# assets.stamp itself is excluded so it doesn't appear in its own dep list.
+# NOTE(Sleepster): shader_binaries/ is excluded to avoid a cycle where the packer re-triggers the shader step
 ASSET_FILES := $(shell find $(ASSET_DIR) -type f \
                   -not -path "$(ASSET_DIR)/shader_binaries/*" \
                   -not -name "assets.stamp")
 
-# --------------------------------------------
-# Sandbox / clangd
-# --------------------------------------------
 SANDBOX_SRC       = $(wildcard sandbox/*.cpp)
 SANDBOX_OUT       = $(patsubst sandbox/%.cpp,$(BUILD_DIR)/sandbox_%$(EXE_EXT),$(SANDBOX_SRC))
 SANDBOX_GAME_SRCS = $(filter $(SRC_DIR)/c_%.cpp $(SRC_DIR)/p_%.cpp,$(ALL_SRCS))
@@ -136,34 +95,28 @@ CLANGD_CORE_STAMPS    = $(patsubst $(SRC_DIR)/%.cpp,$(CLANGD_DIR)/%.stamp,$(CLAN
 CLANGD_SANDBOX_STAMPS = $(patsubst sandbox/%.cpp,$(CLANGD_DIR)/sandbox_%.stamp,$(CLANGD_SANDBOX_SRCS))
 CLANGD_SANDBOX_UNITY  = $(patsubst sandbox/%.cpp,$(CLANGD_DIR)/sandbox_%_unity.cpp,$(CLANGD_SANDBOX_SRCS))
 
-# Prevent Make from auto-deleting the clangd unity files (also suppresses the rm spam)
 .PRECIOUS: $(CLANGD_SANDBOX_UNITY)
 
-# --------------------------------------------
-# Set the Outputs
-# --------------------------------------------
 GAME_OUT                  = $(BUILD_DIR)/game_$(BUILD_TYPE)$(EXE_EXT)
 WAD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/wad_asset_file_packer$(EXE_EXT)
 JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
 
-# --------------------------------------------
-# Build Instructions
-# --------------------------------------------
 .PHONY: all shaders clean run_preprocessor sandbox clangd-db pack_assets
 
-all: $(CODE_GENERATOR_OUT) $(PREPROCESSOR_OUT) $(SLANG_REFLECTOR_OUT) do_codegen $(GAME_OUT) $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) shaders tests sandbox clangd-db pack_assets
+all: $(PREPROCESSOR_OUT) $(CODE_GENERATOR_OUT) do_codegen \
+     $(SLANG_REFLECTOR_OUT) \
+     $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) \
+     tests sandbox \
+     shaders pack_assets \
+     $(GAME_OUT) \
+     clangd-db
 
-# Create Build Directory
 $(BUILD_DIR):
 	$(call MKDIR,$(BUILD_DIR))
 
-# Create clangd directory
 $(CLANGD_DIR):
 	$(call MKDIR,$(CLANGD_DIR))
 
-# -------------------------------------------------------------------------
-# Preprocessor - Build and Run BEFORE everything else
-# -------------------------------------------------------------------------
 $(PREPROCESSOR_OUT): $(PREPROCESSOR_SRC) | $(BUILD_DIR)
 	@echo [BUILDING PREPROCESSOR] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
@@ -177,9 +130,6 @@ $(PREPROCESSOR_OUT): $(PREPROCESSOR_SRC) | $(BUILD_DIR)
 
 run_preprocessor: ../code/meta/GENERATED_program_types.h
 
-# -------------------------------------------------------------------------
-# Code Generator 
-# -------------------------------------------------------------------------
 $(CODE_GENERATOR_OUT): $(CODE_GENERATOR_SRC) | $(BUILD_DIR)
 	@echo [BUILDING METAPROGRAM] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
@@ -191,27 +141,17 @@ $(CODE_GENERATOR_OUT): $(CODE_GENERATOR_SRC) | $(BUILD_DIR)
 	$(SILENT)$(call MKDIR,../code/meta)
 	$(SILENT)$(CODE_GENERATOR_OUT) > $@
 
-do_codegen:       ../code/meta/GENERATED_program_RTTI.h
+do_codegen: ../code/meta/GENERATED_program_RTTI.h
 
-# -------------------------------------------------------------------------
-# Slang Reflector 
-# -------------------------------------------------------------------------
-
-$(SLANG_REFLECTOR_OUT): $(SLANG_REFLECTOR_SRC) | $(BUILD_DIR)
+$(SLANG_REFLECTOR_OUT): $(SLANG_REFLECTOR_SRC) | do_codegen $(BUILD_DIR)
 	@echo [BUILDING SLANG REFLECTOR] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/slang_reflector.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
 
-# -------------------------------------------------------------------------
-# Shaders
-# Stamp-based: only re-runs when a .slang or .slh file changes, or the
-# reflector binary is rebuilt. A .slh change triggers a full recompile of
-# all shaders since the reflector is a single invocation with no per-shader
-# dep file output.
-# -------------------------------------------------------------------------
 shaders: $(BUILD_DIR)/shaders.stamp
 
+# NOTE(Sleepster): Any .slh change triggers a full recompile since the reflector is a single invocation with no per-shader dep output
 $(BUILD_DIR)/shaders.stamp: $(SHADER_FILES) $(SLANG_REFLECTOR_OUT) | $(BUILD_DIR)
 	@echo [SHADERS] Running slang reflector...
 	$(SILENT)cd ../code && $(CURDIR)/$(SLANG_REFLECTOR_OUT) \
@@ -220,14 +160,6 @@ $(BUILD_DIR)/shaders.stamp: $(SHADER_FILES) $(SLANG_REFLECTOR_OUT) | $(BUILD_DIR
         --metagen_c_header_output_dir=meta/
 	@touch $@
 
-# -------------------------------------------------------------------------
-# Asset Packing
-# Stamp-based: reruns when any asset file changes, the packer is rebuilt,
-# or shaders are recompiled (via shaders.stamp dependency).
-# shader_binaries/ is excluded from ASSET_FILES to avoid a cycle, but
-# shaders.stamp is listed as an explicit prerequisite so the packer still
-# reruns whenever new .spv files are written.
-# -------------------------------------------------------------------------
 pack_assets: $(BUILD_DIR)/assets.stamp
 
 $(BUILD_DIR)/assets.stamp: $(ASSET_FILES) $(JFD_ASSET_FILE_PACKER_OUT) $(BUILD_DIR)/shaders.stamp | $(BUILD_DIR)
@@ -235,9 +167,6 @@ $(BUILD_DIR)/assets.stamp: $(ASSET_FILES) $(JFD_ASSET_FILE_PACKER_OUT) $(BUILD_D
 	$(SILENT)cd $(ASSET_DIR) && $(CURDIR)/$(JFD_ASSET_FILE_PACKER_OUT)
 	@touch $@
 
-# -------------------------------------------------------------------------
-# Tests 
-# -------------------------------------------------------------------------
 tests: $(TESTS_OUT)
 
 $(TESTS_OUT): $(TESTS_SRC) | do_codegen $(BUILD_DIR)
@@ -246,14 +175,8 @@ $(TESTS_OUT): $(TESTS_SRC) | do_codegen $(BUILD_DIR)
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/test_manager.d \
 		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
 
-# -------------------------------------------------------------------------
-# Sandbox
-# -------------------------------------------------------------------------
 sandbox: $(SANDBOX_OUT)
 
-# The unity file only depends on the sandbox source itself.
-# Core source changes are tracked via the -MMD dep file on the executable,
-# so they trigger a recompile without unnecessarily regenerating this file.
 $(BUILD_DIR)/sandbox_%_unity.cpp: sandbox/%.cpp | $(BUILD_DIR)
 	@{ \
 		echo '// AUTO-GENERATED UNITY FILE'; \
@@ -272,12 +195,8 @@ $(BUILD_DIR)/sandbox_%$(EXE_EXT): $(BUILD_DIR)/sandbox_%_unity.cpp | do_codegen 
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/sandbox_$*.d \
 		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
 
-# -------------------------------------------------------------------------
-# Clangd
-# -------------------------------------------------------------------------
 clangd-db: $(MISC_DIR)/compile_commands.json
 
-# Core source files: compile each directly so clangd gets an entry per file
 $(CLANGD_DIR)/%.stamp: $(SRC_DIR)/%.cpp | $(CLANGD_DIR)
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		-DUNITY_BUILD -DMATH_IMPLEMENTATION -DHASH_TABLE_IMPLEMENTATION -DDYNARRAY_IMPLEMENTATION \
@@ -286,7 +205,6 @@ $(CLANGD_DIR)/%.stamp: $(SRC_DIR)/%.cpp | $(CLANGD_DIR)
 		-fsyntax-only $<
 	@touch $@
 
-# The clangd unity file only depends on the sandbox source itself, same reasoning as above.
 $(CLANGD_DIR)/sandbox_%_unity.cpp: sandbox/%.cpp | $(CLANGD_DIR)
 	@{ \
 		echo '// AUTO-GENERATED CLANGD UNITY FILE'; \
@@ -300,8 +218,6 @@ $(CLANGD_DIR)/sandbox_%_unity.cpp: sandbox/%.cpp | $(CLANGD_DIR)
 		echo '#include "sandbox/$*.cpp"'; \
 	} > $@
 
-# Sandbox stamps: compile the unity file so all engine types are visible,
-# but emit the JSON entry pointing at the sandbox source so clangd maps it correctly
 $(CLANGD_DIR)/sandbox_%.stamp: sandbox/%.cpp $(CLANGD_DIR)/sandbox_%_unity.cpp | $(CLANGD_DIR)
 	@echo [SANDBOX] $<
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
@@ -310,13 +226,9 @@ $(CLANGD_DIR)/sandbox_%.stamp: sandbox/%.cpp $(CLANGD_DIR)/sandbox_%_unity.cpp |
 		-fsyntax-only $(CLANGD_DIR)/sandbox_$*_unity.cpp
 	@touch $@
 
-# Combine all per-file JSON fragments into a single compile_commands.json
 $(MISC_DIR)/compile_commands.json: $(CLANGD_CORE_STAMPS) $(CLANGD_SANDBOX_STAMPS)
 	@(printf '[\n'; cat $(CLANGD_DIR)/*.json | sed '$$s/,$$//'; printf ']\n') > $@
 
-# -------------------------------------------------------------------------
-# Asset file builder 
-# -------------------------------------------------------------------------
 $(WAD_ASSET_FILE_PACKER_OUT): $(WAD_ASSET_FILE_PACKER_SRC) | do_codegen $(BUILD_DIR) 
 	@echo [ASSET FILE PACKER]: $@
 	$(SILENT)$(CXX) $(PROJECT_COMMON_COMPILER_FLAGS) -O0 -g $(GAME_INCLUDES) -Wno-undefined-internal $(OS_DEFINE) \
@@ -329,34 +241,22 @@ $(JFD_ASSET_FILE_PACKER_OUT): $(JFD_ASSET_FILE_PACKER_SRC) | do_codegen $(BUILD_
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/jfd_asset_file_packer.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
 
-# -------------------------------------------------------------------------
-# Game build 
-# -------------------------------------------------------------------------
-
-# Compile regular C++11 source to objects 
-$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | do_codegen $(BUILD_DIR) 
+$(BUILD_DIR)/%$(OBJ_EXT): $(SRC_DIR)/%.cpp | do_codegen $(BUILD_DIR)/shaders.stamp
 	@echo [ENGINE SOURCE]: $< ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) $(DEPFLAGS) -c $< -o $@
 
-# Compile VMA Implementation with C++17
-# We strip -std=c++11 from the flags and replace it with -std=c++17
-$(VMA_OBJ): $(SRC_DIR)/vk_vma_implementation.cpp | $(BUILD_DIR)
+# NOTE(Sleepster): VMA requires C++17, strip the C++11 flag and replace it
+$(VMA_OBJ): $(SRC_DIR)/vk_vma_implementation.cpp | $(BUILD_DIR)/shaders.stamp
 	@echo [VMA IMPL C++17]: $< ...
 	$(SILENT)$(CXX) $(filter-out -std=c++11,$(BUILD_COMPILER_FLAGS)) -std=c++17 $(OS_DEFINE) $(GAME_INCLUDES) $(DEPFLAGS) -c $< -o $@
 
-# Link objects to executable (Include VMA_OBJ)
-$(GAME_OUT): $(GAME_OBJS) $(VMA_OBJ) | $(BUILD_DIR)
+# NOTE(Sleepster): Stamp deps are order-only so shader/asset changes don't force a relink
+$(GAME_OUT): $(GAME_OBJS) $(VMA_OBJ) | $(BUILD_DIR)/shaders.stamp $(BUILD_DIR)/assets.stamp
 	@echo Linking game executable: $@ ...
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) -fuse-ld=lld $(LDFLAGS) $(GAME_OBJS) $(VMA_OBJ) $(GAME_EXTERNAL_LIBRARIES) -o $@
 
 clean:
 	-rm -rf $(BUILD_DIR)
 
-# -------------------------------------------------------------------------
-# Dependencies 
-# -------------------------------------------------------------------------
-# Instead of manually listing files, we include ALL .d files found in the build folder.
-# This works for tests, packers, and game objects automatically.
 -include $(wildcard $(BUILD_DIR)/*.d)
-# Per-file clangd dependency tracking
 -include $(wildcard $(CLANGD_DIR)/*.d)

@@ -142,6 +142,8 @@ entity_render(game_state_t *game_state, render_command_list_t *command_list, ent
                       uv_min,
                       uv_max,
                       vec2_zero(),
+                      vec2_zero(),
+                      vec2_zero(),
                       texture);
 }
 
@@ -383,8 +385,8 @@ game_main(void)
             }
 
             r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer);
+            r_cmd_renderpass_begin(command_list, game_state.game_renderpass_ID);
 
-            r_cmd_renderpass_begin(command_list,    game_state.game_renderpass_ID);
             r_cmd_bind_vertex_buffer(command_list, &game_state.vertex_buffer);
             r_cmd_bind_index_buffer(command_list,  &game_state.index_buffer);
             r_cmd_use_shader_program(command_list,  basic_triangle);
@@ -411,6 +413,10 @@ game_main(void)
         {
             r_cmd_blit_renderpass(command_list, game_state.game_renderpass_ID, game_state.fullscreen_renderpass_ID);
             r_cmd_renderpass_begin(command_list, game_state.fullscreen_renderpass_ID);
+
+            r_cmd_bind_vertex_buffer(command_list, &game_state.vertex_buffer);
+            r_cmd_bind_index_buffer(command_list,  &game_state.index_buffer);
+
             s32 window_width  = Max(renderer_state->window_size.x, 10);
             s32 window_height = Max(renderer_state->window_size.y, 10);
 
@@ -453,7 +459,7 @@ game_main(void)
                                                                    STR("Test panel..."), 
                                                                    vec2(20, 20), 
                                                                    10.0f, 
-                                                                   vec2_zero(), 
+                                                                   vec2(20, 20), 
                                                                    vec4(0.4, 0.4, 0.4, 0.5));
                 ui_column(main_ui, main_panel.widget)
                 {
@@ -488,14 +494,14 @@ game_main(void)
                         {
                             ui_column(main_ui, main_panel.widget)
                             {
-                                ui_widget_set_offset_x(main_panel.widget, 16);
+                                ui_widget_set_offset_x(main_panel.widget, 16.0f);
                                 ui_widget_labeled_button(main_ui, STR("Display Performance Counters"));
                                 ui_widget_labeled_button(main_ui, STR("Show Timing Flame Graph"));
                                 ui_widget_labeled_button(main_ui, STR("Show RAM Stats"));
 
                                 ui_widget_float_slider_bar(main_ui, STR("Test slider..."), 100, 8, 2.5f);
 
-                                ui_widget_set_offset_x(main_panel.widget, 0);
+                                ui_widget_set_offset_x(main_panel.widget, 0.0f);
                             }
                             ui_widget_divider(main_ui, STR("Debug submenu divider"), vec2(main_panel.widget->state->render_size.x, 4.0));
                         }

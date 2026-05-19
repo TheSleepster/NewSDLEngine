@@ -19,9 +19,12 @@ typedef int    s32;
 typedef float  float32;
 
 struct alignas(16) ImmediateWidgetData_t {
-	float iTopLeftRadius;
-	float iTopRightRadius;
-	float iBottomLeftRadius;
-	float iBottomRightRadius;
+	float2 iHalfSize;
+	float iRadius;
+	uint iFlags;
+	float4 iBorderColor;
+	float iBorderThickness;
+	float iSDFSmoothness;
+	float2 iPadding__;
 };
 #endif // WIDGET_INSTANCE_DATA_SLH

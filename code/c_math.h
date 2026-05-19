@@ -156,6 +156,22 @@ typedef struct vec4
             float32 w;
         };
 
+        struct 
+        {
+            float32 left;
+            float32 right;
+            float32 top;
+            float32 bottom;
+        };
+
+        struct 
+        {
+            float32 r;
+            float32 g;
+            float32 b;
+            float32 a;
+        };
+
         struct
         {
             vec2_t xy;
@@ -1190,7 +1206,8 @@ vec4(float32 A, float32 B, float32 C, float32 D)
 MATH_API vec4_t
 vec4_zero()
 {
-    vec4_t result = {};
+    vec4_t result;
+    result.SSE = _mm_set_ps1(0.0);
     return(result);
 }
 

@@ -77,7 +77,8 @@ get_hierarchy_size_data(ui_state_t *ui_state, widget_t *parent, widget_t *first_
     {
         widget_t *current_widget = first_widget;
         do {
-            current_widget->state->render_size = current_widget->minimum_render_size;
+            current_widget->state->render_size = vec2(current_widget->minimum_render_size.x, 
+                                                      current_widget->minimum_render_size.y);
             if(current_widget->first_child)
             {
                 widget_child_size_data_t child_data = get_hierarchy_size_data(ui_state, 
@@ -109,15 +110,15 @@ get_hierarchy_size_data(ui_state_t *ui_state, widget_t *parent, widget_t *first_
             float32 true_height = 0.0f;
             if(layout_style == WIDGET_LAYOUT_STYLE_HORIZONTAL)
             {
-                true_width  = current_widget->state->render_size.x + parent->child_spacing + parent->padding.x + current_widget->offset_from_parent;
-                true_height = current_widget->state->render_size.y + parent->padding.y;            
+                true_width  = current_widget->state->render_size.x + parent->child_spacing + current_widget->offset_from_parent;
+                true_height = current_widget->state->render_size.y; 
 
                 result.total_width  += true_width;
             }
             else
             {
-                true_width  = current_widget->state->render_size.x + parent->padding.x + current_widget->offset_from_parent;
-                true_height = current_widget->state->render_size.y + parent->child_spacing + parent->padding.y;            
+                true_width  = current_widget->state->render_size.x + current_widget->offset_from_parent;
+                true_height = current_widget->state->render_size.y + parent->child_spacing;
 
                 result.total_height += true_height;
             }
@@ -165,12 +166,12 @@ place_widgets_in_hierarchy(ui_state_t *ui_state,
         vec2_t  advance;
         if(layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
         {
-            float32 y_advance = (current_widget->state->render_size.y + parent_spacing + parent_padding.y) * -1.0f;
+            float32 y_advance = (current_widget->state->render_size.y + parent_spacing) * -1.0f;
             advance = vec2(0.0, y_advance);
         }
         else
         {
-            float32 x_advance = (current_widget->state->render_size.x + parent_spacing + parent_padding.x);
+            float32 x_advance = (current_widget->state->render_size.x + parent_spacing);
             advance = vec2(x_advance, 0.0f);
         }
 
@@ -262,26 +263,35 @@ internal_api void
 render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_list, widget_t *first_widget)
 {
     widget_t *current_widget = first_widget;
-
-    u32 rectangle_count = 0;
     do {
+        vec2_t half_size = vec2(current_widget->state->render_size.x * 0.5f, 
+                                current_widget->state->render_size.y * 0.5f);
+
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_RECTANGLE)
         {
+            current_widget->widget_instance_data         = ui_state->widget_instances + ui_state->widget_instance_count;
+            current_widget->widget_instance_data->iFlags = current_widget->widget_flags;
+
+            // NOTE(Sleepster): We're probably setting a ton of redundant data... TOO BAD!! 
+            current_widget->widget_instance_data->iBorderColor     = current_widget->border_color;
+            current_widget->widget_instance_data->iBorderThickness = current_widget->border_thickness;
+            current_widget->widget_instance_data->iHalfSize        = half_size;
+            current_widget->widget_instance_data->iRadius          = current_widget->radius;
+            current_widget->widget_instance_data->iSDFSmoothness   = current_widget->smoothness;
+
             immediate_rect(command_list,
                            &ui_state->vertex_buffer,
                            current_widget->state->position, 
                            current_widget->state->render_size,
                            current_widget->state->render_color,
-                           vec2(0, rectangle_count++));
+                           vec2_negate(half_size),
+                           half_size,
+                           vec2(0, ui_state->widget_instance_count),
+                           vec2_zero(),
+                           vec2_zero());
 
             ++ui_state->widget_item_count;
-
-            ui_state->widget_instances[ui_state->widget_instance_count++] = {
-                .iTopLeftRadius     = ui_state->default_widget_radius_data.x,
-                .iTopRightRadius    = ui_state->default_widget_radius_data.y,
-                .iBottomLeftRadius  = ui_state->default_widget_radius_data.z,
-                .iBottomRightRadius = ui_state->default_widget_radius_data.w
-            };
+            ++ui_state->widget_instance_count;
         }
 
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
@@ -291,17 +301,16 @@ render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_lis
                            current_widget->state->position, 
                            current_widget->state->render_size,
                            current_widget->state->render_color,
-                           vec2(0, 0));
+                           current_widget->state->position.xy,
+                           vec2_add(current_widget->state->position.xy, current_widget->state->render_size),
+                           vec2(0, 0),
+                           vec2_zero(),
+                           vec2_zero());
 
             ++ui_state->widget_item_count;
         }
 
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
-        {
-            InvalidCodePath;
-        }
-
-        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BORDER)
         {
             InvalidCodePath;
         }
@@ -309,9 +318,9 @@ render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_lis
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_TEXT)
         {
             immediate_text(command_list, 
-                          &ui_state->vertex_buffer, 
+                           &ui_state->vertex_buffer, 
                            ui_state->asset_manager,
-                          &ui_state->default_font,
+                           &ui_state->default_font,
                            current_widget->widget_text,
                            vec3_add(current_widget->state->position, vec3(0.0, 0.0, -0.01)), 
                            ui_state->default_font_color,
@@ -360,7 +369,7 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
             s32 window_height = Max(renderer_state->window_size.y, 10);
 
             r_cmd_update_constant_buffer(command_list, ui_state->camera_matrices_buffer, &ui_state->current_camera,   sizeof(camera_matrices_t));
-            r_cmd_update_constant_buffer(command_list, ui_state->widget_instance_data,   &ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
+            r_cmd_update_constant_buffer(command_list, ui_state->widget_instance_data,    ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
 
             r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
             r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
@@ -408,20 +417,23 @@ ui_state_init(ui_state_t       *ui_state,
     ui_state->hot_widget            = null;
     ui_state->active_widget         = null;
 
-    ui_state->default_widget_idle_color   = vec4(1.0, 1.0, 1.0, 1.0);
-    ui_state->default_widget_hover_color  = vec4(1.0, 0.0, 0.0, 1.0);
-    ui_state->default_widget_active_color = vec4(0.0, 1.0, 0.0, 1.0);
+    // NOTE(Sleepster): Theme stuff 
+    ui_state->default_font = s_asset_manager_acquire_asset_handle(asset_manager, STR("LiberationMono_Regular"));
 
-    ui_state->default_font_color = vec4(0.0, 0.0, 0.0, 1.0);
-    ui_state->default_font_size  = 32;
+    ui_state->default_widget_idle_color       = vec4(1.0, 1.0, 1.0, 1.0);
+    ui_state->default_widget_hover_color      = vec4(1.0, 0.0, 0.0, 1.0);
+    ui_state->default_widget_active_color     = vec4(0.0, 1.0, 0.0, 1.0);
+    ui_state->default_widget_border_color     = vec4(0.0, 0.0, 0.0, 1.0);
+    ui_state->default_font_color              = vec4(0.0, 0.0, 0.0, 1.0);
 
-    ui_state->default_widget_radius_data = vec4(0.4, 0.4, 0.4, 0.4);
+    ui_state->default_font_size               = 32;
+    ui_state->default_widget_SDF_smoothness   = 1.0f;
+    ui_state->default_widget_border_thickness = 5;
+    // NOTE(Sleepster): Theme stuff 
 
     ui_state->input_manager = input_manager;
     ui_state->ui_controller = s_im_get_primary_controller(input_manager);
-
     ui_state->widget_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_widget"));
-    ui_state->default_font  = s_asset_manager_acquire_asset_handle(asset_manager, STR("LiberationMono_Regular"));
 
     u32 *indices = c_arena_push_array(&renderer_state->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
     u32  index_offset = 0;
@@ -454,8 +466,7 @@ ui_state_init(ui_state_t       *ui_state,
                                                             indices,
                                                             sizeof(u32) * (6 * MAX_WIDGETS));
     const u32 INSTANCE_BUFFER_SIZE = MAX_WIDGETS;
-    ui_state->widget_instances     = c_arena_push_array(&ui_state->persistent_data_arena, immediate_widget_data_t, INSTANCE_BUFFER_SIZE);
-
+    ui_state->widget_instances       = c_arena_push_array(&ui_state->persistent_data_arena, immediate_widget_data_t, INSTANCE_BUFFER_SIZE);
     ui_state->widget_instance_data   = s_renderer_get_constant_buffer(renderer_state, STR("WidgetInstanceData"));
     ui_state->camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
 }
@@ -608,7 +619,11 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
     result->ID                 = ui_widget_hash(ui_state, result);
     result->parent_stack_depth = ui_widget_determine_depth(ui_state);
     result->state              = ui_state->widget_states.data + result->ID;
-    result->child_offset       = ui_state->active_widget_offset_x;
+
+    result->smoothness         = ui_state->default_widget_SDF_smoothness;
+    result->border_thickness   = ui_state->default_widget_border_thickness;
+    result->border_color       = ui_state->default_widget_border_color;
+    result->radius             = result->state->render_size.x;
 
     // NOTE(Sleepster): NEXT AND PREVIOUS ARE BROKEN... 
     widget_t *parent = ui_widget_get_top_parent(ui_state);
@@ -829,13 +844,14 @@ ui_widget_panel(ui_state_t *ui_state,
                 vec2_t      padding, 
                 vec4_t      background_color)
 {
-    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_DRAW_RECTANGLE);
+    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_DRAW_RECTANGLE|UI_WIDGET_FLAG_DRAW_BORDER);
 
     widget->expected_position   = vec2_expand_vec3(position, widget->parent_stack_depth);
     widget->state->render_color = background_color;
     widget->toggled             = widget->state->toggled;
     widget->child_spacing       = child_spacing;
     widget->padding             = padding;
+    widget->radius              = 0.0f;
 
     ui_signal_t result = ui_widget_get_signals(ui_state, widget);
     return(result);
@@ -866,7 +882,7 @@ ui_widget_sized_button(ui_state_t *ui_state,
 {
     widget_t *widget = ui_widget_create(ui_state, 
                                         widget_name, 
-                                        UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON);
+                                        UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON|UI_WIDGET_FLAG_MAKE_CIRCULAR);
     widget->minimum_render_size = minimum_size;
     widget->idle_color          = ui_state->default_widget_idle_color;
     widget->hovered_color       = ui_state->default_widget_hover_color;
@@ -905,7 +921,7 @@ ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text)
     ui_signal_t result = ui_widget_sized_button(ui_state, 
                                                 widget_text,
                                                 text_size,
-                                                UI_WIDGET_FLAG_DRAW_TEXT);
+                                                UI_WIDGET_FLAG_DRAW_TEXT|UI_WIDGET_FLAG_MAKE_CIRCULAR);
     result.widget->font_size = ui_state->default_font_size;
 
     return(result);
@@ -916,7 +932,7 @@ ui_widget_toggle_box(ui_state_t *ui_state, string_t widget_text, vec2_t size)
 {
     widget_t *widget = ui_widget_create(ui_state, 
                                         widget_text, 
-                                        UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON);
+                                        UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON|UI_WIDGET_FLAG_MAKE_CIRCULAR);
     widget->minimum_render_size = size;
     widget->idle_color          = ui_state->default_widget_idle_color;
     widget->hovered_color       = ui_state->default_widget_hover_color;
@@ -932,7 +948,7 @@ ui_widget_toggle_box(ui_state_t *ui_state, string_t widget_text, vec2_t size)
 void
 ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size)
 {
-    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_DRAW_RECTANGLE);
+    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_DRAW_RECTANGLE|UI_WIDGET_FLAG_MAKE_CIRCULAR);
 
     widget->minimum_render_size = size;
     widget->state->render_color = ui_state->default_widget_idle_color;
@@ -957,7 +973,7 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
 {
     ui_signal_t result;
 
-    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DRAW_RECTANGLE);
+    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DRAW_RECTANGLE|UI_WIDGET_FLAG_MAKE_CIRCULAR);
     widget->minimum_render_size = vec2(bar_width, bar_height);
     widget->state->render_color     = ui_state->default_widget_idle_color;
 
@@ -971,7 +987,7 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
         ui_signal_t slider_button = ui_widget_sized_button(ui_state, 
                                                            box_name, 
                                                            slider_box_size, 
-                                                           UI_WIDGET_FLAG_LEFT_DRAGGABLE);
+                                                           UI_WIDGET_FLAG_LEFT_DRAGGABLE|UI_WIDGET_FLAG_MAKE_CIRCULAR);
         widget_t *box_button = slider_button.widget;
         widget_t *slider_bar = slider_state.widget;
 

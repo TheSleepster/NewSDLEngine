@@ -99,8 +99,9 @@ enum widget_flags_t
     UI_WIDGET_FLAG_DRAW_RECTANGLE   = BIT(7),
     UI_WIDGET_FLAG_DRAW_BACKGROUND  = BIT(8),
     UI_WIDGET_FLAG_DRAW_BORDER      = BIT(9),
+    UI_WIDGET_FLAG_MAKE_CIRCULAR    = BIT(10),
 
-    UI_WIDGET_FLAG_LEFT_DRAGGABLE   = BIT(10),
+    UI_WIDGET_FLAG_LEFT_DRAGGABLE   = BIT(11),
 
     UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_HOVER_COLOR|UI_WIDGET_FLAG_ACTIVE_COLOR|UI_WIDGET_FLAG_MOUSE_CLICKABLE|UI_WIDGET_FLAG_HOVERABLE|UI_WIDGET_FLAG_DRAW_RECTANGLE
 };
@@ -130,19 +131,20 @@ struct widget_t
     u32             child_offset;
     u32             offset_from_parent;
 
-    // NOTE(Sleepster): Time for the best things ever!!! 
-    float32         top_left_radius;
-    float32         top_right_radius;
-    float32         bottom_right_radius;
-    float32         bottom_left_radius;
-
     float32         child_spacing;
     vec2_t          padding;
+
+    // TODO(Sleepster): NOT USED YET!!!!
+    float32                  smoothness;
+    float32                  radius;
+    float32                  border_thickness;
+    immediate_widget_data_t *widget_instance_data; 
 
     // TODO(Sleepster): Merge these into a "ui_theme_t" structure?
     vec4_t          idle_color;
     vec4_t          hovered_color;
     vec4_t          active_color;
+    vec4_t          border_color;
 
     // NOTE(Sleepster): 
     // If this is a tree... 
@@ -187,7 +189,9 @@ struct ui_state_t
     vec4_t                            default_widget_idle_color;
     vec4_t                            default_widget_hover_color;
     vec4_t                            default_widget_active_color;
-    vec4_t                            default_widget_radius_data;
+    vec4_t                            default_widget_border_color;
+    float32                           default_widget_SDF_smoothness;
+    float32                           default_widget_border_thickness;
 
     vec2_t                            mouse_position;
     vec2_t                            mouse_delta;
