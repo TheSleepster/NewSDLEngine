@@ -128,16 +128,20 @@ struct widget_t
     vec3_t          expected_position;
     vec2_t          minimum_render_size;
 
-    u32             child_offset;
-    u32             offset_from_parent;
+    // NOTE(Sleepster): Offset inside the parent, accounting for padding 
+    vec2_t          parent_child_spacing;
+    vec4_t          parent_padding;
+    
+    // NOTE(Sleepster): Left, Right, Top, Bottom 
+    vec4_t          widget_padding;
+    float32         max_left_padding;
+    float32         max_right_padding;
+    float32         max_top_padding;
+    float32         max_bottom_padding;
 
-    float32         child_spacing;
-    vec2_t          padding;
+    // NOTE(Sleepster): X and Y spacing... 
+    vec2_t          child_spacing;
 
-    // TODO(Sleepster): NOT USED YET!!!!
-    float32                  smoothness;
-    float32                  radius;
-    float32                  border_thickness;
     immediate_widget_data_t *widget_instance_data; 
 
     // TODO(Sleepster): Merge these into a "ui_theme_t" structure?
@@ -145,6 +149,9 @@ struct widget_t
     vec4_t          hovered_color;
     vec4_t          active_color;
     vec4_t          border_color;
+    float32         smoothness;
+    float32         radius;
+    float32         border_thickness;
 
     // NOTE(Sleepster): 
     // If this is a tree... 
@@ -196,7 +203,7 @@ struct ui_state_t
     vec2_t                            mouse_position;
     vec2_t                            mouse_delta;
 
-    u32                               active_widget_offset_x;
+    vec4_t                            active_widget_padding;
     u32                               widget_item_count;
     u64                               frame_count;
     u64                               ui_seed;
@@ -227,7 +234,7 @@ true_inline void ui_state_set_default_widget_hover_color(ui_state_t *ui_state, v
 true_inline void ui_state_set_default_widget_active_color(ui_state_t *ui_state, vec4_t color);
 true_inline void ui_widget_set_default_font_color(ui_state_t *ui_state, vec4_t color);
 true_inline void ui_widget_set_default_font_size(ui_state_t *ui_state, u32 font_size);
-true_inline void ui_state_set_active_offset_x(ui_state_t *ui_state, u32 offset);
+true_inline void ui_state_set_active_padding(ui_state_t *ui_state, vec4_t padding);
 true_inline void ui_widget_set_flags(widget_t *widget, u32 flags);
 
 true_inline void ui_state_begin_frame(ui_state_t *ui_state);
@@ -237,11 +244,11 @@ true_inline void ui_state_set_parent_layout(ui_state_t *ui_state, u32 layout_sty
 true_inline void ui_widget_set_layout(widget_t *widget, u32 layout_style);
 true_inline void ui_widget_push_parent(ui_state_t *ui_state, widget_t *widget);
 true_inline void ui_widget_pop_parent(ui_state_t *ui_state);
-true_inline void ui_widget_set_offset_x(widget_t *widget, u32 indent);
+true_inline void ui_widget_set_padding(widget_t *widget, vec4_t padding);
 true_inline void ui_widget_seed(ui_state_t *ui_state, u64 index);
 
 widget_t*   ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags);
-ui_signal_t ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, float32 child_spacing, vec2_t padding, vec4_t background_color);
+ui_signal_t ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, vec2_t child_spacing, vec4_t padding, vec4_t background_color);
 ui_signal_t ui_widget_sized_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, u32 widget_flags);
 ui_signal_t ui_widget_text(ui_state_t *ui_state, string_t widget_text);
 ui_signal_t ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text);
@@ -250,7 +257,7 @@ void        ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t 
 void        ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size);
 void        ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size);
 
-true_inline ui_signal_t ui_widget_draggable_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, float32 child_spacing, vec2_t padding, vec4_t background_color);
+true_inline ui_signal_t ui_widget_draggable_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, vec2_t child_spacing, vec4_t padding, vec4_t background_color);
 
 true_inline void ui_state_begin_row(ui_state_t *ui_state, widget_t *parent);
 true_inline void ui_state_end_row(ui_state_t *ui_state);

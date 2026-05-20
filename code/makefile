@@ -47,7 +47,7 @@ endif
 BUILD_TYPE ?= debug
 
 # NOTE(Sleepster): To enable sanitizers: -fsanitize=thread,undefined,address -fno-omit-frame-pointer -O1
-PROJECT_COMMON_COMPILER_FLAGS = -std=c++11 -Wno-nullability-completeness -flto -fno-rtti -mavx2 -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
+PROJECT_COMMON_COMPILER_FLAGS = -std=c++11 -Wnullability-completeness -flto -fno-rtti -mavx2 -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
 BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FLAGS) 
 
 COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I. -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/vulkan/VMA/ -I../run_tree/deps/vulkan/spirv_reflect/include/ -I../run_tree/deps/Freetype/include/
@@ -253,7 +253,7 @@ $(VMA_OBJ): $(SRC_DIR)/vk_vma_implementation.cpp | $(BUILD_DIR)/shaders.stamp
 # NOTE(Sleepster): Stamp deps are order-only so shader/asset changes don't force a relink
 $(GAME_OUT): $(GAME_OBJS) $(VMA_OBJ) | $(BUILD_DIR)/shaders.stamp $(BUILD_DIR)/assets.stamp
 	@echo Linking game executable: $@ ...
-	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) -fuse-ld=lld $(LDFLAGS) $(GAME_OBJS) $(VMA_OBJ) $(GAME_EXTERNAL_LIBRARIES) -o $@
+	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) -fuse-ld=ld $(LDFLAGS) $(GAME_OBJS) $(VMA_OBJ) $(GAME_EXTERNAL_LIBRARIES) -o $@
 
 clean:
 	-rm -rf $(BUILD_DIR)

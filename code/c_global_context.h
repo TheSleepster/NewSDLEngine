@@ -23,6 +23,7 @@ typedef struct global_context
 {
     bool8             is_initialized;
     bool8             running;
+    bool8             should_reload;
 
     threadpool_t      main_threadpool;
     renderer_state_t *renderer_state;

@@ -742,10 +742,11 @@ struct type_info_struct_global_context_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[8];
+		type_info_member_t member_array[9];
 		struct {
 			type_info_member_t is_initialized;
 			type_info_member_t running;
+			type_info_member_t should_reload;
 			type_info_member_t main_threadpool;
 			type_info_member_t renderer_state;
 			type_info_member_t asset_manager;
@@ -2472,7 +2473,7 @@ struct type_info_struct_widget_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[27];
+		type_info_member_t member_array[31];
 		struct {
 			type_info_member_t ID;
 			type_info_member_t widget_flags;
@@ -2484,18 +2485,22 @@ struct type_info_struct_widget_t {
 			type_info_member_t font_size;
 			type_info_member_t expected_position;
 			type_info_member_t minimum_render_size;
-			type_info_member_t child_offset;
-			type_info_member_t offset_from_parent;
+			type_info_member_t parent_child_spacing;
+			type_info_member_t parent_padding;
+			type_info_member_t widget_padding;
+			type_info_member_t max_left_padding;
+			type_info_member_t max_right_padding;
+			type_info_member_t max_top_padding;
+			type_info_member_t max_bottom_padding;
 			type_info_member_t child_spacing;
-			type_info_member_t padding;
-			type_info_member_t smoothness;
-			type_info_member_t radius;
-			type_info_member_t border_thickness;
 			type_info_member_t widget_instance_data;
 			type_info_member_t idle_color;
 			type_info_member_t hovered_color;
 			type_info_member_t active_color;
 			type_info_member_t border_color;
+			type_info_member_t smoothness;
+			type_info_member_t radius;
+			type_info_member_t border_thickness;
 			type_info_member_t parent;
 			type_info_member_t first_child;
 			type_info_member_t last_child;
@@ -3725,10 +3730,11 @@ const static type_info_struct_global_context_t type_info_struct_global_context_t
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_global_context_t),
-	.member_count = 8,
+	.member_count = 9,
 	.members = {
 		.is_initialized = {.name = "is_initialized", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.is_initialized)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), is_initialized))},
 		.running = {.name = "running", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.running)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), running))},
+		.should_reload = {.name = "should_reload", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.should_reload)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), should_reload))},
 		.main_threadpool = {.name = "main_threadpool", .type = TYPE_threadpool_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.main_threadpool)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), main_threadpool))},
 		.renderer_state = {.name = "renderer_state", .type = TYPE_renderer_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.renderer_state)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), renderer_state))},
 		.asset_manager = {.name = "asset_manager", .type = TYPE_asset_manager_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_global_context_t.asset_manager)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_global_context_t), asset_manager))},
@@ -5194,7 +5200,7 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_widget_t),
-	.member_count = 27,
+	.member_count = 31,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), ID))},
 		.widget_flags = {.name = "widget_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_flags))},
@@ -5206,18 +5212,22 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 		.font_size = {.name = "font_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.font_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), font_size))},
 		.expected_position = {.name = "expected_position", .type = TYPE_vec3_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.expected_position)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), expected_position))},
 		.minimum_render_size = {.name = "minimum_render_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.minimum_render_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), minimum_render_size))},
-		.child_offset = {.name = "child_offset", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.child_offset)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), child_offset))},
-		.offset_from_parent = {.name = "offset_from_parent", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.offset_from_parent)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), offset_from_parent))},
-		.child_spacing = {.name = "child_spacing", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.child_spacing)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), child_spacing))},
-		.padding = {.name = "padding", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), padding))},
-		.smoothness = {.name = "smoothness", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.smoothness)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), smoothness))},
-		.radius = {.name = "radius", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.radius)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), radius))},
-		.border_thickness = {.name = "border_thickness", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.border_thickness)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), border_thickness))},
+		.parent_child_spacing = {.name = "parent_child_spacing", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_child_spacing)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_child_spacing))},
+		.parent_padding = {.name = "parent_padding", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_padding))},
+		.widget_padding = {.name = "widget_padding", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_padding))},
+		.max_left_padding = {.name = "max_left_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_left_padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_left_padding))},
+		.max_right_padding = {.name = "max_right_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_right_padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_right_padding))},
+		.max_top_padding = {.name = "max_top_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_top_padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_top_padding))},
+		.max_bottom_padding = {.name = "max_bottom_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_bottom_padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_bottom_padding))},
+		.child_spacing = {.name = "child_spacing", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.child_spacing)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), child_spacing))},
 		.widget_instance_data = {.name = "widget_instance_data", .type = TYPE_immediate_widget_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_instance_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_instance_data))},
 		.idle_color = {.name = "idle_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.idle_color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), idle_color))},
 		.hovered_color = {.name = "hovered_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.hovered_color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), hovered_color))},
 		.active_color = {.name = "active_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.active_color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), active_color))},
 		.border_color = {.name = "border_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.border_color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), border_color))},
+		.smoothness = {.name = "smoothness", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.smoothness)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), smoothness))},
+		.radius = {.name = "radius", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.radius)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), radius))},
+		.border_thickness = {.name = "border_thickness", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.border_thickness)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), border_thickness))},
 		.parent = {.name = "parent", .type = TYPE_widget_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent))},
 		.first_child = {.name = "first_child", .type = TYPE_widget_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.first_child)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), first_child))},
 		.last_child = {.name = "last_child", .type = TYPE_widget_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.last_child)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), last_child))},
@@ -6068,6 +6078,7 @@ enum file_watcher_t_member_list_enum {
 enum global_context_t_member_list_enum {
 	TYPE_GLOBAL_CONTEXT_T_MEMBER_is_initialized,
 	TYPE_GLOBAL_CONTEXT_T_MEMBER_running,
+	TYPE_GLOBAL_CONTEXT_T_MEMBER_should_reload,
 	TYPE_GLOBAL_CONTEXT_T_MEMBER_main_threadpool,
 	TYPE_GLOBAL_CONTEXT_T_MEMBER_renderer_state,
 	TYPE_GLOBAL_CONTEXT_T_MEMBER_asset_manager,
@@ -6762,18 +6773,22 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_font_size,
 	TYPE_WIDGET_T_MEMBER_expected_position,
 	TYPE_WIDGET_T_MEMBER_minimum_render_size,
-	TYPE_WIDGET_T_MEMBER_child_offset,
-	TYPE_WIDGET_T_MEMBER_offset_from_parent,
+	TYPE_WIDGET_T_MEMBER_parent_child_spacing,
+	TYPE_WIDGET_T_MEMBER_parent_padding,
+	TYPE_WIDGET_T_MEMBER_widget_padding,
+	TYPE_WIDGET_T_MEMBER_max_left_padding,
+	TYPE_WIDGET_T_MEMBER_max_right_padding,
+	TYPE_WIDGET_T_MEMBER_max_top_padding,
+	TYPE_WIDGET_T_MEMBER_max_bottom_padding,
 	TYPE_WIDGET_T_MEMBER_child_spacing,
-	TYPE_WIDGET_T_MEMBER_padding,
-	TYPE_WIDGET_T_MEMBER_smoothness,
-	TYPE_WIDGET_T_MEMBER_radius,
-	TYPE_WIDGET_T_MEMBER_border_thickness,
 	TYPE_WIDGET_T_MEMBER_widget_instance_data,
 	TYPE_WIDGET_T_MEMBER_idle_color,
 	TYPE_WIDGET_T_MEMBER_hovered_color,
 	TYPE_WIDGET_T_MEMBER_active_color,
 	TYPE_WIDGET_T_MEMBER_border_color,
+	TYPE_WIDGET_T_MEMBER_smoothness,
+	TYPE_WIDGET_T_MEMBER_radius,
+	TYPE_WIDGET_T_MEMBER_border_thickness,
 	TYPE_WIDGET_T_MEMBER_parent,
 	TYPE_WIDGET_T_MEMBER_first_child,
 	TYPE_WIDGET_T_MEMBER_last_child,

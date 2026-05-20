@@ -458,12 +458,12 @@ game_main(void)
                 ui_signal_t main_panel = ui_widget_draggable_panel(main_ui, 
                                                                    STR("Test panel..."), 
                                                                    vec2(20, 20), 
-                                                                   10.0f, 
-                                                                   vec2(20, 20), 
+                                                                   vec2(10.0f, 10.0f), 
+                                                                   vec4(20, 20, 20, 20), 
                                                                    vec4(0.4, 0.4, 0.4, 0.5));
                 ui_column(main_ui, main_panel.widget)
                 {
-                    ui_signal_t title_bar = ui_widget_panel(main_ui, STR("Title bar"), vec2(0, 0), 10.0f, vec2_zero(), vec4_zero());
+                    ui_signal_t title_bar = ui_widget_panel(main_ui, STR("Title bar"), vec2(0, 0), vec2(10.0f, 0.0f), vec4_zero(), vec4_zero());
 
                     ui_signal_t open_menu_button = {};
                     ui_row(main_ui, title_bar.widget)
@@ -473,7 +473,6 @@ game_main(void)
                                                                   vec2(20, 20), 0);
                         ui_widget_text(main_ui, STR("[Debug Menu Information]"));
                     }
-
                     if(ui_pressed(open_menu_button))
                     {
                         main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
@@ -481,7 +480,10 @@ game_main(void)
 
                     if(main_panel.widget->toggled)
                     {
-                        ui_widget_divider(main_ui, STR("main menu divider"), vec2(main_panel.widget->state->render_size.x, 4.0));
+                        // TODO(Sleepster): SOMETHING BETTER HAS TO BE DONE WITH THESE 
+                        //
+                        // LIKE SIZE KIND
+                        //ui_widget_divider(main_ui, STR("main menu divider"), vec2(main_panel.widget->state->render_size.x, 4.0));
 
                         ui_widget_set_default_font_size(main_ui, 20);
                         ui_signal_t debug_menu = ui_widget_labeled_button(main_ui, STR("Enable Debug Overlay"));
@@ -492,18 +494,16 @@ game_main(void)
 
                         if(debug_menu.widget->state->toggled == true)
                         {
-                            ui_column(main_ui, main_panel.widget)
+                            ui_signal_t sub_panel = ui_widget_panel(main_ui, STR("Debug Menu subpanel"), vec2(0, 0), vec2(10.0f, 10.0f), vec4_zero(), vec4_zero());
+                            ui_column(main_ui, sub_panel.widget)
                             {
-                                ui_widget_set_offset_x(main_panel.widget, 16.0f);
                                 ui_widget_labeled_button(main_ui, STR("Display Performance Counters"));
                                 ui_widget_labeled_button(main_ui, STR("Show Timing Flame Graph"));
                                 ui_widget_labeled_button(main_ui, STR("Show RAM Stats"));
 
                                 ui_widget_float_slider_bar(main_ui, STR("Test slider..."), 100, 8, 2.5f);
-
-                                ui_widget_set_offset_x(main_panel.widget, 0.0f);
+                                //ui_widget_divider(main_ui, STR("Debug submenu divider"), vec2(main_panel.widget->state->render_size.x, 4.0));
                             }
-                            ui_widget_divider(main_ui, STR("Debug submenu divider"), vec2(main_panel.widget->state->render_size.x, 4.0));
                         }
 
                         ui_widget_labeled_button(main_ui, STR("Enable Editor"));
