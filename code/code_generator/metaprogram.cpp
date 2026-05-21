@@ -850,12 +850,12 @@ parse_structure(ast_file_data *file_data,
                     log_warning("Found member element: '%.*s' within the structure: '%.*s'... This element is not valid and will not be parsed...\n",
                                 token.string.count, C_STR(token.string), structure_type.string.count, C_STR(structure_type.string));
 #endif
-                    c_tokenizer_eat_lines(&file_data->tokenizer, 1);
+                    c_tokenizer_eat_lines(&global_context->temporary_arena, &file_data->tokenizer, 1);
                 }
             }break;
             case TT_OpeningParen:
             {
-                c_tokenizer_eat_lines(&file_data->tokenizer, 1);
+                c_tokenizer_eat_lines(&global_context->temporary_arena, &file_data->tokenizer, 1);
             }break;
             case TT_ClosingBrace:
             {
@@ -1985,7 +1985,7 @@ check_define_data(ast_file_data_t *file, token_data_t token)
                 char next_char = file->tokenizer.data.data[index + 1];
                 if(index != INVALID_ID && (next_char == '\n' || next_char == '\r'))
                 {
-                    c_tokenizer_eat_lines(&file->tokenizer, 1);
+                    c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
 
                     bool8 parsing = true;
                     while(parsing)
@@ -1994,7 +1994,7 @@ check_define_data(ast_file_data_t *file, token_data_t token)
                         next_char = file->tokenizer.data.data[index + 1];
                         if(index != INVALID_ID && (next_char == '\n' || next_char == '\r'))
                         {
-                            c_tokenizer_eat_lines(&file->tokenizer, 1);
+                            c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
                         }
                         else if(index != INVALID_ID && (next_char != '\n' && next_char != '\r'))
                         {
@@ -2002,14 +2002,14 @@ check_define_data(ast_file_data_t *file, token_data_t token)
                         }
                         else if(index == INVALID_ID)
                         {
-                            c_tokenizer_eat_lines(&file->tokenizer, 1);
+                            c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
                             parsing = false;
                         }
                     }
                 }
                 else if(c_string_compare(token.string, STR("typedef")))
                 {
-                    c_tokenizer_eat_lines(&file->tokenizer, 1);
+                    c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
                 }
                 else
                 {
@@ -2019,7 +2019,7 @@ check_define_data(ast_file_data_t *file, token_data_t token)
                     //   to the end of the line the macro expansion and store this in a "macros" hash table 
                     //   using the name of the macro as the key
                     token_data_t macro_name_token = c_tokenizer_get_next_token(&file->tokenizer);
-                    string_t expanded_macro_value = c_tokenizer_eat_lines(&file->tokenizer, 1);
+                    string_t expanded_macro_value = c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
 
                     c_hash_table_insert_pair(&state.macro_hash, macro_name_token.string, expanded_macro_value);
                 }
@@ -2055,10 +2055,10 @@ build_file_ast(ast_file_data_t *file)
                     token_data_t token = c_tokenizer_get_next_token(&file->tokenizer);
                     while(token.type != TT_ClosingBrace)
                     {
-                        c_tokenizer_eat_lines(&file->tokenizer, 1);
+                        c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
                         token = c_tokenizer_get_next_token(&file->tokenizer);
                     }
-                    c_tokenizer_eat_lines(&file->tokenizer, 1);
+                    c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
                 }
 
                 if(c_string_compare(token.string, STR("struct")) || 

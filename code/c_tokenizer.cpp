@@ -5,7 +5,6 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <c_tokenizer.h>
-#include <c_global_context.h>
 
 bool8
 c_tokenizer_token_alphabetical(char A)
@@ -154,7 +153,7 @@ c_tokenizer_peek_token(tokenizer_t *tokenizer, u32 times)
 }
 
 string_t
-c_tokenizer_eat_lines(tokenizer_t *tokenizer, u32 line_count)
+c_tokenizer_eat_lines(memory_arena_t *concat_arena, tokenizer_t *tokenizer, u32 line_count)
 {
     string_t result = {};
 
@@ -167,7 +166,7 @@ c_tokenizer_eat_lines(tokenizer_t *tokenizer, u32 line_count)
         {
             string_t line = tokenizer->data;
             line.count    = end_line;
-            result = c_string_concat(&global_context->temporary_arena, line, result);
+            result = c_string_concat(concat_arena, line, result);
             c_string_advance_by(&tokenizer->data, end_line + 1);
         }
     }
@@ -176,14 +175,20 @@ c_tokenizer_eat_lines(tokenizer_t *tokenizer, u32 line_count)
 }
 
 true_inline void
-c_tokenizer_set_bookmark(tokenizer_t *tokenizer)
+c_tokenizer_set_bookmark(tokenizer_t *tokenizer, token_data_t token)
 {
-    tokenizer->read_bookmark = tokenizer->data.count;
+    tokenizer->read_bookmark         = tokenizer->data.data;
+    tokenizer->bookmarked_read_count = tokenizer->data.count;
+    tokenizer->bookmarked_token      = token;
 }
 
-true_inline void
+true_inline token_data_t 
 c_tokenizer_restore_bookmark(tokenizer_t *tokenizer)
 {
-    tokenizer->data.count = tokenizer->read_bookmark;
+    token_data_t result   = tokenizer->bookmarked_token;
+    tokenizer->data.data  = tokenizer->read_bookmark;
+    tokenizer->data.count = tokenizer->bookmarked_read_count;
+
+    return(result);
 }
 

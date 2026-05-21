@@ -225,7 +225,7 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
         {
             case TT_HashTag:
             {
-                c_tokenizer_eat_lines(tokenizer, 1);
+                c_tokenizer_eat_lines(&global_context->temporary_arena, tokenizer, 1);
             }break;
             case TT_Identifier:
             {
@@ -287,7 +287,7 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
         {
             case TT_HashTag:
             {
-                c_tokenizer_eat_lines(&tokenizer, 1);
+                c_tokenizer_eat_lines(&global_context->temporary_arena, &tokenizer, 1);
             }break;
             case TT_Identifier:
             {

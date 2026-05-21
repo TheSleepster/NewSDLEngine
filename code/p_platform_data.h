@@ -91,7 +91,8 @@ bool8           sys_mutex_unlock(sys_mutex_t *mutex);
   ================ MULTIPROCESS =============
   ===========================================*/
 
-bool8 sys_create_process();
+void *sys_create_process(string_t program_path, string_t argument_string);
+bool8 sys_wait_for_process(void *process);
 
 #endif // P_PLATFORM_DATA_H
 

@@ -43,7 +43,10 @@ typedef struct sys_semaphore
     sys_semaphore_handle_t handle;
 }sys_semaphore_t;
 
-// NOTE(Sleepster): Ticket Mutex. Super simple. 
+// NOTE(Sleepster): 
+// Ticket Mutex. Super simple. Potentially faster than an OS mutex since you avoid the overhead of the OS scheduler... 
+// But be careful beause spinlocking for long periods of time is really really bad...
+
 struct ticket_mutex_t
 {
     volatile u64 next_ticket;

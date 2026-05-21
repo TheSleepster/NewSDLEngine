@@ -42,7 +42,7 @@ struct test_entry_t
 //
 // TEST FILES ARE DECLARED HERE 
 
-#include "dynarray_tests.cpp"
+#include "test_new_metaprogram.cpp"
 
 // TEST FILES ARE DECLARED HERE 
 //
@@ -72,7 +72,7 @@ test_manager_run_test(test_entry_t *entry)
     if(PID == 0)
     {
         entry->function();
-        _exit(0);
+        exit(0);
     }
     else if(PID > 0)
     {
@@ -108,12 +108,12 @@ test_manager_run_tests(test_manager_t *manager)
         bool8 success = test_manager_run_test(entry);
         if(success)
         {
-            log_debug("\n[ PASSED ]\n");
+            log_info("\n[ PASSED ]\n");
             ++result.tests_passed;
         }
         else
         {
-            log_error("\n[ FAILURE ]\n");
+            log_warning("\n[ FAILURE ]\n");
             ++result.tests_failed;
         }
     }
@@ -131,6 +131,8 @@ test_manager_init(test_manager_t *manager)
 int
 main(void)
 {
+    c_global_context_init();
+
     test_manager_t manager = {};
     test_manager_init(&manager);
 

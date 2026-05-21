@@ -48,6 +48,9 @@ struct file_manager_t
     string_t               generated_c_files_output_directory;
 };
 
+// NOTE(Sleepster): Thread local 
+thread_static memory_arena_t thread_arena;
+
 internal_api string_t 
 remove_shader_structure_attributes(string_t *shader_data)
 {
@@ -58,7 +61,7 @@ remove_shader_structure_attributes(string_t *shader_data)
 
     while(line_tokenizer.data.count > 0)
     {
-        string_t current_line = c_tokenizer_eat_lines(&line_tokenizer, 1);
+        string_t current_line = c_tokenizer_eat_lines(&global_context->temporary_arena, &line_tokenizer, 1);
         bool8 attribute_found = false;
 
         tokenizer_t line = {current_line};
@@ -107,6 +110,11 @@ VISIT_FILES(shader_file_callback)
        c_string_compare(file_ext, STR(".slm")))
     {
         c_threadpool_push_work_order(&global_context->main_threadpool, [file_manager, filename, fullname]() {
+            if(thread_arena.is_initialized == false)
+            {
+                thread_arena = c_arena_create(MB(20));
+            }
+
             string_t *file_data = c_hash_table_get_value_ptr(&file_manager->loaded_files, filename);
             if(file_data->count == 0)
             {
@@ -140,8 +148,8 @@ VISIT_FILES(shader_file_callback)
                                 c_ticket_mutex_wait(&file_manager->mutex, ticket);
 
                                 token_data_t included_filename_token = c_tokenizer_get_next_token(tokenizer);
-                                string_t included_filename = c_string_concat(&global_context->temporary_arena, file_manager->shader_directory, STR("/"));
-                                         included_filename = c_string_concat(&global_context->temporary_arena, included_filename, c_string_make_copy(&global_context->temporary_arena, included_filename_token.string));
+                                string_t included_filename = c_string_concat(&thread_arena, file_manager->shader_directory, STR("/"));
+                                         included_filename = c_string_concat(&thread_arena, included_filename, c_string_make_copy(&thread_arena, included_filename_token.string));
 
                                 // NOTE(Sleepster): Eat the ">" character... 
                                 c_tokenizer_get_next_token(tokenizer);
@@ -201,7 +209,7 @@ VISIT_FILES(shader_file_callback)
             u64 ticket = c_ticket_mutex_take_ticket(&file_manager->mutex);
             c_ticket_mutex_wait(&file_manager->mutex, ticket);
 
-            string_t output_file = c_string_concat(&global_context->temporary_arena, file_manager->output_directory, filename);
+            string_t output_file = c_string_concat(&thread_arena, file_manager->output_directory, filename);
 
             c_ticket_mutex_advance_ticket(&file_manager->mutex);
 
@@ -215,6 +223,11 @@ VISIT_FILES(shader_file_callback)
     {
         // NOTE(Sleepster): We could just use a normal "&" here but I just don't care and this is more explicit 
         c_threadpool_push_work_order(&global_context->main_threadpool, [file_manager, filename, fullname]() {
+            if(thread_arena.is_initialized == false)
+            {
+                thread_arena = c_arena_create(MB(20));
+            }
+
             string_t *file_data = c_hash_table_get_value_ptr(&file_manager->loaded_files, filename);
             if(file_data->count == 0)
             {
@@ -438,7 +451,7 @@ typedef float  float32;
                             Expect(alignment.type == TT_Number, "This should be a valid number... Usage is like so:\n[Align(16)]\n");
 
                             current_alignment = c_string_read_int(alignment.string);
-                            c_tokenizer_eat_lines(&tokenizer, 1);
+                            c_tokenizer_eat_lines(&thread_arena, &tokenizer, 1);
                         }
                     }break;
                 }
@@ -452,9 +465,9 @@ typedef float  float32;
             u64 ticket = c_ticket_mutex_take_ticket(&file_manager->mutex);
             c_ticket_mutex_wait(&file_manager->mutex, ticket);
 
-            new_filename = c_string_concat(&global_context->temporary_arena, STR("GENERATED_"), new_filename);
-            new_filename = c_string_concat(&global_context->temporary_arena, file_manager->generated_c_files_output_directory, new_filename);
-            string_t output_file = c_string_concat(&global_context->temporary_arena, 
+            new_filename = c_string_concat(&thread_arena, STR("GENERATED_"), new_filename);
+            new_filename = c_string_concat(&thread_arena, file_manager->generated_c_files_output_directory, new_filename);
+            string_t output_file = c_string_concat(&thread_arena, 
                                                    new_filename, 
                                                    STR(".h"));
 
