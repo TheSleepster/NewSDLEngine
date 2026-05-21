@@ -583,8 +583,9 @@ material_data_t*      s_asset_get_material_data_from_handle(asset_handle_t *hand
 material_archetype_t* s_asset_get_material_archetype_from_handle(asset_handle_t *handle);
 material_instance_t*  s_asset_get_material_instance_from_handle(asset_handle_t *handle);
 
-vec2_t                         s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, asset_handle_t *font_handle, u32 pixel_size);
+vec2_t  s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, asset_handle_t *font_handle, u32 pixel_size, float32 *max_descender_out);
 dynamic_render_font_varient_t* s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t *font_handle, u32 font_size);
+
 glyph_metric_t*
 s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
                          dynamic_render_font_varient_t *varient,

@@ -459,11 +459,11 @@ game_main(void)
                                                                    STR("Test panel..."), 
                                                                    vec2(20, 20), 
                                                                    vec2(10.0f, 10.0f), 
-                                                                   vec4(20, 20, 20, 20), 
+                                                                   vec4(10, 10, 10, 10), 
                                                                    vec4(0.4, 0.4, 0.4, 0.5));
                 ui_column(main_ui, main_panel.widget)
                 {
-                    ui_signal_t title_bar = ui_widget_panel(main_ui, STR("Title bar"), vec2(0, 0), vec2(10.0f, 0.0f), vec4_zero(), vec4_zero());
+                    ui_signal_t title_bar = ui_widget_panel(main_ui, STR("Title bar"), vec2(0, 0), vec2(10.0f, 0.0f), vec4(10, 10, 10, 10), vec4(0.0, 0.0, 0.0, 0.2));
 
                     ui_signal_t open_menu_button = {};
                     ui_row(main_ui, title_bar.widget)
@@ -497,6 +497,7 @@ game_main(void)
                             ui_signal_t sub_panel = ui_widget_panel(main_ui, STR("Debug Menu subpanel"), vec2(0, 0), vec2(10.0f, 10.0f), vec4_zero(), vec4_zero());
                             ui_column(main_ui, sub_panel.widget)
                             {
+                                ui_widget_set_padding(sub_panel.widget, vec4(20, 0, 0, 0));
                                 ui_widget_labeled_button(main_ui, STR("Display Performance Counters"));
                                 ui_widget_labeled_button(main_ui, STR("Show Timing Flame Graph"));
                                 ui_widget_labeled_button(main_ui, STR("Show RAM Stats"));

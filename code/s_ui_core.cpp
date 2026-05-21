@@ -31,7 +31,7 @@ ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list)
 true_inline void
 ui_state_begin_row(ui_state_t *ui_state, widget_t *parent)
 {
-    ui_widget_set_layout(parent, WIDGET_LAYOUT_STYLE_HORIZONTAL);
+    ui_widget_set_layout(parent, UI_WIDGET_LAYOUT_STYLE_HORIZONTAL);
     ui_widget_push_parent(ui_state, parent);
 }
 
@@ -44,7 +44,7 @@ ui_state_end_row(ui_state_t *ui_state)
 true_inline void
 ui_state_begin_column(ui_state_t *ui_state, widget_t *parent)
 {
-    ui_widget_set_layout(parent, WIDGET_LAYOUT_STYLE_VERTICAL);
+    ui_widget_set_layout(parent, UI_WIDGET_LAYOUT_STYLE_VERTICAL);
     ui_widget_push_parent(ui_state, parent);
 }
 
@@ -60,59 +60,129 @@ ui_state_set_active_padding(ui_state_t *ui_state, vec4_t padding)
     ui_state->active_widget_padding = padding;
 }
 
-internal_api vec2_t
-size_widget_hierarchy(widget_t *current_widget)
+internal_api vec2_t 
+determine_hierarchy_size(widget_t *widget)
 {
-    vec2_t result = vec2_zero();
-
-    float32 padding_x = current_widget->widget_padding.left + current_widget->widget_padding.right;
-    float32 padding_y = current_widget->widget_padding.top  + current_widget->widget_padding.bottom;
-
-    vec2_t widget_size = current_widget->minimum_render_size;
-    if(current_widget->first_child)
+    if(widget->widget_flags & UI_WIDGET_FLAG_FIXED_SIZE)
     {
-        vec2_t hierarchy_size = vec2_zero();
-        u32    node_count     = 0;
+        widget->state->render_size = widget->minimum_render_size;
+        if(widget->first_child)
+        {
+            widget_t *current_widget = widget->first_child;
+            do {
+                determine_hierarchy_size(current_widget);
+                current_widget = current_widget->next_sibling;
+            }while(current_widget != widget->first_child);
+        }
+        return(widget->state->render_size);
+    }
 
-        widget_t *current_child = current_widget->first_child;
+    vec2_t result = widget->minimum_render_size;
+    if(widget->first_child)
+    {
+        vec2_t children_total = vec2_zero();
+
+        widget_t *current_widget = widget->first_child;
         do {
-            vec2_t child_size = size_widget_hierarchy(current_child);
+            vec2_t subhierarchy_size = determine_hierarchy_size(current_widget);
 
-            if(current_widget->layout_style == WIDGET_LAYOUT_STYLE_VERTICAL)
+            bool8 has_next_sibling = (current_widget->next_sibling != widget->first_child);
+            if(widget->layout_style == UI_WIDGET_LAYOUT_STYLE_HORIZONTAL)
             {
-                hierarchy_size.x  = Max(hierarchy_size.x, child_size.x);
-                hierarchy_size.y += child_size.y;
+                children_total.x += subhierarchy_size.x;
+                children_total.y  = Max(children_total.y, subhierarchy_size.y);
+
+                if(has_next_sibling) children_total.x += widget->child_spacing.x;
             }
             else
             {
-                hierarchy_size.x += child_size.x;
-                hierarchy_size.y  = Max(hierarchy_size.y, child_size.y);
+                children_total.x  = Max(children_total.x, subhierarchy_size.x);
+                children_total.y += subhierarchy_size.y;
+
+                if(has_next_sibling) children_total.y += widget->child_spacing.y;
             }
 
-            ++node_count;
-            current_child = current_child->next_sibling;
-        }while(current_child != current_widget->first_child);
+            current_widget = current_widget->next_sibling;
+        }while(current_widget != widget->first_child);
 
-        if(node_count > 1)
+        result.x = Max(result.x, children_total.x);
+        result.y = Max(result.y, children_total.y);
+    }
+    widget->state->render_size = vec2(result.x + widget->max_left_padding + widget->max_right_padding,
+                                      result.y + widget->max_top_padding  + widget->max_bottom_padding);
+
+    return(widget->state->render_size);
+}
+
+
+internal_api void
+place_widgets_in_hierarchy(widget_t *first_widget, vec2_t *placement_cursor, u32 layout_style)
+{
+    widget_t *current_widget = first_widget;
+    do {
+        current_widget->expected_position.xy = *placement_cursor;
+        current_widget->expected_position.z  =  current_widget->parent_stack_depth;
+
+        current_widget->state->position = vec3(current_widget->expected_position.x + current_widget->state->offset.x,
+                                               current_widget->expected_position.y + current_widget->state->offset.y - current_widget->state->render_size.y,
+                                               current_widget->parent_stack_depth);
+
+        current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy,
+                                                          current_widget->state->render_size);
+        if(current_widget->first_child)
         {
-            if(current_widget->layout_style == WIDGET_LAYOUT_STYLE_VERTICAL) 
-            {
-                hierarchy_size.y += (float32)(node_count) * current_widget->child_spacing.y;
-            }
-            else 
-            {
-                hierarchy_size.x += (float32)(node_count) * current_widget->child_spacing.x;
-            }
+            widget_t *nested_first_child = current_widget->first_child;
+            vec2_t child_cursor = vec2(current_widget->state->position.x + nested_first_child->parent_padding.x,
+                                       current_widget->state->position.y + current_widget->state->render_size.y
+                                       - nested_first_child->parent_padding.z);
+
+            place_widgets_in_hierarchy(current_widget->first_child,
+                                       &child_cursor,
+                                       current_widget->layout_style);
         }
 
-        widget_size.x = Max(widget_size.x, hierarchy_size.x);
-        widget_size.y = Max(widget_size.y, hierarchy_size.y);
-    }
+        bool8 has_next_sibling = (current_widget->next_sibling != first_widget);
+        if(layout_style == UI_WIDGET_LAYOUT_STYLE_VERTICAL)
+        {
+            placement_cursor->y -= current_widget->state->render_size.y;
+            if(has_next_sibling) placement_cursor->y -= current_widget->parent_child_spacing.y;
+        }
+        else
+        {
+            placement_cursor->x += current_widget->state->render_size.x;
+            if(has_next_sibling) placement_cursor->x += current_widget->parent_child_spacing.x;
+        }
 
-    current_widget->state->render_size = vec2(widget_size.x + padding_x, widget_size.y + padding_y);
+        current_widget = current_widget->next_sibling;
+    }while(current_widget != first_widget);
+}
 
-    result = current_widget->state->render_size;
-    return(result);
+
+internal_api void
+place_all_widgets(ui_state_t *ui_state)
+{
+    widget_t *current_widget = ui_state->first_widget;
+    do {
+        current_widget->state->position.xy = vec2(current_widget->expected_position.x + current_widget->state->offset.x,
+                                                  current_widget->expected_position.y + current_widget->state->offset.y
+                                                  - current_widget->state->render_size.y);
+        current_widget->state->position.z  =  current_widget->parent_stack_depth;
+        current_widget->state->widget_rect  =  rect2_create(current_widget->state->position.xy,
+                                                             current_widget->state->render_size);
+
+        if(current_widget->first_child)
+        {
+            vec2_t placement_cursor = vec2(current_widget->state->position.x + current_widget->max_left_padding,
+                                          (current_widget->state->position.y + current_widget->state->render_size.y)
+                                           - current_widget->max_top_padding);
+
+            place_widgets_in_hierarchy(current_widget->first_child,
+                                       &placement_cursor,
+                                       current_widget->layout_style);
+        }
+
+        current_widget = current_widget->next_sibling;
+    }while(current_widget != ui_state->first_widget);
 }
 
 internal_api void
@@ -120,62 +190,7 @@ size_all_widgets(ui_state_t *ui_state)
 {
     widget_t *current_widget = ui_state->first_widget;
     do {
-        size_widget_hierarchy(current_widget);
-        current_widget = current_widget->next_sibling;
-    }while(current_widget != ui_state->first_widget);
-}
-
-internal_api void
-place_widgets_in_hierarchy(widget_t *first_widget, vec2_t *placement_cursor, u32 layout_style)
-{
-    widget_t *current_widget = first_widget;
-
-    do { 
-        vec2_t widget_cursor = *placement_cursor;
-
-        current_widget->expected_position  = vec2_expand_vec3(widget_cursor, current_widget->parent_stack_depth);
-        current_widget->state->position    = vec3(current_widget->expected_position.x + current_widget->state->offset.x, 
-                                                  current_widget->expected_position.y + current_widget->state->offset.y, 
-                                                  current_widget->parent_stack_depth);
-        current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy, current_widget->state->render_size);
-
-        if(layout_style == WIDGET_LAYOUT_STYLE_HORIZONTAL)
-        {
-            placement_cursor->x += current_widget->state->render_size.x + current_widget->parent_child_spacing.x;
-        }
-        else
-        {
-            placement_cursor->y -= (current_widget->state->render_size.y + current_widget->parent_child_spacing.y);
-        }
-
-        if(current_widget->first_child)
-        {
-            vec2_t parent_relative_cursor = vec2(current_widget->state->position.x,
-                                                 current_widget->state->position.y);
-            place_widgets_in_hierarchy(current_widget->first_child, &parent_relative_cursor, current_widget->layout_style);
-        }
-
-        current_widget = current_widget->next_sibling;
-    }while(current_widget != first_widget);
-}
-
-internal_api void
-place_all_widgets(ui_state_t *ui_state)
-{
-    widget_t *current_widget = ui_state->first_widget;
-    do {
-        current_widget->state->position = vec3(current_widget->expected_position.x + current_widget->state->offset.x, 
-                                              (current_widget->expected_position.y + current_widget->state->offset.y) - current_widget->state->render_size.y, 
-                                               current_widget->parent_stack_depth);
-        current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy, current_widget->state->render_size);
-
-        vec2_t placement_cursor = vec2(current_widget->state->position.x  + current_widget->max_left_padding,
-                                       (current_widget->state->position.y + current_widget->state->render_size.y) - (current_widget->max_top_padding + current_widget->max_bottom_padding));
-        if(current_widget->first_child)
-        {
-            place_widgets_in_hierarchy(current_widget->first_child, &placement_cursor, current_widget->layout_style);
-        }
-
+        determine_hierarchy_size(current_widget);
         current_widget = current_widget->next_sibling;
     }while(current_widget != ui_state->first_widget);
 }
@@ -298,7 +313,7 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
     asset_manager_t  *asset_manager  = ui_state->asset_manager;
     (void)asset_manager;
 
-    widget_t *current_widget = ui_state->first_widget;
+widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
     {
         render_widget_hierarchy(ui_state, command_list, current_widget);
@@ -619,6 +634,7 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
         ui_widget_append(&parent->first_child, &parent->last_child, result);
         result->layout_style         = parent->layout_style;
         result->parent_child_spacing = parent->child_spacing;
+        result->parent_padding       = parent->widget_padding;
     }
     else
     {
@@ -690,26 +706,19 @@ widget_do_draggable(ui_state_t *ui_state, ui_signal_t *signal)
     }
 
     if(widget->state->input_begin_within_bounds &&
-       (ui_state->active_widget == widget))
+      (ui_state->active_widget == widget))
     {
         if(signal->signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN)
         {
-            vec2_t mouse_delta    = vec2_subtract(ui_state->mouse_position, widget->state->initial_mouse_position);
-            widget->state->offset = mouse_delta;
+            vec2_t mouse_delta     = vec2_subtract(ui_state->mouse_position, widget->state->initial_mouse_position);
+            widget->state->offset  = vec2_add(widget->state->offset, mouse_delta);
 
             widget->state->initial_mouse_position = ui_state->mouse_position;
         }
-        else
+        else if(signal->signal_flags & UI_SIGNAL_FLAG_RELEASED)
         {
-            widget->state->initial_mouse_position = vec2_zero();
-            widget->state->offset                 = vec2_zero();
-
             widget->state->input_begin_within_bounds = false;
         }
-    }
-    else
-    {
-        widget->state->offset = vec2_zero();
     }
 }
 
@@ -894,22 +903,27 @@ ui_widget_text(ui_state_t *ui_state, string_t widget_text)
     widget_t *widget  = ui_widget_create(ui_state, widget_text, UI_WIDGET_FLAG_DRAW_TEXT|UI_WIDGET_FLAG_IDLE_COLOR);
     widget->font_size = ui_state->default_font_size;
 
+    float32 max_descender = 0.0f;
     widget->minimum_render_size = s_asset_font_get_string_size(ui_state->asset_manager, 
                                                                widget_text, 
                                                               &ui_state->default_font, 
-                                                               ui_state->default_font_size);
-    ui_signal_t result = ui_widget_get_signals(ui_state, widget);
+                                                               ui_state->default_font_size,
+                                                               &max_descender);
+    widget->state->offset.y = max_descender;
 
+    ui_signal_t result = ui_widget_get_signals(ui_state, widget);
     return(result);
 }
 
 ui_signal_t
 ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text)
 {
+    float32 max_descender = 0.0f;
     vec2_t text_size = s_asset_font_get_string_size(ui_state->asset_manager, 
                                                     widget_text, 
                                                    &ui_state->default_font, 
-                                                    ui_state->default_font_size);
+                                                    ui_state->default_font_size,
+                                                    &max_descender);
     ui_signal_t result = ui_widget_sized_button(ui_state, 
                                                 widget_text,
                                                 text_size,
@@ -965,7 +979,7 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
 {
     ui_signal_t result;
 
-    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DRAW_RECTANGLE|UI_WIDGET_FLAG_MAKE_CIRCULAR);
+    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DRAW_RECTANGLE|UI_WIDGET_FLAG_MAKE_CIRCULAR|UI_WIDGET_FLAG_FIXED_SIZE);
     widget->minimum_render_size = vec2(bar_width, bar_height);
     widget->state->render_color = ui_state->default_widget_idle_color;
 
@@ -980,7 +994,7 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
                                                            box_name, 
                                                            slider_box_size, 
                                                            UI_WIDGET_FLAG_LEFT_DRAGGABLE|UI_WIDGET_FLAG_MAKE_CIRCULAR);
-        slider_button.widget->state->render_color = vec4(0.3, 0.3, 0.3, 1.0);
+        slider_button.widget->state->render_color = vec4(0.0, 0.0, 0.0, 1.0);
 
         widget_t *box_button = slider_button.widget;
         widget_t *slider_bar = slider_state.widget;
@@ -1018,7 +1032,7 @@ ui_widget_draw_demo_layout(ui_state_t *ui_state)
             signal_t button_signal = ui_widget_button();
             ui_widget_parent(signal->widget)
             {
-                ui_widget_set_parent_layout(WIDGET_LAYOUT_STYLE_HORIZONTAL);
+                ui_widget_set_parent_layout(UI_WIDGET_LAYOUT_STYLE_HORIZONTAL);
                 ui_widget_label();
             }
             ui_widget_pop_parent();
@@ -1030,7 +1044,7 @@ ui_widget_draw_demo_layout(ui_state_t *ui_state)
 
             if(dropdown_allowed)
             {
-                ui_state_layout(WIDGET_LAYOUT_STYLE_VERTICAL);
+                ui_state_layout(UI_WIDGET_LAYOUT_STYLE_VERTICAL);
 
                 signal_t start_button = ui_widget_labeled_button("start");
                 signal_t play_button  = ui_widget_labeled_button("play");

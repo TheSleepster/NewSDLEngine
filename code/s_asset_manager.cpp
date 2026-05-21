@@ -517,7 +517,7 @@ s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t
 }
 
 vec2_t 
-s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, asset_handle_t *font_handle, u32 pixel_size)
+s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, asset_handle_t *font_handle, u32 pixel_size, float32 *max_descender_out)
 {
     Assert(string.count > 0);
     vec2_t result = vec2_zero();
@@ -539,6 +539,11 @@ s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, as
         }
 
         total_width += glyph->width + (glyph->advance * 0.33);
+    }
+
+    if(max_descender_out)
+    {
+        *max_descender_out = varient->max_descender;
     }
 
     result = vec2(total_width, tallest_glyph);

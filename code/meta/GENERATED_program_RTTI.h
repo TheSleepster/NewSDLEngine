@@ -222,6 +222,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_ui_signal_t, type_id(ui_signal_t), "ui_signal_t") \
 	X(TYPE_widget_flags_t, type_id(widget_flags_t), "widget_flags_t") \
 	X(TYPE_widget_layout_style_t, type_id(widget_layout_style_t), "widget_layout_style_t") \
+	X(TYPE_widget_size_kind_t, type_id(widget_size_kind_t), "widget_size_kind_t") \
 	X(TYPE_immediate_widget_data_t, type_id(immediate_widget_data_t), "immediate_widget_data_t") \
 	X(TYPE_vulkan_allocation_usage_type_t, type_id(vulkan_allocation_usage_type_t), "vulkan_allocation_usage_type_t") \
 	X(TYPE_VkDeviceSize, type_id(VkDeviceSize), "VkDeviceSize") \
@@ -2473,7 +2474,7 @@ struct type_info_struct_widget_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[31];
+		type_info_member_t member_array[33];
 		struct {
 			type_info_member_t ID;
 			type_info_member_t widget_flags;
@@ -2483,8 +2484,10 @@ struct type_info_struct_widget_t {
 			type_info_member_t toggled;
 			type_info_member_t parent_stack_depth;
 			type_info_member_t font_size;
+			type_info_member_t font_max_descender;
 			type_info_member_t expected_position;
 			type_info_member_t minimum_render_size;
+			type_info_member_t size_kind;
 			type_info_member_t parent_child_spacing;
 			type_info_member_t parent_padding;
 			type_info_member_t widget_padding;
@@ -2493,7 +2496,6 @@ struct type_info_struct_widget_t {
 			type_info_member_t max_top_padding;
 			type_info_member_t max_bottom_padding;
 			type_info_member_t child_spacing;
-			type_info_member_t widget_instance_data;
 			type_info_member_t idle_color;
 			type_info_member_t hovered_color;
 			type_info_member_t active_color;
@@ -2506,6 +2508,7 @@ struct type_info_struct_widget_t {
 			type_info_member_t last_child;
 			type_info_member_t next_sibling;
 			type_info_member_t prev_sibling;
+			type_info_member_t widget_instance_data;
 		}members;
 	};
 };
@@ -3359,7 +3362,7 @@ struct type_info_enum_widget_flags_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[13];
+		type_info_member_t member_array[14];
 		struct {
 			type_info_member_t UI_WIDGET_FLAG_INVALID;
 			type_info_member_t UI_WIDGET_FLAG_IDLE_COLOR;
@@ -3372,6 +3375,7 @@ struct type_info_enum_widget_flags_t {
 			type_info_member_t UI_WIDGET_FLAG_DRAW_BACKGROUND;
 			type_info_member_t UI_WIDGET_FLAG_DRAW_BORDER;
 			type_info_member_t UI_WIDGET_FLAG_MAKE_CIRCULAR;
+			type_info_member_t UI_WIDGET_FLAG_FIXED_SIZE;
 			type_info_member_t UI_WIDGET_FLAG_LEFT_DRAGGABLE;
 			type_info_member_t UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON;
 		}members;
@@ -3389,8 +3393,25 @@ struct type_info_enum_widget_layout_style_t {
 	union {
 		type_info_member_t member_array[2];
 		struct {
-			type_info_member_t WIDGET_LAYOUT_STYLE_VERTICAL;
-			type_info_member_t WIDGET_LAYOUT_STYLE_HORIZONTAL;
+			type_info_member_t UI_WIDGET_LAYOUT_STYLE_VERTICAL;
+			type_info_member_t UI_WIDGET_LAYOUT_STYLE_HORIZONTAL;
+		}members;
+	};
+};
+
+struct type_info_enum_widget_size_kind_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t UI_WIDGET_SIZE_KIND_PIXELS;
+			type_info_member_t UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT;
 		}members;
 	};
 };
@@ -5200,7 +5221,7 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_widget_t),
-	.member_count = 31,
+	.member_count = 33,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.ID)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), ID))},
 		.widget_flags = {.name = "widget_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_flags)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_flags))},
@@ -5210,8 +5231,10 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 		.toggled = {.name = "toggled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.toggled)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), toggled))},
 		.parent_stack_depth = {.name = "parent_stack_depth", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_stack_depth)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_stack_depth))},
 		.font_size = {.name = "font_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.font_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), font_size))},
+		.font_max_descender = {.name = "font_max_descender", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.font_max_descender)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), font_max_descender))},
 		.expected_position = {.name = "expected_position", .type = TYPE_vec3_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.expected_position)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), expected_position))},
 		.minimum_render_size = {.name = "minimum_render_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.minimum_render_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), minimum_render_size))},
+		.size_kind = {.name = "size_kind", .type = TYPE_widget_size_kind_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.size_kind)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), size_kind))},
 		.parent_child_spacing = {.name = "parent_child_spacing", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_child_spacing)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_child_spacing))},
 		.parent_padding = {.name = "parent_padding", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_padding))},
 		.widget_padding = {.name = "widget_padding", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_padding))},
@@ -5220,7 +5243,6 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 		.max_top_padding = {.name = "max_top_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_top_padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_top_padding))},
 		.max_bottom_padding = {.name = "max_bottom_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_bottom_padding)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_bottom_padding))},
 		.child_spacing = {.name = "child_spacing", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.child_spacing)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), child_spacing))},
-		.widget_instance_data = {.name = "widget_instance_data", .type = TYPE_immediate_widget_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_instance_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_instance_data))},
 		.idle_color = {.name = "idle_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.idle_color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), idle_color))},
 		.hovered_color = {.name = "hovered_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.hovered_color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), hovered_color))},
 		.active_color = {.name = "active_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.active_color)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), active_color))},
@@ -5233,6 +5255,7 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 		.last_child = {.name = "last_child", .type = TYPE_widget_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.last_child)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), last_child))},
 		.next_sibling = {.name = "next_sibling", .type = TYPE_widget_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.next_sibling)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), next_sibling))},
 		.prev_sibling = {.name = "prev_sibling", .type = TYPE_widget_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.prev_sibling)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), prev_sibling))},
+		.widget_instance_data = {.name = "widget_instance_data", .type = TYPE_immediate_widget_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_instance_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_instance_data))},
 	}
 };
 
@@ -5862,7 +5885,7 @@ const static type_info_enum_widget_flags_t type_info_enum_widget_flags_t_const_d
 	.name = "widget_flags_t",
 	.type = TYPE_widget_flags_t,
 	.kind = META_TYPE_KIND_Enum,
-	.member_count = 13,
+	.member_count = 14,
 	.members = {
 		.UI_WIDGET_FLAG_INVALID = {.name = "UI_WIDGET_FLAG_INVALID", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_INVALID), .offset = UI_WIDGET_FLAG_INVALID},
 		.UI_WIDGET_FLAG_IDLE_COLOR = {.name = "UI_WIDGET_FLAG_IDLE_COLOR", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_IDLE_COLOR), .offset = UI_WIDGET_FLAG_IDLE_COLOR},
@@ -5875,6 +5898,7 @@ const static type_info_enum_widget_flags_t type_info_enum_widget_flags_t_const_d
 		.UI_WIDGET_FLAG_DRAW_BACKGROUND = {.name = "UI_WIDGET_FLAG_DRAW_BACKGROUND", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_DRAW_BACKGROUND), .offset = UI_WIDGET_FLAG_DRAW_BACKGROUND},
 		.UI_WIDGET_FLAG_DRAW_BORDER = {.name = "UI_WIDGET_FLAG_DRAW_BORDER", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_DRAW_BORDER), .offset = UI_WIDGET_FLAG_DRAW_BORDER},
 		.UI_WIDGET_FLAG_MAKE_CIRCULAR = {.name = "UI_WIDGET_FLAG_MAKE_CIRCULAR", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_MAKE_CIRCULAR), .offset = UI_WIDGET_FLAG_MAKE_CIRCULAR},
+		.UI_WIDGET_FLAG_FIXED_SIZE = {.name = "UI_WIDGET_FLAG_FIXED_SIZE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_FIXED_SIZE), .offset = UI_WIDGET_FLAG_FIXED_SIZE},
 		.UI_WIDGET_FLAG_LEFT_DRAGGABLE = {.name = "UI_WIDGET_FLAG_LEFT_DRAGGABLE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_LEFT_DRAGGABLE), .offset = UI_WIDGET_FLAG_LEFT_DRAGGABLE},
 		.UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = {.name = "UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON), .offset = UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON},
 	}
@@ -5885,8 +5909,18 @@ const static type_info_enum_widget_layout_style_t type_info_enum_widget_layout_s
 	.kind = META_TYPE_KIND_Enum,
 	.member_count = 2,
 	.members = {
-		.WIDGET_LAYOUT_STYLE_VERTICAL = {.name = "WIDGET_LAYOUT_STYLE_VERTICAL", .type = TYPE_widget_layout_style_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(WIDGET_LAYOUT_STYLE_VERTICAL), .offset = WIDGET_LAYOUT_STYLE_VERTICAL},
-		.WIDGET_LAYOUT_STYLE_HORIZONTAL = {.name = "WIDGET_LAYOUT_STYLE_HORIZONTAL", .type = TYPE_widget_layout_style_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(WIDGET_LAYOUT_STYLE_HORIZONTAL), .offset = WIDGET_LAYOUT_STYLE_HORIZONTAL},
+		.UI_WIDGET_LAYOUT_STYLE_VERTICAL = {.name = "UI_WIDGET_LAYOUT_STYLE_VERTICAL", .type = TYPE_widget_layout_style_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_LAYOUT_STYLE_VERTICAL), .offset = UI_WIDGET_LAYOUT_STYLE_VERTICAL},
+		.UI_WIDGET_LAYOUT_STYLE_HORIZONTAL = {.name = "UI_WIDGET_LAYOUT_STYLE_HORIZONTAL", .type = TYPE_widget_layout_style_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_LAYOUT_STYLE_HORIZONTAL), .offset = UI_WIDGET_LAYOUT_STYLE_HORIZONTAL},
+	}
+};
+const static type_info_enum_widget_size_kind_t type_info_enum_widget_size_kind_t_const_data = {
+	.name = "widget_size_kind_t",
+	.type = TYPE_widget_size_kind_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 2,
+	.members = {
+		.UI_WIDGET_SIZE_KIND_PIXELS = {.name = "UI_WIDGET_SIZE_KIND_PIXELS", .type = TYPE_widget_size_kind_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_SIZE_KIND_PIXELS), .offset = UI_WIDGET_SIZE_KIND_PIXELS},
+		.UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT = {.name = "UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT", .type = TYPE_widget_size_kind_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT), .offset = UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT},
 	}
 };
 const static type_info_enum_vulkan_allocation_usage_type_t type_info_enum_vulkan_allocation_usage_type_t_const_data = {
@@ -6771,8 +6805,10 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_toggled,
 	TYPE_WIDGET_T_MEMBER_parent_stack_depth,
 	TYPE_WIDGET_T_MEMBER_font_size,
+	TYPE_WIDGET_T_MEMBER_font_max_descender,
 	TYPE_WIDGET_T_MEMBER_expected_position,
 	TYPE_WIDGET_T_MEMBER_minimum_render_size,
+	TYPE_WIDGET_T_MEMBER_size_kind,
 	TYPE_WIDGET_T_MEMBER_parent_child_spacing,
 	TYPE_WIDGET_T_MEMBER_parent_padding,
 	TYPE_WIDGET_T_MEMBER_widget_padding,
@@ -6781,7 +6817,6 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_max_top_padding,
 	TYPE_WIDGET_T_MEMBER_max_bottom_padding,
 	TYPE_WIDGET_T_MEMBER_child_spacing,
-	TYPE_WIDGET_T_MEMBER_widget_instance_data,
 	TYPE_WIDGET_T_MEMBER_idle_color,
 	TYPE_WIDGET_T_MEMBER_hovered_color,
 	TYPE_WIDGET_T_MEMBER_active_color,
@@ -6794,6 +6829,7 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_last_child,
 	TYPE_WIDGET_T_MEMBER_next_sibling,
 	TYPE_WIDGET_T_MEMBER_prev_sibling,
+	TYPE_WIDGET_T_MEMBER_widget_instance_data,
 };
 
 enum vulkan_allocation_info_t_member_list_enum {
@@ -7191,13 +7227,19 @@ enum widget_flags_t_member_list_enum {
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BACKGROUND,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BORDER,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MAKE_CIRCULAR,
+	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_FIXED_SIZE,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_LEFT_DRAGGABLE,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON,
 };
 
 enum widget_layout_style_t_member_list_enum {
-	TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_WIDGET_LAYOUT_STYLE_VERTICAL,
-	TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_WIDGET_LAYOUT_STYLE_HORIZONTAL,
+	TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_VERTICAL,
+	TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_HORIZONTAL,
+};
+
+enum widget_size_kind_t_member_list_enum {
+	TYPE_WIDGET_SIZE_KIND_T_MEMBER_UI_WIDGET_SIZE_KIND_PIXELS,
+	TYPE_WIDGET_SIZE_KIND_T_MEMBER_UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT,
 };
 
 enum vulkan_allocation_usage_type_t_member_list_enum {
@@ -7451,10 +7493,13 @@ enum render_pipeline_polygon_mode_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BACKGROUND, "UI_WIDGET_FLAG_DRAW_BACKGROUND") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BORDER, "UI_WIDGET_FLAG_DRAW_BORDER") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MAKE_CIRCULAR, "UI_WIDGET_FLAG_MAKE_CIRCULAR") \
+	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_FIXED_SIZE, "UI_WIDGET_FLAG_FIXED_SIZE") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_LEFT_DRAGGABLE, "UI_WIDGET_FLAG_LEFT_DRAGGABLE") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON, "UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON") \
-	X(TYPE_ENUM_LOOKUP_WIDGET_LAYOUT_STYLE_T_MEMBER_WIDGET_LAYOUT_STYLE_VERTICAL, "WIDGET_LAYOUT_STYLE_VERTICAL") \
-	X(TYPE_ENUM_LOOKUP_WIDGET_LAYOUT_STYLE_T_MEMBER_WIDGET_LAYOUT_STYLE_HORIZONTAL, "WIDGET_LAYOUT_STYLE_HORIZONTAL") \
+	X(TYPE_ENUM_LOOKUP_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_VERTICAL, "UI_WIDGET_LAYOUT_STYLE_VERTICAL") \
+	X(TYPE_ENUM_LOOKUP_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_HORIZONTAL, "UI_WIDGET_LAYOUT_STYLE_HORIZONTAL") \
+	X(TYPE_ENUM_LOOKUP_WIDGET_SIZE_KIND_T_MEMBER_UI_WIDGET_SIZE_KIND_PIXELS, "UI_WIDGET_SIZE_KIND_PIXELS") \
+	X(TYPE_ENUM_LOOKUP_WIDGET_SIZE_KIND_T_MEMBER_UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, "UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT") \
 	X(TYPE_ENUM_LOOKUP_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_GPU_ONLY, "VULKAN_MEMORY_USAGE_GPU_ONLY") \
 	X(TYPE_ENUM_LOOKUP_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_CPU_ONLY, "VULKAN_MEMORY_USAGE_CPU_ONLY") \
 	X(TYPE_ENUM_LOOKUP_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_CPU_TO_GPU, "VULKAN_MEMORY_USAGE_CPU_TO_GPU") \
@@ -7682,6 +7727,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "ui_signal_t", .type = TYPE_ui_signal_t, .size = sizeof(ui_signal_t), .struct_info = (type_info_struct_t*)&type_info_struct_ui_signal_t_const_data},
 	{.name = "widget_flags_t", .type = TYPE_widget_flags_t, .size = sizeof(widget_flags_t), .struct_info = NULL},
 	{.name = "widget_layout_style_t", .type = TYPE_widget_layout_style_t, .size = sizeof(widget_layout_style_t), .struct_info = NULL},
+	{.name = "widget_size_kind_t", .type = TYPE_widget_size_kind_t, .size = sizeof(widget_size_kind_t), .struct_info = NULL},
 	{.name = "immediate_widget_data_t", .type = TYPE_immediate_widget_data_t, .size = sizeof(immediate_widget_data_t*), .struct_info = NULL},
 	{.name = "vulkan_allocation_usage_type_t", .type = TYPE_vulkan_allocation_usage_type_t, .size = sizeof(vulkan_allocation_usage_type_t), .struct_info = NULL},
 	{.name = "VkDeviceSize", .type = TYPE_VkDeviceSize, .size = sizeof(VkDeviceSize), .struct_info = NULL},
@@ -7941,10 +7987,13 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "UI_WIDGET_FLAG_DRAW_BACKGROUND", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BACKGROUND, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_DRAW_BORDER", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BORDER, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_MAKE_CIRCULAR", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MAKE_CIRCULAR, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
+	{.name = "UI_WIDGET_FLAG_FIXED_SIZE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_FIXED_SIZE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_LEFT_DRAGGABLE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_LEFT_DRAGGABLE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
-	{.name = "WIDGET_LAYOUT_STYLE_VERTICAL", .member_enum = TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_WIDGET_LAYOUT_STYLE_VERTICAL, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_layout_style_t_const_data},
-	{.name = "WIDGET_LAYOUT_STYLE_HORIZONTAL", .member_enum = TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_WIDGET_LAYOUT_STYLE_HORIZONTAL, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_layout_style_t_const_data},
+	{.name = "UI_WIDGET_LAYOUT_STYLE_VERTICAL", .member_enum = TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_VERTICAL, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_layout_style_t_const_data},
+	{.name = "UI_WIDGET_LAYOUT_STYLE_HORIZONTAL", .member_enum = TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_HORIZONTAL, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_layout_style_t_const_data},
+	{.name = "UI_WIDGET_SIZE_KIND_PIXELS", .member_enum = TYPE_WIDGET_SIZE_KIND_T_MEMBER_UI_WIDGET_SIZE_KIND_PIXELS, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_size_kind_t_const_data},
+	{.name = "UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT", .member_enum = TYPE_WIDGET_SIZE_KIND_T_MEMBER_UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_size_kind_t_const_data},
 	{.name = "VULKAN_MEMORY_USAGE_GPU_ONLY", .member_enum = TYPE_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_GPU_ONLY, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_allocation_usage_type_t_const_data},
 	{.name = "VULKAN_MEMORY_USAGE_CPU_ONLY", .member_enum = TYPE_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_CPU_ONLY, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_allocation_usage_type_t_const_data},
 	{.name = "VULKAN_MEMORY_USAGE_CPU_TO_GPU", .member_enum = TYPE_VULKAN_ALLOCATION_USAGE_TYPE_T_MEMBER_VULKAN_MEMORY_USAGE_CPU_TO_GPU, .type_info_ptr = (const type_info_struct*)&type_info_enum_vulkan_allocation_usage_type_t_const_data},

@@ -100,69 +100,78 @@ enum widget_flags_t
     UI_WIDGET_FLAG_DRAW_BACKGROUND  = BIT(8),
     UI_WIDGET_FLAG_DRAW_BORDER      = BIT(9),
     UI_WIDGET_FLAG_MAKE_CIRCULAR    = BIT(10),
+    UI_WIDGET_FLAG_FIXED_SIZE       = BIT(11),
 
-    UI_WIDGET_FLAG_LEFT_DRAGGABLE   = BIT(11),
+    UI_WIDGET_FLAG_LEFT_DRAGGABLE   = BIT(12),
 
     UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_HOVER_COLOR|UI_WIDGET_FLAG_ACTIVE_COLOR|UI_WIDGET_FLAG_MOUSE_CLICKABLE|UI_WIDGET_FLAG_HOVERABLE|UI_WIDGET_FLAG_DRAW_RECTANGLE
 };
 
 enum widget_layout_style_t
 {
-    WIDGET_LAYOUT_STYLE_VERTICAL,
-    WIDGET_LAYOUT_STYLE_HORIZONTAL
+    UI_WIDGET_LAYOUT_STYLE_VERTICAL,
+    UI_WIDGET_LAYOUT_STYLE_HORIZONTAL
+};
+
+enum widget_size_kind_t
+{
+    UI_WIDGET_SIZE_KIND_PIXELS,
+    UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT,
 };
 
 struct widget_t
 {
-    u64             ID;
-    u32             widget_flags;
-    u32             layout_style;
-    widget_state_t *state;
+    u64                ID;
+    u32                widget_flags;
+    u32                layout_style;
+    widget_state_t    *state;
 
-    string_t        widget_text;
-    bool32          toggled;
+    string_t           widget_text;
+    bool32             toggled;
 
-    float32         parent_stack_depth;
-    u32             font_size;
+    float32            parent_stack_depth;
+    u32                font_size;
+    u32                font_max_descender;
     
-    vec3_t          expected_position;
-    vec2_t          minimum_render_size;
+    vec3_t             expected_position;
+    vec2_t             minimum_render_size;
+    widget_size_kind_t size_kind;
 
     // NOTE(Sleepster): Offset inside the parent, accounting for padding 
-    vec2_t          parent_child_spacing;
-    vec4_t          parent_padding;
+    vec2_t             parent_child_spacing;
+    vec4_t             parent_padding;
     
     // NOTE(Sleepster): Left, Right, Top, Bottom 
-    vec4_t          widget_padding;
-    float32         max_left_padding;
-    float32         max_right_padding;
-    float32         max_top_padding;
-    float32         max_bottom_padding;
+    vec4_t             widget_padding;
+    float32            max_left_padding;
+    float32            max_right_padding;
+    float32            max_top_padding;
+    float32            max_bottom_padding;
 
     // NOTE(Sleepster): X and Y spacing... 
-    vec2_t          child_spacing;
-
-    immediate_widget_data_t *widget_instance_data; 
+    vec2_t             child_spacing;
 
     // TODO(Sleepster): Merge these into a "ui_theme_t" structure?
-    vec4_t          idle_color;
-    vec4_t          hovered_color;
-    vec4_t          active_color;
-    vec4_t          border_color;
-    float32         smoothness;
-    float32         radius;
-    float32         border_thickness;
+    vec4_t             idle_color;
+    vec4_t             hovered_color;
+    vec4_t             active_color;
+    vec4_t             border_color;
+    float32            smoothness;
+    float32            radius;
+    float32            border_thickness;
 
     // NOTE(Sleepster): 
     // If this is a tree... 
-    widget_t       *parent;
-    widget_t       *first_child;
-    widget_t       *last_child;
+    widget_t          *parent;
+    widget_t          *first_child;
+    widget_t          *last_child;
 
     // NOTE(Sleepster): 
     // Chaining upon a linked list... 
-    widget_t       *next_sibling;
-    widget_t       *prev_sibling;
+    widget_t          *next_sibling;
+    widget_t          *prev_sibling;
+
+    immediate_widget_data_t *widget_instance_data; 
 };
 
 struct ui_state_t
