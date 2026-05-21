@@ -16,6 +16,12 @@ TEST(complex_macro)
     Assert(sys_wait_for_process(process));
 }
 
+TEST(basic_typedef)
+{
+    void *process = sys_create_process(STR("../build/new_metaprogram"), STR("--filename=tests/metaprogram_test_simple_typedef.cpp"));
+    Assert(sys_wait_for_process(process));
+}
+
 TEST(basic_structures)
 {
     void *process = sys_create_process(STR("../build/new_metaprogram"), STR("--filename=tests/metaprogram_test_basic_structure.cpp"));

@@ -61,7 +61,6 @@ c_ticket_mutex_take_ticket(ticket_mutex_t *mutex)
     return(result);
 }
 
-
 inline bool8
 c_ticket_mutex_try_wait(ticket_mutex_t *mutex, u64 ticket)
 {
@@ -85,6 +84,15 @@ c_ticket_mutex_advance_ticket(ticket_mutex_t *mutex)
 {
     AtomicIncrement64(&mutex->working_ticket);
 }
+
+inline void
+c_ticket_mutex_take_and_wait(ticket_mutex_t *mutex)
+{
+    u64 ticket = c_ticket_mutex_take_ticket(mutex);
+    c_ticket_mutex_wait(mutex, ticket);
+}
+
+#define TicketMutexScope(mutex) DeferLoop(c_ticket_mutex_take_and_wait((mutex)), c_ticket_mutex_advance_ticket((mutex)))
 
 #endif // C_SYNCHRONIZATION_H
 

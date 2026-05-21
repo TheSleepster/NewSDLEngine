@@ -12,6 +12,7 @@ struct item_t
     int item_member_one;
 };
 
+// C Variant
 typedef struct other_item
 {
     int item_typedeffed_member;

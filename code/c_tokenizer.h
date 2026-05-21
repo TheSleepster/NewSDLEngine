@@ -69,5 +69,7 @@ bool8 c_tokenizer_token_alphabetical(char A);
 true_inline void         c_tokenizer_set_bookmark(tokenizer_t *tokenizer, token_data_t token);
 true_inline token_data_t c_tokenizer_restore_bookmark(tokenizer_t *tokenizer);
 
+#define fprint_token(token) (token).string.count, C_STR((token).string)
+
 #endif // C_TOKENIZER_H
 

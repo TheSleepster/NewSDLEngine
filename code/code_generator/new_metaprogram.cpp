@@ -42,7 +42,10 @@
 
 struct code_type_t
 {
+    bool8    is_valid;
     string_t type_name;
+    u64      type_id;
+    u64      alias_of = INVALID_ID;
 };
 
 struct macro_data_t
@@ -70,7 +73,7 @@ struct state_t
 
     // NOTE(Sleepster): Maps type names to their actual type (accounts for typedef)... maps string -> string
     ticket_mutex_t            type_table_mutex;
-    HashTable_t(string_t)     type_table;
+    HashTable_t(code_type_t)  type_table;
 
     // NOTE(Sleepster): Map types to their definitions. string -> ID
     ticket_mutex_t            type_definition_table_mutex;
@@ -169,12 +172,10 @@ parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t 
         macro.macro_string  = c_string_make_copy(&permanent_arena, full_macro);
     }
 
-    u64 ticket = c_ticket_mutex_take_ticket(&g_state->macro_table_mutex);
-    c_ticket_mutex_wait(&g_state->macro_table_mutex, ticket);
-
-    c_hash_table_insert_pair(&g_state->macro_table, macro.macro_name, macro);
-
-    c_ticket_mutex_advance_ticket(&g_state->macro_table_mutex);
+    TicketMutexScope(&g_state->macro_table_mutex)
+    {
+        c_hash_table_insert_pair(&g_state->macro_table, macro.macro_name, macro);
+    }
 
     printf("\033[0m");
     printf("========== MACRO_DATA ===========\n");
@@ -189,6 +190,99 @@ parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t 
     }
     printf("Macro contents:       '%.*s'...\n", macro.macro_string.count, C_STR(macro.macro_string));
     printf("=================================\n\n");
+}
+
+internal_api inline u64
+id_from_string(string_t string, u64 modular)
+{
+    u64 result = 0;
+    Assert(string.count > 0);
+
+    result  = c_fnv_hash_value(string.data, string.count);
+    if(modular > 0) result %= modular;
+
+    return(result);
+}
+
+internal_api u64
+register_type(string_t type_name, u64 alias_id)
+{
+    u64 type_id = id_from_string(type_name, 2048);
+
+    code_type_t *type_declaration = null;
+    TicketMutexScope(&g_state->type_table_mutex)
+    {
+        type_declaration = g_state->type_table.data + type_id;
+    }
+
+    // NOTE(Sleepster): If the item being typedeffed does not exist yet in the type table, add it
+    if(!type_declaration->is_valid)
+    {
+        type_declaration->is_valid  = true;
+        type_declaration->type_name = c_string_make_copy(&permanent_arena, type_name);
+        type_declaration->type_id   = type_id;
+        type_declaration->alias_of  = alias_id;
+    }
+
+    return(type_id);
+}
+
+internal_api void
+register_structured_type(tokenizer_t *tokenizer, string_t filename, string_t structure_name)
+{
+    u64 struct_id = register_type(structure_name, INVALID_ID);
+
+    token_data_t next_token = c_tokenizer_get_next_token(tokenizer);
+    switch(next_token.type)
+    {
+        case TT_Semicolon:
+        {
+            return;
+        }break;
+        case TT_OpeningBrace:
+        {
+            // NOTE(Sleepster): Eat to the closing brace. 
+            while(next_token.type != TT_ClosingBrace)
+            {
+                next_token = c_tokenizer_get_next_token(tokenizer);
+            }
+
+            // NOTE(Sleepster): Check if this is a C style structure. 
+            next_token = c_tokenizer_get_next_token(tokenizer);
+            if(next_token.type == TT_Semicolon)
+            {
+                printf("\033[0m");
+                printf("Structure of type: '%.*s'\n", 
+                       structure_name.count, C_STR(structure_name));
+
+                return;
+            }
+            else if(next_token.type == TT_Identifier)
+            {
+                // NOTE(Sleepster): Record this as an alias of the formerly declared... 
+                register_type(next_token.string, struct_id);
+
+                printf("\033[0m");
+                printf("Structure of type: '%.*s', with a C style alias of: '%.*s'\n", 
+                       structure_name.count, C_STR(structure_name),
+                       fprint_token(next_token));
+            }
+            else
+            {
+                Expect(false, "[Line: '%d', File: '%.*s']: Token of: '%.*s' is not valid after the closing brace of a structure definition...\n",
+                       tokenizer->line_count, filename, fprint_token(next_token));
+            }
+        }break;
+        case TT_Colon:
+        {
+            // TODO(Sleepster): C++ stuff... 
+        }break;
+        default:
+        {
+            Expect(false, "[Line: '%d', File: '%.*s']: Token of: '%.*s' is not valid after the 'struct' keyword...\n",
+                   tokenizer->line_count, filename, fprint_token(next_token));
+        }break;
+    }
 }
 
 int
@@ -227,16 +321,28 @@ main(int argc, char **argv)
                 if(c_string_compare(macro_type.string, STR("define")))
                 {
                     token_data_t macro_name  = c_tokenizer_get_next_token(&tokenizer);
+                    macro_data_t *macro_info = null;
+                    TicketMutexScope(&g_state->macro_table_mutex)
+                    {
+                        macro_info = c_hash_table_get_value_ptr(&g_state->macro_table, macro_name.string);
+                    }
 
-                    u64 ticket = c_ticket_mutex_take_ticket(&g_state->macro_table_mutex);
-                    c_ticket_mutex_wait(&g_state->macro_table_mutex, ticket);
-
-                    macro_data_t *macro_info = c_hash_table_get_value_ptr(&g_state->macro_table, macro_name.string);
-
-                    c_ticket_mutex_advance_ticket(&g_state->macro_table_mutex);
                     if(!macro_info->is_valid)
                     {
                         parse_macro_information(&tokenizer, filename, macro_name);
+                    }
+                }
+                if(c_string_compare(macro_type.string, STR("if")))
+                {
+                    token_data_t if_zeroed = c_tokenizer_get_next_token(&tokenizer);
+                    Expect(if_zeroed.type == TT_Number, "We currently do not handle anything other than '#if' in this case...\n");
+
+                    if(c_string_compare(if_zeroed.string, STR("0")))
+                    {
+                        while(!c_string_compare(token.string, STR("endif")))
+                        {
+                            token = c_tokenizer_get_next_token(&tokenizer);
+                        }
                     }
                 }
             }break;
@@ -244,9 +350,40 @@ main(int argc, char **argv)
             {
                 if(c_string_compare(token.string, STR("typedef")))
                 {
+                    // NOTE(Sleepster): This will get the type of the item being typedeffed and then get it's runtime type_id (only for the metaprogram)
+                    token_data_t type_name = c_tokenizer_get_next_token(&tokenizer);
+                    if(!c_string_compare(type_name.string, STR("struct")))
+                    {
+                        // TODO(Sleepster): Check this is not a function typedef
+                        //
+                        // typedef void function(int argument, int argument);
+                        u64 type_id = register_type(type_name.string, INVALID_ID);
+
+                        // NOTE(Sleepster): Now record the alias of said type
+                        token_data_t type_alias = c_tokenizer_get_next_token(&tokenizer);
+                        Expect(type_alias.type == TT_Identifier, "Token of type: '%.*s' is not allowed inside a typedef...\n",
+                               type_alias.string.count, C_STR(type_alias.string));
+
+                        register_type(type_name.string, type_id);
+
+                        printf("\033[0m");
+                        printf("Typedef from type: '%.*s' to type: '%.*s'\n", 
+                               fprint_token(type_name),
+                               fprint_token(type_alias));
+                    }
+                    else
+                    {
+                        type_name = c_tokenizer_get_next_token(&tokenizer);
+                        register_structured_type(&tokenizer, filename, type_name.string);
+                    }
                 }
                 if(c_string_compare(token.string, STR("struct")))
                 {
+                    // TODO(Sleepster): in cases like the innards of macros or anonymous structure... this will barf.
+                    token_data_t structure_name = c_tokenizer_get_next_token(&tokenizer);
+                    Expect(structure_name.type == TT_Identifier, "You must have an identifier after declaring a structure...\n");
+
+                    register_structured_type(&tokenizer, filename, structure_name.string);
                 }
             }break;
         }
