@@ -441,13 +441,16 @@ c_string_is_whitespace(string_t *current_line)
     return(result);
 }
 
-void
+u32
 c_string_eat_whitespace(string_t *current_line)
 {
+    u32 result = 0;
+
     while(current_line->count > 0)
     {
         if(c_string_is_whitespace(current_line))
         {
+            if(current_line->data[0] == '\n') result++;
             c_string_advance_by(current_line, 1);
         }
         else if(current_line->data[0] == '/' &&
@@ -456,6 +459,7 @@ c_string_eat_whitespace(string_t *current_line)
             c_string_advance_by(current_line, 2);
             while(!c_string_is_end_of_line(current_line))
             {
+                if(current_line->data[0] == '\n') result++;
                 c_string_advance_by(current_line, 1);
             }
         }
@@ -468,6 +472,7 @@ c_string_eat_whitespace(string_t *current_line)
                  !((current_line->data[0] == '*') && 
                    (current_line->data[1] == '/')))
             {
+                if(current_line->data[0] == '\n') result++;
                 c_string_advance_by(current_line, 1);
             }
 
@@ -481,6 +486,8 @@ c_string_eat_whitespace(string_t *current_line)
             break;
         }
     }
+
+    return(result);
 }
 
 

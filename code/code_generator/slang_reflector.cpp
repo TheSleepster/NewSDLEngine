@@ -6,6 +6,7 @@
    ======================================================================== */
 #include <c_types.h>
 #include <c_base.h>
+#include <c_synchronization.h>
 
 #define DYNARRAY_IMPLEMENTATION 
 #define HASH_TABLE_IMPLEMENTATION
@@ -23,46 +24,6 @@
 #include <c_string.cpp>
 #include <c_threadpool.cpp>
 #include <c_tokenizer.cpp>
-
-// TODO(Sleepster): Figure out where this structure belongs 
-struct ticket_mutex_t
-{
-    volatile u64 next_ticket;
-    volatile u64 working_ticket;
-};
-
-internal_api true_inline u64
-c_ticket_mutex_take_ticket(ticket_mutex_t *mutex)
-{
-    u64 result = 0;
-    result = AtomicIncrement64(&mutex->next_ticket);
-    return(result);
-}
-
-
-internal_api true_inline bool8
-c_ticket_mutex_try_wait(ticket_mutex_t *mutex, u64 ticket)
-{
-    bool8 result = false;
-    if((u64)AtomicLoad64(&mutex->working_ticket) == ticket)
-    {
-        result = true;
-    }
-
-    return(result);
-}
-
-internal_api true_inline void
-c_ticket_mutex_wait(ticket_mutex_t *mutex, u64 ticket)
-{
-    while(!c_ticket_mutex_try_wait(mutex, ticket));
-}
-
-internal_api true_inline void
-c_ticket_mutex_advance_ticket(ticket_mutex_t *mutex)
-{
-    AtomicIncrement64(&mutex->working_ticket);
-}
 
 constexpr u32 MAX_INCLUDED_FILES = 100;
 

@@ -106,6 +106,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_sys_mutex_t, type_id(sys_mutex_t), "sys_mutex_t") \
 	X(TYPE_sys_semaphore_handle_t, type_id(sys_semaphore_handle_t), "sys_semaphore_handle_t") \
 	X(TYPE_sys_semaphore_t, type_id(sys_semaphore_t), "sys_semaphore_t") \
+	X(TYPE_ticket_mutex_t, type_id(ticket_mutex_t), "ticket_mutex_t") \
 	X(TYPE_work_completion_fence_t, type_id(work_completion_fence_t), "work_completion_fence_t") \
 	X(TYPE_work_order_fn, type_id(work_order_fn), "work_order_fn") \
 	X(TYPE_work_order_t, type_id(work_order_t), "work_order_t") \
@@ -425,6 +426,7 @@ const static string_builder_t GENERATED_DEFAULT_string_builder_t = {};
 const static sys_thread_t GENERATED_DEFAULT_sys_thread_t = {};
 const static sys_mutex_t GENERATED_DEFAULT_sys_mutex_t = {};
 const static sys_semaphore_t GENERATED_DEFAULT_sys_semaphore_t = {};
+const static ticket_mutex_t GENERATED_DEFAULT_ticket_mutex_t = {};
 const static work_completion_fence_t GENERATED_DEFAULT_work_completion_fence_t = {};
 const static work_order_t GENERATED_DEFAULT_work_order_t = {};
 const static token_data_t GENERATED_DEFAULT_token_data_t = {};
@@ -1207,6 +1209,23 @@ struct type_info_struct_sys_semaphore_t {
 	};
 };
 
+struct type_info_struct_ticket_mutex_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t next_ticket;
+			type_info_member_t working_ticket;
+		}members;
+	};
+};
+
 struct type_info_struct_work_completion_fence_t {
 	const char *name;
 	u32 type;
@@ -1268,9 +1287,10 @@ struct type_info_struct_tokenizer_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[1];
+		type_info_member_t member_array[2];
 		struct {
 			type_info_member_t data;
+			type_info_member_t line_count;
 		}members;
 	};
 };
@@ -4151,6 +4171,20 @@ const static type_info_struct_sys_semaphore_t type_info_struct_sys_semaphore_t_c
 	}
 };
 
+const static type_info_struct_ticket_mutex_t type_info_struct_ticket_mutex_t_const_data = {
+	.name = "ticket_mutex_t",
+	.type = TYPE_ticket_mutex_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_ticket_mutex_t),
+	.member_count = 2,
+	.members = {
+		.next_ticket = {.name = "next_ticket", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_ticket_mutex_t.next_ticket)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_ticket_mutex_t), next_ticket))},
+		.working_ticket = {.name = "working_ticket", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_ticket_mutex_t.working_ticket)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_ticket_mutex_t), working_ticket))},
+	}
+};
+
 const static type_info_struct_work_completion_fence_t type_info_struct_work_completion_fence_t_const_data = {
 	.name = "work_completion_fence_t",
 	.type = TYPE_work_completion_fence_t,
@@ -4201,9 +4235,10 @@ const static type_info_struct_tokenizer_t type_info_struct_tokenizer_t_const_dat
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_tokenizer_t),
-	.member_count = 1,
+	.member_count = 2,
 	.members = {
 		.data = {.name = "data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_tokenizer_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_tokenizer_t), data))},
+		.line_count = {.name = "line_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_tokenizer_t.line_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_tokenizer_t), line_count))},
 	}
 };
 
@@ -6318,6 +6353,11 @@ enum sys_semaphore_t_member_list_enum {
 	TYPE_SYS_SEMAPHORE_T_MEMBER_handle,
 };
 
+enum ticket_mutex_t_member_list_enum {
+	TYPE_TICKET_MUTEX_T_MEMBER_next_ticket,
+	TYPE_TICKET_MUTEX_T_MEMBER_working_ticket,
+};
+
 enum work_completion_fence_t_member_list_enum {
 	TYPE_WORK_COMPLETION_FENCE_T_MEMBER_pending,
 };
@@ -6336,6 +6376,7 @@ enum token_data_t_member_list_enum {
 
 enum tokenizer_t_member_list_enum {
 	TYPE_TOKENIZER_T_MEMBER_data,
+	TYPE_TOKENIZER_T_MEMBER_line_count,
 };
 
 enum zone_allocator_block_t_member_list_enum {
@@ -7611,6 +7652,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "sys_mutex_t", .type = TYPE_sys_mutex_t, .size = sizeof(sys_mutex_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_mutex_t_const_data},
 	{.name = "sys_semaphore_handle_t", .type = TYPE_sys_semaphore_handle_t, .size = sizeof(sys_semaphore_handle_t), .struct_info = NULL},
 	{.name = "sys_semaphore_t", .type = TYPE_sys_semaphore_t, .size = sizeof(sys_semaphore_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_semaphore_t_const_data},
+	{.name = "ticket_mutex_t", .type = TYPE_ticket_mutex_t, .size = sizeof(ticket_mutex_t), .struct_info = (type_info_struct_t*)&type_info_struct_ticket_mutex_t_const_data},
 	{.name = "work_completion_fence_t", .type = TYPE_work_completion_fence_t, .size = sizeof(work_completion_fence_t), .struct_info = (type_info_struct_t*)&type_info_struct_work_completion_fence_t_const_data},
 	{.name = "work_order_fn", .type = TYPE_work_order_fn, .size = sizeof(work_order_fn*), .struct_info = NULL},
 	{.name = "work_order_t", .type = TYPE_work_order_t, .size = sizeof(work_order_t), .struct_info = (type_info_struct_t*)&type_info_struct_work_order_t_const_data},

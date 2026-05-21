@@ -50,6 +50,8 @@ typedef struct token_data
 typedef struct tokenizer
 {
     string_t data;
+    u32      line_count;
+    u32      read_bookmark;
 }tokenizer_t;
 
 // NOTE(Sleepster): This will eat portions of the string and give you back the eaten bits 
@@ -60,6 +62,9 @@ string_t     c_tokenizer_eat_lines(tokenizer_t *tokenizer, u32 line_count);
 
 bool8 c_tokenizer_token_numeric(char A);
 bool8 c_tokenizer_token_alphabetical(char A);
+
+true_inline void c_tokenizer_set_bookmark(tokenizer_t *tokenizer);
+true_inline void c_tokenizer_restore_bookmark(tokenizer_t *tokenizer);
 
 #endif // C_TOKENIZER_H
 

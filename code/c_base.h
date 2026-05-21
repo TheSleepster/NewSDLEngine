@@ -134,6 +134,16 @@ CODE_GEN_IGNORE_FILE()
 # define ASSERT_ENABLED
 #endif
 
+#define global_variable static
+#define local_persist   static
+#define internal_api    static
+
+#if COMPILER_CLANG || COMPILER_GCC
+# define thread_static   __thread
+#elif defined(COMPILER_CL)
+# define thread_static __declspec(thread)
+#endif
+
 ///////////////////////////////////
 // NOTE(Sleepster): HELPER MACROS 
 #define Statement(x)                 do{x}while(0)
@@ -163,6 +173,7 @@ CODE_GEN_IGNORE_FILE()
 #define Align16(value) ((value + 15) & ~15)
 
 #define BIT(x) (1 << x)
+#define INVALID_ID ((u32)-1)
 
 #include "c_types.h"
 
@@ -209,7 +220,8 @@ typedef void void_func(void);
 #define Assert(cond)
 #endif
 
-// NOTE(Sleepster): By default virtual memory pages are zeroed for you. 
+// NOTE(Sleepster): 
+// By default virtual memory pages are zeroed for you. 
 // Why malloc doesn't do this is beyond me. Probably has to do with speed...
 #define TypeOf(type) __typeof__(type)
 
@@ -238,7 +250,6 @@ typedef void void_func(void);
 #define MB(x) (KB((x))  * 1024ULL)
 #define GB(x) (MB((x))  * 1024ULL)
 
-#define INVALID_ID ((u32)-1)
 
 // NOTE(Sleepster): C++
 #ifdef __cplusplus
@@ -268,7 +279,8 @@ privDefer<F> defer_func(F f) {
 #define defer(code)   auto DEFER_3(_defer_) = defer_func([&](){code;})
 #endif
 
-#define DeferLoop(begin, end)        for(int _i_ = ((begin), 0); !_i_; _i_ += 1, (end))
+// NOTE(Sleepster): Thanks Ryan Fluery 
+#define DeferLoop(begin, end) for(int _i_ = ((begin), 0); !_i_; _i_ += 1, (end))
 
 #endif // C_BASE_H
 

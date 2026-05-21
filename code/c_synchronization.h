@@ -24,6 +24,7 @@ typedef SDL_Thread*    sys_thread_handle_t;
 
 #include <c_base.h>
 #include <c_types.h>
+#include <c_intrinsics.h>
 
 typedef struct sys_thread
 {
@@ -41,6 +42,46 @@ typedef struct sys_semaphore
 {
     sys_semaphore_handle_t handle;
 }sys_semaphore_t;
+
+// NOTE(Sleepster): Ticket Mutex. Super simple. 
+struct ticket_mutex_t
+{
+    volatile u64 next_ticket;
+    volatile u64 working_ticket;
+};
+
+inline u64
+c_ticket_mutex_take_ticket(ticket_mutex_t *mutex)
+{
+    u64 result = 0;
+    result = AtomicIncrement64(&mutex->next_ticket);
+    return(result);
+}
+
+
+inline bool8
+c_ticket_mutex_try_wait(ticket_mutex_t *mutex, u64 ticket)
+{
+    bool8 result = false;
+    if((u64)AtomicLoad64(&mutex->working_ticket) == ticket)
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+inline void
+c_ticket_mutex_wait(ticket_mutex_t *mutex, u64 ticket)
+{
+    while(!c_ticket_mutex_try_wait(mutex, ticket));
+}
+
+inline void
+c_ticket_mutex_advance_ticket(ticket_mutex_t *mutex)
+{
+    AtomicIncrement64(&mutex->working_ticket);
+}
 
 #endif // C_SYNCHRONIZATION_H
 

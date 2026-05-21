@@ -27,7 +27,8 @@ c_tokenizer_get_next_token(tokenizer_t *tokenizer)
 {
     token_data_t result = {};
 
-    c_string_eat_whitespace(&tokenizer->data);
+    u32 new_lines_seen = c_string_eat_whitespace(&tokenizer->data);
+    tokenizer->line_count += new_lines_seen;
     if(tokenizer->data.count == 0)
     {
         result.type = TT_EOF;
@@ -172,5 +173,17 @@ c_tokenizer_eat_lines(tokenizer_t *tokenizer, u32 line_count)
     }
 
     return(result);
+}
+
+true_inline void
+c_tokenizer_set_bookmark(tokenizer_t *tokenizer)
+{
+    tokenizer->read_bookmark = tokenizer->data.count;
+}
+
+true_inline void
+c_tokenizer_restore_bookmark(tokenizer_t *tokenizer)
+{
+    tokenizer->data.count = tokenizer->read_bookmark;
 }
 
