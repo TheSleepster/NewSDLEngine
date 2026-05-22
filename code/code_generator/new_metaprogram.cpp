@@ -40,6 +40,31 @@
 // SECOND PASS
 // - Compute the RTTI from the previous pass...
 
+#define DEFAULT_KEYWORDS(X)               \
+    X("Invalid",  TOKEN_KEYWORD_INVALID)  \
+    X("static",   TOKEN_KEYWORD_STATIC)   \
+    X("extern",   TOKEN_KEYWORD_EXTERN)   \
+    X("inline",   TOKEN_KEYWORD_INLINE)   \
+    X("volatile", TOKEN_KEYWORD_VOLATILE) \
+    X("const",    TOKEN_KEYWORD_CONST)    \
+    X("struct",   TOKEN_KEYWORD_STRUCT)   \
+    X("union",    TOKEN_KEYWORD_UNION)    \
+    X("enum",     TOKEN_KEYWORD_ENUM)     \
+    X("typedef",  TOKEN_KEYWORD_TYPEDEF)
+
+enum lexer_keyword_t
+{
+#define X(string, enum) enum,
+    DEFAULT_KEYWORDS(X)
+#undef X
+};
+
+struct keyword_t 
+{
+    string_t        string;
+    lexer_keyword_t keyword_token;
+};
+
 struct code_type_t
 {
     bool8    is_valid;
@@ -63,6 +88,16 @@ struct macro_data_t
 
 struct code_declaration_t
 {
+    // NOTE(Sleepster): (static, extern) 
+    string_t  storage_class;
+
+    // NOTE(Sleepster): (inline, _NoReturn, etc.)
+    string_t *function_specifiers;
+    u32       specifier_count;
+
+    // NOTE(Sleepster): (const, volatile) 
+    string_t *type_qualifiers;
+    u32       qualifier_count;
 };
 
 struct state_t
@@ -84,8 +119,11 @@ struct state_t
     HashTable_t(string_t)     function_table;
     
     // NOTE(Sleepster): Stores what files are already loaded... 
-    ticket_mutex_t        loaded_file_table_mutex;
-    HashTable_t(string)   loaded_file_table;
+    ticket_mutex_t            loaded_file_table_mutex;
+    HashTable_t(string)       loaded_file_table;
+
+    // NOTE(Sleepster): ONLY WRITTEN TOO BY THE MAIN THREAD!!! 
+    DynArray_t(keyword_t)     keywords;
 };
 
 global_variable state_t *g_state;
@@ -93,6 +131,61 @@ global_variable state_t *g_state;
 // TODO(Sleepster): We will need to make these thread local since these are not threadsafe... 
 thread_static memory_arena_t permanent_arena;
 thread_static memory_arena_t transient_arena;
+
+internal_api void
+register_keywords(void)
+{
+    g_state->keywords = c_dynarray_create(keyword_t);
+
+    string_t default_keyword_strings[] = {
+#define X(string, enum) STR(string),
+        DEFAULT_KEYWORDS(X)
+#undef X
+    };
+
+    lexer_keyword_t default_keyword_enums[] = {
+#define X(string, enum) enum,
+        DEFAULT_KEYWORDS(X)
+#undef X
+    };
+    
+    for(u32 index = 0;
+        index < ArrayCount(default_keyword_strings);
+        ++index)
+    {
+        keyword_t keyword     = {};
+        keyword.string        = default_keyword_strings[index];
+        keyword.keyword_token = default_keyword_enums[index];
+        c_dynarray_push(g_state->keywords, keyword);
+    }
+}
+
+internal_api keyword_t*
+get_keyword(token_data_t token)
+{
+    keyword_t *result = null;
+    c_dynarray_for(g_state->keywords, keyword_index)
+    {
+        keyword_t *keyword = g_state->keywords + keyword_index;
+        if(c_string_compare(keyword->string, token.string))
+        {
+            result = keyword;
+            break;
+        }
+    }
+
+    if(result == null)
+    {
+        // NOTE(Sleepster): Should be invalid 
+        result = g_state->keywords;
+        Expect(result->keyword_token == TOKEN_KEYWORD_INVALID, "Default keyword is not invalid... this is fatal...\n");
+    }
+
+    return(result);
+}
+
+
+// TODO(Sleepster): If a macro expands to a keyword, add it to the keyword table.
 
 internal_api void
 parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t macro_name)
@@ -169,6 +262,15 @@ parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t 
         string_t macro_line = c_tokenizer_eat_lines(&transient_arena, tokenizer, 1);
         string_t full_macro = c_string_concat(&permanent_arena, token.string, macro_line);
 
+        keyword_t *keyword = get_keyword(token);
+        if(keyword->keyword_token != TOKEN_KEYWORD_INVALID)
+        {
+            keyword_t new_keyword     = {};
+            new_keyword.string        = macro_name.string;
+            new_keyword.keyword_token = keyword->keyword_token;
+            c_dynarray_push(g_state->keywords, new_keyword);
+        }
+
         macro.macro_string  = c_string_make_copy(&permanent_arena, full_macro);
     }
 
@@ -228,10 +330,27 @@ register_type(string_t type_name, u64 alias_id)
 }
 
 internal_api void
-register_structured_type(tokenizer_t *tokenizer, string_t filename, string_t structure_name)
+register_structured_type(tokenizer_t *tokenizer, string_t filename, token_data_t structure_name_token)
 {
+    string_t structure_name = structure_name_token.string;
     u64 struct_id = register_type(structure_name, INVALID_ID);
 
+    if(structure_name_token.type == TT_OpeningBrace)
+    {
+        // NOTE(Sleepster): Anonymous structure
+        printf("\033[0m");
+        printf("anonymous structure found!...\n");
+
+        return;
+    }
+    else if(structure_name_token.type != TT_Identifier)
+    {
+        // NOTE(Sleepster): This is an error... 
+        Expect(false, "[Line: '%d', File: '%.*s']: Token of: '%.*s' is not valid after the declared name of a structure...\n",
+               tokenizer->line_count, filename, fprint_token(structure_name_token));
+    }
+
+    // NOTE(Sleepster): Otherwise, parse. 
     token_data_t next_token = c_tokenizer_get_next_token(tokenizer);
     switch(next_token.type)
     {
@@ -245,6 +364,14 @@ register_structured_type(tokenizer_t *tokenizer, string_t filename, string_t str
             while(next_token.type != TT_ClosingBrace)
             {
                 next_token = c_tokenizer_get_next_token(tokenizer);
+
+                // NOTE(Sleepster): Handle nested structures
+                if(c_string_compare(next_token.string, STR("struct")) || 
+                   c_string_compare(next_token.string, STR("union")))
+                {
+                    token_data_t nested_name = c_tokenizer_get_next_token(tokenizer); 
+                    register_structured_type(tokenizer, filename, nested_name);
+                }
             }
 
             // NOTE(Sleepster): Check if this is a C style structure. 
@@ -305,6 +432,8 @@ main(int argc, char **argv)
     permanent_arena = c_arena_create(MB(200));
     transient_arena = c_arena_create(MB(50));
 
+    register_keywords();
+
     string_t filename = STR(*requested_filename);
     string_t file_data = c_file_read_entirety(filename);
 
@@ -348,43 +477,89 @@ main(int argc, char **argv)
             }break;
             case TT_Identifier:
             {
-                if(c_string_compare(token.string, STR("typedef")))
+                keyword_t *keyword = get_keyword(token);
+                // NOTE(Sleepster): If it's a type alias 
+                if(keyword->keyword_token == TOKEN_KEYWORD_TYPEDEF)
                 {
                     // NOTE(Sleepster): This will get the type of the item being typedeffed and then get it's runtime type_id (only for the metaprogram)
                     token_data_t type_name = c_tokenizer_get_next_token(&tokenizer);
-                    if(!c_string_compare(type_name.string, STR("struct")))
+
+                    keyword_t *keyword = get_keyword(type_name);
+                    if(keyword)
                     {
-                        // TODO(Sleepster): Check this is not a function typedef
-                        //
-                        // typedef void function(int argument, int argument);
-                        u64 type_id = register_type(type_name.string, INVALID_ID);
+                        if(keyword->keyword_token == TOKEN_KEYWORD_STRUCT ||
+                           keyword->keyword_token == TOKEN_KEYWORD_UNION)
+                        {
+                            type_name = c_tokenizer_get_next_token(&tokenizer);
+                            register_structured_type(&tokenizer, filename, type_name);
+                        }
+                        else if(keyword->keyword_token == TOKEN_KEYWORD_ENUM)
+                        {
+                            token_data_t enum_type_name = c_tokenizer_get_next_token(&tokenizer);
+                            if(enum_type_name.type == TT_Identifier || 
+                               enum_type_name.type == TT_OpeningBrace)
+                            {
+                                register_structured_type(&tokenizer, filename, enum_type_name);
+                            }
+                            else
+                            {
+                                Expect(false, "After declaring an enum, you MUST either have open parenthesis or an identifier immediately following the 'enum' keyword...\n");
+                            }
+                        }
+                        else 
+                        {
+                            // TODO(Sleepster): Check this is not a function typedef
+                            //
+                            // typedef void function(int argument, int argument);
+                            u64 type_id = register_type(type_name.string, INVALID_ID);
 
-                        // NOTE(Sleepster): Now record the alias of said type
-                        token_data_t type_alias = c_tokenizer_get_next_token(&tokenizer);
-                        Expect(type_alias.type == TT_Identifier, "Token of type: '%.*s' is not allowed inside a typedef...\n",
-                               type_alias.string.count, C_STR(type_alias.string));
+                            // NOTE(Sleepster): Now record the alias of said type
+                            token_data_t type_alias = c_tokenizer_get_next_token(&tokenizer);
+                            Expect(type_alias.type == TT_Identifier, "Token of type: '%.*s' is not allowed inside a typedef...\n",
+                                   type_alias.string.count, C_STR(type_alias.string));
 
-                        register_type(type_name.string, type_id);
+                            register_type(type_name.string, type_id);
 
-                        printf("\033[0m");
-                        printf("Typedef from type: '%.*s' to type: '%.*s'\n", 
-                               fprint_token(type_name),
-                               fprint_token(type_alias));
-                    }
-                    else
-                    {
-                        type_name = c_tokenizer_get_next_token(&tokenizer);
-                        register_structured_type(&tokenizer, filename, type_name.string);
+                            printf("\033[0m");
+                            printf("Typedef from type: '%.*s' to type: '%.*s'\n", 
+                                   fprint_token(type_name),
+                                   fprint_token(type_alias));
+                        }
                     }
                 }
-                if(c_string_compare(token.string, STR("struct")))
+                // NOTE(Sleepster): If it's a structure 
+                else if(keyword->keyword_token == TOKEN_KEYWORD_STRUCT ||
+                        keyword->keyword_token == TOKEN_KEYWORD_UNION)
                 {
                     // TODO(Sleepster): in cases like the innards of macros or anonymous structure... this will barf.
                     token_data_t structure_name = c_tokenizer_get_next_token(&tokenizer);
                     Expect(structure_name.type == TT_Identifier, "You must have an identifier after declaring a structure...\n");
 
-                    register_structured_type(&tokenizer, filename, structure_name.string);
+                    register_structured_type(&tokenizer, filename, structure_name);
                 }
+                // NOTE(Sleepster): If it's a enum
+                else if(keyword->keyword_token == TOKEN_KEYWORD_ENUM)
+                {
+                    token_data_t enum_type_name = c_tokenizer_get_next_token(&tokenizer);
+                    if(enum_type_name.type == TT_Identifier || 
+                       enum_type_name.type == TT_OpeningBrace)
+                    {
+                        register_structured_type(&tokenizer, filename, enum_type_name);
+                    }
+                    else
+                    {
+                        Expect(false, "After declaring an enum, you MUST either have open parenthesis or an identifier immediately following the 'enum' keyword...\n");
+                    }
+                }
+ 
+                // NOTE(Sleepster): If it's some other identifier we can't easily discern 
+                // for function declarations it looks like this:
+                //
+                // [storage_class] [qualifiers] [specifiers] [type] [function name]()
+                else if(keyword->keyword_token != TOKEN_KEYWORD_INVALID)
+                {
+                }
+
             }break;
         }
     }

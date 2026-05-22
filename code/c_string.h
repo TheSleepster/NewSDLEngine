@@ -70,8 +70,9 @@ s32         c_string_read_int(string_t data);
 u32         c_string_read_uint(string_t data);
 
 // MACROS
-#define STR(x)   (string_t){.data = (byte*)x, .count = c_string_length(x)}
-#define C_STR(x) ((const char *)x.data)
+#define STR(x)                (string_t){.data = (byte*)x, .count = c_string_length(x)}
+#define C_STR(x)              ((const char *)x.data)
+#define fprint_string(string) (string).count, C_STR((string))
 ///////////////////////////////////////////
 // STRING BUILDER
 ///////////////////////////////////////////

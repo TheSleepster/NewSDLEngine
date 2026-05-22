@@ -4,7 +4,7 @@
 // FROM INCLUDED FILE: ../code/shaders/immediate_vertex.slh
 #line 1 "../code/shaders/immediate_vertex.slh"
 #ifndef IMMEDIATE_VERTEX_SLH
-    float2 vPadding0 : PADDI
+#define IMMEDIATE_VERTEX_SLH
 
 
 
