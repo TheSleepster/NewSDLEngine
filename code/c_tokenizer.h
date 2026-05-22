@@ -53,6 +53,7 @@ typedef struct tokenizer
     u32          line_count;
 
     u32          bookmarked_read_count;
+    u32          bookmarked_line_count;
     byte        *read_bookmark;
     token_data_t bookmarked_token;
 }tokenizer_t;

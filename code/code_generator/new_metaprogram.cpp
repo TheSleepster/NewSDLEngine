@@ -35,10 +35,17 @@
 // this is a drawback of single pass compilers. However, this is where the "multipass" idea comes in. We will:
 //
 // - Load all files into memory
-// FIRST PASS
-// - Scan them and harvest their type data, macro declarations, and function declarations
+//
+// FIRST PASS, GATHERING OF TYPES AND MACRO DEFINITIONS
+// - Read over all files loaded into memory, adding whatever types they find (declared or defined) to the type table.
+// - While reading for types, record and store macros
+// 
 // SECOND PASS
-// - Compute the RTTI from the previous pass...
+// - With knowledge of what types exist, we can now parse the files for items like function declarations and their arguments
+//
+// THIRD PASS
+// - Use the information from the previous two passes to record all the information related to their declarations
+// (Member count, member names, function parameters and their types, etc.) as RTTI
 
 #define DEFAULT_KEYWORDS(X)               \
     X("Invalid",  TOKEN_KEYWORD_INVALID)  \
@@ -87,6 +94,11 @@ struct macro_data_t
     bool32    uses_va_args;
 };
 
+enum code_declaration_flags_t
+{
+    CODE_DECLARATION_FLAG_POINTER,
+};
+
 struct code_declaration_t
 {
     // NOTE(Sleepster): (static, extern) 
@@ -101,6 +113,8 @@ struct code_declaration_t
     u32       qualifier_count;
 
     string_t  return_type;
+    u32       return_type_flags;
+
     string_t  name;
 };
 
@@ -111,7 +125,7 @@ struct state_t
     HashTable_t(macro_data_t) macro_table;
 
     // NOTE(Sleepster): Maps type names to their actual type (accounts for typedef)... maps string -> string
-ticket_mutex_t            type_table_mutex;
+    ticket_mutex_t            type_table_mutex;
     HashTable_t(code_type_t)  type_table;
 
     // NOTE(Sleepster): Map types to their definitions. string -> ID
@@ -440,24 +454,68 @@ parse_declaration(tokenizer_t *tokenizer, token_data_t token, keyword_t *keyword
             }break;
             default:
             {
-                // NOTE(Sleepster): 
-                //
-                // We need to figure out some way to determine when a function's parsing should end. Right now, we just kinda keep reading into the arguments
-                // which is not good...
-                token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
-                if(peek_token.type == TT_OpeningParen)
+                switch(token.type)
                 {
-                    Expect(token.type == TT_Identifier, "Tried to set the function's name... however the token: '%.*s' was not a valid identifier...\n",
-                           fprint_token(token));
+                    // NOTE(Sleepster): If it's an identifier, but not a keyword we need to find out where it belongs. 
+                    case TT_Identifier:
+                    {
+                        // NOTE(Sleepster): Check if it's a valid type... 
+                        u64 ID = id_from_string(token.string, 2048);
 
-                    decl.name = c_string_make_copy(&permanent_arena, token.string);
-                }
-                else if(peek_token.type == TT_Identifier || peek_token.type == TT_Asterisk)
-                {
-                    Expect(token.type == TT_Identifier, "Tried to set the function's return type... however the token: '%.*s' was not a valid identifier...\n",
-                           fprint_token(token));
+                        code_type_t *type = null;
+                        TicketMutexScope(&g_state->type_table_mutex)
+                        {
+                            type = g_state->type_table.data + ID;
+                        }
 
-                    decl.return_type = c_string_make_copy(&permanent_arena, token.string);
+                        // NOTE(Sleepster): If it is a type... 
+                        token_data_t name_token = c_tokenizer_get_next_token(tokenizer);
+                        if(name_token.type == TT_Identifier)
+                        {
+                            token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
+                            if(peek_token.type == TT_OpeningParen)
+                            {
+                                if(!type->is_valid)
+                                {
+                                    type->type_id   = ID;
+                                    type->type_name = token.string;
+                                    type->alias_of  = INVALID_ID;
+                                    type->is_valid  = true;
+                                }
+
+                                // NOTE(Sleepster): If it has arguments 
+                                peek_token = c_tokenizer_peek_token(tokenizer, 2);
+                                if(peek_token.type == TT_Identifier)
+                                {
+                                    code_type_t *arg_type = null;
+                                    TicketMutexScope(&g_state->type_table_mutex)
+                                    {
+                                        arg_type = g_state->type_table.data + ID;
+                                    }
+
+                                    if(arg_type->is_valid)
+                                    {
+                                        decl.return_type = c_string_make_copy(&permanent_arena, token.string);
+
+                                        token = c_tokenizer_get_next_token(tokenizer);
+                                        decl.name = c_string_make_copy(&permanent_arena, name_token.string);
+                                    }
+                                }
+                                // NOTE(Sleepster): If it does not have arguments 
+                                else if(peek_token.type == TT_ClosingParen)
+                                {
+                                    peek_token = c_tokenizer_peek_token(tokenizer, 3);
+                                    if(peek_token.type == TT_Semicolon || peek_token.type == TT_OpeningBrace)
+                                    {
+                                        decl.return_type = c_string_make_copy(&permanent_arena, token.string);
+
+                                        token = c_tokenizer_get_next_token(tokenizer);
+                                        decl.name = c_string_make_copy(&permanent_arena, name_token.string);
+                                    }
+                                }
+                            }
+                        }
+                    }break;
                 }
             }break;
         }
@@ -637,12 +695,22 @@ main(int argc, char **argv)
                         Expect(false, "After declaring an enum, you MUST either have open parenthesis or an identifier immediately following the 'enum' keyword...\n");
                     }
                 }
-                // NOTE(Sleepster): If it's some other identifier we can't easily discern 
-                // for function declarations it looks like this:
-                //
-                // [storage_class] [qualifiers] [specifiers] [type] [function name]()
-                parse_declaration(&tokenizer, token, keyword);
             }break;
+        }
+    }
+
+    tokenizer = {file_data};
+    while(tokenizer.data.count > 0)
+    {
+        token_data_t token = c_tokenizer_get_next_token(&tokenizer);
+        if(token.type == TT_Identifier)
+        {
+            keyword_t *keyword = get_keyword(token);
+            // NOTE(Sleepster): If it's some other identifier we can't easily discern 
+            // for function declarations it looks like this:
+            //
+            // [storage_class] [qualifiers] [specifiers] [type] [function name]()
+            parse_declaration(&tokenizer, token, keyword);
         }
     }
     printf("File is '%d' lines...\n", tokenizer.line_count);

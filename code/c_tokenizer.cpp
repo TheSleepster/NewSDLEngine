@@ -180,6 +180,7 @@ c_tokenizer_set_bookmark(tokenizer_t *tokenizer, token_data_t token)
     tokenizer->read_bookmark         = tokenizer->data.data;
     tokenizer->bookmarked_read_count = tokenizer->data.count;
     tokenizer->bookmarked_token      = token;
+    tokenizer->bookmarked_line_count = tokenizer->line_count;
 }
 
 true_inline token_data_t 
@@ -188,6 +189,7 @@ c_tokenizer_restore_bookmark(tokenizer_t *tokenizer)
     token_data_t result   = tokenizer->bookmarked_token;
     tokenizer->data.data  = tokenizer->read_bookmark;
     tokenizer->data.count = tokenizer->bookmarked_read_count;
+    tokenizer->line_count = tokenizer->bookmarked_line_count;
 
     return(result);
 }

@@ -8,23 +8,23 @@
 void 
 simple_test_function_decl();
 
-void
+short
 complex_test_function_decl(int argument1, int argument2);
 
 static inline void
 more_complex_function_decl();
 
-static inline void
-simple_function_definition(void)
+static inline double 
+simple_function_definition(float argument)
 {
 }
 
-void 
+u32 
 simpler_function_definition()
 {
 }
 
-static inline int 
+static inline float 
 complex_function_definition(int A, int B)
 {
     return(A + B);
