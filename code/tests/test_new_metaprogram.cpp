@@ -46,3 +46,10 @@ TEST(function_decls)
     void *process = sys_create_process(STR("../build/new_metaprogram"), STR("--filename=tests/metaprogram_tests/metaprogram_test_declared_functions.cpp"));
     Assert(sys_wait_for_process(process));
 }
+
+TEST(macroed_function_decls)
+{
+    void *process = sys_create_process(STR("../build/new_metaprogram"), STR("--filename=tests/metaprogram_tests/metaprogram_test_casey_style_external_function.cpp"));
+    Assert(sys_wait_for_process(process));
+}
+

@@ -42,14 +42,15 @@
 
 #define DEFAULT_KEYWORDS(X)               \
     X("Invalid",  TOKEN_KEYWORD_INVALID)  \
+    X("struct",   TOKEN_KEYWORD_STRUCT)   \
+    X("union",    TOKEN_KEYWORD_UNION)    \
+    X("enum",     TOKEN_KEYWORD_ENUM)     \
     X("static",   TOKEN_KEYWORD_STATIC)   \
     X("extern",   TOKEN_KEYWORD_EXTERN)   \
     X("inline",   TOKEN_KEYWORD_INLINE)   \
     X("volatile", TOKEN_KEYWORD_VOLATILE) \
     X("const",    TOKEN_KEYWORD_CONST)    \
-    X("struct",   TOKEN_KEYWORD_STRUCT)   \
-    X("union",    TOKEN_KEYWORD_UNION)    \
-    X("enum",     TOKEN_KEYWORD_ENUM)     \
+    X("auto",     TOKEN_KEYWORD_AUTO)     \
     X("typedef",  TOKEN_KEYWORD_TYPEDEF)
 
 enum lexer_keyword_t
@@ -92,12 +93,15 @@ struct code_declaration_t
     string_t  storage_class;
 
     // NOTE(Sleepster): (inline, _NoReturn, etc.)
-    string_t *function_specifiers;
+    string_t  function_specifiers[4];
     u32       specifier_count;
 
     // NOTE(Sleepster): (const, volatile) 
-    string_t *type_qualifiers;
+    string_t  type_qualifiers[2];
     u32       qualifier_count;
+
+    string_t  return_type;
+    string_t  name;
 };
 
 struct state_t
@@ -107,7 +111,7 @@ struct state_t
     HashTable_t(macro_data_t) macro_table;
 
     // NOTE(Sleepster): Maps type names to their actual type (accounts for typedef)... maps string -> string
-    ticket_mutex_t            type_table_mutex;
+ticket_mutex_t            type_table_mutex;
     HashTable_t(code_type_t)  type_table;
 
     // NOTE(Sleepster): Map types to their definitions. string -> ID
@@ -288,7 +292,7 @@ parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t 
         ++argument_index)
     {
         string_t argument = macro.arguments[argument_index];
-        printf("\tArgument at index: '%d' is: '%.*s'...\n", argument_index, argument.count, C_STR(argument));
+printf("\tArgument at index: '%d' is: '%.*s'...\n", argument_index, argument.count, C_STR(argument));
     }
     printf("Macro contents:       '%.*s'...\n", macro.macro_string.count, C_STR(macro.macro_string));
     printf("=================================\n\n");
@@ -410,6 +414,88 @@ register_structured_type(tokenizer_t *tokenizer, string_t filename, token_data_t
                    tokenizer->line_count, filename, fprint_token(next_token));
         }break;
     }
+}
+
+internal_api code_declaration_t 
+parse_declaration(tokenizer_t *tokenizer, token_data_t token, keyword_t *keyword)
+{
+    code_declaration_t decl = {};
+    while(token.type != TT_Semicolon && token.type != TT_OpeningParen)
+    {
+        switch(keyword->keyword_token)
+        {
+            case TOKEN_KEYWORD_EXTERN:
+            case TOKEN_KEYWORD_STATIC:
+            {
+                decl.storage_class = c_string_make_copy(&permanent_arena, token.string);
+            }break;
+            case TOKEN_KEYWORD_INLINE:
+            {
+                decl.function_specifiers[decl.specifier_count++] = c_string_make_copy(&permanent_arena, token.string);
+            }break;
+            case TOKEN_KEYWORD_CONST:
+            case TOKEN_KEYWORD_VOLATILE:
+            {
+                decl.type_qualifiers[decl.qualifier_count++] = c_string_make_copy(&permanent_arena, token.string);
+            }break;
+            default:
+            {
+                // NOTE(Sleepster): 
+                //
+                // We need to figure out some way to determine when a function's parsing should end. Right now, we just kinda keep reading into the arguments
+                // which is not good...
+                token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
+                if(peek_token.type == TT_OpeningParen)
+                {
+                    Expect(token.type == TT_Identifier, "Tried to set the function's name... however the token: '%.*s' was not a valid identifier...\n",
+                           fprint_token(token));
+
+                    decl.name = c_string_make_copy(&permanent_arena, token.string);
+                }
+                else if(peek_token.type == TT_Identifier || peek_token.type == TT_Asterisk)
+                {
+                    Expect(token.type == TT_Identifier, "Tried to set the function's return type... however the token: '%.*s' was not a valid identifier...\n",
+                           fprint_token(token));
+
+                    decl.return_type = c_string_make_copy(&permanent_arena, token.string);
+                }
+            }break;
+        }
+
+        token   = c_tokenizer_get_next_token(tokenizer);
+        keyword = get_keyword(token);
+    }
+    printf("\033[0m");
+    printf("Declaration by name: '%.*s' has a return type of: '%.*s'...\n",
+           fprint_string(decl.name), fprint_string(decl.return_type));
+    if(decl.storage_class.data != null)
+    {
+        printf("Declaration has a storage class of: '%.*s'...\n", fprint_string(decl.storage_class));
+    }
+
+    for(u32 specifier_index = 0;
+        specifier_index < decl.specifier_count;
+        ++specifier_index)
+    {
+        string_t specifier = decl.function_specifiers[specifier_index];
+        if(specifier.data != null)
+        {
+            printf("Declaration has a function specifier of: '%.*s'...\n", fprint_string(specifier));
+        }
+    }
+
+    for(u32 qualifier_index = 0;
+        qualifier_index < decl.qualifier_count;
+        ++qualifier_index)
+    {
+        string_t qualifier = decl.type_qualifiers[decl.qualifier_count];
+        if(qualifier.data != null)
+        {
+            printf("Declaration has a bonus type qualifier of: '%.*s'...\n", fprint_string(qualifier));
+        }
+    }
+
+    return(decl);
 }
 
 int
@@ -551,15 +637,11 @@ main(int argc, char **argv)
                         Expect(false, "After declaring an enum, you MUST either have open parenthesis or an identifier immediately following the 'enum' keyword...\n");
                     }
                 }
- 
                 // NOTE(Sleepster): If it's some other identifier we can't easily discern 
                 // for function declarations it looks like this:
                 //
                 // [storage_class] [qualifiers] [specifiers] [type] [function name]()
-                else if(keyword->keyword_token != TOKEN_KEYWORD_INVALID)
-                {
-                }
-
+                parse_declaration(&tokenizer, token, keyword);
             }break;
         }
     }
