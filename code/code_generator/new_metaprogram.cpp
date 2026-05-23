@@ -433,6 +433,7 @@ register_structured_type(tokenizer_t *tokenizer, string_t filename, token_data_t
 internal_api code_declaration_t 
 parse_declaration(tokenizer_t *tokenizer, token_data_t token, keyword_t *keyword)
 {
+#if 0
     code_declaration_t decl = {};
     while(token.type != TT_Semicolon && token.type != TT_OpeningParen)
     {
@@ -553,6 +554,8 @@ parse_declaration(tokenizer_t *tokenizer, token_data_t token, keyword_t *keyword
         }
     }
 
+#endif
+    code_declaration_t decl;
     return(decl);
 }
 
@@ -720,11 +723,46 @@ main(int argc, char **argv)
 }
 
 #if 0
+// NOTE(Sleepster): How we want to eventually have declarations
+void
+parse_declarations()
+{
+    c_dynarray_for(g_state->code_declarations, decl_index)
+    {
+        code_declaration_t *decl = g_state->code_declarations + decl_index;
+        if(decl.flags & DECLARATION_TYPE_PROCEDURE)
+        {
+            // NOTE(Sleepster): Procedures are types... 
+            decl.arguments = ;
+            decl.number_of_non_default_arguments = ;
+            decl.return_type = ;
+            decl.name        = ;
+        }
 
-METAPROGRAM_NOTE(CONSOLE_COMMAND) 
+        struct type_info_member_t {
+            u64 type_id;
+            u32 type_modifiers;
+            u32 type_flags;
+            u32 type_size;
+        };
+
+        if(decl.flags & DECLARATION_TYPE_STRUCTURE)
+        {
+            decl.type_name    = ;
+            decl.member_count = ;
+
+            // NOTE(Sleepster): Members can be functions... 
+            decl.members      = ;
+        }
+    }
+}
+
+
+ 
+// NOTE(Sleepster): How we want to handle notes. 
 int
 command_add(int A, int B) 
 {
     return(A + B);
-}
+}METAPROGRAM_NOTE(CONSOLE_COMMAND)
 #endif
