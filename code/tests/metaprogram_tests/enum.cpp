@@ -5,15 +5,18 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 
-enum {
+enum 
+{
     SOME_DELCARED_ENUM_TYPE
 };
 
-enum test_enum_type_t {
-    SOME_OTHER_DECLARED_TYPE,
-    SOME_OTHER_OTHER_DECLARED_TYPE
+enum test_enum_type_t 
+{
+    SOME_OTHER_DECLARED_TYPE       = 0,
+    SOME_OTHER_OTHER_DECLARED_TYPE = 1,
 };
 
-typedef enum some_other_typedeffed_item {
-    WOW_THIS_IS_TYPEDEFFED,
+typedef enum some_other_typedeffed_item 
+{
+    WOW_THIS_IS_TYPEDEFFED = (1 << 31),
 }some_other_typedeffed_item_t;

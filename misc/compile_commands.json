@@ -1,6 +1,6 @@
 [
   {
-    "file": "../code/code_generator/new_metaprogram.cpp",
+    "file": "../code/code_generator/athena/athena.cpp",
     "arguments": [
       "/usr/bin/clang++",
       "-g",
@@ -43,16 +43,16 @@
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
       "-MT",
-      "new_metaprogram",
+      "athena",
       "-MMD",
       "-MP",
       "-MF",
-      "../build/new_metaprogram.d",
-      "../code/code_generator/new_metaprogram.cpp",
+      "../build/athena.d",
+      "../code/code_generator/athena/athena.cpp",
       "-o",
-      "../build/new_metaprogram"
+      "../build/athena"
     ],
     "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/new_metaprogram"
+    "output": "../build/athena"
   }
 ]

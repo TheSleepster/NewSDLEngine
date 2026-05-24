@@ -50,6 +50,7 @@ typedef struct token_data
 typedef struct tokenizer
 {
     string_t     data;
+    string_t     filename;
     u32          line_count;
 
     u32          bookmarked_read_count;

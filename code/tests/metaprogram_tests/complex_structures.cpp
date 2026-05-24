@@ -7,9 +7,9 @@
 
 typedef struct test_element_typedeffed 
 {
-    u32 oranges;
-    u32 internal_data[128];
-    u32 internal_after_array;
+    s32    oranges              = -1;
+    u32    internal_data[128];
+    float  internal_after_array = 1.0f;
     struct orchard_data {
         u32 apples;
         u32 plums;

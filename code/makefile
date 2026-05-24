@@ -104,7 +104,7 @@ JFD_ASSET_FILE_PACKER_OUT = $(BUILD_DIR)/jfd_asset_file_packer$(EXE_EXT)
 .PHONY: all shaders clean run_preprocessor sandbox clangd-db pack_assets
 
 all: $(PREPROCESSOR_OUT) $(CODE_GENERATOR_OUT) do_codegen \
-     new_metaprogram \
+     athena \
      $(SLANG_REFLECTOR_OUT) \
      $(WAD_ASSET_FILE_PACKER_OUT) $(JFD_ASSET_FILE_PACKER_OUT) \
      tests sandbox \
@@ -137,10 +137,10 @@ $(CODE_GENERATOR_OUT): $(CODE_GENERATOR_SRC) | $(BUILD_DIR)
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/metaprogram.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
 
-new_metaprogram: ../code/code_generator/new_metaprogram.cpp | $(BUILD_DIR)
+athena: ../code/code_generator/athena/athena.cpp | $(BUILD_DIR)
 	@echo [BUILDING METAPROGRAM] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
-		-MT $@ -MMD -MP -MF $(BUILD_DIR)/new_metaprogram.d \
+		-MT $@ -MMD -MP -MF $(BUILD_DIR)/athena.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $(BUILD_DIR)/$@ 
 
 ../code/meta/GENERATED_program_RTTI.h: $(CODE_GENERATOR_OUT) $(ALL_SRCS)

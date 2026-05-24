@@ -25,6 +25,10 @@
 #include <c_threadpool.cpp>
 #include <c_tokenizer.cpp>
 
+// NOTE(Sleepster): 
+//
+// This is just a simple tool to take .slang file items and transform them into C-headers or combined (think #include) .slang files
+
 constexpr u32 MAX_INCLUDED_FILES = 100;
 
 struct slang_reflector_module_t

@@ -10,16 +10,6 @@ struct item_t
 {
     int item_member;
     int item_member_one;
-
-    struct item_contents_t
-    {
-        float owie;
-        float item;
-    };
-
-    struct {
-        item_t *next_item;
-    };
 };
 
 // C Variant
@@ -27,9 +17,10 @@ typedef struct other_item
 {
     int item_typedeffed_member;
     int item_typedeffed_member_one;
-
-    struct other_item_contents {
-        float owie;
-        float item;
-    };
 }other_item_t;
+
+// C++ forward declare
+struct item_t;
+
+// C style forward declare 
+typedef struct other_item other_item_t;

@@ -1287,9 +1287,10 @@ struct type_info_struct_tokenizer_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[6];
+		type_info_member_t member_array[7];
 		struct {
 			type_info_member_t data;
+			type_info_member_t filename;
 			type_info_member_t line_count;
 			type_info_member_t bookmarked_read_count;
 			type_info_member_t bookmarked_line_count;
@@ -4239,9 +4240,10 @@ const static type_info_struct_tokenizer_t type_info_struct_tokenizer_t_const_dat
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_tokenizer_t),
-	.member_count = 6,
+	.member_count = 7,
 	.members = {
 		.data = {.name = "data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_tokenizer_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_tokenizer_t), data))},
+		.filename = {.name = "filename", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_tokenizer_t.filename)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_tokenizer_t), filename))},
 		.line_count = {.name = "line_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_tokenizer_t.line_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_tokenizer_t), line_count))},
 		.bookmarked_read_count = {.name = "bookmarked_read_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_tokenizer_t.bookmarked_read_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_tokenizer_t), bookmarked_read_count))},
 		.bookmarked_line_count = {.name = "bookmarked_line_count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_tokenizer_t.bookmarked_line_count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_tokenizer_t), bookmarked_line_count))},
@@ -6384,6 +6386,7 @@ enum token_data_t_member_list_enum {
 
 enum tokenizer_t_member_list_enum {
 	TYPE_TOKENIZER_T_MEMBER_data,
+	TYPE_TOKENIZER_T_MEMBER_filename,
 	TYPE_TOKENIZER_T_MEMBER_line_count,
 	TYPE_TOKENIZER_T_MEMBER_bookmarked_read_count,
 	TYPE_TOKENIZER_T_MEMBER_bookmarked_line_count,

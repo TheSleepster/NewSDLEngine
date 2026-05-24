@@ -58,6 +58,14 @@ c_tokenizer_get_next_token(tokenizer_t *tokenizer)
         case '\\': {result.type = TT_BackSlash;        }break;
         case '\0': {result.type = TT_EOF;              }break;
         case '|':  {result.type = TT_Seperator;        }break;
+        case '-':  
+        {
+            // NOTE(Sleepster): All my homies hate arrows. 
+            if(tokenizer->data.data[1] != '>')
+            {
+                result.type = TT_Dash;
+            }
+        }break;
         case '*':  
         {
             result.type = TT_Asterisk;

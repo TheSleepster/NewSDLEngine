@@ -379,7 +379,7 @@ c_string_read_int(string_t data)
 u32 
 c_string_read_uint(string_t data)
 {
-    s32 result = 0;
+    u32 result = 0;
     for(u32 index = 0;
         index < data.count;
         ++index)
