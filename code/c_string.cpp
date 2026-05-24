@@ -15,6 +15,18 @@
 #include <c_file_api.h>
 #include <c_file_watcher.h>
 
+char *
+c_string_null_terminated(string_t data)
+{
+    char *result = null;
+    result = c_arena_push_array(&global_context->temporary_arena, char, data.count + 1);
+
+    memcpy((void*)result, (void*)data.data, data.count);
+    result[data.count + 1] = '\0';
+
+    return(result);
+}
+
 u32
 c_string_length(const char *c_string)
 {
@@ -386,6 +398,17 @@ c_string_read_uint(string_t data)
     {
         result = (result * 10) + (data.data[index] - '0');
     }
+
+    return(result);
+}
+
+float32 
+c_string_read_float(string_t data)
+{
+    float32 result = 0;
+
+    const char *c_str = c_string_null_terminated(data);
+    result = atof(c_str);
 
     return(result);
 }

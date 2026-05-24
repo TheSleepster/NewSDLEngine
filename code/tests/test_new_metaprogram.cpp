@@ -53,3 +53,8 @@ TEST(macroed_function_decls)
     Assert(sys_wait_for_process(process));
 }
 
+TEST(CPP_structures)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/cpp_class.cpp"));
+    Assert(sys_wait_for_process(process));
+}

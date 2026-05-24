@@ -4,6 +4,8 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#define MAX_INTERNAL_MEMBERS        128
+#define MAX_PAREN_INTERNAL_MEMBERS (128)
 
 typedef struct test_element_typedeffed 
 {
@@ -24,7 +26,8 @@ typedef struct test_element_typedeffed
 struct test_element_data 
 {
     u32 oranges;
-    u32 internal_data[128];
+    u32 internal_data[MAX_INTERNAL_MEMBERS];
+    u32 more_internal_data[MAX_PAREN_INTERNAL_MEMBERS];
     struct internal_members {
         u32 apples;
     };

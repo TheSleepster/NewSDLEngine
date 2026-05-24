@@ -29,6 +29,7 @@ typedef struct string
 
 //////////// API DEFINITIONS //////////////
 u32         c_string_length(const char *c_string);
+char *      c_string_null_terminated(string_t data);
 bool8       c_string_is_valid(string_t string);
 string_t    c_string_create(const char *c_string);
 string_t    c_string_create_with_length(byte *data, u32 length);
@@ -65,9 +66,9 @@ u32         c_string_eat_whitespace(string_t *current_line);
 
 string_t    c_string_read_line(string_t *data);
 
-// TODO(Sleepster): Yeah... They just don't work. Fix this!
 s32         c_string_read_int(string_t data);
 u32         c_string_read_uint(string_t data);
+float32     c_string_read_float(string_t data);
 
 // MACROS
 #define STR(x)                (string_t){.data = (byte*)x, .count = c_string_length(x)}

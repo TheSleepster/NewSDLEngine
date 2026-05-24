@@ -12,7 +12,7 @@ enum
 
 enum test_enum_type_t 
 {
-    SOME_OTHER_DECLARED_TYPE       = 0,
+    SOME_OTHER_DECLARED_TYPE       = (1 << 31),
     SOME_OTHER_OTHER_DECLARED_TYPE = 1,
 };
 

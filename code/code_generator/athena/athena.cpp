@@ -170,31 +170,37 @@ struct AST_type_t
     u32          pointer_count;
     u32          array_size;
 
-    string_t     value_string;
+    string_t     literal_value;
     union {
         s32      int_value;
         u32      unsigned_value;
         float32  float_value;
-        string_t literal_value;
+        string_t string_value;
     };
 };
 
+#define AST_NODE_TYPE_LIST(X) \
+    X(AST_NODE_TYPE_INVALID, "AST_NODE_TYPE_INVALID")                \
+    X(AST_NODE_TYPE_IDENTIFIER, "AST_NODE_TYPE_IDENTIFIER")          \
+    X(AST_NODE_TYPE_STRING_LITERAL, "AST_NODE_TYPE_STRING_LITERAL")  \
+    X(AST_NODE_TYPE_NUMBER, "AST_NODE_TYPE_NUMBER")                  \
+    X(AST_NODE_TYPE_OPERATOR_EQUALS, "AST_NODE_TYPE_OPERATOR_EQUALS") \
+    X(AST_NODE_TYPE_OPERATOR_BITSHIFT_LEFT, "AST_NODE_TYPE_OPERATOR_BITSHIFT_LEFT") \
+    X(AST_NODE_TYPE_OPERATOR_BITSHIFT_RIGHT, "AST_NODE_TYPE_OPERATOR_BITSHIFT_RIGHT") \
+    X(AST_NODE_TYPE_RETURN_TYPE, "AST_NODE_TYPE_RETURN_TYPE") \
+    X(AST_NODE_TYPE_PROCEDURE, "AST_NODE_TYPE_PROCEDURE") \
+    X(AST_NODE_TYPE_PROCEDURE_ARGUMENT, "AST_NODE_TYPE_PROCEDURE_ARGUMENT") \
+    X(AST_NODE_TYPE_STRUCTURE, "AST_NODE_TYPE_STRUCTURE") \
+    X(AST_NODE_TYPE_STRUCTURE_MEMBER, "AST_NODE_TYPE_STRUCTURE_MEMBER") \
+    X(AST_NODE_TYPE_ENUM, "AST_NODE_TYPE_ENUM") \
+    X(AST_NODE_TYPE_ENUM_MEMBER, "AST_NODE_TYPE_ENUM_MEMBER") \
+
+
 enum AST_node_type_t
 {
-    AST_NODE_TYPE_IDENTIFIER,
-    AST_NODE_TYPE_STRING_LITERAL,
-    AST_NODE_TYPE_NUMBER,
-    AST_NODE_TYPE_OPERATOR_EQUALS,
-
-    AST_NODE_TYPE_RETURN_TYPE,
-
-    AST_NODE_TYPE_PROCEDURE,
-    AST_NODE_TYPE_PROCEDURE_ARGUMENT,
-
-    AST_NODE_TYPE_STRUCTURE,
-    AST_NODE_TYPE_STRUCTURE_MEMBER,
-
-    AST_NODE_TYPE_ENUM,
+#define X(enum, string) enum,
+    AST_NODE_TYPE_LIST(X)
+#undef X
 };
 
 struct AST_node_t 
@@ -270,6 +276,84 @@ global_variable state_t *g_state;
 // TODO(Sleepster): We will need to make these thread local since these are not threadsafe... 
 thread_static memory_arena_t permanent_arena;
 thread_static memory_arena_t transient_arena;
+
+
+// ============= DEBUG CODE =====================
+char *
+get_node_type_name(u32 node_type)
+{
+    switch(node_type)
+    {
+#define X(enum, string) case enum: { return(string); }break;
+        AST_NODE_TYPE_LIST(X)
+#undef X
+        default: {return("INVALID NODE!");};
+    }
+}
+
+void
+print_node_children(AST_node_t *node)
+{
+    for(AST_node_t *current_child = node->first_child;
+        current_child;
+        current_child = current_child->next_sibling)
+    {
+        if(current_child->node_type != AST_NODE_TYPE_STRUCTURE_MEMBER && 
+           current_child->node_type != AST_NODE_TYPE_STRUCTURE        &&
+           current_child->node_type != AST_NODE_TYPE_ENUM_MEMBER)
+        {
+            continue;
+        }
+
+        string_t name = STR("Anonymous Structure..."); 
+        if(current_child->type_data.type)
+        {
+            name = current_child->type_data.type->type_name;
+        }
+
+        printf("Member:\n\tTypename: '%.*s', Node Type: '%s', Name: '%.*s'...\n",
+               fprint_string(name), 
+               get_node_type_name(current_child->node_type),
+               fprint_string(current_child->assigned_name));
+
+        if(current_child->first_child)
+        {
+            printf("\033[0m");
+            printf("\n*** Nested Declaration: 'AST_NODE_TYPE_STRUCTURE' with a name of: '%.*s' found... members are: ***\n",
+                   fprint_string(current_child->assigned_name));
+
+            print_node_children(current_child);
+            printf("*** END OF NESTED DECLARATION MEMBERS ***\n");
+        }
+    }
+}
+
+void
+print_node_list(AST_node_t *top_level_node)
+{
+    for(AST_node_t *node = top_level_node;
+        node;
+        node = node->next_sibling)
+    {
+        if(node->node_type != AST_NODE_TYPE_STRUCTURE_MEMBER && 
+           node->node_type != AST_NODE_TYPE_STRUCTURE        &&
+           node->node_type != AST_NODE_TYPE_ENUM)
+        {
+            continue;
+        }
+
+        printf("\033[0m");
+        printf("\n=================================================\n");
+
+        printf("Declaration with a name of: '%.*s' found... members are:\n",
+               fprint_string(node->assigned_name));
+
+        print_node_children(node);
+
+        printf("=================================================\n");
+    }
+}
+// ============= DEBUG CODE =====================
 
 internal_api void
 register_default_keywords(void)
@@ -376,110 +460,27 @@ get_code_type(string_t type_name)
     return(type);
 }
 
-internal_api AST_node_t*
-AST_get_next_child_node(tokenizer_t *tokenizer, AST_node_t *root)
-{
-    AST_node_t *new_node  = c_arena_push_struct(&permanent_arena, AST_node_t); 
-    new_node->node_type   = AST_NODE_TYPE_STRUCTURE_MEMBER;
-    new_node->filename    = tokenizer->filename;
-    new_node->line_number = tokenizer->line_count;
-
-    // TODO(Sleepster): maybe a doubly linked list??? Traversal is a bitch...
-    if(root->first_child != null)
-    {
-        for(AST_node_t *current_child = root->first_child;
-            current_child;
-            current_child = current_child->next_sibling)
-        {
-            if(!current_child->next_sibling)
-            {
-                current_child->next_sibling = new_node;
-                break;
-            }
-        }
-    }
-    else
-    {
-        root->first_child = new_node;
-    }
-
-    return(new_node);
-}
-
-internal_api AST_node_t*
-AST_get_next_sibling_node(tokenizer_t *tokenizer, AST_node_t *root)
-{
-    AST_node_t *new_node  = c_arena_push_struct(&permanent_arena, AST_node_t); 
-    new_node->node_type   = AST_NODE_TYPE_STRUCTURE_MEMBER;
-    new_node->filename    = tokenizer->filename;
-    new_node->line_number = tokenizer->line_count;
-
-    // TODO(Sleepster): maybe a doubly linked list??? Traversal is a bitch...
-    if(root->next_sibling != null)
-    {
-        for(AST_node_t *current_child = root->next_sibling;
-            current_child;
-            current_child = current_child->next_sibling)
-        {
-            if(!current_child->next_sibling)
-            {
-                current_child->next_sibling = new_node;
-                break;
-            }
-        }
-    }
-    else
-    {
-        root->next_sibling = new_node;
-    }
-
-    return(new_node);
-}
-
-internal_api void
-generate_default_value_AST(tokenizer_t *tokenizer, AST_node_t *base)
-{
-    AST_node_t *equals = AST_get_next_sibling_node(tokenizer, base);
-    equals->node_type = AST_NODE_TYPE_OPERATOR_EQUALS;
-
-    token_data_t token = c_tokenizer_get_next_token(tokenizer);
-
-    AST_node_t *next_node = AST_get_next_sibling_node(tokenizer, base); 
-    Expect(token.type == TT_Number || token.type == TT_Identifier || token.type == TT_Dash, "If the operator '=' is found inside of a structure, the token to the immediate right must either be a number or an identifier... Instead we have: '%.*s'\n", fprint_token(token));
-    switch(token.type)
-    {
-        // NOTE(Sleepster): Will deliberately fall through 
-        case TT_Dash:
-        {
-            token = c_tokenizer_get_next_token(tokenizer);
-            next_node->type_data.type_flags   |= AST_NUMBER_FLAG_SIGNED;
-            next_node->type_data.value_string  = c_string_make_copy(&permanent_arena, token.string);
-        }
-        case TT_Number:
-        {
-            next_node->node_type = AST_NODE_TYPE_NUMBER;
-            next_node->type_data.literal_value = c_string_concat(&permanent_arena, next_node->type_data.literal_value, token.string);
-            token_data_t float_token = c_tokenizer_peek_token(tokenizer);
-            if(float_token.string.data[0] == 'f')
-            {
-                next_node->type_data.literal_value = c_string_concat(&permanent_arena, next_node->type_data.literal_value, STR("f"));
-                next_node->type_data.type_flags   |= AST_NUMBER_FLAG_FLOAT;
-
-                token = c_tokenizer_get_next_token(tokenizer);
-            }
-        }break;
-        case TT_OpeningParen:
-        {
-            // NOTE(Sleepster): Expression 
-        }break;
-        default:
-        {
-            next_node->node_type = AST_NODE_TYPE_IDENTIFIER;
-        }
-    }
-}
-
 // TODO(Sleepster): If a macro expands to a keyword, add it to the keyword table.
+//
+// Three cases we have to handle here:
+// - First is a macro defined as:
+//      #define MACRO (128)
+//  should not be read as having arguments.
+//
+// - Second is that a macro of:
+//      #define MACRO() <a bunch of stuff>
+//   Should not crash the program since there are no arguments.
+//
+// - Three is that a mcaro of:
+//      #define VARIATRIC(first, second, ...) ...
+//   should not crash the program
+//
+//   Macros are annoying.
+//
+//
+//   When we find a macro we should perhaps parse it into an AST and store the AST of the macro inside the actual
+//   macro_data_t so that when we find a macro later in the program's parsing, we can just attach the AST immediately in place of the found 
+//   macro identifier. THIS SHOULD ONLY HAPEEN FOR MACROS THAT ARE EXPRESSIONS!!!!! MULTILINE MACROS ARE STILL SPECIAL
 internal_api void
 parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t macro_name)
 {
@@ -493,7 +494,7 @@ parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t 
     macro.is_valid     = true;
     macro.macro_name   = c_string_make_copy(&permanent_arena, macro_name.string);
 
-    // NOTE(Sleepster): If the macro takes arguments
+    // NOTE(Sleepster): Check if the macro really takes arguments or if this is just an expression...
     if(token.type == TT_OpeningParen)
     {
         // NOTE(Sleepster): Peek tokens ahead 
@@ -586,6 +587,218 @@ parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t 
     }
     printf("Macro contents:       '%.*s'...\n", macro.macro_string.count, C_STR(macro.macro_string));
     printf("=================================\n\n");
+}
+
+internal_api AST_node_t*
+AST_get_next_child_node(tokenizer_t *tokenizer, AST_node_t *root)
+{
+    AST_node_t *new_node  = c_arena_push_struct(&permanent_arena, AST_node_t); 
+    new_node->node_type   = AST_NODE_TYPE_INVALID;
+    new_node->filename    = tokenizer->filename;
+    new_node->line_number = tokenizer->line_count;
+
+    // TODO(Sleepster): maybe a doubly linked list??? Traversal is a bitch...
+    if(root->first_child != null)
+    {
+        for(AST_node_t *current_child = root->first_child;
+            current_child;
+            current_child = current_child->next_sibling)
+        {
+            if(!current_child->next_sibling)
+            {
+                current_child->next_sibling = new_node;
+                break;
+            }
+        }
+    }
+    else
+    {
+        root->first_child = new_node;
+    }
+
+    return(new_node);
+}
+
+internal_api AST_node_t*
+AST_get_next_sibling_node(tokenizer_t *tokenizer, AST_node_t *root)
+{
+    AST_node_t *new_node  = c_arena_push_struct(&permanent_arena, AST_node_t); 
+    new_node->node_type   = AST_NODE_TYPE_INVALID;
+    new_node->filename    = tokenizer->filename;
+    new_node->line_number = tokenizer->line_count;
+
+    // TODO(Sleepster): maybe a doubly linked list??? Traversal is a bitch...
+    if(root->next_sibling != null)
+    {
+        for(AST_node_t *current_child = root->next_sibling;
+            current_child;
+            current_child = current_child->next_sibling)
+        {
+            if(!current_child->next_sibling)
+            {
+                current_child->next_sibling = new_node;
+                break;
+            }
+        }
+    }
+    else
+    {
+        root->next_sibling = new_node;
+    }
+
+    return(new_node);
+}
+
+internal_api void
+generate_expression_AST(tokenizer_t *tokenizer, AST_node_t *sibling, token_data_t token)
+{
+    if(token.type == TT_OpeningParen)
+    {
+        token = c_tokenizer_get_next_token(tokenizer);
+    }
+
+    Expect(token.type == TT_Number || token.type == TT_Identifier, 
+           "The token in this expression must be either a number or an identifier (such as a constexpr or a macro), but we instead found: '%.*s' which is invalid...\n", 
+           fprint_token(token));
+
+    while(token.type != TT_Semicolon && token.type != TT_ClosingParen && token.type != TT_Comma && token.type != TT_ClosingBrace)
+    {
+        AST_node_t *new_node = AST_get_next_sibling_node(tokenizer, sibling); 
+
+        AST_type_t *type_data = &new_node->type_data;
+        type_data->literal_value = c_string_make_copy(&permanent_arena, token.string);
+
+        switch(token.type)
+        {
+            case TT_Dash:
+            {
+                type_data->type_flags   |= AST_NUMBER_FLAG_SIGNED;
+                type_data->literal_value = c_string_make_copy(&permanent_arena, token.string);
+
+                token = c_tokenizer_get_next_token(tokenizer);
+            }
+            case TT_Number:
+            {
+                new_node->node_type = AST_NODE_TYPE_NUMBER;
+
+                token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
+                if(peek_token.string.data[0] == 'f' && peek_token.string.count == 1)
+                {
+                    type_data->literal_value = c_string_concat(&permanent_arena, type_data->literal_value, peek_token.string);
+                    type_data->type_flags   |= AST_NUMBER_FLAG_FLOAT; 
+                    type_data->float_value   = c_string_read_float(token.string);
+
+                    token = c_tokenizer_get_next_token(tokenizer);
+                }
+                else
+                {
+                    if(type_data->type_flags & AST_NUMBER_FLAG_SIGNED)
+                    {
+                        type_data->int_value = c_string_read_int(token.string);
+                    }
+                    else
+                    {
+                        type_data->unsigned_value = c_string_read_uint(token.string);
+                    }
+
+                    token = c_tokenizer_get_next_token(tokenizer);
+                }
+            }break;
+            case TT_OpenAngleBracket:
+            {
+                token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
+                if(peek_token.type == TT_OpenAngleBracket)
+                {
+                    new_node->node_type = AST_NODE_TYPE_OPERATOR_BITSHIFT_LEFT;
+                    type_data->literal_value = c_string_concat(&permanent_arena, type_data->literal_value, peek_token.string);
+
+                    token = c_tokenizer_get_next_token(tokenizer);
+                    token = c_tokenizer_get_next_token(tokenizer);
+                }
+            }break;
+            case TT_CloseAngleBracket:
+            {
+                token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
+                if(peek_token.type == TT_CloseAngleBracket)
+                {
+                    new_node->node_type = AST_NODE_TYPE_OPERATOR_BITSHIFT_RIGHT;
+                    type_data->literal_value = c_string_concat(&permanent_arena, type_data->literal_value, peek_token.string);
+
+                    token = c_tokenizer_get_next_token(tokenizer);
+                    token = c_tokenizer_get_next_token(tokenizer);
+                }
+            }break;
+        }
+        Expect(new_node->node_type != AST_NODE_TYPE_INVALID, "Somehow... this node being parsed by the expression handler is invalid...\n");
+    }
+}
+
+internal_api void
+generate_default_value_AST(tokenizer_t *tokenizer, AST_node_t *base)
+{
+    AST_node_t *equals = AST_get_next_sibling_node(tokenizer, base);
+    equals->node_type = AST_NODE_TYPE_OPERATOR_EQUALS;
+
+    token_data_t token = c_tokenizer_get_next_token(tokenizer);
+
+    // TODO(Sleepster): 
+    // If this turns out to be an expression that needs to parsed such as:
+    //
+    // (1 << 31) 
+    //
+    // then this node will remain invalid... This might be a problem? Or 
+    // it's not and we can just continue to ignore it...
+    AST_node_t *next_node = AST_get_next_sibling_node(tokenizer, base); 
+    Expect(token.type == TT_Number     || 
+           token.type == TT_Identifier || 
+           token.type == TT_Dash       ||
+           token.type == TT_OpeningParen, 
+           "If the operator '=' is found inside of a structure, the token to the immediate right must either be a number or an identifier... Instead we have: '%.*s'\n", fprint_token(token));
+    switch(token.type)
+    {
+        // NOTE(Sleepster): Will deliberately fall through 
+        case TT_Dash:
+        {
+            token = c_tokenizer_get_next_token(tokenizer);
+            next_node->type_data.type_flags   |= AST_NUMBER_FLAG_SIGNED;
+            next_node->type_data.literal_value = c_string_make_copy(&permanent_arena, token.string);
+        }
+        case TT_Number:
+        {
+            // NOTE(Sleepster): If this is a semicolon, then this is easily parseable. 
+            token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
+            if(peek_token.type == TT_Semicolon || peek_token.type == TT_Comma || peek_token.string.data[0] == 'f')
+            {
+                next_node->node_type = AST_NODE_TYPE_NUMBER;
+                next_node->type_data.literal_value = c_string_concat(&permanent_arena, next_node->type_data.literal_value, token.string);
+                token_data_t float_token = c_tokenizer_peek_token(tokenizer);
+                if(float_token.string.data[0] == 'f')
+                {
+                    next_node->type_data.literal_value = c_string_concat(&permanent_arena, next_node->type_data.literal_value, STR("f"));
+                    next_node->type_data.type_flags   |= AST_NUMBER_FLAG_FLOAT;
+
+                    token = c_tokenizer_get_next_token(tokenizer);
+                }
+                token = c_tokenizer_get_next_token(tokenizer);
+            }
+            else
+            {
+                // NOTE(Sleepster): Expression. 
+                generate_expression_AST(tokenizer, next_node, token);
+            }
+        }break;
+        case TT_OpeningParen:
+        {
+            // NOTE(Sleepster): Expression 
+            generate_expression_AST(tokenizer, next_node, token);
+        }break;
+        default:
+        {
+            next_node->node_type = AST_NODE_TYPE_IDENTIFIER;
+        }
+    }
+
+    //Expect(next_node->node_type != AST_NODE_TYPE_INVALID, "Somehow... this node being parsed by the default value handler is invalid...\n");
 }
 
 internal_api void
@@ -744,31 +957,46 @@ generate_enum_AST(tokenizer_t *tokenizer, token_data_t token, AST_node_t *new_no
         register_typename(new_node->assigned_name, INVALID_ID);
 
         code_type_t *enum_type = get_code_type(new_node->assigned_name);
+        new_node->type_data.type = enum_type;
+        token = c_tokenizer_get_next_token(tokenizer);
+    }
+    else
+    {
+        token = name_token;
+    }
+
+    Expect(token.type == TT_OpeningBrace, "Expected '{' when parsing and enum, the token was: '%.*s'...\n", fprint_token(token))
+
+    token = c_tokenizer_get_next_token(tokenizer);
+    while(token.type != TT_ClosingBrace)
+    {
+        AST_node_t *member = AST_get_next_child_node(tokenizer, new_node);
+        member->node_type = AST_NODE_TYPE_ENUM_MEMBER;
+        member->type_data = new_node->type_data;
+        member->assigned_name = c_string_make_copy(&permanent_arena, token.string);
 
         token = c_tokenizer_get_next_token(tokenizer);
-        Expect(token.type == TT_OpeningBrace, "Expected '{' when parsing and enum, the token was: '%.*s'...\n", fprint_token(token))
-
-        while(token.type != TT_ClosingBrace)
+        if(token.type == TT_Equals)
         {
-            AST_node_t *member = AST_get_next_child_node(tokenizer, new_node);
-            member->node_type = AST_NODE_TYPE_IDENTIFIER;
-            member->type_data = {enum_type, 0, 0, 0};
-
+            generate_default_value_AST(tokenizer, member);
             token = c_tokenizer_get_next_token(tokenizer);
-            if(token.type == TT_Equals)
+
+            // NOTE(Sleepster): Check if this is a strange enum formatted like:
+            //
+            // enum blah 
+            // {
+            //      NUMBER_DECL, <- The comma should get eaten since there is no member after...
+            // };
+            token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
+            if(peek_token.type == TT_ClosingBrace || token.type == TT_Comma)
             {
-                generate_default_value_AST(tokenizer, member);
-            }
-            else if(token.type == TT_Comma)
-            {
-                // create a new member
+                token = c_tokenizer_get_next_token(tokenizer);
             }
         }
     }
-    else if(name_token.type == TT_OpeningBrace)
-    {
-        // NOTE(Sleepster): This is an anonymous enum... 
-    }
+
+    printf("\033[0m");
+    print_node_list(new_node);
 }
 
 internal_api void
@@ -809,68 +1037,6 @@ generate_typedef_AST(tokenizer_t *tokenizer, token_data_t token, AST_node_t *new
     }
 
 }
-
-// ============= DEBUG CODE =====================
-void
-print_node_children(AST_node_t *node)
-{
-    for(AST_node_t *current_child = node->first_child;
-        current_child;
-        current_child = current_child->next_sibling)
-    {
-        if(current_child->node_type != AST_NODE_TYPE_STRUCTURE_MEMBER && 
-           current_child->node_type != AST_NODE_TYPE_STRUCTURE)
-        {
-            continue;
-        }
-
-        string_t name = STR("Anonymous Structure..."); 
-        if(current_child->type_data.type)
-        {
-            name = current_child->type_data.type->type_name;
-        }
-
-        printf("Member:\n\tType: '%.*s' Name: '%.*s'...\n",
-               fprint_string(name), 
-               fprint_string(current_child->assigned_name));
-
-        if(current_child->first_child)
-        {
-            printf("\033[0m");
-            printf("\n*** Nested Declaration: 'AST_NODE_TYPE_STRUCTURE' with a name of: '%.*s' found... members are: ***\n",
-                   fprint_string(current_child->assigned_name));
-
-            print_node_children(current_child);
-            printf("*** END OF NESTED DECLARATION MEMBERS ***\n");
-        }
-    }
-}
-
-void
-print_node_list(AST_node_t *top_level_node)
-{
-    for(AST_node_t *node = top_level_node;
-        node;
-        node = node->next_sibling)
-    {
-        if(node->node_type != AST_NODE_TYPE_STRUCTURE_MEMBER && 
-           node->node_type != AST_NODE_TYPE_STRUCTURE)
-        {
-            continue;
-        }
-
-        printf("\033[0m");
-        printf("\n=================================================\n");
-
-        printf("Declaration of type: 'AST_NODE_TYPE_STRUCTURE' with a name of: '%.*s' found... members are:\n",
-               fprint_string(node->assigned_name));
-
-        print_node_children(node);
-
-        printf("=================================================\n");
-    }
-}
-// ============= DEBUG CODE =====================
 
 int
 main(int argc, char **argv)
