@@ -71,7 +71,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/athena",
             "cwd": "${workspaceFolder}/code",
-            "args": ["--filename=tests/metaprogram_tests/basic_macro.cpp"],
+            "args": ["--filename=tests/metaprogram_tests/complex_macro.cpp"],
             "stopOnEntry": false,
             "terminal": "integrated",
         },

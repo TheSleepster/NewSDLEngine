@@ -24,3 +24,8 @@ public:
 private:
     void some_stupid_getter(void *data);
 };
+
+void
+class_test_t::some_stupid_getter(void *data)
+{
+}

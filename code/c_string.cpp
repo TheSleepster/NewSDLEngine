@@ -16,10 +16,10 @@
 #include <c_file_watcher.h>
 
 char *
-c_string_null_terminated(string_t data)
+c_string_null_terminated(memory_arena_t *arena, string_t data)
 {
     char *result = null;
-    result = c_arena_push_array(&global_context->temporary_arena, char, data.count + 1);
+    result = c_arena_push_array(arena, char, data.count + 1);
 
     memcpy((void*)result, (void*)data.data, data.count);
     result[data.count + 1] = '\0';
@@ -403,11 +403,11 @@ c_string_read_uint(string_t data)
 }
 
 float32 
-c_string_read_float(string_t data)
+c_string_read_float(memory_arena_t *arena, string_t data)
 {
     float32 result = 0;
 
-    const char *c_str = c_string_null_terminated(data);
+    const char *c_str = c_string_null_terminated(arena, data);
     result = atof(c_str);
 
     return(result);

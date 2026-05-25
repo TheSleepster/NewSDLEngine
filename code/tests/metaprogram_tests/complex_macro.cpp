@@ -4,12 +4,13 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#define REPLACEMENT_NUMBER 10
+#define REPLACEMENT_NUMBER_WITH_PAREN (10)
 
-#define COMPLEX_MACRO_MULTILINE(argument0, argument1, argument2) \
-argument0##argument1##argument2
+#define COMPLEX_MACRO(argument0, argument1, argument2) argument0##argument1##argument2
+#define SIMPLE_MACRO2(argument) argument
 
-#define COMPLEX_MACRO(argument) argument
-
+// NOTE(Sleepster): A macro such as this just simply will not be turned into an AST. It's pointless.
 #define Alloc(type) ({                    \
     void *_result = malloc(sizeof(type)); \
     ZeroMemory(_result, sizeof(type));    \

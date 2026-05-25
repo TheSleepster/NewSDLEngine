@@ -3410,6 +3410,7 @@ backend_get_command_buffer(render_command_list_t *command_list)
         }
         else
         {
+            InvalidCodePath;
         }
     }
     else

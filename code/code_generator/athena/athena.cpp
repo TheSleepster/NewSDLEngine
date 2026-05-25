@@ -103,20 +103,6 @@
 // THIRD PASS
 // - Use the information from the previous two passes to record all the information related to their declarations
 //   (Member count, member names, function parameters and their types, etc.) as RTTI
-struct macro_data_t
-{
-    bool8     is_valid;
-    bool8    is_multiline;
-    // NOTE(Sleepster): Whatever is #define BLAH 
-    string_t  macro_name;
-    // NOTE(Sleepster): Whatever is after the #define BLAH ... 
-    string_t  macro_string;
-
-    string_t *arguments;
-    s32       argument_count;
-    bool32    uses_va_args;
-};
-
 #define DEFAULT_KEYWORDS(X)               \
     X("Invalid",  TOKEN_KEYWORD_INVALID)  \
     X("struct",   TOKEN_KEYWORD_STRUCT)   \
@@ -194,6 +180,7 @@ struct AST_type_t
     X(AST_NODE_TYPE_STRUCTURE_MEMBER, "AST_NODE_TYPE_STRUCTURE_MEMBER") \
     X(AST_NODE_TYPE_ENUM, "AST_NODE_TYPE_ENUM") \
     X(AST_NODE_TYPE_ENUM_MEMBER, "AST_NODE_TYPE_ENUM_MEMBER") \
+    X(AST_NODE_TYPE_MACRO_DEFINITION, "AST_NODE_TYPE_MACRO_DEFINITION") \
 
 
 enum AST_node_type_t
@@ -213,6 +200,7 @@ struct AST_node_t
     string_t    filename;
 
     AST_node_t *next_sibling;
+    AST_node_t *prev_sibling;
     AST_node_t *first_child;
 };
 
@@ -222,6 +210,22 @@ enum code_declaration_type_t
     CODE_DECLARATION_TYPE_STRUCTURE,
     CODE_DECLARATION_TYPE_ENUM,
     CODE_DECLARATION_TYPE_PROCEDURE,
+};
+
+struct macro_data_t
+{
+    bool8       is_valid;
+    bool8       is_multiline;
+    // NOTE(Sleepster): Whatever is the name of the macro 
+    string_t    macro_name;
+    // NOTE(Sleepster): Whatever is after the #define name ... 
+    string_t    expansion_string;
+
+    AST_node_t *expansion_AST;
+
+    string_t   *arguments;
+    s32         argument_count;
+    bool32      uses_va_args;
 };
 
 struct code_declaration_t
@@ -460,135 +464,6 @@ get_code_type(string_t type_name)
     return(type);
 }
 
-// TODO(Sleepster): If a macro expands to a keyword, add it to the keyword table.
-//
-// Three cases we have to handle here:
-// - First is a macro defined as:
-//      #define MACRO (128)
-//  should not be read as having arguments.
-//
-// - Second is that a macro of:
-//      #define MACRO() <a bunch of stuff>
-//   Should not crash the program since there are no arguments.
-//
-// - Three is that a mcaro of:
-//      #define VARIATRIC(first, second, ...) ...
-//   should not crash the program
-//
-//   Macros are annoying.
-//
-//
-//   When we find a macro we should perhaps parse it into an AST and store the AST of the macro inside the actual
-//   macro_data_t so that when we find a macro later in the program's parsing, we can just attach the AST immediately in place of the found 
-//   macro identifier. THIS SHOULD ONLY HAPEEN FOR MACROS THAT ARE EXPRESSIONS!!!!! MULTILINE MACROS ARE STILL SPECIAL
-internal_api void
-parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t macro_name)
-{
-    token_data_t token = c_tokenizer_get_next_token(tokenizer);
-
-    // NOTE(Sleepster): I cannot wait to get a custom string formatter... 
-    Expect(macro_name.type == TT_Identifier, "Invalid token on line: '%d' of file: '%.*s':\nToken: '%.*s' is invalid at this location, it must be an identifier.\n",
-           tokenizer->line_count, filename.count, C_STR(filename), token.string.count, C_STR(token.string));
-
-    macro_data_t macro = {};
-    macro.is_valid     = true;
-    macro.macro_name   = c_string_make_copy(&permanent_arena, macro_name.string);
-
-    // NOTE(Sleepster): Check if the macro really takes arguments or if this is just an expression...
-    if(token.type == TT_OpeningParen)
-    {
-        // NOTE(Sleepster): Peek tokens ahead 
-        c_tokenizer_set_bookmark(tokenizer, token);
-        while(token.type != TT_ClosingParen)
-        {
-            // TODO(Sleepster): We need to figure out what to do with __VA_ARGS__ (...)
-            token = c_tokenizer_get_next_token(tokenizer);
-            if(token.type == TT_Identifier)
-            {
-                ++macro.argument_count;
-            }
-        }
-        token = c_tokenizer_restore_bookmark(tokenizer);
-
-        // NOTE(Sleepster): allocate string_t * argument_count 
-        macro.arguments = c_arena_push_array(&permanent_arena, string_t, macro.argument_count);
-
-        // NOTE(Sleepster): Copy each of the argument strings
-        u32 argument_index = 0;
-        while(token.type != TT_ClosingParen)
-        {
-            token = c_tokenizer_get_next_token(tokenizer);
-            if(token.type == TT_Identifier)
-            {
-                macro.arguments[argument_index++] = c_string_make_copy(&permanent_arena, token.string);
-            }
-        }
-
-        // TODO(Sleepster): I hate this! TOO BAD!!
-        string_builder_t temp_builder;
-        c_string_builder_init(&temp_builder, MB(10));
-        defer(c_string_builder_deinit(&temp_builder));
-
-        Expect(token.type == TT_ClosingParen, "We have failed to parse the macro on line '%d' of file '%.*s' 'up a closing parenthesis... Current token is: '%.*s' which is not valid...\n",
-               tokenizer->line_count, filename.count, C_STR(filename), token.string.count, C_STR(token.string))
-        // NOTE(Sleepster): Get the rest of the macro on the right side 
-        for(;;)
-        {
-            string_t line = c_tokenizer_eat_lines(&transient_arena, tokenizer, 1);
-            c_string_builder_append_data(&temp_builder, line);
-
-            s32 backslash = c_string_find_first_char_from_right(line, '\\');
-            if(backslash != -1)
-            {
-                macro.is_multiline = true;
-                c_string_builder_append_data(&temp_builder, STR("\n"));
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        macro.macro_string = c_string_make_copy(&permanent_arena, c_string_builder_get_current_string(&temp_builder));
-    }
-    // NOTE(Sleepster): If it doesn't take any arguments... 
-    else
-    {
-        string_t macro_line = c_tokenizer_eat_lines(&transient_arena, tokenizer, 1);
-        string_t full_macro = c_string_concat(&permanent_arena, token.string, macro_line);
-
-        keyword_t *keyword = get_keyword(token);
-        if(keyword->keyword_token != TOKEN_KEYWORD_INVALID)
-        {
-            keyword_t new_keyword     = {};
-            new_keyword.string        = macro_name.string;
-            new_keyword.keyword_token = keyword->keyword_token;
-            c_dynarray_push(g_state->keywords, new_keyword);
-        }
-
-        macro.macro_string  = c_string_make_copy(&permanent_arena, full_macro);
-    }
-
-    TicketMutexScope(&g_state->macro_table_mutex)
-    {
-        c_hash_table_insert_pair(&g_state->macro_table, macro.macro_name, macro);
-    }
-
-    printf("\033[0m");
-    printf("========== MACRO_DATA ===========\n");
-    printf("Macro name:           '%.*s'...\n", macro.macro_name.count,   C_STR(macro.macro_name));
-    printf("Macro Argument Count: '%d'...\n",   macro.argument_count);
-    for(s32 argument_index = 0;
-        argument_index < macro.argument_count;
-        ++argument_index)
-    {
-        string_t argument = macro.arguments[argument_index];
-        printf("\tArgument at index: '%d' is: '%.*s'...\n", argument_index, argument.count, C_STR(argument));
-    }
-    printf("Macro contents:       '%.*s'...\n", macro.macro_string.count, C_STR(macro.macro_string));
-    printf("=================================\n\n");
-}
-
 internal_api AST_node_t*
 AST_get_next_child_node(tokenizer_t *tokenizer, AST_node_t *root)
 {
@@ -637,6 +512,7 @@ AST_get_next_sibling_node(tokenizer_t *tokenizer, AST_node_t *root)
             if(!current_child->next_sibling)
             {
                 current_child->next_sibling = new_node;
+                new_node->prev_sibling      = current_child;
                 break;
             }
         }
@@ -650,6 +526,231 @@ AST_get_next_sibling_node(tokenizer_t *tokenizer, AST_node_t *root)
 }
 
 internal_api void
+generate_number_AST(tokenizer_t *tokenizer, AST_node_t *new_node, AST_type_t *type_data, token_data_t *token_out)
+{
+    switch(token_out->type)
+    {
+        case TT_Dash:
+        {
+            type_data->type_flags   |= AST_NUMBER_FLAG_SIGNED;
+            type_data->literal_value = c_string_make_copy(&permanent_arena, token_out->string);
+
+            *token_out = c_tokenizer_get_next_token(tokenizer);
+        }
+        case TT_Number:
+        {
+            new_node->node_type = AST_NODE_TYPE_NUMBER;
+
+            token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
+            if(peek_token.type != TT_EOF)
+            {
+                if(peek_token.string.data[0] == 'f' && peek_token.string.count == 1)
+                {
+                    type_data->literal_value = c_string_concat(&permanent_arena, type_data->literal_value, peek_token.string);
+                    type_data->type_flags   |= AST_NUMBER_FLAG_FLOAT; 
+                    type_data->float_value   = c_string_read_float(&permanent_arena, token_out->string);
+
+                    *token_out = c_tokenizer_get_next_token(tokenizer);
+                }
+                else
+                {
+                    if(type_data->type_flags & AST_NUMBER_FLAG_SIGNED)
+                    {
+                        type_data->int_value = c_string_read_int(token_out->string);
+                    }
+                    else
+                    {
+                        type_data->unsigned_value = c_string_read_uint(token_out->string);
+                    }
+
+                    *token_out = c_tokenizer_get_next_token(tokenizer);
+                }
+            }
+        }break;
+    }
+}
+
+// TODO(Sleepster): If a macro expands to a keyword, add it to the keyword table.
+//
+// Three cases we have to handle here:
+// - First is a macro defined as:
+//      #define MACRO (128)
+//  should not be read as having arguments.
+//
+// - Second is that a macro of:
+//      #define MACRO() <a bunch of stuff>
+//   Should not crash the program since there are no arguments.
+//
+// - Three is that a mcaro of:
+//      #define VARIATRIC(first, second, ...) ...
+//   should not crash the program
+//
+//   Macros are annoying.
+//
+//
+//   When we find a macro we should perhaps parse it into an AST and store the AST of the macro inside the actual
+//   macro_data_t so that when we find a macro later in the program's parsing, we can just attach the AST immediately in place of the found 
+//   macro identifier. THIS SHOULD ONLY HAPEEN FOR MACROS THAT ARE EXPRESSIONS!!!!! MULTILINE MACROS ARE STILL SPECIAL
+internal_api void
+parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t macro_name)
+{
+    token_data_t token = c_tokenizer_get_next_token(tokenizer);
+
+    // NOTE(Sleepster): I cannot wait to get a custom string formatter... 
+    Expect(macro_name.type == TT_Identifier, "Invalid token on line: '%d' of file: '%.*s':\nToken: '%.*s' is invalid at this location, it must be an identifier.\n",
+           tokenizer->line_count, filename.count, C_STR(filename), token.string.count, C_STR(token.string));
+
+    macro_data_t macro = {};
+    macro.is_valid     = true;
+    macro.macro_name   = c_string_make_copy(&permanent_arena, macro_name.string);
+
+    // NOTE(Sleepster): First node is the macro name 
+    macro.expansion_AST   = c_arena_push_struct(&permanent_arena, AST_node_t);
+
+    macro.expansion_AST->assigned_name = macro.macro_name;
+    macro.expansion_AST->filename      = tokenizer->filename;
+    macro.expansion_AST->line_number   = tokenizer->line_count;
+
+    // NOTE(Sleepster): If the macro is '#define' around a keyword, add the macro as a new keyword
+    keyword_t *keyword = get_keyword(token);
+    if(keyword->keyword_token != TOKEN_KEYWORD_INVALID)
+    {
+        keyword_t new_keyword     = {};
+        new_keyword.string        = macro_name.string;
+        new_keyword.keyword_token = keyword->keyword_token;
+        c_dynarray_push(g_state->keywords, new_keyword);
+    }
+
+    string_builder_t temp_builder;
+    c_string_builder_init(&temp_builder, MB(10));
+    defer(c_string_builder_deinit(&temp_builder));
+
+    if(token.type == TT_OpeningParen)
+    {
+        // NOTE(Sleepster): Determine whether this is an expression or an argument list... 
+        char separator = macro_name.string.data[macro_name.string.count];
+        if(separator != ' ')
+        {
+            // NOTE(Sleepster): Arguments ARE NOT part of the AST as that would be silly... So instead
+            // we just copy each of the arugment strings into the macro's argument list
+            macro.arguments = c_arena_push_array(&permanent_arena, string_t, 20);
+            u32 argument_index = 0;
+            while(token.type != TT_ClosingParen)
+            {
+                token = c_tokenizer_get_next_token(tokenizer);
+
+                Expect(token.type == TT_Identifier, 
+                       "Encountered token: '%.*s' when parsing the arugment stream of macro: '%.*s'... This is not valid and it must be an identifier...\n",
+                       fprint_token(token),
+                       fprint_string(macro.macro_name));
+
+                macro.arguments[argument_index++] = c_string_make_copy(&permanent_arena, token.string);
+
+                token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
+                if(peek_token.type == TT_Comma || peek_token.type == TT_ClosingParen) 
+                {
+                    token = c_tokenizer_get_next_token(tokenizer);
+                }
+            }
+
+            macro.argument_count = argument_index;
+            Expect(token.type == TT_ClosingParen, "We have failed to parse the macro on line '%d' of file '%.*s' expected a closing parenthesis... Current token is: '%.*s' which is not valid...\n",
+                   tokenizer->line_count, filename.count, C_STR(filename), token.string.count, C_STR(token.string))
+
+            // NOTE(Sleepster): Eat the open close paren for the arugment list... this so the copying of the 
+            // expansion is clean.
+            token = c_tokenizer_get_next_token(tokenizer);
+        }
+    }
+    else
+    {        
+        // NOTE(Sleepster): Otherwise, this is a simple macro like:
+        // #define NUMBER 10
+        macro.expansion_string = c_string_make_copy(&permanent_arena, token.string);
+    }
+
+    // NOTE(Sleepster): Get the rest of the macro on the right side 
+    c_string_builder_append_data(&temp_builder, token.string);
+    for(;;)
+    {
+        string_t line = c_tokenizer_eat_lines(&transient_arena, tokenizer, 1);
+        c_string_builder_append_data(&temp_builder, line);
+
+        s32 backslash = c_string_find_first_char_from_right(line, '\\');
+        if(backslash != -1)
+        {
+            macro.is_multiline = true;
+            c_string_builder_append_data(&temp_builder, STR("\n"));
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    macro.expansion_string = c_string_make_copy(&permanent_arena, c_string_builder_get_current_string(&temp_builder));
+
+    // NOTE(Sleepster): Construct the macro expansion's AST 
+    tokenizer_t expansion = (tokenizer_t){macro.expansion_string};
+    while(expansion.data.count > 0)
+    {
+        token_data_t token = c_tokenizer_get_next_token(&expansion);
+        if(token.type == TT_OpeningParen)
+        {
+            token = c_tokenizer_get_next_token(&expansion);
+            if(token.type == TT_OpeningBrace)
+            {
+                // NOTE(Sleepster): If this is a GCC style macro expression such as:
+                // #define array_add(array, item) ({ 
+                //     array.data[array.count] = item;
+                //
+                //     array
+                // })
+                //
+                // then just don't do anything
+                break;
+            }
+        }
+
+        AST_node_t *new_node = AST_get_next_sibling_node(tokenizer, macro.expansion_AST);
+        switch(token.type)
+        {
+            case TT_Identifier:
+            {
+                new_node->node_type     = AST_NODE_TYPE_IDENTIFIER;
+                new_node->assigned_name = token.string;
+            }break;
+            case TT_OpeningParen:
+            {
+                if(new_node->prev_sibling->node_type == AST_NODE_TYPE_IDENTIFIER)
+                {
+                    // NOTE(Sleepster): Investigate whether this is a function call / function declaration... 
+                }
+            }break;
+            case TT_Dash:
+            case TT_Number:
+            {
+                generate_number_AST(&expansion, new_node, &new_node->type_data, &token);
+            }break;
+        };
+    }
+
+    printf("\033[0m");
+    printf("========== MACRO_DATA ===========\n");
+    printf("Macro name:           '%.*s'...\n", macro.macro_name.count,   C_STR(macro.macro_name));
+    printf("Macro Argument Count: '%d'...\n",   macro.argument_count);
+    for(s32 argument_index = 0;
+        argument_index < macro.argument_count;
+        ++argument_index)
+    {
+        string_t argument = macro.arguments[argument_index];
+        printf("\tArgument at index: '%d' is: '%.*s'...\n", argument_index, argument.count, C_STR(argument));
+    }
+    printf("Macro expansion:      '%.*s'...\n", macro.expansion_string.count, C_STR(macro.expansion_string));
+    printf("=================================\n\n");
+}
+
+internal_api void
 generate_expression_AST(tokenizer_t *tokenizer, AST_node_t *sibling, token_data_t token)
 {
     if(token.type == TT_OpeningParen)
@@ -657,7 +758,7 @@ generate_expression_AST(tokenizer_t *tokenizer, AST_node_t *sibling, token_data_
         token = c_tokenizer_get_next_token(tokenizer);
     }
 
-    Expect(token.type == TT_Number || token.type == TT_Identifier, 
+    Expect(token.type == TT_Number || token.type == TT_Identifier || token.type == TT_Dash, 
            "The token in this expression must be either a number or an identifier (such as a constexpr or a macro), but we instead found: '%.*s' which is invalid...\n", 
            fprint_token(token));
 
@@ -671,38 +772,9 @@ generate_expression_AST(tokenizer_t *tokenizer, AST_node_t *sibling, token_data_
         switch(token.type)
         {
             case TT_Dash:
-            {
-                type_data->type_flags   |= AST_NUMBER_FLAG_SIGNED;
-                type_data->literal_value = c_string_make_copy(&permanent_arena, token.string);
-
-                token = c_tokenizer_get_next_token(tokenizer);
-            }
             case TT_Number:
             {
-                new_node->node_type = AST_NODE_TYPE_NUMBER;
-
-                token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
-                if(peek_token.string.data[0] == 'f' && peek_token.string.count == 1)
-                {
-                    type_data->literal_value = c_string_concat(&permanent_arena, type_data->literal_value, peek_token.string);
-                    type_data->type_flags   |= AST_NUMBER_FLAG_FLOAT; 
-                    type_data->float_value   = c_string_read_float(token.string);
-
-                    token = c_tokenizer_get_next_token(tokenizer);
-                }
-                else
-                {
-                    if(type_data->type_flags & AST_NUMBER_FLAG_SIGNED)
-                    {
-                        type_data->int_value = c_string_read_int(token.string);
-                    }
-                    else
-                    {
-                        type_data->unsigned_value = c_string_read_uint(token.string);
-                    }
-
-                    token = c_tokenizer_get_next_token(tokenizer);
-                }
+                generate_number_AST(tokenizer, new_node, type_data, &token);
             }break;
             case TT_OpenAngleBracket:
             {
@@ -758,28 +830,13 @@ generate_default_value_AST(tokenizer_t *tokenizer, AST_node_t *base)
     {
         // NOTE(Sleepster): Will deliberately fall through 
         case TT_Dash:
-        {
-            token = c_tokenizer_get_next_token(tokenizer);
-            next_node->type_data.type_flags   |= AST_NUMBER_FLAG_SIGNED;
-            next_node->type_data.literal_value = c_string_make_copy(&permanent_arena, token.string);
-        }
         case TT_Number:
         {
             // NOTE(Sleepster): If this is a semicolon, then this is easily parseable. 
             token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
             if(peek_token.type == TT_Semicolon || peek_token.type == TT_Comma || peek_token.string.data[0] == 'f')
             {
-                next_node->node_type = AST_NODE_TYPE_NUMBER;
-                next_node->type_data.literal_value = c_string_concat(&permanent_arena, next_node->type_data.literal_value, token.string);
-                token_data_t float_token = c_tokenizer_peek_token(tokenizer);
-                if(float_token.string.data[0] == 'f')
-                {
-                    next_node->type_data.literal_value = c_string_concat(&permanent_arena, next_node->type_data.literal_value, STR("f"));
-                    next_node->type_data.type_flags   |= AST_NUMBER_FLAG_FLOAT;
-
-                    token = c_tokenizer_get_next_token(tokenizer);
-                }
-                token = c_tokenizer_get_next_token(tokenizer);
+                generate_number_AST(tokenizer, next_node, &next_node->type_data, &token);
             }
             else
             {
@@ -862,9 +919,13 @@ generate_declaration_AST(tokenizer_t *tokenizer, AST_node_t *new_node, token_dat
     {
         // NOTE(Sleepster): Some Structure Default value... 
          generate_default_value_AST(tokenizer, new_node);
-        *token_out = c_tokenizer_get_next_token(tokenizer);
+
+         token_data_t peek_token = c_tokenizer_peek_token(tokenizer, 1);
+         if(peek_token.type == TT_Semicolon)
+         {
+             *token_out = c_tokenizer_get_next_token(tokenizer);
+         }
     }
-    Expect(token_out->type == TT_Semicolon, "Expected a semicolon at the end of this member type->name expression, found: '%.*s' instead...\n", fprint_token(*token_out));
 }
 
 internal_api void
@@ -909,6 +970,7 @@ generate_structure_AST(tokenizer_t *tokenizer, token_data_t token, AST_node_t *s
             }
 
             AST_node_t *new_node = AST_get_next_child_node(tokenizer, structure); 
+            new_node->node_type  = AST_NODE_TYPE_STRUCTURE_MEMBER;
 
             // NOTE(Sleepster): If it is not a nested structure...
             peek_token = c_tokenizer_peek_token(tokenizer, 1);
@@ -1035,7 +1097,6 @@ generate_typedef_AST(tokenizer_t *tokenizer, token_data_t token, AST_node_t *new
             Expect(false, "Currently, we only support simple to parse typedefs like 'typedef uint32_t u32'... therefore the token: '%.*s' is not allowed here yet...\n", fprint_token(peek_token));
         }
     }
-
 }
 
 int
@@ -1123,6 +1184,7 @@ main(int argc, char **argv)
                     case TOKEN_KEYWORD_TYPEDEF:
                     {
                         generate_typedef_AST(&tokenizer, token, &new_node);
+                        print_node_list(&new_node);
                     }break;
                 }
             }break;
