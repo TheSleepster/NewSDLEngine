@@ -103,18 +103,23 @@
 // THIRD PASS
 // - Use the information from the previous two passes to record all the information related to their declarations
 //   (Member count, member names, function parameters and their types, etc.) as RTTI
-#define DEFAULT_KEYWORDS(X)               \
-    X("Invalid",  TOKEN_KEYWORD_INVALID)  \
-    X("struct",   TOKEN_KEYWORD_STRUCT)   \
-    X("union",    TOKEN_KEYWORD_UNION)    \
-    X("enum",     TOKEN_KEYWORD_ENUM)     \
-    X("static",   TOKEN_KEYWORD_STATIC)   \
-    X("extern",   TOKEN_KEYWORD_EXTERN)   \
-    X("inline",   TOKEN_KEYWORD_INLINE)   \
-    X("volatile", TOKEN_KEYWORD_VOLATILE) \
-    X("const",    TOKEN_KEYWORD_CONST)    \
-    X("auto",     TOKEN_KEYWORD_AUTO)     \
-    X("typedef",  TOKEN_KEYWORD_TYPEDEF)
+#define DEFAULT_KEYWORDS(X)                 \
+    X("Invalid",   TOKEN_KEYWORD_INVALID)   \
+    X("struct",    TOKEN_KEYWORD_STRUCT)    \
+    X("union",     TOKEN_KEYWORD_UNION)     \
+    X("enum",      TOKEN_KEYWORD_ENUM)      \
+    X("static",    TOKEN_KEYWORD_STATIC)    \
+    X("extern",    TOKEN_KEYWORD_EXTERN)    \
+    X("inline",    TOKEN_KEYWORD_INLINE)    \
+    X("volatile",  TOKEN_KEYWORD_VOLATILE)  \
+    X("const",     TOKEN_KEYWORD_CONST)     \
+    X("auto",      TOKEN_KEYWORD_AUTO)      \
+    X("class",     TOKEN_KEYWORD_CLASS)     \
+    X("public",    TOKEN_KEYWORD_PUBLIC)    \
+    X("private",   TOKEN_KEYWORD_PRIVATE)   \
+    X("protected", TOKEN_KEYWORD_PROTECTED) \
+    X("typedef",   TOKEN_KEYWORD_TYPEDEF)   \
+    X("using",     TOKEN_KEYWORD_USING)
 
 enum lexer_keyword_t
 {
@@ -144,16 +149,17 @@ enum AST_type_flags_t
     AST_TYPE_FLAG_CONSTANT = BIT(2),
     AST_TYPE_FLAG_STATIC   = BIT(3),
     AST_TYPE_FLAG_ARRAY    = BIT(4),
+    AST_TYPE_FLAG_POINTER  = BIT(5),
 
-    AST_NUMBER_FLAG_SIGNED = BIT(5),
-    AST_NUMBER_FLAG_FLOAT  = BIT(6)
+    AST_NUMBER_FLAG_SIGNED = BIT(6),
+    AST_NUMBER_FLAG_FLOAT  = BIT(7)
 };
 
 struct AST_type_t 
 {
     code_type_t *type;
     u32          type_flags; // is_pointer, is constant, is volatile, etc.
-    u32          pointer_count;
+    u32          pointer_depth;
     u32          array_size;
 
     string_t     literal_value;
@@ -194,6 +200,7 @@ struct AST_node_t
 {
     u32         node_type;
     string_t    assigned_name;
+    keyword_t  *keyword_data;
     AST_type_t  type_data;
 
     u32         line_number;
@@ -690,49 +697,122 @@ parse_macro_information(tokenizer_t *tokenizer, string_t filename, token_data_t 
 
     macro.expansion_string = c_string_make_copy(&permanent_arena, c_string_builder_get_current_string(&temp_builder));
 
-    // NOTE(Sleepster): Construct the macro expansion's AST 
     tokenizer_t expansion = (tokenizer_t){macro.expansion_string};
+    c_tokenizer_set_bookmark(&expansion, token);
+
+    // static inline void get_item(item_t *item);
+    // void get_item(item_t *item);
+    // item_t *get_item(string_t item);
+    //
+    // int item(42);
+    
+    bool8 is_procedure = false;
+    AST_node_t *node = c_arena_push_struct(&permanent_arena, AST_node_t);
     while(expansion.data.count > 0)
     {
-        token_data_t token = c_tokenizer_get_next_token(&expansion);
-        if(token.type == TT_OpeningParen)
+        token_data_t expansion_token = c_tokenizer_get_next_token(&expansion);
+        token_data_t peek_token      = c_tokenizer_peek_token(&expansion, 1);
+        if(expansion_token.type == TT_Identifier && (peek_token.type == TT_Identifier || 
+                                                     peek_token.type == TT_Asterisk   || 
+                                                     peek_token.type == TT_OpeningParen))
         {
-            token = c_tokenizer_get_next_token(&expansion);
-            if(token.type == TT_OpeningBrace)
+
+            AST_node_t *new_node = AST_get_next_sibling_node(&expansion, node);
+
+            new_node->node_type     = AST_NODE_TYPE_IDENTIFIER;
+            new_node->assigned_name = expansion_token.string;
+            keyword_t *keyword      = get_keyword(expansion_token);
+            if(keyword->keyword_token != TOKEN_KEYWORD_INVALID)
             {
-                // NOTE(Sleepster): If this is a GCC style macro expression such as:
-                // #define array_add(array, item) ({ 
-                //     array.data[array.count] = item;
-                //
-                //     array
-                // })
-                //
-                // then just don't do anything
-                break;
+                new_node->keyword_data = keyword;
+            }
+
+            AST_type_t *type_data = &new_node->type_data;
+            type_data->type = get_code_type(macro.macro_name);
+
+            // NOTE(Sleepster): Set the first node of the list to be that of the procedure. So that way the tree is created like so:
+            //              procedure name
+            //              / \        \
+            //             /   \        \
+            //          static inline  void
+            //
+            //  The general idea here is that the macro name is in place of the procedure name
+            node->assigned_name = expansion_token.string;
+            node->node_type     = AST_NODE_TYPE_PROCEDURE;
+            if(peek_token.type == TT_OpeningParen)
+            {
+                Expect(new_node->keyword_data == null, 
+                       "Somehow when parsing this macro's expansion, we found a return type that is also a keyword... This just shouldn't be allowed to happen. Token is: '%.*s'...\n", 
+                       fprint_token(expansion_token));
+
+                // NOTE(Sleepster): Set the sibling node to an AST_NODE_TYPE_RETURN_TYPE 
+                new_node->node_type = AST_NODE_TYPE_RETURN_TYPE;
+                is_procedure = true;
+            }
+            else if(peek_token.type == TT_Asterisk)
+            {
+                while(peek_token.type == TT_Asterisk)
+                {
+                    ++new_node->type_data.pointer_depth;
+
+                    peek_token = c_tokenizer_peek_token(&expansion);
+                    if(peek_token.type == TT_Asterisk)
+                    {
+                        peek_token = c_tokenizer_get_next_token(&expansion);
+                    }
+                }
+
+                new_node->type_data.type_flags |= AST_TYPE_FLAG_POINTER;
             }
         }
+    }
 
-        AST_node_t *new_node = AST_get_next_sibling_node(tokenizer, macro.expansion_AST);
-        switch(token.type)
+    if(!is_procedure)
+    {
+        printf("NOT A PROCEDURE!!!!\n");
+        printf("NOT A PROCEDURE!!!!\n");
+        printf("NOT A PROCEDURE!!!!\n");
+        printf("NOT A PROCEDURE!!!!\n");
+        c_tokenizer_restore_bookmark(&expansion);
+        // NOTE(Sleepster): Construct the macro expansion's AST 
+        while(expansion.data.count > 0)
         {
-            case TT_Identifier:
+            token_data_t token = c_tokenizer_get_next_token(&expansion);
+            if(token.type == TT_OpeningParen)
             {
-                new_node->node_type     = AST_NODE_TYPE_IDENTIFIER;
-                new_node->assigned_name = token.string;
-            }break;
-            case TT_OpeningParen:
-            {
-                if(new_node->prev_sibling->node_type == AST_NODE_TYPE_IDENTIFIER)
+                token = c_tokenizer_get_next_token(&expansion);
+                if(token.type == TT_OpeningBrace)
                 {
-                    // NOTE(Sleepster): Investigate whether this is a function call / function declaration... 
+                    // NOTE(Sleepster): If this is a GCC style macro expression such as:
+                    // #define array_add(array, item) ({ 
+                    //     array.data[array.count] = item;
+                    //
+                    //     array
+                    // })
+                    //
+                    // then just don't do anything
+                    break;
                 }
-            }break;
-            case TT_Dash:
-            case TT_Number:
+            }
+
+            switch(token.type)
             {
-                generate_number_AST(&expansion, new_node, &new_node->type_data, &token);
-            }break;
-        };
+                case TT_Identifier:
+                {
+                    node->node_type     = AST_NODE_TYPE_IDENTIFIER;
+                    node->assigned_name = token.string;
+                }break;
+                case TT_Dash:
+                case TT_Number:
+                {
+                    generate_number_AST(&expansion, node, &node->type_data, &token);
+                }break;
+            };
+        }
+    }
+    else
+    {
+        printf("Is a procedure!!!!\n");
     }
 
     printf("\033[0m");

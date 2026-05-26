@@ -439,6 +439,7 @@ game_main(void)
             r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
             r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
 
+            // TODO(Sleepster): There are only two periods... why? 
             immediate_text(command_list, 
                           &game_state.vertex_buffer, 
                            asset_manager, 
