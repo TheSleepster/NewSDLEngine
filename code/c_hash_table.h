@@ -78,7 +78,7 @@ struct {                                     \
     void                       *allocator;   \
     c_hash_table_allocate_fn_t *allocate_fn; \
     c_hash_table_free_fn_t     *free_fn;     \
-} 
+}
 
 #define _GET_SECOND_ARG(A, B, ...) B
 #define _GET_THIRD_ARG(A, B, C, ...) C

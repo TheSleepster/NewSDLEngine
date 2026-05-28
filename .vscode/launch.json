@@ -71,7 +71,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/athena",
             "cwd": "${workspaceFolder}/code",
-            "args": ["--filename=tests/metaprogram_tests/casey_style_external_function.cpp"],
+            "args": ["--filename=tests/metaprogram_tests/basic_macro.cpp"],
             "stopOnEntry": false,
             "terminal": "integrated",
         },

@@ -7,6 +7,8 @@
 #define MAX_INTERNAL_MEMBERS        128
 #define MAX_PAREN_INTERNAL_MEMBERS (128)
 
+#define internal static
+
 typedef struct test_element_typedeffed 
 {
     s32    oranges              = -1;
@@ -22,6 +24,11 @@ typedef struct test_element_typedeffed
         u32 lemons;
     };
 }test_element_typedeffed_t;
+
+enum data_types 
+{
+    DATA_TYPE_TEST_ENUM_THING = 1 << 31,
+};
 
 struct test_element_data 
 {

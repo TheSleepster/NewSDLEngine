@@ -513,6 +513,29 @@ c_string_eat_whitespace(string_t *current_line)
     return(result);
 }
 
+u32
+c_string_get_whitespace_size(string_t string)
+{
+    u32 result = 0;
+    u32 old_string_count = string.count;
+
+    c_string_eat_whitespace(&string);
+    result = old_string_count - string.count;
+
+    return(result);
+}
+
+u32 
+c_string_get_current_line_size(string_t string)
+{
+    u32 result = 0;
+
+    string_t line = c_string_read_line(&string);
+    result        = line.count;
+
+    return(result);
+}
+
 
 ///////////////////
 // STRING BUILDER

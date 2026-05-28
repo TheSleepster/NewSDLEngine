@@ -21,3 +21,9 @@
 #define global_variable static
 #define local_persist   static
 #define internal_api    static
+
+#if 0
+
+#define THIS_SHOULD_NOT_GET_FOUND
+
+#endif

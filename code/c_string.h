@@ -63,6 +63,8 @@ bool32      c_string_is_whitespace(string_t *current_line);
 bool32      c_string_is_end_of_line(string_t *current_line);
 // NOTE(Sleepster): Returns the number of new_line characters seen
 u32         c_string_eat_whitespace(string_t *current_line);
+u32         c_string_get_whitespace_size(string_t string);
+u32         c_string_get_current_line_size(string_t string);
 
 string_t    c_string_read_line(string_t *data);
 
