@@ -11,11 +11,12 @@ typedef C_HASH_TABLE_ALLOCATE_IMPL(hash_table_allocate_impl_t);
 
 typedef void allocate_memory_t(void *memory, int size);
 
+#define MAX_ALLOCATOR_CALLBACKS 100
 
 struct hash_table_data_t
 {
     hash_table_allocate_impl_t *function;
-    allocate_memory_t          *allocator;
+    allocate_memory_t          *allocator[MAX_ALLOCATOR_CALLBACKS];
 };
 
 internal_api

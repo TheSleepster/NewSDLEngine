@@ -229,6 +229,9 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
         result.data       = {};
     }
 
+    ++token_stream->current_token_stream_depth;
+    token_stream->last_token = result;
+
     return(result);
 }
 
@@ -256,7 +259,7 @@ lexer_peek_token(lexer_t *lexer, u32 tokens_to_peek_ahead = 1)
     {
         token = lexer_get_next_token(lexer);
     }
-    lexer_pop_token_stream(lexer);
+    lexer_pop_token_stream(lexer, false);
 
     return(token);
 }
@@ -301,8 +304,9 @@ init_token_stream_from_string(string_t string)
 internal_api void
 lexer_push_token_stream(lexer_t *lexer, lexer_token_stream_t *new_stream)
 {
-    lexer_token_stream_t *stream = lexer->token_streams + lexer->token_stream_count;
-    lexer->token_stream_count   += 1;
+    lexer_token_stream_t *stream       = lexer->token_streams + lexer->token_stream_count;
+    stream->current_token_stream_depth = 0;
+    lexer->token_stream_count         += 1;
 
     *stream = *new_stream;
 
@@ -310,13 +314,26 @@ lexer_push_token_stream(lexer_t *lexer, lexer_token_stream_t *new_stream)
 }
 
 internal_api void
-lexer_pop_token_stream(lexer_t *lexer)
+lexer_pop_token_stream(lexer_t *lexer, bool8 sync_streams)
 {
     lexer->token_stream_count -= 1;
-    Assert(lexer->token_stream_count - 1 >= 0);
-    
-    lexer_token_stream_t *stream = lexer->token_streams + (lexer->token_stream_count - 1);
+    lexer_token_stream_t *old_stream = lexer->current_stream;
+
+    u32 next_stream_index = Max(0, lexer->token_stream_count - 1);
+    lexer_token_stream_t *stream  = lexer->token_streams + next_stream_index;
+
+    stream->current_token_stream_depth = 0;
+
     lexer->current_stream = stream;
+    if(sync_streams)
+    {
+        for(u32 index = 0;
+            index < old_stream->current_token_stream_depth;
+            ++index)
+        {
+            lexer_get_next_token(lexer);
+        }
+    }
 }
 
 internal_api string_t

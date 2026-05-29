@@ -167,8 +167,67 @@ parse_macro_info(parser_state_t *parser, lexer_t *lexer, macro_info_t *macro_inf
         }
     }
 
-    lexer_pop_token_stream(lexer);
+    lexer_pop_token_stream(lexer, false);
     macro_info->is_set = true;
+}
+
+internal_api lexer_token_t
+handle_macro_expansion(lexer_t *lexer, parser_state_t *parser, bool8 record_macro)
+{
+    lexer_token_t token = lexer_get_next_token(lexer);
+    if(c_string_compare(token.data, STR("define")))
+    {
+        if(record_macro)
+        {
+            lexer_token_t name_token = lexer_get_next_token(lexer);
+            TicketMutexScope(&parser->macro_table_mutex)
+            {
+                macro_info_t *macro_info = c_hash_table_get_value_ptr(&parser->macro_table, name_token.data);
+                if(!macro_info->is_set)
+                {
+                    parse_macro_info(parser, lexer, macro_info, name_token);
+                    printf("Macro: '%.*s'...\n", fprint_string(macro_info->name));
+                    printf("Expansion: '%.*s'...\n", fprint_string(macro_info->expansion_string));
+                    printf("Argument Count: '%d'...\n", macro_info->argument_count);
+                    for(u32 index = 0;
+                        index < macro_info->argument_count;
+                        ++index)
+                    {
+                        printf("\tArgument: '%.*s'...\n", fprint_string(macro_info->arguments[index]));
+                    }
+                }
+            }
+        }
+        else
+        {
+            // NOTE(Sleepster): Just eat the macro
+            for(;;)
+            {
+                string_t line = lexer_eat_lines(&transient_arena, lexer, 1);
+                s32 backslash = c_string_find_first_char_from_right(line, '\\');
+                if(backslash == -1)
+                {
+                    break;
+                }
+            }
+        }
+    }
+    else if(c_string_compare(token.data, STR("if")))
+    {
+        lexer_token_t if_token = lexer_get_next_token(lexer);
+        Expect(if_token.token_type == TOKEN_TYPE_NUMBER, "Currently the only item supported after a '#if ' is a number...\n");
+
+        u32 number = c_string_read_uint(if_token.data);
+        if(number == 0)
+        {
+            while(!c_string_compare(token.data, STR("endif")))
+            {
+                token = lexer_get_next_token(lexer);
+            }
+        }
+    }
+
+    return(token);
 }
 
 int
@@ -196,47 +255,33 @@ main(int argc, char **argv)
         {
             case TOKEN_TYPE_POUND:
             {
-                token = lexer_get_next_token(&lexer);
-                if(c_string_compare(token.data, STR("define")))
-                {
-                    lexer_token_t name_token = lexer_get_next_token(&lexer);
-                    TicketMutexScope(&parser->macro_table_mutex)
-                    {
-                        macro_info_t *macro_info = c_hash_table_get_value_ptr(&parser->macro_table, name_token.data);
-                        if(!macro_info->is_set)
-                        {
-                            parse_macro_info(parser, &lexer, macro_info, name_token);
-                            printf("Macro: '%.*s'...\n", fprint_string(macro_info->name));
-                            printf("Expansion: '%.*s'...\n", fprint_string(macro_info->expansion_string));
-                            printf("Argument Count: '%d'...\n", macro_info->argument_count);
-                            for(u32 index = 0;
-                                index < macro_info->argument_count;
-                                ++index)
-                            {
-                                printf("\tArgument: '%.*s'...\n", fprint_string(macro_info->arguments[index]));
-                            }
-                        }
-                    }
-                }
-                else if(c_string_compare(token.data, STR("if")))
-                {
-                    lexer_token_t if_token = lexer_get_next_token(&lexer);
-                    Expect(if_token.token_type == TOKEN_TYPE_NUMBER, "Currently the only item supported after a '#if ' is a number...\n");
-
-                    u32 number = c_string_read_uint(if_token.data);
-                    if(number == 0)
-                    {
-                        while(!c_string_compare(token.data, STR("endif")))
-                        {
-                            token = lexer_get_next_token(&lexer);
-                        }
-                    }
-                }
+                token = handle_macro_expansion(&lexer, parser, true);
             }break;
         }
     }
 
     // NOTE(Sleepster): Parse the rest of the file using the macros to intercept token streams.
+    lexer_reset_token_stream(lexer.current_stream);
+    for(;;)
+    {
+        lexer_token_t token = parser_get_next_lexer_token(parser, &lexer);
+        switch(token.token_type)
+        {
+            case TOKEN_TYPE_POUND:
+            {
+                token = handle_macro_expansion(&lexer, parser, false);
+            }break;
+            case TOKEN_TYPE_EOF:
+            {
+                goto done;
+            }break;
+            default:
+            {
+                printf("Token is: '%.*s'...\n", fprint_token(token));
+            }break;
+        }
+    }
 
+done:
     return(0);
 }

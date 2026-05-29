@@ -11,7 +11,6 @@
 constexpr u32 MAX_LEXER_BOOKMARKS = 10;
 
 #define fprint_token(token) token.data.count, token.data.data
-
 #define TOKEN_TYPE_LIST(X) \
     X(TOKEN_TYPE_UNKNOWN, "TOKEN_TYPE_UNKNOWN") \
     X(TOKEN_TYPE_ARROW_OPERATOR, "TOKEN_TYPE_ARROW_OPERATOR") \
@@ -95,6 +94,9 @@ struct lexer_token_stream_t
     lexer_token_t *token_buffer;
     u32            buffered_token_count;
     u32            token_buffer_index;
+    u32            current_token_stream_depth;
+
+    lexer_token_t  last_token;
 
     lexer_bookmark_t bookmarks[MAX_LEXER_BOOKMARKS]; 
     s32              bookmark_count;
@@ -103,12 +105,13 @@ struct lexer_token_stream_t
 struct lexer_t
 {
     lexer_token_stream_t *current_stream;
+    lexer_token_stream_t *secondary_stream;
 
     lexer_token_stream_t  token_streams[MAX_LEXER_BOOKMARKS];
-    u32                   token_stream_count;
+    s32                   token_stream_count;
 };
 
 internal_api void lexer_push_token_stream(lexer_t *lexer, lexer_token_stream_t *new_stream);
-internal_api void lexer_pop_token_stream(lexer_t *lexer);
+internal_api void lexer_pop_token_stream(lexer_t *lexer, bool8 sync_streams);
 internal_api lexer_token_stream_t init_token_stream_from_string(string_t string);
 #endif

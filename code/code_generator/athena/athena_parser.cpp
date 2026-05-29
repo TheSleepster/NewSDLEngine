@@ -106,40 +106,71 @@ internal_api lexer_token_stream_t
 parser_substitute_macro_arguments(lexer_t *lexer, lexer_token_t last_token, macro_info_t *macro_info)
 {
     lexer_token_stream_t result = {};
+
+    // NOTE(Sleepster): This right now is completely wrong.
+    // Firstly, this function should just not be getting called when it is.
+    // Secondly, this function should operate on TWO streams at the same time, eating from both and replacing the saved macro's arguments
+    // with the corresponding argument from the invoked macro. like so:
+    // #define item(name) item_##name
+    //
+    // In the event of this invocation:
+    // item(gloves);
+    //
+    // We should see:
+    // item_gloves
     
     lexer_push_bookmark(lexer, last_token);
     lexer_token_t next_token = lexer_get_next_token(lexer);
-
-    Expect(next_token.token_type == TOKEN_TYPE_OPEN_PAREN,
-           "When attempting to substitute arguments of a macro, we failed to find the invocation (which is an '(') and instead were left with: '%.*s'...\n",
-           fprint_token(next_token));
-
-    result = lexer_copy_token_stream(&macro_info->expansion_token_stream);
-    
-    u32 macro_argument_index = 0;
-    while(next_token.token_type != TOKEN_TYPE_CLOSE_PAREN)
+    // NOTE(Sleepster): If the macro takes arguments... 
+    if(next_token.token_type == TOKEN_TYPE_OPEN_PAREN && last_token.data.data[last_token.data.count] != ' ')
     {
-        // NOTE(Sleepster): Get our argument string
-        next_token = lexer_get_next_token(lexer);
+        Expect(next_token.token_type == TOKEN_TYPE_OPEN_PAREN,
+               "When attempting to substitute arguments of a macro, we failed to find the invocation (which is an '(') and instead were left with: '%.*s'...\n",
+               fprint_token(next_token));
 
-        string_t macro_argument = macro_info->arguments[macro_argument_index];
-        for(u32 token_index = 0;
-            token_index < macro_info->expansion_token_stream.buffered_token_count;
-            ++token_index)
+        result = lexer_copy_token_stream(&macro_info->expansion_token_stream);
+
+        // NOTE(Sleepster): Go through each of the arguments and find every token that matches that argument, replace this
+        // with the actual argument from the macro.
+    
+        u32 macro_argument_index = 0;
+        while(next_token.token_type != TOKEN_TYPE_CLOSE_PAREN)
         {
-            lexer_token_t *macro_token = result.token_buffer + token_index;
-            if(c_string_compare(macro_token->data, macro_argument))
-            {
-                *macro_token = next_token;
-                ++macro_argument_index;
+            // NOTE(Sleepster): Get our argument string
+            next_token = lexer_get_next_token(lexer);
+            Expect(next_token.token_type != TOKEN_TYPE_COMMA,
+                   "Expected to find another argument when expanding this macro, instead found: '%.*s'...\n",
+                   fprint_token(next_token));
 
+            string_t macro_argument = macro_info->arguments[macro_argument_index];
+            for(u32 token_index = 0;
+                token_index < macro_info->expansion_token_stream.buffered_token_count;
+                ++token_index)
+            {
+                lexer_token_t *macro_token = result.token_buffer + token_index;
+                if(c_string_compare(macro_token->data, macro_argument))
+                {
+                    *macro_token = next_token;
+                    ++macro_argument_index;
+
+                    break;
+                }
+            }
+            lexer_token_t check_token = lexer_peek_token(lexer, 1);
+            Expect(check_token.token_type == TOKEN_TYPE_COMMA || check_token.token_type == TOKEN_TYPE_CLOSE_PAREN,
+                   "Invalid token when parsing the end of this macro invocation's argument string... token found was: '%.*s'...\n",
+                   fprint_token(check_token));
+            lexer_get_next_token(lexer);
+            if(check_token.token_type == TOKEN_TYPE_CLOSE_PAREN)
+            {
                 break;
             }
         }
-        lexer_token_t check_token = lexer_peek_token(lexer, 1);
-        Expect(check_token.token_type == TOKEN_TYPE_COMMA || check_token.token_type == TOKEN_TYPE_CLOSE_PAREN,
-               "Invalid token when parsing the end of this macro invocation's argument string... token found was: '%.*s'...\n",
-               fprint_token(check_token));
+    }
+    // NOTE(Sleepster): If it does not... 
+    else
+    {
+        result = macro_info->expansion_token_stream;
     }
     lexer_pop_bookmark(lexer);
 
@@ -153,19 +184,24 @@ parser_get_next_lexer_token(parser_state_t *parser, lexer_t *lexer)
     result = lexer_get_next_token(lexer);
     if(result.token_type == TOKEN_TYPE_EOF)
     {
-        lexer_pop_token_stream(lexer);
+        lexer_pop_token_stream(lexer, true);
+        result = lexer_get_next_token(lexer);
     }
 
     macro_info_t *macro = null;
     TicketMutexScope(&parser->macro_table_mutex)
     {
         macro = c_hash_table_get_value_ptr(&parser->macro_table, result.data);
-        if(macro)
+        if(macro->is_set)
         {
             lexer_token_stream_t macro_stream = parser_substitute_macro_arguments(lexer, result, macro);
             lexer_push_token_stream(lexer, &macro_stream);
 
             result = lexer_get_next_token(lexer);
+            if(lexer->current_stream->string.count == 0)
+            {
+                lexer_pop_token_stream(lexer, false);
+            }
         }
     }
     
