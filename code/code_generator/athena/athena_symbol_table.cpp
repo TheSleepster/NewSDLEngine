@@ -10,6 +10,7 @@ internal_api void
 symbol_table_init(void)
 {
     c_hash_table_init(&g_symbol_table.macro_table, 2048);
+    c_hash_table_init(&g_symbol_table.type_table,  2048);
 
     g_symbol_table.keywords = c_dynarray_create(language_keyword_t);
     string_t default_keyword_strings[] = {

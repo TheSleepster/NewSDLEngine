@@ -41,12 +41,36 @@ struct language_keyword_t
     u32      keyword_id;
 };
 
+struct macro_info_t
+{
+    bool8                is_set;
+
+    u64                  name_hash;
+    string_t             name;
+    string_t             expansion_string;
+    lexer_token_stream_t expansion_token_stream;
+
+    string_t            *arguments;
+    u32                  argument_count;
+};
+
+struct code_type_t
+{
+    bool8    is_set;
+    string_t identifier;
+    u64      ID;
+    u64      alias_of = INVALID_ID;
+};
+
 // TODO(Sleepster): We may want to make the macro_data, the type table, and the structure/enum data a GLOBAL table seperate from the symbol_table
 struct symbol_table_t
 {
     // NOTE(Sleepster): Maps macro declarations to their values... 
     ticket_mutex_t                 macro_table_mutex;
     HashTable_t(macro_info_t)      macro_table;
+
+    ticket_mutex_t                 type_table_mutex;
+    HashTable_t(code_type_t)       type_table;
 
     // NOTE(Sleepster): In case you want to add more keywords besides those added, this is
     // a get_keyword(token.string)dynamic array.
