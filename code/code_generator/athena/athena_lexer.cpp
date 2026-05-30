@@ -5,6 +5,7 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include "athena_lexer.h"
+#include "athena_symbol_table.h"
 
 const char *
 lexer_token_type_to_string(lexer_token_t *token)
@@ -54,181 +55,216 @@ internal_api lexer_token_t
 lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
 {
     lexer_token_t result = {};
-    
-    u32 new_line_count  = c_string_eat_whitespace(&token_stream->string);
-    token_stream->line_number += new_line_count;
-    if(token_stream->string.count != 0)
+
+    // NOTE(Sleepster): If the stream has a token buffer, we will always pull from the buffer instead... 
+    if(!token_stream->token_buffer)
     {
-        result.data       = token_stream->string;
-        result.data.count = 1;
-
-        char character = token_stream->string.data[0];
-        switch(character)
+        u32 new_line_count  = c_string_eat_whitespace(&token_stream->string);
+        token_stream->line_number += new_line_count;
+        if(token_stream->string.count != 0)
         {
-            case ';':  {result.token_type = TOKEN_TYPE_SEMICOLON;     }break;
-            case '{':  {result.token_type = TOKEN_TYPE_OPEN_BRACE;    }break;
-            case '}':  {result.token_type = TOKEN_TYPE_CLOSE_BRACE;   }break;
-            case '(':  {result.token_type = TOKEN_TYPE_OPEN_PAREN;    }break;
-            case ')':  {result.token_type = TOKEN_TYPE_CLOSE_PAREN;   }break;
-            case '[':  {result.token_type = TOKEN_TYPE_OPEN_BRACKET;  }break;
-            case ']':  {result.token_type = TOKEN_TYPE_CLOSE_BRACKET; }break;
-            case ',':  {result.token_type = TOKEN_TYPE_COMMA;         }break;
-            case '!':  {result.token_type = TOKEN_TYPE_BANG;          }break;
-            case '\0': {result.token_type = TOKEN_TYPE_EOF;           }break;
-            case '\\': {result.token_type = TOKEN_TYPE_BACKSLASH;     }break;
-            case '?':  {result.token_type = TOKEN_TYPE_TERNARY_IF;    }break;
-            case '"':  
-            {
-                u32 advance = 0;
-                while(token_stream->string.data[advance] != '"')
-                {
-                    ++advance;
-                }
+            result.data       = token_stream->string;
+            result.data.count = 1;
 
-                result.data.count = advance - 1;
-                result.token_type = TOKEN_TYPE_LITERAL;
-            }break;
-
-            // NOTE(Sleepster): POTENTIALLY COMMENTS
-            case '*': 
+            char character = token_stream->string.data[0];
+            switch(character)
             {
-                result.token_type = TOKEN_TYPE_ASTERISK;
-                if(token_stream->string.count > 0 && token_stream->string.data[1] == '/')
+                case ';':  {result.token_type = TOKEN_TYPE_SEMICOLON;     }break;
+                case '{':  {result.token_type = TOKEN_TYPE_OPEN_BRACE;    }break;
+                case '}':  {result.token_type = TOKEN_TYPE_CLOSE_BRACE;   }break;
+                case '(':  {result.token_type = TOKEN_TYPE_OPEN_PAREN;    }break;
+                case ')':  {result.token_type = TOKEN_TYPE_CLOSE_PAREN;   }break;
+                case '[':  {result.token_type = TOKEN_TYPE_OPEN_BRACKET;  }break;
+                case ']':  {result.token_type = TOKEN_TYPE_CLOSE_BRACKET; }break;
+                case ',':  {result.token_type = TOKEN_TYPE_COMMA;         }break;
+                case '!':  {result.token_type = TOKEN_TYPE_BANG;          }break;
+                case '\0': {result.token_type = TOKEN_TYPE_EOF;           }break;
+                case '\\': {result.token_type = TOKEN_TYPE_BACKSLASH;     }break;
+                case '?':  {result.token_type = TOKEN_TYPE_TERNARY_IF;    }break;
+                case '"':  
                 {
-                    result.data.count += c_string_get_whitespace_size(token_stream->string);
-                }               
-            }break;
-            case '/': 
-            {
-                result.token_type = TOKEN_TYPE_FORWARD_SLASH;
-                if(token_stream->string.count > 0 && token_stream->string.data[1] == '/')
-                {
-                    result.data.count += c_string_get_whitespace_size(token_stream->string);
-                }
-            }break;
-            
-            // NOTE(Sleepster): REPEATABLE OPERATORS
-            case '.':
-            {
-                result.token_type = TOKEN_TYPE_PERIOD;
-                if(token_stream->string.data[1] == result.data.data[0] && 
-                   token_stream->string.data[2] == result.data.data[0])
-                {
-                    result.data.count = 3;
-                    result.token_type = TOKEN_TYPE_ELIPSES;
-                }
-            }break;
-            case '<':
-            {
-                result.token_type = TOKEN_TYPE_LESS_THAN;
-                lexer_stream_eat_repeating_character(token_stream, &result);
-
-                if(result.token_type != TOKEN_TYPE_BITSHIFT_LEFT)
-                {
-                    if(token_stream->string.data[1] == TOKEN_TYPE_EQUALS)
+                    u32 advance = 0;
+                    while(token_stream->string.data[advance] != '"')
                     {
-                        result.token_type = TOKEN_TYPE_LESS_EQUAL;
-                        result.data.count = 2;
+                        ++advance;
                     }
-                }
-            }break;
-            case '>':
-            {
-                result.token_type = TOKEN_TYPE_GREATER_THAN;
-                lexer_stream_eat_repeating_character(token_stream, &result);
 
-                if(result.token_type != TOKEN_TYPE_BITSHIFT_RIGHT)
-                {
-                    if(token_stream->string.data[1] == TOKEN_TYPE_EQUALS)
-                    {
-                        result.token_type = TOKEN_TYPE_GREATER_EQUAL;
-                        result.data.count = 2;
-                    }
-                }
-            }break;
-            case '|':  
-            {
-               result.token_type = TOKEN_TYPE_OR;
-               lexer_stream_eat_repeating_character(token_stream, &result);
-            }break;
-            case '&':
-            {
-                result.token_type = TOKEN_TYPE_AND;
-                lexer_stream_eat_repeating_character(token_stream, &result);
-            }break;
-            case ':':  
-            {
-                result.token_type = TOKEN_TYPE_COLON;
-                lexer_stream_eat_repeating_character(token_stream, &result);
-            }break;
-            case '=':  
-            {
-                result.token_type = TOKEN_TYPE_EQUALS;
-                lexer_stream_eat_repeating_character(token_stream, &result);
-            }break;
-            case '-':
-            {
-                result.token_type = TOKEN_TYPE_DASH;
-                lexer_stream_eat_repeating_character(token_stream, &result);
-                if(result.token_type == TOKEN_TYPE_DASH && token_stream->string.data[1] == '>')
-                {
-                    result.token_type = TOKEN_TYPE_ARROW_OPERATOR;
-                    result.data.count = 2;
-                }
-            }break;
-            case '+':
-            {
-                result.token_type = TOKEN_TYPE_PLUS;
-                lexer_stream_eat_repeating_character(token_stream, &result);
-            }break;
-            case '#':  
-            {
-                result.token_type = TOKEN_TYPE_POUND;
-                lexer_stream_eat_repeating_character(token_stream, &result);
-            }break;
-            default:
-            {
-                u32 next_char_index = 0;
-
-                if(lexer_is_token_alphabetical(result.data.data[0]) || character == '_')
-                {
-                    result.token_type = TOKEN_TYPE_IDENT;
-                    while(token_stream->string.count > 0                                          && 
-                         (lexer_is_token_alphabetical(token_stream->string.data[next_char_index]) || 
-                          lexer_is_token_numeric(token_stream->string.data[next_char_index])      ||
-                          token_stream->string.data[next_char_index] == '_'                       || 
-                          token_stream->string.data[next_char_index] == '.'))
-                    {
-                        ++next_char_index;
-                    }
-                    result.data.count = next_char_index;
-                }
-                else if(lexer_is_token_numeric(result.data.data[0]))
-                {
-                    result.token_type = TOKEN_TYPE_NUMBER;
-                    while(token_stream->string.count > 0 &&
-                          (lexer_is_token_numeric(result.data.data[next_char_index]) || 
-                           token_stream->string.data[next_char_index] == '.'))
-                    {
-                        ++next_char_index;
-                    }
-                    result.data.count = next_char_index;
-                }
-                else
-                {
-                    result.token_type = TOKEN_TYPE_UNKNOWN;
+                    result.data.count = advance - 1;
+                    result.token_type = TOKEN_TYPE_LITERAL;
                 }break;
-            }break;
-        }
 
-        c_string_advance_by(&token_stream->string, result.data.count);
+                // NOTE(Sleepster): POTENTIALLY COMMENTS
+                case '*': 
+                {
+                    result.token_type = TOKEN_TYPE_ASTERISK;
+                    if(token_stream->string.count > 0 && token_stream->string.data[1] == '/')
+                    {
+                        result.data.count += c_string_get_whitespace_size(token_stream->string);
+                    }               
+                }break;
+                case '/': 
+                {
+                    result.token_type = TOKEN_TYPE_FORWARD_SLASH;
+                    if(token_stream->string.count > 0 && token_stream->string.data[1] == '/')
+                    {
+                        result.data.count += c_string_get_whitespace_size(token_stream->string);
+                    }
+                }break;
+                
+                // NOTE(Sleepster): REPEATABLE OPERATORS
+                case '.':
+                {
+                    result.token_type = TOKEN_TYPE_PERIOD;
+                    if(token_stream->string.data[1] == result.data.data[0] && 
+                       token_stream->string.data[2] == result.data.data[0])
+                    {
+                        result.data.count = 3;
+                        result.token_type = TOKEN_TYPE_ELIPSES;
+                    }
+                }break;
+                case '<':
+                {
+                    result.token_type = TOKEN_TYPE_LESS_THAN;
+                    lexer_stream_eat_repeating_character(token_stream, &result);
+
+                    if(result.token_type != TOKEN_TYPE_BITSHIFT_LEFT)
+                    {
+                        if(token_stream->string.data[1] == TOKEN_TYPE_EQUALS)
+                        {
+                            result.token_type = TOKEN_TYPE_LESS_EQUAL;
+                            result.data.count = 2;
+                        }
+                    }
+                }break;
+                case '>':
+                {
+                    result.token_type = TOKEN_TYPE_GREATER_THAN;
+                    lexer_stream_eat_repeating_character(token_stream, &result);
+
+                    if(result.token_type != TOKEN_TYPE_BITSHIFT_RIGHT)
+                    {
+                        if(token_stream->string.data[1] == TOKEN_TYPE_EQUALS)
+                        {
+                            result.token_type = TOKEN_TYPE_GREATER_EQUAL;
+                            result.data.count = 2;
+                        }
+                    }
+                }break;
+                case '|':  
+                {
+                   result.token_type = TOKEN_TYPE_OR;
+                   lexer_stream_eat_repeating_character(token_stream, &result);
+                }break;
+                case '&':
+                {
+                    result.token_type = TOKEN_TYPE_AND;
+                    lexer_stream_eat_repeating_character(token_stream, &result);
+                }break;
+                case ':':  
+                {
+                    result.token_type = TOKEN_TYPE_COLON;
+                    lexer_stream_eat_repeating_character(token_stream, &result);
+                }break;
+                case '=':  
+                {
+                    result.token_type = TOKEN_TYPE_EQUALS;
+                    lexer_stream_eat_repeating_character(token_stream, &result);
+                }break;
+                case '-':
+                {
+                    result.token_type = TOKEN_TYPE_DASH;
+                    lexer_stream_eat_repeating_character(token_stream, &result);
+                    if(result.token_type == TOKEN_TYPE_DASH && token_stream->string.data[1] == '>')
+                    {
+                        result.token_type = TOKEN_TYPE_ARROW_OPERATOR;
+                        result.data.count = 2;
+                    }
+                }break;
+                case '+':
+                {
+                    result.token_type = TOKEN_TYPE_PLUS;
+                    lexer_stream_eat_repeating_character(token_stream, &result);
+                }break;
+                case '#':  
+                {
+                    result.token_type = TOKEN_TYPE_POUND;
+                    lexer_stream_eat_repeating_character(token_stream, &result);
+                }break;
+                default:
+                {
+                    u32 next_char_index = 0;
+
+                    if(lexer_is_token_alphabetical(result.data.data[0]) || character == '_')
+                    {
+                        result.token_type = TOKEN_TYPE_IDENT;
+                        while(token_stream->string.count > 0                                          && 
+                             (lexer_is_token_alphabetical(token_stream->string.data[next_char_index]) || 
+                              lexer_is_token_numeric(token_stream->string.data[next_char_index])      ||
+                              token_stream->string.data[next_char_index] == '_'                       || 
+                              token_stream->string.data[next_char_index] == '.'))
+                        {
+                            ++next_char_index;
+                        }
+                        result.data.count = next_char_index;
+
+                        // NOTE(Sleepster): If we find an identifier, we need to check if it's a keyword.
+                        language_keyword_t *keyword = symbol_table_get_keyword(result.data);
+                        if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
+                        {
+                            switch(keyword->keyword_id)
+                            {
+                                // NOTE(Sleepster): X MACRO to automate this. 
+#define X(string, enum, keyword_token_type) \
+                                case enum: {result.token_type = keyword_token_type;}break;
+
+                                DEFAULT_KEYWORD_LIST(X);
+#undef X
+                                default:
+                                {
+                                    result.token_type = TOKEN_TYPE_IDENT;
+                                }
+                            }
+                        }
+                    }
+                    else if(lexer_is_token_numeric(result.data.data[0]))
+                    {
+                        result.token_type = TOKEN_TYPE_NUMBER;
+                        while(token_stream->string.count > 0 &&
+                              (lexer_is_token_numeric(result.data.data[next_char_index]) || 
+                               token_stream->string.data[next_char_index] == '.'))
+                        {
+                            ++next_char_index;
+                        }
+                        result.data.count = next_char_index;
+                    }
+                    else
+                    {
+                        result.token_type = TOKEN_TYPE_UNKNOWN;
+                    }break;
+                }break;
+            }
+
+            c_string_advance_by(&token_stream->string, result.data.count);
+        }
+        else
+        {
+            result.token_type = TOKEN_TYPE_EOF;
+            result.data       = {};
+        }
     }
     else
     {
-        result.token_type = TOKEN_TYPE_EOF;
-        result.data       = {};
+        // NOTE(Sleepster): In the event that we've read all the tokens from the buffer, we'll simply return an EOF 
+        if(token_stream->token_buffer_index < token_stream->buffered_token_count)
+        {
+            result = token_stream->token_buffer[token_stream->token_buffer_index++];
+        }
+        else
+        {
+            result = {.data = {}, .token_type = TOKEN_TYPE_EOF};
+        }
     }
-
+    
     ++token_stream->current_token_stream_depth;
     token_stream->last_token = result;
 
@@ -247,19 +283,29 @@ lexer_get_next_token(lexer_t *lexer)
 }
 
 internal_api lexer_token_t
-lexer_peek_token(lexer_t *lexer, u32 tokens_to_peek_ahead = 1)
+lexer_peek_token_from_stream(lexer_t *lexer, lexer_token_stream_t *stream, u32 tokens_to_peek_ahead = 1)
 {
-    lexer_token_t token = {};
+    lexer_token_t result = {};
 
-    lexer_token_stream_t fake_stream = init_token_stream_from_string(lexer->current_stream->string);
+    lexer_token_stream_t fake_stream = init_token_stream_from_string(stream->string);
     lexer_push_token_stream(lexer, &fake_stream);
     for(u32 peek_index = 0;
         peek_index < tokens_to_peek_ahead;
         ++peek_index)
     {
-        token = lexer_get_next_token(lexer);
+        result = lexer_get_next_token(lexer);
     }
     lexer_pop_token_stream(lexer, false);
+
+    return(result);
+}
+
+internal_api lexer_token_t
+lexer_peek_token(lexer_t *lexer, u32 tokens_to_peek_ahead = 1)
+{
+    lexer_token_t token = {};
+
+    token = lexer_peek_token_from_stream(lexer, lexer->current_stream, tokens_to_peek_ahead);
 
     return(token);
 }
@@ -310,7 +356,8 @@ lexer_push_token_stream(lexer_t *lexer, lexer_token_stream_t *new_stream)
 
     *stream = *new_stream;
 
-    lexer->current_stream = stream;
+    lexer->secondary_stream = lexer->current_stream;
+    lexer->current_stream   = stream;
 }
 
 internal_api void
@@ -324,7 +371,8 @@ lexer_pop_token_stream(lexer_t *lexer, bool8 sync_streams)
 
     stream->current_token_stream_depth = 0;
 
-    lexer->current_stream = stream;
+    lexer->secondary_stream = lexer->current_stream;
+    lexer->current_stream   = stream;
     if(sync_streams)
     {
         for(u32 index = 0;

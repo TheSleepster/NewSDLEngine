@@ -47,11 +47,13 @@ thread_static memory_arena_t permanent_arena;
 thread_static memory_arena_t transient_arena;
 
 // ATHENA FILES
+#include "athena_lexer.h"
+
 #include "athena_lexer.cpp"
-#include "athena_parser.cpp"
+#include "athena_symbol_table.cpp"
 
 internal_api void
-parse_macro_info(parser_state_t *parser, lexer_t *lexer, macro_info_t *macro_info, lexer_token_t name_token)
+parse_macro_info(lexer_t *lexer, macro_info_t *macro_info, lexer_token_t name_token)
 {
     macro_info->name      = c_string_make_copy(&permanent_arena, name_token.data);
     macro_info->name_hash = ((c_fnv_hash_value(name_token.data.data, name_token.data.count)) % 2048);
@@ -63,13 +65,13 @@ parse_macro_info(parser_state_t *parser, lexer_t *lexer, macro_info_t *macro_inf
     // NOTE(Sleepster): If the macro takes arguments 
     lexer_token_t token = lexer_get_next_token(lexer);
 
-    language_keyword_t *keyword = parser_get_keyword(parser, token);
+    language_keyword_t *keyword = symbol_table_get_keyword(token.data);
     if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
     {
         language_keyword_t new_keyword = {};
         new_keyword.identifier = macro_info->name;
         new_keyword.keyword_id = keyword->keyword_id;
-        c_dynarray_push(parser->keywords, new_keyword);
+        c_dynarray_push(g_symbol_table.keywords, new_keyword);
     }
 
     if(token.token_type == TOKEN_TYPE_OPEN_PAREN)
@@ -172,7 +174,7 @@ parse_macro_info(parser_state_t *parser, lexer_t *lexer, macro_info_t *macro_inf
 }
 
 internal_api lexer_token_t
-handle_macro_expansion(lexer_t *lexer, parser_state_t *parser, bool8 record_macro)
+handle_macro_expansion(lexer_t *lexer, bool8 record_macro)
 {
     lexer_token_t token = lexer_get_next_token(lexer);
     if(c_string_compare(token.data, STR("define")))
@@ -180,12 +182,12 @@ handle_macro_expansion(lexer_t *lexer, parser_state_t *parser, bool8 record_macr
         if(record_macro)
         {
             lexer_token_t name_token = lexer_get_next_token(lexer);
-            TicketMutexScope(&parser->macro_table_mutex)
+            TicketMutexScope(&g_symbol_table.macro_table_mutex)
             {
-                macro_info_t *macro_info = c_hash_table_get_value_ptr(&parser->macro_table, name_token.data);
+                macro_info_t *macro_info = c_hash_table_get_value_ptr(&g_symbol_table.macro_table, name_token.data);
                 if(!macro_info->is_set)
                 {
-                    parse_macro_info(parser, lexer, macro_info, name_token);
+                    parse_macro_info(lexer, macro_info, name_token);
                     printf("Macro: '%.*s'...\n", fprint_string(macro_info->name));
                     printf("Expansion: '%.*s'...\n", fprint_string(macro_info->expansion_string));
                     printf("Argument Count: '%d'...\n", macro_info->argument_count);
@@ -194,6 +196,14 @@ handle_macro_expansion(lexer_t *lexer, parser_state_t *parser, bool8 record_macr
                         ++index)
                     {
                         printf("\tArgument: '%.*s'...\n", fprint_string(macro_info->arguments[index]));
+                    }
+
+                    language_keyword_t *keyword = symbol_table_get_keyword(macro_info->expansion_string);
+                    if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
+                    {
+                        c_dynarray_push(g_symbol_table.keywords, token.data);
+                        printf("Found token: '%.*s' which is a #define'd alias for the language keyword: '%.*s'...\n",
+                               fprint_string(macro_info->name), fprint_string(keyword->identifier));
                     }
                 }
             }
@@ -233,8 +243,7 @@ handle_macro_expansion(lexer_t *lexer, parser_state_t *parser, bool8 record_macr
 int
 main(int argc, char **argv)
 {
-    parser_state_t *parser = Alloc(parser_state_t);
-    parser_init(parser);
+    symbol_table_init();
 
     permanent_arena = c_arena_create(MB(10));
     transient_arena = c_arena_create(MB(10));
@@ -255,7 +264,7 @@ main(int argc, char **argv)
         {
             case TOKEN_TYPE_POUND:
             {
-                token = handle_macro_expansion(&lexer, parser, true);
+                token = handle_macro_expansion(&lexer, true);
             }break;
         }
     }
@@ -264,12 +273,12 @@ main(int argc, char **argv)
     lexer_reset_token_stream(lexer.current_stream);
     for(;;)
     {
-        lexer_token_t token = parser_get_next_lexer_token(parser, &lexer);
+        lexer_token_t token = symbol_table_get_next_lexer_token(&lexer);
         switch(token.token_type)
         {
             case TOKEN_TYPE_POUND:
             {
-                token = handle_macro_expansion(&lexer, parser, false);
+                token = handle_macro_expansion(&lexer, false);
             }break;
             case TOKEN_TYPE_EOF:
             {
@@ -277,7 +286,6 @@ main(int argc, char **argv)
             }break;
             default:
             {
-                printf("Token is: '%.*s'...\n", fprint_token(token));
             }break;
         }
     }

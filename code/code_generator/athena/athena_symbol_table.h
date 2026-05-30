@@ -1,0 +1,64 @@
+#if !defined(ATHENA_SYMBOL_TABLE_H)
+/* ========================================================================
+   $File: athena_symbol_table.h $
+   $Date: May 30 2026 08:43 am $
+   $Revision: $
+   $Creator: Justin Lewis $
+   ======================================================================== */
+
+#define ATHENA_SYMBOL_TABLE_H
+
+#define DEFAULT_KEYWORD_LIST(X)                                   \
+    X("Invalid",   TOKEN_KEYWORD_INVALID,   TOKEN_TYPE_UNKNOWN)   \
+    X("struct",    TOKEN_KEYWORD_STRUCT,    TOKEN_TYPE_STRUCT)    \
+    X("union",     TOKEN_KEYWORD_UNION,     TOKEN_TYPE_UNION)     \
+    X("enum",      TOKEN_KEYWORD_ENUM,      TOKEN_TYPE_ENUM)      \
+    X("static",    TOKEN_KEYWORD_STATIC,    TOKEN_TYPE_STATIC)    \
+    X("extern",    TOKEN_KEYWORD_EXTERN,    TOKEN_TYPE_EXTERN)    \
+    X("inline",    TOKEN_KEYWORD_INLINE,    TOKEN_TYPE_INLINE)    \
+    X("volatile",  TOKEN_KEYWORD_VOLATILE,  TOKEN_TYPE_VOLATILE)  \
+    X("const",     TOKEN_KEYWORD_CONST,     TOKEN_TYPE_CONST)     \
+    X("auto",      TOKEN_KEYWORD_AUTO,      TOKEN_TYPE_AUTO)      \
+    X("class",     TOKEN_KEYWORD_CLASS,     TOKEN_TYPE_CLASS)     \
+    X("public",    TOKEN_KEYWORD_PUBLIC,    TOKEN_TYPE_PUBLIC)    \
+    X("private",   TOKEN_KEYWORD_PRIVATE,   TOKEN_TYPE_PRIVATE)   \
+    X("protected", TOKEN_KEYWORD_PROTECTED, TOKEN_TYPE_PROTECTED) \
+    X("typedef",   TOKEN_KEYWORD_TYPEDEF,   TOKEN_TYPE_TYPEDEF)   \
+    X("template",  TOKEN_KEYWORD_TEMPLATE,  TOKEN_TYPE_TEMPLATE)  \
+    X("namespace", TOKEN_KEYWORD_NAMESPACE, TOKEN_TYPE_NAMESPACE) \
+    X("using",     TOKEN_KEYWORD_USING,     TOKEN_TYPE_USING)
+
+enum keywords_t
+{
+#define X(string, enum, token_type) enum,
+    DEFAULT_KEYWORD_LIST(X)
+#undef X
+};
+
+struct language_keyword_t
+{
+    string_t identifier;
+    u32      keyword_id;
+};
+
+// TODO(Sleepster): We may want to make the macro_data, the type table, and the structure/enum data a GLOBAL table seperate from the symbol_table
+struct symbol_table_t
+{
+    // NOTE(Sleepster): Maps macro declarations to their values... 
+    ticket_mutex_t                 macro_table_mutex;
+    HashTable_t(macro_info_t)      macro_table;
+
+    // NOTE(Sleepster): In case you want to add more keywords besides those added, this is
+    // a get_keyword(token.string)dynamic array.
+    DynArray_t(language_keyword_t) keywords;
+};
+
+global_variable symbol_table_t g_symbol_table;
+
+internal_api void                 symbol_table_init(void);
+internal_api language_keyword_t  *symbol_table_get_keyword(string_t string);
+internal_api lexer_token_stream_t symbol_table_substitute_macro_arguments(lexer_t *lexer, lexer_token_t last_token, macro_info_t *macro_info);
+internal_api lexer_token_t        symbol_table_get_next_lexer_token(lexer_t *lexer);
+
+#endif // ATHENA_SYMBOL_TABLE_H
+
