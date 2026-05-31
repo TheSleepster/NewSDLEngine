@@ -291,7 +291,7 @@ handle_macro_expansion(lexer_t *lexer, bool8 record_macro)
 }
 
 internal_api AST_node_t* 
-parse_structured_type(lexer_t *lexer)
+generate_structure_AST(lexer_t *lexer)
 {
     AST_node_t *result = null;
 
@@ -384,11 +384,6 @@ parse_structured_type(lexer_t *lexer)
                 token = symbol_table_get_next_lexer_token(lexer);
                 if(token.token_type == TOKEN_TYPE_OPEN_BRACKET)
                 {
-                    //
-                    //
-                    // TODO(Sleepster): Instead of parsing it in place like this, we should instead use this time to generate the AST
-                    //
-                    //
                     token = symbol_table_get_next_lexer_token(lexer);
                     if(token.token_type == TOKEN_TYPE_OPEN_PAREN)
                     {
@@ -407,7 +402,10 @@ parse_structured_type(lexer_t *lexer)
 
                     // NOTE(Sleepster): Eat the ']' then the ';'
                     token = symbol_table_get_next_lexer_token(lexer);
+                    Expect(token.token_type == TOKEN_TYPE_CLOSE_BRACKET, "Expected to find token ']' when parsing a structure member array... Instead found: '%.*s'", fprint_token(token));
+
                     token = symbol_table_get_next_lexer_token(lexer);
+                    Expect(token.token_type == TOKEN_TYPE_SEMICOLON, "Expected to find token ';' when parsing a structure member array... Instead found: '%.*s'", fprint_token(token));
                 }
                 else if(token.token_type == TOKEN_TYPE_EQUALS)
                 {
@@ -421,7 +419,7 @@ parse_structured_type(lexer_t *lexer)
             else if(typename_token.token_type == TOKEN_TYPE_STRUCT || 
                     typename_token.token_type == TOKEN_TYPE_UNION)
             {
-                AST_node_t *nested_structure = parse_structured_type(lexer);
+                AST_node_t *nested_structure = generate_structure_AST(lexer);
                 AST_add_child(structure_root, nested_structure);
             }
         }
@@ -454,6 +452,90 @@ parse_structured_type(lexer_t *lexer)
     return(result);
 }
 
+internal_api AST_node_t*
+generate_enum_AST(lexer_t *lexer)
+{
+    AST_node_t *result = null;
+    u64 enum_ID = 0;
+
+    lexer_token_t token;
+    lexer_token_t name_token = symbol_table_get_next_lexer_token(lexer);
+    if(name_token.token_type == TOKEN_TYPE_IDENT)
+    {
+        enum_ID = register_typename(name_token.data);
+        token   = symbol_table_get_next_lexer_token(lexer);
+    }
+    else if(name_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+    {
+        token = name_token;
+    }
+
+    Expect(token.token_type == TOKEN_TYPE_OPEN_BRACE || token.token_type == TOKEN_TYPE_SEMICOLON,
+           "When parsing as structure by the name of: '%.*s' we expected to find either an ending semicolon (for a declaration) or an '{' for the definition, however we found neither of these and instead found: '%.*s'...\n",
+           fprint_token(name_token), fprint_token(token));
+
+    // NOTE(Sleepster): Same as a structured type, if it's an open brace it's a definition 
+    if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
+    {
+        AST_node_t *enum_root = AST_create_new_node(&permanent_arena);
+        enum_root->node_type = AST_NODE_TYPE_ENUM;
+
+        if(name_token.token_type == TOKEN_TYPE_IDENT) enum_root->identifier = c_string_make_copy(&permanent_arena, name_token.data);
+        else                                          enum_root->identifier = STR("anonymous");
+        for(;;)
+        {
+            lexer_token_t enum_member_token = symbol_table_get_next_lexer_token(lexer);
+            if(enum_member_token.token_type == TOKEN_TYPE_CLOSE_BRACE)
+            {
+                break;
+            }
+
+            Expect(enum_member_token.token_type == TOKEN_TYPE_IDENT, "Expected to find an identifier when parsing type information for an enum... Instead found: '%.*s'...\n", fprint_token(enum_member_token));
+
+            AST_node_t *member = AST_create_new_node(&permanent_arena);
+            member->node_type  = AST_NODE_TYPE_ENUM_MEMBER;
+            member->identifier = c_string_make_copy(&permanent_arena, enum_member_token.data);
+
+            AST_add_child(enum_root, member);
+
+            // NOTE(Sleepster): Eat the comma...
+            token = symbol_table_get_next_lexer_token(lexer);
+            Expect(token.token_type == TOKEN_TYPE_COMMA, 
+                   "Expected to find a comma when parsing an enum member... However, we instead found: '%.*s'...\n", 
+                   fprint_token(token))
+
+            lexer_token_t peek_token = lexer_peek_token(lexer);
+            Expect(peek_token.token_type == TOKEN_TYPE_IDENT || peek_token.token_type == TOKEN_TYPE_CLOSE_BRACE,
+                   "Expected to find either an enum member identifier or a closing brace... We instead found: '%.*s'...\n", 
+                   fprint_token(peek_token));
+        }
+
+        token = symbol_table_get_next_lexer_token(lexer);
+        if(token.token_type == TOKEN_TYPE_IDENT)
+        {
+            register_typename(token.data, enum_ID);
+            token = symbol_table_get_next_lexer_token(lexer);
+        }
+        Expect(token.token_type == TOKEN_TYPE_SEMICOLON, 
+               "Finished parsing a enum type and expected a closing ';'... Failed to find that. Instead found, %.*s...\n",
+               fprint_token(token));
+
+        result = enum_root;
+    }
+    printf("\n\n=========== ENUM DEFINITION =============\n\n");
+    printf("Enum of name: '%.*s' found!\n", fprint_string(result->identifier));
+    printf("Members are:\n");
+    for(AST_node_t *current_child = result->first_child;
+        current_child;
+        current_child = current_child->next_sibling)
+    {
+        printf("\t'%.*s'...\n", fprint_string(current_child->identifier));
+    }
+    printf("==============================================\n\n");
+
+    return(result);
+}
+
 internal_api void
 parse_typedef_data(lexer_t *lexer)
 {
@@ -463,10 +545,11 @@ parse_typedef_data(lexer_t *lexer)
         case TOKEN_TYPE_STRUCT:
         case TOKEN_TYPE_UNION:
         {
-            parse_structured_type(lexer);
+            generate_structure_AST(lexer);
         }break;
         case TOKEN_TYPE_ENUM:
         {
+            generate_enum_AST(lexer);
         }break;
         case TOKEN_TYPE_IDENT:
         {
@@ -553,10 +636,11 @@ main(int argc, char **argv)
             case TOKEN_TYPE_UNION:
             case TOKEN_TYPE_CLASS:
             {
-                parse_structured_type(&lexer);
+                generate_structure_AST(&lexer);
             }break;
             case TOKEN_TYPE_ENUM:
             {
+                generate_enum_AST(&lexer);
             }break;
             case TOKEN_TYPE_IDENT:
             {

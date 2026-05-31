@@ -29,8 +29,10 @@ struct AST_type_t
 
 #define AST_NODE_TYPE_LIST(X) \
     X(AST_NODE_TYPE_EXPRESSION, "AST_NODE_TYPE_EXPRESSION") \
-    X(AST_NODE_TYPE_STRUCTURE,  "AST_NODE_TYPE_EXPRESSION") \
-    X(AST_NODE_TYPE_STRUCTURE_MEMBER, "AST_NODE_TYPE_STRUCTURE_MEMBER")
+    X(AST_NODE_TYPE_STRUCTURE,  "AST_NODE_TYPE_STRUCTURE") \
+    X(AST_NODE_TYPE_STRUCTURE_MEMBER, "AST_NODE_TYPE_STRUCTURE_MEMBER") \
+    X(AST_NODE_TYPE_ENUM,       "AST_NODE_TYPE_ENUM") \
+    X(AST_NODE_TYPE_ENUM_MEMBER, "AST_NODE_TYPE_ENUM_MEMBER") \
 
 enum AST_node_type_t
 {
@@ -81,3 +83,17 @@ AST_add_child(AST_node_t *parent, AST_node_t *next_child)
     }
 }
 
+internal_api true_inline void
+AST_add_sibling(AST_node_t *sibling, AST_node_t *new_sibling)
+{
+    for(AST_node_t *current_sibling = sibling;
+        current_sibling;
+        current_sibling = current_sibling->next_sibling)
+    {
+        if(!current_sibling->next_sibling)
+        {
+            current_sibling->next_sibling = new_sibling;
+            break;
+        }
+    }
+}

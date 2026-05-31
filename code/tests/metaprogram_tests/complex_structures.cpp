@@ -27,7 +27,7 @@ typedef struct test_element_typedeffed
 
 enum data_types 
 {
-    DATA_TYPE_TEST_ENUM_THING = 1 << 31,
+    DATA_TYPE_TEST_ENUM_THING,
 };
 
 struct test_element_data 
