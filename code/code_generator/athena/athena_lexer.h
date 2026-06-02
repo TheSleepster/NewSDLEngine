@@ -14,6 +14,16 @@ constexpr u32 MAX_LEXER_BOOKMARKS = 10;
 
 // TODO(Sleepster): For this token list, when it comes to using keywords we are required in this case
 // to define the unique token type here again instead of just the DEFAULT_KEYWORD_LIST. This is bad
+//
+// maybe make these bitflags? Just so we can do something like:
+//
+// token.token_type & TOKEN_TYPE_OPERATOR
+//
+// and 
+//
+// token.token_type & TOKEN_TYPE_BITSHIFT_LEFT
+//
+// Too show that this token is both an operator and a bitshift left.
 #define TOKEN_TYPE_LIST(X) \
     X(TOKEN_TYPE_UNKNOWN, "TOKEN_TYPE_UNKNOWN") \
     X(TOKEN_TYPE_ARROW_OPERATOR, "TOKEN_TYPE_ARROW_OPERATOR") \
@@ -85,10 +95,17 @@ enum token_type_t
 #undef X
 };
 
+enum token_flags_t
+{
+    TOKEN_FLAG_NONE            = BIT(0),
+    TOKEN_FLAG_BINARY_OPERATOR = BIT(1),
+};
+
 struct lexer_token_t
 {
     string_t data;
     u32      token_type;
+    u32      token_flags;
 };
 
 struct lexer_bookmark_t

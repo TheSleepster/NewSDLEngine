@@ -20,3 +20,9 @@ typedef enum some_other_typedeffed_item
 {
     WOW_THIS_IS_TYPEDEFFED = (1 << 31),
 }some_other_typedeffed_item_t;
+
+
+typedef enum some_other_typedeffed_item_without_a_comma
+{
+    WOW_THIS_IS_TYPEDEFFED = (1 << 31)
+}some_other_typedeffed_item_without_a_comma_t;

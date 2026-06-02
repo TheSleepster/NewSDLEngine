@@ -37,9 +37,11 @@ lexer_is_token_numeric(char A)
     return(result);
 }
 
-internal_api true_inline void
+internal_api true_inline bool8
 lexer_stream_eat_repeating_character(lexer_token_stream_t *token_stream, lexer_token_t *token)
 {
+    bool8 result = false;
+
     string_t stream = token_stream->string;
     if(stream.data[0] == stream.data[1])
     {
@@ -48,7 +50,11 @@ lexer_stream_eat_repeating_character(lexer_token_stream_t *token_stream, lexer_t
         // single variant. Example: '&' = 10, '&&' = 11
         token->data.count = 2;
         ++token->token_type;
+
+        result = true;
     }
+
+    return(result);
 }
 
 internal_api lexer_token_t
@@ -96,7 +102,8 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
                 // NOTE(Sleepster): POTENTIALLY COMMENTS
                 case '*': 
                 {
-                    result.token_type = TOKEN_TYPE_ASTERISK;
+                    result.token_type   = TOKEN_TYPE_ASTERISK;
+                    result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
                     if(token_stream->string.count > 0 && token_stream->string.data[1] == '/')
                     {
                         result.data.count += c_string_get_whitespace_size(token_stream->string);
@@ -125,40 +132,53 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
                 case '<':
                 {
                     result.token_type = TOKEN_TYPE_LESS_THAN;
-                    lexer_stream_eat_repeating_character(token_stream, &result);
+                    if(lexer_stream_eat_repeating_character(token_stream, &result))
+                    {
+                        result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
+                    }
 
                     if(result.token_type != TOKEN_TYPE_BITSHIFT_LEFT)
                     {
                         if(token_stream->string.data[1] == TOKEN_TYPE_EQUALS)
                         {
-                            result.token_type = TOKEN_TYPE_LESS_EQUAL;
-                            result.data.count = 2;
+                            result.token_type   = TOKEN_TYPE_LESS_EQUAL;
+                            result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
+                            result.data.count   = 2;
                         }
                     }
                 }break;
                 case '>':
                 {
                     result.token_type = TOKEN_TYPE_GREATER_THAN;
-                    lexer_stream_eat_repeating_character(token_stream, &result);
+                    if(lexer_stream_eat_repeating_character(token_stream, &result))
+                    {
+                        result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
+                    }
 
                     if(result.token_type != TOKEN_TYPE_BITSHIFT_RIGHT)
                     {
                         if(token_stream->string.data[1] == TOKEN_TYPE_EQUALS)
                         {
-                            result.token_type = TOKEN_TYPE_GREATER_EQUAL;
-                            result.data.count = 2;
+                            result.token_type   = TOKEN_TYPE_GREATER_EQUAL;
+                            result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
+                            result.data.count   = 2;
                         }
                     }
                 }break;
                 case '|':  
                 {
-                   result.token_type = TOKEN_TYPE_OR;
+                   result.token_type    = TOKEN_TYPE_OR;
+                   result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
                    lexer_stream_eat_repeating_character(token_stream, &result);
                 }break;
                 case '&':
                 {
-                    result.token_type = TOKEN_TYPE_AND;
-                    lexer_stream_eat_repeating_character(token_stream, &result);
+                    result.token_type   = TOKEN_TYPE_AND;
+                    result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
+                    if(lexer_stream_eat_repeating_character(token_stream, &result))
+                    {
+                        result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
+                    }
                 }break;
                 case ':':  
                 {
@@ -167,13 +187,22 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
                 }break;
                 case '=':  
                 {
-                    result.token_type = TOKEN_TYPE_EQUALS;
-                    lexer_stream_eat_repeating_character(token_stream, &result);
+                    result.token_type   = TOKEN_TYPE_EQUALS;
+                    result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
+                    if(lexer_stream_eat_repeating_character(token_stream, &result))
+                    {
+                        result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
+                    }
                 }break;
                 case '-':
                 {
-                    result.token_type = TOKEN_TYPE_DASH;
-                    lexer_stream_eat_repeating_character(token_stream, &result);
+                    result.token_type   = TOKEN_TYPE_DASH;
+                    result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
+                    if(lexer_stream_eat_repeating_character(token_stream, &result))
+                    {
+                        result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
+                    }
+
                     if(result.token_type == TOKEN_TYPE_DASH && token_stream->string.data[1] == '>')
                     {
                         result.token_type = TOKEN_TYPE_ARROW_OPERATOR;
@@ -182,7 +211,8 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
                 }break;
                 case '+':
                 {
-                    result.token_type = TOKEN_TYPE_PLUS;
+                    result.token_type   = TOKEN_TYPE_PLUS;
+                    result.token_flags |= TOKEN_FLAG_BINARY_OPERATOR;
                     lexer_stream_eat_repeating_character(token_stream, &result);
                 }break;
                 case '#':  
@@ -287,7 +317,7 @@ lexer_peek_token_from_stream(lexer_t *lexer, lexer_token_stream_t *stream, u32 t
 {
     lexer_token_t result = {};
 
-    lexer_token_stream_t fake_stream = init_token_stream_from_string(stream->string);
+    lexer_token_stream_t fake_stream = *lexer->current_stream;
     lexer_push_token_stream(lexer, &fake_stream);
     for(u32 peek_index = 0;
         peek_index < tokens_to_peek_ahead;

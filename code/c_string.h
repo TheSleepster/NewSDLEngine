@@ -47,9 +47,9 @@ string_t    c_string_sub_from_right(string_t string, u32 index);
 string_t    c_string_substring(string_t string, u32 first_index, u32 last_index);
 void        c_string_advance_by(string_t *string, u32 advance);
 
-u32         c_string_find_first_char_from_left(string_t string,  char character);
-u32         c_string_find_first_char_from_right(string_t string, char character);
-u32         c_string_find_first_char_from_left_on_line(string_t string,  char character);
+s32         c_string_find_first_char_from_left(string_t string,  char character);
+s32         c_string_find_first_char_from_right(string_t string, char character);
+s32         c_string_find_first_char_from_left_on_line(string_t string,  char character);
 // NOTE(Sleepster): This takes that "ending index" so that you don't have to parse the whole string.
 // if it's 0, we just use the string length
 u32         c_string_find_first_char_from_right_on_line(string_t string, char character, u32 ending_index);
@@ -70,9 +70,8 @@ string_t    c_string_read_line(string_t *data);
 
 s32         c_string_read_int(string_t data);
 u32         c_string_read_uint(string_t data);
-
-// NOTE(Sleepster): Uses atof() which is why we need the arena.
-float32     c_string_read_float(memory_arena_t *arena, string_t data);
+float32     c_string_read_float32(string_t data);
+float64     c_string_read_float64(string_t data);
 
 // MACROS
 #define STR(x)                (string_t){.data = (byte*)x, .count = c_string_length(x)}

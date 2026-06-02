@@ -61,6 +61,35 @@ symbol_table_get_keyword(string_t string)
     return(result);
 }
 
+internal_api code_type_t*
+symbol_table_get_code_type(string_t type_identifier)
+{
+    code_type_t *result = null;
+    u64 ID = type_id_from_identifier(type_identifier);
+
+    code_type_t *found = null;
+    TicketMutexScope(&g_symbol_table.type_table_mutex)
+    {
+        found = g_symbol_table.type_table.data + ID;
+    }
+
+    if(!found->is_set)
+    {
+        found->is_set     = true;
+        found->identifier = type_identifier; 
+        found->ID         = ID;
+
+        result = found;
+    }
+    else
+    {
+        result = found;
+    }
+
+    return(result);
+}
+
+
 internal_api lexer_token_stream_t 
 symbol_table_substitute_macro_arguments(lexer_t *lexer, lexer_token_t last_token, macro_info_t *macro_info)
 {

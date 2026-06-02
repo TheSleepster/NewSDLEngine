@@ -184,10 +184,10 @@ c_string_advance_by(string_t *string, u32 amount)
     string->count -= amount;
 }
 
-u32
+s32
 c_string_find_first_char_from_left(string_t string, char character)
 {
-    u32 result = -1;
+    s32 result = -1;
     for(u32 index = 0;
         index < string.count;
         ++index)
@@ -203,10 +203,10 @@ c_string_find_first_char_from_left(string_t string, char character)
     return(result);
 }
 
-u32
+s32
 c_string_find_first_char_from_right(string_t string, char character)
 {
-    u32 result = -1;
+    s32 result = -1;
     for(u32 index = string.count;
         index > 0;
         --index)
@@ -222,10 +222,10 @@ c_string_find_first_char_from_right(string_t string, char character)
     return(result);
 }
 
-u32
+s32
 c_string_find_first_char_from_left_on_line(string_t string, char character)
 {
-    u32 result = -1;
+    s32 result = -1;
     for(u32 index = 0;
         index < string.count;
         ++index)
@@ -378,12 +378,17 @@ s32
 c_string_read_int(string_t data)
 {
     s32 result = 0;
+#if 0
     for(u32 index = 0;
         index < data.count;
         ++index)
     {
         result = (result * 10) + (data.data[index] - '0');
     }
+#else
+    char *end_ptr = (char*)(data.data + data.count);
+    result = strtol((const char*)data.data, &end_ptr, 10);
+#endif
 
     return(result);
 }
@@ -392,23 +397,39 @@ u32
 c_string_read_uint(string_t data)
 {
     u32 result = 0;
+#if 0
     for(u32 index = 0;
         index < data.count;
         ++index)
     {
         result = (result * 10) + (data.data[index] - '0');
     }
+#else
+    char *end_ptr = (char*)(data.data + data.count);
+    result = strtoul((const char*)data.data, &end_ptr, 10);
+#endif
 
     return(result);
 }
 
 float32 
-c_string_read_float(memory_arena_t *arena, string_t data)
+c_string_read_float32(string_t data)
 {
     float32 result = 0;
 
-    const char *c_str = c_string_null_terminated(arena, data);
-    result = atof(c_str);
+    char *end_ptr = (char*)(data.data + data.count);
+    result = strtof((const char*)data.data, &end_ptr);
+
+    return(result);
+}
+
+float64
+c_string_read_float64(string_t data)
+{
+    float64 result = 0;
+
+    char *end_ptr = (char*)(data.data + data.count);
+    result = strtod((const char*)data.data, &end_ptr);
 
     return(result);
 }

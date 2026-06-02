@@ -13,7 +13,7 @@ typedef struct test_element_typedeffed
 {
     s32    *oranges;
     u32     internal_data[128];
-    float   internal_after_array;
+    float   internal_after_array = 4;
     struct orchard_data {
         u32 apples;
         u32 plums;
@@ -27,7 +27,9 @@ typedef struct test_element_typedeffed
 
 enum data_types 
 {
-    DATA_TYPE_TEST_ENUM_THING,
+    DATA_TYPE_NEGATIVE_ENUM_VALUE = (1 << 30),
+    DATA_TYPE_TEST_ENUM_VALUED    = (1 << 31),
+    DATA_TYPE_TEST_ENUM_THING     = (1 << 32),
 };
 
 struct test_element_data 
@@ -35,6 +37,7 @@ struct test_element_data
     u32 oranges;
     u32 internal_data[MAX_INTERNAL_MEMBERS];
     u32 more_internal_data[MAX_PAREN_INTERNAL_MEMBERS];
+    float floating_point_test_item;
     struct internal_members {
         u32 apples;
     };
