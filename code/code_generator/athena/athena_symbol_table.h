@@ -35,6 +35,27 @@ enum keywords_t
 #undef X
 };
 
+#define DEFAULT_PRIMITIVE_TYPES_LIST(X) \
+    X("unsigned int") \
+    X("unsigned char") \
+    X("short") \
+    X("long") \
+    X("int") \
+    X("char") \
+    X("float") \
+    X("double") \
+    X("void") \
+    X("bool") \
+    X("int8_t") \
+    X("int16_t")  \
+    X("int32_t")  \
+    X("int64_t")  \
+    X("uint8_t")  \
+    X("uint16_t") \
+    X("uint32_t") \
+    X("uint64_t") \
+    X("size_t") \
+
 struct language_keyword_t
 {
     string_t identifier;
@@ -54,12 +75,31 @@ struct macro_info_t
     u32                  argument_count;
 };
 
+#define CODE_TYPE_METATYPE_LIST(X) \
+    X(CODE_TYPE_UNDEFINED, "CODE_TYPE_UNDEFINED") \
+    X(CODE_TYPE_PRIMITIVE, "CODE_TYPE_PRIMITIVE") \
+    X(CODE_TYPE_STRUCTURE, "CODE_TYPE_STRUCTURE") \
+    X(CODE_TYPE_ENUM,      "CODE_TYPE_ENUM") \
+    X(CODE_TYPE_LAMBDA,    "CODE_TYPE_LAMBDA") \
+
+enum code_type_metatype_t
+{
+#define X(enum, string) enum,
+    CODE_TYPE_METATYPE_LIST(X)
+#undef X
+};
+
 struct code_type_t
 {
-    bool8    is_set;
-    string_t identifier;
-    u64      ID;
-    u64      alias_of = INVALID_ID;
+    bool8       is_registered;
+    bool8       type_inferred;
+
+    string_t    identifier;
+    u64         ID;
+    u64         alias_of = INVALID_ID;
+
+    u32         code_metatype;
+    AST_node_t *type_info_AST;
 };
 
 // TODO(Sleepster): We may want to make the macro_data, the type table, and the structure/enum data a GLOBAL table seperate from the symbol_table
@@ -69,12 +109,26 @@ struct symbol_table_t
     ticket_mutex_t                 macro_table_mutex;
     HashTable_t(macro_info_t)      macro_table;
 
+    // NOTE(Sleepster): "sparse" array
     ticket_mutex_t                 type_table_mutex;
     HashTable_t(code_type_t)       type_table;
 
     // NOTE(Sleepster): In case you want to add more keywords besides those added, this is
     // a get_keyword(token.string)dynamic array.
     DynArray_t(language_keyword_t) keywords;
+    DynArray_t(code_type_t*)       primitives;
+
+    ticket_mutex_t                 type_table_indices_mutex;
+    DynArray_t(u32)                valid_type_table_indices;
+
+    ticket_mutex_t                 AST_structures_mutex;
+    DynArray_t(AST_node_t*)        structures;
+
+    ticket_mutex_t                 AST_enums_mutex;
+    DynArray_t(AST_node_t*)        enums;
+
+    ticket_mutex_t                 AST_lambdas_mutex;
+    DynArray_t(AST_node_t*)        lambdas;
 };
 
 global_variable symbol_table_t g_symbol_table;

@@ -58,3 +58,21 @@ TEST(CPP_structures)
     void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/cpp_class.cpp"));
     Assert(sys_wait_for_process(process));
 }
+
+TEST(cpp_member_functions)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/member_functions.cpp"));
+    Assert(sys_wait_for_process(process));
+}
+
+TEST(cpp_namespaces)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/namespaces.cpp"));
+    Assert(sys_wait_for_process(process));
+}
+
+TEST(cpp_attributes)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/attributes.cpp"));
+    Assert(sys_wait_for_process(process));
+}

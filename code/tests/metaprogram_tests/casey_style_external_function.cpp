@@ -9,6 +9,7 @@
 #define C_HASH_TABLE_ALLOCATE_IMPL(name)  void *name(void *allocator, u32 allocation_size, u32 allocation_flags)
 typedef C_HASH_TABLE_ALLOCATE_IMPL(hash_table_allocate_impl_t);
 
+typedef void* LPVOID;
 typedef void allocate_memory_t(void *memory, int size);
 
 #define MAX_ALLOCATOR_CALLBACKS 100

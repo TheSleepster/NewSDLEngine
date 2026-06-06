@@ -23,9 +23,10 @@ public:
     float other_apples;
 private:
     void some_stupid_getter(void *data);
-};
+    void some_expanded_setter(int *data)
+    {
+        this->apples = *data;   
+    }
 
-void
-class_test_t::some_stupid_getter(void *data)
-{
-}
+    float hidden_apples;
+};
