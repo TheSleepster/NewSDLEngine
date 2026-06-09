@@ -8,11 +8,10 @@
 #include <c_base.h>
 #include <c_synchronization.h>
 
-#define HASH_TABLE_IMPLEMENTATION
 #define PROGRAM_FLAG_HANDLER_IMPLEMENTATION
 #define DYNARRAY_IMPLEMENTATION 
 
-#include <c_hash_table.h>
+#include "hash_table.h"
 #include <c_file_api.h>
 #include <c_string.h>
 #include <c_program_flag_handler.h>

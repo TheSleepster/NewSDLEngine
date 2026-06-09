@@ -48,9 +48,9 @@ store_lambda_AST(AST_node_t *node)
 internal_api void
 symbol_table_init(void)
 {
-    c_hash_table_init(&g_symbol_table.macro_table,     SYMBOL_TABLE_SIZE);
-    c_hash_table_init(&g_symbol_table.type_table,      SYMBOL_TABLE_SIZE);
-    c_hash_table_init(&g_symbol_table.constants_table, SYMBOL_TABLE_SIZE);
+    g_symbol_table.macro_table     = hash_table_create<macro_info_t>(SYMBOL_TABLE_SIZE);
+    g_symbol_table.type_table      = hash_table_create<code_type_t>(SYMBOL_TABLE_SIZE);    
+    g_symbol_table.constants_table = hash_table_create<AST_expression_value_t>(SYMBOL_TABLE_SIZE); 
 
     g_symbol_table.keywords   = c_dynarray_create(language_keyword_t);
     g_symbol_table.primitives = c_dynarray_create(code_type_t*);
@@ -98,9 +98,9 @@ symbol_table_init(void)
     {
         string_t type_name = default_primitive_types[index];
 
-        u64 type_id = (c_fnv_hash_value(type_name.data, type_name.count) % SYMBOL_TABLE_SIZE);
+        u64 type_id = (hash_table_hash_key(type_name) % SYMBOL_TABLE_SIZE);
 
-        code_type_t *primitive   = c_hash_table_get_value_ptr_at_index(&g_symbol_table.type_table, type_id);
+        code_type_t *primitive   = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, type_id);
         primitive->is_registered = true;
         primitive->type_inferred = true;
         primitive->identifier    = c_string_make_copy(&permanent_arena, type_name);
@@ -112,9 +112,9 @@ symbol_table_init(void)
 
     // NOTE(Sleepster): NULL 
     string_t null_name = STR("NULL");
-    u64 hash = ((c_fnv_hash_value(null_name.data, null_name.count)) % SYMBOL_TABLE_SIZE);
+    u64 hash = ((hash_table_hash_key(null_name)) % SYMBOL_TABLE_SIZE);
 
-    macro_info_t *null_macro = c_hash_table_get_value_ptr(&g_symbol_table.macro_table, null_name);
+    macro_info_t *null_macro = hash_table_get_element_ptr(&g_symbol_table.macro_table, null_name);
 
     null_macro->name      = c_string_make_copy(&permanent_arena, null_name);
     null_macro->name_hash = hash;
@@ -124,9 +124,9 @@ symbol_table_init(void)
 
     // NOTE(Sleepster): Nullptr 
     string_t nullptr_name = STR("nullptr");
-    hash = ((c_fnv_hash_value(null_name.data, null_name.count)) % SYMBOL_TABLE_SIZE);
+    hash = ((hash_table_hash_key(null_name)) % SYMBOL_TABLE_SIZE);
 
-    macro_info_t *nullptr_macro = c_hash_table_get_value_ptr(&g_symbol_table.macro_table, nullptr_name);
+    macro_info_t *nullptr_macro = hash_table_get_element_ptr(&g_symbol_table.macro_table, nullptr_name);
 
     nullptr_macro->name      = c_string_make_copy(&permanent_arena, nullptr_name);
     nullptr_macro->name_hash = hash;

@@ -1,12 +1,17 @@
+#if !defined(HASH_TABLE_H)
 /* ========================================================================
-   $File: hash_table.cpp $
-   $Date: June 08 2026 12:17 pm $
+   $File: hash_table.h $
+   $Date: June 09 2026 11:41 am $
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-#include <stdio.h>
-#include <stdlib.h>
 
+#define HASH_TABLE_H
+#include <c_base.h>
+#include <c_types.h>
+#include <c_string.h>
+
+// EXPERIMENTAL
 typedef void *hash_table_allocate_impl_t(void *allocator, u32 allocation_size);
 typedef void  hash_table_free_impl_t(void *allocator, void *memory);
 
@@ -44,6 +49,36 @@ struct hash_table_t
     hash_table_free_impl_t     *free_fn;
 };
 
+u64
+hash_table_hash_key(string_t key)
+{
+    u64 result = 0;
+
+    local_persist const u64 base_hash = 0xcbf29ce484222325ULL;
+    local_persist const u64 FNV_prime = 0x100000001b3ULL;
+
+    // TODO(Sleepster): 4 wide SIMD?? 
+    u64 current_hash = base_hash;
+    for(u32 key_index = 0;
+        key_index < key.count;
+        ++key_index)
+    {
+        byte key_data = key.data[key_index];
+        current_hash  = current_hash ^ key_data;
+        current_hash  = current_hash * FNV_prime;
+    }
+
+    result = current_hash;
+    return(result);
+}
+
+u64
+hash_table_combine_hashes(u64 A, u64 B)
+{
+    u64 result = 0;
+    return(result);
+}
+
 template <typename T>
 hash_table_t<T>
 hash_table_create(u32                         max_entries, 
@@ -68,29 +103,6 @@ hash_table_destroy(hash_table_t<T> *table)
 {
     table->free(table->allocator, table->items);
     table->free(table->allocator, table->occupied_indices);
-}
-
-u64
-hash_table_hash_key(string_t key)
-{
-    u64 result = 0;
-
-    local_persist const u64 base_hash = 0xcbf29ce484222325ULL;
-    local_persist const u64 FNV_prime = 0x100000001b3ULL;
-
-    // TODO(Sleepster): 4 wide SIMD?? 
-    u64 current_hash = base_hash;
-    for(u32 key_index = 0;
-        key_index < key.count;
-        ++key_index)
-    {
-        byte key_data = key.data[key_index];
-        current_hash  = current_hash ^ key_data;
-        current_hash  = current_hash * FNV_prime;
-    }
-
-    result = current_hash;
-    return(result);
 }
 
 template <typename T>
@@ -176,6 +188,22 @@ hash_table_get_hash_element_block(hash_table_t<T> *table, string_t key)
 }
 
 template <typename T>
+T
+hash_table_get_element_at_index(hash_table_t<T> *table, u64 index)
+{
+    hash_element_t<T> element = table->elements[index].item;
+    return(element);
+}
+
+template <typename T>
+T*
+hash_table_get_element_ptr_at_index(hash_table_t<T> *table, u64 index)
+{
+    hash_element_t<T> *element = &table->elements[index].item;
+    return(element);
+}
+
+template <typename T>
 void
 hash_table_clear_element_item(hash_table_t<T> *table, string_t key)
 {
@@ -185,18 +213,8 @@ hash_table_clear_element_item(hash_table_t<T> *table, string_t key)
     hash_element_t<T> *element = hash_table_get_hash_element(table, index, key_hash);
     ZeroStruct(element->item);
 }
+// EXPERIMENTAL
 
-int
-main(void)
-{
-    hash_table_t<u32> table = hash_table_create<u32>(4096);
 
-    u32 test_element = 938;
-    hash_table_add_element(&table, &test_element, STR("double"));
+#endif // HASH_TABLE_H
 
-    u32 new_element = hash_table_get_element(&table, STR("hash_table_data_t"));
-    Assert(new_element != test_element);
-
-    printf("test_element: '%d'...\n", test_element);
-    printf("new_element: '%d'...\n", new_element);
-}

@@ -109,32 +109,32 @@ struct code_type_t
 struct symbol_table_t
 {
     // NOTE(Sleepster): Maps macro declarations to their values... 
-    ticket_mutex_t                      macro_table_mutex;
-    HashTable_t(macro_info_t)           macro_table;
+    ticket_mutex_t                       macro_table_mutex;
+    hash_table_t<macro_info_t>           macro_table;
 
     // NOTE(Sleepster): "sparse" array
-    ticket_mutex_t                      type_table_mutex;
-    HashTable_t(code_type_t)            type_table;
+    ticket_mutex_t                       type_table_mutex;
+    hash_table_t<code_type_t>            type_table;
 
     // NOTE(Sleepster): In case you want to add more keywords besides those added, this is
     // a get_keyword(token.string)dynamic array.
-    DynArray_t(language_keyword_t)      keywords;
-    DynArray_t(code_type_t*)            primitives;
+    DynArray_t(language_keyword_t)       keywords;
+    DynArray_t(code_type_t*)             primitives;
 
-    ticket_mutex_t                      constant_table_mutex;
-    HashTable_t(AST_expression_value_t) constants_table;
+    ticket_mutex_t                       constant_table_mutex;
+    hash_table_t<AST_expression_value_t> constants_table;
 
-    ticket_mutex_t                      type_table_indices_mutex;
-    DynArray_t(u32)                     valid_type_table_indices;
+    ticket_mutex_t                       type_table_indices_mutex;
+    DynArray_t(u32)                      valid_type_table_indices;
 
-    ticket_mutex_t                      AST_structures_mutex;
-    DynArray_t(AST_node_t*)             structures;
+    ticket_mutex_t                       AST_structures_mutex;
+    DynArray_t(AST_node_t*)              structures;
 
-    ticket_mutex_t                      AST_enums_mutex;
-    DynArray_t(AST_node_t*)             enums;
+    ticket_mutex_t                       AST_enums_mutex;
+    DynArray_t(AST_node_t*)              enums;
 
-    ticket_mutex_t                      AST_lambdas_mutex;
-    DynArray_t(AST_node_t*)             lambdas;
+    ticket_mutex_t                       AST_lambdas_mutex;
+    DynArray_t(AST_node_t*)              lambdas;
 };
 
 global_variable symbol_table_t g_symbol_table;
