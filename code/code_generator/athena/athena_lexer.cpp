@@ -87,15 +87,17 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
                 case '\0': {result.token_type = TOKEN_TYPE_EOF;           }break;
                 case '\\': {result.token_type = TOKEN_TYPE_BACKSLASH;     }break;
                 case '?':  {result.token_type = TOKEN_TYPE_TERNARY_IF;    }break;
+                case '~':  {result.token_type = TOKEN_TYPE_TILDE;         }break;
                 case '"':  
                 {
-                    u32 advance = 0;
+                    u32 advance = 1;
                     while(token_stream->string.data[advance] != '"')
                     {
                         ++advance;
                     }
 
                     result.data.count = advance - 1;
+                    result.data.data  = result.data.data + 1;
                     result.token_type = TOKEN_TYPE_LITERAL;
                 }break;
 
@@ -274,7 +276,15 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
                 }break;
             }
 
-            c_string_advance_by(&token_stream->string, result.data.count);
+            // TODO(Sleepster): This is dumb but I'm lazy. 
+            if(result.token_type == TOKEN_TYPE_LITERAL)
+            {
+                c_string_advance_by(&token_stream->string, result.data.count + 2);
+            }
+            else
+            {
+                c_string_advance_by(&token_stream->string, result.data.count);
+            }
         }
         else
         {
@@ -430,6 +440,8 @@ lexer_eat_lines(memory_arena_t *concat_arena, lexer_t *lexer, u32 line_count)
             line.count    = end_line;
             result = c_string_concat(concat_arena, line, result);
             c_string_advance_by(&lexer->current_stream->string, end_line + 1);
+
+            ++lexer->current_stream->line_number;
         }
     }
 
@@ -437,10 +449,11 @@ lexer_eat_lines(memory_arena_t *concat_arena, lexer_t *lexer, u32 line_count)
 }
 
 internal_api void
-lexer_reset_token_stream(lexer_token_stream_t *stream )
+lexer_reset_token_stream(lexer_token_stream_t *stream)
 {
     stream->string.data  = stream->start;
     stream->string.count = stream->initial_length;
+    stream->line_number  = 0;
 }
 
 internal_api lexer_token_stream_t 

@@ -4,13 +4,13 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-TEST(basic_macro)
+TEST(basic_macros)
 {
     void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/basic_macro.cpp"));
     Assert(sys_wait_for_process(process));
 }
 
-TEST(complex_macro)
+TEST(complex_macros)
 {
     void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/complex_macro.cpp"));
     Assert(sys_wait_for_process(process));
@@ -47,13 +47,13 @@ TEST(function_decls)
     Assert(sys_wait_for_process(process));
 }
 
-TEST(macroed_function_decls)
+TEST(casey_style_declarations)
 {
     void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/casey_style_external_function.cpp"));
     Assert(sys_wait_for_process(process));
 }
 
-TEST(CPP_structures)
+TEST(cpp_structures)
 {
     void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/cpp_class.cpp"));
     Assert(sys_wait_for_process(process));
@@ -68,6 +68,24 @@ TEST(cpp_member_functions)
 TEST(cpp_namespaces)
 {
     void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/namespaces.cpp"));
+    Assert(sys_wait_for_process(process));
+}
+
+TEST(templates)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/templates.cpp"));
+    Assert(sys_wait_for_process(process));
+}
+
+TEST(nested_macros)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/nested_macros.cpp"));
+    Assert(sys_wait_for_process(process));
+}
+
+TEST(overloads)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/overloads.cpp"));
     Assert(sys_wait_for_process(process));
 }
 

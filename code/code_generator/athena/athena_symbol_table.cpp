@@ -48,8 +48,9 @@ store_lambda_AST(AST_node_t *node)
 internal_api void
 symbol_table_init(void)
 {
-    c_hash_table_init(&g_symbol_table.macro_table, SYMBOL_TABLE_SIZE);
-    c_hash_table_init(&g_symbol_table.type_table,  SYMBOL_TABLE_SIZE);
+    c_hash_table_init(&g_symbol_table.macro_table,     SYMBOL_TABLE_SIZE);
+    c_hash_table_init(&g_symbol_table.type_table,      SYMBOL_TABLE_SIZE);
+    c_hash_table_init(&g_symbol_table.constants_table, SYMBOL_TABLE_SIZE);
 
     g_symbol_table.keywords   = c_dynarray_create(language_keyword_t);
     g_symbol_table.primitives = c_dynarray_create(code_type_t*);
@@ -108,6 +109,30 @@ symbol_table_init(void)
         
         c_dynarray_push(g_symbol_table.primitives, primitive);
     }
+
+    // NOTE(Sleepster): NULL 
+    string_t null_name = STR("NULL");
+    u64 hash = ((c_fnv_hash_value(null_name.data, null_name.count)) % SYMBOL_TABLE_SIZE);
+
+    macro_info_t *null_macro = c_hash_table_get_value_ptr(&g_symbol_table.macro_table, null_name);
+
+    null_macro->name      = c_string_make_copy(&permanent_arena, null_name);
+    null_macro->name_hash = hash;
+    null_macro->expansion_string = STR("0");
+    null_macro->expansion_token_stream = init_token_stream_from_string(null_macro->expansion_string);
+    null_macro->is_set = true;
+
+    // NOTE(Sleepster): Nullptr 
+    string_t nullptr_name = STR("nullptr");
+    hash = ((c_fnv_hash_value(null_name.data, null_name.count)) % SYMBOL_TABLE_SIZE);
+
+    macro_info_t *nullptr_macro = c_hash_table_get_value_ptr(&g_symbol_table.macro_table, nullptr_name);
+
+    nullptr_macro->name      = c_string_make_copy(&permanent_arena, nullptr_name);
+    nullptr_macro->name_hash = hash;
+    nullptr_macro->expansion_string = STR("0");
+    nullptr_macro->expansion_token_stream = init_token_stream_from_string(null_macro->expansion_string);
+    nullptr_macro->is_set = true;
 }
 
 internal_api language_keyword_t*
@@ -147,7 +172,7 @@ symbol_table_search_for_code_type(string_t type_identifier)
         // NOTE(Sleepster): 
         // This will work down the scope stack checking whatever our current namespace 
         // is up to global to find the registered type. 
-        for(s32 stack_index = thread_scope_stack.current_stack_depth;
+        for(s32 stack_index = Max(thread_scope_stack.current_stack_depth - 1, 0);
             stack_index >= 0;
             --stack_index)
         {
@@ -168,7 +193,7 @@ symbol_table_search_for_code_type(string_t type_identifier)
 
 // NOTE(Sleepster): This will add the type to the type_table in the current_scope 
 internal_api code_type_t* 
-symbol_table_register_typename(string_t type_name, u64 alias_id)
+symbol_table_register_typename(string_t type_name, u32 expected_metatype, u64 alias_id)
 {
     u64 type_ID   = type_id_from_identifier(type_name);
     u64 scope_ID  = c_dynarray_get_value(thread_scope_stack.current_stack, (u32)thread_scope_stack.current_stack_depth); 
@@ -188,9 +213,41 @@ symbol_table_register_typename(string_t type_name, u64 alias_id)
         type->identifier    = type_name;
         type->ID            = type_hash;
         type->alias_of      = alias_id;
-        type->code_metatype = CODE_TYPE_UNDEFINED;
+        type->code_metatype = expected_metatype;
+        type->scope_ID      = scope_ID;
         type->is_registered = true;
         type->type_inferred = false;
+    }
+    else if(type && type->code_metatype == CODE_TYPE_LAMBDA)
+    {
+        code_type_t *new_overload = c_arena_push_struct(&permanent_arena, code_type_t);
+        if(!type->next_overload)
+        {
+            type->next_overload = new_overload;
+        }
+        else
+        {
+            for(code_type_t *current_overload = type->next_overload;
+                current_overload;
+                current_overload = current_overload->next_overload)
+            {
+                if(!current_overload->next_overload)
+                {
+                    current_overload->next_overload = new_overload;
+                    break;
+                }
+            }
+        }
+
+        new_overload->identifier    = type_name;
+        new_overload->ID            = type_hash;
+        new_overload->alias_of      = alias_id;
+        new_overload->code_metatype = expected_metatype;
+        new_overload->scope_ID      = scope_ID;
+        new_overload->is_registered = true;
+        new_overload->type_inferred = false;
+
+        type = new_overload;
     }
 
     return(type);
@@ -199,7 +256,9 @@ symbol_table_register_typename(string_t type_name, u64 alias_id)
 internal_api void
 symbol_table_infer_type(AST_node_t *node_data)
 {
-    code_type_t *type   = symbol_table_search_for_code_type(node_data->identifier);
+    code_type_t *type = symbol_table_search_for_code_type(node_data->identifier);
+    Expect(type, "Failure to find any type for identifier: '%.*s'...\n", fprint_string(node_data->identifier))
+
     if(!type->type_inferred)
     {
         type->type_info_AST = node_data;
@@ -258,28 +317,34 @@ symbol_table_substitute_macro_arguments(lexer_t *lexer, lexer_token_t last_token
                    "Expected to find another argument when expanding this macro, instead found: '%.*s'...\n",
                    fprint_token(next_expansion_token));
 
-            string_t macro_argument = macro_info->arguments[macro_argument_index];
-            for(u32 token_index = 0;
-                token_index < macro_info->expansion_token_stream.buffered_token_count;
-                ++token_index)
+            if(macro_info->argument_count)
             {
-                lexer_token_t *macro_token = result.token_buffer + token_index;
-                if(c_string_compare(macro_token->data, macro_argument))
+                string_t macro_argument = macro_info->arguments[macro_argument_index];
+                for(u32 token_index = 0;
+                    token_index < macro_info->expansion_token_stream.buffered_token_count;
+                    ++token_index)
                 {
-                    *macro_token = next_expansion_token;
-                    ++macro_argument_index;
+                    lexer_token_t *macro_token = result.token_buffer + token_index;
+                    if(c_string_compare(macro_token->data, macro_argument))
+                    {
+                        *macro_token = next_expansion_token;
+                        ++macro_argument_index;
 
+                        break;
+                    }
+                }
+                lexer_token_t check_token = lexer_peek_token(lexer, 1);
+                if(check_token.token_type != TOKEN_TYPE_COMMA && check_token.token_type != TOKEN_TYPE_CLOSE_PAREN)
+                {
+                    report_error(lexer,
+                                 "Invalid token when parsing the end of this macro invocation's argument string... token found was: '%.*s'...\n",
+                                 fprint_token(check_token));
+                }
+                lexer_get_next_token(lexer);
+                if(check_token.token_type == TOKEN_TYPE_CLOSE_PAREN)
+                {
                     break;
                 }
-            }
-            lexer_token_t check_token = lexer_peek_token(lexer, 1);
-            Expect(check_token.token_type == TOKEN_TYPE_COMMA || check_token.token_type == TOKEN_TYPE_CLOSE_PAREN,
-                   "Invalid token when parsing the end of this macro invocation's argument string... token found was: '%.*s'...\n",
-                   fprint_token(check_token));
-            lexer_get_next_token(lexer);
-            if(check_token.token_type == TOKEN_TYPE_CLOSE_PAREN)
-            {
-                break;
             }
         }
     }
@@ -328,8 +393,9 @@ get_metatype_string(u32 metatype)
 {
     switch(metatype)
     {
-#define X(enum, string) case enum: return string;
-    default: return "null";
+#define X(enum, string) case enum: return string; break;
+        CODE_TYPE_METATYPE_LIST(X)
+        default: return "null";
 #undef X
     }
 }

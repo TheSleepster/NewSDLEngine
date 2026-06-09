@@ -45,8 +45,8 @@ struct AST_type_t
 
     string_t     literal;
     union {
-        s32      int_value;
-        u32      unsigned_value;
+        s64      int_value;
+        u64      unsigned_value;
         float32  float32_value;
         float64  float64_value;
         string_t string_value;
@@ -59,6 +59,7 @@ struct AST_type_t
     X(AST_NODE_TYPE_LAMBDA, "AST_NODE_TYPE_LAMBDA") \
     X(AST_NODE_TYPE_LAMBDA_ARGUMENT, "AST_NODE_TYPE_LAMBDA_ARGUMENT") \
     X(AST_NODE_TYPE_LAMBDA_RETURN_TYPE, "AST_NODE_TYPE_LAMBDA_RETURN_TYPE") \
+    X(AST_NODE_TYPE_CONSTEXPR, "AST_NODE_TYPE_CONSTEXPR") \
     X(AST_NODE_TYPE_UNARY_EXPRESSION, "AST_NODE_TYPE_UNARY_EXPRESSION") \
     X(AST_NODE_TYPE_BINARY_EXPRESSION, "AST_NODE_TYPE_BINARY_EXPRESSION") \
     X(AST_NODE_TYPE_EXPRESSION_VALUE, "AST_NODE_TYPE_EXPRESSION_VALUE") \
@@ -66,8 +67,11 @@ struct AST_type_t
     X(AST_NODE_TYPE_BINARY_OPERATOR, "AST_NODE_TYPE_BINARY_OPERATOR") \
     X(AST_NODE_TYPE_ASSIGNMENT, "AST_NODE_TYPE_ASSIGNMENT") \
     X(AST_NODE_TYPE_NUMBER, "AST_NODE_TYPE_NUMBER") \
+    X(AST_NODE_TYPE_LITERAL, "AST_NODE_TYPE_LITERAL") \
     X(AST_NODE_TYPE_STRUCTURE,  "AST_NODE_TYPE_STRUCTURE") \
     X(AST_NODE_TYPE_STRUCTURE_MEMBER, "AST_NODE_TYPE_STRUCTURE_MEMBER") \
+    X(AST_NODE_TYPE_CONSTRUCTOR, "AST_NODE_TYPE_CONSTRUCTOR") \
+    X(AST_NODE_TYPE_DECONSTRUCTOR, "AST_NODE_TYPE_DECONSTRUCTOR") \
     X(AST_NODE_TYPE_INHERITANCE_INFO,  "AST_NODE_TYPE_INHERITANCE_INFO") \
     X(AST_NODE_TYPE_ENUM,       "AST_NODE_TYPE_ENUM") \
     X(AST_NODE_TYPE_ENUM_MEMBER, "AST_NODE_TYPE_ENUM_MEMBER") \
@@ -85,8 +89,15 @@ enum AST_node_expression_type_t
     AST_NODE_EXPRESSION_TYPE_UNARY
 };
 
+// TODO(Sleepster): Identifiers like "NULL"
 enum AST_expression_value_type_t
 {
+    AST_EXPRESSION_VALUE_INVALID,
+    // NOTE(Sleepster): Ident is something like 'NULL' 
+    AST_EXPRESSION_VALUE_IDENT,
+    // NOTE(Sleepster): Whereas a literal is something like char *name = "Test name"
+    AST_EXPRESSION_VALUE_LITERAL,
+
     AST_EXPRESSION_VALUE_INT,
     AST_EXPRESSION_VALUE_UNSIGNED,
     AST_EXPRESSION_VALUE_FLOAT,
@@ -101,6 +112,7 @@ struct AST_expression_value_t
         u64      unsigned_value;
         float32  float32_value;
         float64  float64_value;
+        string_t identifier_value;
     };
 };
 
