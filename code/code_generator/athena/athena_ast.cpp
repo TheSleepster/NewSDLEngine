@@ -66,8 +66,10 @@ AST_add_sibling(AST_node_t *sibling, AST_node_t *new_sibling)
 }
 
 internal_api void
-build_number_AST_node(lexer_t *lexer, AST_node_t *value_expression, lexer_token_t token)
+build_number_AST_node(parser_t *parser, AST_node_t *value_expression, lexer_token_t token)
 {
+    lexer_t *lexer = &parser->lexer;
+
     bool8 signed_value = false;
     bool8 is_float     = false;
 
@@ -170,7 +172,7 @@ get_prefix_binding_power(lexer_token_t *token)
 }
 
 internal_api AST_node_t*
-generate_unary_expression_AST(lexer_t *lexer, lexer_token_t *token, AST_node_t *unary_operation)
+generate_unary_expression_AST(lexer_token_t *token, AST_node_t *unary_operation)
 {
     AST_node_t *result = AST_create_new_node(&permanent_arena);
     result->node_type  = AST_NODE_TYPE_UNARY_EXPRESSION;
@@ -193,9 +195,11 @@ generate_binary_expression_AST(lexer_token_t *operator_token, AST_node_t *left_n
 }
 
 internal_api AST_node_t*
-generate_nud_prefix_AST(lexer_t *lexer, lexer_token_t *token)
+generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
 {
     AST_node_t *result = null;
+
+    lexer_t *lexer = &parser->lexer;
 
     s32 prefix_value = get_prefix_binding_power(token);
     if(prefix_value == -1)
@@ -256,7 +260,7 @@ generate_nud_prefix_AST(lexer_t *lexer, lexer_token_t *token)
             case TOKEN_TYPE_OPEN_PAREN:
             {
                 // NOTE(Sleepster): Subexpression 
-                result = generate_expression_AST(lexer, 0, token);
+                result = generate_expression_AST(0, token);
             }break;
             default: 
             {
@@ -268,7 +272,7 @@ generate_nud_prefix_AST(lexer_t *lexer, lexer_token_t *token)
     }
     else
     {
-        AST_node_t *unary_operation = generate_expression_AST(lexer, prefix_value, token);
+        AST_node_t *unary_operation = generate_expression_AST(parser, prefix_value, token);
         result = generate_unary_expression_AST(lexer, token, unary_operation);
     }
 
@@ -282,20 +286,20 @@ generate_led_AST(lexer_t *lexer, lexer_token_t *token, AST_node_t *left_hand_exp
 
     lexer_token_t operator_token = *token;
 
-    AST_node_t *right_expression  = generate_expression_AST(lexer, current_infix_binding_power, token);
+    AST_node_t *right_expression  = generate_expression_AST(parser, current_infix_binding_power, token);
     AST_node_t *binary_expression = generate_binary_expression_AST(&operator_token, left_hand_expression, right_expression);
     return(binary_expression);
 }
 
 
 internal_api AST_node_t* 
-generate_expression_AST(lexer_t *lexer, s32 expression_min_binding_power, lexer_token_t *token_out)
+generate_expression_AST(parser_t *parser, s32 expression_min_binding_power, lexer_token_t *token_out)
 {
     AST_node_t *value_expression = null;
 
     // NOTE(Sleepster): Is the next token a number? 
     lexer_token_t token       = symbol_table_get_next_lexer_token(lexer);
-    AST_node_t *left_hand_AST = generate_nud_prefix_AST(lexer, &token);
+    AST_node_t *left_hand_AST = generate_nud_prefix_AST(parser, &token);
 
     token = symbol_table_get_next_lexer_token(lexer);
     for(;;)

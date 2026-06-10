@@ -240,7 +240,7 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
                         result.data.count = next_char_index;
 
                         // NOTE(Sleepster): If we find an identifier, we need to check if it's a keyword.
-                        language_keyword_t *keyword = symbol_table_get_keyword(result.data);
+                        language_keyword_t *keyword = get_keyword_from_identifier(result.data);
                         if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
                         {
                             switch(keyword->keyword_id)

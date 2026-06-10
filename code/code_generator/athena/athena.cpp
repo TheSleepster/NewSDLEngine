@@ -505,7 +505,7 @@ parse_single_file(string_t filename)
                         lexer_get_next_token(lexer);
 
                         // TODO(Sleepster): Check to make sure there's actually an ending semicolon 
-                        node->expression.info = generate_expression_AST(lexer, 0, null);
+                        node->expression.info = generate_expression_AST(parser, 0, null);
                     }
                     else
                     {
@@ -515,12 +515,13 @@ parse_single_file(string_t filename)
                 else if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
                 {
                     // NOTE(Sleepster): Lambda, not a constant 
-                    node = generate_lambda_AST(lexer, type_token, pointer_depth, false);
+                    node = generate_lambda_AST(parser, type_token, pointer_depth, false);
                     invalid_expression = true;
                 }
 
                 if(!invalid_expression)
                 {
+                    // TODO(Sleepster): Store the AST not the evaluated expression for this phase 
                     AST_expression_value_t eval = evaluate_expression_AST(node->expression.info);
                     hash_table_add_element(&g_symbol_table.constants_table, eval, name_token.data);
                 }

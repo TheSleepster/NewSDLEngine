@@ -108,7 +108,7 @@ struct code_type_t
 struct language_info_t
 {
     dynarray_t<language_keyword_t> keywords;
-    dynarray_t<code_type_t>        language_primitive_type;
+    dynarray_t<code_type_t>        language_primitive_types;
 };
 
 struct declaration_context_t
@@ -131,6 +131,8 @@ struct parser_t
 };
 
 global_variable language_info_t g_language_info;
+
+internal_api language_keyword_t *get_keyword_from_identifier(string_t identifier);
 
 #endif // ATHENA_SYMBOL_TABLE_H
 

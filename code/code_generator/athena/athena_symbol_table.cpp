@@ -6,6 +6,8 @@
    ======================================================================== */
 #include "athena_symbol_table.h"
 
+#if 0
+
 internal_api void
 store_structure_AST(AST_node_t *node)
 {
@@ -399,6 +401,8 @@ get_metatype_string(u32 metatype)
     }
 }
 
+#endif
+
 // PARSER
 internal_api void
 parser_init(parser_t *parser, string_t filename)
@@ -431,6 +435,7 @@ initialize_default_language_info(void)
 #undef X
     };
 
+    // NOTE(Sleepster): Keywords 
     for(u32 index = 0;
         index < ArrayCount(default_keyword_strings);
         ++index)
@@ -439,8 +444,15 @@ initialize_default_language_info(void)
         keyword.identifier = c_string_make_copy(&permanent_arena, default_keyword_strings[index]);
         keyword.keyword_id = default_keyword_enums[index];
 
-        dynarray_add(&g_language_info->keywords, keyword);
+        dynarray_add(&g_language_info.keywords, keyword);
     }
+
+    // NOTE(Sleepster): Primitives 
+    string_t default_primitive_types[] = {
+#define X(string) STR(string),
+        DEFAULT_PRIMITIVE_TYPES_LIST(X)
+#undef X
+    };
 
     for(u32 index = 0;
         index < ArrayCount(default_primitive_types);
@@ -456,15 +468,15 @@ initialize_default_language_info(void)
         primitive->ID            = type_id;
         primitive->code_metatype = CODE_TYPE_PRIMITIVE;
         
-        dynarray_add(&g_language_info->language_primitive_types, primitive);
+        dynarray_add(&g_language_info.language_primitive_types, primitive);
     }
 }
 
 internal_api language_keyword_t*
-parser_get_keyword(parser_t *parser, string_t identifier)
+get_keyword_from_identifier(string_t identifier)
 {
     language_keyword_t *result = null;
-    for(const auto &keyword : g_language_info->keywords)
+    for(const auto &keyword : g_language_info.keywords)
     {
         if(c_string_compare(keyword->identifier, identifier))
         {
