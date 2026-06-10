@@ -90,7 +90,7 @@ thread_static scope_stack_t  thread_scope_stack;
 internal_api void
 push_scope_stack(string_t scope)
 {
-    u64 scope_ID = c_fnv_hash_value(scope.data, scope.count);
+    u64 scope_ID = hash_table_hash_key(scope);
 
     c_dynarray_push(thread_scope_stack.current_stack, scope_ID);
     ++thread_scope_stack.current_stack_depth;
@@ -121,7 +121,7 @@ type_id_from_identifier(string_t string, u64 modular)
     u64 result = 0;
     Expect(string.count > 0, "String passed to 'type_id_from_identifier()' was of size 0...\n");
 
-    result = c_fnv_hash_value(string.data, string.count);
+    result = hash_table_hash_key(string);
     if(modular > 0) result %= modular;
 
     return(result);
@@ -135,7 +135,7 @@ internal_api void
 parse_macro_info(lexer_t *lexer, macro_info_t *macro_info, lexer_token_t name_token)
 {
     macro_info->name      = c_string_make_copy(&permanent_arena, name_token.data);
-    macro_info->name_hash = ((c_fnv_hash_value(name_token.data.data, name_token.data.count)) % SYMBOL_TABLE_SIZE);
+    macro_info->name_hash = ((hash_table_hash_key(name_token.data)) % SYMBOL_TABLE_SIZE);
 
     string_builder_t temp_builder;
     c_string_builder_init(&temp_builder, MB(10));
@@ -266,7 +266,7 @@ handle_macro_expansion(lexer_t *lexer, bool8 record_macro)
             lexer_token_t name_token = lexer_get_next_token(lexer);
             TicketMutexScope(&g_symbol_table.macro_table_mutex)
             {
-                macro_info_t *macro_info = c_hash_table_get_value_ptr(&g_symbol_table.macro_table, name_token.data);
+                macro_info_t *macro_info = hash_table_get_element_ptr(&g_symbol_table.macro_table, name_token.data);
                 if(!macro_info->is_set)
                 {
                     parse_macro_info(lexer, macro_info, name_token);
@@ -518,7 +518,7 @@ parse_file(string_t filename)
                 if(!invalid_expression)
                 {
                     AST_expression_value_t eval = evaluate_expression_AST(node->expression.info);
-                    c_hash_table_insert_pair(&g_symbol_table.constants_table, name_token.data, eval);
+                    hash_table_add_element(&g_symbol_table.constants_table, eval, name_token.data);
                 }
             }break;
         }

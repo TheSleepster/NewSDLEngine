@@ -73,7 +73,7 @@
 
             "cwd": "${workspaceFolder}/code",
             //"args": ["--filename=c_dynarray.h"],
-            "args": ["--filename=tests/metaprogram_tests/casey_style_external_function.cpp"],
+            "args": ["--filename=tests/metaprogram_tests/complex_structures.cpp"],
 
             //"cwd": "${workspaceFolder}",
             //"args": ["--directory=${workspaceFolder}/code"],

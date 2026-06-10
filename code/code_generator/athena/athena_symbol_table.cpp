@@ -177,9 +177,9 @@ symbol_table_search_for_code_type(string_t type_identifier)
             --stack_index)
         {
             u64 current_scope_id = c_dynarray_get_value(thread_scope_stack.current_stack, (u32)stack_index);
-            u64 lookup_hash = (c_combine_hashes(current_scope_id, type_ID) % SYMBOL_TABLE_SIZE);
+            u64 lookup_hash = (hash_table_combine_hashes(current_scope_id, type_ID) % SYMBOL_TABLE_SIZE);
 
-            code_type_t *candidate = c_hash_table_get_value_ptr_at_index(&g_symbol_table.type_table, lookup_hash);
+            code_type_t *candidate = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, lookup_hash);
             if(candidate && candidate->is_registered)
             {
                 result = candidate;
@@ -197,14 +197,14 @@ symbol_table_register_typename(string_t type_name, u32 expected_metatype, u64 al
 {
     u64 type_ID   = type_id_from_identifier(type_name);
     u64 scope_ID  = c_dynarray_get_value(thread_scope_stack.current_stack, (u32)thread_scope_stack.current_stack_depth); 
-    u64 type_hash = (c_combine_hashes(scope_ID, type_ID) % SYMBOL_TABLE_SIZE);
+    u64 type_hash = (hash_table_combine_hashes(scope_ID, type_ID) % SYMBOL_TABLE_SIZE);
 
     code_type_t *type = symbol_table_search_for_code_type(type_name);
     if(!type)
     {
         TicketMutexScope(&g_symbol_table.type_table_mutex)
         {
-            type = c_hash_table_get_value_ptr_at_index(&g_symbol_table.type_table, type_hash);
+            type = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, type_hash);
             Expect(type->is_registered == false, 
                    "When registering a type by name of: '%.*s' we expected the type to not already been registered, however this was not the case and the type's type->is_registered is true... meaning this is an invalid action...\n",
                    fprint_string(type_name));
@@ -218,7 +218,7 @@ symbol_table_register_typename(string_t type_name, u32 expected_metatype, u64 al
         type->is_registered = true;
         type->type_inferred = false;
     }
-    else if(type && type->code_metatype == CODE_TYPE_LAMBDA)
+    else if(type->code_metatype == CODE_TYPE_LAMBDA)
     {
         code_type_t *new_overload = c_arena_push_struct(&permanent_arena, code_type_t);
         if(!type->next_overload)
@@ -371,7 +371,7 @@ symbol_table_get_next_lexer_token(lexer_t *lexer)
     macro_info_t *macro = null;
     TicketMutexScope(&g_symbol_table.macro_table_mutex)
     {
-        macro = c_hash_table_get_value_ptr(&g_symbol_table.macro_table, result.data);
+        macro = hash_table_get_element_ptr(&g_symbol_table.macro_table, result.data);
         if(macro->is_set)
         {
             lexer_token_stream_t macro_stream = symbol_table_substitute_macro_arguments(lexer, result, macro);

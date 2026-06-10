@@ -75,7 +75,7 @@ hash_table_hash_key(string_t key)
 u64
 hash_table_combine_hashes(u64 A, u64 B)
 {
-    u64 result = 0;
+    u64 result = A * 31 + B;
     return(result);
 }
 
@@ -126,7 +126,7 @@ hash_table_get_hash_element(hash_table_t<T> *table, u64 index, u64 key_hash)
 
 template <typename T>
 void
-hash_table_add_element(hash_table_t<T> *table, T *new_element, string_t key)
+hash_table_add_element(hash_table_t<T> *table, T new_element, string_t key)
 {
     Assert(table->items);
     Assert(table->max_entries > 0);
@@ -137,8 +137,8 @@ hash_table_add_element(hash_table_t<T> *table, T *new_element, string_t key)
     hash_element_t<T> *element = hash_table_get_hash_element(table, index, key_hash);
 
     // NOTE(Sleepster): Copies the element 
-    element->item         = *new_element;
-    element->raw_key_hash =  key_hash;
+    element->item         = new_element;
+    element->raw_key_hash = key_hash;
 
     //dynarray_add(&table->occupied_indices, index);
 }
@@ -191,7 +191,7 @@ template <typename T>
 T
 hash_table_get_element_at_index(hash_table_t<T> *table, u64 index)
 {
-    hash_element_t<T> element = table->elements[index].item;
+    T element = table->elements[index].item;
     return(element);
 }
 
@@ -199,7 +199,7 @@ template <typename T>
 T*
 hash_table_get_element_ptr_at_index(hash_table_t<T> *table, u64 index)
 {
-    hash_element_t<T> *element = &table->elements[index].item;
+    T *element = &table->items[index].item;
     return(element);
 }
 

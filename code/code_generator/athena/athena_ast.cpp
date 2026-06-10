@@ -211,7 +211,7 @@ generate_nud_prefix_AST(lexer_t *lexer, lexer_token_t *token)
             // NOTE(Sleepster): For macros, this will never happen since the symbol table simply substitues the macro expansion in place. 
             case TOKEN_TYPE_IDENT:
             {
-                AST_expression_value_t *constant = c_hash_table_get_value_ptr(&g_symbol_table.constants_table, token->data);
+                AST_expression_value_t *constant = hash_table_get_element_ptr(&g_symbol_table.constants_table, token->data);
                 if(constant->type != AST_EXPRESSION_VALUE_INVALID)
                 {
                     result = AST_create_new_node(&permanent_arena);
@@ -760,7 +760,7 @@ generate_structure_AST(lexer_t *lexer)
 
         if(struct_ID != INVALID_ID)
         {
-            code_type_t *type = c_hash_table_get_value_ptr_at_index(&g_symbol_table.type_table, struct_ID);
+            code_type_t *type = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, struct_ID);
             if(!type->type_info_AST)
             {
                 type->type_info_AST = structure_root;
@@ -1049,7 +1049,7 @@ generate_enum_AST(lexer_t *lexer)
         enum_root->type.code_type = symbol_table_search_for_code_type(name_token.data);
         if(enum_ID != INVALID_ID)
         {
-            code_type_t *type = c_hash_table_get_value_ptr_at_index(&g_symbol_table.type_table, enum_ID);
+            code_type_t *type = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, enum_ID);
             if(!type->type_info_AST)
             {
                 type->type_info_AST = enum_root;
