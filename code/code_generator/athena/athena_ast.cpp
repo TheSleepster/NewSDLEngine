@@ -151,7 +151,7 @@ get_infix_binding_power(lexer_token_t *token)
 
         case TOKEN_TYPE_FORWARD_SLASH:
         case TOKEN_TYPE_ASTERISK:      {result = 20;}break;
-        default: {result = 0;}break;
+        default:                       {result = 0; }break;
     };
 
     return(result);

@@ -105,44 +105,32 @@ struct code_type_t
     code_type_t *next_overload;
 };
 
-// TODO(Sleepster): We may want to make the macro_data, the type table, and the structure/enum data a GLOBAL table seperate from the symbol_table
-struct symbol_table_t
+struct language_info_t
 {
-    // NOTE(Sleepster): Maps macro declarations to their values... 
-    ticket_mutex_t                       macro_table_mutex;
-    hash_table_t<macro_info_t>           macro_table;
-
-    // NOTE(Sleepster): "sparse" array
-    ticket_mutex_t                       type_table_mutex;
-    hash_table_t<code_type_t>            type_table;
-
-    // NOTE(Sleepster): In case you want to add more keywords besides those added, this is
-    // a get_keyword(token.string)dynamic array.
-    DynArray_t(language_keyword_t)       keywords;
-    DynArray_t(code_type_t*)             primitives;
-
-    ticket_mutex_t                       constant_table_mutex;
-    hash_table_t<AST_expression_value_t> constants_table;
-
-    ticket_mutex_t                       type_table_indices_mutex;
-    DynArray_t(u32)                      valid_type_table_indices;
-
-    ticket_mutex_t                       AST_structures_mutex;
-    DynArray_t(AST_node_t*)              structures;
-
-    ticket_mutex_t                       AST_enums_mutex;
-    DynArray_t(AST_node_t*)              enums;
-
-    ticket_mutex_t                       AST_lambdas_mutex;
-    DynArray_t(AST_node_t*)              lambdas;
+    dynarray_t<language_keyword_t> keywords;
+    dynarray_t<code_type_t>        language_primitive_type;
 };
 
-global_variable symbol_table_t g_symbol_table;
+struct declaration_context_t
+{
+    hash_table_t<code_type_t*> local_types;
+    declaration_context_t     *parent_scope;
+};
 
-internal_api void                 symbol_table_init(void);
-internal_api language_keyword_t  *symbol_table_get_keyword(string_t string);
-internal_api lexer_token_stream_t symbol_table_substitute_macro_arguments(lexer_t *lexer, lexer_token_t last_token, macro_info_t *macro_info);
-internal_api lexer_token_t        symbol_table_get_next_lexer_token(lexer_t *lexer);
+struct parser_t
+{
+    memory_arena_t                       arena;
+    string_t                             filename;
+
+    declaration_context_t                file_scope;
+    lexer_t                              lexer;
+
+    hash_table_t<macro_info_t>           macro_table;
+    hash_table_t<AST_expression_value_t> constants;
+    hash_table_t<code_type_t>            type_table;
+};
+
+global_variable language_info_t g_language_info;
 
 #endif // ATHENA_SYMBOL_TABLE_H
 

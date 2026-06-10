@@ -11,7 +11,11 @@
 #define PROGRAM_FLAG_HANDLER_IMPLEMENTATION
 #define DYNARRAY_IMPLEMENTATION 
 
+// EXPERIMENTAL
 #include "hash_table.h"
+#include "dynarray.h"
+// EXPERIMENTAL
+
 #include <c_file_api.h>
 #include <c_string.h>
 #include <c_program_flag_handler.h>
@@ -444,40 +448,40 @@ DEBUG_print_structure_members(AST_node_t *structure)
 }
 
 internal_api void
-parse_file(string_t filename)
+parse_single_file(string_t filename)
 {
-    string_t file_data = c_file_read_entirety(filename);
+    parser_t file_parser;
+    parser_init(&file_parser, filename); 
 
-    // NOTE(Sleepster): Gather all the macros and all the constexpr in the file...
-    lexer_t lexer = lexer_create(file_data);
-    while(lexer.current_stream->string.count > 0)
+    lexer_t *lexer = &file_parser.lexer;
+    while(lexer->current_stream->string.count > 0)
     {
-        lexer_token_t token = lexer_get_next_token(&lexer);
+        lexer_token_t token = lexer_get_next_token(lexer);
         switch(token.token_type)
         {
             case TOKEN_TYPE_POUND:
             {
-                token = handle_macro_expansion(&lexer, true);
+                token = handle_macro_expansion(lexer, true);
             }break;
             case TOKEN_TYPE_CONSTEXPR:
             {
-                lexer_token_t type_token = lexer_get_next_token(&lexer);
-                lexer_token_t name_token = lexer_peek_token(&lexer);
+                lexer_token_t type_token = lexer_get_next_token(lexer);
+                lexer_token_t name_token = lexer_peek_token(lexer);
 
                 u32 pointer_depth = 0;
                 while(name_token.token_type == TOKEN_TYPE_ASTERISK)
                 {
-                    name_token = lexer_peek_token(&lexer, pointer_depth + 2);
+                    name_token = lexer_peek_token(lexer, pointer_depth + 2);
                     ++pointer_depth;
                 }
 
-                lexer_token_t peek_token = lexer_peek_token(&lexer, pointer_depth + 2);
+                lexer_token_t peek_token = lexer_peek_token(lexer, pointer_depth + 2);
                 bool8 invalid_expression = false;
 
                 AST_node_t *node = null;
                 if(peek_token.token_type == TOKEN_TYPE_EQUALS)
                 {
-                    lexer_token_t initializer_token = lexer_peek_token(&lexer, pointer_depth + 3);
+                    lexer_token_t initializer_token = lexer_peek_token(lexer, pointer_depth + 3);
                     // NOTE(Sleepster): If this is not an initializer list 
                     if(initializer_token.token_type != TOKEN_TYPE_OPEN_BRACE)
                     {
@@ -497,11 +501,11 @@ parse_file(string_t filename)
                             node->type.flags |= AST_TYPE_MODIFIER_FLAG_POINTER;
                         }
 
-                        lexer_get_next_token(&lexer);
-                        lexer_get_next_token(&lexer);
+                        lexer_get_next_token(lexer);
+                        lexer_get_next_token(lexer);
 
                         // TODO(Sleepster): Check to make sure there's actually an ending semicolon 
-                        node->expression.info = generate_expression_AST(&lexer, 0, null);
+                        node->expression.info = generate_expression_AST(lexer, 0, null);
                     }
                     else
                     {
@@ -511,7 +515,7 @@ parse_file(string_t filename)
                 else if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
                 {
                     // NOTE(Sleepster): Lambda, not a constant 
-                    node = generate_lambda_AST(&lexer, type_token, pointer_depth, false);
+                    node = generate_lambda_AST(lexer, type_token, pointer_depth, false);
                     invalid_expression = true;
                 }
 
@@ -525,19 +529,19 @@ parse_file(string_t filename)
     }
 
     // NOTE(Sleepster): Parse the rest of the file using the macros to intercept token streams.
-    lexer_reset_token_stream(lexer.current_stream);
+    lexer_reset_token_stream(lexer->current_stream);
     for(;;)
     {
-        lexer_token_t token = symbol_table_get_next_lexer_token(&lexer);
+        lexer_token_t token = symbol_table_get_next_lexer_token(lexer);
         switch(token.token_type)
         {
             case TOKEN_TYPE_POUND:
             {
-                token = handle_macro_expansion(&lexer, false);
+                token = handle_macro_expansion(lexer, false);
             }break;
             case TOKEN_TYPE_TYPEDEF:
             {
-                AST_node_t *typedef_AST = generate_typedef_AST(&lexer);
+                AST_node_t *typedef_AST = generate_typedef_AST(lexer);
                 if(typedef_AST)
                 {
                     switch(typedef_AST->node_type)
@@ -561,7 +565,7 @@ parse_file(string_t filename)
             case TOKEN_TYPE_UNION:
             case TOKEN_TYPE_CLASS:
             {
-                AST_node_t *structure_AST = generate_structure_AST(&lexer);
+                AST_node_t *structure_AST = generate_structure_AST(lexer);
                 if(structure_AST)
                 {
                     store_structure_AST(structure_AST);
@@ -569,7 +573,7 @@ parse_file(string_t filename)
             }break;
             case TOKEN_TYPE_ENUM:
             {
-                AST_node_t *enum_AST = generate_enum_AST(&lexer);
+                AST_node_t *enum_AST = generate_enum_AST(lexer);
                 if(enum_AST)
                 {
                     store_enum_AST(enum_AST);
@@ -577,7 +581,7 @@ parse_file(string_t filename)
             }break;
             case TOKEN_TYPE_NAMESPACE:
             {
-                //token = symbol_table_get_next_lexer_token(&lexer);
+                //token = symbol_table_get_next_lexer_token(lexer);
                 //push_scope_stack(token.data);
             }break;
             case TOKEN_TYPE_CLOSE_BRACE:
@@ -612,24 +616,24 @@ parse_file(string_t filename)
                 bool8 is_const = false;
                 if(token.token_type == TOKEN_TYPE_CONST)
                 {
-                    token = symbol_table_get_next_lexer_token(&lexer);
+                    token = symbol_table_get_next_lexer_token(lexer);
                     is_const = true;
                 }
 
                 lexer_token_t return_type = token;
-                lexer_token_t name_token  = lexer_peek_token(&lexer);
+                lexer_token_t name_token  = lexer_peek_token(lexer);
 
                 u32 peek_amount = 2;
                 u32 return_type_pointer_depth = 0;
                 while(name_token.token_type == TOKEN_TYPE_ASTERISK)
                 {
-                    name_token = lexer_peek_token(&lexer, peek_amount++);
+                    name_token = lexer_peek_token(lexer, peek_amount++);
                     ++return_type_pointer_depth;
                 }
 
                 if(name_token.token_type == TOKEN_TYPE_IDENT)
                 {
-                    lexer_token_t namespace_peek_token = lexer_peek_token(&lexer, peek_amount);
+                    lexer_token_t namespace_peek_token = lexer_peek_token(lexer, peek_amount);
 
                     bool8 namespaced = false;
                     if(namespace_peek_token.token_type == TOKEN_TYPE_DOUBLE_COLON)
@@ -638,14 +642,14 @@ parse_file(string_t filename)
                         push_scope_stack(name_token.data);
                         namespaced = true;
 
-                        symbol_table_get_next_lexer_token(&lexer);
-                        symbol_table_get_next_lexer_token(&lexer);
+                        symbol_table_get_next_lexer_token(lexer);
+                        symbol_table_get_next_lexer_token(lexer);
                     }
 
-                    lexer_token_t parenthesis_token = lexer_peek_token(&lexer, peek_amount);
+                    lexer_token_t parenthesis_token = lexer_peek_token(lexer, peek_amount);
                     if(parenthesis_token.token_type == TOKEN_TYPE_OPEN_PAREN)
                     {
-                        AST_node_t *lambda = generate_lambda_AST(&lexer, return_type, return_type_pointer_depth, is_const);
+                        AST_node_t *lambda = generate_lambda_AST(lexer, return_type, return_type_pointer_depth, is_const);
 
                         store_lambda_AST(lambda);
                         if(namespaced)
@@ -656,7 +660,7 @@ parse_file(string_t filename)
                 }
                 else
                 {
-                    lexer_eat_lines(&transient_arena, &lexer, 1);
+                    lexer_eat_lines(&transient_arena, lexer, 1);
                 }
             }break;
             case TOKEN_TYPE_EOF:
@@ -687,7 +691,7 @@ VISIT_FILES(generate_project_RTTI)
         return;
     }
 
-    parse_file(filename);
+    parse_single_file(filename);
 }
 
 int
@@ -722,7 +726,7 @@ main(int argc, char **argv)
     if(!(*requested_directory))
     {
         string_t filename = STR(*requested_filename);
-        parse_file(filename);
+        parse_single_file(filename);
     }
     else
     {

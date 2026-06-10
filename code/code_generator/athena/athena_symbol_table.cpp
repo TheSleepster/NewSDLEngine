@@ -97,7 +97,6 @@ symbol_table_init(void)
         ++index)
     {
         string_t type_name = default_primitive_types[index];
-
         u64 type_id = (hash_table_hash_key(type_name) % SYMBOL_TABLE_SIZE);
 
         code_type_t *primitive   = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, type_id);
@@ -398,4 +397,81 @@ get_metatype_string(u32 metatype)
         default: return "null";
 #undef X
     }
+}
+
+// PARSER
+internal_api void
+parser_init(parser_t *parser, string_t filename)
+{
+    ZeroStruct(*parser);
+
+    parser->arena    = c_arena_create(MB(1));
+    parser->filename = c_string_make_copy(&parser->arena, filename);
+
+    string_t file_data  = c_file_read_entirety(parser->filename, &parser->arena);
+    parser->lexer       = lexer_create(file_data);
+
+    parser->macro_table = hash_table_create<macro_info_t>(1024);
+    parser->constants   = hash_table_create<AST_expression_value_t>(1024);
+    parser->type_table  = hash_table_create<code_type_t>(4096);
+}
+
+internal_api void
+initialize_default_language_info(void)
+{
+    string_t default_keyword_strings[] = {
+#define X(string, enum, token_type) STR(string),
+        DEFAULT_KEYWORD_LIST(X)
+#undef X
+    };
+
+    keywords_t default_keyword_enums[] = {
+#define X(string, enum, token_type) enum,
+        DEFAULT_KEYWORD_LIST(X)
+#undef X
+    };
+
+    for(u32 index = 0;
+        index < ArrayCount(default_keyword_strings);
+        ++index)
+    {
+        language_keyword_t keyword = {};
+        keyword.identifier = c_string_make_copy(&permanent_arena, default_keyword_strings[index]);
+        keyword.keyword_id = default_keyword_enums[index];
+
+        dynarray_add(&g_language_info->keywords, keyword);
+    }
+
+    for(u32 index = 0;
+        index < ArrayCount(default_primitive_types);
+        ++index)
+    {
+        string_t type_name = default_primitive_types[index];
+        u64 type_id = (hash_table_hash_key(type_name) % SYMBOL_TABLE_SIZE);
+
+        code_type_t *primitive   = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, type_id);
+        primitive->is_registered = true;
+        primitive->type_inferred = true;
+        primitive->identifier    = c_string_make_copy(&permanent_arena, type_name);
+        primitive->ID            = type_id;
+        primitive->code_metatype = CODE_TYPE_PRIMITIVE;
+        
+        dynarray_add(&g_language_info->language_primitive_types, primitive);
+    }
+}
+
+internal_api language_keyword_t*
+parser_get_keyword(parser_t *parser, string_t identifier)
+{
+    language_keyword_t *result = null;
+    for(const auto &keyword : g_language_info->keywords)
+    {
+        if(c_string_compare(keyword->identifier, identifier))
+        {
+            result = keyword;
+            break;
+        }
+    }
+
+    return(result);
 }
