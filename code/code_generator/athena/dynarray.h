@@ -68,6 +68,13 @@ struct array_t
 
     T  &operator[](u32 index);
     T *operator+(u32 index);
+
+    // NOTE(Sleepster): Stupid C++ stuff 
+    T *begin() { return items; }
+    T *end()   { return items + capacity; }
+
+    const T *begin() const { return items; }
+    const T *end()   const { return items + capacity; }
 };
 
 template <typename T>
@@ -132,6 +139,13 @@ struct dynarray_t
 
     T &operator[](u32 index);
     T *operator+(u32 index);
+
+    // NOTE(Sleepster): Stupid C++ crap 
+    T *begin() { return items; }
+    T *end()   { return items + used; }
+
+    const T *begin() const { return items; }
+    const T *end()   const { return items + used; }
 };
 
 template <typename T>

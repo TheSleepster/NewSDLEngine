@@ -35,10 +35,7 @@
 #include "athena_lexer.h"
 
 /* TODO:
- * - [X] No default definition of types like NULL or nullptr
- * - [X] Function overloading. (Right now, function overloading is automatically handled.)
- * - [X] Constexpr values are not parsed
- * - [X] Constructors and deconstructors handled
+ * - [ ] PURGE THE THREAD ARENAS
  * - [ ] When we find an identifier in the place of an expected number, we should try to find the enum value as well..
  * - [ ] #if statments that use macros or constexpr values are invalid. Thus crash the program.
  * - [ ] No way of printing the namespace string such as "Namespace is: 'Structure::'...\n"
@@ -55,6 +52,10 @@
  *      #endif
  *
  *      Break that macro parser.
+ * - [X] No default definition of types like NULL or nullptr
+ * - [X] Function overloading. (Right now, function overloading is automatically handled.)
+ * - [X] Constexpr values are not parsed
+ * - [X] Constructors and deconstructors handled
  */
 
 internal_api void
@@ -87,6 +88,7 @@ struct scope_stack_t
     u64             active_scope_ID;
 };
 
+// TODO(Sleepster): Purge these
 thread_static memory_arena_t permanent_arena;
 thread_static memory_arena_t transient_arena;
 thread_static scope_stack_t  thread_scope_stack;
@@ -136,8 +138,10 @@ type_id_from_identifier(string_t string, u64 modular)
 #include "athena_ast.cpp"
 
 internal_api void
-parse_macro_info(lexer_t *lexer, macro_info_t *macro_info, lexer_token_t name_token)
+parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_token)
 {
+    lexer_t *lexer = &parser->lexer;
+
     macro_info->name      = c_string_make_copy(&permanent_arena, name_token.data);
     macro_info->name_hash = ((hash_table_hash_key(name_token.data)) % SYMBOL_TABLE_SIZE);
 
@@ -148,7 +152,7 @@ parse_macro_info(lexer_t *lexer, macro_info_t *macro_info, lexer_token_t name_to
     // NOTE(Sleepster): If the macro takes arguments 
     lexer_token_t token = lexer_get_next_token(lexer);
 
-    language_keyword_t *keyword = symbol_table_get_keyword(token.data);
+    language_keyword_t *keyword = get_keyword_from_identifier(token.data);
     if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
     {
         language_keyword_t new_keyword = {};
@@ -186,7 +190,7 @@ parse_macro_info(lexer_t *lexer, macro_info_t *macro_info, lexer_token_t name_to
                 macro_info->arguments = c_arena_push_array(&permanent_arena, string_t, macro_info->argument_count);
                 while(token.token_type != TOKEN_TYPE_CLOSE_PAREN)
                 {
-                    token = lexer_get_next_token(lexer);
+                   token = lexer_get_next_token(lexer);
                     if(token.token_type == TOKEN_TYPE_IDENT)
                     {
                         lexer_token_t peek_token = lexer_peek_token(lexer);
@@ -260,39 +264,40 @@ parse_macro_info(lexer_t *lexer, macro_info_t *macro_info, lexer_token_t name_to
 }
 
 internal_api lexer_token_t
-handle_macro_expansion(lexer_t *lexer, bool8 record_macro)
+handle_macro_expansion(parser_t *parser, bool8 record_macro)
 {
+    lexer_t *lexer = &parser->lexer;
+
     lexer_token_t token = lexer_get_next_token(lexer);
     if(c_string_compare(token.data, STR("define")))
     {
         if(record_macro)
         {
             lexer_token_t name_token = lexer_get_next_token(lexer);
-            TicketMutexScope(&g_symbol_table.macro_table_mutex)
-            {
-                macro_info_t *macro_info = hash_table_get_element_ptr(&g_symbol_table.macro_table, name_token.data);
-                if(!macro_info->is_set)
-                {
-                    parse_macro_info(lexer, macro_info, name_token);
-                    printf("========== MACRO DEFINITION ========\n");
-                    printf("Macro: '%.*s'...\n", fprint_string(macro_info->name));
-                    printf("Expansion: '%.*s'...\n", fprint_string(macro_info->expansion_string));
-                    printf("Argument Count: '%d'...\n", macro_info->argument_count);
-                    for(u32 index = 0;
-                        index < macro_info->argument_count;
-                        ++index)
-                    {
-                        printf("\tArgument: '%.*s'...\n", fprint_string(macro_info->arguments[index]));
-                    }
-                    printf("====================================\n");
 
-                    language_keyword_t *keyword = symbol_table_get_keyword(macro_info->expansion_string);
-                    if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
-                    {
-                        c_dynarray_push(g_symbol_table.keywords, token.data);
-                        printf("Found token: '%.*s' which is a #define'd alias for the language keyword: '%.*s'...\n",
-                               fprint_string(macro_info->name), fprint_string(keyword->identifier));
-                    }
+            //macro_info_t *macro_info = hash_table_get_element_ptr(&g_symbol_table.macro_table, name_token.data);
+            macro_info_t *macro_info = hash_table_get_element_ptr(&parser->macro_table, name_token.data);
+            if(!macro_info->is_set)
+            {
+                parse_macro_info(lexer, macro_info, name_token);
+                printf("========== MACRO DEFINITION ========\n");
+                printf("Macro: '%.*s'...\n", fprint_string(macro_info->name));
+                printf("Expansion: '%.*s'...\n", fprint_string(macro_info->expansion_string));
+                printf("Argument Count: '%d'...\n", macro_info->argument_count);
+                for(u32 index = 0;
+                    index < macro_info->argument_count;
+                    ++index)
+                {
+                    printf("\tArgument: '%.*s'...\n", fprint_string(macro_info->arguments[index]));
+                }
+                printf("====================================\n");
+
+                language_keyword_t *keyword = symbol_table_get_keyword(macro_info->expansion_string);
+                if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
+                {
+                    c_dynarray_push(g_symbol_table.keywords, token.data);
+                    printf("Found token: '%.*s' which is a #define'd alias for the language keyword: '%.*s'...\n",
+                           fprint_string(macro_info->name), fprint_string(keyword->identifier));
                 }
             }
         }

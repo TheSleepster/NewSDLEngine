@@ -278,11 +278,14 @@ symbol_table_infer_type(AST_node_t *node_data)
     }
 }
 
+#endif
+
 internal_api lexer_token_stream_t 
-symbol_table_substitute_macro_arguments(lexer_t *lexer, lexer_token_t last_token, macro_info_t *macro_info)
+parser_substitute_macro_arguments(parser_t *parser, lexer_token_t last_token, macro_info_t *macro_info)
 {
     lexer_token_stream_t result = {};
 
+    lexer_t *lexer = &parser->lexer;
     // NOTE(Sleepster): This right now is completely wrong.
     // Firstly, this function should just not be getting called when it is.
     // Secondly, this function should operate on TWO streams at the same time, eating from both and replacing the saved macro's arguments
@@ -358,50 +361,6 @@ symbol_table_substitute_macro_arguments(lexer_t *lexer, lexer_token_t last_token
     return(result);
 }
 
-internal_api lexer_token_t
-symbol_table_get_next_lexer_token(lexer_t *lexer)
-{
-    lexer_token_t result;
-    result = lexer_get_next_token(lexer);
-    if(result.token_type == TOKEN_TYPE_EOF)
-    {
-        lexer_pop_token_stream(lexer, false);
-        result = lexer_get_next_token(lexer);
-    }
-
-    macro_info_t *macro = null;
-    TicketMutexScope(&g_symbol_table.macro_table_mutex)
-    {
-        macro = hash_table_get_element_ptr(&g_symbol_table.macro_table, result.data);
-        if(macro->is_set)
-        {
-            lexer_token_stream_t macro_stream = symbol_table_substitute_macro_arguments(lexer, result, macro);
-            lexer_push_token_stream(lexer, &macro_stream);
-
-            result = lexer_get_next_token(lexer);
-            if(lexer->current_stream->string.count == 0)
-            {
-                lexer_pop_token_stream(lexer, false);
-            }
-        }
-    }
-    
-    return(result);
-}
-
-internal_api char *
-get_metatype_string(u32 metatype)
-{
-    switch(metatype)
-    {
-#define X(enum, string) case enum: return string; break;
-        CODE_TYPE_METATYPE_LIST(X)
-        default: return "null";
-#undef X
-    }
-}
-
-#endif
 
 // PARSER
 internal_api void
@@ -415,9 +374,9 @@ parser_init(parser_t *parser, string_t filename)
     string_t file_data  = c_file_read_entirety(parser->filename, &parser->arena);
     parser->lexer       = lexer_create(file_data);
 
-    parser->macro_table = hash_table_create<macro_info_t>(1024);
-    parser->constants   = hash_table_create<AST_expression_value_t>(1024);
-    parser->type_table  = hash_table_create<code_type_t>(4096);
+    parser->macro_table     = hash_table_create<macro_info_t>(1024);
+    parser->constants_table = hash_table_create<AST_expression_value_t>(1024);
+    parser->type_table      = hash_table_create<code_type_t>(4096);
 }
 
 internal_api void
@@ -461,12 +420,13 @@ initialize_default_language_info(void)
         string_t type_name = default_primitive_types[index];
         u64 type_id = (hash_table_hash_key(type_name) % SYMBOL_TABLE_SIZE);
 
-        code_type_t *primitive   = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, type_id);
-        primitive->is_registered = true;
-        primitive->type_inferred = true;
-        primitive->identifier    = c_string_make_copy(&permanent_arena, type_name);
-        primitive->ID            = type_id;
-        primitive->code_metatype = CODE_TYPE_PRIMITIVE;
+        //code_type_t primitive    = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, type_id);
+        code_type_t primitive   = {};
+        primitive.is_registered = true;
+        primitive.type_inferred = true;
+        primitive.identifier    = c_string_make_copy(&permanent_arena, type_name);
+        primitive.ID            = type_id;
+        primitive.code_metatype = CODE_TYPE_PRIMITIVE;
         
         dynarray_add(&g_language_info.language_primitive_types, primitive);
     }
@@ -476,14 +436,86 @@ internal_api language_keyword_t*
 get_keyword_from_identifier(string_t identifier)
 {
     language_keyword_t *result = null;
-    for(const auto &keyword : g_language_info.keywords)
+    for(auto &keyword: g_language_info.keywords)
     {
-        if(c_string_compare(keyword->identifier, identifier))
+        if(c_string_compare(keyword.identifier, identifier))
         {
-            result = keyword;
+            result = &keyword;
             break;
         }
     }
 
     return(result);
+}
+
+internal_api lexer_token_t
+parser_get_next_lexer_token(parser_t *parser)
+{
+    lexer_t *lexer = &parser->lexer;
+
+    lexer_token_t result;
+    result = lexer_get_next_token(lexer);
+    if(result.token_type == TOKEN_TYPE_EOF)
+    {
+        lexer_pop_token_stream(lexer, false);
+        result = lexer_get_next_token(lexer);
+    }
+
+    // macro_info_t *macro = hash_table_get_element_ptr(&g_symbol_table.macro_table, result.data);
+    macro_info_t *macro = hash_table_get_element_ptr(&parser->macro_table, result.data);
+    if(macro->is_set)
+    {
+        lexer_token_stream_t macro_stream = parser_substitute_macro_arguments(parser, result, macro);
+        lexer_push_token_stream(lexer, &macro_stream);
+
+        result = lexer_get_next_token(lexer);
+        if(lexer->current_stream->string.count == 0)
+        {
+            lexer_pop_token_stream(lexer, false);
+        }
+    }
+    
+    return(result);
+}
+
+internal_api char *
+get_metatype_string(u32 metatype)
+{
+    switch(metatype)
+    {
+#define X(enum, string) case enum: return string; break;
+        CODE_TYPE_METATYPE_LIST(X)
+        default: return "null";
+#undef X
+    }
+}
+
+// search for code_type
+// * We must also be able to search within the current scope.
+internal_api code_type_t*
+parser_search_for_code_type(parser_t *parser, string_t identifier)
+{
+    code_type_t *result = null;
+    return(result);
+}
+
+internal_api code_type_t*
+find_type_within_declaration_context(declaration_context_t *context, string_t identifier)
+{
+    code_type_t *result = null;
+    return(result);
+}
+
+// register code_type
+internal_api code_type_t* 
+parser_register_code_type_identifier(parser_t *parser, string_t identifier)
+{
+    code_type_t *result = null;
+    return(result);
+}
+
+// infer code_type
+internal_api void
+parser_infer_type(parser_t *parser)
+{
 }

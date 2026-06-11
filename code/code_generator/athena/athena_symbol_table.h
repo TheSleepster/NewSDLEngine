@@ -126,7 +126,7 @@ struct parser_t
     lexer_t                              lexer;
 
     hash_table_t<macro_info_t>           macro_table;
-    hash_table_t<AST_expression_value_t> constants;
+    hash_table_t<AST_expression_value_t> constants_table;
     hash_table_t<code_type_t>            type_table;
 };
 
