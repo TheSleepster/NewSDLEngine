@@ -9,6 +9,7 @@
 #define DYNARRAY_H
 #include <c_base.h>
 #include <c_types.h>
+#include <c_math.h>
 #include <c_string.h>
 
 /////////////////////////
@@ -176,16 +177,20 @@ dynarray_reserve(dynarray_t<T> *array, u32 to_reserve)
 }
 
 template <typename T>
-void
-dynarray_add(dynarray_t<T> *array, T element)
+T*
+dynarray_add(dynarray_t<T> *array, T *element)
 {
+    T *result = null;
     if((array->used + 1) > array->capacity)
     {
         array->capacity = Max(8, array->capacity * 2);
         array->items = (T*)reallocarray(array->items, sizeof(T), array->capacity);
     }
 
-    array->items[array->used++] = element;
+    result = array->items + array->used; 
+    array->items[array->used++] = *element;
+
+    return(result);
 }
 
 template <typename T>
@@ -211,7 +216,6 @@ dynarray_pop(dynarray_t<T> *array)
     Assert(array->used - 1 >= 0);
 
     T result = array->items[array->used];
-    array->items[array->used] = {}; 
     --array->used;
 
     return(result);
@@ -224,23 +228,22 @@ dynarray_pop_ptr(dynarray_t<T> *array)
     Assert(array->used - 1 >= 0);
 
     T *result = array->items + array->used;
-    array->items[array->used] = {}; 
     --array->used;
 
     return(result);
 }
 
 template <typename T>
-u32
+s32
 dynarray_find(dynarray_t<T> *array, T *element)
 {
-    u32 result = 0;
+    s32 result = -1;
     for(u32 index = 0;
         index < array->used;
         ++index)
     {
-        T *found = array + index;
-        if(*found == *element)
+        T *found = array->items + index;
+        if(memcmp(found, element, sizeof(T)) == 0)
         {
             result = index;
             break;
@@ -251,10 +254,47 @@ dynarray_find(dynarray_t<T> *array, T *element)
 }
 
 template <typename T>
+bool8
+dynarray_add_if_unique(dynarray_t<T> *array, T *element, s32 *index_out = null)
+{
+    bool8 added = false;
+
+    s32 index = dynarray_find(array, element);
+    if(index == -1)
+    {
+        dynarray_add(array, element);
+        if(index_out)
+        {
+            *index_out = array->used - 1;
+        }
+
+        added = true;
+    }
+
+    return(added);
+}
+
+template <typename T>
 void
 dynarray_insert_at(dynarray_t<T> *array, T *element, u32 index)
 {
     array->items[index] = *element;
+}
+
+template <typename T>
+T
+dynarray_get_at_index(dynarray_t<T> *array, u32 index)
+{
+    T result = array->items[index];
+    return(result);
+}
+
+template <typename T>
+T*
+dynarray_get_ptr_at_index(dynarray_t<T> *array, u32 index)
+{
+    T* result = array->items + index;
+    return(result);
 }
 
 template <typename T>

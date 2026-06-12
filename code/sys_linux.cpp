@@ -498,6 +498,48 @@ sys_directory_exists(string_t filepath)
     return(result);
 }
 
+s32
+sys_directory_get_file_count(string_t filepath, bool8 recursive)
+{
+    s32 result = -1;
+    
+    DIR *directory = opendir(C_STR(filepath));
+    if(directory)
+    {
+        result = 0;
+        
+        struct dirent *file_entry = readdir(directory);
+        while(file_entry) 
+        {
+            if(file_entry->d_type == DT_REG)
+            {
+                ++result;
+            }
+
+            if(file_entry->d_type == DT_DIR && recursive)
+            {
+                if (strcmp(file_entry->d_name, ".") == 0 || strcmp(file_entry->d_name, "..") == 0) 
+                {
+                    continue;
+                }
+
+                char subdirectory[1024];
+                snprintf(subdirectory, sizeof(subdirectory), "%s/%s", C_STR(filepath), file_entry->d_name);
+
+                result += sys_directory_get_file_count(filepath, recursive);
+            }
+
+            file_entry = readdir(directory);
+        };
+    }
+    else
+    {
+        log_error("Could not open a directory by name of: %s... make sure the string you pass is null-terminated...\n", filepath.data);
+    }
+
+    return(result);
+}
+
 void
 sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 {

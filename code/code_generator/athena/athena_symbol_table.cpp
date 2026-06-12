@@ -7,46 +7,6 @@
 #include "athena_symbol_table.h"
 
 #if 0
-
-internal_api void
-store_structure_AST(AST_node_t *node)
-{
-    Expect(node->node_type == AST_NODE_TYPE_STRUCTURE, 
-           "Attempted to store an AST_node_t in the AST_Node structures table... However, the AST_node_t was not of type AST_NODE_TYPE_STRUCTURE and was instead: '%.*s'...\n",
-           print_AST_node_type(node->node_type));
-
-    TicketMutexScope(&g_symbol_table.AST_structures_mutex)
-    {
-        c_dynarray_push(g_symbol_table.structures, node);
-    }
-}
-
-internal_api void
-store_enum_AST(AST_node_t *node)
-{
-    Expect(node->node_type == AST_NODE_TYPE_ENUM, 
-           "Attempted to store an AST_node_t in the AST_Node enums table... However, the AST_node_t was not of type AST_NODE_TYPE_ENUM and was instead: '%.*s'...\n",
-           print_AST_node_type(node->node_type));
-
-    TicketMutexScope(&g_symbol_table.AST_enums_mutex)
-    {
-        c_dynarray_push(g_symbol_table.enums, node);
-    }
-}
-
-internal_api void
-store_lambda_AST(AST_node_t *node)
-{
-    Expect(node->node_type == AST_NODE_TYPE_LAMBDA, 
-           "Attempted to store an AST_node_t in the AST_Node lambdas table... However, the AST_node_t was not of type AST_NODE_TYPE_LAMBDA and was instead: '%.*s'...\n",
-           print_AST_node_type(node->node_type));
-
-    TicketMutexScope(&g_symbol_table.AST_lambdas_mutex)
-    {
-        c_dynarray_push(g_symbol_table.lambdas, node);
-    }
-}
-
 internal_api void
 symbol_table_init(void)
 {
@@ -340,7 +300,7 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t last_token, ma
                 lexer_token_t check_token = lexer_peek_token(lexer, 1);
                 if(check_token.token_type != TOKEN_TYPE_COMMA && check_token.token_type != TOKEN_TYPE_CLOSE_PAREN)
                 {
-                    report_error(lexer,
+                    report_error(parser,
                                  "Invalid token when parsing the end of this macro invocation's argument string... token found was: '%.*s'...\n",
                                  fprint_token(check_token));
                 }
@@ -361,12 +321,40 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t last_token, ma
     return(result);
 }
 
+// NOTE(Sleepster): SYMBOL TABLE
+
+internal_api void
+symbol_table_init(string_t filepath, bool8 recursive)
+{
+    table->file_count   = sys_directory_get_file_count(filepath, recursive);
+    table->file_parsers = c_arena_push_array(&permanent_arena, parser_t, table->file_count); 
+
+    table->defined_global_macro_table = hash_table_create<macro_info_t>(1024);
+    table->defined_global_constants   = hash_table_create<AST_node_t *>(1024);
+
+    table->is_initialized = true;
+}
 
 // PARSER
-internal_api void
-parser_init(parser_t *parser, string_t filename)
+internal_api declaration_context_t*
+parser_create_declaration_context(parser_t *parser, declaration_context_t *parent)
 {
-    ZeroStruct(*parser);
+    declaration_context_t *result = null;
+
+    declaration_context_t  new_context = {};
+    new_context.local_types  = hash_table_create<code_type_t>(512);
+    new_context.parent_scope = parent;
+
+    result = dynarray_add(&parser->recorded_decl_contexts, &new_context);
+
+    return(result);
+}
+
+internal_api parser_t* 
+parser_create(string_t filename)
+{
+    u32 parser_index = AtomicIncrement32(&g_symbol_table.next_parser_index);
+    parser_t *parser = g_symbol_table.file_parsers + parser_index;
 
     parser->arena    = c_arena_create(MB(1));
     parser->filename = c_string_make_copy(&parser->arena, filename);
@@ -376,7 +364,48 @@ parser_init(parser_t *parser, string_t filename)
 
     parser->macro_table     = hash_table_create<macro_info_t>(1024);
     parser->constants_table = hash_table_create<AST_expression_value_t>(1024);
-    parser->type_table      = hash_table_create<code_type_t>(4096);
+
+    declaration_context_t *global_scope = parser_create_declaration_context(parser, null);
+    Expect(g_language_info.language_primitive_types.items != null,
+           "Cannot initialize the parser without primtive type information... Make sure you call initialize_default_language_info() before you call this function!\n");
+
+    // NOTE(Sleepster): Maybe this doesn't do what we think it does... references are weird.
+    for(auto &primitive: g_language_info.language_primitive_types)
+    {
+        hash_table_add_element(&global_scope->local_types, 
+                               primitive, 
+                               primitive.identifier);
+    }
+        
+    dynarray_add(&parser->decl_context_stack,     global_scope);
+    dynarray_add(&parser->recorded_decl_contexts, global_scope);
+
+    parser->active_decl_context = parser->decl_context_stack.items;
+
+    return(parser);
+}
+
+internal_api void
+parser_push_decl_context(parser_t *parser, declaration_context_t *context)
+{
+    dynarray_add(&parser->decl_context_stack, context);
+    dynarray_add_if_unique(&parser->recorded_decl_contexts, context);
+
+    parser->active_decl_context = dynarray_get_ptr_at_index(&parser->decl_context_stack, parser->decl_context_stack.used - 1);
+}
+
+internal_api void
+parser_pop_decl_context(parser_t *parser)
+{
+    if(parser->decl_context_stack.used - 1 <= 0)
+    {
+        report_error(parser,
+                     "We attempted to pop the decl_context stack on the parser for file: '%.*s' however this would pop the top level file context as well... This should not happen as the file context must constantly be at index 1...\n",
+                     fprint_string(parser->filename));
+    }
+
+    dynarray_pop(&parser->decl_context_stack);
+    parser->active_decl_context = dynarray_get_ptr_at_index(&parser->decl_context_stack, parser->decl_context_stack.used);
 }
 
 internal_api void
@@ -403,7 +432,7 @@ initialize_default_language_info(void)
         keyword.identifier = c_string_make_copy(&permanent_arena, default_keyword_strings[index]);
         keyword.keyword_id = default_keyword_enums[index];
 
-        dynarray_add(&g_language_info.keywords, keyword);
+        dynarray_add(&g_language_info.keywords, &keyword);
     }
 
     // NOTE(Sleepster): Primitives 
@@ -418,7 +447,7 @@ initialize_default_language_info(void)
         ++index)
     {
         string_t type_name = default_primitive_types[index];
-        u64 type_id = (hash_table_hash_key(type_name) % SYMBOL_TABLE_SIZE);
+        u64 type_id = hash_table_hash_key(type_name);
 
         //code_type_t primitive    = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, type_id);
         code_type_t primitive   = {};
@@ -428,7 +457,7 @@ initialize_default_language_info(void)
         primitive.ID            = type_id;
         primitive.code_metatype = CODE_TYPE_PRIMITIVE;
         
-        dynarray_add(&g_language_info.language_primitive_types, primitive);
+        dynarray_add(&g_language_info.language_primitive_types, &primitive);
     }
 }
 
@@ -443,6 +472,13 @@ get_keyword_from_identifier(string_t identifier)
             result = &keyword;
             break;
         }
+    }
+
+    if(result == null)
+    {
+        // NOTE(Sleepster): First element should be invalid 
+        result = g_language_info.keywords.items;
+        Expect(result->keyword_id == TOKEN_KEYWORD_INVALID, "Default keyword is not invalid... this is fatal...\n");
     }
 
     return(result);
@@ -496,21 +532,45 @@ internal_api code_type_t*
 parser_search_for_code_type(parser_t *parser, string_t identifier)
 {
     code_type_t *result = null;
+    for(u32 index = parser->decl_context_stack.used - 1;
+        index > 0;
+        --index)
+    {
+        declaration_context_t *decl_context = dynarray_get_ptr_at_index(&parser->decl_context_stack, index);
+        code_type_t *found = hash_table_get_element_ptr(&decl_context->local_types, identifier);
+        if(found && found->is_registered)
+        {
+            result = found;
+            break;
+        }
+    }
+
     return(result);
 }
 
+#if 0
 internal_api code_type_t*
-find_type_within_declaration_context(declaration_context_t *context, string_t identifier)
+is_type_within_declaration_context(declaration_context_t *context, string_t identifier)
 {
     code_type_t *result = null;
     return(result);
 }
+#endif
 
 // register code_type
 internal_api code_type_t* 
-parser_register_code_type_identifier(parser_t *parser, string_t identifier)
+parser_register_code_type_identifier(parser_t *parser, string_t identifier, u64 alias_id = -1)
 {
-    code_type_t *result = null;
+    code_type_t *result = parser_search_for_code_type(parser, identifier);
+    if(!result)
+    {
+        result = hash_table_get_element_ptr(&parser->active_decl_context->local_types, identifier);
+
+        result->identifier    = c_string_make_copy(&parser->arena, identifier);
+        result->alias_of      = alias_id;
+        result->is_registered = true;
+    }
+
     return(result);
 }
 

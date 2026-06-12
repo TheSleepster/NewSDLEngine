@@ -9,25 +9,28 @@
 #define ATHENA_AST_H
 struct AST_node_t;
 struct code_type_t;
+struct parser_t;
 
 internal_api AST_node_t* 
-generate_lambda_AST(lexer_t      *lexer, 
+generate_lambda_AST(parser_t     *parser, 
                     lexer_token_t return_type_token, 
                     u32           return_type_pointer_depth, 
                     bool8         return_type_is_const);
 
-#define AST_TYPE_MODIFIER_FLAGS(X)                                                   \
-    X(AST_TYPE_MODIFIER_FLAG_NONE,      "AST_TYPE_MODIFIER_FLAG_NONE",      BIT(0))  \
-    X(AST_TYPE_MODIFIER_FLAG_POINTER,   "AST_TYPE_MODIFIER_FLAG_POINTER",   BIT(1))  \
-    X(AST_TYPE_MODIFIER_FLAG_VOLATILE,  "AST_TYPE_MODIFIER_FLAG_VOLATILE",  BIT(2))  \
-    X(AST_TYPE_MODIFIER_FLAG_CONST,     "AST_TYPE_MODIFIER_FLAG_CONST",     BIT(3))  \
-    X(AST_TYPE_MODIFIER_FLAG_STATIC,    "AST_TYPE_MODIFIER_FLAG_STATIC",    BIT(4))  \
-    X(AST_TYPE_MODIFIER_FLAG_INLINE,    "AST_TYPE_MODIFIER_FLAG_INLINE",    BIT(5))  \
-    X(AST_TYPE_MODIFIER_FLAG_ARRAY,     "AST_TYPE_MODIFIER_FLAG_ARRAY",     BIT(6))  \
-    X(AST_TYPE_MODIFIER_FLAG_SIGNED,    "AST_TYPE_MODIFIER_FLAG_SIGNED",    BIT(7))  \
-    X(AST_TYPE_MODIFIER_FLAG_FLOAT,     "AST_TYPE_MODIFIER_FLAG_FLOAT",     BIT(8))  \
-    X(AST_TYPE_MODIFIER_FLAG_PROCEDURE, "AST_TYPE_MODIFIER_FLAG_PROCEDURE", BIT(9))  \
-    X(AST_TYPE_MODIFIER_FLAG_ANONYMOUS, "AST_TYPE_MODIFIER_FLAG_ANONYMOUS", BIT(10)) \
+#define AST_TYPE_MODIFIER_FLAGS(X)                                                     \
+    X(AST_TYPE_MODIFIER_FLAG_NONE,        "AST_TYPE_MODIFIER_FLAG_NONE",      BIT(0))  \
+    X(AST_TYPE_MODIFIER_FLAG_POINTER,     "AST_TYPE_MODIFIER_FLAG_POINTER",   BIT(1))  \
+    X(AST_TYPE_MODIFIER_FLAG_VOLATILE,    "AST_TYPE_MODIFIER_FLAG_VOLATILE",  BIT(2))  \
+    X(AST_TYPE_MODIFIER_FLAG_CONST,       "AST_TYPE_MODIFIER_FLAG_CONST",     BIT(3))  \
+    X(AST_TYPE_MODIFIER_FLAG_STATIC,      "AST_TYPE_MODIFIER_FLAG_STATIC",    BIT(4))  \
+    X(AST_TYPE_MODIFIER_FLAG_INLINE,      "AST_TYPE_MODIFIER_FLAG_INLINE",    BIT(5))  \
+    X(AST_TYPE_MODIFIER_FLAG_ARRAY,       "AST_TYPE_MODIFIER_FLAG_ARRAY",     BIT(6))  \
+    X(AST_TYPE_MODIFIER_FLAG_SIGNED,      "AST_TYPE_MODIFIER_FLAG_SIGNED",    BIT(7))  \
+    X(AST_TYPE_MODIFIER_FLAG_FLOAT,       "AST_TYPE_MODIFIER_FLAG_FLOAT",     BIT(8))  \
+    X(AST_TYPE_MODIFIER_FLAG_DOUBLE_FLOAT,"AST_TYPE_MODIFIER_FLAG_FLOAT",     BIT(9))  \
+    X(AST_TYPE_MODIFIER_FLAG_PROCEDURE,   "AST_TYPE_MODIFIER_FLAG_PROCEDURE", BIT(10)) \
+    X(AST_TYPE_MODIFIER_FLAG_ANONYMOUS,   "AST_TYPE_MODIFIER_FLAG_ANONYMOUS", BIT(11)) \
+    X(AST_TYPE_MODIFIER_FLAG_UNION,       "AST_TYPE_MODIFIER_FLAG_UNION",     BIT(12)) \
 
 enum AST_type_flags_t 
 {
@@ -134,11 +137,12 @@ struct AST_expression_value_t
 
 struct AST_node_t 
 {
-    u32         node_type;
-    string_t    identifier;
+    u32                    node_type;
+    string_t               identifier;
 
-    AST_type_t  type;
-    AST_node_t *next_sibling;
+    AST_type_t             type;
+    AST_node_t            *next_sibling;
+    //declaration_context_t *decl_context;
     union {
         // NOTE(Sleepster): For structures or enums... 
         struct {

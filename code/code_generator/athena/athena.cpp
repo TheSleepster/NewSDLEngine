@@ -58,9 +58,15 @@
  * - [X] Constructors and deconstructors handled
  */
 
+// ATHENA FILES
+#include "athena_lexer.h"
+#include "athena_ast.h"
+#include "athena_symbol_table.h"
+
 internal_api void
-report_error(lexer_t *lexer, char *message, ...)
+report_error(parser_t *parser, char *message, ...)
 {
+    lexer_t *lexer = &parser->lexer;
     char buffer[8096] = {};
 
     va_list arg_ptr;
@@ -68,8 +74,12 @@ report_error(lexer_t *lexer, char *message, ...)
     int length = vsnprintf(buffer, sizeof(buffer), message, arg_ptr);
     va_end(arg_ptr);
 
-    // TODO(Sleepster): Filename? 
-    fprintf(stderr, "\033[31m[Athena Error] Line: '%d': %.*s\033[0m\n", lexer->current_stream->line_number + 1, length, buffer);
+    fprintf(stderr, "\033[31m[Athena Error] [File]: '%.*s', Line: '%d': %.*s\033[0m\n", 
+            fprint_string(parser->filename), 
+            lexer->current_stream->line_number + 1, 
+            length, 
+            buffer);
+
     fprintf(stderr, "error reported... exiting...\n");
 #if 0
     exit(-1);
@@ -78,57 +88,22 @@ report_error(lexer_t *lexer, char *message, ...)
 #endif
 }
 
-#define SYMBOL_TABLE_SIZE (4096)
-
-struct scope_stack_t
-{
-    DynArray_t(u64) current_stack;
-    s32             current_stack_depth;
-
-    u64             active_scope_ID;
-};
-
 // TODO(Sleepster): Purge these
 thread_static memory_arena_t permanent_arena;
 thread_static memory_arena_t transient_arena;
-thread_static scope_stack_t  thread_scope_stack;
-
-internal_api void
-push_scope_stack(string_t scope)
-{
-    u64 scope_ID = hash_table_hash_key(scope);
-
-    c_dynarray_push(thread_scope_stack.current_stack, scope_ID);
-    ++thread_scope_stack.current_stack_depth;
-}
-
-internal_api void
-pop_scope_stack(void)
-{
-    Assert(thread_scope_stack.current_stack_depth >= 0);
-
-    c_dynarray_pop(thread_scope_stack.current_stack);
-    --thread_scope_stack.current_stack_depth;
-}
-
-// ATHENA FILES
-#include "athena_lexer.h"
-#include "athena_ast.h"
-#include "athena_symbol_table.h"
 
 struct AST_node_t;
 
-internal_api inline u64   type_id_from_identifier(string_t string, u64 modular = SYMBOL_TABLE_SIZE);
+internal_api inline u64   type_id_from_identifier(string_t string);
 internal_api code_type_t* symbol_table_register_typename(string_t type_name, u32 expected_metatype, u64 alias_id = INVALID_ID);
 
 internal_api inline u64
-type_id_from_identifier(string_t string, u64 modular)
+type_id_from_identifier(string_t string)
 {
     u64 result = 0;
     Expect(string.count > 0, "String passed to 'type_id_from_identifier()' was of size 0...\n");
 
     result = hash_table_hash_key(string);
-    if(modular > 0) result %= modular;
 
     return(result);
 }
@@ -143,7 +118,7 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
     lexer_t *lexer = &parser->lexer;
 
     macro_info->name      = c_string_make_copy(&permanent_arena, name_token.data);
-    macro_info->name_hash = ((hash_table_hash_key(name_token.data)) % SYMBOL_TABLE_SIZE);
+    macro_info->name_hash = ((hash_table_hash_key(name_token.data)) % parser->macro_table.max_entries);
 
     string_builder_t temp_builder;
     c_string_builder_init(&temp_builder, MB(10));
@@ -158,7 +133,8 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
         language_keyword_t new_keyword = {};
         new_keyword.identifier = macro_info->name;
         new_keyword.keyword_id = keyword->keyword_id;
-        c_dynarray_push(g_symbol_table.keywords, new_keyword);
+
+        dynarray_add(&g_language_info.keywords, &new_keyword);
     }
 
     if(token.token_type == TOKEN_TYPE_OPEN_PAREN)
@@ -243,7 +219,7 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
     lexer_reset_token_stream(lexer->current_stream);
     if(token_count <= 0)
     {
-        report_error(lexer, "Somehow when parsing the token stream for the macro: '%.*s', token_count was 0...\n", fprint_token(name_token));
+        report_error(parser, "Somehow when parsing the token stream for the macro: '%.*s', token_count was 0...\n", fprint_token(name_token));
     }
 
     macro_info->expansion_token_stream.token_buffer         = c_arena_push_array(&permanent_arena, lexer_token_t, token_count);
@@ -275,11 +251,10 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
         {
             lexer_token_t name_token = lexer_get_next_token(lexer);
 
-            //macro_info_t *macro_info = hash_table_get_element_ptr(&g_symbol_table.macro_table, name_token.data);
             macro_info_t *macro_info = hash_table_get_element_ptr(&parser->macro_table, name_token.data);
             if(!macro_info->is_set)
             {
-                parse_macro_info(lexer, macro_info, name_token);
+                parse_macro_info(parser, macro_info, name_token);
                 printf("========== MACRO DEFINITION ========\n");
                 printf("Macro: '%.*s'...\n", fprint_string(macro_info->name));
                 printf("Expansion: '%.*s'...\n", fprint_string(macro_info->expansion_string));
@@ -292,10 +267,14 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
                 }
                 printf("====================================\n");
 
-                language_keyword_t *keyword = symbol_table_get_keyword(macro_info->expansion_string);
+                language_keyword_t *keyword = get_keyword_from_identifier(macro_info->expansion_string);
                 if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
                 {
-                    c_dynarray_push(g_symbol_table.keywords, token.data);
+                    language_keyword_t new_keyword;
+                    new_keyword.keyword_id = keyword->keyword_id;
+                    new_keyword.identifier = c_string_make_copy(&parser->arena, token.data);
+
+                    dynarray_add(&g_language_info.keywords, &new_keyword);
                     printf("Found token: '%.*s' which is a #define'd alias for the language keyword: '%.*s'...\n",
                            fprint_string(macro_info->name), fprint_string(keyword->identifier));
                 }
@@ -455,10 +434,9 @@ DEBUG_print_structure_members(AST_node_t *structure)
 internal_api void
 parse_single_file(string_t filename)
 {
-    parser_t file_parser;
-    parser_init(&file_parser, filename); 
+    parser_t *file_parser = parser_create(filename); 
 
-    lexer_t *lexer = &file_parser.lexer;
+    lexer_t *lexer = &file_parser->lexer;
     while(lexer->current_stream->string.count > 0)
     {
         lexer_token_t token = lexer_get_next_token(lexer);
@@ -466,7 +444,7 @@ parse_single_file(string_t filename)
         {
             case TOKEN_TYPE_POUND:
             {
-                token = handle_macro_expansion(lexer, true);
+                token = handle_macro_expansion(file_parser, true);
             }break;
             case TOKEN_TYPE_CONSTEXPR:
             {
@@ -481,7 +459,6 @@ parse_single_file(string_t filename)
                 }
 
                 lexer_token_t peek_token = lexer_peek_token(lexer, pointer_depth + 2);
-                bool8 invalid_expression = false;
 
                 AST_node_t *node = null;
                 if(peek_token.token_type == TOKEN_TYPE_EQUALS)
@@ -495,12 +472,6 @@ parse_single_file(string_t filename)
 
                         node->node_type  = AST_NODE_TYPE_CONSTEXPR;
                         node->identifier = c_string_make_copy(&permanent_arena, name_token.data);
-                        node->type.code_type = symbol_table_search_for_code_type(type_token.data);
-                        if(!node->type.code_type)
-                        {
-                            node->type.code_type = symbol_table_register_typename(type_token.data, CODE_TYPE_UNDEFINED);
-                        }
-
                         if(pointer_depth > 0)
                         {
                             node->type.flags |= AST_TYPE_MODIFIER_FLAG_POINTER;
@@ -510,26 +481,22 @@ parse_single_file(string_t filename)
                         lexer_get_next_token(lexer);
 
                         // TODO(Sleepster): Check to make sure there's actually an ending semicolon 
-                        node->expression.info = generate_expression_AST(parser, 0, null);
-                    }
-                    else
-                    {
-                        invalid_expression = true;
+                        node->expression.info = generate_expression_AST(file_parser, 0, null);
                     }
                 }
                 else if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
                 {
                     // NOTE(Sleepster): Lambda, not a constant 
-                    node = generate_lambda_AST(parser, type_token, pointer_depth, false);
-                    invalid_expression = true;
+                    node = generate_lambda_AST(file_parser, type_token, pointer_depth, false);
                 }
-
+#if 0
                 if(!invalid_expression)
                 {
                     // TODO(Sleepster): Store the AST not the evaluated expression for this phase 
                     AST_expression_value_t eval = evaluate_expression_AST(node->expression.info);
-                    hash_table_add_element(&g_symbol_table.constants_table, eval, name_token.data);
+                    hash_table_add_element(&file_parser.constants_table, eval, name_token.data);
                 }
+#endif
             }break;
         }
     }
@@ -538,16 +505,18 @@ parse_single_file(string_t filename)
     lexer_reset_token_stream(lexer->current_stream);
     for(;;)
     {
-        lexer_token_t token = symbol_table_get_next_lexer_token(lexer);
+        lexer_token_t token = parser_get_next_lexer_token(file_parser);
         switch(token.token_type)
         {
             case TOKEN_TYPE_POUND:
             {
-                token = handle_macro_expansion(lexer, false);
+                token = handle_macro_expansion(file_parser, false);
             }break;
             case TOKEN_TYPE_TYPEDEF:
             {
-                AST_node_t *typedef_AST = generate_typedef_AST(lexer);
+                AST_node_t *typedef_AST = generate_typedef_AST(file_parser);
+                (void)typedef_AST;
+#if 0
                 if(typedef_AST)
                 {
                     switch(typedef_AST->node_type)
@@ -566,36 +535,45 @@ parse_single_file(string_t filename)
                         }break;
                     }
                 }
+#endif
             }break;
             case TOKEN_TYPE_STRUCT:
             case TOKEN_TYPE_UNION:
             case TOKEN_TYPE_CLASS:
             {
-                AST_node_t *structure_AST = generate_structure_AST(lexer);
+                AST_node_t *structure_AST = generate_structure_AST(file_parser);
+                (void)structure_AST;
+#if 0
                 if(structure_AST)
                 {
                     store_structure_AST(structure_AST);
                 }
+#endif
             }break;
             case TOKEN_TYPE_ENUM:
             {
-                AST_node_t *enum_AST = generate_enum_AST(lexer);
+                AST_node_t *enum_AST = generate_enum_AST(file_parser);
+                (void)enum_AST;
+#if 0
                 if(enum_AST)
                 {
                     store_enum_AST(enum_AST);
                 }
+#endif
             }break;
             case TOKEN_TYPE_NAMESPACE:
             {
-                //token = symbol_table_get_next_lexer_token(lexer);
-                //push_scope_stack(token.data);
+                lexer_token_t namespace_token = parser_get_next_lexer_token(file_parser);
+                token = namespace_token;
+
+                declaration_context_t *context = parser_create_declaration_context(file_parser, 
+                                                                                   file_parser->active_decl_context);
+                parser_push_decl_context(file_parser, context);
             }break;
             case TOKEN_TYPE_CLOSE_BRACE:
             {
-                // if(thread_scope_stack.active_scope_ID)
-                // {
-                //     pop_scope_stack();
-                // }
+                // TODO(Sleepster): verify that this only effects namespaces
+                parser_pop_decl_context(file_parser);
             }break;
             case TOKEN_TYPE_CONSTEXPR:
             {
@@ -622,7 +600,7 @@ parse_single_file(string_t filename)
                 bool8 is_const = false;
                 if(token.token_type == TOKEN_TYPE_CONST)
                 {
-                    token = symbol_table_get_next_lexer_token(lexer);
+                    token = parser_get_next_lexer_token(file_parser);
                     is_const = true;
                 }
 
@@ -641,27 +619,30 @@ parse_single_file(string_t filename)
                 {
                     lexer_token_t namespace_peek_token = lexer_peek_token(lexer, peek_amount);
 
-                    bool8 namespaced = false;
                     if(namespace_peek_token.token_type == TOKEN_TYPE_DOUBLE_COLON)
                     {
+#if 0
                         // NOTE(Sleepster): Eat the namespace
                         push_scope_stack(name_token.data);
-                        namespaced = true;
+#endif
 
-                        symbol_table_get_next_lexer_token(lexer);
-                        symbol_table_get_next_lexer_token(lexer);
+                        parser_get_next_lexer_token(file_parser);
+                        parser_get_next_lexer_token(file_parser);
                     }
 
                     lexer_token_t parenthesis_token = lexer_peek_token(lexer, peek_amount);
                     if(parenthesis_token.token_type == TOKEN_TYPE_OPEN_PAREN)
                     {
-                        AST_node_t *lambda = generate_lambda_AST(lexer, return_type, return_type_pointer_depth, is_const);
+                        AST_node_t *lambda = generate_lambda_AST(file_parser, return_type, return_type_pointer_depth, is_const);
+                        (void)lambda;
 
+#if 0
                         store_lambda_AST(lambda);
                         if(namespaced)
                         {
                             pop_scope_stack();
                         } 
+#endif
                     }
                 }
                 else
@@ -678,6 +659,60 @@ parse_single_file(string_t filename)
             }break;
         }
     }
+}
+
+/* TODO: Here's the steps of the parser:
+ *
+ * PHASE 1:
+ *  - Find all macros and record them to their associated namespace and file declaration_context_t
+ *  - Once finished across all files, join these items into a single global registery
+ *
+ *  FOR #IFDEF
+ *  - There is no single good way to know what is #ifdef at the time of analyzing as the definition might be in another file
+ *    and thus makes it impossible to know what branch of the ifdef is the one that will be parsed. One thing we will do is allow
+ *    the user to pass their own list of defined macros to the command line interface and allow the user to SET their own macros
+ *    in the API version.
+ *
+ *    We will have to parse both branches of the conditional, storing the result inside the macro_info_t as a branching path.
+ *    Once we have parsed all the macros in all files, we'll be able to determine which path is valid.
+ *
+ * PHASE 2:
+ *  - Build ASTs for every structure, expression, enum, and lambda
+ *  - Find all constants (constexpr) and record them the same way
+ *  - DO NOT link the code_type_t to that of the AST. Types cannot be determined in this phase, 
+ *    this also means expressions remain unresolved due to the fact that constants are unknown.
+ *  - Collapse all the found AST_node_t (includeing constants) into a global table for processing. 
+ *    The same "read only" style as the first phase.
+ *
+ * PHASE 3:
+ * - Infer types by linking the AST to that of their code_type_t data
+ * - Evaluate all expressions now that all constants, macros, and types are known.
+ * - PROFIT
+ */
+
+internal_api void
+record_file_macros(parser_t *parser)
+{
+    lexer_t *lexer = &parser->lexer;
+    while(lexer->current_stream->string.count > 0)
+    {
+        lexer_token_t token = lexer_get_next_token(lexer);
+        switch(token.token_type)
+        {
+            case TOKEN_TYPE_POUND:
+            {
+                token = handle_macro_expansion(parser, true);
+            }break;
+        }
+    }
+
+    // NOTE(Sleepster): Once we gather the macros from this file, consolidate them 
+    lexer_reset_token_stream(lexer->current_stream);
+}
+
+internal_api void
+consolidate_macro_tables(parser_t *parser)
+{
 }
 
 VISIT_FILES(generate_project_RTTI)
@@ -712,16 +747,12 @@ main(int argc, char **argv)
     // NOTE(Sleepster): Thread init 
     permanent_arena = c_arena_create(MB(10));
     transient_arena = c_arena_create(MB(10));
-    thread_scope_stack.current_stack = c_dynarray_create(u64);
 
-    // NOTE(Sleepster): Pushes the global scope 
-    static const s32 global_scope_ID = 0;
-    c_dynarray_push(thread_scope_stack.current_stack, global_scope_ID);
-    ++thread_scope_stack.current_stack_depth;
+    // NOTE(Sleepster): These are global READ ONLY datasets
+    initialize_default_language_info();
+    symbol_table_int();
 
     // NOTE(Sleepster): Thread init 
-
-    symbol_table_init();
     Expect(argc > 1, "You must pass a file to parse...\n");
 
     char **requested_filename = c_program_flag_add_string("-filename", null, "This is the file we wish to parse...\n");
@@ -742,6 +773,7 @@ main(int argc, char **argv)
         c_directory_visit(directory, &visit_info);
     }
 
+#if 0
     // NOTE(Sleepster): Print the parsed data 
     c_dynarray_for(g_symbol_table.structures, index)
     {
@@ -853,6 +885,7 @@ main(int argc, char **argv)
 
         printf("====================================================================\n");
     }
+#endif
 
     return(0);
 }
