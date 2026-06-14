@@ -67,7 +67,7 @@ struct array_t
 
     array_t(u32 initial_capacity = 0);
 
-    T  &operator[](u32 index);
+    T &operator[](u32 index);
     T *operator+(u32 index);
 
     // NOTE(Sleepster): Stupid C++ stuff 
@@ -84,7 +84,7 @@ array_t<T>::array_t(u32 initial_capacity)
     this->capacity = initial_capacity;
     if(initial_capacity > 0)
     {
-        this->items = reallocarray(this->items, sizeof(T), initial_capacity);
+        this->items = (T*)reallocarray(this->items, sizeof(T), initial_capacity);
     }
 }
 
@@ -108,7 +108,7 @@ template <typename T>
 void
 array_resize(array_t<T> *array, u32 new_capacity)
 {
-    array->items    = reallocarray(array->items, sizeof(T), new_capacity);
+    array->items    = (T*)reallocarray(array->items, sizeof(T), new_capacity);
     array->capacity = new_capacity;
 }
 
@@ -120,10 +120,31 @@ array_clear(array_t<T> *array)
 }
 
 template <typename T>
+s32
+array_find(array_t<T> *array, T *element)
+{
+    s32 result = -1;
+    for(u32 index = 0;
+        index < array->used;
+        ++index)
+    {
+        T *found = array->items + index;
+        if(memcmp(found, element, sizeof(T)) == 0)
+        {
+            result = index;
+            break;
+        }
+    }
+
+    return(result);
+}
+
+template <typename T>
 void
 array_free(array_t<T> *array)
 {
     array->capacity = 0;
+    array->used     = 0;
     free(array->items);
 }
 

@@ -97,11 +97,9 @@ struct code_type_t
 
     string_t     identifier;
     u64          ID;
-    u64          alias_of = INVALID_ID;
+    code_type_t *alias_of = null;
 
     u32          code_metatype;
-    AST_node_t  *type_info_AST;
-    code_type_t *next_overload;
 };
 
 struct language_info_t
@@ -112,42 +110,45 @@ struct language_info_t
 
 struct declaration_context_t
 {
-    hash_table_t<code_type_t> local_types;
-    dynarray_t<AST_node_t*>   code_decls;
+    string_t                   lexical_scope;
+    u64                        context_ID;
 
-    declaration_context_t    *parent_scope;
+    hash_table_t<code_type_t*> local_types;
+    hash_table_t<AST_node_t*>  code_decls;
+
+    declaration_context_t     *parent_scope;
 };
 
 struct parser_t
 {
-    memory_arena_t                       arena;
-    string_t                             filename;
+    memory_arena_t                     arena;
+    string_t                           filename;
 
-    dynarray_t<declaration_context_t>    decl_context_stack;
-    dynarray_t<declaration_context_t>    recorded_decl_contexts;
-    declaration_context_t               *active_decl_context;
+    dynarray_t<declaration_context_t*> decl_context_stack;
+    dynarray_t<declaration_context_t>  recorded_decl_contexts;
+    declaration_context_t             *active_decl_context;
 
-    lexer_t                              lexer;
+    lexer_t                            lexer;
 
-    hash_table_t<macro_info_t>           macro_table;
-    hash_table_t<AST_expression_value_t> constants_table;
+    hash_table_t<macro_info_t>         macro_table;
 };
 
-struct symbol_table_t
+struct symbol_table_t 
 {
-    bool8                      is_initialized;
+    bool8                             is_initialized;
 
-    parser_t                  *file_parsers;
-    u32                        file_count;
-    volatile u32               next_parser_index;
+    parser_t                         *file_parsers;
+    u32                               file_count;
+    volatile u32                      next_parser_index;
         
-    hash_table_t<macro_info_t> defined_global_macro_table;
-    hash_table_t<AST_node_t*>  defined_global_constants;
+    hash_table_t<macro_info_t>        defined_global_macro_table;
+    dynarray_t<declaration_context_t> declaration_contexts;
 };
 
 global_variable language_info_t g_language_info;
 global_variable symbol_table_t  g_symbol_table;
 
 internal_api language_keyword_t *get_keyword_from_identifier(string_t identifier);
+internal_api void                symbol_table_init(string_t filepath, bool8 recursive);
 #endif // ATHENA_SYMBOL_TABLE_H
 

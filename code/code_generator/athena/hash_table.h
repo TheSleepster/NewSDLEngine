@@ -11,44 +11,6 @@
 #include <c_types.h>
 #include <c_string.h>
 
-// EXPERIMENTAL
-typedef void *hash_table_allocate_impl_t(void *allocator, u32 allocation_size);
-typedef void  hash_table_free_impl_t(void *allocator, void *memory);
-
-void*
-hash_table_default_allocate(void *allocator, u32 allocation_size)
-{
-    void *result = null;
-    result = malloc(allocation_size);
-
-    return(result);
-}
-
-void
-hash_table_default_free(void *allocator, void *memory)
-{
-    free(memory);
-}
-
-template <typename T>
-struct hash_element_t
-{
-    T   item;
-    u64 raw_key_hash;
-};
-
-template <typename T>
-struct hash_table_t
-{
-    hash_element_t<T>          *items;
-    //dynarray_t<u64>             occupied_indices;
-    u32                         max_entries;
-
-    void                       *allocator;
-    hash_table_allocate_impl_t *allocate_fn;
-    hash_table_free_impl_t     *free_fn;
-};
-
 u64
 hash_table_hash_key(string_t key)
 {
@@ -79,6 +41,46 @@ hash_table_combine_hashes(u64 A, u64 B)
     return(result);
 }
 
+// EXPERIMENTAL
+typedef void *hash_table_allocate_impl_t(void *allocator, u32 allocation_size);
+typedef void  hash_table_free_impl_t(void *allocator, void *memory);
+
+void*
+hash_table_default_allocate(void *allocator, u32 allocation_size)
+{
+    void *result = null;
+    result = malloc(allocation_size);
+
+    return(result);
+}
+
+void
+hash_table_default_free(void *allocator, void *memory)
+{
+    free(memory);
+}
+
+template <typename T>
+struct hash_element_t
+{
+    T   item;
+    u64 raw_key_hash;
+};
+
+template <typename T>
+struct hash_table_t
+{
+    // TODO(Sleepster): Make this an array_t? Also, perhaps make this expandable like bucket arrays.
+    hash_element_t<T>             *items;
+
+    dynarray_t<hash_element_t<T>*> used_entries;
+    u32                            max_entries;
+
+    void                          *allocator;
+    hash_table_allocate_impl_t    *allocate_fn;
+    hash_table_free_impl_t        *free_fn;
+};
+
 template <typename T>
 hash_table_t<T>
 hash_table_create(u32                         max_entries, 
@@ -102,7 +104,7 @@ void
 hash_table_destroy(hash_table_t<T> *table)
 {
     table->free(table->allocator, table->items);
-    table->free(table->allocator, table->occupied_indices);
+    dynarray_free(table->used_entries);
 }
 
 template <typename T>
@@ -126,7 +128,7 @@ hash_table_get_hash_element(hash_table_t<T> *table, u64 index, u64 key_hash)
 
 template <typename T>
 void
-hash_table_add_element(hash_table_t<T> *table, T new_element, string_t key)
+hash_table_add_element(hash_table_t<T> *table, T *new_element, string_t key)
 {
     Assert(table->items);
     Assert(table->max_entries > 0);
@@ -137,10 +139,10 @@ hash_table_add_element(hash_table_t<T> *table, T new_element, string_t key)
     hash_element_t<T> *element = hash_table_get_hash_element(table, index, key_hash);
 
     // NOTE(Sleepster): Copies the element 
-    element->item         = new_element;
-    element->raw_key_hash = key_hash;
+    element->item         = *new_element;
+    element->raw_key_hash =  key_hash;
 
-    //dynarray_add(&table->occupied_indices, index);
+    dynarray_add(&table->used_entries, &element);
 }
 
 template <typename T>
@@ -212,6 +214,8 @@ hash_table_clear_element_item(hash_table_t<T> *table, string_t key)
 
     hash_element_t<T> *element = hash_table_get_hash_element(table, index, key_hash);
     ZeroStruct(element->item);
+
+    dynarray_remove(&table->used_entries, index);
 }
 // EXPERIMENTAL
 

@@ -12,8 +12,8 @@
 #define DYNARRAY_IMPLEMENTATION 
 
 // EXPERIMENTAL
-#include "hash_table.h"
 #include "dynarray.h"
+#include "hash_table.h"
 // EXPERIMENTAL
 
 #include <c_file_api.h>
@@ -74,7 +74,7 @@ report_error(parser_t *parser, char *message, ...)
     int length = vsnprintf(buffer, sizeof(buffer), message, arg_ptr);
     va_end(arg_ptr);
 
-    fprintf(stderr, "\033[31m[Athena Error] [File]: '%.*s', Line: '%d': %.*s\033[0m\n", 
+    fprintf(stderr, "\033[31m[Athena Error]: File: '%.*s', Line: '%d': %.*s\033[0m\n", 
             fprint_string(parser->filename), 
             lexer->current_stream->line_number + 1, 
             length, 
@@ -431,6 +431,7 @@ DEBUG_print_structure_members(AST_node_t *structure)
     }
 }
 
+#if 0
 internal_api void
 parse_single_file(string_t filename)
 {
@@ -566,7 +567,9 @@ parse_single_file(string_t filename)
                 lexer_token_t namespace_token = parser_get_next_lexer_token(file_parser);
                 token = namespace_token;
 
+                string_t lexical_namespace = c_string_make_copy(&file_parser->arena, namespace_token.data);
                 declaration_context_t *context = parser_create_declaration_context(file_parser, 
+                                                                                   lexical_namespace,
                                                                                    file_parser->active_decl_context);
                 parser_push_decl_context(file_parser, context);
             }break;
@@ -660,6 +663,7 @@ parse_single_file(string_t filename)
         }
     }
 }
+#endif
 
 /* TODO: Here's the steps of the parser:
  *
@@ -677,11 +681,11 @@ parse_single_file(string_t filename)
  *    Once we have parsed all the macros in all files, we'll be able to determine which path is valid.
  *
  * PHASE 2:
- *  - Build ASTs for every structure, expression, enum, and lambda
  *  - Find all constants (constexpr) and record them the same way
+ *  - Build ASTs for every structure, expression, enum, and lambda
  *  - DO NOT link the code_type_t to that of the AST. Types cannot be determined in this phase, 
  *    this also means expressions remain unresolved due to the fact that constants are unknown.
- *  - Collapse all the found AST_node_t (includeing constants) into a global table for processing. 
+ *  - Collapse all the found AST_node_t (including constants) into a global table for processing. 
  *    The same "read only" style as the first phase.
  *
  * PHASE 3:
@@ -690,6 +694,7 @@ parse_single_file(string_t filename)
  * - PROFIT
  */
 
+// NOTE(Sleepster): PHASE 1: MACROS
 internal_api void
 record_file_macros(parser_t *parser)
 {
@@ -706,13 +711,416 @@ record_file_macros(parser_t *parser)
         }
     }
 
-    // NOTE(Sleepster): Once we gather the macros from this file, consolidate them 
+    // NOTE(Sleepster): Once we gather the macros from this file, reset the token stream for the file 
     lexer_reset_token_stream(lexer->current_stream);
 }
 
 internal_api void
-consolidate_macro_tables(parser_t *parser)
+consolidate_macro_tables(void)
 {
+    for(u32 parser_index = 0;
+        parser_index < g_symbol_table.file_count;
+        ++parser_index)
+    {
+        parser_t *parser = g_symbol_table.file_parsers + parser_index;
+        for(const auto &element: parser->macro_table.used_entries)
+        {
+            macro_info_t *macro = &element->item;
+            hash_table_add_element(&g_symbol_table.defined_global_macro_table, macro, macro->name);
+        }
+    }
+}
+
+// NOTE(Sleepster): PHASE 2: ASTs AND CONSTANTS 
+internal_api void
+record_file_constants(parser_t *parser)
+{
+    lexer_t *lexer = &parser->lexer;
+    while(lexer->current_stream->string.count > 0)
+    {
+        lexer_token_t token = lexer_get_next_token(lexer);
+        switch(token.token_type)
+        {
+            case TOKEN_TYPE_CONSTEXPR:
+            {
+                lexer_token_t type_token = lexer_get_next_token(lexer);
+                lexer_token_t name_token = lexer_peek_token(lexer);
+
+                u32 pointer_depth = 0;
+                while(name_token.token_type == TOKEN_TYPE_ASTERISK)
+                {
+                    name_token = lexer_peek_token(lexer, pointer_depth + 2);
+                    ++pointer_depth;
+                }
+
+                lexer_token_t peek_token = lexer_peek_token(lexer, pointer_depth + 2);
+
+                AST_node_t *node = null;
+                if(peek_token.token_type == TOKEN_TYPE_EQUALS)
+                {
+                    lexer_token_t initializer_token = lexer_peek_token(lexer, pointer_depth + 3);
+                    // NOTE(Sleepster): If this is not an initializer list 
+                    if(initializer_token.token_type != TOKEN_TYPE_OPEN_BRACE)
+                    {
+                        // NOTE(Sleepster): It's an easily parsable expression 
+                        node = AST_create_new_node(&transient_arena);
+
+                        node->node_type  = AST_NODE_TYPE_CONSTEXPR;
+                        node->identifier = c_string_make_copy(&permanent_arena, name_token.data);
+                        if(pointer_depth > 0)
+                        {
+                            node->type.flags |= AST_TYPE_MODIFIER_FLAG_POINTER;
+                        }
+
+                        lexer_get_next_token(lexer);
+                        lexer_get_next_token(lexer);
+
+                        // TODO(Sleepster): Check to make sure there's actually an ending semicolon 
+                        node->expression.info = generate_expression_AST(parser, 0, null);
+                    }
+                }
+                else if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
+                {
+                    // NOTE(Sleepster): Lambda, not a constant 
+                    node = generate_lambda_AST(parser, type_token, pointer_depth, false);
+                }
+
+                if(node)
+                {
+                    hash_table_add_element(&parser->active_decl_context->code_decls, &node, node->identifier);
+                }
+#if 0
+                if(!invalid_expression)
+                {
+                    // TODO(Sleepster): Store the AST not the evaluated expression for this phase 
+                    AST_expression_value_t eval = evaluate_expression_AST(node->expression.info);
+                    hash_table_add_element(&parser.constants_table, eval, name_token.data);
+                }
+#endif
+            }break;
+        }
+    }
+
+    lexer_reset_token_stream(lexer->current_stream);
+}
+
+internal_api void
+build_file_AST(parser_t *parser)
+{
+    lexer_t *lexer = &parser->lexer;
+    for(;;)
+    {
+        lexer_token_t token = parser_get_next_lexer_token(parser);
+        switch(token.token_type)
+        {
+            case TOKEN_TYPE_POUND:
+            {
+                token = handle_macro_expansion(parser, false);
+            }break;
+            case TOKEN_TYPE_TYPEDEF:
+            {
+                generate_typedef_AST(parser);
+            }break;
+            case TOKEN_TYPE_STRUCT:
+            case TOKEN_TYPE_UNION:
+            case TOKEN_TYPE_CLASS:
+            {
+                generate_structure_AST(parser);
+            }break;
+            case TOKEN_TYPE_ENUM:
+            {
+                generate_enum_AST(parser);
+            }break;
+            case TOKEN_TYPE_NAMESPACE:
+            {
+                lexer_token_t namespace_token = parser_get_next_lexer_token(parser);
+                token = namespace_token;
+
+                string_t lexical_namespace = c_string_make_copy(&parser->arena, namespace_token.data);
+                declaration_context_t *context = parser_create_declaration_context(parser, 
+                                                                                   lexical_namespace,
+                                                                                   parser->active_decl_context);
+                parser_push_decl_context(parser, context);
+            }break;
+            case TOKEN_TYPE_CLOSE_BRACE:
+            {
+                // TODO(Sleepster): verify that this only effects namespaces
+                parser_pop_decl_context(parser);
+            }break;
+            case TOKEN_TYPE_CONSTEXPR:
+            {
+                // TODO(Sleepster):
+                // Right now there's a problem where this loop will process constexpr's that are lambdas twice, once as a constant
+                // another as a valid type. Is this a problem? Idk... But right now I just don't care since it's not obvious that this
+                // could be a problem.
+            }break;
+            // NOTE(Sleepster): We don't really care about these two... 
+            //case TOKEN_TYPE_INLINE:
+            //case TOKEN_TYPE_STATIC:
+            case TOKEN_TYPE_CONST:
+            case TOKEN_TYPE_IDENT:
+            {
+                // NOTE(Sleepster): 
+                // We want to create function defines like this:
+                //
+                // void *allocator(memory_arena_t *arena)
+                //
+                // where we parse this as:
+                //
+                // "allocator is a function that returns a void * and takes a memory_arena_t * as an argument" 
+
+                bool8 is_const = false;
+                if(token.token_type == TOKEN_TYPE_CONST)
+                {
+                    token = parser_get_next_lexer_token(parser);
+                    is_const = true;
+                }
+
+                lexer_token_t return_type = token;
+                lexer_token_t name_token  = lexer_peek_token(lexer);
+
+                u32 peek_amount = 2;
+                u32 return_type_pointer_depth = 0;
+                while(name_token.token_type == TOKEN_TYPE_ASTERISK)
+                {
+                    name_token = lexer_peek_token(lexer, peek_amount++);
+                    ++return_type_pointer_depth;
+                }
+
+                if(name_token.token_type == TOKEN_TYPE_IDENT)
+                {
+                    lexer_token_t namespace_peek_token = lexer_peek_token(lexer, peek_amount);
+
+                    if(namespace_peek_token.token_type == TOKEN_TYPE_DOUBLE_COLON)
+                    {
+#if 0
+                        // NOTE(Sleepster): Eat the namespace
+                        push_scope_stack(name_token.data);
+#endif
+
+                        parser_get_next_lexer_token(parser);
+                        parser_get_next_lexer_token(parser);
+                    }
+
+                    lexer_token_t parenthesis_token = lexer_peek_token(lexer, peek_amount);
+                    if(parenthesis_token.token_type == TOKEN_TYPE_OPEN_PAREN)
+                    {
+                        generate_lambda_AST(parser, return_type, return_type_pointer_depth, is_const);
+                    }
+                }
+                else
+                {
+                    lexer_eat_lines(&transient_arena, lexer, 1);
+                }
+            }break;
+            case TOKEN_TYPE_EOF:
+            {
+                return;
+            }break;
+            default:
+            {
+            }break;
+        }
+    }
+}
+
+internal_api void
+consolidate_AST_nodes(void)
+{
+    for(u32 parser_index = 0;
+        parser_index < g_symbol_table.file_count;
+        ++parser_index)
+    {
+        parser_t *parser = g_symbol_table.file_parsers + parser_index;
+
+        // NOTE(Sleepster): Consolidate all recorded declaration_context_t
+        for(auto &decl_context: parser->recorded_decl_contexts)
+        {
+            // NOTE(Sleepster): Check if it's unique to the global table, adding it to the global table if it is.
+            s32 index = 0;
+            bool8 unique = dynarray_add_if_unique(&g_symbol_table.declaration_contexts, &decl_context, &index);
+            if(!unique)
+            {
+                // NOTE(Sleepster): Combine the knowledge of the two contexts to get a better picture of what symbols
+                // are actually within this scope.
+                declaration_context_t *recorded_context = dynarray_get_ptr_at_index(&g_symbol_table.declaration_contexts, index);
+                for(auto &element: decl_context.code_decls.used_entries) 
+                {
+                    AST_node_t *code_decl = element->item;
+
+                    // TODO(Sleepster): Check to make sure that two items with the same name but of different types don't 
+                    // have issues here. Such as:
+                    // struct item_data
+                    // {
+                    //      char *data;
+                    // }
+                    //
+                    // and
+                    //
+                    // void item_data(item_data *item, char *data);
+                    //
+                    // These two are completely different despite sharing the same name, so should have no issue.
+                    hash_table_add_element(&recorded_context->code_decls, &code_decl, code_decl->identifier);
+                }
+
+                // NOTE(Sleepster): Do the same for each of the types, this is safe regardless of if they are 
+                // unique types or not. 
+                for(auto &local_type: decl_context.local_types.used_entries)
+                {
+                    code_type_t *type = local_type->item;
+                    hash_table_add_element(&recorded_context->local_types, &type, type->identifier);
+                }
+            }
+        }
+    }
+}
+
+// NOTE(Sleepster): PHASE 3: TYPE INFERENCE
+internal_api void
+deduce_AST_node_type_data()
+{
+    for(const auto &decl_context: g_symbol_table.declaration_contexts)
+    {
+        for(auto &element: decl_context.code_decls.used_entries)
+        {
+            AST_node_t *code_decl = element->item;
+            if(code_decl->node_type != AST_NODE_TYPE_CONSTEXPR)
+            {
+
+                // NOTE(Sleepster): Set the code metatype 
+                code_type_t *type = code_decl->type.code_type;
+                if(type && type->code_metatype == CODE_TYPE_UNDEFINED)
+                {
+                    switch(code_decl->node_type)
+                    {
+                        case AST_NODE_TYPE_ENUM:
+                        {
+                            type->code_metatype = CODE_TYPE_ENUM;
+                        }break;
+                        case AST_NODE_TYPE_STRUCTURE:
+                        {
+                            type->code_metatype = CODE_TYPE_STRUCTURE;
+                        }break;
+                        case AST_NODE_TYPE_LAMBDA:
+                        {
+                            type->code_metatype = CODE_TYPE_LAMBDA;
+                        }break;
+                        default:
+                        {
+                            InvalidCodePath;
+                        }break;
+                    }
+                }
+
+                switch(code_decl->node_type)
+                {
+                    case AST_NODE_TYPE_STRUCTURE:
+                    case AST_NODE_TYPE_ENUM:
+                    {
+                        // NOTE(Sleepster): Evaluate expressions on members
+                        for(AST_node_t *current_member = code_decl->struct_decl.first_member;
+                            current_member;
+                            current_member = current_member->next_sibling)
+                        {
+                            if(current_member->expression.info && !current_member->expression.evaluated)
+                            {
+                                current_member->expression.value = evaluate_expression_AST(current_member->expression.info);
+                                if(current_member->type.flags & AST_TYPE_MODIFIER_FLAG_ARRAY)
+                                {
+                                    current_member->type.array_size = current_member->expression.value.int_value;
+                                }
+
+                                current_member->expression.evaluated = true;
+                            }
+                        }
+                    }break;
+                    case AST_NODE_TYPE_LAMBDA:
+                    {
+                        // NOTE(Sleepster): Evaluate expressions on arguments 
+                    }break;
+                }
+            }
+            else
+            {
+                code_decl->expression.value     = evaluate_expression_AST(code_decl->expression.info);
+                code_decl->expression.evaluated = true;
+            }
+        }
+    }
+}
+
+internal_api void
+parse_single_file(string_t filename)
+{
+    parser_t *parser = parser_create(filename); 
+
+    record_file_macros(parser);
+    consolidate_macro_tables();
+
+    record_file_constants(parser);
+    build_file_AST(parser);
+    consolidate_AST_nodes();
+    deduce_AST_node_type_data();
+
+    printf("\n\nGlobal symbol table has: '%d' recorded decl_contexts...\n", g_symbol_table.declaration_contexts.used);
+    for(const auto &scope: g_symbol_table.declaration_contexts)
+    {
+        printf("\n================ CODE DECLARATION ===============\n");
+        printf("Scope by name of: '%.*s' has '%d' recorded types and '%d' recorded AST_node_t...\n",
+               fprint_string(scope.lexical_scope), scope.local_types.used_entries.used, scope.code_decls.used_entries.used);
+        if(scope.local_types.used_entries.used > 0)
+        {
+            printf("\tRecorded Types: \n");
+            for(const auto &element: scope.local_types.used_entries)
+            {
+                code_type_t *type = element->item;
+                printf("\t\t'%.*s'\n", fprint_string(type->identifier));
+            }
+        }
+
+        if(scope.code_decls.used_entries.used > 0)
+        {
+            printf("\tRecorded AST_node_t's:\n");
+            for(const auto &element: scope.code_decls.used_entries)
+            {
+                AST_node_t *AST = element->item;
+                printf("\t\tAST_node named: '%.*s' is of node_type: '%s'...\n",
+                       fprint_string(AST->identifier), print_AST_node_type(AST->node_type));
+                if(AST->type.code_type)
+                {
+                    printf("\t\t\tType alias of: %p\n", AST->type.code_type->alias_of);
+                    printf("\t\t\tMetatype: '%s'\n", get_metatype_string(AST->type.code_type->code_metatype));
+                    printf("\t\t\tcode_type identifier is: '%.*s'...\n", fprint_string(AST->type.code_type->identifier));
+                    if(AST->type.flags & AST_TYPE_MODIFIER_FLAG_ARRAY)
+                    {
+                        printf("\t\t\tArray Size: '%d'...\n", AST->type.array_size);
+                    }
+
+                }
+
+                if(AST->struct_decl.inherited_type_info)
+                {
+                    AST_node_t *inher = AST->struct_decl.inherited_type_info;
+                    printf("\t\tInherits from type: '%.*s'...\n", fprint_string(inher->identifier));
+                }
+
+                if(AST->type.flags != 0)
+                {
+                    printf("\t\ttype flags are:\n");
+#define X(enum, string, value) if(AST->type.flags & enum) { printf("\t\t\t%s\n", string); }
+                    AST_TYPE_MODIFIER_FLAGS(X)
+#undef X
+                }
+
+                if(AST->node_type == AST_NODE_TYPE_STRUCTURE)
+                {
+                    printf("\tAST is of structured type, members are: \n");
+                    DEBUG_print_structure_members(AST);
+                }
+            }
+        }
+        printf("============= END OF CODE DECLARATION ============\n");
+    }
 }
 
 VISIT_FILES(generate_project_RTTI)
@@ -748,28 +1156,31 @@ main(int argc, char **argv)
     permanent_arena = c_arena_create(MB(10));
     transient_arena = c_arena_create(MB(10));
 
-    // NOTE(Sleepster): These are global READ ONLY datasets
+    // NOTE(Sleepster): This is a global READ ONLY dataset
     initialize_default_language_info();
-    symbol_table_int();
 
     // NOTE(Sleepster): Thread init 
-    Expect(argc > 1, "You must pass a file to parse...\n");
+    Expect(argc > 1, "You must pass a file to parse or a target directory that contains these files...\n");
 
     char **requested_filename = c_program_flag_add_string("-filename", null, "This is the file we wish to parse...\n");
     char   **requested_directory = c_program_flag_add_string("-directory", null, "Points to the directory you wish to parse...\n");
     bool32 *recursive            = c_program_flag_add_bool32("-recursive", false, "Denotes recursive parsing over the passed directory...\n");
 
     c_program_flag_parse_args(argc, argv);
+
     if(!(*requested_directory))
     {
         string_t filename = STR(*requested_filename);
+        symbol_table_init(filename, *recursive);
+
         parse_single_file(filename);
     }
     else
     {
         visit_file_data_t visit_info = c_directory_create_visit_data(generate_project_RTTI, *recursive, null);
-
         string_t directory = STR(*requested_directory);
+        symbol_table_init(directory, *recursive);
+
         c_directory_visit(directory, &visit_info);
     }
 

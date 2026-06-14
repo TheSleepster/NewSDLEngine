@@ -91,8 +91,8 @@ build_number_AST_node(parser_t *parser, AST_node_t *value_expression, lexer_toke
         value_expression->type.flags |= AST_TYPE_MODIFIER_FLAG_DOUBLE_FLOAT;
     }
 
-    value_expression->node_type    = AST_NODE_TYPE_NUMBER;
-    value_expression->type.literal = c_string_make_copy(&parser->arena, value_token.data); 
+    value_expression->node_type          = AST_NODE_TYPE_NUMBER;
+    value_expression->type.value_literal = c_string_make_copy(&parser->arena, value_token.data); 
 #if 0
     if(signed_value && !is_float)
     {
@@ -208,14 +208,19 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
         {
             case TOKEN_TYPE_NUMBER:
             {
-                result = AST_create_new_node(&permanent_arena);
+                result = AST_create_new_node(&parser->arena);
                 build_number_AST_node(parser, result, *token);
             }break;
             // NOTE(Sleepster): For macros, this will never happen since the symbol table simply substitues the macro expansion in place. 
             case TOKEN_TYPE_IDENT:
             {
+                result = AST_create_new_node(&parser->arena);
+
+                result->identifier = c_string_make_copy(&parser->arena, token->data);
+                result->node_type  = AST_NODE_TYPE_IDENTIFIER;
+#if 0
                 //AST_expression_value_t *constant = hash_table_get_element_ptr(&g_symbol_table.constants_table, token->data);
-                AST_expression_value_t *constant = hash_table_get_element_ptr(&parser->constants_table, token->data);
+                AST_expression_value_t *constant = hash_table_get_element_ptr(&parser->constant_expression_table, token->data);
                 if(constant->type != AST_EXPRESSION_VALUE_INVALID)
                 {
                     result = AST_create_new_node(&permanent_arena);
@@ -248,12 +253,13 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
                 {
                     printf("Wanted to input parsing data for constant: '%.*s' however, this constant is not valid yet...\n", fprint_string(token->data));
                 }
+#endif
             }break;
             case TOKEN_TYPE_LITERAL:
             {
                 result = AST_create_new_node(&permanent_arena);
-                result->node_type         = AST_NODE_TYPE_LITERAL;
-                result->type.string_value = c_string_make_copy(&permanent_arena, token->data);
+                result->node_type          = AST_NODE_TYPE_LITERAL;
+                result->type.value_literal = c_string_make_copy(&permanent_arena, token->data);
 
                 printf("String literal: '%.*s' found when generating an expression...\n", token->data.count, token->data.data);
             }break;
@@ -458,38 +464,48 @@ evaluate_expression_AST(AST_node_t *expression)
     AST_type_t *type = &expression->type;
     switch(expression->node_type)
     {
+        case AST_NODE_TYPE_IDENTIFIER:
+        {
+            // NOTE(Sleepster): Inside generate, we record all constexpr as identifiers.
+            // In this case, we must do what generate used to do, and determine the type here.
+            AST_node_t *constant_expression = symbol_table_find_code_declaration(expression->identifier);
+            if(constant_expression->expression.evaluated == false)
+            {
+                constant_expression->expression.value = evaluate_expression_AST(constant_expression->expression.info);
+            }
+
+            result = constant_expression->expression.value;
+        }break;
         case AST_NODE_TYPE_LITERAL:
         {
             result.type             = AST_EXPRESSION_VALUE_LITERAL;
-            result.identifier_value = type->string_value;
+            result.identifier_value = type->value_literal;
         }break;
         case AST_NODE_TYPE_NUMBER:
         {
-            if(type->flags & AST_TYPE_MODIFIER_FLAG_SIGNED)
+            if(type->flags & AST_TYPE_MODIFIER_FLAG_FLOAT)
             {
-                if(type->flags & AST_TYPE_MODIFIER_FLAG_FLOAT)
-                {
-                    if(c_string_compare(type->code_type->identifier, STR("float")))
-                    {
-                        result.type          = AST_EXPRESSION_VALUE_FLOAT;
-                        result.float32_value = type->float32_value;
-                    }
-                    else
-                    {
-                        result.type          = AST_EXPRESSION_VALUE_DOUBLE;
-                        result.float64_value = type->float64_value;
-                    }
-                }
-                else
-                {
-                    result.type      = AST_EXPRESSION_VALUE_INT;
-                    result.int_value = type->int_value;
-                }
+                result.type          = AST_EXPRESSION_VALUE_FLOAT;
+                result.float32_value = c_string_read_float32(type->value_literal);
             }
-            else
+            else if(type->flags & AST_TYPE_MODIFIER_FLAG_DOUBLE_FLOAT)
             {
-                result.type           = AST_EXPRESSION_VALUE_UNSIGNED;
-                result.unsigned_value = type->unsigned_value;
+                result.type          = AST_EXPRESSION_VALUE_DOUBLE;
+                result.float64_value = c_string_read_float64(type->value_literal);
+            }
+
+            if((type->flags & AST_TYPE_MODIFIER_FLAG_SIGNED) && 
+               ((type->flags & AST_TYPE_MODIFIER_FLAG_FLOAT) == 0) && 
+               ((type->flags & AST_TYPE_MODIFIER_FLAG_DOUBLE_FLOAT) == 0))
+            {
+                result.type = AST_EXPRESSION_VALUE_INT;
+                result.int_value = c_string_read_int(type->value_literal);
+            }
+            else if(((type->flags & AST_TYPE_MODIFIER_FLAG_FLOAT) == 0) && 
+                    ((type->flags & AST_TYPE_MODIFIER_FLAG_DOUBLE_FLOAT) == 0))
+            {
+                result.type = AST_EXPRESSION_VALUE_UNSIGNED;
+                result.int_value = c_string_read_uint(type->value_literal);
             }
         }break;
         case AST_NODE_TYPE_UNARY_EXPRESSION:
@@ -560,16 +576,6 @@ parse_lambda_argument_list(parser_t *parser, AST_node_t *lambda)
             // NOTE(Sleepster): Generate an AST_node_t for each of the function's arugments;
             lexer_token_t argument_typename = token;
 
-            // TODO(Sleepster): handle other cases like namespace::type
-            //
-            // Also allow for the usage of combining hashes for overloads. Such as:
-            //
-            // line 13      void get_item(string_t item_name);
-            //
-            // line 219     void get_item(u64 ID);
-            //
-            // The above should be 2 different types. This can be achieved through many methods. Just do it.
-
             // TODO(Sleepster):   
             // We also need to handle namespaced types
             //
@@ -615,13 +621,8 @@ parse_lambda_argument_list(parser_t *parser, AST_node_t *lambda)
                 argument->identifier = c_string_make_copy(&permanent_arena, argument_name.data);
 
                 AST_type_t *type_data = &argument->type;
-                type_data->code_type  = parser_search_for_code_type(parser, argument_typename.data);
-                if(!type_data->code_type)
-                {
-                    type_data->code_type = parser_register_code_type_identifier(parser, argument_typename.data);
-                }
+                type_data->code_type  = parser_register_code_type_identifier(parser, c_string_make_copy(&permanent_arena, argument_typename.data));
 
-                type_data->literal       = c_string_make_copy(&permanent_arena, argument_typename.data);
                 type_data->flags         = pointer_depth > 0 ? (argument_flags | AST_TYPE_MODIFIER_FLAG_POINTER) : argument_flags;
                 type_data->pointer_depth = pointer_depth;
                 if(lambda->lambda.first_argument != null)
@@ -675,8 +676,6 @@ generate_structure_AST(parser_t *parser)
     lexer_t *lexer = &parser->lexer;
 
     lexer_token_t name_token = parser_get_next_lexer_token(parser);
-    u64 struct_ID = INVALID_ID;
-
     lexer_token_t token;
     if(name_token.token_type == TOKEN_TYPE_IDENT)
     {
@@ -687,11 +686,7 @@ generate_structure_AST(parser_t *parser)
                          fprint_token(name_token));
         }
 
-        parser_register_code_type_identifier(parser, name_token.data);
-        printf("Registered structure identifier type: '%.*s'...\n", fprint_string(name_token.data));
-
-        struct_ID = hash_table_hash_key(name_token.data);
-        token     = parser_get_next_lexer_token(parser);
+        token = parser_get_next_lexer_token(parser);
     }
     else if(name_token.token_type == TOKEN_TYPE_OPEN_BRACE)
     {
@@ -725,11 +720,12 @@ generate_structure_AST(parser_t *parser)
         inheritance_node            = AST_create_new_node(&permanent_arena);
         inheritance_node->node_type = AST_NODE_TYPE_INHERITANCE_INFO;
 
-        parser_register_code_type_identifier(parser, inherited_typename.data);
-        printf("Encountered inherited structure identifier type: '%.*s'...\n", fprint_string(inherited_typename.data));
+        code_type_t *inherited_type = parser_register_code_type_identifier(parser, inherited_typename.data);
 
         inheritance_node->inheritance_info.inheritance_type = inheritance_publicity_token.token_type;
         inheritance_node->inheritance_info.inherited_data   = inheritance_node;
+
+        inheritance_node->type.code_type = inherited_type;
 
         // NOTE(Sleepster): Eat the token right before the open brace 
         token = parser_get_next_lexer_token(parser);
@@ -758,14 +754,23 @@ generate_structure_AST(parser_t *parser)
             structure_root->struct_decl.inherited_type_info = inheritance_node;
         }
 
-        if(name_token.token_type == TOKEN_TYPE_IDENT) structure_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
-        else                                          structure_root->identifier = STR("anonymous");
+        // NOTE(Sleepster): Set the code type of the structure 
+        code_type_t *structure_type = null;
+        if(name_token.token_type == TOKEN_TYPE_IDENT) 
+        {
+            structure_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
+            structure_type = parser_register_code_type_identifier(parser, name_token.data);
+        }
+        else 
+        {
+            structure_root->identifier = STR("anonymous");
+        }
+
+        structure_root->type.code_type = structure_type;
 
         // NOTE(Sleepster): Create a new declaration_context_t for this scope, then push items onto it. 
-        declaration_context_t *context = parser_create_declaration_context(parser, parser->active_decl_context);
+        declaration_context_t *context = parser_create_declaration_context(parser, structure_root->identifier, parser->active_decl_context);
         parser_push_decl_context(parser, context);
-        defer(parser_pop_decl_context(parser));
-
         for(;;)
         {
             lexer_token_t typename_token = parser_get_next_lexer_token(parser);
@@ -941,8 +946,8 @@ generate_structure_AST(parser_t *parser)
                         member_node->node_type  = AST_NODE_TYPE_STRUCTURE_MEMBER;
                         member_node->identifier = c_string_make_copy(&permanent_arena, member_name_token.data); 
 
-                        parser_register_code_type_identifier(parser, typename_token.data);
-                        printf("Encountered structure type: '%.*s'...\n", fprint_string(typename_token.data));
+                        code_type_t *member_type    = parser_register_code_type_identifier(parser, typename_token.data);
+                        member_node->type.code_type = member_type;
 
                         member_node->type.pointer_depth = pointer_depth;
                         member_node->type.flags         = type_modifier_flags;
@@ -985,12 +990,14 @@ generate_structure_AST(parser_t *parser)
                 lexer_eat_lines(&transient_arena, lexer, 1);
             }
         }
+        parser_pop_decl_context(parser);
         
         token = parser_get_next_lexer_token(parser);
         if(token.token_type == TOKEN_TYPE_IDENT)
         {
-            // TODO(Sleepster): Make sure that when we convert these from the raw ID to the active_decl_context's space everything works fine!
-            parser_register_code_type_identifier(parser, token.data, struct_ID);
+            string_t alias_name = c_string_make_copy(&parser->arena, token.data);
+
+            parser_register_code_type_identifier(parser, alias_name, structure_type);
             token = parser_get_next_lexer_token(parser);
         }
         if(token.token_type != TOKEN_TYPE_SEMICOLON)
@@ -1001,9 +1008,9 @@ generate_structure_AST(parser_t *parser)
         }
 
         result = structure_root;
-        dynarray_add(&parser->active_decl_context->code_decls, &result);
     }
 
+    hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
     return(result);
 }
 
@@ -1011,17 +1018,12 @@ internal_api AST_node_t*
 generate_enum_AST(parser_t *parser)
 {
     AST_node_t *result = null;
-    u64 enum_ID  = 0;
 
     lexer_token_t token;
     lexer_token_t name_token = parser_get_next_lexer_token(parser);
     if(name_token.token_type == TOKEN_TYPE_IDENT)
     {
-        parser_register_code_type_identifier(parser, name_token.data);
-        printf("Registered enum type: '%.*s'...\n", fprint_string(name_token.data));
-
-        enum_ID = hash_table_hash_key(name_token.data);
-        token   = parser_get_next_lexer_token(parser);
+        token = parser_get_next_lexer_token(parser);
     }
     else if(name_token.token_type == TOKEN_TYPE_OPEN_BRACE)
     {
@@ -1043,6 +1045,10 @@ generate_enum_AST(parser_t *parser)
 
         if(name_token.token_type == TOKEN_TYPE_IDENT) enum_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
         else                                          enum_root->identifier = STR("anonymous");
+
+        code_type_t *enum_type    = parser_register_code_type_identifier(parser, enum_root->identifier);
+        enum_root->type.code_type = enum_type;
+
         for(;;)
         {
             if(token.token_type == TOKEN_TYPE_CLOSE_BRACE) break;
@@ -1077,7 +1083,8 @@ generate_enum_AST(parser_t *parser)
         token = parser_get_next_lexer_token(parser);
         if(token.token_type == TOKEN_TYPE_IDENT)
         {
-            parser_register_code_type_identifier(parser, token.data, enum_ID);
+            string_t alias_name = c_string_make_copy(&parser->arena, token.data);
+            parser_register_code_type_identifier(parser, alias_name, enum_type);
             token = parser_get_next_lexer_token(parser);
         }
         if(token.token_type != TOKEN_TYPE_SEMICOLON)
@@ -1090,6 +1097,7 @@ generate_enum_AST(parser_t *parser)
         result = enum_root;
     }
 
+    hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
     return(result);
 }
 
@@ -1098,11 +1106,12 @@ parser_create_lambda_type(parser_t *parser, AST_node_t *expression)
 {
     // NOTE(Sleepster): 
     // In this case we don't bother recording an overload or anything. This stage is purely for TYPE REGISTRY
-    parser_register_code_type_identifier(parser, expression->identifier);
+    code_type_t *lambda_type = parser_register_code_type_identifier(parser, expression->identifier);
     printf("Registered lambda type: '%.*s'...\n", fprint_string(expression->identifier));
 
     AST_type_t new_type = {};
     new_type.flags      = AST_TYPE_MODIFIER_FLAG_PROCEDURE;
+    new_type.code_type  = lambda_type;
 
     return(new_type);
 }
@@ -1118,8 +1127,8 @@ generate_lambda_AST(parser_t     *parser,
     return_type->identifier = c_string_make_copy(&permanent_arena, return_type_token.data);
 
     AST_type_t *return_type_data = &return_type->type;
+    return_type_data->code_type  = parser_register_code_type_identifier(parser, return_type->identifier);
 
-    return_type_data->literal       = c_string_make_copy(&permanent_arena, return_type_token.data);
     return_type_data->flags         = return_type_pointer_depth > 0 ? AST_TYPE_MODIFIER_FLAG_POINTER : 0;
     return_type_data->pointer_depth = return_type_pointer_depth;
     if(return_type_is_const)
@@ -1156,6 +1165,7 @@ generate_lambda_AST(parser_t     *parser,
     lambda->identifier = c_string_make_copy(&permanent_arena, procedure_name_token.data);
     lambda->type       = parser_create_lambda_type(parser, lambda);
 
+    hash_table_add_element(&parser->active_decl_context->code_decls, &lambda, lambda->identifier);
     return(lambda);
 }
 
@@ -1197,12 +1207,8 @@ generate_typedef_AST(parser_t *parser)
                 if(final_token.token_type == TOKEN_TYPE_SEMICOLON)
                 {
                     code_type_t *main_type = parser_search_for_code_type(parser, type_token.data);
-                    if(!main_type)
-                    {
-                        main_type = parser_register_code_type_identifier(parser, type_token.data);
-                    }
 
-                    parser_register_code_type_identifier(parser, alias_token.data, main_type->ID);
+                    parser_register_code_type_identifier(parser, alias_token.data, main_type);
                     printf("FOUND TYPE ALIAS: '%.*s' OF TYPE: '%.*s'...\n",
                            fprint_token(alias_token), fprint_token(type_token));
 

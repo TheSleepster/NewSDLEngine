@@ -4,7 +4,7 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-constexpr u32 MAX_INTERNAL_MEMBERS =  128;
+constexpr u32 MAX_INTERNAL_MEMBERS = 128;
 constexpr u32 MINIMUM_MEMBERS      = MAX_INTERNAL_MEMBERS / 4;
 
 // Nested macros are unaccounted for...
