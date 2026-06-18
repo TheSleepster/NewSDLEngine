@@ -39,14 +39,11 @@
  *      - tests/metaprogram_tests/attributes.cpp (currently, failing as intended)
  *      - nested_macros
  *
- * - [ ] PURGE THE THREAD ARENAS
+ * - [ ] #if !defined() header guards bricks the parser, deal with this
  * - [ ] #if statements that use macros or constexpr values are invalid. Thus crash the program.
- * - [ ] No way of printing the namespace string such as "Namespace is: 'Structure::'...\n"
- * - [X] C++ style [[attributes]] are not handled...
  * - [ ] Nested macros are unaccounted for, macro expansion is not recursive and MUST be recursive
- * - [ ] Templated members such as "hash_table_t<Type> types" would blow up the parser
- * - [ ] In the same way as above, templated members like "hash_table_t<Type> *table" would blow up the parser
  * - [ ] Macros such as:
+ * - [ ] Special markers to denote the ignoring of certain code_declarations / files.
  *
  *      #ifdef MATH_API_IMPL
  *      # define MATH_API 
@@ -55,6 +52,14 @@
  *      #endif
  *
  *      Break that macro parser.
+ *
+ * - [-] No way of printing the namespace string such as "Namespace is: 'Structure::'...\n"
+ * - [-] PURGE THE THREAD ARENAS
+ *
+ * - [X] Enums must be allowed in expressions.
+ * - [X] Templated members such as "hash_table_t<Type> types" would blow up the parser
+ * - [X] In the same way as above, templated members like "hash_table_t<Type> *table" would blow up the parser
+ * - [X] C++ style [[attributes]] are not handled...
  * - [X] When we find an identifier in the place of an expected number, we should try to find the enum value as well..
  * - [X] No default definition of types like NULL or nullptr
  * - [X] Function overloading. (Right now, function overloading is automatically handled.)
@@ -135,12 +140,6 @@ DEBUG_print_type_signature(AST_type_t *type)
     {
         printf("*");
     }
-
-    if(type->flags & AST_TYPE_MODIFIER_FLAG_ARRAY)
-    {
-        printf(" [%u]", type->array_size);
-    }
-    printf(" ");
 }
 
 internal_api void
@@ -228,13 +227,17 @@ DEBUG_print_structure_members(AST_node_t *structure, u32 indent)
         DEBUG_print_type_signature(&current_member->type);
         printf("%.*s", fprint_string(current_member->identifier));
 
-        if(current_member->expression.info && (current_member->type.flags & AST_TYPE_MODIFIER_FLAG_ARRAY))
-        {
-            AST_expression_value_t value = evaluate_expression_AST(current_member->expression.info);
-            if(value.type == AST_EXPRESSION_VALUE_INT)
+        if(current_member->type.flags & AST_TYPE_MODIFIER_FLAG_ARRAY)
+        {                        
+            Assert(current_member->array_data.array_expression);
+            for(AST_node_t *current_array = current_member->array_data.array_expression;
+                current_array;
+                current_array = current_array->next_sibling)
             {
-                current_member->type.array_size = (u32)value.int_value;
-                printf(" [%u]", current_member->type.array_size);
+                AST_expression_value_t value = evaluate_expression_AST(current_array);
+                current_array->array_size    = value.int_value;
+
+                printf("[%u]", current_array->array_size);
             }
         }
         else if(current_member->expression.info && 
@@ -695,8 +698,12 @@ build_file_AST(parser_t *parser)
             }break;
             case TOKEN_TYPE_CLOSE_BRACE:
             {
-                // TODO(Sleepster): verify that this only effects namespaces
-                parser_pop_decl_context(parser);
+                // NOTE(Sleepster): If this is a semicolon than it's some global initializer... 
+                lexer_token_t semicolon = parser_peek_next_lexer_token(parser);
+                if(semicolon.token_type != TOKEN_TYPE_SEMICOLON)
+                {
+                    parser_pop_decl_context(parser);
+                }
             }break;
             case TOKEN_TYPE_CONSTEXPR:
             {
@@ -935,12 +942,18 @@ deduce_AST_node_type_data()
                             if(current_member->expression.info && !current_member->expression.evaluated)
                             {
                                 current_member->expression.value = evaluate_expression_AST(current_member->expression.info);
-                                if(current_member->type.flags & AST_TYPE_MODIFIER_FLAG_ARRAY)
-                                {
-                                    current_member->type.array_size = current_member->expression.value.int_value;
-                                }
-
                                 current_member->expression.evaluated = true;
+                            }
+                            else if(current_member->type.flags & AST_TYPE_MODIFIER_FLAG_ARRAY)
+                            {
+                                Assert(current_member->array_data.array_expression);
+                                for(AST_node_t *current_array = current_member->array_data.array_expression;
+                                    current_array;
+                                    current_array = current_array->next_sibling)
+                                {
+                                    AST_expression_value_t value = evaluate_expression_AST(current_array);
+                                    current_array->array_size    = value.int_value;
+                                }
                             }
                         }
                     }break;

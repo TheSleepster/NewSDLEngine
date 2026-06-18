@@ -394,11 +394,6 @@ evaluate_expression_AST(AST_node_t *expression)
 
                 result = constant_expression->expression.value;
             }
-            else if(constant_expression && constant_expression->node_type == AST_NODE_TYPE_LAMBDA)
-            {
-                result.type             = AST_EXPRESSION_VALUE_IDENT;
-                result.identifier_value = constant_expression->identifier;
-            }
             else
             {
                 language_keyword_t *keyword = get_keyword_from_identifier(expression->identifier);
@@ -416,7 +411,8 @@ evaluate_expression_AST(AST_node_t *expression)
                 }                    
                 else
                 {
-                    Expect(false, "Undeclared identifier within expression: '%.*s'...\n", fprint_string(expression->identifier));
+                    result.type             = AST_EXPRESSION_VALUE_IDENT;
+                    result.identifier_value = expression->identifier;
                 }
             }
         }break;
@@ -875,8 +871,18 @@ generate_structure_AST(parser_t *parser)
                         token = parser_get_next_lexer_token(parser);
                         if(token.token_type == TOKEN_TYPE_OPEN_BRACKET)
                         {
-                            member_node->expression.info = generate_expression_AST(parser, 0, &token);
-                            member_node->type.flags     |= AST_TYPE_MODIFIER_FLAG_ARRAY;
+                            member_node->type.flags |= AST_TYPE_MODIFIER_FLAG_ARRAY;
+
+                            AST_node_t **array = &member_node->array_data.array_expression;
+                            while(token.token_type != TOKEN_TYPE_SEMICOLON)
+                            {
+                                if(!(*array)) *array = c_arena_push_struct(&parser->arena, AST_node_t);
+
+                                *array = generate_expression_AST(parser, 0, &token);
+                                 array = &(*array)->next_sibling;
+
+                                token = parser_get_next_lexer_token(parser);
+                            }
                         }
                         else if(token.token_type == TOKEN_TYPE_EQUALS)
                         {
@@ -982,9 +988,9 @@ generate_structure_AST(parser_t *parser)
         }
 
         result = structure_root;
+        hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
     }
 
-    hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
     return(result);
 }
 

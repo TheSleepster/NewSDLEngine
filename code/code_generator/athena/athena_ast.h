@@ -79,7 +79,6 @@ struct AST_type_t
     code_type_t *code_type;
     u32          flags;
     u32          pointer_depth;
-    u32          array_size;
 
     string_t     value_literal;
     //AST_expression_value_t value;
@@ -137,6 +136,7 @@ struct AST_node_t
     // This does not imply heap allocations on a per-node basis, we only use heap allocations 
     // if the parser->attributes array has content.
     dynarray_t<code_attribute_t> attributes;
+    u32                          array_size;
 
     AST_type_t                   type;
     AST_node_t                  *next_sibling;
@@ -178,6 +178,13 @@ struct AST_node_t
         AST_node_t *first_argument;
         u32         argument_count;
     }lambda;
+
+    // NOTE(Sleepster): In the event we have something like: 'int items[3][4];' We simply chain these together. It's
+    // a chain to allow for more arrays if we really need that like 'int items2[3][4][5][6]'
+    struct 
+    {
+        AST_node_t   *array_expression;
+    }array_data;
 };
 
 struct argument_list_t
