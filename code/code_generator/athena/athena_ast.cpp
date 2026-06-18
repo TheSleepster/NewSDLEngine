@@ -48,6 +48,8 @@ AST_add_member(AST_node_t *parent, AST_node_t *next_member)
             }
         }
     }
+
+    ++parent->struct_decl.member_count;
 }
 
 internal_api true_inline void
@@ -68,8 +70,6 @@ AST_add_sibling(AST_node_t *sibling, AST_node_t *new_sibling)
 internal_api void
 build_number_AST_node(parser_t *parser, AST_node_t *value_expression, lexer_token_t token)
 {
-    lexer_t *lexer = &parser->lexer;
-
     lexer_token_t value_token = token;
     if(token.token_type == TOKEN_TYPE_DASH)
     {
@@ -80,7 +80,7 @@ build_number_AST_node(parser_t *parser, AST_node_t *value_expression, lexer_toke
     s32 decimal_index = c_string_find_first_char_from_left(token.data, '.');
     if(decimal_index == -1)
     {
-        lexer_token_t float_token = lexer_peek_token(lexer, 1);
+        lexer_token_t float_token = parser_peek_next_lexer_token(parser, 1);
         if(float_token.data.count == 1 && float_token.data.data[0] == 'f')
         {
             value_expression->type.flags |= AST_TYPE_MODIFIER_FLAG_FLOAT;
@@ -93,50 +93,6 @@ build_number_AST_node(parser_t *parser, AST_node_t *value_expression, lexer_toke
 
     value_expression->node_type          = AST_NODE_TYPE_NUMBER;
     value_expression->type.value_literal = c_string_make_copy(&parser->arena, value_token.data); 
-#if 0
-    if(signed_value && !is_float)
-    {
-        //value_expression->type.code_type = symbol_table_search_for_code_type(STR("int64_t"));
-        value_expression->type.code_type = parser_search_for_code_type(parser, STR("int64_t"));
-        value_expression->type.int_value = c_string_read_int(value_token.data); 
-
-        value_expression->type.flags |= AST_TYPE_MODIFIER_FLAG_SIGNED;
-    }
-    else if(!signed_value && !is_float)
-    {
-        //value_expression->type.code_type      = symbol_table_search_for_code_type(STR("uint64_t"));
-        value_expression->type.code_type      = parser_search_for_code_type(parser, STR("uint64_t"));
-        value_expression->type.unsigned_value = c_string_read_uint(value_token.data); 
-    }
-    else if(is_float)
-    {
-        bool8 half_float = false;
-        lexer_token_t float_token = lexer_peek_token(lexer, 1);
-        if(float_token.data.count == 1 && float_token.data.data[0] == 'f')
-        {
-            parser_get_next_lexer_token(parser);
-            half_float = true;
-        }
-
-        if(half_float)
-        {
-            value_expression->type.code_type     = parser_search_for_code_type(parser, STR("float"));
-            value_expression->type.float32_value = c_string_read_float32(value_token.data); 
-        }
-        else
-        {
-            value_expression->type.code_type     = parser_search_for_code_type(parser, STR("double"));
-            value_expression->type.float64_value = c_string_read_float64(value_token.data); 
-        }
-        value_expression->type.flags |= (AST_TYPE_MODIFIER_FLAG_FLOAT | AST_TYPE_MODIFIER_FLAG_SIGNED);
-    }
-    else
-    {
-        report_error(parser, 
-                     "Expected to parse a number when building the number AST node... Failed to find that... Instead found: '%.*s'...\n", 
-                     fprint_token(token));
-    }
-#endif
 }
 
 internal_api u32
@@ -204,62 +160,23 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
     if(prefix_value == -1)
     {
         // NOTE(Sleepster): If this is not a prefix value (like '-') 
+        result = AST_create_new_node(&parser->arena);
         switch(token->token_type)
         {
             case TOKEN_TYPE_NUMBER:
             {
-                result = AST_create_new_node(&parser->arena);
                 build_number_AST_node(parser, result, *token);
             }break;
             // NOTE(Sleepster): For macros, this will never happen since the symbol table simply substitues the macro expansion in place. 
             case TOKEN_TYPE_IDENT:
             {
-                result = AST_create_new_node(&parser->arena);
-
                 result->identifier = c_string_make_copy(&parser->arena, token->data);
                 result->node_type  = AST_NODE_TYPE_IDENTIFIER;
-#if 0
-                //AST_expression_value_t *constant = hash_table_get_element_ptr(&g_symbol_table.constants_table, token->data);
-                AST_expression_value_t *constant = hash_table_get_element_ptr(&parser->constant_expression_table, token->data);
-                if(constant->type != AST_EXPRESSION_VALUE_INVALID)
-                {
-                    result = AST_create_new_node(&permanent_arena);
-                    result->node_type  = AST_NODE_TYPE_NUMBER;
-                    result->identifier = c_string_make_copy(&permanent_arena, token->data); 
-                    switch(constant->type)
-                    {
-                        case AST_EXPRESSION_VALUE_INT:
-                        case AST_EXPRESSION_VALUE_UNSIGNED:
-                        case AST_EXPRESSION_VALUE_FLOAT:
-                        case AST_EXPRESSION_VALUE_DOUBLE:
-                        {
-                            result->type.literal = constant->identifier_value;
-                            memcpy(&result->type.float64_value, &constant->float64_value, sizeof(double));
-
-                            printf("Found constexpr: '%.*s'...\n", token->data.count, token->data.data);
-                        }break;
-                        case AST_EXPRESSION_VALUE_LITERAL:
-                        {
-                            result = AST_create_new_node(&permanent_arena);
-                            result->node_type         = AST_NODE_TYPE_LITERAL;
-                            result->type.string_value = c_string_make_copy(&permanent_arena, token->data);
-
-                            printf("String literal: '%.*s' found when generating an expression...\n", token->data.count, token->data.data);
-                        }break;
-                        default: { InvalidCodePath; } break;
-                    }
-                }
-                else
-                {
-                    printf("Wanted to input parsing data for constant: '%.*s' however, this constant is not valid yet...\n", fprint_string(token->data));
-                }
-#endif
             }break;
             case TOKEN_TYPE_LITERAL:
             {
-                result = AST_create_new_node(&permanent_arena);
                 result->node_type          = AST_NODE_TYPE_LITERAL;
-                result->type.value_literal = c_string_make_copy(&permanent_arena, token->data);
+                result->type.value_literal = c_string_make_copy(&parser->arena, token->data);
 
                 printf("String literal: '%.*s' found when generating an expression...\n", token->data.count, token->data.data);
             }break;
@@ -270,9 +187,8 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
             }break;
             default: 
             {
-                report_error(parser, 
-                             "Expected either an identifier, a number, or another expression when generating the prefix AST... Instead found: '%.*s' token type: '%.*s'...\n",
-                             token->data.count, token->data.data, lexer_token_type_to_string(token));
+                result->node_type  = AST_NODE_TYPE_IDENTIFIER;
+                result->identifier = c_string_make_copy(&parser->arena, token->data);
             }break;
         }
     }
@@ -469,12 +385,40 @@ evaluate_expression_AST(AST_node_t *expression)
             // NOTE(Sleepster): Inside generate, we record all constexpr as identifiers.
             // In this case, we must do what generate used to do, and determine the type here.
             AST_node_t *constant_expression = symbol_table_find_code_declaration(expression->identifier);
-            if(constant_expression->expression.evaluated == false)
+            if(constant_expression && constant_expression->node_type == AST_NODE_TYPE_CONSTEXPR)
             {
-                constant_expression->expression.value = evaluate_expression_AST(constant_expression->expression.info);
-            }
+                if(constant_expression->expression.evaluated == false)
+                {
+                    constant_expression->expression.value = evaluate_expression_AST(constant_expression->expression.info);
+                }
 
-            result = constant_expression->expression.value;
+                result = constant_expression->expression.value;
+            }
+            else if(constant_expression && constant_expression->node_type == AST_NODE_TYPE_LAMBDA)
+            {
+                result.type             = AST_EXPRESSION_VALUE_IDENT;
+                result.identifier_value = constant_expression->identifier;
+            }
+            else
+            {
+                language_keyword_t *keyword = get_keyword_from_identifier(expression->identifier);
+                if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
+                {
+                    if(keyword->keyword_id == TOKEN_KEYWORD_NULL || keyword->keyword_id == TOKEN_KEYWORD_NULLPTR)
+                    {
+                        result.type      = AST_EXPRESSION_VALUE_INT;
+                        result.int_value = 0;
+                    }
+                    else
+                    {
+                        Expect(false, "Undeclared identifier within expression: '%.*s'...\n", fprint_string(expression->identifier));
+                    }
+                }                    
+                else
+                {
+                    Expect(false, "Undeclared identifier within expression: '%.*s'...\n", fprint_string(expression->identifier));
+                }
+            }
         }break;
         case AST_NODE_TYPE_LITERAL:
         {
@@ -551,111 +495,119 @@ evaluate_expression_AST(AST_node_t *expression)
     return(result);
 }
 
-internal_api void
-parse_lambda_argument_list(parser_t *parser, AST_node_t *lambda)
+internal_api argument_list_t 
+parse_argument_list(parser_t *parser)
 {
+    argument_list_t result = {};
+
     lexer_token_t token = parser_get_next_lexer_token(parser);
     do {
         if(token.token_type == TOKEN_TYPE_IDENT)
         {
-            u32 argument_flags = 0;
+            lexer_token_t typename_token = token;
 
+            // NOTE(Sleepster): Check for qualifiers like const or volatile 
+            u32 argument_flags = 0;
             language_keyword_t *keyword = get_keyword_from_identifier(token.data);
             if(keyword->keyword_id == TOKEN_KEYWORD_CONST)
             {
-                token = parser_get_next_lexer_token(parser);
+                typename_token = parser_get_next_lexer_token(parser);
                 argument_flags |= AST_TYPE_MODIFIER_FLAG_CONST;
             }
-
             if(keyword->keyword_id == TOKEN_KEYWORD_VOLATILE)
             {
-                token = parser_get_next_lexer_token(parser);
+                typename_token = parser_get_next_lexer_token(parser);
                 argument_flags |= AST_TYPE_MODIFIER_FLAG_VOLATILE;
             }
 
-            // NOTE(Sleepster): Generate an AST_node_t for each of the function's arugments;
-            lexer_token_t argument_typename = token;
-
-            // TODO(Sleepster):   
-            // We also need to handle namespaced types
-            //
-            // void item_manager::get_items(string_t item_name);
-            //
-            // void get_items(string_t item_name);
-            //
-            // should be different as well..
-            if(argument_typename.token_type == TOKEN_TYPE_IDENT || 
-               argument_typename.token_type == TOKEN_TYPE_NAMESPACE || 
-               argument_typename.token_type == TOKEN_TYPE_ASTERISK)
+            // NOTE(Sleepster): Check if this is a namespaced type 
+            lexer_token_t check_namespace_token = parser_peek_next_lexer_token(parser);
+            if(check_namespace_token.token_type == TOKEN_TYPE_DOUBLE_COLON)
             {
-                lexer_token_t argument_name = parser_get_next_lexer_token(parser);
-
-                u32 pointer_depth = 0;
-                while(argument_name.token_type == TOKEN_TYPE_ASTERISK)
+                parser_get_next_lexer_token(parser);
+                typename_token = parser_get_next_lexer_token(parser);
+            }
+            else if(check_namespace_token.token_type == TOKEN_TYPE_LESS_THAN)
+            {
+                // TODO(Sleepster): For now we just assume that templates are waste of time to parse here. However if this
+                // needs to change, here's where you'd do so.
+                while(check_namespace_token.token_type != TOKEN_TYPE_GREATER_THAN)
                 {
-                    argument_name = parser_get_next_lexer_token(parser);
-                    ++pointer_depth;
-                }
-
-                if(argument_name.token_type != TOKEN_TYPE_IDENT && 
-                   c_string_compare(argument_typename.data, STR("void")))
-                {
-                    // NOTE(Sleepster): 
-                    // This is a declaration like:
-                    //
-                    // int random_function(void);
-                    //
-                    // therefore there are no arguments
-                    break;
-                }
-
-                if(argument_name.token_type != TOKEN_TYPE_IDENT)
-                {
-                    report_error(parser,
-                                 "Expected the arugment_name token to be a valid identifier... Instead it was: '%.*s'...\n",
-                                 fprint_token(argument_name));
-                }
-
-                AST_node_t *argument = AST_create_new_node(&permanent_arena);
-                argument->node_type  = AST_NODE_TYPE_LAMBDA_ARGUMENT;
-                argument->identifier = c_string_make_copy(&permanent_arena, argument_name.data);
-
-                AST_type_t *type_data = &argument->type;
-                type_data->code_type  = parser_register_code_type_identifier(parser, c_string_make_copy(&permanent_arena, argument_typename.data));
-
-                type_data->flags         = pointer_depth > 0 ? (argument_flags | AST_TYPE_MODIFIER_FLAG_POINTER) : argument_flags;
-                type_data->pointer_depth = pointer_depth;
-                if(lambda->lambda.first_argument != null)
-                {
-                    for(AST_node_t *current_argument = lambda->lambda.first_argument;
-                        current_argument;
-                        current_argument = current_argument->next_sibling)
-                    {
-                        if(current_argument->next_sibling == null)
-                        {
-                            current_argument->next_sibling = argument;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    lambda->lambda.first_argument = argument;
-                }
-
-                ++lambda->lambda.argument_count;
-
-                token = parser_get_next_lexer_token(parser);
-                if(token.token_type == TOKEN_TYPE_EQUALS)
-                {
-                    argument->expression.info = generate_expression_AST(parser, 0, &token);
-                }
-
-                if(token.token_type == TOKEN_TYPE_CLOSE_PAREN)
-                {
-                    break;
+                    check_namespace_token = parser_get_next_lexer_token(parser);
                 }
             }
+
+            lexer_token_t declaration_name = parser_get_next_lexer_token(parser);
+
+            u32 pointer_depth = 0;
+            while(declaration_name.token_type == TOKEN_TYPE_ASTERISK)
+            {
+                declaration_name = parser_get_next_lexer_token(parser);
+                ++pointer_depth;
+            }
+
+            if(declaration_name.token_type != TOKEN_TYPE_IDENT && 
+               c_string_compare(typename_token.data, STR("void")))
+            {
+                // NOTE(Sleepster): 
+                // This is a declaration like:
+                //
+                // int random_function(void);
+                //
+                // therefore there are no arguments
+                break;
+            }
+
+            if(declaration_name.token_type != TOKEN_TYPE_IDENT)
+            {
+                report_error(parser, "Error, expected to find identifier following a typename in this argument list...\n");
+            }
+
+            AST_node_t *argument = AST_create_new_node(&parser->arena);
+            argument->node_type  = AST_NODE_TYPE_LAMBDA_ARGUMENT;
+            argument->identifier = c_string_make_copy(&parser->arena, declaration_name.data);
+
+            AST_type_t *type_data = &argument->type;
+            type_data->code_type  = parser_register_code_type_identifier(parser, c_string_make_copy(&parser->arena, typename_token.data));
+
+            type_data->flags         = pointer_depth > 0 ? (argument_flags | AST_TYPE_MODIFIER_FLAG_POINTER) : argument_flags;
+            type_data->pointer_depth = pointer_depth;
+            if(result.first_argument == null)
+            {
+                result.first_argument = argument;
+            }
+            else
+            {
+                for(AST_node_t *current_argument = result.first_argument;
+                    current_argument;
+                    current_argument = current_argument->next_sibling)
+                {
+                    if(current_argument->next_sibling == null)
+                    {
+                        current_argument->next_sibling = argument;
+                        break;
+                    }
+                }
+            }
+
+            ++result.argument_count;
+
+            token = parser_get_next_lexer_token(parser);
+            if(token.token_type == TOKEN_TYPE_EQUALS)
+            {
+                argument->expression.info = generate_expression_AST(parser, 0, &token);
+            }
+
+            if(token.token_type == TOKEN_TYPE_CLOSE_PAREN  ||
+               token.token_type == TOKEN_TYPE_GREATER_THAN)
+            {
+                break;
+            }
+
+
+            // int main(int argc, char *argv);
+            // int add(namespace::item item, namespace::thing thing)
+            // template<typename T, typename U>
         }
         else if(token.token_type == TOKEN_TYPE_NUMBER)
         {
@@ -664,7 +616,11 @@ parse_lambda_argument_list(parser_t *parser, AST_node_t *lambda)
         }
 
         token = parser_get_next_lexer_token(parser);
-    }while(token.token_type != TOKEN_TYPE_CLOSE_PAREN);
+    }while(token.token_type != TOKEN_TYPE_CLOSE_PAREN && 
+           token.token_type != TOKEN_TYPE_CLOSE_BRACE && 
+           token.token_type != TOKEN_TYPE_GREATER_THAN);
+
+    return(result);
 }
 
 internal_api AST_node_t* 
@@ -749,6 +705,15 @@ generate_structure_AST(parser_t *parser)
         AST_node_t *structure_root = AST_create_new_node(&permanent_arena);
         structure_root->node_type  = AST_NODE_TYPE_STRUCTURE;
         structure_root->type.flags = structure_flags;
+
+        // NOTE(Sleepster): Copy the attributes 
+        if(parser->current_attribute_list.used > 0)
+        {
+            dynarray_copy(&structure_root->attributes, &parser->current_attribute_list);
+            dynarray_reset(&parser->current_attribute_list);
+        }
+
+        // NOTE(Sleepster): Handle inheritence 
         if(inheritance_node)
         {
             structure_root->struct_decl.inherited_type_info = inheritance_node;
@@ -779,7 +744,6 @@ generate_structure_AST(parser_t *parser)
             // NOTE(Sleepster): Handle type modifier (const or volatile)
             u32 type_modifier_flags = 0;
             language_keyword_t *keyword = get_keyword_from_identifier(typename_token.data);
-
             bool8 is_valid_member = true;
             while(keyword->keyword_id != TOKEN_KEYWORD_INVALID &&
                   keyword->keyword_id != TOKEN_KEYWORD_STRUCT  &&
@@ -816,7 +780,117 @@ generate_structure_AST(parser_t *parser)
 
             if(is_valid_member)
             {
-                lexer_token_t member_name_token = lexer_peek_token(lexer);
+                lexer_token_t member_name_token = parser_peek_next_lexer_token(parser);
+                if(member_name_token.token_type == TOKEN_TYPE_LESS_THAN)
+                {
+                    // NOTE(Sleepster): Eat the template params, we don't care. 
+                    u32 template_depth = 0;
+                    do {
+                        member_name_token = parser_get_next_lexer_token(parser);
+                        if(member_name_token.token_type == TOKEN_TYPE_LESS_THAN)
+                        {
+                            ++template_depth;
+                        }
+                        else if(member_name_token.token_type == TOKEN_TYPE_GREATER_THAN)
+                        {
+                            --template_depth;
+                        }
+                    }while(template_depth > 0);
+
+                    // NOTE(Sleepster): This gets us the name 
+                    member_name_token = parser_peek_next_lexer_token(parser);
+                }
+
+                // NOTE(Sleepster): A normal member that should be recorded, otherwise a constructor 
+                if(member_name_token.token_type != TOKEN_TYPE_OPEN_PAREN &&
+                   typename_token.token_type    != TOKEN_TYPE_TILDE)
+                {
+                    // NOTE(Sleepster): Handle member pointer 
+                    u32 pointer_depth = 0;
+                    if(member_name_token.token_type == TOKEN_TYPE_ASTERISK)
+                    {
+                        do {
+                            member_name_token = parser_peek_next_lexer_token(parser, pointer_depth + 2);
+                            ++pointer_depth;
+                        }while(member_name_token.token_type == TOKEN_TYPE_ASTERISK);
+                    }
+
+                    // NOTE(Sleepster): This assert is disabled for anonymous structures...
+                    // Expect(member_name_token.token_type == TOKEN_TYPE_IDENT, 
+                    //        "Expected to find a member name in this location... Instead found: '%.*s'...\n",
+                    //        fprint_token(member_name_token));
+
+                    lexer_token_t peek_token = parser_peek_next_lexer_token(parser, pointer_depth + 2);
+                    if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
+                    {
+                        // usual lambda
+                        AST_node_t *member_node = generate_lambda_AST(parser, 
+                                                                      typename_token, 
+                                                                      pointer_depth, 
+                                                                      (type_modifier_flags & AST_TYPE_MODIFIER_FLAG_CONST) ? true : false);
+                        member_node->identifier = c_string_make_copy(&parser->arena, member_name_token.data);
+                        AST_add_member(structure_root, member_node);
+
+                        peek_token = parser_peek_next_lexer_token(parser);
+                        if(peek_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+                        {
+                            while(peek_token.token_type != TOKEN_TYPE_CLOSE_BRACE)
+                            {
+                                peek_token = parser_get_next_lexer_token(parser);
+                            }
+                        }
+                        else if(peek_token.token_type == TOKEN_TYPE_SEMICOLON)
+                        {
+                            parser_get_next_lexer_token(parser);
+                        }
+                    }
+                    else if(typename_token.token_type == TOKEN_TYPE_IDENT)
+                    {
+                        parser_get_next_lexer_token(parser);
+
+                        for(u32 pointer_index = 0;
+                            pointer_index < pointer_depth;
+                            ++pointer_index)
+                        {
+                            parser_get_next_lexer_token(parser);
+                        }
+
+                        AST_node_t *member_node = AST_create_new_node(&permanent_arena);
+                        member_node->node_type  = AST_NODE_TYPE_STRUCTURE_MEMBER;
+                        member_node->identifier = c_string_make_copy(&permanent_arena, member_name_token.data); 
+
+                        code_type_t *member_type    = parser_register_code_type_identifier(parser, typename_token.data);
+                        member_node->type.code_type = member_type;
+
+                        member_node->type.pointer_depth = pointer_depth;
+                        member_node->type.flags         = type_modifier_flags;
+                        if(pointer_depth > 0)
+                        {
+                            member_node->type.flags |= AST_TYPE_MODIFIER_FLAG_POINTER;
+                        }
+
+                        AST_add_member(structure_root, member_node);
+
+                        // NOTE(Sleepster): Eat the semicolon, if it is not a semicolon, then check for an array or a default expression value
+                        token = parser_get_next_lexer_token(parser);
+                        if(token.token_type == TOKEN_TYPE_OPEN_BRACKET)
+                        {
+                            member_node->expression.info = generate_expression_AST(parser, 0, &token);
+                            member_node->type.flags     |= AST_TYPE_MODIFIER_FLAG_ARRAY;
+                        }
+                        else if(token.token_type == TOKEN_TYPE_EQUALS)
+                        {
+                            // NOTE(Sleepster): Generate the assignment AST 
+                            member_node->expression.info = generate_expression_AST(parser, 0, &token);
+                        }
+                    }
+                    else if(typename_token.token_type == TOKEN_TYPE_STRUCT || 
+                            typename_token.token_type == TOKEN_TYPE_UNION)
+                    {
+                        AST_node_t *nested_structure = generate_structure_AST(parser);
+                        AST_add_member(structure_root, nested_structure);
+                    }
+                }
                 if(member_name_token.token_type == TOKEN_TYPE_OPEN_PAREN || 
                    typename_token.token_type == TOKEN_TYPE_TILDE)
                 {
@@ -884,106 +958,6 @@ generate_structure_AST(parser_t *parser)
                     constructor_node->type.code_type->code_metatype = CODE_TYPE_LAMBDA;
 #endif
                 }
-                else
-                {
-                    // NOTE(Sleepster): Handle member pointer 
-                    u32 pointer_depth = 0;
-                    if(member_name_token.token_type == TOKEN_TYPE_ASTERISK)
-                    {
-                        do {
-                            member_name_token = lexer_peek_token(lexer, pointer_depth + 2);
-                            ++pointer_depth;
-                        }while(member_name_token.token_type == TOKEN_TYPE_ASTERISK);
-                    }
-
-                    // NOTE(Sleepster): This assert is disabled for anonymous structures...
-                    // Expect(member_name_token.token_type == TOKEN_TYPE_IDENT, 
-                    //        "Expected to find a member name in this location... Instead found: '%.*s'...\n",
-                    //        fprint_token(member_name_token));
-
-                    lexer_token_t peek_token = lexer_peek_token(lexer, pointer_depth + 2);
-                    if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
-                    {
-                        // usual lambda
-                        AST_node_t *member_node = generate_lambda_AST(parser, 
-                                                                      typename_token, 
-                                                                      pointer_depth, 
-                                                                      (type_modifier_flags & AST_TYPE_MODIFIER_FLAG_CONST) ? true : false);
-                        member_node->identifier = c_string_make_copy(&parser->arena, typename_token.data);
-                        AST_add_member(structure_root, member_node);
-
-                        peek_token = lexer_peek_token(lexer);
-                        if(peek_token.token_type == TOKEN_TYPE_OPEN_BRACE)
-                        {
-                            while(peek_token.token_type != TOKEN_TYPE_CLOSE_BRACE)
-                            {
-                                peek_token = parser_get_next_lexer_token(parser);
-                            }
-                        }
-                        else if(peek_token.token_type == TOKEN_TYPE_SEMICOLON)
-                        {
-                            parser_get_next_lexer_token(parser);
-                        }
-                        else
-                        {
-                            report_error(parser,
-                                         "Failure to parse expression after struct member lambda... Found: '%.*s' which is an invalid token...\n",
-                                         fprint_token(peek_token));
-                        }
-                    }
-                    else if(typename_token.token_type == TOKEN_TYPE_IDENT)
-                    {
-                        parser_get_next_lexer_token(parser);
-
-                        for(u32 pointer_index = 0;
-                            pointer_index < pointer_depth;
-                            ++pointer_index)
-                        {
-                            parser_get_next_lexer_token(parser);
-                        }
-
-                        AST_node_t *member_node = AST_create_new_node(&permanent_arena);
-                        member_node->node_type  = AST_NODE_TYPE_STRUCTURE_MEMBER;
-                        member_node->identifier = c_string_make_copy(&permanent_arena, member_name_token.data); 
-
-                        code_type_t *member_type    = parser_register_code_type_identifier(parser, typename_token.data);
-                        member_node->type.code_type = member_type;
-
-                        member_node->type.pointer_depth = pointer_depth;
-                        member_node->type.flags         = type_modifier_flags;
-                        if(pointer_depth > 0)
-                        {
-                            member_node->type.flags |= AST_TYPE_MODIFIER_FLAG_POINTER;
-                        }
-
-                        AST_add_member(structure_root, member_node);
-
-                        // NOTE(Sleepster): Eat the semicolon, if it is not a semicolon, then check for an array or a default expression value
-                        token = parser_get_next_lexer_token(parser);
-                        if(token.token_type == TOKEN_TYPE_OPEN_BRACKET)
-                        {
-                            member_node->expression.info = generate_expression_AST(parser, 0, null);
-                            member_node->type.flags     |= AST_TYPE_MODIFIER_FLAG_ARRAY;
-
-                            lexer_token_t token = lexer_peek_token(lexer);
-                            if(token.token_type != TOKEN_TYPE_SEMICOLON)
-                            {
-                                report_error(parser, "Expected token following an array declaration to be that of a ';', instead found: '%.s'...\n", fprint_token(token));
-                            }
-                        }
-                        else if(token.token_type == TOKEN_TYPE_EQUALS)
-                        {
-                            // NOTE(Sleepster): Generate the assignment AST 
-                            member_node->expression.info = generate_expression_AST(parser, 0, &token);
-                        }
-                    }
-                    else if(typename_token.token_type == TOKEN_TYPE_STRUCT || 
-                            typename_token.token_type == TOKEN_TYPE_UNION)
-                    {
-                        AST_node_t *nested_structure = generate_structure_AST(parser);
-                        AST_add_member(structure_root, nested_structure);
-                    }
-                }
             }
             else
             {
@@ -1043,12 +1017,18 @@ generate_enum_AST(parser_t *parser)
         AST_node_t *enum_root     = AST_create_new_node(&permanent_arena);
         enum_root->node_type      = AST_NODE_TYPE_ENUM;
 
+        // NOTE(Sleepster): Copy the attributes 
+        if(parser->current_attribute_list.used > 0)
+        {
+            dynarray_copy(&enum_root->attributes, &parser->current_attribute_list);
+            dynarray_reset(&parser->current_attribute_list);
+        }
+
         if(name_token.token_type == TOKEN_TYPE_IDENT) enum_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
         else                                          enum_root->identifier = STR("anonymous");
 
         code_type_t *enum_type    = parser_register_code_type_identifier(parser, enum_root->identifier);
         enum_root->type.code_type = enum_type;
-
         for(;;)
         {
             if(token.token_type == TOKEN_TYPE_CLOSE_BRACE) break;
@@ -1158,14 +1138,41 @@ generate_lambda_AST(parser_t     *parser,
     AST_node_t *lambda = AST_create_new_node(&permanent_arena);
     lambda->lambda.return_type = return_type;
 
-    parse_lambda_argument_list(parser, lambda);
+    argument_list_t list = parse_argument_list(parser);
+    lambda->lambda.first_argument = list.first_argument;
+    lambda->lambda.argument_count = list.argument_count;
 
     // NOTE(Sleepster): Fill in the data related to the lambda. 
     lambda->node_type  = AST_NODE_TYPE_LAMBDA;
     lambda->identifier = c_string_make_copy(&permanent_arena, procedure_name_token.data);
     lambda->type       = parser_create_lambda_type(parser, lambda);
+    if(parser->current_attribute_list.used > 0)
+    {
+        dynarray_copy(&lambda->attributes, &parser->current_attribute_list);
+        dynarray_reset(&parser->current_attribute_list);
+    }
 
     hash_table_add_element(&parser->active_decl_context->code_decls, &lambda, lambda->identifier);
+
+    // NOTE(Sleepster): If the last token here is an open paren, this is a procedure body,
+    // eat the body of the procedure to prevent issues with namespaces.
+    lexer_token_t token = parser_peek_next_lexer_token(parser, 1);
+    if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
+    {
+        u32 brace_depth = 0;
+        do {
+            token = parser_get_next_lexer_token(parser);
+            if(token.token_type == TOKEN_TYPE_CLOSE_BRACE)
+            {
+                --brace_depth;
+            }
+            else if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
+            {
+                ++brace_depth;
+            }
+        }while(brace_depth > 0);
+    }
+
     return(lambda);
 }
 
@@ -1189,18 +1196,18 @@ generate_typedef_AST(parser_t *parser)
         }break;
         case TOKEN_TYPE_IDENT:
         {
-            lexer_token_t alias_token = lexer_peek_token(&parser->lexer);
+            lexer_token_t alias_token = parser_peek_next_lexer_token(parser);
 
             u32 pointer_depth = 0;
             while(alias_token.token_type == TOKEN_TYPE_ASTERISK)
             {
-                alias_token = lexer_peek_token(lexer, pointer_depth + 2);
+                alias_token = parser_peek_next_lexer_token(parser, pointer_depth + 2);
                 ++pointer_depth;
             }
 
             if(alias_token.token_type == TOKEN_TYPE_IDENT)
             {
-                lexer_token_t final_token = lexer_peek_token(lexer, pointer_depth + 2);
+                lexer_token_t final_token = parser_peek_next_lexer_token(parser, pointer_depth + 2);
                 // NOTE(Sleepster): 
                 // For something as simple as this typedef expression, 
                 // we do not need an AST since that is insanely redundant...
@@ -1225,6 +1232,19 @@ generate_typedef_AST(parser_t *parser)
             }
         }break;
     }
+
+    return(result);
+}
+
+internal_api code_attribute_t
+create_template_attribute(parser_t *parser)
+{
+    code_attribute_t result = {};
+    result.is_template = true;
+    
+    argument_list_t list = parse_argument_list(parser);
+    result.template_data.arguments      = list.first_argument;
+    result.template_data.argument_count = list.argument_count;
 
     return(result);
 }

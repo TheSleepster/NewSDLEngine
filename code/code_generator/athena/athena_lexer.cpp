@@ -305,7 +305,6 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
         }
     }
     
-    ++token_stream->current_token_stream_depth;
     token_stream->last_token = result;
 
     return(result);
@@ -315,9 +314,7 @@ internal_api lexer_token_t
 lexer_get_next_token(lexer_t *lexer)
 {
     lexer_token_t result  = {};
-    lexer_token_stream_t *token_stream = lexer->current_stream;
-
-    result = lexer_get_next_token_from_stream(token_stream);
+    result = lexer_get_next_token_from_stream(lexer->current_stream);
     
     return(result);
 }
@@ -335,7 +332,7 @@ lexer_peek_token_from_stream(lexer_t *lexer, lexer_token_stream_t *stream, u32 t
     {
         result = lexer_get_next_token(lexer);
     }
-    lexer_pop_token_stream(lexer, false);
+    lexer_pop_token_stream(lexer);
 
     return(result);
 }
@@ -353,46 +350,50 @@ lexer_peek_token(lexer_t *lexer, u32 tokens_to_peek_ahead = 1)
 internal_api true_inline void
 lexer_push_bookmark(lexer_t *lexer, lexer_token_t token)
 {
-    lexer_bookmark_t *bookmark = lexer->current_stream->bookmarks + lexer->current_stream->bookmark_count++;
-    Expect(lexer->current_stream->bookmark_count + 1 <= (s32)MAX_LEXER_BOOKMARKS, "The amount of lexer bookmarks is limitted to '%u'... You have gone over that", MAX_LEXER_BOOKMARKS);
+    lexer_bookmark_t *bookmark = lexer->current_stream->bookmarks + ++lexer->current_stream->bookmark_count;
+    Expect(lexer->current_stream->bookmark_count + 1 <= (s32)MAX_LEXER_BOOKMARKS, 
+           "The amount of lexer bookmarks is limitted to '%u'... You have gone over that", 
+           MAX_LEXER_BOOKMARKS);
 
-    bookmark->read_data   = lexer->current_stream->string.data;
-    bookmark->read_count  = lexer->current_stream->string.count;
-    bookmark->line_number = lexer->current_stream->line_number;
-    bookmark->last_token  = token;
+    bookmark->read_data          = lexer->current_stream->string.data;
+    bookmark->read_count         = lexer->current_stream->string.count;
+    bookmark->line_number        = lexer->current_stream->line_number;
+    bookmark->last_token         = token;
+    bookmark->stream             = lexer->current_stream;
+    bookmark->token_buffer_index = lexer->current_stream->token_buffer_index;
+    bookmark->next_token_stream  = lexer->next_token_stream;
 }
 
 internal_api true_inline lexer_token_t 
 lexer_pop_bookmark(lexer_t *lexer)
 {
-    lexer_bookmark_t *bookmark = lexer->current_stream->bookmarks + --lexer->current_stream->bookmark_count;
-    Expect(lexer->current_stream->bookmark_count >= 0, "lexer->bookmark_count must be between 0 and 10, somehow you have a number LESS than 0...\n");
+    lexer_bookmark_t *bookmark = lexer->current_stream->bookmarks + lexer->current_stream->bookmark_count--;
+    Expect(lexer->current_stream->bookmark_count >= 0, 
+           "lexer->bookmark_count must be between 0 and 10, somehow you have a number LESS than 0...\n");
 
     lexer_token_t result = bookmark->last_token;
-    lexer->current_stream->string.data  = bookmark->read_data;
-    lexer->current_stream->string.count = bookmark->read_count;
-    lexer->current_stream->line_number  = bookmark->line_number;
+    lexer->current_stream                     = bookmark->stream;
+    lexer->current_stream->string.data        = bookmark->read_data;
+    lexer->current_stream->string.count       = bookmark->read_count;
+    lexer->current_stream->line_number        = bookmark->line_number;
+    lexer->current_stream->token_buffer_index = bookmark->token_buffer_index;
+    lexer->next_token_stream                  = bookmark->next_token_stream;
 
     return(result);
 }
 
-internal_api lexer_token_stream_t 
-init_token_stream_from_string(string_t string)
+internal_api void 
+init_token_stream_from_string(lexer_token_stream_t *stream, string_t string)
 {
-    lexer_token_stream_t result = {};
-    result.string         = string;
-    result.start          = string.data;
-    result.initial_length = string.count;
-
-    return(result);
+    stream->string         = string;
+    stream->start          = string.data;
+    stream->initial_length = string.count;
 }
 
 internal_api void
 lexer_push_token_stream(lexer_t *lexer, lexer_token_stream_t *new_stream)
 {
-    lexer_token_stream_t *stream       = lexer->token_streams + lexer->token_stream_count;
-    stream->current_token_stream_depth = 0;
-    lexer->token_stream_count         += 1;
+    lexer_token_stream_t *stream = lexer->token_streams + ++lexer->next_token_stream;
 
     *stream = *new_stream;
 
@@ -401,26 +402,14 @@ lexer_push_token_stream(lexer_t *lexer, lexer_token_stream_t *new_stream)
 }
 
 internal_api void
-lexer_pop_token_stream(lexer_t *lexer, bool8 sync_streams)
+lexer_pop_token_stream(lexer_t *lexer)
 {
-    lexer->token_stream_count -= 1;
-    lexer_token_stream_t *old_stream = lexer->current_stream;
-
-    u32 next_stream_index = Max(0, lexer->token_stream_count - 1);
-    lexer_token_stream_t *stream  = lexer->token_streams + next_stream_index;
-
-    stream->current_token_stream_depth = 0;
-
-    lexer->secondary_stream = lexer->current_stream;
-    lexer->current_stream   = stream;
-    if(sync_streams)
+    if(lexer->next_token_stream - 1 >= 0)
     {
-        for(u32 index = 0;
-            index < old_stream->current_token_stream_depth;
-            ++index)
-        {
-            lexer_get_next_token(lexer);
-        }
+        lexer_token_stream_t *stream  = lexer->token_streams + --lexer->next_token_stream;
+
+        lexer->secondary_stream = lexer->current_stream;
+        lexer->current_stream   = stream;
     }
 }
 
@@ -438,7 +427,7 @@ lexer_eat_lines(memory_arena_t *concat_arena, lexer_t *lexer, u32 line_count)
         {
             string_t line = lexer->current_stream->string;
             line.count    = end_line;
-            result = c_string_concat(concat_arena, line, result);
+            result        = c_string_concat(concat_arena, line, result);
             c_string_advance_by(&lexer->current_stream->string, end_line + 1);
 
             ++lexer->current_stream->line_number;
@@ -457,22 +446,31 @@ lexer_reset_token_stream(lexer_token_stream_t *stream)
 }
 
 internal_api lexer_token_stream_t 
-lexer_copy_token_stream(lexer_token_stream_t *stream)
+lexer_copy_token_stream(memory_arena_t *arena, lexer_token_stream_t *stream)
 {
     lexer_token_stream_t result = {};
     memcpy(&result, stream, sizeof(lexer_token_stream_t));
     
+    result.token_buffer         = c_arena_push_array(arena, lexer_token_t, stream->buffered_token_count);
+    result.buffered_token_count = stream->buffered_token_count;
+    result.token_buffer_index   = 0;
+    for(u32 index = 0;
+        index < stream->buffered_token_count;
+        ++index)
+    {
+        lexer_token_t *source      = stream->token_buffer + index;
+        lexer_token_t *destination = result.token_buffer  + index;
+        
+         *destination = *source;
+    }
+
     return(result);
 }
 
-internal_api lexer_t
-lexer_create(string_t string_data)
+internal_api void 
+lexer_create(lexer_t *lexer, string_t string_data)
 {
-    lexer_t result = {};
-
-    lexer_token_stream_t new_stream = init_token_stream_from_string(string_data);
-    lexer_push_token_stream(&result, &new_stream);
-
-    return(result);
+    init_token_stream_from_string(&lexer->token_streams[0], string_data);
+    lexer->current_stream = lexer->token_streams;
 }
 

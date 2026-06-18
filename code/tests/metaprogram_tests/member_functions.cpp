@@ -1,3 +1,9 @@
+struct item_t
+{
+    char *get_item_data();
+    void  set_item_data(void *new_item_data);
+};
+
 char * 
 item_t::get_item_data()
 {

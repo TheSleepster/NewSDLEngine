@@ -8,6 +8,8 @@
 
 #define ATHENA_LEXER_H
 
+struct lexer_token_stream_t;
+
 constexpr u32 MAX_LEXER_BOOKMARKS = 10;
 
 #define fprint_token(token) token.data.count, token.data.data
@@ -87,6 +89,8 @@ constexpr u32 MAX_LEXER_BOOKMARKS = 10;
     X(TOKEN_TYPE_NAMESPACE, "TOKEN_TYPE_NAMESPACE") \
     X(TOKEN_TYPE_CONSTEXPR, "TOKEN_TYPE_CONSTEXPR") \
     X(TOKEN_TYPE_USING, "TOKEN_TYPE_USING") \
+    X(TOKEN_TYPE_NULL, "TOKEN_TYPE_NULL") \
+    X(TOKEN_TYPE_NULLPTR, "TOKEN_TYPE_NULLPTR") \
     X(TOKEN_TYPE_EOF, "TOKEN_TYPE_EOF")
 
 enum token_type_t
@@ -114,30 +118,30 @@ struct lexer_bookmark_t
     u32                   read_count;
     byte                 *read_data;
     u32                   line_number;
-    lexer_token_t         last_token;
-
-    u32                   buffered_token_count;
     u32                   token_buffer_index;
+    u32                   next_token_stream;
+
+    lexer_token_t         last_token;
+    lexer_token_stream_t *stream;
 };
 
 struct lexer_token_stream_t
 {
-    string_t string;
-    u32      line_number;
+    string_t         string;
+    u32              line_number;
 
-    byte    *start;
-    u32      initial_length;
+    byte            *start;
+    u32              initial_length;
 
     // NOTE(Sleepster): The usage of this is optional 
-    lexer_token_t *token_buffer;
-    u32            buffered_token_count;
-    u32            token_buffer_index;
-    u32            current_token_stream_depth;
-
-    lexer_token_t  last_token;
+    lexer_token_t   *token_buffer;
+    u32              buffered_token_count;
+    u32              token_buffer_index;
 
     lexer_bookmark_t bookmarks[MAX_LEXER_BOOKMARKS]; 
     s32              bookmark_count;
+
+    lexer_token_t    last_token;
 };
 
 struct lexer_t
@@ -146,10 +150,10 @@ struct lexer_t
     lexer_token_stream_t *secondary_stream;
 
     lexer_token_stream_t  token_streams[MAX_LEXER_BOOKMARKS];
-    s32                   token_stream_count;
+    s32                   next_token_stream;
 };
 
 internal_api void lexer_push_token_stream(lexer_t *lexer, lexer_token_stream_t *new_stream);
-internal_api void lexer_pop_token_stream(lexer_t *lexer, bool8 sync_streams);
-internal_api lexer_token_stream_t init_token_stream_from_string(string_t string);
+internal_api void lexer_pop_token_stream(lexer_t *lexer);
+internal_api void init_token_stream_from_string(lexer_token_stream_t *stream, string_t string);
 #endif

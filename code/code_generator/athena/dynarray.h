@@ -322,9 +322,8 @@ template <typename T>
 void
 dynarray_reset(dynarray_t<T> *array)
 {
-    array->used     = 0;
-    array->capacity = 0;
-    free(array->items);
+    array->used = 0;
+    memset(array->items, 0, sizeof(T) * array->capacity);
 }
 
 template <typename T>

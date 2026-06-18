@@ -5,11 +5,6 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 
-enum 
-{
-    SOME_DELCARED_ENUM_TYPE
-};
-
 enum test_enum_type_t 
 {
     SOME_OTHER_DECLARED_TYPE       = (1 << 31),
@@ -26,3 +21,8 @@ typedef enum some_other_typedeffed_item_without_a_comma
 {
     WOW_THIS_IS_TYPEDEFFED = (1 << 31)
 }some_other_typedeffed_item_without_a_comma_t;
+
+enum 
+{
+    SOME_DELCARED_ENUM_TYPE
+};

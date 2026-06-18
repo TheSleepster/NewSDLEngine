@@ -35,11 +35,14 @@
 #include "athena_lexer.h"
 
 /* TODO:
+ * THESE TESTS ARE BROKEN!!!!!
+ *      - tests/metaprogram_tests/attributes.cpp (currently, failing as intended)
+ *      - nested_macros
+ *
  * - [ ] PURGE THE THREAD ARENAS
- * - [ ] When we find an identifier in the place of an expected number, we should try to find the enum value as well..
- * - [ ] #if statments that use macros or constexpr values are invalid. Thus crash the program.
+ * - [ ] #if statements that use macros or constexpr values are invalid. Thus crash the program.
  * - [ ] No way of printing the namespace string such as "Namespace is: 'Structure::'...\n"
- * - [ ] C++ style [[attributes]] are not handled...
+ * - [X] C++ style [[attributes]] are not handled...
  * - [ ] Nested macros are unaccounted for, macro expansion is not recursive and MUST be recursive
  * - [ ] Templated members such as "hash_table_t<Type> types" would blow up the parser
  * - [ ] In the same way as above, templated members like "hash_table_t<Type> *table" would blow up the parser
@@ -52,6 +55,7 @@
  *      #endif
  *
  *      Break that macro parser.
+ * - [X] When we find an identifier in the place of an expected number, we should try to find the enum value as well..
  * - [X] No default definition of types like NULL or nullptr
  * - [X] Function overloading. (Right now, function overloading is automatically handled.)
  * - [X] Constexpr values are not parsed
@@ -111,6 +115,210 @@ type_id_from_identifier(string_t string)
 #include "athena_lexer.cpp"
 #include "athena_symbol_table.cpp"
 #include "athena_ast.cpp"
+
+internal_api void
+DEBUG_indent(u32 depth)
+{
+    for(u32 i = 0; i < depth; ++i)
+    {
+        printf("  ");
+    }
+}
+
+internal_api void
+DEBUG_print_type_signature(AST_type_t *type)
+{
+    printf("%.*s ", fprint_string(type->code_type->identifier));
+    for(u32 index = 0; 
+        index < type->pointer_depth; 
+        ++index)
+    {
+        printf("*");
+    }
+
+    if(type->flags & AST_TYPE_MODIFIER_FLAG_ARRAY)
+    {
+        printf(" [%u]", type->array_size);
+    }
+    printf(" ");
+}
+
+internal_api void
+DEBUG_print_lambda_data(AST_node_t *lambda_AST, u32 indent)
+{
+    DEBUG_indent(indent);
+    printf("lambda: %.*s\n", fprint_string(lambda_AST->identifier));
+
+    DEBUG_indent(indent + 1);
+    printf("returns: ");
+    DEBUG_print_type_signature(&lambda_AST->lambda.return_type->type);
+    printf("\n");
+
+    DEBUG_indent(indent + 1);
+    printf("params (%d)\n", lambda_AST->lambda.argument_count);
+
+    for(AST_node_t *current_argument = lambda_AST->lambda.first_argument;
+        current_argument;
+        current_argument = current_argument->next_sibling)
+    {
+        DEBUG_indent(indent + 2);
+        printf("%.*s: ", fprint_string(current_argument->identifier));
+        DEBUG_print_type_signature(&current_argument->type);
+
+        if(current_argument->expression.info)
+        {
+            AST_expression_value_t value = evaluate_expression_AST(current_argument->expression.info);
+            printf("= ");
+
+            switch(value.type)
+            {
+                case AST_EXPRESSION_VALUE_INT:
+                {
+                    printf("%ld", value.int_value);
+                }break;
+                case AST_EXPRESSION_VALUE_UNSIGNED:
+                {
+                    printf("%lu", value.unsigned_value);
+                }break;
+                case AST_EXPRESSION_VALUE_FLOAT:
+                {
+                    printf("%f", value.float32_value);
+                }break;
+                case AST_EXPRESSION_VALUE_DOUBLE:
+                {
+                    printf("%lf", value.float64_value);
+                }break;
+                case AST_EXPRESSION_VALUE_LITERAL:
+                case AST_EXPRESSION_VALUE_IDENT:
+                {
+                    printf("%.*s", fprint_string(value.identifier_value));
+                }break;
+            }
+        }
+
+        printf("\n");
+    }
+}
+
+internal_api void
+DEBUG_print_structure_members(AST_node_t *structure, u32 indent)
+{
+    if(structure->struct_decl.inherited_type_info)
+    {
+        DEBUG_indent(indent);
+        printf("Inherits from: '%.*s'\n", fprint_string(structure->struct_decl.inherited_type_info->identifier));
+    }
+
+    DEBUG_indent(indent + 1);
+    printf("members: (%d)\n", structure->struct_decl.member_count);
+
+    for(AST_node_t *current_member = structure->struct_decl.first_member;
+        current_member;
+        current_member = current_member->next_sibling)
+    {
+        if(current_member->node_type == AST_NODE_TYPE_STRUCTURE)
+        {
+            DEBUG_indent(indent + 2);
+            printf("struct: %.*s\n", fprint_string(current_member->identifier));
+            DEBUG_print_structure_members(current_member, indent + 3);
+            continue;
+        }
+
+        DEBUG_indent(indent + 2);
+        DEBUG_print_type_signature(&current_member->type);
+        printf("%.*s", fprint_string(current_member->identifier));
+
+        if(current_member->expression.info && (current_member->type.flags & AST_TYPE_MODIFIER_FLAG_ARRAY))
+        {
+            AST_expression_value_t value = evaluate_expression_AST(current_member->expression.info);
+            if(value.type == AST_EXPRESSION_VALUE_INT)
+            {
+                current_member->type.array_size = (u32)value.int_value;
+                printf(" [%u]", current_member->type.array_size);
+            }
+        }
+        else if(current_member->expression.info && 
+                current_member->expression.evaluated &&
+                current_member->node_type != AST_NODE_TYPE_LAMBDA)
+        {
+            AST_expression_value_t value = current_member->expression.value;
+            printf(" = ");
+
+            switch(value.type)
+            {
+                case AST_EXPRESSION_VALUE_INT:
+                {
+                    printf("%ld", value.int_value);
+                }break;
+                case AST_EXPRESSION_VALUE_UNSIGNED:
+                {
+                    printf("%lu", value.unsigned_value);
+                }break;
+                case AST_EXPRESSION_VALUE_FLOAT:
+                {
+                    printf("%f", value.float32_value);
+                }break;
+                case AST_EXPRESSION_VALUE_DOUBLE:
+                {
+                    printf("%lf", value.float64_value);
+                }break;
+                case AST_EXPRESSION_VALUE_LITERAL:
+                case AST_EXPRESSION_VALUE_IDENT:
+                {
+                    printf("%.*s", fprint_string(value.identifier_value));
+                }break;
+            }
+        }
+
+        printf("\n");
+    }
+}
+
+internal_api void
+DEBUG_print_enum_data(AST_node_t *enum_AST, u32 indent)
+{
+    DEBUG_indent(indent);
+    printf("values (%u)\n", enum_AST->struct_decl.member_count);
+    for(AST_node_t *current_member = enum_AST->struct_decl.first_member;
+        current_member;
+        current_member = current_member->next_sibling)
+    {
+        DEBUG_indent(indent + 1);
+
+        printf("%.*s", fprint_string(current_member->identifier));
+        if(current_member->expression.info)
+        {
+            printf(" = ");
+
+            AST_expression_value_t value = current_member->expression.value;
+            switch(value.type)
+            {
+                case AST_EXPRESSION_VALUE_INT:
+                {
+                    printf("%ld", value.int_value);
+                } break;
+                case AST_EXPRESSION_VALUE_UNSIGNED:
+                {
+                    printf("%lu", value.unsigned_value);
+                } break;
+                case AST_EXPRESSION_VALUE_FLOAT:
+                {
+                    printf("%f", value.float32_value);
+                } break;
+                case AST_EXPRESSION_VALUE_DOUBLE:
+                {
+                    printf("%lf", value.float64_value);
+                } break;
+                case AST_EXPRESSION_VALUE_LITERAL:
+                case AST_EXPRESSION_VALUE_IDENT:
+                {
+                    printf("%.*s", fprint_string(value.identifier_value));
+                } break;
+            }
+        }
+        printf("\n");
+    }
+}
 
 internal_api void
 parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_token)
@@ -203,7 +411,7 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
 
     // NOTE(Sleepster): Create the token stream's token buffer
     macro_info->expansion_string = c_string_make_copy(&permanent_arena, c_string_builder_get_current_string(&temp_builder));
-    macro_info->expansion_token_stream = init_token_stream_from_string(macro_info->expansion_string);
+    init_token_stream_from_string(&macro_info->expansion_token_stream, macro_info->expansion_string);
 
     lexer_push_token_stream(lexer, &macro_info->expansion_token_stream);
 
@@ -234,8 +442,7 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
             macro_info->expansion_token_stream.token_buffer[token_index++] = token;
         }
     }
-
-    lexer_pop_token_stream(lexer, false);
+    lexer_pop_token_stream(lexer);
     macro_info->is_set = true;
 }
 
@@ -317,353 +524,6 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
     return(token);
 }
 
-internal_api void
-DEBUG_print_lambda_data(AST_node_t *lambda_AST)
-{
-    AST_type_t *return_type = &lambda_AST->lambda.return_type->type;
-    printf("\tLambda return type: '%.*s ", fprint_string(return_type->code_type->identifier));
-    for(u32 index = 0;
-        index < return_type->pointer_depth;
-        ++index)
-    {
-        printf("*");
-    }
-    printf("'\n");
-    printf("Lambda takes '%d' arguments...\n", lambda_AST->lambda.argument_count);
-    if(lambda_AST->lambda.argument_count > 0)
-    {
-        for(AST_node_t *current_argument = lambda_AST->lambda.first_argument;
-            current_argument;
-            current_argument = current_argument->next_sibling)
-        {
-            AST_type_t *argument_type = &current_argument->type;
-
-            printf("\tArgument is: '%.*s' with a type: '%.*s",
-                   fprint_string(current_argument->identifier), fprint_string(argument_type->code_type->identifier));
-            for(u32 index = 0;
-                index < argument_type->pointer_depth;
-                ++index)
-            {
-                printf("*");
-            }
-            printf("'\n");
-            if(current_argument->expression.info)
-            {
-                AST_expression_value_t value = evaluate_expression_AST(current_argument->expression.info);
-                printf("\t\tArgument default value: ");
-                switch(value.type)
-                {
-                    case AST_EXPRESSION_VALUE_INT:
-                    {
-                        printf("%ld", value.int_value);
-                    }break;
-                    case AST_EXPRESSION_VALUE_UNSIGNED:
-                    {
-                        printf("%lu", value.unsigned_value);
-                    }break;
-                    case AST_EXPRESSION_VALUE_FLOAT:
-                    {
-                        printf("%f", value.float32_value);
-                    }break;
-                    case AST_EXPRESSION_VALUE_DOUBLE:
-                    {
-                        printf("%lf", value.float64_value);
-                    }break;
-                    case AST_EXPRESSION_VALUE_LITERAL:
-                    {
-                        printf("%.*s", fprint_string(value.identifier_value));
-                    }break;
-                    case AST_EXPRESSION_VALUE_IDENT:
-                    {
-                        InvalidCodePath;
-                    }break;
-                }
-                printf("\n");
-            }
-        }
-    }
-}
-
-internal_api void
-DEBUG_print_structure_members(AST_node_t *structure)
-{
-    for(AST_node_t *member = structure->struct_decl.first_member;
-        member;
-        member = member->next_sibling)
-    {
-        AST_type_t *type = &member->type;
-
-        if(member->node_type != AST_NODE_TYPE_STRUCTURE)
-        {
-            printf("\t\t%.*s %.*s\n", fprint_string(type->code_type->identifier), fprint_string(member->identifier));
-            if(type->flags != 0)
-            {
-                printf("\t\tType flags:\n");
-#define X(enum, string, value) if(type->flags & enum) { printf("\t\t\t%s\n", string); }
-                AST_TYPE_MODIFIER_FLAGS(X)
-#undef X
-            }
-
-            if(type->flags & AST_TYPE_MODIFIER_FLAG_ARRAY)
-            {
-                AST_node_t *expression = member->expression.info;
-
-                AST_expression_value_t value;
-                if(expression)
-                {
-                    value = evaluate_expression_AST(expression);
-                }
-
-                type->array_size = value.int_value;
-                printf("\t\tMember is an array of size: '%d'...\n", type->array_size);
-            }
-
-            if(member->type.flags & AST_TYPE_MODIFIER_FLAG_PROCEDURE)
-            {
-                DEBUG_print_lambda_data(member);
-            }
-        }
-        else
-        {
-            printf("\tType: '%.*s' is a nested structure...\n", fprint_string(member->identifier));
-            DEBUG_print_structure_members(member);
-        }
-    }
-}
-
-#if 0
-internal_api void
-parse_single_file(string_t filename)
-{
-    parser_t *file_parser = parser_create(filename); 
-
-    lexer_t *lexer = &file_parser->lexer;
-    while(lexer->current_stream->string.count > 0)
-    {
-        lexer_token_t token = lexer_get_next_token(lexer);
-        switch(token.token_type)
-        {
-            case TOKEN_TYPE_POUND:
-            {
-                token = handle_macro_expansion(file_parser, true);
-            }break;
-            case TOKEN_TYPE_CONSTEXPR:
-            {
-                lexer_token_t type_token = lexer_get_next_token(lexer);
-                lexer_token_t name_token = lexer_peek_token(lexer);
-
-                u32 pointer_depth = 0;
-                while(name_token.token_type == TOKEN_TYPE_ASTERISK)
-                {
-                    name_token = lexer_peek_token(lexer, pointer_depth + 2);
-                    ++pointer_depth;
-                }
-
-                lexer_token_t peek_token = lexer_peek_token(lexer, pointer_depth + 2);
-
-                AST_node_t *node = null;
-                if(peek_token.token_type == TOKEN_TYPE_EQUALS)
-                {
-                    lexer_token_t initializer_token = lexer_peek_token(lexer, pointer_depth + 3);
-                    // NOTE(Sleepster): If this is not an initializer list 
-                    if(initializer_token.token_type != TOKEN_TYPE_OPEN_BRACE)
-                    {
-                        // NOTE(Sleepster): It's an easily parsable expression 
-                        node = AST_create_new_node(&transient_arena);
-
-                        node->node_type  = AST_NODE_TYPE_CONSTEXPR;
-                        node->identifier = c_string_make_copy(&permanent_arena, name_token.data);
-                        if(pointer_depth > 0)
-                        {
-                            node->type.flags |= AST_TYPE_MODIFIER_FLAG_POINTER;
-                        }
-
-                        lexer_get_next_token(lexer);
-                        lexer_get_next_token(lexer);
-
-                        // TODO(Sleepster): Check to make sure there's actually an ending semicolon 
-                        node->expression.info = generate_expression_AST(file_parser, 0, null);
-                    }
-                }
-                else if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
-                {
-                    // NOTE(Sleepster): Lambda, not a constant 
-                    node = generate_lambda_AST(file_parser, type_token, pointer_depth, false);
-                }
-#if 0
-                if(!invalid_expression)
-                {
-                    // TODO(Sleepster): Store the AST not the evaluated expression for this phase 
-                    AST_expression_value_t eval = evaluate_expression_AST(node->expression.info);
-                    hash_table_add_element(&file_parser.constants_table, eval, name_token.data);
-                }
-#endif
-            }break;
-        }
-    }
-
-    // NOTE(Sleepster): Parse the rest of the file using the macros to intercept token streams.
-    lexer_reset_token_stream(lexer->current_stream);
-    for(;;)
-    {
-        lexer_token_t token = parser_get_next_lexer_token(file_parser);
-        switch(token.token_type)
-        {
-            case TOKEN_TYPE_POUND:
-            {
-                token = handle_macro_expansion(file_parser, false);
-            }break;
-            case TOKEN_TYPE_TYPEDEF:
-            {
-                AST_node_t *typedef_AST = generate_typedef_AST(file_parser);
-                (void)typedef_AST;
-#if 0
-                if(typedef_AST)
-                {
-                    switch(typedef_AST->node_type)
-                    {
-                        case AST_NODE_TYPE_STRUCTURE:
-                        {
-                            store_structure_AST(typedef_AST);
-                        }break;
-                        case AST_NODE_TYPE_LAMBDA:
-                        {
-                            store_lambda_AST(typedef_AST);
-                        }break;
-                        case AST_NODE_TYPE_ENUM:
-                        {
-                            store_enum_AST(typedef_AST);
-                        }break;
-                    }
-                }
-#endif
-            }break;
-            case TOKEN_TYPE_STRUCT:
-            case TOKEN_TYPE_UNION:
-            case TOKEN_TYPE_CLASS:
-            {
-                AST_node_t *structure_AST = generate_structure_AST(file_parser);
-                (void)structure_AST;
-#if 0
-                if(structure_AST)
-                {
-                    store_structure_AST(structure_AST);
-                }
-#endif
-            }break;
-            case TOKEN_TYPE_ENUM:
-            {
-                AST_node_t *enum_AST = generate_enum_AST(file_parser);
-                (void)enum_AST;
-#if 0
-                if(enum_AST)
-                {
-                    store_enum_AST(enum_AST);
-                }
-#endif
-            }break;
-            case TOKEN_TYPE_NAMESPACE:
-            {
-                lexer_token_t namespace_token = parser_get_next_lexer_token(file_parser);
-                token = namespace_token;
-
-                string_t lexical_namespace = c_string_make_copy(&file_parser->arena, namespace_token.data);
-                declaration_context_t *context = parser_create_declaration_context(file_parser, 
-                                                                                   lexical_namespace,
-                                                                                   file_parser->active_decl_context);
-                parser_push_decl_context(file_parser, context);
-            }break;
-            case TOKEN_TYPE_CLOSE_BRACE:
-            {
-                // TODO(Sleepster): verify that this only effects namespaces
-                parser_pop_decl_context(file_parser);
-            }break;
-            case TOKEN_TYPE_CONSTEXPR:
-            {
-                // TODO(Sleepster):
-                // Right now there's a problem where this loop will process constexpr's that are lambdas twice, once as a constant
-                // another as a valid type. Is this a problem? Idk... But right now I just don't care since it's not obvious that this
-                // could be a problem.
-            }break;
-            // NOTE(Sleepster): We don't really care about these two... 
-            //case TOKEN_TYPE_INLINE:
-            //case TOKEN_TYPE_STATIC:
-            case TOKEN_TYPE_CONST:
-            case TOKEN_TYPE_IDENT:
-            {
-                // NOTE(Sleepster): 
-                // We want to create function defines like this:
-                //
-                // void *allocator(memory_arena_t *arena)
-                //
-                // where we parse this as:
-                //
-                // "allocator is a function that returns a void * and takes a memory_arena_t * as an argument" 
-
-                bool8 is_const = false;
-                if(token.token_type == TOKEN_TYPE_CONST)
-                {
-                    token = parser_get_next_lexer_token(file_parser);
-                    is_const = true;
-                }
-
-                lexer_token_t return_type = token;
-                lexer_token_t name_token  = lexer_peek_token(lexer);
-
-                u32 peek_amount = 2;
-                u32 return_type_pointer_depth = 0;
-                while(name_token.token_type == TOKEN_TYPE_ASTERISK)
-                {
-                    name_token = lexer_peek_token(lexer, peek_amount++);
-                    ++return_type_pointer_depth;
-                }
-
-                if(name_token.token_type == TOKEN_TYPE_IDENT)
-                {
-                    lexer_token_t namespace_peek_token = lexer_peek_token(lexer, peek_amount);
-
-                    if(namespace_peek_token.token_type == TOKEN_TYPE_DOUBLE_COLON)
-                    {
-#if 0
-                        // NOTE(Sleepster): Eat the namespace
-                        push_scope_stack(name_token.data);
-#endif
-
-                        parser_get_next_lexer_token(file_parser);
-                        parser_get_next_lexer_token(file_parser);
-                    }
-
-                    lexer_token_t parenthesis_token = lexer_peek_token(lexer, peek_amount);
-                    if(parenthesis_token.token_type == TOKEN_TYPE_OPEN_PAREN)
-                    {
-                        AST_node_t *lambda = generate_lambda_AST(file_parser, return_type, return_type_pointer_depth, is_const);
-                        (void)lambda;
-
-#if 0
-                        store_lambda_AST(lambda);
-                        if(namespaced)
-                        {
-                            pop_scope_stack();
-                        } 
-#endif
-                    }
-                }
-                else
-                {
-                    lexer_eat_lines(&transient_arena, lexer, 1);
-                }
-            }break;
-            case TOKEN_TYPE_EOF:
-            {
-                return;
-            }break;
-            default:
-            {
-            }break;
-        }
-    }
-}
-#endif
 
 /* TODO: Here's the steps of the parser:
  *
@@ -698,10 +558,9 @@ parse_single_file(string_t filename)
 internal_api void
 record_file_macros(parser_t *parser)
 {
-    lexer_t *lexer = &parser->lexer;
-    while(lexer->current_stream->string.count > 0)
+    while(parser->lexer.current_stream->string.count > 0)
     {
-        lexer_token_t token = lexer_get_next_token(lexer);
+        lexer_token_t token = lexer_get_next_token(&parser->lexer);
         switch(token.token_type)
         {
             case TOKEN_TYPE_POUND:
@@ -712,7 +571,7 @@ record_file_macros(parser_t *parser)
     }
 
     // NOTE(Sleepster): Once we gather the macros from this file, reset the token stream for the file 
-    lexer_reset_token_stream(lexer->current_stream);
+    lexer_reset_token_stream(parser->lexer.current_stream);
 }
 
 internal_api void
@@ -789,14 +648,6 @@ record_file_constants(parser_t *parser)
                 {
                     hash_table_add_element(&parser->active_decl_context->code_decls, &node, node->identifier);
                 }
-#if 0
-                if(!invalid_expression)
-                {
-                    // TODO(Sleepster): Store the AST not the evaluated expression for this phase 
-                    AST_expression_value_t eval = evaluate_expression_AST(node->expression.info);
-                    hash_table_add_element(&parser.constants_table, eval, name_token.data);
-                }
-#endif
             }break;
         }
     }
@@ -808,7 +659,7 @@ internal_api void
 build_file_AST(parser_t *parser)
 {
     lexer_t *lexer = &parser->lexer;
-    for(;;)
+    while(lexer->current_stream)
     {
         lexer_token_t token = parser_get_next_lexer_token(parser);
         switch(token.token_type)
@@ -854,6 +705,39 @@ build_file_AST(parser_t *parser)
                 // another as a valid type. Is this a problem? Idk... But right now I just don't care since it's not obvious that this
                 // could be a problem.
             }break;
+            case TOKEN_TYPE_OPEN_BRACKET:
+            {
+                lexer_token_t next_token = parser_get_next_lexer_token(parser);
+                if(next_token.token_type == TOKEN_TYPE_OPEN_BRACKET)
+                {
+                    // NOTE(Sleepster): This is a C++ attribute
+                    lexer_token_t attribute_name = parser_get_next_lexer_token(parser);
+                    lexer_token_t argument_token = parser_get_next_lexer_token(parser);
+                    if(argument_token.token_type != TOKEN_TYPE_CLOSE_BRACKET)
+                    {
+                        report_error(parser, "Sorry, we don't support attributes with arguments...\n");
+                    }
+
+                    code_attribute_t attribute = {
+                        .name = c_string_make_copy(&parser->arena, attribute_name.data),
+                    };
+
+                    dynarray_add(&parser->current_attribute_list, &attribute);
+                }
+            }break;
+            case TOKEN_TYPE_TEMPLATE:
+            {
+                lexer_token_t open_angle_bracket = parser_get_next_lexer_token(parser);
+                if(open_angle_bracket.token_type != TOKEN_TYPE_LESS_THAN)
+                {
+                    report_error(parser, 
+                                 "Expected a '<' following a template declaration, instead found: '%.s'...\n", 
+                                 fprint_token(open_angle_bracket));
+                }
+
+                code_attribute_t template_attribute = create_template_attribute(parser);
+                dynarray_add(&parser->current_attribute_list, &template_attribute);
+            }break;
             // NOTE(Sleepster): We don't really care about these two... 
             //case TOKEN_TYPE_INLINE:
             //case TOKEN_TYPE_STATIC:
@@ -877,33 +761,60 @@ build_file_AST(parser_t *parser)
                 }
 
                 lexer_token_t return_type = token;
-                lexer_token_t name_token  = lexer_peek_token(lexer);
+                lexer_token_t name_token  = parser_peek_next_lexer_token(parser);
+                if(name_token.token_type == TOKEN_TYPE_LESS_THAN)
+                {
+                    while(name_token.token_type != TOKEN_TYPE_GREATER_THAN)
+                    {
+                        name_token = parser_get_next_lexer_token(parser);
+                    }
+
+                    name_token = parser_peek_next_lexer_token(parser);
+                }
 
                 u32 peek_amount = 2;
                 u32 return_type_pointer_depth = 0;
                 while(name_token.token_type == TOKEN_TYPE_ASTERISK)
                 {
-                    name_token = lexer_peek_token(lexer, peek_amount++);
+                    name_token = parser_peek_next_lexer_token(parser, peek_amount++);
                     ++return_type_pointer_depth;
                 }
 
                 if(name_token.token_type == TOKEN_TYPE_IDENT)
                 {
-                    lexer_token_t namespace_peek_token = lexer_peek_token(lexer, peek_amount);
-
+                    lexer_token_t namespace_peek_token = parser_peek_next_lexer_token(parser, peek_amount);
                     if(namespace_peek_token.token_type == TOKEN_TYPE_DOUBLE_COLON)
                     {
-#if 0
                         // NOTE(Sleepster): Eat the namespace
-                        push_scope_stack(name_token.data);
-#endif
+                        parser_create_declaration_context(parser, name_token.data, parser->active_decl_context);
+                        for(u32 peek_index = 0;
+                            peek_index < peek_amount;
+                            ++peek_index)
+                        {
+                            token = parser_get_next_lexer_token(parser);
+                        }
 
-                        parser_get_next_lexer_token(parser);
-                        parser_get_next_lexer_token(parser);
+                        // NOTE(Sleepster): Skip the next peek token because that's a name! 
+                        lexer_token_t parenthesis_token = parser_peek_next_lexer_token(parser, 2);
+                        if(parenthesis_token.token_type == TOKEN_TYPE_OPEN_PAREN)
+                        {
+                            while(parenthesis_token.token_type != TOKEN_TYPE_CLOSE_PAREN)
+                            {
+                                parenthesis_token = parser_get_next_lexer_token(parser);
+                            }
+
+                            parenthesis_token = parser_get_next_lexer_token(parser);
+                            if(parenthesis_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+                            {
+                                while(parenthesis_token.token_type != TOKEN_TYPE_CLOSE_BRACE)
+                                {
+                                    parenthesis_token = parser_get_next_lexer_token(parser);
+                                }
+                                //generate_lambda_AST(parser, return_type, return_type_pointer_depth, is_const);
+                            }
+                        }
                     }
-
-                    lexer_token_t parenthesis_token = lexer_peek_token(lexer, peek_amount);
-                    if(parenthesis_token.token_type == TOKEN_TYPE_OPEN_PAREN)
+                    else if(namespace_peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
                     {
                         generate_lambda_AST(parser, return_type, return_type_pointer_depth, is_const);
                     }
@@ -947,7 +858,6 @@ consolidate_AST_nodes(void)
                 for(auto &element: decl_context.code_decls.used_entries) 
                 {
                     AST_node_t *code_decl = element->item;
-
                     // TODO(Sleepster): Check to make sure that two items with the same name but of different types don't 
                     // have issues here. Such as:
                     // struct item_data
@@ -1052,7 +962,8 @@ deduce_AST_node_type_data()
 internal_api void
 parse_single_file(string_t filename)
 {
-    parser_t *parser = parser_create(filename); 
+    string_t file_data = c_file_read_entirety(filename);
+    parser_t *parser   = parser_create(filename, file_data); 
 
     record_file_macros(parser);
     consolidate_macro_tables();
@@ -1062,64 +973,75 @@ parse_single_file(string_t filename)
     consolidate_AST_nodes();
     deduce_AST_node_type_data();
 
-    printf("\n\nGlobal symbol table has: '%d' recorded decl_contexts...\n", g_symbol_table.declaration_contexts.used);
-    for(const auto &scope: g_symbol_table.declaration_contexts)
+    printf("Global symbol table\n");
+    printf("  Declaration contexts: %u\n\n", g_symbol_table.declaration_contexts.used);
+    for(const auto &scope : g_symbol_table.declaration_contexts)
     {
-        printf("\n================ CODE DECLARATION ===============\n");
-        printf("Scope by name of: '%.*s' has '%d' recorded types and '%d' recorded AST_node_t...\n",
-               fprint_string(scope.lexical_scope), scope.local_types.used_entries.used, scope.code_decls.used_entries.used);
-        if(scope.local_types.used_entries.used > 0)
+        printf("Context: %.*s\n", fprint_string(scope.lexical_scope));
+        printf("  Types (%u)\n", scope.local_types.used_entries.used);
+        for(const auto &element : scope.local_types.used_entries)
         {
-            printf("\tRecorded Types: \n");
-            for(const auto &element: scope.local_types.used_entries)
-            {
-                code_type_t *type = element->item;
-                printf("\t\t'%.*s'\n", fprint_string(type->identifier));
-            }
+            code_type_t *type = element->item;
+            printf("    %.*s\n", fprint_string(type->identifier));
         }
 
-        if(scope.code_decls.used_entries.used > 0)
+        printf("\n  Declarations (%u)\n", scope.code_decls.used_entries.used);
+        for(const auto &element : scope.code_decls.used_entries)
         {
-            printf("\tRecorded AST_node_t's:\n");
-            for(const auto &element: scope.code_decls.used_entries)
+            AST_node_t *AST = element->item;
+            switch(AST->node_type)
             {
-                AST_node_t *AST = element->item;
-                printf("\t\tAST_node named: '%.*s' is of node_type: '%s'...\n",
-                       fprint_string(AST->identifier), print_AST_node_type(AST->node_type));
-                if(AST->type.code_type)
+                case AST_NODE_TYPE_CONSTEXPR:
                 {
-                    printf("\t\t\tType alias of: %p\n", AST->type.code_type->alias_of);
-                    printf("\t\t\tMetatype: '%s'\n", get_metatype_string(AST->type.code_type->code_metatype));
-                    printf("\t\t\tcode_type identifier is: '%.*s'...\n", fprint_string(AST->type.code_type->identifier));
-                    if(AST->type.flags & AST_TYPE_MODIFIER_FLAG_ARRAY)
+                    printf("    constexpr %.*s = ", fprint_string(AST->identifier));
+                    switch(AST->expression.value.type)
                     {
-                        printf("\t\t\tArray Size: '%d'...\n", AST->type.array_size);
+                        case AST_EXPRESSION_VALUE_INT:
+                        {
+                            printf("%ld", AST->expression.value.int_value);
+                        }break;
+                        case AST_EXPRESSION_VALUE_UNSIGNED:
+                        {
+                            printf("%lu", AST->expression.value.unsigned_value);
+                        }break;
+                        case AST_EXPRESSION_VALUE_FLOAT:
+                        {
+                            printf("%.2f", AST->expression.value.float32_value);
+                        }break;
+                        case AST_EXPRESSION_VALUE_DOUBLE:
+                        {
+                            printf("%.2lf", AST->expression.value.float64_value);
+                        }break;
+                        case AST_EXPRESSION_VALUE_IDENT:
+                        case AST_EXPRESSION_VALUE_LITERAL:
+                        {
+                            printf("%.*s", fprint_string(AST->expression.value.identifier_value));
+                        }break;
                     }
 
-                }
-
-                if(AST->struct_decl.inherited_type_info)
+                    printf("\n\n");
+                } break;
+                case AST_NODE_TYPE_STRUCTURE:
                 {
-                    AST_node_t *inher = AST->struct_decl.inherited_type_info;
-                    printf("\t\tInherits from type: '%.*s'...\n", fprint_string(inher->identifier));
-                }
-
-                if(AST->type.flags != 0)
+                    printf("    struct %.*s\n", fprint_string(AST->identifier));
+                    DEBUG_print_structure_members(AST, 3);
+                    printf("\n");
+                } break;
+                case AST_NODE_TYPE_ENUM:
                 {
-                    printf("\t\ttype flags are:\n");
-#define X(enum, string, value) if(AST->type.flags & enum) { printf("\t\t\t%s\n", string); }
-                    AST_TYPE_MODIFIER_FLAGS(X)
-#undef X
-                }
-
-                if(AST->node_type == AST_NODE_TYPE_STRUCTURE)
+                    printf("    enum %.*s\n", fprint_string(AST->identifier));
+                    DEBUG_print_enum_data(AST, 3);
+                    printf("\n");
+                }break;
+                case AST_NODE_TYPE_LAMBDA:
                 {
-                    printf("\tAST is of structured type, members are: \n");
-                    DEBUG_print_structure_members(AST);
-                }
+                    DEBUG_print_lambda_data(AST, 2);
+                    printf("\n");
+                } break;
             }
         }
-        printf("============= END OF CODE DECLARATION ============\n");
+
+        printf("\n");
     }
 }
 
@@ -1183,120 +1105,6 @@ main(int argc, char **argv)
 
         c_directory_visit(directory, &visit_info);
     }
-
-#if 0
-    // NOTE(Sleepster): Print the parsed data 
-    c_dynarray_for(g_symbol_table.structures, index)
-    {
-        AST_node_t *structure = g_symbol_table.structures[index]; 
-
-        bool8 anon = true;
-        if(!c_string_compare(structure->identifier, STR("anonymous")))
-        {
-            symbol_table_infer_type(structure);
-            anon = false;
-        }
-        
-        printf("====================================================================\n");
-        printf("AST Node Type: '%s' is found:\n", print_AST_node_type(structure->node_type));
-        printf("Type Name: %.*s\n", fprint_string(structure->identifier));
-
-        AST_type_t *type = &structure->type;
-        printf("Type ID is: %lu\n", type->code_type->ID);
-        if(!anon)
-        {
-            printf("Type alias of: %lu\n", type->code_type->alias_of);
-            printf("Metatype: '%s'\n", get_metatype_string(type->code_type->code_metatype));
-            printf("code_type identifier is: '%.*s'...\n", fprint_string(type->code_type->identifier));
-        }
-        printf("type flags are:\n");
-
-#define X(enum, string, value) if(type->flags & enum) { printf("%s\n", string); }
-        AST_TYPE_MODIFIER_FLAGS(X)
-#undef X
-        printf("\tStructure Info!:\n");
-        if(structure->struct_decl.inherited_type_info)
-        {
-            AST_node_t *inher = structure->struct_decl.inherited_type_info;
-            printf("\t\tInherits from type: '%.*s'...\n", fprint_string(inher->identifier));
-        }
-
-        if(structure->struct_decl.first_member)
-        {
-            printf("\tStructure members are:\n");
-            DEBUG_print_structure_members(structure);
-        }
-
-        printf("====================================================================\n");
-    }
-
-    c_dynarray_for(g_symbol_table.enums, index)
-    {
-        printf("====================================================================\n");
-        AST_node_t *enum_AST = g_symbol_table.enums[index]; 
-
-        bool8 anon = true;
-        if(!c_string_compare(enum_AST->identifier, STR("anonymous")))
-        {
-            symbol_table_infer_type(enum_AST);
-            anon = false;
-        }
-
-        printf("AST Node Type: '%s' is found:\n", print_AST_node_type(enum_AST->node_type));
-        printf("Type Name: %.*s\n", fprint_string(enum_AST->identifier));
-
-        AST_type_t *type = &enum_AST->type;
-        if(!anon)
-        {
-            printf("Type alias of: %lu\n", type->code_type->alias_of);
-            printf("Metatype: '%s'\n", get_metatype_string(type->code_type->code_metatype));
-            printf("identifier is: '%.*s'...\n", fprint_string(type->code_type->identifier));
-        }
-
-        if(type->flags != 0)
-        {
-            printf("type flags are:\n");
-#define X(enum, string, value) if(type->flags & enum) { printf("%s\n", string); }
-            AST_TYPE_MODIFIER_FLAGS(X)
-#undef X
-        }
-
-        printf("Enum members are:\n");
-        for(AST_node_t *current_member = enum_AST->struct_decl.first_member;
-            current_member;
-            current_member = current_member->next_sibling)
-        {
-            AST_expression_value_t value = {};
-            if(current_member->expression.info)
-            {
-                 value = evaluate_expression_AST(current_member->expression.info);
-            }
-            printf("Enum member: '%.*s'... Value is: '%lu'...\n", fprint_string(current_member->identifier), value.unsigned_value);
-        }
-        printf("====================================================================\n");
-    }
-
-    c_dynarray_for(g_symbol_table.lambdas, index)
-    {
-        printf("====================================================================\n");
-        AST_node_t *lambda_AST = g_symbol_table.lambdas[index]; 
-        symbol_table_infer_type(lambda_AST);
-
-        printf("AST Node Type: '%s' is found:\n", print_AST_node_type(lambda_AST->node_type));
-        printf("Type Name: %.*s\n", fprint_string(lambda_AST->identifier));
-
-        AST_type_t *type = &lambda_AST->type;
-        printf("Type ID is: %lu\n", type->code_type->ID);
-        printf("Type alias of: %lu\n", type->code_type->alias_of);
-        printf("Metatype: '%s'\n", get_metatype_string(type->code_type->code_metatype));
-
-        printf("code_type identifier is: '%.*s'...\n", fprint_string(type->code_type->identifier));
-
-        DEBUG_print_lambda_data(lambda_AST);
-
-        printf("====================================================================\n");
-    }
-#endif
 
     return(0);
 }

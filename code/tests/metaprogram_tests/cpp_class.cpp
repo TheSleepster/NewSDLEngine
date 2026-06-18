@@ -20,12 +20,16 @@ private:
 class class_test_t : public CPP_test_t
 {
 public:
-    float other_apples;
+    float other_apples = 1.0f;
 private:
     void some_stupid_getter(void *data);
-    void some_expanded_setter(int *data)
+    void some_stupid_getter(void *data, u32 offset);
+    void some_expanded_setter(int *data = NULL)
     {
-        this->apples = *data;   
+        if(data != null)
+        {
+            this->apples = *data;   
+        }
     }
 
     float hidden_apples;

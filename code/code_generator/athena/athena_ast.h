@@ -10,6 +10,7 @@
 struct AST_node_t;
 struct code_type_t;
 struct parser_t;
+struct code_attribute_t;
 
 internal_api AST_node_t* 
 generate_lambda_AST(parser_t     *parser, 
@@ -129,49 +130,60 @@ enum AST_node_type_t
 
 struct AST_node_t 
 {
-    u32                    node_type;
-    string_t               identifier;
+    u32                          node_type;
+    string_t                     identifier;
 
-    AST_type_t             type;
-    AST_node_t            *next_sibling;
+    // NOTE(Sleepster): 
+    // This does not imply heap allocations on a per-node basis, we only use heap allocations 
+    // if the parser->attributes array has content.
+    dynarray_t<code_attribute_t> attributes;
+
+    AST_type_t                   type;
+    AST_node_t                  *next_sibling;
     //declaration_context_t *decl_context;
-    union {
-        // NOTE(Sleepster): For structures or enums... 
-        struct {
-            AST_node_t *first_member;
-            AST_node_t *inherited_type_info;
-        }struct_decl;
 
-        struct {
-            // NOTE(Sleepster): public or private 
-            u32         inheritance_type;
-            AST_node_t *inherited_data;
-        }inheritance_info;
+    // NOTE(Sleepster): For structures or enums... 
+    struct {
+        AST_node_t *first_member;
+        AST_node_t *inherited_type_info;
+        u32         member_count;
+    }struct_decl;
 
-        struct {
-            u32         operator_type;
-            AST_node_t *operand;
-        }unary_expression;
+    struct {
+        // NOTE(Sleepster): public or private 
+        u32         inheritance_type;
+        AST_node_t *inherited_data;
+    }inheritance_info;
 
-        struct {
-            u32         operator_type;
-            AST_node_t *left;
-            AST_node_t *right;
-        }binary_expression;
+    struct {
+        u32         operator_type;
+        AST_node_t *operand;
+    }unary_expression;
 
-        // NOTE(Sleepster): For members with a default value... 
-        struct {
-            bool8                  evaluated;
-            AST_node_t            *info;
-            AST_expression_value_t value;
-        }expression;
+    struct {
+        u32         operator_type;
+        AST_node_t *left;
+        AST_node_t *right;
+    }binary_expression;
 
-        struct {
-            AST_node_t *return_type;
-            AST_node_t *first_argument;
-            u32         argument_count;
-        }lambda;
-    };
+    // NOTE(Sleepster): For members with a default value... 
+    struct {
+        bool8                  evaluated;
+        AST_node_t            *info;
+        AST_expression_value_t value;
+    }expression;
+
+    struct {
+        AST_node_t *return_type;
+        AST_node_t *first_argument;
+        u32         argument_count;
+    }lambda;
+};
+
+struct argument_list_t
+{
+    AST_node_t *first_argument;
+    u32         argument_count;
 };
 
 struct parser_t;

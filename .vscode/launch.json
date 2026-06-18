@@ -72,8 +72,10 @@
             "program": "${workspaceFolder}/build/athena",
 
             "cwd": "${workspaceFolder}/code",
-            //"args": ["--filename=c_dynarray.h"],
-            "args": ["--filename=tests/metaprogram_tests/complex_structures.cpp"],
+            //"args": ["--filename=tests/metaprogram_tests/advanced_templates.cpp"],
+            "args": ["--filename=vk_backend_core.h"],
+            //"args": ["--filename=tests/metaprogram_tests/cpp_class.cpp"],
+            //"args": ["--filename=tests/metaprogram_tests/complex_structures.cpp"],
 
             //"cwd": "${workspaceFolder}",
             //"args": ["--directory=${workspaceFolder}/code"],
