@@ -32,11 +32,11 @@
 #include <poll.h>
 #include <stdlib.h>
 
-u32 
-sys_align_to_page_size(u32 size)
+u64 
+sys_align_to_page_size(u64 size)
 {
-    u32 result = 0;
-    u32 page_size = sysconf(_SC_PAGESIZE);
+    u64 result = 0;
+    u64 page_size = sysconf(_SC_PAGESIZE);
 
     result = Align(size, page_size);
 
@@ -52,10 +52,11 @@ sys_align_to_page_size(u32 size)
 // and then just use mprotect() to actually MAP the pages into physical memory as needed (mimics MEM_COMMIT).
 //
 // But, this needs more work.
+
 void*
 sys_allocate_memory(usize allocation_size)
 {
-    u32 true_allocation = sys_align_to_page_size(allocation_size);
+    u64 true_allocation = sys_align_to_page_size(allocation_size);
     void *data = mmap(0, true_allocation, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
     if(data == MAP_FAILED)
     {
@@ -75,17 +76,27 @@ sys_allocate_memory(usize allocation_size)
 void*
 sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
 {
-    Assert(base);
-    errno = 0;
-    
-    u32 true_allocation = sys_align_to_page_size(allocation_size);
-    void *result = mremap(base, old_size, true_allocation, MREMAP_MAYMOVE);
-    if(result == MAP_FAILED)
+    void *result = null;
+    if(base)
     {
-        int error = errno;
-        log_fatal("mmap failed... error: (%s), code: '%d'...\n", strerror(error), error);
+        // TODO(Sleepster): Maybe MREMAP_MAYMOVE but probably not, It cannot be zero though...
+        Assert(base);
+        errno = 0;
 
-        result = null;
+        u64 true_allocation = sys_align_to_page_size(allocation_size);
+        u64 old_allocation  = sys_align_to_page_size(old_size);
+        void *result = mremap(base, old_allocation, true_allocation, MREMAP_DONTUNMAP|MREMAP_MAYMOVE);
+        if(result == MAP_FAILED)
+        {
+            int error = errno;
+            log_fatal("mmap failed... error: (%s), code: '%d'...\n", strerror(error), error);
+
+            result = null;
+        }
+    }
+    else
+    {
+        result = sys_allocate_memory(allocation_size);
     }
 
     return(result);

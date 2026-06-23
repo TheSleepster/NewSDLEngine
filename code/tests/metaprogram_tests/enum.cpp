@@ -4,6 +4,12 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+enum chained_values {
+    TEST_VAL  = 1 << 1,
+    TEST_VAL2 = 1 << 2,
+    TEST_VAL3 = 1 << 3,
+    TEST_VAL4 = TEST_VAL|TEST_VAL2|TEST_VAL3,
+};
 
 enum test_enum_type_t 
 {

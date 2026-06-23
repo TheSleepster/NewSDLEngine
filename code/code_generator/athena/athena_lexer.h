@@ -8,12 +8,10 @@
 
 #define ATHENA_LEXER_H
 
-struct lexer_token_stream_t;
-
 constexpr u32 MAX_LEXER_BOOKMARKS = 10;
-
 #define fprint_token(token) token.data.count, token.data.data
 
+struct lexer_token_stream_t;
 // TODO(Sleepster): For this token list, when it comes to using keywords we are required in this case
 // to define the unique token type here again instead of just the DEFAULT_KEYWORD_LIST. This is bad
 //

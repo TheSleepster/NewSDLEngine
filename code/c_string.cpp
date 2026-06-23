@@ -115,8 +115,8 @@ c_string_concat(memory_arena_t *arena, string_t A, string_t B)
     result.data  = (byte*)c_arena_push_size(arena, (result.count + 1) * sizeof(byte));
     Assert(result.data != null);
 
-    MemoryCopy(result.data,           A.data, A.count);
-    MemoryCopy(result.data + A.count, B.data, B.count);
+    if(A.data != null) MemoryCopy(result.data,           A.data, A.count);
+    if(B.data != null) MemoryCopy(result.data + A.count, B.data, B.count);
 
     result.data[result.count] = '\0';
     return(result);

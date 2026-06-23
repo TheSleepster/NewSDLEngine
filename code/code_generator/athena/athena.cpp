@@ -42,16 +42,9 @@
  * - [ ] #if !defined() header guards bricks the parser, deal with this
  * - [ ] #if statements that use macros or constexpr values are invalid. Thus crash the program.
  * - [ ] Nested macros are unaccounted for, macro expansion is not recursive and MUST be recursive
- * - [ ] Macros such as:
+ *
+ * - [ ] Variadic functions '...' and ##__VA_ARGS__ macros are not handled.
  * - [ ] Special markers to denote the ignoring of certain code_declarations / files.
- *
- *      #ifdef MATH_API_IMPL
- *      # define MATH_API 
- *      #else 
- *      # define MATH_API extern
- *      #endif
- *
- *      Break that macro parser.
  *
  * - [-] No way of printing the namespace string such as "Namespace is: 'Structure::'...\n"
  * - [-] PURGE THE THREAD ARENAS
@@ -328,125 +321,129 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
 {
     lexer_t *lexer = &parser->lexer;
 
-    macro_info->name      = c_string_make_copy(&permanent_arena, name_token.data);
-    macro_info->name_hash = ((hash_table_hash_key(name_token.data)) % parser->macro_table.max_entries);
-
-    string_builder_t temp_builder;
-    c_string_builder_init(&temp_builder, MB(10));
-    defer(c_string_builder_deinit(&temp_builder));
-
-    // NOTE(Sleepster): If the macro takes arguments 
-    lexer_token_t token = lexer_get_next_token(lexer);
-
-    language_keyword_t *keyword = get_keyword_from_identifier(token.data);
-    if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
+    lexer_token_t token = lexer_peek_token(lexer);
+    if(lexer->current_stream->line_number == lexer->secondary_stream->line_number)
     {
-        language_keyword_t new_keyword = {};
-        new_keyword.identifier = macro_info->name;
-        new_keyword.keyword_id = keyword->keyword_id;
+        macro_info->name      = c_string_make_copy(&permanent_arena, name_token.data);
+        macro_info->name_hash = ((hash_table_hash_key(name_token.data)) % parser->macro_table.max_entries);
 
-        dynarray_add(&g_language_info.keywords, &new_keyword);
-    }
+        string_builder_t temp_builder;
+        c_string_builder_init(&temp_builder, MB(10));
+        defer(c_string_builder_deinit(&temp_builder));
 
-    if(token.token_type == TOKEN_TYPE_OPEN_PAREN)
-    {
-        char separator = macro_info->name.data[macro_info->name.count];
-        lexer_push_bookmark(lexer, token);
-        if(separator != ' ')
+        // NOTE(Sleepster): If the macro takes arguments 
+        token = lexer_get_next_token(lexer);
+
+        language_keyword_t *keyword = get_keyword_from_identifier(token.data);
+        if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
         {
-            // NOTE(Sleepster): Determine how many arguments the macro takes 
-            while(token.token_type != TOKEN_TYPE_CLOSE_PAREN)
-            {
-                token = lexer_get_next_token(lexer);
-                if(token.token_type == TOKEN_TYPE_IDENT)
-                {
-                    lexer_token_t peek_token = lexer_peek_token(lexer);
-                    if(peek_token.token_type == TOKEN_TYPE_COMMA || peek_token.token_type == TOKEN_TYPE_CLOSE_PAREN)
-                    {
-                        ++macro_info->argument_count;
-                    }
-                }
-            }
-            token = lexer_pop_bookmark(lexer);
+            language_keyword_t new_keyword = {};
+            new_keyword.identifier = macro_info->name;
+            new_keyword.keyword_id = keyword->keyword_id;
 
-            // NOTE(Sleepster): Parse the arguments out of the macro's arg list 
-            if(macro_info->argument_count > 0)
-            {
-                u32 argument_index = 0;
+            dynarray_add(&g_language_info.keywords, &new_keyword);
+        }
 
-                macro_info->arguments = c_arena_push_array(&permanent_arena, string_t, macro_info->argument_count);
+        if(token.token_type == TOKEN_TYPE_OPEN_PAREN)
+        {
+            char separator = macro_info->name.data[macro_info->name.count];
+            lexer_push_bookmark(lexer, token);
+            if(separator != ' ')
+            {
+                // NOTE(Sleepster): Determine how many arguments the macro takes 
                 while(token.token_type != TOKEN_TYPE_CLOSE_PAREN)
                 {
-                   token = lexer_get_next_token(lexer);
+                    token = lexer_get_next_token(lexer);
                     if(token.token_type == TOKEN_TYPE_IDENT)
                     {
                         lexer_token_t peek_token = lexer_peek_token(lexer);
                         if(peek_token.token_type == TOKEN_TYPE_COMMA || peek_token.token_type == TOKEN_TYPE_CLOSE_PAREN)
                         {
-                            macro_info->arguments[argument_index++] = c_string_make_copy(&permanent_arena, token.data);
+                            ++macro_info->argument_count;
                         }
                     }
                 }
-                token = lexer_get_next_token(lexer);
+                token = lexer_pop_bookmark(lexer);
+
+                // NOTE(Sleepster): Parse the arguments out of the macro's arg list 
+                if(macro_info->argument_count > 0)
+                {
+                    u32 argument_index = 0;
+
+                    macro_info->arguments = c_arena_push_array(&permanent_arena, string_t, macro_info->argument_count);
+                    while(token.token_type != TOKEN_TYPE_CLOSE_PAREN)
+                    {
+                        token = lexer_get_next_token(lexer);
+                        if(token.token_type == TOKEN_TYPE_IDENT)
+                        {
+                            lexer_token_t peek_token = lexer_peek_token(lexer);
+                            if(peek_token.token_type == TOKEN_TYPE_COMMA || peek_token.token_type == TOKEN_TYPE_CLOSE_PAREN)
+                            {
+                                macro_info->arguments[argument_index++] = c_string_make_copy(&permanent_arena, token.data);
+                            }
+                        }
+                    }
+                    token = lexer_get_next_token(lexer);
+                }
             }
         }
-    }
-    c_string_builder_append_data(&temp_builder, token.data);
+        c_string_builder_append_data(&temp_builder, token.data);
 
-    // NOTE(Sleepster): We can fill out the rest of the macro info here... 
-    lexer_push_bookmark(lexer, token);
-    for(;;)
-    {
-        string_t line = lexer_eat_lines(&transient_arena, lexer, 1);
-        c_string_builder_append_data(&temp_builder, line);
-
-        s32 backslash = c_string_find_first_char_from_right(line, '\\');
-        if(backslash != -1)
+        // NOTE(Sleepster): We can fill out the rest of the macro info here... 
+        lexer_push_bookmark(lexer, token);
+        for(;;)
         {
-            c_string_builder_append_data(&temp_builder, STR("\n"));
+            string_t line = lexer_eat_lines(&transient_arena, lexer, 1);
+            c_string_builder_append_data(&temp_builder, line);
+
+            s32 backslash = c_string_find_first_char_from_right(line, '\\');
+            if(backslash != -1)
+            {
+                c_string_builder_append_data(&temp_builder, STR("\n"));
+            }
+            else
+            {
+                break;
+            }
         }
-        else
+        lexer_pop_bookmark(lexer);
+
+        // NOTE(Sleepster): Create the token stream's token buffer
+        macro_info->expansion_string = c_string_make_copy(&permanent_arena, c_string_builder_get_current_string(&temp_builder));
+        init_token_stream_from_string(&macro_info->expansion_token_stream, macro_info->expansion_string);
+
+        lexer_push_token_stream(lexer, &macro_info->expansion_token_stream);
+
+        u32 token_count = 0;
+        while(lexer->current_stream->string.count > 0)
         {
-            break;
+            lexer_token_t token = lexer_get_next_token(lexer);
+            if(token.token_type != TOKEN_TYPE_BACKSLASH)
+            {
+                ++token_count;
+            }
         }
-    }
-    lexer_pop_bookmark(lexer);
-
-    // NOTE(Sleepster): Create the token stream's token buffer
-    macro_info->expansion_string = c_string_make_copy(&permanent_arena, c_string_builder_get_current_string(&temp_builder));
-    init_token_stream_from_string(&macro_info->expansion_token_stream, macro_info->expansion_string);
-
-    lexer_push_token_stream(lexer, &macro_info->expansion_token_stream);
-
-    u32 token_count = 0;
-    while(lexer->current_stream->string.count > 0)
-    {
-        lexer_token_t token = lexer_get_next_token(lexer);
-        if(token.token_type != TOKEN_TYPE_BACKSLASH)
+        lexer_reset_token_stream(lexer->current_stream);
+        if(token_count <= 0)
         {
-            ++token_count;
+            report_error(parser, "Somehow when parsing the token stream for the macro: '%.*s', token_count was 0...\n", fprint_token(name_token));
         }
-    }
-    lexer_reset_token_stream(lexer->current_stream);
-    if(token_count <= 0)
-    {
-        report_error(parser, "Somehow when parsing the token stream for the macro: '%.*s', token_count was 0...\n", fprint_token(name_token));
-    }
 
-    macro_info->expansion_token_stream.token_buffer         = c_arena_push_array(&permanent_arena, lexer_token_t, token_count);
-    macro_info->expansion_token_stream.buffered_token_count = token_count;
+        macro_info->expansion_token_stream.token_buffer         = c_arena_push_array(&permanent_arena, lexer_token_t, token_count);
+        macro_info->expansion_token_stream.buffered_token_count = token_count;
 
-    u32 token_index = 0;
-    while(lexer->current_stream->string.count > 0)
-    {
-        lexer_token_t token = lexer_get_next_token(lexer);
-        if(token.token_type != TOKEN_TYPE_BACKSLASH)
+        u32 token_index = 0;
+        while(lexer->current_stream->string.count > 0)
         {
-            macro_info->expansion_token_stream.token_buffer[token_index++] = token;
+            lexer_token_t token = lexer_get_next_token(lexer);
+            if(token.token_type != TOKEN_TYPE_BACKSLASH)
+            {
+                macro_info->expansion_token_stream.token_buffer[token_index++] = token;
+            }
         }
+        lexer_pop_token_stream(lexer);
+        macro_info->is_set = true;
     }
-    lexer_pop_token_stream(lexer);
-    macro_info->is_set = true;
 }
 
 internal_api lexer_token_t
@@ -459,25 +456,26 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
     {
         if(record_macro)
         {
-            lexer_token_t name_token = lexer_get_next_token(lexer);
-
-            macro_info_t *macro_info = hash_table_get_element_ptr(&parser->macro_table, name_token.data);
-            if(!macro_info->is_set)
+            lexer_token_t name_token  = lexer_get_next_token(lexer);
+            macro_info_t *macro_entry = hash_table_get_element_ptr(&parser->macro_table, name_token.data);
+            if(!macro_entry->is_set)
             {
-                parse_macro_info(parser, macro_info, name_token);
+                macro_info_t macro_info = {};
+
+                parse_macro_info(parser, &macro_info, name_token);
                 printf("========== MACRO DEFINITION ========\n");
-                printf("Macro: '%.*s'...\n", fprint_string(macro_info->name));
-                printf("Expansion: '%.*s'...\n", fprint_string(macro_info->expansion_string));
-                printf("Argument Count: '%d'...\n", macro_info->argument_count);
+                printf("Macro: '%.*s'...\n", fprint_string(macro_info.name));
+                printf("Expansion: '%.*s'...\n", fprint_string(macro_info.expansion_string));
+                printf("Argument Count: '%d'...\n", macro_info.argument_count);
                 for(u32 index = 0;
-                    index < macro_info->argument_count;
+                    index < macro_info.argument_count;
                     ++index)
                 {
-                    printf("\tArgument: '%.*s'...\n", fprint_string(macro_info->arguments[index]));
+                    printf("\tArgument: '%.*s'...\n", fprint_string(macro_info.arguments[index]));
                 }
                 printf("====================================\n");
 
-                language_keyword_t *keyword = get_keyword_from_identifier(macro_info->expansion_string);
+                language_keyword_t *keyword = get_keyword_from_identifier(macro_info.expansion_string);
                 if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
                 {
                     language_keyword_t new_keyword;
@@ -486,8 +484,10 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
 
                     dynarray_add(&g_language_info.keywords, &new_keyword);
                     printf("Found token: '%.*s' which is a #define'd alias for the language keyword: '%.*s'...\n",
-                           fprint_string(macro_info->name), fprint_string(keyword->identifier));
+                           fprint_string(macro_info.name), fprint_string(keyword->identifier));
                 }
+
+                hash_table_add_element(&parser->macro_table, &macro_info, name_token.data);
             }
         }
         else
@@ -507,11 +507,7 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
     else if(c_string_compare(token.data, STR("if")))
     {
         lexer_token_t if_token = lexer_get_next_token(lexer);
-        if(if_token.token_type != TOKEN_TYPE_NUMBER) 
-        {
-            //report_error(lexer, "Currently the only item supported after a '#if ' is a number... instead got: '%.*s'...\n", fprint_token(if_token));
-        }
-        else
+        if(if_token.token_type == TOKEN_TYPE_NUMBER) 
         {
             u32 number = c_string_read_uint(if_token.data);
             if(number == 0)
@@ -521,6 +517,26 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
                     token = lexer_get_next_token(lexer);
                 }
             }
+        }
+        else
+        {
+            if(if_token.token_type != TOKEN_TYPE_BANG)
+            {
+                //report_error(lexer, "Currently the only item supported after a '#if ' is a number... instead got: '%.*s'...\n", fprint_token(if_token));
+                while(!c_string_compare(token.data, STR("endif")))
+                {
+                    token = lexer_get_next_token(lexer);
+                }
+            }
+        }
+    }
+    else if(c_string_compare(token.data, STR("ifdef")) ||
+            c_string_compare(token.data, STR("elif"))  ||
+            c_string_compare(token.data, STR("else")))
+    {
+        while(!c_string_compare(token.data, STR("endif")))
+        {
+            token = lexer_get_next_token(lexer);
         }
     }
 
@@ -533,6 +549,9 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
  * PHASE 1:
  *  - Find all macros and record them to their associated namespace and file declaration_context_t
  *  - Once finished across all files, join these items into a single global registery
+ *  - Record macros that are in the '#ifdef' style like branching Assert definitions as branching. Record macro mutability.
+ *    If we find a macro being defined several times, record that this macro either has mutltiple definitions or has changing definitions.
+ *  
  *
  *  FOR #IFDEF
  *  - There is no single good way to know what is #ifdef at the time of analyzing as the definition might be in another file
@@ -554,7 +573,27 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
  * PHASE 3:
  * - Infer types by linking the AST to that of their code_type_t data
  * - Evaluate all expressions now that all constants, macros, and types are known.
- * - PROFIT
+ * - Output 
+ */
+
+/* TODO: NEW PLAN (?)
+ * Since we want this tool to be very simple, plug and play like the previous metaprogram that could simply be invoked by:
+ * ./metaprogram --dir=../code/
+ *
+ * We will likely need to redesign how we parse files. Right now, the files are as parallelized as can be. In theory, this is fine but sort of
+ * puts the cart before the horse. We should move to a single linear approach, using threading when proven best.
+ *
+ * PHASE 1:
+ *  - The user calls our program like so:
+ *      ./athena_reflector --directory=../code/ --recursive=false
+ *    From there, we will gather all files from the target directory, recursively if needed.
+ *  - Once we have a list of the valid files to parse (just the .h files, if you care about the type information for something, put it in a header)
+ *  - Due to the usage of macros, we need to build a dependency tree for the each of the files using their #includes (in the case of Unity builds, #include "*.cpp" is skipped). This is annoying, and may want a better approach.
+ *  - Once there is some list of "what file requires what" for each of the files, we should arrange them in a linear file stream inside the lexer. This will go from the first file (acting as the top of the single virtual file) to the bottom.
+ *  - Parse from this virtual top to virtual bottom linearly, recording macros and such as needed and interrupting the primary token stream as needed for items like macro definitions. This will allow us to parse macros in a stateful manner.
+ *  - While parsing, store the location (the beginning index and ending index of the token stream) of items like structures, classes, functions, and enums in an array.
+ *  - Once the file has been parsed top to bottom and all items that wish to be parsed are recorded, parse them and generate their type information.
+ *  - Output the information
  */
 
 // NOTE(Sleepster): PHASE 1: MACROS
@@ -625,7 +664,7 @@ record_file_constants(parser_t *parser)
                     if(initializer_token.token_type != TOKEN_TYPE_OPEN_BRACE)
                     {
                         // NOTE(Sleepster): It's an easily parsable expression 
-                        node = AST_create_new_node(&transient_arena);
+                        node = AST_create_new_node(&parser->arena, parser->active_decl_context);
 
                         node->node_type  = AST_NODE_TYPE_CONSTEXPR;
                         node->identifier = c_string_make_copy(&permanent_arena, name_token.data);
@@ -979,10 +1018,72 @@ parse_single_file(string_t filename)
     parser_t *parser   = parser_create(filename, file_data); 
 
     record_file_macros(parser);
-    consolidate_macro_tables();
-
     record_file_constants(parser);
     build_file_AST(parser);
+}
+
+VISIT_FILES(generate_project_RTTI)
+{
+    string_t filename = visit_file_data->fullname;
+    string_t file_ext = c_string_get_file_ext_from_path(filename);
+
+    if(!c_string_compare(file_ext, STR(".h")))
+    {
+        return;
+    }
+
+    if(c_string_compare(visit_file_data->directory_name, STR("meta"))      || 
+       c_string_compare(visit_file_data->directory_name, STR("generated")) ||
+       c_string_compare(visit_file_data->directory_name, STR("GENERATED"))) 
+    {
+        return;
+    }
+
+    parse_single_file(filename);
+}
+
+int
+main(int argc, char **argv)
+{
+    // NOTE(Sleepster): Just for the threadpool 
+    c_global_context_init();
+
+    //u32 thread_count = sys_get_thread_count();
+    //c_threadpool_init(&global_context->main_threadpool, thread_count - 2, MB(10), false);
+
+    // NOTE(Sleepster): Thread init 
+    permanent_arena = c_arena_create(MB(10));
+    transient_arena = c_arena_create(MB(10));
+
+    // NOTE(Sleepster): This is a global READ ONLY dataset
+    initialize_default_language_info();
+
+    // NOTE(Sleepster): Thread init 
+    Expect(argc > 1, "You must pass a file to parse or a target directory that contains these files...\n");
+
+    char **requested_filename = c_program_flag_add_string("-filename", null, "This is the file we wish to parse...\n");
+    char   **requested_directory = c_program_flag_add_string("-directory", null, "Points to the directory you wish to parse...\n");
+    bool32 *recursive            = c_program_flag_add_bool32("-recursive", false, "Denotes recursive parsing over the passed directory...\n");
+
+    c_program_flag_parse_args(argc, argv);
+
+    if(!(*requested_directory))
+    {
+        string_t filename = STR(*requested_filename);
+        symbol_table_init(filename, *recursive);
+
+        parse_single_file(filename);
+    }
+    else
+    {
+        visit_file_data_t visit_info = c_directory_create_visit_data(generate_project_RTTI, *recursive, null);
+        string_t directory = STR(*requested_directory);
+        symbol_table_init(directory, *recursive);
+
+        c_directory_visit(directory, &visit_info);
+    }
+
+    consolidate_macro_tables();
     consolidate_AST_nodes();
     deduce_AST_node_type_data();
 
@@ -1055,68 +1156,6 @@ parse_single_file(string_t filename)
         }
 
         printf("\n");
-    }
-}
-
-VISIT_FILES(generate_project_RTTI)
-{
-    string_t filename = visit_file_data->fullname;
-    string_t file_ext = c_string_get_file_ext_from_path(filename);
-
-    if(!c_string_compare(file_ext, STR(".h")) && !c_string_compare(file_ext, STR(".cpp")))
-    {
-        return;
-    }
-
-    if(c_string_compare(visit_file_data->directory_name, STR("meta"))      || 
-       c_string_compare(visit_file_data->directory_name, STR("generated")) ||
-       c_string_compare(visit_file_data->directory_name, STR("GENERATED"))) 
-    {
-        return;
-    }
-
-    parse_single_file(filename);
-}
-
-int
-main(int argc, char **argv)
-{
-    // NOTE(Sleepster): Just for the threadpool 
-    c_global_context_init();
-
-    //u32 thread_count = sys_get_thread_count();
-    //c_threadpool_init(&global_context->main_threadpool, thread_count - 2, MB(10), false);
-
-    // NOTE(Sleepster): Thread init 
-    permanent_arena = c_arena_create(MB(10));
-    transient_arena = c_arena_create(MB(10));
-
-    // NOTE(Sleepster): This is a global READ ONLY dataset
-    initialize_default_language_info();
-
-    // NOTE(Sleepster): Thread init 
-    Expect(argc > 1, "You must pass a file to parse or a target directory that contains these files...\n");
-
-    char **requested_filename = c_program_flag_add_string("-filename", null, "This is the file we wish to parse...\n");
-    char   **requested_directory = c_program_flag_add_string("-directory", null, "Points to the directory you wish to parse...\n");
-    bool32 *recursive            = c_program_flag_add_bool32("-recursive", false, "Denotes recursive parsing over the passed directory...\n");
-
-    c_program_flag_parse_args(argc, argv);
-
-    if(!(*requested_directory))
-    {
-        string_t filename = STR(*requested_filename);
-        symbol_table_init(filename, *recursive);
-
-        parse_single_file(filename);
-    }
-    else
-    {
-        visit_file_data_t visit_info = c_directory_create_visit_data(generate_project_RTTI, *recursive, null);
-        string_t directory = STR(*requested_directory);
-        symbol_table_init(directory, *recursive);
-
-        c_directory_visit(directory, &visit_info);
     }
 
     return(0);

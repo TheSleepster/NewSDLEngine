@@ -104,6 +104,7 @@ array_t<T>::operator+(u32 index)
     return(this->items + index);
 }
 
+// NOTE(Sleepster): Right now, this creates a ton of "use after free" bugs. Hopefully with our own allocator that's not a problem. 
 template <typename T>
 void
 array_resize(array_t<T> *array, u32 new_capacity)
@@ -204,7 +205,8 @@ dynarray_add(dynarray_t<T> *array, T *element)
     T *result = null;
     if((array->used + 1) > array->capacity)
     {
-        array->capacity = Max(8, array->capacity * 2);
+        // TODO(Sleepster): THIS IS REALLLLLLLLY BAD. Change this once we have our own malloc 
+        array->capacity = Max(60, array->capacity * 2);
         array->items = (T*)reallocarray(array->items, sizeof(T), array->capacity);
     }
 

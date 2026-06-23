@@ -137,6 +137,7 @@ $(CODE_GENERATOR_OUT): $(CODE_GENERATOR_SRC) | $(BUILD_DIR)
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/metaprogram.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $@
 
+# -fsanitize=undefined,address -fno-omit-frame-pointer -O1 
 athena: ../code/code_generator/athena/athena.cpp | $(BUILD_DIR)
 	@echo [BUILDING METAPROGRAM] $@
 	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \

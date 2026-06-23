@@ -50,6 +50,7 @@ hash_table_default_allocate(void *allocator, u32 allocation_size)
 {
     void *result = null;
     result = malloc(allocation_size);
+    ZeroMemory(result, allocation_size);
 
     return(result);
 }

@@ -11,6 +11,7 @@ struct AST_node_t;
 struct code_type_t;
 struct parser_t;
 struct code_attribute_t;
+struct declaration_context_t;
 
 internal_api AST_node_t* 
 generate_lambda_AST(parser_t     *parser, 
@@ -70,7 +71,7 @@ struct AST_expression_value_t
 enum AST_type_flags_t 
 {
 #define X(enum, string, value) enum = value,
-AST_TYPE_MODIFIER_FLAGS(X)
+    AST_TYPE_MODIFIER_FLAGS(X)
 #undef X
 };
 
@@ -132,6 +133,10 @@ struct AST_node_t
     u32                          node_type;
     string_t                     identifier;
 
+    string_t                     parent_file;
+    AST_node_t                  *parent;
+    u32                          line_number;
+
     // NOTE(Sleepster): 
     // This does not imply heap allocations on a per-node basis, we only use heap allocations 
     // if the parser->attributes array has content.
@@ -140,6 +145,7 @@ struct AST_node_t
 
     AST_type_t                   type;
     AST_node_t                  *next_sibling;
+    declaration_context_t       *decl_context;
     //declaration_context_t *decl_context;
 
     // NOTE(Sleepster): For structures or enums... 

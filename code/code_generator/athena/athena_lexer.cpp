@@ -65,7 +65,7 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
     // NOTE(Sleepster): If the stream has a token buffer, we will always pull from the buffer instead... 
     if(!token_stream->token_buffer)
     {
-        u32 new_line_count  = c_string_eat_whitespace(&token_stream->string);
+        u32 new_line_count = c_string_eat_whitespace(&token_stream->string);
         token_stream->line_number += new_line_count;
         if(token_stream->string.count != 0)
         {

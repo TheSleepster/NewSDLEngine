@@ -2868,7 +2868,7 @@ struct type_info_enum_file_watcher_change_event_t {
 			type_info_member_t FWC_EVENT_SCAN_CHILDREN;
 			type_info_member_t FWC_EVENT_RENAMED;
 			type_info_member_t FWC_EVENT_ALL;
-			type_info_member_t WFC_EVENT_COUNT;
+			type_info_member_t FWC_EVENT_COUNT;
 		}members;
 	};
 };
@@ -5579,7 +5579,7 @@ const static type_info_enum_file_watcher_change_event_t type_info_enum_file_watc
 		.FWC_EVENT_SCAN_CHILDREN = {.name = "FWC_EVENT_SCAN_CHILDREN", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_SCAN_CHILDREN), .offset = FWC_EVENT_SCAN_CHILDREN},
 		.FWC_EVENT_RENAMED = {.name = "FWC_EVENT_RENAMED", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_RENAMED), .offset = FWC_EVENT_RENAMED},
 		.FWC_EVENT_ALL = {.name = "FWC_EVENT_ALL", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_ALL), .offset = FWC_EVENT_ALL},
-		.WFC_EVENT_COUNT = {.name = "WFC_EVENT_COUNT", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(WFC_EVENT_COUNT), .offset = WFC_EVENT_COUNT},
+		.FWC_EVENT_COUNT = {.name = "FWC_EVENT_COUNT", .type = TYPE_file_watcher_change_event_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(FWC_EVENT_COUNT), .offset = FWC_EVENT_COUNT},
 	}
 };
 const static type_info_enum_hash_table_allocation_flags_t type_info_enum_hash_table_allocation_flags_t_const_data = {
@@ -7039,7 +7039,7 @@ enum file_watcher_change_event_t_member_list_enum {
 	TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_SCAN_CHILDREN,
 	TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_RENAMED,
 	TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ALL,
-	TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_WFC_EVENT_COUNT,
+	TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_COUNT,
 };
 
 enum hash_table_allocation_flags_t_member_list_enum {
@@ -7377,7 +7377,7 @@ enum render_pipeline_polygon_mode_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_SCAN_CHILDREN, "FWC_EVENT_SCAN_CHILDREN") \
 	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_RENAMED, "FWC_EVENT_RENAMED") \
 	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ALL, "FWC_EVENT_ALL") \
-	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_WFC_EVENT_COUNT, "WFC_EVENT_COUNT") \
+	X(TYPE_ENUM_LOOKUP_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_COUNT, "FWC_EVENT_COUNT") \
 	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Invalid, "HTAF_Invalid") \
 	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Static, "HTAF_Static") \
 	X(TYPE_ENUM_LOOKUP_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_KeyCopy, "HTAF_KeyCopy") \
@@ -7872,7 +7872,7 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "FWC_EVENT_SCAN_CHILDREN", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_SCAN_CHILDREN, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
 	{.name = "FWC_EVENT_RENAMED", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_RENAMED, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
 	{.name = "FWC_EVENT_ALL", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_ALL, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
-	{.name = "WFC_EVENT_COUNT", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_WFC_EVENT_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
+	{.name = "FWC_EVENT_COUNT", .member_enum = TYPE_FILE_WATCHER_CHANGE_EVENT_T_MEMBER_FWC_EVENT_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_file_watcher_change_event_t_const_data},
 	{.name = "HTAF_Invalid", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
 	{.name = "HTAF_Static", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_Static, .type_info_ptr = (const type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},
 	{.name = "HTAF_KeyCopy", .member_enum = TYPE_HASH_TABLE_ALLOCATION_FLAGS_T_MEMBER_HTAF_KeyCopy, .type_info_ptr = (const type_info_struct*)&type_info_enum_hash_table_allocation_flags_t_const_data},

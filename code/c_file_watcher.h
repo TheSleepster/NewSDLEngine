@@ -39,7 +39,7 @@ typedef enum file_watcher_change_event
     FWC_EVENT_SCAN_CHILDREN    = 1 << 6,
     FWC_EVENT_RENAMED          = 1 << 7,
     FWC_EVENT_ALL              = FWC_EVENT_ADDED|FWC_EVENT_MODIFIED|FWC_EVENT_DELETED|FWC_EVENT_MOVED|FWC_EVENT_ATTRIBUTE_CHANGE|FWC_EVENT_SCAN_CHILDREN|FWC_EVENT_RENAMED,
-    WFC_EVENT_COUNT,
+    FWC_EVENT_COUNT,
 }file_watcher_change_event_t;
 
 typedef struct file_watcher_recorded_change

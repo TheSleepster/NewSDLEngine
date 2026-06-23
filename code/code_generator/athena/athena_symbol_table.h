@@ -119,15 +119,15 @@ struct declaration_context_t
 
     hash_table_t<code_type_t*> local_types;
     hash_table_t<AST_node_t*>  code_decls;
+    hash_table_t<AST_node_t*>  enum_symbols;
 
     declaration_context_t     *parent_scope;
 };
 
 struct code_attribute_t
 {
-    string_t    name;
-
-    bool8 is_template;
+    string_t name;
+    bool8    is_template;
     struct {
         AST_node_t *arguments;
         u32         argument_count;
@@ -164,10 +164,14 @@ struct symbol_table_t
     dynarray_t<declaration_context_t> declaration_contexts;
 };
 
+
 global_variable language_info_t g_language_info;
 global_variable symbol_table_t  g_symbol_table;
 
 internal_api language_keyword_t *get_keyword_from_identifier(string_t identifier);
 internal_api void                symbol_table_init(string_t filepath, bool8 recursive);
+
+internal_api lexer_token_t parser_get_next_lexer_token(parser_t *parser);
+internal_api lexer_token_t parser_peek_next_lexer_token(parser_t *parser, u32 peek_amount = 1);
 #endif // ATHENA_SYMBOL_TABLE_H
 

@@ -20,10 +20,12 @@ print_AST_node_type(u32 node_type)
 }
 
 internal_api true_inline AST_node_t*
-AST_create_new_node(memory_arena_t *arena)
+AST_create_new_node(memory_arena_t *arena, declaration_context_t *current_context)
 {
     AST_node_t *result = c_arena_push_struct(arena, AST_node_t);
     ZeroStruct(*result);
+
+    result->decl_context = current_context;
 
     return(result);
 }
@@ -101,16 +103,27 @@ get_infix_binding_power(lexer_token_t *token)
     u32 result = 0;
     switch(token->token_type)
     {
-        // NOTE(Sleepster): Bitshift left is the only special infix operator... (not '&', '|', etc.)
-        case TOKEN_TYPE_BITSHIFT_LEFT:  {result = 5;}break;
-        case TOKEN_TYPE_BITSHIFT_RIGHT: {result = 5;}break;
-
+        case TOKEN_TYPE_BITSHIFT_LEFT:  
+        case TOKEN_TYPE_BITSHIFT_RIGHT: 
+        case TOKEN_TYPE_AND:            
+        case TOKEN_TYPE_OR:            
+        {
+            result = 5;
+        }break;
         case TOKEN_TYPE_PLUS:
-        case TOKEN_TYPE_DASH:          {result = 10;}break;
-
+        case TOKEN_TYPE_DASH:          
+        {
+            result = 10;
+        }break;
         case TOKEN_TYPE_FORWARD_SLASH:
-        case TOKEN_TYPE_ASTERISK:      {result = 20;}break;
-        default:                       {result = 0; }break;
+        case TOKEN_TYPE_ASTERISK:      
+        {
+            result = 20;
+        }break;
+        default: 
+        {
+            result = 0; 
+        }break;
     };
 
     return(result);
@@ -129,9 +142,9 @@ get_prefix_binding_power(lexer_token_t *token)
 }
 
 internal_api AST_node_t*
-generate_unary_expression_AST(lexer_token_t *token, AST_node_t *unary_operation)
+generate_unary_expression_AST(parser_t *parser, lexer_token_t *token, AST_node_t *unary_operation)
 {
-    AST_node_t *result = AST_create_new_node(&permanent_arena);
+    AST_node_t *result = AST_create_new_node(&parser->arena, parser->active_decl_context);
     result->node_type  = AST_NODE_TYPE_UNARY_EXPRESSION;
     result->unary_expression.operator_type = token->token_type;
     result->unary_expression.operand       = unary_operation;
@@ -140,9 +153,9 @@ generate_unary_expression_AST(lexer_token_t *token, AST_node_t *unary_operation)
 }
 
 internal_api AST_node_t*
-generate_binary_expression_AST(lexer_token_t *operator_token, AST_node_t *left_node, AST_node_t *right_node)
+generate_binary_expression_AST(parser_t *parser, lexer_token_t *operator_token, AST_node_t *left_node, AST_node_t *right_node)
 {
-    AST_node_t *result = AST_create_new_node(&permanent_arena);
+    AST_node_t *result = AST_create_new_node(&parser->arena, parser->active_decl_context);
     result->node_type  = AST_NODE_TYPE_BINARY_EXPRESSION;
     result->binary_expression.operator_type = operator_token->token_type;
     result->binary_expression.left          = left_node;
@@ -160,7 +173,7 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
     if(prefix_value == -1)
     {
         // NOTE(Sleepster): If this is not a prefix value (like '-') 
-        result = AST_create_new_node(&parser->arena);
+        result = AST_create_new_node(&parser->arena, parser->active_decl_context);
         switch(token->token_type)
         {
             case TOKEN_TYPE_NUMBER:
@@ -195,7 +208,7 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
     else
     {
         AST_node_t *unary_operation = generate_expression_AST(parser, prefix_value, token);
-        result = generate_unary_expression_AST(token, unary_operation);
+        result = generate_unary_expression_AST(parser, token, unary_operation);
     }
 
     return(result);
@@ -209,7 +222,7 @@ generate_led_AST(parser_t *parser, lexer_token_t *token, AST_node_t *left_hand_e
     lexer_token_t operator_token = *token;
 
     AST_node_t *right_expression  = generate_expression_AST(parser, current_infix_binding_power, token);
-    AST_node_t *binary_expression = generate_binary_expression_AST(&operator_token, left_hand_expression, right_expression);
+    AST_node_t *binary_expression = generate_binary_expression_AST(parser, &operator_token, left_hand_expression, right_expression);
     return(binary_expression);
 }
 
@@ -261,16 +274,16 @@ case_expression_value(AST_expression_value_t value, u32 target_type)
             case AST_EXPRESSION_VALUE_INT:      { intermediate = (float64)value.int_value;      }break;
             case AST_EXPRESSION_VALUE_UNSIGNED: { intermediate = (float64)value.unsigned_value; }break;
             case AST_EXPRESSION_VALUE_FLOAT:    { intermediate = (float64)value.float32_value;  }break;
-            case AST_EXPRESSION_VALUE_DOUBLE:   { intermediate = value.float64_value;           }break;
+            case AST_EXPRESSION_VALUE_DOUBLE:   { intermediate = (float64)value.float64_value;  }break;
         }
 
         result = {target_type};
         switch(target_type)
         {
-            case AST_EXPRESSION_VALUE_INT:      { result.int_value = (s32)intermediate;     }break; 
-            case AST_EXPRESSION_VALUE_UNSIGNED: { result.int_value = (u32)intermediate;     }break; 
-            case AST_EXPRESSION_VALUE_FLOAT:    { result.int_value = (float32)intermediate; }break; 
-            case AST_EXPRESSION_VALUE_DOUBLE:   { result.int_value = (float64)intermediate; }break; 
+            case AST_EXPRESSION_VALUE_INT:      { result.int_value     = (s32)intermediate;     }break; 
+            case AST_EXPRESSION_VALUE_UNSIGNED: { result.int_value     = (u32)intermediate;     }break; 
+            case AST_EXPRESSION_VALUE_FLOAT:    { result.float32_value = (float32)intermediate; }break; 
+            case AST_EXPRESSION_VALUE_DOUBLE:   { result.float64_value = (float64)intermediate; }break; 
         }
     }
     else
@@ -301,16 +314,18 @@ evaluate_binary_expression(u32 operator_type, AST_expression_value_t left, AST_e
         {
             switch(operator_type)
             {
-                case TOKEN_TYPE_PLUS:           value.int_value = left.int_value + right.int_value; break;
-                case TOKEN_TYPE_DASH:           value.int_value = left.int_value - right.int_value; break;
-                case TOKEN_TYPE_ASTERISK:       value.int_value = left.int_value * right.int_value; break;
+                case TOKEN_TYPE_PLUS:         { value.int_value = left.int_value + right.int_value; }break;
+                case TOKEN_TYPE_DASH:         { value.int_value = left.int_value - right.int_value; }break;
+                case TOKEN_TYPE_ASTERISK:     { value.int_value = left.int_value * right.int_value; }break;
+                case TOKEN_TYPE_OR:           { value.int_value = left.int_value | right.int_value; }break; 
+                case TOKEN_TYPE_AND:          { value.int_value = left.int_value & right.int_value; }break; 
                 case TOKEN_TYPE_FORWARD_SLASH:
                 {
                     Expect(right.int_value != 0, "Division by zero\n");
                     value.int_value = left.int_value / right.int_value;
-                } break;
-                case TOKEN_TYPE_BITSHIFT_LEFT:  value.int_value = (s32)((u32)left.int_value << right.int_value); break;
-                case TOKEN_TYPE_BITSHIFT_RIGHT: value.int_value = left.int_value >> right.int_value;             break;
+                }break;
+                case TOKEN_TYPE_BITSHIFT_LEFT:  { value.int_value = (s32)((u32)left.int_value << right.int_value); }break;
+                case TOKEN_TYPE_BITSHIFT_RIGHT: { value.int_value = left.int_value >> right.int_value;             }break;
                 default: Expect(false, "Unknown operator for s32\n"); break;
             }
         }break;
@@ -318,22 +333,23 @@ evaluate_binary_expression(u32 operator_type, AST_expression_value_t left, AST_e
         {
             switch(operator_type)
             {
-                case TOKEN_TYPE_PLUS:           value.unsigned_value = left.unsigned_value + right.unsigned_value; break;
-                case TOKEN_TYPE_DASH:           value.unsigned_value = left.unsigned_value - right.unsigned_value; break;
-                case TOKEN_TYPE_ASTERISK:       value.unsigned_value = left.unsigned_value * right.unsigned_value; break;
+                case TOKEN_TYPE_PLUS:           { value.unsigned_value = left.unsigned_value + right.unsigned_value; }break;
+                case TOKEN_TYPE_DASH:           { value.unsigned_value = left.unsigned_value - right.unsigned_value; }break;
+                case TOKEN_TYPE_ASTERISK:       { value.unsigned_value = left.unsigned_value * right.unsigned_value; }break;
+                case TOKEN_TYPE_OR:             { value.unsigned_value = left.unsigned_value | right.unsigned_value; }break; 
+                case TOKEN_TYPE_AND:            { value.unsigned_value = left.unsigned_value & right.unsigned_value; }break; 
                 case TOKEN_TYPE_FORWARD_SLASH:
                 {
                     Expect(right.unsigned_value != 0, "Division by zero\n");
                     value.unsigned_value = left.unsigned_value / right.unsigned_value;
-                } break;
-                case TOKEN_TYPE_BITSHIFT_LEFT:  value.unsigned_value = left.unsigned_value << right.unsigned_value; break;
-                case TOKEN_TYPE_BITSHIFT_RIGHT: value.unsigned_value = left.unsigned_value >> right.unsigned_value; break;
-
+                }break;
+                case TOKEN_TYPE_BITSHIFT_LEFT:  { value.unsigned_value = left.unsigned_value << right.unsigned_value; }break;
+                case TOKEN_TYPE_BITSHIFT_RIGHT: { value.unsigned_value = left.unsigned_value >> right.unsigned_value; }break;
 
                 // TODO(Sleepster): 
                 // The issue here is very simple, for some reason the final character of an expression 
                 // (whether it be a comma, or a close paren, or literally anything) gets added to the expression's AST. This is bad.
-                case TOKEN_TYPE_CLOSE_PAREN: {Expect(false, "Bro what the hell bro...\n"); }break;
+                case TOKEN_TYPE_CLOSE_PAREN: { Expect(false, "Bro what the hell bro...\n"); }break;
                 default: Expect(false, "Unknown operator for u32\n"); break;
             }
         }break;
@@ -341,14 +357,14 @@ evaluate_binary_expression(u32 operator_type, AST_expression_value_t left, AST_e
         {
             switch(operator_type)
             {
-                case TOKEN_TYPE_PLUS:           value.float32_value = left.float32_value + right.float32_value; break;
-                case TOKEN_TYPE_DASH:           value.float32_value = left.float32_value - right.float32_value; break;
-                case TOKEN_TYPE_ASTERISK:       value.float32_value = left.float32_value * right.float32_value; break;
+                case TOKEN_TYPE_PLUS:          { value.float32_value = left.float32_value + right.float32_value; }break;
+                case TOKEN_TYPE_DASH:          { value.float32_value = left.float32_value - right.float32_value; }break;
+                case TOKEN_TYPE_ASTERISK:      { value.float32_value = left.float32_value * right.float32_value; }break;
                 case TOKEN_TYPE_FORWARD_SLASH:
                 {
                     Expect(right.float32_value != 0.0f, "Division by zero\n");
                     value.float32_value = left.float32_value / right.float32_value;
-                } break;
+                }break;
                 default: Expect(false, "Unknown operator for f32\n"); break;
             }
         }break;
@@ -356,14 +372,14 @@ evaluate_binary_expression(u32 operator_type, AST_expression_value_t left, AST_e
         {
             switch(operator_type)
             {
-                case TOKEN_TYPE_PLUS:           value.float64_value = left.float64_value + right.float64_value; break;
-                case TOKEN_TYPE_DASH:           value.float64_value = left.float64_value - right.float64_value; break;
-                case TOKEN_TYPE_ASTERISK:       value.float64_value = left.float64_value * right.float64_value; break;
+                case TOKEN_TYPE_PLUS:           { value.float64_value = left.float64_value + right.float64_value; }break;
+                case TOKEN_TYPE_DASH:           { value.float64_value = left.float64_value - right.float64_value; }break;
+                case TOKEN_TYPE_ASTERISK:       { value.float64_value = left.float64_value * right.float64_value; }break;
                 case TOKEN_TYPE_FORWARD_SLASH:
                 {
                     Expect(right.float64_value != 0.0, "Division by zero\n");
                     value.float64_value = left.float64_value / right.float64_value;
-                } break;
+                }break;
                 default: Expect(false, "Unknown operator for f64\n"); break;
             }
         }break;
@@ -389,7 +405,8 @@ evaluate_expression_AST(AST_node_t *expression)
             {
                 if(constant_expression->expression.evaluated == false)
                 {
-                    constant_expression->expression.value = evaluate_expression_AST(constant_expression->expression.info);
+                    constant_expression->expression.value     = evaluate_expression_AST(constant_expression->expression.info);
+                    constant_expression->expression.evaluated = true;
                 }
 
                 result = constant_expression->expression.value;
@@ -411,8 +428,23 @@ evaluate_expression_AST(AST_node_t *expression)
                 }                    
                 else
                 {
-                    result.type             = AST_EXPRESSION_VALUE_IDENT;
-                    result.identifier_value = expression->identifier;
+                    AST_node_t *node = hash_table_get_element(&expression->decl_context->enum_symbols, expression->identifier);
+                    if(node && node->identifier.data != null)
+                    {
+                        if(node->expression.evaluated)
+                        {
+                            result = node->expression.value;
+                        }
+                        else
+                        {
+                            Expect(false, "Oopsies how are you here???\n");
+                        }
+                    }
+                    else
+                    {
+                        result.type             = AST_EXPRESSION_VALUE_IDENT;
+                        result.identifier_value = expression->identifier;
+                    }
                 }
             }
         }break;
@@ -559,7 +591,7 @@ parse_argument_list(parser_t *parser)
                 report_error(parser, "Error, expected to find identifier following a typename in this argument list...\n");
             }
 
-            AST_node_t *argument = AST_create_new_node(&parser->arena);
+            AST_node_t *argument = AST_create_new_node(&parser->arena, parser->active_decl_context);
             argument->node_type  = AST_NODE_TYPE_LAMBDA_ARGUMENT;
             argument->identifier = c_string_make_copy(&parser->arena, declaration_name.data);
 
@@ -669,7 +701,7 @@ generate_structure_AST(parser_t *parser)
                          fprint_token(inherited_typename));
         }
 
-        inheritance_node            = AST_create_new_node(&permanent_arena);
+        inheritance_node            = AST_create_new_node(&parser->arena, parser->active_decl_context);
         inheritance_node->node_type = AST_NODE_TYPE_INHERITANCE_INFO;
 
         code_type_t *inherited_type = parser_register_code_type_identifier(parser, inherited_typename.data);
@@ -698,9 +730,12 @@ generate_structure_AST(parser_t *parser)
     // NOTE(Sleepster): If it's a brace, it's a definition... otherwise it's just a declaration and we don't care... 
     if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
     {
-        AST_node_t *structure_root = AST_create_new_node(&permanent_arena);
+        AST_node_t *structure_root = AST_create_new_node(&parser->arena, parser->active_decl_context);
         structure_root->node_type  = AST_NODE_TYPE_STRUCTURE;
         structure_root->type.flags = structure_flags;
+
+        structure_root->parent_file = c_string_make_copy(&parser->arena, parser->filename);
+        structure_root->line_number = parser->lexer.current_stream->line_number;
 
         // NOTE(Sleepster): Copy the attributes 
         if(parser->current_attribute_list.used > 0)
@@ -715,12 +750,21 @@ generate_structure_AST(parser_t *parser)
             structure_root->struct_decl.inherited_type_info = inheritance_node;
         }
 
+        bool8 pushed_context = false;
+
         // NOTE(Sleepster): Set the code type of the structure 
         code_type_t *structure_type = null;
         if(name_token.token_type == TOKEN_TYPE_IDENT) 
         {
             structure_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
             structure_type = parser_register_code_type_identifier(parser, name_token.data);
+
+            // NOTE(Sleepster): Create a new declaration_context_t for this scope, then push items onto it. 
+            declaration_context_t *context = parser_create_declaration_context(parser, 
+                                                                               structure_root->identifier, 
+                                                                               parser->active_decl_context);
+            parser_push_decl_context(parser, context);
+            pushed_context = true;
         }
         else 
         {
@@ -728,10 +772,6 @@ generate_structure_AST(parser_t *parser)
         }
 
         structure_root->type.code_type = structure_type;
-
-        // NOTE(Sleepster): Create a new declaration_context_t for this scope, then push items onto it. 
-        declaration_context_t *context = parser_create_declaration_context(parser, structure_root->identifier, parser->active_decl_context);
-        parser_push_decl_context(parser, context);
         for(;;)
         {
             lexer_token_t typename_token = parser_get_next_lexer_token(parser);
@@ -851,9 +891,9 @@ generate_structure_AST(parser_t *parser)
                             parser_get_next_lexer_token(parser);
                         }
 
-                        AST_node_t *member_node = AST_create_new_node(&permanent_arena);
+                        AST_node_t *member_node = AST_create_new_node(&parser->arena, parser->active_decl_context);
                         member_node->node_type  = AST_NODE_TYPE_STRUCTURE_MEMBER;
-                        member_node->identifier = c_string_make_copy(&permanent_arena, member_name_token.data); 
+                        member_node->identifier = c_string_make_copy(&parser->arena, member_name_token.data); 
 
                         code_type_t *member_type    = parser_register_code_type_identifier(parser, typename_token.data);
                         member_node->type.code_type = member_type;
@@ -919,7 +959,7 @@ generate_structure_AST(parser_t *parser)
                         }
                     }
 #else
-                    AST_node_t *constructor_node = AST_create_new_node(&permanent_arena);
+                    AST_node_t *constructor_node = AST_create_new_node(&parser->arena);
                     if(typename_token.token_type == TOKEN_TYPE_TILDE)
                     {
                         constructor_node->node_type = AST_NODE_TYPE_DECONSTRUCTOR;
@@ -970,7 +1010,11 @@ generate_structure_AST(parser_t *parser)
                 lexer_eat_lines(&transient_arena, lexer, 1);
             }
         }
-        parser_pop_decl_context(parser);
+
+        if(pushed_context)
+        {
+            parser_pop_decl_context(parser);
+        }
         
         token = parser_get_next_lexer_token(parser);
         if(token.token_type == TOKEN_TYPE_IDENT)
@@ -1020,7 +1064,7 @@ generate_enum_AST(parser_t *parser)
     // NOTE(Sleepster): Same as a structured type, if it's an open brace it's a definition 
     if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
     {
-        AST_node_t *enum_root     = AST_create_new_node(&permanent_arena);
+        AST_node_t *enum_root     = AST_create_new_node(&parser->arena, parser->active_decl_context);
         enum_root->node_type      = AST_NODE_TYPE_ENUM;
 
         // NOTE(Sleepster): Copy the attributes 
@@ -1030,8 +1074,15 @@ generate_enum_AST(parser_t *parser)
             dynarray_reset(&parser->current_attribute_list);
         }
 
-        if(name_token.token_type == TOKEN_TYPE_IDENT) enum_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
-        else                                          enum_root->identifier = STR("anonymous");
+        // NOTE(Sleepster): Record the name of the enum if there is one. 
+        if(name_token.token_type == TOKEN_TYPE_IDENT) 
+        {
+            enum_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
+        }
+        else 
+        {
+            enum_root->identifier = STR("anonymous");
+        }
 
         code_type_t *enum_type    = parser_register_code_type_identifier(parser, enum_root->identifier);
         enum_root->type.code_type = enum_type;
@@ -1050,20 +1101,19 @@ generate_enum_AST(parser_t *parser)
                 report_error(parser, "Expected to find an identifier when parsing type information for an enum... Instead found: '%.*s'...\n", fprint_token(enum_member_token));
             }
 
-            AST_node_t *member = AST_create_new_node(&permanent_arena);
+            AST_node_t *member = AST_create_new_node(&parser->arena, parser->active_decl_context);
             member->node_type  = AST_NODE_TYPE_ENUM_MEMBER;
-            member->identifier = c_string_make_copy(&permanent_arena, enum_member_token.data);
+            member->identifier = c_string_make_copy(&parser->arena, enum_member_token.data);
 
-            AST_add_member(enum_root, member);
-
-            // NOTE(Sleepster): Eat whatever comes after the member name...
+            // NOTE(Sleepster): Eat whatever comes after the member name... If it's an '=' then this is an expression 
             token = parser_get_next_lexer_token(parser);
-
-            // NOTE(Sleepster): If it's an '=' then this is an expression 
             if(token.token_type == TOKEN_TYPE_EQUALS)
             {
                 member->expression.info = generate_expression_AST(parser, 0, &token);
             }
+            
+            AST_add_member(enum_root, member);
+            hash_table_add_element(&parser->active_decl_context->enum_symbols, &member, member->identifier);
         }
 
         token = parser_get_next_lexer_token(parser);
@@ -1108,9 +1158,9 @@ generate_lambda_AST(parser_t     *parser,
                     u32           return_type_pointer_depth, 
                     bool8         return_type_is_const)
 {
-    AST_node_t *return_type = AST_create_new_node(&permanent_arena);
+    AST_node_t *return_type = AST_create_new_node(&parser->arena, parser->active_decl_context);
     return_type->node_type  = AST_NODE_TYPE_LAMBDA_RETURN_TYPE;
-    return_type->identifier = c_string_make_copy(&permanent_arena, return_type_token.data);
+    return_type->identifier = c_string_make_copy(&parser->arena, return_type_token.data);
 
     AST_type_t *return_type_data = &return_type->type;
     return_type_data->code_type  = parser_register_code_type_identifier(parser, return_type->identifier);
@@ -1141,7 +1191,7 @@ generate_lambda_AST(parser_t     *parser,
                      fprint_token(procedure_name_token));
     }
 
-    AST_node_t *lambda = AST_create_new_node(&permanent_arena);
+    AST_node_t *lambda = AST_create_new_node(&parser->arena, parser->active_decl_context);
     lambda->lambda.return_type = return_type;
 
     argument_list_t list = parse_argument_list(parser);
@@ -1150,7 +1200,7 @@ generate_lambda_AST(parser_t     *parser,
 
     // NOTE(Sleepster): Fill in the data related to the lambda. 
     lambda->node_type  = AST_NODE_TYPE_LAMBDA;
-    lambda->identifier = c_string_make_copy(&permanent_arena, procedure_name_token.data);
+    lambda->identifier = c_string_make_copy(&parser->arena, procedure_name_token.data);
     lambda->type       = parser_create_lambda_type(parser, lambda);
     if(parser->current_attribute_list.used > 0)
     {

@@ -105,6 +105,7 @@ parser_create_declaration_context(parser_t *parser, string_t scope_name, declara
         declaration_context_t  new_context = {};
         new_context.local_types   = hash_table_create<code_type_t*>(512);
         new_context.code_decls    = hash_table_create<AST_node_t*>(512);
+        new_context.enum_symbols  = hash_table_create<AST_node_t*>(512);
         new_context.lexical_scope = scope_name;
         new_context.context_ID    = context_ID;
         new_context.parent_scope  = parent;
@@ -139,7 +140,8 @@ parser_create(string_t filename, string_t file_data)
     lexer_create(&parser->lexer, file_data);
     parser->macro_table = hash_table_create<macro_info_t>(1024);
 
-    declaration_context_t *global_scope = parser_create_declaration_context(parser, STR("global"), null);
+    string_t scope_string = STR("global");
+    declaration_context_t *global_scope = parser_create_declaration_context(parser, c_string_make_copy(&permanent_arena, scope_string), null);
     Expect(g_language_info.language_primitive_types.items != null,
            "Cannot initialize the parser without primtive type information... Make sure you call initialize_default_language_info() before you call this function!\n");
 
@@ -235,23 +237,15 @@ initialize_default_language_info(void)
     }
 }
 
+#if 0
 internal_api lexer_token_stream_t 
 parser_substitute_macro_arguments(parser_t *parser, lexer_token_t last_token, macro_info_t *macro_info)
 {
+    // TODO(Sleepster): Handle macros like:
+    // #define item(name) item_##name 
+    
     lexer_token_stream_t result = {};
-
     lexer_t *lexer = &parser->lexer;
-    // NOTE(Sleepster): This right now is completely wrong.
-    // Firstly, this function should just not be getting called when it is.
-    // Secondly, this function should operate on TWO streams at the same time, eating from both and replacing the saved macro's arguments
-    // with the corresponding argument from the invoked macro. like so:
-    // #define item(name) item_##name
-    //
-    // In the event of this invocation:
-    // item(gloves);
-    //
-    // We should see:
-    // item_gloves
     
     lexer_token_t next_expansion_token = lexer_peek_token(lexer);
     // NOTE(Sleepster): If the macro takes arguments... 
@@ -292,6 +286,7 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t last_token, ma
                         break;
                     }
                 }
+
                 lexer_token_t check_token = lexer_peek_token(lexer, 1);
                 if(check_token.token_type != TOKEN_TYPE_COMMA && check_token.token_type != TOKEN_TYPE_CLOSE_PAREN)
                 {
@@ -315,6 +310,14 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t last_token, ma
 
     return(result);
 }
+#endif
+
+internal_api lexer_token_stream_t
+parser_substitute_macro_arguments(parser_t *parser, lexer_token_t last_token, macro_info_t *macro_info)
+{
+    Assert(false);
+    return((lexer_token_stream_t){});
+}
 
 internal_api lexer_token_t
 parser_fetch_next_token(parser_t *parser)
@@ -329,7 +332,7 @@ parser_fetch_next_token(parser_t *parser)
         result = lexer_get_next_token(lexer);
     }
 
-    macro_info_t *macro = hash_table_get_element_ptr(&parser->macro_table, result.data);
+    macro_info_t *macro = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, result.data);
     if(macro->is_set)
     {
         lexer_token_stream_t macro_stream = parser_substitute_macro_arguments(parser, result, macro);
@@ -366,7 +369,7 @@ parser_get_next_lexer_token(parser_t *parser)
 }
 
 internal_api lexer_token_t
-parser_peek_next_lexer_token(parser_t *parser, u32 peek_amount = 1)
+parser_peek_next_lexer_token(parser_t *parser, u32 peek_amount)
 {
     lexer_token_t result = {};
     while(parser->buffered_token_count < peek_amount)
