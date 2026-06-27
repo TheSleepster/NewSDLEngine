@@ -72,10 +72,10 @@ struct threadpool_t
 {
     sys_semaphore_t work_avaliable_semaphore;
     worker_thread_t workers[MAX_THREAD_COUNT];
-    u32             thread_count;
+    s32             thread_count;
 
-    alignas(CACHE_LINE) volatile u32 threads_flushed;
-    alignas(CACHE_LINE) volatile u32 next_worker_index;
+    alignas(CACHE_LINE) volatile s32 threads_flushed;
+    alignas(CACHE_LINE) volatile s32 next_worker_index;
 };
 
 /*===========================================
@@ -95,12 +95,12 @@ true_inline void c_threadpool_push_work_order(threadpool_t *threadpool, LambdaTy
   ===========================================*/
 
 #define parallel_for_FIFO(threadpool, iterator, max_iterations, work_completed_fence_ptr, lambda) \
-    for(u32 iterator = max_iterations; iterator > 0; --iterator)  \
+    for(u32 iterator = max_iterations; iterator > 0; --iterator) \
         c_threadpool_push_work_order(threadpool, lambda, work_completed_fence_ptr)                  
 
 // NOTE(Sleepster): This is by default first in last out. 
 #define parallel_for(threadpool, iterator, max_iterations, work_completed_fence_ptr, lambda) \
-    for(u32 iterator = 0; iterator < max_iterations; ++iterator)  \
+    for(u32 iterator = 0; iterator < max_iterations; ++iterator) \
         c_threadpool_push_work_order(threadpool, lambda, work_completed_fence_ptr)                  
 
 // NOTE(Sleepster): 

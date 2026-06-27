@@ -1284,7 +1284,7 @@ typedef struct type_info_data_mapping
                 string_t canonical_type_name = get_canonical_type_name(&member->type_info);
 
                 c_string_builder_sprintf(type_member_enum_builder, "\tTYPE_%.*s_MEMBER_%.*s,\n", 
-                                         struct_canonical_type_name.count, C_STR(c_string_to_upper(struct_canonical_type_name)),
+                                         struct_canonical_type_name.count, C_STR(c_string_to_upper(&global_context->context_arena, struct_canonical_type_name)),
                                          member->name.count,               C_STR(member->name));
 
                 if(member->type_info.kind == META_TYPE_KIND_Struct && 
@@ -1353,12 +1353,12 @@ typedef struct type_info_data_mapping
             {
                 meta_member_t *member = c_dynarray_get_ptr(enum_data->members, member_index);
                 c_string_builder_sprintf(type_table_builder, "\tX(TYPE_ENUM_LOOKUP_%.*s_MEMBER_%.*s, \"%.*s\") \\\n", 
-                                         enum_data->type_data.type_name.count, C_STR(c_string_to_upper(enum_data->type_data.type_name)),
+                                         enum_data->type_data.type_name.count, C_STR(c_string_to_upper(&global_context->context_arena, enum_data->type_data.type_name)),
                                          member->name.count,                   C_STR(member->name),
                                          member->name.count,                   C_STR(member->name));
 
                 c_string_builder_sprintf(type_member_enum_builder, "\tTYPE_%.*s_MEMBER_%.*s,\n", 
-                                         enum_data->type_data.type_name.count, C_STR(c_string_to_upper(enum_data->type_data.type_name)),
+                                         enum_data->type_data.type_name.count, C_STR(c_string_to_upper(&global_context->context_arena, enum_data->type_data.type_name)),
                                          member->name.count,                   C_STR(member->name));
 
                 c_string_builder_sprintf(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(%.*s), .offset = %.*s},\n",
@@ -1474,7 +1474,7 @@ GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
 
                 c_string_builder_sprintf(type_table_builder, "\t{.name = \"%.*s\", .member_enum = TYPE_%.*s_MEMBER_%.*s, .type_info_ptr = (const type_info_struct*)&type_info_enum_%.*s_const_data},\n",
                                          member->name.count,        C_STR(member->name),                           // .name
-                                         canonical_enum_name.count, C_STR(c_string_to_upper(canonical_enum_name)), // .member_enum, first half
+                                         canonical_enum_name.count, C_STR(c_string_to_upper(&global_context->context_arena, canonical_enum_name)), // .member_enum, first half
                                          member->name.count,        C_STR(member->name),                           // .member_enum, second half
                                          canonical_enum_name.count, C_STR(canonical_enum_name));                   // .struct_const_data
             }

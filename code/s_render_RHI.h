@@ -50,7 +50,7 @@ enum render_buffer_advance_rate_t
 enum render_buffer_memory_type_t
 {
     RenderBufferAllocationTypeMapped  = BIT(0),
-    RenderBufferAllocationTypeGPUOnly = BIT(1)
+    RenderBufferAllocationTypeGPUOnly = BIT(1),
 };
 
 struct render_buffer_desc_t

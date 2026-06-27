@@ -1,6 +1,10 @@
 {
     // Debug configurations for Linux (CodeLLDB)
     "version": "0.2.0",
+    "initCommands": [
+        "settings set target.x86-disassembly-flavor intel"
+    ],
+
     "configurations": [
         {
             "name": "game_debug (host)",
@@ -72,7 +76,7 @@
             "program": "${workspaceFolder}/build/athena",
 
             "cwd": "${workspaceFolder}/code",
-            //"args": ["--filename=tests/metaprogram_tests/conditional_macros.cpp"],
+            //"args": ["--filename=tests/metaprogram_tests/nested_macros.cpp"],
             //"args": ["--filename=tests/metaprogram_tests/advanced_templates.cpp"],
             //"args": ["--filename=tests/metaprogram_tests/advanced_header.cpp"],
             //"args": ["--filename=tests/metaprogram_tests/cpp_class.cpp"],
@@ -80,10 +84,11 @@
             //"args": ["--filename=tests/metaprogram_tests/enum.cpp"],
             //"args": ["--filename=c_file_watcher.h"],
             //"args": ["--filename=c_math.h"],
+            "args": ["--filename=c_base.h"],
 
             //"cwd": "${workspaceFolder}",
+            //"args": ["--filename=tests/metaprogram_tests/nested_macros.cpp"],
             //"args": ["--directory=${workspaceFolder}/code"],
-            "args": ["--filename=tests/metaprogram_tests/nested_macros.cpp"],
             "stopOnEntry": false,
             "terminal": "integrated",
         },

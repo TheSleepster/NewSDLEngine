@@ -4,6 +4,9 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#define END_LINE(arg1, arg2) \
+    arg1##arg2
+
 constexpr u32 MAX_INTERNAL_MEMBERS = 128;
 constexpr u32 MINIMUM_MEMBERS      = MAX_INTERNAL_MEMBERS / 4;
 

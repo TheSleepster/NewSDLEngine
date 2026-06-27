@@ -65,6 +65,22 @@
 #include "athena_ast.h"
 #include "athena_symbol_table.h"
 
+struct athena_state_t
+{
+    dynarray_t<string_t>    filenames;
+    hash_table_t<parser_t*> parser_table; 
+};
+
+global_variable athena_state_t state;
+
+thread_static memory_arena_t permanent_arena;
+thread_static memory_arena_t transient_arena;
+
+struct AST_node_t;
+
+internal_api inline u64   type_id_from_identifier(string_t string);
+internal_api code_type_t* symbol_table_register_typename(string_t type_name, u32 expected_metatype, u64 alias_id = INVALID_ID);
+
 internal_api void
 report_error(parser_t *parser, char *message, ...)
 {
@@ -89,15 +105,6 @@ report_error(parser_t *parser, char *message, ...)
     AssertBreak;
 #endif
 }
-
-// TODO(Sleepster): Purge these
-thread_static memory_arena_t permanent_arena;
-thread_static memory_arena_t transient_arena;
-
-struct AST_node_t;
-
-internal_api inline u64   type_id_from_identifier(string_t string);
-internal_api code_type_t* symbol_table_register_typename(string_t type_name, u32 expected_metatype, u64 alias_id = INVALID_ID);
 
 internal_api inline u64
 type_id_from_identifier(string_t string)
@@ -394,16 +401,19 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
         for(;;)
         {
             string_t line = lexer_eat_lines(&transient_arena, lexer, 1);
-            c_string_builder_append_data(&temp_builder, line);
+            if(line.count > 0)
+            {
+                c_string_builder_append_data(&temp_builder, line);
 
-            s32 backslash = c_string_find_first_char_from_right(line, '\\');
-            if(backslash != -1)
-            {
-                c_string_builder_append_data(&temp_builder, STR("\n"));
-            }
-            else
-            {
-                break;
+                s32 backslash = c_string_find_first_char_from_right(line, '\\');
+                if(backslash != -1)
+                {
+                    c_string_builder_append_data(&temp_builder, STR("\n"));
+                }
+                else
+                {
+                    break;
+                }
             }
         }
         lexer_pop_bookmark(lexer);
@@ -461,6 +471,7 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
             if(!macro_entry->is_set)
             {
                 macro_info_t macro_info = {};
+                macro_info.is_set = true;
 
                 parse_macro_info(parser, &macro_info, name_token);
                 printf("========== MACRO DEFINITION ========\n");
@@ -538,6 +549,10 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
         {
             token = lexer_get_next_token(lexer);
         }
+    }
+    else if(c_string_compare(token.data, STR("pragma")))
+    {
+        lexer_eat_lines(&parser->arena, lexer, 1);
     }
 
     return(token);
@@ -708,7 +723,7 @@ build_file_AST(parser_t *parser)
         {
             case TOKEN_TYPE_POUND:
             {
-                token = handle_macro_expansion(parser, false);
+                AST_handle_macro(parser, token);
             }break;
             case TOKEN_TYPE_TYPEDEF:
             {
@@ -798,6 +813,13 @@ build_file_AST(parser_t *parser)
                 // where we parse this as:
                 //
                 // "allocator is a function that returns a void * and takes a memory_arena_t * as an argument" 
+
+                macro_info_t *macro = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, token.data);
+                if(macro)
+                {
+                    lexer_eat_lines(&parser->arena, &parser->lexer, 1);
+                    break;
+                }
 
                 bool8 is_const = false;
                 if(token.token_type == TOKEN_TYPE_CONST)
@@ -1019,10 +1041,14 @@ parse_single_file(string_t filename)
 
     record_file_macros(parser);
     record_file_constants(parser);
+    consolidate_macro_tables();
+
     build_file_AST(parser);
+    consolidate_AST_nodes();
+    deduce_AST_node_type_data();
 }
 
-VISIT_FILES(generate_project_RTTI)
+VISIT_FILES(gather_files_in_directory)
 {
     string_t filename = visit_file_data->fullname;
     string_t file_ext = c_string_get_file_ext_from_path(filename);
@@ -1039,7 +1065,8 @@ VISIT_FILES(generate_project_RTTI)
         return;
     }
 
-    parse_single_file(filename);
+    string_t new_filename = c_string_make_copy(&permanent_arena, filename);
+    dynarray_add(&state.filenames, &new_filename);
 }
 
 int
@@ -1048,8 +1075,10 @@ main(int argc, char **argv)
     // NOTE(Sleepster): Just for the threadpool 
     c_global_context_init();
 
-    //u32 thread_count = sys_get_thread_count();
-    //c_threadpool_init(&global_context->main_threadpool, thread_count - 2, MB(10), false);
+    u32 thread_count = sys_get_thread_count() - 2;
+    c_threadpool_init(&global_context->main_threadpool, thread_count, MB(200), true);
+
+    state.parser_table = hash_table_create<parser_t*>(4096);
 
     // NOTE(Sleepster): Thread init 
     permanent_arena = c_arena_create(MB(10));
@@ -1076,16 +1105,70 @@ main(int argc, char **argv)
     }
     else
     {
-        visit_file_data_t visit_info = c_directory_create_visit_data(generate_project_RTTI, *recursive, null);
+        visit_file_data_t visit_info = c_directory_create_visit_data(gather_files_in_directory, *recursive, null);
         string_t directory = STR(*requested_directory);
         symbol_table_init(directory, *recursive);
 
         c_directory_visit(directory, &visit_info);
-    }
+        // NOTE(Sleepster): Read the data for each of the files and create their parsers 
+        for(u32 iterator = 0;
+            iterator < state.filenames.used;
+            ++iterator)
+        {
+            string_t filename = state.filenames[iterator];
+            string_t filedata = c_file_read_entirety(filename);
 
-    consolidate_macro_tables();
-    consolidate_AST_nodes();
-    deduce_AST_node_type_data();
+            parser_t *parser = parser_create(filename, filedata);
+            hash_table_add_element(&state.parser_table, &parser, filename);
+        }
+
+        // NOTE(Sleepster): Collect the macros for each of the files. 
+        work_completion_fence_t macro_fence = {};
+        for(u32 iterator = 0;
+            iterator < state.filenames.used;
+            ++iterator)
+        {
+            c_threadpool_push_work_order(&global_context->main_threadpool, [iterator]() {
+                 if(!permanent_arena.is_initialized)
+                 {
+                     permanent_arena = c_arena_create(MB(10));
+                     transient_arena = c_arena_create(MB(10));
+                 }
+
+                 string_t filename     = state.filenames[iterator];
+                 parser_t *file_parser = hash_table_get_element(&state.parser_table, filename);
+                 Assert(file_parser);
+
+                 record_file_macros(file_parser);
+            }, &macro_fence);
+        }
+
+        c_threadpool_wait_on_fence(&global_context->main_threadpool, &macro_fence);
+
+        // NOTE(Sleepster): Consolidate macros 
+        consolidate_macro_tables();
+
+        // NOTE(Sleepster): Record the AST_node_t for this file, both the constants and other items.
+        work_completion_fence_t AST_fence = {};
+        for(u32 iterator = 0;
+            iterator < state.filenames.used;
+            ++iterator)
+        {
+            c_threadpool_push_work_order(&global_context->main_threadpool, [iterator]() {
+                string_t filename     = state.filenames[iterator];
+                parser_t *file_parser = hash_table_get_element(&state.parser_table, filename);
+                 Assert(file_parser);
+
+                record_file_constants(file_parser);
+                build_file_AST(file_parser);
+            }, &AST_fence);
+        }
+
+        c_threadpool_wait_on_fence(&global_context->main_threadpool, &AST_fence);
+
+        consolidate_AST_nodes();
+        deduce_AST_node_type_data();
+    }
 
     printf("Global symbol table\n");
     printf("  Declaration contexts: %u\n\n", g_symbol_table.declaration_contexts.used);

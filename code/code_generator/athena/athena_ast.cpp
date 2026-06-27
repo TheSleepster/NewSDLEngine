@@ -103,28 +103,53 @@ get_infix_binding_power(lexer_token_t *token)
     u32 result = 0;
     switch(token->token_type)
     {
-        case TOKEN_TYPE_BITSHIFT_LEFT:  
-        case TOKEN_TYPE_BITSHIFT_RIGHT: 
-        case TOKEN_TYPE_AND:            
-        case TOKEN_TYPE_OR:            
+        case TOKEN_TYPE_TERNARY_IF:
+        {
+            result = 2;
+        }break;
+        case TOKEN_TYPE_OR:
         {
             result = 5;
         }break;
-        case TOKEN_TYPE_PLUS:
-        case TOKEN_TYPE_DASH:          
+        case TOKEN_TYPE_ANDAND:
         {
             result = 10;
         }break;
-        case TOKEN_TYPE_FORWARD_SLASH:
-        case TOKEN_TYPE_ASTERISK:      
+        case TOKEN_TYPE_XOR:
         {
             result = 20;
         }break;
-        default: 
+        case TOKEN_TYPE_AND:
         {
-            result = 0; 
+            result = 25;
         }break;
-    };
+        case TOKEN_TYPE_GREATER_THAN:
+        case TOKEN_TYPE_LESS_THAN:
+        case TOKEN_TYPE_LESS_EQUAL:
+        case TOKEN_TYPE_GREATER_EQUAL:
+        {
+            result = 35;
+        }break;
+        case TOKEN_TYPE_BITSHIFT_LEFT:
+        case TOKEN_TYPE_BITSHIFT_RIGHT:
+        {
+            result = 40;
+        }break;
+        case TOKEN_TYPE_PLUS:
+        case TOKEN_TYPE_DASH:
+        {
+            result = 50;
+        }break;
+        case TOKEN_TYPE_FORWARD_SLASH:
+        case TOKEN_TYPE_ASTERISK:
+        {
+            result = 60;
+        }break;
+        default:
+        {
+            result = 0;
+        }break;
+    }
 
     return(result);
 }
@@ -135,7 +160,11 @@ get_prefix_binding_power(lexer_token_t *token)
     s32 result = -1;
     switch(token->token_type)
     {
-        case TOKEN_TYPE_DASH: {result = 25;}break;
+        case TOKEN_TYPE_BANG: 
+        case TOKEN_TYPE_DASH: 
+        { 
+            result = 70; 
+        }break;
     }
 
     return(result);
@@ -200,6 +229,13 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
             }break;
             default: 
             {
+                if(token->token_type != TOKEN_TYPE_IDENT & token->token_type != TOKEN_TYPE_NULL && token->token_type != TOKEN_TYPE_NULLPTR)
+                {
+                    report_error(parser, 
+                                 "Expected an identifier as the last option here... instead found: '%.*s'... It is of token_type: '%s'\n",
+                                 token->data.count, token->data.data, lexer_token_type_to_string(token));
+                }
+
                 result->node_type  = AST_NODE_TYPE_IDENTIFIER;
                 result->identifier = c_string_make_copy(&parser->arena, token->data);
             }break;
@@ -215,17 +251,48 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
 }
 
 internal_api AST_node_t*
-generate_led_AST(parser_t *parser, lexer_token_t *token, AST_node_t *left_hand_expression)
+generate_ternary_led_AST(parser_t *parser, AST_node_t *conditional_expression)
 {
-    u32 current_infix_binding_power = get_infix_binding_power(token);
+    lexer_token_t dummy;
+    AST_node_t *then_expr = generate_expression_AST(parser, 0, &dummy);
+    Expect(dummy.token_type == TOKEN_TYPE_COLON,
+           "Expected ':' in ternary expression, got '%.*s'\n",
+           fprint_token(dummy));
 
-    lexer_token_t operator_token = *token;
+    // NOTE(Sleepster): Infix value for ternary is 2 
+    // Parse the "else" branch with ternary_value - 1 for right-associativity.
+    // This lets nested ternaries chain rightward:
+    //      a ? b : c ? d : e  ->  a ? b : (c ? d : e)
+    AST_node_t *else_expr = generate_expression_AST(parser, 2 - 1, &dummy);
 
-    AST_node_t *right_expression  = generate_expression_AST(parser, current_infix_binding_power, token);
-    AST_node_t *binary_expression = generate_binary_expression_AST(parser, &operator_token, left_hand_expression, right_expression);
-    return(binary_expression);
+    AST_node_t *result = AST_create_new_node(&parser->arena, parser->active_decl_context);
+    result->node_type                    = AST_NODE_TYPE_TERNARY_EXPRESSION;
+    result->ternary_expression.condition = conditional_expression;
+    result->ternary_expression.then_expr = then_expr;
+    result->ternary_expression.else_expr = else_expr;
+
+    return(result);
 }
 
+internal_api AST_node_t*
+generate_led_AST(parser_t *parser, lexer_token_t *token, AST_node_t *left_hand_expression)
+{
+    AST_node_t *full_expression = null;
+    if(token->token_type != TOKEN_TYPE_TERNARY_IF)
+    {
+        u32 current_infix_binding_power = get_infix_binding_power(token);
+        lexer_token_t operator_token = *token;
+
+        AST_node_t *right_expression = generate_expression_AST(parser, current_infix_binding_power, token);
+        full_expression = generate_binary_expression_AST(parser, &operator_token, left_hand_expression, right_expression);
+    }
+    else
+    {
+        full_expression = generate_ternary_led_AST(parser, left_hand_expression);
+    }
+
+    return(full_expression);
+}
 
 internal_api AST_node_t* 
 generate_expression_AST(parser_t *parser, s32 expression_min_binding_power, lexer_token_t *token_out)
@@ -241,7 +308,6 @@ generate_expression_AST(parser_t *parser, s32 expression_min_binding_power, lexe
     {
         // NOTE(Sleepster): Measure the current left expression's binding power if it beats our fence, fold it in. Otherwise, ignore it.
         s32 current_left_expression_binding_power = get_infix_binding_power(&token);
-
         if(current_left_expression_binding_power >= expression_min_binding_power && 
            current_left_expression_binding_power != 0)
         {
@@ -516,6 +582,10 @@ evaluate_expression_AST(AST_node_t *expression)
             AST_expression_value_t right = evaluate_expression_AST(expression->binary_expression.right);
 
             result = evaluate_binary_expression(expression->binary_expression.operator_type, left, right);
+        }break;
+        case AST_NODE_TYPE_TERNARY_EXPRESSION:
+        {
+            Assert(false);
         }break;
         default: { Expect(false, "Node_type is invalid: '%s'...\n", print_AST_node_type(expression->node_type)); }break;
     }
@@ -1303,4 +1373,16 @@ create_template_attribute(parser_t *parser)
     result.template_data.argument_count = list.argument_count;
 
     return(result);
+}
+
+internal_api void
+AST_handle_macro(parser_t *parser, lexer_token_t token)
+{
+    s32 index = 0;
+    while(index != -1)
+    {
+        string_t current_line = lexer_eat_lines(&parser->arena, &parser->lexer, 1);
+        index = c_string_find_first_char_from_left(current_line, '\\');
+    }
+    lexer_eat_lines(&parser->arena, &parser->lexer, 1);
 }

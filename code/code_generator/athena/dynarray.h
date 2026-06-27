@@ -226,7 +226,7 @@ dynarray_remove(dynarray_t<T> *array, u32 index)
         this_index < (array->used - 1);
         ++this_index)
     {
-        array[this_index] = array[this_index + 1];
+        array->items[this_index] = array->items[this_index + 1];
     }
 
     --array->used;

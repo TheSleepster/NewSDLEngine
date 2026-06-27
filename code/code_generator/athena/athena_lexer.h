@@ -123,7 +123,7 @@ struct lexer_bookmark_t
     lexer_token_stream_t *stream;
 };
 
-struct lexer_token_stream_t
+struct lexer_token_stream_t 
 {
     string_t         string;
     u32              line_number;

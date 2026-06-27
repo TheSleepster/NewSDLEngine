@@ -137,6 +137,7 @@ struct code_attribute_t
 struct parser_t
 {
     memory_arena_t                     arena;
+    memory_arena_t                     temp_allocator;
     string_t                           filename;
 
     dynarray_t<code_attribute_t>       current_attribute_list;

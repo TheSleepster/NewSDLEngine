@@ -9,6 +9,6 @@ constexpr u32 ELEMENT_SIZE = 10;
 
 struct sizes
 {
-    u32 size[Min(100000, Max(90000, 100000))];
+    u32 size[MB(10)];
     u32 item;
 };

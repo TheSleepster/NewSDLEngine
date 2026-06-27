@@ -94,6 +94,7 @@ struct AST_type_t
     X(AST_NODE_TYPE_CONSTEXPR, "AST_NODE_TYPE_CONSTEXPR") \
     X(AST_NODE_TYPE_UNARY_EXPRESSION, "AST_NODE_TYPE_UNARY_EXPRESSION") \
     X(AST_NODE_TYPE_BINARY_EXPRESSION, "AST_NODE_TYPE_BINARY_EXPRESSION") \
+    X(AST_NODE_TYPE_TERNARY_EXPRESSION, "AST_NODE_TYPE_TERNARY_EXPRESSION") \
     X(AST_NODE_TYPE_NUMBER, "AST_NODE_TYPE_NUMBER") \
     X(AST_NODE_TYPE_LITERAL, "AST_NODE_TYPE_LITERAL") \
     X(AST_NODE_TYPE_STRUCTURE,  "AST_NODE_TYPE_STRUCTURE") \
@@ -172,6 +173,12 @@ struct AST_node_t
         AST_node_t *right;
     }binary_expression;
 
+    struct {
+        AST_node_t *condition;
+        AST_node_t *then_expr;
+        AST_node_t *else_expr;
+    }ternary_expression;
+
     // NOTE(Sleepster): For members with a default value... 
     struct {
         bool8                  evaluated;
@@ -189,7 +196,7 @@ struct AST_node_t
     // a chain to allow for more arrays if we really need that like 'int items2[3][4][5][6]'
     struct 
     {
-        AST_node_t   *array_expression;
+        AST_node_t *array_expression;
     }array_data;
 };
 

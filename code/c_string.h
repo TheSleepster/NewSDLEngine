@@ -38,7 +38,7 @@ bool8       c_string_compare(string_t A, string_t B);
 bool8       c_string_ends_with(string_t A, string_t ending);
 string_t    c_string_concat(memory_arena_t *arena, string_t A, string_t B);
 const char *c_string_to_const_array(string_t string);
-string_t    c_string_to_upper(string_t string);
+string_t    c_string_to_upper(memory_arena_t *arena, string_t string);
 
 string_t    c_string_sprintf(char *buffer, u32 buffer_size, const char *string, ...);
 string_t    c_string_make_copy(memory_arena_t *arena, string_t string);

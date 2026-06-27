@@ -133,8 +133,9 @@ parser_create(string_t filename, string_t file_data)
     u32 parser_index = AtomicIncrement32(&g_symbol_table.next_parser_index);
     parser_t *parser = g_symbol_table.file_parsers + parser_index;
 
-    parser->arena    = c_arena_create(MB(1));
-    parser->filename = c_string_make_copy(&parser->arena, filename);
+    parser->arena          = c_arena_create(MB(1));
+    parser->temp_allocator = c_arena_create(MB(2));
+    parser->filename       = c_string_make_copy(&parser->arena, filename);
     
     // NOTE(Sleepster): This has to pass the lexer by pointer or we get a weird use-after-return stack bug. 
     lexer_create(&parser->lexer, file_data);
@@ -310,13 +311,250 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t last_token, ma
 
     return(result);
 }
+
+#else
+internal_api lexer_token_stream_t
+parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, macro_info_t *macro_info)
+{
+    lexer_token_stream_t result = {};
+
+    lexer_token_t takes_arguments = lexer_peek_token(&parser->lexer);
+    if(takes_arguments.token_type == TOKEN_TYPE_OPEN_PAREN && macro_name.data.data[macro_name.data.count] != ' ')
+    {
+        // NOTE(Sleepster): Eat the paren 
+        lexer_token_t last_token = lexer_get_next_token(&parser->lexer);
+        lexer_push_bookmark(&parser->lexer, last_token);
+
+        u32 current_macro_depth = 1;
+        while(current_macro_depth > 0)
+        {
+            lexer_token_t token = lexer_get_next_token(&parser->lexer);
+            if(token.token_type == TOKEN_TYPE_CLOSE_PAREN)
+            {
+                --current_macro_depth;
+            }
+
+            macro_info_t *new_macro_info = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, token.data);
+            if(new_macro_info && new_macro_info->is_set)
+            {
+                ++current_macro_depth;
+            }
+        }
+        lexer_pop_bookmark(&parser->lexer);
+
+        // TODO(Sleepster): GROSS I look like a web programmer...
+        dynarray_t<dynarray_t<lexer_token_t>> argument_tokens = {};
+        defer(for(auto &element: argument_tokens) { dynarray_free(&element); });
+
+        current_macro_depth = 1;
+        while(current_macro_depth > 0)
+        {
+            lexer_token_t token = lexer_get_next_token(&parser->lexer);
+            u32 this_macro_depth = current_macro_depth;
+
+            dynarray_t<lexer_token_t> tokens = {};
+            while((token.token_type != TOKEN_TYPE_COMMA) || (this_macro_depth != current_macro_depth))
+            {
+                if(token.token_type == TOKEN_TYPE_CLOSE_PAREN)
+                {
+                    --current_macro_depth;
+                }
+
+                dynarray_add(&tokens, &token);
+                macro_info_t *new_macro_info = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, token.data);
+                if(new_macro_info && new_macro_info->is_set)
+                {
+                    ++current_macro_depth;
+                }
+
+                token = lexer_get_next_token(&parser->lexer);
+                if(current_macro_depth == 0) break;
+            }
+
+            dynarray_add(&argument_tokens, &tokens);
+        }
+
+        dynarray_t<lexer_token_t> expansion_tokens = {};
+        defer(dynarray_free(&expansion_tokens));
+
+        lexer_token_stream_t *macro_stream = &macro_info->expansion_token_stream;
+        for(u32 token_index = 0;
+            token_index < macro_info->expansion_token_stream.buffered_token_count;
+            ++token_index)
+        {
+            lexer_token_t *macro_token = macro_stream->token_buffer + token_index;
+
+            bool8 found = false;
+            for(u32 argument_index = 0;
+                argument_index < macro_info->argument_count;
+                ++argument_index)
+            {
+                string_t current_arg = macro_info->arguments[argument_index];
+                if(c_string_compare(macro_token->data, current_arg))
+                {
+                    dynarray_t<lexer_token_t> *argument_inputs = &argument_tokens[argument_index];
+                    for(lexer_token_t &token: *argument_inputs)
+                    {
+                        dynarray_add(&expansion_tokens, &token);
+                    }
+
+                    found = true;
+                }
+            }
+
+            if(!found)
+            {
+                dynarray_add(&expansion_tokens, macro_token);
+            }
+        }
+
+        string_builder_t builder = {};
+        c_string_builder_init(&builder, KB(4));
+        for(lexer_token_t &token: expansion_tokens)
+        {
+            c_string_builder_append_data(&builder, token.data);
+        }
+
+        string_t resulting_string = c_string_builder_get_current_string(&builder);
+        init_token_stream_from_string(&result, resulting_string);
+    }
+    else
+    {
+        // NOTE(Sleepster): Otherwise, just return the default stream 
+        result = macro_info->expansion_token_stream;
+    }
+
+    return(result);
+}
 #endif
 
+#if 0
 internal_api lexer_token_stream_t
-parser_substitute_macro_arguments(parser_t *parser, lexer_token_t last_token, macro_info_t *macro_info)
+parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name_token, macro_info_t *macro_info)
 {
-    Assert(false);
-    return((lexer_token_stream_t){});
+    lexer_token_stream_t result = {};
+
+    // NOTE(Sleepster): If the macro takes arguments... 
+    lexer_token_t next_expansion_token = lexer_peek_token(&parser->lexer);
+    if(next_expansion_token.token_type == TOKEN_TYPE_OPEN_PAREN && macro_name_token.data.data[macro_name_token.data.count] != ' ')
+    {
+        if(next_expansion_token.token_type != TOKEN_TYPE_OPEN_PAREN)
+        {
+            report_error(parser,
+                         "Expected to find another argument when expanding this macro, instead found: '%.*s'...\n",
+                         fprint_token(next_expansion_token));
+        }
+
+        u32 current_macro_depth = 1;
+        u32 total_macro_depth   = 0;
+        next_expansion_token = lexer_get_next_token(&parser->lexer);
+
+        lexer_push_bookmark(&parser->lexer, next_expansion_token);
+        while(current_macro_depth > 0)
+        {
+            next_expansion_token = lexer_get_next_token(&parser->lexer);
+            if(next_expansion_token.token_type == TOKEN_TYPE_CLOSE_PAREN)
+            {
+                --current_macro_depth;
+            }
+
+            macro_info_t *new_macro_info = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, next_expansion_token.data);
+            if(new_macro_info && new_macro_info->is_set)
+            {
+                ++current_macro_depth;
+                ++total_macro_depth;
+            }
+        }
+        lexer_pop_bookmark(&parser->lexer);
+
+        dynarray_t<lexer_token_t> expansion_tokens = {};
+        defer(dynarray_free(&expansion_tokens));
+
+        dynarray_t<dynarray_t<lexer_token_t>> argument_tokens = {};
+        defer(for(auto &element: argument_tokens) { dynarray_free(&element); });
+
+        lexer_token_stream_t *current_macro_stream = &macro_info->expansion_token_stream;
+
+        u32 macro_argument_index = 0;
+        current_macro_depth = total_macro_depth;
+        while(current_macro_depth > 0)
+        {
+            lexer_token_t token = lexer_get_next_token(&parser->lexer);
+            if(token.token_type != TOKEN_TYPE_IDENT && token.token_type != TOKEN_TYPE_NUMBER)
+            {
+                report_error(parser,
+                             "Expected to find either an identifier or a number when parsing macro aguments... Instead found: '%.*s'...\n",
+                             fprint_token(token));
+            }
+
+            // NOTE(Sleepster): If we find an identifier and it's not a macro, then it's just something we normally care about. 
+            //
+            // Just do a dumb copy on all the items as needed.
+            string_t macro_argument = macro_info->arguments[macro_argument_index];
+
+            for(u32 argument_index = 0;
+                argument_index < macro_info->argument_count;
+                ++argument_index)
+            {
+                macro_argument = macro_info->arguments[argument_index];
+                for(u32 token_index = 0;
+                    token_index < macro_info->expansion_token_stream.buffered_token_count;
+                    ++token_index)
+                {
+                    lexer_token_t *macro_token = current_macro_stream->token_buffer + token_index;
+                    if(c_string_compare(macro_token->data, macro_argument))
+                    {
+                        while(token.token_type != TOKEN_TYPE_COMMA && token.token_type != TOKEN_TYPE_CLOSE_PAREN)
+                        {
+                            dynarray_add(&expansion_tokens, &token);
+                            token = lexer_get_next_token(&parser->lexer);
+                            if(token.token_type == TOKEN_TYPE_OPEN_PAREN)
+                            {
+                                // NOTE(Sleepster): If there is a nested macro as the argument... 
+                                while(token.token_type != TOKEN_TYPE_CLOSE_PAREN)
+                                {
+                                    token = lexer_get_next_token(&parser->lexer);
+                                    dynarray_add(&expansion_tokens, &token);
+                                }
+                            } 
+                        }
+
+                        // NOTE(Sleepster): Do not include the comma!!!! 
+                        if(token.token_type == TOKEN_TYPE_COMMA)
+                        {
+                            token = lexer_get_next_token(&parser->lexer);
+                        }
+                    }
+                    else
+                    {
+                        dynarray_add(&expansion_tokens, macro_token);
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        // NOTE(Sleepster): Otherwise, just return the default stream 
+        result = macro_info->expansion_token_stream;
+    }
+
+    c_arena_reset(&parser->temp_allocator);
+    return(result);
+}
+#endif
+
+internal_api s32
+get_new_value()
+{
+    return 10;
+}
+
+internal_api u32
+get_default_value(u32 default_new_value = get_new_value())
+{
+    u32 result = default_new_value;
+    return result;
 }
 
 internal_api lexer_token_t

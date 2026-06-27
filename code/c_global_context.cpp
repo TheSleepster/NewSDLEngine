@@ -11,7 +11,7 @@
 vec2_t g_window_size = {};
 bool8 g_running      = false;
 
-global_context_t *global_context = nullptr;
+thread_local global_context_t *global_context = null;
 
 void
 c_global_context_init()

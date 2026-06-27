@@ -4,17 +4,19 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#define BIT(x) (1 << x)
+
+enum test_enum_type_t 
+{
+    SOME_OTHER_DECLARED_TYPE       = (1 << 31),
+    SOME_OTHER_OTHER_DECLARED_TYPE = BIT(4),
+};
+
 enum chained_values {
     TEST_VAL  = 1 << 1,
     TEST_VAL2 = 1 << 2,
     TEST_VAL3 = 1 << 3,
     TEST_VAL4 = TEST_VAL|TEST_VAL2|TEST_VAL3,
-};
-
-enum test_enum_type_t 
-{
-    SOME_OTHER_DECLARED_TYPE       = (1 << 31),
-    SOME_OTHER_OTHER_DECLARED_TYPE = 1,
 };
 
 typedef enum some_other_typedeffed_item 

@@ -65,7 +65,7 @@ remove_shader_structure_attributes(string_t *shader_data)
 
     while(line_tokenizer.data.count > 0)
     {
-        string_t current_line = c_tokenizer_eat_lines(&global_context->temporary_arena, &line_tokenizer, 1);
+        string_t current_line = c_tokenizer_eat_lines(&thread_arena, &line_tokenizer, 1);
         bool8 attribute_found = false;
 
         tokenizer_t line = {current_line};
@@ -241,7 +241,7 @@ VISIT_FILES(shader_file_callback)
             string_builder_t header_builder = {};
             c_string_builder_init(&header_builder, MB(5));
 
-            string_t define_filename = c_string_to_upper(filename);
+            string_t define_filename = c_string_to_upper(&thread_arena, filename);
             s32 file_ext_start = c_string_find_first_char_from_right(define_filename, '.');
             if(file_ext_start != -1)
             {

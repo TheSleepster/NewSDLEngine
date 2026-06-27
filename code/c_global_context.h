@@ -41,7 +41,7 @@ void c_global_context_reset_temporary_data();
 void c_global_context_reset_context_arena();
 void gc_reset_context_arena();
 
-extern global_context_t *global_context;
+extern thread_local global_context_t *global_context;
 
 #endif // C_GLOBALS_H
 

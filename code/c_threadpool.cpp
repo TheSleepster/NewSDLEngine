@@ -67,7 +67,7 @@ void
 c_threadpool_start(threadpool_t *threadpool)
 {
     AtomicStore(&threadpool->threads_flushed, 0);
-    for(u32 thread_index = 0;
+    for(s32 thread_index = 0;
         thread_index < threadpool->thread_count;
         ++thread_index)
     {
@@ -169,7 +169,7 @@ c_thread_steal_work_order(worker_thread_t *theif_thread)
     u32 target_thread_index      = 0;
     u32 highest_work_order_count = 0;
     for(u32 thread_index = 0;
-        thread_index < theif_thread->threadpool->thread_count;
+        thread_index < (u32)theif_thread->threadpool->thread_count;
         ++thread_index)
     {
         if(thread_index == theif_thread->thread_id) continue;

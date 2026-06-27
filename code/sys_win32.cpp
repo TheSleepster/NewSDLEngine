@@ -13,7 +13,7 @@
 #include <c_file_api.h>
 #include <c_file_watcher.h>
 #include <c_string.h>
-#include <c_globals.h>
+#include <c_global_context.h>
 #include <c_dynarray.h>
 
 // TODO(Sleepster): UNICODE 
