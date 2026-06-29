@@ -4,15 +4,15 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#define MAX_PAREN_INTERNAL_MEMBERS (128)
+#define internal static
+
+// Nested macros are unaccounted for...
 #define END_LINE(arg1, arg2) \
     arg1##arg2
 
 constexpr u32 MAX_INTERNAL_MEMBERS = 128;
 constexpr u32 MINIMUM_MEMBERS      = MAX_INTERNAL_MEMBERS / 4;
-
-// Nested macros are unaccounted for...
-#define MAX_PAREN_INTERNAL_MEMBERS (128)
-#define internal static
 
 template <typename T>
 void
@@ -75,7 +75,7 @@ enum data_types
 {
     DATA_TYPE_NEGATIVE_ENUM_VALUE = 1 << 30,
     DATA_TYPE_TEST_ENUM_VALUED    = 1 << 31,
-    DATA_TYPE_TEST_ENUM_THING     = 1 << 32,
+    DATA_TYPE_TEST_ENUM_THING     = 1 << 32
 };
 
 internal inline void*

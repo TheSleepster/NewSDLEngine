@@ -229,7 +229,8 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
                     if(lexer_is_token_alphabetical(result.data.data[0]) || character == '_')
                     {
                         result.token_type = TOKEN_TYPE_IDENT;
-                        while(token_stream->string.count > 0                                          && 
+                        while(token_stream->string.count > 0                                          &&
+                              next_char_index < token_stream->string.count                            &&
                              (lexer_is_token_alphabetical(token_stream->string.data[next_char_index]) || 
                               lexer_is_token_numeric(token_stream->string.data[next_char_index])      ||
                               token_stream->string.data[next_char_index] == '_'                       || 
@@ -383,11 +384,22 @@ lexer_pop_bookmark(lexer_t *lexer)
 }
 
 internal_api void 
-init_token_stream_from_string(lexer_token_stream_t *stream, string_t string)
+lexer_init_token_stream_from_string(lexer_token_stream_t *stream, string_t string)
 {
     stream->string         = string;
     stream->start          = string.data;
     stream->initial_length = string.count;
+}
+
+internal_api void
+lexer_init_token_stream_from_token_array(memory_arena_t *arena, lexer_token_stream_t *stream, lexer_token_t *tokens, u32 token_count)
+{
+    ZeroStruct(*stream);
+
+    stream->token_buffer         = c_arena_push_array(arena, lexer_token_t, token_count);
+    stream->buffered_token_count = token_count;
+
+    memcpy(stream->token_buffer, tokens, sizeof(lexer_token_t) * token_count);
 }
 
 internal_api void
@@ -470,7 +482,7 @@ lexer_copy_token_stream(memory_arena_t *arena, lexer_token_stream_t *stream)
 internal_api void 
 lexer_create(lexer_t *lexer, string_t string_data)
 {
-    init_token_stream_from_string(&lexer->token_streams[0], string_data);
+    lexer_init_token_stream_from_string(&lexer->token_streams[0], string_data);
     lexer->current_stream = lexer->token_streams;
 }
 

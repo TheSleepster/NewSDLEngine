@@ -355,11 +355,6 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
             dynarray_t<lexer_token_t> tokens = {};
             while((token.token_type != TOKEN_TYPE_COMMA) || (this_macro_depth != current_macro_depth))
             {
-                if(token.token_type == TOKEN_TYPE_CLOSE_PAREN)
-                {
-                    --current_macro_depth;
-                }
-
                 dynarray_add(&tokens, &token);
                 macro_info_t *new_macro_info = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, token.data);
                 if(new_macro_info && new_macro_info->is_set)
@@ -368,9 +363,13 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
                 }
 
                 token = lexer_get_next_token(&parser->lexer);
+                if(token.token_type == TOKEN_TYPE_CLOSE_PAREN)
+                {
+                    --current_macro_depth;
+                }
+
                 if(current_macro_depth == 0) break;
             }
-
             dynarray_add(&argument_tokens, &tokens);
         }
 
@@ -408,6 +407,7 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
             }
         }
 
+#if 0
         string_builder_t builder = {};
         c_string_builder_init(&builder, KB(4));
         for(lexer_token_t &token: expansion_tokens)
@@ -416,7 +416,13 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
         }
 
         string_t resulting_string = c_string_builder_get_current_string(&builder);
-        init_token_stream_from_string(&result, resulting_string);
+        lexer_init_token_stream_from_string(&result, resulting_string);
+#else
+        lexer_init_token_stream_from_token_array(&parser->arena, &result, expansion_tokens.items, expansion_tokens.used);
+        result.string = c_string_make_copy(&parser->arena, macro_info->expansion_string);
+        result.start  = result.string.data;
+        result.initial_length = result.string.count;
+#endif
     }
     else
     {

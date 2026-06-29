@@ -20,6 +20,11 @@ struct hash_table_data_t
     allocate_memory_t          *allocator[MAX_ALLOCATOR_CALLBACKS];
 };
 
+internal_api void
+test_lambda()
+{
+}
+
 internal_api
 C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
 {

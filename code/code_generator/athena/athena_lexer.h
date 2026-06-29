@@ -153,5 +153,6 @@ struct lexer_t
 
 internal_api void lexer_push_token_stream(lexer_t *lexer, lexer_token_stream_t *new_stream);
 internal_api void lexer_pop_token_stream(lexer_t *lexer);
-internal_api void init_token_stream_from_string(lexer_token_stream_t *stream, string_t string);
+internal_api void lexer_init_token_stream_from_string(lexer_token_stream_t *stream, string_t string);
+internal_api void lexer_init_token_stream_from_token_array(memory_arena_t *arena, lexer_token_stream_t *stream, lexer_token_t *tokens, u32 token_count);
 #endif

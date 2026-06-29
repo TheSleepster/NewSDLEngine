@@ -94,3 +94,21 @@ TEST(cpp_attributes)
     void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/attributes.cpp"));
     Assert(sys_wait_for_process(process));
 }
+
+TEST(c_style_structures)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/c_style_structures.cpp"));
+    Assert(sys_wait_for_process(process));
+}
+
+TEST(conditional_define)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/conditional_define.cpp"));
+    Assert(sys_wait_for_process(process));
+}
+
+TEST(anon_internal_unions)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/nested_anon_unions.cpp"));
+    Assert(sys_wait_for_process(process));
+}

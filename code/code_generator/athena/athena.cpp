@@ -353,10 +353,11 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
 
         if(token.token_type == TOKEN_TYPE_OPEN_PAREN)
         {
-            char separator = macro_info->name.data[macro_info->name.count];
-            lexer_push_bookmark(lexer, token);
+            char separator = name_token.data.data[macro_info->name.count];
             if(separator != ' ')
             {
+                lexer_push_bookmark(lexer, token);
+
                 // NOTE(Sleepster): Determine how many arguments the macro takes 
                 while(token.token_type != TOKEN_TYPE_CLOSE_PAREN)
                 {
@@ -390,11 +391,17 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
                             }
                         }
                     }
-                    token = lexer_get_next_token(lexer);
                 }
             }
+            else
+            {
+                c_string_builder_append_data(&temp_builder, token.data);
+            }
         }
-        c_string_builder_append_data(&temp_builder, token.data);
+        else
+        {
+            c_string_builder_append_data(&temp_builder, token.data);
+        }
 
         // NOTE(Sleepster): We can fill out the rest of the macro info here... 
         lexer_push_bookmark(lexer, token);
@@ -415,12 +422,16 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
                     break;
                 }
             }
+            else
+            {
+                break;
+            }
         }
         lexer_pop_bookmark(lexer);
 
         // NOTE(Sleepster): Create the token stream's token buffer
         macro_info->expansion_string = c_string_make_copy(&permanent_arena, c_string_builder_get_current_string(&temp_builder));
-        init_token_stream_from_string(&macro_info->expansion_token_stream, macro_info->expansion_string);
+        lexer_init_token_stream_from_string(&macro_info->expansion_token_stream, macro_info->expansion_string);
 
         lexer_push_token_stream(lexer, &macro_info->expansion_token_stream);
 
@@ -723,7 +734,7 @@ build_file_AST(parser_t *parser)
         {
             case TOKEN_TYPE_POUND:
             {
-                AST_handle_macro(parser, token);
+                token = handle_macro_expansion(parser, false);
             }break;
             case TOKEN_TYPE_TYPEDEF:
             {
@@ -813,13 +824,6 @@ build_file_AST(parser_t *parser)
                 // where we parse this as:
                 //
                 // "allocator is a function that returns a void * and takes a memory_arena_t * as an argument" 
-
-                macro_info_t *macro = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, token.data);
-                if(macro)
-                {
-                    lexer_eat_lines(&parser->arena, &parser->lexer, 1);
-                    break;
-                }
 
                 bool8 is_const = false;
                 if(token.token_type == TOKEN_TYPE_CONST)
@@ -922,7 +926,7 @@ consolidate_AST_nodes(void)
             {
                 // NOTE(Sleepster): Combine the knowledge of the two contexts to get a better picture of what symbols
                 // are actually within this scope.
-                declaration_context_t *recorded_context = dynarray_get_ptr_at_index(&g_symbol_table.declaration_contexts, index);
+                declaration_context_t *recorded_context = &g_symbol_table.declaration_contexts[index];
                 for(auto &element: decl_context.code_decls.used_entries) 
                 {
                     AST_node_t *code_decl = element->item;
