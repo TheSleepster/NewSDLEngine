@@ -340,21 +340,10 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
             while((token.token_type != TOKEN_TYPE_COMMA) || (this_macro_depth != current_macro_depth))
             {
                 dynarray_add(&tokens, &token);
-                macro_info_t *new_macro_info = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, token.data);
-                if(new_macro_info && new_macro_info->is_set)
-                {
-                    ++current_macro_depth;
-                }
 
                 token = lexer_get_next_token(&parser->lexer);
-                if(token.token_type == TOKEN_TYPE_CLOSE_PAREN)
-                {
-                    --current_macro_depth;
-                }
-                if(token.token_type == TOKEN_TYPE_OPEN_PAREN)  
-                {
-                    ++current_macro_depth;
-                }
+                if(token.token_type == TOKEN_TYPE_CLOSE_PAREN) --current_macro_depth;
+                if(token.token_type == TOKEN_TYPE_OPEN_PAREN)  ++current_macro_depth;
 
                 if(current_macro_depth == 0) break;
             }
@@ -557,6 +546,11 @@ parser_fetch_next_token(parser_t *parser)
     }
 
     macro_info_t *macro = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, result.data);
+    if(c_string_compare(result.data, STR("C_HASH_TABLE_ALLOCATE_IMPL")))
+    {
+        printf("LOOKUP '%.*s' -> is_set: %d\n", fprint_string(result.data), macro->is_set);
+    }
+
     if(macro->is_set)
     {
         lexer_token_stream_t macro_stream = parser_substitute_macro_arguments(parser, result, macro);

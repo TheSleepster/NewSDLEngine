@@ -1197,6 +1197,7 @@ generate_lambda_AST(parser_t     *parser,
                     u32           return_type_pointer_depth, 
                     bool8         return_type_is_const)
 {
+
     AST_node_t *return_type = AST_create_new_node(&parser->arena, parser->active_decl_context);
     return_type->node_type  = AST_NODE_TYPE_LAMBDA_RETURN_TYPE;
     return_type->identifier = c_string_make_copy(&parser->arena, return_type_token.data);
@@ -1212,6 +1213,8 @@ generate_lambda_AST(parser_t     *parser,
     }
 
     lexer_token_t procedure_name_token = parser_get_next_lexer_token(parser);
+    printf("LAMBDA NAME RECORDED: '%.*s'...\n", fprint_token(procedure_name_token));
+
     if(procedure_name_token.token_type != TOKEN_TYPE_IDENT)
     {
         for(u32 pointer_index = 0;

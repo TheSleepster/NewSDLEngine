@@ -340,10 +340,19 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
 
     lexer_token_t token = lexer_peek_token(lexer);
 
-    macro_info->name      = c_string_make_copy(&permanent_arena, name_token.data);
-    macro_info->name_hash = ((hash_table_hash_key(name_token.data)) % parser->macro_table.max_entries);
+    macro_info->name = c_string_make_copy(&permanent_arena, name_token.data);
+    if(c_string_compare(macro_info->name, STR("HASH_TABLE_ALLOCATE_IMPL")))
+    {
+        printf("Parse macro info Found HASH_TABLE_ALLOCATE_IMPL...\n");
+    }
+
     if(lexer->current_stream->line_number == lexer->secondary_stream->line_number)
     {
+        if(c_string_compare(macro_info->name, STR("HASH_TABLE_ALLOCATE_IMPL")))
+        {
+            printf("\n\nThis was on the same line!!!!!!!\n\n");
+        }
+
         string_builder_t temp_builder;
         c_string_builder_init(&temp_builder, MB(10));
         defer(c_string_builder_deinit(&temp_builder));
@@ -454,6 +463,7 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
                 ++token_count;
             }
         }
+
         lexer_reset_token_stream(lexer->current_stream);
         if(token_count <= 0)
         {
@@ -472,8 +482,21 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
                 macro_info->expansion_token_stream.token_buffer[token_index++] = token;
             }
         }
+
+        if(token_index != token_count)
+        {
+            report_error(parser, "Macro '%.*s': counted %u tokens but wrote %u...\n",
+                         fprint_token(name_token), token_count, token_index);
+        }
+
         lexer_pop_token_stream(lexer);
         macro_info->is_set = true;
+
+
+        if(c_string_compare(macro_info->name, STR("HASH_TABLE_ALLOCATE_IMPL")))
+        {
+            printf("\n\nThis was on the same line AND SET!!!!!!!\n\n");
+        }
     }
 }
 
@@ -1105,7 +1128,7 @@ main(int argc, char **argv)
     c_global_context_init();
 
     //u32 thread_count = 1;
-    u32 thread_count = sys_get_thread_count() - 2;
+    u32 thread_count = 1;
     c_threadpool_init(&global_context->main_threadpool, thread_count, MB(200), true, false);
 
     // NOTE(Sleepster): Thread init 

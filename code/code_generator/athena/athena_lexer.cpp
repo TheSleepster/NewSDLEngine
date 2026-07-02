@@ -327,7 +327,7 @@ lexer_peek_token_from_stream(lexer_t *lexer, lexer_token_stream_t *stream, u32 t
 {
     lexer_token_t result = {};
 
-    lexer_token_stream_t fake_stream = *lexer->current_stream;
+    lexer_token_stream_t fake_stream = *stream;
     lexer_push_token_stream(lexer, &fake_stream);
     for(u32 peek_index = 0;
         peek_index < tokens_to_peek_ahead;
