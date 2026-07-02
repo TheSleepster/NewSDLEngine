@@ -418,7 +418,8 @@ lexer_push_token_stream(lexer_t *lexer, lexer_token_stream_t *new_stream)
 internal_api void
 lexer_pop_token_stream(lexer_t *lexer)
 {
-    if(lexer->next_token_stream - 1 >= 0)
+    s32 next_stream_index = lexer->next_token_stream - 1;
+    if(next_stream_index >= 0)
     {
         lexer_token_stream_t *stream  = lexer->token_streams + --lexer->next_token_stream;
 

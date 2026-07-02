@@ -19,7 +19,7 @@ typedef struct file file_t;
 
 // NOTE(Sleepster): A string is essentially just a byte array. The values in here of ASCII size,
 //                  but this could potentially be UTF-8 in the future.  
-typedef struct string
+typedef struct string 
 {
     byte *data;
     s64   count;
@@ -77,11 +77,12 @@ float64     c_string_read_float64(string_t data);
 #define STR(x)                (string_t){.data = (byte*)x, .count = c_string_length(x)}
 #define C_STR(x)              ((const char *)x.data)
 #define fprint_string(string) (s32)((string).count), C_STR((string))
+
 ///////////////////////////////////////////
 // STRING BUILDER
 ///////////////////////////////////////////
 
-typedef struct string_builder_buffer
+typedef struct string_builder_buffer 
 {
     byte *buffer_data;
     s64   bytes_used;

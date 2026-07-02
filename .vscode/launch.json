@@ -92,6 +92,7 @@
             //"args": ["--filename=tests/metaprogram_tests/c_style_structures.cpp"],
             //"args": ["--filename=tests/metaprogram_tests/nested_macros.cpp"],
             //"args": ["--filename=tests/metaprogram_tests/nested_anon_unions.cpp"],
+            //"args": ["--filename=tests/metaprogram_tests/test_hash_table.h"],
 
             //"cwd": "${workspaceFolder}",
             "args": ["--directory=${workspaceFolder}/code"],

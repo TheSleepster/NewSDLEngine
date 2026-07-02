@@ -1213,8 +1213,6 @@ generate_lambda_AST(parser_t     *parser,
     }
 
     lexer_token_t procedure_name_token = parser_get_next_lexer_token(parser);
-    printf("LAMBDA NAME RECORDED: '%.*s'...\n", fprint_token(procedure_name_token));
-
     if(procedure_name_token.token_type != TOKEN_TYPE_IDENT)
     {
         for(u32 pointer_index = 0;

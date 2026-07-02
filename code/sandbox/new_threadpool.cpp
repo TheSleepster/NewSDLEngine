@@ -29,7 +29,7 @@ main(void)
     threadpool_t *threadpool = (threadpool_t*)AllocSize(Align(sizeof(threadpool_t), 64));
 
     u32 thread_count = sys_get_thread_count() - 1;
-    c_threadpool_init(threadpool, thread_count, MB(200), false, true);
+    c_threadpool_init(threadpool, thread_count, MB(200), false, false);
 
     work_completion_fence_t matrix_fence = {};
     parallel_for_FIFO(threadpool, work_index, MAX_WORK_ORDERS, &matrix_fence, [=]() {

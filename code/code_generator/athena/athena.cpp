@@ -337,22 +337,11 @@ internal_api void
 parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_token)
 {
     lexer_t *lexer = &parser->lexer;
-
     lexer_token_t token = lexer_peek_token(lexer);
 
     macro_info->name = c_string_make_copy(&permanent_arena, name_token.data);
-    if(c_string_compare(macro_info->name, STR("HASH_TABLE_ALLOCATE_IMPL")))
-    {
-        printf("Parse macro info Found HASH_TABLE_ALLOCATE_IMPL...\n");
-    }
-
     if(lexer->current_stream->line_number == lexer->secondary_stream->line_number)
     {
-        if(c_string_compare(macro_info->name, STR("HASH_TABLE_ALLOCATE_IMPL")))
-        {
-            printf("\n\nThis was on the same line!!!!!!!\n\n");
-        }
-
         string_builder_t temp_builder;
         c_string_builder_init(&temp_builder, MB(10));
         defer(c_string_builder_deinit(&temp_builder));
@@ -491,12 +480,6 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
 
         lexer_pop_token_stream(lexer);
         macro_info->is_set = true;
-
-
-        if(c_string_compare(macro_info->name, STR("HASH_TABLE_ALLOCATE_IMPL")))
-        {
-            printf("\n\nThis was on the same line AND SET!!!!!!!\n\n");
-        }
     }
 }
 
@@ -512,6 +495,7 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
         {
             lexer_token_t name_token  = lexer_get_next_token(lexer);
             macro_info_t *macro_entry = hash_table_get_element_ptr(&parser->macro_table, name_token.data);
+
             if(!macro_entry->is_set)
             {
                 macro_info_t macro_info = {};
@@ -546,6 +530,11 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
 
                 hash_table_add_element(&parser->macro_table, &macro_info, name_token.data);
             }
+            else
+            {
+                printf("SKIPPED (already set) for macro name: '%.*s' in file '%.*s'\n",
+                       fprint_token(name_token), fprint_string(parser->filename));
+            }
         }
         else
         {
@@ -574,6 +563,10 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
                     token = lexer_get_next_token(lexer);
                 }
             }
+        }
+        else if(if_token.token_type == TOKEN_TYPE_BANG)
+        {
+            lexer_eat_lines(&parser->arena, lexer, 1);
         }
         else
         {
@@ -658,9 +651,13 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
 internal_api void
 record_file_macros(parser_t *parser)
 {
+    Assert(parser->lexer.current_stream->string.count > 0);
+
+    u32 token_count = 0;
     while(parser->lexer.current_stream->string.count > 0)
     {
         lexer_token_t token = lexer_get_next_token(&parser->lexer);
+        ++token_count;
         switch(token.token_type)
         {
             case TOKEN_TYPE_POUND:
@@ -672,6 +669,8 @@ record_file_macros(parser_t *parser)
 
     // NOTE(Sleepster): Once we gather the macros from this file, reset the token stream for the file 
     lexer_reset_token_stream(parser->lexer.current_stream);
+
+    printf("Parsed file '%.*s'... Found: '%d' tokens...\n", fprint_string(parser->filename), token_count);
 }
 
 internal_api void
@@ -682,10 +681,14 @@ consolidate_macro_tables(void)
         ++parser_index)
     {
         parser_t *parser = g_symbol_table.file_parsers + parser_index;
+
+        printf("File handled: '%.*s'...\n", fprint_string(parser->filename));
         for(const auto &element: parser->macro_table.used_entries)
         {
             macro_info_t *macro = &element->item;
             hash_table_add_element(&g_symbol_table.defined_global_macro_table, macro, macro->name);
+
+            printf("Macro added: '%.*s'...\n", fprint_string(macro->name));
         }
     }
 }
@@ -1118,6 +1121,7 @@ VISIT_FILES(gather_files_in_directory)
     }
 
     string_t new_filename = c_string_make_copy(&permanent_arena, filename);
+    printf("File added: '%.*s'...\n", fprint_string(new_filename));
     dynarray_add(&state.filenames, &new_filename);
 }
 
@@ -1128,7 +1132,7 @@ main(int argc, char **argv)
     c_global_context_init();
 
     //u32 thread_count = 1;
-    u32 thread_count = 1;
+    u32 thread_count = sys_get_thread_count() - 1;
     c_threadpool_init(&global_context->main_threadpool, thread_count, MB(200), true, false);
 
     // NOTE(Sleepster): Thread init 
@@ -1175,21 +1179,26 @@ main(int argc, char **argv)
 
         // NOTE(Sleepster): Collect the macros for each of the files. 
         work_completion_fence_t macro_fence = {};
-        for(u32 iterator = 0;
-            iterator < state.filenames.used;
-            ++iterator)
+        for(u32 file_index = 0;
+            file_index < state.filenames.used;
+            ++file_index)
         {
-            c_threadpool_push_work_order(&global_context->main_threadpool, [iterator]() {
-                 if(!permanent_arena.is_initialized)
-                 {
-                     permanent_arena = c_arena_create(MB(10));
-                     transient_arena = c_arena_create(MB(10));
-                 }
+            c_threadpool_push_work_order(&global_context->main_threadpool, [=]() {
+                u32 thread_arena_is_valid = AtomicCompareExchange32(&permanent_arena.is_initialized,
+                                                                    true,
+                                                                    false);
+                if(thread_arena_is_valid == false)
+                {
+                    permanent_arena = c_arena_create(MB(10));
+                    transient_arena = c_arena_create(MB(10));
+                }
 
-                 parser_t *file_parser = state.parser_table[iterator];
-                 Assert(file_parser);
+                parser_t *file_parser = state.parser_table[file_index];
+                Assert(file_parser->lexer.current_stream->string.data != null && file_parser->lexer.current_stream->string.count > 0);
+                Assert(file_parser);
 
-                 record_file_macros(file_parser);
+                printf("Parsing macros for file: '%.*s'...\n", fprint_string(file_parser->filename));
+                record_file_macros(file_parser);
             }, &macro_fence);
         }
 

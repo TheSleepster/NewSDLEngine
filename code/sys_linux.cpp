@@ -510,7 +510,7 @@ sys_directory_exists(string_t filepath)
 }
 
 s32
-sys_directory_get_file_count(string_t filepath, bool8 recursive)
+sys_directory_get_file_count(string_t filepath, bool8 recursive, string_t file_ext)
 {
     s32 result = -1;
     
@@ -524,7 +524,19 @@ sys_directory_get_file_count(string_t filepath, bool8 recursive)
         {
             if(file_entry->d_type == DT_REG)
             {
-                ++result;
+                if(file_ext.data == null)
+                {
+                    ++result;
+                }
+                else
+                {
+                    string_t filename = STR(file_entry->d_name);
+                    string_t file_extension = c_string_get_file_ext_from_path(filename);
+                    if(c_string_compare(file_ext, file_extension))
+                    {
+                        ++result;
+                    }
+                }
             }
 
             if(file_entry->d_type == DT_DIR && recursive)
@@ -537,7 +549,7 @@ sys_directory_get_file_count(string_t filepath, bool8 recursive)
                 char subdirectory[1024];
                 snprintf(subdirectory, sizeof(subdirectory), "%s/%s", C_STR(filepath), file_entry->d_name);
 
-                result += sys_directory_get_file_count(filepath, recursive);
+                result += sys_directory_get_file_count(filepath, recursive, file_ext);
             }
 
             file_entry = readdir(directory);

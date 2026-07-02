@@ -54,7 +54,7 @@ symbol_table_init(string_t filepath, bool8 recursive)
     bool8 is_directory = sys_directory_exists(filepath);
     if(is_directory)
     {
-        file_count = sys_directory_get_file_count(filepath, recursive);
+        file_count = sys_directory_get_file_count(filepath, recursive, STR(".h"));
     }
 
     g_symbol_table.file_count   = file_count;
@@ -127,6 +127,8 @@ parser_create_declaration_context(parser_t *parser, string_t scope_name, declara
 internal_api parser_t* 
 parser_create(string_t filename, string_t file_data)
 {
+    Assert(filename.count > 0);
+
     Expect(g_symbol_table.is_initialized == true,
            "You must call symbol_table_init() before creating any file parsers...\n");
 
@@ -135,7 +137,7 @@ parser_create(string_t filename, string_t file_data)
 
     parser->arena          = c_arena_create(MB(1));
     parser->temp_allocator = c_arena_create(MB(2));
-    parser->filename       = c_string_make_copy(&parser->arena, filename);
+    parser->filename       = c_string_make_copy(&permanent_arena, filename);
     
     // NOTE(Sleepster): This has to pass the lexer by pointer or we get a weird use-after-return stack bug. 
     lexer_create(&parser->lexer, file_data);
@@ -339,6 +341,7 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
             dynarray_t<lexer_token_t> tokens = {};
             while((token.token_type != TOKEN_TYPE_COMMA) || (this_macro_depth != current_macro_depth))
             {
+                if(token.token_type == TOKEN_TYPE_EOF) break;
                 dynarray_add(&tokens, &token);
 
                 token = lexer_get_next_token(&parser->lexer);
@@ -347,6 +350,8 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
 
                 if(current_macro_depth == 0) break;
             }
+
+            if(token.token_type == TOKEN_TYPE_EOF) break;
             dynarray_add(&argument_tokens, &tokens);
         }
 
@@ -545,14 +550,18 @@ parser_fetch_next_token(parser_t *parser)
         result = lexer_get_next_token(lexer);
     }
 
-    macro_info_t *macro = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, result.data);
-    if(c_string_compare(result.data, STR("C_HASH_TABLE_ALLOCATE_IMPL")))
+    if(c_string_compare(result.data, STR("BIT")))
     {
-        printf("LOOKUP '%.*s' -> is_set: %d\n", fprint_string(result.data), macro->is_set);
+        printf("Looking up macro %.*s...\n", fprint_token(result));
     }
-
+    macro_info_t *macro = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, result.data);
     if(macro->is_set)
     {
+        if(c_string_compare(result.data, STR("BIT")))
+        {
+            printf("FOUND macro %.*s...\n", fprint_string(macro->name));
+        }
+
         lexer_token_stream_t macro_stream = parser_substitute_macro_arguments(parser, result, macro);
         lexer_push_token_stream(lexer, &macro_stream);
 

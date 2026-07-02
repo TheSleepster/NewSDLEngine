@@ -188,7 +188,9 @@ c_threadpool_push_work_order(threadpool_t *threadpool, LambdaType lambda, work_c
         AtomicIncrement32(&fence->pending);
     }
 
-    c_threadpool_push_work_order(thread, lambda, fence);
+    // NOTE(Sleepster): Copy this here to prevent possible corruption 
+    LambdaType lambda2 = lambda;
+    c_threadpool_push_work_order(thread, lambda2, fence);
 }
 
 
