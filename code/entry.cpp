@@ -107,7 +107,7 @@ main(int argc, char **argv)
 
         // TODO(Sleepster): The count will need to be adjusted in the future. But this is fine for now 
         u32 thread_count = sys_get_thread_count() - 4;
-        c_threadpool_init(&global_context->main_threadpool, thread_count, MB(10), true);
+        c_threadpool_init(&global_context->main_threadpool, thread_count, MB(10), true, false);
 
         s_asset_manager_init(global_context->asset_manager);
 

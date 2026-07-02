@@ -98,6 +98,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_memory_arena_footer_t, type_id(memory_arena_footer_t), "memory_arena_footer_t") \
 	X(TYPE_u8, type_id(u8), "u8") \
 	X(TYPE_scratch_arena_t, type_id(scratch_arena_t), "scratch_arena_t") \
+	X(TYPE_s64, type_id(s64), "s64") \
 	X(TYPE_string_builder_buffer_t, type_id(string_builder_buffer_t), "string_builder_buffer_t") \
 	X(TYPE_string_builder_t, type_id(string_builder_t), "string_builder_t") \
 	X(TYPE_sys_thread_handle_t, type_id(sys_thread_handle_t), "sys_thread_handle_t") \
@@ -149,7 +150,6 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_temporary_glyph_t, type_id(temporary_glyph_t), "temporary_glyph_t") \
 	X(TYPE_dynamic_render_font_varient_t, type_id(dynamic_render_font_varient_t), "dynamic_render_font_varient_t") \
 	X(TYPE_float64, type_id(float64), "float64") \
-	X(TYPE_s64, type_id(s64), "s64") \
 	X(TYPE_dynamic_render_font_page_t, type_id(dynamic_render_font_page_t), "dynamic_render_font_page_t") \
 	X(TYPE_FT_Face, type_id(FT_Face), "FT_Face") \
 	X(TYPE_jfd_package_entry_t, type_id(jfd_package_entry_t), "jfd_package_entry_t") \
@@ -4096,7 +4096,7 @@ const static type_info_struct_string_t type_info_struct_string_t_const_data = {
 	.member_count = 2,
 	.members = {
 		.data = {.name = "data", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_t.data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_t), data))},
-		.count = {.name = "count", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_t.count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_t), count))},
+		.count = {.name = "count", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_t.count)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_t), count))},
 	}
 };
 
@@ -4110,8 +4110,8 @@ const static type_info_struct_string_builder_buffer_t type_info_struct_string_bu
 	.member_count = 4,
 	.members = {
 		.buffer_data = {.name = "buffer_data", .type = TYPE_byte, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_buffer_t.buffer_data)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_buffer_t), buffer_data))},
-		.bytes_used = {.name = "bytes_used", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_buffer_t.bytes_used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_buffer_t), bytes_used))},
-		.buffer_size = {.name = "buffer_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_buffer_t.buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_buffer_t), buffer_size))},
+		.bytes_used = {.name = "bytes_used", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_buffer_t.bytes_used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_buffer_t), bytes_used))},
+		.buffer_size = {.name = "buffer_size", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_buffer_t.buffer_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_buffer_t), buffer_size))},
 		.next_buffer = {.name = "next_buffer", .type = TYPE_string_builder_buffer_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_buffer_t.next_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_buffer_t), next_buffer))},
 	}
 };
@@ -4129,9 +4129,9 @@ const static type_info_struct_string_builder_t type_info_struct_string_builder_t
 		.arena = {.name = "arena", .type = TYPE_memory_arena_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.arena)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), arena))},
 		.first_buffer = {.name = "first_buffer", .type = TYPE_string_builder_buffer_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.first_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), first_buffer))},
 		.current_buffer = {.name = "current_buffer", .type = TYPE_string_builder_buffer_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.current_buffer)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), current_buffer))},
-		.default_buffer_block_size = {.name = "default_buffer_block_size", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.default_buffer_block_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), default_buffer_block_size))},
-		.bytes_used = {.name = "bytes_used", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.bytes_used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), bytes_used))},
-		.total_allocated = {.name = "total_allocated", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.total_allocated)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), total_allocated))},
+		.default_buffer_block_size = {.name = "default_buffer_block_size", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.default_buffer_block_size)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), default_buffer_block_size))},
+		.bytes_used = {.name = "bytes_used", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.bytes_used)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), bytes_used))},
+		.total_allocated = {.name = "total_allocated", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.total_allocated)), .offset = IntFromPtr(OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), total_allocated))},
 	}
 };
 
@@ -7659,6 +7659,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "memory_arena_footer_t", .type = TYPE_memory_arena_footer_t, .size = sizeof(memory_arena_footer_t), .struct_info = (type_info_struct_t*)&type_info_struct_memory_arena_footer_t_const_data},
 	{.name = "u8", .type = TYPE_u8, .size = sizeof(u8*), .struct_info = NULL},
 	{.name = "scratch_arena_t", .type = TYPE_scratch_arena_t, .size = sizeof(scratch_arena_t), .struct_info = (type_info_struct_t*)&type_info_struct_scratch_arena_t_const_data},
+	{.name = "s64", .type = TYPE_s64, .size = sizeof(s64), .struct_info = NULL},
 	{.name = "string_builder_buffer_t", .type = TYPE_string_builder_buffer_t, .size = sizeof(string_builder_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_buffer_t_const_data},
 	{.name = "string_builder_t", .type = TYPE_string_builder_t, .size = sizeof(string_builder_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_t_const_data},
 	{.name = "sys_thread_handle_t", .type = TYPE_sys_thread_handle_t, .size = sizeof(sys_thread_handle_t), .struct_info = NULL},
@@ -7710,7 +7711,6 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "temporary_glyph_t", .type = TYPE_temporary_glyph_t, .size = sizeof(temporary_glyph_t), .struct_info = (type_info_struct_t*)&type_info_struct_temporary_glyph_t_const_data},
 	{.name = "dynamic_render_font_varient_t", .type = TYPE_dynamic_render_font_varient_t, .size = sizeof(dynamic_render_font_varient_t), .struct_info = (type_info_struct_t*)&type_info_struct_dynamic_render_font_varient_t_const_data},
 	{.name = "float64", .type = TYPE_float64, .size = sizeof(float64), .struct_info = NULL},
-	{.name = "s64", .type = TYPE_s64, .size = sizeof(s64), .struct_info = NULL},
 	{.name = "dynamic_render_font_page_t", .type = TYPE_dynamic_render_font_page_t, .size = sizeof(dynamic_render_font_page_t*), .struct_info = NULL},
 	{.name = "FT_Face", .type = TYPE_FT_Face, .size = sizeof(FT_Face), .struct_info = NULL},
 	{.name = "jfd_package_entry_t", .type = TYPE_jfd_package_entry_t, .size = sizeof(jfd_package_entry_t*), .struct_info = NULL},

@@ -220,7 +220,7 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
                 result->node_type          = AST_NODE_TYPE_LITERAL;
                 result->type.value_literal = c_string_make_copy(&parser->arena, token->data);
 
-                printf("String literal: '%.*s' found when generating an expression...\n", token->data.count, token->data.data);
+                printf("String literal: '%.*s' found when generating an expression...\n", (s32)token->data.count, token->data.data);
             }break;
             case TOKEN_TYPE_OPEN_PAREN:
             {
@@ -346,10 +346,10 @@ case_expression_value(AST_expression_value_t value, u32 target_type)
         result = {target_type};
         switch(target_type)
         {
-            case AST_EXPRESSION_VALUE_INT:      { result.int_value     = (s32)intermediate;     }break; 
-            case AST_EXPRESSION_VALUE_UNSIGNED: { result.int_value     = (u32)intermediate;     }break; 
-            case AST_EXPRESSION_VALUE_FLOAT:    { result.float32_value = (float32)intermediate; }break; 
-            case AST_EXPRESSION_VALUE_DOUBLE:   { result.float64_value = (float64)intermediate; }break; 
+            case AST_EXPRESSION_VALUE_INT:      { result.int_value      = (s32)intermediate;     }break; 
+            case AST_EXPRESSION_VALUE_UNSIGNED: { result.unsigned_value = (u32)intermediate;     }break; 
+            case AST_EXPRESSION_VALUE_FLOAT:    { result.float32_value  = (float32)intermediate; }break; 
+            case AST_EXPRESSION_VALUE_DOUBLE:   { result.float64_value  = (float64)intermediate; }break; 
         }
     }
     else
@@ -658,7 +658,8 @@ parse_argument_list(parser_t *parser)
 
             if(declaration_name.token_type != TOKEN_TYPE_IDENT)
             {
-                report_error(parser, "Error, expected to find identifier following a typename in this argument list...\n");
+                report_error(parser, "Error, expected to find identifier following a typename in this argument list... Instead found: '%.*s' it is of token_type: '%.*s'...\n",
+                             fprint_token(declaration_name), lexer_token_type_to_string(&declaration_name));
             }
 
             AST_node_t *argument = AST_create_new_node(&parser->arena, parser->active_decl_context);
@@ -842,9 +843,11 @@ generate_structure_AST(parser_t *parser)
         }
 
         structure_root->type.code_type = structure_type;
-        for(;;)
+
+        lexer_token_t typename_token = {};
+        while(typename_token.token_type != TOKEN_TYPE_EOF)
         {
-            lexer_token_t typename_token = parser_get_next_lexer_token(parser);
+            typename_token = parser_get_next_lexer_token(parser);
             if(typename_token.token_type == TOKEN_TYPE_CLOSE_BRACE) break;
 
             if(typename_token.token_type == TOKEN_TYPE_STRUCT)
@@ -1180,7 +1183,6 @@ parser_create_lambda_type(parser_t *parser, AST_node_t *expression)
     // NOTE(Sleepster): 
     // In this case we don't bother recording an overload or anything. This stage is purely for TYPE REGISTRY
     code_type_t *lambda_type = parser_register_code_type_identifier(parser, expression->identifier);
-    printf("Registered lambda type: '%.*s'...\n", fprint_string(expression->identifier));
 
     AST_type_t new_type = {};
     new_type.flags      = AST_TYPE_MODIFIER_FLAG_PROCEDURE;
@@ -1250,12 +1252,12 @@ generate_lambda_AST(parser_t     *parser,
 
     // NOTE(Sleepster): If the last token here is an open paren, this is a procedure body,
     // eat the body of the procedure to prevent issues with namespaces.
-    lexer_token_t token = parser_peek_next_lexer_token(parser, 1);
+    lexer_token_t token = lexer_peek_token(&parser->lexer, 1);
     if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
     {
         u32 brace_depth = 0;
         do {
-            token = parser_get_next_lexer_token(parser);
+            token = lexer_get_next_token(&parser->lexer);
             if(token.token_type == TOKEN_TYPE_CLOSE_BRACE)
             {
                 --brace_depth;

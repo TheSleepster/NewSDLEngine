@@ -11,7 +11,6 @@
       "-Wnullability-completeness",
       "-flto",
       "-fno-rtti",
-      "-mavx2",
       "-mfma",
       "-Wno-c++14-extensions",
       "-Wall",

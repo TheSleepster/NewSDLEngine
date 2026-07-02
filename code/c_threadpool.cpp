@@ -31,11 +31,11 @@ c_threadpool_init
 */
 
 void
-c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocator_size, bool8 start_instantly)
+c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocator_size, bool8 start_instantly, bool8 allow_stealing)
 {
     ZeroStruct(*threadpool);
-    threadpool->thread_count = max_threads;
     threadpool->work_avaliable_semaphore = sys_semaphore_create(0, max_threads);
+    threadpool->allow_stealing           = allow_stealing;
 
     for(u32 thread_index = 0;
         thread_index < max_threads;
@@ -48,12 +48,20 @@ c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocato
         allocator->buffer  = (byte*)sys_allocate_memory(thread_allocator_size);
         allocator->size    = thread_allocator_size;
 
-        thread->is_started = start_instantly;
+        thread->is_started = false;
         thread->threadpool = threadpool;
         thread->thread_id  = thread_index;
 
         // TODO(Sleepster): Windows might complain about thread_proc_entry returning an 'int' and not a 'DWORD'... But we'll see. 
-        thread->handle     = sys_thread_create(thread_proc_entry, thread, true);
+        thread->handle = sys_thread_create(thread_proc_entry, thread, true);
+
+        WriteBarrier;
+        AtomicIncrement(&threadpool->thread_count);
+    }
+
+    if(start_instantly)
+    {
+        c_threadpool_start(threadpool);
     }
 }
 
@@ -66,13 +74,12 @@ c_threadpool_start
 void
 c_threadpool_start(threadpool_t *threadpool)
 {
-    AtomicStore(&threadpool->threads_flushed, 0);
     for(s32 thread_index = 0;
         thread_index < threadpool->thread_count;
         ++thread_index)
     {
         worker_thread_t *thread = threadpool->workers + thread_index;
-        thread->is_started = true;
+        AtomicStore32(&thread->is_started, 1);
     }
 
     sys_semaphore_release(&threadpool->work_avaliable_semaphore, threadpool->thread_count);
@@ -92,9 +99,11 @@ c_threadpool_flush_work_orders(threadpool_t *threadpool)
     this_thread.threadpool = threadpool;
     while(threadpool->threads_flushed != threadpool->thread_count)
     {
-        c_thread_steal_work_order(&this_thread);
+        if(threadpool->allow_stealing)
+        {
+            c_thread_steal_work_order(&this_thread);
+        }
     }
-    threadpool->threads_flushed = 0;
 }
 
 /*
@@ -111,7 +120,10 @@ c_threadpool_wait_on_fence(threadpool_t *threadpool, work_completion_fence_t *fe
     this_thread.threadpool = threadpool;
     while(fence->pending > 0)
     {
-        c_thread_steal_work_order(&this_thread);
+        if(threadpool->allow_stealing)
+        {
+            c_thread_steal_work_order(&this_thread);
+        }
     }
 }
 
@@ -168,14 +180,20 @@ c_thread_steal_work_order(worker_thread_t *theif_thread)
 
     u32 target_thread_index      = 0;
     u32 highest_work_order_count = 0;
+
+    u32 current_thread_count = (u32)(AtomicLoad32(&theif_thread->threadpool->thread_count));
     for(u32 thread_index = 0;
-        thread_index < (u32)theif_thread->threadpool->thread_count;
+        thread_index < current_thread_count;
         ++thread_index)
     {
         if(thread_index == theif_thread->thread_id) continue;
 
         worker_thread_t *target_thread = theif_thread->threadpool->workers + thread_index;
-        u32 work_orders_left = Max(target_thread->work_avaliable.head - target_thread->work_avaliable.tail, 0); 
+
+        u32 current_head = AtomicLoad32(&target_thread->work_avaliable.head);
+        u32 current_tail = AtomicLoad32(&target_thread->work_avaliable.tail);
+
+        u32 work_orders_left = Max(current_head - current_tail, 0); 
         if(work_orders_left > highest_work_order_count)
         {
             highest_work_order_count = work_orders_left;
@@ -225,11 +243,19 @@ thread_proc_entry(void *user_data)
     worker_thread_t *thread = (worker_thread_t *)user_data;
     for(;;)
     {
-        if(thread->is_started)
+        bool32 is_started = AtomicLoad32(&thread->is_started);
+        if(is_started)
         {
             if(!thread_pop_work_order(thread))
             {
-                if(!c_thread_steal_work_order(thread))
+                if(thread->threadpool->allow_stealing)
+                {
+                    if(!c_thread_steal_work_order(thread))
+                    {
+                        goto sleep;
+                    }
+                }
+                else
                 {
                     goto sleep;
                 }
@@ -245,9 +271,13 @@ sleep:
             AtomicIncrement(&thread->threadpool->threads_flushed);
             sys_semaphore_wait(&thread->threadpool->work_avaliable_semaphore, 0);
 
+            ReadWriteBarrier;
             // NOTE(Sleepster): When the thread wakes up, reset it's state.
-            thread->allocator.used = 0;
+            AtomicStore32(&thread->allocator.used, 0);
             AtomicDecrement(&thread->threadpool->threads_flushed);
+
+            u32 threads_flushed = AtomicLoad32(&thread->threadpool->threads_flushed);
+            Assert(threads_flushed >= 0);
         }
     }
     

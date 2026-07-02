@@ -4,6 +4,10 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+
+#define parallel_for(threadpool, iterator, max_iterations, work_completed_fence_ptr, lambda) \
+for(u32 iterator = 0; iterator < max_iterations; ++iterator) \
+    c_threadpool_push_work_order(threadpool, lambda, work_completed_fence_ptr)                  
 #define MAX_PAREN_INTERNAL_MEMBERS (128)
 #define internal static
 

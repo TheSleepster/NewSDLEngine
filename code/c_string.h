@@ -22,7 +22,7 @@ typedef struct file file_t;
 typedef struct string
 {
     byte *data;
-    u32   count;
+    s64   count;
 }string_t;
 
 // TODO(Sleepster): - [ ] Any function in here that allocates memory should be reordered like the file API 
@@ -76,7 +76,7 @@ float64     c_string_read_float64(string_t data);
 // MACROS
 #define STR(x)                (string_t){.data = (byte*)x, .count = c_string_length(x)}
 #define C_STR(x)              ((const char *)x.data)
-#define fprint_string(string) (string).count, C_STR((string))
+#define fprint_string(string) (s32)((string).count), C_STR((string))
 ///////////////////////////////////////////
 // STRING BUILDER
 ///////////////////////////////////////////
@@ -84,8 +84,8 @@ float64     c_string_read_float64(string_t data);
 typedef struct string_builder_buffer
 {
     byte *buffer_data;
-    u32   bytes_used;
-    u32   buffer_size;
+    s64   bytes_used;
+    s64   buffer_size;
 
     struct string_builder_buffer *next_buffer;
 }string_builder_buffer_t;
@@ -98,10 +98,10 @@ typedef struct string_builder
 
     string_builder_buffer_t     *first_buffer;
     string_builder_buffer_t     *current_buffer;
-    u64                          default_buffer_block_size;
+    s64                          default_buffer_block_size;
 
-    u64                          bytes_used;
-    u64                          total_allocated;
+    s64                          bytes_used;
+    s64                          total_allocated;
 }string_builder_t;
 
 void     c_string_builder_init(string_builder_t *builder, u64 buffer_block_size);

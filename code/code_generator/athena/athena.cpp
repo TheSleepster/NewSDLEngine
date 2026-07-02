@@ -35,6 +35,11 @@
 #include "athena_lexer.h"
 
 /* TODO:
+ *
+ * TWO CUPLRITS
+ * - Management of whitespace...
+ * - Macro substitution
+ *
  * THESE TESTS ARE BROKEN!!!!!
  *      - tests/metaprogram_tests/attributes.cpp (currently, failing as intended)
  *      - nested_macros
@@ -67,8 +72,8 @@
 
 struct athena_state_t
 {
-    dynarray_t<string_t>    filenames;
-    hash_table_t<parser_t*> parser_table; 
+    dynarray_t<string_t>  filenames;
+    dynarray_t<parser_t*> parser_table; 
 };
 
 global_variable athena_state_t state;
@@ -81,6 +86,8 @@ struct AST_node_t;
 internal_api inline u64   type_id_from_identifier(string_t string);
 internal_api code_type_t* symbol_table_register_typename(string_t type_name, u32 expected_metatype, u64 alias_id = INVALID_ID);
 
+static ticket_mutex_t error_mutex;
+
 internal_api void
 report_error(parser_t *parser, char *message, ...)
 {
@@ -92,18 +99,21 @@ report_error(parser_t *parser, char *message, ...)
     int length = vsnprintf(buffer, sizeof(buffer), message, arg_ptr);
     va_end(arg_ptr);
 
-    fprintf(stderr, "\033[31m[Athena Error]: File: '%.*s', Line: '%d': %.*s\033[0m\n", 
-            fprint_string(parser->filename), 
-            lexer->current_stream->line_number + 1, 
-            length, 
-            buffer);
+    TicketMutexScope(&error_mutex)
+    {
+        fprintf(stderr, "\033[31m[Athena Error]: File: '%.*s', Line: '%d': %.*s\033[0m\n", 
+                fprint_string(parser->filename), 
+                lexer->current_stream->line_number + 1, 
+                length, 
+                buffer);
 
-    fprintf(stderr, "error reported... exiting...\n");
+        fprintf(stderr, "error reported... exiting...\n");
 #if 0
-    exit(-1);
+        exit(-1);
 #else
-    AssertBreak;
+        AssertBreak;
 #endif
+    }
 }
 
 internal_api inline u64
@@ -329,11 +339,11 @@ parse_macro_info(parser_t *parser, macro_info_t *macro_info, lexer_token_t name_
     lexer_t *lexer = &parser->lexer;
 
     lexer_token_t token = lexer_peek_token(lexer);
+
+    macro_info->name      = c_string_make_copy(&permanent_arena, name_token.data);
+    macro_info->name_hash = ((hash_table_hash_key(name_token.data)) % parser->macro_table.max_entries);
     if(lexer->current_stream->line_number == lexer->secondary_stream->line_number)
     {
-        macro_info->name      = c_string_make_copy(&permanent_arena, name_token.data);
-        macro_info->name_hash = ((hash_table_hash_key(name_token.data)) % parser->macro_table.max_entries);
-
         string_builder_t temp_builder;
         c_string_builder_init(&temp_builder, MB(10));
         defer(c_string_builder_deinit(&temp_builder));
@@ -485,6 +495,8 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
                 macro_info.is_set = true;
 
                 parse_macro_info(parser, &macro_info, name_token);
+                Assert(macro_info.name.count > 0);
+
                 printf("========== MACRO DEFINITION ========\n");
                 printf("Macro: '%.*s'...\n", fprint_string(macro_info.name));
                 printf("Expansion: '%.*s'...\n", fprint_string(macro_info.expansion_string));
@@ -542,13 +554,10 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
         }
         else
         {
-            if(if_token.token_type != TOKEN_TYPE_BANG)
+            //report_error(lexer, "Currently the only item supported after a '#if ' is a number... instead got: '%.*s'...\n", fprint_token(if_token));
+            while(!c_string_compare(token.data, STR("endif")))
             {
-                //report_error(lexer, "Currently the only item supported after a '#if ' is a number... instead got: '%.*s'...\n", fprint_token(if_token));
-                while(!c_string_compare(token.data, STR("endif")))
-                {
-                    token = lexer_get_next_token(lexer);
-                }
+                token = lexer_get_next_token(lexer);
             }
         }
     }
@@ -767,7 +776,7 @@ build_file_AST(parser_t *parser)
                 lexer_token_t semicolon = parser_peek_next_lexer_token(parser);
                 if(semicolon.token_type != TOKEN_TYPE_SEMICOLON)
                 {
-                    parser_pop_decl_context(parser);
+                    //parser_pop_decl_context(parser);
                 }
             }break;
             case TOKEN_TYPE_CONSTEXPR:
@@ -921,8 +930,21 @@ consolidate_AST_nodes(void)
         {
             // NOTE(Sleepster): Check if it's unique to the global table, adding it to the global table if it is.
             s32 index = 0;
-            bool8 unique = dynarray_add_if_unique(&g_symbol_table.declaration_contexts, &decl_context, &index);
-            if(!unique)
+            bool8 unique = true;
+            for(auto &context: g_symbol_table.declaration_contexts)
+            {
+                if(context.context_ID == decl_context.context_ID)
+                {
+                    unique = false;
+                    break;
+                }
+            }
+
+            if(unique)
+            {
+                dynarray_add(&g_symbol_table.declaration_contexts, &decl_context);
+            }
+            else
             {
                 // NOTE(Sleepster): Combine the knowledge of the two contexts to get a better picture of what symbols
                 // are actually within this scope.
@@ -950,7 +972,11 @@ consolidate_AST_nodes(void)
                 for(auto &local_type: decl_context.local_types.used_entries)
                 {
                     code_type_t *type = local_type->item;
-                    hash_table_add_element(&recorded_context->local_types, &type, type->identifier);
+                    code_type_t *table_type = hash_table_get_element(&recorded_context->local_types, type->identifier);
+                    if(!table_type || !table_type->is_registered)
+                    {
+                        hash_table_add_element(&recorded_context->local_types, &type, type->identifier);
+                    }
                 }
             }
         }
@@ -968,7 +994,6 @@ deduce_AST_node_type_data()
             AST_node_t *code_decl = element->item;
             if(code_decl->node_type != AST_NODE_TYPE_CONSTEXPR)
             {
-
                 // NOTE(Sleepster): Set the code metatype 
                 code_type_t *type = code_decl->type.code_type;
                 if(type && type->code_metatype == CODE_TYPE_UNDEFINED)
@@ -1024,7 +1049,7 @@ deduce_AST_node_type_data()
                     }break;
                     case AST_NODE_TYPE_LAMBDA:
                     {
-                        // NOTE(Sleepster): Evaluate expressions on arguments 
+                        // TODO(Sleepster): Evaluate expressions on arguments 
                     }break;
                 }
             }
@@ -1079,10 +1104,9 @@ main(int argc, char **argv)
     // NOTE(Sleepster): Just for the threadpool 
     c_global_context_init();
 
+    //u32 thread_count = 1;
     u32 thread_count = sys_get_thread_count() - 2;
-    c_threadpool_init(&global_context->main_threadpool, thread_count, MB(200), true);
-
-    state.parser_table = hash_table_create<parser_t*>(4096);
+    c_threadpool_init(&global_context->main_threadpool, thread_count, MB(200), true, false);
 
     // NOTE(Sleepster): Thread init 
     permanent_arena = c_arena_create(MB(10));
@@ -1119,11 +1143,11 @@ main(int argc, char **argv)
             iterator < state.filenames.used;
             ++iterator)
         {
-            string_t filename = state.filenames[iterator];
+            const string_t filename = state.filenames[iterator];
             string_t filedata = c_file_read_entirety(filename);
 
             parser_t *parser = parser_create(filename, filedata);
-            hash_table_add_element(&state.parser_table, &parser, filename);
+            dynarray_add(&state.parser_table, &parser);
         }
 
         // NOTE(Sleepster): Collect the macros for each of the files. 
@@ -1139,8 +1163,7 @@ main(int argc, char **argv)
                      transient_arena = c_arena_create(MB(10));
                  }
 
-                 string_t filename     = state.filenames[iterator];
-                 parser_t *file_parser = hash_table_get_element(&state.parser_table, filename);
+                 parser_t *file_parser = state.parser_table[iterator];
                  Assert(file_parser);
 
                  record_file_macros(file_parser);
@@ -1159,9 +1182,8 @@ main(int argc, char **argv)
             ++iterator)
         {
             c_threadpool_push_work_order(&global_context->main_threadpool, [iterator]() {
-                string_t filename     = state.filenames[iterator];
-                parser_t *file_parser = hash_table_get_element(&state.parser_table, filename);
-                 Assert(file_parser);
+                parser_t *file_parser = state.parser_table[iterator];
+                Assert(file_parser);
 
                 record_file_constants(file_parser);
                 build_file_AST(file_parser);

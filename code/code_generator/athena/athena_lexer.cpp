@@ -229,6 +229,7 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
                     if(lexer_is_token_alphabetical(result.data.data[0]) || character == '_')
                     {
                         result.token_type = TOKEN_TYPE_IDENT;
+                        // TODO(Sleepster): DIRTY 
                         while(token_stream->string.count > 0                                          &&
                               next_char_index < token_stream->string.count                            &&
                              (lexer_is_token_alphabetical(token_stream->string.data[next_char_index]) || 
@@ -263,6 +264,7 @@ lexer_get_next_token_from_stream(lexer_token_stream_t *token_stream)
                     {
                         result.token_type = TOKEN_TYPE_NUMBER;
                         while(token_stream->string.count > 0 &&
+                              next_char_index < token_stream->string.count &&
                               (lexer_is_token_numeric(result.data.data[next_char_index]) || 
                                token_stream->string.data[next_char_index] == '.'))
                         {

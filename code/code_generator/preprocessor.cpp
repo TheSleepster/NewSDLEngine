@@ -94,7 +94,7 @@ append_type_enum_token(token_data_t type_name_token)
         {
             c_dynarray_push(state.type_ids, type_id);
             char buffer[256];
-            s32 length = sprintf(buffer, "\tTYPE_%.*s,\n", type_name_token.string.count, type_name_token.string.data);
+            s32 length = sprintf(buffer, "\tTYPE_%.*s,\n", (s32)type_name_token.string.count, type_name_token.string.data);
 
             string_t type_name_string = {
                 .data  = (byte*)buffer,
@@ -172,7 +172,7 @@ parse_member(token_data_t         structure_name,
                 char buffer[8192];
 
                 // NOTE(Sleepster): The most recently found element_identifier is exactly what we need.
-                s32 length = sprintf(buffer, "\t\ttype_info_member_t %.*s;\n", element_identifier.string.count, C_STR(element_identifier.string));
+                s32 length = sprintf(buffer, "\t\ttype_info_member_t %.*s;\n", (s32)element_identifier.string.count, C_STR(element_identifier.string));
                 string_t test_string = {
                     .data  = (byte*)buffer,
                     .count = (u32)length
@@ -191,12 +191,12 @@ parse_member(token_data_t         structure_name,
                 // NOTE(Sleepster): format the const definition information 
                 ZeroMemory(buffer, sizeof(buffer));
                 length = sprintf(buffer, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .offset = offsetof(%.*s, %.*s), .size = sizeof(%.*s)},\n",
-                                 element_identifier.string.count,   C_STR(element_identifier.string),    // initialized name
-                                 element_identifier.string.count,   C_STR(element_identifier.string),    // .name
-                                 type_identifier.string.count,      C_STR(type_identifier.string),       // .type
-                                 structure_name.string.count,       C_STR(structure_name.string),        // .offset structure
-                                 element_identifier.string.count,   C_STR(element_identifier.string),    // .offset element name
-                                 type_identifier_COPY.string.count, C_STR(type_identifier_COPY.string)); // .size
+                                 (s32)element_identifier.string.count,   C_STR(element_identifier.string),    // initialized name
+                                 (s32)element_identifier.string.count,   C_STR(element_identifier.string),    // .name
+                                 (s32)type_identifier.string.count,      C_STR(type_identifier.string),       // .type
+                                 (s32)structure_name.string.count,       C_STR(structure_name.string),        // .offset structure
+                                 (s32)element_identifier.string.count,   C_STR(element_identifier.string),    // .offset element name
+                                 (s32)type_identifier_COPY.string.count, C_STR(type_identifier_COPY.string)); // .size
                 test_string = {
                     .data  = (byte*)buffer,
                     .count = (u32)length
@@ -252,7 +252,7 @@ parse_structure(tokenizer_t *tokenized_data, token_data_t structure_type_token)
     char buffer[8192];
 
     s32 length = sprintf(buffer, "struct type_info_%.*s {\n\tconst char *name;\n\tu32 type;\n\tu32 member_count;\n\tstruct {\n", 
-                         struct_name_token.string.count, C_STR(struct_name_token.string));
+                         (s32)struct_name_token.string.count, C_STR(struct_name_token.string));
     string_t test_string = {
         .data  = (byte*)buffer,
         .count = (u32)length
@@ -263,10 +263,10 @@ parse_structure(tokenizer_t *tokenized_data, token_data_t structure_type_token)
     ZeroMemory(buffer, sizeof(buffer));
 
     length = sprintf(buffer, "const static type_info_%.*s type_info_%.*s = {\n\t.name = \"%.*s\",\n\t.type = TYPE_%.*s,\n", 
-                     struct_name_token.string.count, C_STR(struct_name_token.string),
-                     struct_name_token.string.count, C_STR(struct_name_token.string),
-                     struct_name_token.string.count, C_STR(struct_name_token.string),
-                     struct_name_token.string.count, C_STR(struct_name_token.string));
+                     (s32)struct_name_token.string.count, C_STR(struct_name_token.string),
+                     (s32)struct_name_token.string.count, C_STR(struct_name_token.string),
+                     (s32)struct_name_token.string.count, C_STR(struct_name_token.string),
+                     (s32)struct_name_token.string.count, C_STR(struct_name_token.string));
     test_string = {
         .data  = (byte*)buffer,
         .count = (u32)length
@@ -401,7 +401,7 @@ generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
     append_type_enum_token(enum_name_token);
 
     s32 length = sprintf(buffer, "struct type_info_enum_%.*s {\n\tconst char *name;\n\tu32 type;\n\tu32 member_count;\n\tstruct {\n", 
-                         enum_name_token.string.count, C_STR(enum_name_token.string));
+                         (s32)enum_name_token.string.count, C_STR(enum_name_token.string));
     string_t test_string = {
         .data  = (byte*)buffer,
         .count = (u32)length
@@ -411,10 +411,10 @@ generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
     ZeroMemory(buffer, sizeof(buffer));
 
     length = sprintf(buffer, "const static type_info_enum_%.*s type_info_enum_%.*s = {\n\t.name = \"%.*s\",\n\t.type = TYPE_%.*s,\n", 
-                     enum_name_token.string.count, C_STR(enum_name_token.string),
-                     enum_name_token.string.count, C_STR(enum_name_token.string),
-                     enum_name_token.string.count, C_STR(enum_name_token.string),
-                     enum_name_token.string.count, C_STR(enum_name_token.string));
+                     (s32)enum_name_token.string.count, C_STR(enum_name_token.string),
+                     (s32)enum_name_token.string.count, C_STR(enum_name_token.string),
+                     (s32)enum_name_token.string.count, C_STR(enum_name_token.string),
+                     (s32)enum_name_token.string.count, C_STR(enum_name_token.string));
     test_string = {
         .data  = (byte*)buffer,
         .count = (u32)length
@@ -432,10 +432,10 @@ generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
                 ZeroMemory(buffer, sizeof(buffer));
 
                 length = sprintf(buffer, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .offset = %.*s, .size = 0},\n",
-                                 token.string.count,           C_STR(token.string),            // initialized name
-                                 token.string.count,           C_STR(token.string),            // .name
-                                 enum_name_token.string.count, C_STR(enum_name_token.string),  // .type
-                                 token.string.count,           C_STR(token.string));           // .offset, for enums this is just their numeric value 
+                                 (s32)token.string.count,           C_STR(token.string),            // initialized name
+                                 (s32)token.string.count,           C_STR(token.string),            // .name
+                                 (s32)enum_name_token.string.count, C_STR(enum_name_token.string),  // .type
+                                 (s32)token.string.count,           C_STR(token.string));           // .offset, for enums this is just their numeric value 
                 string_t enum_data = {
                     .data  = (byte*)buffer,
                     .count = (u32)length
@@ -448,10 +448,10 @@ generate_enum_type_info(tokenizer_t *tokenized_data, token_data_t enum_token)
                 char buffer[8192];
 
                 // NOTE(Sleepster): The most recently found element_identifier is exactly what we need.
-                s32 length = sprintf(buffer, "\t\ttype_info_member_t %.*s;\n", token.string.count, C_STR(token.string));
+                s32 length = sprintf(buffer, "\t\ttype_info_member_t %.*s;\n", (s32)token.string.count, C_STR(token.string));
                 string_t test_string = {
                     .data  = (byte*)buffer,
-                    .count = (u32)length
+                    .count = (s64)length
                 };
                 c_string_builder_append_data(&enum_info_builder, test_string);
             }break;

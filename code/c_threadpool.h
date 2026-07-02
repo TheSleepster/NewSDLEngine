@@ -73,6 +73,7 @@ struct threadpool_t
     sys_semaphore_t work_avaliable_semaphore;
     worker_thread_t workers[MAX_THREAD_COUNT];
     s32             thread_count;
+    bool32          allow_stealing;
 
     alignas(CACHE_LINE) volatile s32 threads_flushed;
     alignas(CACHE_LINE) volatile s32 next_worker_index;
@@ -82,7 +83,7 @@ struct threadpool_t
   ============= FUNCATION API ===============
   ===========================================*/
 
-void c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocator_size, bool8 start_instantly);
+void c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocator_size, bool8 start_instantly, bool8 allow_stealing);
 void c_threadpool_start(threadpool_t *threadpool);
 void c_threadpool_flush_work_orders(threadpool_t *threadpool);
 void c_threadpool_wait_on_fence(threadpool_t *threadpool, work_completion_fence_t *fence);
@@ -184,7 +185,7 @@ c_threadpool_push_work_order(threadpool_t *threadpool, LambdaType lambda, work_c
     threadpool->next_worker_index = (threadpool->next_worker_index + 1) % threadpool->thread_count;
     if(fence)
     {
-        AtomicIncrement(&fence->pending);
+        AtomicIncrement32(&fence->pending);
     }
 
     c_threadpool_push_work_order(thread, lambda, fence);

@@ -195,6 +195,9 @@ dynarray_reserve(dynarray_t<T> *array, u32 to_reserve)
     {
         array->capacity = to_reserve;
         array->items = reallocarray(array->items, sizeof(T), array->capacity);
+        Assert(array->items);
+
+        memset(array->items, 0, sizeof(T) * array->capacity);
     }
 }
 
@@ -205,9 +208,20 @@ dynarray_add(dynarray_t<T> *array, T *element)
     T *result = null;
     if((array->used + 1) > array->capacity)
     {
+        u32 old_capacity = array->capacity;
+
         // TODO(Sleepster): THIS IS REALLLLLLLLY BAD. Change this once we have our own malloc 
         array->capacity = Max(60, array->capacity * 2);
-        array->items = (T*)reallocarray(array->items, sizeof(T), array->capacity);
+        array->items = (T*)realloc(array->items, Align(sizeof(T) * array->capacity, 32));
+        Assert(array->items);
+
+        if(old_capacity > 0)
+        {
+            void *offset_ptr = (void*)(array->items + old_capacity);
+            u32 copy_size    = (sizeof(T) * (array->capacity - old_capacity));
+
+            memset(offset_ptr, 0, copy_size);
+        }
     }
 
     result = array->items + array->used; 
@@ -336,7 +350,8 @@ dynarray_copy(dynarray_t<T> *destination, dynarray_t<T> *source)
     Assert(source->capacity);
     if(!destination->items || destination->capacity != source->capacity)
     {
-        destination->items = (T*)reallocarray(destination->items, sizeof(T), source->capacity);
+        destination->items = (T*)realloc(destination->items, Align(sizeof(T) * source->capacity, 32));
+        Assert(destination->items);
     }
 
     destination->capacity = source->capacity;

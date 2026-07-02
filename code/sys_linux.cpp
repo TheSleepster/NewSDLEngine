@@ -151,7 +151,7 @@ sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overl
     }
 
     char buffer[512];
-    sprintf(buffer, "%.*s", filepath.count, C_STR(filepath));
+    sprintf(buffer, "%.*s", (s32)filepath.count, C_STR(filepath));
 
     result.handle = open(buffer, flags, 0666);
     if(result.handle == -1)

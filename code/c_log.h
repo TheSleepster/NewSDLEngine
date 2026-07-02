@@ -14,6 +14,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <c_synchronization.h>
+
 typedef enum debug_log_level
 {
     SL_LOG_DEBUG,
@@ -32,6 +34,8 @@ typedef enum debug_log_level
 #define log_warning(message, ...)  Log(SL_LOG_WARNING, message, ##__VA_ARGS__)
 #define log_error(message, ...)    Log(SL_LOG_ERROR,   message, ##__VA_ARGS__); AssertBreak;
 #define log_fatal(message, ...)    Log(SL_LOG_FATAL,   message, ##__VA_ARGS__); AssertBreak;
+
+static ticket_mutex_t log_mutex;
 
 inline void
 _log(debug_log_level_t log_level, 
@@ -63,28 +67,31 @@ _log(debug_log_level_t log_level,
     char out_buffer[32000];
     memset(out_buffer, 0, sizeof(out_buffer));
 
-    if(is_error)
+    TicketMutexScope(&log_mutex)
     {
-        sprintf(out_buffer, 
-                "%s%s[File: %s, Line: %d, Function: %s]: %s\033[0m\n", 
-                color_schemes[log_level], 
-                info_strings[log_level], 
-                file, 
-                line, 
-                function, 
-                buffer);
+        if(is_error)
+        {
+            sprintf(out_buffer, 
+                    "%s%s[File: %s, Line: %d, Function: %s]: %s\033[0m\n", 
+                    color_schemes[log_level], 
+                    info_strings[log_level], 
+                    file, 
+                    line, 
+                    function, 
+                    buffer);
 
-        fprintf(stderr, "%s", out_buffer);
-    }
-    else
-    {
-        sprintf(out_buffer, 
-                "%s%s%s\033[0m", 
-                color_schemes[log_level], 
-                info_strings[log_level], 
-                buffer);
+            fprintf(stderr, "%s", out_buffer);
+        }
+        else
+        {
+            sprintf(out_buffer, 
+                    "%s%s%s\033[0m", 
+                    color_schemes[log_level], 
+                    info_strings[log_level], 
+                    buffer);
 
-        fprintf(stdout, "%s", out_buffer);
+            fprintf(stdout, "%s", out_buffer);
+        }
     }
 }
 

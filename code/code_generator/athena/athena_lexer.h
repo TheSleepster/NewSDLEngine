@@ -9,7 +9,7 @@
 #define ATHENA_LEXER_H
 
 constexpr u32 MAX_LEXER_BOOKMARKS = 10;
-#define fprint_token(token) token.data.count, token.data.data
+#define fprint_token(token) static_cast<s32>(token.data.count), token.data.data
 
 struct lexer_token_stream_t;
 // TODO(Sleepster): For this token list, when it comes to using keywords we are required in this case

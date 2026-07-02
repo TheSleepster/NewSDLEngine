@@ -492,7 +492,7 @@ main(int argc, char **argv)
     c_global_context_init();
 
     u32 thread_count = sys_get_thread_count();
-    c_threadpool_init(&global_context->main_threadpool, thread_count, MB(1), true);
+    c_threadpool_init(&global_context->main_threadpool, thread_count, MB(1), true, true);
 
     char  **shader_input_directory      = c_program_flag_add_string("-shader_input_path", "shaders/", "This is the location that the preprocessor will search for shaders when a #include directive is found.\n");
     char  **shader_output_directory     = c_program_flag_add_string("-shader_output_dir", "../build/", "This is the output location for the newly generated .slang files");

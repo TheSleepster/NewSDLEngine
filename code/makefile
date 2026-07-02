@@ -46,8 +46,8 @@ endif
 
 BUILD_TYPE ?= debug
 
-# NOTE(Sleepster): To enable sanitizers: -fsanitize=thread,undefined,address -fno-omit-frame-pointer -O1
-PROJECT_COMMON_COMPILER_FLAGS = -std=c++11 -Wformat -Wnullability-completeness -flto -fno-rtti -mavx2 -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
+# NOTE(Sleepster): To enable sanitizers: -fsanitize=thread,undefined,address -fno-omit-frame-pointer -O1 -mavx2 
+PROJECT_COMMON_COMPILER_FLAGS = -std=c++11 -Wformat -Wnullability-completeness -flto -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
 BUILD_COMPILER_FLAGS = -g -O0 -fno-inline-functions $(PROJECT_COMMON_COMPILER_FLAGS) 
 
 COMMON_INCLUDES = -I../run_tree/deps/vulkan/Include/ -I. -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/vulkan/VMA/ -I../run_tree/deps/vulkan/spirv_reflect/include/ -I../run_tree/deps/Freetype/include/
@@ -140,7 +140,7 @@ $(CODE_GENERATOR_OUT): $(CODE_GENERATOR_SRC) | $(BUILD_DIR)
 # -fsanitize=undefined,address -fno-omit-frame-pointer -O1 
 athena: ../code/code_generator/athena/athena.cpp | $(BUILD_DIR)
 	@echo [BUILDING METAPROGRAM] $@
-	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+	$(SILENT) $(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/athena.d \
 		$< $(GAME_EXTERNAL_LIBRARIES) -o $(BUILD_DIR)/$@ 
 

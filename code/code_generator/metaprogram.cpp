@@ -1046,7 +1046,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 
         char buffer[4096] = {};
         sprintf(buffer, "type_id(%.*s)", 
-                full_typename.count, C_STR(full_typename));
+                (s32)full_typename.count, C_STR(full_typename));
 
         c_string_builder_sprintf(type_enum_builder, "\tX(TYPE_%.*s, %s, \"%.*s\") \\\n", 
                                  type->canonical_name.count, C_STR(type->canonical_name),
@@ -1161,7 +1161,7 @@ typedef struct type_info_data_mapping
 }type_info_data_mapping_t;
 )");
     string_t builder_string = c_string_builder_get_current_string(type_enum_builder);
-    fprintf(stdout, "%.*s\n", builder_string.count, C_STR(builder_string));
+    fprintf(stdout, "%.*s\n", (s32)builder_string.count, C_STR(builder_string));
 
     // NOTE(Sleepster): Generate the type_info_t for the data structures 
     if(ast->structure_count > 0)
@@ -1245,8 +1245,8 @@ typedef struct type_info_data_mapping
             if((structure->type_data.modifier_flags & META_TYPE_FLAGS_PrivatelyDeclared) == 0)
             {
                 fprintf(stdout, "const static %.*s GENERATED_DEFAULT_%.*s = {};\n",
-                        struct_canonical_type_name.count, C_STR(struct_canonical_type_name),
-                        struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
+                        (s32)struct_canonical_type_name.count, C_STR(struct_canonical_type_name),
+                        (s32)struct_canonical_type_name.count, C_STR(struct_canonical_type_name));
             }
 
             // NOTE(Sleepster): Get the nested name 
@@ -1850,7 +1850,7 @@ exit:
     c_string_builder_sprintf(struct_info_builder, "#endif\n");
     
     builder_string = c_string_builder_get_current_string(struct_info_builder);
-    fprintf(stdout, "%.*s\n", builder_string.count, C_STR(builder_string));
+    fprintf(stdout, "%.*s\n", (s32)builder_string.count, C_STR(builder_string));
 }
 
 void

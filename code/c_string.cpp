@@ -71,6 +71,8 @@ c_string_create_with_length(byte *data, u32 length)
 string_t
 c_string_make_heap(memory_arena_t *arena, string_t string)
 {
+    Assert(string.count > 0);
+
     string_t result;
     result.count = string.count;
     result.data  = c_arena_push_array(arena, byte, string.count);
@@ -471,15 +473,19 @@ c_string_is_end_of_line(string_t *current_line)
 bool32
 c_string_is_whitespace(string_t *current_line)
 {
+    Expect(current_line->count > 0, "Attempted to perform this on an empty string...\n");
     bool32 result = false;
 
     char character = current_line->data[0];
-    if(character == ' '  ||
-       character == '\n' ||
-       character == '\r' ||
-       character == '\t')
+    if(character != '\0') 
     {
-        result = true;
+        if(character == ' '  ||
+           character == '\n' ||
+           character == '\r' ||
+           character == '\t')
+        {
+            result = true;
+        }
     }
 
     return(result);
@@ -490,7 +496,7 @@ c_string_eat_whitespace(string_t *current_line)
 {
     u32 result = 0;
 
-    while(current_line->count > 0)
+    while(current_line->count > 0 && current_line->data[0] != '\0')
     {
         if(c_string_is_whitespace(current_line))
         {
