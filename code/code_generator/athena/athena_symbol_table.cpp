@@ -54,7 +54,7 @@ symbol_table_init(string_t filepath, bool8 recursive)
     bool8 is_directory = sys_directory_exists(filepath);
     if(is_directory)
     {
-        file_count = sys_directory_get_file_count(filepath, recursive, STR(".h"));
+        file_count = sys_directory_get_file_count(&permanent_arena, filepath, recursive, STR(".h"));
     }
 
     g_symbol_table.file_count   = file_count;

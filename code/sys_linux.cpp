@@ -510,11 +510,12 @@ sys_directory_exists(string_t filepath)
 }
 
 s32
-sys_directory_get_file_count(string_t filepath, bool8 recursive, string_t file_ext)
+sys_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 recursive, string_t file_ext)
 {
     s32 result = -1;
     
-    DIR *directory = opendir(C_STR(filepath));
+    const char *c_str_filepath = c_string_null_terminated(arena, filepath);
+    DIR *directory = opendir(c_str_filepath);
     if(directory)
     {
         result = 0;
@@ -549,7 +550,7 @@ sys_directory_get_file_count(string_t filepath, bool8 recursive, string_t file_e
                 char subdirectory[1024];
                 snprintf(subdirectory, sizeof(subdirectory), "%s/%s", C_STR(filepath), file_entry->d_name);
 
-                result += sys_directory_get_file_count(filepath, recursive, file_ext);
+                result += sys_directory_get_file_count(arena, filepath, recursive, file_ext);
             }
 
             file_entry = readdir(directory);

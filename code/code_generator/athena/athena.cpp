@@ -1131,10 +1131,6 @@ main(int argc, char **argv)
     // NOTE(Sleepster): Just for the threadpool 
     c_global_context_init();
 
-    //u32 thread_count = 1;
-    u32 thread_count = sys_get_thread_count() - 1;
-    c_threadpool_init(&global_context->main_threadpool, thread_count, MB(200), true, false);
-
     // NOTE(Sleepster): Thread init 
     permanent_arena = c_arena_create(MB(10));
     transient_arena = c_arena_create(MB(10));
@@ -1150,6 +1146,10 @@ main(int argc, char **argv)
     bool32 *recursive            = c_program_flag_add_bool32("-recursive", false, "Denotes recursive parsing over the passed directory...\n");
 
     c_program_flag_parse_args(argc, argv);
+
+    //u32 thread_count = 1;
+    u32 thread_count = sys_get_thread_count() - 1;
+    c_threadpool_init(&global_context->main_threadpool, thread_count, MB(200), true, false);
 
     if(!(*requested_directory))
     {
@@ -1177,6 +1177,35 @@ main(int argc, char **argv)
             dynarray_add(&state.parser_table, &parser);
         }
 
+#if 1
+        for(u32 file_index = 0;
+            file_index < state.filenames.used;
+            ++file_index)
+        {
+            parser_t *file_parser = state.parser_table[file_index];
+            Assert(file_parser->lexer.current_stream->string.data != null && file_parser->lexer.current_stream->string.count > 0);
+            Assert(file_parser);
+
+            printf("Parsing macros for file: '%.*s'...\n", fprint_string(file_parser->filename));
+            record_file_macros(file_parser);
+        }
+
+        consolidate_macro_tables();
+
+        for(u32 iterator = 0;
+            iterator < state.filenames.used;
+            ++iterator)
+        {
+            parser_t *file_parser = state.parser_table[iterator];
+            Assert(file_parser);
+
+            record_file_constants(file_parser);
+            build_file_AST(file_parser);
+        }
+
+        consolidate_AST_nodes();
+        deduce_AST_node_type_data();
+#else
         // NOTE(Sleepster): Collect the macros for each of the files. 
         work_completion_fence_t macro_fence = {};
         for(u32 file_index = 0;
@@ -1226,6 +1255,7 @@ main(int argc, char **argv)
 
         consolidate_AST_nodes();
         deduce_AST_node_type_data();
+#endif
     }
 
     printf("Global symbol table\n");
