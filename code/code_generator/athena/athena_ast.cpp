@@ -212,8 +212,22 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
             // NOTE(Sleepster): For macros, this will never happen since the symbol table simply substitues the macro expansion in place. 
             case TOKEN_TYPE_IDENT:
             {
-                result->identifier = c_string_make_copy(&parser->arena, token->data);
-                result->node_type  = AST_NODE_TYPE_IDENTIFIER;
+                if(c_string_compare(token->data, STR("true")))
+                {
+                    result->type.value_literal  = c_string_make_copy(&parser->arena, STR("1"));
+                    result->node_type = AST_NODE_TYPE_NUMBER;
+                }
+                else if(c_string_compare(token->data, STR("false")))
+                {
+                    result->type.value_literal  = c_string_make_copy(&parser->arena, STR("0"));
+                    result->node_type = AST_NODE_TYPE_NUMBER;
+                }
+                else
+                {
+                    result->type.value_literal = c_string_make_copy(&parser->arena, token->data);
+                    result->identifier = c_string_make_copy(&parser->arena, token->data);
+                    result->node_type  = AST_NODE_TYPE_IDENTIFIER;
+                }
             }break;
             case TOKEN_TYPE_LITERAL:
             {

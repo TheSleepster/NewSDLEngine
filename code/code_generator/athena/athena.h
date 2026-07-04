@@ -7,7 +7,7 @@
    ======================================================================== */
 
 #define ATHENA_H
-typedef unsigned int u32;
+typedef unsigned int unsigned_int;
 
 struct type_info_t;
 struct type_info_member_t;
@@ -35,7 +35,7 @@ enum athena_evaluated_type
 
 struct type_default_value_t 
 {
-    u32 type;
+    unsigned_int type;
     union {
         int                int32;
         long long          int64;
@@ -52,37 +52,38 @@ struct type_info_t
     const char  *type_name;
     type_info_t *alias_of;
     type_info_t *next_overload;
-    u32          type;
-    u32          size;
+    unsigned int type;
+    unsigned int size;
 };
 
 struct type_info_member_t: public type_info_t
 {
-    const char          *member_name;
-    type_info_struct_t  *parent;
-    u32                  array_size;
-    u32                  flags;
-    u32                  pointer_depth;
+    const char               *member_name;
+    const type_info_struct_t *parent;
+    //unsigned_int              array_size;
+    unsigned_int              flags;
+    unsigned_int              pointer_depth;
 
-    type_default_value_t value;
+    type_default_value_t      value;
 };
 
 struct type_info_struct_t: public type_info_t
 {
-    u32                 member_count;
+    unsigned_int        member_count;
     type_info_member_t *members;
 };
 
 struct type_info_procedure_t: public type_info_t
 {
-    u32                 argument_count;
+    unsigned_int        argument_count;
     type_info_member_t *arguments;
+    type_info_t        *return_type;
 };
 
 struct athena_reflection_bundle_t
 {
     const type_info_t *type_info_array;
-    u32                type_info_array_size;
+    unsigned_int       type_info_array_size;
 };
 
 extern const type_info_t athena_type_information_array[];

@@ -1238,6 +1238,58 @@ parse_directory_type_data(void)
 #endif
 }
 
+internal_api void
+print_type_info_struct_member_info(string_builder_t *builder, code_type_t *type, AST_node_t *current_member)
+{
+    if(current_member->node_type == AST_NODE_TYPE_STRUCTURE)
+    {
+        return;
+    }
+
+    c_string_builder_sprintf(builder, "\t.%.*s = {\n", fprint_string(current_member->identifier));
+    c_string_builder_sprintf(builder, "\t\t.type_name     = \"%.*s\",\n", fprint_string(current_member->type.code_type->identifier));
+    //c_string_builder_sprintf(builder, "\t\t.alias_of      = \"%.*s\",\n", fprint_string(current_member->type.code_type->identifier));
+    //c_string_builder_sprintf(builder, "\t\t.next_overload = \"%.*s\",\n", fprint_string(current_member->type.code_type->identifier));
+    c_string_builder_sprintf(builder, "\t\t.type          = \"%.*s\",\n", fprint_string(current_member->type.code_type->identifier));
+    c_string_builder_sprintf(builder, "\t\t.size          = sizeof(%.*s),\n", fprint_string(current_member->identifier));
+    c_string_builder_sprintf(builder, "\t\t.member_name   = \"%.*s\",\n", fprint_string(current_member->identifier));
+    c_string_builder_sprintf(builder, "\t\t.parent        = &DEFAULT_type_%.*s,\n", fprint_string(type->identifier));
+    //c_string_builder_sprintf(&builder, "\t\t.array_size  = %lu,\n", current_member->type.flags);
+    c_string_builder_sprintf(builder, "\t\t.flags         = %lu,\n", current_member->type.flags);
+    c_string_builder_sprintf(builder, "\t\t.pointer_depth = %lu,\n", current_member->type.pointer_depth);
+    if(current_member->expression.evaluated)
+    {
+        c_string_builder_sprintf(builder, "\t\t.value = {\n");
+        c_string_builder_sprintf(builder, "\t\t\t.type = %d\n", current_member->expression.value.type);
+        switch(current_member->expression.value.type)
+        {
+            case AST_EXPRESSION_VALUE_INT:
+            {
+                c_string_builder_sprintf(builder, "\t\t\t.int64 = %ld\n", current_member->expression.value.int_value);
+            }break;
+            case AST_EXPRESSION_VALUE_UNSIGNED:
+            {
+                c_string_builder_sprintf(builder, "\t\t\t.u64 = %lu\n", current_member->expression.value.unsigned_value);
+            }break;
+            case AST_EXPRESSION_VALUE_FLOAT:
+            {
+                c_string_builder_sprintf(builder, "\t\t\t.float32 = %f\n", current_member->expression.value.float32_value);
+            }break;
+            case AST_EXPRESSION_VALUE_DOUBLE:
+            {
+                c_string_builder_sprintf(builder, "\t\t\t.float64 = %lf\n", current_member->expression.value.float32_value);
+            }break;
+            case AST_EXPRESSION_VALUE_IDENT:
+            case AST_EXPRESSION_VALUE_LITERAL:
+            {
+                c_string_builder_sprintf(builder, "\t\t\t.string = \"%.*s\"\n", fprint_string(current_member->expression.value.identifier_value));
+            }break;
+        }
+        c_string_builder_sprintf(builder, "\t\t};\n");
+    }
+    c_string_builder_sprintf(builder, "\t};\n");
+}
+
 void
 athena_handle_type_info(const char *char_filepath, bool32 directory, bool32 recursive)
 {
@@ -1354,6 +1406,7 @@ athena_handle_type_info(const char *char_filepath, bool32 directory, bool32 recu
     string_builder_t file_builder;
     c_string_builder_init(&file_builder, MB(40));
 
+    // NOTE(Sleepster): Create the structure types. 
     for(u32 type_index = 0;
         type_index < g_symbol_table.type_table.used_entries.used;
         ++type_index)
@@ -1362,13 +1415,57 @@ athena_handle_type_info(const char *char_filepath, bool32 directory, bool32 recu
         switch(type->code_metatype)
         {
             case CODE_TYPE_STRUCTURE:
+            case CODE_TYPE_ENUM:
             {
-                c_string_builder_sprintf(&file_builder, "type_info_struct_%.*s type_%.*s: public type_info_struct_t {\n", fprint_string(type->identifier), fprint_string(type->identifier));
+                c_string_builder_sprintf(&file_builder, "struct type_info_struct_%.*s : public type_info_struct_t {\n", fprint_string(type->identifier));
+                c_string_builder_sprintf(&file_builder, "\tunion {\n");
+                c_string_builder_sprintf(&file_builder, "\t\ttype_info_member_t member_array[%d];\n", type->type_data->struct_decl.member_count);
                 for(AST_node_t *current_member = type->type_data->struct_decl.first_member;
                     current_member;
                     current_member = current_member->next_sibling)
                 {
-                    c_string_builder_sprintf(&file_builder, "\ttype_info_member_t %.*s;\n", fprint_string(current_member->identifier));
+                    c_string_builder_sprintf(&file_builder, "\t\ttype_info_member_t %.*s;\n", fprint_string(current_member->identifier));
+                }
+                c_string_builder_sprintf(&file_builder, "\t}members;\n");
+                c_string_builder_append_data(&file_builder, STR("};\n\n"));
+            }break;
+            case CODE_TYPE_LAMBDA:
+            {
+                c_string_builder_sprintf(&file_builder, "struct type_info_procedure_%.*s : public type_info_procedure_t {\n", fprint_string(type->identifier));
+                c_string_builder_sprintf(&file_builder, "\tunion {\n");
+                c_string_builder_sprintf(&file_builder, "\t\ttype_info_member_t argument_array[%d];\n", type->type_data->lambda.argument_count);
+                if(type->type_data->lambda.first_argument)
+                {
+                    for(AST_node_t *current_argument = type->type_data->lambda.first_argument;
+                        current_argument;
+                        current_argument = current_argument->next_sibling)
+                    {
+                        c_string_builder_sprintf(&file_builder, "\t\ttype_info_member_t %.*s\n", fprint_string(current_argument->identifier));
+                    }
+                }
+                c_string_builder_sprintf(&file_builder, "\t}arguments;\n");
+                c_string_builder_append_data(&file_builder, STR("};\n\n"));
+            }break;
+        }
+    }
+
+    for(u32 type_index = 0;
+        type_index < g_symbol_table.type_table.used_entries.used;
+        ++type_index)
+    {
+        code_type_t *type = (code_type_t*)((g_symbol_table.type_table.used_entries[type_index])->item);
+        switch(type->code_metatype)
+        {
+            case CODE_TYPE_STRUCTURE:
+            case CODE_TYPE_ENUM:
+            {
+                c_string_builder_sprintf(&file_builder, "constexpr type_info_struct_%.*s DEFAULT_type_%.*s = {\n", fprint_string(type->identifier), fprint_string(type->identifier));
+                c_string_builder_sprintf(&file_builder, "\t.member_count = %d\n", type->type_data->struct_decl.member_count);
+                for(AST_node_t *current_member = type->type_data->struct_decl.first_member;
+                    current_member;
+                    current_member = current_member->next_sibling)
+                {
+                    print_type_info_struct_member_info(&file_builder, type, current_member);
                 }
 
                 c_string_builder_append_data(&file_builder, STR("};\n\n"));
@@ -1376,6 +1473,14 @@ athena_handle_type_info(const char *char_filepath, bool32 directory, bool32 recu
             case CODE_TYPE_LAMBDA:
             {
                 c_string_builder_sprintf(&file_builder, "type_info_procedure_%.*s type_%.*s: public type_info_procedure_t {\n", fprint_string(type->identifier), fprint_string(type->identifier));
+                c_string_builder_sprintf(&file_builder, "\t.argument_count = %d,\n", type->type_data->lambda.argument_count);
+                for(AST_node_t *current_argument = type->type_data->lambda.first_argument;
+                    current_argument;
+                    current_argument = current_argument->next_sibling)
+                {
+                    print_type_info_struct_member_info(&file_builder, type, current_argument);
+                }
+                c_string_builder_sprintf(&file_builder, "};\n");
             }break;
         }
     }
@@ -1402,7 +1507,7 @@ athena_handle_type_info(const char *char_filepath, bool32 directory, bool32 recu
                     current_member;
                     current_member->next_sibling)
                 {
-                    c_string_builder_sprintf(&file_builder, "\t.member_count = %d,\n", type->struct_decl.member_count));
+                    print_type_info_struct_member_info(&file_builder, type, current_member);
                 }
 
                 c_string_builder_append_data(&file_builder, STR("};\n"));
