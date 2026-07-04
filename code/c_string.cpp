@@ -84,7 +84,8 @@ c_string_make_heap(memory_arena_t *arena, string_t string)
 bool8
 c_string_compare(string_t A, string_t B)
 {
-    if(A.count != B.count) return false;
+    if(A.count != B.count) return(false);
+    if(A.data  == B.data)  return(true); 
     return(memcmp(A.data, B.data, A.count) == 0);
 }
 

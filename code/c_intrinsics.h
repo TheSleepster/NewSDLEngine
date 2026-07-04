@@ -92,7 +92,7 @@
         // NOTE(Sleepster): Adds the value, returns the new sum of the values. 
         #define AtomicAdd16(ptr, value) __atomic_add_fetch((volatile s16*)(ptr), (s16)value, __ATOMIC_SEQ_CST)
         #define AtomicAdd32(ptr, value) __atomic_add_fetch((volatile s32*)(ptr), (s32)value, __ATOMIC_SEQ_CST)
-        #define Atomicadd64(ptr, value) __atomic_add_fetch((volatile s64*)(ptr), (s64)value, __ATOMIC_SEQ_CST)
+        #define AtomicAdd64(ptr, value) __atomic_add_fetch((volatile s64*)(ptr), (s64)value, __ATOMIC_SEQ_CST)
 
         #define AtomicAdd(ptr, value) AtomicAdd32(ptr, value)
 

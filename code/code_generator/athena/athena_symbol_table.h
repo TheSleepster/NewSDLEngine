@@ -31,7 +31,7 @@ constexpr u32 MAX_PEEK_AHEAD_TOKENS = 32;
     X("namespace", TOKEN_KEYWORD_NAMESPACE, TOKEN_TYPE_NAMESPACE)  \
     X("using",     TOKEN_KEYWORD_USING,     TOKEN_TYPE_USING)      \
     X("NULL",      TOKEN_KEYWORD_NULL,      TOKEN_TYPE_NULL)       \
-    X("nullptr",   TOKEN_KEYWORD_NULLPTR,   TOKEN_TYPE_NULLPTR)    \
+    X("nullptr",   TOKEN_KEYWORD_NULLPTR,   TOKEN_TYPE_NULLPTR)
 
 enum keywords_t
 {
@@ -59,7 +59,7 @@ enum keywords_t
     X("uint16_t") \
     X("uint32_t") \
     X("uint64_t") \
-    X("size_t") \
+    X("size_t")
 
 struct language_keyword_t
 {
@@ -102,6 +102,7 @@ struct code_type_t
     string_t     identifier;
     u64          ID;
     code_type_t *alias_of = null;
+    AST_node_t  *type_data;
 
     u32          code_metatype;
 };
@@ -134,6 +135,7 @@ struct code_attribute_t
     }template_data;
 };
 
+// TODO(Sleepster): With subarenas, all parsers can just be children of a parent arena and thus share the same lifetime as the parent.
 struct parser_t
 {
     memory_arena_t                     arena;
@@ -162,6 +164,7 @@ struct symbol_table_t
     volatile u32                      next_parser_index;
         
     hash_table_t<macro_info_t>        defined_global_macro_table;
+    hash_table_t<code_type_t*>        type_table;
     dynarray_t<declaration_context_t> declaration_contexts;
 };
 

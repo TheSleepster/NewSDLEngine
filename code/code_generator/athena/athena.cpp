@@ -4,6 +4,9 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#define ATHENA_IMPLEMENTATION 
+#include "athena.h"
+
 #include <c_types.h>
 #include <c_base.h>
 #include <c_synchronization.h>
@@ -36,23 +39,16 @@
 
 /* TODO:
  *
- * TWO CUPLRITS
- * - Management of whitespace...
- * - Macro substitution
  *
- * THESE TESTS ARE BROKEN!!!!!
- *      - tests/metaprogram_tests/attributes.cpp (currently, failing as intended)
- *      - nested_macros
- *
- * - [ ] #if !defined() header guards bricks the parser, deal with this
- * - [ ] #if statements that use macros or constexpr values are invalid. Thus crash the program.
- * - [ ] Nested macros are unaccounted for, macro expansion is not recursive and MUST be recursive
- *
- * - [ ] Variadic functions '...' and ##__VA_ARGS__ macros are not handled.
  * - [ ] Special markers to denote the ignoring of certain code_declarations / files.
+ * - [ ] Variadic functions '...' and ##__VA_ARGS__ macros are not handled.
  *
  * - [-] No way of printing the namespace string such as "Namespace is: 'Structure::'...\n"
  * - [-] PURGE THE THREAD ARENAS
+ *
+ * - [X] #if !defined() header guards bricks the parser, deal with this
+ * - [X] #if statements that use macros or constexpr values are invalid. Thus crash the program.
+ * - [X] Nested macros are unaccounted for, macro expansion is not recursive and MUST be recursive
  *
  * - [X] Enums must be allowed in expressions.
  * - [X] Templated members such as "hash_table_t<Type> types" would blow up the parser
@@ -230,6 +226,7 @@ DEBUG_print_structure_members(AST_node_t *structure, u32 indent)
             DEBUG_indent(indent + 2);
             printf("struct: %.*s\n", fprint_string(current_member->identifier));
             DEBUG_print_structure_members(current_member, indent + 3);
+
             continue;
         }
 
@@ -807,10 +804,6 @@ build_file_AST(parser_t *parser)
             }break;
             case TOKEN_TYPE_CONSTEXPR:
             {
-                // TODO(Sleepster):
-                // Right now there's a problem where this loop will process constexpr's that are lambdas twice, once as a constant
-                // another as a valid type. Is this a problem? Idk... But right now I just don't care since it's not obvious that this
-                // could be a problem.
             }break;
             case TOKEN_TYPE_OPEN_BRACKET:
             {
@@ -1011,7 +1004,7 @@ consolidate_AST_nodes(void)
 
 // NOTE(Sleepster): PHASE 3: TYPE INFERENCE
 internal_api void
-deduce_AST_node_type_data()
+deduce_AST_node_type_data(void)
 {
     for(const auto &decl_context: g_symbol_table.declaration_contexts)
     {
@@ -1024,6 +1017,7 @@ deduce_AST_node_type_data()
                 code_type_t *type = code_decl->type.code_type;
                 if(type && type->code_metatype == CODE_TYPE_UNDEFINED)
                 {
+                    type->type_data = code_decl;
                     switch(code_decl->node_type)
                     {
                         case AST_NODE_TYPE_ENUM:
@@ -1089,6 +1083,29 @@ deduce_AST_node_type_data()
 }
 
 internal_api void
+consolidate_AST_types(void)
+{
+    // TODO(Sleepster): We are saving member identifiers as types. Meaning:
+    // u32 type_data;
+    //
+    // the identifier type_data gets stored as a type along with u32 somehow.
+    for(auto &decl_context: g_symbol_table.declaration_contexts)
+    {
+        for(auto &element: decl_context.local_types.used_entries)
+        {
+            code_type_t *type = element->item;
+            Assert(type->identifier.count > 0 && type->identifier.data != 0);
+
+            code_type_t *found = hash_table_get_element(&g_symbol_table.type_table, type->identifier);
+            if(!found || !found->is_registered)
+            {
+                hash_table_add_element(&g_symbol_table.type_table, &type, type->identifier);
+            }
+        }
+    }
+}
+
+internal_api void
 parse_single_file(string_t filename)
 {
     string_t file_data = c_file_read_entirety(filename);
@@ -1107,7 +1124,6 @@ VISIT_FILES(gather_files_in_directory)
 {
     string_t filename = visit_file_data->fullname;
     string_t file_ext = c_string_get_file_ext_from_path(filename);
-
     if(!c_string_compare(file_ext, STR(".h")))
     {
         return;
@@ -1125,150 +1141,134 @@ VISIT_FILES(gather_files_in_directory)
     dynarray_add(&state.filenames, &new_filename);
 }
 
-int
-main(int argc, char **argv)
+internal_api void
+parse_directory_type_data(void)
 {
-    // NOTE(Sleepster): Just for the threadpool 
-    c_global_context_init();
-
-    // NOTE(Sleepster): Thread init 
-    permanent_arena = c_arena_create(MB(10));
-    transient_arena = c_arena_create(MB(10));
-
-    // NOTE(Sleepster): This is a global READ ONLY dataset
-    initialize_default_language_info();
-
-    // NOTE(Sleepster): Thread init 
-    Expect(argc > 1, "You must pass a file to parse or a target directory that contains these files...\n");
-
-    char **requested_filename = c_program_flag_add_string("-filename", null, "This is the file we wish to parse...\n");
-    char   **requested_directory = c_program_flag_add_string("-directory", null, "Points to the directory you wish to parse...\n");
-    bool32 *recursive            = c_program_flag_add_bool32("-recursive", false, "Denotes recursive parsing over the passed directory...\n");
-
-    c_program_flag_parse_args(argc, argv);
-
-    //u32 thread_count = 1;
-    u32 thread_count = sys_get_thread_count() - 1;
-    c_threadpool_init(&global_context->main_threadpool, thread_count, MB(200), true, false);
-
-    if(!(*requested_directory))
+    // NOTE(Sleepster): Read the data for each of the files and create their parsers 
+    for(u32 iterator = 0;
+        iterator < state.filenames.used;
+        ++iterator)
     {
-        string_t filename = STR(*requested_filename);
-        symbol_table_init(filename, *recursive);
+        string_t filename = state.filenames[iterator];
+        string_t filedata = c_file_read_entirety(filename);
 
-        parse_single_file(filename);
+        parser_t *parser = parser_create(filename, filedata);
+        dynarray_add(&state.parser_table, &parser);
     }
-    else
-    {
-        visit_file_data_t visit_info = c_directory_create_visit_data(gather_files_in_directory, *recursive, null);
-        string_t directory = STR(*requested_directory);
-        symbol_table_init(directory, *recursive);
-
-        c_directory_visit(directory, &visit_info);
-        // NOTE(Sleepster): Read the data for each of the files and create their parsers 
-        for(u32 iterator = 0;
-            iterator < state.filenames.used;
-            ++iterator)
-        {
-            const string_t filename = state.filenames[iterator];
-            string_t filedata = c_file_read_entirety(filename);
-
-            parser_t *parser = parser_create(filename, filedata);
-            dynarray_add(&state.parser_table, &parser);
-        }
 
 #if 1
-        for(u32 file_index = 0;
-            file_index < state.filenames.used;
-            ++file_index)
-        {
+    for(u32 file_index = 0;
+        file_index < state.filenames.used;
+        ++file_index)
+    {
+        parser_t *file_parser = state.parser_table[file_index];
+        Assert(file_parser->lexer.current_stream->string.data != null && file_parser->lexer.current_stream->string.count > 0);
+        Assert(file_parser);
+
+        printf("Parsing macros for file: '%.*s'...\n", fprint_string(file_parser->filename));
+        record_file_macros(file_parser);
+    }
+
+    consolidate_macro_tables();
+
+    for(u32 iterator = 0;
+        iterator < state.filenames.used;
+        ++iterator)
+    {
+        parser_t *file_parser = state.parser_table[iterator];
+        Assert(file_parser);
+
+        record_file_constants(file_parser);
+        build_file_AST(file_parser);
+    }
+
+    consolidate_AST_nodes();
+    deduce_AST_node_type_data();
+    consolidate_AST_types();
+#else
+    // NOTE(Sleepster): Collect the macros for each of the files. 
+    work_completion_fence_t macro_fence = {};
+    for(u32 file_index = 0;
+        file_index < state.filenames.used;
+        ++file_index)
+    {
+        c_threadpool_push_work_order(&global_context->main_threadpool, [=]() {
+            u32 thread_arena_is_valid = AtomicCompareExchange32(&permanent_arena.is_initialized,
+                                                                true,
+                                                                false);
+            if(thread_arena_is_valid == false)
+            {
+                permanent_arena = c_arena_create(MB(10));
+                transient_arena = c_arena_create(MB(10));
+            }
+
             parser_t *file_parser = state.parser_table[file_index];
             Assert(file_parser->lexer.current_stream->string.data != null && file_parser->lexer.current_stream->string.count > 0);
             Assert(file_parser);
 
             printf("Parsing macros for file: '%.*s'...\n", fprint_string(file_parser->filename));
             record_file_macros(file_parser);
-        }
+        }, &macro_fence);
+    }
 
-        consolidate_macro_tables();
+    c_threadpool_wait_on_fence(&global_context->main_threadpool, &macro_fence);
 
-        for(u32 iterator = 0;
-            iterator < state.filenames.used;
-            ++iterator)
-        {
+    // NOTE(Sleepster): Consolidate macros 
+    consolidate_macro_tables();
+
+    // NOTE(Sleepster): Record the AST_node_t for this file, both the constants and other items.
+    work_completion_fence_t AST_fence = {};
+    for(u32 iterator = 0;
+        iterator < state.filenames.used;
+        ++iterator)
+    {
+        c_threadpool_push_work_order(&global_context->main_threadpool, [iterator]() {
             parser_t *file_parser = state.parser_table[iterator];
             Assert(file_parser);
 
             record_file_constants(file_parser);
             build_file_AST(file_parser);
-        }
+        }, &AST_fence);
+    }
 
-        consolidate_AST_nodes();
-        deduce_AST_node_type_data();
-#else
-        // NOTE(Sleepster): Collect the macros for each of the files. 
-        work_completion_fence_t macro_fence = {};
-        for(u32 file_index = 0;
-            file_index < state.filenames.used;
-            ++file_index)
-        {
-            c_threadpool_push_work_order(&global_context->main_threadpool, [=]() {
-                u32 thread_arena_is_valid = AtomicCompareExchange32(&permanent_arena.is_initialized,
-                                                                    true,
-                                                                    false);
-                if(thread_arena_is_valid == false)
-                {
-                    permanent_arena = c_arena_create(MB(10));
-                    transient_arena = c_arena_create(MB(10));
-                }
+    c_threadpool_wait_on_fence(&global_context->main_threadpool, &AST_fence);
 
-                parser_t *file_parser = state.parser_table[file_index];
-                Assert(file_parser->lexer.current_stream->string.data != null && file_parser->lexer.current_stream->string.count > 0);
-                Assert(file_parser);
-
-                printf("Parsing macros for file: '%.*s'...\n", fprint_string(file_parser->filename));
-                record_file_macros(file_parser);
-            }, &macro_fence);
-        }
-
-        c_threadpool_wait_on_fence(&global_context->main_threadpool, &macro_fence);
-
-        // NOTE(Sleepster): Consolidate macros 
-        consolidate_macro_tables();
-
-        // NOTE(Sleepster): Record the AST_node_t for this file, both the constants and other items.
-        work_completion_fence_t AST_fence = {};
-        for(u32 iterator = 0;
-            iterator < state.filenames.used;
-            ++iterator)
-        {
-            c_threadpool_push_work_order(&global_context->main_threadpool, [iterator]() {
-                parser_t *file_parser = state.parser_table[iterator];
-                Assert(file_parser);
-
-                record_file_constants(file_parser);
-                build_file_AST(file_parser);
-            }, &AST_fence);
-        }
-
-        c_threadpool_wait_on_fence(&global_context->main_threadpool, &AST_fence);
-
-        consolidate_AST_nodes();
-        deduce_AST_node_type_data();
+    consolidate_AST_nodes();
+    deduce_AST_node_type_data();
 #endif
+}
+
+void
+athena_handle_type_info(const char *char_filepath, bool32 directory, bool32 recursive)
+{
+    string_t filepath = STR(char_filepath);
+    if(!directory)
+    {
+        symbol_table_init(filepath, recursive);
+        parse_single_file(filepath);
+    }
+    else
+    {
+        visit_file_data_t visit_info = c_directory_create_visit_data(gather_files_in_directory, recursive, null);
+        symbol_table_init(filepath, recursive);
+
+        c_directory_visit(filepath, &visit_info);
+        parse_directory_type_data();
     }
 
     printf("Global symbol table\n");
+    printf("  TYPES:\n");
+    for(const auto &element : g_symbol_table.type_table.used_entries)
+    {
+        code_type_t *type = element->item;
+        printf("    %.*s\n", fprint_string(type->identifier));
+    }
+
     printf("  Declaration contexts: %u\n\n", g_symbol_table.declaration_contexts.used);
     for(const auto &scope : g_symbol_table.declaration_contexts)
     {
         printf("Context: %.*s\n", fprint_string(scope.lexical_scope));
         printf("  Types (%u)\n", scope.local_types.used_entries.used);
-        for(const auto &element : scope.local_types.used_entries)
-        {
-            code_type_t *type = element->item;
-            printf("    %.*s\n", fprint_string(type->identifier));
-        }
 
         printf("\n  Declarations (%u)\n", scope.code_decls.used_entries.used);
         for(const auto &element : scope.code_decls.used_entries)
@@ -1305,13 +1305,13 @@ main(int argc, char **argv)
                     }
 
                     printf("\n\n");
-                } break;
+                }break;
                 case AST_NODE_TYPE_STRUCTURE:
                 {
                     printf("    struct %.*s\n", fprint_string(AST->identifier));
                     DEBUG_print_structure_members(AST, 3);
                     printf("\n");
-                } break;
+                }break;
                 case AST_NODE_TYPE_ENUM:
                 {
                     printf("    enum %.*s\n", fprint_string(AST->identifier));
@@ -1329,5 +1329,132 @@ main(int argc, char **argv)
         printf("\n");
     }
 
+#if 0
+    string_t item_to_read = ...
+    type_info_t *string_data       = type_info(string_t);
+    type_info_t *item_to_read_data = type_info(item_to_read);
+    type_info_t *item_data         = type_info_from_string(item_to_read);
+    
+    type_info_struct_t *string_type_info = static_cast<type_info_struct_t*>(string_data);
+    for(auto &member: string_type_info.members_array)
+    {
+        printf("member_name: '%s'...\n", member->name);
+        printf("type: '%s'...\n", metatype_to_name(member->metatype));
+        printf("offset: '%d'...\n", member->offset);
+        printf("size: '%d'...\n", member->size);
+    }
+
+    type_info_member_t *count = string_data.members.count;
+    type_info_member_t *data  = string_data.members.data;
+
+    s64 *member_variable  = meta_get_member_pointer(string_data, STR("count"));
+    s64 *member_variable2 = meta_get_member_pointer(string_t, count); // second param is a type_info_member_t*
+#endif
+
+    string_builder_t file_builder;
+    c_string_builder_init(&file_builder, MB(40));
+
+    for(u32 type_index = 0;
+        type_index < g_symbol_table.type_table.used_entries.used;
+        ++type_index)
+    {
+        code_type_t *type = (code_type_t*)((g_symbol_table.type_table.used_entries[type_index])->item);
+        switch(type->code_metatype)
+        {
+            case CODE_TYPE_STRUCTURE:
+            {
+                c_string_builder_sprintf(&file_builder, "type_info_struct_%.*s type_%.*s: public type_info_struct_t {\n", fprint_string(type->identifier), fprint_string(type->identifier));
+                for(AST_node_t *current_member = type->type_data->struct_decl.first_member;
+                    current_member;
+                    current_member = current_member->next_sibling)
+                {
+                    c_string_builder_sprintf(&file_builder, "\ttype_info_member_t %.*s;\n", fprint_string(current_member->identifier));
+                }
+
+                c_string_builder_append_data(&file_builder, STR("};\n\n"));
+            }break;
+            case CODE_TYPE_LAMBDA:
+            {
+                c_string_builder_sprintf(&file_builder, "type_info_procedure_%.*s type_%.*s: public type_info_procedure_t {\n", fprint_string(type->identifier), fprint_string(type->identifier));
+            }break;
+        }
+    }
+
+    string_t string = c_string_builder_get_current_string(&file_builder);
+    fprintf(stdout, "%.*s\n", fprint_string(string));
+}
+
+#if 0
+            case CODE_TYPE_PRIMITIVE:
+            {
+                c_string_builder_append_data(&file_builder, STR("const static type_info_t type_info_%.*s = {\n"));
+                c_string_builder_sprintf(&file_builder, "\t.type_name = \"%.*s\",\n", fprint_string(type->identifier));
+                c_string_builder_sprintf(&file_builder, "\t.size = sizeof(%.*s),\n",  fprint_string(type->identifier));
+                c_string_builder_append_data(&file_builder, STR("};\n"));
+            }break;
+            case CODE_TYPE_STRUCTURE:
+            {
+                c_string_builder_append_data(&file_builder, STR("const static type_info_struct_t type_info_struct_%.*s = {\n"));
+                c_string_builder_sprintf(&file_builder, "\t.type_name = \"%.*s\",\n", fprint_string(type->identifier));
+                c_string_builder_sprintf(&file_builder, "\t.size = sizeof(%.*s),\n",  fprint_string(type->identifier));
+                c_string_builder_sprintf(&file_builder, "\t.member_count = %d,\n", type->struct_decl.member_count));
+                for(AST_node_t *current_member = type->struct_decl.first_member;
+                    current_member;
+                    current_member->next_sibling)
+                {
+                    c_string_builder_sprintf(&file_builder, "\t.member_count = %d,\n", type->struct_decl.member_count));
+                }
+
+                c_string_builder_append_data(&file_builder, STR("};\n"));
+            }break;
+            case CODE_TYPE_ENUM:
+            {
+            }break;
+            case CODE_TYPE_LAMBDA:
+            {
+            }break;
+#endif
+
+int
+main(int argc, char **argv)
+{
+    // NOTE(Sleepster): Just for the threadpool 
+    c_global_context_init();
+
+    // NOTE(Sleepster): Thread init 
+    permanent_arena = c_arena_create(MB(10));
+    transient_arena = c_arena_create(MB(10));
+
+    // NOTE(Sleepster): This is a global READ ONLY dataset
+    initialize_default_language_info();
+
+    // NOTE(Sleepster): Thread init 
+    Expect(argc > 1, "You must pass a file to parse or a target directory that contains these files...\n");
+
+    char **requested_filename    = c_program_flag_add_string("-filename", null, "This is the file we wish to parse...\n");
+    char   **requested_directory = c_program_flag_add_string("-directory", null, "Points to the directory you wish to parse...\n");
+    bool32 *recursive            = c_program_flag_add_bool32("-recursive", false, "Denotes recursive parsing over the passed directory...\n");
+
+    c_program_flag_parse_args(argc, argv);
+
+#if 0
+    //u32 thread_count = 1;
+    u32 thread_count = sys_get_thread_count() - 1;
+    c_threadpool_init(&global_context->main_threadpool, thread_count, MB(200), true, false);
+#endif
+
+    const char *filepath;
+    bool8 directory = false;
+    if(*requested_directory)
+    {
+        filepath  = *requested_directory;
+        directory = true;
+    }
+    else
+    {
+        filepath = *requested_filename;
+    }
+   
+    athena_handle_type_info(filepath, directory, *recursive);
     return(0);
 }

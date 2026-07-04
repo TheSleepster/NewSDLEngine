@@ -61,6 +61,7 @@ symbol_table_init(string_t filepath, bool8 recursive)
     g_symbol_table.file_parsers = c_arena_push_array(&permanent_arena, parser_t, g_symbol_table.file_count); 
 
     g_symbol_table.defined_global_macro_table = hash_table_create<macro_info_t>(1024);
+    g_symbol_table.type_table                 = hash_table_create<code_type_t*>(24571);
     g_symbol_table.is_initialized = true;
 }
 

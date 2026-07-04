@@ -10,6 +10,10 @@
 #include <c_base.h>
 #include <c_types.h>
 
+// TODO(Sleepster): 
+// Subarenas. Arenas that cannot grow in size, and are part of the parent arena. 
+// This way we can have many arenas share the same lifetime.
+
 struct memory_arena_footer_t
 {
     byte *last_base;

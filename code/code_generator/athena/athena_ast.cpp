@@ -775,7 +775,7 @@ generate_structure_AST(parser_t *parser)
         inheritance_node            = AST_create_new_node(&parser->arena, parser->active_decl_context);
         inheritance_node->node_type = AST_NODE_TYPE_INHERITANCE_INFO;
 
-        code_type_t *inherited_type = parser_register_code_type_identifier(parser, inherited_typename.data);
+        code_type_t *inherited_type = parser_register_code_type_identifier(parser, c_string_make_copy(&parser->arena, inherited_typename.data));
 
         inheritance_node->inheritance_info.inheritance_type = inheritance_publicity_token.token_type;
         inheritance_node->inheritance_info.inherited_data   = inheritance_node;
@@ -828,7 +828,7 @@ generate_structure_AST(parser_t *parser)
         if(name_token.token_type == TOKEN_TYPE_IDENT) 
         {
             structure_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
-            structure_type = parser_register_code_type_identifier(parser, name_token.data);
+            structure_type = parser_register_code_type_identifier(parser, structure_root->identifier);
 
             // NOTE(Sleepster): Create a new declaration_context_t for this scope, then push items onto it. 
             declaration_context_t *context = parser_create_declaration_context(parser, 
@@ -1121,7 +1121,7 @@ generate_enum_AST(parser_t *parser)
         }
         else 
         {
-            enum_root->identifier = STR("anonymous");
+            enum_root->identifier = c_string_make_copy(&parser->arena, STR("anonymous"));
         }
 
         code_type_t *enum_type    = parser_register_code_type_identifier(parser, enum_root->identifier);
@@ -1312,7 +1312,7 @@ generate_typedef_AST(parser_t *parser)
                 {
                     code_type_t *main_type = parser_search_for_code_type(parser, type_token.data);
 
-                    parser_register_code_type_identifier(parser, alias_token.data, main_type);
+                    parser_register_code_type_identifier(parser, c_string_make_copy(&parser->arena, alias_token.data), main_type);
                     printf("FOUND TYPE ALIAS: '%.*s' OF TYPE: '%.*s'...\n",
                            fprint_token(alias_token), fprint_token(type_token));
 
