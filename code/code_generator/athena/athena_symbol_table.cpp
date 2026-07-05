@@ -671,6 +671,7 @@ parser_register_code_type_identifier(parser_t *parser, string_t identifier, code
         result->identifier    = identifier;
         result->alias_of      = type_alias;
         result->is_registered = true;
+        result->owner_file    = parser->filename;
 
         hash_table_add_element(&parser->active_decl_context->local_types, &result, identifier);
     }

@@ -100,6 +100,7 @@ struct code_type_t
     bool8        type_inferred;
 
     string_t     identifier;
+    string_t     owner_file;
     u64          ID;
     code_type_t *alias_of = null;
     AST_node_t  *type_data;

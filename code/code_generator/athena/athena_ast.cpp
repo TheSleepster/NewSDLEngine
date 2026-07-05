@@ -819,7 +819,6 @@ generate_structure_AST(parser_t *parser)
         structure_root->node_type  = AST_NODE_TYPE_STRUCTURE;
         structure_root->type.flags = structure_flags;
 
-        structure_root->parent_file = c_string_make_copy(&parser->arena, parser->filename);
         structure_root->line_number = parser->lexer.current_stream->line_number;
 
         // NOTE(Sleepster): Copy the attributes 
@@ -1129,16 +1128,17 @@ generate_enum_AST(parser_t *parser)
         }
 
         // NOTE(Sleepster): Record the name of the enum if there is one. 
+        code_type_t *enum_type = null;
         if(name_token.token_type == TOKEN_TYPE_IDENT) 
         {
             enum_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
+            enum_type = parser_register_code_type_identifier(parser, enum_root->identifier);
         }
         else 
         {
             enum_root->identifier = c_string_make_copy(&parser->arena, STR("anonymous"));
         }
 
-        code_type_t *enum_type    = parser_register_code_type_identifier(parser, enum_root->identifier);
         enum_root->type.code_type = enum_type;
         for(;;)
         {
