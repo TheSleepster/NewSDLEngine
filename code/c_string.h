@@ -73,6 +73,9 @@ u32         c_string_read_uint(string_t data);
 float32     c_string_read_float32(string_t data);
 float64     c_string_read_float64(string_t data);
 
+u32      c_string_find_all_instances_of(string_t string, u8 character);
+string_t c_string_replace_all_instances_of(memory_arena_t *arena, string_t string, u8 character, u8 replacement);
+
 // MACROS
 #define STR(x)                (string_t){.data = (byte*)x, .count = c_string_length(x)}
 #define C_STR(x)              ((const char *)x.data)

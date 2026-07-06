@@ -564,6 +564,41 @@ c_string_get_current_line_size(string_t string)
     return(result);
 }
 
+u32
+c_string_find_all_instances_of(string_t string, u8 character)
+{
+    u32 result = 0;
+    for(u32 index = 0;
+        index < string.count;
+        ++index)
+    {
+        if(character == string.data[index])
+        {
+            ++result;
+        }
+    }
+
+    return(result);
+}
+
+string_t
+c_string_replace_all_instances_of(memory_arena_t *arena, string_t string, u8 character, u8 replacement)
+{
+    string_t result = {};
+
+    result = c_string_make_copy(arena, string);
+    for(u32 index = 0;
+        index < string.count;
+        ++index)
+    {
+        if(character == string.data[index])
+        {
+            result.data[index] = replacement;
+        }
+    }
+
+    return(result);
+}
 
 ///////////////////
 // STRING BUILDER
