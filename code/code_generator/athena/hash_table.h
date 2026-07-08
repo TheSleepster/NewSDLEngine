@@ -118,7 +118,7 @@ hash_table_get_hash_element(hash_table_t<T> *table, u64 index, u64 key_hash)
     // Check the index, if there is a collision and the raw key_hashes do not match we move 
     // forward 1 index at a time until we find an a hash that is either 0 or matches our key_hash.
     result = table->items + index;
-    while(result->raw_key_hash != 0 && result->raw_key_hash != key_hash)
+    while(result->raw_key_hash != 0 && key_hash != result->raw_key_hash)
     {
         index = (index + 1) % table->max_entries;
         result = table->items + index;

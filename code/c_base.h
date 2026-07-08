@@ -156,8 +156,8 @@ CODE_GEN_IGNORE_FILE()
 #define PtrFromInt(x)                ((void *) ((char *)0 + (x)))
 
 #define MemberHelper(type, member)   (((type *)0)->member)
-#define OffsetOf(type, member)       (&MemberHelper(type, member))
-#define OffsetOfInt(type, member)    (IntFromPtr(OffsetOf(type, member)))
+#define OffsetOf_(type, member)      (&MemberHelper(type, member))
+#define OffsetOf(type, member)       (IntFromPtr(OffsetOf_(type, member)))
 
 #define ZeroMemory(data, size)       (memset((data), 0, (size)))
 #define ZeroStruct(type)             (ZeroMemory(&type, sizeof(type)))

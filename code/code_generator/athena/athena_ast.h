@@ -133,6 +133,7 @@ struct AST_node_t
 {
     u32                          node_type;
     string_t                     identifier;
+    string_t                     identity_tag;
 
     AST_node_t                  *parent;
     u32                          line_number;

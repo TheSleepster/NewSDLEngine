@@ -6,15 +6,20 @@
    ======================================================================== */
 
 // C++ variant
-struct item_t 
+struct item
 {
     int item_member;
     int item_member_one;
+
+    struct  other_item_group {
+        item *subitem;
+        char *name;
+    };
+    // TODO: Not found...
+    int item_member_one;
 };
 
-// C Variant
-typedef struct other_item
+static void
+item()
 {
-    int item_typedeffed_member;
-    int item_typedeffed_member_one;
-}other_item_t;
+}

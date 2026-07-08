@@ -108,6 +108,30 @@ struct code_type_t
     u32          code_metatype;
 };
 
+#if 0
+struct item {
+    u32 ID;
+    char *name;
+};
+
+struct entity_manager {
+    entity_t *entities;
+    u32       entity_count;
+
+    struct item {
+        u32 sector;
+    };
+};
+
+void item()
+{
+}
+
+void item(u32 item_ID)
+{
+}
+#endif
+
 struct language_info_t
 {
     dynarray_t<language_keyword_t> keywords;

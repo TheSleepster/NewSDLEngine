@@ -992,10 +992,11 @@ generate_type_information(ast_file_data_t *ast)
     c_string_builder_sprintf(type_enum_builder, "#define GENERATED_PROGRAM_RTTI_H\n\n");
     c_string_builder_sprintf(type_enum_builder, "#ifndef CODE_GEN_IGNORE_FILE\n#define CODE_GEN_IGNORE_FILE()\n#endif\n");
     c_string_builder_sprintf(type_enum_builder, "#ifndef OffsetOf\n");
-    c_string_builder_sprintf(type_enum_builder, "#define OffsetOf(type, member) ((size_t)&(((type*)0)->member))\n");
-    c_string_builder_sprintf(type_enum_builder, "#endif\n\n");
-    c_string_builder_sprintf(type_enum_builder, "#ifndef IntFromPtr\n");
-    c_string_builder_sprintf(type_enum_builder, "#define IntFromPtr(x) ((u32) ((char *)x - (char*)0))\n");
+    c_string_builder_sprintf(type_enum_builder, R"(
+#define MemberHelper(type, member) (((type *)0)->member)
+#define OffsetOf_(type, member)    (&MemberHelper(type, member))
+#define OffsetOf(type, member)     (IntFromPtr(OffsetOf_(type, member)))
+    )");
     c_string_builder_sprintf(type_enum_builder, "#endif\n\n");
     c_string_builder_sprintf(type_enum_builder, "#include <stdio.h>\n\n");
     c_string_builder_sprintf(type_enum_builder, "#ifndef Assert\n");
@@ -1317,7 +1318,7 @@ typedef struct type_info_data_mapping
                 string_t fullname = c_string_concat(&global_context->temporary_arena, nested_name, STR("."));
                 fullname = c_string_concat(&global_context->temporary_arena, fullname, member->name);
                 c_string_builder_sprintf(struct_info_builder, ".size = sizeof(decltype(%.*s)), ", fullname.count, C_STR(fullname));
-                c_string_builder_sprintf(struct_info_builder, ".offset = IntFromPtr(OffsetOf(decltype(%.*s), %.*s))},\n", 
+                c_string_builder_sprintf(struct_info_builder, ".offset = OffsetOf(decltype(%.*s), %.*s)},\n", 
                                          nested_name.count, C_STR(nested_name),
                                          member->name.count, C_STR(member->name));
             }

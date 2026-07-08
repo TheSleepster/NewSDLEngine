@@ -57,29 +57,33 @@ struct type_info_t
     unsigned int size;
 };
 
-struct type_info_member_t: public type_info_t
+struct type_info_member_t
 {
+    const type_info_t        *type_info;
     const char               *member_name;
     const type_info_struct_t *parent;
-    //unsigned_int              array_size;
+    unsigned int              offset;
+    //unsigned_int            array_size;
     unsigned int              flags;
     unsigned int              pointer_depth;
 
     type_default_value_t      value;
 };
 
-struct type_info_struct_t: public type_info_t
+struct type_info_struct_t
 {
-    unsigned int              member_count;
-    const type_info_member_t *members;
+    const type_info_t type_info;
+    unsigned int      member_count;
 };
 
-struct type_info_procedure_t: public type_info_t
+struct type_info_procedure_t
 {
+    type_info_t               type_info;
     unsigned int              argument_count;
     const type_info_t        *return_type;
     const type_info_member_t *arguments;
 };
+
 
 struct athena_reflection_bundle_t
 {
@@ -121,7 +125,7 @@ type_info()
     template <> \
     inline const type_info_t* \
     type_info<cpp_type>() { \
-        return(static_cast<const type_info_t *>(structure); \
+        return(static_cast<const type_info_t *>(structure)); \
     }
     
     ATHENA_RTTI_COMPLETE_TYPE_LIST(X)
@@ -131,7 +135,7 @@ template<typename T>
 ATHENA_API inline const type_info_t*
 type_info(const T &item)
 {
-    return type_info<T>();
+    return(type_info<T>());
 }
 
 // NOTE(Sleepster): STB style lib
@@ -140,12 +144,11 @@ ATHENA_API inline const type_info_t        *type_info(string_t string);
 ATHENA_API inline const type_info_member_t *athena_get_member_info(const type_info_t *type_info, string_t member_name);
 #endif
 
-
 ATHENA_API inline const type_info_t        *type_info(unsigned long long type_id);
 ATHENA_API inline const type_info_t        *type_info(const char *string);
 ATHENA_API inline const type_info_member_t *athena_get_member_info(const type_info_t *type_info, const char *member_name);
 ATHENA_API inline const type_info_struct_t *athena_get_struct_info_from_member(const type_info_t *info);
-ATHENA_API inline const type_info_struct_t *athena_get_struct_info_from_member(const type_info_member_t *member)
+ATHENA_API inline const type_info_struct_t *athena_get_struct_info_from_member(const type_info_member_t *member);
 
 #endif // ATHENA_H
 

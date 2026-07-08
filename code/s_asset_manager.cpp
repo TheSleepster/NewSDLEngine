@@ -37,6 +37,10 @@
 #include <asset_file_packer/jfd_asset_file.h>
 #include <meta/GENERATED_program_RTTI.h>
 
+#if 0
+#include <meta/ATHENA_GENERATED_RTTI.h>
+#endif
+
 internal_api
 C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
 {

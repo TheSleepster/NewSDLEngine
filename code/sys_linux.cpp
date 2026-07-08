@@ -878,7 +878,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher, bool8 *changed)
 
         if(!directory_data)
         {
-            u64 this_event_size = IntFromPtr(OffsetOf(struct inotify_event, name) + event->len);
+            u64 this_event_size = OffsetOf(struct inotify_event, name) + event->len;
             offset += this_event_size;
             continue;
         }

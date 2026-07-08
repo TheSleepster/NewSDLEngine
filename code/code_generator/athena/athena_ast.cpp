@@ -736,6 +736,7 @@ parse_argument_list(parser_t *parser)
     return(result);
 }
 
+// TODO(Sleepster): STRUCT PARSING IS BROKEN
 internal_api AST_node_t* 
 generate_structure_AST(parser_t *parser)
 {
@@ -857,11 +858,19 @@ generate_structure_AST(parser_t *parser)
 
         structure_root->type.code_type = structure_type;
 
+        u32 scope_depth = 1;
         lexer_token_t typename_token = {};
-        while(typename_token.token_type != TOKEN_TYPE_EOF)
+        while(scope_depth > 0 && typename_token.token_type != TOKEN_TYPE_EOF)
         {
             typename_token = parser_get_next_lexer_token(parser);
-            if(typename_token.token_type == TOKEN_TYPE_CLOSE_BRACE) break;
+            if(typename_token.token_type == TOKEN_TYPE_CLOSE_BRACE) 
+            {
+                lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 1);
+                if(peek_token.token_type == TOKEN_TYPE_SEMICOLON || peek_token.token_type == TOKEN_TYPE_IDENT)
+                {
+                    --scope_depth;
+                }
+            }
 
             if(typename_token.token_type == TOKEN_TYPE_STRUCT)
             {
@@ -982,7 +991,6 @@ generate_structure_AST(parser_t *parser)
                     else if(typename_token.token_type == TOKEN_TYPE_IDENT)
                     {
                         parser_get_next_lexer_token(parser);
-
                         for(u32 pointer_index = 0;
                             pointer_index < pointer_depth;
                             ++pointer_index)
@@ -1032,8 +1040,16 @@ generate_structure_AST(parser_t *parser)
                     else if(typename_token.token_type == TOKEN_TYPE_STRUCT || 
                             typename_token.token_type == TOKEN_TYPE_UNION)
                     {
-                        AST_node_t *nested_structure = generate_structure_AST(parser);
-                        AST_add_member(structure_root, nested_structure);
+                        lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 1);
+                        if(peek_token.token_type == TOKEN_TYPE_IDENT)
+                        {
+                            AST_node_t *nested_structure = generate_structure_AST(parser);
+                            AST_add_member(structure_root, nested_structure);
+                        }
+                        else if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
+                        {
+                            ++scope_depth;
+                        }
                     }
                 }
                 if(member_name_token.token_type == TOKEN_TYPE_OPEN_PAREN || 
@@ -1085,6 +1101,13 @@ generate_structure_AST(parser_t *parser)
         }
 
         result = structure_root;
+#if 0
+        string_t identity_tag = c_string_concat(&parser->arena, result->identifier, STR("_structure"));
+                 identity_tag = c_string_concat(&parser->arena, parser->active_decl_context->lexical_scope, identity_tag);
+
+        result->identity_tag = identity_tag;
+        hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identity_tag);
+#endif
         hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
     }
 
@@ -1187,7 +1210,14 @@ generate_enum_AST(parser_t *parser)
         result = enum_root;
     }
 
+#if 0
+    string_t identity_tag = c_string_concat(&parser->arena, result->identifier, STR("_enum"));
+    identity_tag = c_string_concat(&parser->arena, parser->active_decl_context->lexical_scope, identity_tag);
+
+    result->identity_tag = identity_tag;
+#endif
     hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
+
     return(result);
 }
 

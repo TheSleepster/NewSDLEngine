@@ -313,7 +313,7 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
     asset_manager_t  *asset_manager  = ui_state->asset_manager;
     (void)asset_manager;
 
-widget_t *current_widget = ui_state->first_widget;
+    widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
     {
         render_widget_hierarchy(ui_state, command_list, current_widget);
