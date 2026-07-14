@@ -1080,7 +1080,16 @@ deduce_AST_node_type_data(void)
                     }break;
                     case AST_NODE_TYPE_LAMBDA:
                     {
-                        // TODO(Sleepster): Evaluate expressions on arguments 
+                        // NOTE(Sleepster): Evaluate expressions on arguments 
+                        for(AST_node_t *current_argument = code_decl->lambda.first_argument;
+                            current_argument;
+                            current_argument = current_argument->next_sibling)
+                        {
+                            if(current_argument->expression.info)
+                            {
+                                current_argument->expression.value = evaluate_expression_AST(current_argument->expression.info);
+                            }
+                        }
                     }break;
                 }
             }
@@ -1106,19 +1115,9 @@ consolidate_AST_types(void)
         {
             code_type_t *type = element->item;
             Assert(type->identifier.count > 0 && type->identifier.data != 0);
-            if(c_string_compare(type->identifier, STR("item_t")))
-            {
-                int x = 0;
-            }
-
-            if(c_string_compare(type->identifier, STR("item")))
-            {
-                int x = 0;
-            }
 
             code_type_t *found = hash_table_get_element(&g_symbol_table.type_table, type->identifier);
-            if((!found || (found && !found->is_registered)) ||
-               ((found && found->type_data) && (found->type_data->node_type == type->type_data->node_type)))
+            if((!found || (found && !found->is_registered)))
             {
                 hash_table_add_element(&g_symbol_table.type_table, &type, type->identifier);
             }
@@ -1305,18 +1304,8 @@ output_type_info_member_data(string_builder_t *builder, code_type_t *type, AST_n
     c_string_builder_sprintf(builder, "\t\t.%.*s = {\n", fprint_string(current_member->identifier));
     c_string_builder_sprintf(builder, "\t\t\t.type_info     = athena_type_information_array[TYPE_%.*s],\n", fprint_string(current_member->type.code_type->identifier));
     c_string_builder_sprintf(builder, "\t\t\t.member_name   = \"%.*s\",\n", fprint_string(current_member->identifier));
-    switch(current_member->node_type)
-    {
-        case AST_NODE_TYPE_STRUCTURE:
-        case AST_NODE_TYPE_ENUM:
-        {
-            c_string_builder_sprintf(builder, "\t\t\t.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_%.*s),\n", fprint_string(type->identifier));
-        }break;
-        case AST_NODE_TYPE_LAMBDA:
-        {
-            c_string_builder_sprintf(builder, "\t\t\t.parent        = static_cast<type_info_procedure_t*>(&DEFAULT_type_procedure_%.*s),\n", fprint_string(type->identifier));
-        };
-    }
+    c_string_builder_sprintf(builder, "\t\t\t.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_%.*s),\n", fprint_string(type->identifier));
+
     //c_string_builder_sprintf(&builder, ".array_size  = %lu,\n", type_data->type.flags);
     if(current_member->node_type == AST_NODE_TYPE_STRUCTURE_MEMBER)
     {

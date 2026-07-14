@@ -24,12 +24,9 @@
 	X(uint32_t, TYPE_uint32_t, &DEFAULT_type_uint32_t, "uint32_t") \
 	X(uint64_t, TYPE_uint64_t, &DEFAULT_type_uint64_t, "uint64_t") \
 	X(size_t, TYPE_size_t, &DEFAULT_type_size_t, "size_t") \
-	X(u32, TYPE_u32, &DEFAULT_type_u32, "u32") \
-	X(get_value, TYPE_get_value, &DEFAULT_type_procedure_get_value, "get_value") \
-	X(item_t, TYPE_item_t, &DEFAULT_type_item_t, "item_t") \
-	X(string_t, TYPE_string_t, &DEFAULT_type_string_t, "string_t") \
+	X(item, TYPE_item, &DEFAULT_type_structure_item, "item") \
+	X(other_item_group, TYPE_other_item_group, &DEFAULT_type_structure_other_item_group, "other_item_group") \
 	X(get_item, TYPE_get_item, &DEFAULT_type_procedure_get_item, "get_item") \
-	X(u64, TYPE_u64, &DEFAULT_type_u64, "u64") \
 
 
 enum athena_program_types {
@@ -143,15 +140,30 @@ void athena_handle_type_info(const char *filepath, int directory, int recursive)
 #endif
 
 extern const type_info_t *athena_type_information_array[];
-struct type_info_procedure_get_value {
-	const type_info_t  type_info;
-	unsigned int       argument_count;
-	const type_info_t *return_type;
+struct type_info_struct_item {
+	const type_info_t type_info;
+	unsigned int member_count;
 	union {
-		type_info_member_t argument_array[1];
+		const type_info_member_t member_array[5];
 		struct {
-			const type_info_member_t apples;
-		}arguments;
+			const type_info_member_t item_member;
+			const type_info_member_t item_member_one;
+			const type_info_member_t other_item_group;
+			const type_info_member_t get_item;
+			const type_info_member_t item_member_one;
+		}members;
+	};
+};
+
+struct type_info_struct_other_item_group {
+	const type_info_t type_info;
+	unsigned int member_count;
+	union {
+		const type_info_member_t member_array[2];
+		struct {
+			const type_info_member_t subitem;
+			const type_info_member_t name;
+		}members;
 	};
 };
 
@@ -162,7 +174,7 @@ struct type_info_procedure_get_item {
 	union {
 		type_info_member_t argument_array[1];
 		struct {
-			const type_info_member_t item_ID;
+			const type_info_member_t name;
 		}arguments;
 	};
 };
@@ -261,35 +273,96 @@ constexpr type_info_t DEFAULT_typedata_size_t = {
 	.type_id = TYPE_size_t,
 	.size = sizeof(size_t),
 };
-constexpr type_info_procedure_get_value DEFAULT_typedata_procedure_get_value = {
+constexpr type_info_struct_item DEFAULT_typedata_structure_item = {
 	.type_info = {
-		.type_name = "get_value",
-		.type_id = TYPE_get_value,
+		.type_name = "item",
+		.type_id = TYPE_item,
+		.size = sizeof(item),
 	},
-	.return_type    = athena_type_information_array[TYPE_u32],
-	.argument_count = 1,
-	.arguments = {
-		.apples = {
+	.member_count = 5,
+	.members = {
+		.item_member = {
 			.type_info     = athena_type_information_array[TYPE_int],
-			.member_name   = "apples",
+			.member_name   = "item_member",
+			.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_item),
+			.offset        = OffsetOf(item, item_member),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.item_member_one = {
+			.type_info     = athena_type_information_array[TYPE_int],
+			.member_name   = "item_member_one",
+			.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_item),
+			.offset        = OffsetOf(item, item_member_one),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.other_item_group = {
+			.type_info     = athena_type_information_array[TYPE_other_item_group],
+			.member_name   = "other_item_group",
+			.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_item),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.get_item = {
+			.type_info     = athena_type_information_array[TYPE_get_item],
+			.member_name   = "get_item",
+			.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_item),
+			.flags         = 1024,
+			.pointer_depth = 0,
+		},
+		.item_member_one = {
+			.type_info     = athena_type_information_array[TYPE_int],
+			.member_name   = "item_member_one",
+			.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_item),
+			.offset        = OffsetOf(item, item_member_one),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
+
+constexpr type_info_struct_other_item_group DEFAULT_typedata_structure_other_item_group = {
+	.type_info = {
+		.type_name = "other_item_group",
+		.type_id = TYPE_other_item_group,
+		.size = sizeof(other_item_group),
+	},
+	.member_count = 2,
+	.members = {
+		.subitem = {
+			.type_info     = athena_type_information_array[TYPE_item],
+			.member_name   = "subitem",
+			.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_other_item_group),
+			.offset        = OffsetOf(other_item_group, subitem),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.name = {
+			.type_info     = athena_type_information_array[TYPE_char],
+			.member_name   = "name",
+			.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_other_item_group),
+			.offset        = OffsetOf(other_item_group, name),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+
 constexpr type_info_procedure_get_item DEFAULT_typedata_procedure_get_item = {
 	.type_info = {
 		.type_name = "get_item",
 		.type_id = TYPE_get_item,
 	},
-	.return_type    = athena_type_information_array[TYPE_item_t],
+	.return_type    = athena_type_information_array[TYPE_item],
 	.argument_count = 1,
 	.arguments = {
-		.item_ID = {
-			.type_info     = athena_type_information_array[TYPE_u64],
-			.member_name   = "item_ID",
-			.flags         = 0,
-			.pointer_depth = 0,
+		.name = {
+			.type_info     = athena_type_information_array[TYPE_char],
+			.member_name   = "name",
+			.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_get_item),
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
 	},
 };
@@ -313,12 +386,9 @@ constexpr type_info_t *athena_type_information_array[] = {
 	&DEFAULT_typedata_uint32_t
 	&DEFAULT_typedata_uint64_t
 	&DEFAULT_typedata_size_t
-	&DEFAULT_typedata_u32
-	&DEFAULT_typedata_procedure_get_value
-	&DEFAULT_typedata_item_t
-	&DEFAULT_typedata_string_t
+	&DEFAULT_typedata_structure_item
+	&DEFAULT_typedata_structure_other_item_group
 	&DEFAULT_typedata_procedure_get_item
-	&DEFAULT_typedata_u64
 };
 
 

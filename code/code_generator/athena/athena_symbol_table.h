@@ -96,16 +96,21 @@ enum code_type_metatype_t
 
 struct code_type_t
 {
-    bool8        is_registered;
-    bool8        type_inferred;
-
-    string_t     identifier;
-    string_t     owner_file;
     u64          ID;
-    code_type_t *alias_of = null;
     AST_node_t  *type_data;
+    code_type_t *next_type;
+};
 
-    u32          code_metatype;
+// NOTE(Sleepster): Replacement for the old code_type_t. Make this a list of types. 
+struct code_type_info_t
+{
+    bool8             is_registered;
+    string_t          identifier;
+    string_t          owner_file;
+    u32               code_metatype;
+
+    code_type_info_t *alias_of = null;
+    code_type_t       first_type;
 };
 
 #if 0
@@ -189,7 +194,7 @@ struct symbol_table_t
     volatile u32                      next_parser_index;
         
     hash_table_t<macro_info_t>        defined_global_macro_table;
-    hash_table_t<code_type_t*>        type_table;
+    hash_table_t<code_type_info_t*>   type_table;
     dynarray_t<declaration_context_t> declaration_contexts;
 };
 

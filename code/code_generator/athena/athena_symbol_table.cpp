@@ -144,7 +144,7 @@ parser_create(string_t filename, string_t file_data)
     lexer_create(&parser->lexer, file_data);
     parser->macro_table = hash_table_create<macro_info_t>(1024);
 
-    string_t scope_string = STR("global");
+    string_t scope_string = c_string_get_filename_from_path(filename);
     declaration_context_t *global_scope = parser_create_declaration_context(parser, c_string_make_copy(&permanent_arena, scope_string), null);
     Expect(g_language_info.language_primitive_types.items != null,
            "Cannot initialize the parser without primtive type information... Make sure you call initialize_default_language_info() before you call this function!\n");
@@ -241,81 +241,6 @@ initialize_default_language_info(void)
     }
 }
 
-#if 0
-internal_api lexer_token_stream_t 
-parser_substitute_macro_arguments(parser_t *parser, lexer_token_t last_token, macro_info_t *macro_info)
-{
-    // TODO(Sleepster): Handle macros like:
-    // #define item(name) item_##name 
-    
-    lexer_token_stream_t result = {};
-    lexer_t *lexer = &parser->lexer;
-    
-    lexer_token_t next_expansion_token = lexer_peek_token(lexer);
-    // NOTE(Sleepster): If the macro takes arguments... 
-    if(next_expansion_token.token_type == TOKEN_TYPE_OPEN_PAREN && last_token.data.data[last_token.data.count] != ' ')
-    {
-        Expect(next_expansion_token.token_type == TOKEN_TYPE_OPEN_PAREN,
-               "When attempting to substitute arguments of a macro, we failed to find the invocation (which is an '(') and instead were left with: '%.*s'...\n",
-               fprint_token(next_expansion_token));
-        next_expansion_token = lexer_get_next_token(lexer);
-
-        result = lexer_copy_token_stream(&parser->arena, &macro_info->expansion_token_stream);
-
-        // NOTE(Sleepster): Go through each of the arguments and find every token that matches that argument, replace this
-        // with the actual argument from the macro.
-    
-        u32 macro_argument_index = 0;
-        while(next_expansion_token.token_type != TOKEN_TYPE_CLOSE_PAREN)
-        {
-            // NOTE(Sleepster): Get our argument string
-            next_expansion_token = lexer_get_next_token(lexer);
-            Expect(next_expansion_token.token_type != TOKEN_TYPE_COMMA,
-                   "Expected to find another argument when expanding this macro, instead found: '%.*s'...\n",
-                   fprint_token(next_expansion_token));
-
-            if(macro_info->argument_count)
-            {
-                string_t macro_argument = macro_info->arguments[macro_argument_index];
-                for(u32 token_index = 0;
-                    token_index < macro_info->expansion_token_stream.buffered_token_count;
-                    ++token_index)
-                {
-                    lexer_token_t *macro_token = result.token_buffer + token_index;
-                    if(c_string_compare(macro_token->data, macro_argument))
-                    {
-                        *macro_token = next_expansion_token;
-                        ++macro_argument_index;
-
-                        break;
-                    }
-                }
-
-                lexer_token_t check_token = lexer_peek_token(lexer, 1);
-                if(check_token.token_type != TOKEN_TYPE_COMMA && check_token.token_type != TOKEN_TYPE_CLOSE_PAREN)
-                {
-                    report_error(parser,
-                                 "Invalid token when parsing the end of this macro invocation's argument string... token found was: '%.*s'...\n",
-                                 fprint_token(check_token));
-                }
-                lexer_get_next_token(lexer);
-                if(check_token.token_type == TOKEN_TYPE_CLOSE_PAREN)
-                {
-                    break;
-                }
-            }
-        }
-    }
-    // NOTE(Sleepster): If it does not... 
-    else
-    {
-        result = macro_info->expansion_token_stream;
-    }
-
-    return(result);
-}
-
-#else
 internal_api lexer_token_stream_t
 parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, macro_info_t *macro_info)
 {
@@ -396,22 +321,10 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
             }
         }
 
-#if 0
-        string_builder_t builder = {};
-        c_string_builder_init(&builder, KB(4));
-        for(lexer_token_t &token: expansion_tokens)
-        {
-            c_string_builder_append_data(&builder, token.data);
-        }
-
-        string_t resulting_string = c_string_builder_get_current_string(&builder);
-        lexer_init_token_stream_from_string(&result, resulting_string);
-#else
         lexer_init_token_stream_from_token_array(&parser->arena, &result, expansion_tokens.items, expansion_tokens.used);
         result.string = c_string_make_copy(&parser->arena, macro_info->expansion_string);
         result.start  = result.string.data;
         result.initial_length = result.string.count;
-#endif
     }
     else
     {
@@ -421,122 +334,6 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
 
     return(result);
 }
-#endif
-
-#if 0
-internal_api lexer_token_stream_t
-parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name_token, macro_info_t *macro_info)
-{
-    lexer_token_stream_t result = {};
-
-    // NOTE(Sleepster): If the macro takes arguments... 
-    lexer_token_t next_expansion_token = lexer_peek_token(&parser->lexer);
-    if(next_expansion_token.token_type == TOKEN_TYPE_OPEN_PAREN && macro_name_token.data.data[macro_name_token.data.count] != ' ')
-    {
-        if(next_expansion_token.token_type != TOKEN_TYPE_OPEN_PAREN)
-        {
-            report_error(parser,
-                         "Expected to find another argument when expanding this macro, instead found: '%.*s'...\n",
-                         fprint_token(next_expansion_token));
-        }
-
-        u32 current_macro_depth = 1;
-        u32 total_macro_depth   = 0;
-        next_expansion_token = lexer_get_next_token(&parser->lexer);
-
-        lexer_push_bookmark(&parser->lexer, next_expansion_token);
-        while(current_macro_depth > 0)
-        {
-            next_expansion_token = lexer_get_next_token(&parser->lexer);
-            if(next_expansion_token.token_type == TOKEN_TYPE_CLOSE_PAREN)
-            {
-                --current_macro_depth;
-            }
-
-            macro_info_t *new_macro_info = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, next_expansion_token.data);
-            if(new_macro_info && new_macro_info->is_set)
-            {
-                ++current_macro_depth;
-                ++total_macro_depth;
-            }
-        }
-        lexer_pop_bookmark(&parser->lexer);
-
-        dynarray_t<lexer_token_t> expansion_tokens = {};
-        defer(dynarray_free(&expansion_tokens));
-
-        dynarray_t<dynarray_t<lexer_token_t>> argument_tokens = {};
-        defer(for(auto &element: argument_tokens) { dynarray_free(&element); });
-
-        lexer_token_stream_t *current_macro_stream = &macro_info->expansion_token_stream;
-
-        u32 macro_argument_index = 0;
-        current_macro_depth = total_macro_depth;
-        while(current_macro_depth > 0)
-        {
-            lexer_token_t token = lexer_get_next_token(&parser->lexer);
-            if(token.token_type != TOKEN_TYPE_IDENT && token.token_type != TOKEN_TYPE_NUMBER)
-            {
-                report_error(parser,
-                             "Expected to find either an identifier or a number when parsing macro aguments... Instead found: '%.*s'...\n",
-                             fprint_token(token));
-            }
-
-            // NOTE(Sleepster): If we find an identifier and it's not a macro, then it's just something we normally care about. 
-            //
-            // Just do a dumb copy on all the items as needed.
-            string_t macro_argument = macro_info->arguments[macro_argument_index];
-
-            for(u32 argument_index = 0;
-                argument_index < macro_info->argument_count;
-                ++argument_index)
-            {
-                macro_argument = macro_info->arguments[argument_index];
-                for(u32 token_index = 0;
-                    token_index < macro_info->expansion_token_stream.buffered_token_count;
-                    ++token_index)
-                {
-                    lexer_token_t *macro_token = current_macro_stream->token_buffer + token_index;
-                    if(c_string_compare(macro_token->data, macro_argument))
-                    {
-                        while(token.token_type != TOKEN_TYPE_COMMA && token.token_type != TOKEN_TYPE_CLOSE_PAREN)
-                        {
-                            dynarray_add(&expansion_tokens, &token);
-                            token = lexer_get_next_token(&parser->lexer);
-                            if(token.token_type == TOKEN_TYPE_OPEN_PAREN)
-                            {
-                                // NOTE(Sleepster): If there is a nested macro as the argument... 
-                                while(token.token_type != TOKEN_TYPE_CLOSE_PAREN)
-                                {
-                                    token = lexer_get_next_token(&parser->lexer);
-                                    dynarray_add(&expansion_tokens, &token);
-                                }
-                            } 
-                        }
-
-                        // NOTE(Sleepster): Do not include the comma!!!! 
-                        if(token.token_type == TOKEN_TYPE_COMMA)
-                        {
-                            token = lexer_get_next_token(&parser->lexer);
-                        }
-                    }
-                    else
-                    {
-                        dynarray_add(&expansion_tokens, macro_token);
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-        // NOTE(Sleepster): Otherwise, just return the default stream 
-        result = macro_info->expansion_token_stream;
-    }
-
-    return(result);
-}
-#endif
 
 internal_api lexer_token_t
 parser_fetch_next_token(parser_t *parser)
@@ -650,18 +447,9 @@ parser_search_for_code_type(parser_t *parser, string_t identifier)
     return(result);
 }
 
-#if 0
-internal_api code_type_t*
-is_type_within_declaration_context(declaration_context_t *context, string_t identifier)
-{
-    code_type_t *result = null;
-    return(result);
-}
-#endif
-
 // register code_type
 internal_api code_type_t* 
-parser_register_code_type_identifier(parser_t *parser, string_t identifier, code_type_t *type_alias = null)
+parser_register_code_type(parser_t *parser, string_t identifier, code_type_t *type_alias = null)
 {
     code_type_t *result = parser_search_for_code_type(parser, identifier);
     if(!result)

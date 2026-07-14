@@ -681,7 +681,7 @@ parse_argument_list(parser_t *parser)
             argument->identifier = c_string_make_copy(&parser->arena, declaration_name.data);
 
             AST_type_t *type_data = &argument->type;
-            type_data->code_type  = parser_register_code_type_identifier(parser, c_string_make_copy(&parser->arena, typename_token.data));
+            type_data->code_type  = parser_register_code_type(parser, c_string_make_copy(&parser->arena, typename_token.data));
 
             type_data->flags         = pointer_depth > 0 ? (argument_flags | AST_TYPE_MODIFIER_FLAG_POINTER) : argument_flags;
             type_data->pointer_depth = pointer_depth;
@@ -736,7 +736,6 @@ parse_argument_list(parser_t *parser)
     return(result);
 }
 
-// TODO(Sleepster): STRUCT PARSING IS BROKEN
 internal_api AST_node_t* 
 generate_structure_AST(parser_t *parser)
 {
@@ -790,7 +789,7 @@ generate_structure_AST(parser_t *parser)
         inheritance_node            = AST_create_new_node(&parser->arena, parser->active_decl_context);
         inheritance_node->node_type = AST_NODE_TYPE_INHERITANCE_INFO;
 
-        code_type_t *inherited_type = parser_register_code_type_identifier(parser, c_string_make_copy(&parser->arena, inherited_typename.data));
+        code_type_t *inherited_type = parser_register_code_type(parser, c_string_make_copy(&parser->arena, inherited_typename.data));
 
         inheritance_node->inheritance_info.inheritance_type = inheritance_publicity_token.token_type;
         inheritance_node->inheritance_info.inherited_data   = inheritance_node;
@@ -842,7 +841,7 @@ generate_structure_AST(parser_t *parser)
         if(name_token.token_type == TOKEN_TYPE_IDENT) 
         {
             structure_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
-            structure_type = parser_register_code_type_identifier(parser, structure_root->identifier);
+            structure_type = parser_register_code_type(parser, structure_root->identifier);
 
             // NOTE(Sleepster): Create a new declaration_context_t for this scope, then push items onto it. 
             declaration_context_t *context = parser_create_declaration_context(parser, 
@@ -1002,7 +1001,7 @@ generate_structure_AST(parser_t *parser)
                         member_node->node_type  = AST_NODE_TYPE_STRUCTURE_MEMBER;
                         member_node->identifier = c_string_make_copy(&parser->arena, member_name_token.data); 
 
-                        code_type_t *member_type    = parser_register_code_type_identifier(parser, typename_token.data);
+                        code_type_t *member_type    = parser_register_code_type(parser, typename_token.data);
                         member_node->type.code_type = member_type;
 
                         member_node->type.pointer_depth = pointer_depth;
@@ -1090,7 +1089,7 @@ generate_structure_AST(parser_t *parser)
         {
             string_t alias_name = c_string_make_copy(&parser->arena, token.data);
 
-            parser_register_code_type_identifier(parser, alias_name, structure_type);
+            parser_register_code_type(parser, alias_name, structure_type);
             token = parser_get_next_lexer_token(parser);
         }
         if(token.token_type != TOKEN_TYPE_SEMICOLON)
@@ -1155,7 +1154,7 @@ generate_enum_AST(parser_t *parser)
         if(name_token.token_type == TOKEN_TYPE_IDENT) 
         {
             enum_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
-            enum_type = parser_register_code_type_identifier(parser, enum_root->identifier);
+            enum_type = parser_register_code_type(parser, enum_root->identifier);
         }
         else 
         {
@@ -1181,6 +1180,7 @@ generate_enum_AST(parser_t *parser)
             AST_node_t *member = AST_create_new_node(&parser->arena, parser->active_decl_context);
             member->node_type  = AST_NODE_TYPE_ENUM_MEMBER;
             member->identifier = c_string_make_copy(&parser->arena, enum_member_token.data);
+            member->type.code_type = enum_type;
 
             // NOTE(Sleepster): Eat whatever comes after the member name... If it's an '=' then this is an expression 
             token = parser_get_next_lexer_token(parser);
@@ -1197,7 +1197,7 @@ generate_enum_AST(parser_t *parser)
         if(token.token_type == TOKEN_TYPE_IDENT)
         {
             string_t alias_name = c_string_make_copy(&parser->arena, token.data);
-            parser_register_code_type_identifier(parser, alias_name, enum_type);
+            parser_register_code_type(parser, alias_name, enum_type);
             token = parser_get_next_lexer_token(parser);
         }
         if(token.token_type != TOKEN_TYPE_SEMICOLON)
@@ -1226,7 +1226,7 @@ parser_create_lambda_type(parser_t *parser, AST_node_t *expression)
 {
     // NOTE(Sleepster): 
     // In this case we don't bother recording an overload or anything. This stage is purely for TYPE REGISTRY
-    code_type_t *lambda_type = parser_register_code_type_identifier(parser, expression->identifier);
+    code_type_t *lambda_type = parser_register_code_type(parser, expression->identifier);
 
     AST_type_t new_type = {};
     new_type.flags      = AST_TYPE_MODIFIER_FLAG_PROCEDURE;
@@ -1247,7 +1247,7 @@ generate_lambda_AST(parser_t     *parser,
     return_type->identifier = c_string_make_copy(&parser->arena, return_type_token.data);
 
     AST_type_t *return_type_data = &return_type->type;
-    return_type_data->code_type  = parser_register_code_type_identifier(parser, return_type->identifier);
+    return_type_data->code_type  = parser_register_code_type(parser, return_type->identifier);
 
     return_type_data->flags         = return_type_pointer_depth > 0 ? AST_TYPE_MODIFIER_FLAG_POINTER : 0;
     return_type_data->pointer_depth = return_type_pointer_depth;
@@ -1356,7 +1356,7 @@ generate_typedef_AST(parser_t *parser)
                 {
                     code_type_t *main_type = parser_search_for_code_type(parser, type_token.data);
 
-                    parser_register_code_type_identifier(parser, c_string_make_copy(&parser->arena, alias_token.data), main_type);
+                    parser_register_code_type(parser, c_string_make_copy(&parser->arena, alias_token.data), main_type);
                     printf("FOUND TYPE ALIAS: '%.*s' OF TYPE: '%.*s'...\n",
                            fprint_token(alias_token), fprint_token(type_token));
 
