@@ -138,12 +138,15 @@ hash_table_add_element(hash_table_t<T> *table, T *new_element, string_t key)
     u64 index    = key_hash % table->max_entries;
 
     hash_element_t<T> *element = hash_table_get_hash_element(table, index, key_hash);
+    if(element->raw_key_hash == 0)
+    {
+        dynarray_add(&table->used_entries, &element);
+    }
 
     // NOTE(Sleepster): Copies the element 
     element->item         = *new_element;
     element->raw_key_hash =  key_hash;
 
-    dynarray_add(&table->used_entries, &element);
 }
 
 template <typename T>

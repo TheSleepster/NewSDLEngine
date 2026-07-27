@@ -64,6 +64,12 @@
 */
   
 #define C_MATH_H
+
+#if !defined(CODE_GEN_IGNORE_FILE)
+#define CODE_GEN_IGNORE_FILE
+CODE_GEN_IGNORE_FILE
+#endif
+
 #include <c_types.h>
 #include <c_intrinsics.h>
 

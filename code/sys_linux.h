@@ -7,9 +7,6 @@
    ======================================================================== */
 
 #define SYS_LINUX_H
-#ifndef CODE_GEN_IGNORE_FILE
-#define CODE_GEN_IGNORE_FILE()
-#endif
 
 #include <c_types.h>
 #include <c_base.h>
@@ -31,6 +28,11 @@
 #include <string.h> 
 #include <poll.h>
 
+#ifndef CODE_GEN_IGNORE_DECL
+#define CODE_GEN_IGNORE_DECL
+CODE_GEN_IGNORE_DECL
+#endif
+
 #define INVALID_SOCKET      (-1)
 #define INVALID_FILE_HANDLE (-1)
 
@@ -39,6 +41,7 @@
 
 typedef int sys_handle_t;
 
+CODE_GEN_IGNORE_DECL
 typedef struct sys_file_check_event_data
 {
     s32         file_data;
@@ -49,6 +52,7 @@ typedef struct sys_file_check_event_data
     string_t    old_filename;
 }sys_file_check_event_data_t;
 
+CODE_GEN_IGNORE_DECL
 typedef struct file_watcher_watch_data
 {
     s32          inotify_instance;

@@ -38,14 +38,26 @@
  *
  * The immediate things to finish now are:
  *  - [ ] Attribute handling
- *  - [ ] type_info_member_t should store a pointer to it's type info. 
- *  - [ ] Handle Overloads
+ *  - [ ] Better user-facing API handling of lambda type_info
+ *  - [ ] Metatype labeling within type_info_t so that we can cast appropriately
+ *
+ *  - [?] Structures such as mat4_t in math.h are not parsed properly and we miss the final members when dealing with deep structure nesting
+ *  - [?] Structures such as mat4_t with internal anonymous structures fail to have all their members properly added to the top level scope.
+ *  - [?] Issues with structures and lambdas that share the same name (IE. struct vec2 and vec2())
+ *
+ *  - [X] Issues with our macro'ed hash tables and dynarrays.
+ *  - [X] Issues with types that are incomplete. Such as SDL_Gamepad
+ *  - [X] Better function overload handling
+ *  - [X] Special markers to denote the ignoring of certain code_declarations / files.
+ *  - [X] Ignore templated items. ALL templated items. If we find a member that uses template inputs (IE. dynarray<char *>) then we'll register that, but nothing else
+ *        the reflection will simply be "decltype(dynarray<char *>)"
+ *  - [X] type_info_member_t should store a pointer to it's type info. 
+ *  - [X] Handle Type Overloads (struct vec2 as well as vec2() sharing the same name, but being different types is a problem.)
  *  - [X] Better printout handling of nested anonymous structures more inline with the metaprogram
  *  - [X] Offset component for members
  *  - [?] Grouping of items by required file to allow easy exclusion of unnecessary data
  *
  *
- * - [ ] Special markers to denote the ignoring of certain code_declarations / files.
  * - [ ] Variadic functions '...' and ##__VA_ARGS__ macros are not handled.
  *
  * - [-] No way of printing the namespace string such as "Namespace is: 'Structure::'...\n"
@@ -672,6 +684,14 @@ record_file_macros(parser_t *parser)
             {
                 token = handle_macro_expansion(parser, true);
             }break;
+            case TOKEN_TYPE_IDENT:
+            {
+                if(c_string_compare(token.data, STR("CODE_GEN_IGNORE_FILE")))
+                {
+                    parser->should_parse = false;
+                    return;
+                }
+            }break;
         }
     }
 
@@ -706,7 +726,7 @@ internal_api void
 record_file_constants(parser_t *parser)
 {
     lexer_t *lexer = &parser->lexer;
-    while(lexer->current_stream->string.count > 0)
+    while(lexer->current_stream->string.count > 0 && parser->should_parse)
     {
         lexer_token_t token = lexer_get_next_token(lexer);
         switch(token.token_type)
@@ -770,7 +790,7 @@ internal_api void
 build_file_AST(parser_t *parser)
 {
     lexer_t *lexer = &parser->lexer;
-    while(lexer->current_stream)
+    while(lexer->current_stream && parser->should_parse)
     {
         lexer_token_t token = parser_get_next_lexer_token(parser);
         switch(token.token_type)
@@ -982,18 +1002,23 @@ consolidate_AST_nodes(void)
                 for(auto &element: decl_context.code_decls.used_entries) 
                 {
                     AST_node_t *code_decl = element->item;
-                    // TODO(Sleepster): Check to make sure that two items with the same name but of different types don't 
-                    // have issues here. Such as:
-                    // struct item_data
-                    // {
-                    //      char *data;
-                    // }
+                    // For lambdas (procedures) the key would be as follows:
+                    // (please note + in this instance is not literally '+', simply a combine)
                     //
-                    // and
+                    // identifier hash + a hash of each of the procedure's argument typenames. Example:
                     //
-                    // void item_data(item_data *item, char *data);
+                    // item_t *item(void *item_data, char *name)
                     //
-                    // These two are completely different despite sharing the same name, so should have no issue.
+                    // would hash like so:
+                    //
+                    // procedure hash id + the decl_context hash + identifier + void + name
+                    //
+                    // where procedure hash id is simply some number like 4384384384, and the decl_context hash is simply the hash of the active context's name
+                    //
+                    //
+                    // then structures & enums are similar, instead:
+                    //
+                    // structure hash id + decl_context hash + identifier
                     hash_table_add_element(&recorded_context->code_decls, &code_decl, code_decl->identifier);
                 }
 
@@ -1003,12 +1028,13 @@ consolidate_AST_nodes(void)
                 {
                     code_type_t *type = local_type->item;
                     code_type_t *table_type = hash_table_get_element(&recorded_context->local_types, type->identifier);
-                    if(!table_type || !table_type->is_registered)
+                    if((!table_type || !table_type->is_registered) || (type->type_data && !table_type->type_data))
                     {
                         hash_table_add_element(&recorded_context->local_types, &type, type->identifier);
                     }
                 }
             }
+            index += 1;
         }
     }
 }
@@ -1034,14 +1060,42 @@ deduce_AST_node_type_data(void)
                         case AST_NODE_TYPE_ENUM:
                         {
                             type->code_metatype = CODE_TYPE_ENUM;
+
+                            u64 scopeID      = code_decl->decl_context->context_ID;
+                            u64 identifierID = hash_table_hash_key(type->identifier);
+                            u64 metatypeID   = hash_table_combine_hashes(0x9329329ULL, identifierID);
+
+                            type->ID = hash_table_combine_hashes(metatypeID, scopeID);
                         }break;
                         case AST_NODE_TYPE_STRUCTURE:
                         {
                             type->code_metatype = CODE_TYPE_STRUCTURE;
+
+                            u64 scopeID      = code_decl->decl_context->context_ID;
+                            u64 identifierID = hash_table_hash_key(type->identifier);
+                            u64 metatypeID   = hash_table_combine_hashes(0x9329329ULL, identifierID);
+
+                            type->ID = hash_table_combine_hashes(metatypeID, scopeID);
                         }break;
                         case AST_NODE_TYPE_LAMBDA:
                         {
                             type->code_metatype = CODE_TYPE_LAMBDA;
+
+                            u64 scopeID      = code_decl->decl_context->context_ID;
+                            u64 identifierID = hash_table_hash_key(type->identifier);
+                            u64 metatypeID   = hash_table_combine_hashes(0x695743742ULL, identifierID);
+
+                            u64 argumentID = 0;
+                            for(AST_node_t *current_argument = code_decl->lambda.first_argument;
+                                current_argument;
+                                current_argument = current_argument->next_sibling)
+                            {
+                                u64 key_value = hash_table_hash_key(current_argument->type.code_type->identifier);
+                                argumentID    = hash_table_combine_hashes(key_value, argumentID);
+                            }
+
+                            u64 newID = hash_table_combine_hashes(metatypeID, scopeID);
+                            type->ID = hash_table_combine_hashes(newID, argumentID);
                         }break;
                         default:
                         {
@@ -1117,7 +1171,7 @@ consolidate_AST_types(void)
             Assert(type->identifier.count > 0 && type->identifier.data != 0);
 
             code_type_t *found = hash_table_get_element(&g_symbol_table.type_table, type->identifier);
-            if((!found || (found && !found->is_registered)))
+            if(!found || (type->type_data != null && found->type_data == null))
             {
                 hash_table_add_element(&g_symbol_table.type_table, &type, type->identifier);
             }
@@ -1274,7 +1328,7 @@ internal_api void
 output_basic_type_info(string_builder_t *builder, code_type_t *type, u32 indent_level)
 {
     ident(builder, indent_level);
-    c_string_builder_sprintf(builder, "\t.type_name = \"%.*s\",\n", fprint_string(type->identifier));
+    c_string_builder_sprintf(builder, ".type_name = \"%.*s\",\n", fprint_string(type->identifier));
 
     //c_string_builder_sprintf(builder, ".alias_of      = \"%.*s\",\n", fprint_string(type_data->type.code_type->identifier));
     //c_string_builder_sprintf(builder, ".next_overload = \"%.*s\",\n", fprint_string(type_data->type.code_type->identifier));
@@ -1286,30 +1340,69 @@ output_basic_type_info(string_builder_t *builder, code_type_t *type, u32 indent_
     {
         type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
     }
-
+#if 0
     ident(builder, indent_level);
     c_string_builder_sprintf(builder, "\t.type_id = TYPE_%.*s,\n", fprint_string(type_string));
+#endif
 
     if(!c_string_compare(type->identifier, STR("void")) && type->code_metatype != CODE_TYPE_LAMBDA)
     {
         ident(builder, indent_level);
-        c_string_builder_sprintf(builder, "\t.size = sizeof(%.*s),\n", fprint_string(type->identifier));
+        c_string_builder_sprintf(builder, ".size = athena_internal::safe_sizeof<%.*s>(),\n", fprint_string(type->identifier));
     }
-    ident(builder, indent_level);
 }
 
 internal_api void
 output_type_info_member_data(string_builder_t *builder, code_type_t *type, AST_node_t *parent, AST_node_t *current_member)
 {
+    if(current_member->node_type == AST_NODE_TYPE_STRUCTURE)
+    {
+        if((current_member->type.flags & AST_TYPE_MODIFIER_FLAG_NESTED) != 0)
+        {
+            log_info("member '%.*s' is a nested structure\n", fprint_string(current_member->identifier));
+        }
+        log_info("member '%.*s' is a structure\n", fprint_string(current_member->identifier));
+        return;
+    }
+
     c_string_builder_sprintf(builder, "\t\t.%.*s = {\n", fprint_string(current_member->identifier));
-    c_string_builder_sprintf(builder, "\t\t\t.type_info     = athena_type_information_array[TYPE_%.*s],\n", fprint_string(current_member->type.code_type->identifier));
+    c_string_builder_sprintf(builder, "\t\t\t.type_info     = &DEFAULT_typedata_");
+
+    code_type_t *type_data = hash_table_get_element(&g_symbol_table.type_table, current_member->type.code_type->identifier);
+    switch(type_data->code_metatype)
+    {
+        case CODE_TYPE_STRUCTURE:
+        case CODE_TYPE_ENUM:
+        {
+            c_string_builder_sprintf(builder, "structure_%.*s.type_info,",
+                                     fprint_string(type_data->identifier));
+        }break;
+        case CODE_TYPE_LAMBDA:
+        {
+            c_string_builder_sprintf(builder, "procedure_%.*s.type_info,",
+                                     fprint_string(type_data->identifier));
+        }break;
+        default:
+        {
+            c_string_builder_sprintf(builder, "%.*s,",
+                                     fprint_string(type_data->identifier));
+        }break;
+    }
+    c_string_builder_sprintf(builder, "\n");
     c_string_builder_sprintf(builder, "\t\t\t.member_name   = \"%.*s\",\n", fprint_string(current_member->identifier));
-    c_string_builder_sprintf(builder, "\t\t\t.parent        = static_cast<type_info_struct_t*>(&DEFAULT_type_structure_%.*s),\n", fprint_string(type->identifier));
+    if(parent->node_type == AST_NODE_TYPE_STRUCTURE || parent->node_type == AST_NODE_TYPE_ENUM)
+    {
+        c_string_builder_sprintf(builder, "\t\t\t.parent        = &DEFAULT_typedata_structure_%.*s.type_info,\n", fprint_string(type->identifier));
+    }
+    else
+    {
+        c_string_builder_sprintf(builder, "\t\t\t.parent        = &DEFAULT_typedata_procedure_%.*s.type_info,\n", fprint_string(type->identifier));
+    }
 
     //c_string_builder_sprintf(&builder, ".array_size  = %lu,\n", type_data->type.flags);
     if(current_member->node_type == AST_NODE_TYPE_STRUCTURE_MEMBER)
     {
-        c_string_builder_sprintf(builder, "\t\t\t.offset        = OffsetOf(%.*s, %.*s),\n", 
+        c_string_builder_sprintf(builder, "\t\t\t.offset        = offsetof(%.*s, %.*s),\n", 
                                  fprint_string(parent->identifier), 
                                  fprint_string(current_member->identifier));
     }
@@ -1392,55 +1485,60 @@ athena_handle_type_info(const char *char_filepath, const char *output_path, bool
         for(const auto &element : scope.code_decls.used_entries)
         {
             AST_node_t *AST = element->item;
-            switch(AST->node_type)
+            while(AST)
             {
-                case AST_NODE_TYPE_CONSTEXPR:
+                switch(AST->node_type)
                 {
-                    printf("    constexpr %.*s = ", fprint_string(AST->identifier));
-                    switch(AST->expression.value.type)
+                    case AST_NODE_TYPE_CONSTEXPR:
                     {
-                        case AST_EXPRESSION_VALUE_INT:
+                        printf("    constexpr %.*s = ", fprint_string(AST->identifier));
+                        switch(AST->expression.value.type)
                         {
-                            printf("%ld", AST->expression.value.int_value);
-                        }break;
-                        case AST_EXPRESSION_VALUE_UNSIGNED:
-                        {
-                            printf("%lu", AST->expression.value.unsigned_value);
-                        }break;
-                        case AST_EXPRESSION_VALUE_FLOAT:
-                        {
-                            printf("%.2f", AST->expression.value.float32_value);
-                        }break;
-                        case AST_EXPRESSION_VALUE_DOUBLE:
-                        {
-                            printf("%.2lf", AST->expression.value.float64_value);
-                        }break;
-                        case AST_EXPRESSION_VALUE_IDENT:
-                        case AST_EXPRESSION_VALUE_LITERAL:
-                        {
-                            printf("%.*s", fprint_string(AST->expression.value.identifier_value));
-                        }break;
-                    }
+                            case AST_EXPRESSION_VALUE_INT:
+                            {
+                                printf("%ld", AST->expression.value.int_value);
+                            }break;
+                            case AST_EXPRESSION_VALUE_UNSIGNED:
+                            {
+                                printf("%lu", AST->expression.value.unsigned_value);
+                            }break;
+                            case AST_EXPRESSION_VALUE_FLOAT:
+                            {
+                                printf("%.2f", AST->expression.value.float32_value);
+                            }break;
+                            case AST_EXPRESSION_VALUE_DOUBLE:
+                            {
+                                printf("%.2lf", AST->expression.value.float64_value);
+                            }break;
+                            case AST_EXPRESSION_VALUE_IDENT:
+                            case AST_EXPRESSION_VALUE_LITERAL:
+                            {
+                                printf("%.*s", fprint_string(AST->expression.value.identifier_value));
+                            }break;
+                        }
 
-                    printf("\n\n");
-                }break;
-                case AST_NODE_TYPE_STRUCTURE:
-                {
-                    printf("    struct %.*s\n", fprint_string(AST->identifier));
-                    DEBUG_print_structure_members(AST, 3);
-                    printf("\n");
-                }break;
-                case AST_NODE_TYPE_ENUM:
-                {
-                    printf("    enum %.*s\n", fprint_string(AST->identifier));
-                    DEBUG_print_enum_data(AST, 3);
-                    printf("\n");
-                }break;
-                case AST_NODE_TYPE_LAMBDA:
-                {
-                    DEBUG_print_lambda_data(AST, 2);
-                    printf("\n");
-                } break;
+                        printf("\n\n");
+                    }break;
+                    case AST_NODE_TYPE_STRUCTURE:
+                    {
+                        printf("    struct %.*s\n", fprint_string(AST->identifier));
+                        DEBUG_print_structure_members(AST, 3);
+                        printf("\n");
+                    }break;
+                    case AST_NODE_TYPE_ENUM:
+                    {
+                        printf("    enum %.*s\n", fprint_string(AST->identifier));
+                        DEBUG_print_enum_data(AST, 3);
+                        printf("\n");
+                    }break;
+                    case AST_NODE_TYPE_LAMBDA:
+                    {
+                        DEBUG_print_lambda_data(AST, 2);
+                        printf("\n");
+                    } break;
+                }
+
+                AST = AST->next_overload;
             }
         }
 
@@ -1452,7 +1550,7 @@ athena_handle_type_info(const char *char_filepath, const char *output_path, bool
 
     c_string_builder_append_data(&file_builder, STR("// THIS FILE IS GENERATED BY THE ATHENA REFLECTOR\n// DO NOT EDIT!!!!!!\n\n"));
     c_string_builder_append_data(&file_builder, STR("#if !defined(ATHENA_GENERATED_FILE_H)\n#define ATHENA_GENERATED_FILE_H\n\n"));
-
+#if 0
     // NOTE(Sleepster): Define X macro for each of the types 
     c_string_builder_sprintf(&file_builder, "#define ATHENA_RTTI_COMPLETE_TYPE_LIST(X) \\\n");
     for(u32 type_index = 0;
@@ -1468,28 +1566,35 @@ athena_handle_type_info(const char *char_filepath, const char *output_path, bool
             type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
         }
 
-        if(type->type_data)
+        AST_node_t *type_data = type->type_data;
+        if(type_data)
         {
-            if(type->type_data->node_type == AST_NODE_TYPE_STRUCTURE || type->type_data->node_type == AST_NODE_TYPE_ENUM)
+            while(type_data)
             {
-                c_string_builder_sprintf(&file_builder, "\tX(%.*s, TYPE_%.*s, &DEFAULT_type_structure_%.*s, \"%.*s\") \\\n", 
-                                         fprint_string(type->identifier), 
-                                         fprint_string(type_string), 
-                                         fprint_string(type_string), 
-                                         fprint_string(type->identifier));
-            }
-            else if(type->type_data->node_type == AST_NODE_TYPE_LAMBDA)
-            {
-                c_string_builder_sprintf(&file_builder, "\tX(%.*s, TYPE_%.*s, &DEFAULT_type_procedure_%.*s, \"%.*s\") \\\n", 
-                                         fprint_string(type->identifier), 
-                                         fprint_string(type_string), 
-                                         fprint_string(type_string), 
-                                         fprint_string(type->identifier));
+                if(type_data->node_type == AST_NODE_TYPE_STRUCTURE || 
+                   type_data->node_type == AST_NODE_TYPE_ENUM)
+                {
+                    c_string_builder_sprintf(&file_builder, "\tX(%.*s, TYPE_%.*s, &DEFAULT_typedata_structure_%.*s, \"%.*s\") \\\n", 
+                                             fprint_string(type_data->identifier), 
+                                             fprint_string(type_string), 
+                                             fprint_string(type_string), 
+                                             fprint_string(type_data->identifier));
+                }
+                else if(type_data->node_type == AST_NODE_TYPE_LAMBDA)
+                {
+                    c_string_builder_sprintf(&file_builder, "\tX(%.*s, TYPE_%.*s, &DEFAULT_typedata_procedure_%.*s, \"%.*s\") \\\n", 
+                                             fprint_string(type_data->identifier), 
+                                             fprint_string(type_string), 
+                                             fprint_string(type_string), 
+                                             fprint_string(type_data->identifier));
+                }
+
+                type_data = type_data->next_overload;
             }
         }
         else
         {
-            c_string_builder_sprintf(&file_builder, "\tX(%.*s, TYPE_%.*s, &DEFAULT_type_%.*s, \"%.*s\") \\\n", 
+            c_string_builder_sprintf(&file_builder, "\tX(%.*s, TYPE_%.*s, &DEFAULT_typedata_%.*s, \"%.*s\") \\\n", 
                                      fprint_string(type->identifier), 
                                      fprint_string(type_string), 
                                      fprint_string(type_string), 
@@ -1506,9 +1611,11 @@ enum athena_program_types {
 };
 
 )"));
+#endif
 
     c_string_builder_append_data(&file_builder, STR(R"(
 #include <string.h>
+#include <stddef.h>
 
 
 struct type_info_t;
@@ -1563,7 +1670,9 @@ struct type_info_member_t
 {
     const type_info_t        *type_info;
     const char               *member_name;
-    const type_info_struct_t *parent;
+    // NOTE(Sleepster): Either type_info_struct_t, or type_info_procedure_t 
+    const type_info_t        *parent;
+
     unsigned int              offset;
     //unsigned_int            array_size;
     unsigned int              flags;
@@ -1574,8 +1683,9 @@ struct type_info_member_t
 
 struct type_info_struct_t
 {
-    const type_info_t type_info;
-    unsigned int      member_count;
+    const type_info_t         type_info;
+    unsigned int              member_count;
+    const type_info_member_t *members;
 };
 
 struct type_info_procedure_t
@@ -1601,17 +1711,18 @@ void athena_handle_type_info(const char *filepath, int directory, int recursive)
 #define ATHENA_API extern
 #endif
 
-#if !defined(ATHENA_RTTI_COMPLETE_TYPE_LIST)
-#define ATHENA_RTTI_COMPLETE_TYPE_LIST(X)
-#endif
+namespace athena_internal {
+    template<typename T, unsigned int N = sizeof(T)>
+    constexpr unsigned int safe_sizeof_impl(int) { return N; }
 
-#if !defined(OffsetOf)
-#define MemberHelper(type, member) (((type *)0)->member)
-#define OffsetOf_(type, member)    (&MemberHelper(type, member))
-#define OffsetOf(type, member)     (IntFromPtr(OffsetOf_(type, member)))
-#endif
+    template<typename T>
+    constexpr unsigned int safe_sizeof_impl(...) { return 0; }
 
-extern const type_info_t *athena_type_information_array[];
+    template<typename T>
+    constexpr unsigned int safe_sizeof() { return safe_sizeof_impl<T>(0); }
+}
+
+extern const type_info_t *const athena_type_information_array[];
 )"));
     // NOTE(Sleepster): Create the type structures. 
     for(u32 type_index = 0;
@@ -1619,125 +1730,73 @@ extern const type_info_t *athena_type_information_array[];
         ++type_index)
     {
         code_type_t *type = (code_type_t*)((g_symbol_table.type_table.used_entries[type_index])->item);
-        switch(type->code_metatype)
+        AST_node_t *type_data = type->type_data;
+        if(type_data)
         {
-            case CODE_TYPE_STRUCTURE:
-            case CODE_TYPE_ENUM:
+            while(type_data)
             {
-                c_string_builder_sprintf(&file_builder, "struct type_info_struct_%.*s {\n", fprint_string(type->identifier));
-                c_string_builder_sprintf(&file_builder, "\tconst type_info_t type_info;\n");
-                c_string_builder_sprintf(&file_builder, "\tunsigned int member_count;\n");
-                c_string_builder_sprintf(&file_builder, "\tunion {\n");
-                c_string_builder_sprintf(&file_builder, "\t\tconst type_info_member_t member_array[%d];\n", type->type_data->struct_decl.member_count);
-                c_string_builder_sprintf(&file_builder, "\t\tstruct {\n");
-                for(AST_node_t *current_member = type->type_data->struct_decl.first_member;
-                    current_member;
-                    current_member = current_member->next_sibling)
+                if((type_data->type.flags & AST_TYPE_MODIFIER_FLAG_NESTED) == 0)
                 {
-                    c_string_builder_sprintf(&file_builder, "\t\t\tconst type_info_member_t %.*s;\n", fprint_string(current_member->identifier));
-                }
-                c_string_builder_sprintf(&file_builder, "\t\t}members;\n");
-                c_string_builder_sprintf(&file_builder, "\t};\n");
-                c_string_builder_append_data(&file_builder, STR("};\n\n"));
-            }break;
-            case CODE_TYPE_LAMBDA:
-            {
-                c_string_builder_sprintf(&file_builder, "struct type_info_procedure_%.*s {\n", fprint_string(type->identifier));
-                c_string_builder_sprintf(&file_builder, "\tconst type_info_t  type_info;\n");
-                c_string_builder_sprintf(&file_builder, "\tunsigned int       argument_count;\n");
-                c_string_builder_sprintf(&file_builder, "\tconst type_info_t *return_type;\n");
-                if(type->type_data->lambda.argument_count > 0)
-                {
-                    c_string_builder_sprintf(&file_builder, "\tunion {\n");
-                    c_string_builder_sprintf(&file_builder, "\t\ttype_info_member_t argument_array[%d];\n", type->type_data->lambda.argument_count);
-                    c_string_builder_sprintf(&file_builder, "\t\tstruct {\n");
-                    if(type->type_data->lambda.first_argument)
+                    switch(type_data->node_type)
                     {
-                        for(AST_node_t *current_argument = type->type_data->lambda.first_argument;
-                            current_argument;
-                            current_argument = current_argument->next_sibling)
+                        case AST_NODE_TYPE_ENUM:
+                        case AST_NODE_TYPE_STRUCTURE:
                         {
-                            c_string_builder_sprintf(&file_builder, "\t\t\tconst type_info_member_t %.*s;\n", fprint_string(current_argument->identifier));
-                        }
+                            c_string_builder_sprintf(&file_builder, "struct type_info_struct_%.*s {\n", fprint_string(type->identifier));
+                            c_string_builder_sprintf(&file_builder, "\tconst type_info_t  type_info;\n");
+                            c_string_builder_sprintf(&file_builder, "\tconst unsigned int member_count;\n");
+                            c_string_builder_sprintf(&file_builder, "\tconst type_info_member_t *member_pointer;\n");
+                            c_string_builder_sprintf(&file_builder, "\tunion {\n");
+                            c_string_builder_sprintf(&file_builder, "\t\tconst type_info_member_t member_array[%d];\n", type_data->struct_decl.member_count);
+                            c_string_builder_sprintf(&file_builder, "\t\tstruct {\n");
+                            for(AST_node_t *current_member = type_data->struct_decl.first_member;
+                                current_member;
+                                current_member = current_member->next_sibling)
+                            {
+                                c_string_builder_sprintf(&file_builder, "\t\t\tconst type_info_member_t %.*s;\n", fprint_string(current_member->identifier));
+                            }
+                            c_string_builder_sprintf(&file_builder, "\t\t}members;\n");
+                            c_string_builder_sprintf(&file_builder, "\t};\n");
+                            c_string_builder_append_data(&file_builder, STR("};\n\n"));
+                        }break;
+                        case AST_NODE_TYPE_LAMBDA:
+                        {
+                            if(!type_data->next_overload)
+                            {
+                                c_string_builder_sprintf(&file_builder, "struct type_info_procedure_%.*s {\n", fprint_string(type->identifier));
+                                c_string_builder_sprintf(&file_builder, "\tconst type_info_t  type_info;\n");
+                                c_string_builder_sprintf(&file_builder, "\tconst unsigned int argument_count;\n");
+                                c_string_builder_sprintf(&file_builder, "\tconst type_info_t *return_type;\n");
+                                c_string_builder_sprintf(&file_builder, "\tconst type_info_member_t *argument_pointer;\n");
+                                if(type->type_data->lambda.argument_count > 0)
+                                {
+                                    c_string_builder_sprintf(&file_builder, "\tunion {\n");
+                                    c_string_builder_sprintf(&file_builder, "\t\ttype_info_member_t argument_array[%d];\n", type_data->lambda.argument_count);
+                                    c_string_builder_sprintf(&file_builder, "\t\tstruct {\n");
+                                    if(type->type_data->lambda.first_argument)
+                                    {
+                                        for(AST_node_t *current_argument = type->type_data->lambda.first_argument;
+                                            current_argument;
+                                            current_argument = current_argument->next_sibling)
+                                        {
+                                            c_string_builder_sprintf(&file_builder, "\t\t\tconst type_info_member_t %.*s;\n", fprint_string(current_argument->identifier));
+                                        }
+                                    }
+                                    c_string_builder_sprintf(&file_builder, "\t\t}arguments;\n");
+                                    c_string_builder_sprintf(&file_builder, "\t};\n");
+                                }
+                                c_string_builder_append_data(&file_builder, STR("};\n\n"));
+                            }
+                        }break;
                     }
-                    c_string_builder_sprintf(&file_builder, "\t\t}arguments;\n");
-                    c_string_builder_sprintf(&file_builder, "\t};\n");
                 }
-                c_string_builder_append_data(&file_builder, STR("};\n\n"));
-            }break;
+
+                type_data = type_data->next_overload;
+            }
         }
     }
 
-    // NOTE(Sleepster): Create a default version for these. 
-    for(u32 type_index = 0;
-        type_index < g_symbol_table.type_table.used_entries.used;
-        ++type_index)
-    {
-        code_type_t *type = (code_type_t*)((g_symbol_table.type_table.used_entries[type_index])->item);
-        switch(type->code_metatype)
-        {
-            case CODE_TYPE_STRUCTURE:
-            case CODE_TYPE_ENUM:
-            {
-                c_string_builder_sprintf(&file_builder, "constexpr type_info_struct_%.*s DEFAULT_typedata_structure_%.*s = {\n", fprint_string(type->identifier), fprint_string(type->identifier));
-                c_string_builder_sprintf(&file_builder, "\t.type_info = {\n");
-                output_basic_type_info(&file_builder, type, 1);
-                c_string_builder_sprintf(&file_builder, "},\n");
-
-                c_string_builder_sprintf(&file_builder, "\t.member_count = %d,\n", type->type_data->struct_decl.member_count);
-                c_string_builder_sprintf(&file_builder, "\t.members = {\n");
-                for(AST_node_t *current_member = type->type_data->struct_decl.first_member;
-                    current_member;
-                    current_member = current_member->next_sibling)
-                {
-                    output_type_info_member_data(&file_builder, type, type->type_data, current_member);
-                }
-                c_string_builder_sprintf(&file_builder, "\t},\n");
-                c_string_builder_append_data(&file_builder, STR("};\n\n"));
-            }break;
-            case CODE_TYPE_LAMBDA:
-            {
-                c_string_builder_sprintf(&file_builder, "constexpr type_info_procedure_%.*s DEFAULT_typedata_procedure_%.*s = {\n", fprint_string(type->identifier), fprint_string(type->identifier));
-                ident(&file_builder, 1);
-                c_string_builder_sprintf(&file_builder, ".type_info = {\n");
-                output_basic_type_info(&file_builder, type, 1);
-                c_string_builder_sprintf(&file_builder, "},\n");
-
-                c_string_builder_sprintf(&file_builder, "\t.return_type    = athena_type_information_array[TYPE_%.*s],\n", 
-                                         fprint_string(type->type_data->lambda.return_type->type.code_type->identifier));
-                c_string_builder_sprintf(&file_builder, "\t.argument_count = %d,\n", type->type_data->lambda.argument_count);
-                if(type->type_data->lambda.argument_count > 0)
-                {
-                    c_string_builder_sprintf(&file_builder, "\t.arguments = {\n");
-                    for(AST_node_t *current_argument = type->type_data->lambda.first_argument;
-                        current_argument;
-                        current_argument = current_argument->next_sibling)
-                    {
-                        output_type_info_member_data(&file_builder, type, type->type_data, current_argument);
-                    }
-                    c_string_builder_sprintf(&file_builder, "\t},\n");
-                }
-                c_string_builder_sprintf(&file_builder, "};\n");
-            }break;
-            case CODE_TYPE_PRIMITIVE:
-            {
-                string_t type_string = type->identifier;
-
-                s32 index = c_string_find_first_char_from_right(type->identifier, ' ');
-                if(index != -1)
-                {
-                    type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
-                }
-
-                c_string_builder_sprintf(&file_builder, "constexpr type_info_t DEFAULT_typedata_%.*s = {\n", fprint_string(type_string), fprint_string(type_string));
-                output_basic_type_info(&file_builder, type, 0);
-                c_string_builder_sprintf(&file_builder, "};\n");
-            }break;
-        }
-    }
-
-    // NOTE(Sleepster): Create the type array and link the enums to the types. 
-    c_string_builder_sprintf(&file_builder, "constexpr type_info_t *athena_type_information_array[] = {\n");
+    // NOTE(Sleepster): Forward declare their items. 
     for(u32 type_index = 0;
         type_index < g_symbol_table.type_table.used_entries.used;
         ++type_index)
@@ -1750,45 +1809,255 @@ extern const type_info_t *athena_type_information_array[];
         {
             type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
         }
-        c_string_builder_sprintf(&file_builder, "\t&DEFAULT_typedata");
-        if(type->type_data)
+
+        AST_node_t *type_data = type->type_data;
+        if(type_data)
         {
-            switch(type->type_data->node_type)
+            if((type_data->type.flags & AST_TYPE_MODIFIER_FLAG_NESTED) == 0)
             {
-                case AST_NODE_TYPE_STRUCTURE:
+                if(type_data->node_type == AST_NODE_TYPE_STRUCTURE || 
+                   type_data->node_type == AST_NODE_TYPE_ENUM)
                 {
-                    c_string_builder_sprintf(&file_builder, "_structure");
-                }break;
-                case AST_NODE_TYPE_LAMBDA:
+                    c_string_builder_sprintf(&file_builder, "extern const type_info_struct_%.*s DEFAULT_typedata_structure_%.*s;\n", 
+                                             fprint_string(type_data->identifier), 
+                                             fprint_string(type_data->identifier));
+                }
+                else if(type_data->node_type == AST_NODE_TYPE_LAMBDA)
                 {
-                    c_string_builder_sprintf(&file_builder, "_procedure");
+                    if(!type_data->next_overload)
+                    {
+                        c_string_builder_sprintf(&file_builder, "extern const type_info_procedure_%.*s DEFAULT_typedata_procedure_%.*s;\n", 
+                                                 fprint_string(type_data->identifier), 
+                                                 fprint_string(type_data->identifier));
+                    }
+                    else
+                    {
+                        while(type_data->next_overload)
+                        {
+                            type_data = type_data->next_overload;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            if(!c_string_compare(type->identifier, STR("void")))
+            {
+                c_string_builder_sprintf(&file_builder, "extern const type_info_t DEFAULT_typedata_%.*s;\n", 
+                                         fprint_string(type_string));
+            }
+        }
+    }
+    c_string_builder_append_data(&file_builder, STR("\n"));
+
+    // NOTE(Sleepster): Create a default version for these. 
+    for(u32 type_index = 0;
+        type_index < g_symbol_table.type_table.used_entries.used;
+        ++type_index)
+    {
+        code_type_t *type = (code_type_t*)((g_symbol_table.type_table.used_entries[type_index])->item);
+        AST_node_t *type_data = type->type_data;
+        if(type_data)
+        {
+            if((type_data->type.flags & AST_TYPE_MODIFIER_FLAG_NESTED) == 0)
+            {
+                while(type_data)
+                {
+                    switch(type_data->node_type)
+                    {
+                        case AST_NODE_TYPE_ENUM:
+                        case AST_NODE_TYPE_STRUCTURE:
+                        {
+                            c_string_builder_sprintf(&file_builder, "constexpr type_info_struct_%.*s DEFAULT_typedata_structure_%.*s = {\n", fprint_string(type->identifier), fprint_string(type->identifier));
+                            c_string_builder_sprintf(&file_builder, "\t.type_info = {\n");
+                            output_basic_type_info(&file_builder, type, 2);
+                            c_string_builder_sprintf(&file_builder, "\t}t,\n");
+
+                            c_string_builder_sprintf(&file_builder, "\t.member_count   = %d,\n", type_data->struct_decl.member_count);
+                            c_string_builder_sprintf(&file_builder, "\t.member_pointer = DEFAULT_typedata_structure_%.*s.member_array,\n", fprint_string(type_data->identifier));
+                            c_string_builder_sprintf(&file_builder, "\t.members = {\n");
+                            for(AST_node_t *current_member = type_data->struct_decl.first_member;
+                                current_member;
+                                current_member = current_member->next_sibling)
+                            {
+                                output_type_info_member_data(&file_builder, type, type_data, current_member);
+                            }
+                            c_string_builder_sprintf(&file_builder, "\t},\n");
+                            c_string_builder_append_data(&file_builder, STR("};\n\n"));
+                        }break;
+                        case AST_NODE_TYPE_LAMBDA:
+                        {
+                            if(!type_data->next_overload)
+                            {
+                                c_string_builder_sprintf(&file_builder, "constexpr type_info_procedure_%.*s DEFAULT_typedata_procedure_%.*s = {\n", fprint_string(type->identifier), fprint_string(type->identifier));
+                                c_string_builder_sprintf(&file_builder, "\t.type_info = {\n");
+                                output_basic_type_info(&file_builder, type, 2);
+                                c_string_builder_sprintf(&file_builder, "\t},\n");
+
+                                c_string_builder_sprintf(&file_builder, "\t.argument_count = %d,\n", type_data->lambda.argument_count);
+                                c_string_builder_sprintf(&file_builder, "\t.return_type    = &DEFAULT_typedata_");
+
+                                code_type_t *return_type = hash_table_get_element(&g_symbol_table.type_table, type_data->lambda.return_type->type.code_type->identifier);
+                                switch(return_type->code_metatype)
+                                {
+                                    case CODE_TYPE_ENUM:
+                                    case CODE_TYPE_STRUCTURE:
+                                    {
+                                        c_string_builder_sprintf(&file_builder, "structure_%.*s.type_info,",
+                                                                 fprint_string(return_type->identifier));
+                                    }break;
+                                    case CODE_TYPE_LAMBDA:
+                                    {
+                                        c_string_builder_sprintf(&file_builder, "procedure_%.*s.type_info,",
+                                                                 fprint_string(return_type->identifier));
+                                    }break;
+                                    default:
+                                    {
+                                        c_string_builder_sprintf(&file_builder, "%.*s,",
+                                                                 fprint_string(return_type->identifier));
+                                    }break;
+
+                                }
+                                c_string_builder_sprintf(&file_builder, "\n");
+                                c_string_builder_sprintf(&file_builder, "\t.argument_pointer = DEFAULT_typedata_procedure_%.*s.argument_array,\n", fprint_string(type_data->identifier));
+                                if(type_data->lambda.argument_count > 0)
+                                {
+                                    c_string_builder_sprintf(&file_builder, "\t.arguments = {\n");
+                                    for(AST_node_t *current_argument = type_data->lambda.first_argument;
+                                        current_argument;
+                                        current_argument = current_argument->next_sibling)
+                                    {
+                                        output_type_info_member_data(&file_builder, type, type_data, current_argument);
+                                    }
+                                    c_string_builder_sprintf(&file_builder, "\t},\n");
+                                }
+                                c_string_builder_sprintf(&file_builder, "};\n");
+                            }
+                            else
+                            {
+                                while(type_data->next_overload)
+                                {
+                                    type_data = type_data->next_overload;
+                                }
+                            }
+                        }break;
+                    }
+
+                    type_data = type_data->next_overload;
+                }
+            }
+        }
+        else
+        {
+            string_t type_string = type->identifier;
+
+            s32 index = c_string_find_first_char_from_right(type->identifier, ' ');
+            if(index != -1)
+            {
+                type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
+            }
+
+            c_string_builder_sprintf(&file_builder, "constexpr type_info_t DEFAULT_typedata_%.*s = {\n", fprint_string(type_string), fprint_string(type_string));
+            output_basic_type_info(&file_builder, type, 0);
+            c_string_builder_sprintf(&file_builder, "};\n");
+        }
+    }
+
+    // NOTE(Sleepster): Create the type array and link the enums to the types. 
+    c_string_builder_sprintf(&file_builder, "constexpr const type_info_t *const athena_type_information_array[] = {\n");
+    for(u32 type_index = 0;
+        type_index < g_symbol_table.type_table.used_entries.used;
+        ++type_index)
+    {
+        code_type_t *type = (code_type_t*)((g_symbol_table.type_table.used_entries[type_index])->item);
+        AST_node_t *type_data = type->type_data;
+        if(type_data)
+        {
+            if((type_data->type.flags & AST_TYPE_MODIFIER_FLAG_NESTED) == 0)
+            {
+                while(type_data)
+                {
+                    string_t type_string = type->identifier;
+                    s32 index = c_string_find_first_char_from_right(type->identifier, ' ');
+                    if(index != -1)
+                    {
+                        type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
+                    }
+
+                    if(type_data && !(type_data->next_overload))
+                    {
+                        c_string_builder_sprintf(&file_builder, "\t&DEFAULT_typedata");
+                        switch(type_data->type.code_type->code_metatype)
+                        {
+                            case CODE_TYPE_ENUM:
+                            case CODE_TYPE_STRUCTURE:
+                            {
+                                c_string_builder_sprintf(&file_builder, "_structure");
+                                c_string_builder_sprintf(&file_builder, "_%.*s.type_info,\n", fprint_string(type_string));
+                            }break;
+                            case CODE_TYPE_LAMBDA:
+                            {
+                                c_string_builder_sprintf(&file_builder, "_procedure");
+                                c_string_builder_sprintf(&file_builder, "_%.*s.type_info,\n", fprint_string(type_string));
+                            }break;
+                            default:
+                            {
+                                c_string_builder_sprintf(&file_builder, "_%.*s,\n", fprint_string(type_string));
+                            }break;
+                        }
+                    }
+                    else if(type_data->next_overload)
+                    {
+                        while(type_data->next_overload)
+                        {
+                            type_data = type_data->next_overload;
+                        }
+                    }
+
+                    type_data = type_data->next_overload;
+                }
+            }
+        }
+        else
+        {
+            switch(type->code_metatype)
+            {
+                case CODE_TYPE_PRIMITIVE:
+                {
+                    string_t type_string = type->identifier;
+
+                    s32 index = c_string_find_first_char_from_right(type->identifier, ' ');
+                    if(index != -1)
+                    {
+                        type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
+                    }
+                    c_string_builder_sprintf(&file_builder, "\t&DEFAULT_typedata_%.*s,\n", fprint_string(type_string));
                 }break;
             }
         }
-
-        c_string_builder_sprintf(&file_builder, "_%.*s\n", fprint_string(type_string));
     }
     c_string_builder_sprintf(&file_builder, "};\n\n");
     c_string_builder_append_data(&file_builder, STR(R"(
-ATHENA_API inline const type_info_t *type_info(unsigned long long type_id);
-ATHENA_API inline const type_info_t *type_info(const char *string);
+ATHENA_API const type_info_t *type_info(unsigned long long type_id);
+ATHENA_API const type_info_t *type_info(const char *string);
 
 #ifdef C_STRING_H
 ATHENA_API inline const type_info_t *type_info(string_t string);
 #endif
 
 // NOTE(Sleepster): STB style lib
-#ifdef ATHENA_IMPLMENETATION 
+#ifdef ATHENA_IMPLMENTATION 
 
-ATHENA_API inline const type_info_t*
+ATHENA_API const type_info_t*
 type_info(unsigned long long type_id)
 {
-    const type_info_t *result = static_cast<const type_info_t*>(athena_type_information_array[type_id]);
+    const type_info_t *result = (const type_info_t*)athena_type_information_array[type_id];
     return(result);
 };
 
 #ifdef C_STRING_H
-ATHENA_API inline const type_info_t*
+ATHENA_API const type_info_t*
 type_info(string_t string)
 {
     const type_info_t *result = null;
@@ -1796,9 +2065,9 @@ type_info(string_t string)
     {
         for(auto &element: athena_type_information_array)
         {
-            if(c_string_compare(STR(element.type_name), string))
+            if(c_string_compare(STR(element->type_name), string))
             {
-                result = &element;
+                result = element;
                 break;
             }
         }
@@ -1807,22 +2076,22 @@ type_info(string_t string)
     return(result);
 }
 
-ATHENA_API inline const type_info_member_t*
+ATHENA_API const type_info_member_t*
 athena_get_member_info(const type_info_t *type_info, string_t member_name) 
 {
     const type_info_member_t *result = null;
 
     if(member_name.count > 0)
     {
-        const type_info_struct_t *structure_info = static_cast<const type_info_struct_t*>(type_info);
+        const type_info_struct_t *structure_info = (const type_info_struct_t*)type_info;
         for(u32 member_index = 0;
             member_index < structure_info->member_count;
             ++member_index)
         {
-            const type_info_member_t *member = structure_info->member_array[member_index];
+            const type_info_member_t *member = &structure_info->members[member_index];
             if(c_string_compare(STR(member->member_name), member_name))
             {
-                result = static_cast<const type_info_t*>(member);
+                result = (const type_info_member_t*)(member);
                 break;
             }
         }
@@ -1836,7 +2105,7 @@ athena_get_member_info(const type_info_t *type_info, string_t member_name)
 #define ArrayCount(x) (sizeof(x) / sizeof((x[0])))
 #endif
 
-ATHENA_API inline const type_info_t*
+ATHENA_API const type_info_t*
 type_info(const char *string)
 {
     const type_info_t *result = nullptr;
@@ -1863,7 +2132,7 @@ type_info(const char *string)
     return(result);
 }
 
-ATHENA_API inline const type_info_member_t*
+ATHENA_API const type_info_member_t*
 athena_get_member_info(const type_info_t *type_info, const char *member_name) 
 {
     const type_info_member_t *result = nullptr;
@@ -1871,7 +2140,7 @@ athena_get_member_info(const type_info_t *type_info, const char *member_name)
     int name_length = strlen(member_name);
     if(name_length > 0)
     {
-        const type_info_struct_t *structure_info = static_cast<const type_info_struct_t*>(type_info);
+        const type_info_struct_t *structure_info = (const type_info_struct_t*)type_info;
         for(unsigned int member_index = 0;
             member_index < structure_info->member_count;
             ++member_index)
@@ -1892,26 +2161,26 @@ athena_get_member_info(const type_info_t *type_info, const char *member_name)
     return(result);
 }
 
-ATHENA_API inline const type_info_struct_t*
+ATHENA_API const type_info_struct_t*
 athena_get_struct_info_from_member(const type_info_t *info)
 {
     const type_info_struct_t *result = nullptr;
-    const type_info_member_t *member = static_cast<const type_info_member_t*>(info);
+    const type_info_member_t *member = (const type_info_member_t*)info;
     if(member->parent)
     {
-        result = member->parent;
+        result = (type_info_struct_t*)member->parent;
     }
 
     return(result);
 }
 
-ATHENA_API inline const type_info_struct_t*
+ATHENA_API const type_info_struct_t*
 athena_get_struct_info_from_member(const type_info_member_t *member)
 {
     const type_info_struct_t *result = nullptr;
     if(member->parent)
     {
-        result = member->parent;
+        result = (type_info_struct_t*)member->parent;
     }
 
     return(result);
@@ -1930,6 +2199,14 @@ athena_get_struct_info_from_member(const type_info_member_t *member)
 
         c_file_write_string(&new_file, string);
     }
+}
+
+
+struct apples { int x; };
+
+void apples(int x)
+{
+    (void)x;
 }
 
 int

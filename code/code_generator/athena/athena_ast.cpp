@@ -6,6 +6,8 @@
    ======================================================================== */
 #include "athena_ast.h"
 
+internal_api AST_node_t* generate_structure_AST(parser_t *parser);
+
 internal_api char*
 print_AST_node_type(u32 node_type)
 {
@@ -608,7 +610,7 @@ evaluate_expression_AST(AST_node_t *expression)
 }
 
 internal_api argument_list_t 
-parse_argument_list(parser_t *parser)
+parse_argument_list(parser_t *parser, AST_node_t *parent)
 {
     argument_list_t result = {};
 
@@ -681,7 +683,10 @@ parse_argument_list(parser_t *parser)
             argument->identifier = c_string_make_copy(&parser->arena, declaration_name.data);
 
             AST_type_t *type_data = &argument->type;
-            type_data->code_type  = parser_register_code_type(parser, c_string_make_copy(&parser->arena, typename_token.data));
+            if(!c_string_compare(typename_token.data, STR("typename")))
+            {
+                type_data->code_type = parser_register_code_type(parser, c_string_make_copy(&parser->arena, typename_token.data));
+            }
 
             type_data->flags         = pointer_depth > 0 ? (argument_flags | AST_TYPE_MODIFIER_FLAG_POINTER) : argument_flags;
             type_data->pointer_depth = pointer_depth;
@@ -703,13 +708,13 @@ parse_argument_list(parser_t *parser)
                 }
             }
 
-            ++result.argument_count;
-
             token = parser_get_next_lexer_token(parser);
             if(token.token_type == TOKEN_TYPE_EQUALS)
             {
                 argument->expression.info = generate_expression_AST(parser, 0, &token);
             }
+
+            ++result.argument_count;
 
             if(token.token_type == TOKEN_TYPE_CLOSE_PAREN  ||
                token.token_type == TOKEN_TYPE_GREATER_THAN)
@@ -736,6 +741,62 @@ parse_argument_list(parser_t *parser)
     return(result);
 }
 
+internal_api void
+add_AST_overload(AST_node_t *previous, AST_node_t *overload)
+{
+    AST_node_t *node      = previous;
+    AST_node_t *last_node = node;
+
+    bool8 found = false;
+    while(node)
+    {
+        if(node->node_type == AST_NODE_TYPE_LAMBDA)
+        {
+            if(node->lambda.argument_count == overload->lambda.argument_count && 
+               node->decl_context->context_ID == overload->decl_context->context_ID)
+            {
+                AST_node_t *lambda_arg = overload->lambda.first_argument;
+                AST_node_t *node_arg   = node->lambda.first_argument;
+
+                u32 matching_argument_count = 0;
+                while(lambda_arg && node_arg)
+                {
+                    if(lambda_arg->type.code_type == node_arg->type.code_type)
+                    {
+                        matching_argument_count += 1;
+                    }
+
+                    lambda_arg = lambda_arg->next_sibling;
+                    node_arg   = node_arg->next_sibling;
+                }
+
+                // NOTE(Sleepster): Add as overload if all arguments do not match 
+                if(matching_argument_count == overload->lambda.argument_count)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            else
+            {
+                // NOTE(Sleepster): Add as overload if the argument count is different or the decl contexts are different
+                found = true;
+                break;
+            }
+        }
+
+        last_node = node;
+        node = node->next_overload;
+    }
+
+    Assert(last_node);
+    if(!found)
+    {
+        last_node->next_overload = overload;
+    }
+}
+
+#if 0
 internal_api AST_node_t* 
 generate_structure_AST(parser_t *parser)
 {
@@ -744,17 +805,24 @@ generate_structure_AST(parser_t *parser)
 
     lexer_t *lexer = &parser->lexer;
 
+    // NOTE(Sleepster): Skip this structure if it is a template! 
+    bool8 parse_structure = true;
+    for(const auto &attribute: parser->current_attribute_list)
+    {
+        if(attribute.is_template)
+        {
+            parse_structure = false;
+        }
+    }
+
     lexer_token_t name_token = parser_get_next_lexer_token(parser);
     lexer_token_t token;
     if(name_token.token_type == TOKEN_TYPE_IDENT)
     {
-        if(name_token.token_type != TOKEN_TYPE_IDENT) 
+        if(c_string_compare(name_token.data, STR("dynamic_render_font_page_t")))
         {
-            report_error(parser,
-                         "Expected to find the name of the structure after the 'struct' keyword, failed to find that... instead found: '%.*s'...\n",
-                         fprint_token(name_token));
+            int x = 0;
         }
-
         token = parser_get_next_lexer_token(parser);
     }
     else if(name_token.token_type == TOKEN_TYPE_OPEN_BRACE)
@@ -815,303 +883,906 @@ generate_structure_AST(parser_t *parser)
     // NOTE(Sleepster): If it's a brace, it's a definition... otherwise it's just a declaration and we don't care... 
     if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
     {
-        AST_node_t *structure_root = AST_create_new_node(&parser->arena, parser->active_decl_context);
-        structure_root->node_type  = AST_NODE_TYPE_STRUCTURE;
-        structure_root->type.flags = structure_flags;
-
-        structure_root->line_number = parser->lexer.current_stream->line_number;
-
-        // NOTE(Sleepster): Copy the attributes 
-        if(parser->current_attribute_list.used > 0)
+        if(parse_structure)
         {
-            dynarray_copy(&structure_root->attributes, &parser->current_attribute_list);
-            dynarray_reset(&parser->current_attribute_list);
-        }
+            AST_node_t *structure_root = AST_create_new_node(&parser->arena, parser->active_decl_context);
+            structure_root->node_type  = AST_NODE_TYPE_STRUCTURE;
+            structure_root->type.flags = structure_flags;
 
-        // NOTE(Sleepster): Handle inheritence 
-        if(inheritance_node)
-        {
-            structure_root->struct_decl.inherited_type_info = inheritance_node;
-        }
+            structure_root->line_number = parser->lexer.current_stream->line_number;
 
-        bool8 pushed_context = false;
-
-        // NOTE(Sleepster): Set the code type of the structure 
-        code_type_t *structure_type = null;
-        if(name_token.token_type == TOKEN_TYPE_IDENT) 
-        {
-            structure_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
-            structure_type = parser_register_code_type(parser, structure_root->identifier);
-
-            // NOTE(Sleepster): Create a new declaration_context_t for this scope, then push items onto it. 
-            declaration_context_t *context = parser_create_declaration_context(parser, 
-                                                                               structure_root->identifier, 
-                                                                               parser->active_decl_context);
-            parser_push_decl_context(parser, context);
-            pushed_context = true;
-        }
-        else 
-        {
-            structure_root->identifier = STR("anonymous");
-        }
-
-        structure_root->type.code_type = structure_type;
-
-        u32 scope_depth = 1;
-        lexer_token_t typename_token = {};
-        while(scope_depth > 0 && typename_token.token_type != TOKEN_TYPE_EOF)
-        {
-            typename_token = parser_get_next_lexer_token(parser);
-            if(typename_token.token_type == TOKEN_TYPE_CLOSE_BRACE) 
+            // NOTE(Sleepster): Copy the attributes 
+            if(parser->current_attribute_list.used > 0)
             {
-                lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 1);
-                if(peek_token.token_type == TOKEN_TYPE_SEMICOLON || peek_token.token_type == TOKEN_TYPE_IDENT)
-                {
-                    --scope_depth;
-                }
+                dynarray_copy(&structure_root->attributes, &parser->current_attribute_list);
+                dynarray_reset(&parser->current_attribute_list);
             }
 
-            if(typename_token.token_type == TOKEN_TYPE_STRUCT)
+            // NOTE(Sleepster): Handle inheritence 
+            if(inheritance_node)
             {
-                lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 1);
-                if(peek_token.token_type == TOKEN_TYPE_IDENT)
+                structure_root->struct_decl.inherited_type_info = inheritance_node;
+            }
+
+            bool8 pushed_context = false;
+
+            // NOTE(Sleepster): Set the code type of the structure 
+            if(name_token.token_type == TOKEN_TYPE_IDENT) 
+            {
+                structure_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
+                // NOTE(Sleepster): Create a new declaration_context_t for this scope, then push items onto it. 
+                declaration_context_t *context = parser_create_declaration_context(parser, 
+                                                                                   structure_root->identifier, 
+                                                                                   parser->active_decl_context);
+                parser_push_decl_context(parser, context);
+                pushed_context = true;
+
+                structure_root->decl_context = context;
+            }
+
+            u32 scope_depth = 1;
+            lexer_token_t typename_token = {};
+            while(scope_depth > 0 && typename_token.token_type != TOKEN_TYPE_EOF)
+            {
+                typename_token = parser_get_next_lexer_token(parser);
+                if(typename_token.token_type == TOKEN_TYPE_CLOSE_BRACE) 
                 {
-                    lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 2);
-                    if(peek_token.token_type != TOKEN_TYPE_OPEN_BRACE)
+                    lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 1);
+                    if(peek_token.token_type == TOKEN_TYPE_SEMICOLON || peek_token.token_type == TOKEN_TYPE_IDENT)
                     {
+                        --scope_depth;
+                    }
+                }
+
+                if(typename_token.token_type == TOKEN_TYPE_STRUCT)
+                {
+                    lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 1);
+                    if(peek_token.token_type == TOKEN_TYPE_IDENT)
+                    {
+                        lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 2);
+                        if(peek_token.token_type != TOKEN_TYPE_OPEN_BRACE)
+                        {
+                            typename_token = parser_get_next_lexer_token(parser);
+                        }
+                    }
+                }
+
+                // NOTE(Sleepster): Handle type modifier (const or volatile)
+                u32 type_modifier_flags = 0;
+                if(typename_token.token_type == TOKEN_TYPE_UNION)
+                {
+                    type_modifier_flags |= AST_TYPE_MODIFIER_FLAG_UNION;
+                }
+
+                language_keyword_t *keyword = get_keyword_from_identifier(typename_token.data);
+                bool8 is_valid_member = true;
+                while(keyword->keyword_id != TOKEN_KEYWORD_INVALID && 
+                      keyword->keyword_id != TOKEN_KEYWORD_STRUCT  &&
+                      keyword->keyword_id != TOKEN_KEYWORD_UNION)
+                {
+                    if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
+                    {
+                        if(keyword->keyword_id == TOKEN_KEYWORD_VOLATILE)
+                        {
+                            type_modifier_flags |= AST_TYPE_MODIFIER_FLAG_VOLATILE;
+                        }
+                        if(keyword->keyword_id == TOKEN_KEYWORD_CONST)
+                        {
+                            type_modifier_flags |= AST_TYPE_MODIFIER_FLAG_CONST;
+                        }
+
+                        if(keyword->keyword_id == TOKEN_KEYWORD_PUBLIC  ||
+                           keyword->keyword_id == TOKEN_KEYWORD_PRIVATE ||
+                           keyword->keyword_id == TOKEN_KEYWORD_PROTECTED)
+                        {
+                            is_valid_member = false;
+                        }
+
                         typename_token = parser_get_next_lexer_token(parser);
                     }
-                }
-            }
 
-            // NOTE(Sleepster): Handle type modifier (const or volatile)
-            u32 type_modifier_flags = 0;
-            if(typename_token.token_type == TOKEN_TYPE_UNION)
-            {
-                type_modifier_flags |= AST_TYPE_MODIFIER_FLAG_UNION;
-            }
-
-            language_keyword_t *keyword = get_keyword_from_identifier(typename_token.data);
-            bool8 is_valid_member = true;
-            while(keyword->keyword_id != TOKEN_KEYWORD_INVALID && 
-                  keyword->keyword_id != TOKEN_KEYWORD_STRUCT  &&
-                  keyword->keyword_id != TOKEN_KEYWORD_UNION)
-            {
-                if(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
-                {
-                    if(keyword->keyword_id == TOKEN_KEYWORD_VOLATILE)
-                    {
-                        type_modifier_flags |= AST_TYPE_MODIFIER_FLAG_VOLATILE;
-                    }
-                    if(keyword->keyword_id == TOKEN_KEYWORD_CONST)
-                    {
-                        type_modifier_flags |= AST_TYPE_MODIFIER_FLAG_CONST;
-                    }
-
-                    if(keyword->keyword_id == TOKEN_KEYWORD_PUBLIC  ||
-                       keyword->keyword_id == TOKEN_KEYWORD_PRIVATE ||
-                       keyword->keyword_id == TOKEN_KEYWORD_PROTECTED)
-                    {
-                        is_valid_member = false;
-                    }
-
-                    typename_token = parser_get_next_lexer_token(parser);
+                    keyword = get_keyword_from_identifier(typename_token.data);
                 }
 
-                keyword = get_keyword_from_identifier(typename_token.data);
-            }
-
-            if(is_valid_member)
-            {
-                lexer_token_t member_name_token = parser_peek_next_lexer_token(parser);
-                if(member_name_token.token_type == TOKEN_TYPE_LESS_THAN)
+                if(is_valid_member)
                 {
-                    // NOTE(Sleepster): Eat the template params, we don't care. 
-                    u32 template_depth = 0;
-                    do {
-                        member_name_token = parser_get_next_lexer_token(parser);
-                        if(member_name_token.token_type == TOKEN_TYPE_LESS_THAN)
-                        {
-                            ++template_depth;
-                        }
-                        else if(member_name_token.token_type == TOKEN_TYPE_GREATER_THAN)
-                        {
-                            --template_depth;
-                        }
-                    }while(template_depth > 0);
-
-                    // NOTE(Sleepster): This gets us the name 
-                    member_name_token = parser_peek_next_lexer_token(parser);
-                }
-
-                // NOTE(Sleepster): A normal member that should be recorded, otherwise a constructor 
-                if(member_name_token.token_type != TOKEN_TYPE_OPEN_PAREN &&
-                   typename_token.token_type    != TOKEN_TYPE_TILDE)
-                {
-                    // NOTE(Sleepster): Handle member pointer 
-                    u32 pointer_depth = 0;
-                    if(member_name_token.token_type == TOKEN_TYPE_ASTERISK)
+                    lexer_token_t member_name_token = parser_peek_next_lexer_token(parser);
+                    if(member_name_token.token_type == TOKEN_TYPE_LESS_THAN)
                     {
+                        // NOTE(Sleepster): Eat the template params, we don't care. 
+                        u32 template_depth = 0;
                         do {
-                            member_name_token = parser_peek_next_lexer_token(parser, pointer_depth + 2);
-                            ++pointer_depth;
-                        }while(member_name_token.token_type == TOKEN_TYPE_ASTERISK);
+                            member_name_token = parser_get_next_lexer_token(parser);
+                            if(member_name_token.token_type == TOKEN_TYPE_LESS_THAN)
+                            {
+                                ++template_depth;
+                            }
+                            else if(member_name_token.token_type == TOKEN_TYPE_GREATER_THAN)
+                            {
+                                --template_depth;
+                            }
+                        }while(template_depth > 0);
+
+                        // NOTE(Sleepster): This gets us the name 
+                        member_name_token = parser_peek_next_lexer_token(parser);
                     }
 
-                    // NOTE(Sleepster): This assert is disabled for anonymous structures...
-                    // Expect(member_name_token.token_type == TOKEN_TYPE_IDENT, 
-                    //        "Expected to find a member name in this location... Instead found: '%.*s'...\n",
-                    //        fprint_token(member_name_token));
-
-                    lexer_token_t peek_token = parser_peek_next_lexer_token(parser, pointer_depth + 2);
-                    if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
+                    // NOTE(Sleepster): A normal member that should be recorded, otherwise a constructor 
+                    if(member_name_token.token_type != TOKEN_TYPE_OPEN_PAREN &&
+                       typename_token.token_type    != TOKEN_TYPE_TILDE)
                     {
-                        // usual lambda
-                        AST_node_t *member_node = generate_lambda_AST(parser, 
-                                                                      typename_token, 
-                                                                      pointer_depth, 
-                                                                      (type_modifier_flags & AST_TYPE_MODIFIER_FLAG_CONST) ? true : false);
-                        member_node->identifier = c_string_make_copy(&parser->arena, member_name_token.data);
-                        AST_add_member(structure_root, member_node);
-
-                        peek_token = parser_peek_next_lexer_token(parser);
-                        if(peek_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+                        // NOTE(Sleepster): Handle member pointer 
+                        u32 pointer_depth = 0;
+                        if(member_name_token.token_type == TOKEN_TYPE_ASTERISK)
                         {
-                            while(peek_token.token_type != TOKEN_TYPE_CLOSE_BRACE)
+                            do {
+                                member_name_token = parser_peek_next_lexer_token(parser, pointer_depth + 2);
+                                ++pointer_depth;
+                            }while(member_name_token.token_type == TOKEN_TYPE_ASTERISK);
+                        }
+
+                        // NOTE(Sleepster): This assert is disabled for anonymous structures...
+                        // Expect(member_name_token.token_type == TOKEN_TYPE_IDENT, 
+                        //        "Expected to find a member name in this location... Instead found: '%.*s'...\n",
+                        //        fprint_token(member_name_token));
+
+                        lexer_token_t peek_token = parser_peek_next_lexer_token(parser, pointer_depth + 2);
+                        if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
+                        {
+                            // usual lambda
+                            AST_node_t *member_node = generate_lambda_AST(parser, 
+                                                                          typename_token, 
+                                                                          pointer_depth, 
+                                                                          (type_modifier_flags & AST_TYPE_MODIFIER_FLAG_CONST) ? true : false);
+                            member_node->identifier = c_string_make_copy(&parser->arena, member_name_token.data);
+                            AST_add_member(structure_root, member_node);
+
+                            peek_token = parser_peek_next_lexer_token(parser);
+                            if(peek_token.token_type == TOKEN_TYPE_OPEN_BRACE)
                             {
-                                peek_token = parser_get_next_lexer_token(parser);
+                                while(peek_token.token_type != TOKEN_TYPE_CLOSE_BRACE)
+                                {
+                                    peek_token = parser_get_next_lexer_token(parser);
+                                }
+                            }
+                            else if(peek_token.token_type == TOKEN_TYPE_SEMICOLON)
+                            {
+                                parser_get_next_lexer_token(parser);
                             }
                         }
-                        else if(peek_token.token_type == TOKEN_TYPE_SEMICOLON)
+                        else if(typename_token.token_type == TOKEN_TYPE_IDENT)
                         {
                             parser_get_next_lexer_token(parser);
-                        }
-                    }
-                    else if(typename_token.token_type == TOKEN_TYPE_IDENT)
-                    {
-                        parser_get_next_lexer_token(parser);
-                        for(u32 pointer_index = 0;
-                            pointer_index < pointer_depth;
-                            ++pointer_index)
-                        {
-                            parser_get_next_lexer_token(parser);
-                        }
-
-                        AST_node_t *member_node = AST_create_new_node(&parser->arena, parser->active_decl_context);
-                        member_node->node_type  = AST_NODE_TYPE_STRUCTURE_MEMBER;
-                        member_node->identifier = c_string_make_copy(&parser->arena, member_name_token.data); 
-
-                        code_type_t *member_type    = parser_register_code_type(parser, typename_token.data);
-                        member_node->type.code_type = member_type;
-
-                        member_node->type.pointer_depth = pointer_depth;
-                        member_node->type.flags         = type_modifier_flags;
-                        if(pointer_depth > 0)
-                        {
-                            member_node->type.flags |= AST_TYPE_MODIFIER_FLAG_POINTER;
-                        }
-
-                        AST_add_member(structure_root, member_node);
-
-                        // NOTE(Sleepster): Eat the semicolon, if it is not a semicolon, then check for an array or a default expression value
-                        token = parser_get_next_lexer_token(parser);
-                        if(token.token_type == TOKEN_TYPE_OPEN_BRACKET)
-                        {
-                            member_node->type.flags |= AST_TYPE_MODIFIER_FLAG_ARRAY;
-
-                            AST_node_t **array = &member_node->array_data.array_expression;
-                            while(token.token_type != TOKEN_TYPE_SEMICOLON)
+                            for(u32 pointer_index = 0;
+                                pointer_index < pointer_depth;
+                                ++pointer_index)
                             {
-                                if(!(*array)) *array = c_arena_push_struct(&parser->arena, AST_node_t);
+                                parser_get_next_lexer_token(parser);
+                            }
 
-                                *array = generate_expression_AST(parser, 0, &token);
-                                 array = &(*array)->next_sibling;
+                            AST_node_t *member_node = AST_create_new_node(&parser->arena, parser->active_decl_context);
+                            member_node->node_type  = AST_NODE_TYPE_STRUCTURE_MEMBER;
+                            member_node->identifier = c_string_make_copy(&parser->arena, member_name_token.data); 
 
-                                token = parser_get_next_lexer_token(parser);
+                            code_type_t *member_type    = parser_register_code_type(parser, typename_token.data);
+                            member_node->type.code_type = member_type;
+
+                            member_node->type.pointer_depth = pointer_depth;
+                            member_node->type.flags         = type_modifier_flags;
+                            if(pointer_depth > 0)
+                            {
+                                member_node->type.flags |= AST_TYPE_MODIFIER_FLAG_POINTER;
+                            }
+
+                            AST_add_member(structure_root, member_node);
+
+                            // NOTE(Sleepster): Eat the semicolon, if it is not a semicolon, then check for an array or a default expression value
+                            token = parser_get_next_lexer_token(parser);
+                            if(token.token_type == TOKEN_TYPE_OPEN_BRACKET)
+                            {
+                                member_node->type.flags |= AST_TYPE_MODIFIER_FLAG_ARRAY;
+
+                                AST_node_t **array = &member_node->array_data.array_expression;
+                                while(token.token_type != TOKEN_TYPE_SEMICOLON)
+                                {
+                                    if(!(*array)) *array = c_arena_push_struct(&parser->arena, AST_node_t);
+
+                                    *array = generate_expression_AST(parser, 0, &token);
+                                    array = &(*array)->next_sibling;
+
+                                    token = parser_get_next_lexer_token(parser);
+                                }
+                            }
+                            else if(token.token_type == TOKEN_TYPE_EQUALS)
+                            {
+                                // NOTE(Sleepster): Generate the assignment AST 
+                                member_node->expression.info = generate_expression_AST(parser, 0, &token);
                             }
                         }
-                        else if(token.token_type == TOKEN_TYPE_EQUALS)
+                        else if(typename_token.token_type == TOKEN_TYPE_STRUCT || 
+                                typename_token.token_type == TOKEN_TYPE_UNION)
                         {
-                            // NOTE(Sleepster): Generate the assignment AST 
-                            member_node->expression.info = generate_expression_AST(parser, 0, &token);
+                            lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 1);
+                            if(peek_token.token_type == TOKEN_TYPE_IDENT)
+                            {
+                                AST_node_t *nested_structure = generate_structure_AST(parser);
+                                AST_add_member(structure_root, nested_structure);
+                            }
+                            else if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
+                            {
+                                ++scope_depth;
+                            }
                         }
                     }
-                    else if(typename_token.token_type == TOKEN_TYPE_STRUCT || 
-                            typename_token.token_type == TOKEN_TYPE_UNION)
+                    if(member_name_token.token_type == TOKEN_TYPE_OPEN_PAREN || 
+                       typename_token.token_type == TOKEN_TYPE_TILDE)
                     {
-                        lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 1);
-                        if(peek_token.token_type == TOKEN_TYPE_IDENT)
+                        // NOTE(Sleepster): Constructor / Deconstructor 
+                        lexer_token_t end_token = parser_get_next_lexer_token(parser);
+                        if(end_token.token_type != TOKEN_TYPE_SEMICOLON && end_token.token_type != TOKEN_TYPE_OPEN_BRACE)
                         {
-                            AST_node_t *nested_structure = generate_structure_AST(parser);
-                            AST_add_member(structure_root, nested_structure);
+                            while(end_token.token_type != TOKEN_TYPE_SEMICOLON && end_token.token_type != TOKEN_TYPE_OPEN_BRACE)
+                            {
+                                end_token = parser_get_next_lexer_token(parser);
+                            }
                         }
-                        else if(peek_token.token_type == TOKEN_TYPE_OPEN_PAREN)
+
+                        if(end_token.token_type == TOKEN_TYPE_OPEN_BRACE)
                         {
-                            ++scope_depth;
+                            while(end_token.token_type != TOKEN_TYPE_CLOSE_BRACE)
+                            {
+                                end_token = parser_get_next_lexer_token(parser);
+                            }
                         }
                     }
                 }
-                if(member_name_token.token_type == TOKEN_TYPE_OPEN_PAREN || 
-                   typename_token.token_type == TOKEN_TYPE_TILDE)
+                else
                 {
-                    // NOTE(Sleepster): Constructor / Deconstructor 
-                    lexer_token_t end_token = parser_get_next_lexer_token(parser);
-                    if(end_token.token_type != TOKEN_TYPE_SEMICOLON && end_token.token_type != TOKEN_TYPE_OPEN_BRACE)
-                    {
-                        while(end_token.token_type != TOKEN_TYPE_SEMICOLON && end_token.token_type != TOKEN_TYPE_OPEN_BRACE)
-                        {
-                            end_token = parser_get_next_lexer_token(parser);
-                        }
-                    }
+                    lexer_eat_lines(&transient_arena, lexer, 1);
+                }
+            }
 
-                    if(end_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+            if(pushed_context)
+            {
+                parser_pop_decl_context(parser);
+            }
+
+            // NOTE(Sleepster): Check post closing brace for an identifier (C style)
+            token = parser_get_next_lexer_token(parser);
+            if(token.token_type == TOKEN_TYPE_IDENT)
+            {
+                string_t alias_name = c_string_make_copy(&parser->arena, token.data);
+                structure_root->identifier = alias_name;
+
+                token = parser_get_next_lexer_token(parser);
+            }
+            if(token.token_type != TOKEN_TYPE_SEMICOLON)
+            {
+                report_error(parser,
+                             "Finished parsing a structured type and expected a closing ';'... Failed to find that. Instead found, %.*s...\n",
+                             fprint_token(token));
+            }
+
+            result = structure_root;
+            if(result->identifier.data != null && result->identifier.count > 0)
+            {
+                code_type_t *type = parser_register_code_type(parser, result->identifier);
+                type->type_data = result;
+
+                result->type.code_type = type;
+            }
+
+            AST_node_t *node = hash_table_get_element(&parser->active_decl_context->code_decls, result->identifier);
+            if(node)
+            {
+                node->next_overload = result;
+            }
+            else
+            {
+                hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
+            }
+        }
+        else
+        {
+            u32 current_depth = 1;
+            while(current_depth > 0)
+            {
+                lexer_token_t token = parser_get_next_lexer_token(parser);
+                if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
+                {
+                    ++current_depth;
+                }
+                else if(token.token_type == TOKEN_TYPE_CLOSE_BRACE)
+                {
+                    --current_depth;
+                }
+            }
+        }
+    }
+
+    return(result);
+}
+#else
+internal_api void
+consume_code_block(parser_t *parser, lexer_token_t *token_out)
+{
+    lexer_token_t peek_token = parser_get_next_lexer_token(parser);
+    // NOTE(Sleepster): Eat all the braces here and return 
+    u32 current_depth = 1;
+    while(current_depth > 0)
+    {
+        peek_token = parser_get_next_lexer_token(parser);
+        if(peek_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+        {
+            ++current_depth;
+        }
+        else if(peek_token.token_type == TOKEN_TYPE_CLOSE_BRACE)
+        {
+            --current_depth;
+        }
+    }
+
+    if(token_out)
+    {
+        *token_out = peek_token;
+    }
+}
+
+internal_api void
+consume_member_lambda_code_block(parser_t *parser, lexer_token_t member_type, lexer_token_t *token_out)
+{
+    while(member_type.token_type != TOKEN_TYPE_CLOSE_PAREN)
+    {
+        if(member_type.token_type == TOKEN_TYPE_SEMICOLON)
+        {
+            report_error(parser,
+                         "Expected to find a ')' to match this deconstructors '('... However, we instead found: '%.*s'...\n",
+                         fprint_token(member_type));
+        }
+
+        // NOTE(Sleepster): This is fine here because you can't pass anything to a deconstructor 
+        member_type = parser_get_next_lexer_token(parser);
+    }
+
+    lexer_token_t peek_token = parser_peek_next_lexer_token(parser);
+    if(peek_token.token_type == TOKEN_TYPE_SEMICOLON)
+    {
+        // NOTE(Sleepster): Eat the semicolon and return 
+        *token_out = parser_get_next_lexer_token(parser);
+    }
+    else if(peek_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+    {
+        // NOTE(Sleepster): Eat all the braces here and return 
+        u32 current_depth = 1;
+        while(current_depth > 0)
+        {
+            peek_token = parser_get_next_lexer_token(parser);
+            if(peek_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+            {
+                ++current_depth;
+            }
+            else if(peek_token.token_type == TOKEN_TYPE_CLOSE_BRACE)
+            {
+                --current_depth;
+            }
+        }
+
+        *token_out = peek_token;
+    }
+    else
+    {
+        report_error(parser,
+                     "Expected to either find a semicolon or an '{' at the end of this deconstructor's declaration.. instead found: '%.*s'...\n",
+                     fprint_token(peek_token));
+    }
+}
+
+internal_api AST_node_t*
+parse_structure_member(parser_t *parser, AST_node_t *structure, lexer_token_t *token_out)
+{
+    AST_node_t *result = null;
+    lexer_token_t member_type = parser_get_next_lexer_token(parser);
+    if(member_type.token_type == TOKEN_TYPE_CLOSE_BRACE)
+    {
+        *token_out = member_type;
+        return(result);
+    }
+
+    // NOTE(Sleepster): If this token is a '~' it is a deconstructor, return. 
+    if(member_type.token_type != TOKEN_TYPE_TILDE)
+    {
+        // NOTE(Sleepster): Check if this is some sort of C-style embed like:
+        // typedef struct blah {
+        //     struct blah *next_blah; <- this
+        // }blah_t;
+        if(member_type.token_type == TOKEN_TYPE_STRUCT || member_type.token_type == TOKEN_TYPE_UNION)
+        {
+            lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 1);
+            if(peek_token.token_type == TOKEN_TYPE_IDENT)
+            {
+                peek_token = parser_peek_next_lexer_token(parser, 2);
+                if(peek_token.token_type == TOKEN_TYPE_ASTERISK)
+                {
+                    u32 peek_depth = 3;
+                    while(peek_token.token_type != TOKEN_TYPE_IDENT && peek_token.token_type != TOKEN_TYPE_SEMICOLON)
                     {
-                        while(end_token.token_type != TOKEN_TYPE_CLOSE_BRACE)
+                        if(peek_token.token_type != TOKEN_TYPE_ASTERISK &&
+                           peek_token.token_type != TOKEN_TYPE_CONST    &&
+                           peek_token.token_type != TOKEN_TYPE_VOLATILE)
                         {
-                            end_token = parser_get_next_lexer_token(parser);
+                            report_error(parser,
+                                         "Unexpected token when parsing a structure member. Found: '%.*s'...\n",
+                                         fprint_token(peek_token));
                         }
+                        peek_token = parser_peek_next_lexer_token(parser, peek_depth++);
                     }
+                }
+
+                if(peek_token.token_type == TOKEN_TYPE_IDENT)
+                {
+                    // NOTE(Sleepster): If there is an identifier here for the C-style embed, just eat the struct token. 
+                    member_type = parser_get_next_lexer_token(parser);
+                }
+            }
+            else if(peek_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+            {
+                // NOTE(Sleepster): Nested structure ... 
+                AST_node_t *nested_structure = generate_structure_AST(parser);
+                nested_structure->type.flags |= AST_TYPE_MODIFIER_FLAG_NESTED;
+                if(nested_structure->type.flags & AST_TYPE_MODIFIER_FLAG_ANONYMOUS)
+                {
+                    AST_node_t *current_member = nested_structure->struct_decl.first_member;
+                    while(current_member)
+                    {
+                        AST_add_member(structure, current_member);
+                        AST_node_t *last_member = current_member;
+                        current_member = current_member->next_sibling;
+
+                        // NOTE(Sleepster): We have to wipe out it's next_sibling pointer since it's part of a new structure... 
+                        last_member->next_sibling = null;
+                    }
+                }
+                else
+                {
+                    AST_add_member(structure, nested_structure);
+                }
+
+                return(result);
+            }
+        }
+        else
+        {
+            if(member_type.token_type == TOKEN_TYPE_PUBLIC    ||
+               member_type.token_type == TOKEN_TYPE_PRIVATE   ||
+               member_type.token_type == TOKEN_TYPE_PROTECTED)
+            {
+                // NOTE(Sleepster): Eat the semicolon 
+                parser_get_next_lexer_token(parser);
+                return(result);
+            }
+        }
+
+        // NOTE(Sleepster): Deal with qualifiers
+        u32 type_qualifier_flags = 0;
+        language_keyword_t *keyword = get_keyword_from_identifier(member_type.data);
+        if(keyword->keyword_id != TOKEN_KEYWORD_STRUCT &&
+           keyword->keyword_id != TOKEN_KEYWORD_UNION)
+        {
+            while(keyword->keyword_id != TOKEN_KEYWORD_INVALID)
+            {
+                if(keyword->keyword_id == TOKEN_KEYWORD_VOLATILE)
+                {
+                    type_qualifier_flags |= AST_TYPE_MODIFIER_FLAG_VOLATILE;
+                }
+                if(keyword->keyword_id == TOKEN_KEYWORD_CONST)
+                {
+                    type_qualifier_flags |= AST_TYPE_MODIFIER_FLAG_CONST;
+                }
+                member_type = parser_get_next_lexer_token(parser);
+                keyword = get_keyword_from_identifier(member_type.data);
+            }
+        }
+        else
+        {
+            // NOTE(Sleepster): Nested structure ... 
+            AST_node_t *nested_structure  = generate_structure_AST(parser);
+            nested_structure->type.flags |= AST_TYPE_MODIFIER_FLAG_NESTED;
+            if(nested_structure->type.flags & AST_TYPE_MODIFIER_FLAG_ANONYMOUS)
+            {
+                for(AST_node_t *current_member = nested_structure->struct_decl.first_member;
+                    current_member;
+                    current_member = current_member->next_sibling)
+                {
+                    AST_add_member(structure, current_member);
                 }
             }
             else
             {
-                lexer_eat_lines(&transient_arena, lexer, 1);
+                AST_add_member(structure, nested_structure);
+            }
+            return(result);
+        }
+
+        u32 pointer_depth = 0;
+        lexer_token_t asterisk_token = parser_peek_next_lexer_token(parser, 1);
+        if(asterisk_token.token_type == TOKEN_TYPE_ASTERISK)
+        {
+            while(asterisk_token.token_type == TOKEN_TYPE_ASTERISK)
+            {
+                asterisk_token = parser_get_next_lexer_token(parser);
+                ++pointer_depth;
+
+                lexer_token_t peek = parser_peek_next_lexer_token(parser);
+                if(peek.token_type != TOKEN_TYPE_ASTERISK)
+                {
+                    break;
+                }
             }
         }
 
-        if(pushed_context)
+        // NOTE(Sleepster): If the asterisk token is an open paren then we need to verify 
+        // this isn't some intrinsic like: 'alignas()' with an argument of '(some value)' like:
+        // 'alignas((64))' as that would evaluate to a lambda, which is incorrect.
+        lexer_token_t lambda_peek_token = parser_peek_next_lexer_token(parser, 2);
+        if(lambda_peek_token.token_type == TOKEN_TYPE_OPEN_PAREN && 
+           asterisk_token.token_type != TOKEN_TYPE_OPEN_PAREN)
+        {
+            // NOTE(Sleepster): Lambda 
+            result = AST_create_new_node(&parser->arena, parser->active_decl_context);
+            result = generate_lambda_AST(parser,
+                                         member_type,
+                                         pointer_depth,
+                                        (type_qualifier_flags & AST_TYPE_MODIFIER_FLAG_CONST) ? true : false);
+
+            lexer_token_t end_peek_token = parser_peek_next_lexer_token(parser);
+            if(end_peek_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+            {
+                consume_code_block(parser, null);
+            }
+            else if(end_peek_token.token_type == TOKEN_TYPE_SEMICOLON)
+            {
+                parser_get_next_lexer_token(parser);
+            }
+        }
+        else
+        {
+            // NOTE(Sleepster): Normal member 
+            lexer_token_t member_name = parser_get_next_lexer_token(parser);
+
+            // NOTE(Sleepster): This would be a template 
+            if(member_name.token_type == TOKEN_TYPE_LESS_THAN)
+            {
+                member_name = parser_get_next_lexer_token(parser);
+                // NOTE(Sleepster): Eat the template params, we don't care. 
+                u32 template_depth = 0;
+                do {
+                    member_name = parser_get_next_lexer_token(parser);
+                    if(member_name.token_type == TOKEN_TYPE_LESS_THAN)
+                    {
+                        ++template_depth;
+                    }
+                    else if(member_name.token_type == TOKEN_TYPE_GREATER_THAN)
+                    {
+                        --template_depth;
+                    }
+                }while(template_depth > 0);
+
+                // NOTE(Sleepster): This gets us the name of the template param 
+                member_name = parser_peek_next_lexer_token(parser);
+            }
+            else if(member_name.token_type == TOKEN_TYPE_OPEN_PAREN)
+            {
+                // NOTE(Sleepster): Constructor, eat and return
+                if(c_string_compare(structure->identifier, member_type.data))
+                {
+                    consume_member_lambda_code_block(parser, member_type, token_out);
+                    return(result);
+                }
+                else
+                {
+                    if(c_string_compare(member_type.data, STR("alignas")))
+                    {
+                        u32 current_depth = 1;
+                        // NOTE(Sleepster): Some compiler directive like: 'alignas(64)' or something of the sort.
+                        while(current_depth > 0)
+                        {
+                            member_type = parser_get_next_lexer_token(parser);
+                            if(member_type.token_type == TOKEN_TYPE_OPEN_PAREN)
+                            {
+                                ++current_depth;
+                            }
+                            else if(member_type.token_type == TOKEN_TYPE_CLOSE_PAREN)
+                            {
+                                --current_depth;
+                            }
+                        }
+
+                        result = parse_structure_member(parser, structure, token_out);
+                    }
+                    else
+                    {
+                        while(member_type.token_type != TOKEN_TYPE_SEMICOLON)
+                        {
+                            member_type = parser_get_next_lexer_token(parser);
+                        }
+                    }
+
+                    return(result);
+                }
+            }
+
+            result = AST_create_new_node(&parser->arena, parser->active_decl_context);
+            if(member_type.token_type == TOKEN_TYPE_IDENT)
+            {
+                // NOTE(Sleepster): Standard member 
+                result->node_type  = AST_NODE_TYPE_STRUCTURE_MEMBER;
+                result->identifier = c_string_make_copy(&parser->arena, member_name.data);
+                code_type_t *member_code_type = parser_register_code_type(parser, member_type.data);
+                result->type.code_type        = member_code_type;
+
+                result->type.pointer_depth = pointer_depth;
+                result->type.flags         = type_qualifier_flags;
+                if(pointer_depth > 0)
+                {
+                    result->type.flags |= AST_TYPE_MODIFIER_FLAG_POINTER;
+                }
+
+                // NOTE(Sleepster): Eat the semicolon, if it is not a semicolon, then check for an array or a default expression value
+                lexer_token_t token = parser_get_next_lexer_token(parser);
+                if(token.token_type == TOKEN_TYPE_OPEN_BRACKET)
+                {
+                    result->type.flags |= AST_TYPE_MODIFIER_FLAG_ARRAY;
+
+                    AST_node_t **array = &result->array_data.array_expression;
+                    while(token.token_type != TOKEN_TYPE_SEMICOLON)
+                    {
+                        if(!(*array)) *array = c_arena_push_struct(&parser->arena, AST_node_t);
+
+                        *array = generate_expression_AST(parser, 0, &token);
+                        array  = &(*array)->next_sibling;
+
+                        token = parser_get_next_lexer_token(parser);
+                    }
+                }
+                else if(token.token_type == TOKEN_TYPE_EQUALS)
+                {
+                    // NOTE(Sleepster): Generate the assignment AST 
+                    result->expression.info = generate_expression_AST(parser, 0, &token);
+                    lexer_token_t semicolon_token = parser_peek_next_lexer_token(parser);
+                    if(semicolon_token.token_type == TOKEN_TYPE_SEMICOLON)
+                    {
+                        token = parser_get_next_lexer_token(parser);
+                    }
+                }
+                else
+                {
+                    if(token.token_type != TOKEN_TYPE_SEMICOLON)
+                    {
+                        report_error(parser,
+                                     "Expected to find either a ';' or an '[]' array size identifier at the end of this struct member declaration... Instead found: '%.*s'...\n",
+                                     fprint_token(token));
+                    }
+                }
+
+                *token_out = token;
+            }
+        }
+    }
+    else
+    {
+        // NOTE(Sleepster): Deconstructor path. 
+        member_type = parser_get_next_lexer_token(parser);
+        if(member_type.token_type != TOKEN_TYPE_IDENT)
+        {
+            report_error(parser,
+                         "The only token allowed to follow a '~' is an identifier... instead found: '%.*s'...\n",
+                         fprint_token(member_type));
+        }
+
+        member_type = parser_get_next_lexer_token(parser);
+        if(member_type.token_type != TOKEN_TYPE_OPEN_PAREN)
+        {
+            report_error(parser,
+                         "Expected to find an open paren following this suspected deconstructor definition, instead found: '%.*s'...\n",
+                         fprint_token(member_type));
+        }
+
+        consume_member_lambda_code_block(parser, member_type, token_out);
+    }
+
+    return(result);
+}
+
+internal_api AST_node_t*
+generate_structure_AST(parser_t *parser)
+{
+    AST_node_t *result = null;
+
+    // NOTE(Sleepster): Check if this is a templated structure, if it is templated ignore it. 
+    for(const auto &attribute: parser->current_attribute_list)
+    {
+        if(attribute.is_template)
+        {
+            dynarray_reset(&parser->current_attribute_list);
+            return(result);
+        }
+    }
+
+    u32 structure_AST_flags = 0;
+    lexer_token_t structure_name_token = parser_get_next_lexer_token(parser);
+    // NOTE(Sleepster): Set a bookmark at the '{' here... Search for a name at the end of the decl. 
+    parser_push_bookmark(parser, structure_name_token);
+    // NOTE(Sleepster): If this is a valid name, check many things:
+    // 1.) Is this a declaration?
+    // 2.) Does it inherit from another structure?
+    if(structure_name_token.token_type == TOKEN_TYPE_IDENT)
+    {
+        // NOTE(Sleepster): If there is a brace or colon after the identifier, then we're good. Otherwise leave.
+        lexer_token_t peek_token = parser_peek_next_lexer_token(parser);
+        if(!(peek_token.token_type == TOKEN_TYPE_OPEN_BRACE ||
+             peek_token.token_type == TOKEN_TYPE_COLON))
+        {
+            return(result);
+        }
+    }
+
+    string_t structure_name = {};
+    if(structure_name_token.token_type == TOKEN_TYPE_IDENT)
+    {
+        structure_name = structure_name_token.data;
+    }
+
+    // NOTE(Sleepster): Check if there is an inheritance ':' marker and eat it. 
+    lexer_token_t peek_token = parser_peek_next_lexer_token(parser, 1);
+    if(peek_token.token_type == TOKEN_TYPE_COLON)
+    {
+        while(peek_token.token_type != TOKEN_TYPE_OPEN_BRACE)
+        {
+            peek_token = parser_get_next_lexer_token(parser);
+        }
+    }
+
+    consume_code_block(parser, &peek_token);
+    peek_token = parser_get_next_lexer_token(parser);
+    if(peek_token.token_type == TOKEN_TYPE_IDENT)
+    {
+        structure_name = peek_token.data;
+    }
+
+    parser_pop_bookmark(parser);
+
+    if(structure_name.data == null || structure_name.count == 0)
+    {
+        structure_AST_flags |= AST_TYPE_MODIFIER_FLAG_ANONYMOUS;
+    }
+
+    // NOTE(Sleepster): Check for inheritance data. 
+    AST_node_t *inheritance_data = null;
+    lexer_token_t token = parser_peek_next_lexer_token(parser);
+    if(token.token_type == TOKEN_TYPE_COLON)
+    {
+        parser_get_next_lexer_token(parser);
+
+        // NOTE(Sleepster): Get the qualifier 
+        token = parser_get_next_lexer_token(parser);
+        if(token.token_type != TOKEN_TYPE_PUBLIC &&
+           token.token_type != TOKEN_TYPE_PRIVATE &&
+           token.token_type != TOKEN_TYPE_PROTECTED)
+        {
+            report_error(parser, 
+                         "Attempted to parse a structure of name: '%.*s' and it's inheritance data... Expected either: 'public', 'private', or 'protected'. Instead found: '%.*s'...\n",
+                         fprint_token(structure_name_token), fprint_token(token));
+        }
+
+        lexer_token_t inherited_struct = parser_get_next_lexer_token(parser);
+        if(inherited_struct.token_type != TOKEN_TYPE_IDENT)
+        {
+            report_error(parser,
+                         "Expected to find the name of a structure following a declaration of type: 'struct %.*s: ' instead found: '%.*s'...\n",
+                         fprint_token(structure_name_token), inherited_struct);
+        }
+
+        inheritance_data            = AST_create_new_node(&parser->arena, parser->active_decl_context);
+        inheritance_data->node_type = AST_NODE_TYPE_INHERITANCE_INFO;
+
+        code_type_t *inherited_type = parser_register_code_type(parser ,c_string_make_copy(&parser->arena, inherited_struct.data));
+        inheritance_data->inheritance_info.inheritance_type = token.token_type;
+        inheritance_data->inheritance_info.inherited_data   = inheritance_data;
+        inheritance_data->type.code_type                    = inherited_type;
+
+        token = parser_get_next_lexer_token(parser);
+    }
+
+    // NOTE(Sleepster): Parse the structure 
+    if(token.token_type == TOKEN_TYPE_OPEN_BRACE || structure_name_token.token_type == TOKEN_TYPE_OPEN_BRACE)
+    {
+        if(token.token_type == TOKEN_TYPE_OPEN_BRACE && inheritance_data == null)
+        {
+            parser_get_next_lexer_token(parser);
+        }
+
+        AST_node_t *structure  = AST_create_new_node(&parser->arena, parser->active_decl_context);
+        structure->node_type   = AST_NODE_TYPE_STRUCTURE;
+        structure->type.flags  = structure_AST_flags;
+        structure->line_number = parser->lexer.current_stream->line_number;
+        if(structure_name.data != null && structure_name.count > 0)
+        {
+            structure->identifier  = c_string_make_copy(&parser->arena, structure_name);
+        }
+
+        // NOTE(Sleepster): Copy the attributes 
+        if(parser->current_attribute_list.used > 0)
+        {
+            dynarray_copy(&structure->attributes, &parser->current_attribute_list);
+            dynarray_reset(&parser->current_attribute_list);
+        }
+
+        // NOTE(Sleepster): Handle inheritence 
+        if(inheritance_data)
+        {
+            structure->struct_decl.inherited_type_info = inheritance_data;
+        }
+
+        // NOTE(Sleepster): Push it's declaration context 
+        if(structure->identifier.data != null && structure->identifier.count > 0)
+        {
+            declaration_context_t *context = parser_create_declaration_context(parser, 
+                                                                               structure->identifier, 
+                                                                               parser->active_decl_context);
+            parser_push_decl_context(parser, context);
+            structure->decl_context = context;
+        }
+
+        // NOTE(Sleepster): Parse each of the members, allowing lambdas but ignoring constructor & deconstructors. 
+        while(token.token_type != TOKEN_TYPE_CLOSE_BRACE)
+        {
+            AST_node_t *member = parse_structure_member(parser, structure, &token);
+            if(member)
+            {
+                AST_add_member(structure, member);
+            }
+        }
+
+        lexer_token_t end_token = parser_get_next_lexer_token(parser);
+        if(end_token.token_type == TOKEN_TYPE_IDENT)
+        {
+            end_token = parser_get_next_lexer_token(parser);
+        }
+
+        result = structure;
+        if(structure->identifier.data != null && structure->identifier.count > 0)
         {
             parser_pop_decl_context(parser);
         }
-        
-        token = parser_get_next_lexer_token(parser);
-        if(token.token_type == TOKEN_TYPE_IDENT)
-        {
-            string_t alias_name = c_string_make_copy(&parser->arena, token.data);
+    }
+    else
+    {
+        report_error(parser,
+                     "Tried to parse a structure, however did not find the '{' where we expected too, instead found: '%.*s'",
+                     fprint_token(token));
+    }
 
-            parser_register_code_type(parser, alias_name, structure_type);
-            token = parser_get_next_lexer_token(parser);
-        }
-        if(token.token_type != TOKEN_TYPE_SEMICOLON)
-        {
-            report_error(parser,
-                         "Finished parsing a structured type and expected a closing ';'... Failed to find that. Instead found, %.*s...\n",
-                         fprint_token(token));
-        }
+    if(result->identifier.data != null && result->identifier.count > 0)
+    {
+        code_type_t *type = parser_register_code_type(parser, result->identifier);
+        type->type_data = result;
 
-        result = structure_root;
-#if 0
-        string_t identity_tag = c_string_concat(&parser->arena, result->identifier, STR("_structure"));
-                 identity_tag = c_string_concat(&parser->arena, parser->active_decl_context->lexical_scope, identity_tag);
+        result->type.code_type = type;
+    }
 
-        result->identity_tag = identity_tag;
-        hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identity_tag);
-#endif
+    AST_node_t *node = hash_table_get_element(&parser->active_decl_context->code_decls, result->identifier);
+    if(node)
+    {
+        node->next_overload = result;
+    }
+    else
+    {
         hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
     }
 
     return(result);
 }
+#endif
 
 internal_api AST_node_t*
 generate_enum_AST(parser_t *parser)
@@ -1139,8 +1810,8 @@ generate_enum_AST(parser_t *parser)
     // NOTE(Sleepster): Same as a structured type, if it's an open brace it's a definition 
     if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
     {
-        AST_node_t *enum_root     = AST_create_new_node(&parser->arena, parser->active_decl_context);
-        enum_root->node_type      = AST_NODE_TYPE_ENUM;
+        AST_node_t *enum_root = AST_create_new_node(&parser->arena, parser->active_decl_context);
+        enum_root->node_type  = AST_NODE_TYPE_ENUM;
 
         // NOTE(Sleepster): Copy the attributes 
         if(parser->current_attribute_list.used > 0)
@@ -1154,14 +1825,12 @@ generate_enum_AST(parser_t *parser)
         if(name_token.token_type == TOKEN_TYPE_IDENT) 
         {
             enum_root->identifier = c_string_make_copy(&parser->arena, name_token.data);
-            enum_type = parser_register_code_type(parser, enum_root->identifier);
         }
         else 
         {
             enum_root->identifier = c_string_make_copy(&parser->arena, STR("anonymous"));
         }
 
-        enum_root->type.code_type = enum_type;
         for(;;)
         {
             if(token.token_type == TOKEN_TYPE_CLOSE_BRACE) break;
@@ -1197,7 +1866,8 @@ generate_enum_AST(parser_t *parser)
         if(token.token_type == TOKEN_TYPE_IDENT)
         {
             string_t alias_name = c_string_make_copy(&parser->arena, token.data);
-            parser_register_code_type(parser, alias_name, enum_type);
+            enum_root->identifier = alias_name;
+
             token = parser_get_next_lexer_token(parser);
         }
         if(token.token_type != TOKEN_TYPE_SEMICOLON)
@@ -1208,15 +1878,30 @@ generate_enum_AST(parser_t *parser)
         }
 
         result = enum_root;
+        if(result->identifier.data != null && result->identifier.count > 0)
+        {
+            code_type_t *type = parser_register_code_type(parser, enum_root->identifier);
+            type->type_data = result;
+
+            result->type.code_type = type;
+            for(AST_node_t *current_argument = result->struct_decl.first_member;
+                current_argument;
+                current_argument = current_argument->next_sibling)
+            {
+                current_argument->type.code_type = type;
+            }
+        }
     }
 
-#if 0
-    string_t identity_tag = c_string_concat(&parser->arena, result->identifier, STR("_enum"));
-    identity_tag = c_string_concat(&parser->arena, parser->active_decl_context->lexical_scope, identity_tag);
-
-    result->identity_tag = identity_tag;
-#endif
-    hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
+    AST_node_t *node = hash_table_get_element(&parser->active_decl_context->code_decls, result->identifier);
+    if(node)
+    {
+        node->next_overload = result;
+    }
+    else
+    {
+        hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
+    }
 
     return(result);
 }
@@ -1241,77 +1926,125 @@ generate_lambda_AST(parser_t     *parser,
                     u32           return_type_pointer_depth, 
                     bool8         return_type_is_const)
 {
+    AST_node_t *lambda = null;
 
-    AST_node_t *return_type = AST_create_new_node(&parser->arena, parser->active_decl_context);
-    return_type->node_type  = AST_NODE_TYPE_LAMBDA_RETURN_TYPE;
-    return_type->identifier = c_string_make_copy(&parser->arena, return_type_token.data);
-
-    AST_type_t *return_type_data = &return_type->type;
-    return_type_data->code_type  = parser_register_code_type(parser, return_type->identifier);
-
-    return_type_data->flags         = return_type_pointer_depth > 0 ? AST_TYPE_MODIFIER_FLAG_POINTER : 0;
-    return_type_data->pointer_depth = return_type_pointer_depth;
-    if(return_type_is_const)
+    bool8 parse_lambda = true;
+    for(const auto &attribute: parser->current_attribute_list)
     {
-        return_type_data->flags |= AST_TYPE_MODIFIER_FLAG_CONST;
-    }
-
-    lexer_token_t procedure_name_token = parser_get_next_lexer_token(parser);
-    if(procedure_name_token.token_type != TOKEN_TYPE_IDENT)
-    {
-        for(u32 pointer_index = 0;
-            pointer_index < return_type_pointer_depth;
-            ++pointer_index)
+        if(attribute.is_template)
         {
-            procedure_name_token = parser_get_next_lexer_token(parser);
+            dynarray_reset(&parser->current_attribute_list);
+            parse_lambda = false;
         }
     }
 
-    // NOTE(Sleepster): Generate the lambda_node 
-    if(procedure_name_token.token_type != TOKEN_TYPE_IDENT)
+    if(parse_lambda)
     {
-        report_error(parser,
-                     "Expected to find an identifier for the name of this lambda, instead found: '%.*s'\n",
-                     fprint_token(procedure_name_token));
-    }
+        AST_node_t *return_type = AST_create_new_node(&parser->arena, parser->active_decl_context);
+        return_type->node_type  = AST_NODE_TYPE_LAMBDA_RETURN_TYPE;
+        return_type->identifier = c_string_make_copy(&parser->arena, return_type_token.data);
 
-    printf("Found lambda: '%.*s'...\n", fprint_token(procedure_name_token));
-    AST_node_t *lambda = AST_create_new_node(&parser->arena, parser->active_decl_context);
-    lambda->lambda.return_type = return_type;
+        AST_type_t *return_type_data = &return_type->type;
+        return_type_data->code_type  = parser_register_code_type(parser, return_type->identifier);
 
-    argument_list_t list = parse_argument_list(parser);
-    lambda->lambda.first_argument = list.first_argument;
-    lambda->lambda.argument_count = list.argument_count;
+        return_type_data->flags         = return_type_pointer_depth > 0 ? AST_TYPE_MODIFIER_FLAG_POINTER : 0;
+        return_type_data->pointer_depth = return_type_pointer_depth;
+        if(return_type_is_const)
+        {
+            return_type_data->flags |= AST_TYPE_MODIFIER_FLAG_CONST;
+        }
 
-    // NOTE(Sleepster): Fill in the data related to the lambda. 
-    lambda->node_type  = AST_NODE_TYPE_LAMBDA;
-    lambda->identifier = c_string_make_copy(&parser->arena, procedure_name_token.data);
-    lambda->type       = parser_create_lambda_type(parser, lambda);
-    if(parser->current_attribute_list.used > 0)
-    {
-        dynarray_copy(&lambda->attributes, &parser->current_attribute_list);
-        dynarray_reset(&parser->current_attribute_list);
-    }
-
-    hash_table_add_element(&parser->active_decl_context->code_decls, &lambda, lambda->identifier);
-
-    // NOTE(Sleepster): If the last token here is an open paren, this is a procedure body,
-    // eat the body of the procedure to prevent issues with namespaces.
-    lexer_token_t token = lexer_peek_token(&parser->lexer, 1);
-    if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
-    {
-        u32 brace_depth = 0;
-        do {
-            token = lexer_get_next_token(&parser->lexer);
-            if(token.token_type == TOKEN_TYPE_CLOSE_BRACE)
+        lexer_token_t procedure_name_token = parser_get_next_lexer_token(parser);
+        if(procedure_name_token.token_type != TOKEN_TYPE_IDENT)
+        {
+            for(u32 pointer_index = 0;
+                pointer_index < return_type_pointer_depth;
+                ++pointer_index)
             {
-                --brace_depth;
+                procedure_name_token = parser_get_next_lexer_token(parser);
             }
-            else if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
+        }
+
+        // NOTE(Sleepster): Generate the lambda_node 
+        if(procedure_name_token.token_type != TOKEN_TYPE_IDENT)
+        {
+            report_error(parser,
+                         "Expected to find an identifier for the name of this lambda, instead found: '%.*s'\n",
+                         fprint_token(procedure_name_token));
+        }
+
+        printf("Found lambda: '%.*s'...\n", fprint_token(procedure_name_token));
+        lambda = AST_create_new_node(&parser->arena, parser->active_decl_context);
+        lambda->lambda.return_type = return_type;
+        if(parser->current_attribute_list.used > 0)
+        {
+            dynarray_copy(&lambda->attributes, &parser->current_attribute_list);
+            dynarray_reset(&parser->current_attribute_list);
+        }
+
+        argument_list_t list = parse_argument_list(parser, lambda);
+        lambda->lambda.first_argument = list.first_argument;
+        lambda->lambda.argument_count = list.argument_count;
+
+        // NOTE(Sleepster): Fill in the data related to the lambda. 
+        lambda->node_type  = AST_NODE_TYPE_LAMBDA;
+        lambda->identifier = c_string_make_copy(&parser->arena, procedure_name_token.data);
+        lambda->type       = parser_create_lambda_type(parser, lambda);
+
+        AST_node_t *node = hash_table_get_element(&parser->active_decl_context->code_decls, lambda->identifier);
+        if(node)
+        {
+            add_AST_overload(node, lambda);
+        }
+        else
+        {
+            hash_table_add_element(&parser->active_decl_context->code_decls, &lambda, lambda->identifier);
+        }
+
+        // NOTE(Sleepster): If the last token here is an open paren, this is a procedure body,
+        // eat the body of the procedure to prevent issues with namespaces.
+        lexer_token_t token = lexer_peek_token(&parser->lexer, 1);
+        if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
+        {
+            u32 brace_depth = 0;
+            do {
+                token = lexer_get_next_token(&parser->lexer);
+                if(token.token_type == TOKEN_TYPE_CLOSE_BRACE)
+                {
+                    --brace_depth;
+                }
+                else if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
+                {
+                    ++brace_depth;
+                }
+            }while(brace_depth > 0);
+        }
+    }
+    else
+    {
+        lexer_token_t token = parser_get_next_lexer_token(parser);
+        while(token.token_type != TOKEN_TYPE_OPEN_BRACE && 
+              token.token_type != TOKEN_TYPE_SEMICOLON)
+        {
+            token = parser_get_next_lexer_token(parser);
+        }
+
+        if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
+        {
+            u32 current_depth = 1;
+            while(current_depth > 0)
             {
-                ++brace_depth;
+                token = parser_get_next_lexer_token(parser);
+                if(token.token_type == TOKEN_TYPE_OPEN_BRACE)
+                {
+                    ++current_depth;
+                }
+                else if(token.token_type == TOKEN_TYPE_CLOSE_BRACE)
+                {
+                    --current_depth;
+                }
             }
-        }while(brace_depth > 0);
+        }
     }
 
     return(lambda);
@@ -1321,8 +2054,6 @@ internal_api AST_node_t*
 generate_typedef_AST(parser_t *parser)
 {
     AST_node_t *result = null;
-    lexer_t *lexer     = &parser->lexer;
-
     lexer_token_t type_token = parser_get_next_lexer_token(parser);
     switch(type_token.token_type)
     {
@@ -1355,12 +2086,10 @@ generate_typedef_AST(parser_t *parser)
                 if(final_token.token_type == TOKEN_TYPE_SEMICOLON)
                 {
                     code_type_t *main_type = parser_search_for_code_type(parser, type_token.data);
-
                     parser_register_code_type(parser, c_string_make_copy(&parser->arena, alias_token.data), main_type);
+
                     printf("FOUND TYPE ALIAS: '%.*s' OF TYPE: '%.*s'...\n",
                            fprint_token(alias_token), fprint_token(type_token));
-
-                    lexer_eat_lines(&transient_arena, lexer, 1);
                 }
                 else if(final_token.token_type == TOKEN_TYPE_OPEN_PAREN)
                 {
@@ -1371,6 +2100,10 @@ generate_typedef_AST(parser_t *parser)
                                                  false);
                 }
             }
+        }break;
+        case TOKEN_TYPE_EOF:
+        {
+            printf("Ignoring file: '%.*s'...\n", fprint_string(parser->filename));
         }break;
     }
 
@@ -1383,7 +2116,7 @@ create_template_attribute(parser_t *parser)
     code_attribute_t result = {};
     result.is_template = true;
     
-    argument_list_t list = parse_argument_list(parser);
+    argument_list_t list = parse_argument_list(parser, null);
     result.template_data.arguments      = list.first_argument;
     result.template_data.argument_count = list.argument_count;
 

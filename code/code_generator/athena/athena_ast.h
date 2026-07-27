@@ -67,6 +67,7 @@ struct AST_expression_value_t
     X(AST_TYPE_MODIFIER_FLAG_PROCEDURE,   "AST_TYPE_MODIFIER_FLAG_PROCEDURE", BIT(10)) \
     X(AST_TYPE_MODIFIER_FLAG_ANONYMOUS,   "AST_TYPE_MODIFIER_FLAG_ANONYMOUS", BIT(11)) \
     X(AST_TYPE_MODIFIER_FLAG_UNION,       "AST_TYPE_MODIFIER_FLAG_UNION",     BIT(12)) \
+    X(AST_TYPE_MODIFIER_FLAG_NESTED,      "AST_TYPE_MODIFIER_FLAG_NESTED",    BIT(13)) \
 
 enum AST_type_flags_t 
 {
@@ -133,7 +134,6 @@ struct AST_node_t
 {
     u32                          node_type;
     string_t                     identifier;
-    string_t                     identity_tag;
 
     AST_node_t                  *parent;
     u32                          line_number;
@@ -147,6 +147,7 @@ struct AST_node_t
     AST_type_t                   type;
     AST_node_t                  *next_sibling;
     declaration_context_t       *decl_context;
+    AST_node_t                  *next_overload;
     //declaration_context_t *decl_context;
 
     // NOTE(Sleepster): For structures or enums... 

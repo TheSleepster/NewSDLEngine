@@ -31,7 +31,6 @@
 #include <s_asset_manager.h>
 
 #include <asset_file_packer/jfd_asset_file.h>
-//#include <meta/GENERATED_program_RTTI.h>
 
 int game_main(void);
 

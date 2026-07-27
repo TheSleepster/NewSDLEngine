@@ -9,7 +9,7 @@
 #define GENERATED_TEST2_H
 #include <c_types.h>
 
-CODE_GEN_IGNORE_FILE()
+CODE_GEN_IGNORE_FILE
 
 GENERATE_TYPE_INFO
 struct test_element_data 

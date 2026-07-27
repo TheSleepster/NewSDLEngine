@@ -13,11 +13,9 @@
 
 #include <stdlib.h>
 
-// NOTE(Sleepster): Meant to allow for labeling files to be hold on, ignored by the metaprogram.
-#define CODE_GEN_IGNORE_FILE()
-#define CODE_GEN_IGNORE_STRUCTURE()
-
-CODE_GEN_IGNORE_FILE()
+#ifndef CODE_GEN_IGNORE_FILE
+#define CODE_GEN_IGNORE_FILE
+#endif
 
 // TODO(Sleepster): Determine instruction set support (SSE2, SSE3, AVX, AVX2, etc...)
 
@@ -167,7 +165,7 @@ CODE_GEN_IGNORE_FILE()
 
 #define InvalidCodePath Expect(false, "Invalid code path...\n")
 
-#define Align(value, number) ((value + ((number) - 1))  & ~((number) - 1))
+#define Align(value, number) ((value + ((number) - 1)) & ~((number) - 1))
 #define Align4(value)  ((value + 3)  & ~3)
 #define Align8(value)  ((value + 7)  & ~7)
 #define Align16(value) ((value + 15) & ~15)
@@ -197,8 +195,8 @@ const global_variable u16 U16_MAX = (u16)0xfffff;
 const global_variable u32 U32_MAX = (u32)0xffffffff;
 const global_variable u64 U64_MAX = (u64)0xFFFFFFFFllu;
 
-const global_variable float32 machine_epsilon_f32 = 1.1920929e-7f;
-const global_variable float64 machine_epsilon_f64 = 2.220446e-16;
+const global_variable float32 MACHINE_EPSILON_F32 = 1.1920929e-7f;
+const global_variable float64 MACHINE_EPSILON_F64 = 2.220446e-16;
 
 typedef void void_func(void);
 
@@ -220,10 +218,11 @@ typedef void void_func(void);
 #define Assert(cond)
 #endif
 
+#define TypeOf(type) __typeof__(type)
+
 // NOTE(Sleepster): 
 // By default virtual memory pages are zeroed for you. 
 // Why malloc doesn't do this is beyond me. Probably has to do with speed...
-#define TypeOf(type) __typeof__(type)
 
 #define Alloc(type) ({                    \
     void *_result = malloc(sizeof(type)); \
@@ -277,7 +276,7 @@ privDefer<F> defer_func(F f) {
 #define DEFER_2(x, y) DEFER_1(x, y)
 #define DEFER_3(x)    DEFER_2(x, __COUNTER__)
 #define defer(code)   auto DEFER_3(_defer_) = defer_func([&](){code;})
-#endif
+#endif // __cplusplus
 
 // NOTE(Sleepster): Thanks Ryan Fluery 
 #define DeferLoop(begin, end) for(int _i_ = ((begin), 0); !_i_; _i_ += 1, (end))

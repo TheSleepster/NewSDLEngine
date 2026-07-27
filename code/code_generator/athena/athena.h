@@ -125,7 +125,7 @@ type_info()
     template <> \
     inline const type_info_t* \
     type_info<cpp_type>() { \
-        return(static_cast<const type_info_t *>(structure)); \
+        return(reinterpret_cast<const type_info_t *>(structure)); \
     }
     
     ATHENA_RTTI_COMPLETE_TYPE_LIST(X)
@@ -149,6 +149,9 @@ ATHENA_API inline const type_info_t        *type_info(const char *string);
 ATHENA_API inline const type_info_member_t *athena_get_member_info(const type_info_t *type_info, const char *member_name);
 ATHENA_API inline const type_info_struct_t *athena_get_struct_info_from_member(const type_info_t *info);
 ATHENA_API inline const type_info_struct_t *athena_get_struct_info_from_member(const type_info_member_t *member);
+
+#define CODE_GEN_IGNORE_FILE
+#define CODE_GEN_IGNORE_DECL
 
 #endif // ATHENA_H
 

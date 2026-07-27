@@ -8,7 +8,7 @@
 
 #define ATHENA_LEXER_H
 
-constexpr u32 MAX_LEXER_BOOKMARKS = 10;
+constexpr u32 MAX_LEXER_BOOKMARKS = 32;
 #define fprint_token(token) static_cast<s32>(token.data.count), token.data.data
 
 struct lexer_token_stream_t;

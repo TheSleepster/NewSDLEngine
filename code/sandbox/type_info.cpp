@@ -9,31 +9,42 @@
 
 #include <c_base.h>
 #include <c_types.h>
-#include <c_math.h>
 
-#include <p_platform_data.h>
-#include <c_dynarray.h>
+struct test_structure {
+    int apples;
+    int oranges;
+    int bananas;
 
-#if 0
-#include <meta/GENERATED_test_output.h>
-#endif
+    void apples_test_func(char *name);
+};
+
+#define ATHENA_IMPLMENTATION
+#include "generated_test.h"
 
 int
-main(void)
+main(int argc, char **argv)
 {
-#if 0
-    const type_info_t *type_data = c_meta_get_type_info_by_name(STR("test_structure"));
-    for(u32 member_index = 0;
-        member_index < type_data->struct_info->member_count;
-        ++member_index)
+    const type_info_t *info = type_info("test_structure");
+    if(info)
     {
-        type_info_member_t *member = type_data->struct_info->members + member_index;
-        log_info("Member by name: '%s' found...\n", member->name);
+        const type_info_struct_t *structure = (const type_info_struct_t *)info;
+        printf("%d members\n", structure->member_count);
+
+        for(u32 member_index = 0;
+            member_index < structure->member_count;
+            ++member_index)
+        {
+            const type_info_member_t *member = structure->members + member_index;
+            printf("Member name: '%s'...\n", member->member_name);
+        }
+
+        const type_info_member_t *function = athena_get_member_info(info, "apples_test_func");
+        if(function)
+        {
+            const type_info_procedure_t *test_proc_data = (const type_info_procedure_t *)function->type_info;
+            int x = 0;
+        }
     }
 
-    string_t member_name = STR("other_thing");
-    const type_info_member_t *member_data = c_meta_get_member_info(type_data->struct_info, member_name);
-
-    (void)member_data;
-#endif
+    return(0);
 }

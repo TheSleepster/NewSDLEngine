@@ -94,23 +94,17 @@ enum code_type_metatype_t
 #undef X
 };
 
+// NOTE(Sleepster): Replacement for the old code_type_t. Make this a list of types. 
 struct code_type_t
 {
-    u64          ID;
-    AST_node_t  *type_data;
-    code_type_t *next_type;
-};
-
-// NOTE(Sleepster): Replacement for the old code_type_t. Make this a list of types. 
-struct code_type_info_t
-{
+    u64               ID;
     bool8             is_registered;
     string_t          identifier;
     string_t          owner_file;
     u32               code_metatype;
 
-    code_type_info_t *alias_of = null;
-    code_type_t       first_type;
+    code_type_t *alias_of = null;
+    AST_node_t  *type_data;
 };
 
 #if 0
@@ -166,11 +160,21 @@ struct code_attribute_t
 };
 
 // TODO(Sleepster): With subarenas, all parsers can just be children of a parent arena and thus share the same lifetime as the parent.
+struct parser_bookmark_t
+{
+    lexer_token_t peek_ahead_buffer[MAX_PEEK_AHEAD_TOKENS];
+    u32           token_buffer_head;
+    u32           buffered_token_count;
+
+    lexer_token_stream_t *stream;
+};
+
 struct parser_t
 {
     memory_arena_t                     arena;
     memory_arena_t                     temp_allocator;
     string_t                           filename;
+    bool8                              should_parse;
 
     dynarray_t<code_attribute_t>       current_attribute_list;
     dynarray_t<declaration_context_t*> decl_context_stack;
@@ -181,6 +185,9 @@ struct parser_t
     lexer_token_t                      peek_ahead_buffer[MAX_PEEK_AHEAD_TOKENS];
     u32                                token_buffer_head;
     u32                                buffered_token_count;
+
+    parser_bookmark_t                  bookmarks[MAX_PEEK_AHEAD_TOKENS];
+    u32                                current_bookmark_count;
 
     hash_table_t<macro_info_t>         macro_table;
 };
@@ -194,7 +201,7 @@ struct symbol_table_t
     volatile u32                      next_parser_index;
         
     hash_table_t<macro_info_t>        defined_global_macro_table;
-    hash_table_t<code_type_info_t*>   type_table;
+    hash_table_t<code_type_t*>        type_table;
     dynarray_t<declaration_context_t> declaration_contexts;
 };
 

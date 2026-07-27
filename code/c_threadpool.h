@@ -89,7 +89,7 @@ void c_threadpool_flush_work_orders(threadpool_t *threadpool);
 void c_threadpool_wait_on_fence(threadpool_t *threadpool, work_completion_fence_t *fence);
 
 template <typename LambdaType>
-true_inline void c_threadpool_push_work_order(threadpool_t *threadpool, LambdaType lambda, work_completion_fence_t *fence);
+internal_api void c_threadpool_push_work_order(threadpool_t *threadpool, LambdaType lambda, work_completion_fence_t *fence);
 
 /*===========================================
   ================= MACROS ==================

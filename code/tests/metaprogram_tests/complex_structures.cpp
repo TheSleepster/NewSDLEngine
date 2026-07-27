@@ -54,7 +54,14 @@ struct test_element_data
 
     void brick_the_tool(char *data = NULL)
     {
-        return;
+        d;skladsa;dsa
+        das
+        d
+        sad
+        sa
+        dsa
+        d
+        sa
     }
 };
 

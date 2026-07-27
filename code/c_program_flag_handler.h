@@ -47,7 +47,7 @@ typedef struct program_flag
 typedef struct program_flag_state
 {
     program_flag_t program_flags[MAX_PROGRAM_FLAGS];
-    u32                flag_counter;
+    u32            flag_counter;
 }program_flag_state_t;
 
 program_flag_t* c_program_flag_add(char *flag_name, char *flag_description);

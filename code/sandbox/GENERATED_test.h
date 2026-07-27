@@ -10,7 +10,7 @@
 #include <c_types.h>
 #include <c_base.h>
 
-CODE_GEN_IGNORE_FILE()
+CODE_GEN_IGNORE_FILE
 
 #define SIZE_MACRO_TEST (20)
 #define MULTILINE()          \
@@ -20,7 +20,7 @@ struct {                     \
     u32 thingy_mabob;        \
 }
 
-CODE_GEN_IGNORE_STRUCTURE()
+CODE_GEN_IGNORE_DECL
 struct we_should_not_find_this 
 {
     u32 not_found0;

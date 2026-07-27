@@ -344,13 +344,12 @@ internal_api lexer_token_t
 lexer_peek_token(lexer_t *lexer, u32 tokens_to_peek_ahead = 1)
 {
     lexer_token_t token = {};
-
     token = lexer_peek_token_from_stream(lexer, lexer->current_stream, tokens_to_peek_ahead);
 
     return(token);
 }
 
-internal_api true_inline void
+internal_api true_inline s32
 lexer_push_bookmark(lexer_t *lexer, lexer_token_t token)
 {
     lexer_bookmark_t *bookmark = lexer->current_stream->bookmarks + ++lexer->current_stream->bookmark_count;
@@ -365,6 +364,8 @@ lexer_push_bookmark(lexer_t *lexer, lexer_token_t token)
     bookmark->stream             = lexer->current_stream;
     bookmark->token_buffer_index = lexer->current_stream->token_buffer_index;
     bookmark->next_token_stream  = lexer->next_token_stream;
+
+    return(lexer->current_stream->bookmark_count);
 }
 
 internal_api true_inline lexer_token_t 
@@ -465,18 +466,20 @@ lexer_copy_token_stream(memory_arena_t *arena, lexer_token_stream_t *stream)
 {
     lexer_token_stream_t result = {};
     memcpy(&result, stream, sizeof(lexer_token_stream_t));
-    
-    result.token_buffer         = c_arena_push_array(arena, lexer_token_t, stream->buffered_token_count);
-    result.buffered_token_count = stream->buffered_token_count;
-    result.token_buffer_index   = 0;
-    for(u32 index = 0;
-        index < stream->buffered_token_count;
-        ++index)
+    if(stream->buffered_token_count > 0)
     {
-        lexer_token_t *source      = stream->token_buffer + index;
-        lexer_token_t *destination = result.token_buffer  + index;
-        
-         *destination = *source;
+        result.token_buffer         = c_arena_push_array(arena, lexer_token_t, stream->buffered_token_count);
+        result.buffered_token_count = stream->buffered_token_count;
+        result.token_buffer_index   = 0;
+        for(u32 index = 0;
+            index < stream->buffered_token_count;
+            ++index)
+        {
+            lexer_token_t *source      = stream->token_buffer + index;
+            lexer_token_t *destination = result.token_buffer  + index;
+
+            *destination = *source;
+        }
     }
 
     return(result);

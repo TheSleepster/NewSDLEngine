@@ -139,6 +139,7 @@ parser_create(string_t filename, string_t file_data)
     parser->arena          = c_arena_create(MB(1));
     parser->temp_allocator = c_arena_create(MB(2));
     parser->filename       = c_string_make_copy(&permanent_arena, filename);
+    parser->should_parse   = true;
     
     // NOTE(Sleepster): This has to pass the lexer by pointer or we get a weird use-after-return stack bug. 
     lexer_create(&parser->lexer, file_data);
@@ -232,7 +233,6 @@ initialize_default_language_info(void)
         //code_type_t primitive    = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, type_id);
         code_type_t primitive   = {};
         primitive.is_registered = true;
-        primitive.type_inferred = true;
         primitive.identifier    = c_string_make_copy(&permanent_arena, type_name);
         primitive.ID            = type_id;
         primitive.code_metatype = CODE_TYPE_PRIMITIVE;
@@ -348,25 +348,61 @@ parser_fetch_next_token(parser_t *parser)
         result = lexer_get_next_token(lexer);
     }
 
-    if(c_string_compare(result.data, STR("BIT")))
+    if(c_string_compare(result.data, STR("CODE_GEN_IGNORE_FILE")))
     {
-        printf("Looking up macro %.*s...\n", fprint_token(result));
+        result = {
+            .token_type = TOKEN_TYPE_EOF,
+            .data       = {},
+        };
+
+        parser->should_parse = false;
+        fprintf(stdout, "Ignoring file: '%.*s'...\n", fprint_string(parser->filename));
     }
-    macro_info_t *macro = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, result.data);
-    if(macro->is_set)
+    else if(c_string_compare(result.data, STR("CODE_GEN_IGNORE_DECL")))
     {
-        if(c_string_compare(result.data, STR("BIT")))
+        string_t current_line = lexer_eat_lines(&parser->arena, lexer, 2);
+        s32 brace_index = c_string_find_first_char_from_left(current_line, '{');
+        if(brace_index != -1)
         {
-            printf("FOUND macro %.*s...\n", fprint_string(macro->name));
+            while(result.token_type != TOKEN_TYPE_OPEN_BRACE)
+            {
+                result = parser_get_next_lexer_token(parser);
+            }
+
+            u32 current_depth = 1;
+            while(current_depth > 0)
+            {
+                result = parser_get_next_lexer_token(parser);
+                if(result.token_type == TOKEN_TYPE_OPEN_BRACE)
+                {
+                    ++current_depth;
+                }
+                else if(result.token_type == TOKEN_TYPE_CLOSE_BRACE)
+                {
+                    --current_depth;
+                }
+            }
         }
 
-        lexer_token_stream_t macro_stream = parser_substitute_macro_arguments(parser, result, macro);
-        lexer_push_token_stream(lexer, &macro_stream);
+        result = {
+            .token_type = TOKEN_TYPE_UNKNOWN,
+            .data       = {},
+        };
+    }
 
-        result = lexer_get_next_token(lexer);
-        if(lexer->current_stream->string.count == 0 || result.token_type == TOKEN_TYPE_EOF)
+    if(result.token_type != TOKEN_TYPE_EOF)
+    {
+        macro_info_t *macro = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, result.data);
+        if(macro->is_set)
         {
-            lexer_pop_token_stream(lexer);
+            lexer_token_stream_t macro_stream = parser_substitute_macro_arguments(parser, result, macro);
+            lexer_push_token_stream(lexer, &macro_stream);
+
+            result = lexer_get_next_token(lexer);
+            if(lexer->current_stream->string.count == 0 || result.token_type == TOKEN_TYPE_EOF)
+            {
+                lexer_pop_token_stream(lexer);
+            }
         }
     }
     
@@ -425,8 +461,12 @@ get_metatype_string(u32 metatype)
     }
 }
 
-// search for code_type
-// * We must also be able to search within the current scope.
+internal_api code_type_t*
+parser_get_code_type(parser_t *parser, string_t identifier, u64 ID)
+{
+    return((code_type_t*)null);
+}
+
 internal_api code_type_t*
 parser_search_for_code_type(parser_t *parser, string_t identifier)
 {
@@ -447,6 +487,15 @@ parser_search_for_code_type(parser_t *parser, string_t identifier)
     return(result);
 }
 
+internal_api void
+init_code_type(code_type_t *type, parser_t *parser, string_t identifier, code_type_t *type_alias)
+{
+    type->is_registered = true;
+    type->identifier    = identifier;
+    type->owner_file    = parser->filename;
+    type->alias_of      = type_alias;
+}
+
 // register code_type
 internal_api code_type_t* 
 parser_register_code_type(parser_t *parser, string_t identifier, code_type_t *type_alias = null)
@@ -455,14 +504,41 @@ parser_register_code_type(parser_t *parser, string_t identifier, code_type_t *ty
     if(!result)
     {
         result = c_arena_push_struct(&parser->arena, code_type_t); 
-
-        result->identifier    = identifier;
-        result->alias_of      = type_alias;
-        result->is_registered = true;
-        result->owner_file    = parser->filename;
+        init_code_type(result, parser, identifier, type_alias);
 
         hash_table_add_element(&parser->active_decl_context->local_types, &result, identifier);
     }
 
+    result->alias_of = type_alias;
+    return(result);
+}
+
+internal_api true_inline s32 
+parser_push_bookmark(parser_t *parser, lexer_token_t last_token)
+{
+    parser_bookmark_t *bookmark = parser->bookmarks + parser->current_bookmark_count++;
+    Assert(parser->current_bookmark_count < MAX_PEEK_AHEAD_TOKENS);
+
+    bookmark->buffered_token_count = parser->buffered_token_count;
+    bookmark->token_buffer_head    = parser->token_buffer_head;
+    bookmark->stream               = parser->lexer.current_stream;
+    memcpy(bookmark->peek_ahead_buffer, parser->peek_ahead_buffer, sizeof(lexer_token_t) * MAX_PEEK_AHEAD_TOKENS);
+
+    lexer_push_bookmark(&parser->lexer, last_token);
+    return(parser->current_bookmark_count);
+}
+
+internal_api true_inline lexer_token_t 
+parser_pop_bookmark(parser_t *parser)
+{
+    parser_bookmark_t *bookmark  = parser->bookmarks + --parser->current_bookmark_count;
+    Assert(parser->current_bookmark_count >= 0);
+
+    parser->token_buffer_head    = bookmark->token_buffer_head;
+    parser->buffered_token_count = bookmark->buffered_token_count;
+    parser->lexer.current_stream = bookmark->stream;
+    memcpy(parser->peek_ahead_buffer, bookmark->peek_ahead_buffer, sizeof(lexer_token_t) * MAX_PEEK_AHEAD_TOKENS);
+
+    lexer_token_t result = lexer_pop_bookmark(&parser->lexer);
     return(result);
 }

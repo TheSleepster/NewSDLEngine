@@ -990,7 +990,7 @@ generate_type_information(ast_file_data_t *ast)
     c_string_builder_sprintf(type_enum_builder, "// IT CONTAINS ALL THE RTTI NEEDED FOR THE PROGRAM...\n\n");
     c_string_builder_sprintf(type_enum_builder, "#if !defined(GENERATED_PROGRAM_RTTI_H)\n");
     c_string_builder_sprintf(type_enum_builder, "#define GENERATED_PROGRAM_RTTI_H\n\n");
-    c_string_builder_sprintf(type_enum_builder, "#ifndef CODE_GEN_IGNORE_FILE\n#define CODE_GEN_IGNORE_FILE()\n#endif\n");
+    c_string_builder_sprintf(type_enum_builder, "#ifndef CODE_GEN_IGNORE_FILE\n#define CODE_GEN_IGNORE_FILE\n#endif\n");
     c_string_builder_sprintf(type_enum_builder, "#ifndef OffsetOf\n");
     c_string_builder_sprintf(type_enum_builder, R"(
 #define MemberHelper(type, member) (((type *)0)->member)

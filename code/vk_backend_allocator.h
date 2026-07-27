@@ -15,7 +15,6 @@
 #define VK_ALLOCATOR_DEBUG_ID (0xC0FFEE)
 
 struct vulkan_context_t;
-struct vulkan_allocation_block_t;
 struct vulkan_allocator_t;
 
 enum vulkan_allocation_usage_type_t
@@ -48,8 +47,6 @@ struct vulkan_allocator_t
 
     memory_arena_t             block_allocator;
     VkDeviceSize               default_block_size;
-
-    vulkan_allocation_block_t *first_free_block;
 };
 
 vulkan_allocator_t         vk_allocator_create(vulkan_context_t *vulkan_context, u64 default_block_size);

@@ -117,23 +117,42 @@ extern const type_info_t *const athena_type_information_array[];
 struct type_info_struct_test_structure {
 	const type_info_t  type_info;
 	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[2];
+		const type_info_member_t member_array[4];
 		struct {
-			const type_info_member_t pre_test_int;
-			const type_info_member_t post_test_int;
+			const type_info_member_t apples;
+			const type_info_member_t oranges;
+			const type_info_member_t bananas;
+			const type_info_member_t apples_test_func;
 		}members;
 	};
 };
 
-struct type_info_struct_test2 {
+struct type_info_procedure_main {
 	const type_info_t  type_info;
-	const unsigned int member_count;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
 	union {
-		const type_info_member_t member_array[1];
+		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t test;
-		}members;
+			const type_info_member_t argc;
+			const type_info_member_t argv;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_apples_test_func {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t name;
+		}arguments;
 	};
 };
 
@@ -156,127 +175,167 @@ extern const type_info_t DEFAULT_typedata_uint32_t;
 extern const type_info_t DEFAULT_typedata_uint64_t;
 extern const type_info_t DEFAULT_typedata_size_t;
 extern const type_info_struct_test_structure DEFAULT_typedata_structure_test_structure;
-extern const type_info_struct_test2 DEFAULT_typedata_structure_test2;
+extern const type_info_procedure_main DEFAULT_typedata_procedure_main;
+extern const type_info_procedure_apples_test_func DEFAULT_typedata_procedure_apples_test_func;
 
 constexpr type_info_t DEFAULT_typedata_unsigned_int = {
-	.type_name = "unsigned int",
-	.size = athena_internal::safe_sizeof<unsigned int>(),
+.type_name = "unsigned int",
+.size = athena_internal::safe_sizeof<unsigned int>(),
 };
 constexpr type_info_t DEFAULT_typedata_unsigned_char = {
-	.type_name = "unsigned char",
-	.size = athena_internal::safe_sizeof<unsigned char>(),
+.type_name = "unsigned char",
+.size = athena_internal::safe_sizeof<unsigned char>(),
 };
 constexpr type_info_t DEFAULT_typedata_short = {
-	.type_name = "short",
-	.size = athena_internal::safe_sizeof<short>(),
+.type_name = "short",
+.size = athena_internal::safe_sizeof<short>(),
 };
 constexpr type_info_t DEFAULT_typedata_long = {
-	.type_name = "long",
-	.size = athena_internal::safe_sizeof<long>(),
+.type_name = "long",
+.size = athena_internal::safe_sizeof<long>(),
 };
 constexpr type_info_t DEFAULT_typedata_int = {
-	.type_name = "int",
-	.size = athena_internal::safe_sizeof<int>(),
+.type_name = "int",
+.size = athena_internal::safe_sizeof<int>(),
 };
 constexpr type_info_t DEFAULT_typedata_char = {
-	.type_name = "char",
-	.size = athena_internal::safe_sizeof<char>(),
+.type_name = "char",
+.size = athena_internal::safe_sizeof<char>(),
 };
 constexpr type_info_t DEFAULT_typedata_float = {
-	.type_name = "float",
-	.size = athena_internal::safe_sizeof<float>(),
+.type_name = "float",
+.size = athena_internal::safe_sizeof<float>(),
 };
 constexpr type_info_t DEFAULT_typedata_double = {
-	.type_name = "double",
-	.size = athena_internal::safe_sizeof<double>(),
+.type_name = "double",
+.size = athena_internal::safe_sizeof<double>(),
 };
 constexpr type_info_t DEFAULT_typedata_void = {
-	.type_name = "void",
+.type_name = "void",
 };
 constexpr type_info_t DEFAULT_typedata_bool = {
-	.type_name = "bool",
-	.size = athena_internal::safe_sizeof<bool>(),
+.type_name = "bool",
+.size = athena_internal::safe_sizeof<bool>(),
 };
 constexpr type_info_t DEFAULT_typedata_int8_t = {
-	.type_name = "int8_t",
-	.size = athena_internal::safe_sizeof<int8_t>(),
+.type_name = "int8_t",
+.size = athena_internal::safe_sizeof<int8_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_int16_t = {
-	.type_name = "int16_t",
-	.size = athena_internal::safe_sizeof<int16_t>(),
+.type_name = "int16_t",
+.size = athena_internal::safe_sizeof<int16_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_int32_t = {
-	.type_name = "int32_t",
-	.size = athena_internal::safe_sizeof<int32_t>(),
+.type_name = "int32_t",
+.size = athena_internal::safe_sizeof<int32_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_int64_t = {
-	.type_name = "int64_t",
-	.size = athena_internal::safe_sizeof<int64_t>(),
+.type_name = "int64_t",
+.size = athena_internal::safe_sizeof<int64_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint8_t = {
-	.type_name = "uint8_t",
-	.size = athena_internal::safe_sizeof<uint8_t>(),
+.type_name = "uint8_t",
+.size = athena_internal::safe_sizeof<uint8_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint16_t = {
-	.type_name = "uint16_t",
-	.size = athena_internal::safe_sizeof<uint16_t>(),
+.type_name = "uint16_t",
+.size = athena_internal::safe_sizeof<uint16_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint32_t = {
-	.type_name = "uint32_t",
-	.size = athena_internal::safe_sizeof<uint32_t>(),
+.type_name = "uint32_t",
+.size = athena_internal::safe_sizeof<uint32_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint64_t = {
-	.type_name = "uint64_t",
-	.size = athena_internal::safe_sizeof<uint64_t>(),
+.type_name = "uint64_t",
+.size = athena_internal::safe_sizeof<uint64_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_size_t = {
-	.type_name = "size_t",
-	.size = athena_internal::safe_sizeof<size_t>(),
+.type_name = "size_t",
+.size = athena_internal::safe_sizeof<size_t>(),
 };
 constexpr type_info_struct_test_structure DEFAULT_typedata_structure_test_structure = {
 	.type_info = {
 		.type_name = "test_structure",
-			.size = athena_internal::safe_sizeof<test_structure>(),
+		.size = athena_internal::safe_sizeof<test_structure>(),
 	},
-	.member_count = 2,
+	.member_count   = 4,
+	.member_pointer = DEFAULT_typedata_structure_test_structure.member_array,
 	.members = {
-		.pre_test_int = {
+		.apples = {
 			.type_info     = &DEFAULT_typedata_int,
-			.member_name   = "pre_test_int",
+			.member_name   = "apples",
 			.parent        = &DEFAULT_typedata_structure_test_structure.type_info,
-			.offset        = offsetof(test_structure, pre_test_int),
+			.offset        = offsetof(test_structure, apples),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.post_test_int = {
+		.oranges = {
 			.type_info     = &DEFAULT_typedata_int,
-			.member_name   = "post_test_int",
+			.member_name   = "oranges",
 			.parent        = &DEFAULT_typedata_structure_test_structure.type_info,
-			.offset        = offsetof(test_structure, post_test_int),
+			.offset        = offsetof(test_structure, oranges),
 			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.bananas = {
+			.type_info     = &DEFAULT_typedata_int,
+			.member_name   = "bananas",
+			.parent        = &DEFAULT_typedata_structure_test_structure.type_info,
+			.offset        = offsetof(test_structure, bananas),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.apples_test_func = {
+			.type_info     = &DEFAULT_typedata_procedure_apples_test_func.type_info,
+			.member_name   = "apples_test_func",
+			.parent        = &DEFAULT_typedata_structure_test_structure.type_info,
+			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 	},
 };
 
-constexpr type_info_struct_test2 DEFAULT_typedata_structure_test2 = {
+constexpr type_info_procedure_main DEFAULT_typedata_procedure_main = {
 	.type_info = {
-		.type_name = "test2",
-			.size = athena_internal::safe_sizeof<test2>(),
+		.type_name = "main",
 	},
-	.member_count = 1,
-	.members = {
-		.test = {
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_int,
+	.argument_pointer = DEFAULT_typedata_procedure_main.argument_array,
+	.arguments = {
+		.argc = {
 			.type_info     = &DEFAULT_typedata_int,
-			.member_name   = "test",
-			.parent        = &DEFAULT_typedata_structure_test2.type_info,
-			.offset        = offsetof(test2, test),
+			.member_name   = "argc",
+			.parent        = &DEFAULT_typedata_procedure_main.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.argv = {
+			.type_info     = &DEFAULT_typedata_char,
+			.member_name   = "argv",
+			.parent        = &DEFAULT_typedata_procedure_main.type_info,
+			.flags         = 2,
+			.pointer_depth = 2,
+		},
 	},
 };
-
+constexpr type_info_procedure_apples_test_func DEFAULT_typedata_procedure_apples_test_func = {
+	.type_info = {
+		.type_name = "apples_test_func",
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_apples_test_func.argument_array,
+	.arguments = {
+		.name = {
+			.type_info     = &DEFAULT_typedata_char,
+			.member_name   = "name",
+			.parent        = &DEFAULT_typedata_procedure_apples_test_func.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_unsigned_int,
 	&DEFAULT_typedata_unsigned_char,
@@ -298,21 +357,22 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_uint64_t,
 	&DEFAULT_typedata_size_t,
 	&DEFAULT_typedata_structure_test_structure.type_info,
-	&DEFAULT_typedata_structure_test2.type_info,
+	&DEFAULT_typedata_procedure_main.type_info,
+	&DEFAULT_typedata_procedure_apples_test_func.type_info,
 };
 
 
-ATHENA_API inline const type_info_t *type_info(unsigned long long type_id);
-ATHENA_API inline const type_info_t *type_info(const char *string);
+ATHENA_API const type_info_t *type_info(unsigned long long type_id);
+ATHENA_API const type_info_t *type_info(const char *string);
 
 #ifdef C_STRING_H
 ATHENA_API inline const type_info_t *type_info(string_t string);
 #endif
 
 // NOTE(Sleepster): STB style lib
-#ifdef ATHENA_IMPLMENETATION 
+#ifdef ATHENA_IMPLMENTATION 
 
-ATHENA_API inline const type_info_t*
+ATHENA_API const type_info_t*
 type_info(unsigned long long type_id)
 {
     const type_info_t *result = (const type_info_t*)athena_type_information_array[type_id];
@@ -320,7 +380,7 @@ type_info(unsigned long long type_id)
 };
 
 #ifdef C_STRING_H
-ATHENA_API inline const type_info_t*
+ATHENA_API const type_info_t*
 type_info(string_t string)
 {
     const type_info_t *result = null;
@@ -328,9 +388,9 @@ type_info(string_t string)
     {
         for(auto &element: athena_type_information_array)
         {
-            if(c_string_compare(STR(element.type_name), string))
+            if(c_string_compare(STR(element->type_name), string))
             {
-                result = &element;
+                result = element;
                 break;
             }
         }
@@ -339,7 +399,7 @@ type_info(string_t string)
     return(result);
 }
 
-ATHENA_API inline const type_info_member_t*
+ATHENA_API const type_info_member_t*
 athena_get_member_info(const type_info_t *type_info, string_t member_name) 
 {
     const type_info_member_t *result = null;
@@ -351,10 +411,10 @@ athena_get_member_info(const type_info_t *type_info, string_t member_name)
             member_index < structure_info->member_count;
             ++member_index)
         {
-            const type_info_member_t *member = structure_info->member_array[member_index];
+            const type_info_member_t *member = &structure_info->members[member_index];
             if(c_string_compare(STR(member->member_name), member_name))
             {
-                result = static_cast<const type_info_t*>(member);
+                result = (const type_info_member_t*)(member);
                 break;
             }
         }
@@ -368,7 +428,7 @@ athena_get_member_info(const type_info_t *type_info, string_t member_name)
 #define ArrayCount(x) (sizeof(x) / sizeof((x[0])))
 #endif
 
-ATHENA_API inline const type_info_t*
+ATHENA_API const type_info_t*
 type_info(const char *string)
 {
     const type_info_t *result = nullptr;
@@ -395,7 +455,7 @@ type_info(const char *string)
     return(result);
 }
 
-ATHENA_API inline const type_info_member_t*
+ATHENA_API const type_info_member_t*
 athena_get_member_info(const type_info_t *type_info, const char *member_name) 
 {
     const type_info_member_t *result = nullptr;
@@ -424,26 +484,26 @@ athena_get_member_info(const type_info_t *type_info, const char *member_name)
     return(result);
 }
 
-ATHENA_API inline const type_info_struct_t*
+ATHENA_API const type_info_struct_t*
 athena_get_struct_info_from_member(const type_info_t *info)
 {
     const type_info_struct_t *result = nullptr;
     const type_info_member_t *member = (const type_info_member_t*)info;
     if(member->parent)
     {
-        result = member->parent;
+        result = (type_info_struct_t*)member->parent;
     }
 
     return(result);
 }
 
-ATHENA_API inline const type_info_struct_t*
+ATHENA_API const type_info_struct_t*
 athena_get_struct_info_from_member(const type_info_member_t *member)
 {
     const type_info_struct_t *result = nullptr;
     if(member->parent)
     {
-        result = member->parent;
+        result = (type_info_struct_t*)member->parent;
     }
 
     return(result);
