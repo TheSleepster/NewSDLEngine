@@ -16,10 +16,10 @@ struct type_info_procedure_t;
 
 enum athena_reflection_type 
 {
-    ATHENA_METATYPE_INFO_PRIMITIVE,
-    ATHENA_METATYPE_INFO_STRUCT,
-    ATHENA_METATYPE_INFO_ENUM,
-    ATHENA_METATYPE_INFO_PROCEDURE,
+    ATHENA_METATYPE_PRIMITIVE,
+    ATHENA_METATYPE_STRUCT,
+    ATHENA_METATYPE_ENUM,
+    ATHENA_METATYPE_PROCEDURE,
 };
 
 enum athena_evaluated_type 
@@ -179,83 +179,103 @@ extern const type_info_procedure_main DEFAULT_typedata_procedure_main;
 extern const type_info_procedure_apples_test_func DEFAULT_typedata_procedure_apples_test_func;
 
 constexpr type_info_t DEFAULT_typedata_unsigned_int = {
-.type_name = "unsigned int",
-.size = athena_internal::safe_sizeof<unsigned int>(),
+	.type_name = "unsigned int",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<unsigned int>(),
 };
 constexpr type_info_t DEFAULT_typedata_unsigned_char = {
-.type_name = "unsigned char",
-.size = athena_internal::safe_sizeof<unsigned char>(),
+	.type_name = "unsigned char",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<unsigned char>(),
 };
 constexpr type_info_t DEFAULT_typedata_short = {
-.type_name = "short",
-.size = athena_internal::safe_sizeof<short>(),
+	.type_name = "short",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<short>(),
 };
 constexpr type_info_t DEFAULT_typedata_long = {
-.type_name = "long",
-.size = athena_internal::safe_sizeof<long>(),
+	.type_name = "long",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<long>(),
 };
 constexpr type_info_t DEFAULT_typedata_int = {
-.type_name = "int",
-.size = athena_internal::safe_sizeof<int>(),
+	.type_name = "int",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<int>(),
 };
 constexpr type_info_t DEFAULT_typedata_char = {
-.type_name = "char",
-.size = athena_internal::safe_sizeof<char>(),
+	.type_name = "char",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<char>(),
 };
 constexpr type_info_t DEFAULT_typedata_float = {
-.type_name = "float",
-.size = athena_internal::safe_sizeof<float>(),
+	.type_name = "float",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<float>(),
 };
 constexpr type_info_t DEFAULT_typedata_double = {
-.type_name = "double",
-.size = athena_internal::safe_sizeof<double>(),
+	.type_name = "double",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<double>(),
 };
 constexpr type_info_t DEFAULT_typedata_void = {
-.type_name = "void",
+	.type_name = "void",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 };
 constexpr type_info_t DEFAULT_typedata_bool = {
-.type_name = "bool",
-.size = athena_internal::safe_sizeof<bool>(),
+	.type_name = "bool",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<bool>(),
 };
 constexpr type_info_t DEFAULT_typedata_int8_t = {
-.type_name = "int8_t",
-.size = athena_internal::safe_sizeof<int8_t>(),
+	.type_name = "int8_t",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<int8_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_int16_t = {
-.type_name = "int16_t",
-.size = athena_internal::safe_sizeof<int16_t>(),
+	.type_name = "int16_t",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<int16_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_int32_t = {
-.type_name = "int32_t",
-.size = athena_internal::safe_sizeof<int32_t>(),
+	.type_name = "int32_t",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<int32_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_int64_t = {
-.type_name = "int64_t",
-.size = athena_internal::safe_sizeof<int64_t>(),
+	.type_name = "int64_t",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<int64_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint8_t = {
-.type_name = "uint8_t",
-.size = athena_internal::safe_sizeof<uint8_t>(),
+	.type_name = "uint8_t",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<uint8_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint16_t = {
-.type_name = "uint16_t",
-.size = athena_internal::safe_sizeof<uint16_t>(),
+	.type_name = "uint16_t",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<uint16_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint32_t = {
-.type_name = "uint32_t",
-.size = athena_internal::safe_sizeof<uint32_t>(),
+	.type_name = "uint32_t",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<uint32_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint64_t = {
-.type_name = "uint64_t",
-.size = athena_internal::safe_sizeof<uint64_t>(),
+	.type_name = "uint64_t",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<uint64_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_size_t = {
-.type_name = "size_t",
-.size = athena_internal::safe_sizeof<size_t>(),
+	.type_name = "size_t",
+	.metatype  = ATHENA_METATYPE_PRIMITIVE,
+	.size = athena_internal::safe_sizeof<size_t>(),
 };
 constexpr type_info_struct_test_structure DEFAULT_typedata_structure_test_structure = {
 	.type_info = {
 		.type_name = "test_structure",
+		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<test_structure>(),
 	},
 	.member_count   = 4,
@@ -298,6 +318,7 @@ constexpr type_info_struct_test_structure DEFAULT_typedata_structure_test_struct
 constexpr type_info_procedure_main DEFAULT_typedata_procedure_main = {
 	.type_info = {
 		.type_name = "main",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_int,
@@ -322,6 +343,7 @@ constexpr type_info_procedure_main DEFAULT_typedata_procedure_main = {
 constexpr type_info_procedure_apples_test_func DEFAULT_typedata_procedure_apples_test_func = {
 	.type_info = {
 		.type_name = "apples_test_func",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
 	.return_type    = &DEFAULT_typedata_void,

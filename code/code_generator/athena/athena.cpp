@@ -37,9 +37,9 @@
 /* TODO:
  *
  * The immediate things to finish now are:
- *  - [ ] Attribute handling
+ *  - [ ] Attribute handling. Perhaps create lists of items in attributes so that we can query for specific attributes
  *  - [ ] Better user-facing API handling of lambda type_info
- *  - [ ] Metatype labeling within type_info_t so that we can cast appropriately
+ *  - [X] Metatype labeling within type_info_t so that we can cast appropriately
  *
  *  - [?] Structures such as mat4_t in math.h are not parsed properly and we miss the final members when dealing with deep structure nesting
  *  - [?] Structures such as mat4_t with internal anonymous structures fail to have all their members properly added to the top level scope.
@@ -1344,7 +1344,30 @@ output_basic_type_info(string_builder_t *builder, code_type_t *type, u32 indent_
     ident(builder, indent_level);
     c_string_builder_sprintf(builder, "\t.type_id = TYPE_%.*s,\n", fprint_string(type_string));
 #endif
-
+    if(type->code_metatype != CODE_TYPE_UNDEFINED)
+    {
+        ident(builder, indent_level);
+        c_string_builder_sprintf(builder, ".metatype  = ATHENA_METATYPE_", fprint_string(type_string));
+        switch(type->code_metatype)
+        {
+            case CODE_TYPE_PRIMITIVE:
+            {
+                c_string_builder_sprintf(builder, "PRIMITIVE,\n");
+            }break;
+            case CODE_TYPE_STRUCTURE:
+            {
+                c_string_builder_sprintf(builder, "STRUCT,\n");
+            }break;
+            case CODE_TYPE_ENUM:
+            {
+                c_string_builder_sprintf(builder, "ENUM,\n");
+            }break;
+            case CODE_TYPE_LAMBDA:
+            {
+                c_string_builder_sprintf(builder, "PROCEDURE,\n");
+            }break;
+        }
+    }
     if(!c_string_compare(type->identifier, STR("void")) && type->code_metatype != CODE_TYPE_LAMBDA)
     {
         ident(builder, indent_level);
@@ -1625,10 +1648,10 @@ struct type_info_procedure_t;
 
 enum athena_reflection_type 
 {
-    ATHENA_METATYPE_INFO_PRIMITIVE,
-    ATHENA_METATYPE_INFO_STRUCT,
-    ATHENA_METATYPE_INFO_ENUM,
-    ATHENA_METATYPE_INFO_PROCEDURE,
+    ATHENA_METATYPE_PRIMITIVE,
+    ATHENA_METATYPE_STRUCT,
+    ATHENA_METATYPE_ENUM,
+    ATHENA_METATYPE_PROCEDURE,
 };
 
 enum athena_evaluated_type 
@@ -1872,7 +1895,7 @@ extern const type_info_t *const athena_type_information_array[];
                             c_string_builder_sprintf(&file_builder, "constexpr type_info_struct_%.*s DEFAULT_typedata_structure_%.*s = {\n", fprint_string(type->identifier), fprint_string(type->identifier));
                             c_string_builder_sprintf(&file_builder, "\t.type_info = {\n");
                             output_basic_type_info(&file_builder, type, 2);
-                            c_string_builder_sprintf(&file_builder, "\t}t,\n");
+                            c_string_builder_sprintf(&file_builder, "\t},\n");
 
                             c_string_builder_sprintf(&file_builder, "\t.member_count   = %d,\n", type_data->struct_decl.member_count);
                             c_string_builder_sprintf(&file_builder, "\t.member_pointer = DEFAULT_typedata_structure_%.*s.member_array,\n", fprint_string(type_data->identifier));
@@ -1959,7 +1982,7 @@ extern const type_info_t *const athena_type_information_array[];
             }
 
             c_string_builder_sprintf(&file_builder, "constexpr type_info_t DEFAULT_typedata_%.*s = {\n", fprint_string(type_string), fprint_string(type_string));
-            output_basic_type_info(&file_builder, type, 0);
+            output_basic_type_info(&file_builder, type, 1);
             c_string_builder_sprintf(&file_builder, "};\n");
         }
     }

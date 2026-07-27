@@ -10,7 +10,8 @@
 #include <c_base.h>
 #include <c_types.h>
 
-struct test_structure {
+struct test_structure 
+{
     int apples;
     int oranges;
     int bananas;
