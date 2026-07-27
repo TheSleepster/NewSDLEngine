@@ -20,12 +20,14 @@ struct test_structure
 };
 
 #define ATHENA_IMPLMENTATION
+#include "../code_generator/athena/athena.h"
 #include "generated_test.h"
 
 int
 main(int argc, char **argv)
 {
-    const type_info_t *info = type_info("test_structure");
+    test_structure item = {};
+    const type_info_t *info = Athena::type_info(item);
     if(info)
     {
         const type_info_struct_t *structure = (const type_info_struct_t *)info;
@@ -39,12 +41,21 @@ main(int argc, char **argv)
             printf("Member name: '%s'...\n", member->member_name);
         }
 
-        const type_info_member_t *function = athena_get_member_info(info, "apples_test_func");
+        const type_info_member_t *function = Athena::get_member(info, "apples_test_func");
         if(function)
         {
-            const type_info_procedure_t *test_proc_data = (const type_info_procedure_t *)function->type_info;
-            int x = 0;
+            const type_info_procedure_t *func_data = Athena::as_procedure(function);
+            for(u32 arg_index = 0;
+                arg_index < func_data->argument_count;
+                ++arg_index)
+            {
+                const type_info_member_t *argument = func_data->arguments + arg_index;
+                printf("Argument name: '%s'...\n", argument->member_name);
+            }
         }
+
+        const type_info_struct_t *parent = Athena::get_struct_info_from_member(function);
+        int x = 0;
     }
 
     return(0);

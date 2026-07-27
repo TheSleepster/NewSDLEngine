@@ -16,10 +16,10 @@ struct type_info_procedure_t;
 
 enum athena_reflection_type 
 {
-    ATHENA_METATYPE_INFO_PRIMITIVE,
-    ATHENA_METATYPE_INFO_STRUCT,
-    ATHENA_METATYPE_INFO_ENUM,
-    ATHENA_METATYPE_INFO_PROCEDURE,
+    ATHENA_METATYPE_PRIMITIVE,
+    ATHENA_METATYPE_STRUCT,
+    ATHENA_METATYPE_ENUM,
+    ATHENA_METATYPE_PROCEDURE,
 };
 
 enum athena_evaluated_type 
@@ -61,7 +61,9 @@ struct type_info_member_t
 {
     const type_info_t        *type_info;
     const char               *member_name;
-    const type_info_struct_t *parent;
+    // NOTE(Sleepster): Either type_info_struct_t, or type_info_procedure_t 
+    const type_info_t        *parent;
+
     unsigned int              offset;
     //unsigned_int            array_size;
     unsigned int              flags;
@@ -72,8 +74,9 @@ struct type_info_member_t
 
 struct type_info_struct_t
 {
-    const type_info_t type_info;
-    unsigned int      member_count;
+    const type_info_t         type_info;
+    unsigned int              member_count;
+    const type_info_member_t *members;
 };
 
 struct type_info_procedure_t
@@ -84,14 +87,33 @@ struct type_info_procedure_t
     const type_info_member_t *arguments;
 };
 
-
 struct athena_reflection_bundle_t
 {
     const type_info_t *type_info_array;
     unsigned int       type_info_array_size;
 };
 
-extern const type_info_t **athena_type_information_array;
+// function
+void athena_handle_type_info(const char *filepath, int directory, int recursive);
+
+#ifdef ATHENA_IMPLEMENTATION
+# define ATHENA_API 
+#else
+#define ATHENA_API extern
+#endif
+
+namespace athena_internal {
+    template<typename T, unsigned int N = sizeof(T)>
+    constexpr unsigned int safe_sizeof_impl(int) { return N; }
+
+    template<typename T>
+    constexpr unsigned int safe_sizeof_impl(...) { return 0; }
+
+    template<typename T>
+    constexpr unsigned int safe_sizeof() { return safe_sizeof_impl<T>(0); }
+}
+
+extern const type_info_t *const athena_type_information_array[];
 
 // function
 void athena_handle_type_info(const char *filepath, int directory, int recursive);
@@ -102,6 +124,7 @@ void athena_handle_type_info(const char *filepath, int directory, int recursive)
 #define ATHENA_API extern
 #endif
 
+namespace Athena {
 ATHENA_API inline const type_info_t *type_info(unsigned long long type_id);
 ATHENA_API inline const type_info_t *type_info(const char *string);
 
@@ -109,46 +132,21 @@ ATHENA_API inline const type_info_t *type_info(const char *string);
 ATHENA_API inline const type_info_t *type_info(string_t string);
 #endif
 
-// NOTE(Sleepster): Templates
-template <typename T>
-ATHENA_API inline const type_info_t*
-type_info()
-{
-    return(nullptr);
-}
-
-#ifndef ATHENA_GENERATED_FILE_H
-#define ATHENA_RTTI_COMPLETE_TYPE_LIST(X)
-#endif
-
-#define X(cpp_type, type_id, structure, string) \
-    template <> \
-    inline const type_info_t* \
-    type_info<cpp_type>() { \
-        return(reinterpret_cast<const type_info_t *>(structure)); \
-    }
-    
-    ATHENA_RTTI_COMPLETE_TYPE_LIST(X)
-#undef X
-
-template<typename T>
-ATHENA_API inline const type_info_t*
-type_info(const T &item)
-{
-    return(type_info<T>());
-}
-
 // NOTE(Sleepster): STB style lib
 #ifdef C_STRING_H
 ATHENA_API inline const type_info_t        *type_info(string_t string);
-ATHENA_API inline const type_info_member_t *athena_get_member_info(const type_info_t *type_info, string_t member_name);
+ATHENA_API inline const type_info_member_t *get_member(const type_info_t *type_info, string_t member_name);
 #endif
 
 ATHENA_API inline const type_info_t        *type_info(unsigned long long type_id);
 ATHENA_API inline const type_info_t        *type_info(const char *string);
-ATHENA_API inline const type_info_member_t *athena_get_member_info(const type_info_t *type_info, const char *member_name);
-ATHENA_API inline const type_info_struct_t *athena_get_struct_info_from_member(const type_info_t *info);
-ATHENA_API inline const type_info_struct_t *athena_get_struct_info_from_member(const type_info_member_t *member);
+ATHENA_API inline const type_info_member_t *get_member(const type_info_t *type_info, const char *member_name);
+ATHENA_API inline const type_info_struct_t *get_struct_info_from_member(const type_info_t *info);
+ATHENA_API inline const type_info_struct_t *get_struct_info_from_member(const type_info_member_t *member);
+
+ATHENA_API const type_info_procedure_t* as_procedure(const type_info_t *info);
+ATHENA_API const type_info_procedure_t* as_procedure(const type_info_member_t *info);
+}
 
 #define CODE_GEN_IGNORE_FILE
 #define CODE_GEN_IGNORE_DECL

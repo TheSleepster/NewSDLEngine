@@ -52,7 +52,7 @@
       "-o",
       "../build/athena"
     ],
-    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
+    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
     "output": "../build/athena"
   },
   {
@@ -108,7 +108,7 @@
       "-o",
       "../build/sandbox_type_info"
     ],
-    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
+    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
     "output": "../build/sandbox_type_info"
   },
   {
@@ -165,6 +165,6 @@
       "-fsyntax-only",
       "../misc/clangd/sandbox_type_info_unity.cpp"
     ],
-    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code"
+    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code"
   }
 ]

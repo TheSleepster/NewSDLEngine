@@ -4,114 +4,34 @@
 #if !defined(ATHENA_GENERATED_FILE_H)
 #define ATHENA_GENERATED_FILE_H
 
+#define ATHENA_RTTI_COMPLETE_TYPE_LIST(X) \
+	X(unsigned int, &DEFAULT_typedata_unsigned_int) \
+	X(unsigned char, &DEFAULT_typedata_unsigned_char) \
+	X(short, &DEFAULT_typedata_short) \
+	X(long, &DEFAULT_typedata_long) \
+	X(int, &DEFAULT_typedata_int) \
+	X(char, &DEFAULT_typedata_char) \
+	X(float, &DEFAULT_typedata_float) \
+	X(double, &DEFAULT_typedata_double) \
+	X(void, &DEFAULT_typedata_void) \
+	X(bool, &DEFAULT_typedata_bool) \
+	X(int8_t, &DEFAULT_typedata_int8_t) \
+	X(int16_t, &DEFAULT_typedata_int16_t) \
+	X(int32_t, &DEFAULT_typedata_int32_t) \
+	X(int64_t, &DEFAULT_typedata_int64_t) \
+	X(uint8_t, &DEFAULT_typedata_uint8_t) \
+	X(uint16_t, &DEFAULT_typedata_uint16_t) \
+	X(uint32_t, &DEFAULT_typedata_uint32_t) \
+	X(uint64_t, &DEFAULT_typedata_uint64_t) \
+	X(size_t, &DEFAULT_typedata_size_t) \
+	X(test_structure, &DEFAULT_typedata_structure_test_structure.type_info) \
+
 
 #include <string.h>
 #include <stddef.h>
-
-
-struct type_info_t;
-struct type_info_member_t;
-struct type_info_struct_t;
-struct type_info_procedure_t;
-
-enum athena_reflection_type 
-{
-    ATHENA_METATYPE_PRIMITIVE,
-    ATHENA_METATYPE_STRUCT,
-    ATHENA_METATYPE_ENUM,
-    ATHENA_METATYPE_PROCEDURE,
-};
-
-enum athena_evaluated_type 
-{
-    ATHENA_TYPE_INT32,
-    ATHENA_TYPE_INT64,
-    ATHENA_TYPE_UNSIGNED32,
-    ATHENA_TYPE_UNSIGNED64,
-    ATHENA_TYPE_FLOAT32,
-    ATHENA_TYPE_FLOAT64,
-    ATHENA_TYPE_STRING,
-};
-
-struct type_default_value_t 
-{
-    unsigned int type;
-    union {
-        int                int32;
-        long long          int64;
-        unsigned int       u32;
-        unsigned long long u64;
-        float              float32;
-        double             float64;
-        const char        *string;
-    };
-};
-
-struct type_info_t
-{
-    const char  *type_name;
-    type_info_t *alias_of;
-    type_info_t *next_overload;
-    unsigned int metatype;
-    unsigned int type_id;
-    unsigned int size;
-};
-
-struct type_info_member_t
-{
-    const type_info_t        *type_info;
-    const char               *member_name;
-    // NOTE(Sleepster): Either type_info_struct_t, or type_info_procedure_t 
-    const type_info_t        *parent;
-
-    unsigned int              offset;
-    //unsigned_int            array_size;
-    unsigned int              flags;
-    unsigned int              pointer_depth;
-
-    type_default_value_t      value;
-};
-
-struct type_info_struct_t
-{
-    const type_info_t         type_info;
-    unsigned int              member_count;
-    const type_info_member_t *members;
-};
-
-struct type_info_procedure_t
-{
-    type_info_t               type_info;
-    unsigned int              argument_count;
-    const type_info_t        *return_type;
-    const type_info_member_t *arguments;
-};
-
-struct athena_reflection_bundle_t
-{
-    const type_info_t *type_info_array;
-    unsigned int       type_info_array_size;
-};
-
-// function
-void athena_handle_type_info(const char *filepath, int directory, int recursive);
-
-#ifdef ATHENA_IMPLEMENTATION
-# define ATHENA_API 
-#else
-#define ATHENA_API extern
+#ifndef ATHENA_H
+#error "You must include athena.h before this file..."
 #endif
-
-namespace athena_internal {
-    template<typename T, unsigned int N = sizeof(T)>
-    constexpr unsigned int safe_sizeof_impl(int) { return N; }
-
-    template<typename T>
-    constexpr unsigned int safe_sizeof_impl(...) { return 0; }
-
-    template<typename T>
-    constexpr unsigned int safe_sizeof() { return safe_sizeof_impl<T>(0); }
-}
 
 extern const type_info_t *const athena_type_information_array[];
 struct type_info_struct_test_structure {
@@ -450,6 +370,9 @@ athena_get_member_info(const type_info_t *type_info, string_t member_name)
 #define ArrayCount(x) (sizeof(x) / sizeof((x[0])))
 #endif
 
+#include <type_traits>
+namespace Athena {
+
 ATHENA_API const type_info_t*
 type_info(const char *string)
 {
@@ -478,7 +401,7 @@ type_info(const char *string)
 }
 
 ATHENA_API const type_info_member_t*
-athena_get_member_info(const type_info_t *type_info, const char *member_name) 
+get_member(const type_info_t *type_info, const char *member_name) 
 {
     const type_info_member_t *result = nullptr;
 
@@ -507,7 +430,7 @@ athena_get_member_info(const type_info_t *type_info, const char *member_name)
 }
 
 ATHENA_API const type_info_struct_t*
-athena_get_struct_info_from_member(const type_info_t *info)
+get_struct_info_from_member(const type_info_t *info)
 {
     const type_info_struct_t *result = nullptr;
     const type_info_member_t *member = (const type_info_member_t*)info;
@@ -520,7 +443,7 @@ athena_get_struct_info_from_member(const type_info_t *info)
 }
 
 ATHENA_API const type_info_struct_t*
-athena_get_struct_info_from_member(const type_info_member_t *member)
+get_struct_info_from_member(const type_info_member_t *member)
 {
     const type_info_struct_t *result = nullptr;
     if(member->parent)
@@ -529,6 +452,41 @@ athena_get_struct_info_from_member(const type_info_member_t *member)
     }
 
     return(result);
+}
+
+ATHENA_API const type_info_procedure_t*
+as_procedure(const type_info_t *info)
+{
+    Assert(info->metatype == ATHENA_METATYPE_PROCEDURE);
+    return((const type_info_procedure_t *)info);
+}
+
+ATHENA_API const type_info_procedure_t*
+as_procedure(const type_info_member_t *info)
+{
+    Assert(info->type_info->metatype == ATHENA_METATYPE_PROCEDURE);
+    return((const type_info_procedure_t *)info->type_info);
+}
+
+template<typename T> constexpr const type_info_t* type_info();
+
+// NOTE(Sleepster): Templates
+
+#define X(cpp_type, structure) \
+    std::is_same<T, cpp_type>::value ? (const type_info_t*)(structure) :
+
+template<typename T>
+constexpr const type_info_t* type_info() {
+    return ATHENA_RTTI_COMPLETE_TYPE_LIST(X) nullptr;
+}
+#undef X
+
+template<typename T>
+ATHENA_API const type_info_t*
+type_info(T &item)
+{
+    return(type_info<T>());
+}
 }
 
 #endif // ATHENA_IMPLEMENTATION
