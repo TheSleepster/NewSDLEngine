@@ -93,6 +93,18 @@ struct athena_reflection_bundle_t
     unsigned int       type_info_array_size;
 };
 
+struct attribute_info_list_t {
+    const char               *attribute_name;
+    const type_info_t *const *infos;
+    u32                       info_count;
+
+    const type_info_t *const *begin() { return(infos);              }
+    const type_info_t *const *end()   { return(infos + info_count); }
+
+    const type_info_t *const *begin() const { return(infos);                }
+    const type_info_t *const *end()   const { return((infos + info_count)); }
+};
+
 // function
 void athena_handle_type_info(const char *filepath, int directory, int recursive);
 
@@ -146,6 +158,11 @@ ATHENA_API inline const type_info_struct_t *get_struct_info_from_member(const ty
 
 ATHENA_API const type_info_procedure_t* as_procedure(const type_info_t *info);
 ATHENA_API const type_info_procedure_t* as_procedure(const type_info_member_t *info);
+
+ATHENA_API const type_info_struct_t* as_structure(const type_info_t *info);
+ATHENA_API const type_info_struct_t* as_structure(const type_info_member_t *info);
+
+ATHENA_API const attribute_info_list_t *get_attribute_list(char *name);
 }
 
 #define CODE_GEN_IGNORE_FILE

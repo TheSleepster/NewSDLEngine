@@ -49,6 +49,19 @@ struct type_info_struct_test_structure {
 	};
 };
 
+struct type_info_procedure_attribute_test_function {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t name;
+		}arguments;
+	};
+};
+
 struct type_info_procedure_main {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -95,6 +108,7 @@ extern const type_info_t DEFAULT_typedata_uint32_t;
 extern const type_info_t DEFAULT_typedata_uint64_t;
 extern const type_info_t DEFAULT_typedata_size_t;
 extern const type_info_struct_test_structure DEFAULT_typedata_structure_test_structure;
+extern const type_info_procedure_attribute_test_function DEFAULT_typedata_procedure_attribute_test_function;
 extern const type_info_procedure_main DEFAULT_typedata_procedure_main;
 extern const type_info_procedure_apples_test_func DEFAULT_typedata_procedure_apples_test_func;
 
@@ -235,6 +249,24 @@ constexpr type_info_struct_test_structure DEFAULT_typedata_structure_test_struct
 	},
 };
 
+constexpr type_info_procedure_attribute_test_function DEFAULT_typedata_procedure_attribute_test_function = {
+	.type_info = {
+		.type_name = "attribute_test_function",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_attribute_test_function.argument_array,
+	.arguments = {
+		.name = {
+			.type_info     = &DEFAULT_typedata_char,
+			.member_name   = "name",
+			.parent        = &DEFAULT_typedata_procedure_attribute_test_function.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr type_info_procedure_main DEFAULT_typedata_procedure_main = {
 	.type_info = {
 		.type_name = "main",
@@ -299,10 +331,23 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_uint64_t,
 	&DEFAULT_typedata_size_t,
 	&DEFAULT_typedata_structure_test_structure.type_info,
+	&DEFAULT_typedata_procedure_attribute_test_function.type_info,
 	&DEFAULT_typedata_procedure_main.type_info,
 	&DEFAULT_typedata_procedure_apples_test_func.type_info,
 };
 
+constexpr const type_info_t *ATTRIBUTE_member_func_array[] = {
+	&DEFAULT_typedata_procedure_apples_test_func.type_info,
+};
+constexpr const type_info_t *ATTRIBUTE_generate_function_array[] = {
+	&DEFAULT_typedata_procedure_attribute_test_function.type_info,
+};
+
+// using info_list_t = const type_info_t *const *;
+constexpr attribute_info_list_t complete_attribute_array[] = {
+	{"member_func", ATTRIBUTE_member_func_array, ArrayCount(ATTRIBUTE_member_func_array)},
+	{"generate_function", ATTRIBUTE_generate_function_array, ArrayCount(ATTRIBUTE_generate_function_array)},
+};
 
 ATHENA_API const type_info_t *type_info(unsigned long long type_id);
 ATHENA_API const type_info_t *type_info(const char *string);
@@ -313,6 +358,13 @@ ATHENA_API inline const type_info_t *type_info(string_t string);
 
 // NOTE(Sleepster): STB style lib
 #ifdef ATHENA_IMPLMENTATION 
+
+#ifndef ArrayCount
+#define ArrayCount(x) (sizeof(x) / sizeof((x[0])))
+#endif
+
+#include <type_traits>
+namespace Athena {
 
 ATHENA_API const type_info_t*
 type_info(unsigned long long type_id)
@@ -342,7 +394,7 @@ type_info(string_t string)
 }
 
 ATHENA_API const type_info_member_t*
-athena_get_member_info(const type_info_t *type_info, string_t member_name) 
+get_member_info(const type_info_t *type_info, string_t member_name) 
 {
     const type_info_member_t *result = null;
 
@@ -365,13 +417,6 @@ athena_get_member_info(const type_info_t *type_info, string_t member_name)
     return(result);
 }
 #endif
-
-#ifndef ArrayCount
-#define ArrayCount(x) (sizeof(x) / sizeof((x[0])))
-#endif
-
-#include <type_traits>
-namespace Athena {
 
 ATHENA_API const type_info_t*
 type_info(const char *string)
@@ -468,9 +513,22 @@ as_procedure(const type_info_member_t *info)
     return((const type_info_procedure_t *)info->type_info);
 }
 
-template<typename T> constexpr const type_info_t* type_info();
+ATHENA_API const type_info_struct_t*
+as_structure(const type_info_member_t *info)
+{
+    Assert(info->type_info->metatype == ATHENA_METATYPE_STRUCT);
+    return((const type_info_struct_t *)info->type_info);
+}
+
+ATHENA_API const type_info_struct_t*
+as_structure(const type_info_t *info)
+{
+    Assert(info->metatype == ATHENA_METATYPE_STRUCT);
+    return((const type_info_struct_t *)info);
+}
 
 // NOTE(Sleepster): Templates
+template<typename T> constexpr const type_info_t* type_info();
 
 #define X(cpp_type, structure) \
     std::is_same<T, cpp_type>::value ? (const type_info_t*)(structure) :
@@ -487,6 +545,29 @@ type_info(T &item)
 {
     return(type_info<T>());
 }
+
+ATHENA_API const attribute_info_list_t*
+get_attribute_list(char *name)
+{
+    const attribute_info_list_t *result = null;
+
+    int name_len = strlen(name);
+    for(const attribute_info_list_t &info_list: complete_attribute_array)
+    {
+        int our_length = strlen(info_list.attribute_name); 
+        if(our_length == name_len)
+        {
+            if(memcmp(info_list.attribute_name, name, our_length) == 0)
+            {
+                result = &info_list;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
 }
 
 #endif // ATHENA_IMPLEMENTATION

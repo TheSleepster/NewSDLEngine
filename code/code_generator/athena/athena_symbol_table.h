@@ -190,6 +190,7 @@ struct parser_t
     u32                                current_bookmark_count;
 
     hash_table_t<macro_info_t>         macro_table;
+    hash_table_t<code_attribute_t>     recorded_attributes;
 };
 
 struct symbol_table_t 
@@ -202,6 +203,7 @@ struct symbol_table_t
         
     hash_table_t<macro_info_t>        defined_global_macro_table;
     hash_table_t<code_type_t*>        type_table;
+    dynarray_t<code_attribute_t>      code_attributes;
     dynarray_t<declaration_context_t> declaration_contexts;
 };
 

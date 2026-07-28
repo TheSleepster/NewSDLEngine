@@ -37,25 +37,27 @@
 /* TODO:
  *
  * The immediate things to finish now are:
- *  - [ ] Attribute handling. Perhaps create lists of items in attributes so that we can query for specific attributes
- *  - [ ] Better user-facing API handling of lambda type_info
- *  - [X] Metatype labeling within type_info_t so that we can cast appropriately
+ * - [ ] Record attributes into the parser and store a table of found attributes
+ * - [ ] Attribute handling. Perhaps create lists of items in attributes so that we can query for specific attributes
+ * - [X] Handle Attributes inside structures 
+ * - [X] Better user-facing API handling of lambda type_info
+ * - [X] Metatype labeling within type_info_t so that we can cast appropriately
  *
- *  - [?] Structures such as mat4_t in math.h are not parsed properly and we miss the final members when dealing with deep structure nesting
- *  - [?] Structures such as mat4_t with internal anonymous structures fail to have all their members properly added to the top level scope.
- *  - [?] Issues with structures and lambdas that share the same name (IE. struct vec2 and vec2())
+ * - [?] Structures such as mat4_t in math.h are not parsed properly and we miss the final members when dealing with deep structure nesting
+ * - [?] Structures such as mat4_t with internal anonymous structures fail to have all their members properly added to the top level scope.
+ * - [?] Issues with structures and lambdas that share the same name (IE. struct vec2 and vec2())
  *
- *  - [X] Issues with our macro'ed hash tables and dynarrays.
- *  - [X] Issues with types that are incomplete. Such as SDL_Gamepad
- *  - [X] Better function overload handling
- *  - [X] Special markers to denote the ignoring of certain code_declarations / files.
- *  - [X] Ignore templated items. ALL templated items. If we find a member that uses template inputs (IE. dynarray<char *>) then we'll register that, but nothing else
- *        the reflection will simply be "decltype(dynarray<char *>)"
- *  - [X] type_info_member_t should store a pointer to it's type info. 
- *  - [X] Handle Type Overloads (struct vec2 as well as vec2() sharing the same name, but being different types is a problem.)
- *  - [X] Better printout handling of nested anonymous structures more inline with the metaprogram
- *  - [X] Offset component for members
- *  - [?] Grouping of items by required file to allow easy exclusion of unnecessary data
+ * - [X] Issues with our macro'ed hash tables and dynarrays.
+ * - [X] Issues with types that are incomplete. Such as SDL_Gamepad
+ * - [X] Better function overload handling
+ * - [X] Special markers to denote the ignoring of certain code_declarations / files.
+ * - [X] Ignore templated items. ALL templated items. If we find a member that uses template inputs (IE. dynarray<char *>) then we'll register that, but nothing else
+ *       the reflection will simply be "decltype(dynarray<char *>)"
+ * - [X] type_info_member_t should store a pointer to it's type info. 
+ * - [X] Handle Type Overloads (struct vec2 as well as vec2() sharing the same name, but being different types is a problem.)
+ * - [X] Better printout handling of nested anonymous structures more inline with the metaprogram
+ * - [X] Offset component for members
+ * - [?] Grouping of items by required file to allow easy exclusion of unnecessary data
  *
  *
  * - [ ] Variadic functions '...' and ##__VA_ARGS__ macros are not handled.
@@ -83,10 +85,6 @@
 #include "athena_ast.h"
 #include "athena_symbol_table.h"
 
-#if 0
-#define ATHENA_IMPLEMENTATION
-#include "ATHENA_GENERATED.h"
-#endif
 #include "athena.h"
 
 struct athena_state_t
@@ -849,11 +847,7 @@ build_file_AST(parser_t *parser)
                         report_error(parser, "Sorry, we don't support attributes with arguments...\n");
                     }
 
-                    code_attribute_t attribute = {
-                        .name = c_string_make_copy(&parser->arena, attribute_name.data),
-                    };
-
-                    dynarray_add(&parser->current_attribute_list, &attribute);
+                    handle_AST_attribute(parser, attribute_name.data);
                 }
             }break;
             case TOKEN_TYPE_TEMPLATE:
@@ -1035,6 +1029,19 @@ consolidate_AST_nodes(void)
                 }
             }
             index += 1;
+        }
+
+        // NOTE(Sleepster): Consolidate attributes 
+        for(u32 entry_index = 0;
+            entry_index < parser->recorded_attributes.used_entries.used;
+            ++entry_index)
+        {
+            code_attribute_t *attrib = &((parser->recorded_attributes.used_entries[entry_index])->item);
+            s32 index = dynarray_find(&g_symbol_table.code_attributes, attrib);
+            if(index == -1)
+            {
+                dynarray_add(&g_symbol_table.code_attributes, attrib);
+            }
         }
     }
 }
@@ -1423,7 +1430,7 @@ output_type_info_member_data(string_builder_t *builder, code_type_t *type, AST_n
     }
 
     //c_string_builder_sprintf(&builder, ".array_size  = %lu,\n", type_data->type.flags);
-    if(current_member->node_type == AST_NODE_TYPE_STRUCTURE_MEMBER)
+    if(current_member->node_type == AST_NODE_TYPE_STRUCTURE_MEMBER) 
     {
         c_string_builder_sprintf(builder, "\t\t\t.offset        = offsetof(%.*s, %.*s),\n", 
                                  fprint_string(parent->identifier), 
@@ -1943,6 +1950,65 @@ extern const type_info_t *const athena_type_information_array[];
         }
     }
     c_string_builder_sprintf(&file_builder, "};\n\n");
+
+    // TODO(Sleepster): SPEED, this is slow and horrible
+    for(const code_attribute_t &attrib: g_symbol_table.code_attributes)
+    {
+        c_string_builder_sprintf(&file_builder, "constexpr const type_info_t *ATTRIBUTE_%.*s_array[] = {\n", fprint_string(attrib.name));
+        for(u32 type_index = 0;
+            type_index < g_symbol_table.type_table.used_entries.used;
+            ++type_index)
+        {
+            code_type_t *type = (code_type_t*)((g_symbol_table.type_table.used_entries[type_index])->item);
+            AST_node_t *type_data = type->type_data;
+            if(type_data && !(type_data->next_overload))
+            {
+                for(const auto &node_attrib: type_data->attributes)
+                {
+                    if(c_string_compare(node_attrib.name, attrib.name))
+                    {
+                        c_string_builder_sprintf(&file_builder, "\t&DEFAULT_typedata");
+                        switch(type_data->type.code_type->code_metatype)
+                        {
+                            case CODE_TYPE_ENUM:
+                            case CODE_TYPE_STRUCTURE:
+                            {
+                                c_string_builder_sprintf(&file_builder, "_structure");
+                                c_string_builder_sprintf(&file_builder, "_%.*s.type_info,\n", fprint_string(type_data->identifier));
+                            }break;
+                            case CODE_TYPE_LAMBDA:
+                            {
+                                c_string_builder_sprintf(&file_builder, "_procedure");
+                                c_string_builder_sprintf(&file_builder, "_%.*s.type_info,\n", fprint_string(type_data->identifier));
+                            }break;
+                            default:
+                            {
+                                InvalidCodePath;
+                            }break;
+                        }
+                    }
+                }
+            }
+        }
+        c_string_builder_append_data(&file_builder, STR("};\n"));
+    }
+
+    //c_string_builder_sprintf(&file_builder, "using attribute_info_list_t = const type_info_t *const *;\n");
+    c_string_builder_append_data(&file_builder, STR(R"(
+// using info_list_t = const type_info_t *const *;
+)"));
+
+    c_string_builder_sprintf(&file_builder, "constexpr attribute_info_list_t complete_attribute_array[] = {\n");
+    for(const code_attribute_t &attrib: g_symbol_table.code_attributes)
+    {
+        c_string_builder_sprintf(&file_builder, "\t{\"%.*s\", ATTRIBUTE_%.*s_array, ArrayCount(ATTRIBUTE_%.*s_array)},\n", 
+                                 fprint_string(attrib.name),
+                                 fprint_string(attrib.name),
+                                 fprint_string(attrib.name));
+    }
+    c_string_builder_sprintf(&file_builder, "};\n");
+
+
     c_string_builder_append_data(&file_builder, STR(R"(
 ATHENA_API const type_info_t *type_info(unsigned long long type_id);
 ATHENA_API const type_info_t *type_info(const char *string);
@@ -1953,6 +2019,13 @@ ATHENA_API inline const type_info_t *type_info(string_t string);
 
 // NOTE(Sleepster): STB style lib
 #ifdef ATHENA_IMPLMENTATION 
+
+#ifndef ArrayCount
+#define ArrayCount(x) (sizeof(x) / sizeof((x[0])))
+#endif
+
+#include <type_traits>
+namespace Athena {
 
 ATHENA_API const type_info_t*
 type_info(unsigned long long type_id)
@@ -1982,7 +2055,7 @@ type_info(string_t string)
 }
 
 ATHENA_API const type_info_member_t*
-athena_get_member_info(const type_info_t *type_info, string_t member_name) 
+get_member_info(const type_info_t *type_info, string_t member_name) 
 {
     const type_info_member_t *result = null;
 
@@ -2005,13 +2078,6 @@ athena_get_member_info(const type_info_t *type_info, string_t member_name)
     return(result);
 }
 #endif
-
-#ifndef ArrayCount
-#define ArrayCount(x) (sizeof(x) / sizeof((x[0])))
-#endif
-
-#include <type_traits>
-namespace Athena {
 
 ATHENA_API const type_info_t*
 type_info(const char *string)
@@ -2108,9 +2174,22 @@ as_procedure(const type_info_member_t *info)
     return((const type_info_procedure_t *)info->type_info);
 }
 
-template<typename T> constexpr const type_info_t* type_info();
+ATHENA_API const type_info_struct_t*
+as_structure(const type_info_member_t *info)
+{
+    Assert(info->type_info->metatype == ATHENA_METATYPE_STRUCT);
+    return((const type_info_struct_t *)info->type_info);
+}
+
+ATHENA_API const type_info_struct_t*
+as_structure(const type_info_t *info)
+{
+    Assert(info->metatype == ATHENA_METATYPE_STRUCT);
+    return((const type_info_struct_t *)info);
+}
 
 // NOTE(Sleepster): Templates
+template<typename T> constexpr const type_info_t* type_info();
 
 #define X(cpp_type, structure) \
     std::is_same<T, cpp_type>::value ? (const type_info_t*)(structure) :
@@ -2127,6 +2206,29 @@ type_info(T &item)
 {
     return(type_info<T>());
 }
+
+ATHENA_API const attribute_info_list_t*
+get_attribute_list(char *name)
+{
+    const attribute_info_list_t *result = null;
+
+    int name_len = strlen(name);
+    for(const attribute_info_list_t &info_list: complete_attribute_array)
+    {
+        int our_length = strlen(info_list.attribute_name); 
+        if(our_length == name_len)
+        {
+            if(memcmp(info_list.attribute_name, name, our_length) == 0)
+            {
+                result = &info_list;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
 }
 
 #endif // ATHENA_IMPLEMENTATION

@@ -7,6 +7,7 @@
       "-O0",
       "-fno-inline-functions",
       "-std=c++11",
+      "-Wno-unknown-attributes",
       "-Wformat",
       "-Wnullability-completeness",
       "-flto",
@@ -52,7 +53,7 @@
       "-o",
       "../build/athena"
     ],
-    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
+    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
     "output": "../build/athena"
   },
   {
@@ -63,6 +64,7 @@
       "-O0",
       "-fno-inline-functions",
       "-std=c++11",
+      "-Wno-unknown-attributes",
       "-Wformat",
       "-Wnullability-completeness",
       "-flto",
@@ -108,7 +110,7 @@
       "-o",
       "../build/sandbox_type_info"
     ],
-    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code",
+    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
     "output": "../build/sandbox_type_info"
   },
   {
@@ -119,6 +121,7 @@
       "-O0",
       "-fno-inline-functions",
       "-std=c++11",
+      "-Wno-unknown-attributes",
       "-Wformat",
       "-Wnullability-completeness",
       "-flto",
@@ -165,6 +168,6 @@
       "-fsyntax-only",
       "../misc/clangd/sandbox_type_info_unity.cpp"
     ],
-    "directory": "/home/justin/personal/projects/c++stuff/NewSDLEngine/code"
+    "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code"
   }
 ]

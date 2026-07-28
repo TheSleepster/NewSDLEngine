@@ -16,8 +16,15 @@ struct test_structure
     int oranges;
     int bananas;
 
+    [[member_func]]
     void apples_test_func(char *name);
 };
+
+[[generate_function]]
+void
+attribute_test_function(char *name)
+{
+}
 
 #define ATHENA_IMPLMENTATION
 #include "../code_generator/athena/athena.h"
@@ -28,9 +35,13 @@ main(int argc, char **argv)
 {
     test_structure item = {};
     const type_info_t *info = Athena::type_info(item);
+#if 0
+    const type_info_t *info = Athena::type_info<test_structure>();
+    const type_info_t *info = Athena::type_info("test_structure");
+#endif
     if(info)
     {
-        const type_info_struct_t *structure = (const type_info_struct_t *)info;
+        const type_info_struct_t *structure = Athena::as_structure(info);
         printf("%d members\n", structure->member_count);
 
         for(u32 member_index = 0;
@@ -38,7 +49,9 @@ main(int argc, char **argv)
             ++member_index)
         {
             const type_info_member_t *member = structure->members + member_index;
-            printf("Member name: '%s'...\n", member->member_name);
+            printf("\tMember name: '%s'...\n", member->member_name);
+            printf("\tMember size: '%d'...\n", member->type_info->size);
+            printf("\tMember offset: '%d'...\n", member->offset);
         }
 
         const type_info_member_t *function = Athena::get_member(info, "apples_test_func");
@@ -56,6 +69,19 @@ main(int argc, char **argv)
 
         const type_info_struct_t *parent = Athena::get_struct_info_from_member(function);
         int x = 0;
+
+        (void)parent;
+        (void)x;
+    }
+
+    const attribute_info_list_t *member_func_list = Athena::get_attribute_list("member_func");
+    if(member_func_list)
+    {
+        printf("Attribute: '%s'...\n", member_func_list->attribute_name);
+        for(const auto &info: *member_func_list)
+        {
+            printf("info: '%s'\n", info->type_name);
+        }
     }
 
     return(0);

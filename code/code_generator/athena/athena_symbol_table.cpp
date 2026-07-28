@@ -143,7 +143,8 @@ parser_create(string_t filename, string_t file_data)
     
     // NOTE(Sleepster): This has to pass the lexer by pointer or we get a weird use-after-return stack bug. 
     lexer_create(&parser->lexer, file_data);
-    parser->macro_table = hash_table_create<macro_info_t>(1024);
+    parser->macro_table         = hash_table_create<macro_info_t>(1024);
+    parser->recorded_attributes = hash_table_create<code_attribute_t>(256);
 
     string_t scope_string = c_string_get_filename_from_path(filename);
     declaration_context_t *global_scope = parser_create_declaration_context(parser, c_string_make_copy(&permanent_arena, scope_string), null);

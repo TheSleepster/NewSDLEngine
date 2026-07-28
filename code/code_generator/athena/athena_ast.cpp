@@ -1277,6 +1277,25 @@ consume_member_lambda_code_block(parser_t *parser, lexer_token_t member_type, le
     }
 }
 
+internal_api void
+handle_AST_attribute(parser_t *parser, string_t name)
+{
+    code_attribute_t *found_attrib = hash_table_get_element_ptr(&parser->recorded_attributes, name);
+    if(found_attrib->name.data == null || found_attrib->name.count == 0)
+    {
+        code_attribute_t attrib = {};
+        attrib.name        = c_string_make_copy(&parser->arena, name);
+        attrib.is_template = false;
+
+        hash_table_add_element(&parser->recorded_attributes, &attrib, name);
+        dynarray_add(&parser->current_attribute_list, &attrib);
+    }
+    else
+    {
+        dynarray_add(&parser->current_attribute_list, found_attrib);
+    }
+}
+
 internal_api AST_node_t*
 parse_structure_member(parser_t *parser, AST_node_t *structure, lexer_token_t *token_out)
 {
@@ -1285,6 +1304,18 @@ parse_structure_member(parser_t *parser, AST_node_t *structure, lexer_token_t *t
     if(member_type.token_type == TOKEN_TYPE_CLOSE_BRACE)
     {
         *token_out = member_type;
+        return(result);
+    }
+    else if(member_type.token_type == TOKEN_TYPE_OPEN_BRACKET)
+    {
+        lexer_token_t attribute_token = parser_get_next_lexer_token(parser);
+        if(attribute_token.token_type == TOKEN_TYPE_OPEN_BRACKET)
+        {
+            // NOTE(Sleepster): Attribute 
+            lexer_token_t attribute_name = parser_get_next_lexer_token(parser);
+            handle_AST_attribute(parser, attribute_name.data);
+        }
+        lexer_eat_lines(&parser->arena, &parser->lexer, 1);
         return(result);
     }
 
@@ -1512,6 +1543,12 @@ parse_structure_member(parser_t *parser, AST_node_t *structure, lexer_token_t *t
             }
 
             result = AST_create_new_node(&parser->arena, parser->active_decl_context);
+            if(parser->current_attribute_list.used > 0)
+            {
+                dynarray_copy(&result->attributes, &parser->current_attribute_list);
+                dynarray_reset(&parser->current_attribute_list);
+            }
+
             if(member_type.token_type == TOKEN_TYPE_IDENT)
             {
                 // NOTE(Sleepster): Standard member 
