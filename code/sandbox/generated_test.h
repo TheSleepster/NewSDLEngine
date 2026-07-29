@@ -33,6 +33,8 @@
 #error "You must include athena.h before this file..."
 #endif
 
+CODE_GEN_IGNORE_FILE
+
 extern const type_info_t *const athena_type_information_array[];
 struct type_info_struct_test_structure {
 	const type_info_t  type_info;
@@ -57,7 +59,7 @@ struct type_info_procedure_attribute_test_function {
 	union {
 		type_info_member_t argument_array[1];
 		struct {
-			const type_info_member_t name;
+			const type_info_member_t apples;
 		}arguments;
 	};
 };
@@ -222,6 +224,10 @@ constexpr type_info_struct_test_structure DEFAULT_typedata_structure_test_struct
 			.offset        = offsetof(test_structure, apples),
 			.flags         = 0,
 			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 4,
+			},
 		},
 		.oranges = {
 			.type_info     = &DEFAULT_typedata_int,
@@ -258,12 +264,16 @@ constexpr type_info_procedure_attribute_test_function DEFAULT_typedata_procedure
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_attribute_test_function.argument_array,
 	.arguments = {
-		.name = {
-			.type_info     = &DEFAULT_typedata_char,
-			.member_name   = "name",
+		.apples = {
+			.type_info     = &DEFAULT_typedata_int,
+			.member_name   = "apples",
 			.parent        = &DEFAULT_typedata_procedure_attribute_test_function.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 4,
+			},
 		},
 	},
 };
@@ -298,7 +308,7 @@ constexpr type_info_procedure_apples_test_func DEFAULT_typedata_procedure_apples
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
+	.return_type    = &DEFAULT_typedata_char,
 	.argument_pointer = DEFAULT_typedata_procedure_apples_test_func.argument_array,
 	.arguments = {
 		.name = {
@@ -307,6 +317,10 @@ constexpr type_info_procedure_apples_test_func DEFAULT_typedata_procedure_apples
 			.parent        = &DEFAULT_typedata_procedure_apples_test_func.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+			.value = {
+				.type = 7,
+				.string = "test",
+			},
 		},
 	},
 };
@@ -336,14 +350,35 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_apples_test_func.type_info,
 };
 
+namespace Athena {
+namespace MemberLists {
+enum class test_structure {
+	apples,
+	oranges,
+	bananas,
+	apples_test_func,
+}; // test_structure
+}; // namespace MemberLists
+namespace ArgumentLists {
+enum class attribute_test_function {
+	apples,
+}; // attribute_test_function
+enum class main {
+	argc,
+	argv,
+}; // main
+enum class apples_test_func {
+	name,
+}; // apples_test_func
+}; // namespace ArgumentLists
+}; // namespace Athena
+
 constexpr const type_info_t *ATTRIBUTE_member_func_array[] = {
 	&DEFAULT_typedata_procedure_apples_test_func.type_info,
 };
 constexpr const type_info_t *ATTRIBUTE_generate_function_array[] = {
 	&DEFAULT_typedata_procedure_attribute_test_function.type_info,
 };
-
-// using info_list_t = const type_info_t *const *;
 constexpr attribute_info_list_t complete_attribute_array[] = {
 	{"member_func", ATTRIBUTE_member_func_array, ArrayCount(ATTRIBUTE_member_func_array)},
 	{"generate_function", ATTRIBUTE_generate_function_array, ArrayCount(ATTRIBUTE_generate_function_array)},
@@ -469,6 +504,157 @@ get_member(const type_info_t *type_info, const char *member_name)
                 break;
             }
         }
+    }
+
+    return(result);
+}
+
+ATHENA_API const type_info_member_t*
+get_member(const type_info_struct_t *type_info, const char *member_name) 
+{
+    const type_info_member_t *result = nullptr;
+
+    int name_length = strlen(member_name);
+    if(name_length > 0)
+    {
+        for(unsigned int member_index = 0;
+            member_index < type_info->member_count;
+            ++member_index)
+        {
+            const type_info_member_t *member = type_info->members + member_index;
+
+            int member_length = strlen(member->member_name);
+            if(member_length != name_length) continue;
+
+            if(memcmp(member_name, member->member_name, member_length) == 0)
+            {
+                result = member;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_t *info, const char *name)
+{
+    const type_info_member_t *result = nullptr;
+    int name_length = strlen(name);
+    if(name_length > 0)
+    {
+        const type_info_procedure_t *proc_info = Athena::as_procedure(info);
+        for(unsigned int argument_index = 0;
+            argument_index < proc_info->argument_count;
+            ++argument_index)
+        {
+            const type_info_member_t *argument = proc_info->arguments + argument_index;
+
+            int member_length = strlen(argument->member_name);
+            if(member_length != name_length) continue;
+
+            if(memcmp(name, argument->member_name, member_length) == 0)
+            {
+                result = argument;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_procedure_t *info, const char *name)
+{
+    const type_info_member_t *result = nullptr;
+    int name_length = strlen(name);
+    if(name_length > 0)
+    {
+        for(unsigned int argument_index = 0;
+            argument_index < info->argument_count;
+            ++argument_index)
+        {
+            const type_info_member_t *argument = info->arguments + argument_index;
+
+            int member_length = strlen(argument->member_name);
+            if(member_length != name_length) continue;
+
+            if(memcmp(name, argument->member_name, member_length) == 0)
+            {
+                result = argument;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_member(const type_info_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+
+    Assert(info->metatype == ATHENA_METATYPE_STRUCT);
+    const type_info_struct_t *struct_info = Athena::as_structure(info);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= struct_info->member_count)
+    {
+        result = (struct_info->members + true_index);
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_member(const type_info_struct_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+    Assert(info->type_info.metatype == ATHENA_METATYPE_STRUCT);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= info->member_count)
+    {
+        result = (info->members + true_index);
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+    Assert(info->metatype == ATHENA_METATYPE_PROCEDURE);
+
+    const type_info_procedure_t *proc = Athena::as_procedure(info);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= proc->argument_count)
+    {
+        result = (proc->arguments + true_index);
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_procedure_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+    Assert(info->type_info.metatype == ATHENA_METATYPE_PROCEDURE);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= info->argument_count)
+    {
+        result = (info->arguments + true_index);
     }
 
     return(result);

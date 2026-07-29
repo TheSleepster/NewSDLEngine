@@ -353,9 +353,9 @@ case_expression_value(AST_expression_value_t value, u32 target_type)
         float64 intermediate = 0.0;
         switch(target_type)
         {
-            case AST_EXPRESSION_VALUE_INT:      { intermediate = (float64)value.int_value;      }break;
-            case AST_EXPRESSION_VALUE_UNSIGNED: { intermediate = (float64)value.unsigned_value; }break;
-            case AST_EXPRESSION_VALUE_FLOAT:    { intermediate = (float64)value.float32_value;  }break;
+            case AST_EXPRESSION_VALUE_INT:      { intermediate = (s32)value.int_value;          }break;
+            case AST_EXPRESSION_VALUE_UNSIGNED: { intermediate = (u32)value.unsigned_value;     }break;
+            case AST_EXPRESSION_VALUE_FLOAT:    { intermediate = (float32)value.float32_value;  }break;
             case AST_EXPRESSION_VALUE_DOUBLE:   { intermediate = (float64)value.float64_value;  }break;
         }
 

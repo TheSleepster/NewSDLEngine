@@ -37,8 +37,14 @@
 /* TODO:
  *
  * The immediate things to finish now are:
- * - [ ] Record attributes into the parser and store a table of found attributes
- * - [ ] Attribute handling. Perhaps create lists of items in attributes so that we can query for specific attributes
+ * - [ ] Allow type_info_ts to store the attributes they have for the sake of querying. Meaning, we can ask if a type_info_t has the attribute [[member_func]]
+ * - [ ] type_info() querying for lambdas, at least for those without overloads
+ * - [X] Generate enum classes for each of the structures and their members for easy access.
+ * - [X] Make sure Lambdas are correctly having their argument's default values stored.
+ *
+ * - [X] Make the value type enums sync together so that ATHENA_VALUE_TYPE_* represents the appropriate type.
+ * - [X] Record attributes into the parser and store a table of found attributes
+ * - [X] Attribute handling. Perhaps create lists of items in attributes so that we can query for specific attributes
  * - [X] Handle Attributes inside structures 
  * - [X] Better user-facing API handling of lambda type_info
  * - [X] Metatype labeling within type_info_t so that we can cast appropriately
@@ -1149,6 +1155,7 @@ deduce_AST_node_type_data(void)
                             if(current_argument->expression.info)
                             {
                                 current_argument->expression.value = evaluate_expression_AST(current_argument->expression.info);
+                                current_argument->expression.evaluated = true;
                             }
                         }
                     }break;
@@ -1442,8 +1449,35 @@ output_type_info_member_data(string_builder_t *builder, code_type_t *type, AST_n
     if(current_member->expression.evaluated)
     {
         c_string_builder_sprintf(builder, "\t\t\t.value = {\n");
-        c_string_builder_sprintf(builder, "\t\t\t\t.type = %d,\n", current_member->expression.value.type);
+
+        s32 type = 0;
         switch(current_member->expression.value.type)
+        {
+            case AST_EXPRESSION_VALUE_INT:
+            {
+                type = AST_EXPRESSION_VALUE_INT;
+            }break;
+            case AST_EXPRESSION_VALUE_UNSIGNED:
+            {
+                type = AST_EXPRESSION_VALUE_UNSIGNED;
+            }break;
+            case AST_EXPRESSION_VALUE_FLOAT:
+            {
+                type = AST_EXPRESSION_VALUE_FLOAT;
+            }break;
+            case AST_EXPRESSION_VALUE_DOUBLE:
+            {
+                type = AST_EXPRESSION_VALUE_DOUBLE;
+            }break;
+            case AST_EXPRESSION_VALUE_IDENT:
+            case AST_EXPRESSION_VALUE_LITERAL:
+            {
+                type = AST_EXPRESSION_VALUE_IDENT;
+            }break;
+        }
+
+        c_string_builder_sprintf(builder, "\t\t\t\t.type = %d,\n", type);
+        switch(type)
         {
             case AST_EXPRESSION_VALUE_INT:
             {
@@ -1464,7 +1498,7 @@ output_type_info_member_data(string_builder_t *builder, code_type_t *type, AST_n
             case AST_EXPRESSION_VALUE_IDENT:
             case AST_EXPRESSION_VALUE_LITERAL:
             {
-                c_string_builder_sprintf(builder, "\t\t\t\t.string = \"%.*s,\"\n", fprint_string(current_member->expression.value.identifier_value));
+                c_string_builder_sprintf(builder, "\t\t\t\t.string = \"%.*s\",\n", fprint_string(current_member->expression.value.identifier_value));
             }break;
         }
         c_string_builder_sprintf(builder, "\t\t\t},\n");
@@ -1472,7 +1506,7 @@ output_type_info_member_data(string_builder_t *builder, code_type_t *type, AST_n
     else if(current_member->node_type == AST_NODE_TYPE_ENUM_MEMBER)
     {
         c_string_builder_sprintf(builder, "\t\t\t.value = {\n");
-        c_string_builder_sprintf(builder, "\t\t\t\t.type  = %d,\n",   ATHENA_TYPE_INT64);
+        c_string_builder_sprintf(builder, "\t\t\t\t.type  = %d,\n",   ATHENA_VALUE_TYPE_INT64);
         c_string_builder_sprintf(builder, "\t\t\t\t.int64 = %.*s,\n", fprint_string(current_member->identifier));
         c_string_builder_sprintf(builder, "\t\t\t},\n");
     }
@@ -1633,6 +1667,8 @@ athena_handle_type_info(const char *char_filepath, const char *output_path, bool
 #ifndef ATHENA_H
 #error "You must include athena.h before this file..."
 #endif
+
+CODE_GEN_IGNORE_FILE
 
 extern const type_info_t *const athena_type_information_array[];
 )"));
@@ -1832,9 +1868,9 @@ extern const type_info_t *const athena_type_information_array[];
 
                                 }
                                 c_string_builder_sprintf(&file_builder, "\n");
-                                c_string_builder_sprintf(&file_builder, "\t.argument_pointer = DEFAULT_typedata_procedure_%.*s.argument_array,\n", fprint_string(type_data->identifier));
                                 if(type_data->lambda.argument_count > 0)
                                 {
+                                    c_string_builder_sprintf(&file_builder, "\t.argument_pointer = DEFAULT_typedata_procedure_%.*s.argument_array,\n", fprint_string(type_data->identifier));
                                     c_string_builder_sprintf(&file_builder, "\t.arguments = {\n");
                                     for(AST_node_t *current_argument = type_data->lambda.first_argument;
                                         current_argument;
@@ -1951,6 +1987,124 @@ extern const type_info_t *const athena_type_information_array[];
     }
     c_string_builder_sprintf(&file_builder, "};\n\n");
 
+    c_string_builder_sprintf(&file_builder, "namespace Athena {\n");
+    c_string_builder_sprintf(&file_builder, "namespace MemberLists {\n");
+    // NOTE(Sleepster): Output enum classes for the access of members easily 
+    for(u32 type_index = 0;
+        type_index < g_symbol_table.type_table.used_entries.used;
+        ++type_index)
+    {
+        code_type_t *type = (code_type_t*)((g_symbol_table.type_table.used_entries[type_index])->item);
+        AST_node_t *type_data = type->type_data;
+        if(type_data)
+        {
+            if((type_data->type.flags & AST_TYPE_MODIFIER_FLAG_NESTED) == 0)
+            {
+                while(type_data)
+                {
+                    string_t type_string = type->identifier;
+                    s32 index = c_string_find_first_char_from_right(type->identifier, ' ');
+                    if(index != -1)
+                    {
+                        type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
+                    }
+
+                    if(type_data && !(type_data->next_overload))
+                    {
+                        switch(type_data->node_type)
+                        {
+                            case AST_NODE_TYPE_STRUCTURE:
+                            case AST_NODE_TYPE_ENUM:
+                            {
+                                if(type_data->struct_decl.member_count > 0)
+                                {
+                                    c_string_builder_sprintf(&file_builder, "enum class %.*s {\n", fprint_string(type_data->identifier));
+                                    for(AST_node_t *current_member = type_data->struct_decl.first_member;
+                                        current_member;
+                                        current_member = current_member->next_sibling)
+                                    {
+                                        c_string_builder_sprintf(&file_builder, "\t%.*s,\n", fprint_string(current_member->identifier));
+                                    }
+
+                                    c_string_builder_sprintf(&file_builder, "}; // %.*s\n", fprint_string(type_data->identifier));
+                                }
+                            }break;
+                        }
+                    }
+                    else if(type_data->next_overload)
+                    {
+                        while(type_data->next_overload)
+                        {
+                            type_data = type_data->next_overload;
+                        }
+                    }
+
+                    type_data = type_data->next_overload;
+                }
+            }
+        }
+    }
+    c_string_builder_sprintf(&file_builder, "}; // namespace MemberLists\n");
+
+    // NOTE(Sleepster): Then print out the arguments for each function
+    c_string_builder_sprintf(&file_builder, "namespace ArgumentLists {\n");
+    for(u32 type_index = 0;
+        type_index < g_symbol_table.type_table.used_entries.used;
+        ++type_index)
+    {
+        code_type_t *type = (code_type_t*)((g_symbol_table.type_table.used_entries[type_index])->item);
+        AST_node_t *type_data = type->type_data;
+        if(type_data)
+        {
+            if((type_data->type.flags & AST_TYPE_MODIFIER_FLAG_NESTED) == 0)
+            {
+                while(type_data)
+                {
+                    string_t type_string = type->identifier;
+                    s32 index = c_string_find_first_char_from_right(type->identifier, ' ');
+                    if(index != -1)
+                    {
+                        type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
+                    }
+
+                    if(type_data && !(type_data->next_overload))
+                    {
+                        switch(type_data->node_type)
+                        {
+                            case AST_NODE_TYPE_LAMBDA:
+                            {
+                                if(type_data->lambda.argument_count > 0)
+                                {
+                                    c_string_builder_sprintf(&file_builder, "enum class %.*s {\n", fprint_string(type_data->identifier));
+                                    for(AST_node_t *current_argument = type_data->lambda.first_argument;
+                                        current_argument;
+                                        current_argument = current_argument->next_sibling)
+                                    {
+                                        c_string_builder_sprintf(&file_builder, "\t%.*s,\n", fprint_string(current_argument->identifier));
+                                    }
+
+                                    c_string_builder_sprintf(&file_builder, "}; // %.*s\n", fprint_string(type_data->identifier));
+                                }
+                            }break;
+                        }
+                    }
+                    else if(type_data->next_overload)
+                    {
+                        while(type_data->next_overload)
+                        {
+                            type_data = type_data->next_overload;
+                        }
+                    }
+
+                    type_data = type_data->next_overload;
+                }
+            }
+        }
+    }
+    c_string_builder_sprintf(&file_builder, "}; // namespace ArgumentLists\n");
+    c_string_builder_sprintf(&file_builder, "}; // namespace Athena\n\n");
+
+    // NOTE(Sleepster): Output attribute table 
     // TODO(Sleepster): SPEED, this is slow and horrible
     for(const code_attribute_t &attrib: g_symbol_table.code_attributes)
     {
@@ -1994,10 +2148,6 @@ extern const type_info_t *const athena_type_information_array[];
     }
 
     //c_string_builder_sprintf(&file_builder, "using attribute_info_list_t = const type_info_t *const *;\n");
-    c_string_builder_append_data(&file_builder, STR(R"(
-// using info_list_t = const type_info_t *const *;
-)"));
-
     c_string_builder_sprintf(&file_builder, "constexpr attribute_info_list_t complete_attribute_array[] = {\n");
     for(const code_attribute_t &attrib: g_symbol_table.code_attributes)
     {
@@ -2130,6 +2280,157 @@ get_member(const type_info_t *type_info, const char *member_name)
                 break;
             }
         }
+    }
+
+    return(result);
+}
+
+ATHENA_API const type_info_member_t*
+get_member(const type_info_struct_t *type_info, const char *member_name) 
+{
+    const type_info_member_t *result = nullptr;
+
+    int name_length = strlen(member_name);
+    if(name_length > 0)
+    {
+        for(unsigned int member_index = 0;
+            member_index < type_info->member_count;
+            ++member_index)
+        {
+            const type_info_member_t *member = type_info->members + member_index;
+
+            int member_length = strlen(member->member_name);
+            if(member_length != name_length) continue;
+
+            if(memcmp(member_name, member->member_name, member_length) == 0)
+            {
+                result = member;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_t *info, const char *name)
+{
+    const type_info_member_t *result = nullptr;
+    int name_length = strlen(name);
+    if(name_length > 0)
+    {
+        const type_info_procedure_t *proc_info = Athena::as_procedure(info);
+        for(unsigned int argument_index = 0;
+            argument_index < proc_info->argument_count;
+            ++argument_index)
+        {
+            const type_info_member_t *argument = proc_info->arguments + argument_index;
+
+            int member_length = strlen(argument->member_name);
+            if(member_length != name_length) continue;
+
+            if(memcmp(name, argument->member_name, member_length) == 0)
+            {
+                result = argument;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_procedure_t *info, const char *name)
+{
+    const type_info_member_t *result = nullptr;
+    int name_length = strlen(name);
+    if(name_length > 0)
+    {
+        for(unsigned int argument_index = 0;
+            argument_index < info->argument_count;
+            ++argument_index)
+        {
+            const type_info_member_t *argument = info->arguments + argument_index;
+
+            int member_length = strlen(argument->member_name);
+            if(member_length != name_length) continue;
+
+            if(memcmp(name, argument->member_name, member_length) == 0)
+            {
+                result = argument;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_member(const type_info_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+
+    Assert(info->metatype == ATHENA_METATYPE_STRUCT);
+    const type_info_struct_t *struct_info = Athena::as_structure(info);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= struct_info->member_count)
+    {
+        result = (struct_info->members + true_index);
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_member(const type_info_struct_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+    Assert(info->type_info.metatype == ATHENA_METATYPE_STRUCT);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= info->member_count)
+    {
+        result = (info->members + true_index);
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+    Assert(info->metatype == ATHENA_METATYPE_PROCEDURE);
+
+    const type_info_procedure_t *proc = Athena::as_procedure(info);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= proc->argument_count)
+    {
+        result = (proc->arguments + true_index);
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_procedure_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+    Assert(info->type_info.metatype == ATHENA_METATYPE_PROCEDURE);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= info->argument_count)
+    {
+        result = (info->arguments + true_index);
     }
 
     return(result);

@@ -297,6 +297,8 @@
 #error "You must include athena.h before this file..."
 #endif
 
+CODE_GEN_IGNORE_FILE
+
 extern const type_info_t *const athena_type_information_array[];
 struct type_info_procedure_void_func {
 	const type_info_t  type_info;
@@ -8992,7 +8994,6 @@ constexpr type_info_procedure_void_func DEFAULT_typedata_procedure_void_func = {
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_void_func.argument_array,
 };
 constexpr type_info_struct_dynarray_header_t DEFAULT_typedata_structure_dynarray_header_t = {
 	.type_info = {
@@ -9229,7 +9230,7 @@ constexpr type_info_struct_file_extension_t DEFAULT_typedata_structure_file_exte
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FILE_EXT_INVALID,
 			},
 		},
@@ -9240,7 +9241,7 @@ constexpr type_info_struct_file_extension_t DEFAULT_typedata_structure_file_exte
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FILE_EXT_TTF,
 			},
 		},
@@ -9251,7 +9252,7 @@ constexpr type_info_struct_file_extension_t DEFAULT_typedata_structure_file_exte
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FILE_EXT_WAV,
 			},
 		},
@@ -9262,7 +9263,7 @@ constexpr type_info_struct_file_extension_t DEFAULT_typedata_structure_file_exte
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FILE_EXT_PNG,
 			},
 		},
@@ -9273,7 +9274,7 @@ constexpr type_info_struct_file_extension_t DEFAULT_typedata_structure_file_exte
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FILE_EXT_GLSL,
 			},
 		},
@@ -9284,7 +9285,7 @@ constexpr type_info_struct_file_extension_t DEFAULT_typedata_structure_file_exte
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FILE_EXT_OS_DLL,
 			},
 		},
@@ -9295,7 +9296,7 @@ constexpr type_info_struct_file_extension_t DEFAULT_typedata_structure_file_exte
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FILE_EXT_COUNT,
 			},
 		},
@@ -9835,7 +9836,7 @@ constexpr type_info_struct_za_allocation_tag_t DEFAULT_typedata_structure_za_all
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 0,
 			},
 		},
@@ -9846,7 +9847,7 @@ constexpr type_info_struct_za_allocation_tag_t DEFAULT_typedata_structure_za_all
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -9857,7 +9858,7 @@ constexpr type_info_struct_za_allocation_tag_t DEFAULT_typedata_structure_za_all
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -9868,7 +9869,7 @@ constexpr type_info_struct_za_allocation_tag_t DEFAULT_typedata_structure_za_all
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 3,
 			},
 		},
@@ -9879,7 +9880,7 @@ constexpr type_info_struct_za_allocation_tag_t DEFAULT_typedata_structure_za_all
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -9890,7 +9891,7 @@ constexpr type_info_struct_za_allocation_tag_t DEFAULT_typedata_structure_za_all
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 100,
 			},
 		},
@@ -9901,7 +9902,7 @@ constexpr type_info_struct_za_allocation_tag_t DEFAULT_typedata_structure_za_all
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 101,
 			},
 		},
@@ -9937,6 +9938,10 @@ constexpr type_info_procedure_c_file_read DEFAULT_typedata_procedure_c_file_read
 			.parent        = &DEFAULT_typedata_procedure_c_file_read.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+			.value = {
+				.type = 1,
+				.int64 = 0,
+			},
 		},
 		.zone = {
 			.type_info     = &DEFAULT_typedata_structure_zone_allocator_t.type_info,
@@ -9944,6 +9949,10 @@ constexpr type_info_procedure_c_file_read DEFAULT_typedata_procedure_c_file_read
 			.parent        = &DEFAULT_typedata_procedure_c_file_read.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+			.value = {
+				.type = 1,
+				.int64 = 0,
+			},
 		},
 		.tag = {
 			.type_info     = &DEFAULT_typedata_structure_za_allocation_tag_t.type_info,
@@ -9951,6 +9960,10 @@ constexpr type_info_procedure_c_file_read DEFAULT_typedata_procedure_c_file_read
 			.parent        = &DEFAULT_typedata_procedure_c_file_read.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
+			.value = {
+				.type = 7,
+				.string = "ZA_TAG_STATIC",
+			},
 		},
 		.create = {
 			.type_info     = &DEFAULT_typedata_bool8,
@@ -9958,6 +9971,10 @@ constexpr type_info_procedure_c_file_read DEFAULT_typedata_procedure_c_file_read
 			.parent        = &DEFAULT_typedata_procedure_c_file_read.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 1,
+			},
 		},
 	},
 };
@@ -9983,6 +10000,10 @@ constexpr type_info_procedure_c_file_read_entirety DEFAULT_typedata_procedure_c_
 			.parent        = &DEFAULT_typedata_procedure_c_file_read_entirety.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+			.value = {
+				.type = 1,
+				.int64 = 0,
+			},
 		},
 		.zone = {
 			.type_info     = &DEFAULT_typedata_structure_zone_allocator_t.type_info,
@@ -9990,6 +10011,10 @@ constexpr type_info_procedure_c_file_read_entirety DEFAULT_typedata_procedure_c_
 			.parent        = &DEFAULT_typedata_procedure_c_file_read_entirety.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+			.value = {
+				.type = 1,
+				.int64 = 0,
+			},
 		},
 		.tag = {
 			.type_info     = &DEFAULT_typedata_structure_za_allocation_tag_t.type_info,
@@ -9997,6 +10022,10 @@ constexpr type_info_procedure_c_file_read_entirety DEFAULT_typedata_procedure_c_
 			.parent        = &DEFAULT_typedata_procedure_c_file_read_entirety.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
+			.value = {
+				.type = 7,
+				.string = "ZA_TAG_STATIC",
+			},
 		},
 	},
 };
@@ -10036,6 +10065,10 @@ constexpr type_info_procedure_c_file_read_from_offset DEFAULT_typedata_procedure
 			.parent        = &DEFAULT_typedata_procedure_c_file_read_from_offset.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+			.value = {
+				.type = 1,
+				.int64 = 0,
+			},
 		},
 		.zone = {
 			.type_info     = &DEFAULT_typedata_structure_zone_allocator_t.type_info,
@@ -10043,6 +10076,10 @@ constexpr type_info_procedure_c_file_read_from_offset DEFAULT_typedata_procedure
 			.parent        = &DEFAULT_typedata_procedure_c_file_read_from_offset.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+			.value = {
+				.type = 1,
+				.int64 = 0,
+			},
 		},
 		.tag = {
 			.type_info     = &DEFAULT_typedata_structure_za_allocation_tag_t.type_info,
@@ -10050,6 +10087,10 @@ constexpr type_info_procedure_c_file_read_from_offset DEFAULT_typedata_procedure
 			.parent        = &DEFAULT_typedata_procedure_c_file_read_from_offset.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
+			.value = {
+				.type = 7,
+				.string = "ZA_TAG_STATIC",
+			},
 		},
 	},
 };
@@ -10082,6 +10123,10 @@ constexpr type_info_procedure_c_file_read_to_end DEFAULT_typedata_procedure_c_fi
 			.parent        = &DEFAULT_typedata_procedure_c_file_read_to_end.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+			.value = {
+				.type = 1,
+				.int64 = 0,
+			},
 		},
 		.zone = {
 			.type_info     = &DEFAULT_typedata_structure_zone_allocator_t.type_info,
@@ -10089,6 +10134,10 @@ constexpr type_info_procedure_c_file_read_to_end DEFAULT_typedata_procedure_c_fi
 			.parent        = &DEFAULT_typedata_procedure_c_file_read_to_end.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+			.value = {
+				.type = 1,
+				.int64 = 0,
+			},
 		},
 		.tag = {
 			.type_info     = &DEFAULT_typedata_structure_za_allocation_tag_t.type_info,
@@ -10096,6 +10145,10 @@ constexpr type_info_procedure_c_file_read_to_end DEFAULT_typedata_procedure_c_fi
 			.parent        = &DEFAULT_typedata_procedure_c_file_read_to_end.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
+			.value = {
+				.type = 7,
+				.string = "ZA_TAG_STATIC",
+			},
 		},
 	},
 };
@@ -10613,7 +10666,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -10624,7 +10677,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -10635,7 +10688,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -10646,7 +10699,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 8,
 			},
 		},
@@ -10657,7 +10710,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 16,
 			},
 		},
@@ -10668,7 +10721,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 32,
 			},
 		},
@@ -10679,7 +10732,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 64,
 			},
 		},
@@ -10690,7 +10743,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 128,
 			},
 		},
@@ -10701,7 +10754,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 254,
 			},
 		},
@@ -10712,7 +10765,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FWC_EVENT_COUNT,
 			},
 		},
@@ -10996,7 +11049,6 @@ constexpr type_info_procedure_c_global_context_init DEFAULT_typedata_procedure_c
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_global_context_init.argument_array,
 };
 constexpr type_info_procedure_c_global_context_reset_temporary_data DEFAULT_typedata_procedure_c_global_context_reset_temporary_data = {
 	.type_info = {
@@ -11005,7 +11057,6 @@ constexpr type_info_procedure_c_global_context_reset_temporary_data DEFAULT_type
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_global_context_reset_temporary_data.argument_array,
 };
 constexpr type_info_procedure_c_global_context_reset_context_arena DEFAULT_typedata_procedure_c_global_context_reset_context_arena = {
 	.type_info = {
@@ -11014,7 +11065,6 @@ constexpr type_info_procedure_c_global_context_reset_context_arena DEFAULT_typed
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_global_context_reset_context_arena.argument_array,
 };
 constexpr type_info_procedure_gc_reset_context_arena DEFAULT_typedata_procedure_gc_reset_context_arena = {
 	.type_info = {
@@ -11023,7 +11073,6 @@ constexpr type_info_procedure_gc_reset_context_arena DEFAULT_typedata_procedure_
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_gc_reset_context_arena.argument_array,
 };
 constexpr type_info_struct_threadpool_t DEFAULT_typedata_structure_threadpool_t = {
 	.type_info = {
@@ -11571,7 +11620,7 @@ constexpr type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_struct
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = HTAF_Invalid,
 			},
 		},
@@ -11582,7 +11631,7 @@ constexpr type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_struct
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = HTAF_Static,
 			},
 		},
@@ -11593,7 +11642,7 @@ constexpr type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_struct
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = HTAF_KeyCopy,
 			},
 		},
@@ -11604,7 +11653,7 @@ constexpr type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_struct
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = HTAF_ValueCopy,
 			},
 		},
@@ -11615,7 +11664,7 @@ constexpr type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_struct
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = HTAF_Garbage,
 			},
 		},
@@ -11626,7 +11675,7 @@ constexpr type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_struct
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = HTAF_None,
 			},
 		},
@@ -11893,7 +11942,7 @@ constexpr type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_lo
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = SL_LOG_DEBUG,
 			},
 		},
@@ -11904,7 +11953,7 @@ constexpr type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_lo
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = SL_LOG_TRACE,
 			},
 		},
@@ -11915,7 +11964,7 @@ constexpr type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_lo
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = SL_LOG_INFO,
 			},
 		},
@@ -11926,7 +11975,7 @@ constexpr type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_lo
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = SL_LOG_WARNING,
 			},
 		},
@@ -11937,7 +11986,7 @@ constexpr type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_lo
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = SL_LOG_ERROR,
 			},
 		},
@@ -11948,7 +11997,7 @@ constexpr type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_lo
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = SL_LOG_FATAL,
 			},
 		},
@@ -12284,7 +12333,7 @@ constexpr type_info_struct_arg_type_t DEFAULT_typedata_structure_arg_type_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FLAG_TYPE_BOOL,
 			},
 		},
@@ -12295,7 +12344,7 @@ constexpr type_info_struct_arg_type_t DEFAULT_typedata_structure_arg_type_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FLAG_TYPE_U64,
 			},
 		},
@@ -12306,7 +12355,7 @@ constexpr type_info_struct_arg_type_t DEFAULT_typedata_structure_arg_type_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FLAG_TYPE_FLOAT32,
 			},
 		},
@@ -12317,7 +12366,7 @@ constexpr type_info_struct_arg_type_t DEFAULT_typedata_structure_arg_type_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = FLAG_TYPE_STRING,
 			},
 		},
@@ -12620,7 +12669,6 @@ constexpr type_info_procedure_c_program_flag_print_flag_list DEFAULT_typedata_pr
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_program_flag_print_flag_list.argument_array,
 };
 constexpr type_info_procedure_c_program_flag_container_init DEFAULT_typedata_procedure_c_program_flag_container_init = {
 	.type_info = {
@@ -14435,7 +14483,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Invalid,
 			},
 		},
@@ -14446,7 +14494,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Semicolon,
 			},
 		},
@@ -14457,7 +14505,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Colon,
 			},
 		},
@@ -14468,7 +14516,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_OpeningBrace,
 			},
 		},
@@ -14479,7 +14527,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_ClosingBrace,
 			},
 		},
@@ -14490,7 +14538,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_OpeningParen,
 			},
 		},
@@ -14501,7 +14549,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_ClosingParen,
 			},
 		},
@@ -14512,7 +14560,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Asterisk,
 			},
 		},
@@ -14523,7 +14571,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_OpenBracket,
 			},
 		},
@@ -14534,7 +14582,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_ClosingBracket,
 			},
 		},
@@ -14545,7 +14593,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Comma,
 			},
 		},
@@ -14556,7 +14604,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_OpenAngleBracket,
 			},
 		},
@@ -14567,7 +14615,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_CloseAngleBracket,
 			},
 		},
@@ -14578,7 +14626,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_HashTag,
 			},
 		},
@@ -14589,7 +14637,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Exclamation,
 			},
 		},
@@ -14600,7 +14648,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Equals,
 			},
 		},
@@ -14611,7 +14659,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Dash,
 			},
 		},
@@ -14622,7 +14670,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_BackSlash,
 			},
 		},
@@ -14633,7 +14681,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Seperator,
 			},
 		},
@@ -14644,7 +14692,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Number,
 			},
 		},
@@ -14655,7 +14703,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_EOF,
 			},
 		},
@@ -14666,7 +14714,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Error,
 			},
 		},
@@ -14677,7 +14725,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Identifier,
 			},
 		},
@@ -14688,7 +14736,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = TT_Count,
 			},
 		},
@@ -14831,6 +14879,10 @@ constexpr type_info_procedure_c_tokenizer_peek_token DEFAULT_typedata_procedure_
 			.parent        = &DEFAULT_typedata_procedure_c_tokenizer_peek_token.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 1,
+			},
 		},
 	},
 };
@@ -15887,7 +15939,6 @@ constexpr type_info_procedure_sys_get_thread_count DEFAULT_typedata_procedure_sy
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_s32,
-	.argument_pointer = DEFAULT_typedata_procedure_sys_get_thread_count.argument_array,
 };
 constexpr type_info_procedure_sys_semaphore_create DEFAULT_typedata_procedure_sys_semaphore_create = {
 	.type_info = {
@@ -16100,7 +16151,6 @@ constexpr type_info_procedure_sys_mutex_create DEFAULT_typedata_procedure_sys_mu
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_structure_sys_mutex_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_sys_mutex_create.argument_array,
 };
 constexpr type_info_procedure_sys_mutex_free DEFAULT_typedata_procedure_sys_mutex_free = {
 	.type_info = {
@@ -16932,7 +16982,7 @@ constexpr type_info_struct_render_image_filter_type_t DEFAULT_typedata_structure
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IMAGE_FILTER_TYPE_INVALID,
 			},
 		},
@@ -16943,7 +16993,7 @@ constexpr type_info_struct_render_image_filter_type_t DEFAULT_typedata_structure
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IMAGE_FILTER_TYPE_NEAREST,
 			},
 		},
@@ -16954,7 +17004,7 @@ constexpr type_info_struct_render_image_filter_type_t DEFAULT_typedata_structure
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IMAGE_FILTER_TYPE_LINEAR,
 			},
 		},
@@ -16977,7 +17027,7 @@ constexpr type_info_struct_render_image_wrapping_type_t DEFAULT_typedata_structu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IMAGE_WRAPPING_INVALID,
 			},
 		},
@@ -16988,7 +17038,7 @@ constexpr type_info_struct_render_image_wrapping_type_t DEFAULT_typedata_structu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IMAGE_WRAPPING_CLAMP_TO_EDGE,
 			},
 		},
@@ -16999,7 +17049,7 @@ constexpr type_info_struct_render_image_wrapping_type_t DEFAULT_typedata_structu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IMAGE_WRAPPING_CLAMP_TO_BORDER,
 			},
 		},
@@ -17010,7 +17060,7 @@ constexpr type_info_struct_render_image_wrapping_type_t DEFAULT_typedata_structu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IMAGE_WRAPPING_REPEAT,
 			},
 		},
@@ -17033,7 +17083,7 @@ constexpr type_info_struct_render_image_usage_t DEFAULT_typedata_structure_rende
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -17044,7 +17094,7 @@ constexpr type_info_struct_render_image_usage_t DEFAULT_typedata_structure_rende
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -17055,7 +17105,7 @@ constexpr type_info_struct_render_image_usage_t DEFAULT_typedata_structure_rende
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -17066,7 +17116,7 @@ constexpr type_info_struct_render_image_usage_t DEFAULT_typedata_structure_rende
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 8,
 			},
 		},
@@ -17077,7 +17127,7 @@ constexpr type_info_struct_render_image_usage_t DEFAULT_typedata_structure_rende
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 16,
 			},
 		},
@@ -17088,7 +17138,7 @@ constexpr type_info_struct_render_image_usage_t DEFAULT_typedata_structure_rende
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 32,
 			},
 		},
@@ -17450,7 +17500,7 @@ constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t 
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = AT_Invalid,
 			},
 		},
@@ -17461,7 +17511,7 @@ constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t 
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = AT_Bitmap,
 			},
 		},
@@ -17472,7 +17522,7 @@ constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t 
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = AT_Shader,
 			},
 		},
@@ -17483,7 +17533,7 @@ constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t 
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = AT_Material,
 			},
 		},
@@ -17494,7 +17544,7 @@ constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t 
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = AT_Font,
 			},
 		},
@@ -17505,7 +17555,7 @@ constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t 
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = AT_Sound,
 			},
 		},
@@ -17516,7 +17566,7 @@ constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t 
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = AT_Count,
 			},
 		},
@@ -17539,7 +17589,7 @@ constexpr type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_a
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = ASLS_Invalid,
 			},
 		},
@@ -17550,7 +17600,7 @@ constexpr type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_a
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = ASLS_Unloaded,
 			},
 		},
@@ -17561,7 +17611,7 @@ constexpr type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_a
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = ASLS_LoadQueued,
 			},
 		},
@@ -17572,7 +17622,7 @@ constexpr type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_a
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = ASLS_Loaded,
 			},
 		},
@@ -17583,7 +17633,7 @@ constexpr type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_a
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = ASLS_ShouldUnload,
 			},
 		},
@@ -17594,7 +17644,7 @@ constexpr type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_a
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = ASLS_ShouldReload,
 			},
 		},
@@ -17605,7 +17655,7 @@ constexpr type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_a
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = ASLS_Count,
 			},
 		},
@@ -17628,7 +17678,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_Invalid,
 			},
 		},
@@ -17639,7 +17689,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_R8,
 			},
 		},
@@ -17650,7 +17700,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_B8,
 			},
 		},
@@ -17661,7 +17711,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_G8,
 			},
 		},
@@ -17672,7 +17722,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_RGBA32_SRGB,
 			},
 		},
@@ -17683,7 +17733,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_RGBA32_UNORM,
 			},
 		},
@@ -17694,7 +17744,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_BGRA32_UNORM,
 			},
 		},
@@ -17705,7 +17755,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_RGB24_UNORM,
 			},
 		},
@@ -17716,7 +17766,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_RGB24_SRGB,
 			},
 		},
@@ -17727,7 +17777,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_D24_SFLOAT_S8,
 			},
 		},
@@ -17738,7 +17788,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_D32_SFLOAT_S8_UINT,
 			},
 		},
@@ -17749,7 +17799,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_D32_SFLOAT,
 			},
 		},
@@ -17760,7 +17810,7 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = BMF_Count,
 			},
 		},
@@ -18099,7 +18149,7 @@ constexpr type_info_struct_stored_material_type_t DEFAULT_typedata_structure_sto
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = SMT_Invalid,
 			},
 		},
@@ -18110,7 +18160,7 @@ constexpr type_info_struct_stored_material_type_t DEFAULT_typedata_structure_sto
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = SMT_Instance,
 			},
 		},
@@ -18121,7 +18171,7 @@ constexpr type_info_struct_stored_material_type_t DEFAULT_typedata_structure_sto
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = SMT_Archetype,
 			},
 		},
@@ -19410,7 +19460,7 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -19422,8 +19472,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 1,
-				.string = "RBM_SrcAlpha,"
+				.type = 7,
+				.string = "RBM_SrcAlpha",
 			},
 		},
 		.dst_color_blend_mode = {
@@ -19434,8 +19484,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 1,
-				.string = "RBM_OneMinusSrcAlpha,"
+				.type = 7,
+				.string = "RBM_OneMinusSrcAlpha",
 			},
 		},
 		.src_alpha_blend_mode = {
@@ -19446,8 +19496,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 1,
-				.string = "RBM_One,"
+				.type = 7,
+				.string = "RBM_One",
 			},
 		},
 		.dst_alpha_blend_mode = {
@@ -19458,8 +19508,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 1,
-				.string = "RBM_Zero,"
+				.type = 7,
+				.string = "RBM_Zero",
 			},
 		},
 		.color_blend_op = {
@@ -19470,8 +19520,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 1,
-				.string = "RBE_Add,"
+				.type = 7,
+				.string = "RBE_Add",
 			},
 		},
 		.alpha_blend_op = {
@@ -19482,8 +19532,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 1,
-				.string = "RBE_Add,"
+				.type = 7,
+				.string = "RBE_Add",
 			},
 		},
 		.depth_testing_enabled = {
@@ -19494,7 +19544,7 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -19506,7 +19556,7 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -19518,8 +19568,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 1,
-				.string = "RDF_Less,"
+				.type = 7,
+				.string = "RDF_Less",
 			},
 		},
 		.stencil_enabled = {
@@ -19530,7 +19580,7 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 0,
 			},
 		},
@@ -19542,7 +19592,7 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 0,
 			},
 		},
@@ -19554,7 +19604,7 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 0,
 			},
 		},
@@ -19566,7 +19616,7 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 0,
 			},
 		},
@@ -19609,7 +19659,7 @@ constexpr type_info_struct_controller_type_t DEFAULT_typedata_structure_controll
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IM_CONTROLLER_INVALID,
 			},
 		},
@@ -19620,7 +19670,7 @@ constexpr type_info_struct_controller_type_t DEFAULT_typedata_structure_controll
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IM_CONTROLLER_GAMEPAD,
 			},
 		},
@@ -19631,7 +19681,7 @@ constexpr type_info_struct_controller_type_t DEFAULT_typedata_structure_controll
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IM_CONTROLLER_KEYBOARD,
 			},
 		},
@@ -19642,7 +19692,7 @@ constexpr type_info_struct_controller_type_t DEFAULT_typedata_structure_controll
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = IM_CONTROLLER_COUNT,
 			},
 		},
@@ -19665,7 +19715,7 @@ constexpr type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_inpu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 513,
 			},
 		},
@@ -19676,7 +19726,7 @@ constexpr type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_inpu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 514,
 			},
 		},
@@ -19687,7 +19737,7 @@ constexpr type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_inpu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 515,
 			},
 		},
@@ -19698,7 +19748,7 @@ constexpr type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_inpu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 516,
 			},
 		},
@@ -19709,7 +19759,7 @@ constexpr type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_inpu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 517,
 			},
 		},
@@ -19720,7 +19770,7 @@ constexpr type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_inpu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 5,
 			},
 		},
@@ -20003,7 +20053,7 @@ constexpr type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = GAB_Invalid,
 			},
 		},
@@ -20014,7 +20064,7 @@ constexpr type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = GAB_Button,
 			},
 		},
@@ -20025,7 +20075,7 @@ constexpr type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = GAB_Axis,
 			},
 		},
@@ -20036,7 +20086,7 @@ constexpr type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = GAB_Count,
 			},
 		},
@@ -20807,7 +20857,7 @@ constexpr type_info_struct_render_buffer_type_t DEFAULT_typedata_structure_rende
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -20818,7 +20868,7 @@ constexpr type_info_struct_render_buffer_type_t DEFAULT_typedata_structure_rende
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -20829,7 +20879,7 @@ constexpr type_info_struct_render_buffer_type_t DEFAULT_typedata_structure_rende
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -20852,7 +20902,7 @@ constexpr type_info_struct_render_buffer_advance_rate_t DEFAULT_typedata_structu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -20863,7 +20913,7 @@ constexpr type_info_struct_render_buffer_advance_rate_t DEFAULT_typedata_structu
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -20886,7 +20936,7 @@ constexpr type_info_struct_render_buffer_memory_type_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -20897,7 +20947,7 @@ constexpr type_info_struct_render_buffer_memory_type_t DEFAULT_typedata_structur
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -21160,7 +21210,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_Invalid,
 			},
 		},
@@ -21171,7 +21221,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_ClearRenderTarget,
 			},
 		},
@@ -21182,7 +21232,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_BeginRenderpass,
 			},
 		},
@@ -21193,7 +21243,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_EndRenderpass,
 			},
 		},
@@ -21204,7 +21254,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_UpdateUniformConstantBuffer,
 			},
 		},
@@ -21215,7 +21265,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_UpdatePushConstants,
 			},
 		},
@@ -21226,7 +21276,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_UpdateBufferContents,
 			},
 		},
@@ -21237,7 +21287,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_BindMaterial,
 			},
 		},
@@ -21248,7 +21298,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_BindTexture,
 			},
 		},
@@ -21259,7 +21309,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_BindShader,
 			},
 		},
@@ -21270,7 +21320,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_BindVertexBuffer,
 			},
 		},
@@ -21281,7 +21331,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_BindIndexBuffer,
 			},
 		},
@@ -21292,7 +21342,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_SetViewport,
 			},
 		},
@@ -21303,7 +21353,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_SetScissor,
 			},
 		},
@@ -21314,7 +21364,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_SetRenderState,
 			},
 		},
@@ -21325,7 +21375,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_ResetRenderState,
 			},
 		},
@@ -21336,7 +21386,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_DispatchCompute,
 			},
 		},
@@ -21347,7 +21397,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_Draw,
 			},
 		},
@@ -21358,7 +21408,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_DrawIndexed,
 			},
 		},
@@ -21369,7 +21419,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_BlitImage,
 			},
 		},
@@ -21380,7 +21430,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_BlitRenderpass,
 			},
 		},
@@ -21391,7 +21441,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_PresentFrame,
 			},
 		},
@@ -21402,7 +21452,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RCT_Count,
 			},
 		},
@@ -22085,7 +22135,7 @@ constexpr type_info_struct_command_list_type_t DEFAULT_typedata_structure_comman
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RENDER_COMMAND_LIST_TYPE_GRAPHICS,
 			},
 		},
@@ -22096,7 +22146,7 @@ constexpr type_info_struct_command_list_type_t DEFAULT_typedata_structure_comman
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RENDER_COMMAND_LIST_TYPE_COMPUTE,
 			},
 		},
@@ -22171,7 +22221,7 @@ constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -22182,7 +22232,7 @@ constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -22193,7 +22243,7 @@ constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -22204,7 +22254,7 @@ constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 6,
 			},
 		},
@@ -22227,7 +22277,7 @@ constexpr type_info_struct_renderpass_attachment_load_operation_t DEFAULT_typeda
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -22238,7 +22288,7 @@ constexpr type_info_struct_renderpass_attachment_load_operation_t DEFAULT_typeda
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -22249,7 +22299,7 @@ constexpr type_info_struct_renderpass_attachment_load_operation_t DEFAULT_typeda
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -22272,7 +22322,7 @@ constexpr type_info_struct_renderpass_attachment_store_operation_t DEFAULT_typed
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -22283,7 +22333,7 @@ constexpr type_info_struct_renderpass_attachment_store_operation_t DEFAULT_typed
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -22294,7 +22344,7 @@ constexpr type_info_struct_renderpass_attachment_store_operation_t DEFAULT_typed
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -23781,7 +23831,6 @@ constexpr type_info_procedure_backend_render_frame DEFAULT_typedata_procedure_ba
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_backend_render_frame.argument_array,
 };
 constexpr type_info_procedure_backend_buffer_create DEFAULT_typedata_procedure_backend_buffer_create = {
 	.type_info = {
@@ -24167,7 +24216,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -24178,7 +24227,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -24189,7 +24238,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -24200,7 +24249,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 8,
 			},
 		},
@@ -24211,7 +24260,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 16,
 			},
 		},
@@ -24222,7 +24271,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 32,
 			},
 		},
@@ -24233,7 +24282,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 64,
 			},
 		},
@@ -24244,7 +24293,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 128,
 			},
 		},
@@ -24255,7 +24304,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 256,
 			},
 		},
@@ -24266,7 +24315,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 512,
 			},
 		},
@@ -24277,7 +24326,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1024,
 			},
 		},
@@ -24288,7 +24337,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2048,
 			},
 		},
@@ -24299,7 +24348,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4096,
 			},
 		},
@@ -24310,7 +24359,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 8192,
 			},
 		},
@@ -24321,7 +24370,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 16384,
 			},
 		},
@@ -24332,7 +24381,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -24343,7 +24392,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 16,
 			},
 		},
@@ -24354,7 +24403,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 128,
 			},
 		},
@@ -24405,7 +24454,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -24416,7 +24465,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -24427,7 +24476,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -24438,7 +24487,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 8,
 			},
 		},
@@ -24449,7 +24498,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 16,
 			},
 		},
@@ -24460,7 +24509,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 32,
 			},
 		},
@@ -24471,7 +24520,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 64,
 			},
 		},
@@ -24482,7 +24531,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 128,
 			},
 		},
@@ -24493,7 +24542,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 256,
 			},
 		},
@@ -24504,7 +24553,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 512,
 			},
 		},
@@ -24515,7 +24564,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1024,
 			},
 		},
@@ -24526,7 +24575,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2048,
 			},
 		},
@@ -24537,7 +24586,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4096,
 			},
 		},
@@ -24548,7 +24597,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 190,
 			},
 		},
@@ -24571,7 +24620,7 @@ constexpr type_info_struct_widget_layout_style_t DEFAULT_typedata_structure_widg
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = UI_WIDGET_LAYOUT_STYLE_VERTICAL,
 			},
 		},
@@ -24582,7 +24631,7 @@ constexpr type_info_struct_widget_layout_style_t DEFAULT_typedata_structure_widg
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = UI_WIDGET_LAYOUT_STYLE_HORIZONTAL,
 			},
 		},
@@ -24605,7 +24654,7 @@ constexpr type_info_struct_widget_size_kind_t DEFAULT_typedata_structure_widget_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = UI_WIDGET_SIZE_KIND_PIXELS,
 			},
 		},
@@ -24616,7 +24665,7 @@ constexpr type_info_struct_widget_size_kind_t DEFAULT_typedata_structure_widget_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT,
 			},
 		},
@@ -26156,7 +26205,7 @@ constexpr type_info_struct_vulkan_allocation_usage_type_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -26167,7 +26216,7 @@ constexpr type_info_struct_vulkan_allocation_usage_type_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -26178,7 +26227,7 @@ constexpr type_info_struct_vulkan_allocation_usage_type_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 8,
 			},
 		},
@@ -26189,7 +26238,7 @@ constexpr type_info_struct_vulkan_allocation_usage_type_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 16,
 			},
 		},
@@ -27533,7 +27582,7 @@ constexpr type_info_struct_renderer_effect_application_flags_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = REAF_None,
 			},
 		},
@@ -27544,7 +27593,7 @@ constexpr type_info_struct_renderer_effect_application_flags_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = REAF_Bloom,
 			},
 		},
@@ -27555,7 +27604,7 @@ constexpr type_info_struct_renderer_effect_application_flags_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = REAF_Emmision,
 			},
 		},
@@ -27566,7 +27615,7 @@ constexpr type_info_struct_renderer_effect_application_flags_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = REAF_Vignette,
 			},
 		},
@@ -27577,7 +27626,7 @@ constexpr type_info_struct_renderer_effect_application_flags_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = REAF_FilmGrain,
 			},
 		},
@@ -27588,7 +27637,7 @@ constexpr type_info_struct_renderer_effect_application_flags_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = REAF_Count,
 			},
 		},
@@ -27611,7 +27660,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 0,
 			},
 		},
@@ -27622,7 +27671,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -27633,7 +27682,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -27644,7 +27693,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 3,
 			},
 		},
@@ -27655,7 +27704,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -27666,7 +27715,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 5,
 			},
 		},
@@ -27677,7 +27726,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 6,
 			},
 		},
@@ -27688,7 +27737,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 7,
 			},
 		},
@@ -27699,7 +27748,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 8,
 			},
 		},
@@ -27710,7 +27759,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 9,
 			},
 		},
@@ -27721,7 +27770,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 10,
 			},
 		},
@@ -27732,7 +27781,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 11,
 			},
 		},
@@ -27743,7 +27792,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 12,
 			},
 		},
@@ -27754,7 +27803,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 13,
 			},
 		},
@@ -27765,7 +27814,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RBM_Count,
 			},
 		},
@@ -27788,7 +27837,7 @@ constexpr type_info_struct_render_pipeline_blending_equation_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 0,
 			},
 		},
@@ -27799,7 +27848,7 @@ constexpr type_info_struct_render_pipeline_blending_equation_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -27810,7 +27859,7 @@ constexpr type_info_struct_render_pipeline_blending_equation_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -27821,7 +27870,7 @@ constexpr type_info_struct_render_pipeline_blending_equation_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 3,
 			},
 		},
@@ -27832,7 +27881,7 @@ constexpr type_info_struct_render_pipeline_blending_equation_t DEFAULT_typedata_
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -27855,7 +27904,7 @@ constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_str
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 0,
 			},
 		},
@@ -27866,7 +27915,7 @@ constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_str
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 1,
 			},
 		},
@@ -27877,7 +27926,7 @@ constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_str
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 2,
 			},
 		},
@@ -27888,7 +27937,7 @@ constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_str
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 3,
 			},
 		},
@@ -27899,7 +27948,7 @@ constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_str
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 4,
 			},
 		},
@@ -27910,7 +27959,7 @@ constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_str
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 5,
 			},
 		},
@@ -27921,7 +27970,7 @@ constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_str
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 6,
 			},
 		},
@@ -27932,7 +27981,7 @@ constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_str
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 4,
+				.type = 3,
 				.u64 = 7,
 			},
 		},
@@ -27955,7 +28004,7 @@ constexpr type_info_struct_render_pipeline_polygon_mode_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RENDER_PIPELINE_POLYGON_MODE_FILL,
 			},
 		},
@@ -27966,7 +28015,7 @@ constexpr type_info_struct_render_pipeline_polygon_mode_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 1,
+				.type  = 2,
 				.int64 = RENDER_PIPELINE_POLYGON_MODE_LINE,
 			},
 		},
@@ -30531,8 +30580,2893 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_vk_backend_shader_create_slang_reflect.type_info,
 };
 
+namespace Athena {
+namespace MemberLists {
+enum class dynarray_header_t {
+	flags,
+	header_id,
+	capacity,
+	element_size,
+	indices_used,
+	total_allocated_bytes,
+	__padding1,
+	__padding2,
+}; // dynarray_header_t
+enum class file_extension_t {
+	FILE_EXT_INVALID,
+	FILE_EXT_TTF,
+	FILE_EXT_WAV,
+	FILE_EXT_PNG,
+	FILE_EXT_GLSL,
+	FILE_EXT_OS_DLL,
+	FILE_EXT_COUNT,
+}; // file_extension_t
+enum class file_t {
+	handle,
+	file_name,
+	filepath,
+	file_size,
+	current_read_offset,
+	current_write_offset,
+	overlapping,
+	for_writing,
+}; // file_t
+enum class mapped_file_t {
+	file,
+	mapping_handle,
+	mapped_file_data,
+}; // mapped_file_t
+enum class file_data_t {
+	last_modtime,
+	file_size,
+	filename,
+	filepath,
+}; // file_data_t
+enum class overlap_io_data_t {
+	offset_to_read,
+	bytes_to_read,
+	status,
+	bytes_transfered,
+	event_handle,
+}; // overlap_io_data_t
+enum class visit_file_data_t {
+	function,
+	user_data,
+	filename,
+	fullname,
+	directory_name,
+	recursive,
+	is_directory,
+}; // visit_file_data_t
+enum class string_t {
+	data,
+	count,
+}; // string_t
+enum class memory_arena_t {
+	is_initialized,
+	base,
+	used,
+	block_size,
+	block_counter,
+	scratch_arena_count,
+}; // memory_arena_t
+enum class zone_allocator_t {
+	mutex,
+	capacity,
+	base,
+	first_block,
+	cursor,
+}; // zone_allocator_t
+enum class za_allocation_tag_t {
+	ZA_TAG_NONE,
+	ZA_TAG_STATIC,
+	ZA_TAG_TEXTURE,
+	ZA_TAG_SOUND,
+	ZA_TAG_FONT,
+	ZA_TAG_PURGELEVEL,
+	ZA_TAG_CACHE,
+}; // za_allocation_tag_t
+enum class file_watcher_t {
+	is_valid,
+	is_verbose,
+	watcher_arena,
+	callback,
+	events_to_monitor,
+	user_data,
+	watch_recursively,
+	observed_changes,
+	change_count,
+	paths_to_watch,
+	paths_watched,
+	notify_buffer_size,
+	sys_watch_data,
+	issues_when_checking,
+}; // file_watcher_t
+enum class file_watcher_recorded_change_t {
+	full_path,
+	old_filename,
+	changes,
+	last_change_timestamp,
+}; // file_watcher_recorded_change_t
+enum class file_watcher_change_event_t {
+	FWC_EVENT_NONE,
+	FWC_EVENT_ADDED,
+	FWC_EVENT_MODIFIED,
+	FWC_EVENT_DELETED,
+	FWC_EVENT_MOVED,
+	FWC_EVENT_ATTRIBUTE_CHANGE,
+	FWC_EVENT_SCAN_CHILDREN,
+	FWC_EVENT_RENAMED,
+	FWC_EVENT_ALL,
+	FWC_EVENT_COUNT,
+}; // file_watcher_change_event_t
+enum class global_context_t {
+	is_initialized,
+	running,
+	should_reload,
+	main_threadpool,
+	renderer_state,
+	asset_manager,
+	input_manager,
+	context_arena,
+	temporary_arena,
+}; // global_context_t
+enum class threadpool_t {
+	work_avaliable_semaphore,
+	workers,
+	thread_count,
+	allow_stealing,
+	threads_flushed,
+	next_worker_index,
+}; // threadpool_t
+enum class renderer_state_t {
+	window,
+	render_context,
+	renderer_arena,
+	transient_arena,
+	command_lists,
+	command_list_count,
+	constant_buffer_hash,
+	used_constant_buffers,
+	total_render_instances,
+	total_materials,
+	total_shaders,
+	total_buffers,
+	window_size,
+	current_window_size_generation,
+	last_window_size_generation,
+	renderpasses,
+	renderpass_count,
+	present_command,
+	backend_initialize,
+	backend_handle_window_resize,
+	backend_render_frame,
+	backend_buffer_create,
+	backend_buffer_copy_data,
+	backend_buffer_append_data,
+	backend_constant_buffer_append_data,
+	backend_buffer_reset,
+	backend_renderpass_initialize,
+	backend_image_create,
+	backend_image_destroy,
+	backend_image_update_contents,
+	backend_shader_create,
+	backend_get_command_buffer,
+}; // renderer_state_t
+enum class asset_manager_t {
+	is_initialized,
+	manager_arena,
+	freetype_handle,
+	asset_files,
+	asset_name_to_file,
+	loaded_file_count,
+	asset_load_queue,
+	load_queue_size,
+	asset_unload_queue,
+	unload_queue_size,
+	atlas_registry,
+	asset_allocator,
+	asset_catalogs,
+	texture_catalog,
+	shader_catalog,
+	material_catalog,
+	font_catalog,
+	sound_catalog,
+	font_manager,
+	renderer_state,
+}; // asset_manager_t
+enum class input_manager_t {
+	keyboard_data,
+	gamepad_data,
+	primary_controller_index,
+	active_controller_index,
+	connected_controller_count,
+	controllers,
+}; // input_manager_t
+enum class hash_table_allocation_flags_t {
+	HTAF_Invalid,
+	HTAF_Static,
+	HTAF_KeyCopy,
+	HTAF_ValueCopy,
+	HTAF_Garbage,
+	HTAF_None,
+}; // hash_table_allocation_flags_t
+enum class hash_table_header_t {
+	max_entries,
+	flags,
+	current_entry_count,
+	debug_id,
+}; // hash_table_header_t
+enum class debug_log_level_t {
+	SL_LOG_DEBUG,
+	SL_LOG_TRACE,
+	SL_LOG_INFO,
+	SL_LOG_WARNING,
+	SL_LOG_ERROR,
+	SL_LOG_FATAL,
+}; // debug_log_level_t
+enum class memory_arena_footer_t {
+	last_base,
+	last_used,
+	last_block_size,
+}; // memory_arena_footer_t
+enum class scratch_arena_t {
+	parent,
+	base,
+	used,
+}; // scratch_arena_t
+enum class arg_type_t {
+	FLAG_TYPE_BOOL,
+	FLAG_TYPE_U64,
+	FLAG_TYPE_FLOAT32,
+	FLAG_TYPE_STRING,
+}; // arg_type_t
+enum class program_flag_data_t {
+	bool32,
+	u64,
+	float32,
+	string,
+}; // program_flag_data_t
+enum class program_flag_t {
+	is_valid,
+	name,
+	description,
+	arg_type,
+	arg_value,
+	default_arg_value,
+}; // program_flag_t
+enum class program_flag_state_t {
+	program_flags,
+	flag_counter,
+}; // program_flag_state_t
+enum class string_builder_buffer_t {
+	buffer_data,
+	bytes_used,
+	buffer_size,
+	next_buffer,
+}; // string_builder_buffer_t
+enum class string_builder_t {
+	is_initialized,
+	arena,
+	first_buffer,
+	current_buffer,
+	default_buffer_block_size,
+	bytes_used,
+	total_allocated,
+}; // string_builder_t
+enum class sys_thread_t {
+	handle,
+	thread_id,
+	user_data,
+}; // sys_thread_t
+enum class sys_mutex_t {
+	handle,
+}; // sys_mutex_t
+enum class sys_semaphore_t {
+	handle,
+}; // sys_semaphore_t
+enum class ticket_mutex_t {
+	next_ticket,
+	working_ticket,
+}; // ticket_mutex_t
+enum class work_completion_fence_t {
+	pending,
+}; // work_completion_fence_t
+enum class work_order_t {
+	data,
+	function,
+	fence,
+	__padding,
+}; // work_order_t
+enum class work_list_t {
+	work_orders,
+	head,
+	tail,
+}; // work_list_t
+enum class thread_allocator_t {
+	buffer,
+	size,
+	used,
+}; // thread_allocator_t
+enum class worker_thread_t {
+	thread_id,
+	handle,
+	work_avaliable,
+	allocator,
+	threadpool,
+	total_work_orders,
+	is_started,
+	should_exit,
+}; // worker_thread_t
+enum class preprocessor_token_type_t {
+	TT_Invalid,
+	TT_Semicolon,
+	TT_Colon,
+	TT_OpeningBrace,
+	TT_ClosingBrace,
+	TT_OpeningParen,
+	TT_ClosingParen,
+	TT_Asterisk,
+	TT_OpenBracket,
+	TT_ClosingBracket,
+	TT_Comma,
+	TT_OpenAngleBracket,
+	TT_CloseAngleBracket,
+	TT_HashTag,
+	TT_Exclamation,
+	TT_Equals,
+	TT_Dash,
+	TT_BackSlash,
+	TT_Seperator,
+	TT_Number,
+	TT_EOF,
+	TT_Error,
+	TT_Identifier,
+	TT_Count,
+}; // preprocessor_token_type_t
+enum class token_data_t {
+	type,
+	string,
+}; // token_data_t
+enum class tokenizer_t {
+	data,
+	filename,
+	line_count,
+	bookmarked_read_count,
+	bookmarked_line_count,
+	read_bookmark,
+	bookmarked_token,
+}; // tokenizer_t
+enum class zone_allocator_block_t {
+	block_id,
+	is_allocated,
+	block_size,
+	allocation_tag,
+	next_block,
+	prev_block,
+}; // zone_allocator_block_t
+enum class render_command_list_t {
+	is_initialized,
+	renderer_state,
+	transient_arena,
+	command_arena,
+	commands,
+	command_count,
+	draw_instance_command_count,
+	bind_shader_command_count,
+	bind_render_target_command_count,
+	bind_material_command_count,
+	active_render_state,
+	vertex_buffer_count,
+	active_index_buffer,
+	active_scissor_command,
+	active_viewport_command,
+	active_shader_program,
+	vertex_offset,
+	instance_offset,
+	index_offset,
+	active_renderpass,
+	presenting,
+	image_shader_params,
+	image_count,
+	image_ids_to_bind,
+	bound_image_count,
+	command_list_type,
+	backend_command_buffer,
+}; // render_command_list_t
+enum class vertex_buffer_t {
+	buffer,
+	vertex_data,
+	max_vertices,
+	vertex_count,
+}; // vertex_buffer_t
+enum class texture2D_t {
+	ID,
+	bitmap,
+	gpu_data,
+}; // texture2D_t
+enum class asset_handle_t {
+	is_valid,
+	type,
+	owner_asset_file_index,
+	subtexture_data,
+	slot,
+	asset_manager,
+	catalog,
+	texture,
+	shader,
+	material_info,
+	dynamic_render_font,
+}; // asset_handle_t
+enum class render_image_filter_type_t {
+	IMAGE_FILTER_TYPE_INVALID,
+	IMAGE_FILTER_TYPE_NEAREST,
+	IMAGE_FILTER_TYPE_LINEAR,
+}; // render_image_filter_type_t
+enum class render_image_wrapping_type_t {
+	IMAGE_WRAPPING_INVALID,
+	IMAGE_WRAPPING_CLAMP_TO_EDGE,
+	IMAGE_WRAPPING_CLAMP_TO_BORDER,
+	IMAGE_WRAPPING_REPEAT,
+}; // render_image_wrapping_type_t
+enum class render_image_usage_t {
+	IMAGE_USAGE_INVALID,
+	IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT,
+	IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT,
+	IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
+	IMAGE_USAGE_BLIT_SOURCE,
+	IMAGE_USAGE_BLIT_DESTINATION,
+}; // render_image_usage_t
+enum class sampler_create_info_t {
+	filtering,
+	anisotropy_enabled,
+	max_anisotropy,
+	wrapu,
+	wrapv,
+	compare_ops_enabled,
+	compare_operation,
+	use_normalized_coordinates,
+}; // sampler_create_info_t
+enum class image_create_info_t {
+	data,
+	width,
+	height,
+	format,
+	usage,
+	sampler_info,
+}; // image_create_info_t
+enum class image_t {
+	ID,
+	create_info,
+	backend_image,
+}; // image_t
+enum class bitmap_t {
+	width,
+	height,
+	channels,
+	format,
+	pixels,
+}; // bitmap_t
+enum class asset_type_t {
+	AT_Invalid,
+	AT_Bitmap,
+	AT_Shader,
+	AT_Material,
+	AT_Font,
+	AT_Sound,
+	AT_Count,
+}; // asset_type_t
+enum class asset_slot_load_status_t {
+	ASLS_Invalid,
+	ASLS_Unloaded,
+	ASLS_LoadQueued,
+	ASLS_Loaded,
+	ASLS_ShouldUnload,
+	ASLS_ShouldReload,
+	ASLS_Count,
+}; // asset_slot_load_status_t
+enum class bitmap_format_t {
+	BMF_Invalid,
+	BMF_R8,
+	BMF_B8,
+	BMF_G8,
+	BMF_RGBA32_SRGB,
+	BMF_RGBA32_UNORM,
+	BMF_BGRA32_UNORM,
+	BMF_RGB24_UNORM,
+	BMF_RGB24_SRGB,
+	BMF_D24_SFLOAT_S8,
+	BMF_D32_SFLOAT_S8_UINT,
+	BMF_D32_SFLOAT,
+	BMF_Count,
+}; // bitmap_format_t
+enum class subtexture_data_t {
+	uv_min,
+	uv_max,
+	offset,
+	size,
+	atlas_subtexture_index,
+	atlas,
+}; // subtexture_data_t
+enum class texture_atlas_t {
+	texture,
+	bitmap_data,
+	ID,
+	merge_counter,
+	packed_subtexture_count,
+	is_valid,
+	atlas_cursor_x,
+	atlas_cursor_y,
+	tallest_y,
+	atlas_size,
+}; // texture_atlas_t
+enum class shader_t {
+	ID,
+	shader_data,
+}; // shader_t
+enum class material_instance_t {
+	ID,
+	version,
+	name,
+	renderer_effect_flags,
+	shader_uniform_count,
+	pipeline_state,
+	archetype,
+}; // material_instance_t
+enum class material_archetype_t {
+	ID,
+	version,
+	name,
+	shader_binary_name,
+	shader_handle,
+	descriptors,
+	base_instance,
+}; // material_archetype_t
+enum class stored_material_type_t {
+	SMT_Invalid,
+	SMT_Instance,
+	SMT_Archetype,
+}; // stored_material_type_t
+enum class material_data_t {
+	material_type,
+	archetype,
+	instance,
+}; // material_data_t
+enum class glyph_metric_t {
+	is_valid,
+	is_fetched,
+	advance,
+	ascent,
+	width,
+	height,
+	offset_x,
+	offset_y,
+	atlas_offset,
+	atlas_size,
+	owner_atlas,
+}; // glyph_metric_t
+enum class temporary_glyph_t {
+	utf32_codepoint,
+	metrics,
+	glyph_width,
+	glyph_height,
+	cursor_x,
+	cursor_y,
+}; // temporary_glyph_t
+enum class dynamic_render_font_page_t {
+	is_dirty,
+	is_full,
+	parent_font,
+	varient,
+	font_atlas,
+	glyphs,
+	loaded_glyph_count,
+	temporary_glyphs,
+	temporary_glyph_count,
+	atlas_cursor_x,
+	atlas_cursor_y,
+	tallest_y,
+	next_page,
+}; // dynamic_render_font_page_t
+enum class dynamic_render_font_varient_t {
+	font_size,
+	size_to_pixels,
+	line_spacing,
+	max_ascender,
+	max_descender,
+	y_center_offset,
+	typical_ascender,
+	typical_descender,
+	em_width,
+	default_unknown_character,
+	default_utf32_unknown_character,
+	parent_font,
+	first_page,
+}; // dynamic_render_font_varient_t
+enum class dynamic_render_font_t {
+	font_arena,
+	font_face,
+}; // dynamic_render_font_t
+enum class asset_slot_t {
+	ID,
+	slot_state,
+	type,
+	name,
+	owner_asset_file,
+	package_entry,
+	package_generation,
+	loaded_asset_index,
+	texture,
+	dynamic_render_font,
+	shader,
+	material,
+}; // asset_slot_t
+enum class asset_manager_asset_file_data_t {
+	is_initialized,
+	ID,
+	init_arena,
+	load_status,
+	file_info,
+	raw_file_data,
+	package_entries,
+	package_entry_count,
+	entry_hash,
+	header_data,
+}; // asset_manager_asset_file_data_t
+enum class asset_catalog_t {
+	ID,
+	catalog_type,
+	asset_manager,
+	default_asset,
+	asset_lookup,
+}; // asset_catalog_t
+enum class texture_manager_t {
+	atlases,
+	current_atlas_count,
+}; // texture_manager_t
+enum class font_manager_t {
+	pages_to_update,
+	pages_queued,
+}; // font_manager_t
+enum class texture_atlas_registry_t {
+	atlases,
+	current_atlas_count,
+}; // texture_atlas_registry_t
+enum class render_pipeline_state_t {
+	blend_enabled,
+	src_color_blend_mode,
+	dst_color_blend_mode,
+	src_alpha_blend_mode,
+	dst_alpha_blend_mode,
+	color_blend_op,
+	alpha_blend_op,
+	depth_testing_enabled,
+	depth_writing_enabled,
+	depth_func,
+	stencil_enabled,
+	stencil_state,
+	stencil_keep,
+	polygon_mode,
+}; // render_pipeline_state_t
+enum class controller_type_t {
+	IM_CONTROLLER_INVALID,
+	IM_CONTROLLER_GAMEPAD,
+	IM_CONTROLLER_KEYBOARD,
+	IM_CONTROLLER_COUNT,
+}; // controller_type_t
+enum class input_mouse_buttons_t {
+	SDL_LEFT_MOUSE,
+	SDL_RIGHT_MOUSE,
+	SDL_MIDDLE_MOUSE,
+	SDL_X1_MOUSE,
+	SDL_X2_MOUSE,
+	SDL_MOUSE_BUTTON_COUNT,
+}; // input_mouse_buttons_t
+enum class action_button_t {
+	is_down,
+	is_released,
+	is_pressed,
+	half_transition_counter,
+}; // action_button_t
+enum class keyboard_controller_data_t {
+	input,
+	current_mouse_pos,
+	last_mouse_pos,
+	mouse_delta,
+	is_shift_key_down,
+	is_control_key_down,
+	is_alt_key_down,
+}; // keyboard_controller_data_t
+enum class analog_button_t {
+	deadzone,
+	value,
+}; // analog_button_t
+enum class gamepad_controller_data_t {
+	gamepad_data,
+	stick_data,
+	gamepad_id,
+	has_rumble,
+	rumble_value,
+	digital_buttons,
+	analog_buttons,
+}; // gamepad_controller_data_t
+enum class input_controller_t {
+	is_valid,
+	is_analog,
+	type,
+	keyboard,
+	gamepad,
+}; // input_controller_t
+enum class game_action_binding_type_t {
+	GAB_Invalid,
+	GAB_Button,
+	GAB_Axis,
+	GAB_Count,
+}; // game_action_binding_type_t
+enum class game_action_binding_t {
+	type,
+	binding_id,
+}; // game_action_binding_t
+enum class game_action_t {
+	keyboard,
+	gamepad,
+	name,
+}; // game_action_t
+enum class camera_matrices_t {
+	view_matrix,
+	projection_matrix,
+}; // camera_matrices_t
+enum class render_buffer_type_t {
+	RenderBufferType_Invalid,
+	RenderBufferType_VertexBuffer,
+	RenderBufferType_IndexBuffer,
+}; // render_buffer_type_t
+enum class render_buffer_advance_rate_t {
+	RenderBufferAdvanceRate_PerElement,
+	RenderBufferAdvanceRate_PerInstance,
+}; // render_buffer_advance_rate_t
+enum class render_buffer_memory_type_t {
+	RenderBufferAllocationTypeMapped,
+	RenderBufferAllocationTypeGPUOnly,
+}; // render_buffer_memory_type_t
+enum class render_buffer_desc_t {
+	type,
+	allocation_type,
+	advance_rate,
+	buffer_capacity,
+	element_size,
+	initial_data,
+}; // render_buffer_desc_t
+enum class render_buffer_t {
+	type,
+	allocation_type,
+	constant_buffer_hash_ID,
+	buffer_ID,
+	buffer_capacity,
+	buffer_element_size,
+	buffer_elements_used,
+	working_offset,
+	mapped_data,
+	buffer,
+}; // render_buffer_t
+enum class index_buffer_t {
+	buffer,
+	index_data,
+	max_indices,
+	index_count,
+}; // index_buffer_t
+enum class uniform_constant_buffer_t {
+	mapped_data,
+	size,
+	offset,
+	uniform_hash_index,
+}; // uniform_constant_buffer_t
+enum class render_command_type_t {
+	RCT_Invalid,
+	RCT_ClearRenderTarget,
+	RCT_BeginRenderpass,
+	RCT_EndRenderpass,
+	RCT_UpdateUniformConstantBuffer,
+	RCT_UpdatePushConstants,
+	RCT_UpdateBufferContents,
+	RCT_BindMaterial,
+	RCT_BindTexture,
+	RCT_BindShader,
+	RCT_BindVertexBuffer,
+	RCT_BindIndexBuffer,
+	RCT_SetViewport,
+	RCT_SetScissor,
+	RCT_SetRenderState,
+	RCT_ResetRenderState,
+	RCT_DispatchCompute,
+	RCT_Draw,
+	RCT_DrawIndexed,
+	RCT_BlitImage,
+	RCT_BlitRenderpass,
+	RCT_PresentFrame,
+	RCT_Count,
+}; // render_command_type_t
+enum class render_command_header_t {
+	command_type,
+}; // render_command_header_t
+enum class render_command_begin_renderpass_t {
+	ID,
+}; // render_command_begin_renderpass_t
+enum class render_command_end_renderpass_t {
+	ID,
+}; // render_command_end_renderpass_t
+enum class render_command_bind_vertex_buffer_t {
+	buffer,
+}; // render_command_bind_vertex_buffer_t
+enum class render_command_bind_index_buffer_t {
+	buffer,
+}; // render_command_bind_index_buffer_t
+enum class render_command_update_texture_t {
+	bitmap,
+	buffer,
+}; // render_command_update_texture_t
+enum class render_command_bind_material_t {
+	materialID,
+	material,
+}; // render_command_bind_material_t
+enum class render_command_bind_shader_t {
+	shaderID,
+	shader,
+}; // render_command_bind_shader_t
+enum class render_command_set_viewport_t {
+	offset,
+	size,
+}; // render_command_set_viewport_t
+enum class render_command_set_scissor_t {
+	offset,
+	size,
+}; // render_command_set_scissor_t
+enum class render_command_update_push_constant_t {
+	data,
+	size,
+	offset,
+}; // render_command_update_push_constant_t
+enum class render_command_update_uniform_constant_buffer_t {
+	backend_uniform_buffer_ptr,
+	buffer,
+	uniform_hash_index,
+	constant_data_size,
+	constant_buffer_offset,
+}; // render_command_update_uniform_constant_buffer_t
+enum class render_command_update_render_buffer_contents_t {
+	buffer,
+	offset,
+	data_size,
+}; // render_command_update_render_buffer_contents_t
+enum class render_command_bind_texture_t {
+	texture,
+}; // render_command_bind_texture_t
+enum class render_command_dispatch_compute_t {
+	invoke_x,
+	invoke_y,
+	invoke_z,
+}; // render_command_dispatch_compute_t
+enum class render_command_set_pipeline_state_t {
+	pipeline_state,
+}; // render_command_set_pipeline_state_t
+enum class render_command_draw_t {
+	bound_images,
+	bound_image_count,
+	backend_vertex_buffer_offset,
+	vertices_to_draw,
+	vertex_offset,
+	indices_to_draw,
+	index_offset,
+	instance_count,
+	first_instance,
+}; // render_command_draw_t
+enum class render_command_blit_image_t {
+	source_image,
+	dest_image,
+	source_offset,
+	source_size,
+	dest_offset,
+	dest_size,
+}; // render_command_blit_image_t
+enum class render_command_blit_renderpass_t {
+	source,
+	destination,
+}; // render_command_blit_renderpass_t
+enum class render_command_present_frame_t {
+	presentation_source,
+}; // render_command_present_frame_t
+enum class render_command_t {
+	header,
+	data,
+}; // render_command_t
+enum class command_list_type_t {
+	RENDER_COMMAND_LIST_TYPE_GRAPHICS,
+	RENDER_COMMAND_LIST_TYPE_COMPUTE,
+}; // command_list_type_t
+enum class clear_value_t {
+	float_color,
+	int_color,
+	uint_color,
+	depth,
+	stencil,
+}; // clear_value_t
+enum class renderpass_attachment_access_t {
+	RenderpassAtachmentAccessInvalid,
+	RenderpassAttachmentAccessRead,
+	RenderpassAttachmentAccessWrite,
+	RenderpassAttachmentAccessReadWrite,
+}; // renderpass_attachment_access_t
+enum class renderpass_attachment_load_operation_t {
+	RenderpassAttachmentLoadOperationInvalid,
+	RenderpassAttachmentLoadOperationClear,
+	RenderpassAttachmentLoadOperationLoad,
+}; // renderpass_attachment_load_operation_t
+enum class renderpass_attachment_store_operation_t {
+	RenderpassAttachmentStoreOperationInvalid,
+	RenderpassAttachmentStoreOperationStore,
+	RenderpassAttachmentStoreOperationDontCare,
+}; // renderpass_attachment_store_operation_t
+enum class renderpass_attachment_t {
+	access,
+	load_operation,
+	store_operation,
+	image,
+	clear_value,
+}; // renderpass_attachment_t
+enum class renderpass_desc_t {
+	color_attachments,
+	depth_stencil_attachment,
+	render_width,
+	render_height,
+	resize_with_window,
+	color_attachment_count,
+}; // renderpass_desc_t
+enum class renderpass_key_t {
+	attachment_formats,
+}; // renderpass_key_t
+enum class renderpass_t {
+	ID,
+	renderpass_key,
+	create_info,
+	renderpass_handle,
+	framebuffer_handle,
+	depth_stencil_attachment,
+	color_attachments,
+	color_attachment_count,
+	total_attachment_count,
+	render_width,
+	render_height,
+	attachment_clear_values,
+	has_depth_stencil_attachment,
+	resize_with_window,
+}; // renderpass_t
+enum class vulkan_buffer_t {
+	handle,
+	is_mapped,
+	size,
+	used,
+	usage_flags,
+	allocation,
+	last_used_timestamp,
+}; // vulkan_buffer_t
+enum class widget_state_t {
+	last_interacted_frame,
+	toggled,
+	dragging,
+	input_begin_within_bounds,
+	slider_value,
+	position,
+	offset,
+	initial_mouse_position,
+	render_size,
+	render_color,
+	widget_rect,
+}; // widget_state_t
+enum class ui_signal_flags_t {
+	UI_SIGNAL_FLAG_INVALID,
+	UI_SIGNAL_FLAG_LEFT_CLICKED,
+	UI_SIGNAL_FLAG_RIGHT_CLICKED,
+	UI_SIGNAL_FLAG_MIDDLE_CLICKED,
+	UI_SIGNAL_FLAG_LEFT_RELEASED,
+	UI_SIGNAL_FLAG_RIGHT_RELEASED,
+	UI_SIGNAL_FLAG_MIDDLE_RELEASED,
+	UI_SIGNAL_FLAG_LEFT_DOUBLE_CLICKED,
+	UI_SIGNAL_FLAG_RIGHT_DOUBLE_CLICKED,
+	UI_SIGNAL_FLAG_MIDDLE_DOUBLE_CLICKED,
+	UI_SIGNAL_FLAG_LEFT_DOWN,
+	UI_SIGNAL_FLAG_RIGHT_DOWN,
+	UI_SIGNAL_FLAG_MIDDLE_DOWN,
+	UI_SIGNAL_FLAG_OUTSIDE_BOUNDS,
+	UI_SIGNAL_FLAG_HOVERING,
+	UI_SIGNAL_FLAG_CLICKED,
+	UI_SIGNAL_FLAG_RELEASED,
+	UI_SIGNAL_FLAG_DOUBLE_CLICKED,
+}; // ui_signal_flags_t
+enum class ui_signal_t {
+	widget,
+	signal_flags,
+}; // ui_signal_t
+enum class widget_flags_t {
+	UI_WIDGET_FLAG_INVALID,
+	UI_WIDGET_FLAG_IDLE_COLOR,
+	UI_WIDGET_FLAG_HOVER_COLOR,
+	UI_WIDGET_FLAG_ACTIVE_COLOR,
+	UI_WIDGET_FLAG_MOUSE_CLICKABLE,
+	UI_WIDGET_FLAG_HOVERABLE,
+	UI_WIDGET_FLAG_DRAW_TEXT,
+	UI_WIDGET_FLAG_DRAW_RECTANGLE,
+	UI_WIDGET_FLAG_DRAW_BACKGROUND,
+	UI_WIDGET_FLAG_DRAW_BORDER,
+	UI_WIDGET_FLAG_MAKE_CIRCULAR,
+	UI_WIDGET_FLAG_FIXED_SIZE,
+	UI_WIDGET_FLAG_LEFT_DRAGGABLE,
+	UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON,
+}; // widget_flags_t
+enum class widget_layout_style_t {
+	UI_WIDGET_LAYOUT_STYLE_VERTICAL,
+	UI_WIDGET_LAYOUT_STYLE_HORIZONTAL,
+}; // widget_layout_style_t
+enum class widget_size_kind_t {
+	UI_WIDGET_SIZE_KIND_PIXELS,
+	UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT,
+}; // widget_size_kind_t
+enum class widget_t {
+	ID,
+	widget_flags,
+	layout_style,
+	state,
+	widget_text,
+	toggled,
+	parent_stack_depth,
+	font_size,
+	font_max_descender,
+	expected_position,
+	minimum_render_size,
+	size_kind,
+	parent_child_spacing,
+	parent_padding,
+	widget_padding,
+	max_left_padding,
+	max_right_padding,
+	max_top_padding,
+	max_bottom_padding,
+	child_spacing,
+	idle_color,
+	hovered_color,
+	active_color,
+	border_color,
+	smoothness,
+	radius,
+	border_thickness,
+	parent,
+	first_child,
+	last_child,
+	next_sibling,
+	prev_sibling,
+	widget_instance_data,
+}; // widget_t
+enum class ui_state_t {
+	widget_arena,
+	section_count,
+	last_hot_ID,
+	last_active_ID,
+	hot_widget,
+	active_widget,
+	last_clicked_widget,
+	persistent_data_arena,
+	widget_states,
+	renderer,
+	asset_manager,
+	input_manager,
+	current_camera,
+	ui_controller,
+	widget_shader,
+	default_font,
+	default_font_size,
+	default_font_color,
+	default_widget_idle_color,
+	default_widget_hover_color,
+	default_widget_active_color,
+	default_widget_border_color,
+	default_widget_SDF_smoothness,
+	default_widget_border_thickness,
+	mouse_position,
+	mouse_delta,
+	active_widget_padding,
+	widget_item_count,
+	frame_count,
+	ui_seed,
+	first_widget,
+	last_widget,
+	parent_stack,
+	parent_stack_top,
+	interface_framebuffer,
+	vertex_buffer,
+	index_buffer,
+	widget_instances,
+	widget_instance_count,
+	widget_instance_data,
+	camera_matrices_buffer,
+}; // ui_state_t
+enum class vulkan_allocation_usage_type_t {
+	VULKAN_MEMORY_USAGE_GPU_ONLY,
+	VULKAN_MEMORY_USAGE_CPU_ONLY,
+	VULKAN_MEMORY_USAGE_CPU_TO_GPU,
+	VULKAN_MEMORY_USAGE_GPU_TO_CPU,
+}; // vulkan_allocation_usage_type_t
+enum class vulkan_allocation_info_t {
+	allocation_type,
+	offset,
+	allocation_size,
+	allocation_flags,
+	memory_requirements,
+	memory,
+	mapped_data,
+}; // vulkan_allocation_info_t
+enum class vulkan_allocator_t {
+	cpu_allocation_callbacks,
+	gpu_info,
+	device,
+	block_allocator,
+	default_block_size,
+}; // vulkan_allocator_t
+enum class vulkan_context_t {
+	initialization_arena,
+	swapchain_arena,
+	permanent_arena,
+	frame_arena,
+	window,
+	current_window_width,
+	current_window_height,
+	last_window_width,
+	last_window_height,
+	window_size_generation,
+	last_window_size_generation,
+	frame_tsc,
+	current_frame_index,
+	current_image_index,
+	instance,
+	render_surface,
+	debug_messenger,
+	cpu_allocation_callbacks,
+	vulkan_allocator,
+	gpu,
+	device,
+	graphics_queue_family_idx,
+	present_queue_family_idx,
+	transfer_queue_family_idx,
+	compute_queue_family_idx,
+	graphics_command_pool,
+	compute_command_pool,
+	graphics_queue,
+	present_queue,
+	transfer_queue,
+	compute_queue,
+	depth_format,
+	swapchain_format,
+	swapchain,
+	swapchain_image_data,
+	depth_buffer,
+	rebuilding_swapchain,
+	frame_command_buffers,
+	frame_command_buffer_recorded,
+	frame_command_buffer_fences,
+	swapchain_image_acquired_semaphores,
+	render_complete_semaphores,
+	image_render_idle_fences,
+	image_in_flight_fences,
+	image_in_flight_fence,
+	image_render_idle_fence,
+	render_complete_semaphore,
+	image_acquired_semaphore,
+	render_command_buffer,
+	render_framebuffer,
+	primary_renderpass,
+	framebuffers,
+	constant_buffer_data,
+	shader_uniform_buffers,
+	descriptor_pools,
+	descriptor_sets,
+	descriptor_count,
+	staging_buffers,
+	next_staging_info,
+	staging_command_pool,
+	staging_fences,
+	image_samplers,
+	default_nearest_sampler,
+	default_linear_sampler,
+}; // vulkan_context_t
+enum class vulkan_staging_info_t {
+	target_buffer,
+	upload_size,
+	target_offset,
+	staging_buffer_offset,
+}; // vulkan_staging_info_t
+enum class vulkan_staging_buffer_t {
+	buffer,
+	submitted,
+	upload_complete_fence,
+}; // vulkan_staging_buffer_t
+enum class renderer_effect_application_flags_t {
+	REAF_None,
+	REAF_Bloom,
+	REAF_Emmision,
+	REAF_Vignette,
+	REAF_FilmGrain,
+	REAF_Count,
+}; // renderer_effect_application_flags_t
+enum class render_pipeline_blending_mode_t {
+	RBM_Zero,
+	RBM_One,
+	RBM_SrcColor,
+	RBM_OneMinusSrcColor,
+	RBM_DstColor,
+	RBM_OneMinusDstColor,
+	RBM_SrcAlpha,
+	RBM_OneMinusSrcAlpha,
+	RBM_DstAlpha,
+	RBM_OneMinusDstAlpha,
+	RBM_ConstantColor,
+	RBM_OneMinusConstantColor,
+	RBM_ConstantAlpha,
+	RBM_OneMinusConstantAlpha,
+	RBM_Count,
+}; // render_pipeline_blending_mode_t
+enum class render_pipeline_blending_equation_t {
+	RBE_Add,
+	RBE_Subtract,
+	RBE_ReverseSubtract,
+	RBE_Min,
+	RBE_Max,
+}; // render_pipeline_blending_equation_t
+enum class render_pipeline_depth_function_t {
+	RDF_Never,
+	RDF_Less,
+	RDF_Equal,
+	RDF_LessOrEqual,
+	RDF_Greater,
+	RDF_NotEqual,
+	RDF_GreaterOrEqual,
+	RDF_Always,
+}; // render_pipeline_depth_function_t
+enum class render_pipeline_polygon_mode_t {
+	RENDER_PIPELINE_POLYGON_MODE_FILL,
+	RENDER_PIPELINE_POLYGON_MODE_LINE,
+}; // render_pipeline_polygon_mode_t
+enum class gpu_info_t {
+	device,
+	properties,
+	memory_properties,
+	features,
+	surface_capabilities,
+	queue_family_count,
+}; // gpu_info_t
+enum class swapchain_info_t {
+	handle,
+	present_mode,
+	format,
+	extent,
+	image_count,
+	images,
+	views,
+	image_layouts,
+}; // swapchain_info_t
+enum class vulkan_shader_t {
+	shader_id,
+	DEBUG_name,
+	source,
+	shader_arena,
+	layouts,
+	descriptor_set_count,
+	push_constants,
+	push_constant_count,
+	stages,
+	stage_count,
+	pipeline_type,
+	pipeline_layout,
+	vertex_buffer_binding_descs,
+	buffer_attributes,
+	pipeline_vertex_input_state,
+	default_pipeline,
+	pipeline,
+	pipeline_hash,
+	used_pipeline_indices,
+	used_pipeline_count,
+	bindings,
+	binding_count,
+}; // vulkan_shader_t
+enum class vulkan_image_t {
+	is_valid,
+	info,
+	handle,
+	view,
+	sampler,
+	layout,
+	renderpass_initial_layout,
+	renderpass_final_layout,
+	internal_format,
+	aspect_mask,
+	allocation,
+	width,
+	height,
+}; // vulkan_image_t
+enum class vulkan_sampler_info_t {
+	min_filter,
+	mag_filter,
+	wrapu,
+	wrapv,
+	anisotropy_enabled,
+	max_anisotropy,
+	compare_enabled,
+	compare_operation,
+	use_normalized_coordinates,
+}; // vulkan_sampler_info_t
+enum class vulkan_image_info_t {
+	width,
+	height,
+	usage,
+	sample_count,
+	mip_count,
+	type,
+	format,
+	initial_layout,
+	final_layout,
+	data,
+	sampler_info,
+}; // vulkan_image_info_t
+enum class vulkan_shader_stage_t {
+	handle,
+	pipeline_stage_create_info,
+}; // vulkan_shader_stage_t
+enum class vulkan_shader_binding_t {
+	type,
+	buffer_hash_index,
+	descriptor_count,
+	name,
+}; // vulkan_shader_binding_t
+}; // namespace MemberLists
+namespace ArgumentLists {
+enum class _dynarray_create_impl {
+	element_size,
+}; // _dynarray_create_impl
+enum class _dynarray_destroy_impl {
+	array,
+}; // _dynarray_destroy_impl
+enum class _dynarray_grow_impl {
+	array,
+	element_size,
+	new_capacity,
+}; // _dynarray_grow_impl
+enum class _dynarray_insert_impl {
+	array,
+	element,
+	element_size,
+	index,
+}; // _dynarray_insert_impl
+enum class _dynarray_remove_impl {
+	array,
+	element_size,
+	index,
+}; // _dynarray_remove_impl
+enum class visit_files_pfn_t {
+	visit_file_data,
+	user_data,
+}; // visit_files_pfn_t
+enum class c_file_open {
+	filepath,
+	create,
+}; // c_file_open
+enum class c_file_close {
+	file,
+}; // c_file_close
+enum class c_file_copy {
+	old_path,
+	new_path,
+}; // c_file_copy
+enum class c_file_read {
+	file_data,
+	bytes_to_read,
+	arena,
+	zone,
+	tag,
+	create,
+}; // c_file_read
+enum class c_file_read_entirety {
+	filepath,
+	arena,
+	zone,
+	tag,
+}; // c_file_read_entirety
+enum class c_file_read_from_offset {
+	file_data,
+	bytes_to_read,
+	offset,
+	arena,
+	zone,
+	tag,
+}; // c_file_read_from_offset
+enum class c_file_read_to_end {
+	file_data,
+	offset,
+	arena,
+	zone,
+	tag,
+}; // c_file_read_to_end
+enum class c_file_open_and_write {
+	filepath,
+	data,
+	bytes_to_write,
+	overwrite,
+}; // c_file_open_and_write
+enum class c_file_write {
+	file,
+	data,
+	bytes_to_write,
+}; // c_file_write
+enum class c_file_write_string {
+	file,
+	data,
+}; // c_file_write_string
+enum class c_file_get_size {
+	file_data,
+}; // c_file_get_size
+enum class c_file_get_file_system_info {
+	filepath,
+}; // c_file_get_file_system_info
+enum class c_file_replace_or_rename {
+	old_file,
+	new_file,
+}; // c_file_replace_or_rename
+enum class c_file_map {
+	filepath,
+}; // c_file_map
+enum class c_file_unmap {
+	map_data,
+}; // c_file_unmap
+enum class c_file_ext_string_to_enum {
+	file_ext,
+}; // c_file_ext_string_to_enum
+enum class c_directory_exists {
+	filepath,
+}; // c_directory_exists
+enum class c_directory_create_visit_data {
+	function,
+	recursive,
+	user_data,
+}; // c_directory_create_visit_data
+enum class c_directory_visit {
+	filepath,
+	visit_file_data,
+}; // c_directory_visit
+enum class file_watcher_callback_pfn_t {
+	watcher,
+	change,
+	user_data,
+}; // file_watcher_callback_pfn_t
+enum class c_file_watcher_create {
+	events_to_monitor,
+	recursive,
+	callback,
+	user_data,
+	verbose,
+}; // c_file_watcher_create
+enum class c_file_watcher_add_path {
+	watcher,
+	filepath,
+}; // c_file_watcher_add_path
+enum class c_file_watcher_issue_check_for_single_path {
+	watcher,
+	watch_data,
+}; // c_file_watcher_issue_check_for_single_path
+enum class c_file_watcher_issue_check_over_all_paths {
+	watcher,
+}; // c_file_watcher_issue_check_over_all_paths
+enum class c_file_watcher_add_change_event {
+	watcher,
+	fullname,
+	old_filename,
+	watch_data,
+	changes,
+}; // c_file_watcher_add_change_event
+enum class c_file_watcher_emit_changes {
+	watcher,
+}; // c_file_watcher_emit_changes
+enum class c_hash_table_allocate_fn_t {
+	allocator,
+	allocation_size,
+	allocation_flags,
+}; // c_hash_table_allocate_fn_t
+enum class c_hash_table_free_fn_t {
+	allocator,
+	data,
+}; // c_hash_table_free_fn_t
+enum class c_hash_table_value_from_key {
+	key,
+	key_size,
+	max_table_entries,
+}; // c_hash_table_value_from_key
+enum class c_fnv_hash_value {
+	key,
+	key_size,
+}; // c_fnv_hash_value
+enum class c_combine_hashes {
+	A,
+	B,
+}; // c_combine_hashes
+enum class c_hash_table_default_alloc_impl {
+	allocator,
+	allocation_size,
+	allocation_flags,
+}; // c_hash_table_default_alloc_impl
+enum class c_hash_table_default_free_impl {
+	allocator,
+	data,
+}; // c_hash_table_default_free_impl
+enum class _log {
+	log_level,
+	message,
+	function,
+	file,
+	line,
+}; // _log
+enum class c_arena_create {
+	block_size,
+}; // c_arena_create
+enum class c_arena_destroy {
+	arena,
+}; // c_arena_destroy
+enum class c_arena_push_size {
+	arena,
+	push_size,
+}; // c_arena_push_size
+enum class c_arena_bootstrap_allocate_struct_ {
+	structure_size,
+	offset_to_arena,
+	block_size,
+}; // c_arena_bootstrap_allocate_struct_
+enum class c_arena_clear_block {
+	arena,
+}; // c_arena_clear_block
+enum class c_arena_free_last_block {
+	arena,
+}; // c_arena_free_last_block
+enum class c_arena_reset {
+	arena,
+}; // c_arena_reset
+enum class c_arena_begin_temporary_memory {
+	arena,
+}; // c_arena_begin_temporary_memory
+enum class c_arena_end_temporary_memory {
+	scratch_arena,
+}; // c_arena_end_temporary_memory
+enum class c_program_flag_add {
+	flag_name,
+	flag_description,
+}; // c_program_flag_add
+enum class c_program_flag_add_bool32 {
+	flag_name,
+	default_value,
+	flag_description,
+}; // c_program_flag_add_bool32
+enum class c_program_flag_add_size {
+	flag_name,
+	default_value,
+	flag_description,
+}; // c_program_flag_add_size
+enum class c_program_flag_add_float32 {
+	flag_name,
+	default_value,
+	flag_description,
+}; // c_program_flag_add_float32
+enum class c_program_flag_add_string {
+	flag_name,
+	default_value,
+	flag_description,
+}; // c_program_flag_add_string
+enum class c_program_flag_container_init {
+	container,
+}; // c_program_flag_container_init
+enum class c_program_flag_parse_args {
+	argc,
+	argv,
+}; // c_program_flag_parse_args
+enum class c_string_length {
+	c_string,
+}; // c_string_length
+enum class c_string_null_terminated {
+	arena,
+	data,
+}; // c_string_null_terminated
+enum class c_string_is_valid {
+	string,
+}; // c_string_is_valid
+enum class c_string_create {
+	c_string,
+}; // c_string_create
+enum class c_string_create_with_length {
+	data,
+	length,
+}; // c_string_create_with_length
+enum class c_string_make_heap {
+	arena,
+	string,
+}; // c_string_make_heap
+enum class c_string_compare {
+	A,
+	B,
+}; // c_string_compare
+enum class c_string_ends_with {
+	A,
+	ending,
+}; // c_string_ends_with
+enum class c_string_concat {
+	arena,
+	A,
+	B,
+}; // c_string_concat
+enum class c_string_to_const_array {
+	string,
+}; // c_string_to_const_array
+enum class c_string_to_upper {
+	arena,
+	string,
+}; // c_string_to_upper
+enum class c_string_sprintf {
+	buffer,
+	buffer_size,
+	string,
+}; // c_string_sprintf
+enum class c_string_make_copy {
+	arena,
+	string,
+}; // c_string_make_copy
+enum class c_string_sub_from_left {
+	string,
+	index,
+}; // c_string_sub_from_left
+enum class c_string_sub_from_right {
+	string,
+	index,
+}; // c_string_sub_from_right
+enum class c_string_substring {
+	string,
+	first_index,
+	last_index,
+}; // c_string_substring
+enum class c_string_advance_by {
+	string,
+	advance,
+}; // c_string_advance_by
+enum class c_string_find_first_char_from_left {
+	string,
+	character,
+}; // c_string_find_first_char_from_left
+enum class c_string_find_first_char_from_right {
+	string,
+	character,
+}; // c_string_find_first_char_from_right
+enum class c_string_find_first_char_from_left_on_line {
+	string,
+	character,
+}; // c_string_find_first_char_from_left_on_line
+enum class c_string_find_first_char_from_right_on_line {
+	string,
+	character,
+	ending_index,
+}; // c_string_find_first_char_from_right_on_line
+enum class c_string_get_filename_from_path {
+	filepath,
+}; // c_string_get_filename_from_path
+enum class c_string_get_file_ext_from_path {
+	filepath,
+}; // c_string_get_file_ext_from_path
+enum class c_string_get_filename_from_path_and_ext {
+	filepath,
+}; // c_string_get_filename_from_path_and_ext
+enum class c_string_override_file_separators {
+	string,
+}; // c_string_override_file_separators
+enum class c_string_is_whitespace {
+	current_line,
+}; // c_string_is_whitespace
+enum class c_string_is_end_of_line {
+	current_line,
+}; // c_string_is_end_of_line
+enum class c_string_eat_whitespace {
+	current_line,
+}; // c_string_eat_whitespace
+enum class c_string_get_whitespace_size {
+	string,
+}; // c_string_get_whitespace_size
+enum class c_string_get_current_line_size {
+	string,
+}; // c_string_get_current_line_size
+enum class c_string_read_line {
+	data,
+}; // c_string_read_line
+enum class c_string_read_int {
+	data,
+}; // c_string_read_int
+enum class c_string_read_uint {
+	data,
+}; // c_string_read_uint
+enum class c_string_read_float32 {
+	data,
+}; // c_string_read_float32
+enum class c_string_read_float64 {
+	data,
+}; // c_string_read_float64
+enum class c_string_find_all_instances_of {
+	string,
+	character,
+}; // c_string_find_all_instances_of
+enum class c_string_replace_all_instances_of {
+	arena,
+	string,
+	character,
+	replacement,
+}; // c_string_replace_all_instances_of
+enum class c_string_builder_init {
+	builder,
+	buffer_block_size,
+}; // c_string_builder_init
+enum class c_string_builder_deinit {
+	builder,
+}; // c_string_builder_deinit
+enum class c_string_builder_append_data {
+	builder,
+	data,
+}; // c_string_builder_append_data
+enum class c_string_builder_append_value {
+	builder,
+	value,
+	value_size,
+}; // c_string_builder_append_value
+enum class c_string_builder_get_current_string {
+	builder,
+}; // c_string_builder_get_current_string
+enum class c_string_builder_reset {
+	builder,
+}; // c_string_builder_reset
+enum class c_string_builder_append_builder {
+	A,
+	B,
+}; // c_string_builder_append_builder
+enum class c_string_builder_sprintf {
+	builder,
+	string,
+}; // c_string_builder_sprintf
+enum class c_string_builder_dump_to_file {
+	file,
+	builder,
+}; // c_string_builder_dump_to_file
+enum class c_string_builder_flush_to_file {
+	file,
+	builder,
+}; // c_string_builder_flush_to_file
+enum class c_ticket_mutex_take_ticket {
+	mutex,
+}; // c_ticket_mutex_take_ticket
+enum class c_ticket_mutex_try_wait {
+	mutex,
+	ticket,
+}; // c_ticket_mutex_try_wait
+enum class c_ticket_mutex_wait {
+	mutex,
+	ticket,
+}; // c_ticket_mutex_wait
+enum class c_ticket_mutex_advance_ticket {
+	mutex,
+}; // c_ticket_mutex_advance_ticket
+enum class c_ticket_mutex_take_and_wait {
+	mutex,
+}; // c_ticket_mutex_take_and_wait
+enum class work_order_fn {
+	data,
+}; // work_order_fn
+enum class c_threadpool_init {
+	threadpool,
+	max_threads,
+	thread_allocator_size,
+	start_instantly,
+	allow_stealing,
+}; // c_threadpool_init
+enum class c_threadpool_start {
+	threadpool,
+}; // c_threadpool_start
+enum class c_threadpool_flush_work_orders {
+	threadpool,
+}; // c_threadpool_flush_work_orders
+enum class c_threadpool_wait_on_fence {
+	threadpool,
+	fence,
+}; // c_threadpool_wait_on_fence
+enum class c_tokenizer_get_next_token {
+	tokenizer,
+}; // c_tokenizer_get_next_token
+enum class c_tokenizer_peek_token {
+	tokenizer,
+	times,
+}; // c_tokenizer_peek_token
+enum class c_tokenizer_eat_lines {
+	concat_arena,
+	tokenizer,
+	line_count,
+}; // c_tokenizer_eat_lines
+enum class c_tokenizer_token_numeric {
+	A,
+}; // c_tokenizer_token_numeric
+enum class c_tokenizer_token_alphabetical {
+	A,
+}; // c_tokenizer_token_alphabetical
+enum class c_tokenizer_set_bookmark {
+	tokenizer,
+	token,
+}; // c_tokenizer_set_bookmark
+enum class c_tokenizer_restore_bookmark {
+	tokenizer,
+}; // c_tokenizer_restore_bookmark
+enum class c_za_create {
+	block_size,
+}; // c_za_create
+enum class c_za_destroy {
+	zone,
+}; // c_za_destroy
+enum class c_za_alloc {
+	zone,
+	size_init,
+	tag,
+}; // c_za_alloc
+enum class c_za_free {
+	zone,
+	data,
+}; // c_za_free
+enum class c_za_free_zone_tag {
+	zone,
+	tag,
+}; // c_za_free_zone_tag
+enum class c_za_free_zone_tag_range {
+	zone,
+	low_tag,
+	high_tag,
+}; // c_za_free_zone_tag_range
+enum class c_za_change_zone_tag {
+	zone,
+	pointer,
+	new_tag,
+}; // c_za_change_zone_tag
+enum class c_za_DEBUG_print_block_list {
+	zone,
+}; // c_za_DEBUG_print_block_list
+enum class c_za_DEBUG_validate_block_list {
+	zone,
+}; // c_za_DEBUG_validate_block_list
+enum class sys_align_to_page_size {
+	size,
+}; // sys_align_to_page_size
+enum class sys_allocate_memory {
+	allocation_size,
+}; // sys_allocate_memory
+enum class sys_free_memory {
+	data,
+	free_size,
+}; // sys_free_memory
+enum class sys_reallocate_memory {
+	base,
+	old_size,
+	allocation_size,
+}; // sys_reallocate_memory
+enum class sys_file_open {
+	filepath,
+	for_writing,
+	overwrite,
+	overlapping_io,
+}; // sys_file_open
+enum class sys_file_close {
+	file_data,
+}; // sys_file_close
+enum class sys_file_copy {
+	old_path,
+	new_path,
+}; // sys_file_copy
+enum class sys_file_get_size {
+	file_data,
+}; // sys_file_get_size
+enum class sys_file_read {
+	file_data,
+	memory,
+	bytes_to_read,
+	file_offset,
+}; // sys_file_read
+enum class sys_file_write {
+	file_data,
+	memory,
+	bytes_to_write,
+}; // sys_file_write
+enum class sys_file_map {
+	filepath,
+}; // sys_file_map
+enum class sys_file_unmap {
+	map_data,
+}; // sys_file_unmap
+enum class sys_file_exists {
+	filepath,
+}; // sys_file_exists
+enum class sys_file_get_modtime_and_size {
+	filepath,
+}; // sys_file_get_modtime_and_size
+enum class sys_file_replace_or_rename {
+	old_file,
+	new_file,
+}; // sys_file_replace_or_rename
+enum class sys_directory_exists {
+	filepath,
+}; // sys_directory_exists
+enum class sys_directory_get_file_count {
+	arena,
+	filepath,
+	recursive,
+	file_ext,
+}; // sys_directory_get_file_count
+enum class sys_directory_get_current_working_dir {
+	buffer,
+	buffer_length,
+}; // sys_directory_get_current_working_dir
+enum class sys_directory_visit {
+	filepath,
+	visit_file_data,
+}; // sys_directory_visit
+enum class sys_load_library {
+	filepath,
+}; // sys_load_library
+enum class sys_free_library {
+	library,
+}; // sys_free_library
+enum class sys_get_proc_address {
+	library,
+	procedure,
+}; // sys_get_proc_address
+enum class sys_file_watcher_init_watch_data {
+	arena,
+	watch_data,
+}; // sys_file_watcher_init_watch_data
+enum class sys_file_watcher_add_path {
+	watcher,
+	path,
+}; // sys_file_watcher_add_path
+enum class sys_file_watcher_issue_check {
+	watcher,
+	directory_data,
+}; // sys_file_watcher_issue_check
+enum class sys_file_watcher_process_changes {
+	watcher,
+	changed,
+}; // sys_file_watcher_process_changes
+enum class sys_semaphore_create {
+	initial_thread_count,
+	max_thread_count,
+}; // sys_semaphore_create
+enum class sys_semaphore_close {
+	semaphore,
+}; // sys_semaphore_close
+enum class sys_semaphore_wait {
+	semaphore,
+	wait_duration_ms,
+}; // sys_semaphore_wait
+enum class sys_semaphore_release {
+	semaphore,
+	threads_to_release,
+}; // sys_semaphore_release
+enum class sys_semaphore_destroy {
+	semaphore,
+}; // sys_semaphore_destroy
+enum class thread_proc_t {
+	user_data,
+}; // thread_proc_t
+enum class sys_thread_create {
+	proc,
+	user_data,
+	close_handle,
+}; // sys_thread_create
+enum class sys_thread_wait {
+	semaphore,
+	wait_duration_ms,
+}; // sys_thread_wait
+enum class sys_thread_close_handle {
+	thread_data,
+}; // sys_thread_close_handle
+enum class sys_mutex_free {
+	mutex,
+}; // sys_mutex_free
+enum class sys_mutex_lock {
+	mutex,
+	should_block,
+}; // sys_mutex_lock
+enum class sys_mutex_unlock {
+	mutex,
+}; // sys_mutex_unlock
+enum class sys_create_process {
+	program_path,
+	argument_string,
+}; // sys_create_process
+enum class sys_wait_for_process {
+	process,
+}; // sys_wait_for_process
+enum class immediate_quad_ex {
+	command_list,
+	buffer,
+	position,
+	render_size,
+	render_color,
+	uv_min,
+	uv_max,
+	padding,
+	sdf_info,
+	padding0,
+	texture,
+}; // immediate_quad_ex
+enum class immediate_rect {
+	command_list,
+	buffer,
+	position,
+	render_size,
+	render_color,
+	uv_min,
+	uv_max,
+	padding,
+	sdf_info,
+	padding0,
+}; // immediate_rect
+enum class immediate_text {
+	command_list,
+	vertex_buffer,
+	asset_manager,
+	asset_handle,
+	render_string,
+	position,
+	text_color,
+	settings,
+	font_size,
+}; // immediate_text
+enum class immediate_put_data {
+	buffer,
+	data,
+	element_size,
+	element_count,
+}; // immediate_put_data
+enum class s_renderer_image_create {
+	render_state,
+	image_create_info,
+}; // s_renderer_image_create
+enum class s_renderer_image_create_from_bitmap {
+	bitmap,
+}; // s_renderer_image_create_from_bitmap
+enum class s_renderer_image_destroy {
+	renderer_state,
+	image,
+}; // s_renderer_image_destroy
+enum class s_renderer_image_update_data {
+	renderer_state,
+	image,
+}; // s_renderer_image_update_data
+enum class sys_work_queue_entry_proc {
+	lpParam,
+}; // sys_work_queue_entry_proc
+enum class FT_ROUND {
+	X,
+}; // FT_ROUND
+enum class unicode_next_character {
+	character,
+}; // unicode_next_character
+enum class s_asset_manager_init {
+	asset_manager,
+}; // s_asset_manager_init
+enum class s_asset_manager_update {
+	asset_manager,
+}; // s_asset_manager_update
+enum class s_asset_manager_queue_asset_load {
+	asset_manager,
+	slot,
+}; // s_asset_manager_queue_asset_load
+enum class s_asset_manager_load_asset_file {
+	asset_manager,
+	filepath,
+}; // s_asset_manager_load_asset_file
+enum class s_asset_manager_acquire_asset_handle {
+	asset_manager,
+	name,
+}; // s_asset_manager_acquire_asset_handle
+enum class s_texture_atlas_create {
+	asset_manager,
+	size,
+	channel_count,
+	format,
+	initial_subtexture_count,
+}; // s_texture_atlas_create
+enum class s_texture_atlas_add_texture {
+	atlas,
+	texture_handle,
+}; // s_texture_atlas_add_texture
+enum class s_texture_atlas_pack_added_textures {
+	asset_manager,
+	atlas,
+}; // s_texture_atlas_pack_added_textures
+enum class s_asset_manager_set_handle_asset_data_pointer {
+	handle,
+	slot,
+}; // s_asset_manager_set_handle_asset_data_pointer
+enum class s_asset_manager_get_asset_slot {
+	catalog,
+	name,
+}; // s_asset_manager_get_asset_slot
+enum class s_asset_get_shader_from_handle {
+	handle,
+}; // s_asset_get_shader_from_handle
+enum class s_asset_get_texture_from_handle {
+	handle,
+}; // s_asset_get_texture_from_handle
+enum class s_asset_get_material_data_from_handle {
+	handle,
+}; // s_asset_get_material_data_from_handle
+enum class s_asset_get_material_archetype_from_handle {
+	handle,
+}; // s_asset_get_material_archetype_from_handle
+enum class s_asset_get_material_instance_from_handle {
+	handle,
+}; // s_asset_get_material_instance_from_handle
+enum class s_asset_font_get_string_size {
+	asset_manager,
+	string,
+	font_handle,
+	pixel_size,
+	max_descender_out,
+}; // s_asset_font_get_string_size
+enum class s_asset_font_acquire_font_at_size {
+	asset_manager,
+	font_handle,
+	font_size,
+}; // s_asset_font_acquire_font_at_size
+enum class s_asset_font_fetch_glyph {
+	asset_manager,
+	varient,
+	codepoint,
+}; // s_asset_font_fetch_glyph
+enum class s_im_init_input_manager {
+	input_manager,
+}; // s_im_init_input_manager
+enum class s_im_handle_window_inputs {
+	event,
+	input_manager,
+}; // s_im_handle_window_inputs
+enum class s_im_reset_controller_states {
+	input_manager,
+}; // s_im_reset_controller_states
+enum class s_im_initialize_keyboard_controller {
+	input_manager,
+	index,
+}; // s_im_initialize_keyboard_controller
+enum class s_im_get_primary_controller {
+	input_manager,
+}; // s_im_get_primary_controller
+enum class s_im_get_controller_at_index {
+	input_manager,
+	index,
+}; // s_im_get_controller_at_index
+enum class s_im_get_active_controller {
+	input_manager,
+}; // s_im_get_active_controller
+enum class s_im_set_active_controller {
+	input_manager,
+	controller_index,
+}; // s_im_set_active_controller
+enum class s_im_set_primary_controller {
+	input_manager,
+	controller_index,
+}; // s_im_set_primary_controller
+enum class s_im_is_shift_key_down {
+	controller,
+}; // s_im_is_shift_key_down
+enum class s_im_is_control_key_down {
+	controller,
+}; // s_im_is_control_key_down
+enum class s_im_is_alt_key_down {
+	controller,
+}; // s_im_is_alt_key_down
+enum class s_im_transform_mouse_data {
+	controller,
+	surface_size,
+	view_matrix,
+	projection_matrix,
+}; // s_im_transform_mouse_data
+enum class s_im_is_keyboard_key_pressed {
+	controller,
+	key_index,
+}; // s_im_is_keyboard_key_pressed
+enum class s_im_is_keyboard_key_down {
+	controller,
+	key_index,
+}; // s_im_is_keyboard_key_down
+enum class s_im_is_keyboard_key_released {
+	controller,
+	key_index,
+}; // s_im_is_keyboard_key_released
+enum class s_im_consume_keyboard_key_press {
+	controller,
+	key_index,
+}; // s_im_consume_keyboard_key_press
+enum class s_im_consume_keyboard_key_down {
+	controller,
+	key_index,
+}; // s_im_consume_keyboard_key_down
+enum class s_im_consume_keyboard_key_release {
+	controller,
+	key_index,
+}; // s_im_consume_keyboard_key_release
+enum class s_im_get_key_state {
+	controller,
+	key_index,
+}; // s_im_get_key_state
+enum class s_im_is_gamepad_button_pressed {
+	controller,
+	button_index,
+}; // s_im_is_gamepad_button_pressed
+enum class s_im_is_gamepad_button_down {
+	controller,
+	button_index,
+}; // s_im_is_gamepad_button_down
+enum class s_im_is_gamepad_button_released {
+	controller,
+	button_index,
+}; // s_im_is_gamepad_button_released
+enum class s_im_consume_gamepad_button_press {
+	controller,
+	button_index,
+}; // s_im_consume_gamepad_button_press
+enum class s_im_consume_gamepad_button_down {
+	controller,
+	button_index,
+}; // s_im_consume_gamepad_button_down
+enum class s_im_consume_gamepad_button_release {
+	controller,
+	button_index,
+}; // s_im_consume_gamepad_button_release
+enum class s_im_get_button_state {
+	controller,
+	button_index,
+}; // s_im_get_button_state
+enum class s_renderer_state_init {
+	renderer_state,
+	render_context,
+}; // s_renderer_state_init
+enum class s_renderer_handle_window_resize {
+	renderer_state,
+	window_size,
+}; // s_renderer_handle_window_resize
+enum class s_renderer_resize_render_targets {
+	renderer_state,
+	window_size,
+}; // s_renderer_resize_render_targets
+enum class s_renderer_build_renderpass {
+	renderer_state,
+	renderpass_desc,
+}; // s_renderer_build_renderpass
+enum class s_renderer_resize_renderpass {
+	renderer_state,
+	renderpass,
+}; // s_renderer_resize_renderpass
+enum class s_renderer_get_constant_buffer {
+	renderer_state,
+	uniform_name,
+}; // s_renderer_get_constant_buffer
+enum class s_renderer_render_buffer_create {
+	renderer_state,
+	buffer_desc,
+}; // s_renderer_render_buffer_create
+enum class s_renderer_vertex_buffer_create {
+	renderer_state,
+	memory_type,
+	rate,
+	vertex_buffer_data,
+	vertex_size,
+	max_vertices,
+}; // s_renderer_vertex_buffer_create
+enum class s_renderer_index_buffer_create {
+	renderer_state,
+	memory_type,
+	element_size,
+	data,
+	size,
+}; // s_renderer_index_buffer_create
+enum class s_renderer_render_buffer_copy_data {
+	renderer_state,
+	buffer,
+	data,
+	size,
+	offset,
+}; // s_renderer_render_buffer_copy_data
+enum class s_renderer_get_command_list {
+	renderer_state,
+	type,
+}; // s_renderer_get_command_list
+enum class s_renderer_is_texture_bound {
+	command_list,
+	texture,
+}; // s_renderer_is_texture_bound
+enum class s_renderer_find_texture_index {
+	command_list,
+	ID,
+}; // s_renderer_find_texture_index
+enum class s_renderer_reset_command_list {
+	command_list,
+}; // s_renderer_reset_command_list
+enum class r_cmd_renderpass_begin {
+	command_list,
+	renderpassID,
+}; // r_cmd_renderpass_begin
+enum class r_cmd_renderpass_end {
+	command_list,
+}; // r_cmd_renderpass_end
+enum class r_cmd_begin_render_group {
+	command_list,
+}; // r_cmd_begin_render_group
+enum class r_cmd_end_render_group {
+	command_list,
+}; // r_cmd_end_render_group
+enum class r_cmd_bind_index_buffer {
+	command_list,
+	buffer,
+}; // r_cmd_bind_index_buffer
+enum class r_cmd_set_scissor {
+	command_list,
+	offset,
+	size,
+}; // r_cmd_set_scissor
+enum class r_cmd_set_viewport {
+	command_list,
+	offset,
+	size,
+}; // r_cmd_set_viewport
+enum class r_cmd_update_push_constants {
+	command_list,
+	offset,
+	size,
+	data,
+}; // r_cmd_update_push_constants
+enum class r_cmd_update_buffer_contents {
+	command_list,
+	buffer,
+	data,
+	data_size,
+}; // r_cmd_update_buffer_contents
+enum class r_cmd_use_shader_program {
+	command_list,
+	program,
+}; // r_cmd_use_shader_program
+enum class r_cmd_update_constant_buffer {
+	command_list,
+	buffer,
+	data,
+	data_size,
+}; // r_cmd_update_constant_buffer
+enum class r_cmd_bind_texture_image {
+	command_list,
+	texture,
+}; // r_cmd_bind_texture_image
+enum class r_cmd_bind_texture_from_handle {
+	command_list,
+	asset_handle,
+}; // r_cmd_bind_texture_from_handle
+enum class r_cmd_reset_render_state {
+	command_list,
+	render_pipeline_state,
+}; // r_cmd_reset_render_state
+enum class r_cmd_set_render_state {
+	command_list,
+	render_pipeline_state,
+}; // r_cmd_set_render_state
+enum class r_cmd_draw {
+	command_list,
+	vertex_count,
+	vertex_offset,
+	instance_count,
+	first_instance,
+}; // r_cmd_draw
+enum class r_cmd_draw_indexed {
+	command_list,
+	index_count,
+	index_offset,
+	instance_count,
+	first_instance,
+}; // r_cmd_draw_indexed
+enum class r_cmd_dispatch_compute {
+	command_list,
+	invoke_x,
+	invoke_y,
+	invoke_z,
+}; // r_cmd_dispatch_compute
+enum class r_cmd_blit_image {
+	command_list,
+	source_image,
+	dest_image,
+	source_offset,
+	source_blit_size,
+	dest_offset,
+	dest_blit_size,
+}; // r_cmd_blit_image
+enum class r_cmd_blit_renderpass {
+	command_list,
+	source_ID,
+	destination_ID,
+}; // r_cmd_blit_renderpass
+enum class r_cmd_present {
+	command_list,
+	presentation_source,
+}; // r_cmd_present
+enum class s_renderer_execute_backend_commands {
+	renderer_state,
+}; // s_renderer_execute_backend_commands
+enum class backend_initialize {
+	window,
+}; // backend_initialize
+enum class backend_handle_window_resize {
+	window_size,
+}; // backend_handle_window_resize
+enum class backend_buffer_create {
+	buffer_desc,
+}; // backend_buffer_create
+enum class backend_buffer_copy_data {
+	buffer,
+	data,
+	size,
+	offset,
+}; // backend_buffer_copy_data
+enum class backend_buffer_append_data {
+	buffer,
+	data,
+	data_size,
+}; // backend_buffer_append_data
+enum class backend_constant_buffer_append_data {
+	data,
+	data_size,
+	buffer_offset_out,
+}; // backend_constant_buffer_append_data
+enum class backend_buffer_reset {
+	buffer,
+}; // backend_buffer_reset
+enum class backend_renderpass_initialize {
+	desc,
+	renderpass,
+}; // backend_renderpass_initialize
+enum class backend_image_create {
+	create_info,
+	image,
+}; // backend_image_create
+enum class backend_image_destroy {
+	image,
+}; // backend_image_destroy
+enum class backend_image_update_contents {
+	image,
+}; // backend_image_update_contents
+enum class backend_shader_create {
+	shader,
+	shader_source,
+}; // backend_shader_create
+enum class backend_get_command_buffer {
+	command_list,
+}; // backend_get_command_buffer
+enum class ui_state_init {
+	ui_state,
+	input_manager,
+	asset_manager,
+	renderer_state,
+	renderpass_ID,
+}; // ui_state_init
+enum class ui_state_update_widget_state {
+	ui_state,
+}; // ui_state_update_widget_state
+enum class ui_state_render_widgets {
+	ui_state,
+	command_list,
+}; // ui_state_render_widgets
+enum class ui_state_set_default_widget_idle_color {
+	ui_state,
+	color,
+}; // ui_state_set_default_widget_idle_color
+enum class ui_state_set_default_widget_hover_color {
+	ui_state,
+	color,
+}; // ui_state_set_default_widget_hover_color
+enum class ui_state_set_default_widget_active_color {
+	ui_state,
+	color,
+}; // ui_state_set_default_widget_active_color
+enum class ui_widget_set_default_font_color {
+	ui_state,
+	color,
+}; // ui_widget_set_default_font_color
+enum class ui_widget_set_default_font_size {
+	ui_state,
+	font_size,
+}; // ui_widget_set_default_font_size
+enum class ui_state_set_active_padding {
+	ui_state,
+	padding,
+}; // ui_state_set_active_padding
+enum class ui_widget_set_flags {
+	widget,
+	flags,
+}; // ui_widget_set_flags
+enum class ui_state_begin_frame {
+	ui_state,
+}; // ui_state_begin_frame
+enum class ui_state_end_frame {
+	ui_state,
+	command_list,
+}; // ui_state_end_frame
+enum class ui_state_set_parent_layout {
+	ui_state,
+	layout_style,
+}; // ui_state_set_parent_layout
+enum class ui_widget_set_layout {
+	widget,
+	layout_style,
+}; // ui_widget_set_layout
+enum class ui_widget_push_parent {
+	ui_state,
+	widget,
+}; // ui_widget_push_parent
+enum class ui_widget_pop_parent {
+	ui_state,
+}; // ui_widget_pop_parent
+enum class ui_widget_set_padding {
+	widget,
+	padding,
+}; // ui_widget_set_padding
+enum class ui_widget_seed {
+	ui_state,
+	index,
+}; // ui_widget_seed
+enum class ui_widget_create {
+	ui_state,
+	widget_name,
+	widget_flags,
+}; // ui_widget_create
+enum class ui_widget_panel {
+	ui_state,
+	widget_name,
+	position,
+	child_spacing,
+	padding,
+	background_color,
+}; // ui_widget_panel
+enum class ui_widget_sized_button {
+	ui_state,
+	widget_name,
+	minimum_size,
+	widget_flags,
+}; // ui_widget_sized_button
+enum class ui_widget_text {
+	ui_state,
+	widget_text,
+}; // ui_widget_text
+enum class ui_widget_labeled_button {
+	ui_state,
+	widget_text,
+}; // ui_widget_labeled_button
+enum class ui_widget_float_slider_bar {
+	ui_state,
+	widget_name,
+	bar_width,
+	bar_height,
+	button_scale_factor,
+}; // ui_widget_float_slider_bar
+enum class ui_widget_spacer {
+	ui_state,
+	widget_name,
+	spacing_size,
+}; // ui_widget_spacer
+enum class ui_widget_rectangle {
+	ui_state,
+	widget_name,
+	size,
+}; // ui_widget_rectangle
+enum class ui_widget_divider {
+	ui_state,
+	widget_name,
+	size,
+}; // ui_widget_divider
+enum class ui_widget_draggable_panel {
+	ui_state,
+	widget_name,
+	position,
+	child_spacing,
+	padding,
+	background_color,
+}; // ui_widget_draggable_panel
+enum class ui_state_begin_row {
+	ui_state,
+	parent,
+}; // ui_state_begin_row
+enum class ui_state_end_row {
+	ui_state,
+}; // ui_state_end_row
+enum class ui_state_begin_column {
+	ui_state,
+	parent,
+}; // ui_state_begin_column
+enum class ui_state_end_column {
+	ui_state,
+}; // ui_state_end_column
+enum class vk_allocator_create {
+	vulkan_context,
+	default_block_size,
+}; // vk_allocator_create
+enum class vk_allocator_destroy {
+	allocator,
+}; // vk_allocator_destroy
+enum class vk_allocator_allocate {
+	allocator,
+	requirements,
+	type,
+}; // vk_allocator_allocate
+enum class vk_allocator_free {
+	allocator,
+	info,
+}; // vk_allocator_free
+enum class vk_backend_buffer_copy_buffer {
+	vulkan_context,
+	source_buffer,
+	destination_buffer,
+	scratch_buffer,
+	source_offset,
+	source_copy_size,
+	destination_offset,
+}; // vk_backend_buffer_copy_buffer
+enum class vk_backend_buffer_copy_data {
+	vulkan_context,
+	buffer,
+	data,
+	copy_size,
+	offset,
+}; // vk_backend_buffer_copy_data
+enum class vk_backend_buffer_create {
+	vulkan_context,
+	buffer_size,
+	usage_flags,
+	usage_type,
+}; // vk_backend_buffer_create
+enum class vk_backend_buffer_destroy {
+	vulkan_context,
+	buffer,
+}; // vk_backend_buffer_destroy
+enum class vk_backend_buffer_resize {
+	vulkan_context,
+	buffer,
+	command_buffer,
+	new_size,
+}; // vk_backend_buffer_resize
+enum class vk_backend_buffer_map {
+	vulkan_context,
+	buffer,
+	offset,
+	size,
+}; // vk_backend_buffer_map
+enum class vk_backend_buffer_unmap {
+	vulkan_context,
+	buffer,
+}; // vk_backend_buffer_unmap
+enum class vk_backend_buffer_append_data {
+	vulkan_context,
+	buffer,
+	data,
+	size,
+}; // vk_backend_buffer_append_data
+enum class vk_backend_buffer_reset {
+	buffer,
+}; // vk_backend_buffer_reset
+enum class vk_backend_staging_buffer_create {
+	vulkan_context,
+	size,
+	usage_flags,
+	memory_type,
+}; // vk_backend_staging_buffer_create
+enum class vk_backend_buffer_upload_staged_data {
+	vulkan_context,
+	command_buffer,
+	target_buffer,
+}; // vk_backend_buffer_upload_staged_data
+enum class vk_backend_buffer_flush_staging_buffer {
+	vulkan_context,
+	command_buffer,
+}; // vk_backend_buffer_flush_staging_buffer
+enum class vk_backend_buffer_stage_data {
+	vulkan_context,
+	data,
+	data_size,
+	target_buffer,
+}; // vk_backend_buffer_stage_data
+enum class vk_backend_init {
+	vulkan_context,
+	window,
+}; // vk_backend_init
+enum class vk_backend_vulkan_result_string {
+	result,
+	get_extended,
+}; // vk_backend_vulkan_result_string
+enum class vk_backend_result_is_success {
+	result,
+}; // vk_backend_result_is_success
+enum class vk_backend_handle_window_resize {
+	vulkan_context,
+	window_size,
+}; // vk_backend_handle_window_resize
+enum class vk_backend_render_frame {
+	vulkan_context,
+}; // vk_backend_render_frame
+enum class vk_backend_create_render_pipeline {
+	vulkan_context,
+	shader,
+	renderpass,
+	rasterization_state,
+	depth_stencil_state,
+	blend_settings,
+	pipeline_vertex_input_state,
+}; // vk_backend_create_render_pipeline
+enum class vk_backend_renderpass_destroy {
+	vulkan_context,
+	renderpass,
+}; // vk_backend_renderpass_destroy
+enum class vk_backend_framebuffer_destroy {
+	vulkan_context,
+	framebuffer,
+}; // vk_backend_framebuffer_destroy
+enum class vk_backend_initialize_RHI_renderpass {
+	renderer_state,
+	renderpass_desc,
+	renderpass,
+}; // vk_backend_initialize_RHI_renderpass
+enum class vk_backend_get_and_begin_scratch_command_buffer {
+	vulkan_context,
+	is_primary,
+}; // vk_backend_get_and_begin_scratch_command_buffer
+enum class vk_backend_submit_and_release_scratch_command_buffer {
+	vulkan_context,
+	command_buffer,
+}; // vk_backend_submit_and_release_scratch_command_buffer
+enum class vk_backend_allocate_descriptor_sets {
+	vulkan_context,
+	archetype,
+}; // vk_backend_allocate_descriptor_sets
+enum class vk_backend_append_uniform_constant_buffer_data {
+	vulkan_context,
+	user_data,
+	data_size,
+	offset_out,
+}; // vk_backend_append_uniform_constant_buffer_data
+enum class vk_backend_framebuffer_create {
+	vulkan_context,
+	renderpass,
+	attachments,
+	attachment_count,
+	width,
+	height,
+}; // vk_backend_framebuffer_create
+enum class vk_backend_renderpass_create {
+	vulkan_context,
+	attachments,
+	attachment_count,
+	initial_layouts,
+	final_layouts,
+	load_operations,
+	store_operations,
+	attachment_types,
+}; // vk_backend_renderpass_create
+enum class vk_backend_image_create {
+	vulkan_context,
+	image_info,
+}; // vk_backend_image_create
+enum class vk_backend_image_update_data {
+	vulkan_context,
+	image,
+}; // vk_backend_image_update_data
+enum class vk_backend_image_destroy {
+	vulkan_context,
+	image,
+}; // vk_backend_image_destroy
+enum class vk_backend_sampler_create {
+	vulkan_context,
+	info,
+}; // vk_backend_sampler_create
+enum class vk_backend_sampler_destroy {
+	vulkan_context,
+	sampler,
+}; // vk_backend_sampler_destroy
+enum class vk_backend_image_change_layout {
+	vulkan_context,
+	command_buffer,
+	image,
+	current_layout,
+	target_layout,
+	src_stage_flag,
+	dst_stage_flag,
+	src_access_flags,
+	dst_access_flags,
+	range,
+}; // vk_backend_image_change_layout
+enum class vk_backend_image_init_from_image_handle {
+	vulkan_context,
+	image,
+	view,
+	info,
+}; // vk_backend_image_init_from_image_handle
+enum class vk_backend_image_blit {
+	vulkan_context,
+	source_image,
+	destination_image,
+	source_offset,
+	source_blit_size,
+	destination_offset,
+	destination_size,
+	source_initial_layout,
+	destination_initial_layout,
+	destination_final_layout,
+	source_range,
+	destination_range,
+}; // vk_backend_image_blit
+enum class vk_backend_image_ensure_shader_readonly_optimal {
+	vulkan_context,
+	image,
+}; // vk_backend_image_ensure_shader_readonly_optimal
+enum class vk_backend_is_image_format_stencil_format {
+	image,
+}; // vk_backend_is_image_format_stencil_format
+enum class vk_backend_is_image_format_depth_format {
+	image,
+}; // vk_backend_is_image_format_depth_format
+enum class vk_backend_transfer_image_to_intial_layout {
+	vulkan_context,
+	render_command_buffer,
+	image,
+}; // vk_backend_transfer_image_to_intial_layout
+enum class vk_backend_transfer_image_to_final_layout {
+	vulkan_context,
+	render_command_buffer,
+	image,
+}; // vk_backend_transfer_image_to_final_layout
+enum class vk_bitmap_format_to_vulkan_format {
+	bitmap_format,
+}; // vk_bitmap_format_to_vulkan_format
+enum class vk_image_usage_flags_from_image_format {
+	format,
+}; // vk_image_usage_flags_from_image_format
+enum class vk_sampler_info_is_valid {
+	create_info,
+}; // vk_sampler_info_is_valid
+enum class vk_sampler_filter_type_to_vk_filter {
+	filter,
+}; // vk_sampler_filter_type_to_vk_filter
+enum class vk_is_depth_format {
+	format,
+}; // vk_is_depth_format
+enum class vk_get_image_initial_layout_from_usage {
+	usage,
+	format,
+}; // vk_get_image_initial_layout_from_usage
+enum class vk_get_image_final_layout_from_usage {
+	usage,
+	format,
+}; // vk_get_image_final_layout_from_usage
+enum class vk_backend_shader_create_spirv_reflect {
+	vulkan_context,
+	shader_source,
+}; // vk_backend_shader_create_spirv_reflect
+enum class vk_backend_shader_create_slang_reflect {
+	vulkan_context,
+	shader_source,
+}; // vk_backend_shader_create_slang_reflect
+}; // namespace ArgumentLists
+}; // namespace Athena
 
-// using info_list_t = const type_info_t *const *;
 constexpr attribute_info_list_t complete_attribute_array[] = {
 };
 
@@ -30656,6 +33590,157 @@ get_member(const type_info_t *type_info, const char *member_name)
                 break;
             }
         }
+    }
+
+    return(result);
+}
+
+ATHENA_API const type_info_member_t*
+get_member(const type_info_struct_t *type_info, const char *member_name) 
+{
+    const type_info_member_t *result = nullptr;
+
+    int name_length = strlen(member_name);
+    if(name_length > 0)
+    {
+        for(unsigned int member_index = 0;
+            member_index < type_info->member_count;
+            ++member_index)
+        {
+            const type_info_member_t *member = type_info->members + member_index;
+
+            int member_length = strlen(member->member_name);
+            if(member_length != name_length) continue;
+
+            if(memcmp(member_name, member->member_name, member_length) == 0)
+            {
+                result = member;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_t *info, const char *name)
+{
+    const type_info_member_t *result = nullptr;
+    int name_length = strlen(name);
+    if(name_length > 0)
+    {
+        const type_info_procedure_t *proc_info = Athena::as_procedure(info);
+        for(unsigned int argument_index = 0;
+            argument_index < proc_info->argument_count;
+            ++argument_index)
+        {
+            const type_info_member_t *argument = proc_info->arguments + argument_index;
+
+            int member_length = strlen(argument->member_name);
+            if(member_length != name_length) continue;
+
+            if(memcmp(name, argument->member_name, member_length) == 0)
+            {
+                result = argument;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_procedure_t *info, const char *name)
+{
+    const type_info_member_t *result = nullptr;
+    int name_length = strlen(name);
+    if(name_length > 0)
+    {
+        for(unsigned int argument_index = 0;
+            argument_index < info->argument_count;
+            ++argument_index)
+        {
+            const type_info_member_t *argument = info->arguments + argument_index;
+
+            int member_length = strlen(argument->member_name);
+            if(member_length != name_length) continue;
+
+            if(memcmp(name, argument->member_name, member_length) == 0)
+            {
+                result = argument;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_member(const type_info_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+
+    Assert(info->metatype == ATHENA_METATYPE_STRUCT);
+    const type_info_struct_t *struct_info = Athena::as_structure(info);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= struct_info->member_count)
+    {
+        result = (struct_info->members + true_index);
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_member(const type_info_struct_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+    Assert(info->type_info.metatype == ATHENA_METATYPE_STRUCT);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= info->member_count)
+    {
+        result = (info->members + true_index);
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+    Assert(info->metatype == ATHENA_METATYPE_PROCEDURE);
+
+    const type_info_procedure_t *proc = Athena::as_procedure(info);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= proc->argument_count)
+    {
+        result = (proc->arguments + true_index);
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_argument(const type_info_procedure_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+    Assert(info->type_info.metatype == ATHENA_METATYPE_PROCEDURE);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= info->argument_count)
+    {
+        result = (info->arguments + true_index);
     }
 
     return(result);

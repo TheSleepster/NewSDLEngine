@@ -12,17 +12,17 @@
 
 struct test_structure 
 {
-    int apples;
+    int apples = 4;
     int oranges;
     int bananas;
 
     [[member_func]]
-    void apples_test_func(char *name);
+    char *apples_test_func(char *name = "test");
 };
 
 [[generate_function]]
 void
-attribute_test_function(char *name)
+attribute_test_function(int apples = 4)
 {
 }
 
@@ -54,7 +54,10 @@ main(int argc, char **argv)
             printf("\tMember offset: '%d'...\n", member->offset);
         }
 
-        const type_info_member_t *function = Athena::get_member(info, "apples_test_func");
+        printf("\n\n\n");
+
+        //const type_info_member_t *function = Athena::get_member(info, "apples_test_func");
+        const type_info_member_t *function = Athena::get_member(info, Athena::MemberLists::test_structure::apples_test_func);
         if(function)
         {
             const type_info_procedure_t *func_data = Athena::as_procedure(function);
@@ -64,7 +67,27 @@ main(int argc, char **argv)
             {
                 const type_info_member_t *argument = func_data->arguments + arg_index;
                 printf("Argument name: '%s'...\n", argument->member_name);
+                if(argument->value.type != ATHENA_VALUE_TYPE_INVALID)
+                {
+                    printf("Argument Default Value:");
+                    switch(argument->value.type)
+                    {
+                        case ATHENA_VALUE_TYPE_STRING:
+                        {
+                            printf(" %s\n", argument->value.string);
+                        }break;
+                        case ATHENA_VALUE_TYPE_INT32:
+                        {
+                            printf(" %d\n", argument->value.int32);
+                        }break;
+                    }
+                }
             }
+            const type_info_member_t *argument = Athena::get_argument(func_data, Athena::ArgumentLists::apples_test_func::name);
+            int z = 0;
+
+            (void)z;
+            (void)argument;
         }
 
         const type_info_struct_t *parent = Athena::get_struct_info_from_member(function);

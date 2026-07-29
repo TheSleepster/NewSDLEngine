@@ -25,19 +25,18 @@ enum AST_node_expression_type_t
     AST_NODE_EXPRESSION_TYPE_UNARY
 };
 
-// TODO(Sleepster): Identifiers like "NULL"
+// NOTE(Sleepster): THIS MUST AT LEAST MOSTLY MATCH "athena_evaluated_type" in athena.h
 enum AST_expression_value_type_t
 {
-    AST_EXPRESSION_VALUE_INVALID,
+    AST_EXPRESSION_VALUE_INVALID = 0,
+    AST_EXPRESSION_VALUE_INT = 1,
+    AST_EXPRESSION_VALUE_UNSIGNED = 3,
+    AST_EXPRESSION_VALUE_FLOAT = 4,
+    AST_EXPRESSION_VALUE_DOUBLE = 5,
     // NOTE(Sleepster): Ident is something like 'NULL' 
-    AST_EXPRESSION_VALUE_IDENT,
+    AST_EXPRESSION_VALUE_IDENT = 7,
     // NOTE(Sleepster): Whereas a literal is something like char *name = "Test name"
-    AST_EXPRESSION_VALUE_LITERAL,
-
-    AST_EXPRESSION_VALUE_INT,
-    AST_EXPRESSION_VALUE_UNSIGNED,
-    AST_EXPRESSION_VALUE_FLOAT,
-    AST_EXPRESSION_VALUE_DOUBLE,
+    AST_EXPRESSION_VALUE_LITERAL = 8,
 };
 
 struct AST_expression_value_t

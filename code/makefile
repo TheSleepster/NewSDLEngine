@@ -199,7 +199,7 @@ $(BUILD_DIR)/sandbox_%_unity.cpp: sandbox/%.cpp | $(BUILD_DIR)
 	} > $@
 
 $(BUILD_DIR)/sandbox_%$(EXE_EXT): $(BUILD_DIR)/sandbox_%_unity.cpp | do_codegen $(BUILD_DIR)
-	$(SILENT)$(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
+	$(SILENT) $(CXX) $(BUILD_COMPILER_FLAGS) $(OS_DEFINE) $(GAME_INCLUDES) \
 		-MT $@ -MMD -MP -MF $(BUILD_DIR)/sandbox_$*.d \
 		$< -o $@ $(GAME_EXTERNAL_LIBRARIES)
 

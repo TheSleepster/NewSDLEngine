@@ -24,13 +24,14 @@ enum athena_reflection_type
 
 enum athena_evaluated_type 
 {
-    ATHENA_TYPE_INT32,
-    ATHENA_TYPE_INT64,
-    ATHENA_TYPE_UNSIGNED32,
-    ATHENA_TYPE_UNSIGNED64,
-    ATHENA_TYPE_FLOAT32,
-    ATHENA_TYPE_FLOAT64,
-    ATHENA_TYPE_STRING,
+    ATHENA_VALUE_TYPE_INVALID,
+    ATHENA_VALUE_TYPE_INT32,
+    ATHENA_VALUE_TYPE_INT64,
+    ATHENA_VALUE_TYPE_UNSIGNED32,
+    ATHENA_VALUE_TYPE_UNSIGNED64,
+    ATHENA_VALUE_TYPE_FLOAT32,
+    ATHENA_VALUE_TYPE_FLOAT64,
+    ATHENA_VALUE_TYPE_STRING,
 };
 
 struct type_default_value_t 
@@ -137,30 +138,25 @@ void athena_handle_type_info(const char *filepath, int directory, int recursive)
 #endif
 
 namespace Athena {
-ATHENA_API inline const type_info_t *type_info(unsigned long long type_id);
-ATHENA_API inline const type_info_t *type_info(const char *string);
-
-#ifdef C_STRING_H
-ATHENA_API inline const type_info_t *type_info(string_t string);
-#endif
 
 // NOTE(Sleepster): STB style lib
 #ifdef C_STRING_H
-ATHENA_API inline const type_info_t        *type_info(string_t string);
-ATHENA_API inline const type_info_member_t *get_member(const type_info_t *type_info, string_t member_name);
+ATHENA_API const type_info_t        *type_info(string_t string);
+ATHENA_API const type_info_t        *type_info(unsigned long long type_id);
+ATHENA_API const type_info_t        *type_info(const char *string);
+ATHENA_API const type_info_member_t *get_member(const type_info_t *type_info, string_t member_name);
 #endif
+ATHENA_API const type_info_member_t *get_member(const type_info_t *type_info, const char *member_name);
+ATHENA_API const type_info_member_t *get_member(const type_info_struct_t *type_info, const char *member_name);
 
-ATHENA_API inline const type_info_t        *type_info(unsigned long long type_id);
-ATHENA_API inline const type_info_t        *type_info(const char *string);
-ATHENA_API inline const type_info_member_t *get_member(const type_info_t *type_info, const char *member_name);
-ATHENA_API inline const type_info_struct_t *get_struct_info_from_member(const type_info_t *info);
-ATHENA_API inline const type_info_struct_t *get_struct_info_from_member(const type_info_member_t *member);
+ATHENA_API const type_info_struct_t *get_struct_info_from_member(const type_info_t *info);
+ATHENA_API const type_info_struct_t *get_struct_info_from_member(const type_info_member_t *member);
 
-ATHENA_API const type_info_procedure_t* as_procedure(const type_info_t *info);
-ATHENA_API const type_info_procedure_t* as_procedure(const type_info_member_t *info);
+ATHENA_API const type_info_procedure_t *as_procedure(const type_info_t *info);
+ATHENA_API const type_info_procedure_t *as_procedure(const type_info_member_t *info);
 
-ATHENA_API const type_info_struct_t* as_structure(const type_info_t *info);
-ATHENA_API const type_info_struct_t* as_structure(const type_info_member_t *info);
+ATHENA_API const type_info_struct_t *as_structure(const type_info_t *info);
+ATHENA_API const type_info_struct_t *as_structure(const type_info_member_t *info);
 
 ATHENA_API const attribute_info_list_t *get_attribute_list(char *name);
 }
