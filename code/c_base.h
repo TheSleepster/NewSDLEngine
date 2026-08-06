@@ -201,7 +201,7 @@ const global_variable float64 MACHINE_EPSILON_F64 = 2.220446e-16;
 typedef void void_func(void);
 
 #ifdef ASSERT_ENABLED
-#define AssertBreak             (*(char*)0 = 0)
+#define AssertBreak             (*(volatile char*)0 = 0)
 #define StaticAssert(cond, msg) static_assert(cond, msg) 
 
 #define Assert(cond) if(!(cond)) { log_fatal("FILE: [%s], FUNCTION: '%s', LINE: '%d': Assertion failed:...\n", __FILE__, __FUNCTION__, __LINE__); AssertBreak;}

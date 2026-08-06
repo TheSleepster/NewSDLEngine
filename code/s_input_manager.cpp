@@ -13,6 +13,8 @@
 //
 // 1.) An input event buffer inside the event manager that stores input events from the start of this frame
 // 2.) An api to allow us to set what keys / gamepad buttons have been pressed.
+//
+// TODO(Sleepster): May want to adjust this to record a "controller ID" when a new device is read
 void
 s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
 {
@@ -93,7 +95,71 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
             controller->keyboard.is_control_key_down = (event->key.mod & SDL_KMOD_CTRL)  != 0;
             controller->keyboard.is_alt_key_down     = (event->key.mod & SDL_KMOD_ALT)   != 0;
 
+            action_key->keycode  = SDL_GetKeyFromScancode(event->key.scancode, event->key.mod, false);
+            action_key->scancode = event->key.scancode;
+
             action_key->half_transition_counter += 1;
+            if(controller->action_inputs_this_frame < MAX_BUFFERED_INPUTS)
+            {
+                controller->transient_action_inputs[controller->action_inputs_this_frame++] = action_key;
+            }
+
+            if(key_index < SDL_SCANCODE_COUNT &&
+               event->type == SDL_EVENT_KEY_DOWN &&
+              (action_key->keycode & SDLK_SCANCODE_MASK) == 0)
+            {
+                text_input_event_t text_event = {};
+                text_event.type     = TEXT_INPUT_EVENT_TYPE_INPUT_EVENT;
+                text_event.scancode = key_index;
+                text_event.keycode  = action_key->keycode;
+
+                // NOTE(Sleepster): Set the input event type 
+                u32 flags = 0;
+                if(event->type == SDL_EVENT_KEY_DOWN)
+                {
+                    flags |= TEXT_INPUT_EVENT_PRESSED;
+                    if(action_key->is_down)
+                    {
+                        flags = TEXT_INPUT_EVENT_DOWN;
+                    }
+                }
+                else if(event->type == SDL_EVENT_KEY_UP)
+                {
+                    flags |= TEXT_INPUT_EVENT_RELEASED;
+                }
+                text_event.input_event_type = flags;
+
+                // NOTE(Sleepster): Set the modifiers 
+                u32 modifier_flags = 0;
+                if((event->key.mod & SDL_KMOD_SHIFT))
+                {
+                    modifier_flags |= TEXT_INPUT_MODIFIER_SHIFT;
+                }
+
+                if((event->key.mod & SDL_KMOD_CTRL))
+                {
+                    modifier_flags |= TEXT_INPUT_MODIFIER_CTRL;
+                }
+
+                if((event->key.mod & SDL_KMOD_ALT))
+                {
+                    modifier_flags |= TEXT_INPUT_MODIFIER_ALT;
+                }
+
+                text_event.modifier_flags = modifier_flags;
+                controller->transient_text_inputs[controller->text_inputs_this_frame++] = text_event;
+            }
+        }break;
+        case SDL_EVENT_TEXT_INPUT:
+        {
+            input_controller_t *controller = input_manager->controllers;
+            Assert(controller->type == IM_CONTROLLER_KEYBOARD);
+
+            text_input_event_t text_event = {};
+            text_event.type         = TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM;
+            text_event.input_stream = (u8*)event->text.text;
+
+            controller->transient_text_inputs[controller->text_inputs_this_frame++] = text_event;
         }break;
         case SDL_EVENT_MOUSE_MOTION:
         {
@@ -118,10 +184,15 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
 
             action_button_t *button = controller->keyboard.input + key_index;
             button->half_transition_counter += 1;
+            button->scancode = key_index;
 
             button->is_pressed  =  event->button.down;
             button->is_released = !event->button.down;
             button->is_down     =  event->button.down;
+            if(controller->action_inputs_this_frame < MAX_BUFFERED_INPUTS)
+            {
+                controller->transient_action_inputs[controller->action_inputs_this_frame++] = button;
+            }
         }break;
         case SDL_EVENT_MOUSE_WHEEL: 
         {
@@ -140,6 +211,10 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
             button->is_released = (button_data.down  == false);
 
             button->half_transition_counter += 1;
+            if(controller->action_inputs_this_frame < MAX_BUFFERED_INPUTS)
+            {
+                controller->transient_action_inputs[controller->action_inputs_this_frame++] = button;
+            }
         }break;
         case SDL_EVENT_GAMEPAD_AXIS_MOTION:
         {
@@ -174,6 +249,7 @@ s_im_reset_controller_states(input_manager_t *input_manager)
                         button->half_transition_counter = 0;
                         button->is_pressed  = false;
                         button->is_released = false;
+                        button->consumed_this_frame = false;
                     }
                 }break;
                 case IM_CONTROLLER_GAMEPAD:
@@ -186,6 +262,7 @@ s_im_reset_controller_states(input_manager_t *input_manager)
                         button->half_transition_counter = 0;
                         button->is_pressed  = false;
                         button->is_released = false;
+                        button->consumed_this_frame = false;
                     }
 
                     for(u32 analog_button_index = 0;
@@ -199,6 +276,12 @@ s_im_reset_controller_states(input_manager_t *input_manager)
                 default: {InvalidCodePath;}break;
             }
         }
+
+        memset(controller->transient_action_inputs, 0, sizeof(action_button_t*) * controller->action_inputs_this_frame);
+        controller->action_inputs_this_frame = 0;
+
+        memset(&controller->text_inputs_this_frame, 0, sizeof(text_input_event_t) * controller->text_inputs_this_frame);
+        controller->text_inputs_this_frame = 0;
     }
 }
 

@@ -155,6 +155,10 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_SDL_Gamepad, type_id(SDL_Gamepad), "SDL_Gamepad") \
 	X(TYPE_SDL_Joystick, type_id(SDL_Joystick), "SDL_Joystick") \
 	X(TYPE_gamepad_controller_data_t, type_id(gamepad_controller_data_t), "gamepad_controller_data_t") \
+	X(TYPE_text_input_action_type_t, type_id(text_input_action_type_t), "text_input_action_type_t") \
+	X(TYPE_text_input_modifier_flags, type_id(text_input_modifier_flags), "text_input_modifier_flags") \
+	X(TYPE_text_input_event_type_t, type_id(text_input_event_type_t), "text_input_event_type_t") \
+	X(TYPE_text_input_event_t, type_id(text_input_event_t), "text_input_event_t") \
 	X(TYPE_input_controller_t, type_id(input_controller_t), "input_controller_t") \
 	X(TYPE_game_action_binding_type_t, type_id(game_action_binding_type_t), "game_action_binding_type_t") \
 	X(TYPE_game_action_binding_t, type_id(game_action_binding_t), "game_action_binding_t") \
@@ -438,6 +442,7 @@ const static action_button_t GENERATED_DEFAULT_action_button_t = {};
 const static keyboard_controller_data_t GENERATED_DEFAULT_keyboard_controller_data_t = {};
 const static analog_button_t GENERATED_DEFAULT_analog_button_t = {};
 const static gamepad_controller_data_t GENERATED_DEFAULT_gamepad_controller_data_t = {};
+const static text_input_event_t GENERATED_DEFAULT_text_input_event_t = {};
 const static input_controller_t GENERATED_DEFAULT_input_controller_t = {};
 const static game_action_binding_t GENERATED_DEFAULT_game_action_binding_t = {};
 const static game_action_t GENERATED_DEFAULT_game_action_t = {};
@@ -1488,11 +1493,14 @@ struct type_info_struct_action_button_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[4];
+		type_info_member_t member_array[7];
 		struct {
 			type_info_member_t is_down;
 			type_info_member_t is_released;
 			type_info_member_t is_pressed;
+			type_info_member_t consumed_this_frame;
+			type_info_member_t keycode;
+			type_info_member_t scancode;
 			type_info_member_t half_transition_counter;
 		}members;
 	};
@@ -1559,6 +1567,27 @@ struct type_info_struct_gamepad_controller_data_t {
 	};
 };
 
+struct type_info_struct_text_input_event_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[6];
+		struct {
+			type_info_member_t type;
+			type_info_member_t input_event_type;
+			type_info_member_t modifier_flags;
+			type_info_member_t scancode;
+			type_info_member_t keycode;
+			type_info_member_t input_stream;
+		}members;
+	};
+};
+
 struct type_info_struct_input_controller_t {
 	const char *name;
 	u32 type;
@@ -1568,11 +1597,15 @@ struct type_info_struct_input_controller_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[5];
+		type_info_member_t member_array[9];
 		struct {
 			type_info_member_t is_valid;
 			type_info_member_t is_analog;
 			type_info_member_t type;
+			type_info_member_t transient_action_inputs;
+			type_info_member_t action_inputs_this_frame;
+			type_info_member_t transient_text_inputs;
+			type_info_member_t text_inputs_this_frame;
 			type_info_member_t keyboard;
 			type_info_member_t gamepad;
 		}members;
@@ -2215,12 +2248,21 @@ struct type_info_struct_widget_state_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[11];
+		type_info_member_t member_array[20];
 		struct {
 			type_info_member_t last_interacted_frame;
 			type_info_member_t toggled;
 			type_info_member_t dragging;
 			type_info_member_t input_begin_within_bounds;
+			type_info_member_t is_held;
+			type_info_member_t just_released;
+			type_info_member_t just_clicked;
+			type_info_member_t is_double_clicked;
+			type_info_member_t is_right_clicked;
+			type_info_member_t widget_text_buffer;
+			type_info_member_t widget_text_buffer_used;
+			type_info_member_t widget_text_render_start_offset;
+			type_info_member_t widget_text_render_end_offset;
 			type_info_member_t slider_value;
 			type_info_member_t position;
 			type_info_member_t offset;
@@ -2258,17 +2300,16 @@ struct type_info_struct_widget_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[33];
+		type_info_member_t member_array[32];
 		struct {
 			type_info_member_t ID;
 			type_info_member_t widget_flags;
 			type_info_member_t layout_style;
 			type_info_member_t state;
-			type_info_member_t widget_text;
+			type_info_member_t widget_name;
 			type_info_member_t toggled;
 			type_info_member_t parent_stack_depth;
 			type_info_member_t font_size;
-			type_info_member_t font_max_descender;
 			type_info_member_t expected_position;
 			type_info_member_t minimum_render_size;
 			type_info_member_t size_kind;
@@ -2922,6 +2963,61 @@ struct type_info_enum_input_mouse_buttons_t {
 	};
 };
 
+struct type_info_enum_text_input_action_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t TEXT_INPUT_EVENT_NONE;
+			type_info_member_t TEXT_INPUT_EVENT_PRESSED;
+			type_info_member_t TEXT_INPUT_EVENT_DOWN;
+			type_info_member_t TEXT_INPUT_EVENT_RELEASED;
+		}members;
+	};
+};
+
+struct type_info_enum_text_input_modifier_flags {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[4];
+		struct {
+			type_info_member_t TEXT_INPUT_MODIFIER_NONE;
+			type_info_member_t TEXT_INPUT_MODIFIER_SHIFT;
+			type_info_member_t TEXT_INPUT_MODIFIER_CTRL;
+			type_info_member_t TEXT_INPUT_MODIFIER_ALT;
+		}members;
+	};
+};
+
+struct type_info_enum_text_input_event_type_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM;
+			type_info_member_t TEXT_INPUT_EVENT_TYPE_INPUT_EVENT;
+		}members;
+	};
+};
+
 struct type_info_enum_game_action_binding_type_t {
 	const char *name;
 	u32 type;
@@ -3145,21 +3241,23 @@ struct type_info_enum_widget_flags_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[14];
+		type_info_member_t member_array[16];
 		struct {
 			type_info_member_t UI_WIDGET_FLAG_INVALID;
 			type_info_member_t UI_WIDGET_FLAG_IDLE_COLOR;
 			type_info_member_t UI_WIDGET_FLAG_HOVER_COLOR;
 			type_info_member_t UI_WIDGET_FLAG_ACTIVE_COLOR;
+			type_info_member_t UI_WIDGET_FLAG_INTERACTABLE;
 			type_info_member_t UI_WIDGET_FLAG_MOUSE_CLICKABLE;
 			type_info_member_t UI_WIDGET_FLAG_HOVERABLE;
+			type_info_member_t UI_WIDGET_FLAG_LEFT_DRAGGABLE;
 			type_info_member_t UI_WIDGET_FLAG_DRAW_TEXT;
 			type_info_member_t UI_WIDGET_FLAG_DRAW_RECTANGLE;
 			type_info_member_t UI_WIDGET_FLAG_DRAW_BACKGROUND;
 			type_info_member_t UI_WIDGET_FLAG_DRAW_BORDER;
 			type_info_member_t UI_WIDGET_FLAG_MAKE_CIRCULAR;
 			type_info_member_t UI_WIDGET_FLAG_FIXED_SIZE;
-			type_info_member_t UI_WIDGET_FLAG_LEFT_DRAGGABLE;
+			type_info_member_t UI_WIDGET_FLAG_HAS_TEXT_CONTENT;
 			type_info_member_t UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON;
 		}members;
 	};
@@ -4180,11 +4278,14 @@ const static type_info_struct_action_button_t type_info_struct_action_button_t_c
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_action_button_t),
-	.member_count = 4,
+	.member_count = 7,
 	.members = {
 		.is_down = {.name = "is_down", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.is_down)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), is_down)},
 		.is_released = {.name = "is_released", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.is_released)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), is_released)},
 		.is_pressed = {.name = "is_pressed", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.is_pressed)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), is_pressed)},
+		.consumed_this_frame = {.name = "consumed_this_frame", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.consumed_this_frame)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), consumed_this_frame)},
+		.keycode = {.name = "keycode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.keycode)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), keycode)},
+		.scancode = {.name = "scancode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.scancode)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), scancode)},
 		.half_transition_counter = {.name = "half_transition_counter", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_action_button_t.half_transition_counter)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_action_button_t), half_transition_counter)},
 	}
 };
@@ -4241,6 +4342,24 @@ const static type_info_struct_gamepad_controller_data_t type_info_struct_gamepad
 	}
 };
 
+const static type_info_struct_text_input_event_t type_info_struct_text_input_event_t_const_data = {
+	.name = "text_input_event_t",
+	.type = TYPE_text_input_event_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_text_input_event_t),
+	.member_count = 6,
+	.members = {
+		.type = {.name = "type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_text_input_event_t.type)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_text_input_event_t), type)},
+		.input_event_type = {.name = "input_event_type", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_text_input_event_t.input_event_type)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_text_input_event_t), input_event_type)},
+		.modifier_flags = {.name = "modifier_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_text_input_event_t.modifier_flags)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_text_input_event_t), modifier_flags)},
+		.scancode = {.name = "scancode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_text_input_event_t.scancode)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_text_input_event_t), scancode)},
+		.keycode = {.name = "keycode", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_text_input_event_t.keycode)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_text_input_event_t), keycode)},
+		.input_stream = {.name = "input_stream", .type = TYPE_u8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Constant|META_TYPE_FLAGS_Pointer, .flag_counter = 2, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_text_input_event_t.input_stream)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_text_input_event_t), input_stream)},
+	}
+};
+
 const static type_info_struct_input_controller_t type_info_struct_input_controller_t_const_data = {
 	.name = "input_controller_t",
 	.type = TYPE_input_controller_t,
@@ -4248,11 +4367,15 @@ const static type_info_struct_input_controller_t type_info_struct_input_controll
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_input_controller_t),
-	.member_count = 5,
+	.member_count = 9,
 	.members = {
 		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.is_valid)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), is_valid)},
 		.is_analog = {.name = "is_analog", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.is_analog)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), is_analog)},
 		.type = {.name = "type", .type = TYPE_controller_type_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.type)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), type)},
+		.transient_action_inputs = {.name = "transient_action_inputs", .type = TYPE_action_button_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.transient_action_inputs)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), transient_action_inputs)},
+		.action_inputs_this_frame = {.name = "action_inputs_this_frame", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.action_inputs_this_frame)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), action_inputs_this_frame)},
+		.transient_text_inputs = {.name = "transient_text_inputs", .type = TYPE_text_input_event_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.transient_text_inputs)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), transient_text_inputs)},
+		.text_inputs_this_frame = {.name = "text_inputs_this_frame", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.text_inputs_this_frame)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), text_inputs_this_frame)},
 		.keyboard = {.name = "keyboard", .type = TYPE_keyboard_controller_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.keyboard)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), keyboard)},
 		.gamepad = {.name = "gamepad", .type = TYPE_gamepad_controller_data_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_input_controller_t.gamepad)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_input_controller_t), gamepad)},
 	}
@@ -4790,12 +4913,21 @@ const static type_info_struct_widget_state_t type_info_struct_widget_state_t_con
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_widget_state_t),
-	.member_count = 11,
+	.member_count = 20,
 	.members = {
 		.last_interacted_frame = {.name = "last_interacted_frame", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.last_interacted_frame)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), last_interacted_frame)},
 		.toggled = {.name = "toggled", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.toggled)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), toggled)},
 		.dragging = {.name = "dragging", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.dragging)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), dragging)},
 		.input_begin_within_bounds = {.name = "input_begin_within_bounds", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.input_begin_within_bounds)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), input_begin_within_bounds)},
+		.is_held = {.name = "is_held", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.is_held)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), is_held)},
+		.just_released = {.name = "just_released", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.just_released)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), just_released)},
+		.just_clicked = {.name = "just_clicked", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.just_clicked)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), just_clicked)},
+		.is_double_clicked = {.name = "is_double_clicked", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.is_double_clicked)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), is_double_clicked)},
+		.is_right_clicked = {.name = "is_right_clicked", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.is_right_clicked)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), is_right_clicked)},
+		.widget_text_buffer = {.name = "widget_text_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_buffer)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_buffer)},
+		.widget_text_buffer_used = {.name = "widget_text_buffer_used", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_buffer_used)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_buffer_used)},
+		.widget_text_render_start_offset = {.name = "widget_text_render_start_offset", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_render_start_offset)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_render_start_offset)},
+		.widget_text_render_end_offset = {.name = "widget_text_render_end_offset", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_render_end_offset)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_render_end_offset)},
 		.slider_value = {.name = "slider_value", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.slider_value)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), slider_value)},
 		.position = {.name = "position", .type = TYPE_vec3_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.position)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), position)},
 		.offset = {.name = "offset", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.offset)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), offset)},
@@ -4827,17 +4959,16 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_widget_t),
-	.member_count = 33,
+	.member_count = 32,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.ID)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), ID)},
 		.widget_flags = {.name = "widget_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_flags)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_flags)},
 		.layout_style = {.name = "layout_style", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.layout_style)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), layout_style)},
 		.state = {.name = "state", .type = TYPE_widget_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.state)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), state)},
-		.widget_text = {.name = "widget_text", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_text)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_text)},
+		.widget_name = {.name = "widget_name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_name)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_name)},
 		.toggled = {.name = "toggled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.toggled)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), toggled)},
 		.parent_stack_depth = {.name = "parent_stack_depth", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_stack_depth)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_stack_depth)},
 		.font_size = {.name = "font_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.font_size)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), font_size)},
-		.font_max_descender = {.name = "font_max_descender", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.font_max_descender)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), font_max_descender)},
 		.expected_position = {.name = "expected_position", .type = TYPE_vec3_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.expected_position)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), expected_position)},
 		.minimum_render_size = {.name = "minimum_render_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.minimum_render_size)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), minimum_render_size)},
 		.size_kind = {.name = "size_kind", .type = TYPE_widget_size_kind_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.size_kind)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), size_kind)},
@@ -5342,6 +5473,40 @@ const static type_info_enum_input_mouse_buttons_t type_info_enum_input_mouse_but
 		.SDL_MOUSE_BUTTON_COUNT = {.name = "SDL_MOUSE_BUTTON_COUNT", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_MOUSE_BUTTON_COUNT), .offset = SDL_MOUSE_BUTTON_COUNT},
 	}
 };
+const static type_info_enum_text_input_action_type_t type_info_enum_text_input_action_type_t_const_data = {
+	.name = "text_input_action_type_t",
+	.type = TYPE_text_input_action_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 4,
+	.members = {
+		.TEXT_INPUT_EVENT_NONE = {.name = "TEXT_INPUT_EVENT_NONE", .type = TYPE_text_input_action_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TEXT_INPUT_EVENT_NONE), .offset = TEXT_INPUT_EVENT_NONE},
+		.TEXT_INPUT_EVENT_PRESSED = {.name = "TEXT_INPUT_EVENT_PRESSED", .type = TYPE_text_input_action_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TEXT_INPUT_EVENT_PRESSED), .offset = TEXT_INPUT_EVENT_PRESSED},
+		.TEXT_INPUT_EVENT_DOWN = {.name = "TEXT_INPUT_EVENT_DOWN", .type = TYPE_text_input_action_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TEXT_INPUT_EVENT_DOWN), .offset = TEXT_INPUT_EVENT_DOWN},
+		.TEXT_INPUT_EVENT_RELEASED = {.name = "TEXT_INPUT_EVENT_RELEASED", .type = TYPE_text_input_action_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TEXT_INPUT_EVENT_RELEASED), .offset = TEXT_INPUT_EVENT_RELEASED},
+	}
+};
+const static type_info_enum_text_input_modifier_flags type_info_enum_text_input_modifier_flags_const_data = {
+	.name = "text_input_modifier_flags",
+	.type = TYPE_text_input_modifier_flags,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 4,
+	.members = {
+		.TEXT_INPUT_MODIFIER_NONE = {.name = "TEXT_INPUT_MODIFIER_NONE", .type = TYPE_text_input_modifier_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TEXT_INPUT_MODIFIER_NONE), .offset = TEXT_INPUT_MODIFIER_NONE},
+		.TEXT_INPUT_MODIFIER_SHIFT = {.name = "TEXT_INPUT_MODIFIER_SHIFT", .type = TYPE_text_input_modifier_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TEXT_INPUT_MODIFIER_SHIFT), .offset = TEXT_INPUT_MODIFIER_SHIFT},
+		.TEXT_INPUT_MODIFIER_CTRL = {.name = "TEXT_INPUT_MODIFIER_CTRL", .type = TYPE_text_input_modifier_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TEXT_INPUT_MODIFIER_CTRL), .offset = TEXT_INPUT_MODIFIER_CTRL},
+		.TEXT_INPUT_MODIFIER_ALT = {.name = "TEXT_INPUT_MODIFIER_ALT", .type = TYPE_text_input_modifier_flags, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TEXT_INPUT_MODIFIER_ALT), .offset = TEXT_INPUT_MODIFIER_ALT},
+	}
+};
+const static type_info_enum_text_input_event_type_t type_info_enum_text_input_event_type_t_const_data = {
+	.name = "text_input_event_type_t",
+	.type = TYPE_text_input_event_type_t,
+	.kind = META_TYPE_KIND_Enum,
+	.member_count = 2,
+	.members = {
+		.TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM = {.name = "TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM", .type = TYPE_text_input_event_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM), .offset = TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM},
+		.TEXT_INPUT_EVENT_TYPE_INPUT_EVENT = {.name = "TEXT_INPUT_EVENT_TYPE_INPUT_EVENT", .type = TYPE_text_input_event_type_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(TEXT_INPUT_EVENT_TYPE_INPUT_EVENT), .offset = TEXT_INPUT_EVENT_TYPE_INPUT_EVENT},
+	}
+};
 const static type_info_enum_game_action_binding_type_t type_info_enum_game_action_binding_type_t_const_data = {
 	.name = "game_action_binding_type_t",
 	.type = TYPE_game_action_binding_type_t,
@@ -5490,21 +5655,23 @@ const static type_info_enum_widget_flags_t type_info_enum_widget_flags_t_const_d
 	.name = "widget_flags_t",
 	.type = TYPE_widget_flags_t,
 	.kind = META_TYPE_KIND_Enum,
-	.member_count = 14,
+	.member_count = 16,
 	.members = {
 		.UI_WIDGET_FLAG_INVALID = {.name = "UI_WIDGET_FLAG_INVALID", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_INVALID), .offset = UI_WIDGET_FLAG_INVALID},
 		.UI_WIDGET_FLAG_IDLE_COLOR = {.name = "UI_WIDGET_FLAG_IDLE_COLOR", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_IDLE_COLOR), .offset = UI_WIDGET_FLAG_IDLE_COLOR},
 		.UI_WIDGET_FLAG_HOVER_COLOR = {.name = "UI_WIDGET_FLAG_HOVER_COLOR", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_HOVER_COLOR), .offset = UI_WIDGET_FLAG_HOVER_COLOR},
 		.UI_WIDGET_FLAG_ACTIVE_COLOR = {.name = "UI_WIDGET_FLAG_ACTIVE_COLOR", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_ACTIVE_COLOR), .offset = UI_WIDGET_FLAG_ACTIVE_COLOR},
+		.UI_WIDGET_FLAG_INTERACTABLE = {.name = "UI_WIDGET_FLAG_INTERACTABLE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_INTERACTABLE), .offset = UI_WIDGET_FLAG_INTERACTABLE},
 		.UI_WIDGET_FLAG_MOUSE_CLICKABLE = {.name = "UI_WIDGET_FLAG_MOUSE_CLICKABLE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_MOUSE_CLICKABLE), .offset = UI_WIDGET_FLAG_MOUSE_CLICKABLE},
 		.UI_WIDGET_FLAG_HOVERABLE = {.name = "UI_WIDGET_FLAG_HOVERABLE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_HOVERABLE), .offset = UI_WIDGET_FLAG_HOVERABLE},
+		.UI_WIDGET_FLAG_LEFT_DRAGGABLE = {.name = "UI_WIDGET_FLAG_LEFT_DRAGGABLE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_LEFT_DRAGGABLE), .offset = UI_WIDGET_FLAG_LEFT_DRAGGABLE},
 		.UI_WIDGET_FLAG_DRAW_TEXT = {.name = "UI_WIDGET_FLAG_DRAW_TEXT", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_DRAW_TEXT), .offset = UI_WIDGET_FLAG_DRAW_TEXT},
 		.UI_WIDGET_FLAG_DRAW_RECTANGLE = {.name = "UI_WIDGET_FLAG_DRAW_RECTANGLE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_DRAW_RECTANGLE), .offset = UI_WIDGET_FLAG_DRAW_RECTANGLE},
 		.UI_WIDGET_FLAG_DRAW_BACKGROUND = {.name = "UI_WIDGET_FLAG_DRAW_BACKGROUND", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_DRAW_BACKGROUND), .offset = UI_WIDGET_FLAG_DRAW_BACKGROUND},
 		.UI_WIDGET_FLAG_DRAW_BORDER = {.name = "UI_WIDGET_FLAG_DRAW_BORDER", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_DRAW_BORDER), .offset = UI_WIDGET_FLAG_DRAW_BORDER},
 		.UI_WIDGET_FLAG_MAKE_CIRCULAR = {.name = "UI_WIDGET_FLAG_MAKE_CIRCULAR", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_MAKE_CIRCULAR), .offset = UI_WIDGET_FLAG_MAKE_CIRCULAR},
 		.UI_WIDGET_FLAG_FIXED_SIZE = {.name = "UI_WIDGET_FLAG_FIXED_SIZE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_FIXED_SIZE), .offset = UI_WIDGET_FLAG_FIXED_SIZE},
-		.UI_WIDGET_FLAG_LEFT_DRAGGABLE = {.name = "UI_WIDGET_FLAG_LEFT_DRAGGABLE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_LEFT_DRAGGABLE), .offset = UI_WIDGET_FLAG_LEFT_DRAGGABLE},
+		.UI_WIDGET_FLAG_HAS_TEXT_CONTENT = {.name = "UI_WIDGET_FLAG_HAS_TEXT_CONTENT", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_HAS_TEXT_CONTENT), .offset = UI_WIDGET_FLAG_HAS_TEXT_CONTENT},
 		.UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = {.name = "UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON), .offset = UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON},
 	}
 };
@@ -6022,6 +6189,9 @@ enum action_button_t_member_list_enum {
 	TYPE_ACTION_BUTTON_T_MEMBER_is_down,
 	TYPE_ACTION_BUTTON_T_MEMBER_is_released,
 	TYPE_ACTION_BUTTON_T_MEMBER_is_pressed,
+	TYPE_ACTION_BUTTON_T_MEMBER_consumed_this_frame,
+	TYPE_ACTION_BUTTON_T_MEMBER_keycode,
+	TYPE_ACTION_BUTTON_T_MEMBER_scancode,
 	TYPE_ACTION_BUTTON_T_MEMBER_half_transition_counter,
 };
 
@@ -6050,10 +6220,23 @@ enum gamepad_controller_data_t_member_list_enum {
 	TYPE_GAMEPAD_CONTROLLER_DATA_T_MEMBER_analog_buttons,
 };
 
+enum text_input_event_t_member_list_enum {
+	TYPE_TEXT_INPUT_EVENT_T_MEMBER_type,
+	TYPE_TEXT_INPUT_EVENT_T_MEMBER_input_event_type,
+	TYPE_TEXT_INPUT_EVENT_T_MEMBER_modifier_flags,
+	TYPE_TEXT_INPUT_EVENT_T_MEMBER_scancode,
+	TYPE_TEXT_INPUT_EVENT_T_MEMBER_keycode,
+	TYPE_TEXT_INPUT_EVENT_T_MEMBER_input_stream,
+};
+
 enum input_controller_t_member_list_enum {
 	TYPE_INPUT_CONTROLLER_T_MEMBER_is_valid,
 	TYPE_INPUT_CONTROLLER_T_MEMBER_is_analog,
 	TYPE_INPUT_CONTROLLER_T_MEMBER_type,
+	TYPE_INPUT_CONTROLLER_T_MEMBER_transient_action_inputs,
+	TYPE_INPUT_CONTROLLER_T_MEMBER_action_inputs_this_frame,
+	TYPE_INPUT_CONTROLLER_T_MEMBER_transient_text_inputs,
+	TYPE_INPUT_CONTROLLER_T_MEMBER_text_inputs_this_frame,
 	TYPE_INPUT_CONTROLLER_T_MEMBER_keyboard,
 	TYPE_INPUT_CONTROLLER_T_MEMBER_gamepad,
 };
@@ -6282,6 +6465,15 @@ enum widget_state_t_member_list_enum {
 	TYPE_WIDGET_STATE_T_MEMBER_toggled,
 	TYPE_WIDGET_STATE_T_MEMBER_dragging,
 	TYPE_WIDGET_STATE_T_MEMBER_input_begin_within_bounds,
+	TYPE_WIDGET_STATE_T_MEMBER_is_held,
+	TYPE_WIDGET_STATE_T_MEMBER_just_released,
+	TYPE_WIDGET_STATE_T_MEMBER_just_clicked,
+	TYPE_WIDGET_STATE_T_MEMBER_is_double_clicked,
+	TYPE_WIDGET_STATE_T_MEMBER_is_right_clicked,
+	TYPE_WIDGET_STATE_T_MEMBER_widget_text_buffer,
+	TYPE_WIDGET_STATE_T_MEMBER_widget_text_buffer_used,
+	TYPE_WIDGET_STATE_T_MEMBER_widget_text_render_start_offset,
+	TYPE_WIDGET_STATE_T_MEMBER_widget_text_render_end_offset,
 	TYPE_WIDGET_STATE_T_MEMBER_slider_value,
 	TYPE_WIDGET_STATE_T_MEMBER_position,
 	TYPE_WIDGET_STATE_T_MEMBER_offset,
@@ -6301,11 +6493,10 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_widget_flags,
 	TYPE_WIDGET_T_MEMBER_layout_style,
 	TYPE_WIDGET_T_MEMBER_state,
-	TYPE_WIDGET_T_MEMBER_widget_text,
+	TYPE_WIDGET_T_MEMBER_widget_name,
 	TYPE_WIDGET_T_MEMBER_toggled,
 	TYPE_WIDGET_T_MEMBER_parent_stack_depth,
 	TYPE_WIDGET_T_MEMBER_font_size,
-	TYPE_WIDGET_T_MEMBER_font_max_descender,
 	TYPE_WIDGET_T_MEMBER_expected_position,
 	TYPE_WIDGET_T_MEMBER_minimum_render_size,
 	TYPE_WIDGET_T_MEMBER_size_kind,
@@ -6620,6 +6811,25 @@ enum input_mouse_buttons_t_member_list_enum {
 	TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MOUSE_BUTTON_COUNT,
 };
 
+enum text_input_action_type_t_member_list_enum {
+	TYPE_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_NONE,
+	TYPE_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_PRESSED,
+	TYPE_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_DOWN,
+	TYPE_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_RELEASED,
+};
+
+enum text_input_modifier_flags_member_list_enum {
+	TYPE_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_NONE,
+	TYPE_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_SHIFT,
+	TYPE_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_CTRL,
+	TYPE_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_ALT,
+};
+
+enum text_input_event_type_t_member_list_enum {
+	TYPE_TEXT_INPUT_EVENT_TYPE_T_MEMBER_TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM,
+	TYPE_TEXT_INPUT_EVENT_TYPE_T_MEMBER_TEXT_INPUT_EVENT_TYPE_INPUT_EVENT,
+};
+
 enum game_action_binding_type_t_member_list_enum {
 	TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Invalid,
 	TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Button,
@@ -6719,15 +6929,17 @@ enum widget_flags_t_member_list_enum {
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_IDLE_COLOR,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HOVER_COLOR,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_ACTIVE_COLOR,
+	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_INTERACTABLE,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MOUSE_CLICKABLE,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HOVERABLE,
+	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_LEFT_DRAGGABLE,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_TEXT,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_RECTANGLE,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BACKGROUND,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BORDER,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MAKE_CIRCULAR,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_FIXED_SIZE,
-	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_LEFT_DRAGGABLE,
+	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HAS_TEXT_CONTENT,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON,
 };
 
@@ -6917,6 +7129,16 @@ enum render_pipeline_polygon_mode_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X1_MOUSE, "SDL_X1_MOUSE") \
 	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X2_MOUSE, "SDL_X2_MOUSE") \
 	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MOUSE_BUTTON_COUNT, "SDL_MOUSE_BUTTON_COUNT") \
+	X(TYPE_ENUM_LOOKUP_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_NONE, "TEXT_INPUT_EVENT_NONE") \
+	X(TYPE_ENUM_LOOKUP_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_PRESSED, "TEXT_INPUT_EVENT_PRESSED") \
+	X(TYPE_ENUM_LOOKUP_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_DOWN, "TEXT_INPUT_EVENT_DOWN") \
+	X(TYPE_ENUM_LOOKUP_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_RELEASED, "TEXT_INPUT_EVENT_RELEASED") \
+	X(TYPE_ENUM_LOOKUP_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_NONE, "TEXT_INPUT_MODIFIER_NONE") \
+	X(TYPE_ENUM_LOOKUP_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_SHIFT, "TEXT_INPUT_MODIFIER_SHIFT") \
+	X(TYPE_ENUM_LOOKUP_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_CTRL, "TEXT_INPUT_MODIFIER_CTRL") \
+	X(TYPE_ENUM_LOOKUP_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_ALT, "TEXT_INPUT_MODIFIER_ALT") \
+	X(TYPE_ENUM_LOOKUP_TEXT_INPUT_EVENT_TYPE_T_MEMBER_TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM, "TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM") \
+	X(TYPE_ENUM_LOOKUP_TEXT_INPUT_EVENT_TYPE_T_MEMBER_TEXT_INPUT_EVENT_TYPE_INPUT_EVENT, "TEXT_INPUT_EVENT_TYPE_INPUT_EVENT") \
 	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Invalid, "GAB_Invalid") \
 	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Button, "GAB_Button") \
 	X(TYPE_ENUM_LOOKUP_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Axis, "GAB_Axis") \
@@ -6985,15 +7207,17 @@ enum render_pipeline_polygon_mode_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_IDLE_COLOR, "UI_WIDGET_FLAG_IDLE_COLOR") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HOVER_COLOR, "UI_WIDGET_FLAG_HOVER_COLOR") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_ACTIVE_COLOR, "UI_WIDGET_FLAG_ACTIVE_COLOR") \
+	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_INTERACTABLE, "UI_WIDGET_FLAG_INTERACTABLE") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MOUSE_CLICKABLE, "UI_WIDGET_FLAG_MOUSE_CLICKABLE") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HOVERABLE, "UI_WIDGET_FLAG_HOVERABLE") \
+	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_LEFT_DRAGGABLE, "UI_WIDGET_FLAG_LEFT_DRAGGABLE") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_TEXT, "UI_WIDGET_FLAG_DRAW_TEXT") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_RECTANGLE, "UI_WIDGET_FLAG_DRAW_RECTANGLE") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BACKGROUND, "UI_WIDGET_FLAG_DRAW_BACKGROUND") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BORDER, "UI_WIDGET_FLAG_DRAW_BORDER") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MAKE_CIRCULAR, "UI_WIDGET_FLAG_MAKE_CIRCULAR") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_FIXED_SIZE, "UI_WIDGET_FLAG_FIXED_SIZE") \
-	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_LEFT_DRAGGABLE, "UI_WIDGET_FLAG_LEFT_DRAGGABLE") \
+	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HAS_TEXT_CONTENT, "UI_WIDGET_FLAG_HAS_TEXT_CONTENT") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON, "UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_VERTICAL, "UI_WIDGET_LAYOUT_STYLE_VERTICAL") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_HORIZONTAL, "UI_WIDGET_LAYOUT_STYLE_HORIZONTAL") \
@@ -7160,6 +7384,10 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "SDL_Gamepad", .type = TYPE_SDL_Gamepad, .size = sizeof(SDL_Gamepad*), .struct_info = NULL},
 	{.name = "SDL_Joystick", .type = TYPE_SDL_Joystick, .size = sizeof(SDL_Joystick*), .struct_info = NULL},
 	{.name = "gamepad_controller_data_t", .type = TYPE_gamepad_controller_data_t, .size = sizeof(gamepad_controller_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_gamepad_controller_data_t_const_data},
+	{.name = "text_input_action_type_t", .type = TYPE_text_input_action_type_t, .size = sizeof(text_input_action_type_t), .struct_info = NULL},
+	{.name = "text_input_modifier_flags", .type = TYPE_text_input_modifier_flags, .size = sizeof(text_input_modifier_flags), .struct_info = NULL},
+	{.name = "text_input_event_type_t", .type = TYPE_text_input_event_type_t, .size = sizeof(text_input_event_type_t), .struct_info = NULL},
+	{.name = "text_input_event_t", .type = TYPE_text_input_event_t, .size = sizeof(text_input_event_t), .struct_info = (type_info_struct_t*)&type_info_struct_text_input_event_t_const_data},
 	{.name = "input_controller_t", .type = TYPE_input_controller_t, .size = sizeof(input_controller_t), .struct_info = (type_info_struct_t*)&type_info_struct_input_controller_t_const_data},
 	{.name = "game_action_binding_type_t", .type = TYPE_game_action_binding_type_t, .size = sizeof(game_action_binding_type_t), .struct_info = NULL},
 	{.name = "game_action_binding_t", .type = TYPE_game_action_binding_t, .size = sizeof(game_action_binding_t), .struct_info = (type_info_struct_t*)&type_info_struct_game_action_binding_t_const_data},
@@ -7405,6 +7633,16 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "SDL_X1_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X1_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
 	{.name = "SDL_X2_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X2_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
 	{.name = "SDL_MOUSE_BUTTON_COUNT", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MOUSE_BUTTON_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
+	{.name = "TEXT_INPUT_EVENT_NONE", .member_enum = TYPE_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_NONE, .type_info_ptr = (const type_info_struct*)&type_info_enum_text_input_action_type_t_const_data},
+	{.name = "TEXT_INPUT_EVENT_PRESSED", .member_enum = TYPE_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_PRESSED, .type_info_ptr = (const type_info_struct*)&type_info_enum_text_input_action_type_t_const_data},
+	{.name = "TEXT_INPUT_EVENT_DOWN", .member_enum = TYPE_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_DOWN, .type_info_ptr = (const type_info_struct*)&type_info_enum_text_input_action_type_t_const_data},
+	{.name = "TEXT_INPUT_EVENT_RELEASED", .member_enum = TYPE_TEXT_INPUT_ACTION_TYPE_T_MEMBER_TEXT_INPUT_EVENT_RELEASED, .type_info_ptr = (const type_info_struct*)&type_info_enum_text_input_action_type_t_const_data},
+	{.name = "TEXT_INPUT_MODIFIER_NONE", .member_enum = TYPE_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_NONE, .type_info_ptr = (const type_info_struct*)&type_info_enum_text_input_modifier_flags_const_data},
+	{.name = "TEXT_INPUT_MODIFIER_SHIFT", .member_enum = TYPE_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_SHIFT, .type_info_ptr = (const type_info_struct*)&type_info_enum_text_input_modifier_flags_const_data},
+	{.name = "TEXT_INPUT_MODIFIER_CTRL", .member_enum = TYPE_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_CTRL, .type_info_ptr = (const type_info_struct*)&type_info_enum_text_input_modifier_flags_const_data},
+	{.name = "TEXT_INPUT_MODIFIER_ALT", .member_enum = TYPE_TEXT_INPUT_MODIFIER_FLAGS_MEMBER_TEXT_INPUT_MODIFIER_ALT, .type_info_ptr = (const type_info_struct*)&type_info_enum_text_input_modifier_flags_const_data},
+	{.name = "TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM", .member_enum = TYPE_TEXT_INPUT_EVENT_TYPE_T_MEMBER_TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM, .type_info_ptr = (const type_info_struct*)&type_info_enum_text_input_event_type_t_const_data},
+	{.name = "TEXT_INPUT_EVENT_TYPE_INPUT_EVENT", .member_enum = TYPE_TEXT_INPUT_EVENT_TYPE_T_MEMBER_TEXT_INPUT_EVENT_TYPE_INPUT_EVENT, .type_info_ptr = (const type_info_struct*)&type_info_enum_text_input_event_type_t_const_data},
 	{.name = "GAB_Invalid", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Invalid, .type_info_ptr = (const type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
 	{.name = "GAB_Button", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Button, .type_info_ptr = (const type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
 	{.name = "GAB_Axis", .member_enum = TYPE_GAME_ACTION_BINDING_TYPE_T_MEMBER_GAB_Axis, .type_info_ptr = (const type_info_struct*)&type_info_enum_game_action_binding_type_t_const_data},
@@ -7473,15 +7711,17 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "UI_WIDGET_FLAG_IDLE_COLOR", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_IDLE_COLOR, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_HOVER_COLOR", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HOVER_COLOR, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_ACTIVE_COLOR", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_ACTIVE_COLOR, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
+	{.name = "UI_WIDGET_FLAG_INTERACTABLE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_INTERACTABLE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_MOUSE_CLICKABLE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MOUSE_CLICKABLE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_HOVERABLE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HOVERABLE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
+	{.name = "UI_WIDGET_FLAG_LEFT_DRAGGABLE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_LEFT_DRAGGABLE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_DRAW_TEXT", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_TEXT, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_DRAW_RECTANGLE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_RECTANGLE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_DRAW_BACKGROUND", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BACKGROUND, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_DRAW_BORDER", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DRAW_BORDER, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_MAKE_CIRCULAR", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MAKE_CIRCULAR, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_FIXED_SIZE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_FIXED_SIZE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
-	{.name = "UI_WIDGET_FLAG_LEFT_DRAGGABLE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_LEFT_DRAGGABLE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
+	{.name = "UI_WIDGET_FLAG_HAS_TEXT_CONTENT", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HAS_TEXT_CONTENT, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_LAYOUT_STYLE_VERTICAL", .member_enum = TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_VERTICAL, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_layout_style_t_const_data},
 	{.name = "UI_WIDGET_LAYOUT_STYLE_HORIZONTAL", .member_enum = TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_HORIZONTAL, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_layout_style_t_const_data},

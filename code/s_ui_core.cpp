@@ -7,7 +7,59 @@
 #include <s_ui_core.h>
 #include <r_immediate_rendering.h>
 
-true_inline void
+internal_api widget_t* 
+find_top_level_in_bounds_widget(ui_state_t *ui_state, widget_t *widget, vec2_t mouse_position)
+{
+    widget_t *result = null;
+
+    widget_t *first_widget = widget;
+    do {
+        if(widget->first_child)
+        { 
+            widget_t *top_level_child = find_top_level_in_bounds_widget(ui_state, widget->first_child, mouse_position);
+            if(result && top_level_child)
+            {
+                if(top_level_child->parent_stack_depth < result->parent_stack_depth)
+                {
+                    result = top_level_child;
+                }
+            }
+            else if(!result)
+            {
+                result = top_level_child;
+            }
+        }
+
+        widget_state_t *state = ui_state->widget_states.data + widget->ID;
+        state->is_held = false;
+        state->just_released = false;
+        state->just_clicked = false;
+        state->is_double_clicked = false;
+        state->is_right_clicked = false;
+
+        bool8 within_widget_bounds = rect2_point_in_rect(state->widget_rect, mouse_position);
+        if(within_widget_bounds && (widget->widget_flags & UI_WIDGET_FLAG_INTERACTABLE))
+        {
+            if(result)
+            {
+                if(widget->parent_stack_depth < result->parent_stack_depth)
+                {
+                    result = widget;
+                }
+            }
+            else
+            {
+                result = widget;
+            }
+        }
+
+        widget = widget->next_sibling;
+    }while(widget != first_widget);
+
+    return(result);
+}
+
+void
 ui_state_begin_frame(ui_state_t *ui_state)
 {
     ui_state->widget_item_count      = 0;
@@ -15,6 +67,72 @@ ui_state_begin_frame(ui_state_t *ui_state)
     ui_state->parent_stack_top       = 1;
     ui_state->default_font_size      = 32;
     ui_state->active_widget_padding  = vec4_zero();
+    ui_state->left_mouse_clicked_this_frame = false;
+
+    if(ui_state->first_widget != null)
+    {
+        vec2_t current_mouse_position = ui_state->mouse_position;
+
+        // NOTE(Sleepster): Determine top most widget for the hierarchy 
+        widget_t *current_widget = ui_state->first_widget;
+        if(ui_state->hot_widget)
+        {
+            widget_state_t *state = ui_state->widget_states.data + ui_state->hot_widget->ID;
+            bool8 within_bounds = rect2_point_in_rect(state->widget_rect, current_mouse_position);
+            if(!within_bounds)
+            {
+                ui_state->last_hot_ID = ui_state->hot_widget->ID;
+                ui_state->hot_widget = null;
+            }
+        }
+        action_button_t *left_mouse  = s_im_get_key_state(ui_state->ui_controller, SDL_LEFT_MOUSE);
+        action_button_t *right_mouse = s_im_get_key_state(ui_state->ui_controller, SDL_RIGHT_MOUSE);
+
+        bool8 is_held           = left_mouse->is_down;
+        bool8 just_released     = left_mouse->is_released;
+        bool8 just_clicked      = left_mouse->is_pressed;
+        bool8 is_double_clicked = left_mouse->half_transition_counter >= 2;
+        bool8 is_right_clicked  = right_mouse->is_pressed;
+
+        ui_state->left_mouse_clicked_this_frame = just_clicked;
+
+        widget_t *top_most_widget = find_top_level_in_bounds_widget(ui_state,
+                                                                    current_widget, 
+                                                                    current_mouse_position);
+        if(ui_state->hot_widget)
+        {
+            ui_state->last_hot_ID = ui_state->hot_widget->ID;
+            ui_state->hot_widget  = top_most_widget;
+        }
+        else
+        {
+            ui_state->hot_widget  = top_most_widget;
+        }
+
+        if(just_clicked)
+        {
+            if(ui_state->active_widget)
+            {
+                ui_state->last_active_ID = ui_state->active_widget->ID;
+                ui_state->active_widget  = top_most_widget;
+            }
+            else
+            {
+                ui_state->active_widget  = top_most_widget;
+            }
+        }
+
+        if(ui_state->active_widget)
+        {
+            widget_state_t *state = ui_state->widget_states.data + ui_state->active_widget->ID;
+
+            state->is_held = is_held;
+            state->just_released = just_released;
+            state->just_clicked = just_clicked;
+            state->is_double_clicked = is_double_clicked;
+            state->is_right_clicked = is_right_clicked;
+        }
+    }
 
     c_arena_reset(&ui_state->widget_arena);
 }
@@ -60,12 +178,95 @@ ui_state_set_active_padding(ui_state_t *ui_state, vec4_t padding)
     ui_state->active_widget_padding = padding;
 }
 
+internal_api void
+place_widgets_in_hierarchy(widget_t *first_widget, vec2_t *placement_cursor, u32 layout_style)
+{
+    widget_t *current_widget = first_widget;
+    do {
+        current_widget->expected_position.xy = *placement_cursor;
+        current_widget->expected_position.z  =  current_widget->parent_stack_depth;
+
+        current_widget->state->position = vec3(current_widget->expected_position.x + current_widget->state->offset.x,
+                                               current_widget->expected_position.y + current_widget->state->offset.y - current_widget->state->render_size.y,
+                                               current_widget->parent_stack_depth);
+
+        current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy,
+                                                          current_widget->state->render_size);
+        if(current_widget->first_child)
+        {
+            widget_t *nested_first_child = current_widget->first_child;
+            vec2_t child_cursor = vec2(current_widget->state->position.x + nested_first_child->parent_padding.x,
+                                       current_widget->state->position.y + current_widget->state->render_size.y - nested_first_child->parent_padding.z);
+
+            place_widgets_in_hierarchy(current_widget->first_child,
+                                      &child_cursor,
+                                       current_widget->layout_style);
+        }
+
+        bool8 has_next_sibling = (current_widget->next_sibling != first_widget);
+        if(layout_style == UI_WIDGET_LAYOUT_STYLE_VERTICAL)
+        {
+            placement_cursor->y -= current_widget->state->render_size.y;
+            if(has_next_sibling) 
+            {
+                placement_cursor->y -= current_widget->parent_child_spacing.y;
+            }
+        }
+        else
+        {
+            placement_cursor->x += current_widget->state->render_size.x;
+            if(has_next_sibling) 
+            {
+                placement_cursor->x += current_widget->parent_child_spacing.x;
+            }
+        }
+
+        current_widget = current_widget->next_sibling;
+    }while(current_widget != first_widget);
+}
+
+
+internal_api void
+place_all_widgets(ui_state_t *ui_state)
+{
+    renderpass_t *renderpass = ui_state->renderer->renderpasses + ui_state->interface_framebuffer;
+    float32 half_width  = renderpass->render_width  * 0.5f;
+    float32 half_height = renderpass->render_height * 0.5f;
+
+    widget_t *current_widget = ui_state->first_widget;
+    do {
+        current_widget->state->position.xy = vec2(current_widget->expected_position.x + current_widget->state->offset.x,
+                                                  current_widget->expected_position.y + current_widget->state->offset.y - current_widget->state->render_size.y);
+        current_widget->state->position.z  = current_widget->parent_stack_depth;
+        
+        // NOTE(Sleepster): Clamp it so that it fits within the window. 
+        current_widget->state->position.x = Clamp(current_widget->state->position.x, (-half_width  + 1), (half_width  - current_widget->state->render_size.x) - 1);
+        current_widget->state->position.y = Clamp(current_widget->state->position.y, (-half_height + 1), (half_height - current_widget->state->render_size.y) - 1);
+
+        current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy,
+                                                          current_widget->state->render_size);
+
+        if(current_widget->first_child)
+        {
+            vec2_t placement_cursor = vec2(current_widget->state->position.x + current_widget->max_left_padding,
+                                          (current_widget->state->position.y + current_widget->state->render_size.y) - current_widget->max_top_padding);
+
+            place_widgets_in_hierarchy(current_widget->first_child,
+                                      &placement_cursor,
+                                       current_widget->layout_style);
+        }
+
+        current_widget = current_widget->next_sibling;
+    }while(current_widget != ui_state->first_widget);
+}
+
 internal_api vec2_t 
 determine_hierarchy_size(widget_t *widget)
 {
     if(widget->widget_flags & UI_WIDGET_FLAG_FIXED_SIZE)
     {
-        widget->state->render_size = widget->minimum_render_size;
+        widget->state->render_size = vec2(widget->minimum_render_size.x + widget->max_left_padding   + widget->max_right_padding,
+                                          widget->minimum_render_size.y + widget->max_bottom_padding + widget->max_top_padding);
         if(widget->first_child)
         {
             widget_t *current_widget = widget->first_child;
@@ -114,77 +315,6 @@ determine_hierarchy_size(widget_t *widget)
     return(widget->state->render_size);
 }
 
-
-internal_api void
-place_widgets_in_hierarchy(widget_t *first_widget, vec2_t *placement_cursor, u32 layout_style)
-{
-    widget_t *current_widget = first_widget;
-    do {
-        current_widget->expected_position.xy = *placement_cursor;
-        current_widget->expected_position.z  =  current_widget->parent_stack_depth;
-
-        current_widget->state->position = vec3(current_widget->expected_position.x + current_widget->state->offset.x,
-                                               current_widget->expected_position.y + current_widget->state->offset.y - current_widget->state->render_size.y,
-                                               current_widget->parent_stack_depth);
-
-        current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy,
-                                                          current_widget->state->render_size);
-        if(current_widget->first_child)
-        {
-            widget_t *nested_first_child = current_widget->first_child;
-            vec2_t child_cursor = vec2(current_widget->state->position.x + nested_first_child->parent_padding.x,
-                                       current_widget->state->position.y + current_widget->state->render_size.y
-                                       - nested_first_child->parent_padding.z);
-
-            place_widgets_in_hierarchy(current_widget->first_child,
-                                       &child_cursor,
-                                       current_widget->layout_style);
-        }
-
-        bool8 has_next_sibling = (current_widget->next_sibling != first_widget);
-        if(layout_style == UI_WIDGET_LAYOUT_STYLE_VERTICAL)
-        {
-            placement_cursor->y -= current_widget->state->render_size.y;
-            if(has_next_sibling) placement_cursor->y -= current_widget->parent_child_spacing.y;
-        }
-        else
-        {
-            placement_cursor->x += current_widget->state->render_size.x;
-            if(has_next_sibling) placement_cursor->x += current_widget->parent_child_spacing.x;
-        }
-
-        current_widget = current_widget->next_sibling;
-    }while(current_widget != first_widget);
-}
-
-
-internal_api void
-place_all_widgets(ui_state_t *ui_state)
-{
-    widget_t *current_widget = ui_state->first_widget;
-    do {
-        current_widget->state->position.xy = vec2(current_widget->expected_position.x + current_widget->state->offset.x,
-                                                  current_widget->expected_position.y + current_widget->state->offset.y
-                                                  - current_widget->state->render_size.y);
-        current_widget->state->position.z  =  current_widget->parent_stack_depth;
-        current_widget->state->widget_rect  =  rect2_create(current_widget->state->position.xy,
-                                                             current_widget->state->render_size);
-
-        if(current_widget->first_child)
-        {
-            vec2_t placement_cursor = vec2(current_widget->state->position.x + current_widget->max_left_padding,
-                                          (current_widget->state->position.y + current_widget->state->render_size.y)
-                                           - current_widget->max_top_padding);
-
-            place_widgets_in_hierarchy(current_widget->first_child,
-                                       &placement_cursor,
-                                       current_widget->layout_style);
-        }
-
-        current_widget = current_widget->next_sibling;
-    }while(current_widget != ui_state->first_widget);
-}
-
 internal_api void
 size_all_widgets(ui_state_t *ui_state)
 {
@@ -202,6 +332,40 @@ ui_state_update_widget_hierarchy(ui_state_t *ui_state)
     size_all_widgets(ui_state);
     // NOTE(Sleepster): Place the widgets in the hierarchy, honoring the sizing and padding
     place_all_widgets(ui_state);
+}
+
+void
+ui_state_maybe_eat_inputs(ui_state_t *ui_state)
+{
+    input_controller_t *input = ui_state->ui_controller;
+    if((input->text_inputs_this_frame > 0) && ui_state->input_focused)
+    {
+        for(u32 input_index = 0;
+            input_index < input->text_inputs_this_frame;
+            ++input_index)
+        {
+            text_input_event_t *event = &ui_state->ui_controller->transient_text_inputs[input_index];
+            if(event->type == TEXT_INPUT_EVENT_TYPE_INPUT_EVENT)
+            {
+                action_button_t *key = input->keyboard.input + event->scancode;
+                switch(event->input_event_type)
+                {
+                    case TEXT_INPUT_EVENT_PRESSED:
+                    {
+                        s_im_consume_keyboard_key_press(input, key->scancode);
+                    }break;
+                    case TEXT_INPUT_EVENT_DOWN:
+                    {
+                        s_im_consume_keyboard_key_down(input, key->scancode);
+                    }break;
+                    case TEXT_INPUT_EVENT_RELEASED:
+                    {
+                        s_im_consume_keyboard_key_release(input, key->scancode);
+                    }break;
+                }
+            }
+        }
+    }
 }
 
 void
@@ -284,17 +448,41 @@ render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_lis
 
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_TEXT)
         {
-            immediate_text(command_list, 
-                           &ui_state->vertex_buffer, 
-                           ui_state->asset_manager,
-                           &ui_state->default_font,
-                           current_widget->widget_text,
-                           vec3_add(current_widget->state->position, vec3(0.0, 0.0, -0.01)), 
-                           ui_state->default_font_color,
-                           2.0,
-                           current_widget->font_size);
+            vec3_t text_render_position = vec3(current_widget->state->position.x + current_widget->widget_padding.left,
+                                               current_widget->state->position.y + current_widget->widget_padding.bottom,
+                                               current_widget->state->position.z + -0.01); // some Epsilon
+            if((current_widget->widget_flags & UI_WIDGET_FLAG_HAS_TEXT_CONTENT) == 0)
+            {
+                immediate_text(command_list, 
+                               &ui_state->vertex_buffer, 
+                               ui_state->asset_manager,
+                               &ui_state->default_font,
+                               current_widget->widget_name,
+                               text_render_position, 
+                               ui_state->default_font_color,
+                               2.0,
+                               current_widget->font_size);
 
-            ui_state->widget_item_count += current_widget->widget_text.count;
+                ui_state->widget_item_count += current_widget->widget_name.count;
+            }
+            else
+            {
+                string_t widget_text = {
+                    .data  = (u8*)(current_widget->state->widget_text_buffer + current_widget->state->widget_text_render_start_offset),
+                    .count = current_widget->state->widget_text_render_end_offset,
+                };
+                immediate_text(command_list, 
+                               &ui_state->vertex_buffer, 
+                               ui_state->asset_manager,
+                               &ui_state->default_font,
+                               widget_text,
+                               text_render_position, 
+                               ui_state->default_font_color,
+                               2.0,
+                               current_widget->font_size);
+
+                ui_state->widget_item_count += widget_text.count;
+            }
         }
 
         if(current_widget->first_child)
@@ -558,15 +746,14 @@ ui_widget_set_padding(widget_t *widget, vec4_t padding)
 true_inline void
 ui_widget_seed(ui_state_t *ui_state, u64 index)
 {
-    u64 hash = c_fnv_hash_value((byte*)&index, sizeof(u64));
-    ui_state->ui_seed = hash;
+    ui_state->ui_seed = index;
 }
 
 true_inline u64
 ui_widget_hash(ui_state_t *ui_state, widget_t *widget)
 {
     u64 result = 0;
-    result = (c_fnv_hash_value(widget->widget_text.data, widget->widget_text.count));
+    result = (c_fnv_hash_value(widget->widget_name.data, widget->widget_name.count));
     if(ui_state->ui_seed != 0)
     {
         result = c_combine_hashes(result, ui_state->ui_seed);
@@ -613,8 +800,18 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
 {
     widget_t *result = c_arena_push_struct(&ui_state->widget_arena, widget_t);
     ZeroStruct(*result);
+    if(widget_flags & UI_WIDGET_FLAG_MOUSE_CLICKABLE || 
+       widget_flags & UI_WIDGET_FLAG_HOVERABLE       ||
+       widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE)
+    {
+        if((widget_flags & UI_WIDGET_FLAG_INTERACTABLE) == 0)
+        {
+            widget_flags |= UI_WIDGET_FLAG_INTERACTABLE;
+        }
+    }
 
-    result->widget_text         = widget_name;
+
+    result->widget_name         = widget_name;
     result->widget_flags        = widget_flags;
     result->ID                  = ui_widget_hash(ui_state, result);
     result->parent_stack_depth  = ui_widget_determine_depth(ui_state);
@@ -624,6 +821,7 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
     result->smoothness          = ui_state->default_widget_SDF_smoothness;
     result->border_thickness    = ui_state->default_widget_border_thickness;
     result->border_color        = ui_state->default_widget_border_color;
+    result->font_size           = ui_state->default_font_size;
     result->radius              = result->state->render_size.x;
     result->expected_position.z = result->parent_stack_depth;
 
@@ -648,8 +846,7 @@ internal_api void
 widget_do_button(ui_state_t *ui_state, ui_signal_t *signal)
 {
     widget_t *widget = signal->widget;
-    if((signal->signal_flags & UI_SIGNAL_FLAG_HOVERING) && 
-       (ui_state->hot_widget == widget))
+    if(signal->signal_flags & UI_SIGNAL_FLAG_HOVERING)
     {
         widget->state->last_interacted_frame = ui_state->frame_count;
         widget->state->render_color = widget->hovered_color;
@@ -660,8 +857,7 @@ widget_do_button(ui_state_t *ui_state, ui_signal_t *signal)
         }
 
         if(widget->state->input_begin_within_bounds && 
-          (signal->signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN) && 
-          (ui_state->active_widget == widget))
+          (signal->signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN))
         {
             widget->state->render_color = widget->active_color;
         }
@@ -693,20 +889,17 @@ internal_api void
 widget_do_draggable(ui_state_t *ui_state, ui_signal_t *signal)
 {
     widget_t *widget = signal->widget;
-    if((signal->signal_flags & UI_SIGNAL_FLAG_HOVERING) &&
-       (ui_state->hot_widget == widget))
+    if(signal->signal_flags & UI_SIGNAL_FLAG_HOVERING)
     {
         widget->state->last_interacted_frame = ui_state->frame_count;
-        if(signal->signal_flags & UI_SIGNAL_FLAG_CLICKED && 
-           (ui_state->active_widget == widget))
+        if(signal->signal_flags & UI_SIGNAL_FLAG_CLICKED)
         {
             widget->state->initial_mouse_position    = ui_state->mouse_position;
             widget->state->input_begin_within_bounds = true;
         }
     }
 
-    if(widget->state->input_begin_within_bounds &&
-      (ui_state->active_widget == widget))
+    if(widget->state->input_begin_within_bounds)
     {
         if(signal->signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN)
         {
@@ -727,105 +920,52 @@ ui_widget_get_signals(ui_state_t *ui_state, widget_t *widget)
 {
     ui_signal_t result = {};
     result.widget = widget;
-
-    widget_state_t *widget_state = ui_state->widget_states.data + widget->ID;
-    Assert(widget_state);
-
-    action_button_t *left_mouse  = s_im_get_key_state(ui_state->ui_controller, SDL_LEFT_MOUSE);
-    action_button_t *right_mouse = s_im_get_key_state(ui_state->ui_controller, SDL_RIGHT_MOUSE);
-
-    bool8 is_held           = left_mouse->is_down;
-    bool8 just_released     = left_mouse->is_released;
-    bool8 just_clicked      = left_mouse->is_pressed;
-    bool8 is_double_clicked = left_mouse->half_transition_counter >= 2;
-    bool8 is_right_clicked  = right_mouse->is_pressed;
-
-    bool8 is_in_bounds = rect2_point_in_rect(widget_state->widget_rect, ui_state->mouse_position);
-    if(is_in_bounds)
+    if(ui_state->hot_widget == widget && (ui_state->hot_widget->widget_flags & UI_WIDGET_FLAG_INTERACTABLE))
     {
+        widget_state_t *widget_state = ui_state->widget_states.data + widget->ID;
+
         if((widget->widget_flags & UI_WIDGET_FLAG_HOVERABLE))
         {
-            if(ui_state->hot_widget)
-            {
-                ui_state->last_hot_ID = ui_state->hot_widget->ID;
-                ui_state->hot_widget  = widget;
-                result.signal_flags |= UI_SIGNAL_FLAG_HOVERING;
-            }
-            else
-            {
-                ui_state->hot_widget  = widget;
-                result.signal_flags |= UI_SIGNAL_FLAG_HOVERING;
-            }
-        }
-
-        if((widget->widget_flags & UI_WIDGET_FLAG_MOUSE_CLICKABLE) || (widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE)) 
-        {
-            if(just_clicked)
-            {
-                // NOTE(Sleepster): Depth comparison (widget->parent_stack_depth < ui_state->hot_widget->parent_stack_depth)
-                if(ui_state->active_widget)
-                {
-                    ui_state->last_active_ID = ui_state->active_widget->ID;
-                    ui_state->active_widget  = widget;
-                }
-                else
-                {
-                    ui_state->active_widget       = widget;
-                    ui_state->last_clicked_widget = widget;
-                } 
-            }
-
-            if(just_released)
-            {
-                ui_state->active_widget       = null;
-                ui_state->last_clicked_widget = null;
-            }
+            result.signal_flags |= UI_SIGNAL_FLAG_HOVERING;
         }
 
         if((widget->widget_flags & UI_WIDGET_FLAG_MOUSE_CLICKABLE))
         {
-            if(just_clicked)
+            if(widget_state->just_clicked)
             {
                 result.signal_flags |= UI_SIGNAL_FLAG_LEFT_CLICKED; 
-                s_im_is_keyboard_key_pressed(ui_state->ui_controller, SDL_LEFT_MOUSE);
             }
 
-            if(is_held)
+            if(widget_state->is_held)
             {
                 result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOWN;
-                s_im_is_keyboard_key_down(ui_state->ui_controller, SDL_LEFT_MOUSE);
             }
 
-            if(just_released)
+            if(widget_state->just_released)
             {
                 result.signal_flags |= UI_SIGNAL_FLAG_LEFT_RELEASED;
-                s_im_consume_keyboard_key_release(ui_state->ui_controller, SDL_LEFT_MOUSE);
             }
 
-            if(is_double_clicked)
+            if(widget_state->is_double_clicked)
             {
                 result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOUBLE_CLICKED;
-                s_im_is_keyboard_key_pressed(ui_state->ui_controller, SDL_LEFT_MOUSE);
             }
         }
         else if((widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE))
         {
-            if(just_clicked)
+            if(widget_state->just_clicked)
             {
                 result.signal_flags |= UI_SIGNAL_FLAG_LEFT_CLICKED;
-                s_im_is_keyboard_key_pressed(ui_state->ui_controller, SDL_LEFT_MOUSE);
             }
-            if(is_held)
+            if(widget_state->is_held)
             {
                 result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOWN;
-                s_im_is_keyboard_key_down(ui_state->ui_controller, SDL_LEFT_MOUSE);
             }
         }
 
-        if(is_right_clicked)
+        if(widget_state->is_right_clicked)
         {
             result.signal_flags |= UI_SIGNAL_FLAG_RIGHT_CLICKED;
-            s_im_is_keyboard_key_pressed(ui_state->ui_controller, SDL_RIGHT_MOUSE);
         }
     }
 
@@ -867,7 +1007,7 @@ ui_widget_draggable_panel(ui_state_t *ui_state,
                           vec4_t      background_color)
 {
     ui_signal_t result = ui_widget_panel(ui_state, widget_name, position, child_spacing, padding, background_color);
-    ui_widget_set_flags(result.widget, (UI_WIDGET_FLAG_LEFT_DRAGGABLE|UI_WIDGET_FLAG_HOVERABLE));
+    ui_widget_set_flags(result.widget, (UI_WIDGET_FLAG_LEFT_DRAGGABLE|UI_WIDGET_FLAG_HOVERABLE|UI_WIDGET_FLAG_INTERACTABLE));
 
     result = ui_widget_get_signals(ui_state, result.widget);
     widget_do_draggable(ui_state, &result);
@@ -924,10 +1064,13 @@ ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text)
                                                    &ui_state->default_font, 
                                                     ui_state->default_font_size,
                                                     &max_descender);
+    
+    vec2_t true_size = vec2(text_size.x + ui_state->active_widget_padding.left + ui_state->active_widget_padding.right,
+                            text_size.y + ui_state->active_widget_padding.top  + ui_state->active_widget_padding.bottom);
     ui_signal_t result = ui_widget_sized_button(ui_state, 
                                                 widget_text,
-                                                text_size,
-                                                UI_WIDGET_FLAG_DRAW_TEXT|UI_WIDGET_FLAG_MAKE_CIRCULAR);
+                                                true_size,
+                                                UI_WIDGET_FLAG_DRAW_TEXT|UI_WIDGET_FLAG_MAKE_CIRCULAR|UI_WIDGET_FLAG_INTERACTABLE);
     result.widget->font_size = ui_state->default_font_size;
 
     return(result);
@@ -938,7 +1081,7 @@ ui_widget_toggle_box(ui_state_t *ui_state, string_t widget_text, vec2_t size)
 {
     widget_t *widget = ui_widget_create(ui_state, 
                                         widget_text, 
-                                        UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON|UI_WIDGET_FLAG_MAKE_CIRCULAR);
+                                        UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON|UI_WIDGET_FLAG_MAKE_CIRCULAR|UI_WIDGET_FLAG_INTERACTABLE);
     widget->minimum_render_size = size;
     widget->idle_color          = ui_state->default_widget_idle_color;
     widget->hovered_color       = ui_state->default_widget_hover_color;
@@ -951,13 +1094,19 @@ ui_widget_toggle_box(ui_state_t *ui_state, string_t widget_text, vec2_t size)
     return(result);
 }
 
-void
+// TODO(Sleepster): color? 
+ui_signal_t
 ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size)
 {
+    ui_signal_t result = {};
     widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_DRAW_RECTANGLE|UI_WIDGET_FLAG_MAKE_CIRCULAR);
+
+    result = ui_widget_get_signals(ui_state, widget);
 
     widget->minimum_render_size = size;
     widget->state->render_color = ui_state->default_widget_idle_color;
+
+    return(result);
 }
 
 void 
@@ -978,6 +1127,9 @@ ui_signal_t
 ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_width, u32 bar_height, float32 button_scale_factor)
 {
     ui_signal_t result;
+
+    vec4_t active_padding = ui_state->active_widget_padding;
+    ui_state_set_active_padding(ui_state, vec4_zero());
 
     widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DRAW_RECTANGLE|UI_WIDGET_FLAG_MAKE_CIRCULAR|UI_WIDGET_FLAG_FIXED_SIZE);
     widget->minimum_render_size = vec2(bar_width, bar_height);
@@ -1009,12 +1161,170 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
         }
 
         float32 remaining_width = (float32)bar_width - box_button->minimum_render_size.x;
-        box_button->state->offset.x = slider_bar->state->slider_value * remaining_width;
+        box_button->state->offset.x = (slider_bar->state->slider_value * remaining_width);
         box_button->state->offset.y = (slider_box_size.y - ((float32)bar_height * (button_scale_factor * 1.3f))) * -1.0f;
+    }
+
+    ui_widget_seed(ui_state, 0);
+    ui_state_set_active_padding(ui_state, active_padding);
+    return(result);
+}
+
+// TODO(Sleepster): Function to fill the contents of the text buffer
+ui_signal_t
+ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, vec2_t size)
+{
+    ui_signal_t result = {};
+    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DRAW_RECTANGLE|
+                                                               UI_WIDGET_FLAG_MOUSE_CLICKABLE|
+                                                               UI_WIDGET_FLAG_INTERACTABLE|
+                                                               UI_WIDGET_FLAG_DRAW_TEXT|
+                                                               UI_WIDGET_FLAG_HAS_TEXT_CONTENT);
+    widget->minimum_render_size = size;
+    widget->state->render_color = ui_state->default_widget_idle_color;
+
+    result = ui_widget_get_signals(ui_state, widget);
+
+    widget_state_t *widget_state = ui_state->widget_states.data + widget->ID;
+    if(ui_pressed(result))
+    {
+        widget_state->toggled = true;
+    }
+    else if(ui_state->left_mouse_clicked_this_frame)
+    {
+        widget_state->toggled = false;
+    }
+
+    if(widget_state->toggled)
+    {
+        // NOTE(Sleepster): Handle text input
+        for(u32 input_event_index = 0;
+            input_event_index < ui_state->ui_controller->text_inputs_this_frame;
+            ++input_event_index)
+        {
+            // NOTE(Sleepster): Eventually render a range of characters 
+            // (such as indices 10 - 32 for items that run off the end, a way of fitting text into a small box like other apps)
+            // rather than the whole string 
+            text_input_event_t *input = &ui_state->ui_controller->transient_text_inputs[input_event_index];
+
+            // NOTE(Sleepster): Input stream, like WM_CHAR events 
+            if(input->type == TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM)
+            {
+                // NOTE(Sleepster): Safe to use here since SDL GUARANTEES that this will be null terminated 
+                s32 input_length = strlen((const char *)input->input_stream);
+                if(input_length > 0)
+                {
+                    for(s32 stream_index = 0;
+                        stream_index < input_length;
+                        ++stream_index)
+                    {
+                        s32 index = widget_state->widget_text_buffer_used + stream_index;
+                        widget_state->widget_text_buffer[index] = input->input_stream[stream_index];
+                    }
+
+                    widget_state->widget_text_buffer_used += input_length;
+                }
+            }
+            else
+            {
+                // NOTE(Sleepster): Special non-character items like backspace, delete, etc. 
+                if(input->keycode == 0x08)
+                {
+                    if((input->modifier_flags & TEXT_INPUT_MODIFIER_CTRL) == 0)
+                    {
+                        widget_state->widget_text_buffer[widget_state->widget_text_buffer_used] = '\0';
+                        widget_state->widget_text_buffer_used = Max(widget_state->widget_text_buffer_used - 1, 0);
+                    }
+                    else
+                    {
+                        for(s32 index = -4;
+                            index != 0;
+                            ++index)
+                        {
+                            s32 char_index = Max(widget_state->widget_text_buffer_used + index, 0);
+                            widget_state->widget_text_buffer[char_index] = '\0';
+                        }
+                        widget_state->widget_text_buffer_used = Max(widget_state->widget_text_buffer_used - 4, 0);
+                    }
+                }
+            }
+        }
+
+        widget_state->widget_text_render_start_offset = 0;
+        widget_state->widget_text_render_end_offset   = widget_state->widget_text_buffer_used;
+
+        vec2_t offset = {};
+        if(widget_state->widget_text_buffer_used > 0)
+        {
+            string_t buffer_string = {
+                .data  = (u8*)widget_state->widget_text_buffer,
+                .count = widget_state->widget_text_buffer_used
+            };
+            vec2_t string_size = s_asset_font_get_string_size(ui_state->asset_manager, 
+                                                              buffer_string,
+                                                              &ui_state->default_font,
+                                                              widget->font_size,
+                                                              null);
+            offset = string_size;
+        }
+        
+        float32 internal_size_left = (size.x - (widget->widget_padding.left + widget->widget_padding.right));
+        float32 internal_size_used = offset.x;
+        if(internal_size_used > internal_size_left)
+        {
+            u32 current_byte_offset = 0;
+            while(internal_size_used > internal_size_left)
+            {
+                byte *character = widget_state->widget_text_buffer + current_byte_offset;
+                dynamic_render_font_varient_t *varient = s_asset_font_acquire_font_at_size(ui_state->asset_manager,
+                                                                                          &ui_state->default_font,
+                                                                                           widget->font_size);
+                glyph_metric_t *glyph = s_asset_font_fetch_glyph(ui_state->asset_manager, varient, character);
+                byte buffer[4] = {};
+                
+                u32 UTF32_character = s_UTF8_convert_UTF32(character);
+                string_t conversion_buffer = {
+                    .data  = buffer,
+                    .count = sizeof(buffer),
+                };
+
+                // NOTE(Sleepster): It's really weird we have to do this, but I'm not sure we can count how many
+                // used bytes are actually in the UTF32 character
+                s_UTF32_convert_to_UTF8(&conversion_buffer, UTF32_character);
+
+                internal_size_used -= glyph->advance;
+                widget_state->widget_text_render_start_offset += 1;
+                widget_state->widget_text_render_end_offset   -= 1;
+
+                current_byte_offset += conversion_buffer.count;
+            }
+        }
+
+        // NOTE(Sleepster): Cursor 
+        ui_row(ui_state, widget)
+        {
+            ui_widget_seed(ui_state, widget->ID);
+
+            string_t name = c_string_concat(&global_context->temporary_arena, STR("TEXT_BOX_CURSOR_"), widget_name);
+            ui_signal_t signal = ui_widget_rectangle(ui_state, name, vec2(12, size.y));
+
+            widget_t *rect = signal.widget;
+            rect->state->render_color = vec4(0.0, 1.0, 0.0, 1.0);
+            rect->state->offset = vec2(internal_size_used, widget->widget_padding.bottom);
+
+            ui_widget_seed(ui_state, 0);
+        }
     }
 
     return(result);
 }
+
+#if 0
+            if((!(input->keycode < 0x20 || input->keycode > 0x7F) &&  // C0 control codes + delete
+                !(input->keycode >= 0x80 && input->keycode <= 0x9F))) // C1 control codes
+            {
+            }
+#endif
 
 #if 0
 void

@@ -10,6 +10,12 @@
 #include <c_base.h>
 #include <c_types.h>
 
+#if 0
+template <typename... Args>
+internal_api void
+print(const char *message, Args... arguments);
+#endif
+
 struct test_structure 
 {
     int apples = 4;
@@ -107,5 +113,38 @@ main(int argc, char **argv)
         }
     }
 
+    //print("Test Message %");
+
     return(0);
 }
+
+#if 0
+template <typename... Args>
+constexpr u32
+get_packed_argument_count(Args... arguments)
+{
+    return(sizeof...(arguments));
+}
+
+template <typename T>
+internal_api void 
+output_type_data(char *buffer, u32 buffer_size, T &item)
+{
+    const type_info_t *info = Athena::type_info(item);
+    if(info->metatype == ATHENA_METATYPE_PRIMITIVE)
+    {
+    }
+}
+
+template <typename... Args>
+internal_api void
+print(Args... arguments)
+{
+    u32 argument_count = get_packed_argument_count(arguments...);
+    char buffer[8192];
+    if(argument_count > 0)
+    {
+        output_type_data(buffer, sizeof(buffer), arguments...);
+    }
+}
+#endif

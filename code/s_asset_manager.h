@@ -320,7 +320,7 @@ const global_variable u8 UTF8_trailing_bytes[] = {
 };
 
 const global_variable u8 UTF8_initial_bytemask[] = {0x7f, 0x1f, 0x0f, 0x07, 0x03, 0x01};
-const global_variable u8 UTF8_first_byte_mask[]  = {0x00, 0x00, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
+const global_variable u8 UTF8_first_byte_mark[]  = {0x00, 0x00, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
 
 const global_variable u32 UTF8_offsets[] = {
     0x00000000, 0x00003080, 0x000e2080, 
@@ -565,6 +565,10 @@ struct asset_manager_t
 void  s_asset_manager_init(asset_manager_t *asset_manager);
 void  s_asset_manager_update(asset_manager_t *asset_manager);
 void s_asset_manager_queue_asset_load(asset_manager_t *asset_manager, asset_slot_t *slot);
+
+// TODO(Sleepster): Unicode.cpp 
+void s_UTF32_convert_to_UTF8(string_t *buffer, u32 character);
+u32 s_UTF8_convert_UTF32(u8 *character);
 
 bool8          s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath);
 asset_handle_t s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name);

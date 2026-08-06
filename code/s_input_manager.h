@@ -20,6 +20,7 @@ extern vec2_t g_window_size;
 
 #define MAX_INPUT_CONTROLLERS 4
 #define MAX_KEYBOARD_BUTTONS (SDL_SCANCODE_COUNT + 5)
+#define MAX_BUFFERED_INPUTS  32
 
 typedef enum controller_type
 {
@@ -44,21 +45,25 @@ typedef struct action_button
     bool8 is_down;
     bool8 is_released;
     bool8 is_pressed;
+    bool8 consumed_this_frame;
+    // NOTE(Sleepster): UTF32 keycode 
+    u32   keycode;
+    u32   scancode;
 
     u8    half_transition_counter;
 }action_button_t;
 
 typedef struct keyboard_controller_data
 {
-    action_button_t input[MAX_KEYBOARD_BUTTONS];
+    action_button_t  input[MAX_KEYBOARD_BUTTONS];
 
-    vec2_t          current_mouse_pos;
-    vec2_t          last_mouse_pos;
-    vec2_t          mouse_delta;
+    vec2_t           current_mouse_pos;
+    vec2_t           last_mouse_pos;
+    vec2_t           mouse_delta;
 
-    bool8           is_shift_key_down;
-    bool8           is_control_key_down;
-    bool8           is_alt_key_down;
+    bool8            is_shift_key_down;
+    bool8            is_control_key_down;
+    bool8            is_alt_key_down;
 }keyboard_controller_data_t;
 
 typedef struct analog_button
@@ -80,11 +85,54 @@ typedef struct gamepad_controller_data
     analog_button_t     analog_buttons[SDL_GAMEPAD_AXIS_COUNT];
 }gamepad_controller_data_t;
 
+typedef enum text_input_action_event_type 
+{
+    TEXT_INPUT_EVENT_NONE,
+    TEXT_INPUT_EVENT_PRESSED  = BIT(1),
+    TEXT_INPUT_EVENT_DOWN     = BIT(2),
+    TEXT_INPUT_EVENT_RELEASED = BIT(3),
+}text_input_action_type_t;
+
+typedef enum text_input_modifier_flags 
+{
+    TEXT_INPUT_MODIFIER_NONE  = BIT(0),
+    TEXT_INPUT_MODIFIER_SHIFT = BIT(1),
+    TEXT_INPUT_MODIFIER_CTRL  = BIT(2),
+    TEXT_INPUT_MODIFIER_ALT   = BIT(3),
+}text_input_modifier_flags;
+
+typedef enum text_input_event_type
+{
+    // NOTE(Sleepster): For messages like WM_CHAR for a character string that has been typed,
+    // Already in UTF8 encoding.
+    TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM = BIT(0),
+    // NOTE(Sleepster): For events like CTRL being pressed, Shift down, etc. 
+    TEXT_INPUT_EVENT_TYPE_INPUT_EVENT      = BIT(1),
+}text_input_event_type_t;
+
+typedef struct text_input_event
+{
+    u32       type;
+    u32       input_event_type;
+    u32       modifier_flags;
+    u32       scancode;
+    u32       keycode;
+
+    const u8 *input_stream;
+}text_input_event_t;
+
 typedef struct input_controller
 {
     bool8             is_valid;
     bool8             is_analog;
     controller_type_t type;
+    
+    action_button_t *transient_action_inputs[MAX_BUFFERED_INPUTS];
+    u32              action_inputs_this_frame;
+
+    text_input_event_t transient_text_inputs[MAX_BUFFERED_INPUTS];
+    u32                text_inputs_this_frame;
+
     union {
         keyboard_controller_data_t keyboard;
         gamepad_controller_data_t  gamepad;

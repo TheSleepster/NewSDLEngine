@@ -98,6 +98,8 @@ main(int argc, char **argv)
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
         }
 
+        SDL_StartTextInput(global_context->renderer_state->window);
+
         global_context->renderer_state->render_context = c_arena_push_struct(&global_context->context_arena, vulkan_context_t);
         global_context->asset_manager->renderer_state  = global_context->renderer_state; 
         vulkan_context_t *vulkan_context = (vulkan_context_t*)global_context->renderer_state->render_context;

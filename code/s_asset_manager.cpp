@@ -374,6 +374,59 @@ s_UTF8_convert_UTF32(u8 *character)
     return(result);
 }
 
+void
+s_UTF32_convert_to_UTF8(string_t *buffer, u32 character)
+{
+    if(buffer->count >= 4)
+    {
+        const local_persist u32 UNICODE_MAX_LEGAL_UTF32 = 0x0010FFFFUL;
+
+        u32 count = 0;
+        if(character < 0x80)                          count = 1;
+        else if(character < 0x800)                    count = 2;
+        else if(character < 0x10000)                  count = 3;
+        else if(character <= UNICODE_MAX_LEGAL_UTF32) count = 4;
+        else 
+        {
+            count = 3;
+            character = UTF32_REPLACEMENT_CHARACTER;
+        }
+
+        const u32 UTF_byte_mask = 0xBF;
+        const u32 UTF_byte_mark = 0x80; 
+
+        buffer->count = count;
+        switch(count)
+        {
+            case 4:
+            {
+                buffer->data[3] = ((character | UTF_byte_mark) & UTF_byte_mask);
+                character = character >> 6;
+            };
+            case 3:
+            {
+                buffer->data[2] = ((character | UTF_byte_mark) & UTF_byte_mask);
+                character = character >> 6;
+            };
+            case 2:
+            {
+                buffer->data[1] = ((character | UTF_byte_mark) & UTF_byte_mask);
+                character = character >> 6;
+            };
+            case 1:
+            {
+                buffer->data[0] = (character | UTF8_first_byte_mark[count]);
+                character = character >> 6;
+            }break;
+        }
+    }
+    else
+    {
+        log_error("Buffer is too small for a UTF32 -> UTF8 conversion. We expect at least 4 bytes, instead got: '%d'...\n",
+                  buffer->count);
+    }
+}
+
 bool8
 s_asset_font_set_unknown_character(dynamic_render_font_varient_t *varient, u32 UTF32_index)
 {
@@ -520,8 +573,14 @@ s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t
     return(result);
 }
 
+// TODO(Sleepster): This will *NOT* correctly handle UTF8 characters as simply advancing by one doesn't work
+// We need to advance by how ever many bytes the UTF character is.
 vec2_t 
-s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, asset_handle_t *font_handle, u32 pixel_size, float32 *max_descender_out)
+s_asset_font_get_string_size(asset_manager_t *asset_manager, 
+                             string_t         string, 
+                             asset_handle_t  *font_handle, 
+                             u32              pixel_size, 
+                             float32         *max_descender_out)
 {
     Assert(string.count > 0);
     vec2_t result = vec2_zero();
@@ -542,7 +601,7 @@ s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, as
             tallest_glyph = glyph->height + glyph->offset_y;
         }
 
-        total_width += glyph->width + (glyph->advance * 0.33);
+        total_width += glyph->advance;
     }
 
     if(max_descender_out)

@@ -46,9 +46,9 @@ struct ImmediateWidgetData_t
 
 enum ImmediateWidgetRenderFlags_t
 {
-    UI_WIDGET_RENDER_FLAG_DRAW_BACKGROUND = (1 << 8),
-    UI_WIDGET_RENDER_FLAG_DRAW_BORDER     = (1 << 9),
-    UI_WIDGET_RENDER_FLAG_MAKE_CIRCULAR   = (1 << 10),
+    UI_WIDGET_RENDER_FLAG_DRAW_BACKGROUND = (1 << 10),
+    UI_WIDGET_RENDER_FLAG_DRAW_BORDER     = (1 << 11),
+    UI_WIDGET_RENDER_FLAG_MAKE_CIRCULAR   = (1 << 12),
 };
 
 #endif // WIDGET_INSTANCE_DATA_SLH

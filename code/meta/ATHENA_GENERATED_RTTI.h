@@ -4592,11 +4592,13 @@ struct type_info_struct_input_controller_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[5];
+		const type_info_member_t member_array[7];
 		struct {
 			const type_info_member_t is_valid;
 			const type_info_member_t is_analog;
 			const type_info_member_t type;
+			const type_info_member_t inputs_this_frame;
+			const type_info_member_t frame_input_counter;
 			const type_info_member_t keyboard;
 			const type_info_member_t gamepad;
 		}members;
@@ -6480,17 +6482,18 @@ struct type_info_struct_widget_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[33];
+		const type_info_member_t member_array[34];
 		struct {
 			const type_info_member_t ID;
 			const type_info_member_t widget_flags;
 			const type_info_member_t layout_style;
 			const type_info_member_t state;
-			const type_info_member_t widget_text;
+			const type_info_member_t widget_name;
+			const type_info_member_t widget_text_buffer;
+			const type_info_member_t widget_text_buffer_used;
 			const type_info_member_t toggled;
 			const type_info_member_t parent_stack_depth;
 			const type_info_member_t font_size;
-			const type_info_member_t font_max_descender;
 			const type_info_member_t expected_position;
 			const type_info_member_t minimum_render_size;
 			const type_info_member_t size_kind;
@@ -6524,10 +6527,11 @@ struct type_info_struct_ui_state_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[41];
+		const type_info_member_t member_array[42];
 		struct {
 			const type_info_member_t widget_arena;
 			const type_info_member_t section_count;
+			const type_info_member_t input_focused;
 			const type_info_member_t last_hot_ID;
 			const type_info_member_t last_active_ID;
 			const type_info_member_t hot_widget;
@@ -19991,7 +19995,7 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<input_controller_t>(),
 	},
-	.member_count   = 5,
+	.member_count   = 7,
 	.member_pointer = DEFAULT_typedata_structure_input_controller_t.member_array,
 	.members = {
 		.is_valid = {
@@ -20015,6 +20019,22 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 			.member_name   = "type",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
 			.offset        = offsetof(input_controller_t, type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.inputs_this_frame = {
+			.type_info     = &DEFAULT_typedata_structure_action_button_t.type_info,
+			.member_name   = "inputs_this_frame",
+			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.offset        = offsetof(input_controller_t, inputs_this_frame),
+			.flags         = 66,
+			.pointer_depth = 1,
+		},
+		.frame_input_counter = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "frame_input_counter",
+			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.offset        = offsetof(input_controller_t, frame_input_counter),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -24678,7 +24698,7 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<widget_t>(),
 	},
-	.member_count   = 33,
+	.member_count   = 34,
 	.member_pointer = DEFAULT_typedata_structure_widget_t.member_array,
 	.members = {
 		.ID = {
@@ -24713,11 +24733,27 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.widget_text = {
+		.widget_name = {
 			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
-			.member_name   = "widget_text",
+			.member_name   = "widget_name",
 			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
-			.offset        = offsetof(widget_t, widget_text),
+			.offset        = offsetof(widget_t, widget_name),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.widget_text_buffer = {
+			.type_info     = &DEFAULT_typedata_char,
+			.member_name   = "widget_text_buffer",
+			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
+			.offset        = offsetof(widget_t, widget_text_buffer),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.widget_text_buffer_used = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "widget_text_buffer_used",
+			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
+			.offset        = offsetof(widget_t, widget_text_buffer_used),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -24742,14 +24778,6 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 			.member_name   = "font_size",
 			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
 			.offset        = offsetof(widget_t, font_size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.font_max_descender = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "font_max_descender",
-			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
-			.offset        = offsetof(widget_t, font_max_descender),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -24954,7 +24982,7 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<ui_state_t>(),
 	},
-	.member_count   = 41,
+	.member_count   = 42,
 	.member_pointer = DEFAULT_typedata_structure_ui_state_t.member_array,
 	.members = {
 		.widget_arena = {
@@ -24970,6 +24998,14 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.member_name   = "section_count",
 			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.offset        = offsetof(ui_state_t, section_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.input_focused = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "input_focused",
+			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.offset        = offsetof(ui_state_t, input_focused),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -31294,6 +31330,8 @@ enum class input_controller_t {
 	is_valid,
 	is_analog,
 	type,
+	inputs_this_frame,
+	frame_input_counter,
 	keyboard,
 	gamepad,
 }; // input_controller_t
@@ -31615,11 +31653,12 @@ enum class widget_t {
 	widget_flags,
 	layout_style,
 	state,
-	widget_text,
+	widget_name,
+	widget_text_buffer,
+	widget_text_buffer_used,
 	toggled,
 	parent_stack_depth,
 	font_size,
-	font_max_descender,
 	expected_position,
 	minimum_render_size,
 	size_kind,
@@ -31648,6 +31687,7 @@ enum class widget_t {
 enum class ui_state_t {
 	widget_arena,
 	section_count,
+	input_focused,
 	last_hot_ID,
 	last_active_ID,
 	hot_widget,
