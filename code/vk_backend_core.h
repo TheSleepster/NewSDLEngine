@@ -235,6 +235,9 @@ struct vulkan_context_t
     HashTable_t(VkSampler)              image_samplers;
     VkSampler                           default_nearest_sampler;
     VkSampler                           default_linear_sampler;
+
+    vulkan_sampler_info_t               default_nearest_sampler_info;
+    vulkan_sampler_info_t               default_linear_sampler_info;
 };
 
 struct vulkan_image_t;

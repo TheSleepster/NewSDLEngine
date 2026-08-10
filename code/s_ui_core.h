@@ -35,6 +35,7 @@ struct widget_state_t
     bool8        just_clicked;
     bool8        is_double_clicked;
     bool8        is_right_clicked;
+    bool8        is_right_held;
 
     // NOTE(Sleepster): Must be persistent, thus here. 
     byte         widget_text_buffer[256];
@@ -53,6 +54,12 @@ struct widget_state_t
     vec2_t       initial_mouse_position;
 
     vec2_t       render_size;
+    // NOTE(Sleepster): The difference between this and the widget's minimum_render_size
+    // is that this is meant to be persistent and accounts for ALL widgets contained within as well as padding
+    // Essentially the widget's "minimum_render_size" is meant to be for the layout engine, whereas this is 
+    // "the smallest size reasonably possible" for actions that modify the size of the widget (such as resizing)
+    vec2_t       absolute_minimum_render_size;
+    vec2_t       resize_amount;
     vec4_t       render_color;
 
     rectangle2_t widget_rect;
@@ -94,11 +101,12 @@ struct ui_signal_t
     u32             signal_flags;
 };
 
-#define ui_hovered(signal)        ((signal).signal_flags & UI_SIGNAL_FLAG_HOVERING)
-#define ui_pressed(signal)        ((signal).signal_flags & UI_SIGNAL_FLAG_CLICKED)
-#define ui_down(signal)           ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN)
-#define ui_released(signal)       ((signal).signal_flags & UI_SIGNAL_FLAG_RELEASED)
-#define ui_dragging(signal)       ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN)
+#define ui_hovered(signal)          ((signal).signal_flags & UI_SIGNAL_FLAG_HOVERING)
+#define ui_pressed(signal)          ((signal).signal_flags & UI_SIGNAL_FLAG_CLICKED)
+#define ui_down(signal)             ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN)
+#define ui_released(signal)         ((signal).signal_flags & UI_SIGNAL_FLAG_RELEASED)
+#define ui_dragging(signal)         ((signal).signal_flags & UI_SIGNAL_FLAG_LEFT_DOWN)
+#define ui_right_mouse_down(signal) ((signal).signal_flags & UI_SIGNAL_FLAG_RIGHT_DOWN)
 
 // NOTE(Sleepster): If you change the values here, make sure they're inline with what's in the 
 // widget.slh file.
@@ -120,6 +128,8 @@ enum widget_flags_t
     UI_WIDGET_FLAG_MAKE_CIRCULAR    = BIT(12),
     UI_WIDGET_FLAG_FIXED_SIZE       = BIT(13),
     UI_WIDGET_FLAG_HAS_TEXT_CONTENT = BIT(14),
+    UI_WIDGET_FLAG_RESIZEABLE       = BIT(15),
+    UI_WIDGET_FLAG_DISPLAY_TEXTURE  = BIT(16),
     UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_HOVER_COLOR|UI_WIDGET_FLAG_ACTIVE_COLOR|UI_WIDGET_FLAG_MOUSE_CLICKABLE|UI_WIDGET_FLAG_HOVERABLE|UI_WIDGET_FLAG_DRAW_RECTANGLE|UI_WIDGET_FLAG_INTERACTABLE
 };
 
@@ -150,6 +160,7 @@ struct widget_t
     
     vec3_t             expected_position;
     vec2_t             minimum_render_size;
+    vec2_t             resize_value;
     widget_size_kind_t size_kind;
 
     // TODO(Sleepster): Replace all of this with a much simpler idea.
@@ -186,6 +197,10 @@ struct widget_t
     float32            smoothness;
     float32            radius;
     float32            border_thickness;
+
+    asset_handle_t    *display_texture;
+    vec2_t             display_texture_uvmin;
+    vec2_t             display_texture_uvmax;
 
     // NOTE(Sleepster): 
     // If this is a tree... 
@@ -244,6 +259,7 @@ struct ui_state_t
 
     vec2_t                            mouse_position;
     vec2_t                            mouse_delta;
+    vec2_t                            max_widget_size;
 
     // TODO(Sleepster): "Padding" and "child offset" need to be STRICTLY different.
     // Right now the idea of "Padding" is confusing because it mainly only applies to the offset of 
@@ -297,7 +313,8 @@ true_inline void ui_widget_set_padding(widget_t *widget, vec4_t padding);
 true_inline void ui_widget_seed(ui_state_t *ui_state, u64 index);
 
 widget_t*   ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags);
-ui_signal_t ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, vec2_t child_spacing, vec4_t padding, vec4_t background_color);
+ui_signal_t ui_widget_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, vec2_t minimum_render_size, vec2_t child_spacing, vec4_t padding, vec4_t background_color, u32 additional_flags);
+ui_signal_t ui_widget_draggable_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, vec2_t minimum_render_size, vec2_t child_spacing, vec4_t padding, vec4_t background_color, u32 additional_flags);
 ui_signal_t ui_widget_sized_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, u32 widget_flags);
 ui_signal_t ui_widget_text(ui_state_t *ui_state, string_t widget_text);
 ui_signal_t ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text);
@@ -306,8 +323,7 @@ void        ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t 
 ui_signal_t ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size);
 void        ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size);
 ui_signal_t ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, vec2_t size);
-
-true_inline ui_signal_t ui_widget_draggable_panel(ui_state_t *ui_state, string_t widget_name, vec2_t position, vec2_t child_spacing, vec4_t padding, vec4_t background_color);
+ui_signal_t ui_widget_texture(ui_state_t *ui_state, string_t widget_name, vec2_t size, asset_handle_t *texture, vec2_t uv_min, vec2_t uv_max, u32 size_kind, u32 additional_flags);
 
 true_inline void ui_state_begin_row(ui_state_t *ui_state, widget_t *parent);
 true_inline void ui_state_end_row(ui_state_t *ui_state);

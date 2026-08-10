@@ -1012,7 +1012,7 @@ s_asset_manager_update(asset_manager_t *asset_manager)
                     .wrapu                      = IMAGE_WRAPPING_CLAMP_TO_EDGE,
                     .wrapv                      = IMAGE_WRAPPING_CLAMP_TO_EDGE,
                     .compare_ops_enabled        = false,
-                    .use_normalized_coordinates = false,
+                    .use_normalized_coordinates = true,
                 };
 
                 image_create_info_t info = {

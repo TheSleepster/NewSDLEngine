@@ -204,8 +204,8 @@ sorted, managed, and appropriately handled without direct control.
 - [X] Actually make the "generation_ID" mean something
 - [ ] PNG Decoder
 ** Fonts
-- [ ] Create a temporary glyph storage method, that way we can store what glyphs need to be added over the frame and add them at all at once at the end of the frame
-- [ ] Really font rendering in general
+- [X] Create a temporary glyph storage method, that way we can store what glyphs need to be added over the frame and add them at all at once at the end of the frame
+- [x] Really font rendering in general
 ** Sounds
 - [ ] The ability to play sound period
 - [ ] Vorbis OGG decoder
@@ -240,7 +240,7 @@ sorted, managed, and appropriately handled without direct control.
 - [X] Type safe hash tables
 - [X] Allow us to set the custom allocator for the hash tables
 - [X] The ability to call a function like 'c_string_builder_flush' which would write out all the string builder's current buffers, and reset it's internal state
-- [ ] Fix the c_string_read_* functions.
+- [X] Fix the c_string_read_* functions.
 - [ ] Why are we using Malloc with our dynamic arrays
 - [ ] Compile the core into a single library. c_data.lib or something. then have c_base.h import all the core headers
 - [X] Convert Dynarray.cpp and Dynarray.h into an STB style library like the hash_tables

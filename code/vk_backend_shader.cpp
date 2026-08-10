@@ -817,8 +817,8 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
     s32 unique_descriptor_sets[MAX_DESCRIPTOR_SET_BINDINGS];
     memset(unique_descriptor_sets, -1, sizeof(s32) * MAX_DESCRIPTOR_SET_BINDINGS);
 
-    u32                unique_set_count    = 0;
-    u32                push_constant_count = 0;
+    u32 unique_set_count    = 0;
+    u32 push_constant_count = 0;
 
     u32 param_count = layout->getParameterCount();
     for(u32 param_index = 0;

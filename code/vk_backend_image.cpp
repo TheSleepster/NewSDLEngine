@@ -58,6 +58,7 @@ vk_image_usage_flags_from_image_format(u32 format)
     return(result);
 }
 
+// TODO(Sleepster): Should not be here. 
 bool8 
 vk_sampler_info_is_valid(image_create_info_t *create_info)
 {
@@ -113,6 +114,7 @@ vk_is_depth_format(u32 format)
     return(result);
 }
 
+// TODO(Sleepster): None of this should be here...
 VkImageLayout
 vk_get_image_initial_layout_from_usage(u32 usage, u32 format)
 {
@@ -356,6 +358,35 @@ vk_backend_image_destroy_view(vulkan_context_t *vulkan_context, vulkan_image_t *
 
 /*
 =============
+vk_backend_get_sampler
+=============
+*/
+
+VkSampler
+vk_backend_get_sampler(vulkan_context_t *vulkan_context, vulkan_sampler_info_t *sampler_info)
+{
+    VkSampler result = {};
+
+    string_t sampler_data = {
+        .data  = (byte*)sampler_info,
+        .count = sizeof(vulkan_sampler_info_t)
+    };
+    VkSampler sampler = c_hash_table_get_value(&vulkan_context->image_samplers, sampler_data);
+    if(sampler == VK_NULL_HANDLE)
+    {
+        sampler = vk_backend_sampler_create(vulkan_context, sampler_info);
+        Assert(sampler);
+
+        c_hash_table_insert_pair(&vulkan_context->image_samplers, sampler_data, sampler);
+    }
+    Assert(sampler);
+
+    result = sampler;
+    return(result);
+}
+
+/*
+=============
 vk_backend_image_create
 =============
 */
@@ -412,27 +443,14 @@ vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *i
         vk_backend_image_update_data(vulkan_context, &result);
     }
 
-    if(image_info->sampler_info)
+    if(image_info->sampler_info.is_valid)
     {
-        string_t sampler_data = {
-            .data  = (byte*)image_info->sampler_info,
-            .count = sizeof(vulkan_sampler_info_t)
-        };
-        VkSampler sampler = c_hash_table_get_value(&vulkan_context->image_samplers, sampler_data);
-        if(sampler == VK_NULL_HANDLE)
-        {
-            sampler = vk_backend_sampler_create(vulkan_context, image_info->sampler_info);
-            Assert(sampler);
-
-            c_hash_table_insert_pair(&vulkan_context->image_samplers, sampler_data, sampler);
-        }
-        Assert(sampler);
-
-        result.sampler = sampler;
+        result.sampler = vk_backend_get_sampler(vulkan_context, &image_info->sampler_info);
     }
     else
     {
-        result.sampler = vulkan_context->default_nearest_sampler;
+        result.sampler           = vulkan_context->default_nearest_sampler;
+        result.info.sampler_info = vulkan_context->default_nearest_sampler_info; 
     }
 
     return(result);
@@ -595,10 +613,12 @@ vk_backend_sampler_create
 =============
 */
 
+// TODO(Sleepster): Hash samplers we already have and reuse them, that way we only create samplers we NEED.
 VkSampler
 vk_backend_sampler_create(vulkan_context_t *vulkan_context, vulkan_sampler_info_t *info)
 {
     Assert(info);
+    Assert(info->is_valid);
     VkSampler result = {};
 
     VkSamplerCreateInfo create_info = {};
@@ -613,7 +633,7 @@ vk_backend_sampler_create(vulkan_context_t *vulkan_context, vulkan_sampler_info_
     create_info.borderColor             = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK;
     create_info.compareEnable           = info->compare_enabled;
     create_info.compareOp               = (VkCompareOp)info->compare_operation;
-    create_info.unnormalizedCoordinates = info->use_normalized_coordinates;
+    create_info.unnormalizedCoordinates = !info->use_normalized_coordinates;
     create_info.mipmapMode              = VK_SAMPLER_MIPMAP_MODE_NEAREST;
 
     vkAssert(vkCreateSampler(vulkan_context->device, &create_info, vulkan_context->cpu_allocation_callbacks, &result));

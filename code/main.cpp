@@ -337,18 +337,22 @@ game_main(void)
         ui_signal_t main_panel = ui_widget_draggable_panel(main_ui, 
                                                            STR("Test panel..."), 
                                                            vec2(20, 20), 
+                                                           vec2(20, 20), 
                                                            vec2(10.0f, 10.0f), 
                                                            vec4(10, 10, 10, 10), 
-                                                           vec4(0.4, 0.4, 0.4, 0.5));
-        // NOTE(Sleepster): If we're inside this panel, take control of the input 
+                                                           vec4(0.4, 0.4, 0.4, 0.5),
+                                                           0);
         ui_column(main_ui, main_panel.widget)
         {
+            ui_widget_set_default_font_size(main_ui, 40);
             ui_signal_t title_bar = ui_widget_panel(main_ui, 
                                                     STR("Title bar"), 
                                                     vec2(0, 0), 
+                                                    vec2(20, 20),
                                                     vec2(10.0f, 0.0f), 
                                                     vec4(10, 10, 10, 10), 
-                                                    vec4(0.0, 0.0, 0.0, 0.2));
+                                                    vec4(0.0, 0.0, 0.0, 0.2),
+                                                    0);
             ui_state_set_active_padding(main_ui, vec4(10, 10, 4, 4));
             ui_signal_t open_menu_button = {};
             ui_row(main_ui, title_bar.widget)
@@ -383,9 +387,11 @@ game_main(void)
                     ui_signal_t sub_panel = ui_widget_panel(main_ui, 
                                                             STR("Debug Menu subpanel"), 
                                                             vec2(0, 0), 
+                                                            vec2(20, 20),
                                                             vec2(10.0f, 10.0f), 
                                                             vec4(10, 10, 0, 0), 
-                                                            vec4_zero());
+                                                            vec4_zero(),
+                                                            0);
                     ui_column(main_ui, sub_panel.widget)
                     {
                         ui_signal_t perf_counters = ui_widget_labeled_button(main_ui, STR("Display Performance Counters"));
@@ -399,9 +405,11 @@ game_main(void)
                             ui_signal_t another_sub_panel = ui_widget_panel(main_ui, 
                                                                             STR("Debug PERF Menu subpanel stuff"), 
                                                                             vec2(0, 0), 
+                                                                            vec2(20, 20),
                                                                             vec2(10.0f, 10.0f), 
-                                                                            vec4(20, 20, 0, 0), 
-                                                                            vec4_zero());
+                                                                            vec4(20, 20, 10, 10), 
+                                                                            vec4_zero(),
+                                                                            0);
                             ui_column(main_ui, another_sub_panel.widget)
                             {
                                 ui_widget_labeled_button(main_ui, STR("Show Performance Chart"));
@@ -428,8 +436,43 @@ game_main(void)
                 {
                     main_ui->input_focused = false;
                 }
-                
+
+                ui_signal_t test_display_panel = ui_widget_panel(main_ui, 
+                                                                 STR("TEST display panel"),
+                                                                 vec2(0, 0), 
+                                                                 vec2(20, 20),
+                                                                 vec2(10.0f, 10.0f), 
+                                                                 vec4(0, 0, 0, 0), 
+                                                                 vec4(0.1, 0.1, 0.1, 0.4),
+                                                                 UI_WIDGET_FLAG_INTERACTABLE|UI_WIDGET_FLAG_RESIZEABLE);
+                ui_row(main_ui, test_display_panel.widget)
+                {
+                    ui_column(main_ui, test_display_panel.widget)
+                    {
+                        ui_widget_labeled_button(main_ui, STR("Save Map"));
+                        ui_widget_labeled_button(main_ui, STR("Test Load map"));
+                        ui_widget_labeled_button(main_ui, STR("Entity Selection"));
+                        ui_widget_labeled_button(main_ui, STR("Tester BLABAH"));
+                    }
+
+                    s_renderer_set_texture_filter_mode(renderer_state, player_sprite.texture, IMAGE_FILTER_TYPE_NEAREST);
+                    ui_widget_texture(main_ui, 
+                                      STR("test atlas"), 
+                                      vec2(1.0, 1.0), 
+                                      &player_sprite, 
+                                      vec2_zero(), 
+                                      vec2(player_sprite.texture->bitmap.width, player_sprite.texture->bitmap.height), 
+                                      UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT,
+                                      0);
+                }
             }
+
+            ui_row(main_ui, main_panel.widget)
+            {
+                ui_widget_labeled_button(main_ui, STR("Button 1"));
+                ui_widget_labeled_button(main_ui, STR("Button 2"));
+            }
+
             ui_state_maybe_eat_inputs(main_ui);
         }
         // NOTE(Sleepster): DEBUG UI 
@@ -553,7 +596,7 @@ game_main(void)
                           32);
 
             r_cmd_update_buffer_contents(command_list, &game_state.vertex_buffer);
-            r_cmd_draw_indexed(command_list, (game_state.vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
+            r_cmd_draw_indexed(command_list, (game_state.vertex_buffer.vertex_count * 0.25f) * 6, 6, 1, 1);
 
             // NOTE(Sleepster): Draw UI 
             ui_state_end_frame(main_ui, command_list);

@@ -66,7 +66,6 @@ immediate_quad_ex(render_command_list_t *command_list,
     bottom_right->vSDFInfo = sdf_info;
     top_left->vSDFInfo     = sdf_info;
     top_right->vSDFInfo    = sdf_info;
-
     if(texture)
     {
         if(s_renderer_is_texture_bound(command_list, texture) == -1)

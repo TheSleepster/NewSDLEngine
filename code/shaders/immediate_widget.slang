@@ -4,10 +4,11 @@
 
 struct VertexOutput_t 
 {
-    [[vk::location(0)]] float4 vOutPosition      : SV_POSITION;
-    [[vk::location(1)]] float4 vOutColor         : SV_TARGET;
-    [[vk::location(2)]] float2 vOutTexCoord      : TEXCOORD3;
-    [[vk::location(3)]] float2 vOutWidgetOptions : TEXCOORD4;
+    [[vk::location(0)]] float4 vOutPosition        : SV_POSITION;
+    [[vk::location(1)]] float4 vOutColor           : SV_TARGET;
+    [[vk::location(2)]] float2 vOutTexCoord        : TEXCOORD3;
+    [[vk::location(3)]] float2 vOutWidgetOptions   : TEXCOORD4;
+    [[vk::location(4)]] float2 vOutFilteringOptions: TEXCOORD5;
 };
 
 struct uCameraMatrices_t
@@ -26,10 +27,11 @@ VSMain(vImmediateVertex_t Input)
     float2 v2DPositionFloored = floor(Input.vPosition.xy);
     float4 vPositionFloored   = float4(v2DPositionFloored, Input.vPosition.zw);
 
-    result.vOutPosition      = mul(CameraMatrices.ProjectionMatrix, mul(CameraMatrices.ViewMatrix, vPositionFloored));
-    result.vOutColor         = Input.vColor + (float4(Input.vPadding, 0, 0) * float4(0.001));
-    result.vOutTexCoord      = Input.vTexCoord;
-    result.vOutWidgetOptions = Input.vPadding;
+    result.vOutPosition         = mul(CameraMatrices.ProjectionMatrix, mul(CameraMatrices.ViewMatrix, vPositionFloored));
+    result.vOutColor            = Input.vColor + (float4(Input.vPadding, 0, 0) * float4(0.001));
+    result.vOutTexCoord         = Input.vTexCoord;
+    result.vOutWidgetOptions    = Input.vPadding;
+    result.vOutFilteringOptions = Input.vSDFInfo;
 
     return(result);
 }
@@ -93,20 +95,19 @@ PSMain(VertexOutput_t VertexOutput)
     // NOTE(Sleepster): Textured rectangle 
     else if(WidgetType == 1)
     {
-        Sampler2D Texture = TextureSamplers[int(VertexOutput.vOutWidgetOptions.y)];
+        Sampler2D Texture   = TextureSamplers[int(VertexOutput.vOutWidgetOptions.y)];
+        float4 TextureColor = Texture.SampleLevel(VertexOutput.vOutTexCoord, 0.0);
 
-        float4 TextureColor = Texture.Sample(VertexOutput.vOutTexCoord);
-        if(TextureColor.a <= 0.3) discard;
-
-        Result.vFragColor = float4(VertexOutput.vOutColor.rgb, TextureColor.a);
+        //if(TextureColor.a <= 0.1) discard;
+        Result.vFragColor = float4(TextureColor.rgb * VertexOutput.vOutColor.rgb, TextureColor.a);
     }
     // NOTE(Sleepster): Font Glyph 
     else if(WidgetType == 2)
     {
         Sampler2D Texture = TextureSamplers[int(VertexOutput.vOutWidgetOptions.y)];
 
-        float4 TextureColor = Texture.Sample(VertexOutput.vOutTexCoord);
-        if(TextureColor.a <= 0.3) discard;
+        float4 TextureColor = Texture.SampleLevel(VertexOutput.vOutTexCoord, 0.0);
+        if(TextureColor.a <= 0.2) discard;
 
         Result.vFragColor = float4(VertexOutput.vOutColor.rgb, TextureColor.a);
     }

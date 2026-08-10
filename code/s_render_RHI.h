@@ -489,26 +489,30 @@ struct renderer_state_t
 
     render_command_present_frame_t        *present_command;
 
-    void            backend_initialize(SDL_Window *window);
-    void            backend_handle_window_resize(vec2_t window_size);
-    void            backend_render_frame(void);
+    void                     backend_initialize(SDL_Window *window);
+    void                     backend_handle_window_resize(vec2_t window_size);
+    void                     backend_render_frame(void);
 
-    render_buffer_t backend_buffer_create(render_buffer_desc_t *buffer_desc);
-    void            backend_buffer_copy_data(render_buffer_t *buffer, void *data, u32 size, u32 offset);
-    void            backend_buffer_append_data(render_buffer_t *buffer, void *data, u32 data_size);
-    void*           backend_constant_buffer_append_data(void *data, u32 data_size, u32 *buffer_offset_out);
-    void            backend_buffer_reset(render_buffer_t *buffer);
+    render_buffer_t          backend_buffer_create(render_buffer_desc_t *buffer_desc);
+    void                     backend_buffer_copy_data(render_buffer_t *buffer, void *data, u32 size, u32 offset);
+    void                     backend_buffer_append_data(render_buffer_t *buffer, void *data, u32 data_size);
+    void*                    backend_constant_buffer_append_data(void *data, u32 data_size, u32 *buffer_offset_out);
+    void                     backend_buffer_reset(render_buffer_t *buffer);
 
-    u32             backend_renderpass_initialize(renderpass_desc_t *desc, renderpass_t *renderpass);
+    u32                      backend_renderpass_initialize(renderpass_desc_t *desc, renderpass_t *renderpass);
 
-    void            backend_image_create(image_create_info_t *create_info, image_t *image);
-    void            backend_image_destroy(image_t *image);
-    void            backend_image_update_contents(image_t *image);
+    void                     backend_image_create(image_create_info_t *create_info, image_t *image);
+    void                     backend_image_destroy(image_t *image);
+    void                     backend_image_update_contents(image_t *image);
+    void                     backend_acquire_image_sampler(image_t *image);
 
-    void            backend_shader_create(shader_t *shader, string_t shader_source);
-
+    void                     backend_shader_create(shader_t *shader, string_t shader_source);
     backend_command_buffer_t backend_get_command_buffer(render_command_list_t *command_list);
 };
+
+// TODO(Sleepster):  
+//
+// - Texture set filter mode functions (to allow us to set the sampler settings)
 
 struct image_create_info_t;
 
@@ -532,6 +536,7 @@ void                   s_renderer_image_destroy(renderer_state_t *renderer_state
 void                   s_renderer_image_update_data(void *backend_context, image_t *image);
 render_command_list_t* s_renderer_get_command_list(renderer_state_t *renderer_state, command_list_type_t type);
 s32                    s_renderer_is_texture_bound(render_command_list_t *command_list, texture2D_t *texture);
+void                   s_renderer_set_texture_filter_mode(renderer_state_t *render_state, texture2D_t *texture, u32 filter_mode);
 s32                    s_renderer_find_texture_index(render_command_list_t *command_list, u64 ID);
 void                   s_renderer_reset_command_list(render_command_list_t *command_list);
 

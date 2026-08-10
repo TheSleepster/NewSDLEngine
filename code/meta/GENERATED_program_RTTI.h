@@ -2248,7 +2248,7 @@ struct type_info_struct_widget_state_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[20];
+		type_info_member_t member_array[23];
 		struct {
 			type_info_member_t last_interacted_frame;
 			type_info_member_t toggled;
@@ -2259,6 +2259,7 @@ struct type_info_struct_widget_state_t {
 			type_info_member_t just_clicked;
 			type_info_member_t is_double_clicked;
 			type_info_member_t is_right_clicked;
+			type_info_member_t is_right_held;
 			type_info_member_t widget_text_buffer;
 			type_info_member_t widget_text_buffer_used;
 			type_info_member_t widget_text_render_start_offset;
@@ -2268,6 +2269,8 @@ struct type_info_struct_widget_state_t {
 			type_info_member_t offset;
 			type_info_member_t initial_mouse_position;
 			type_info_member_t render_size;
+			type_info_member_t absolute_minimum_render_size;
+			type_info_member_t resize_amount;
 			type_info_member_t render_color;
 			type_info_member_t widget_rect;
 		}members;
@@ -2300,7 +2303,7 @@ struct type_info_struct_widget_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[32];
+		type_info_member_t member_array[37];
 		struct {
 			type_info_member_t ID;
 			type_info_member_t widget_flags;
@@ -2312,6 +2315,7 @@ struct type_info_struct_widget_t {
 			type_info_member_t font_size;
 			type_info_member_t expected_position;
 			type_info_member_t minimum_render_size;
+			type_info_member_t resize_value;
 			type_info_member_t size_kind;
 			type_info_member_t parent_child_spacing;
 			type_info_member_t parent_padding;
@@ -2321,6 +2325,7 @@ struct type_info_struct_widget_t {
 			type_info_member_t max_top_padding;
 			type_info_member_t max_bottom_padding;
 			type_info_member_t child_spacing;
+			type_info_member_t scissor_rect;
 			type_info_member_t idle_color;
 			type_info_member_t hovered_color;
 			type_info_member_t active_color;
@@ -2328,6 +2333,9 @@ struct type_info_struct_widget_t {
 			type_info_member_t smoothness;
 			type_info_member_t radius;
 			type_info_member_t border_thickness;
+			type_info_member_t display_texture;
+			type_info_member_t display_texture_uvmin;
+			type_info_member_t display_texture_uvmax;
 			type_info_member_t parent;
 			type_info_member_t first_child;
 			type_info_member_t last_child;
@@ -2500,8 +2508,9 @@ struct type_info_struct_vulkan_sampler_info_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[9];
+		type_info_member_t member_array[10];
 		struct {
+			type_info_member_t is_valid;
 			type_info_member_t min_filter;
 			type_info_member_t mag_filter;
 			type_info_member_t wrapu;
@@ -2553,18 +2562,18 @@ struct type_info_struct_vulkan_image_t {
 		type_info_member_t member_array[13];
 		struct {
 			type_info_member_t is_valid;
+			type_info_member_t width;
+			type_info_member_t height;
+			type_info_member_t sampler;
 			type_info_member_t info;
 			type_info_member_t handle;
 			type_info_member_t view;
-			type_info_member_t sampler;
 			type_info_member_t layout;
 			type_info_member_t renderpass_initial_layout;
 			type_info_member_t renderpass_final_layout;
 			type_info_member_t internal_format;
 			type_info_member_t aspect_mask;
 			type_info_member_t allocation;
-			type_info_member_t width;
-			type_info_member_t height;
 		}members;
 	};
 };
@@ -2954,8 +2963,8 @@ struct type_info_enum_input_mouse_buttons_t {
 		type_info_member_t member_array[6];
 		struct {
 			type_info_member_t SDL_LEFT_MOUSE;
-			type_info_member_t SDL_RIGHT_MOUSE;
 			type_info_member_t SDL_MIDDLE_MOUSE;
+			type_info_member_t SDL_RIGHT_MOUSE;
 			type_info_member_t SDL_X1_MOUSE;
 			type_info_member_t SDL_X2_MOUSE;
 			type_info_member_t SDL_MOUSE_BUTTON_COUNT;
@@ -3241,7 +3250,7 @@ struct type_info_enum_widget_flags_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[16];
+		type_info_member_t member_array[18];
 		struct {
 			type_info_member_t UI_WIDGET_FLAG_INVALID;
 			type_info_member_t UI_WIDGET_FLAG_IDLE_COLOR;
@@ -3258,6 +3267,8 @@ struct type_info_enum_widget_flags_t {
 			type_info_member_t UI_WIDGET_FLAG_MAKE_CIRCULAR;
 			type_info_member_t UI_WIDGET_FLAG_FIXED_SIZE;
 			type_info_member_t UI_WIDGET_FLAG_HAS_TEXT_CONTENT;
+			type_info_member_t UI_WIDGET_FLAG_RESIZEABLE;
+			type_info_member_t UI_WIDGET_FLAG_DISPLAY_TEXTURE;
 			type_info_member_t UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON;
 		}members;
 	};
@@ -4913,7 +4924,7 @@ const static type_info_struct_widget_state_t type_info_struct_widget_state_t_con
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_widget_state_t),
-	.member_count = 20,
+	.member_count = 23,
 	.members = {
 		.last_interacted_frame = {.name = "last_interacted_frame", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.last_interacted_frame)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), last_interacted_frame)},
 		.toggled = {.name = "toggled", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.toggled)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), toggled)},
@@ -4924,6 +4935,7 @@ const static type_info_struct_widget_state_t type_info_struct_widget_state_t_con
 		.just_clicked = {.name = "just_clicked", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.just_clicked)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), just_clicked)},
 		.is_double_clicked = {.name = "is_double_clicked", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.is_double_clicked)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), is_double_clicked)},
 		.is_right_clicked = {.name = "is_right_clicked", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.is_right_clicked)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), is_right_clicked)},
+		.is_right_held = {.name = "is_right_held", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.is_right_held)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), is_right_held)},
 		.widget_text_buffer = {.name = "widget_text_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_buffer)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_buffer)},
 		.widget_text_buffer_used = {.name = "widget_text_buffer_used", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_buffer_used)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_buffer_used)},
 		.widget_text_render_start_offset = {.name = "widget_text_render_start_offset", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_render_start_offset)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_render_start_offset)},
@@ -4933,6 +4945,8 @@ const static type_info_struct_widget_state_t type_info_struct_widget_state_t_con
 		.offset = {.name = "offset", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.offset)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), offset)},
 		.initial_mouse_position = {.name = "initial_mouse_position", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.initial_mouse_position)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), initial_mouse_position)},
 		.render_size = {.name = "render_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.render_size)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), render_size)},
+		.absolute_minimum_render_size = {.name = "absolute_minimum_render_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.absolute_minimum_render_size)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), absolute_minimum_render_size)},
+		.resize_amount = {.name = "resize_amount", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.resize_amount)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), resize_amount)},
 		.render_color = {.name = "render_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.render_color)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), render_color)},
 		.widget_rect = {.name = "widget_rect", .type = TYPE_rectangle2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_rect)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_rect)},
 	}
@@ -4959,7 +4973,7 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_widget_t),
-	.member_count = 32,
+	.member_count = 37,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.ID)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), ID)},
 		.widget_flags = {.name = "widget_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_flags)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_flags)},
@@ -4971,6 +4985,7 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 		.font_size = {.name = "font_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.font_size)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), font_size)},
 		.expected_position = {.name = "expected_position", .type = TYPE_vec3_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.expected_position)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), expected_position)},
 		.minimum_render_size = {.name = "minimum_render_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.minimum_render_size)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), minimum_render_size)},
+		.resize_value = {.name = "resize_value", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.resize_value)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), resize_value)},
 		.size_kind = {.name = "size_kind", .type = TYPE_widget_size_kind_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.size_kind)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), size_kind)},
 		.parent_child_spacing = {.name = "parent_child_spacing", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_child_spacing)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_child_spacing)},
 		.parent_padding = {.name = "parent_padding", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_padding)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_padding)},
@@ -4980,6 +4995,7 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 		.max_top_padding = {.name = "max_top_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_top_padding)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_top_padding)},
 		.max_bottom_padding = {.name = "max_bottom_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_bottom_padding)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_bottom_padding)},
 		.child_spacing = {.name = "child_spacing", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.child_spacing)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), child_spacing)},
+		.scissor_rect = {.name = "scissor_rect", .type = TYPE_rectangle2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.scissor_rect)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), scissor_rect)},
 		.idle_color = {.name = "idle_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.idle_color)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), idle_color)},
 		.hovered_color = {.name = "hovered_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.hovered_color)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), hovered_color)},
 		.active_color = {.name = "active_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.active_color)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), active_color)},
@@ -4987,6 +5003,9 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 		.smoothness = {.name = "smoothness", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.smoothness)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), smoothness)},
 		.radius = {.name = "radius", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.radius)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), radius)},
 		.border_thickness = {.name = "border_thickness", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.border_thickness)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), border_thickness)},
+		.display_texture = {.name = "display_texture", .type = TYPE_asset_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.display_texture)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), display_texture)},
+		.display_texture_uvmin = {.name = "display_texture_uvmin", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.display_texture_uvmin)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), display_texture_uvmin)},
+		.display_texture_uvmax = {.name = "display_texture_uvmax", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.display_texture_uvmax)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), display_texture_uvmax)},
 		.parent = {.name = "parent", .type = TYPE_widget_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent)},
 		.first_child = {.name = "first_child", .type = TYPE_widget_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.first_child)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), first_child)},
 		.last_child = {.name = "last_child", .type = TYPE_widget_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.last_child)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), last_child)},
@@ -5135,8 +5154,9 @@ const static type_info_struct_vulkan_sampler_info_t type_info_struct_vulkan_samp
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_vulkan_sampler_info_t),
-	.member_count = 9,
+	.member_count = 10,
 	.members = {
+		.is_valid = {.name = "is_valid", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t.is_valid)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t), is_valid)},
 		.min_filter = {.name = "min_filter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t.min_filter)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t), min_filter)},
 		.mag_filter = {.name = "mag_filter", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t.mag_filter)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t), mag_filter)},
 		.wrapu = {.name = "wrapu", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t.wrapu)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_sampler_info_t), wrapu)},
@@ -5168,7 +5188,7 @@ const static type_info_struct_vulkan_image_info_t type_info_struct_vulkan_image_
 		.initial_layout = {.name = "initial_layout", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.initial_layout)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), initial_layout)},
 		.final_layout = {.name = "final_layout", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.final_layout)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), final_layout)},
 		.data = {.name = "data", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.data)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), data)},
-		.sampler_info = {.name = "sampler_info", .type = TYPE_vulkan_sampler_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.sampler_info)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), sampler_info)},
+		.sampler_info = {.name = "sampler_info", .type = TYPE_vulkan_sampler_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_info_t.sampler_info)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_info_t), sampler_info)},
 	}
 };
 
@@ -5182,18 +5202,18 @@ const static type_info_struct_vulkan_image_t type_info_struct_vulkan_image_t_con
 	.member_count = 13,
 	.members = {
 		.is_valid = {.name = "is_valid", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.is_valid)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), is_valid)},
+		.width = {.name = "width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.width)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), width)},
+		.height = {.name = "height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.height)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), height)},
+		.sampler = {.name = "sampler", .type = TYPE_VkSampler, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.sampler)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), sampler)},
 		.info = {.name = "info", .type = TYPE_vulkan_image_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.info)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), info)},
 		.handle = {.name = "handle", .type = TYPE_VkImage, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.handle)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), handle)},
 		.view = {.name = "view", .type = TYPE_VkImageView, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.view)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), view)},
-		.sampler = {.name = "sampler", .type = TYPE_VkSampler, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.sampler)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), sampler)},
 		.layout = {.name = "layout", .type = TYPE_VkImageLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.layout)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), layout)},
 		.renderpass_initial_layout = {.name = "renderpass_initial_layout", .type = TYPE_VkImageLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.renderpass_initial_layout)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), renderpass_initial_layout)},
 		.renderpass_final_layout = {.name = "renderpass_final_layout", .type = TYPE_VkImageLayout, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.renderpass_final_layout)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), renderpass_final_layout)},
 		.internal_format = {.name = "internal_format", .type = TYPE_VkFormat, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.internal_format)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), internal_format)},
 		.aspect_mask = {.name = "aspect_mask", .type = TYPE_VkImageAspectFlags, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.aspect_mask)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), aspect_mask)},
 		.allocation = {.name = "allocation", .type = TYPE_vulkan_allocation_info_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.allocation)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), allocation)},
-		.width = {.name = "width", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.width)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), width)},
-		.height = {.name = "height", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_vulkan_image_t.height)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_vulkan_image_t), height)},
 	}
 };
 
@@ -5466,8 +5486,8 @@ const static type_info_enum_input_mouse_buttons_t type_info_enum_input_mouse_but
 	.member_count = 6,
 	.members = {
 		.SDL_LEFT_MOUSE = {.name = "SDL_LEFT_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_LEFT_MOUSE), .offset = SDL_LEFT_MOUSE},
-		.SDL_RIGHT_MOUSE = {.name = "SDL_RIGHT_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_RIGHT_MOUSE), .offset = SDL_RIGHT_MOUSE},
 		.SDL_MIDDLE_MOUSE = {.name = "SDL_MIDDLE_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_MIDDLE_MOUSE), .offset = SDL_MIDDLE_MOUSE},
+		.SDL_RIGHT_MOUSE = {.name = "SDL_RIGHT_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_RIGHT_MOUSE), .offset = SDL_RIGHT_MOUSE},
 		.SDL_X1_MOUSE = {.name = "SDL_X1_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_X1_MOUSE), .offset = SDL_X1_MOUSE},
 		.SDL_X2_MOUSE = {.name = "SDL_X2_MOUSE", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_X2_MOUSE), .offset = SDL_X2_MOUSE},
 		.SDL_MOUSE_BUTTON_COUNT = {.name = "SDL_MOUSE_BUTTON_COUNT", .type = TYPE_input_mouse_buttons_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(SDL_MOUSE_BUTTON_COUNT), .offset = SDL_MOUSE_BUTTON_COUNT},
@@ -5655,7 +5675,7 @@ const static type_info_enum_widget_flags_t type_info_enum_widget_flags_t_const_d
 	.name = "widget_flags_t",
 	.type = TYPE_widget_flags_t,
 	.kind = META_TYPE_KIND_Enum,
-	.member_count = 16,
+	.member_count = 18,
 	.members = {
 		.UI_WIDGET_FLAG_INVALID = {.name = "UI_WIDGET_FLAG_INVALID", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_INVALID), .offset = UI_WIDGET_FLAG_INVALID},
 		.UI_WIDGET_FLAG_IDLE_COLOR = {.name = "UI_WIDGET_FLAG_IDLE_COLOR", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_IDLE_COLOR), .offset = UI_WIDGET_FLAG_IDLE_COLOR},
@@ -5672,6 +5692,8 @@ const static type_info_enum_widget_flags_t type_info_enum_widget_flags_t_const_d
 		.UI_WIDGET_FLAG_MAKE_CIRCULAR = {.name = "UI_WIDGET_FLAG_MAKE_CIRCULAR", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_MAKE_CIRCULAR), .offset = UI_WIDGET_FLAG_MAKE_CIRCULAR},
 		.UI_WIDGET_FLAG_FIXED_SIZE = {.name = "UI_WIDGET_FLAG_FIXED_SIZE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_FIXED_SIZE), .offset = UI_WIDGET_FLAG_FIXED_SIZE},
 		.UI_WIDGET_FLAG_HAS_TEXT_CONTENT = {.name = "UI_WIDGET_FLAG_HAS_TEXT_CONTENT", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_HAS_TEXT_CONTENT), .offset = UI_WIDGET_FLAG_HAS_TEXT_CONTENT},
+		.UI_WIDGET_FLAG_RESIZEABLE = {.name = "UI_WIDGET_FLAG_RESIZEABLE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_RESIZEABLE), .offset = UI_WIDGET_FLAG_RESIZEABLE},
+		.UI_WIDGET_FLAG_DISPLAY_TEXTURE = {.name = "UI_WIDGET_FLAG_DISPLAY_TEXTURE", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_DISPLAY_TEXTURE), .offset = UI_WIDGET_FLAG_DISPLAY_TEXTURE},
 		.UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = {.name = "UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON", .type = TYPE_widget_flags_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON), .offset = UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON},
 	}
 };
@@ -6470,6 +6492,7 @@ enum widget_state_t_member_list_enum {
 	TYPE_WIDGET_STATE_T_MEMBER_just_clicked,
 	TYPE_WIDGET_STATE_T_MEMBER_is_double_clicked,
 	TYPE_WIDGET_STATE_T_MEMBER_is_right_clicked,
+	TYPE_WIDGET_STATE_T_MEMBER_is_right_held,
 	TYPE_WIDGET_STATE_T_MEMBER_widget_text_buffer,
 	TYPE_WIDGET_STATE_T_MEMBER_widget_text_buffer_used,
 	TYPE_WIDGET_STATE_T_MEMBER_widget_text_render_start_offset,
@@ -6479,6 +6502,8 @@ enum widget_state_t_member_list_enum {
 	TYPE_WIDGET_STATE_T_MEMBER_offset,
 	TYPE_WIDGET_STATE_T_MEMBER_initial_mouse_position,
 	TYPE_WIDGET_STATE_T_MEMBER_render_size,
+	TYPE_WIDGET_STATE_T_MEMBER_absolute_minimum_render_size,
+	TYPE_WIDGET_STATE_T_MEMBER_resize_amount,
 	TYPE_WIDGET_STATE_T_MEMBER_render_color,
 	TYPE_WIDGET_STATE_T_MEMBER_widget_rect,
 };
@@ -6499,6 +6524,7 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_font_size,
 	TYPE_WIDGET_T_MEMBER_expected_position,
 	TYPE_WIDGET_T_MEMBER_minimum_render_size,
+	TYPE_WIDGET_T_MEMBER_resize_value,
 	TYPE_WIDGET_T_MEMBER_size_kind,
 	TYPE_WIDGET_T_MEMBER_parent_child_spacing,
 	TYPE_WIDGET_T_MEMBER_parent_padding,
@@ -6508,6 +6534,7 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_max_top_padding,
 	TYPE_WIDGET_T_MEMBER_max_bottom_padding,
 	TYPE_WIDGET_T_MEMBER_child_spacing,
+	TYPE_WIDGET_T_MEMBER_scissor_rect,
 	TYPE_WIDGET_T_MEMBER_idle_color,
 	TYPE_WIDGET_T_MEMBER_hovered_color,
 	TYPE_WIDGET_T_MEMBER_active_color,
@@ -6515,6 +6542,9 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_smoothness,
 	TYPE_WIDGET_T_MEMBER_radius,
 	TYPE_WIDGET_T_MEMBER_border_thickness,
+	TYPE_WIDGET_T_MEMBER_display_texture,
+	TYPE_WIDGET_T_MEMBER_display_texture_uvmin,
+	TYPE_WIDGET_T_MEMBER_display_texture_uvmax,
 	TYPE_WIDGET_T_MEMBER_parent,
 	TYPE_WIDGET_T_MEMBER_first_child,
 	TYPE_WIDGET_T_MEMBER_last_child,
@@ -6593,6 +6623,7 @@ enum swapchain_info_t_member_list_enum {
 };
 
 enum vulkan_sampler_info_t_member_list_enum {
+	TYPE_VULKAN_SAMPLER_INFO_T_MEMBER_is_valid,
 	TYPE_VULKAN_SAMPLER_INFO_T_MEMBER_min_filter,
 	TYPE_VULKAN_SAMPLER_INFO_T_MEMBER_mag_filter,
 	TYPE_VULKAN_SAMPLER_INFO_T_MEMBER_wrapu,
@@ -6620,18 +6651,18 @@ enum vulkan_image_info_t_member_list_enum {
 
 enum vulkan_image_t_member_list_enum {
 	TYPE_VULKAN_IMAGE_T_MEMBER_is_valid,
+	TYPE_VULKAN_IMAGE_T_MEMBER_width,
+	TYPE_VULKAN_IMAGE_T_MEMBER_height,
+	TYPE_VULKAN_IMAGE_T_MEMBER_sampler,
 	TYPE_VULKAN_IMAGE_T_MEMBER_info,
 	TYPE_VULKAN_IMAGE_T_MEMBER_handle,
 	TYPE_VULKAN_IMAGE_T_MEMBER_view,
-	TYPE_VULKAN_IMAGE_T_MEMBER_sampler,
 	TYPE_VULKAN_IMAGE_T_MEMBER_layout,
 	TYPE_VULKAN_IMAGE_T_MEMBER_renderpass_initial_layout,
 	TYPE_VULKAN_IMAGE_T_MEMBER_renderpass_final_layout,
 	TYPE_VULKAN_IMAGE_T_MEMBER_internal_format,
 	TYPE_VULKAN_IMAGE_T_MEMBER_aspect_mask,
 	TYPE_VULKAN_IMAGE_T_MEMBER_allocation,
-	TYPE_VULKAN_IMAGE_T_MEMBER_width,
-	TYPE_VULKAN_IMAGE_T_MEMBER_height,
 };
 
 enum vulkan_shader_stage_t_member_list_enum {
@@ -6804,8 +6835,8 @@ enum controller_type_t_member_list_enum {
 
 enum input_mouse_buttons_t_member_list_enum {
 	TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_LEFT_MOUSE,
-	TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_RIGHT_MOUSE,
 	TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MIDDLE_MOUSE,
+	TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_RIGHT_MOUSE,
 	TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X1_MOUSE,
 	TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X2_MOUSE,
 	TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MOUSE_BUTTON_COUNT,
@@ -6940,6 +6971,8 @@ enum widget_flags_t_member_list_enum {
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MAKE_CIRCULAR,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_FIXED_SIZE,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HAS_TEXT_CONTENT,
+	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_RESIZEABLE,
+	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DISPLAY_TEXTURE,
 	TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON,
 };
 
@@ -7124,8 +7157,8 @@ enum render_pipeline_polygon_mode_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_KEYBOARD, "IM_CONTROLLER_KEYBOARD") \
 	X(TYPE_ENUM_LOOKUP_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_COUNT, "IM_CONTROLLER_COUNT") \
 	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_LEFT_MOUSE, "SDL_LEFT_MOUSE") \
-	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_RIGHT_MOUSE, "SDL_RIGHT_MOUSE") \
 	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MIDDLE_MOUSE, "SDL_MIDDLE_MOUSE") \
+	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_RIGHT_MOUSE, "SDL_RIGHT_MOUSE") \
 	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X1_MOUSE, "SDL_X1_MOUSE") \
 	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X2_MOUSE, "SDL_X2_MOUSE") \
 	X(TYPE_ENUM_LOOKUP_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MOUSE_BUTTON_COUNT, "SDL_MOUSE_BUTTON_COUNT") \
@@ -7218,6 +7251,8 @@ enum render_pipeline_polygon_mode_t_member_list_enum {
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MAKE_CIRCULAR, "UI_WIDGET_FLAG_MAKE_CIRCULAR") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_FIXED_SIZE, "UI_WIDGET_FLAG_FIXED_SIZE") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HAS_TEXT_CONTENT, "UI_WIDGET_FLAG_HAS_TEXT_CONTENT") \
+	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_RESIZEABLE, "UI_WIDGET_FLAG_RESIZEABLE") \
+	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DISPLAY_TEXTURE, "UI_WIDGET_FLAG_DISPLAY_TEXTURE") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON, "UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_VERTICAL, "UI_WIDGET_LAYOUT_STYLE_VERTICAL") \
 	X(TYPE_ENUM_LOOKUP_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_HORIZONTAL, "UI_WIDGET_LAYOUT_STYLE_HORIZONTAL") \
@@ -7628,8 +7663,8 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "IM_CONTROLLER_KEYBOARD", .member_enum = TYPE_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_KEYBOARD, .type_info_ptr = (const type_info_struct*)&type_info_enum_controller_type_t_const_data},
 	{.name = "IM_CONTROLLER_COUNT", .member_enum = TYPE_CONTROLLER_TYPE_T_MEMBER_IM_CONTROLLER_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_controller_type_t_const_data},
 	{.name = "SDL_LEFT_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_LEFT_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
-	{.name = "SDL_RIGHT_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_RIGHT_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
 	{.name = "SDL_MIDDLE_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MIDDLE_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
+	{.name = "SDL_RIGHT_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_RIGHT_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
 	{.name = "SDL_X1_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X1_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
 	{.name = "SDL_X2_MOUSE", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_X2_MOUSE, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
 	{.name = "SDL_MOUSE_BUTTON_COUNT", .member_enum = TYPE_INPUT_MOUSE_BUTTONS_T_MEMBER_SDL_MOUSE_BUTTON_COUNT, .type_info_ptr = (const type_info_struct*)&type_info_enum_input_mouse_buttons_t_const_data},
@@ -7722,6 +7757,8 @@ const static type_info_data_mapping_t GENERATED_enum_member_name_to_type_info_ta
 	{.name = "UI_WIDGET_FLAG_MAKE_CIRCULAR", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_MAKE_CIRCULAR, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_FIXED_SIZE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_FIXED_SIZE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_HAS_TEXT_CONTENT", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_HAS_TEXT_CONTENT, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
+	{.name = "UI_WIDGET_FLAG_RESIZEABLE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_RESIZEABLE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
+	{.name = "UI_WIDGET_FLAG_DISPLAY_TEXTURE", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_DISPLAY_TEXTURE, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON", .member_enum = TYPE_WIDGET_FLAGS_T_MEMBER_UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_flags_t_const_data},
 	{.name = "UI_WIDGET_LAYOUT_STYLE_VERTICAL", .member_enum = TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_VERTICAL, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_layout_style_t_const_data},
 	{.name = "UI_WIDGET_LAYOUT_STYLE_HORIZONTAL", .member_enum = TYPE_WIDGET_LAYOUT_STYLE_T_MEMBER_UI_WIDGET_LAYOUT_STYLE_HORIZONTAL, .type_info_ptr = (const type_info_struct*)&type_info_enum_widget_layout_style_t_const_data},

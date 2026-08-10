@@ -455,6 +455,32 @@ s_renderer_find_texture_index(render_command_list_t *command_list, u64 ID)
 
 /*
 =============
+s_renderer_set_texture_filter_mode
+=============
+*/
+
+void
+s_renderer_set_texture_filter_mode(renderer_state_t *render_state, texture2D_t *texture, u32 filter_mode)
+{
+    if(texture->gpu_data.create_info.sampler_info.filtering != filter_mode)
+    {
+        texture->gpu_data.create_info.sampler_info.filtering = (render_image_filter_type_t)filter_mode;
+        if(filter_mode == IMAGE_FILTER_TYPE_LINEAR)
+        {
+            texture->gpu_data.create_info.sampler_info.use_normalized_coordinates = true;
+        }
+        else if(filter_mode == IMAGE_FILTER_TYPE_NEAREST)
+        {
+            texture->gpu_data.create_info.sampler_info.use_normalized_coordinates = false;
+        }
+
+        render_state->backend_acquire_image_sampler(&texture->gpu_data);
+    }
+}
+
+
+/*
+=============
 r_cmd_renderpass_begin
 =============
 */
@@ -775,7 +801,10 @@ r_cmd_update_buffer_contents(render_command_list_t *command_list, render_buffer_
 true_inline void
 r_cmd_update_buffer_contents(render_command_list_t *command_list, vertex_buffer_t *buffer)
 {
-    r_cmd_update_buffer_contents(command_list, &buffer->buffer, buffer->vertex_data, buffer->vertex_count * buffer->buffer.buffer_element_size);
+    r_cmd_update_buffer_contents(command_list, 
+                                &buffer->buffer, 
+                                 buffer->vertex_data, 
+                                 buffer->vertex_count * buffer->buffer.buffer_element_size);
 }
 
 /*

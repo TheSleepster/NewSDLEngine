@@ -19,6 +19,7 @@ struct vulkan_context_t;
 
 struct vulkan_sampler_info_t
 {
+    bool32 is_valid;
     u32    min_filter;
     u32    mag_filter;
     u32    wrapu;
@@ -35,36 +36,36 @@ struct vulkan_sampler_info_t
 
 struct vulkan_image_info_t
 {
-    u32      width;
-    u32      height; 
-    u32      usage;
-    u32      sample_count;
-    u32      mip_count;
-    u32      type;
-    u32      format;
-    u32      initial_layout;
-    u32      final_layout;
-    string_t data;
-
-    vulkan_sampler_info_t *sampler_info;
+    u32                   width;
+    u32                   height; 
+    u32                   usage;
+    u32                   sample_count;
+    u32                   mip_count;
+    u32                   type;
+    u32                   format;
+    u32                   initial_layout;
+    u32                   final_layout;
+    string_t              data;
+    vulkan_sampler_info_t sampler_info;
 };
+
 
 struct vulkan_image_t
 {
     bool8                    is_valid;
+    u32                      width;
+    u32                      height;
+    VkSampler                sampler;
+
     vulkan_image_info_t      info;
     VkImage                  handle;
     VkImageView              view;
-    VkSampler                sampler;
     VkImageLayout            layout;
     VkImageLayout            renderpass_initial_layout;
     VkImageLayout            renderpass_final_layout;
     VkFormat                 internal_format;
     VkImageAspectFlags       aspect_mask;
     vulkan_allocation_info_t allocation;
-
-    u32                      width;
-    u32                      height;
 };
 
 vulkan_image_t vk_backend_image_create(vulkan_context_t *vulkan_context, vulkan_image_info_t *image_info);
@@ -119,6 +120,7 @@ VkFilter          vk_sampler_filter_type_to_vk_filter(u32 filter);
 bool8             vk_is_depth_format(u32 format);
 VkImageLayout     vk_get_image_initial_layout_from_usage(u32 usage, u32 format);
 VkImageLayout     vk_get_image_final_layout_from_usage(u32 usage, u32 format);
+VkSampler         vk_backend_get_sampler(vulkan_context_t *vulkan_context, vulkan_sampler_info_t *sampler_info);
      
 #endif // VK_BACKEND_IMAGE_H
 

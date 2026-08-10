@@ -1653,7 +1653,8 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
                        memory_arena_hash_allocate,
                        null);
 
-    vulkan_sampler_info_t nearest_sampler_info = {
+    vulkan_context->default_nearest_sampler_info = {
+        .is_valid           = true,
         .anisotropy_enabled = false,
         .compare_enabled    = false,
         .max_anisotropy     = 1,
@@ -1662,10 +1663,11 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
         .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
         .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
 
-        .use_normalized_coordinates = true,
+        .use_normalized_coordinates = false,
     };
 
-    vulkan_sampler_info_t linear_sampler_info = {
+    vulkan_context->default_linear_sampler_info = {
+        .is_valid           = true,
         .anisotropy_enabled = true,
         .compare_enabled    = false,
         .max_anisotropy     = 4,
@@ -1674,10 +1676,10 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
         .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
         .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
 
-        .use_normalized_coordinates = false,
+        .use_normalized_coordinates = true,
     };
-    vulkan_context->default_nearest_sampler = vk_backend_sampler_create(vulkan_context, &nearest_sampler_info);
-    vulkan_context->default_linear_sampler  = vk_backend_sampler_create(vulkan_context, &linear_sampler_info);
+    vulkan_context->default_nearest_sampler = vk_backend_sampler_create(vulkan_context, &vulkan_context->default_nearest_sampler_info);
+    vulkan_context->default_linear_sampler  = vk_backend_sampler_create(vulkan_context, &vulkan_context->default_linear_sampler_info);
 
     string_t nearest_sampler_data = {
         .data  = (byte*)&nearest_sampler_data,
@@ -2933,7 +2935,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                               cmd->first_instance + command_list->instance_offset);
 
                     command_list->vertex_offset   += cmd->vertices_to_draw;
-                    command_list->instance_offset += cmd->instance_count;
+                    command_list->instance_offset += 0;
 
                     command_list->image_count = 0;
                     command_list->bound_image_count = 0;
@@ -2961,9 +2963,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                                      0);
 
 
-                    command_list->vertex_offset   += (cmd->indices_to_draw / 6) * 4;
-                    command_list->index_offset    += cmd->indices_to_draw;
-                    command_list->instance_offset += cmd->instance_count;
+                    command_list->vertex_offset   += ((cmd->indices_to_draw / 6) * 4);
+                    command_list->index_offset    +=  cmd->indices_to_draw;
+                    command_list->instance_offset +=  cmd->instance_count;
 
                     command_list->image_count = 0;
                     command_list->bound_image_count = 0;
@@ -3318,6 +3320,7 @@ backend_image_create(image_create_info_t *create_info, image_t *image)
         VkFilter filter = vk_sampler_filter_type_to_vk_filter(image_sampler->filtering);
 
         sampler_info = {
+            .is_valid           = true,
             .anisotropy_enabled = image_sampler->anisotropy_enabled,
             .max_anisotropy     = image_sampler->max_anisotropy,
             .compare_enabled    = false,
@@ -3330,7 +3333,7 @@ backend_image_create(image_create_info_t *create_info, image_t *image)
             .use_normalized_coordinates = image_sampler->use_normalized_coordinates
         };
 
-        info.sampler_info = &sampler_info;
+        info.sampler_info = sampler_info;
     }
 
     // TODO(Sleepster): Maybe we need this???
@@ -3370,6 +3373,30 @@ true_inline void renderer_state_t::
 backend_image_update_contents(image_t *image)
 {
     vk_backend_image_update_data(this->render_context, &image->backend_image);
+}
+
+// NOTE(Sleepster): Samplers are given to each texture by default on creation, this is used only for
+// application of NEW samplers
+true_inline void renderer_state_t::
+backend_acquire_image_sampler(image_t *image)
+{
+    vulkan_image_info_t   *vk_image_info = &image->backend_image.info;
+    sampler_create_info_t *sampler_info  = &image->create_info.sampler_info;
+
+    VkFilter filter = vk_sampler_filter_type_to_vk_filter(sampler_info->filtering);
+    vk_image_info->sampler_info = {
+        .is_valid           = true,
+        .anisotropy_enabled = sampler_info->anisotropy_enabled,
+        .compare_enabled    = false,
+        .compare_operation  = 0,
+        .min_filter         = filter,
+        .mag_filter         = filter,
+        .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+        .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+        .use_normalized_coordinates = sampler_info->use_normalized_coordinates
+    };
+
+    image->backend_image.sampler = vk_backend_get_sampler(this->render_context, &image->backend_image.info.sampler_info);
 }
 
 /*
