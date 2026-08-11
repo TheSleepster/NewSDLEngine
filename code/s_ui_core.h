@@ -37,10 +37,6 @@ struct widget_state_t
     bool8        is_right_clicked;
     bool8        is_right_held;
 
-    // NOTE(Sleepster): Must be persistent, thus here. 
-    byte         widget_text_buffer[256];
-    s32          widget_text_buffer_used;
-
     // NOTE(Sleepster): For rendering SECTIONS of a string 
     s32          widget_text_render_start_offset;
     s32          widget_text_render_end_offset;
@@ -112,24 +108,24 @@ struct ui_signal_t
 // widget.slh file.
 enum widget_flags_t
 {
-    UI_WIDGET_FLAG_INVALID          = BIT(0),
-    UI_WIDGET_FLAG_IDLE_COLOR       = BIT(1),
-    UI_WIDGET_FLAG_HOVER_COLOR      = BIT(2),
-    UI_WIDGET_FLAG_ACTIVE_COLOR     = BIT(3),
-    UI_WIDGET_FLAG_INTERACTABLE     = BIT(4),
-    UI_WIDGET_FLAG_MOUSE_CLICKABLE  = BIT(5),
-    UI_WIDGET_FLAG_HOVERABLE        = BIT(6),
-    UI_WIDGET_FLAG_LEFT_DRAGGABLE   = BIT(7),
+    UI_WIDGET_FLAG_INVALID           = BIT(0),
+    UI_WIDGET_FLAG_IDLE_COLOR        = BIT(1),
+    UI_WIDGET_FLAG_HOVER_COLOR       = BIT(2),
+    UI_WIDGET_FLAG_ACTIVE_COLOR      = BIT(3),
+    UI_WIDGET_FLAG_INTERACTABLE      = BIT(4),
+    UI_WIDGET_FLAG_MOUSE_CLICKABLE   = BIT(5),
+    UI_WIDGET_FLAG_HOVERABLE         = BIT(6),
+    UI_WIDGET_FLAG_LEFT_DRAGGABLE    = BIT(7),
 
-    UI_WIDGET_FLAG_DRAW_TEXT        = BIT(8),
-    UI_WIDGET_FLAG_DRAW_RECTANGLE   = BIT(9),
-    UI_WIDGET_FLAG_DRAW_BACKGROUND  = BIT(10),
-    UI_WIDGET_FLAG_DRAW_BORDER      = BIT(11),
-    UI_WIDGET_FLAG_MAKE_CIRCULAR    = BIT(12),
-    UI_WIDGET_FLAG_FIXED_SIZE       = BIT(13),
-    UI_WIDGET_FLAG_HAS_TEXT_CONTENT = BIT(14),
-    UI_WIDGET_FLAG_RESIZEABLE       = BIT(15),
-    UI_WIDGET_FLAG_DISPLAY_TEXTURE  = BIT(16),
+    UI_WIDGET_FLAG_DRAW_TEXT         = BIT(8),
+    UI_WIDGET_FLAG_DRAW_RECTANGLE    = BIT(9),
+    UI_WIDGET_FLAG_DRAW_BACKGROUND   = BIT(10),
+    UI_WIDGET_FLAG_DRAW_BORDER       = BIT(11),
+    UI_WIDGET_FLAG_MAKE_CIRCULAR     = BIT(12),
+    UI_WIDGET_FLAG_FIXED_SIZE        = BIT(13),
+    UI_WIDGET_FLAG_HAS_TEXT_CONTENT  = BIT(14),
+    UI_WIDGET_FLAG_RESIZEABLE        = BIT(15),
+    UI_WIDGET_FLAG_DISPLAY_TEXTURE   = BIT(16),
     UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_HOVER_COLOR|UI_WIDGET_FLAG_ACTIVE_COLOR|UI_WIDGET_FLAG_MOUSE_CLICKABLE|UI_WIDGET_FLAG_HOVERABLE|UI_WIDGET_FLAG_DRAW_RECTANGLE|UI_WIDGET_FLAG_INTERACTABLE
 };
 
@@ -153,6 +149,7 @@ struct widget_t
     widget_state_t    *state;
 
     string_t           widget_name;
+    string_t          *widget_text_buffer;
     bool32             toggled;
 
     float32            parent_stack_depth;
@@ -161,31 +158,18 @@ struct widget_t
     vec3_t             expected_position;
     vec2_t             minimum_render_size;
     vec2_t             resize_value;
-    widget_size_kind_t size_kind;
+    ivec2_t            size_kind;
 
-    // TODO(Sleepster): Replace all of this with a much simpler idea.
-    // We will track 3 things:
-    //
-    // - Our widget padding
-    // - Our child spacing
-    // - Our current spacing
-    //
-    // Meaning, instead of tracking all this crap, we instead only track 3 things.
-// REPLACE
     // NOTE(Sleepster): Offset inside the parent, accounting for padding 
     vec2_t             parent_child_spacing;
     vec4_t             parent_padding;
     
     // NOTE(Sleepster): Left, Right, Top, Bottom 
     vec4_t             widget_padding;
-    float32            max_left_padding;
-    float32            max_right_padding;
-    float32            max_top_padding;
-    float32            max_bottom_padding;
+    vec4_t             max_widget_padding;
 
     // NOTE(Sleepster): X and Y spacing... 
     vec2_t             child_spacing;
-// REPLACE
 
     rectangle2_t       scissor_rect;
 
@@ -213,8 +197,6 @@ struct widget_t
     widget_t          *next_sibling;
     widget_t          *prev_sibling;
 
-    // TODO(Sleepster): Perhaps make this a part of widget_state_t so we don't need
-    // to completely rebuild it every frame... 
     immediate_widget_data_t *widget_instance_data; 
 };
 
@@ -224,6 +206,8 @@ struct ui_state_t
     memory_arena_t                    widget_arena;
     u32                               section_count;
 
+    bool8                             frame_begun;
+    bool8                             frame_ended;
     // NOTE(Sleepster): For collecting and handling input to things like textboxes. 
     bool8                             input_focused;
     bool8                             left_mouse_clicked_this_frame;
@@ -260,13 +244,6 @@ struct ui_state_t
     vec2_t                            mouse_position;
     vec2_t                            mouse_delta;
     vec2_t                            max_widget_size;
-
-    // TODO(Sleepster): "Padding" and "child offset" need to be STRICTLY different.
-    // Right now the idea of "Padding" is confusing because it mainly only applies to the offset of 
-    // children within the sub-context of a panel and not actually the padding of the widget?
-    // Which means that when you give a labeled button a "padding" of {20, 20, 10, 10} you'd expect
-    // the widget to grow by that much, but instead it simply moves int the subcontext... which...
-    // is wrong.
     vec4_t                            active_widget_padding;
     u32                               widget_item_count;
     u64                               frame_count;
@@ -319,11 +296,11 @@ ui_signal_t ui_widget_sized_button(ui_state_t *ui_state, string_t widget_name, v
 ui_signal_t ui_widget_text(ui_state_t *ui_state, string_t widget_text);
 ui_signal_t ui_widget_labeled_button(ui_state_t *ui_state, string_t widget_text);
 ui_signal_t ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_width, u32 bar_height, float32 button_scale_factor);
-void        ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t spacing_size);
-ui_signal_t ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size);
-void        ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size);
-ui_signal_t ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, vec2_t size);
-ui_signal_t ui_widget_texture(ui_state_t *ui_state, string_t widget_name, vec2_t size, asset_handle_t *texture, vec2_t uv_min, vec2_t uv_max, u32 size_kind, u32 additional_flags);
+void        ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t spacing_size, ivec2_t size_kind);
+ui_signal_t ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size, ivec2_t size_kind);
+void        ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size, ivec2_t size_kind);
+ui_signal_t ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_text_content, vec2_t size);
+ui_signal_t ui_widget_texture(ui_state_t *ui_state, string_t widget_name, vec2_t size, asset_handle_t *texture, vec2_t uv_min, vec2_t uv_max, ivec2_t size_kind, u32 additional_flags);
 
 true_inline void ui_state_begin_row(ui_state_t *ui_state, widget_t *parent);
 true_inline void ui_state_end_row(ui_state_t *ui_state);

@@ -10,11 +10,9 @@
 #include <c_base.h>
 #include <c_types.h>
 
-#if 0
 template <typename... Args>
 internal_api void
 print(const char *message, Args... arguments);
-#endif
 
 struct test_structure 
 {
@@ -113,17 +111,22 @@ main(int argc, char **argv)
         }
     }
 
-    //print("Test Message %");
+    print("Test Message %");
 
     return(0);
 }
 
-#if 0
 template <typename... Args>
-constexpr u32
+static constexpr u32
 get_packed_argument_count(Args... arguments)
 {
     return(sizeof...(arguments));
+}
+
+// NOTE(Sleepster): Empty for no arguments 
+internal_api void 
+output_type_data(char *buffer, u32 buffer_size)
+{
 }
 
 template <typename T>
@@ -131,14 +134,17 @@ internal_api void
 output_type_data(char *buffer, u32 buffer_size, T &item)
 {
     const type_info_t *info = Athena::type_info(item);
-    if(info->metatype == ATHENA_METATYPE_PRIMITIVE)
+    if(info->metatype != ATHENA_METATYPE_PRIMITIVE)
+    {
+    }
+    else
     {
     }
 }
 
 template <typename... Args>
 internal_api void
-print(Args... arguments)
+print(const char *message, Args... arguments)
 {
     u32 argument_count = get_packed_argument_count(arguments...);
     char buffer[8192];
@@ -147,4 +153,3 @@ print(Args... arguments)
         output_type_data(buffer, sizeof(buffer), arguments...);
     }
 }
-#endif

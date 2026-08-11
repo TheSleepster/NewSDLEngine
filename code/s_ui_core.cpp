@@ -62,12 +62,16 @@ find_top_level_in_bounds_widget(ui_state_t *ui_state, widget_t *widget, vec2_t m
 void
 ui_state_begin_frame(ui_state_t *ui_state)
 {
+    Expect(ui_state->frame_begun == false, "Attempted to call 'ui_state_begin_frame()' on this ui_state_t, however the frame has already begun for this ui_state_t...\n");
+
     ui_state->widget_item_count      = 0;
     ui_state->ui_seed                = 0;
     ui_state->parent_stack_top       = 1;
     ui_state->default_font_size      = 32;
     ui_state->active_widget_padding  = vec4_zero();
     ui_state->left_mouse_clicked_this_frame = false;
+    ui_state->frame_begun = true;
+    ui_state->frame_ended = false;
 
     if(ui_state->first_widget != null)
     {
@@ -141,8 +145,13 @@ ui_state_begin_frame(ui_state_t *ui_state)
 true_inline void
 ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list)
 {
+    Expect(ui_state->frame_begun == true, "Attempted to call 'ui_state_end_frame()' but 'ui_state_begin_frame()' was never called on this ui_state_t...\n");
+    Expect(ui_state->frame_ended == false, "Attempted to call 'ui_state_end_frame()' but this has already been called on this ui_state_t this frame...\n");
+
     ui_state_update_widget_state(ui_state);
     ui_state_render_widgets(ui_state, command_list);
+    ui_state->frame_ended = true;
+    ui_state->frame_begun = false;
 
     ++ui_state->frame_count;
 }
@@ -179,7 +188,6 @@ ui_state_set_active_padding(ui_state_t *ui_state, vec4_t padding)
     ui_state->active_widget_padding = padding;
 }
 
-#if 0
 internal_api void
 place_widgets_in_hierarchy(widget_t *first_widget, vec2_t *placement_cursor, u32 layout_style)
 {
@@ -236,39 +244,44 @@ place_all_widgets(ui_state_t *ui_state)
     float32 half_height = renderpass->render_height * 0.5f;
 
     widget_t *current_widget = ui_state->first_widget;
-    do {
-        current_widget->state->position.xy = vec2(current_widget->expected_position.x + current_widget->state->offset.x,
-                                                  current_widget->expected_position.y + current_widget->state->offset.y - current_widget->state->render_size.y);
-        current_widget->state->position.z  = current_widget->parent_stack_depth;
-        
-        // NOTE(Sleepster): Clamp it so that it fits within the window. 
-        current_widget->state->position.x = Clamp(current_widget->state->position.x, (-half_width  + 1), (half_width  - current_widget->state->render_size.x) - 1);
-        current_widget->state->position.y = Clamp(current_widget->state->position.y, (-half_height + 1), (half_height - current_widget->state->render_size.y) - 1);
+    if(current_widget)
+    {
+        do {
+            current_widget->state->position.xy = vec2(current_widget->expected_position.x + current_widget->state->offset.x,
+                                                      current_widget->expected_position.y + current_widget->state->offset.y - current_widget->state->render_size.y);
+            current_widget->state->position.z  = current_widget->parent_stack_depth;
 
-        current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy,
-                                                          current_widget->state->render_size);
+            // NOTE(Sleepster): Clamp it so that it fits within the window. 
+            current_widget->state->position.x = Clamp(current_widget->state->position.x, (-half_width  + 1), (half_width  - current_widget->state->render_size.x) - 1);
+            current_widget->state->position.y = Clamp(current_widget->state->position.y, (-half_height + 1), (half_height - current_widget->state->render_size.y) - 1);
 
-        if(current_widget->first_child)
-        {
-            vec2_t placement_cursor = vec2(current_widget->state->position.x + current_widget->max_left_padding,
-                                          (current_widget->state->position.y + current_widget->state->render_size.y) - current_widget->max_top_padding);
+            current_widget->state->widget_rect = rect2_create(current_widget->state->position.xy,
+                                                              current_widget->state->render_size);
 
-            place_widgets_in_hierarchy(current_widget->first_child,
-                                      &placement_cursor,
-                                       current_widget->layout_style);
-        }
+            if(current_widget->first_child)
+            {
+                vec2_t placement_cursor = vec2(current_widget->state->position.x + current_widget->max_widget_padding.left,
+                                               (current_widget->state->position.y + current_widget->state->render_size.y) - current_widget->max_widget_padding.top);
 
-        current_widget = current_widget->next_sibling;
-    }while(current_widget != ui_state->first_widget);
+                place_widgets_in_hierarchy(current_widget->first_child,
+                                           &placement_cursor,
+                                           current_widget->layout_style);
+            }
+
+            current_widget = current_widget->next_sibling;
+        }while(current_widget != ui_state->first_widget);
+    }
 }
 
+#if 0
 internal_api vec2_t 
 determine_hierarchy_size(ui_state_t *ui_state, widget_t *widget)
 {
     vec2_t result = {};
     if((widget->widget_flags & UI_WIDGET_FLAG_FIXED_SIZE) == 0)
     {
-        if(widget->size_kind == UI_WIDGET_SIZE_KIND_PIXELS)
+        if(widget->size_kind.x == UI_WIDGET_SIZE_KIND_PIXELS || 
+           widget->size_kind.y == UI_WIDGET_SIZE_KIND_PIXELS)
         {
             // NOTE(Sleepster): Resizable widgets 
             result = widget->minimum_render_size;
@@ -278,7 +291,8 @@ determine_hierarchy_size(ui_state_t *ui_state, widget_t *widget)
                 widget_t *current_widget = widget->first_child;
                 do {
                     vec2_t subhierarchy_size = determine_hierarchy_size(ui_state, current_widget);
-                    if(current_widget->size_kind != UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT)
+                    if(current_widget->size_kind.x != UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT ||
+                       current_widget->size_kind.y != UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT)
                     {
                         bool8 has_next_sibling = (current_widget->next_sibling != widget->first_child);
                         if(widget->layout_style == UI_WIDGET_LAYOUT_STYLE_HORIZONTAL)
@@ -350,7 +364,8 @@ determine_hierarchy_size(ui_state_t *ui_state, widget_t *widget)
                 }
             }
         }
-        else if(widget->size_kind == UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT)
+        else if(widget->size_kind.x == UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT ||
+                widget->size_kind.y == UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT)
         {
             Expect(widget->parent, "Widget size is set too 'UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT', but this widget does not HAVE a parent...\n");
 
@@ -370,6 +385,8 @@ determine_hierarchy_size(ui_state_t *ui_state, widget_t *widget)
                                           widget->minimum_render_size.y + widget->max_bottom_padding + widget->max_top_padding);
 
         widget->state->absolute_minimum_render_size = widget->state->render_size;
+
+        // NOTE(Sleepster): Even if our size doesn't change, we must still do the sizing of our children 
         if(widget->first_child)
         {
             widget_t *current_widget = widget->first_child;
@@ -383,27 +400,169 @@ determine_hierarchy_size(ui_state_t *ui_state, widget_t *widget)
     result = widget->state->render_size;
     return(result);
 }
+#else
+internal_api vec2_t
+determine_hierarchy_size(ui_state_t *ui_state, widget_t *widget)
+{
+    vec2_t result = {};
+    if((widget->widget_flags & UI_WIDGET_FLAG_FIXED_SIZE) == 0)
+    {
+        // NOTE(Sleepster): Dynamically sized widget
+        vec2_t resize_factor = {1.0f, -1.0f};
+
+        result = widget->minimum_render_size;
+        // NOTE(Sleepster): Measure Children First
+        if(widget->first_child)
+        {
+            vec2_t total_children_sizing = vec2_zero();
+            widget_t *current_widget = widget->first_child;
+            do {
+                vec2_t current_subhierarchy_size = determine_hierarchy_size(ui_state, current_widget);
+                for(u32 axis = 0;
+                    axis < ArrayCount(widget->size_kind.elements);
+                    ++axis)
+                {
+                    widget_size_kind_t size_kind = (widget_size_kind_t)current_widget->size_kind.elements[axis];
+                    if(size_kind != UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT)
+                    {
+                        bool8 has_next_sibling = (current_widget->next_sibling != widget->first_child);
+                        if(widget->layout_style == UI_WIDGET_LAYOUT_STYLE_HORIZONTAL)
+                        {
+                            if(axis == 0)
+                            {
+                                total_children_sizing.elements[axis] += current_subhierarchy_size.elements[axis];
+                            }
+                            else if(axis == 1)
+                            {
+                                total_children_sizing.elements[axis] = Max(total_children_sizing.elements[axis], 
+                                                                           current_subhierarchy_size.elements[axis]);
+                            }
+
+                            if(has_next_sibling) total_children_sizing.elements[axis] += widget->child_spacing.elements[axis];
+                        }
+                        else
+                        {
+                            if(axis == 0)
+                            {
+                                total_children_sizing.elements[axis] = Max(total_children_sizing.elements[axis], 
+                                                                           current_subhierarchy_size.elements[axis]);
+                            }
+                            else if(axis == 1)
+                            {
+                                total_children_sizing.elements[axis] += current_subhierarchy_size.elements[axis];
+                            }
+
+                            if(has_next_sibling) total_children_sizing.elements[axis] += widget->child_spacing.elements[axis];
+                        }
+                    }
+                }
+
+                current_widget = current_widget->next_sibling;
+            }while(current_widget != widget->first_child);
+
+            result.x = Max(result.x, total_children_sizing.x);
+            result.y = Max(result.y, total_children_sizing.y);
+        } 
+
+        // NOTE(Sleepster): Compute the size for each axis
+        for(u32 axis = 0;
+            axis < ArrayCount(widget->size_kind.elements);
+            ++axis)
+        {
+            float32 padding = widget->max_widget_padding.elements[axis * 2] + widget->max_widget_padding.elements[axis * 2 + 1];
+
+            widget_size_kind_t size_kind = (widget_size_kind_t)widget->size_kind.elements[axis];
+            if(size_kind == UI_WIDGET_SIZE_KIND_PIXELS)
+            {
+                widget->state->render_size.elements[axis] = (result.elements[axis] + padding);
+
+                // NOTE(Sleepster): Set what the size of the widget is before any operations that may change this number 
+                widget->state->absolute_minimum_render_size.elements[axis] = widget->state->render_size.elements[axis];
+                if(widget->widget_flags & UI_WIDGET_FLAG_RESIZEABLE)
+                {
+                    float32 *resize_amount = &widget->state->resize_amount.elements[axis];
+                    float32 *current_size  = &widget->state->render_size.elements[axis];
+
+                    *resize_amount = widget->resize_value.elements[axis] + *resize_amount;
+                    *current_size  = widget->state->render_size.elements[axis] + (*resize_amount * resize_factor.elements[axis]);
+
+                    // NOTE(Sleepster): Clamp the value 
+                    if(*current_size < widget->state->absolute_minimum_render_size.elements[axis])
+                    {
+                        float32 difference = widget->state->absolute_minimum_render_size.elements[axis] - *current_size;
+                        widget->state->resize_amount.elements[axis] += (difference * resize_factor.elements[axis]);
+                    }
+
+                    *current_size = Max(*current_size, widget->state->absolute_minimum_render_size.elements[axis]);
+
+                    if(*current_size > ui_state->max_widget_size.elements[axis])
+                    {
+                        float32 difference = *current_size - ui_state->max_widget_size.elements[axis];
+                        *current_size = ui_state->max_widget_size.elements[axis];
+
+                        *current_size += (difference * resize_factor.elements[axis]);
+                    }
+                }
+            }
+            else if(size_kind == UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT)
+            {
+                Expect(widget->parent, "Widget size is set too 'UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT', but this widget does not HAVE a parent...\n");
+                widget->minimum_render_size.elements[axis] = Clamp(widget->minimum_render_size.elements[axis], 0.0, 1.0);
+
+                float32 render_size = widget->parent->state->render_size.elements[axis] - (padding);
+                widget->state->render_size.elements[axis] = render_size * widget->minimum_render_size.elements[axis];
+            }
+            else
+            {
+                InvalidCodePath;
+            }
+        }
+    }
+    else
+    {
+        // NOTE(Sleepster): If this is a statically sized widget 
+        widget->state->render_size = vec2(widget->minimum_render_size.x + widget->max_widget_padding.left + widget->max_widget_padding.right,
+                                          widget->minimum_render_size.y + widget->max_widget_padding.top  + widget->max_widget_padding.bottom);
+
+        widget->state->absolute_minimum_render_size = widget->state->render_size;
+
+        // NOTE(Sleepster): Even if our size doesn't change, we must still do the sizing of our children 
+        if(widget->first_child)
+        {
+            widget_t *current_widget = widget->first_child;
+            do {
+                determine_hierarchy_size(ui_state, current_widget);
+                current_widget = current_widget->next_sibling;
+            }while(current_widget != widget->first_child);
+        }
+    }
+
+    result = widget->state->render_size;
+
+    return(result);
+}
+#endif
 
 internal_api void
 size_all_widgets(ui_state_t *ui_state)
 {
     widget_t *current_widget = ui_state->first_widget;
-    do {
-        determine_hierarchy_size(ui_state, current_widget);
-        current_widget = current_widget->next_sibling;
-    }while(current_widget != ui_state->first_widget);
+    if(current_widget)
+    {
+        do {
+            determine_hierarchy_size(ui_state, current_widget);
+            current_widget = current_widget->next_sibling;
+        }while(current_widget != ui_state->first_widget);
+    }
 }
-#endif
 
 internal_api void
 ui_state_update_widget_hierarchy(ui_state_t *ui_state)
 {
-#if 0
     // NOTE(Sleepster): Get the total size of the hierarchy
     size_all_widgets(ui_state);
     // NOTE(Sleepster): Place the widgets in the hierarchy, honoring the sizing and padding
     place_all_widgets(ui_state);
-#endif
 }
 
 void
@@ -542,7 +701,7 @@ render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_lis
             else
             {
                 string_t widget_text = {
-                    .data  = (u8*)(current_widget->state->widget_text_buffer + current_widget->state->widget_text_render_start_offset),
+                    .data  = (u8*)(current_widget->widget_text_buffer->data + current_widget->state->widget_text_render_start_offset),
                     .count = current_widget->state->widget_text_render_end_offset,
                 };
                 immediate_text(command_list, 
@@ -806,33 +965,33 @@ ui_widget_set_padding(widget_t *widget, vec4_t padding)
     widget->widget_padding = padding;
 
     bool8 padding_changed = false;
-    if(padding.left > widget->max_left_padding)
+    if(padding.left > widget->max_widget_padding.left)
     {
-        widget->max_left_padding = padding.left;
+        widget->max_widget_padding.left = padding.left;
         padding_changed = true;
     }
 
-    if(padding.right > widget->max_right_padding)
+    if(padding.right > widget->max_widget_padding.right)
     {
-        widget->max_right_padding = padding.right;
+        widget->max_widget_padding.right = padding.right;
         padding_changed = true;
     }
 
-    if(padding.top > widget->max_top_padding)
+    if(padding.top > widget->max_widget_padding.top)
     {
-        widget->max_top_padding = padding.top;
+        widget->max_widget_padding.top = padding.top;
         padding_changed = true;
     }
 
-    if(padding.bottom > widget->max_bottom_padding)
+    if(padding.bottom > widget->max_widget_padding.bottom)
     {
-        widget->max_bottom_padding = padding.bottom;
+        widget->max_widget_padding.bottom = padding.bottom;
         padding_changed = true;
     }
 
     if(padding_changed)
     {
-        vec2_t new_size   = vec2(widget->max_left_padding + widget->max_right_padding, widget->max_top_padding + widget->max_bottom_padding);
+        vec2_t new_size   = vec2(widget->max_widget_padding.left + widget->max_widget_padding.right, widget->max_widget_padding.top + widget->max_widget_padding.bottom);
         vec2_t size_delta = vec2_subtract(new_size, widget->minimum_render_size);
 
         widget->minimum_render_size += size_delta;
@@ -849,6 +1008,7 @@ true_inline u64
 ui_widget_hash(ui_state_t *ui_state, widget_t *widget)
 {
     u64 result = 0;
+
     result = (c_fnv_hash_value(widget->widget_name.data, widget->widget_name.count));
     if(ui_state->ui_seed != 0)
     {
@@ -1096,10 +1256,7 @@ ui_widget_panel(ui_state_t *ui_state,
     widget->child_spacing        = child_spacing;
     widget->widget_padding       = padding;
     widget->radius               = 0.0f;
-    widget->max_left_padding     = padding.left;
-    widget->max_right_padding    = padding.right;
-    widget->max_top_padding      = padding.top;
-    widget->max_bottom_padding   = padding.bottom;
+    widget->max_widget_padding   = padding;
     widget->minimum_render_size  = vec2_add(minimum_render_size, 
                                             vec2(padding.left + padding.right, padding.top + padding.bottom));
 
@@ -1218,7 +1375,7 @@ ui_widget_toggle_box(ui_state_t *ui_state, string_t widget_text, vec2_t size)
 
 // TODO(Sleepster): color? 
 ui_signal_t
-ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size)
+ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size, ivec2_t size_kind)
 {
     ui_signal_t result = {};
     widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_IDLE_COLOR|UI_WIDGET_FLAG_DRAW_RECTANGLE|UI_WIDGET_FLAG_MAKE_CIRCULAR);
@@ -1226,23 +1383,25 @@ ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size)
     result = ui_widget_get_signals(ui_state, widget);
 
     widget->minimum_render_size = size;
+    widget->size_kind           = size_kind;
     widget->state->render_color = ui_state->default_widget_idle_color;
 
     return(result);
 }
 
 void 
-ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t spacing_size)
+ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t spacing_size, ivec2_t size_kind)
 {
     widget_t *widget = ui_widget_create(ui_state, widget_name, 0);
     widget->minimum_render_size = spacing_size;
+    widget->size_kind           = size_kind;
     widget->state->render_color = ui_state->default_widget_idle_color;
 }
 
 void
-ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size)
+ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size, ivec2_t size_kind)
 {
-    ui_widget_rectangle(ui_state, widget_name, size);
+    ui_widget_rectangle(ui_state, widget_name, size, size_kind);
 }
 
 ui_signal_t
@@ -1294,7 +1453,7 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
 
 // TODO(Sleepster): Function to fill the contents of the text buffer
 ui_signal_t
-ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, vec2_t size)
+ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_text_content, vec2_t size)
 {
     ui_signal_t result = {};
     widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DRAW_RECTANGLE|
@@ -1304,6 +1463,7 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, vec2_t size)
                                                                UI_WIDGET_FLAG_HAS_TEXT_CONTENT);
     widget->minimum_render_size = size;
     widget->state->render_color = ui_state->default_widget_idle_color;
+    widget->widget_text_buffer  = widget_text_content;
 
     result = ui_widget_get_signals(ui_state, widget);
 
@@ -1340,11 +1500,11 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, vec2_t size)
                         stream_index < input_length;
                         ++stream_index)
                     {
-                        s32 index = widget_state->widget_text_buffer_used + stream_index;
-                        widget_state->widget_text_buffer[index] = input->input_stream[stream_index];
+                        s32 index = widget->widget_text_buffer->count + stream_index;
+                        widget->widget_text_buffer->data[index] = input->input_stream[stream_index];
                     }
 
-                    widget_state->widget_text_buffer_used += input_length;
+                    widget->widget_text_buffer->count += input_length;
                 }
             }
             else
@@ -1354,8 +1514,8 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, vec2_t size)
                 {
                     if((input->modifier_flags & TEXT_INPUT_MODIFIER_CTRL) == 0)
                     {
-                        widget_state->widget_text_buffer[widget_state->widget_text_buffer_used] = '\0';
-                        widget_state->widget_text_buffer_used = Max(widget_state->widget_text_buffer_used - 1, 0);
+                        widget->widget_text_buffer->data[widget->widget_text_buffer->count] = '\0';
+                        widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 1, 0);
                     }
                     else
                     {
@@ -1363,27 +1523,23 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, vec2_t size)
                             index != 0;
                             ++index)
                         {
-                            s32 char_index = Max(widget_state->widget_text_buffer_used + index, 0);
-                            widget_state->widget_text_buffer[char_index] = '\0';
+                            s32 char_index = Max(widget->widget_text_buffer->count + index, 0);
+                            widget->widget_text_buffer->data[char_index] = '\0';
                         }
-                        widget_state->widget_text_buffer_used = Max(widget_state->widget_text_buffer_used - 4, 0);
+                        widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 4, 0);
                     }
                 }
             }
         }
 
         widget_state->widget_text_render_start_offset = 0;
-        widget_state->widget_text_render_end_offset   = widget_state->widget_text_buffer_used;
+        widget_state->widget_text_render_end_offset   = widget->widget_text_buffer->count;
 
         vec2_t offset = {};
-        if(widget_state->widget_text_buffer_used > 0)
+        if(widget->widget_text_buffer->count > 0)
         {
-            string_t buffer_string = {
-                .data  = (u8*)widget_state->widget_text_buffer,
-                .count = widget_state->widget_text_buffer_used
-            };
             vec2_t string_size = s_asset_font_get_string_size(ui_state->asset_manager, 
-                                                              buffer_string,
+                                                             *widget->widget_text_buffer,
                                                               &ui_state->default_font,
                                                               widget->font_size,
                                                               null);
@@ -1397,7 +1553,7 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, vec2_t size)
             u32 current_byte_offset = 0;
             while(internal_size_used > internal_size_left)
             {
-                byte *character = widget_state->widget_text_buffer + current_byte_offset;
+                byte *character = widget->widget_text_buffer->data + current_byte_offset;
                 dynamic_render_font_varient_t *varient = s_asset_font_acquire_font_at_size(ui_state->asset_manager,
                                                                                           &ui_state->default_font,
                                                                                            widget->font_size);
@@ -1428,7 +1584,7 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, vec2_t size)
             ui_widget_seed(ui_state, widget->ID);
 
             string_t name = c_string_concat(&global_context->temporary_arena, STR("TEXT_BOX_CURSOR_"), widget_name);
-            ui_signal_t signal = ui_widget_rectangle(ui_state, name, vec2(12, size.y));
+            ui_signal_t signal = ui_widget_rectangle(ui_state, name, vec2(12, size.y), {UI_WIDGET_SIZE_KIND_PIXELS, UI_WIDGET_SIZE_KIND_PIXELS});
 
             widget_t *rect = signal.widget;
             rect->state->render_color = vec4(0.0, 1.0, 0.0, 1.0);
@@ -1448,14 +1604,14 @@ ui_widget_texture(ui_state_t     *ui_state,
                   asset_handle_t *texture, 
                   vec2_t          uv_min,
                   vec2_t          uv_max,
-                  u32             size_kind,
+                  ivec2_t         size_kind,
                   u32             additional_flags)
 {
     ui_signal_t result = {};
 
     widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DISPLAY_TEXTURE);
     widget->minimum_render_size   = size;
-    widget->size_kind             = (widget_size_kind_t)size_kind;
+    widget->size_kind             = size_kind;
     widget->display_texture       = texture;
     widget->display_texture_uvmin = uv_min;
     widget->display_texture_uvmax = uv_max;

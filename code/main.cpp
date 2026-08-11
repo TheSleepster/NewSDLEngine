@@ -89,7 +89,13 @@ struct game_state_t
 
     u32                 game_renderpass_ID;
     u32                 fullscreen_renderpass_ID; 
+
+    bool32              open_debug_menu;
 };
+
+// TODO(Sleepster): DEBUG CODE 
+global_variable string_t global_test_textbox_string = {}; 
+// TODO(Sleepster): DEBUG CODE 
 
 entity_t*
 entity_create(game_state_t *game_state)
@@ -145,6 +151,176 @@ entity_render(game_state_t *game_state, render_command_list_t *command_list, ent
                       vec2_zero(),
                       vec2_zero(),
                       texture);
+}
+
+// NOTE(Sleepster): DEBUG CODE
+internal_api void
+handle_debug_ui_menu(ui_state_t *main_ui, renderer_state_t *renderer_state, asset_handle_t *player_sprite)
+{
+    // NOTE(Sleepster): DEBUG UI 
+    ui_state_begin_frame(main_ui);
+    ui_signal_t main_panel = ui_widget_draggable_panel(main_ui, 
+                                                       STR("Test panel..."), 
+                                                       vec2(20, 20), 
+                                                       vec2(20, 20), 
+                                                       vec2(10.0f, 10.0f), 
+                                                       vec4(10, 10, 10, 10), 
+                                                       vec4(0.4, 0.4, 0.4, 0.5),
+                                                       0);
+    ui_column(main_ui, main_panel.widget)
+    {
+        ui_widget_set_default_font_size(main_ui, 40);
+        ui_signal_t title_bar = ui_widget_panel(main_ui, 
+                                                STR("Title bar"), 
+                                                vec2(0, 0), 
+                                                vec2(20, 20),
+                                                vec2(10.0f, 0.0f), 
+                                                vec4(10, 10, 10, 10), 
+                                                vec4(0.0, 0.0, 0.0, 0.2),
+                                                0);
+        ui_state_set_active_padding(main_ui, vec4(10, 10, 4, 4));
+        ui_signal_t open_menu_button = {};
+        ui_row(main_ui, title_bar.widget)
+        {
+            open_menu_button = ui_widget_sized_button(main_ui, 
+                                                      STR("Test button..."), 
+                                                      vec2(20, 20), 0);
+            ui_widget_text(main_ui, STR("[Debug Menu Information]"));
+        }
+
+        if(ui_pressed(open_menu_button))
+        {
+            main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
+        }
+
+        if(main_panel.widget->toggled)
+        {
+            ui_widget_divider(main_ui, 
+                              STR("main menu divider"), 
+                              vec2(0.9, 5.0f), 
+                              {UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, UI_WIDGET_SIZE_KIND_PIXELS});
+
+            ui_widget_set_default_font_size(main_ui, 20);
+            ui_signal_t debug_menu = ui_widget_labeled_button(main_ui, STR("Enable Debug Overlay"));
+            if(ui_pressed(debug_menu))
+            {
+                debug_menu.widget->state->toggled = !debug_menu.widget->state->toggled;
+            }
+
+            if(debug_menu.widget->state->toggled == true)
+            {
+                ui_signal_t sub_panel = ui_widget_panel(main_ui, 
+                                                        STR("Debug Menu subpanel"), 
+                                                        vec2(0, 0), 
+                                                        vec2(20, 20),
+                                                        vec2(10.0f, 10.0f), 
+                                                        vec4(10, 10, 0, 0), 
+                                                        vec4_zero(),
+                                                        0);
+                ui_column(main_ui, sub_panel.widget)
+                {
+                    ui_widget_divider(main_ui, 
+                                      STR("Debug submenu bar 2"), 
+                                      vec2(1.0, 5.0f), 
+                                      {UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, UI_WIDGET_SIZE_KIND_PIXELS});
+                    ui_signal_t perf_counters = ui_widget_labeled_button(main_ui, STR("Display Performance Counters"));
+                    if(ui_pressed(perf_counters))
+                    {
+                        perf_counters.widget->state->toggled = !perf_counters.widget->state->toggled;
+                    }
+
+                    if(perf_counters.widget->state->toggled == true)
+                    {                    
+                        ui_signal_t another_sub_panel = ui_widget_panel(main_ui, 
+                                                                        STR("Debug PERF Menu subpanel stuff"), 
+                                                                        vec2(0, 0), 
+                                                                        vec2(20, 20),
+                                                                        vec2(10.0f, 10.0f), 
+                                                                        vec4(20, 20, 10, 10), 
+                                                                        vec4_zero(),
+                                                                        0);
+                        ui_column(main_ui, another_sub_panel.widget)
+                        {
+                            ui_widget_labeled_button(main_ui, STR("Show Performance Chart"));
+                            ui_widget_labeled_button(main_ui, STR("Show Running Chart"));
+                            ui_widget_labeled_button(main_ui, STR("Show Entity Culling Chart"));
+                        }
+                    }
+
+                    ui_widget_labeled_button(main_ui, STR("Show Timing Flame Graph"));
+                    ui_widget_labeled_button(main_ui, STR("Show RAM Stats"));
+
+                    ui_widget_float_slider_bar(main_ui, STR("Test slider..."), 100, 8, 2.5f);
+                    ui_widget_divider(main_ui, 
+                                      STR("Debug submenu divider"), 
+                                      vec2(1.0, 5.0f), 
+                                      {UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, UI_WIDGET_SIZE_KIND_PIXELS});
+                }
+            }
+
+            ui_widget_labeled_button(main_ui, STR("Enable Editor"));
+
+            ui_signal_t textbox = ui_widget_textbox(main_ui, STR("Information Box"), &global_test_textbox_string, {400, 20});
+            if(textbox.widget->state->toggled)
+            {
+                main_ui->input_focused = true;
+            }
+            else
+            {
+                main_ui->input_focused = false;
+            }
+
+            ui_signal_t editor_select_panel = ui_widget_panel(main_ui, 
+                                                              STR("editor_select_panel"),
+                                                              vec2(0, 0), 
+                                                              vec2(20, 20),
+                                                              vec2(10.0f, 10.0f), 
+                                                              vec4(0, 0, 0, 0), 
+                                                              vec4_zero(),
+                                                              0);
+            ui_row(main_ui, editor_select_panel.widget)
+            {
+                ui_signal_t editor_buttons = ui_widget_panel(main_ui, 
+                                                             STR("game_editor_button_panel"),
+                                                             vec2(0, 0), 
+                                                             vec2(20, 20),
+                                                             vec2(10.0f, 10.0f), 
+                                                             vec4(0, 0, 0, 0), 
+                                                             vec4_zero(),
+                                                             0);
+                ui_column(main_ui, editor_buttons.widget)
+                {
+                    ui_widget_labeled_button(main_ui, STR("Save Map"));
+                    ui_widget_labeled_button(main_ui, STR("Test Load map"));
+                    ui_widget_labeled_button(main_ui, STR("Entity Selection"));
+                    ui_widget_labeled_button(main_ui, STR("Tester BLABAH"));
+                }
+
+                ui_signal_t test_display_panel = ui_widget_panel(main_ui, 
+                                                                 STR("TEST display panel"),
+                                                                 vec2(0, 0), 
+                                                                 vec2(20, 20),
+                                                                 vec2(10.0f, 10.0f), 
+                                                                 vec4(0, 0, 0, 0), 
+                                                                 vec4(0.1, 0.1, 0.1, 0.4),
+                                                                 UI_WIDGET_FLAG_INTERACTABLE|UI_WIDGET_FLAG_RESIZEABLE);
+                ui_row(main_ui, test_display_panel.widget)
+                {
+                    s_renderer_set_texture_filter_mode(renderer_state, player_sprite->texture, IMAGE_FILTER_TYPE_NEAREST);
+                    ui_widget_texture(main_ui, 
+                                      STR("test atlas"), 
+                                      vec2(1.0, 1.0), 
+                                      player_sprite, 
+                                      vec2_zero(), 
+                                      vec2(player_sprite->texture->bitmap.width, player_sprite->texture->bitmap.height), 
+                                      {UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT},
+                                      0);
+                }
+            }
+        }
+
+        ui_state_maybe_eat_inputs(main_ui);
+    }
 }
 
 int
@@ -319,6 +495,9 @@ game_main(void)
     s_texture_atlas_add_texture(atlas, &player_sprite);
     s_texture_atlas_pack_added_textures(asset_manager, atlas);
 
+    global_test_textbox_string.data  = c_arena_push_array(&global_context->context_arena, byte, 256);
+    global_test_textbox_string.count = 0;
+
     u64 perf_count_freq = SDL_GetPerformanceFrequency();
     u64 last_tsc        = SDL_GetPerformanceCounter();
     u64 current_tsc     = 0;
@@ -332,150 +511,10 @@ game_main(void)
         s_im_reset_controller_states(input_manager);
         process_window_events(global_context->renderer_state, input_manager);
 
-        // NOTE(Sleepster): DEBUG UI 
-        ui_state_begin_frame(main_ui);
-        ui_signal_t main_panel = ui_widget_draggable_panel(main_ui, 
-                                                           STR("Test panel..."), 
-                                                           vec2(20, 20), 
-                                                           vec2(20, 20), 
-                                                           vec2(10.0f, 10.0f), 
-                                                           vec4(10, 10, 10, 10), 
-                                                           vec4(0.4, 0.4, 0.4, 0.5),
-                                                           0);
-        ui_column(main_ui, main_panel.widget)
+        if(game_state.open_debug_menu)
         {
-            ui_widget_set_default_font_size(main_ui, 40);
-            ui_signal_t title_bar = ui_widget_panel(main_ui, 
-                                                    STR("Title bar"), 
-                                                    vec2(0, 0), 
-                                                    vec2(20, 20),
-                                                    vec2(10.0f, 0.0f), 
-                                                    vec4(10, 10, 10, 10), 
-                                                    vec4(0.0, 0.0, 0.0, 0.2),
-                                                    0);
-            ui_state_set_active_padding(main_ui, vec4(10, 10, 4, 4));
-            ui_signal_t open_menu_button = {};
-            ui_row(main_ui, title_bar.widget)
-            {
-                open_menu_button = ui_widget_sized_button(main_ui, 
-                                                          STR("Test button..."), 
-                                                          vec2(20, 20), 0);
-                ui_widget_text(main_ui, STR("[Debug Menu Information]"));
-            }
-
-            if(ui_pressed(open_menu_button))
-            {
-                main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
-            }
-
-            if(main_panel.widget->toggled)
-            {
-                // TODO(Sleepster): SOMETHING BETTER HAS TO BE DONE WITH THESE 
-                //
-                // LIKE SIZE KIND
-                //ui_widget_divider(main_ui, STR("main menu divider"), vec2(main_panel.widget->state->render_size.x, 4.0));
-
-                ui_widget_set_default_font_size(main_ui, 20);
-                ui_signal_t debug_menu = ui_widget_labeled_button(main_ui, STR("Enable Debug Overlay"));
-                if(ui_pressed(debug_menu))
-                {
-                    debug_menu.widget->state->toggled = !debug_menu.widget->state->toggled;
-                }
-
-                if(debug_menu.widget->state->toggled == true)
-                {
-                    ui_signal_t sub_panel = ui_widget_panel(main_ui, 
-                                                            STR("Debug Menu subpanel"), 
-                                                            vec2(0, 0), 
-                                                            vec2(20, 20),
-                                                            vec2(10.0f, 10.0f), 
-                                                            vec4(10, 10, 0, 0), 
-                                                            vec4_zero(),
-                                                            0);
-                    ui_column(main_ui, sub_panel.widget)
-                    {
-                        ui_signal_t perf_counters = ui_widget_labeled_button(main_ui, STR("Display Performance Counters"));
-                        if(ui_pressed(perf_counters))
-                        {
-                            perf_counters.widget->state->toggled = !perf_counters.widget->state->toggled;
-                        }
-
-                        if(perf_counters.widget->state->toggled == true)
-                        {                    
-                            ui_signal_t another_sub_panel = ui_widget_panel(main_ui, 
-                                                                            STR("Debug PERF Menu subpanel stuff"), 
-                                                                            vec2(0, 0), 
-                                                                            vec2(20, 20),
-                                                                            vec2(10.0f, 10.0f), 
-                                                                            vec4(20, 20, 10, 10), 
-                                                                            vec4_zero(),
-                                                                            0);
-                            ui_column(main_ui, another_sub_panel.widget)
-                            {
-                                ui_widget_labeled_button(main_ui, STR("Show Performance Chart"));
-                                ui_widget_labeled_button(main_ui, STR("Show Running Chart"));
-                                ui_widget_labeled_button(main_ui, STR("Show Entity Culling Chart"));
-                            }
-                        }
-
-                        ui_widget_labeled_button(main_ui, STR("Show Timing Flame Graph"));
-                        ui_widget_labeled_button(main_ui, STR("Show RAM Stats"));
-
-                        ui_widget_float_slider_bar(main_ui, STR("Test slider..."), 100, 8, 2.5f);
-                        //ui_widget_divider(main_ui, STR("Debug submenu divider"), vec2(main_panel.widget->state->render_size.x, 4.0));
-                    }
-                }
-
-                ui_widget_labeled_button(main_ui, STR("Enable Editor"));
-                ui_signal_t textbox = ui_widget_textbox(main_ui, STR("Information Box"), {400, 20});
-                if(textbox.widget->state->toggled)
-                {
-                    main_ui->input_focused = true;
-                }
-                else
-                {
-                    main_ui->input_focused = false;
-                }
-
-                ui_signal_t test_display_panel = ui_widget_panel(main_ui, 
-                                                                 STR("TEST display panel"),
-                                                                 vec2(0, 0), 
-                                                                 vec2(20, 20),
-                                                                 vec2(10.0f, 10.0f), 
-                                                                 vec4(0, 0, 0, 0), 
-                                                                 vec4(0.1, 0.1, 0.1, 0.4),
-                                                                 UI_WIDGET_FLAG_INTERACTABLE|UI_WIDGET_FLAG_RESIZEABLE);
-                ui_row(main_ui, test_display_panel.widget)
-                {
-                    ui_column(main_ui, test_display_panel.widget)
-                    {
-                        ui_widget_labeled_button(main_ui, STR("Save Map"));
-                        ui_widget_labeled_button(main_ui, STR("Test Load map"));
-                        ui_widget_labeled_button(main_ui, STR("Entity Selection"));
-                        ui_widget_labeled_button(main_ui, STR("Tester BLABAH"));
-                    }
-
-                    s_renderer_set_texture_filter_mode(renderer_state, player_sprite.texture, IMAGE_FILTER_TYPE_NEAREST);
-                    ui_widget_texture(main_ui, 
-                                      STR("test atlas"), 
-                                      vec2(1.0, 1.0), 
-                                      &player_sprite, 
-                                      vec2_zero(), 
-                                      vec2(player_sprite.texture->bitmap.width, player_sprite.texture->bitmap.height), 
-                                      UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT,
-                                      0);
-                }
-            }
-
-            ui_row(main_ui, main_panel.widget)
-            {
-                ui_widget_labeled_button(main_ui, STR("Button 1"));
-                ui_widget_labeled_button(main_ui, STR("Button 2"));
-            }
-
-            ui_state_maybe_eat_inputs(main_ui);
+            handle_debug_ui_menu(main_ui, renderer_state, &player_sprite);
         }
-        // NOTE(Sleepster): DEBUG UI 
 
         vec2_t input_axis = {};
         if(s_im_is_keyboard_key_down(game_state.controller, SDL_SCANCODE_W))
@@ -498,6 +537,13 @@ game_main(void)
             input_axis.x += 1.0f;
         }
 
+        // NOTE(Sleepster): Debug menu 
+        if(s_im_is_keyboard_key_pressed(game_state.controller, SDL_SCANCODE_SEMICOLON))
+        {
+            game_state.open_debug_menu = !game_state.open_debug_menu;
+        }
+
+        // NOTE(Sleepster): Simulate loop 
         const float64 TICK_RATE = 1.0 / 60.0;
         if(delta_time >= (TICK_RATE * 2.0f))
         {
@@ -514,6 +560,7 @@ game_main(void)
             dt_accumulator -= TICK_RATE;
         }
         float32 alpha = (float32)(dt_accumulator / TICK_RATE);
+        // NOTE(Sleepster): Simulate loop 
 
         // NOTE(Sleepster): Game renderpass
         render_command_list_t *command_list = s_renderer_get_command_list(renderer_state, RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -583,8 +630,6 @@ game_main(void)
             r_cmd_use_shader_program(command_list, font_shader);
             r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
             r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
-
-            // TODO(Sleepster): There are only two periods... why? 
             immediate_text(command_list, 
                           &game_state.vertex_buffer, 
                           asset_manager, 
@@ -599,7 +644,10 @@ game_main(void)
             r_cmd_draw_indexed(command_list, (game_state.vertex_buffer.vertex_count * 0.25f) * 6, 6, 1, 1);
 
             // NOTE(Sleepster): Draw UI 
-            ui_state_end_frame(main_ui, command_list);
+            if(game_state.open_debug_menu && main_ui->frame_begun)
+            {
+                ui_state_end_frame(main_ui, command_list);
+            }
             r_cmd_renderpass_end(command_list);
         }
         r_cmd_present(command_list, &game_state.fullscreen_color_buffer);

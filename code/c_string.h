@@ -85,6 +85,8 @@ string_t c_string_replace_all_instances_of(memory_arena_t *arena, string_t strin
 // STRING BUILDER
 ///////////////////////////////////////////
 
+#define DEFAULT_STRING_BUILDER_BUFFER_SIZE (2048)
+
 typedef struct string_builder_buffer 
 {
     byte *buffer_data;
@@ -103,6 +105,11 @@ typedef struct string_builder
     string_builder_buffer_t     *first_buffer;
     string_builder_buffer_t     *current_buffer;
     s64                          default_buffer_block_size;
+
+#if 0
+    // NOTE(Sleepster): Just in case we don't need to allocate memory...
+    byte                         initial_buffer[DEFAULT_STRING_BUILDER_BUFFER_SIZE];
+#endif
 
     s64                          bytes_used;
     s64                          total_allocated;

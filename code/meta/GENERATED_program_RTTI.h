@@ -44,19 +44,26 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 
 #define type_id(x) type_id_from_ptr((__typeof__(x)*)nullptr)
 #define GENERATED_PROGRAM_TYPE_LIST(X) \
+	X(TYPE_sys_thread_handle_t, type_id(sys_thread_handle_t), "sys_thread_handle_t") \
 	X(TYPE_u32, type_id(u32), "u32") \
+	X(TYPE_void, type_id(void), "void") \
+	X(TYPE_sys_thread_t, type_id(sys_thread_t), "sys_thread_t") \
+	X(TYPE_sys_mutex_handle_t, type_id(sys_mutex_handle_t), "sys_mutex_handle_t") \
+	X(TYPE_sys_mutex_t, type_id(sys_mutex_t), "sys_mutex_t") \
+	X(TYPE_sys_semaphore_handle_t, type_id(sys_semaphore_handle_t), "sys_semaphore_handle_t") \
+	X(TYPE_sys_semaphore_t, type_id(sys_semaphore_t), "sys_semaphore_t") \
+	X(TYPE_u64, type_id(u64), "u64") \
+	X(TYPE_ticket_mutex_t, type_id(ticket_mutex_t), "ticket_mutex_t") \
 	X(TYPE_dynarray_header_t, type_id(dynarray_header_t), "dynarray_header_t") \
 	X(TYPE_file_extension_t, type_id(file_extension_t), "file_extension_t") \
 	X(TYPE_sys_handle_t, type_id(sys_handle_t), "sys_handle_t") \
 	X(TYPE_string_t, type_id(string_t), "string_t") \
-	X(TYPE_u64, type_id(u64), "u64") \
 	X(TYPE_bool8, type_id(bool8), "bool8") \
 	X(TYPE_file_t, type_id(file_t), "file_t") \
 	X(TYPE_mapped_file_t, type_id(mapped_file_t), "mapped_file_t") \
 	X(TYPE_file_data_t, type_id(file_data_t), "file_data_t") \
 	X(TYPE_overlap_io_data_t, type_id(overlap_io_data_t), "overlap_io_data_t") \
 	X(TYPE_visit_files_pfn_t, type_id(visit_files_pfn_t), "visit_files_pfn_t") \
-	X(TYPE_void, type_id(void), "void") \
 	X(TYPE_visit_file_data_t, type_id(visit_file_data_t), "visit_file_data_t") \
 	X(TYPE_file_watcher_change_event_t, type_id(file_watcher_change_event_t), "file_watcher_change_event_t") \
 	X(TYPE_file_watcher_recorded_change_t, type_id(file_watcher_recorded_change_t), "file_watcher_recorded_change_t") \
@@ -86,13 +93,6 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_s64, type_id(s64), "s64") \
 	X(TYPE_string_builder_buffer_t, type_id(string_builder_buffer_t), "string_builder_buffer_t") \
 	X(TYPE_string_builder_t, type_id(string_builder_t), "string_builder_t") \
-	X(TYPE_sys_thread_handle_t, type_id(sys_thread_handle_t), "sys_thread_handle_t") \
-	X(TYPE_sys_thread_t, type_id(sys_thread_t), "sys_thread_t") \
-	X(TYPE_sys_mutex_handle_t, type_id(sys_mutex_handle_t), "sys_mutex_handle_t") \
-	X(TYPE_sys_mutex_t, type_id(sys_mutex_t), "sys_mutex_t") \
-	X(TYPE_sys_semaphore_handle_t, type_id(sys_semaphore_handle_t), "sys_semaphore_handle_t") \
-	X(TYPE_sys_semaphore_t, type_id(sys_semaphore_t), "sys_semaphore_t") \
-	X(TYPE_ticket_mutex_t, type_id(ticket_mutex_t), "ticket_mutex_t") \
 	X(TYPE_work_completion_fence_t, type_id(work_completion_fence_t), "work_completion_fence_t") \
 	X(TYPE_work_order_fn, type_id(work_order_fn), "work_order_fn") \
 	X(TYPE_work_order_t, type_id(work_order_t), "work_order_t") \
@@ -221,6 +221,7 @@ type_id_from_ptr(T*) { return type_id_impl<T>(); }
 	X(TYPE_widget_flags_t, type_id(widget_flags_t), "widget_flags_t") \
 	X(TYPE_widget_layout_style_t, type_id(widget_layout_style_t), "widget_layout_style_t") \
 	X(TYPE_widget_size_kind_t, type_id(widget_size_kind_t), "widget_size_kind_t") \
+	X(TYPE_ivec2_t, type_id(ivec2_t), "ivec2_t") \
 	X(TYPE_immediate_widget_data_t, type_id(immediate_widget_data_t), "immediate_widget_data_t") \
 	X(TYPE_vulkan_allocation_usage_type_t, type_id(vulkan_allocation_usage_type_t), "vulkan_allocation_usage_type_t") \
 	X(TYPE_VkDeviceSize, type_id(VkDeviceSize), "VkDeviceSize") \
@@ -389,6 +390,10 @@ typedef struct type_info_data_mapping
     const type_info_struct_t *type_info_ptr;
 }type_info_data_mapping_t;
 
+const static sys_thread_t GENERATED_DEFAULT_sys_thread_t = {};
+const static sys_mutex_t GENERATED_DEFAULT_sys_mutex_t = {};
+const static sys_semaphore_t GENERATED_DEFAULT_sys_semaphore_t = {};
+const static ticket_mutex_t GENERATED_DEFAULT_ticket_mutex_t = {};
 const static dynarray_header_t GENERATED_DEFAULT_dynarray_header_t = {};
 const static file_t GENERATED_DEFAULT_file_t = {};
 const static mapped_file_t GENERATED_DEFAULT_mapped_file_t = {};
@@ -408,10 +413,6 @@ const static program_flag_state_t GENERATED_DEFAULT_program_flag_state_t = {};
 const static string_t GENERATED_DEFAULT_string_t = {};
 const static string_builder_buffer_t GENERATED_DEFAULT_string_builder_buffer_t = {};
 const static string_builder_t GENERATED_DEFAULT_string_builder_t = {};
-const static sys_thread_t GENERATED_DEFAULT_sys_thread_t = {};
-const static sys_mutex_t GENERATED_DEFAULT_sys_mutex_t = {};
-const static sys_semaphore_t GENERATED_DEFAULT_sys_semaphore_t = {};
-const static ticket_mutex_t GENERATED_DEFAULT_ticket_mutex_t = {};
 const static work_completion_fence_t GENERATED_DEFAULT_work_completion_fence_t = {};
 const static work_order_t GENERATED_DEFAULT_work_order_t = {};
 const static token_data_t GENERATED_DEFAULT_token_data_t = {};
@@ -493,6 +494,73 @@ const static vulkan_image_info_t GENERATED_DEFAULT_vulkan_image_info_t = {};
 const static vulkan_image_t GENERATED_DEFAULT_vulkan_image_t = {};
 const static vulkan_shader_stage_t GENERATED_DEFAULT_vulkan_shader_stage_t = {};
 const static vulkan_shader_binding_t GENERATED_DEFAULT_vulkan_shader_binding_t = {};
+
+struct type_info_struct_sys_thread_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[3];
+		struct {
+			type_info_member_t handle;
+			type_info_member_t thread_id;
+			type_info_member_t user_data;
+		}members;
+	};
+};
+
+struct type_info_struct_sys_mutex_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[1];
+		struct {
+			type_info_member_t handle;
+		}members;
+	};
+};
+
+struct type_info_struct_sys_semaphore_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[1];
+		struct {
+			type_info_member_t handle;
+		}members;
+	};
+};
+
+struct type_info_struct_ticket_mutex_t {
+	const char *name;
+	u32 type;
+	u32 kind;
+	u32 modifier_flags;
+	u32 flag_counter;
+	u32 element_size;
+	u32 member_count;
+	union {
+		type_info_member_t member_array[2];
+		struct {
+			type_info_member_t next_ticket;
+			type_info_member_t working_ticket;
+		}members;
+	};
+};
 
 struct type_info_struct_dynarray_header_t {
 	const char *name;
@@ -878,73 +946,6 @@ struct type_info_struct_string_builder_t {
 			type_info_member_t default_buffer_block_size;
 			type_info_member_t bytes_used;
 			type_info_member_t total_allocated;
-		}members;
-	};
-};
-
-struct type_info_struct_sys_thread_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[3];
-		struct {
-			type_info_member_t handle;
-			type_info_member_t thread_id;
-			type_info_member_t user_data;
-		}members;
-	};
-};
-
-struct type_info_struct_sys_mutex_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[1];
-		struct {
-			type_info_member_t handle;
-		}members;
-	};
-};
-
-struct type_info_struct_sys_semaphore_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[1];
-		struct {
-			type_info_member_t handle;
-		}members;
-	};
-};
-
-struct type_info_struct_ticket_mutex_t {
-	const char *name;
-	u32 type;
-	u32 kind;
-	u32 modifier_flags;
-	u32 flag_counter;
-	u32 element_size;
-	u32 member_count;
-	union {
-		type_info_member_t member_array[2];
-		struct {
-			type_info_member_t next_ticket;
-			type_info_member_t working_ticket;
 		}members;
 	};
 };
@@ -2248,7 +2249,7 @@ struct type_info_struct_widget_state_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[23];
+		type_info_member_t member_array[21];
 		struct {
 			type_info_member_t last_interacted_frame;
 			type_info_member_t toggled;
@@ -2260,8 +2261,6 @@ struct type_info_struct_widget_state_t {
 			type_info_member_t is_double_clicked;
 			type_info_member_t is_right_clicked;
 			type_info_member_t is_right_held;
-			type_info_member_t widget_text_buffer;
-			type_info_member_t widget_text_buffer_used;
 			type_info_member_t widget_text_render_start_offset;
 			type_info_member_t widget_text_render_end_offset;
 			type_info_member_t slider_value;
@@ -2303,13 +2302,14 @@ struct type_info_struct_widget_t {
 	u32 element_size;
 	u32 member_count;
 	union {
-		type_info_member_t member_array[37];
+		type_info_member_t member_array[35];
 		struct {
 			type_info_member_t ID;
 			type_info_member_t widget_flags;
 			type_info_member_t layout_style;
 			type_info_member_t state;
 			type_info_member_t widget_name;
+			type_info_member_t widget_text_buffer;
 			type_info_member_t toggled;
 			type_info_member_t parent_stack_depth;
 			type_info_member_t font_size;
@@ -2320,10 +2320,7 @@ struct type_info_struct_widget_t {
 			type_info_member_t parent_child_spacing;
 			type_info_member_t parent_padding;
 			type_info_member_t widget_padding;
-			type_info_member_t max_left_padding;
-			type_info_member_t max_right_padding;
-			type_info_member_t max_top_padding;
-			type_info_member_t max_bottom_padding;
+			type_info_member_t max_widget_padding;
 			type_info_member_t child_spacing;
 			type_info_member_t scissor_rect;
 			type_info_member_t idle_color;
@@ -3439,6 +3436,61 @@ struct type_info_enum_render_pipeline_polygon_mode_t {
 };
 
 
+const static type_info_struct_sys_thread_t type_info_struct_sys_thread_t_const_data = {
+	.name = "sys_thread_t",
+	.type = TYPE_sys_thread_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_sys_thread_t),
+	.member_count = 3,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_thread_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.handle)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), handle)},
+		.thread_id = {.name = "thread_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.thread_id)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), thread_id)},
+		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.user_data)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), user_data)},
+	}
+};
+
+const static type_info_struct_sys_mutex_t type_info_struct_sys_mutex_t_const_data = {
+	.name = "sys_mutex_t",
+	.type = TYPE_sys_mutex_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_sys_mutex_t),
+	.member_count = 1,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_mutex_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_mutex_t.handle)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_sys_mutex_t), handle)},
+	}
+};
+
+const static type_info_struct_sys_semaphore_t type_info_struct_sys_semaphore_t_const_data = {
+	.name = "sys_semaphore_t",
+	.type = TYPE_sys_semaphore_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_sys_semaphore_t),
+	.member_count = 1,
+	.members = {
+		.handle = {.name = "handle", .type = TYPE_sys_semaphore_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_semaphore_t.handle)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_sys_semaphore_t), handle)},
+	}
+};
+
+const static type_info_struct_ticket_mutex_t type_info_struct_ticket_mutex_t_const_data = {
+	.name = "ticket_mutex_t",
+	.type = TYPE_ticket_mutex_t,
+	.kind = META_TYPE_KIND_Struct,
+	.modifier_flags = META_TYPE_FLAGS_None,
+	.flag_counter = 0,
+	.element_size = sizeof(GENERATED_DEFAULT_ticket_mutex_t),
+	.member_count = 2,
+	.members = {
+		.next_ticket = {.name = "next_ticket", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_ticket_mutex_t.next_ticket)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_ticket_mutex_t), next_ticket)},
+		.working_ticket = {.name = "working_ticket", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_ticket_mutex_t.working_ticket)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_ticket_mutex_t), working_ticket)},
+	}
+};
+
 const static type_info_struct_dynarray_header_t type_info_struct_dynarray_header_t_const_data = {
 	.name = "dynarray_header_t",
 	.type = TYPE_dynarray_header_t,
@@ -3767,61 +3819,6 @@ const static type_info_struct_string_builder_t type_info_struct_string_builder_t
 		.default_buffer_block_size = {.name = "default_buffer_block_size", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.default_buffer_block_size)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), default_buffer_block_size)},
 		.bytes_used = {.name = "bytes_used", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.bytes_used)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), bytes_used)},
 		.total_allocated = {.name = "total_allocated", .type = TYPE_s64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_string_builder_t.total_allocated)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_string_builder_t), total_allocated)},
-	}
-};
-
-const static type_info_struct_sys_thread_t type_info_struct_sys_thread_t_const_data = {
-	.name = "sys_thread_t",
-	.type = TYPE_sys_thread_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_sys_thread_t),
-	.member_count = 3,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_sys_thread_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.handle)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), handle)},
-		.thread_id = {.name = "thread_id", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.thread_id)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), thread_id)},
-		.user_data = {.name = "user_data", .type = TYPE_void, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_thread_t.user_data)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_sys_thread_t), user_data)},
-	}
-};
-
-const static type_info_struct_sys_mutex_t type_info_struct_sys_mutex_t_const_data = {
-	.name = "sys_mutex_t",
-	.type = TYPE_sys_mutex_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_sys_mutex_t),
-	.member_count = 1,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_sys_mutex_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_mutex_t.handle)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_sys_mutex_t), handle)},
-	}
-};
-
-const static type_info_struct_sys_semaphore_t type_info_struct_sys_semaphore_t_const_data = {
-	.name = "sys_semaphore_t",
-	.type = TYPE_sys_semaphore_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_sys_semaphore_t),
-	.member_count = 1,
-	.members = {
-		.handle = {.name = "handle", .type = TYPE_sys_semaphore_handle_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_sys_semaphore_t.handle)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_sys_semaphore_t), handle)},
-	}
-};
-
-const static type_info_struct_ticket_mutex_t type_info_struct_ticket_mutex_t_const_data = {
-	.name = "ticket_mutex_t",
-	.type = TYPE_ticket_mutex_t,
-	.kind = META_TYPE_KIND_Struct,
-	.modifier_flags = META_TYPE_FLAGS_None,
-	.flag_counter = 0,
-	.element_size = sizeof(GENERATED_DEFAULT_ticket_mutex_t),
-	.member_count = 2,
-	.members = {
-		.next_ticket = {.name = "next_ticket", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_ticket_mutex_t.next_ticket)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_ticket_mutex_t), next_ticket)},
-		.working_ticket = {.name = "working_ticket", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_Volatile, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_ticket_mutex_t.working_ticket)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_ticket_mutex_t), working_ticket)},
 	}
 };
 
@@ -4924,7 +4921,7 @@ const static type_info_struct_widget_state_t type_info_struct_widget_state_t_con
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_widget_state_t),
-	.member_count = 23,
+	.member_count = 21,
 	.members = {
 		.last_interacted_frame = {.name = "last_interacted_frame", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.last_interacted_frame)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), last_interacted_frame)},
 		.toggled = {.name = "toggled", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.toggled)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), toggled)},
@@ -4936,8 +4933,6 @@ const static type_info_struct_widget_state_t type_info_struct_widget_state_t_con
 		.is_double_clicked = {.name = "is_double_clicked", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.is_double_clicked)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), is_double_clicked)},
 		.is_right_clicked = {.name = "is_right_clicked", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.is_right_clicked)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), is_right_clicked)},
 		.is_right_held = {.name = "is_right_held", .type = TYPE_bool8, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.is_right_held)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), is_right_held)},
-		.widget_text_buffer = {.name = "widget_text_buffer", .type = TYPE_byte, .kind = META_TYPE_KIND_Array, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_buffer)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_buffer)},
-		.widget_text_buffer_used = {.name = "widget_text_buffer_used", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_buffer_used)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_buffer_used)},
 		.widget_text_render_start_offset = {.name = "widget_text_render_start_offset", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_render_start_offset)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_render_start_offset)},
 		.widget_text_render_end_offset = {.name = "widget_text_render_end_offset", .type = TYPE_s32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.widget_text_render_end_offset)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), widget_text_render_end_offset)},
 		.slider_value = {.name = "slider_value", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_state_t.slider_value)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_state_t), slider_value)},
@@ -4973,27 +4968,25 @@ const static type_info_struct_widget_t type_info_struct_widget_t_const_data = {
 	.modifier_flags = META_TYPE_FLAGS_None,
 	.flag_counter = 0,
 	.element_size = sizeof(GENERATED_DEFAULT_widget_t),
-	.member_count = 37,
+	.member_count = 35,
 	.members = {
 		.ID = {.name = "ID", .type = TYPE_u64, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.ID)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), ID)},
 		.widget_flags = {.name = "widget_flags", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_flags)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_flags)},
 		.layout_style = {.name = "layout_style", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.layout_style)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), layout_style)},
 		.state = {.name = "state", .type = TYPE_widget_state_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.state)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), state)},
 		.widget_name = {.name = "widget_name", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_name)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_name)},
+		.widget_text_buffer = {.name = "widget_text_buffer", .type = TYPE_string_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_Pointer, .flag_counter = 1, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_text_buffer)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_text_buffer)},
 		.toggled = {.name = "toggled", .type = TYPE_bool32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.toggled)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), toggled)},
 		.parent_stack_depth = {.name = "parent_stack_depth", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_stack_depth)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_stack_depth)},
 		.font_size = {.name = "font_size", .type = TYPE_u32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.font_size)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), font_size)},
 		.expected_position = {.name = "expected_position", .type = TYPE_vec3_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.expected_position)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), expected_position)},
 		.minimum_render_size = {.name = "minimum_render_size", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.minimum_render_size)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), minimum_render_size)},
 		.resize_value = {.name = "resize_value", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.resize_value)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), resize_value)},
-		.size_kind = {.name = "size_kind", .type = TYPE_widget_size_kind_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.size_kind)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), size_kind)},
+		.size_kind = {.name = "size_kind", .type = TYPE_ivec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.size_kind)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), size_kind)},
 		.parent_child_spacing = {.name = "parent_child_spacing", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_child_spacing)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_child_spacing)},
 		.parent_padding = {.name = "parent_padding", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.parent_padding)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), parent_padding)},
 		.widget_padding = {.name = "widget_padding", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.widget_padding)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), widget_padding)},
-		.max_left_padding = {.name = "max_left_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_left_padding)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_left_padding)},
-		.max_right_padding = {.name = "max_right_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_right_padding)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_right_padding)},
-		.max_top_padding = {.name = "max_top_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_top_padding)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_top_padding)},
-		.max_bottom_padding = {.name = "max_bottom_padding", .type = TYPE_float32, .kind = META_TYPE_KIND_Primitive, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_bottom_padding)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_bottom_padding)},
+		.max_widget_padding = {.name = "max_widget_padding", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.max_widget_padding)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), max_widget_padding)},
 		.child_spacing = {.name = "child_spacing", .type = TYPE_vec2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.child_spacing)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), child_spacing)},
 		.scissor_rect = {.name = "scissor_rect", .type = TYPE_rectangle2_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.scissor_rect)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), scissor_rect)},
 		.idle_color = {.name = "idle_color", .type = TYPE_vec4_t, .kind = META_TYPE_KIND_Struct, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(decltype(GENERATED_DEFAULT_widget_t.idle_color)), .offset = OffsetOf(decltype(GENERATED_DEFAULT_widget_t), idle_color)},
@@ -5805,6 +5798,25 @@ const static type_info_enum_render_pipeline_polygon_mode_t type_info_enum_render
 		.RENDER_PIPELINE_POLYGON_MODE_LINE = {.name = "RENDER_PIPELINE_POLYGON_MODE_LINE", .type = TYPE_render_pipeline_polygon_mode_t, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(RENDER_PIPELINE_POLYGON_MODE_LINE), .offset = RENDER_PIPELINE_POLYGON_MODE_LINE},
 	}
 };
+enum sys_thread_t_member_list_enum {
+	TYPE_SYS_THREAD_T_MEMBER_handle,
+	TYPE_SYS_THREAD_T_MEMBER_thread_id,
+	TYPE_SYS_THREAD_T_MEMBER_user_data,
+};
+
+enum sys_mutex_t_member_list_enum {
+	TYPE_SYS_MUTEX_T_MEMBER_handle,
+};
+
+enum sys_semaphore_t_member_list_enum {
+	TYPE_SYS_SEMAPHORE_T_MEMBER_handle,
+};
+
+enum ticket_mutex_t_member_list_enum {
+	TYPE_TICKET_MUTEX_T_MEMBER_next_ticket,
+	TYPE_TICKET_MUTEX_T_MEMBER_working_ticket,
+};
+
 enum dynarray_header_t_member_list_enum {
 	TYPE_DYNARRAY_HEADER_T_MEMBER_flags,
 	TYPE_DYNARRAY_HEADER_T_MEMBER_header_id,
@@ -5963,25 +5975,6 @@ enum string_builder_t_member_list_enum {
 	TYPE_STRING_BUILDER_T_MEMBER_default_buffer_block_size,
 	TYPE_STRING_BUILDER_T_MEMBER_bytes_used,
 	TYPE_STRING_BUILDER_T_MEMBER_total_allocated,
-};
-
-enum sys_thread_t_member_list_enum {
-	TYPE_SYS_THREAD_T_MEMBER_handle,
-	TYPE_SYS_THREAD_T_MEMBER_thread_id,
-	TYPE_SYS_THREAD_T_MEMBER_user_data,
-};
-
-enum sys_mutex_t_member_list_enum {
-	TYPE_SYS_MUTEX_T_MEMBER_handle,
-};
-
-enum sys_semaphore_t_member_list_enum {
-	TYPE_SYS_SEMAPHORE_T_MEMBER_handle,
-};
-
-enum ticket_mutex_t_member_list_enum {
-	TYPE_TICKET_MUTEX_T_MEMBER_next_ticket,
-	TYPE_TICKET_MUTEX_T_MEMBER_working_ticket,
 };
 
 enum work_completion_fence_t_member_list_enum {
@@ -6493,8 +6486,6 @@ enum widget_state_t_member_list_enum {
 	TYPE_WIDGET_STATE_T_MEMBER_is_double_clicked,
 	TYPE_WIDGET_STATE_T_MEMBER_is_right_clicked,
 	TYPE_WIDGET_STATE_T_MEMBER_is_right_held,
-	TYPE_WIDGET_STATE_T_MEMBER_widget_text_buffer,
-	TYPE_WIDGET_STATE_T_MEMBER_widget_text_buffer_used,
 	TYPE_WIDGET_STATE_T_MEMBER_widget_text_render_start_offset,
 	TYPE_WIDGET_STATE_T_MEMBER_widget_text_render_end_offset,
 	TYPE_WIDGET_STATE_T_MEMBER_slider_value,
@@ -6519,6 +6510,7 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_layout_style,
 	TYPE_WIDGET_T_MEMBER_state,
 	TYPE_WIDGET_T_MEMBER_widget_name,
+	TYPE_WIDGET_T_MEMBER_widget_text_buffer,
 	TYPE_WIDGET_T_MEMBER_toggled,
 	TYPE_WIDGET_T_MEMBER_parent_stack_depth,
 	TYPE_WIDGET_T_MEMBER_font_size,
@@ -6529,10 +6521,7 @@ enum widget_t_member_list_enum {
 	TYPE_WIDGET_T_MEMBER_parent_child_spacing,
 	TYPE_WIDGET_T_MEMBER_parent_padding,
 	TYPE_WIDGET_T_MEMBER_widget_padding,
-	TYPE_WIDGET_T_MEMBER_max_left_padding,
-	TYPE_WIDGET_T_MEMBER_max_right_padding,
-	TYPE_WIDGET_T_MEMBER_max_top_padding,
-	TYPE_WIDGET_T_MEMBER_max_bottom_padding,
+	TYPE_WIDGET_T_MEMBER_max_widget_padding,
 	TYPE_WIDGET_T_MEMBER_child_spacing,
 	TYPE_WIDGET_T_MEMBER_scissor_rect,
 	TYPE_WIDGET_T_MEMBER_idle_color,
@@ -7308,19 +7297,26 @@ GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
 
 
 const static type_info_t GENERATED_type_table[] = {
+	{.name = "sys_thread_handle_t", .type = TYPE_sys_thread_handle_t, .size = sizeof(sys_thread_handle_t), .struct_info = NULL},
 	{.name = "u32", .type = TYPE_u32, .size = sizeof(u32), .struct_info = NULL},
+	{.name = "void", .type = TYPE_void, .size = sizeof(void*), .struct_info = NULL},
+	{.name = "sys_thread_t", .type = TYPE_sys_thread_t, .size = sizeof(sys_thread_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_thread_t_const_data},
+	{.name = "sys_mutex_handle_t", .type = TYPE_sys_mutex_handle_t, .size = sizeof(sys_mutex_handle_t), .struct_info = NULL},
+	{.name = "sys_mutex_t", .type = TYPE_sys_mutex_t, .size = sizeof(sys_mutex_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_mutex_t_const_data},
+	{.name = "sys_semaphore_handle_t", .type = TYPE_sys_semaphore_handle_t, .size = sizeof(sys_semaphore_handle_t), .struct_info = NULL},
+	{.name = "sys_semaphore_t", .type = TYPE_sys_semaphore_t, .size = sizeof(sys_semaphore_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_semaphore_t_const_data},
+	{.name = "u64", .type = TYPE_u64, .size = sizeof(u64), .struct_info = NULL},
+	{.name = "ticket_mutex_t", .type = TYPE_ticket_mutex_t, .size = sizeof(ticket_mutex_t), .struct_info = (type_info_struct_t*)&type_info_struct_ticket_mutex_t_const_data},
 	{.name = "dynarray_header_t", .type = TYPE_dynarray_header_t, .size = sizeof(dynarray_header_t), .struct_info = (type_info_struct_t*)&type_info_struct_dynarray_header_t_const_data},
 	{.name = "file_extension_t", .type = TYPE_file_extension_t, .size = sizeof(file_extension_t), .struct_info = NULL},
 	{.name = "sys_handle_t", .type = TYPE_sys_handle_t, .size = sizeof(sys_handle_t), .struct_info = NULL},
 	{.name = "string_t", .type = TYPE_string_t, .size = sizeof(string_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_t_const_data},
-	{.name = "u64", .type = TYPE_u64, .size = sizeof(u64), .struct_info = NULL},
 	{.name = "bool8", .type = TYPE_bool8, .size = sizeof(bool8), .struct_info = NULL},
 	{.name = "file_t", .type = TYPE_file_t, .size = sizeof(file_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_t_const_data},
 	{.name = "mapped_file_t", .type = TYPE_mapped_file_t, .size = sizeof(mapped_file_t), .struct_info = (type_info_struct_t*)&type_info_struct_mapped_file_t_const_data},
 	{.name = "file_data_t", .type = TYPE_file_data_t, .size = sizeof(file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_data_t_const_data},
 	{.name = "overlap_io_data_t", .type = TYPE_overlap_io_data_t, .size = sizeof(overlap_io_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_overlap_io_data_t_const_data},
 	{.name = "visit_files_pfn_t", .type = TYPE_visit_files_pfn_t, .size = sizeof(visit_files_pfn_t*), .struct_info = NULL},
-	{.name = "void", .type = TYPE_void, .size = sizeof(void*), .struct_info = NULL},
 	{.name = "visit_file_data_t", .type = TYPE_visit_file_data_t, .size = sizeof(visit_file_data_t), .struct_info = (type_info_struct_t*)&type_info_struct_visit_file_data_t_const_data},
 	{.name = "file_watcher_change_event_t", .type = TYPE_file_watcher_change_event_t, .size = sizeof(file_watcher_change_event_t), .struct_info = NULL},
 	{.name = "file_watcher_recorded_change_t", .type = TYPE_file_watcher_recorded_change_t, .size = sizeof(file_watcher_recorded_change_t), .struct_info = (type_info_struct_t*)&type_info_struct_file_watcher_recorded_change_t_const_data},
@@ -7350,13 +7346,6 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "s64", .type = TYPE_s64, .size = sizeof(s64), .struct_info = NULL},
 	{.name = "string_builder_buffer_t", .type = TYPE_string_builder_buffer_t, .size = sizeof(string_builder_buffer_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_buffer_t_const_data},
 	{.name = "string_builder_t", .type = TYPE_string_builder_t, .size = sizeof(string_builder_t), .struct_info = (type_info_struct_t*)&type_info_struct_string_builder_t_const_data},
-	{.name = "sys_thread_handle_t", .type = TYPE_sys_thread_handle_t, .size = sizeof(sys_thread_handle_t), .struct_info = NULL},
-	{.name = "sys_thread_t", .type = TYPE_sys_thread_t, .size = sizeof(sys_thread_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_thread_t_const_data},
-	{.name = "sys_mutex_handle_t", .type = TYPE_sys_mutex_handle_t, .size = sizeof(sys_mutex_handle_t), .struct_info = NULL},
-	{.name = "sys_mutex_t", .type = TYPE_sys_mutex_t, .size = sizeof(sys_mutex_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_mutex_t_const_data},
-	{.name = "sys_semaphore_handle_t", .type = TYPE_sys_semaphore_handle_t, .size = sizeof(sys_semaphore_handle_t), .struct_info = NULL},
-	{.name = "sys_semaphore_t", .type = TYPE_sys_semaphore_t, .size = sizeof(sys_semaphore_t), .struct_info = (type_info_struct_t*)&type_info_struct_sys_semaphore_t_const_data},
-	{.name = "ticket_mutex_t", .type = TYPE_ticket_mutex_t, .size = sizeof(ticket_mutex_t), .struct_info = (type_info_struct_t*)&type_info_struct_ticket_mutex_t_const_data},
 	{.name = "work_completion_fence_t", .type = TYPE_work_completion_fence_t, .size = sizeof(work_completion_fence_t), .struct_info = (type_info_struct_t*)&type_info_struct_work_completion_fence_t_const_data},
 	{.name = "work_order_fn", .type = TYPE_work_order_fn, .size = sizeof(work_order_fn*), .struct_info = NULL},
 	{.name = "work_order_t", .type = TYPE_work_order_t, .size = sizeof(work_order_t), .struct_info = (type_info_struct_t*)&type_info_struct_work_order_t_const_data},
@@ -7485,6 +7474,7 @@ const static type_info_t GENERATED_type_table[] = {
 	{.name = "widget_flags_t", .type = TYPE_widget_flags_t, .size = sizeof(widget_flags_t), .struct_info = NULL},
 	{.name = "widget_layout_style_t", .type = TYPE_widget_layout_style_t, .size = sizeof(widget_layout_style_t), .struct_info = NULL},
 	{.name = "widget_size_kind_t", .type = TYPE_widget_size_kind_t, .size = sizeof(widget_size_kind_t), .struct_info = NULL},
+	{.name = "ivec2_t", .type = TYPE_ivec2_t, .size = sizeof(ivec2_t), .struct_info = NULL},
 	{.name = "immediate_widget_data_t", .type = TYPE_immediate_widget_data_t, .size = sizeof(immediate_widget_data_t*), .struct_info = NULL},
 	{.name = "vulkan_allocation_usage_type_t", .type = TYPE_vulkan_allocation_usage_type_t, .size = sizeof(vulkan_allocation_usage_type_t), .struct_info = NULL},
 	{.name = "VkDeviceSize", .type = TYPE_VkDeviceSize, .size = sizeof(VkDeviceSize), .struct_info = NULL},
