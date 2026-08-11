@@ -12,7 +12,7 @@
 
 template <typename... Args>
 internal_api void
-print(const char *message, Args... arguments);
+print(string_t message, Args... arguments);
 
 struct test_structure 
 {
@@ -111,8 +111,7 @@ main(int argc, char **argv)
         }
     }
 
-    print("Test Message %");
-
+    print(STR("Test Message... Item is: '%'\n"), 4);
     return(0);
 }
 
@@ -125,31 +124,67 @@ get_packed_argument_count(Args... arguments)
 
 // NOTE(Sleepster): Empty for no arguments 
 internal_api void 
-output_type_data(char *buffer, u32 buffer_size)
+output_type_data(string_t message, string_builder_t *builder)
 {
+    fprintf(stdout, "%.*s", fprint_string(message));
 }
 
 template <typename T>
 internal_api void 
-output_type_data(char *buffer, u32 buffer_size, T &item)
+output_type_data(string_t message, string_builder_t *builder, T &item)
 {
     const type_info_t *info = Athena::type_info(item);
-    if(info->metatype != ATHENA_METATYPE_PRIMITIVE)
+    switch(info->metatype)
     {
-    }
-    else
-    {
+        case ATHENA_METATYPE_PRIMITIVE:
+        {
+#if 0
+            switch(info->type_id)
+            {
+                case TYPE_int:
+                {
+                }break;
+                case TYPE_long:
+                {
+                }break;
+                case TYPE_unsigned_int:
+                {
+                }break;
+                case TYPE_usigned_long:
+                {
+                }break;
+                case TYPE_float:
+                {
+                }break;
+                case TYPE_double:
+                {
+                }break;
+                case TYPE_bool8:
+                case TYPE_bool32:
+                {
+                }break;
+            }
+#endif
+        }break;
+        case ATHENA_METATYPE_STRUCT:
+        case ATHENA_METATYPE_ENUM:
+        {
+        }break;
+        case ATHENA_METATYPE_PROCEDURE:
+        {
+        }break;
     }
 }
 
 template <typename... Args>
 internal_api void
-print(const char *message, Args... arguments)
+print(string_t message, Args... arguments)
 {
     u32 argument_count = get_packed_argument_count(arguments...);
-    char buffer[8192];
-    if(argument_count > 0)
-    {
-        output_type_data(buffer, sizeof(buffer), arguments...);
-    }
+
+    string_builder_t builder = {};
+    c_string_builder_init(&builder, KB(100));
+    defer(c_string_builder_deinit(&builder));
+
+    output_type_data(message, &builder, arguments...);
 }

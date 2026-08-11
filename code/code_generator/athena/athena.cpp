@@ -1347,21 +1347,26 @@ output_basic_type_info(string_builder_t *builder, code_type_t *type, u32 indent_
     //c_string_builder_sprintf(builder, ".alias_of      = \"%.*s\",\n", fprint_string(type_data->type.code_type->identifier));
     //c_string_builder_sprintf(builder, ".next_overload = \"%.*s\",\n", fprint_string(type_data->type.code_type->identifier));
     //c_string_builder_sprintf(builder, ".type          = \"%.*s\",\n", fprint_string(type->identifier));
-    string_t type_string = type->identifier;
+    code_type_t *root_type = type;
+    while(root_type->alias_of)
+    {
+        root_type = root_type->alias_of;
+    }
 
+    string_t type_string = root_type->identifier;
     s32 index = c_string_find_first_char_from_right(type->identifier, ' ');
     if(index != -1)
     {
         type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
     }
-#if 0
+
     ident(builder, indent_level);
     c_string_builder_sprintf(builder, "\t.type_id = TYPE_%.*s,\n", fprint_string(type_string));
-#endif
+
     if(type->code_metatype != CODE_TYPE_UNDEFINED)
     {
         ident(builder, indent_level);
-        c_string_builder_sprintf(builder, ".metatype  = ATHENA_METATYPE_", fprint_string(type_string));
+        c_string_builder_sprintf(builder, ".metatype  = ATHENA_METATYPE_");
         switch(type->code_metatype)
         {
             case CODE_TYPE_PRIMITIVE:
