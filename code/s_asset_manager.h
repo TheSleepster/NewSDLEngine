@@ -23,6 +23,7 @@
 #include <c_hash_table.h>
 #include <c_threadpool.h>
 #include <c_dynarray.h>
+#include <c_duration_counter.h>
 
 #include <r_render_image.h>
 #include <vk_backend_image.h>
@@ -40,6 +41,8 @@ typedef struct shader             shader_t;
 typedef struct material_archetype material_archetype_t;
 typedef struct material_instance  material_instance_t;
 typedef struct material_data      material_data_t;
+typedef struct animation_source2D animation_source2D_t;
+typedef struct animation2D        animation2D_t;
 typedef struct jfd_package_entry  jfd_package_entry_t;
 typedef struct jfd_file_header    jfd_file_header_t;
 
@@ -111,6 +114,8 @@ typedef struct asset_handle
         shader_t              *shader;
         material_data_t       *material_info;
         dynamic_render_font_t *dynamic_render_font;
+        animation_source2D_t  *animation_source2D;
+        animation2D_t         *animation2D;
     };
 }asset_handle_t;
 
@@ -177,6 +182,27 @@ typedef struct texture_atlas
     u32                           tallest_y;
     u32                           atlas_size;
 }texture_atlas_t;
+
+/*===========================================
+  =============== ANIMATION2D ===============
+  =========================================== */
+
+typedef struct animation_source2D 
+{
+    // NOTE(Sleepster): Debug information 
+    string_t           name;
+
+    asset_handle_t     texture;
+    u32                frame_count;
+    duration_counter_t frame_timer;
+}animation_source2D_t;
+
+typedef struct animation2D
+{
+    animation_source2D_t *animation_info;
+    u32                   current_frame;
+    duration_counter_t    frame_timer;
+}animation2D_t;
 
 /*===========================================
   ================== SHADERS ================

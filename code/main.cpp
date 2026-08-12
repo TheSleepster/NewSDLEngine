@@ -93,25 +93,6 @@ struct game_state_t
     bool32              open_debug_menu;
 };
 
-// NOTE(Sleepster): Can't use 'timer_t' because glibc... 
-struct duration_counter_t
-{
-    u64    duration_ms;
-    u64    current_elapsed;
-    bool32 looped;
-};
-
-struct animation2D_t 
-{
-    // NOTE(Sleepster): Debug information 
-    string_t           name;
-
-    asset_handle_t     texture;
-    u32                frame_count;
-    u32                current_frame;
-    duration_counter_t frame_timer;
-};
-
 // TODO(Sleepster): DEBUG CODE 
 global_variable string_t global_test_textbox_string = {}; 
 // TODO(Sleepster): DEBUG CODE 
@@ -575,6 +556,25 @@ game_main(void)
             input_axis = vec2_normalize(input_axis);
             player->last_position = player->position;
             player->position = vec2_add(player->position, vec2_scale(vec2_scale(input_axis, 250), TICK_RATE));
+
+#if 0
+            // init
+            asset_handle_t player_idle    = s_asset_manager_get_animation2D(asset_manager, "player_idle");
+            asset_handle_t player_running = s_asset_manager_get_animation2D(asset_manager, "player_running");
+            asset_handle_t player_falling = s_asset_manager_get_animation2D(asset_manager, "player_falling");
+
+            enum entity_animation_states 
+            {
+                PLAYER_IDLE;
+            };
+
+            entity_animation_map_insert(&player.animation_map, PLAYER_IDLE, player_idle);
+            entity_animation_map_insert(&player.animation_map, PLAYER_RUNNING, player_running);
+            entity_animation_map_insert(&player.animation_map, PLAYER_FALLING, player_falling);
+
+            animation2D_t *playing_animation = entity_animation_map_get(&player.animation_map, player.animation_state);
+            // player the animation...
+#endif
 
             dt_accumulator -= TICK_RATE;
         }

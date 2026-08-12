@@ -133,6 +133,17 @@ s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 n
     return(result);
 }
 
+/*===========================================
+  =============== ANIMATION2D ===============
+  =========================================== */
+
+animation_source2D_t
+s_asset_animation_source_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
+{
+    animation_source2D_t result = {};
+    return(result);
+}
+
 /*===============================
   =========== SHADERS ===========
   =============================== */
