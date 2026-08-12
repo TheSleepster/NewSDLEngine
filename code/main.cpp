@@ -93,65 +93,28 @@ struct game_state_t
     bool32              open_debug_menu;
 };
 
+// NOTE(Sleepster): Can't use 'timer_t' because glibc... 
+struct duration_counter_t
+{
+    u64    duration_ms;
+    u64    current_elapsed;
+    bool32 looped;
+};
+
+struct animation2D_t 
+{
+    // NOTE(Sleepster): Debug information 
+    string_t           name;
+
+    asset_handle_t     texture;
+    u32                frame_count;
+    u32                current_frame;
+    duration_counter_t frame_timer;
+};
+
 // TODO(Sleepster): DEBUG CODE 
 global_variable string_t global_test_textbox_string = {}; 
 // TODO(Sleepster): DEBUG CODE 
-
-entity_t*
-entity_create(game_state_t *game_state)
-{
-    Assert(game_state->entity_manager);
-
-    entity_t *result = null;
-    entity_t *found  = game_state->entity_manager->entities + game_state->entity_manager->active_entities;
-    if((found->e_flags & EF_Valid) == 0)
-    {
-        result = found;
-        result->e_flags = EF_Valid;
-
-        ++game_state->entity_manager->active_entities;
-    }
-
-    Assert(result);
-    return(result);
-}
-
-void
-entity_render(game_state_t *game_state, render_command_list_t *command_list, entity_t *entity)
-{
-    texture2D_t *texture = null;
-    vec2_t       uv_min  = vec2_zero();
-    vec2_t       uv_max  = vec2_zero();
-
-    if(entity->e_flags & EF_HasSprite)
-    {
-        subtexture_data_t *data = entity->sprite->subtexture_data;
-        if(data)
-        {
-            texture = &data->atlas->texture;
-            uv_min  =  data->uv_min;
-            uv_max  =  data->uv_max;
-        }
-        else
-        {
-            texture = entity->sprite->texture;
-            uv_min  = vec2(0.0f, 0.0f);
-            uv_max  = vec2(1.0f, 1.0f);
-        }
-    }
-    
-    immediate_quad_ex(command_list,
-                     &game_state->vertex_buffer, 
-                      vec2_expand_vec3(entity->position, 0.8f), 
-                      entity->size, 
-                      vec4(1.0, 1.0, 1.0, 1.0),
-                      uv_min,
-                      uv_max,
-                      vec2_zero(),
-                      vec2_zero(),
-                      vec2_zero(),
-                      texture);
-}
 
 // NOTE(Sleepster): DEBUG CODE
 internal_api void
@@ -321,6 +284,62 @@ handle_debug_ui_menu(ui_state_t *main_ui, renderer_state_t *renderer_state, asse
 
         ui_state_maybe_eat_inputs(main_ui);
     }
+}
+
+entity_t*
+entity_create(game_state_t *game_state)
+{
+    Assert(game_state->entity_manager);
+
+    entity_t *result = null;
+    entity_t *found  = game_state->entity_manager->entities + game_state->entity_manager->active_entities;
+    if((found->e_flags & EF_Valid) == 0)
+    {
+        result = found;
+        result->e_flags = EF_Valid;
+
+        ++game_state->entity_manager->active_entities;
+    }
+
+    Assert(result);
+    return(result);
+}
+
+void
+entity_render(game_state_t *game_state, render_command_list_t *command_list, entity_t *entity)
+{
+    texture2D_t *texture = null;
+    vec2_t       uv_min  = vec2_zero();
+    vec2_t       uv_max  = vec2_zero();
+
+    if(entity->e_flags & EF_HasSprite)
+    {
+        subtexture_data_t *data = entity->sprite->subtexture_data;
+        if(data)
+        {
+            texture = &data->atlas->texture;
+            uv_min  =  data->uv_min;
+            uv_max  =  data->uv_max;
+        }
+        else
+        {
+            texture = entity->sprite->texture;
+            uv_min  = vec2(0.0f, 0.0f);
+            uv_max  = vec2(1.0f, 1.0f);
+        }
+    }
+    
+    immediate_quad_ex(command_list,
+                     &game_state->vertex_buffer, 
+                      vec2_expand_vec3(entity->position, 0.8f), 
+                      entity->size, 
+                      vec4(1.0, 1.0, 1.0, 1.0),
+                      uv_min,
+                      uv_max,
+                      vec2_zero(),
+                      vec2_zero(),
+                      vec2_zero(),
+                      texture);
 }
 
 int
