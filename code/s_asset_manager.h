@@ -63,7 +63,7 @@ typedef enum asset_type
 
 typedef enum asset_slot_state
 {
-    //ASLS_Invalid,
+    ASLS_Invalid,
     ASLS_Unloaded,
     ASLS_LoadQueued,
     ASLS_Loaded,

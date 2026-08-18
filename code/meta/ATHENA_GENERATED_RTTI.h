@@ -4432,8 +4432,9 @@ struct type_info_struct_asset_slot_load_status_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[6];
+		const type_info_member_t member_array[7];
 		struct {
+			const type_info_member_t ASLS_Invalid;
 			const type_info_member_t ASLS_Unloaded;
 			const type_info_member_t ASLS_LoadQueued;
 			const type_info_member_t ASLS_Loaded;
@@ -18538,9 +18539,20 @@ constexpr type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_a
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<asset_slot_load_status_t>(),
 	},
-	.member_count   = 6,
+	.member_count   = 7,
 	.member_pointer = DEFAULT_typedata_structure_asset_slot_load_status_t.member_array,
 	.members = {
+		.ASLS_Invalid = {
+			.type_info     = &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info,
+			.member_name   = "ASLS_Invalid",
+			.parent        = &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = ASLS_Invalid,
+			},
+		},
 		.ASLS_Unloaded = {
 			.type_info     = &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info,
 			.member_name   = "ASLS_Unloaded",
@@ -33305,6 +33317,7 @@ enum class asset_type_t {
 	AT_Count,
 }; // asset_type_t
 enum class asset_slot_load_status_t {
+	ASLS_Invalid,
 	ASLS_Unloaded,
 	ASLS_LoadQueued,
 	ASLS_Loaded,
