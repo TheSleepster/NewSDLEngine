@@ -97,7 +97,7 @@ struct athena_reflection_bundle_t
 struct attribute_info_list_t {
     const char               *attribute_name;
     const type_info_t *const *infos;
-    u32                       info_count;
+    unsigned int              info_count;
 
     const type_info_t *const *begin() { return(infos);              }
     const type_info_t *const *end()   { return(infos + info_count); }
@@ -108,12 +108,6 @@ struct attribute_info_list_t {
 
 // function
 void athena_handle_type_info(const char *filepath, int directory, int recursive);
-
-#ifdef ATHENA_IMPLEMENTATION
-# define ATHENA_API 
-#else
-#define ATHENA_API extern
-#endif
 
 namespace athena_internal {
     template<typename T, unsigned int N = sizeof(T)>
@@ -131,10 +125,10 @@ extern const type_info_t *const athena_type_information_array[];
 // function
 void athena_handle_type_info(const char *filepath, int directory, int recursive);
 
-#ifdef ATHENA_IMPLMENETATION
+#ifdef ATHENA_IMPLMENTATION
 # define ATHENA_API 
 #else
-#define ATHENA_API extern
+# define ATHENA_API extern
 #endif
 
 namespace Athena {

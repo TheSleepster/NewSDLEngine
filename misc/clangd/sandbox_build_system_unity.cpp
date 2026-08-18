@@ -1,8 +1,9 @@
-// AUTO-GENERATED UNITY FILE
+// AUTO-GENERATED CLANGD UNITY FILE
 #define UNITY_BUILD
 #define MATH_IMPLEMENTATION
 #define HASH_TABLE_IMPLEMENTATION
 #define DYNARRAY_IMPLEMENTATION
+#include "c_duration_counter.cpp"
 #include "c_file_api.cpp"
 #include "c_file_watcher.cpp"
 #include "c_global_context.cpp"
@@ -12,4 +13,4 @@
 #include "c_tokenizer.cpp"
 #include "c_zone_allocator.cpp"
 #include "p_platform_data.cpp"
-#include "sandbox/type_info.cpp"
+#include "sandbox/build_system.cpp"

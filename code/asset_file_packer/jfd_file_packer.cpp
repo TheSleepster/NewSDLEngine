@@ -54,6 +54,7 @@ typedef struct asset_entry_info
     string_t fullpath;
     string_t asset_data;
     u32      type;
+    u64      timestamp;
 }asset_entry_info_t;
 
 typedef struct file_packer_state
@@ -126,10 +127,13 @@ VISIT_FILES(gather_all_asset_file_entries)
         asset_entry_info *entry = packer_state.asset_entries + packer_state.asset_next_entry_to_write++;
         ZeroStruct(*entry);
 
+        file_data_t file_info = c_file_get_file_system_info(filepath);
+
         entry->filename   = c_string_make_copy(&packer_state.packages_arena, filename_no_ext);
         entry->fullpath   = c_string_make_copy(&packer_state.packages_arena, filepath);
         entry->asset_data = c_file_read_entirety(filepath, &packer_state.packages_arena);
         entry->type       = type;
+        entry->timestamp  = file_info.last_modtime;
         if(entry->asset_data.data == null)
         {
             log_error("Error reading file: '%s'...\n", C_STR(entry->filename));
@@ -214,16 +218,20 @@ main(int arg_count, char **args)
             // TODO(Sleepster): filenames should be null terminated...
             jfd_chunk_data chunk_data = {};
             chunk_data.chunk_header.magic_value      = ASSET_FILE_CHUNK_MAGIC;
-            chunk_data.chunk_header.total_entry_size = sizeof(jfd_package_chunk_header_t) + (asset_info->asset_data.count + asset_info->filename.count);
+            chunk_data.chunk_header.total_entry_size = sizeof(jfd_package_chunk_header_t) + (asset_info->asset_data.count + asset_info->fullpath.count + asset_info->filename.count);
             chunk_data.chunk_header.asset_type       = asset_info->type;
             chunk_data.chunk_header.filename_size    = asset_info->filename.count;
+            chunk_data.chunk_header.fullpath_size    = asset_info->fullpath.count;
             chunk_data.chunk_header.entry_data_size  = asset_info->asset_data.count;
+            chunk_data.chunk_header.modtime          = asset_info->timestamp;
 
             chunk_data.filename_data    = asset_info->filename.data;
+            chunk_data.fullpath_data    = asset_info->fullpath.data;
             chunk_data.asset_entry_data = asset_info->asset_data.data;
 
             c_string_builder_append_value(&packer_state.builder, (void*)&chunk_data.chunk_header, sizeof(jfd_package_chunk_header_t));
             c_string_builder_append_data(&packer_state.builder, asset_info->filename);
+            c_string_builder_append_data(&packer_state.builder, asset_info->fullpath);
             c_string_builder_append_data(&packer_state.builder, asset_info->asset_data);
         }
         c_string_builder_flush_to_file(&packer_state.output_file, &packer_state.builder);

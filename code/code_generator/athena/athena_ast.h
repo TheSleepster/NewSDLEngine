@@ -211,6 +211,7 @@ struct parser_t;
 //internal_api AST_node_t* generate_expression_AST(lexer_t *lexer, s32 expression_min_binding_power, lexer_token_t *out_token);
 internal_api AST_node_t* generate_expression_AST(parser_t *parser, s32 expression_min_binding_power, lexer_token_t *token_out);
 internal_api char* print_AST_node_type(u32 node_type);
+internal_api void consume_code_block(parser_t *parser, lexer_token_t *token_out);
 
 #endif // ATHENA_AST_H
 

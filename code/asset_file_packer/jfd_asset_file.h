@@ -45,22 +45,27 @@ typedef struct jfd_package_chunk_header
     u32      total_entry_size;
     u32      asset_type; 
     u32      filename_size;
+    u32      fullpath_size;
     u32      entry_data_size;
+    u64      modtime;
 }jfd_package_chunk_header_t;
 
 typedef struct jfd_chunk_data
 {
     jfd_package_chunk_header_t  chunk_header;
     byte                       *filename_data;
+    byte                       *fullpath_data;
     byte                       *asset_entry_data;
 }jfd_chunk_data_t;
 
 typedef struct jfd_package_entry
 {
     jfd_package_chunk_header_t *entry_header;
-    u32                         data_offset;
+    u64                         data_offset;
+    u64                         modtime;
 
     string_t                    filename;
+    string_t                    fullpath;
     string_t                    asset_data;
 }jfd_package_entry_t;
 #pragma pack(pop)

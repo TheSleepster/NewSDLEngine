@@ -302,7 +302,7 @@ vk_backend_buffer_stage_data(vulkan_context_t *vulkan_context, byte *data, u64 d
     memcpy(buffer_handle->allocation.mapped_data + buffer_handle->used, data, data_size);
     buffer_handle->used += data_size;
 
-    c_dynarray_push(vulkan_context->staging_infos, staging_info);
+    c_dynarray_add(&vulkan_context->staging_infos, &staging_info);
 }
 
 /*
@@ -316,26 +316,23 @@ vk_backend_buffer_flush_staging_buffer(vulkan_context_t *vulkan_context,
                                        VkCommandBuffer   command_buffer)
 {
     vulkan_staging_buffer_t *staging_buffer = vulkan_context->staging_buffers + vulkan_context->current_frame_index;
-
-    dynarray_header_t *header = c_dynarray_header(vulkan_context->staging_infos);
-    if(header && header->indices_used > 0) 
+    if(vulkan_context->staging_infos.used > 0) 
     {
-        c_dynarray_for(vulkan_context->staging_infos, info_index)
+        for(const vulkan_staging_info_t &staging_info: vulkan_context->staging_infos)
         {
-            vulkan_staging_info_t *info = vulkan_context->staging_infos + info_index;
-            Expect(info->upload_size + info->staging_buffer_offset <= staging_buffer->buffer.size, "Staging buffer size exceeeded...\n");
+            Expect(staging_info.upload_size + staging_info.staging_buffer_offset <= staging_buffer->buffer.size, "Staging buffer size exceeeded...\n");
 
             VkBufferCopy region = {
-                .srcOffset = info->staging_buffer_offset,
-                .dstOffset = info->target_offset,
-                .size      = info->upload_size,
+                .srcOffset = staging_info.staging_buffer_offset,
+                .dstOffset = staging_info.target_offset,
+                .size      = staging_info.upload_size,
             };
 
-            vkCmdCopyBuffer(command_buffer, staging_buffer->buffer.handle, info->target_buffer, 1, &region);
+            vkCmdCopyBuffer(command_buffer, staging_buffer->buffer.handle, staging_info.target_buffer, 1, &region);
         }
         staging_buffer->buffer.used   = 0;
         staging_buffer->submitted     = true;
 
-        c_dynarray_clear(vulkan_context->staging_infos);
+        c_dynarray_reset(&vulkan_context->staging_infos);
     }
 }

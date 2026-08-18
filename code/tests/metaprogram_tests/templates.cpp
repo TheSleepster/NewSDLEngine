@@ -11,6 +11,12 @@ struct template_container
     template_test<T> items;
 };
 
+struct template_test2
+{
+    template_test<int*> test_array;
+    int test_int;
+};
+
 template <typename T>
 struct template_test
 {

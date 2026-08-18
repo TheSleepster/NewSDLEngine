@@ -433,7 +433,6 @@ internal_api string_t
 lexer_eat_lines(memory_arena_t *concat_arena, lexer_t *lexer, u32 line_count)
 {
     string_t result = {};
-
     for(u32 line_index = 0;
         line_index < line_count;
         ++line_index)

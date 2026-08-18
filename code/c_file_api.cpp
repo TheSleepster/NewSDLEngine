@@ -217,37 +217,14 @@ c_file_unmap(mapped_file_t *map_data)
 u32
 c_file_ext_string_to_enum(string_t file_extension)
 {
-    u32 result = 0;
-    if(c_string_compare(file_extension, STR(".ttf")))
-    {
-        result = FILE_EXT_TTF;
-        return(result);
+    u32 result = FILE_EXT_INVALID;
+#define X(enum, string) \
+    if(c_string_compare(file_extension, STR(string))) { \
+        result = enum; \
+        return(result); \
     }
-    if(c_string_compare(file_extension, STR(".wav")))
-    {
-        result = FILE_EXT_WAV;
-        return(result);
-    }
-    if(c_string_compare(file_extension, STR(".png")))
-    {
-        result = FILE_EXT_PNG;
-        return(result);
-    }
-    if(c_string_compare(file_extension, STR(".glsl")))
-    {
-        result = FILE_EXT_GLSL;
-        return(result);
-    }
-    if(c_string_compare(file_extension, STR(".dll")))
-    {
-        result = FILE_EXT_OS_DLL;
-        return(result);
-    }
-    if(c_string_compare(file_extension, STR(".so")))
-    {
-        result = FILE_EXT_OS_DLL;
-        return(result);
-    }
+    FILE_EXTENSION_ENUM_LIST(X)
+#undef X
 
     return(result);
 }
@@ -280,3 +257,8 @@ c_directory_exists(string_t filepath)
     return(sys_directory_exists(filepath));
 }
 
+s32
+c_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 recursive, string_t file_ext)
+{
+    return(sys_directory_get_file_count(arena, filepath, recursive, file_ext));
+}

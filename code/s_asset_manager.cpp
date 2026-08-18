@@ -4,11 +4,11 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-#define DYNARRAY_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_PNG
 #include <stb/stb_image.h>
 
+#define DYNARRAY_IMPLEMENTATION
 #include <c_base.h>
 #include <c_types.h>
 #include <c_log.h>
@@ -21,25 +21,16 @@
 #include <c_dynarray.h>
 #include <c_hash_table.h>
 #include <c_tokenizer.h>
-
-// TODO(Sleepster): This is annoying. We need to figure out a better way of allowing people to use the RTTI in chunks.
-//                  So that we don't have to include essentially every parsed header...
-#include <c_program_flag_handler.h>
-#include <s_input_manager.h>
-#include <s_nt_networking.h>
-#include <s_asset_manager.h>
-#include <s_render_RHI.h>
-#include <s_ui_core.h>
-#include <r_render_image.h>
-#include <r_immediate_rendering.h>
-//
+#include <code_generator/athena/athena.h>
 
 #include <asset_file_packer/jfd_asset_file.h>
-#include <meta/GENERATED_program_RTTI.h>
 
 #if 0
 #include <meta/ATHENA_GENERATED_RTTI.h>
 #endif
+
+internal_api void  asset_file_load_packages(asset_manager_t *asset_manager, asset_file_data_t *asset_file, jfd_file_header_t *header);
+internal_api bool8 initialize_asset_file_contents(asset_manager_t *asset_manager, asset_file_data_t *asset_file, string_t filepath);
 
 internal_api
 C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
@@ -49,7 +40,6 @@ C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
 
     return(result);
 }
-
 
 /*===============================
   ========== TEXTURES ===========
@@ -173,12 +163,14 @@ material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *toke
     token_data_t value_token = c_tokenizer_get_next_token(tokenizer);
 
     // NOTE(Sleepster): Handle enums stuff. 
-    const type_info_member_t *member = c_meta_get_member_info(parent_type_data, name_token.string); 
-    const type_info_struct_t *enum_data = c_meta_get_enum_type_info_from_member_string(value_token.string);
-    if(member)
+    const type_info_member_t *struct_member = Athena::get_member(parent_type_data, name_token.string); 
+
+    const type_info_member_t *enum_member = (type_info_member_t*)Athena::type_info(value_token.string);
+    const type_info_struct_t *enum_data   = Athena::get_struct_info_from_member(enum_member);
+    if(struct_member)
     {
-        byte *data_ptr = (byte*)parent_data + member->offset; 
-        if(member->type == TYPE_string_t)
+        byte *data_ptr = (byte*)parent_data + struct_member->offset; 
+        if(struct_member->type_info->type_id == TYPE_string_t)
         {
             // NOTE(Sleepster): We'll need to ignore quotes in the tokenizer 
             string_t *string_data = (string_t*)data_ptr;
@@ -189,7 +181,7 @@ material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *toke
             // NOTE(Sleepster): rare instance of a do {}while(); loop being genuinely useful. We NEED this to happen at least once.
             token_data_t peek_token = c_tokenizer_peek_token(tokenizer);
             do {
-                const type_info_member_t *enum_member = c_meta_get_member_info(enum_data, value_token.string);
+                const type_info_member_t *enum_member = Athena::get_member(enum_data, value_token.string);
                 u32 *value = (u32*)data_ptr;
 
                 *value |= enum_member->offset;
@@ -204,7 +196,7 @@ material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *toke
         }
         else
         {
-            memcpy(data_ptr, value_token.string.data, member->size);
+            memcpy(data_ptr, value_token.string.data, struct_member->type_info->size);
         }
     }
     else if(c_string_compare(name_token.string, STR("shader")))
@@ -216,15 +208,17 @@ material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *toke
         log_error("Item of name: '%.*s' was found in the material file: '%s' however this item is not contained within the %s structure...\n",
                   name_token.string.count, C_STR(name_token.string), 
                   C_STR(filename),
-                  parent_type_data->name);
+                  parent_type_data->type_name);
 
-        log_info("Valid members for structure of type name: '%s' are as follows:\n", parent_type_data->name);
+        log_info("Valid members for structure of type name: '%s' are as follows:\n", parent_type_data->type_name);
+
+        const type_info_struct_t *parent_struct = Athena::as_structure(parent_type_data);
         for(u32 member_index = 0;
-            member_index < parent_type_data->struct_info->member_count;
+            member_index < parent_struct->member_count;
             ++member_index)
         {
-            const type_info_member_t *member = parent_type_data->struct_info->members + member_index;
-            log_info("[%d]: %s...\n", member_index, member->name);
+            const type_info_member_t *member = parent_struct->members + member_index;
+            log_info("[%d]: %s...\n", member_index, member->type_info->type_name);
         }
     }
 }
@@ -251,17 +245,17 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
                     // NOTE(Sleepster): Nested block. 
                     if(c_string_compare(token.string, STR("render_pipeline_state")))
                     {
-                        const type_info_member_t *render_pipeline_info = c_meta_get_member_info(parent_type_data, STR("pipeline_state"));
+                        const type_info_member_t *render_pipeline_info = Athena::get_member(parent_type_data, STR("pipeline_state"));
                         render_pipeline_state_t *state_data = (render_pipeline_state_t*)((byte*)parent_data + render_pipeline_info->offset);
 
-                        const type_info_t *type_data = c_meta_get_type_info_by_name(STR("render_pipeline_state_t"));
+                        const type_info_t *type_data = Athena::type_info<render_pipeline_state_t>();
                         material_file_parse_block_data(filename, state_data, tokenizer, type_data, token);
                     }
                     else
                     {
                         log_error("This nested block named '%.*s' inside of our '%s' block is not a valid subblock, the only valid one right now is 'render_pipeline_state'...\n",
                                   token.string.count, C_STR(token.string),
-                                  parent_type_data->name);
+                                  parent_type_data->type_name);
                         return;
                     }
                 }
@@ -321,12 +315,12 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
                     const type_info_t *struct_info = null;
                     if(c_string_compare(token.string, STR("material_archetype"))) 
                     {
-                        struct_info = c_meta_get_type_info_by_name(STR("material_archetype_t"));
+                        struct_info = Athena::type_info(STR("material_archetype_t"));
                         material_file_parse_block_data(slot->owner_asset_file.file_name, &archetype, &tokenizer, struct_info, token);
                     }
                     else if(c_string_compare(token.string, STR("base_instance")))
                     {
-                        struct_info = c_meta_get_type_info_by_name(STR("material_instance_t"));
+                        struct_info = Athena::type_info(STR("material_archetype_t"));
                         material_file_parse_block_data(slot->owner_asset_file.file_name, &archetype.base_instance, &tokenizer, struct_info, token);
                     }
                     else 
@@ -529,7 +523,7 @@ s_asset_font_create_new_varient(asset_manager_t *asset_manager, dynamic_render_f
     if(!success) success = s_asset_font_set_unknown_character(result, (u32)'?');
     if(!success) log_warning("Unable to set the unknown character for this font...\n");
 
-    c_dynarray_push(font->varients, result);
+    c_dynarray_add(&font->varients, &result);
 
     return(result);
 }
@@ -546,7 +540,6 @@ s_asset_font_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name
                          &result.font_face))
     {
         result.font_arena = c_arena_create(MB(100));
-        result.varients   = c_dynarray_create(dynamic_render_font_varient_t*);
     }
     else
     { 
@@ -560,18 +553,18 @@ s_asset_font_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name
 dynamic_render_font_varient_t*
 s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t *font_handle, u32 font_size)
 {
-    Assert(font_handle->type == AT_Font);
+    Assert(font_handle->slot->type == AT_Font);
     dynamic_render_font_varient_t *result = null;
 
     if(font_handle->is_valid)
     {
         dynamic_render_font_t *font = font_handle->dynamic_render_font;
-        c_dynarray_for(font->varients, varient_index)
+        for(dynamic_render_font_varient_t *varient: font->varients)
         {
-            dynamic_render_font_varient_t *varient = font->varients[varient_index];
             if(varient->font_size == font_size)
             {
                 result = varient;
+                break;
             }
         }
 
@@ -806,21 +799,44 @@ s_asset_font_load_glyph(dynamic_render_font_varient_t *varient,
 // TODO(Sleepster): 
 // Dude, this asset slot + handle setup is ABSOLUTE GARBAGE. Just look at something like
 //
-//
-// vulkan_shader_data_t *shader  = &current_group->material->material->archetype->shader.slot->shader.shader_data;
+// vulkan_shader_data_t *shader = &current_group->material->material->archetype->shader.slot->shader.shader_data;
 //
 // Like what the fuck???
 void
 s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     Assert(slot->slot_state == ASLS_LoadQueued);
-    slot->package_entry->asset_data = c_file_read_from_offset(&slot->owner_asset_file, 
-                                                              slot->package_entry->asset_data.count,
-                                                              slot->package_entry->data_offset, 
-                                                              null, 
-                                                              asset_manager->asset_allocator, 
-                                                              ZA_TAG_STATIC);
-    Assert(slot->package_entry->asset_data.data != null);
+    string_t asset_data = {};
+    
+
+    // TODO(Sleepster): Only load from the asset packages in release 
+    asset_file_data_t *asset_file = asset_manager->asset_files + slot->owner_asset_file_index;
+    file_data_t package_file_info = c_file_get_file_system_info(asset_file->file_info.filepath);
+    file_data_t asset_file_info   = c_file_get_file_system_info(slot->package_entry->fullpath);
+    if(package_file_info.last_modtime > asset_file_info.last_modtime)
+    {
+        asset_data = c_file_read_from_offset(&slot->owner_asset_file, 
+                                             slot->package_entry->asset_data.count,
+                                             slot->package_entry->data_offset, 
+                                             null, 
+                                             asset_manager->asset_allocator, 
+                                             ZA_TAG_STATIC);
+        log_info("Asset data for asset '%.*s' loaded from the asset package file...\n", fprint_string(slot->package_entry->filename));
+
+        asset_file_data_t *source_asset_file = asset_manager->asset_files + slot->owner_asset_file_index;
+        c_dynarray_add(&source_asset_file->loaded_assets, &slot);
+    }
+    else
+    {
+        asset_data = c_file_read_entirety(slot->package_entry->fullpath, 
+                                          null, 
+                                          asset_manager->asset_allocator, 
+                                          ZA_TAG_STATIC);
+        log_info("Asset data for asset '%.*s' loaded from it's local filepath...\n", fprint_string(slot->package_entry->filename));
+    }
+
+    Assert(asset_data.data != null && asset_data.count > 0);
+     slot->package_entry->asset_data = asset_data;
     switch(slot->type)
     {
         case AT_Bitmap:
@@ -851,7 +867,8 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_slot_t *sl
         }break;
     }
 
-    slot->slot_state = ASLS_Loaded;
+    slot->slot_state    = ASLS_Loaded;
+    slot->asset_manager = asset_manager;
     AtomicIncrement32(&slot->package_generation);
 }
 
@@ -891,8 +908,8 @@ asset_catalog_load_default_asset(asset_catalog_t *catalog)
                                                   default_asset_name.count, 
                                                   entry_count);
 
-    result.slot    = s_asset_manager_get_asset_slot(catalog, default_asset_name);
-    result.catalog = catalog;
+    result.slot = s_asset_manager_get_asset_slot(catalog, default_asset_name);
+    result.slot->catalog = catalog;
     result.slot->slot_state = ASLS_LoadQueued;
 
     s_asset_manager_load_asset_data(catalog->asset_manager, result.slot, hash_value);
@@ -965,17 +982,72 @@ s_asset_manager_init(asset_manager_t *asset_manager)
 void
 s_asset_manager_update(asset_manager_t *asset_manager)
 {
+    // NOTE(Sleepster): Reload asset files 
+    for(u32 asset_file_index = 0;
+        asset_file_index < asset_manager->loaded_file_count;
+        ++asset_file_index)
+    {
+        asset_file_data_t *asset_file = asset_manager->asset_files + asset_file_index; 
+        if(asset_file->load_status == ASLS_ShouldReload)
+        {
+            for(asset_slot_t *loaded_asset: asset_file->loaded_assets)
+            {
+                bool8 found = false;
+                for(u32 load_queue_index = 0;
+                    load_queue_index < asset_manager->load_queue_size;
+                    ++load_queue_index)
+                {
+                    asset_slot_t *load_queue_asset = asset_manager->asset_load_queue[load_queue_index];
+                    if(load_queue_asset == loaded_asset)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found)
+                {
+                    s_asset_manager_queue_asset_load(asset_manager, loaded_asset);
+                }
+            }
+
+            string_t filepath = c_string_make_copy(&global_context->temporary_arena, asset_file->file_info.filepath);
+
+            c_dynarray_reset(&asset_file->loaded_assets);
+            c_arena_reset(&asset_file->init_arena);
+            c_file_close(&asset_file->file_info);
+
+            initialize_asset_file_contents(asset_manager, asset_file, filepath);
+        }
+    }
+
+    // NOTE(Sleepster): Update texture atlases 
     for(u32 atlas_index = 0;
         atlas_index < asset_manager->atlas_registry.current_atlas_count;
         ++atlas_index)
     {
         texture_atlas_t *atlas = asset_manager->atlas_registry.atlases + atlas_index;
+        for(u32 texture_index = 0;
+            texture_index < atlas->packed_subtexture_count;
+            ++texture_index)
+        {
+            subtexture_data_t *data = atlas->packed_subtextures + texture_index;
+
+            volatile u32 recorded_package_version = AtomicLoad32(&data->packed_asset.slot->package_generation);
+            volatile u32 atlased_generation       = AtomicLoad32(&data->atlased_generation);
+            if(recorded_package_version != atlased_generation)
+            {
+                s_texture_atlas_add_texture(atlas, &data->packed_asset);
+            }
+        }
+
         if(atlas->merge_counter > 0)
         {
             s_texture_atlas_pack_added_textures(asset_manager, atlas);
         }
     }
 
+    // NOTE(Sleepster): Process items in the load queue 
     // TODO(Sleepster): Unload queue...
     for(u32 queued_load_index = 0;
         queued_load_index < asset_manager->load_queue_size;
@@ -985,13 +1057,16 @@ s_asset_manager_update(asset_manager_t *asset_manager)
         asset_catalog_t *catalog = asset_manager->asset_catalogs + slot_to_load->type;
 
         s_asset_manager_load_asset_data(asset_manager, slot_to_load, slot_to_load->ID);
-        c_dynarray_push(catalog->loaded_assets, slot_to_load);
+        c_dynarray_add(&catalog->loaded_assets, &slot_to_load);
 
         slot_to_load->slot_state = ASLS_Loaded;
         slot_to_load = null;
     }
+
+    ZeroMemory(asset_manager->asset_load_queue, sizeof(asset_slot_t*) * asset_manager->load_queue_size);
     asset_manager->load_queue_size = 0;
 
+    // NOTE(Sleepster): Add temporary_glyphs into the proper atlas   
     font_manager_t *font_manager = &asset_manager->font_manager;
     for(u32 page_index = 0;
         page_index < font_manager->pages_queued;
@@ -1043,39 +1118,83 @@ s_asset_manager_update(asset_manager_t *asset_manager)
     font_manager->pages_queued = 0;
 }
 
-bool8
-s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath)
+internal_api void
+asset_file_load_packages(asset_manager_t *asset_manager, asset_file_data_t *asset_file, jfd_file_header_t *header)
 {
-    Assert(asset_manager->loaded_file_count + 1 <= ASSET_MANAGER_MAX_ASSET_FILES);
-    
-    bool8 result = true; 
-    asset_manager_asset_file_data_t *asset_file = null;
-    for(u32 file_index = 0;
-        file_index < ASSET_MANAGER_MAX_ASSET_FILES;
-        ++file_index)
+    file_t *file_handle = &asset_file->file_info;
+    u64 current_file_offset = file_handle->current_read_offset;
+    for(u32 entry_index = 0;
+        entry_index < header->entry_count;
+        ++entry_index)
     {
-        asset_manager_asset_file_data_t *found = asset_manager->asset_files + file_index;
-        if(found->is_initialized == false)
-        {
-            asset_file = found;
-            break;
-        }
-    } 
-    Assert(asset_file);
-    Assert(!asset_file->is_initialized);
-    
+        u64 data_offset = current_file_offset + sizeof(jfd_package_chunk_header_t);
+        jfd_package_entry_t *entry = asset_file->package_entries + entry_index;
+        entry->entry_header = (jfd_package_chunk_header_t*)(c_file_read_from_offset(file_handle, 
+                                                                                    sizeof(jfd_package_chunk_header_t), 
+                                                                                    current_file_offset, 
+                                                                                    &asset_file->init_arena).data);
+        Assert(entry->entry_header->magic_value == ASSET_FILE_CHUNK_MAGIC);
+        entry->filename = c_file_read_from_offset(file_handle, 
+                                                  entry->entry_header->filename_size, 
+                                                  data_offset, 
+                                                  &asset_file->init_arena);
+        entry->fullpath = c_file_read_from_offset(file_handle,
+                                                  entry->entry_header->fullpath_size,
+                                                  data_offset + entry->filename.count,
+                                                  &asset_file->init_arena);
+
+        entry->asset_data.count = entry->entry_header->entry_data_size;
+        entry->data_offset      = data_offset + (entry->filename.count + entry->fullpath.count);
+        entry->modtime          = entry->entry_header->modtime;
+
+        current_file_offset    += entry->entry_header->total_entry_size;
+
+        c_hash_table_insert_pair(&asset_file->entry_hash, entry->filename, (s32)entry_index);
+        c_hash_table_insert_pair(&asset_manager->asset_name_to_file, entry->filename, (s32)asset_file->ID);
+        u64 hash_value = c_hash_table_value_from_key(entry->filename.data, 
+                                                     entry->filename.count, 
+                                                     asset_manager->asset_name_to_file.header.max_entries);
+
+        log_debug("Inserting asset with name: '%s' with a name length of: '%d' into the name_to_file hash with file_index: '%d' hash_value: '%llu'...\n", 
+                  C_STR(entry->filename), entry->filename.count, asset_file->ID, hash_value);
+
+        asset_catalog_t *catalog = asset_manager->asset_catalogs + entry->entry_header->asset_type;
+        asset_slot_t    *slot    = c_hash_table_get_value_ptr(&catalog->asset_lookup, entry->filename);
+
+        Assert(entry->entry_header->asset_type == catalog->catalog_type);
+        Assert(slot);
+
+        slot->slot_state         = ASLS_Unloaded;
+        slot->type               = (asset_type_t)entry->entry_header->asset_type;
+        slot->name               = entry->filename;
+        slot->package_entry      = entry;
+        slot->owner_asset_file   = asset_file->file_info;
+    }
+    asset_manager->loaded_file_count += 1;
+}
+
+internal_api bool8 
+initialize_asset_file_contents(asset_manager_t *asset_manager, asset_file_data_t *asset_file, string_t filepath)
+{
+    bool8 result = true;
+
     asset_file->file_info = c_file_open(filepath, false);
     if(asset_file->file_info.handle != INVALID_FILE_HANDLE)
     {
         file_t *file_handle = &asset_file->file_info;
 
-        asset_file->init_arena      = c_arena_create(MB(500));
-        asset_file->is_initialized  = true;
-        asset_file->ID              = asset_manager->loaded_file_count;
+        if(asset_file->init_arena.is_initialized == false)
+        {
+            asset_file->init_arena = c_arena_create(MB(500));
+        }
+
+        asset_file->is_initialized = true;
+        asset_file->ID             = asset_manager->loaded_file_count;
 
         jfd_file_header_t *header = (jfd_file_header_t*)(c_file_read(file_handle, sizeof(jfd_file_header_t), &asset_file->init_arena).data);
         Assert(header->magic_value == ASSET_FILE_HEADER_MAGIC);
-        
+
+        asset_file->header          = header;
         asset_file->package_entries = c_arena_push_array(&asset_file->init_arena, jfd_package_entry_t, header->entry_count);
         c_hash_table_init(&asset_file->entry_hash, 
                            ASSET_CATALOG_MAX_LOOKUPS, 
@@ -1083,50 +1202,8 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
                            asset_manager_hash_arena_allocate,
                            null);
 
-        u64 current_file_offset = file_handle->current_read_offset;
-        for(u32 entry_index = 0;
-            entry_index < header->entry_count;
-            ++entry_index)
-        {
-            u64 data_offset = current_file_offset + sizeof(jfd_package_chunk_header_t);
-            jfd_package_entry_t *entry = asset_file->package_entries + entry_index;
-            entry->entry_header = (jfd_package_chunk_header_t*)(c_file_read_from_offset(file_handle, 
-                                                                                        sizeof(jfd_package_chunk_header_t), 
-                                                                                        current_file_offset, 
-                                                                                       &asset_file->init_arena).data);
-            Assert(entry->entry_header->magic_value == ASSET_FILE_CHUNK_MAGIC);
-            entry->filename = c_file_read_from_offset(file_handle, 
-                                                      entry->entry_header->filename_size, 
-                                                      data_offset, 
-                                                     &asset_file->init_arena);
-
-            entry->asset_data.count = entry->entry_header->entry_data_size;
-            entry->data_offset   = data_offset + entry->filename.count;
-            current_file_offset += entry->entry_header->total_entry_size;
-             
-            c_hash_table_insert_pair(&asset_file->entry_hash, entry->filename, (s32)entry_index);
-            c_hash_table_insert_pair(&asset_manager->asset_name_to_file, entry->filename, (s32)asset_file->ID);
-            u64 hash_value = c_hash_table_value_from_key(entry->filename.data, 
-                                                         entry->filename.count, 
-                                                         asset_manager->asset_name_to_file.header.max_entries);
-
-            log_debug("Inserting asset with name: '%s' with a name length of: '%d' into the name_to_file hash with file_index: '%d' hash_value: '%llu'...\n", 
-                      C_STR(entry->filename), entry->filename.count, asset_file->ID, hash_value);
-
-            asset_catalog_t *catalog = asset_manager->asset_catalogs + entry->entry_header->asset_type;
-            asset_slot_t    *slot    = c_hash_table_get_value_ptr(&catalog->asset_lookup, entry->filename);
-
-            Assert(entry->entry_header->asset_type == catalog->catalog_type);
-            Assert(slot);
-
-            ZeroStruct(*slot);
-            slot->slot_state       = ASLS_Unloaded;
-            slot->type             = (asset_type_t)entry->entry_header->asset_type;
-            slot->name             = entry->filename;
-            slot->package_entry    = entry;
-            slot->owner_asset_file = asset_file->file_info;
-        }
-        asset_manager->loaded_file_count += 1;
+        // NOTE(Sleepster): Load the packages 
+        asset_file_load_packages(asset_manager, asset_file, header);
     }
     else
     {
@@ -1135,6 +1212,60 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
     }
 
     return(result);
+}
+
+bool8
+s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath)
+{
+    Assert(asset_manager->loaded_file_count + 1 <= ASSET_MANAGER_MAX_ASSET_FILES);
+    
+    bool8 result = true; 
+    asset_file_data_t *asset_file = null;
+    for(u32 file_index = 0;
+        file_index < ASSET_MANAGER_MAX_ASSET_FILES;
+        ++file_index)
+    {
+        asset_file_data_t *found = asset_manager->asset_files + file_index;
+        if(found->is_initialized == false)
+        {
+            asset_file = found;
+            break;
+        }
+    } 
+    Assert(asset_file);
+    Assert(!asset_file->is_initialized);
+
+    result = initialize_asset_file_contents(asset_manager, asset_file, filepath);
+
+    return(result);
+}
+
+void
+s_asset_manager_signal_asset_file_reload(asset_manager_t *asset_manager, string_t filename)
+{
+    // TODO(Sleepster): Hash table? 
+    asset_file_data_t *our_file = null;
+    for(u32 file_index = 0;
+        file_index < ASSET_MANAGER_MAX_ASSET_FILES;
+        ++file_index)
+    {
+        asset_file_data_t *found = asset_manager->asset_files + file_index;
+        if(c_string_compare(found->file_info.file_name, filename))
+        {
+            our_file = found;
+            break;
+        }
+    }
+
+    if(our_file)
+    {
+        AtomicIncrement32(&our_file->current_package_generation);
+        our_file->load_status = ASLS_ShouldReload;
+    }
+    else
+    {
+        log_warning("Could not find asset file: '%.*s'... therefore we cannot reload it.");
+    }
 }
 
 internal_api asset_slot_t *
@@ -1166,8 +1297,54 @@ s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot
 void
 s_asset_manager_queue_asset_load(asset_manager_t *asset_manager, asset_slot_t *slot)
 {
-    asset_manager->asset_load_queue[asset_manager->load_queue_size++] = slot;
-    slot->slot_state = ASLS_LoadQueued;
+    if(slot->slot_state == ASLS_Loaded)
+    {
+        s32 index    = -1;
+        s32 iterator =  0;
+        for(const asset_slot_t *loaded_asset: slot->catalog->loaded_assets)
+        {
+            if(loaded_asset == slot)
+            {
+                index = iterator;
+                break;
+            }
+
+            ++iterator;
+        }
+
+        if(index > -1)
+        {
+            c_dynarray_remove(&slot->catalog->loaded_assets, (u32)index);
+        }
+
+        // NOTE(Sleepster): Free the data. 
+        c_za_free(asset_manager->asset_allocator, slot->package_entry->asset_data.data);
+        if(slot->type == AT_Bitmap && slot->texture.bitmap.pixels.data)
+        {
+            stbi_image_free(slot->texture.bitmap.pixels.data);
+        }
+
+        log_info("Reload triggered for asset of name: '%.*s'...\n", fprint_string(slot->name));
+        AtomicIncrement32(&slot->package_generation);
+    }
+
+    bool8 found = false;
+    for(u32 asset_index = 0;
+        asset_index < asset_manager->load_queue_size;
+        ++asset_index)
+    {
+        asset_slot_t *found_slot = asset_manager->asset_load_queue[asset_index];
+        if(found_slot->ID == slot->ID)
+        {
+            found = true;
+        }
+    }
+
+    if(!found)
+    {
+        asset_manager->asset_load_queue[asset_manager->load_queue_size++] = slot;
+        slot->slot_state = ASLS_LoadQueued;
+    }
 }
 
 asset_handle_t
@@ -1176,11 +1353,11 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
     asset_handle_t result;
 
     u64 hash_value = c_hash_table_value_from_key(name.data, name.count, asset_manager->asset_name_to_file.header.max_entries);
-    log_info("hash index for: '%.*s' is '%llu'...\n", name.count, C_STR(name), hash_value);
+    log_info("hash index for: '%.*s' is '%llu'...\n", fprint_string(name), hash_value);
     s32 file_index = c_hash_table_get_value(&asset_manager->asset_name_to_file, name);
     if(file_index != -1)
     {
-        asset_manager_asset_file_data_t *asset_file = asset_manager->asset_files + file_index;
+        asset_file_data_t *asset_file = asset_manager->asset_files + file_index;
         s32 asset_entry_index = c_hash_table_get_value(&asset_file->entry_hash, name);
         // NOTE(Sleepster): This just SHOULD NOT be possible... 
         //                  An assert here would imply that we found the file inside of a package, but cannot locate it.
@@ -1197,28 +1374,25 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
 
         result.slot     = slot;
         result.slot->ID = hash_value;
-
-        result.type          = slot->type;
-        result.asset_manager = asset_manager;
-        result.catalog       = catalog;
+        result.slot->catalog = asset_manager->asset_catalogs + result.slot->type;
         if(result.slot->slot_state == ASLS_Loaded)
         {
             // NOTE(Sleepster): If loaded, just set basic stuff 
-            result.owner_asset_file_index = file_index;
-            result.is_valid               = true;
+            result.is_valid = true;
         }
         else if(result.slot->slot_state == ASLS_Unloaded)
         {
             // NOTE(Sleepster): Otherwise, load it. 
             s_asset_manager_queue_asset_load(asset_manager, slot);
+            slot->owner_asset_file_index = file_index;
         }
 
         s_asset_manager_set_handle_asset_data_pointer(&result, slot);
     }
     else
     {
-        log_error("Asset by name of: '%.*s' cannot be found in the asset file database...\n",
-                  name.count, C_STR(name));
+        log_warning("Asset by name of: '%.*s' cannot be found in the asset file database...\n",
+                    name.count, C_STR(name));
     }
 
     return(result);
@@ -1258,11 +1432,8 @@ s_texture_atlas_create(asset_manager_t *asset_manager,
     atlas->bitmap_data    = &atlas->texture.bitmap;
     atlas->atlas_size     = size;
 
-    atlas->textures_to_merge = c_dynarray_create(asset_handle_t*);
-    c_dynarray_reserve(atlas->textures_to_merge, initial_subtexture_count);
-
-    atlas->packed_subtextures = c_dynarray_create(subtexture_data_t);
-    atlas->packed_subtextures = c_dynarray_reserve(atlas->packed_subtextures, initial_subtexture_count);
+    c_dynarray_reserve(&atlas->textures_to_merge, initial_subtexture_count);
+    c_dynarray_reserve(&atlas->packed_subtextures, initial_subtexture_count);
 
     atlas->ID       = registry->current_atlas_count - 1;
     atlas->is_valid = true;
@@ -1274,9 +1445,9 @@ void
 s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle)
 {
     Assert(texture_handle);
-    Assert(texture_handle->type == AT_Bitmap);
+    Assert(texture_handle->slot->type == AT_Bitmap);
 
-    c_dynarray_push(atlas->textures_to_merge, texture_handle);
+    c_dynarray_add(&atlas->textures_to_merge, &texture_handle);
     atlas->merge_counter += 1;
 }
 
@@ -1284,7 +1455,6 @@ void
 s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atlas_t *atlas)
 {
     Assert(atlas->is_valid);
-
     if(atlas->merge_counter > 0)
     {
         u32 atlas_width       = atlas->bitmap_data->width;
@@ -1292,9 +1462,9 @@ s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atla
         u32 atlas_channels    = atlas->bitmap_data->channels;
         string_t atlas_pixels = atlas->bitmap_data->pixels;
 
-        c_dynarray_for(atlas->textures_to_merge, texture_index)
+        s32 texture_index = 0;
+        for(const asset_handle_t *asset: atlas->textures_to_merge)
         {
-            asset_handle_t *asset =  atlas->textures_to_merge[texture_index];
             if(asset->slot->slot_state == ASLS_Loaded)
             {
                 bitmap_t *asset_bitmap = &asset->slot->texture.bitmap;
@@ -1336,22 +1506,33 @@ s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atla
                 vec2_t uv_max = vec2(atlas_cursor_x + bitmap_width, atlas_cursor_y + bitmap_height);
 
                 // NOTE(Sleepster): Create the subtexture, let the owner of the sprite know this is the new texture we will draw it from. 
-                subtexture_data_t *subtexture = atlas->packed_subtextures + atlas->packed_subtexture_count;
-                asset->subtexture_data = subtexture;
+                s32 subtexture_index = atlas->packed_subtexture_count;
+                subtexture_data_t *subtexture = asset->slot->subtexture_data;
+                if(!subtexture)
+                {
+                    subtexture = atlas->packed_subtextures + atlas->packed_subtexture_count;
+                    asset->slot->subtexture_data = subtexture;
+
+                    ++atlas->packed_subtexture_count;
+                }
 
                 subtexture->uv_min                 = uv_min;
                 subtexture->uv_max                 = uv_max;
                 subtexture->offset                 = uv_min;
                 subtexture->size                   = vec2(bitmap_width, bitmap_height);
-                subtexture->atlas_subtexture_index = atlas->packed_subtexture_count++;
+                subtexture->atlas_subtexture_index = subtexture_index;
                 subtexture->atlas                  = atlas;
+                subtexture->atlased_generation     = asset->slot->package_generation;
+                subtexture->packed_asset           = *asset;
 
                 atlas->atlas_cursor_x = atlas_cursor_x + bitmap_width;
-                c_dynarray_remove_element(atlas->textures_to_merge, texture_index);
+                c_dynarray_remove(&atlas->textures_to_merge, texture_index);
 
                 atlas->merge_counter -= 1;
                 Assert(atlas->merge_counter >= 0);
             }
+
+            ++texture_index;
         }
 
         image_create_info_t info = {

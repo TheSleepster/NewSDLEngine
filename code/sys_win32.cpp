@@ -774,7 +774,7 @@ sys_file_watcher_move_info_forward(FILE_NOTIFY_INFORMATION *info)
 }
 
 void
-sys_file_watcher_process_changes(file_watcher_t *watcher, bool8 *changed)
+sys_file_watcher_process_changes(file_watcher_t *watcher)
 {
     for(u32 data_index = 0;
         data_index < watcher->sys_watch_data.directory_data_count;

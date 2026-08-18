@@ -339,7 +339,7 @@ struct render_command_list_t
 
     render_pipeline_state_t       active_render_state;
 
-    DynArray_t(render_buffer_t*)  active_vertex_buffers;
+    dynarray_t<render_buffer_t*>  active_vertex_buffers;
     u32                           vertex_buffer_count;
 
     render_buffer_t              *active_index_buffer;

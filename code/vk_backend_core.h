@@ -123,10 +123,10 @@ struct gpu_info_t
 	VkSurfaceCapabilitiesKHR            surface_capabilities;
 
     u32                                 queue_family_count;
-    DynArray_t(VkSurfaceFormatKHR)      valid_surface_formats;
-    DynArray_t(VkPresentModeKHR)        valid_present_modes;
-    DynArray_t(VkQueueFamilyProperties)	queue_family_properties;
-    DynArray_t(VkExtensionProperties)   extension_properties;
+    dynarray_t<VkSurfaceFormatKHR>      valid_surface_formats;
+    dynarray_t<VkPresentModeKHR>        valid_present_modes;
+    dynarray_t<VkQueueFamilyProperties>	queue_family_properties;
+    dynarray_t<VkExtensionProperties>   extension_properties;
 };
 
 struct swapchain_info_t 
@@ -226,7 +226,7 @@ struct vulkan_context_t
     // and later uploading at once when we flush the buffer. However, if the buffer gets full before the designated "flush" time, then we
     // flush it ourselves
     vulkan_staging_buffer_t             staging_buffers[MAX_FRAMES_IN_FLIGHT];
-    DynArray_t(vulkan_staging_info_t)   staging_infos;
+    dynarray_t<vulkan_staging_info_t>   staging_infos;
     u32                                 next_staging_info;
 
     VkCommandPool                       staging_command_pool;

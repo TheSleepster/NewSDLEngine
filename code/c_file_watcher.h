@@ -44,6 +44,7 @@ typedef enum file_watcher_change_event
 
 typedef struct file_watcher_recorded_change
 {
+    bool8    redudant;
     string_t full_path;
     string_t old_filename;
 
@@ -63,8 +64,12 @@ typedef struct file_watcher
     void                          *user_data;
 
     bool8                          watch_recursively;
+
     file_watcher_recorded_change_t observed_changes[FILE_WATCHER_MAX_CHANGES]; 
     u32                            change_count;
+
+    file_watcher_recorded_change_t recorded_change_events[FILE_WATCHER_MAX_CHANGES]; 
+    u32                            recorded_change_event_count;
     
     string_t                       paths_to_watch[FILE_WATCHER_MAX_PATHS_TO_WATCH];
     u32                            paths_watched;
@@ -85,6 +90,7 @@ void            c_file_watcher_issue_check_over_all_paths(file_watcher_t *watche
 
 void            c_file_watcher_add_change_event(file_watcher_t *watcher, string_t fullname, string_t old_filename, sys_file_check_event_data_t *watch_data, u32 changes);
 void            c_file_watcher_emit_changes(file_watcher_t *watcher);
+void            c_file_watcher_process_changes(file_watcher_t *watcher);
 
 #endif // C_FILE_WATCHER_H
 

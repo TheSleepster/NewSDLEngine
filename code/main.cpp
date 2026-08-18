@@ -295,7 +295,7 @@ entity_render(game_state_t *game_state, render_command_list_t *command_list, ent
 
     if(entity->e_flags & EF_HasSprite)
     {
-        subtexture_data_t *data = entity->sprite->subtexture_data;
+        subtexture_data_t *data = entity->sprite->slot->subtexture_data;
         if(data)
         {
             texture = &data->atlas->texture;
@@ -510,6 +510,7 @@ game_main(void)
     {
         s_im_reset_controller_states(input_manager);
         process_window_events(global_context->renderer_state, input_manager);
+        c_file_watcher_process_changes(&global_context->file_watcher);
 
         if(game_state.open_debug_menu)
         {

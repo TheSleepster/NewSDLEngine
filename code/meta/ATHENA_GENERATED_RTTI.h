@@ -24,23 +24,44 @@
 	X(uint32_t, &DEFAULT_typedata_uint32_t) \
 	X(uint64_t, &DEFAULT_typedata_uint64_t) \
 	X(size_t, &DEFAULT_typedata_size_t) \
-	X(dynarray_header_t, &DEFAULT_typedata_structure_dynarray_header_t.type_info) \
+	X(sys_thread_t, &DEFAULT_typedata_structure_sys_thread_t.type_info) \
+	X(sys_mutex_t, &DEFAULT_typedata_structure_sys_mutex_t.type_info) \
+	X(sys_semaphore_t, &DEFAULT_typedata_structure_sys_semaphore_t.type_info) \
+	X(ticket_mutex_t, &DEFAULT_typedata_structure_ticket_mutex_t.type_info) \
+	X(u64, &DEFAULT_typedata_u64) \
+	X(bool8, &DEFAULT_typedata_bool8) \
+	X(sys_thread_handle_t, &DEFAULT_typedata_sys_thread_handle_t) \
 	X(u32, &DEFAULT_typedata_u32) \
-	X(file_extension_t, &DEFAULT_typedata_structure_file_extension_t.type_info) \
+	X(sys_mutex_handle_t, &DEFAULT_typedata_sys_mutex_handle_t) \
+	X(sys_semaphore_handle_t, &DEFAULT_typedata_sys_semaphore_handle_t) \
+	X(immediate_vertex_t, &DEFAULT_typedata_immediate_vertex_t) \
+	X(immediate_widget_data_t, &DEFAULT_typedata_immediate_widget_data_t) \
+	X(render_command_list_t, &DEFAULT_typedata_structure_render_command_list_t.type_info) \
+	X(vertex_buffer_t, &DEFAULT_typedata_structure_vertex_buffer_t.type_info) \
+	X(vec3_t, &DEFAULT_typedata_vec3_t) \
+	X(vec2_t, &DEFAULT_typedata_vec2_t) \
+	X(vec4_t, &DEFAULT_typedata_vec4_t) \
+	X(texture2D_t, &DEFAULT_typedata_structure_texture2D_t.type_info) \
+	X(asset_manager_t, &DEFAULT_typedata_structure_asset_manager_t.type_info) \
+	X(asset_handle_t, &DEFAULT_typedata_structure_asset_handle_t.type_info) \
+	X(string_t, &DEFAULT_typedata_structure_string_t.type_info) \
+	X(float32, &DEFAULT_typedata_float32) \
+	X(byte, &DEFAULT_typedata_byte) \
+	X(duration_counter_t, &DEFAULT_typedata_structure_duration_counter_t.type_info) \
+	X(bool32, &DEFAULT_typedata_bool32) \
+	X(T, &DEFAULT_typedata_T) \
 	X(file_t, &DEFAULT_typedata_structure_file_t.type_info) \
 	X(mapped_file_t, &DEFAULT_typedata_structure_mapped_file_t.type_info) \
 	X(file_data_t, &DEFAULT_typedata_structure_file_data_t.type_info) \
 	X(overlap_io_data_t, &DEFAULT_typedata_structure_overlap_io_data_t.type_info) \
 	X(visit_file_data, &DEFAULT_typedata_visit_file_data) \
 	X(visit_file_data_t, &DEFAULT_typedata_structure_visit_file_data_t.type_info) \
-	X(string_t, &DEFAULT_typedata_structure_string_t.type_info) \
-	X(bool8, &DEFAULT_typedata_bool8) \
 	X(memory_arena_t, &DEFAULT_typedata_structure_memory_arena_t.type_info) \
 	X(zone_allocator_t, &DEFAULT_typedata_structure_zone_allocator_t.type_info) \
 	X(za_allocation_tag_t, &DEFAULT_typedata_structure_za_allocation_tag_t.type_info) \
 	X(s64, &DEFAULT_typedata_s64) \
+	X(s32, &DEFAULT_typedata_s32) \
 	X(sys_handle_t, &DEFAULT_typedata_sys_handle_t) \
-	X(u64, &DEFAULT_typedata_u64) \
 	X(file_watcher_t, &DEFAULT_typedata_structure_file_watcher_t.type_info) \
 	X(file_watcher_recorded_change_t, &DEFAULT_typedata_structure_file_watcher_recorded_change_t.type_info) \
 	X(file_watcher_change_event_t, &DEFAULT_typedata_structure_file_watcher_change_event_t.type_info) \
@@ -49,33 +70,21 @@
 	X(global_context_t, &DEFAULT_typedata_structure_global_context_t.type_info) \
 	X(threadpool_t, &DEFAULT_typedata_structure_threadpool_t.type_info) \
 	X(renderer_state_t, &DEFAULT_typedata_structure_renderer_state_t.type_info) \
-	X(asset_manager_t, &DEFAULT_typedata_structure_asset_manager_t.type_info) \
 	X(input_manager_t, &DEFAULT_typedata_structure_input_manager_t.type_info) \
 	X(hash_table_allocation_flags_t, &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info) \
-	X(byte, &DEFAULT_typedata_byte) \
 	X(hash_table_header_t, &DEFAULT_typedata_structure_hash_table_header_t.type_info) \
 	X(debug_log_level_t, &DEFAULT_typedata_structure_debug_log_level_t.type_info) \
-	X(s32, &DEFAULT_typedata_s32) \
 	X(memory_arena_footer_t, &DEFAULT_typedata_structure_memory_arena_footer_t.type_info) \
 	X(scratch_arena_t, &DEFAULT_typedata_structure_scratch_arena_t.type_info) \
-	X(bool32, &DEFAULT_typedata_bool32) \
 	X(u8, &DEFAULT_typedata_u8) \
 	X(arg_type_t, &DEFAULT_typedata_structure_arg_type_t.type_info) \
 	X(program_flag_data_t, &DEFAULT_typedata_structure_program_flag_data_t.type_info) \
 	X(program_flag_t, &DEFAULT_typedata_structure_program_flag_t.type_info) \
 	X(program_flag_state_t, &DEFAULT_typedata_structure_program_flag_state_t.type_info) \
-	X(float32, &DEFAULT_typedata_float32) \
 	X(float64, &DEFAULT_typedata_float64) \
 	X(string_builder_buffer_t, &DEFAULT_typedata_structure_string_builder_buffer_t.type_info) \
 	X(string_builder_t, &DEFAULT_typedata_structure_string_builder_t.type_info) \
 	X(string_builder_buffer, &DEFAULT_typedata_string_builder_buffer) \
-	X(sys_thread_t, &DEFAULT_typedata_structure_sys_thread_t.type_info) \
-	X(sys_mutex_t, &DEFAULT_typedata_structure_sys_mutex_t.type_info) \
-	X(sys_semaphore_t, &DEFAULT_typedata_structure_sys_semaphore_t.type_info) \
-	X(ticket_mutex_t, &DEFAULT_typedata_structure_ticket_mutex_t.type_info) \
-	X(sys_thread_handle_t, &DEFAULT_typedata_sys_thread_handle_t) \
-	X(sys_mutex_handle_t, &DEFAULT_typedata_sys_mutex_handle_t) \
-	X(sys_semaphore_handle_t, &DEFAULT_typedata_sys_semaphore_handle_t) \
 	X(work_completion_fence_t, &DEFAULT_typedata_structure_work_completion_fence_t.type_info) \
 	X(work_order_t, &DEFAULT_typedata_structure_work_order_t.type_info) \
 	X(work_list_t, &DEFAULT_typedata_structure_work_list_t.type_info) \
@@ -92,15 +101,7 @@
 	X(real64, &DEFAULT_typedata_real64) \
 	X(zone_allocator_block_t, &DEFAULT_typedata_structure_zone_allocator_block_t.type_info) \
 	X(zone_allocator_block, &DEFAULT_typedata_zone_allocator_block) \
-	X(immediate_vertex_t, &DEFAULT_typedata_immediate_vertex_t) \
-	X(immediate_widget_data_t, &DEFAULT_typedata_immediate_widget_data_t) \
-	X(render_command_list_t, &DEFAULT_typedata_structure_render_command_list_t.type_info) \
-	X(vertex_buffer_t, &DEFAULT_typedata_structure_vertex_buffer_t.type_info) \
-	X(vec3_t, &DEFAULT_typedata_vec3_t) \
-	X(vec2_t, &DEFAULT_typedata_vec2_t) \
-	X(vec4_t, &DEFAULT_typedata_vec4_t) \
-	X(texture2D_t, &DEFAULT_typedata_structure_texture2D_t.type_info) \
-	X(asset_handle_t, &DEFAULT_typedata_structure_asset_handle_t.type_info) \
+	X(thread_proc_t, &DEFAULT_typedata_thread_proc_t) \
 	X(render_image_filter_type_t, &DEFAULT_typedata_structure_render_image_filter_type_t.type_info) \
 	X(render_image_wrapping_type_t, &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info) \
 	X(render_image_usage_t, &DEFAULT_typedata_structure_render_image_usage_t.type_info) \
@@ -114,6 +115,8 @@
 	X(bitmap_format_t, &DEFAULT_typedata_structure_bitmap_format_t.type_info) \
 	X(subtexture_data_t, &DEFAULT_typedata_structure_subtexture_data_t.type_info) \
 	X(texture_atlas_t, &DEFAULT_typedata_structure_texture_atlas_t.type_info) \
+	X(animation_source2D_t, &DEFAULT_typedata_structure_animation_source2D_t.type_info) \
+	X(animation2D_t, &DEFAULT_typedata_structure_animation2D_t.type_info) \
 	X(shader_t, &DEFAULT_typedata_structure_shader_t.type_info) \
 	X(material_instance_t, &DEFAULT_typedata_structure_material_instance_t.type_info) \
 	X(material_archetype_t, &DEFAULT_typedata_structure_material_archetype_t.type_info) \
@@ -125,7 +128,7 @@
 	X(dynamic_render_font_varient_t, &DEFAULT_typedata_structure_dynamic_render_font_varient_t.type_info) \
 	X(dynamic_render_font_t, &DEFAULT_typedata_structure_dynamic_render_font_t.type_info) \
 	X(asset_slot_t, &DEFAULT_typedata_structure_asset_slot_t.type_info) \
-	X(asset_manager_asset_file_data_t, &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info) \
+	X(asset_file_data_t, &DEFAULT_typedata_structure_asset_file_data_t.type_info) \
 	X(asset_catalog_t, &DEFAULT_typedata_structure_asset_catalog_t.type_info) \
 	X(texture_manager_t, &DEFAULT_typedata_structure_texture_manager_t.type_info) \
 	X(font_manager_t, &DEFAULT_typedata_structure_font_manager_t.type_info) \
@@ -133,20 +136,20 @@
 	X(backend_shader_t, &DEFAULT_typedata_backend_shader_t) \
 	X(render_pipeline_state_t, &DEFAULT_typedata_structure_render_pipeline_state_t.type_info) \
 	X(VkDescriptorSet, &DEFAULT_typedata_VkDescriptorSet) \
-	X(glyphs, &DEFAULT_typedata_structure_glyphs.type_info) \
 	X(FT_Face, &DEFAULT_typedata_FT_Face) \
 	X(jfd_package_entry_t, &DEFAULT_typedata_jfd_package_entry_t) \
-	X(entry_hash, &DEFAULT_typedata_structure_entry_hash.type_info) \
 	X(jfd_file_header_t, &DEFAULT_typedata_jfd_file_header_t) \
-	X(asset_lookup, &DEFAULT_typedata_structure_asset_lookup.type_info) \
 	X(FT_Library, &DEFAULT_typedata_FT_Library) \
-	X(asset_name_to_file, &DEFAULT_typedata_structure_asset_name_to_file.type_info) \
 	X(controller_type_t, &DEFAULT_typedata_structure_controller_type_t.type_info) \
 	X(input_mouse_buttons_t, &DEFAULT_typedata_structure_input_mouse_buttons_t.type_info) \
 	X(action_button_t, &DEFAULT_typedata_structure_action_button_t.type_info) \
 	X(keyboard_controller_data_t, &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info) \
 	X(analog_button_t, &DEFAULT_typedata_structure_analog_button_t.type_info) \
 	X(gamepad_controller_data_t, &DEFAULT_typedata_structure_gamepad_controller_data_t.type_info) \
+	X(text_input_action_type_t, &DEFAULT_typedata_structure_text_input_action_type_t.type_info) \
+	X(text_input_modifier_flags, &DEFAULT_typedata_structure_text_input_modifier_flags.type_info) \
+	X(text_input_event_type_t, &DEFAULT_typedata_structure_text_input_event_type_t.type_info) \
+	X(text_input_event_t, &DEFAULT_typedata_structure_text_input_event_t.type_info) \
 	X(input_controller_t, &DEFAULT_typedata_structure_input_controller_t.type_info) \
 	X(game_action_binding_type_t, &DEFAULT_typedata_structure_game_action_binding_type_t.type_info) \
 	X(game_action_binding_t, &DEFAULT_typedata_structure_game_action_binding_t.type_info) \
@@ -201,7 +204,6 @@
 	X(backend_renderpass_handle_t, &DEFAULT_typedata_backend_renderpass_handle_t) \
 	X(backend_framebuffer_handle_t, &DEFAULT_typedata_backend_framebuffer_handle_t) \
 	X(SDL_Window, &DEFAULT_typedata_SDL_Window) \
-	X(constant_buffer_hash, &DEFAULT_typedata_structure_constant_buffer_hash.type_info) \
 	X(widget_state_t, &DEFAULT_typedata_structure_widget_state_t.type_info) \
 	X(ui_signal_flags_t, &DEFAULT_typedata_structure_ui_signal_flags_t.type_info) \
 	X(ui_signal_t, &DEFAULT_typedata_structure_ui_signal_t.type_info) \
@@ -210,8 +212,8 @@
 	X(widget_size_kind_t, &DEFAULT_typedata_structure_widget_size_kind_t.type_info) \
 	X(widget_t, &DEFAULT_typedata_structure_widget_t.type_info) \
 	X(ui_state_t, &DEFAULT_typedata_structure_ui_state_t.type_info) \
+	X(ivec2_t, &DEFAULT_typedata_ivec2_t) \
 	X(rectangle2_t, &DEFAULT_typedata_rectangle2_t) \
-	X(widget_states, &DEFAULT_typedata_structure_widget_states.type_info) \
 	X(vulkan_allocation_usage_type_t, &DEFAULT_typedata_structure_vulkan_allocation_usage_type_t.type_info) \
 	X(vulkan_allocation_info_t, &DEFAULT_typedata_structure_vulkan_allocation_info_t.type_info) \
 	X(vulkan_allocator_t, &DEFAULT_typedata_structure_vulkan_allocator_t.type_info) \
@@ -267,7 +269,6 @@
 	X(vulkan_image_t, &DEFAULT_typedata_structure_vulkan_image_t.type_info) \
 	X(VkSemaphore, &DEFAULT_typedata_VkSemaphore) \
 	X(VkDescriptorPool, &DEFAULT_typedata_VkDescriptorPool) \
-	X(image_samplers, &DEFAULT_typedata_structure_image_samplers.type_info) \
 	X(VkSampler, &DEFAULT_typedata_VkSampler) \
 	X(vulkan_sampler_info_t, &DEFAULT_typedata_structure_vulkan_sampler_info_t.type_info) \
 	X(vulkan_image_info_t, &DEFAULT_typedata_structure_vulkan_image_info_t.type_info) \
@@ -288,9 +289,679 @@
 	X(VkPipelineLayout, &DEFAULT_typedata_VkPipelineLayout) \
 	X(VkVertexInputBindingDescription, &DEFAULT_typedata_VkVertexInputBindingDescription) \
 	X(VkVertexInputAttributeDescription, &DEFAULT_typedata_VkVertexInputAttributeDescription) \
-	X(pipeline_hash, &DEFAULT_typedata_structure_pipeline_hash.type_info) \
 
+#define ATHENA_UNIQUE_TYPE_ID_LIST(X) \
+	X(TYPE_unsigned_int) \
+	X(TYPE_unsigned_char) \
+	X(TYPE_short) \
+	X(TYPE_long) \
+	X(TYPE_int) \
+	X(TYPE_char) \
+	X(TYPE_float) \
+	X(TYPE_double) \
+	X(TYPE_void) \
+	X(TYPE_bool) \
+	X(TYPE_int8_t) \
+	X(TYPE_int16_t) \
+	X(TYPE_int32_t) \
+	X(TYPE_int64_t) \
+	X(TYPE_uint8_t) \
+	X(TYPE_uint16_t) \
+	X(TYPE_uint32_t) \
+	X(TYPE_uint64_t) \
+	X(TYPE_size_t) \
+	X(TYPE_sys_thread_t) \
+	X(TYPE_sys_mutex_t) \
+	X(TYPE_sys_semaphore_t) \
+	X(TYPE_ticket_mutex_t) \
+	X(TYPE_u64) \
+	X(TYPE_c_ticket_mutex_take_ticket) \
+	X(TYPE_bool8) \
+	X(TYPE_c_ticket_mutex_try_wait) \
+	X(TYPE_c_ticket_mutex_wait) \
+	X(TYPE_c_ticket_mutex_advance_ticket) \
+	X(TYPE_c_ticket_mutex_take_and_wait) \
+	X(TYPE_sys_thread_handle_t) \
+	X(TYPE_u32) \
+	X(TYPE_sys_mutex_handle_t) \
+	X(TYPE_sys_semaphore_handle_t) \
+	X(TYPE_immediate_vertex_t) \
+	X(TYPE_immediate_widget_data_t) \
+	X(TYPE_render_command_list_t) \
+	X(TYPE_vertex_buffer_t) \
+	X(TYPE_vec3_t) \
+	X(TYPE_vec2_t) \
+	X(TYPE_vec4_t) \
+	X(TYPE_texture2D_t) \
+	X(TYPE_immediate_quad_ex) \
+	X(TYPE_immediate_rect) \
+	X(TYPE_asset_manager_t) \
+	X(TYPE_asset_handle_t) \
+	X(TYPE_string_t) \
+	X(TYPE_float32) \
+	X(TYPE_immediate_text) \
+	X(TYPE_byte) \
+	X(TYPE_immediate_put_data) \
+	X(TYPE_void_func) \
+	X(TYPE_duration_counter_t) \
+	X(TYPE_bool32) \
+	X(TYPE_T) \
+	X(TYPE_begin) \
+	X(TYPE_end) \
+	X(TYPE_file_t) \
+	X(TYPE_mapped_file_t) \
+	X(TYPE_file_data_t) \
+	X(TYPE_overlap_io_data_t) \
+	X(TYPE_visit_file_data) \
+	X(TYPE_visit_files_pfn_t) \
+	X(TYPE_visit_file_data_t) \
+	X(TYPE_c_file_open) \
+	X(TYPE_c_file_close) \
+	X(TYPE_c_file_copy) \
+	X(TYPE_memory_arena_t) \
+	X(TYPE_zone_allocator_t) \
+	X(TYPE_za_allocation_tag_t) \
+	X(TYPE_c_file_read) \
+	X(TYPE_c_file_read_entirety) \
+	X(TYPE_c_file_read_from_offset) \
+	X(TYPE_c_file_read_to_end) \
+	X(TYPE_s64) \
+	X(TYPE_c_file_open_and_write) \
+	X(TYPE_c_file_write) \
+	X(TYPE_c_file_write_string) \
+	X(TYPE_c_file_get_size) \
+	X(TYPE_c_file_get_file_system_info) \
+	X(TYPE_c_file_replace_or_rename) \
+	X(TYPE_c_file_map) \
+	X(TYPE_c_file_unmap) \
+	X(TYPE_c_file_ext_string_to_enum) \
+	X(TYPE_c_directory_exists) \
+	X(TYPE_c_directory_create_visit_data) \
+	X(TYPE_c_directory_visit) \
+	X(TYPE_s32) \
+	X(TYPE_c_directory_get_file_count) \
+	X(TYPE_sys_handle_t) \
+	X(TYPE_file_watcher_t) \
+	X(TYPE_file_watcher_recorded_change_t) \
+	X(TYPE_file_watcher_callback_pfn_t) \
+	X(TYPE_file_watcher_change_event_t) \
+	X(TYPE_c_file_watcher_create) \
+	X(TYPE_c_file_watcher_add_path) \
+	X(TYPE_sys_file_check_event_data_t) \
+	X(TYPE_c_file_watcher_issue_check_for_single_path) \
+	X(TYPE_c_file_watcher_issue_check_over_all_paths) \
+	X(TYPE_c_file_watcher_add_change_event) \
+	X(TYPE_c_file_watcher_emit_changes) \
+	X(TYPE_c_file_watcher_process_changes) \
+	X(TYPE_file_watcher_sys_watch_data_t) \
+	X(TYPE_global_context_t) \
+	X(TYPE_c_global_context_init) \
+	X(TYPE_c_global_context_reset_temporary_data) \
+	X(TYPE_c_global_context_reset_context_arena) \
+	X(TYPE_gc_reset_context_arena) \
+	X(TYPE_threadpool_t) \
+	X(TYPE_renderer_state_t) \
+	X(TYPE_input_manager_t) \
+	X(TYPE_hash_table_allocation_flags_t) \
+	X(TYPE_c_hash_table_allocate_fn_t) \
+	X(TYPE_c_hash_table_free_fn_t) \
+	X(TYPE_c_hash_table_value_from_key) \
+	X(TYPE_c_fnv_hash_value) \
+	X(TYPE_c_combine_hashes) \
+	X(TYPE_c_hash_table_default_alloc_impl) \
+	X(TYPE_c_hash_table_default_free_impl) \
+	X(TYPE_hash_table_header_t) \
+	X(TYPE_debug_log_level_t) \
+	X(TYPE__log) \
+	X(TYPE_memory_arena_footer_t) \
+	X(TYPE_scratch_arena_t) \
+	X(TYPE_c_arena_create) \
+	X(TYPE_c_arena_destroy) \
+	X(TYPE_c_arena_push_size) \
+	X(TYPE_c_arena_bootstrap_allocate_struct_) \
+	X(TYPE_c_arena_clear_block) \
+	X(TYPE_c_arena_free_last_block) \
+	X(TYPE_c_arena_reset) \
+	X(TYPE_c_arena_begin_temporary_memory) \
+	X(TYPE_c_arena_end_temporary_memory) \
+	X(TYPE_u8) \
+	X(TYPE_arg_type_t) \
+	X(TYPE_program_flag_data_t) \
+	X(TYPE_program_flag_t) \
+	X(TYPE_program_flag_state_t) \
+	X(TYPE_c_program_flag_add) \
+	X(TYPE_c_program_flag_add_bool32) \
+	X(TYPE_c_program_flag_add_size) \
+	X(TYPE_c_program_flag_add_float32) \
+	X(TYPE_c_program_flag_add_string) \
+	X(TYPE_c_program_flag_print_flag_list) \
+	X(TYPE_c_program_flag_container_init) \
+	X(TYPE_c_program_flag_parse_args) \
+	X(TYPE_c_string_length) \
+	X(TYPE_c_string_null_terminated) \
+	X(TYPE_c_string_is_valid) \
+	X(TYPE_c_string_create) \
+	X(TYPE_c_string_create_with_length) \
+	X(TYPE_c_string_make_heap) \
+	X(TYPE_c_string_compare) \
+	X(TYPE_c_string_ends_with) \
+	X(TYPE_c_string_concat) \
+	X(TYPE_c_string_to_const_array) \
+	X(TYPE_c_string_to_upper) \
+	X(TYPE_c_string_sprintf) \
+	X(TYPE_c_string_make_copy) \
+	X(TYPE_c_string_sub_from_left) \
+	X(TYPE_c_string_sub_from_right) \
+	X(TYPE_c_string_substring) \
+	X(TYPE_c_string_advance_by) \
+	X(TYPE_c_string_find_first_char_from_left) \
+	X(TYPE_c_string_find_first_char_from_right) \
+	X(TYPE_c_string_find_first_char_from_left_on_line) \
+	X(TYPE_c_string_find_first_char_from_right_on_line) \
+	X(TYPE_c_string_get_filename_from_path) \
+	X(TYPE_c_string_get_file_ext_from_path) \
+	X(TYPE_c_string_get_filename_from_path_and_ext) \
+	X(TYPE_c_string_override_file_separators) \
+	X(TYPE_c_string_is_whitespace) \
+	X(TYPE_c_string_is_end_of_line) \
+	X(TYPE_c_string_eat_whitespace) \
+	X(TYPE_c_string_get_whitespace_size) \
+	X(TYPE_c_string_get_current_line_size) \
+	X(TYPE_c_string_read_line) \
+	X(TYPE_c_string_read_int) \
+	X(TYPE_c_string_read_uint) \
+	X(TYPE_c_string_read_float32) \
+	X(TYPE_float64) \
+	X(TYPE_c_string_read_float64) \
+	X(TYPE_c_string_find_all_instances_of) \
+	X(TYPE_c_string_replace_all_instances_of) \
+	X(TYPE_string_builder_buffer_t) \
+	X(TYPE_string_builder_t) \
+	X(TYPE_c_string_builder_init) \
+	X(TYPE_c_string_builder_deinit) \
+	X(TYPE_c_string_builder_append_data) \
+	X(TYPE_c_string_builder_append_value) \
+	X(TYPE_c_string_builder_get_current_string) \
+	X(TYPE_c_string_builder_reset) \
+	X(TYPE_c_string_builder_append_builder) \
+	X(TYPE_c_string_builder_sprintf) \
+	X(TYPE_c_string_builder_dump_to_file) \
+	X(TYPE_c_string_builder_flush_to_file) \
+	X(TYPE_string_builder_buffer) \
+	X(TYPE_work_order_fn) \
+	X(TYPE_work_completion_fence_t) \
+	X(TYPE_work_order_t) \
+	X(TYPE_work_list_t) \
+	X(TYPE_thread_allocator_t) \
+	X(TYPE_worker_thread_t) \
+	X(TYPE_c_threadpool_init) \
+	X(TYPE_c_threadpool_start) \
+	X(TYPE_c_threadpool_flush_work_orders) \
+	X(TYPE_c_threadpool_wait_on_fence) \
+	X(TYPE_preprocessor_token_type_t) \
+	X(TYPE_token_data_t) \
+	X(TYPE_tokenizer_t) \
+	X(TYPE_c_tokenizer_get_next_token) \
+	X(TYPE_c_tokenizer_peek_token) \
+	X(TYPE_c_tokenizer_eat_lines) \
+	X(TYPE_c_tokenizer_token_numeric) \
+	X(TYPE_c_tokenizer_token_alphabetical) \
+	X(TYPE_c_tokenizer_set_bookmark) \
+	X(TYPE_c_tokenizer_restore_bookmark) \
+	X(TYPE_zone_allocator_block_t) \
+	X(TYPE_c_za_create) \
+	X(TYPE_c_za_destroy) \
+	X(TYPE_c_za_alloc) \
+	X(TYPE_c_za_free) \
+	X(TYPE_c_za_free_zone_tag) \
+	X(TYPE_c_za_free_zone_tag_range) \
+	X(TYPE_c_za_change_zone_tag) \
+	X(TYPE_c_za_DEBUG_print_block_list) \
+	X(TYPE_c_za_DEBUG_validate_block_list) \
+	X(TYPE_zone_allocator_block) \
+	X(TYPE_sys_align_to_page_size) \
+	X(TYPE_sys_allocate_memory) \
+	X(TYPE_sys_free_memory) \
+	X(TYPE_sys_reallocate_memory) \
+	X(TYPE_sys_file_open) \
+	X(TYPE_sys_file_close) \
+	X(TYPE_sys_file_copy) \
+	X(TYPE_sys_file_get_size) \
+	X(TYPE_sys_file_read) \
+	X(TYPE_sys_file_write) \
+	X(TYPE_sys_file_map) \
+	X(TYPE_sys_file_unmap) \
+	X(TYPE_sys_file_exists) \
+	X(TYPE_sys_file_get_modtime_and_size) \
+	X(TYPE_sys_file_replace_or_rename) \
+	X(TYPE_sys_directory_exists) \
+	X(TYPE_sys_directory_get_file_count) \
+	X(TYPE_sys_directory_get_current_working_dir) \
+	X(TYPE_sys_directory_visit) \
+	X(TYPE_sys_load_library) \
+	X(TYPE_sys_free_library) \
+	X(TYPE_sys_get_proc_address) \
+	X(TYPE_sys_file_watcher_init_watch_data) \
+	X(TYPE_sys_file_watcher_add_path) \
+	X(TYPE_sys_file_watcher_issue_check) \
+	X(TYPE_sys_file_watcher_process_changes) \
+	X(TYPE_sys_get_thread_count) \
+	X(TYPE_sys_semaphore_create) \
+	X(TYPE_sys_semaphore_close) \
+	X(TYPE_sys_semaphore_wait) \
+	X(TYPE_sys_semaphore_release) \
+	X(TYPE_sys_semaphore_destroy) \
+	X(TYPE_thread_proc_t) \
+	X(TYPE_sys_thread_create) \
+	X(TYPE_sys_thread_wait) \
+	X(TYPE_sys_thread_close_handle) \
+	X(TYPE_sys_mutex_create) \
+	X(TYPE_sys_mutex_free) \
+	X(TYPE_sys_mutex_lock) \
+	X(TYPE_sys_mutex_unlock) \
+	X(TYPE_sys_create_process) \
+	X(TYPE_sys_wait_for_process) \
+	X(TYPE_render_image_filter_type_t) \
+	X(TYPE_render_image_wrapping_type_t) \
+	X(TYPE_render_image_usage_t) \
+	X(TYPE_sampler_create_info_t) \
+	X(TYPE_image_create_info_t) \
+	X(TYPE_image_t) \
+	X(TYPE_s_renderer_image_create) \
+	X(TYPE_bitmap_t) \
+	X(TYPE_s_renderer_image_create_from_bitmap) \
+	X(TYPE_s_renderer_image_destroy) \
+	X(TYPE_s_renderer_image_update_data) \
+	X(TYPE_backend_image_t) \
+	X(TYPE_asset_type_t) \
+	X(TYPE_asset_slot_load_status_t) \
+	X(TYPE_bitmap_format_t) \
+	X(TYPE_subtexture_data_t) \
+	X(TYPE_texture_atlas_t) \
+	X(TYPE_animation_source2D_t) \
+	X(TYPE_animation2D_t) \
+	X(TYPE_shader_t) \
+	X(TYPE_material_instance_t) \
+	X(TYPE_material_archetype_t) \
+	X(TYPE_stored_material_type_t) \
+	X(TYPE_material_data_t) \
+	X(TYPE_FT_ROUND) \
+	X(TYPE_unicode_next_character) \
+	X(TYPE_glyph_metric_t) \
+	X(TYPE_temporary_glyph_t) \
+	X(TYPE_dynamic_render_font_page_t) \
+	X(TYPE_dynamic_render_font_varient_t) \
+	X(TYPE_dynamic_render_font_t) \
+	X(TYPE_asset_slot_t) \
+	X(TYPE_asset_file_data_t) \
+	X(TYPE_asset_catalog_t) \
+	X(TYPE_texture_manager_t) \
+	X(TYPE_font_manager_t) \
+	X(TYPE_texture_atlas_registry_t) \
+	X(TYPE_s_asset_manager_init) \
+	X(TYPE_s_asset_manager_update) \
+	X(TYPE_s_asset_manager_queue_asset_load) \
+	X(TYPE_s_UTF32_convert_to_UTF8) \
+	X(TYPE_s_UTF8_convert_UTF32) \
+	X(TYPE_s_asset_manager_load_asset_file) \
+	X(TYPE_s_asset_manager_signal_asset_file_reload) \
+	X(TYPE_s_asset_manager_acquire_asset_handle) \
+	X(TYPE_s_texture_atlas_create) \
+	X(TYPE_s_texture_atlas_add_texture) \
+	X(TYPE_s_texture_atlas_pack_added_textures) \
+	X(TYPE_s_asset_manager_set_handle_asset_data_pointer) \
+	X(TYPE_s_asset_manager_get_asset_slot) \
+	X(TYPE_s_asset_get_shader_from_handle) \
+	X(TYPE_s_asset_get_texture_from_handle) \
+	X(TYPE_s_asset_get_material_data_from_handle) \
+	X(TYPE_s_asset_get_material_archetype_from_handle) \
+	X(TYPE_s_asset_get_material_instance_from_handle) \
+	X(TYPE_s_asset_font_get_string_size) \
+	X(TYPE_s_asset_font_acquire_font_at_size) \
+	X(TYPE_s_asset_font_fetch_glyph) \
+	X(TYPE_dynarray_t) \
+	X(TYPE_backend_shader_t) \
+	X(TYPE_render_pipeline_state_t) \
+	X(TYPE_VkDescriptorSet) \
+	X(TYPE_glyphs) \
+	X(TYPE_FT_Face) \
+	X(TYPE_jfd_package_entry_t) \
+	X(TYPE_jfd_file_header_t) \
+	X(TYPE_entry_hash) \
+	X(TYPE_asset_lookup) \
+	X(TYPE_FT_Library) \
+	X(TYPE_asset_name_to_file) \
+	X(TYPE_controller_type_t) \
+	X(TYPE_input_mouse_buttons_t) \
+	X(TYPE_action_button_t) \
+	X(TYPE_keyboard_controller_data_t) \
+	X(TYPE_analog_button_t) \
+	X(TYPE_gamepad_controller_data_t) \
+	X(TYPE_text_input_action_type_t) \
+	X(TYPE_text_input_modifier_flags) \
+	X(TYPE_text_input_event_type_t) \
+	X(TYPE_text_input_event_t) \
+	X(TYPE_input_controller_t) \
+	X(TYPE_game_action_binding_type_t) \
+	X(TYPE_game_action_binding_t) \
+	X(TYPE_game_action_t) \
+	X(TYPE_s_im_init_input_manager) \
+	X(TYPE_SDL_Event) \
+	X(TYPE_s_im_handle_window_inputs) \
+	X(TYPE_s_im_reset_controller_states) \
+	X(TYPE_s_im_initialize_keyboard_controller) \
+	X(TYPE_s_im_get_primary_controller) \
+	X(TYPE_s_im_get_controller_at_index) \
+	X(TYPE_s_im_get_active_controller) \
+	X(TYPE_s_im_set_active_controller) \
+	X(TYPE_s_im_set_primary_controller) \
+	X(TYPE_s_im_is_shift_key_down) \
+	X(TYPE_s_im_is_control_key_down) \
+	X(TYPE_s_im_is_alt_key_down) \
+	X(TYPE_mat4_t) \
+	X(TYPE_s_im_transform_mouse_data) \
+	X(TYPE_s_im_is_keyboard_key_pressed) \
+	X(TYPE_s_im_is_keyboard_key_down) \
+	X(TYPE_s_im_is_keyboard_key_released) \
+	X(TYPE_s_im_consume_keyboard_key_press) \
+	X(TYPE_s_im_consume_keyboard_key_down) \
+	X(TYPE_s_im_consume_keyboard_key_release) \
+	X(TYPE_s_im_get_key_state) \
+	X(TYPE_s_im_is_gamepad_button_pressed) \
+	X(TYPE_s_im_is_gamepad_button_down) \
+	X(TYPE_s_im_is_gamepad_button_released) \
+	X(TYPE_s_im_consume_gamepad_button_press) \
+	X(TYPE_s_im_consume_gamepad_button_down) \
+	X(TYPE_s_im_consume_gamepad_button_release) \
+	X(TYPE_s_im_get_button_state) \
+	X(TYPE_SDL_Gamepad) \
+	X(TYPE_SDL_Joystick) \
+	X(TYPE_camera_matrices_t) \
+	X(TYPE_render_buffer_type_t) \
+	X(TYPE_render_buffer_advance_rate_t) \
+	X(TYPE_render_buffer_memory_type_t) \
+	X(TYPE_render_buffer_desc_t) \
+	X(TYPE_render_buffer_t) \
+	X(TYPE_index_buffer_t) \
+	X(TYPE_uniform_constant_buffer_t) \
+	X(TYPE_render_command_type_t) \
+	X(TYPE_render_command_header_t) \
+	X(TYPE_render_command_begin_renderpass_t) \
+	X(TYPE_render_command_end_renderpass_t) \
+	X(TYPE_render_command_bind_vertex_buffer_t) \
+	X(TYPE_render_command_bind_index_buffer_t) \
+	X(TYPE_render_command_update_texture_t) \
+	X(TYPE_render_command_bind_material_t) \
+	X(TYPE_render_command_bind_shader_t) \
+	X(TYPE_render_command_set_viewport_t) \
+	X(TYPE_render_command_set_scissor_t) \
+	X(TYPE_render_command_update_push_constant_t) \
+	X(TYPE_render_command_update_uniform_constant_buffer_t) \
+	X(TYPE_render_command_update_render_buffer_contents_t) \
+	X(TYPE_render_command_bind_texture_t) \
+	X(TYPE_render_command_dispatch_compute_t) \
+	X(TYPE_render_command_set_pipeline_state_t) \
+	X(TYPE_render_command_draw_t) \
+	X(TYPE_render_command_blit_image_t) \
+	X(TYPE_render_command_blit_renderpass_t) \
+	X(TYPE_render_command_present_frame_t) \
+	X(TYPE_render_command_t) \
+	X(TYPE_command_list_type_t) \
+	X(TYPE_clear_value_t) \
+	X(TYPE_renderpass_attachment_access_t) \
+	X(TYPE_renderpass_attachment_load_operation_t) \
+	X(TYPE_renderpass_attachment_store_operation_t) \
+	X(TYPE_renderpass_attachment_t) \
+	X(TYPE_renderpass_desc_t) \
+	X(TYPE_renderpass_key_t) \
+	X(TYPE_renderpass_t) \
+	X(TYPE_backend_renderer_t) \
+	X(TYPE_s_renderer_state_init) \
+	X(TYPE_s_renderer_handle_window_resize) \
+	X(TYPE_s_renderer_resize_render_targets) \
+	X(TYPE_s_renderer_build_renderpass) \
+	X(TYPE_s_renderer_resize_renderpass) \
+	X(TYPE_s_renderer_get_constant_buffer) \
+	X(TYPE_s_renderer_render_buffer_create) \
+	X(TYPE_s_renderer_vertex_buffer_create) \
+	X(TYPE_s_renderer_index_buffer_create) \
+	X(TYPE_s_renderer_render_buffer_copy_data) \
+	X(TYPE_s_renderer_buffer_reset) \
+	X(TYPE_s_renderer_get_command_list) \
+	X(TYPE_s_renderer_is_texture_bound) \
+	X(TYPE_s_renderer_set_texture_filter_mode) \
+	X(TYPE_s_renderer_find_texture_index) \
+	X(TYPE_s_renderer_reset_command_list) \
+	X(TYPE_r_cmd_renderpass_begin) \
+	X(TYPE_r_cmd_renderpass_end) \
+	X(TYPE_r_cmd_begin_render_group) \
+	X(TYPE_r_cmd_end_render_group) \
+	X(TYPE_r_cmd_bind_vertex_buffer) \
+	X(TYPE_r_cmd_bind_index_buffer) \
+	X(TYPE_r_cmd_set_scissor) \
+	X(TYPE_r_cmd_set_viewport) \
+	X(TYPE_r_cmd_update_push_constants) \
+	X(TYPE_r_cmd_update_buffer_contents) \
+	X(TYPE_r_cmd_use_shader_program) \
+	X(TYPE_r_cmd_update_constant_buffer) \
+	X(TYPE_r_cmd_bind_texture_image) \
+	X(TYPE_r_cmd_bind_texture_from_handle) \
+	X(TYPE_r_cmd_reset_render_state) \
+	X(TYPE_r_cmd_set_render_state) \
+	X(TYPE_r_cmd_draw) \
+	X(TYPE_r_cmd_draw_indexed) \
+	X(TYPE_r_cmd_dispatch_compute) \
+	X(TYPE_r_cmd_blit_image) \
+	X(TYPE_r_cmd_blit_renderpass) \
+	X(TYPE_r_cmd_present) \
+	X(TYPE_s_renderer_execute_backend_commands) \
+	X(TYPE_vulkan_buffer_t) \
+	X(TYPE_backend_command_buffer_t) \
+	X(TYPE_ivec4_t) \
+	X(TYPE_backend_renderpass_handle_t) \
+	X(TYPE_backend_framebuffer_handle_t) \
+	X(TYPE_SDL_Window) \
+	X(TYPE_constant_buffer_hash) \
+	X(TYPE_backend_initialize) \
+	X(TYPE_backend_handle_window_resize) \
+	X(TYPE_backend_render_frame) \
+	X(TYPE_backend_buffer_create) \
+	X(TYPE_backend_buffer_copy_data) \
+	X(TYPE_backend_buffer_append_data) \
+	X(TYPE_backend_constant_buffer_append_data) \
+	X(TYPE_backend_buffer_reset) \
+	X(TYPE_backend_renderpass_initialize) \
+	X(TYPE_backend_image_create) \
+	X(TYPE_backend_image_destroy) \
+	X(TYPE_backend_image_update_contents) \
+	X(TYPE_backend_acquire_image_sampler) \
+	X(TYPE_backend_shader_create) \
+	X(TYPE_backend_get_command_buffer) \
+	X(TYPE_widget_state_t) \
+	X(TYPE_ui_signal_flags_t) \
+	X(TYPE_ui_signal_t) \
+	X(TYPE_widget_flags_t) \
+	X(TYPE_widget_layout_style_t) \
+	X(TYPE_widget_size_kind_t) \
+	X(TYPE_widget_t) \
+	X(TYPE_ui_state_t) \
+	X(TYPE_ui_state_init) \
+	X(TYPE_ui_state_update_widget_state) \
+	X(TYPE_ui_state_maybe_eat_inputs) \
+	X(TYPE_ui_state_render_widgets) \
+	X(TYPE_ui_state_set_default_widget_idle_color) \
+	X(TYPE_ui_state_set_default_widget_hover_color) \
+	X(TYPE_ui_state_set_default_widget_active_color) \
+	X(TYPE_ui_widget_set_default_font_color) \
+	X(TYPE_ui_widget_set_default_font_size) \
+	X(TYPE_ui_state_set_active_padding) \
+	X(TYPE_ui_widget_set_flags) \
+	X(TYPE_ui_state_begin_frame) \
+	X(TYPE_ui_state_end_frame) \
+	X(TYPE_ui_state_set_parent_layout) \
+	X(TYPE_ui_widget_set_layout) \
+	X(TYPE_ui_widget_push_parent) \
+	X(TYPE_ui_widget_pop_parent) \
+	X(TYPE_ui_widget_set_padding) \
+	X(TYPE_ui_widget_seed) \
+	X(TYPE_ui_widget_create) \
+	X(TYPE_ui_widget_panel) \
+	X(TYPE_ui_widget_draggable_panel) \
+	X(TYPE_ui_widget_sized_button) \
+	X(TYPE_ui_widget_text) \
+	X(TYPE_ui_widget_labeled_button) \
+	X(TYPE_ui_widget_float_slider_bar) \
+	X(TYPE_ivec2_t) \
+	X(TYPE_ui_widget_spacer) \
+	X(TYPE_ui_widget_rectangle) \
+	X(TYPE_ui_widget_divider) \
+	X(TYPE_ui_widget_textbox) \
+	X(TYPE_ui_widget_texture) \
+	X(TYPE_ui_state_begin_row) \
+	X(TYPE_ui_state_end_row) \
+	X(TYPE_ui_state_begin_column) \
+	X(TYPE_ui_state_end_column) \
+	X(TYPE_rectangle2_t) \
+	X(TYPE_widget_states) \
+	X(TYPE_vulkan_allocation_usage_type_t) \
+	X(TYPE_vulkan_allocation_info_t) \
+	X(TYPE_vulkan_allocator_t) \
+	X(TYPE_vulkan_context_t) \
+	X(TYPE_vk_allocator_create) \
+	X(TYPE_vk_allocator_destroy) \
+	X(TYPE_VkMemoryRequirements) \
+	X(TYPE_vk_allocator_allocate) \
+	X(TYPE_vk_allocator_free) \
+	X(TYPE_VkDeviceSize) \
+	X(TYPE_VkMemoryPropertyFlags) \
+	X(TYPE_VkDeviceMemory) \
+	X(TYPE_VkAllocationCallbacks) \
+	X(TYPE_VkDevice) \
+	X(TYPE_VkCommandBuffer) \
+	X(TYPE_vk_backend_buffer_copy_buffer) \
+	X(TYPE_vk_backend_buffer_copy_data) \
+	X(TYPE_VkBufferUsageFlags) \
+	X(TYPE_vk_backend_buffer_create) \
+	X(TYPE_vk_backend_buffer_destroy) \
+	X(TYPE_vk_backend_buffer_resize) \
+	X(TYPE_vk_backend_buffer_map) \
+	X(TYPE_vk_backend_buffer_unmap) \
+	X(TYPE_vk_backend_buffer_append_data) \
+	X(TYPE_vk_backend_buffer_reset) \
+	X(TYPE_vulkan_staging_info_t) \
+	X(TYPE_vulkan_staging_buffer_t) \
+	X(TYPE_vk_backend_staging_buffer_create) \
+	X(TYPE_vk_backend_buffer_upload_staged_data) \
+	X(TYPE_vk_backend_buffer_flush_staging_buffer) \
+	X(TYPE_vk_backend_buffer_stage_data) \
+	X(TYPE_VkBuffer) \
+	X(TYPE_VkFence) \
+	X(TYPE_renderer_effect_application_flags_t) \
+	X(TYPE_render_pipeline_blending_mode_t) \
+	X(TYPE_render_pipeline_blending_equation_t) \
+	X(TYPE_render_pipeline_depth_function_t) \
+	X(TYPE_render_pipeline_polygon_mode_t) \
+	X(TYPE_gpu_info_t) \
+	X(TYPE_swapchain_info_t) \
+	X(TYPE_vk_backend_init) \
+	X(TYPE_VkResult) \
+	X(TYPE_vk_backend_vulkan_result_string) \
+	X(TYPE_vk_backend_result_is_success) \
+	X(TYPE_vk_backend_handle_window_resize) \
+	X(TYPE_vk_backend_render_frame) \
+	X(TYPE_VkPipeline) \
+	X(TYPE_vulkan_shader_t) \
+	X(TYPE_VkRenderPass) \
+	X(TYPE_VkPipelineRasterizationStateCreateInfo) \
+	X(TYPE_VkPipelineDepthStencilStateCreateInfo) \
+	X(TYPE_VkPipelineColorBlendAttachmentState) \
+	X(TYPE_VkPipelineVertexInputStateCreateInfo) \
+	X(TYPE_vk_backend_create_render_pipeline) \
+	X(TYPE_vk_backend_renderpass_destroy) \
+	X(TYPE_VkFramebuffer) \
+	X(TYPE_vk_backend_framebuffer_destroy) \
+	X(TYPE_vk_backend_initialize_RHI_renderpass) \
+	X(TYPE_vk_backend_get_and_begin_scratch_command_buffer) \
+	X(TYPE_vk_backend_submit_and_release_scratch_command_buffer) \
+	X(TYPE_vk_backend_allocate_descriptor_sets) \
+	X(TYPE_vk_backend_append_uniform_constant_buffer_data) \
+	X(TYPE_vk_backend_framebuffer_create) \
+	X(TYPE_VkImageLayout) \
+	X(TYPE_VkAttachmentLoadOp) \
+	X(TYPE_VkAttachmentStoreOp) \
+	X(TYPE_vk_backend_renderpass_create) \
+	X(TYPE_VkPhysicalDevice) \
+	X(TYPE_VkPhysicalDeviceProperties) \
+	X(TYPE_VkPhysicalDeviceMemoryProperties) \
+	X(TYPE_VkPhysicalDeviceFeatures) \
+	X(TYPE_VkSurfaceCapabilitiesKHR) \
+	X(TYPE_VkSwapchainKHR) \
+	X(TYPE_VkPresentModeKHR) \
+	X(TYPE_VkSurfaceFormatKHR) \
+	X(TYPE_VkExtent2D) \
+	X(TYPE_VkImage) \
+	X(TYPE_VkImageView) \
+	X(TYPE_VkInstance) \
+	X(TYPE_VkSurfaceKHR) \
+	X(TYPE_VkDebugUtilsMessengerEXT) \
+	X(TYPE_VkCommandPool) \
+	X(TYPE_VkQueue) \
+	X(TYPE_VkFormat) \
+	X(TYPE_vulkan_image_t) \
+	X(TYPE_VkSemaphore) \
+	X(TYPE_VkDescriptorPool) \
+	X(TYPE_image_samplers) \
+	X(TYPE_VkSampler) \
+	X(TYPE_vulkan_sampler_info_t) \
+	X(TYPE_vulkan_image_info_t) \
+	X(TYPE_vk_backend_image_create) \
+	X(TYPE_vk_backend_image_update_data) \
+	X(TYPE_vk_backend_image_destroy) \
+	X(TYPE_vk_backend_sampler_create) \
+	X(TYPE_vk_backend_sampler_destroy) \
+	X(TYPE_VkPipelineStageFlags) \
+	X(TYPE_VkAccessFlags) \
+	X(TYPE_VkImageSubresourceRange) \
+	X(TYPE_vk_backend_image_change_layout) \
+	X(TYPE_vk_backend_image_init_from_image_handle) \
+	X(TYPE_vk_backend_image_blit) \
+	X(TYPE_vk_backend_image_ensure_shader_readonly_optimal) \
+	X(TYPE_vk_backend_is_image_format_stencil_format) \
+	X(TYPE_vk_backend_is_image_format_depth_format) \
+	X(TYPE_vk_backend_transfer_image_to_intial_layout) \
+	X(TYPE_vk_backend_transfer_image_to_final_layout) \
+	X(TYPE_vk_bitmap_format_to_vulkan_format) \
+	X(TYPE_VkImageUsageFlags) \
+	X(TYPE_vk_image_usage_flags_from_image_format) \
+	X(TYPE_vk_sampler_info_is_valid) \
+	X(TYPE_VkFilter) \
+	X(TYPE_vk_sampler_filter_type_to_vk_filter) \
+	X(TYPE_vk_is_depth_format) \
+	X(TYPE_vk_get_image_initial_layout_from_usage) \
+	X(TYPE_vk_get_image_final_layout_from_usage) \
+	X(TYPE_vk_backend_get_sampler) \
+	X(TYPE_VkImageAspectFlags) \
+	X(TYPE_vulkan_shader_stage_t) \
+	X(TYPE_vulkan_shader_binding_t) \
+	X(TYPE_vk_backend_shader_create_spirv_reflect) \
+	X(TYPE_vk_backend_shader_create_slang_reflect) \
+	X(TYPE_VkShaderModule) \
+	X(TYPE_VkPipelineShaderStageCreateInfo) \
+	X(TYPE_VkDescriptorType) \
+	X(TYPE_VkDescriptorSetLayout) \
+	X(TYPE_VkPushConstantRange) \
+	X(TYPE_VkPipelineBindPoint) \
+	X(TYPE_VkPipelineLayout) \
+	X(TYPE_VkVertexInputBindingDescription) \
+	X(TYPE_VkVertexInputAttributeDescription) \
+	X(TYPE_pipeline_hash) \
 
+enum athena_unique_type_ID_list {
+#define X(enum) enum,
+    ATHENA_UNIQUE_TYPE_ID_LIST(X)
+#undef X
+};
+    
 #include <string.h>
 #include <stddef.h>
 #ifndef ATHENA_H
@@ -300,74 +971,322 @@
 CODE_GEN_IGNORE_FILE
 
 extern const type_info_t *const athena_type_information_array[];
-struct type_info_procedure_void_func {
+struct type_info_struct_sys_thread_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[3];
+		struct {
+			const type_info_member_t handle;
+			const type_info_member_t thread_id;
+			const type_info_member_t user_data;
+		}members;
+	};
+};
+
+struct type_info_struct_sys_mutex_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[1];
+		struct {
+			const type_info_member_t handle;
+		}members;
+	};
+};
+
+struct type_info_struct_sys_semaphore_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[1];
+		struct {
+			const type_info_member_t handle;
+		}members;
+	};
+};
+
+struct type_info_struct_ticket_mutex_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[2];
+		struct {
+			const type_info_member_t next_ticket;
+			const type_info_member_t working_ticket;
+		}members;
+	};
+};
+
+struct type_info_procedure_c_ticket_mutex_take_ticket {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t mutex;
+		}arguments;
+	};
 };
 
-struct type_info_struct_dynarray_header_t {
+struct type_info_procedure_c_ticket_mutex_try_wait {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t mutex;
+			const type_info_member_t ticket;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_c_ticket_mutex_wait {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t mutex;
+			const type_info_member_t ticket;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_c_ticket_mutex_advance_ticket {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t mutex;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_c_ticket_mutex_take_and_wait {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t mutex;
+		}arguments;
+	};
+};
+
+struct type_info_struct_render_command_list_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[28];
+		struct {
+			const type_info_member_t is_initialized;
+			const type_info_member_t renderer_state;
+			const type_info_member_t transient_arena;
+			const type_info_member_t command_arena;
+			const type_info_member_t commands;
+			const type_info_member_t command_count;
+			const type_info_member_t draw_instance_command_count;
+			const type_info_member_t bind_shader_command_count;
+			const type_info_member_t bind_render_target_command_count;
+			const type_info_member_t bind_material_command_count;
+			const type_info_member_t active_render_state;
+			const type_info_member_t active_vertex_buffers;
+			const type_info_member_t vertex_buffer_count;
+			const type_info_member_t active_index_buffer;
+			const type_info_member_t active_scissor_command;
+			const type_info_member_t active_viewport_command;
+			const type_info_member_t active_shader_program;
+			const type_info_member_t vertex_offset;
+			const type_info_member_t instance_offset;
+			const type_info_member_t index_offset;
+			const type_info_member_t active_renderpass;
+			const type_info_member_t presenting;
+			const type_info_member_t image_shader_params;
+			const type_info_member_t image_count;
+			const type_info_member_t image_ids_to_bind;
+			const type_info_member_t bound_image_count;
+			const type_info_member_t command_list_type;
+			const type_info_member_t backend_command_buffer;
+		}members;
+	};
+};
+
+struct type_info_struct_vertex_buffer_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[4];
+		struct {
+			const type_info_member_t buffer;
+			const type_info_member_t vertex_data;
+			const type_info_member_t max_vertices;
+			const type_info_member_t vertex_count;
+		}members;
+	};
+};
+
+struct type_info_struct_texture2D_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[3];
+		struct {
+			const type_info_member_t ID;
+			const type_info_member_t bitmap;
+			const type_info_member_t gpu_data;
+		}members;
+	};
+};
+
+struct type_info_procedure_immediate_quad_ex {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[11];
+		struct {
+			const type_info_member_t command_list;
+			const type_info_member_t buffer;
+			const type_info_member_t position;
+			const type_info_member_t render_size;
+			const type_info_member_t render_color;
+			const type_info_member_t uv_min;
+			const type_info_member_t uv_max;
+			const type_info_member_t padding;
+			const type_info_member_t sdf_info;
+			const type_info_member_t padding0;
+			const type_info_member_t texture;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_immediate_rect {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[10];
+		struct {
+			const type_info_member_t command_list;
+			const type_info_member_t buffer;
+			const type_info_member_t position;
+			const type_info_member_t render_size;
+			const type_info_member_t render_color;
+			const type_info_member_t uv_min;
+			const type_info_member_t uv_max;
+			const type_info_member_t padding;
+			const type_info_member_t sdf_info;
+			const type_info_member_t padding0;
+		}arguments;
+	};
+};
+
+struct type_info_struct_asset_manager_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[20];
+		struct {
+			const type_info_member_t is_initialized;
+			const type_info_member_t manager_arena;
+			const type_info_member_t freetype_handle;
+			const type_info_member_t asset_files;
+			const type_info_member_t asset_name_to_file;
+			const type_info_member_t loaded_file_count;
+			const type_info_member_t asset_load_queue;
+			const type_info_member_t load_queue_size;
+			const type_info_member_t asset_unload_queue;
+			const type_info_member_t unload_queue_size;
+			const type_info_member_t atlas_registry;
+			const type_info_member_t asset_allocator;
+			const type_info_member_t asset_catalogs;
+			const type_info_member_t texture_catalog;
+			const type_info_member_t shader_catalog;
+			const type_info_member_t material_catalog;
+			const type_info_member_t font_catalog;
+			const type_info_member_t sound_catalog;
+			const type_info_member_t font_manager;
+			const type_info_member_t renderer_state;
+		}members;
+	};
+};
+
+struct type_info_struct_asset_handle_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[8];
 		struct {
-			const type_info_member_t flags;
-			const type_info_member_t header_id;
-			const type_info_member_t capacity;
-			const type_info_member_t element_size;
-			const type_info_member_t indices_used;
-			const type_info_member_t total_allocated_bytes;
-			const type_info_member_t __padding1;
-			const type_info_member_t __padding2;
+			const type_info_member_t is_valid;
+			const type_info_member_t slot;
+			const type_info_member_t texture;
+			const type_info_member_t shader;
+			const type_info_member_t material_info;
+			const type_info_member_t dynamic_render_font;
+			const type_info_member_t animation_source2D;
+			const type_info_member_t animation2D;
 		}members;
 	};
 };
 
-struct type_info_procedure__dynarray_create_impl {
+struct type_info_struct_string_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[2];
+		struct {
+			const type_info_member_t data;
+			const type_info_member_t count;
+		}members;
+	};
+};
+
+struct type_info_procedure_immediate_text {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[1];
+		type_info_member_t argument_array[9];
 		struct {
-			const type_info_member_t element_size;
+			const type_info_member_t command_list;
+			const type_info_member_t vertex_buffer;
+			const type_info_member_t asset_manager;
+			const type_info_member_t asset_handle;
+			const type_info_member_t render_string;
+			const type_info_member_t position;
+			const type_info_member_t text_color;
+			const type_info_member_t settings;
+			const type_info_member_t font_size;
 		}arguments;
 	};
 };
 
-struct type_info_procedure__dynarray_destroy_impl {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t array;
-		}arguments;
-	};
-};
-
-struct type_info_procedure__dynarray_grow_impl {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[3];
-		struct {
-			const type_info_member_t array;
-			const type_info_member_t element_size;
-			const type_info_member_t new_capacity;
-		}arguments;
-	};
-};
-
-struct type_info_procedure__dynarray_insert_impl {
+struct type_info_procedure_immediate_put_data {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -375,45 +1294,47 @@ struct type_info_procedure__dynarray_insert_impl {
 	union {
 		type_info_member_t argument_array[4];
 		struct {
-			const type_info_member_t array;
-			const type_info_member_t element;
+			const type_info_member_t buffer;
+			const type_info_member_t data;
 			const type_info_member_t element_size;
-			const type_info_member_t index;
+			const type_info_member_t element_count;
 		}arguments;
 	};
 };
 
-struct type_info_procedure__dynarray_remove_impl {
+struct type_info_procedure_void_func {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[3];
-		struct {
-			const type_info_member_t array;
-			const type_info_member_t element_size;
-			const type_info_member_t index;
-		}arguments;
-	};
 };
 
-struct type_info_struct_file_extension_t {
+struct type_info_struct_duration_counter_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[7];
+		const type_info_member_t member_array[3];
 		struct {
-			const type_info_member_t FILE_EXT_INVALID;
-			const type_info_member_t FILE_EXT_TTF;
-			const type_info_member_t FILE_EXT_WAV;
-			const type_info_member_t FILE_EXT_PNG;
-			const type_info_member_t FILE_EXT_GLSL;
-			const type_info_member_t FILE_EXT_OS_DLL;
-			const type_info_member_t FILE_EXT_COUNT;
+			const type_info_member_t duration_ms;
+			const type_info_member_t current_elapsed;
+			const type_info_member_t looped;
 		}members;
 	};
+};
+
+struct type_info_procedure_begin {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+};
+
+struct type_info_procedure_end {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
 };
 
 struct type_info_struct_file_t {
@@ -508,19 +1429,6 @@ struct type_info_struct_visit_file_data_t {
 			const type_info_member_t directory_name;
 			const type_info_member_t recursive;
 			const type_info_member_t is_directory;
-		}members;
-	};
-};
-
-struct type_info_struct_string_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[2];
-		struct {
-			const type_info_member_t data;
-			const type_info_member_t count;
 		}members;
 	};
 };
@@ -852,12 +1760,28 @@ struct type_info_procedure_c_directory_visit {
 	};
 };
 
+struct type_info_procedure_c_directory_get_file_count {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[4];
+		struct {
+			const type_info_member_t arena;
+			const type_info_member_t filepath;
+			const type_info_member_t recursive;
+			const type_info_member_t file_ext;
+		}arguments;
+	};
+};
+
 struct type_info_struct_file_watcher_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[14];
+		const type_info_member_t member_array[16];
 		struct {
 			const type_info_member_t is_valid;
 			const type_info_member_t is_verbose;
@@ -868,6 +1792,8 @@ struct type_info_struct_file_watcher_t {
 			const type_info_member_t watch_recursively;
 			const type_info_member_t observed_changes;
 			const type_info_member_t change_count;
+			const type_info_member_t recorded_change_events;
+			const type_info_member_t recorded_change_event_count;
 			const type_info_member_t paths_to_watch;
 			const type_info_member_t paths_watched;
 			const type_info_member_t notify_buffer_size;
@@ -882,8 +1808,9 @@ struct type_info_struct_file_watcher_recorded_change_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[4];
+		const type_info_member_t member_array[5];
 		struct {
+			const type_info_member_t redudant;
 			const type_info_member_t full_path;
 			const type_info_member_t old_filename;
 			const type_info_member_t changes;
@@ -1016,12 +1943,25 @@ struct type_info_procedure_c_file_watcher_emit_changes {
 	};
 };
 
+struct type_info_procedure_c_file_watcher_process_changes {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t watcher;
+		}arguments;
+	};
+};
+
 struct type_info_struct_global_context_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[9];
+		const type_info_member_t member_array[10];
 		struct {
 			const type_info_member_t is_initialized;
 			const type_info_member_t running;
@@ -1030,6 +1970,7 @@ struct type_info_struct_global_context_t {
 			const type_info_member_t renderer_state;
 			const type_info_member_t asset_manager;
 			const type_info_member_t input_manager;
+			const type_info_member_t file_watcher;
 			const type_info_member_t context_arena;
 			const type_info_member_t temporary_arena;
 		}members;
@@ -1086,7 +2027,7 @@ struct type_info_struct_renderer_state_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[32];
+		const type_info_member_t member_array[33];
 		struct {
 			const type_info_member_t window;
 			const type_info_member_t render_context;
@@ -1118,39 +2059,9 @@ struct type_info_struct_renderer_state_t {
 			const type_info_member_t backend_image_create;
 			const type_info_member_t backend_image_destroy;
 			const type_info_member_t backend_image_update_contents;
+			const type_info_member_t backend_acquire_image_sampler;
 			const type_info_member_t backend_shader_create;
 			const type_info_member_t backend_get_command_buffer;
-		}members;
-	};
-};
-
-struct type_info_struct_asset_manager_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[20];
-		struct {
-			const type_info_member_t is_initialized;
-			const type_info_member_t manager_arena;
-			const type_info_member_t freetype_handle;
-			const type_info_member_t asset_files;
-			const type_info_member_t asset_name_to_file;
-			const type_info_member_t loaded_file_count;
-			const type_info_member_t asset_load_queue;
-			const type_info_member_t load_queue_size;
-			const type_info_member_t asset_unload_queue;
-			const type_info_member_t unload_queue_size;
-			const type_info_member_t atlas_registry;
-			const type_info_member_t asset_allocator;
-			const type_info_member_t asset_catalogs;
-			const type_info_member_t texture_catalog;
-			const type_info_member_t shader_catalog;
-			const type_info_member_t material_catalog;
-			const type_info_member_t font_catalog;
-			const type_info_member_t sound_catalog;
-			const type_info_member_t font_manager;
-			const type_info_member_t renderer_state;
 		}members;
 	};
 };
@@ -1160,7 +2071,7 @@ struct type_info_struct_input_manager_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[6];
+		const type_info_member_t member_array[7];
 		struct {
 			const type_info_member_t keyboard_data;
 			const type_info_member_t gamepad_data;
@@ -1168,6 +2079,7 @@ struct type_info_struct_input_manager_t {
 			const type_info_member_t active_controller_index;
 			const type_info_member_t connected_controller_count;
 			const type_info_member_t controllers;
+			const type_info_member_t game_actions;
 		}members;
 	};
 };
@@ -2332,124 +3244,6 @@ struct type_info_procedure_c_string_builder_flush_to_file {
 	};
 };
 
-struct type_info_struct_sys_thread_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[3];
-		struct {
-			const type_info_member_t handle;
-			const type_info_member_t thread_id;
-			const type_info_member_t user_data;
-		}members;
-	};
-};
-
-struct type_info_struct_sys_mutex_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[1];
-		struct {
-			const type_info_member_t handle;
-		}members;
-	};
-};
-
-struct type_info_struct_sys_semaphore_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[1];
-		struct {
-			const type_info_member_t handle;
-		}members;
-	};
-};
-
-struct type_info_struct_ticket_mutex_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[2];
-		struct {
-			const type_info_member_t next_ticket;
-			const type_info_member_t working_ticket;
-		}members;
-	};
-};
-
-struct type_info_procedure_c_ticket_mutex_take_ticket {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t mutex;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_c_ticket_mutex_try_wait {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t mutex;
-			const type_info_member_t ticket;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_c_ticket_mutex_wait {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t mutex;
-			const type_info_member_t ticket;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_c_ticket_mutex_advance_ticket {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t mutex;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_c_ticket_mutex_take_and_wait {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t mutex;
-		}arguments;
-	};
-};
-
 struct type_info_procedure_work_order_fn {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -3250,10 +4044,9 @@ struct type_info_procedure_sys_file_watcher_process_changes {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[2];
+		type_info_member_t argument_array[1];
 		struct {
 			const type_info_member_t watcher;
-			const type_info_member_t changed;
 		}arguments;
 	};
 };
@@ -3329,19 +4122,6 @@ struct type_info_procedure_sys_semaphore_destroy {
 		type_info_member_t argument_array[1];
 		struct {
 			const type_info_member_t semaphore;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_thread_proc_t {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t user_data;
 		}arguments;
 	};
 };
@@ -3458,177 +4238,6 @@ struct type_info_procedure_sys_wait_for_process {
 		type_info_member_t argument_array[1];
 		struct {
 			const type_info_member_t process;
-		}arguments;
-	};
-};
-
-struct type_info_struct_render_command_list_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[27];
-		struct {
-			const type_info_member_t is_initialized;
-			const type_info_member_t renderer_state;
-			const type_info_member_t transient_arena;
-			const type_info_member_t command_arena;
-			const type_info_member_t commands;
-			const type_info_member_t command_count;
-			const type_info_member_t draw_instance_command_count;
-			const type_info_member_t bind_shader_command_count;
-			const type_info_member_t bind_render_target_command_count;
-			const type_info_member_t bind_material_command_count;
-			const type_info_member_t active_render_state;
-			const type_info_member_t vertex_buffer_count;
-			const type_info_member_t active_index_buffer;
-			const type_info_member_t active_scissor_command;
-			const type_info_member_t active_viewport_command;
-			const type_info_member_t active_shader_program;
-			const type_info_member_t vertex_offset;
-			const type_info_member_t instance_offset;
-			const type_info_member_t index_offset;
-			const type_info_member_t active_renderpass;
-			const type_info_member_t presenting;
-			const type_info_member_t image_shader_params;
-			const type_info_member_t image_count;
-			const type_info_member_t image_ids_to_bind;
-			const type_info_member_t bound_image_count;
-			const type_info_member_t command_list_type;
-			const type_info_member_t backend_command_buffer;
-		}members;
-	};
-};
-
-struct type_info_struct_vertex_buffer_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[4];
-		struct {
-			const type_info_member_t buffer;
-			const type_info_member_t vertex_data;
-			const type_info_member_t max_vertices;
-			const type_info_member_t vertex_count;
-		}members;
-	};
-};
-
-struct type_info_struct_texture2D_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[3];
-		struct {
-			const type_info_member_t ID;
-			const type_info_member_t bitmap;
-			const type_info_member_t gpu_data;
-		}members;
-	};
-};
-
-struct type_info_procedure_immediate_quad_ex {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[11];
-		struct {
-			const type_info_member_t command_list;
-			const type_info_member_t buffer;
-			const type_info_member_t position;
-			const type_info_member_t render_size;
-			const type_info_member_t render_color;
-			const type_info_member_t uv_min;
-			const type_info_member_t uv_max;
-			const type_info_member_t padding;
-			const type_info_member_t sdf_info;
-			const type_info_member_t padding0;
-			const type_info_member_t texture;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_immediate_rect {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[10];
-		struct {
-			const type_info_member_t command_list;
-			const type_info_member_t buffer;
-			const type_info_member_t position;
-			const type_info_member_t render_size;
-			const type_info_member_t render_color;
-			const type_info_member_t uv_min;
-			const type_info_member_t uv_max;
-			const type_info_member_t padding;
-			const type_info_member_t sdf_info;
-			const type_info_member_t padding0;
-		}arguments;
-	};
-};
-
-struct type_info_struct_asset_handle_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[11];
-		struct {
-			const type_info_member_t is_valid;
-			const type_info_member_t type;
-			const type_info_member_t owner_asset_file_index;
-			const type_info_member_t subtexture_data;
-			const type_info_member_t slot;
-			const type_info_member_t asset_manager;
-			const type_info_member_t catalog;
-			const type_info_member_t texture;
-			const type_info_member_t shader;
-			const type_info_member_t material_info;
-			const type_info_member_t dynamic_render_font;
-		}members;
-	};
-};
-
-struct type_info_procedure_immediate_text {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[9];
-		struct {
-			const type_info_member_t command_list;
-			const type_info_member_t vertex_buffer;
-			const type_info_member_t asset_manager;
-			const type_info_member_t asset_handle;
-			const type_info_member_t render_string;
-			const type_info_member_t position;
-			const type_info_member_t text_color;
-			const type_info_member_t settings;
-			const type_info_member_t font_size;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_immediate_put_data {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[4];
-		struct {
-			const type_info_member_t buffer;
-			const type_info_member_t data;
-			const type_info_member_t element_size;
-			const type_info_member_t element_count;
 		}arguments;
 	};
 };
@@ -3800,19 +4409,6 @@ struct type_info_procedure_s_renderer_image_update_data {
 	};
 };
 
-struct type_info_procedure_sys_work_queue_entry_proc {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t lpParam;
-		}arguments;
-	};
-};
-
 struct type_info_struct_asset_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -3836,9 +4432,8 @@ struct type_info_struct_asset_slot_load_status_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[7];
+		const type_info_member_t member_array[6];
 		struct {
-			const type_info_member_t ASLS_Invalid;
 			const type_info_member_t ASLS_Unloaded;
 			const type_info_member_t ASLS_LoadQueued;
 			const type_info_member_t ASLS_Loaded;
@@ -3878,14 +4473,16 @@ struct type_info_struct_subtexture_data_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[6];
+		const type_info_member_t member_array[8];
 		struct {
 			const type_info_member_t uv_min;
 			const type_info_member_t uv_max;
 			const type_info_member_t offset;
 			const type_info_member_t size;
+			const type_info_member_t atlased_generation;
 			const type_info_member_t atlas_subtexture_index;
 			const type_info_member_t atlas;
+			const type_info_member_t packed_asset;
 		}members;
 	};
 };
@@ -3895,18 +4492,49 @@ struct type_info_struct_texture_atlas_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[10];
+		const type_info_member_t member_array[12];
 		struct {
 			const type_info_member_t texture;
 			const type_info_member_t bitmap_data;
 			const type_info_member_t ID;
 			const type_info_member_t merge_counter;
+			const type_info_member_t textures_to_merge;
+			const type_info_member_t packed_subtextures;
 			const type_info_member_t packed_subtexture_count;
 			const type_info_member_t is_valid;
 			const type_info_member_t atlas_cursor_x;
 			const type_info_member_t atlas_cursor_y;
 			const type_info_member_t tallest_y;
 			const type_info_member_t atlas_size;
+		}members;
+	};
+};
+
+struct type_info_struct_animation_source2D_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[4];
+		struct {
+			const type_info_member_t name;
+			const type_info_member_t texture;
+			const type_info_member_t frame_count;
+			const type_info_member_t frame_timer;
+		}members;
+	};
+};
+
+struct type_info_struct_animation2D_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[3];
+		struct {
+			const type_info_member_t animation_info;
+			const type_info_member_t current_frame;
+			const type_info_member_t frame_timer;
 		}members;
 	};
 };
@@ -4106,10 +4734,11 @@ struct type_info_struct_dynamic_render_font_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[2];
+		const type_info_member_t member_array[3];
 		struct {
 			const type_info_member_t font_arena;
 			const type_info_member_t font_face;
+			const type_info_member_t varients;
 		}members;
 	};
 };
@@ -4119,7 +4748,7 @@ struct type_info_struct_asset_slot_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[12];
+		const type_info_member_t member_array[16];
 		struct {
 			const type_info_member_t ID;
 			const type_info_member_t slot_state;
@@ -4127,8 +4756,12 @@ struct type_info_struct_asset_slot_t {
 			const type_info_member_t name;
 			const type_info_member_t owner_asset_file;
 			const type_info_member_t package_entry;
+			const type_info_member_t subtexture_data;
+			const type_info_member_t asset_manager;
+			const type_info_member_t catalog;
 			const type_info_member_t package_generation;
 			const type_info_member_t loaded_asset_index;
+			const type_info_member_t owner_asset_file_index;
 			const type_info_member_t texture;
 			const type_info_member_t dynamic_render_font;
 			const type_info_member_t shader;
@@ -4137,22 +4770,25 @@ struct type_info_struct_asset_slot_t {
 	};
 };
 
-struct type_info_struct_asset_manager_asset_file_data_t {
+struct type_info_struct_asset_file_data_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[10];
+		const type_info_member_t member_array[13];
 		struct {
 			const type_info_member_t is_initialized;
 			const type_info_member_t ID;
+			const type_info_member_t current_package_generation;
 			const type_info_member_t init_arena;
 			const type_info_member_t load_status;
 			const type_info_member_t file_info;
 			const type_info_member_t raw_file_data;
+			const type_info_member_t header;
 			const type_info_member_t package_entries;
 			const type_info_member_t package_entry_count;
 			const type_info_member_t entry_hash;
+			const type_info_member_t loaded_assets;
 			const type_info_member_t header_data;
 		}members;
 	};
@@ -4163,13 +4799,14 @@ struct type_info_struct_asset_catalog_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[5];
+		const type_info_member_t member_array[6];
 		struct {
 			const type_info_member_t ID;
 			const type_info_member_t catalog_type;
 			const type_info_member_t asset_manager;
 			const type_info_member_t default_asset;
 			const type_info_member_t asset_lookup;
+			const type_info_member_t loaded_assets;
 		}members;
 	};
 };
@@ -4253,6 +4890,33 @@ struct type_info_procedure_s_asset_manager_queue_asset_load {
 	};
 };
 
+struct type_info_procedure_s_UTF32_convert_to_UTF8 {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t buffer;
+			const type_info_member_t character;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_s_UTF8_convert_UTF32 {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t character;
+		}arguments;
+	};
+};
+
 struct type_info_procedure_s_asset_manager_load_asset_file {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -4263,6 +4927,20 @@ struct type_info_procedure_s_asset_manager_load_asset_file {
 		struct {
 			const type_info_member_t asset_manager;
 			const type_info_member_t filepath;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_s_asset_manager_signal_asset_file_reload {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t asset_manager;
+			const type_info_member_t filename;
 		}arguments;
 	};
 };
@@ -4514,8 +5192,8 @@ struct type_info_struct_input_mouse_buttons_t {
 		const type_info_member_t member_array[6];
 		struct {
 			const type_info_member_t SDL_LEFT_MOUSE;
-			const type_info_member_t SDL_RIGHT_MOUSE;
 			const type_info_member_t SDL_MIDDLE_MOUSE;
+			const type_info_member_t SDL_RIGHT_MOUSE;
 			const type_info_member_t SDL_X1_MOUSE;
 			const type_info_member_t SDL_X2_MOUSE;
 			const type_info_member_t SDL_MOUSE_BUTTON_COUNT;
@@ -4528,11 +5206,14 @@ struct type_info_struct_action_button_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[4];
+		const type_info_member_t member_array[7];
 		struct {
 			const type_info_member_t is_down;
 			const type_info_member_t is_released;
 			const type_info_member_t is_pressed;
+			const type_info_member_t consumed_this_frame;
+			const type_info_member_t keycode;
+			const type_info_member_t scancode;
 			const type_info_member_t half_transition_counter;
 		}members;
 	};
@@ -4587,18 +5268,80 @@ struct type_info_struct_gamepad_controller_data_t {
 	};
 };
 
+struct type_info_struct_text_input_action_type_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[4];
+		struct {
+			const type_info_member_t TEXT_INPUT_EVENT_NONE;
+			const type_info_member_t TEXT_INPUT_EVENT_PRESSED;
+			const type_info_member_t TEXT_INPUT_EVENT_DOWN;
+			const type_info_member_t TEXT_INPUT_EVENT_RELEASED;
+		}members;
+	};
+};
+
+struct type_info_struct_text_input_modifier_flags {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[4];
+		struct {
+			const type_info_member_t TEXT_INPUT_MODIFIER_NONE;
+			const type_info_member_t TEXT_INPUT_MODIFIER_SHIFT;
+			const type_info_member_t TEXT_INPUT_MODIFIER_CTRL;
+			const type_info_member_t TEXT_INPUT_MODIFIER_ALT;
+		}members;
+	};
+};
+
+struct type_info_struct_text_input_event_type_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[2];
+		struct {
+			const type_info_member_t TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM;
+			const type_info_member_t TEXT_INPUT_EVENT_TYPE_INPUT_EVENT;
+		}members;
+	};
+};
+
+struct type_info_struct_text_input_event_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[6];
+		struct {
+			const type_info_member_t type;
+			const type_info_member_t input_event_type;
+			const type_info_member_t modifier_flags;
+			const type_info_member_t scancode;
+			const type_info_member_t keycode;
+			const type_info_member_t input_stream;
+		}members;
+	};
+};
+
 struct type_info_struct_input_controller_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[7];
+		const type_info_member_t member_array[9];
 		struct {
 			const type_info_member_t is_valid;
 			const type_info_member_t is_analog;
 			const type_info_member_t type;
-			const type_info_member_t inputs_this_frame;
-			const type_info_member_t frame_input_counter;
+			const type_info_member_t transient_action_inputs;
+			const type_info_member_t action_inputs_this_frame;
+			const type_info_member_t transient_text_inputs;
+			const type_info_member_t text_inputs_this_frame;
 			const type_info_member_t keyboard;
 			const type_info_member_t gamepad;
 		}members;
@@ -5791,6 +6534,21 @@ struct type_info_procedure_s_renderer_is_texture_bound {
 	};
 };
 
+struct type_info_procedure_s_renderer_set_texture_filter_mode {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[3];
+		struct {
+			const type_info_member_t render_state;
+			const type_info_member_t texture;
+			const type_info_member_t filter_mode;
+		}arguments;
+	};
+};
+
 struct type_info_procedure_s_renderer_find_texture_index {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -6335,6 +7093,19 @@ struct type_info_procedure_backend_image_update_contents {
 	};
 };
 
+struct type_info_procedure_backend_acquire_image_sampler {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t image;
+		}arguments;
+	};
+};
+
 struct type_info_procedure_backend_shader_create {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -6367,17 +7138,27 @@ struct type_info_struct_widget_state_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[11];
+		const type_info_member_t member_array[21];
 		struct {
 			const type_info_member_t last_interacted_frame;
 			const type_info_member_t toggled;
 			const type_info_member_t dragging;
 			const type_info_member_t input_begin_within_bounds;
+			const type_info_member_t is_held;
+			const type_info_member_t just_released;
+			const type_info_member_t just_clicked;
+			const type_info_member_t is_double_clicked;
+			const type_info_member_t is_right_clicked;
+			const type_info_member_t is_right_held;
+			const type_info_member_t widget_text_render_start_offset;
+			const type_info_member_t widget_text_render_end_offset;
 			const type_info_member_t slider_value;
 			const type_info_member_t position;
 			const type_info_member_t offset;
 			const type_info_member_t initial_mouse_position;
 			const type_info_member_t render_size;
+			const type_info_member_t absolute_minimum_render_size;
+			const type_info_member_t resize_amount;
 			const type_info_member_t render_color;
 			const type_info_member_t widget_rect;
 		}members;
@@ -6431,21 +7212,25 @@ struct type_info_struct_widget_flags_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[14];
+		const type_info_member_t member_array[18];
 		struct {
 			const type_info_member_t UI_WIDGET_FLAG_INVALID;
 			const type_info_member_t UI_WIDGET_FLAG_IDLE_COLOR;
 			const type_info_member_t UI_WIDGET_FLAG_HOVER_COLOR;
 			const type_info_member_t UI_WIDGET_FLAG_ACTIVE_COLOR;
+			const type_info_member_t UI_WIDGET_FLAG_INTERACTABLE;
 			const type_info_member_t UI_WIDGET_FLAG_MOUSE_CLICKABLE;
 			const type_info_member_t UI_WIDGET_FLAG_HOVERABLE;
+			const type_info_member_t UI_WIDGET_FLAG_LEFT_DRAGGABLE;
 			const type_info_member_t UI_WIDGET_FLAG_DRAW_TEXT;
 			const type_info_member_t UI_WIDGET_FLAG_DRAW_RECTANGLE;
 			const type_info_member_t UI_WIDGET_FLAG_DRAW_BACKGROUND;
 			const type_info_member_t UI_WIDGET_FLAG_DRAW_BORDER;
 			const type_info_member_t UI_WIDGET_FLAG_MAKE_CIRCULAR;
 			const type_info_member_t UI_WIDGET_FLAG_FIXED_SIZE;
-			const type_info_member_t UI_WIDGET_FLAG_LEFT_DRAGGABLE;
+			const type_info_member_t UI_WIDGET_FLAG_HAS_TEXT_CONTENT;
+			const type_info_member_t UI_WIDGET_FLAG_RESIZEABLE;
+			const type_info_member_t UI_WIDGET_FLAG_DISPLAY_TEXTURE;
 			const type_info_member_t UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON;
 		}members;
 	};
@@ -6482,7 +7267,7 @@ struct type_info_struct_widget_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[34];
+		const type_info_member_t member_array[35];
 		struct {
 			const type_info_member_t ID;
 			const type_info_member_t widget_flags;
@@ -6490,21 +7275,19 @@ struct type_info_struct_widget_t {
 			const type_info_member_t state;
 			const type_info_member_t widget_name;
 			const type_info_member_t widget_text_buffer;
-			const type_info_member_t widget_text_buffer_used;
 			const type_info_member_t toggled;
 			const type_info_member_t parent_stack_depth;
 			const type_info_member_t font_size;
 			const type_info_member_t expected_position;
 			const type_info_member_t minimum_render_size;
+			const type_info_member_t resize_value;
 			const type_info_member_t size_kind;
 			const type_info_member_t parent_child_spacing;
 			const type_info_member_t parent_padding;
 			const type_info_member_t widget_padding;
-			const type_info_member_t max_left_padding;
-			const type_info_member_t max_right_padding;
-			const type_info_member_t max_top_padding;
-			const type_info_member_t max_bottom_padding;
+			const type_info_member_t max_widget_padding;
 			const type_info_member_t child_spacing;
+			const type_info_member_t scissor_rect;
 			const type_info_member_t idle_color;
 			const type_info_member_t hovered_color;
 			const type_info_member_t active_color;
@@ -6512,6 +7295,9 @@ struct type_info_struct_widget_t {
 			const type_info_member_t smoothness;
 			const type_info_member_t radius;
 			const type_info_member_t border_thickness;
+			const type_info_member_t display_texture;
+			const type_info_member_t display_texture_uvmin;
+			const type_info_member_t display_texture_uvmax;
 			const type_info_member_t parent;
 			const type_info_member_t first_child;
 			const type_info_member_t last_child;
@@ -6527,11 +7313,14 @@ struct type_info_struct_ui_state_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[42];
+		const type_info_member_t member_array[46];
 		struct {
 			const type_info_member_t widget_arena;
 			const type_info_member_t section_count;
+			const type_info_member_t frame_begun;
+			const type_info_member_t frame_ended;
 			const type_info_member_t input_focused;
+			const type_info_member_t left_mouse_clicked_this_frame;
 			const type_info_member_t last_hot_ID;
 			const type_info_member_t last_active_ID;
 			const type_info_member_t hot_widget;
@@ -6556,6 +7345,7 @@ struct type_info_struct_ui_state_t {
 			const type_info_member_t default_widget_border_thickness;
 			const type_info_member_t mouse_position;
 			const type_info_member_t mouse_delta;
+			const type_info_member_t max_widget_size;
 			const type_info_member_t active_widget_padding;
 			const type_info_member_t widget_item_count;
 			const type_info_member_t frame_count;
@@ -6593,6 +7383,19 @@ struct type_info_procedure_ui_state_init {
 };
 
 struct type_info_procedure_ui_state_update_widget_state {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t ui_state;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_ui_state_maybe_eat_inputs {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6848,14 +7651,36 @@ struct type_info_procedure_ui_widget_panel {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[6];
+		type_info_member_t argument_array[8];
 		struct {
 			const type_info_member_t ui_state;
 			const type_info_member_t widget_name;
 			const type_info_member_t position;
+			const type_info_member_t minimum_render_size;
 			const type_info_member_t child_spacing;
 			const type_info_member_t padding;
 			const type_info_member_t background_color;
+			const type_info_member_t additional_flags;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_ui_widget_draggable_panel {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[8];
+		struct {
+			const type_info_member_t ui_state;
+			const type_info_member_t widget_name;
+			const type_info_member_t position;
+			const type_info_member_t minimum_render_size;
+			const type_info_member_t child_spacing;
+			const type_info_member_t padding;
+			const type_info_member_t background_color;
+			const type_info_member_t additional_flags;
 		}arguments;
 	};
 };
@@ -6927,11 +7752,12 @@ struct type_info_procedure_ui_widget_spacer {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[3];
+		type_info_member_t argument_array[4];
 		struct {
 			const type_info_member_t ui_state;
 			const type_info_member_t widget_name;
 			const type_info_member_t spacing_size;
+			const type_info_member_t size_kind;
 		}arguments;
 	};
 };
@@ -6942,11 +7768,12 @@ struct type_info_procedure_ui_widget_rectangle {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[3];
+		type_info_member_t argument_array[4];
 		struct {
 			const type_info_member_t ui_state;
 			const type_info_member_t widget_name;
 			const type_info_member_t size;
+			const type_info_member_t size_kind;
 		}arguments;
 	};
 };
@@ -6957,29 +7784,48 @@ struct type_info_procedure_ui_widget_divider {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[3];
+		type_info_member_t argument_array[4];
 		struct {
 			const type_info_member_t ui_state;
 			const type_info_member_t widget_name;
 			const type_info_member_t size;
+			const type_info_member_t size_kind;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_ui_widget_draggable_panel {
+struct type_info_procedure_ui_widget_textbox {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[6];
+		type_info_member_t argument_array[4];
 		struct {
 			const type_info_member_t ui_state;
 			const type_info_member_t widget_name;
-			const type_info_member_t position;
-			const type_info_member_t child_spacing;
-			const type_info_member_t padding;
-			const type_info_member_t background_color;
+			const type_info_member_t widget_text_content;
+			const type_info_member_t size;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_ui_widget_texture {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[8];
+		struct {
+			const type_info_member_t ui_state;
+			const type_info_member_t widget_name;
+			const type_info_member_t size;
+			const type_info_member_t texture;
+			const type_info_member_t uv_min;
+			const type_info_member_t uv_max;
+			const type_info_member_t size_kind;
+			const type_info_member_t additional_flags;
 		}arguments;
 	};
 };
@@ -7092,7 +7938,7 @@ struct type_info_struct_vulkan_context_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[64];
+		const type_info_member_t member_array[67];
 		struct {
 			const type_info_member_t initialization_arena;
 			const type_info_member_t swapchain_arena;
@@ -7152,12 +7998,15 @@ struct type_info_struct_vulkan_context_t {
 			const type_info_member_t descriptor_sets;
 			const type_info_member_t descriptor_count;
 			const type_info_member_t staging_buffers;
+			const type_info_member_t staging_infos;
 			const type_info_member_t next_staging_info;
 			const type_info_member_t staging_command_pool;
 			const type_info_member_t staging_fences;
 			const type_info_member_t image_samplers;
 			const type_info_member_t default_nearest_sampler;
 			const type_info_member_t default_linear_sampler;
+			const type_info_member_t default_nearest_sampler_info;
+			const type_info_member_t default_linear_sampler_info;
 		}members;
 	};
 };
@@ -7545,7 +8394,7 @@ struct type_info_struct_gpu_info_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[6];
+		const type_info_member_t member_array[10];
 		struct {
 			const type_info_member_t device;
 			const type_info_member_t properties;
@@ -7553,6 +8402,10 @@ struct type_info_struct_gpu_info_t {
 			const type_info_member_t features;
 			const type_info_member_t surface_capabilities;
 			const type_info_member_t queue_family_count;
+			const type_info_member_t valid_surface_formats;
+			const type_info_member_t valid_present_modes;
+			const type_info_member_t queue_family_properties;
+			const type_info_member_t extension_properties;
 		}members;
 	};
 };
@@ -7843,18 +8696,18 @@ struct type_info_struct_vulkan_image_t {
 		const type_info_member_t member_array[13];
 		struct {
 			const type_info_member_t is_valid;
+			const type_info_member_t width;
+			const type_info_member_t height;
+			const type_info_member_t sampler;
 			const type_info_member_t info;
 			const type_info_member_t handle;
 			const type_info_member_t view;
-			const type_info_member_t sampler;
 			const type_info_member_t layout;
 			const type_info_member_t renderpass_initial_layout;
 			const type_info_member_t renderpass_final_layout;
 			const type_info_member_t internal_format;
 			const type_info_member_t aspect_mask;
 			const type_info_member_t allocation;
-			const type_info_member_t width;
-			const type_info_member_t height;
 		}members;
 	};
 };
@@ -7864,8 +8717,9 @@ struct type_info_struct_vulkan_sampler_info_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[9];
+		const type_info_member_t member_array[10];
 		struct {
+			const type_info_member_t is_valid;
 			const type_info_member_t min_filter;
 			const type_info_member_t mag_filter;
 			const type_info_member_t wrapu;
@@ -8196,6 +9050,20 @@ struct type_info_procedure_vk_get_image_final_layout_from_usage {
 	};
 };
 
+struct type_info_procedure_vk_backend_get_sampler {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t vulkan_context;
+			const type_info_member_t sampler_info;
+		}arguments;
+	};
+};
+
 struct type_info_struct_vulkan_shader_stage_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -8270,15 +9138,44 @@ extern const type_info_t DEFAULT_typedata_uint16_t;
 extern const type_info_t DEFAULT_typedata_uint32_t;
 extern const type_info_t DEFAULT_typedata_uint64_t;
 extern const type_info_t DEFAULT_typedata_size_t;
-extern const type_info_procedure_void_func DEFAULT_typedata_procedure_void_func;
-extern const type_info_struct_dynarray_header_t DEFAULT_typedata_structure_dynarray_header_t;
+extern const type_info_struct_sys_thread_t DEFAULT_typedata_structure_sys_thread_t;
+extern const type_info_struct_sys_mutex_t DEFAULT_typedata_structure_sys_mutex_t;
+extern const type_info_struct_sys_semaphore_t DEFAULT_typedata_structure_sys_semaphore_t;
+extern const type_info_struct_ticket_mutex_t DEFAULT_typedata_structure_ticket_mutex_t;
+extern const type_info_t DEFAULT_typedata_u64;
+extern const type_info_procedure_c_ticket_mutex_take_ticket DEFAULT_typedata_procedure_c_ticket_mutex_take_ticket;
+extern const type_info_t DEFAULT_typedata_bool8;
+extern const type_info_procedure_c_ticket_mutex_try_wait DEFAULT_typedata_procedure_c_ticket_mutex_try_wait;
+extern const type_info_procedure_c_ticket_mutex_wait DEFAULT_typedata_procedure_c_ticket_mutex_wait;
+extern const type_info_procedure_c_ticket_mutex_advance_ticket DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket;
+extern const type_info_procedure_c_ticket_mutex_take_and_wait DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait;
+extern const type_info_t DEFAULT_typedata_sys_thread_handle_t;
 extern const type_info_t DEFAULT_typedata_u32;
-extern const type_info_procedure__dynarray_create_impl DEFAULT_typedata_procedure__dynarray_create_impl;
-extern const type_info_procedure__dynarray_destroy_impl DEFAULT_typedata_procedure__dynarray_destroy_impl;
-extern const type_info_procedure__dynarray_grow_impl DEFAULT_typedata_procedure__dynarray_grow_impl;
-extern const type_info_procedure__dynarray_insert_impl DEFAULT_typedata_procedure__dynarray_insert_impl;
-extern const type_info_procedure__dynarray_remove_impl DEFAULT_typedata_procedure__dynarray_remove_impl;
-extern const type_info_struct_file_extension_t DEFAULT_typedata_structure_file_extension_t;
+extern const type_info_t DEFAULT_typedata_sys_mutex_handle_t;
+extern const type_info_t DEFAULT_typedata_sys_semaphore_handle_t;
+extern const type_info_t DEFAULT_typedata_immediate_vertex_t;
+extern const type_info_t DEFAULT_typedata_immediate_widget_data_t;
+extern const type_info_struct_render_command_list_t DEFAULT_typedata_structure_render_command_list_t;
+extern const type_info_struct_vertex_buffer_t DEFAULT_typedata_structure_vertex_buffer_t;
+extern const type_info_t DEFAULT_typedata_vec3_t;
+extern const type_info_t DEFAULT_typedata_vec2_t;
+extern const type_info_t DEFAULT_typedata_vec4_t;
+extern const type_info_struct_texture2D_t DEFAULT_typedata_structure_texture2D_t;
+extern const type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immediate_quad_ex;
+extern const type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediate_rect;
+extern const type_info_struct_asset_manager_t DEFAULT_typedata_structure_asset_manager_t;
+extern const type_info_struct_asset_handle_t DEFAULT_typedata_structure_asset_handle_t;
+extern const type_info_struct_string_t DEFAULT_typedata_structure_string_t;
+extern const type_info_t DEFAULT_typedata_float32;
+extern const type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediate_text;
+extern const type_info_t DEFAULT_typedata_byte;
+extern const type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data;
+extern const type_info_procedure_void_func DEFAULT_typedata_procedure_void_func;
+extern const type_info_struct_duration_counter_t DEFAULT_typedata_structure_duration_counter_t;
+extern const type_info_t DEFAULT_typedata_bool32;
+extern const type_info_t DEFAULT_typedata_T;
+extern const type_info_procedure_begin DEFAULT_typedata_procedure_begin;
+extern const type_info_procedure_end DEFAULT_typedata_procedure_end;
 extern const type_info_struct_file_t DEFAULT_typedata_structure_file_t;
 extern const type_info_struct_mapped_file_t DEFAULT_typedata_structure_mapped_file_t;
 extern const type_info_struct_file_data_t DEFAULT_typedata_structure_file_data_t;
@@ -8286,8 +9183,6 @@ extern const type_info_struct_overlap_io_data_t DEFAULT_typedata_structure_overl
 extern const type_info_t DEFAULT_typedata_visit_file_data;
 extern const type_info_procedure_visit_files_pfn_t DEFAULT_typedata_procedure_visit_files_pfn_t;
 extern const type_info_struct_visit_file_data_t DEFAULT_typedata_structure_visit_file_data_t;
-extern const type_info_struct_string_t DEFAULT_typedata_structure_string_t;
-extern const type_info_t DEFAULT_typedata_bool8;
 extern const type_info_procedure_c_file_open DEFAULT_typedata_procedure_c_file_open;
 extern const type_info_procedure_c_file_close DEFAULT_typedata_procedure_c_file_close;
 extern const type_info_procedure_c_file_copy DEFAULT_typedata_procedure_c_file_copy;
@@ -8311,8 +9206,9 @@ extern const type_info_procedure_c_file_ext_string_to_enum DEFAULT_typedata_proc
 extern const type_info_procedure_c_directory_exists DEFAULT_typedata_procedure_c_directory_exists;
 extern const type_info_procedure_c_directory_create_visit_data DEFAULT_typedata_procedure_c_directory_create_visit_data;
 extern const type_info_procedure_c_directory_visit DEFAULT_typedata_procedure_c_directory_visit;
+extern const type_info_t DEFAULT_typedata_s32;
+extern const type_info_procedure_c_directory_get_file_count DEFAULT_typedata_procedure_c_directory_get_file_count;
 extern const type_info_t DEFAULT_typedata_sys_handle_t;
-extern const type_info_t DEFAULT_typedata_u64;
 extern const type_info_struct_file_watcher_t DEFAULT_typedata_structure_file_watcher_t;
 extern const type_info_struct_file_watcher_recorded_change_t DEFAULT_typedata_structure_file_watcher_recorded_change_t;
 extern const type_info_procedure_file_watcher_callback_pfn_t DEFAULT_typedata_procedure_file_watcher_callback_pfn_t;
@@ -8324,6 +9220,7 @@ extern const type_info_procedure_c_file_watcher_issue_check_for_single_path DEFA
 extern const type_info_procedure_c_file_watcher_issue_check_over_all_paths DEFAULT_typedata_procedure_c_file_watcher_issue_check_over_all_paths;
 extern const type_info_procedure_c_file_watcher_add_change_event DEFAULT_typedata_procedure_c_file_watcher_add_change_event;
 extern const type_info_procedure_c_file_watcher_emit_changes DEFAULT_typedata_procedure_c_file_watcher_emit_changes;
+extern const type_info_procedure_c_file_watcher_process_changes DEFAULT_typedata_procedure_c_file_watcher_process_changes;
 extern const type_info_t DEFAULT_typedata_file_watcher_sys_watch_data_t;
 extern const type_info_struct_global_context_t DEFAULT_typedata_structure_global_context_t;
 extern const type_info_procedure_c_global_context_init DEFAULT_typedata_procedure_c_global_context_init;
@@ -8332,12 +9229,10 @@ extern const type_info_procedure_c_global_context_reset_context_arena DEFAULT_ty
 extern const type_info_procedure_gc_reset_context_arena DEFAULT_typedata_procedure_gc_reset_context_arena;
 extern const type_info_struct_threadpool_t DEFAULT_typedata_structure_threadpool_t;
 extern const type_info_struct_renderer_state_t DEFAULT_typedata_structure_renderer_state_t;
-extern const type_info_struct_asset_manager_t DEFAULT_typedata_structure_asset_manager_t;
 extern const type_info_struct_input_manager_t DEFAULT_typedata_structure_input_manager_t;
 extern const type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_structure_hash_table_allocation_flags_t;
 extern const type_info_procedure_c_hash_table_allocate_fn_t DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t;
 extern const type_info_procedure_c_hash_table_free_fn_t DEFAULT_typedata_procedure_c_hash_table_free_fn_t;
-extern const type_info_t DEFAULT_typedata_byte;
 extern const type_info_procedure_c_hash_table_value_from_key DEFAULT_typedata_procedure_c_hash_table_value_from_key;
 extern const type_info_procedure_c_fnv_hash_value DEFAULT_typedata_procedure_c_fnv_hash_value;
 extern const type_info_procedure_c_combine_hashes DEFAULT_typedata_procedure_c_combine_hashes;
@@ -8345,7 +9240,6 @@ extern const type_info_procedure_c_hash_table_default_alloc_impl DEFAULT_typedat
 extern const type_info_procedure_c_hash_table_default_free_impl DEFAULT_typedata_procedure_c_hash_table_default_free_impl;
 extern const type_info_struct_hash_table_header_t DEFAULT_typedata_structure_hash_table_header_t;
 extern const type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_log_level_t;
-extern const type_info_t DEFAULT_typedata_s32;
 extern const type_info_procedure__log DEFAULT_typedata_procedure__log;
 extern const type_info_struct_memory_arena_footer_t DEFAULT_typedata_structure_memory_arena_footer_t;
 extern const type_info_struct_scratch_arena_t DEFAULT_typedata_structure_scratch_arena_t;
@@ -8358,7 +9252,6 @@ extern const type_info_procedure_c_arena_free_last_block DEFAULT_typedata_proced
 extern const type_info_procedure_c_arena_reset DEFAULT_typedata_procedure_c_arena_reset;
 extern const type_info_procedure_c_arena_begin_temporary_memory DEFAULT_typedata_procedure_c_arena_begin_temporary_memory;
 extern const type_info_procedure_c_arena_end_temporary_memory DEFAULT_typedata_procedure_c_arena_end_temporary_memory;
-extern const type_info_t DEFAULT_typedata_bool32;
 extern const type_info_t DEFAULT_typedata_u8;
 extern const type_info_struct_arg_type_t DEFAULT_typedata_structure_arg_type_t;
 extern const type_info_struct_program_flag_data_t DEFAULT_typedata_structure_program_flag_data_t;
@@ -8367,7 +9260,6 @@ extern const type_info_struct_program_flag_state_t DEFAULT_typedata_structure_pr
 extern const type_info_procedure_c_program_flag_add DEFAULT_typedata_procedure_c_program_flag_add;
 extern const type_info_procedure_c_program_flag_add_bool32 DEFAULT_typedata_procedure_c_program_flag_add_bool32;
 extern const type_info_procedure_c_program_flag_add_size DEFAULT_typedata_procedure_c_program_flag_add_size;
-extern const type_info_t DEFAULT_typedata_float32;
 extern const type_info_procedure_c_program_flag_add_float32 DEFAULT_typedata_procedure_c_program_flag_add_float32;
 extern const type_info_procedure_c_program_flag_add_string DEFAULT_typedata_procedure_c_program_flag_add_string;
 extern const type_info_procedure_c_program_flag_print_flag_list DEFAULT_typedata_procedure_c_program_flag_print_flag_list;
@@ -8424,18 +9316,6 @@ extern const type_info_procedure_c_string_builder_sprintf DEFAULT_typedata_proce
 extern const type_info_procedure_c_string_builder_dump_to_file DEFAULT_typedata_procedure_c_string_builder_dump_to_file;
 extern const type_info_procedure_c_string_builder_flush_to_file DEFAULT_typedata_procedure_c_string_builder_flush_to_file;
 extern const type_info_t DEFAULT_typedata_string_builder_buffer;
-extern const type_info_struct_sys_thread_t DEFAULT_typedata_structure_sys_thread_t;
-extern const type_info_struct_sys_mutex_t DEFAULT_typedata_structure_sys_mutex_t;
-extern const type_info_struct_sys_semaphore_t DEFAULT_typedata_structure_sys_semaphore_t;
-extern const type_info_struct_ticket_mutex_t DEFAULT_typedata_structure_ticket_mutex_t;
-extern const type_info_procedure_c_ticket_mutex_take_ticket DEFAULT_typedata_procedure_c_ticket_mutex_take_ticket;
-extern const type_info_procedure_c_ticket_mutex_try_wait DEFAULT_typedata_procedure_c_ticket_mutex_try_wait;
-extern const type_info_procedure_c_ticket_mutex_wait DEFAULT_typedata_procedure_c_ticket_mutex_wait;
-extern const type_info_procedure_c_ticket_mutex_advance_ticket DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket;
-extern const type_info_procedure_c_ticket_mutex_take_and_wait DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait;
-extern const type_info_t DEFAULT_typedata_sys_thread_handle_t;
-extern const type_info_t DEFAULT_typedata_sys_mutex_handle_t;
-extern const type_info_t DEFAULT_typedata_sys_semaphore_handle_t;
 extern const type_info_procedure_work_order_fn DEFAULT_typedata_procedure_work_order_fn;
 extern const type_info_struct_work_completion_fence_t DEFAULT_typedata_structure_work_completion_fence_t;
 extern const type_info_struct_work_order_t DEFAULT_typedata_structure_work_order_t;
@@ -8505,7 +9385,7 @@ extern const type_info_procedure_sys_semaphore_close DEFAULT_typedata_procedure_
 extern const type_info_procedure_sys_semaphore_wait DEFAULT_typedata_procedure_sys_semaphore_wait;
 extern const type_info_procedure_sys_semaphore_release DEFAULT_typedata_procedure_sys_semaphore_release;
 extern const type_info_procedure_sys_semaphore_destroy DEFAULT_typedata_procedure_sys_semaphore_destroy;
-extern const type_info_procedure_thread_proc_t DEFAULT_typedata_procedure_thread_proc_t;
+extern const type_info_t DEFAULT_typedata_thread_proc_t;
 extern const type_info_procedure_sys_thread_create DEFAULT_typedata_procedure_sys_thread_create;
 extern const type_info_procedure_sys_thread_wait DEFAULT_typedata_procedure_sys_thread_wait;
 extern const type_info_procedure_sys_thread_close_handle DEFAULT_typedata_procedure_sys_thread_close_handle;
@@ -8515,19 +9395,6 @@ extern const type_info_procedure_sys_mutex_lock DEFAULT_typedata_procedure_sys_m
 extern const type_info_procedure_sys_mutex_unlock DEFAULT_typedata_procedure_sys_mutex_unlock;
 extern const type_info_procedure_sys_create_process DEFAULT_typedata_procedure_sys_create_process;
 extern const type_info_procedure_sys_wait_for_process DEFAULT_typedata_procedure_sys_wait_for_process;
-extern const type_info_t DEFAULT_typedata_immediate_vertex_t;
-extern const type_info_t DEFAULT_typedata_immediate_widget_data_t;
-extern const type_info_struct_render_command_list_t DEFAULT_typedata_structure_render_command_list_t;
-extern const type_info_struct_vertex_buffer_t DEFAULT_typedata_structure_vertex_buffer_t;
-extern const type_info_t DEFAULT_typedata_vec3_t;
-extern const type_info_t DEFAULT_typedata_vec2_t;
-extern const type_info_t DEFAULT_typedata_vec4_t;
-extern const type_info_struct_texture2D_t DEFAULT_typedata_structure_texture2D_t;
-extern const type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immediate_quad_ex;
-extern const type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediate_rect;
-extern const type_info_struct_asset_handle_t DEFAULT_typedata_structure_asset_handle_t;
-extern const type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediate_text;
-extern const type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data;
 extern const type_info_struct_render_image_filter_type_t DEFAULT_typedata_structure_render_image_filter_type_t;
 extern const type_info_struct_render_image_wrapping_type_t DEFAULT_typedata_structure_render_image_wrapping_type_t;
 extern const type_info_struct_render_image_usage_t DEFAULT_typedata_structure_render_image_usage_t;
@@ -8540,12 +9407,13 @@ extern const type_info_procedure_s_renderer_image_create_from_bitmap DEFAULT_typ
 extern const type_info_procedure_s_renderer_image_destroy DEFAULT_typedata_procedure_s_renderer_image_destroy;
 extern const type_info_procedure_s_renderer_image_update_data DEFAULT_typedata_procedure_s_renderer_image_update_data;
 extern const type_info_t DEFAULT_typedata_backend_image_t;
-extern const type_info_procedure_sys_work_queue_entry_proc DEFAULT_typedata_procedure_sys_work_queue_entry_proc;
 extern const type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t;
 extern const type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_asset_slot_load_status_t;
 extern const type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_format_t;
 extern const type_info_struct_subtexture_data_t DEFAULT_typedata_structure_subtexture_data_t;
 extern const type_info_struct_texture_atlas_t DEFAULT_typedata_structure_texture_atlas_t;
+extern const type_info_struct_animation_source2D_t DEFAULT_typedata_structure_animation_source2D_t;
+extern const type_info_struct_animation2D_t DEFAULT_typedata_structure_animation2D_t;
 extern const type_info_struct_shader_t DEFAULT_typedata_structure_shader_t;
 extern const type_info_struct_material_instance_t DEFAULT_typedata_structure_material_instance_t;
 extern const type_info_struct_material_archetype_t DEFAULT_typedata_structure_material_archetype_t;
@@ -8559,7 +9427,7 @@ extern const type_info_struct_dynamic_render_font_page_t DEFAULT_typedata_struct
 extern const type_info_struct_dynamic_render_font_varient_t DEFAULT_typedata_structure_dynamic_render_font_varient_t;
 extern const type_info_struct_dynamic_render_font_t DEFAULT_typedata_structure_dynamic_render_font_t;
 extern const type_info_struct_asset_slot_t DEFAULT_typedata_structure_asset_slot_t;
-extern const type_info_struct_asset_manager_asset_file_data_t DEFAULT_typedata_structure_asset_manager_asset_file_data_t;
+extern const type_info_struct_asset_file_data_t DEFAULT_typedata_structure_asset_file_data_t;
 extern const type_info_struct_asset_catalog_t DEFAULT_typedata_structure_asset_catalog_t;
 extern const type_info_struct_texture_manager_t DEFAULT_typedata_structure_texture_manager_t;
 extern const type_info_struct_font_manager_t DEFAULT_typedata_structure_font_manager_t;
@@ -8567,7 +9435,10 @@ extern const type_info_struct_texture_atlas_registry_t DEFAULT_typedata_structur
 extern const type_info_procedure_s_asset_manager_init DEFAULT_typedata_procedure_s_asset_manager_init;
 extern const type_info_procedure_s_asset_manager_update DEFAULT_typedata_procedure_s_asset_manager_update;
 extern const type_info_procedure_s_asset_manager_queue_asset_load DEFAULT_typedata_procedure_s_asset_manager_queue_asset_load;
+extern const type_info_procedure_s_UTF32_convert_to_UTF8 DEFAULT_typedata_procedure_s_UTF32_convert_to_UTF8;
+extern const type_info_procedure_s_UTF8_convert_UTF32 DEFAULT_typedata_procedure_s_UTF8_convert_UTF32;
 extern const type_info_procedure_s_asset_manager_load_asset_file DEFAULT_typedata_procedure_s_asset_manager_load_asset_file;
+extern const type_info_procedure_s_asset_manager_signal_asset_file_reload DEFAULT_typedata_procedure_s_asset_manager_signal_asset_file_reload;
 extern const type_info_procedure_s_asset_manager_acquire_asset_handle DEFAULT_typedata_procedure_s_asset_manager_acquire_asset_handle;
 extern const type_info_procedure_s_texture_atlas_create DEFAULT_typedata_procedure_s_texture_atlas_create;
 extern const type_info_procedure_s_texture_atlas_add_texture DEFAULT_typedata_procedure_s_texture_atlas_add_texture;
@@ -8582,6 +9453,7 @@ extern const type_info_procedure_s_asset_get_material_instance_from_handle DEFAU
 extern const type_info_procedure_s_asset_font_get_string_size DEFAULT_typedata_procedure_s_asset_font_get_string_size;
 extern const type_info_procedure_s_asset_font_acquire_font_at_size DEFAULT_typedata_procedure_s_asset_font_acquire_font_at_size;
 extern const type_info_procedure_s_asset_font_fetch_glyph DEFAULT_typedata_procedure_s_asset_font_fetch_glyph;
+extern const type_info_t DEFAULT_typedata_dynarray_t;
 extern const type_info_t DEFAULT_typedata_backend_shader_t;
 extern const type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_render_pipeline_state_t;
 extern const type_info_t DEFAULT_typedata_VkDescriptorSet;
@@ -8595,6 +9467,10 @@ extern const type_info_struct_action_button_t DEFAULT_typedata_structure_action_
 extern const type_info_struct_keyboard_controller_data_t DEFAULT_typedata_structure_keyboard_controller_data_t;
 extern const type_info_struct_analog_button_t DEFAULT_typedata_structure_analog_button_t;
 extern const type_info_struct_gamepad_controller_data_t DEFAULT_typedata_structure_gamepad_controller_data_t;
+extern const type_info_struct_text_input_action_type_t DEFAULT_typedata_structure_text_input_action_type_t;
+extern const type_info_struct_text_input_modifier_flags DEFAULT_typedata_structure_text_input_modifier_flags;
+extern const type_info_struct_text_input_event_type_t DEFAULT_typedata_structure_text_input_event_type_t;
+extern const type_info_struct_text_input_event_t DEFAULT_typedata_structure_text_input_event_t;
 extern const type_info_struct_input_controller_t DEFAULT_typedata_structure_input_controller_t;
 extern const type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure_game_action_binding_type_t;
 extern const type_info_struct_game_action_binding_t DEFAULT_typedata_structure_game_action_binding_t;
@@ -8682,6 +9558,7 @@ extern const type_info_procedure_s_renderer_index_buffer_create DEFAULT_typedata
 extern const type_info_procedure_s_renderer_render_buffer_copy_data DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data;
 extern const type_info_procedure_s_renderer_get_command_list DEFAULT_typedata_procedure_s_renderer_get_command_list;
 extern const type_info_procedure_s_renderer_is_texture_bound DEFAULT_typedata_procedure_s_renderer_is_texture_bound;
+extern const type_info_procedure_s_renderer_set_texture_filter_mode DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode;
 extern const type_info_procedure_s_renderer_find_texture_index DEFAULT_typedata_procedure_s_renderer_find_texture_index;
 extern const type_info_procedure_s_renderer_reset_command_list DEFAULT_typedata_procedure_s_renderer_reset_command_list;
 extern const type_info_procedure_r_cmd_renderpass_begin DEFAULT_typedata_procedure_r_cmd_renderpass_begin;
@@ -8724,6 +9601,7 @@ extern const type_info_procedure_backend_renderpass_initialize DEFAULT_typedata_
 extern const type_info_procedure_backend_image_create DEFAULT_typedata_procedure_backend_image_create;
 extern const type_info_procedure_backend_image_destroy DEFAULT_typedata_procedure_backend_image_destroy;
 extern const type_info_procedure_backend_image_update_contents DEFAULT_typedata_procedure_backend_image_update_contents;
+extern const type_info_procedure_backend_acquire_image_sampler DEFAULT_typedata_procedure_backend_acquire_image_sampler;
 extern const type_info_procedure_backend_shader_create DEFAULT_typedata_procedure_backend_shader_create;
 extern const type_info_procedure_backend_get_command_buffer DEFAULT_typedata_procedure_backend_get_command_buffer;
 extern const type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_state_t;
@@ -8736,6 +9614,7 @@ extern const type_info_struct_widget_t DEFAULT_typedata_structure_widget_t;
 extern const type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t;
 extern const type_info_procedure_ui_state_init DEFAULT_typedata_procedure_ui_state_init;
 extern const type_info_procedure_ui_state_update_widget_state DEFAULT_typedata_procedure_ui_state_update_widget_state;
+extern const type_info_procedure_ui_state_maybe_eat_inputs DEFAULT_typedata_procedure_ui_state_maybe_eat_inputs;
 extern const type_info_procedure_ui_state_render_widgets DEFAULT_typedata_procedure_ui_state_render_widgets;
 extern const type_info_procedure_ui_state_set_default_widget_idle_color DEFAULT_typedata_procedure_ui_state_set_default_widget_idle_color;
 extern const type_info_procedure_ui_state_set_default_widget_hover_color DEFAULT_typedata_procedure_ui_state_set_default_widget_hover_color;
@@ -8754,14 +9633,17 @@ extern const type_info_procedure_ui_widget_set_padding DEFAULT_typedata_procedur
 extern const type_info_procedure_ui_widget_seed DEFAULT_typedata_procedure_ui_widget_seed;
 extern const type_info_procedure_ui_widget_create DEFAULT_typedata_procedure_ui_widget_create;
 extern const type_info_procedure_ui_widget_panel DEFAULT_typedata_procedure_ui_widget_panel;
+extern const type_info_procedure_ui_widget_draggable_panel DEFAULT_typedata_procedure_ui_widget_draggable_panel;
 extern const type_info_procedure_ui_widget_sized_button DEFAULT_typedata_procedure_ui_widget_sized_button;
 extern const type_info_procedure_ui_widget_text DEFAULT_typedata_procedure_ui_widget_text;
 extern const type_info_procedure_ui_widget_labeled_button DEFAULT_typedata_procedure_ui_widget_labeled_button;
 extern const type_info_procedure_ui_widget_float_slider_bar DEFAULT_typedata_procedure_ui_widget_float_slider_bar;
+extern const type_info_t DEFAULT_typedata_ivec2_t;
 extern const type_info_procedure_ui_widget_spacer DEFAULT_typedata_procedure_ui_widget_spacer;
 extern const type_info_procedure_ui_widget_rectangle DEFAULT_typedata_procedure_ui_widget_rectangle;
 extern const type_info_procedure_ui_widget_divider DEFAULT_typedata_procedure_ui_widget_divider;
-extern const type_info_procedure_ui_widget_draggable_panel DEFAULT_typedata_procedure_ui_widget_draggable_panel;
+extern const type_info_procedure_ui_widget_textbox DEFAULT_typedata_procedure_ui_widget_textbox;
+extern const type_info_procedure_ui_widget_texture DEFAULT_typedata_procedure_ui_widget_texture;
 extern const type_info_procedure_ui_state_begin_row DEFAULT_typedata_procedure_ui_state_begin_row;
 extern const type_info_procedure_ui_state_end_row DEFAULT_typedata_procedure_ui_state_end_row;
 extern const type_info_procedure_ui_state_begin_column DEFAULT_typedata_procedure_ui_state_begin_column;
@@ -8882,6 +9764,7 @@ extern const type_info_procedure_vk_sampler_filter_type_to_vk_filter DEFAULT_typ
 extern const type_info_procedure_vk_is_depth_format DEFAULT_typedata_procedure_vk_is_depth_format;
 extern const type_info_procedure_vk_get_image_initial_layout_from_usage DEFAULT_typedata_procedure_vk_get_image_initial_layout_from_usage;
 extern const type_info_procedure_vk_get_image_final_layout_from_usage DEFAULT_typedata_procedure_vk_get_image_final_layout_from_usage;
+extern const type_info_procedure_vk_backend_get_sampler DEFAULT_typedata_procedure_vk_backend_get_sampler;
 extern const type_info_t DEFAULT_typedata_VkImageAspectFlags;
 extern const type_info_struct_vulkan_shader_stage_t DEFAULT_typedata_structure_vulkan_shader_stage_t;
 extern const type_info_struct_vulkan_shader_binding_t DEFAULT_typedata_structure_vulkan_shader_binding_t;
@@ -8899,417 +9782,1342 @@ extern const type_info_t DEFAULT_typedata_VkVertexInputAttributeDescription;
 
 constexpr type_info_t DEFAULT_typedata_unsigned_int = {
 	.type_name = "unsigned int",
+	.type_id = TYPE_unsigned_int,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<unsigned int>(),
 };
 constexpr type_info_t DEFAULT_typedata_unsigned_char = {
 	.type_name = "unsigned char",
+	.type_id = TYPE_unsigned_char,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<unsigned char>(),
 };
 constexpr type_info_t DEFAULT_typedata_short = {
 	.type_name = "short",
+	.type_id = TYPE_short,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<short>(),
 };
 constexpr type_info_t DEFAULT_typedata_long = {
 	.type_name = "long",
+	.type_id = TYPE_long,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<long>(),
 };
 constexpr type_info_t DEFAULT_typedata_int = {
 	.type_name = "int",
+	.type_id = TYPE_int,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<int>(),
 };
 constexpr type_info_t DEFAULT_typedata_char = {
 	.type_name = "char",
+	.type_id = TYPE_char,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<char>(),
 };
 constexpr type_info_t DEFAULT_typedata_float = {
 	.type_name = "float",
+	.type_id = TYPE_float,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<float>(),
 };
 constexpr type_info_t DEFAULT_typedata_double = {
 	.type_name = "double",
+	.type_id = TYPE_double,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<double>(),
 };
 constexpr type_info_t DEFAULT_typedata_void = {
 	.type_name = "void",
+	.type_id = TYPE_void,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 };
 constexpr type_info_t DEFAULT_typedata_bool = {
 	.type_name = "bool",
+	.type_id = TYPE_bool,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<bool>(),
 };
 constexpr type_info_t DEFAULT_typedata_int8_t = {
 	.type_name = "int8_t",
+	.type_id = TYPE_int8_t,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<int8_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_int16_t = {
 	.type_name = "int16_t",
+	.type_id = TYPE_int16_t,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<int16_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_int32_t = {
 	.type_name = "int32_t",
+	.type_id = TYPE_int32_t,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<int32_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_int64_t = {
 	.type_name = "int64_t",
+	.type_id = TYPE_int64_t,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<int64_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint8_t = {
 	.type_name = "uint8_t",
+	.type_id = TYPE_uint8_t,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<uint8_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint16_t = {
 	.type_name = "uint16_t",
+	.type_id = TYPE_uint16_t,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<uint16_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint32_t = {
 	.type_name = "uint32_t",
+	.type_id = TYPE_uint32_t,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<uint32_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_uint64_t = {
 	.type_name = "uint64_t",
+	.type_id = TYPE_uint64_t,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<uint64_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_size_t = {
 	.type_name = "size_t",
+	.type_id = TYPE_size_t,
 	.metatype  = ATHENA_METATYPE_PRIMITIVE,
 	.size = athena_internal::safe_sizeof<size_t>(),
 };
-constexpr type_info_procedure_void_func DEFAULT_typedata_procedure_void_func = {
+constexpr type_info_struct_sys_thread_t DEFAULT_typedata_structure_sys_thread_t = {
 	.type_info = {
-		.type_name = "void_func",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 0,
-	.return_type    = &DEFAULT_typedata_void,
-};
-constexpr type_info_struct_dynarray_header_t DEFAULT_typedata_structure_dynarray_header_t = {
-	.type_info = {
-		.type_name = "dynarray_header_t",
+		.type_name = "sys_thread_t",
+		.type_id = TYPE_sys_thread_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<dynarray_header_t>(),
+		.size = athena_internal::safe_sizeof<sys_thread_t>(),
 	},
-	.member_count   = 8,
-	.member_pointer = DEFAULT_typedata_structure_dynarray_header_t.member_array,
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_sys_thread_t.member_array,
 	.members = {
-		.flags = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "flags",
-			.parent        = &DEFAULT_typedata_structure_dynarray_header_t.type_info,
-			.offset        = offsetof(dynarray_header_t, flags),
+		.handle = {
+			.type_info     = &DEFAULT_typedata_sys_thread_handle_t,
+			.member_name   = "handle",
+			.parent        = &DEFAULT_typedata_structure_sys_thread_t.type_info,
+			.offset        = offsetof(sys_thread_t, handle),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.header_id = {
+		.thread_id = {
 			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "header_id",
-			.parent        = &DEFAULT_typedata_structure_dynarray_header_t.type_info,
-			.offset        = offsetof(dynarray_header_t, header_id),
+			.member_name   = "thread_id",
+			.parent        = &DEFAULT_typedata_structure_sys_thread_t.type_info,
+			.offset        = offsetof(sys_thread_t, thread_id),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.capacity = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "capacity",
-			.parent        = &DEFAULT_typedata_structure_dynarray_header_t.type_info,
-			.offset        = offsetof(dynarray_header_t, capacity),
-			.flags         = 0,
-			.pointer_depth = 0,
+		.user_data = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "user_data",
+			.parent        = &DEFAULT_typedata_structure_sys_thread_t.type_info,
+			.offset        = offsetof(sys_thread_t, user_data),
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
-		.element_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "element_size",
-			.parent        = &DEFAULT_typedata_structure_dynarray_header_t.type_info,
-			.offset        = offsetof(dynarray_header_t, element_size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.indices_used = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "indices_used",
-			.parent        = &DEFAULT_typedata_structure_dynarray_header_t.type_info,
-			.offset        = offsetof(dynarray_header_t, indices_used),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.total_allocated_bytes = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "total_allocated_bytes",
-			.parent        = &DEFAULT_typedata_structure_dynarray_header_t.type_info,
-			.offset        = offsetof(dynarray_header_t, total_allocated_bytes),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.__padding1 = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "__padding1",
-			.parent        = &DEFAULT_typedata_structure_dynarray_header_t.type_info,
-			.offset        = offsetof(dynarray_header_t, __padding1),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.__padding2 = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "__padding2",
-			.parent        = &DEFAULT_typedata_structure_dynarray_header_t.type_info,
-			.offset        = offsetof(dynarray_header_t, __padding2),
+	},
+};
+
+constexpr type_info_struct_sys_mutex_t DEFAULT_typedata_structure_sys_mutex_t = {
+	.type_info = {
+		.type_name = "sys_mutex_t",
+		.type_id = TYPE_sys_mutex_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<sys_mutex_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_sys_mutex_t.member_array,
+	.members = {
+		.handle = {
+			.type_info     = &DEFAULT_typedata_sys_mutex_handle_t,
+			.member_name   = "handle",
+			.parent        = &DEFAULT_typedata_structure_sys_mutex_t.type_info,
+			.offset        = offsetof(sys_mutex_t, handle),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
 
+constexpr type_info_struct_sys_semaphore_t DEFAULT_typedata_structure_sys_semaphore_t = {
+	.type_info = {
+		.type_name = "sys_semaphore_t",
+		.type_id = TYPE_sys_semaphore_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<sys_semaphore_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_sys_semaphore_t.member_array,
+	.members = {
+		.handle = {
+			.type_info     = &DEFAULT_typedata_sys_semaphore_handle_t,
+			.member_name   = "handle",
+			.parent        = &DEFAULT_typedata_structure_sys_semaphore_t.type_info,
+			.offset        = offsetof(sys_semaphore_t, handle),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_ticket_mutex_t DEFAULT_typedata_structure_ticket_mutex_t = {
+	.type_info = {
+		.type_name = "ticket_mutex_t",
+		.type_id = TYPE_ticket_mutex_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<ticket_mutex_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_ticket_mutex_t.member_array,
+	.members = {
+		.next_ticket = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "next_ticket",
+			.parent        = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
+			.offset        = offsetof(ticket_mutex_t, next_ticket),
+			.flags         = 4,
+			.pointer_depth = 0,
+		},
+		.working_ticket = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "working_ticket",
+			.parent        = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
+			.offset        = offsetof(ticket_mutex_t, working_ticket),
+			.flags         = 4,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_t DEFAULT_typedata_u64 = {
+	.type_name = "u64",
+	.type_id = TYPE_u64,
+	.size = athena_internal::safe_sizeof<u64>(),
+};
+constexpr type_info_procedure_c_ticket_mutex_take_ticket DEFAULT_typedata_procedure_c_ticket_mutex_take_ticket = {
+	.type_info = {
+		.type_name = "c_ticket_mutex_take_ticket",
+		.type_id = TYPE_c_ticket_mutex_take_ticket,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_u64,
+	.argument_pointer = DEFAULT_typedata_procedure_c_ticket_mutex_take_ticket.argument_array,
+	.arguments = {
+		.mutex = {
+			.type_info     = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
+			.member_name   = "mutex",
+			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_take_ticket.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_t DEFAULT_typedata_bool8 = {
+	.type_name = "bool8",
+	.type_id = TYPE_bool8,
+	.size = athena_internal::safe_sizeof<bool8>(),
+};
+constexpr type_info_procedure_c_ticket_mutex_try_wait DEFAULT_typedata_procedure_c_ticket_mutex_try_wait = {
+	.type_info = {
+		.type_name = "c_ticket_mutex_try_wait",
+		.type_id = TYPE_c_ticket_mutex_try_wait,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_bool8,
+	.argument_pointer = DEFAULT_typedata_procedure_c_ticket_mutex_try_wait.argument_array,
+	.arguments = {
+		.mutex = {
+			.type_info     = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
+			.member_name   = "mutex",
+			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_try_wait.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.ticket = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "ticket",
+			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_try_wait.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_c_ticket_mutex_wait DEFAULT_typedata_procedure_c_ticket_mutex_wait = {
+	.type_info = {
+		.type_name = "c_ticket_mutex_wait",
+		.type_id = TYPE_c_ticket_mutex_wait,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_c_ticket_mutex_wait.argument_array,
+	.arguments = {
+		.mutex = {
+			.type_info     = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
+			.member_name   = "mutex",
+			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_wait.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.ticket = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "ticket",
+			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_wait.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_c_ticket_mutex_advance_ticket DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket = {
+	.type_info = {
+		.type_name = "c_ticket_mutex_advance_ticket",
+		.type_id = TYPE_c_ticket_mutex_advance_ticket,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket.argument_array,
+	.arguments = {
+		.mutex = {
+			.type_info     = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
+			.member_name   = "mutex",
+			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_c_ticket_mutex_take_and_wait DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait = {
+	.type_info = {
+		.type_name = "c_ticket_mutex_take_and_wait",
+		.type_id = TYPE_c_ticket_mutex_take_and_wait,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait.argument_array,
+	.arguments = {
+		.mutex = {
+			.type_info     = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
+			.member_name   = "mutex",
+			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_t DEFAULT_typedata_sys_thread_handle_t = {
+	.type_name = "sys_thread_handle_t",
+	.type_id = TYPE_sys_thread_handle_t,
+	.size = athena_internal::safe_sizeof<sys_thread_handle_t>(),
+};
 constexpr type_info_t DEFAULT_typedata_u32 = {
 	.type_name = "u32",
+	.type_id = TYPE_u32,
 	.size = athena_internal::safe_sizeof<u32>(),
 };
-constexpr type_info_procedure__dynarray_create_impl DEFAULT_typedata_procedure__dynarray_create_impl = {
+constexpr type_info_t DEFAULT_typedata_sys_mutex_handle_t = {
+	.type_name = "sys_mutex_handle_t",
+	.type_id = TYPE_sys_mutex_handle_t,
+	.size = athena_internal::safe_sizeof<sys_mutex_handle_t>(),
+};
+constexpr type_info_t DEFAULT_typedata_sys_semaphore_handle_t = {
+	.type_name = "sys_semaphore_handle_t",
+	.type_id = TYPE_sys_semaphore_handle_t,
+	.size = athena_internal::safe_sizeof<sys_semaphore_handle_t>(),
+};
+constexpr type_info_t DEFAULT_typedata_immediate_vertex_t = {
+	.type_name = "immediate_vertex_t",
+	.type_id = TYPE_immediate_vertex_t,
+	.size = athena_internal::safe_sizeof<immediate_vertex_t>(),
+};
+constexpr type_info_t DEFAULT_typedata_immediate_widget_data_t = {
+	.type_name = "immediate_widget_data_t",
+	.type_id = TYPE_immediate_widget_data_t,
+	.size = athena_internal::safe_sizeof<immediate_widget_data_t>(),
+};
+constexpr type_info_struct_render_command_list_t DEFAULT_typedata_structure_render_command_list_t = {
 	.type_info = {
-		.type_name = "_dynarray_create_impl",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_name = "render_command_list_t",
+		.type_id = TYPE_render_command_list_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<render_command_list_t>(),
 	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure__dynarray_create_impl.argument_array,
-	.arguments = {
-		.element_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "element_size",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_create_impl.type_info,
+	.member_count   = 28,
+	.member_pointer = DEFAULT_typedata_structure_render_command_list_t.member_array,
+	.members = {
+		.is_initialized = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "is_initialized",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, is_initialized),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-	},
-};
-constexpr type_info_procedure__dynarray_destroy_impl DEFAULT_typedata_procedure__dynarray_destroy_impl = {
-	.type_info = {
-		.type_name = "_dynarray_destroy_impl",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure__dynarray_destroy_impl.argument_array,
-	.arguments = {
-		.array = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "array",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_destroy_impl.type_info,
+		.renderer_state = {
+			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.member_name   = "renderer_state",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, renderer_state),
 			.flags         = 2,
-			.pointer_depth = 2,
+			.pointer_depth = 1,
+		},
+		.transient_arena = {
+			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
+			.member_name   = "transient_arena",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, transient_arena),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.command_arena = {
+			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
+			.member_name   = "command_arena",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, command_arena),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.commands = {
+			.type_info     = &DEFAULT_typedata_structure_render_command_t.type_info,
+			.member_name   = "commands",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, commands),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.command_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "command_count",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, command_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.draw_instance_command_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "draw_instance_command_count",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, draw_instance_command_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.bind_shader_command_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "bind_shader_command_count",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, bind_shader_command_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.bind_render_target_command_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "bind_render_target_command_count",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, bind_render_target_command_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.bind_material_command_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "bind_material_command_count",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, bind_material_command_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.active_render_state = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
+			.member_name   = "active_render_state",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, active_render_state),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.vertex_buffer_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_buffer_count",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, vertex_buffer_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.active_index_buffer = {
+			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
+			.member_name   = "active_index_buffer",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, active_index_buffer),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.active_scissor_command = {
+			.type_info     = &DEFAULT_typedata_structure_render_command_t.type_info,
+			.member_name   = "active_scissor_command",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, active_scissor_command),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.active_viewport_command = {
+			.type_info     = &DEFAULT_typedata_structure_render_command_t.type_info,
+			.member_name   = "active_viewport_command",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, active_viewport_command),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.active_shader_program = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "active_shader_program",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, active_shader_program),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.vertex_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_offset",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, vertex_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.instance_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "instance_offset",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, instance_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.index_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "index_offset",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, index_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.active_renderpass = {
+			.type_info     = &DEFAULT_typedata_structure_renderpass_t.type_info,
+			.member_name   = "active_renderpass",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, active_renderpass),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.presenting = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "presenting",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, presenting),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.image_shader_params = {
+			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.member_name   = "image_shader_params",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, image_shader_params),
+			.flags         = 66,
+			.pointer_depth = 1,
+		},
+		.image_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "image_count",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, image_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.image_ids_to_bind = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "image_ids_to_bind",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, image_ids_to_bind),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.bound_image_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "bound_image_count",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, bound_image_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.command_list_type = {
+			.type_info     = &DEFAULT_typedata_structure_command_list_type_t.type_info,
+			.member_name   = "command_list_type",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, command_list_type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.backend_command_buffer = {
+			.type_info     = &DEFAULT_typedata_backend_command_buffer_t,
+			.member_name   = "backend_command_buffer",
+			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.offset        = offsetof(render_command_list_t, backend_command_buffer),
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure__dynarray_grow_impl DEFAULT_typedata_procedure__dynarray_grow_impl = {
+
+constexpr type_info_struct_vertex_buffer_t DEFAULT_typedata_structure_vertex_buffer_t = {
 	.type_info = {
-		.type_name = "_dynarray_grow_impl",
+		.type_name = "vertex_buffer_t",
+		.type_id = TYPE_vertex_buffer_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<vertex_buffer_t>(),
+	},
+	.member_count   = 4,
+	.member_pointer = DEFAULT_typedata_structure_vertex_buffer_t.member_array,
+	.members = {
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.offset        = offsetof(vertex_buffer_t, buffer),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.vertex_data = {
+			.type_info     = &DEFAULT_typedata_byte,
+			.member_name   = "vertex_data",
+			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.offset        = offsetof(vertex_buffer_t, vertex_data),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.max_vertices = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "max_vertices",
+			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.offset        = offsetof(vertex_buffer_t, max_vertices),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.vertex_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_count",
+			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.offset        = offsetof(vertex_buffer_t, vertex_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_t DEFAULT_typedata_vec3_t = {
+	.type_name = "vec3_t",
+	.type_id = TYPE_vec3_t,
+	.size = athena_internal::safe_sizeof<vec3_t>(),
+};
+constexpr type_info_t DEFAULT_typedata_vec2_t = {
+	.type_name = "vec2_t",
+	.type_id = TYPE_vec2_t,
+	.size = athena_internal::safe_sizeof<vec2_t>(),
+};
+constexpr type_info_t DEFAULT_typedata_vec4_t = {
+	.type_name = "vec4_t",
+	.type_id = TYPE_vec4_t,
+	.size = athena_internal::safe_sizeof<vec4_t>(),
+};
+constexpr type_info_struct_texture2D_t DEFAULT_typedata_structure_texture2D_t = {
+	.type_info = {
+		.type_name = "texture2D_t",
+		.type_id = TYPE_texture2D_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<texture2D_t>(),
+	},
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_texture2D_t.member_array,
+	.members = {
+		.ID = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "ID",
+			.parent        = &DEFAULT_typedata_structure_texture2D_t.type_info,
+			.offset        = offsetof(texture2D_t, ID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.bitmap = {
+			.type_info     = &DEFAULT_typedata_structure_bitmap_t.type_info,
+			.member_name   = "bitmap",
+			.parent        = &DEFAULT_typedata_structure_texture2D_t.type_info,
+			.offset        = offsetof(texture2D_t, bitmap),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.gpu_data = {
+			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.member_name   = "gpu_data",
+			.parent        = &DEFAULT_typedata_structure_texture2D_t.type_info,
+			.offset        = offsetof(texture2D_t, gpu_data),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immediate_quad_ex = {
+	.type_info = {
+		.type_name = "immediate_quad_ex",
+		.type_id = TYPE_immediate_quad_ex,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 3,
+	.argument_count = 11,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure__dynarray_grow_impl.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_immediate_quad_ex.argument_array,
 	.arguments = {
-		.array = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "array",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_grow_impl.type_info,
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
 			.flags         = 2,
-			.pointer_depth = 2,
+			.pointer_depth = 1,
 		},
-		.element_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "element_size",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_grow_impl.type_info,
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.position = {
+			.type_info     = &DEFAULT_typedata_vec3_t,
+			.member_name   = "position",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.new_capacity = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "new_capacity",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_grow_impl.type_info,
+		.render_size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "render_size",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.render_color = {
+			.type_info     = &DEFAULT_typedata_vec4_t,
+			.member_name   = "render_color",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.uv_min = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "uv_min",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.uv_max = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "uv_max",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.padding = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "padding",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.sdf_info = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "sdf_info",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.padding0 = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "padding0",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.texture = {
+			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
+			.member_name   = "texture",
+			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediate_rect = {
+	.type_info = {
+		.type_name = "immediate_rect",
+		.type_id = TYPE_immediate_rect,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 10,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.position = {
+			.type_info     = &DEFAULT_typedata_vec3_t,
+			.member_name   = "position",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.render_size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "render_size",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.render_color = {
+			.type_info     = &DEFAULT_typedata_vec4_t,
+			.member_name   = "render_color",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.uv_min = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "uv_min",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.uv_max = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "uv_max",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.padding = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "padding",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.sdf_info = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "sdf_info",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.padding0 = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "padding0",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure__dynarray_insert_impl DEFAULT_typedata_procedure__dynarray_insert_impl = {
+constexpr type_info_struct_asset_manager_t DEFAULT_typedata_structure_asset_manager_t = {
 	.type_info = {
-		.type_name = "_dynarray_insert_impl",
+		.type_name = "asset_manager_t",
+		.type_id = TYPE_asset_manager_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<asset_manager_t>(),
+	},
+	.member_count   = 20,
+	.member_pointer = DEFAULT_typedata_structure_asset_manager_t.member_array,
+	.members = {
+		.is_initialized = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "is_initialized",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, is_initialized),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.manager_arena = {
+			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
+			.member_name   = "manager_arena",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, manager_arena),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.freetype_handle = {
+			.type_info     = &DEFAULT_typedata_FT_Library,
+			.member_name   = "freetype_handle",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, freetype_handle),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.asset_files = {
+			.type_info     = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.member_name   = "asset_files",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, asset_files),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.loaded_file_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "loaded_file_count",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, loaded_file_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.asset_load_queue = {
+			.type_info     = &DEFAULT_typedata_structure_asset_slot_t.type_info,
+			.member_name   = "asset_load_queue",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, asset_load_queue),
+			.flags         = 66,
+			.pointer_depth = 1,
+		},
+		.load_queue_size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "load_queue_size",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, load_queue_size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.asset_unload_queue = {
+			.type_info     = &DEFAULT_typedata_structure_asset_slot_t.type_info,
+			.member_name   = "asset_unload_queue",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, asset_unload_queue),
+			.flags         = 66,
+			.pointer_depth = 1,
+		},
+		.unload_queue_size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "unload_queue_size",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, unload_queue_size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.atlas_registry = {
+			.type_info     = &DEFAULT_typedata_structure_texture_atlas_registry_t.type_info,
+			.member_name   = "atlas_registry",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, atlas_registry),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.asset_allocator = {
+			.type_info     = &DEFAULT_typedata_structure_zone_allocator_t.type_info,
+			.member_name   = "asset_allocator",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, asset_allocator),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.asset_catalogs = {
+			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
+			.member_name   = "asset_catalogs",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, asset_catalogs),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.texture_catalog = {
+			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
+			.member_name   = "texture_catalog",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, texture_catalog),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.shader_catalog = {
+			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
+			.member_name   = "shader_catalog",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, shader_catalog),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.material_catalog = {
+			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
+			.member_name   = "material_catalog",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, material_catalog),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.font_catalog = {
+			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
+			.member_name   = "font_catalog",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, font_catalog),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.sound_catalog = {
+			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
+			.member_name   = "sound_catalog",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, sound_catalog),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.font_manager = {
+			.type_info     = &DEFAULT_typedata_structure_font_manager_t.type_info,
+			.member_name   = "font_manager",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, font_manager),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.renderer_state = {
+			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.member_name   = "renderer_state",
+			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.offset        = offsetof(asset_manager_t, renderer_state),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+
+constexpr type_info_struct_asset_handle_t DEFAULT_typedata_structure_asset_handle_t = {
+	.type_info = {
+		.type_name = "asset_handle_t",
+		.type_id = TYPE_asset_handle_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<asset_handle_t>(),
+	},
+	.member_count   = 8,
+	.member_pointer = DEFAULT_typedata_structure_asset_handle_t.member_array,
+	.members = {
+		.is_valid = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "is_valid",
+			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.offset        = offsetof(asset_handle_t, is_valid),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.slot = {
+			.type_info     = &DEFAULT_typedata_structure_asset_slot_t.type_info,
+			.member_name   = "slot",
+			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.offset        = offsetof(asset_handle_t, slot),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.texture = {
+			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
+			.member_name   = "texture",
+			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.offset        = offsetof(asset_handle_t, texture),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.shader = {
+			.type_info     = &DEFAULT_typedata_structure_shader_t.type_info,
+			.member_name   = "shader",
+			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.offset        = offsetof(asset_handle_t, shader),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.material_info = {
+			.type_info     = &DEFAULT_typedata_structure_material_data_t.type_info,
+			.member_name   = "material_info",
+			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.offset        = offsetof(asset_handle_t, material_info),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.dynamic_render_font = {
+			.type_info     = &DEFAULT_typedata_structure_dynamic_render_font_t.type_info,
+			.member_name   = "dynamic_render_font",
+			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.offset        = offsetof(asset_handle_t, dynamic_render_font),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.animation_source2D = {
+			.type_info     = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
+			.member_name   = "animation_source2D",
+			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.offset        = offsetof(asset_handle_t, animation_source2D),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.animation2D = {
+			.type_info     = &DEFAULT_typedata_structure_animation2D_t.type_info,
+			.member_name   = "animation2D",
+			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.offset        = offsetof(asset_handle_t, animation2D),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+
+constexpr type_info_struct_string_t DEFAULT_typedata_structure_string_t = {
+	.type_info = {
+		.type_name = "string_t",
+		.type_id = TYPE_string_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<string_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_string_t.member_array,
+	.members = {
+		.data = {
+			.type_info     = &DEFAULT_typedata_byte,
+			.member_name   = "data",
+			.parent        = &DEFAULT_typedata_structure_string_t.type_info,
+			.offset        = offsetof(string_t, data),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.count = {
+			.type_info     = &DEFAULT_typedata_s64,
+			.member_name   = "count",
+			.parent        = &DEFAULT_typedata_structure_string_t.type_info,
+			.offset        = offsetof(string_t, count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_t DEFAULT_typedata_float32 = {
+	.type_name = "float32",
+	.type_id = TYPE_float32,
+	.size = athena_internal::safe_sizeof<float32>(),
+};
+constexpr type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediate_text = {
+	.type_info = {
+		.type_name = "immediate_text",
+		.type_id = TYPE_immediate_text,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 9,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_immediate_text.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.vertex_buffer = {
+			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.member_name   = "vertex_buffer",
+			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.asset_manager = {
+			.type_info     = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.member_name   = "asset_manager",
+			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.asset_handle = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "asset_handle",
+			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.render_string = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "render_string",
+			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.position = {
+			.type_info     = &DEFAULT_typedata_vec3_t,
+			.member_name   = "position",
+			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.text_color = {
+			.type_info     = &DEFAULT_typedata_vec4_t,
+			.member_name   = "text_color",
+			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.settings = {
+			.type_info     = &DEFAULT_typedata_float32,
+			.member_name   = "settings",
+			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.font_size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "font_size",
+			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_t DEFAULT_typedata_byte = {
+	.type_name = "byte",
+	.type_id = TYPE_byte,
+	.size = athena_internal::safe_sizeof<byte>(),
+};
+constexpr type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data = {
+	.type_info = {
+		.type_name = "immediate_put_data",
+		.type_id = TYPE_immediate_put_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure__dynarray_insert_impl.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_immediate_put_data.argument_array,
 	.arguments = {
-		.array = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "array",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_insert_impl.type_info,
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
 			.flags         = 2,
-			.pointer_depth = 2,
+			.pointer_depth = 1,
 		},
-		.element = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "element",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_insert_impl.type_info,
+		.data = {
+			.type_info     = &DEFAULT_typedata_byte,
+			.member_name   = "data",
+			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.element_size = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "element_size",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_insert_impl.type_info,
+			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.index = {
+		.element_count = {
 			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "index",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_insert_impl.type_info,
+			.member_name   = "element_count",
+			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure__dynarray_remove_impl DEFAULT_typedata_procedure__dynarray_remove_impl = {
+constexpr type_info_procedure_void_func DEFAULT_typedata_procedure_void_func = {
 	.type_info = {
-		.type_name = "_dynarray_remove_impl",
+		.type_name = "void_func",
+		.type_id = TYPE_void_func,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 3,
+	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure__dynarray_remove_impl.argument_array,
-	.arguments = {
-		.array = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "array",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_remove_impl.type_info,
-			.flags         = 2,
-			.pointer_depth = 2,
-		},
-		.element_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "element_size",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_remove_impl.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.index = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "index",
-			.parent        = &DEFAULT_typedata_procedure__dynarray_remove_impl.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
 };
-constexpr type_info_struct_file_extension_t DEFAULT_typedata_structure_file_extension_t = {
+constexpr type_info_struct_duration_counter_t DEFAULT_typedata_structure_duration_counter_t = {
 	.type_info = {
-		.type_name = "file_extension_t",
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<file_extension_t>(),
+		.type_name = "duration_counter_t",
+		.type_id = TYPE_duration_counter_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<duration_counter_t>(),
 	},
-	.member_count   = 7,
-	.member_pointer = DEFAULT_typedata_structure_file_extension_t.member_array,
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_duration_counter_t.member_array,
 	.members = {
-		.FILE_EXT_INVALID = {
-			.type_info     = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.member_name   = "FILE_EXT_INVALID",
-			.parent        = &DEFAULT_typedata_structure_file_extension_t.type_info,
+		.duration_ms = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "duration_ms",
+			.parent        = &DEFAULT_typedata_structure_duration_counter_t.type_info,
+			.offset        = offsetof(duration_counter_t, duration_ms),
 			.flags         = 0,
 			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = FILE_EXT_INVALID,
-			},
 		},
-		.FILE_EXT_TTF = {
-			.type_info     = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.member_name   = "FILE_EXT_TTF",
-			.parent        = &DEFAULT_typedata_structure_file_extension_t.type_info,
+		.current_elapsed = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "current_elapsed",
+			.parent        = &DEFAULT_typedata_structure_duration_counter_t.type_info,
+			.offset        = offsetof(duration_counter_t, current_elapsed),
 			.flags         = 0,
 			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = FILE_EXT_TTF,
-			},
 		},
-		.FILE_EXT_WAV = {
-			.type_info     = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.member_name   = "FILE_EXT_WAV",
-			.parent        = &DEFAULT_typedata_structure_file_extension_t.type_info,
+		.looped = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "looped",
+			.parent        = &DEFAULT_typedata_structure_duration_counter_t.type_info,
+			.offset        = offsetof(duration_counter_t, looped),
 			.flags         = 0,
 			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = FILE_EXT_WAV,
-			},
-		},
-		.FILE_EXT_PNG = {
-			.type_info     = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.member_name   = "FILE_EXT_PNG",
-			.parent        = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = FILE_EXT_PNG,
-			},
-		},
-		.FILE_EXT_GLSL = {
-			.type_info     = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.member_name   = "FILE_EXT_GLSL",
-			.parent        = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = FILE_EXT_GLSL,
-			},
-		},
-		.FILE_EXT_OS_DLL = {
-			.type_info     = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.member_name   = "FILE_EXT_OS_DLL",
-			.parent        = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = FILE_EXT_OS_DLL,
-			},
-		},
-		.FILE_EXT_COUNT = {
-			.type_info     = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.member_name   = "FILE_EXT_COUNT",
-			.parent        = &DEFAULT_typedata_structure_file_extension_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = FILE_EXT_COUNT,
-			},
 		},
 	},
 };
 
+constexpr type_info_t DEFAULT_typedata_bool32 = {
+	.type_name = "bool32",
+	.type_id = TYPE_bool32,
+	.size = athena_internal::safe_sizeof<bool32>(),
+};
+constexpr type_info_t DEFAULT_typedata_T = {
+};
+constexpr type_info_procedure_begin DEFAULT_typedata_procedure_begin = {
+	.type_info = {
+		.type_name = "begin",
+		.type_id = TYPE_begin,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 0,
+	.return_type    = &DEFAULT_typedata_T,
+};
+constexpr type_info_procedure_end DEFAULT_typedata_procedure_end = {
+	.type_info = {
+		.type_name = "end",
+		.type_id = TYPE_end,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 0,
+	.return_type    = &DEFAULT_typedata_T,
+};
 constexpr type_info_struct_file_t DEFAULT_typedata_structure_file_t = {
 	.type_info = {
 		.type_name = "file_t",
+		.type_id = TYPE_file_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<file_t>(),
 	},
@@ -9386,6 +11194,7 @@ constexpr type_info_struct_file_t DEFAULT_typedata_structure_file_t = {
 constexpr type_info_struct_mapped_file_t DEFAULT_typedata_structure_mapped_file_t = {
 	.type_info = {
 		.type_name = "mapped_file_t",
+		.type_id = TYPE_mapped_file_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<mapped_file_t>(),
 	},
@@ -9422,6 +11231,7 @@ constexpr type_info_struct_mapped_file_t DEFAULT_typedata_structure_mapped_file_
 constexpr type_info_struct_file_data_t DEFAULT_typedata_structure_file_data_t = {
 	.type_info = {
 		.type_name = "file_data_t",
+		.type_id = TYPE_file_data_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<file_data_t>(),
 	},
@@ -9466,6 +11276,7 @@ constexpr type_info_struct_file_data_t DEFAULT_typedata_structure_file_data_t = 
 constexpr type_info_struct_overlap_io_data_t DEFAULT_typedata_structure_overlap_io_data_t = {
 	.type_info = {
 		.type_name = "overlap_io_data_t",
+		.type_id = TYPE_overlap_io_data_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<overlap_io_data_t>(),
 	},
@@ -9517,11 +11328,13 @@ constexpr type_info_struct_overlap_io_data_t DEFAULT_typedata_structure_overlap_
 
 constexpr type_info_t DEFAULT_typedata_visit_file_data = {
 	.type_name = "visit_file_data",
+	.type_id = TYPE_visit_file_data,
 	.size = athena_internal::safe_sizeof<visit_file_data>(),
 };
 constexpr type_info_procedure_visit_files_pfn_t DEFAULT_typedata_procedure_visit_files_pfn_t = {
 	.type_info = {
 		.type_name = "visit_files_pfn_t",
+		.type_id = TYPE_visit_files_pfn_t,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -9547,6 +11360,7 @@ constexpr type_info_procedure_visit_files_pfn_t DEFAULT_typedata_procedure_visit
 constexpr type_info_struct_visit_file_data_t DEFAULT_typedata_structure_visit_file_data_t = {
 	.type_info = {
 		.type_name = "visit_file_data_t",
+		.type_id = TYPE_visit_file_data_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<visit_file_data_t>(),
 	},
@@ -9612,41 +11426,10 @@ constexpr type_info_struct_visit_file_data_t DEFAULT_typedata_structure_visit_fi
 	},
 };
 
-constexpr type_info_struct_string_t DEFAULT_typedata_structure_string_t = {
-	.type_info = {
-		.type_name = "string_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<string_t>(),
-	},
-	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_string_t.member_array,
-	.members = {
-		.data = {
-			.type_info     = &DEFAULT_typedata_byte,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_structure_string_t.type_info,
-			.offset        = offsetof(string_t, data),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.count = {
-			.type_info     = &DEFAULT_typedata_s64,
-			.member_name   = "count",
-			.parent        = &DEFAULT_typedata_structure_string_t.type_info,
-			.offset        = offsetof(string_t, count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_t DEFAULT_typedata_bool8 = {
-	.type_name = "bool8",
-	.size = athena_internal::safe_sizeof<bool8>(),
-};
 constexpr type_info_procedure_c_file_open DEFAULT_typedata_procedure_c_file_open = {
 	.type_info = {
 		.type_name = "c_file_open",
+		.type_id = TYPE_c_file_open,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -9672,6 +11455,7 @@ constexpr type_info_procedure_c_file_open DEFAULT_typedata_procedure_c_file_open
 constexpr type_info_procedure_c_file_close DEFAULT_typedata_procedure_c_file_close = {
 	.type_info = {
 		.type_name = "c_file_close",
+		.type_id = TYPE_c_file_close,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -9690,6 +11474,7 @@ constexpr type_info_procedure_c_file_close DEFAULT_typedata_procedure_c_file_clo
 constexpr type_info_procedure_c_file_copy DEFAULT_typedata_procedure_c_file_copy = {
 	.type_info = {
 		.type_name = "c_file_copy",
+		.type_id = TYPE_c_file_copy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -9715,6 +11500,7 @@ constexpr type_info_procedure_c_file_copy DEFAULT_typedata_procedure_c_file_copy
 constexpr type_info_struct_memory_arena_t DEFAULT_typedata_structure_memory_arena_t = {
 	.type_info = {
 		.type_name = "memory_arena_t",
+		.type_id = TYPE_memory_arena_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<memory_arena_t>(),
 	},
@@ -9775,6 +11561,7 @@ constexpr type_info_struct_memory_arena_t DEFAULT_typedata_structure_memory_aren
 constexpr type_info_struct_zone_allocator_t DEFAULT_typedata_structure_zone_allocator_t = {
 	.type_info = {
 		.type_name = "zone_allocator_t",
+		.type_id = TYPE_zone_allocator_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<zone_allocator_t>(),
 	},
@@ -9827,6 +11614,7 @@ constexpr type_info_struct_zone_allocator_t DEFAULT_typedata_structure_zone_allo
 constexpr type_info_struct_za_allocation_tag_t DEFAULT_typedata_structure_za_allocation_tag_t = {
 	.type_info = {
 		.type_name = "za_allocation_tag_t",
+		.type_id = TYPE_za_allocation_tag_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<za_allocation_tag_t>(),
 	},
@@ -9916,6 +11704,7 @@ constexpr type_info_struct_za_allocation_tag_t DEFAULT_typedata_structure_za_all
 constexpr type_info_procedure_c_file_read DEFAULT_typedata_procedure_c_file_read = {
 	.type_info = {
 		.type_name = "c_file_read",
+		.type_id = TYPE_c_file_read,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 6,
@@ -9985,6 +11774,7 @@ constexpr type_info_procedure_c_file_read DEFAULT_typedata_procedure_c_file_read
 constexpr type_info_procedure_c_file_read_entirety DEFAULT_typedata_procedure_c_file_read_entirety = {
 	.type_info = {
 		.type_name = "c_file_read_entirety",
+		.type_id = TYPE_c_file_read_entirety,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -10036,6 +11826,7 @@ constexpr type_info_procedure_c_file_read_entirety DEFAULT_typedata_procedure_c_
 constexpr type_info_procedure_c_file_read_from_offset DEFAULT_typedata_procedure_c_file_read_from_offset = {
 	.type_info = {
 		.type_name = "c_file_read_from_offset",
+		.type_id = TYPE_c_file_read_from_offset,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 6,
@@ -10101,6 +11892,7 @@ constexpr type_info_procedure_c_file_read_from_offset DEFAULT_typedata_procedure
 constexpr type_info_procedure_c_file_read_to_end DEFAULT_typedata_procedure_c_file_read_to_end = {
 	.type_info = {
 		.type_name = "c_file_read_to_end",
+		.type_id = TYPE_c_file_read_to_end,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -10158,11 +11950,13 @@ constexpr type_info_procedure_c_file_read_to_end DEFAULT_typedata_procedure_c_fi
 };
 constexpr type_info_t DEFAULT_typedata_s64 = {
 	.type_name = "s64",
+	.type_id = TYPE_s64,
 	.size = athena_internal::safe_sizeof<s64>(),
 };
 constexpr type_info_procedure_c_file_open_and_write DEFAULT_typedata_procedure_c_file_open_and_write = {
 	.type_info = {
 		.type_name = "c_file_open_and_write",
+		.type_id = TYPE_c_file_open_and_write,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -10202,6 +11996,7 @@ constexpr type_info_procedure_c_file_open_and_write DEFAULT_typedata_procedure_c
 constexpr type_info_procedure_c_file_write DEFAULT_typedata_procedure_c_file_write = {
 	.type_info = {
 		.type_name = "c_file_write",
+		.type_id = TYPE_c_file_write,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -10234,6 +12029,7 @@ constexpr type_info_procedure_c_file_write DEFAULT_typedata_procedure_c_file_wri
 constexpr type_info_procedure_c_file_write_string DEFAULT_typedata_procedure_c_file_write_string = {
 	.type_info = {
 		.type_name = "c_file_write_string",
+		.type_id = TYPE_c_file_write_string,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -10259,6 +12055,7 @@ constexpr type_info_procedure_c_file_write_string DEFAULT_typedata_procedure_c_f
 constexpr type_info_procedure_c_file_get_size DEFAULT_typedata_procedure_c_file_get_size = {
 	.type_info = {
 		.type_name = "c_file_get_size",
+		.type_id = TYPE_c_file_get_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -10277,6 +12074,7 @@ constexpr type_info_procedure_c_file_get_size DEFAULT_typedata_procedure_c_file_
 constexpr type_info_procedure_c_file_get_file_system_info DEFAULT_typedata_procedure_c_file_get_file_system_info = {
 	.type_info = {
 		.type_name = "c_file_get_file_system_info",
+		.type_id = TYPE_c_file_get_file_system_info,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -10295,6 +12093,7 @@ constexpr type_info_procedure_c_file_get_file_system_info DEFAULT_typedata_proce
 constexpr type_info_procedure_c_file_replace_or_rename DEFAULT_typedata_procedure_c_file_replace_or_rename = {
 	.type_info = {
 		.type_name = "c_file_replace_or_rename",
+		.type_id = TYPE_c_file_replace_or_rename,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -10320,6 +12119,7 @@ constexpr type_info_procedure_c_file_replace_or_rename DEFAULT_typedata_procedur
 constexpr type_info_procedure_c_file_map DEFAULT_typedata_procedure_c_file_map = {
 	.type_info = {
 		.type_name = "c_file_map",
+		.type_id = TYPE_c_file_map,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -10338,6 +12138,7 @@ constexpr type_info_procedure_c_file_map DEFAULT_typedata_procedure_c_file_map =
 constexpr type_info_procedure_c_file_unmap DEFAULT_typedata_procedure_c_file_unmap = {
 	.type_info = {
 		.type_name = "c_file_unmap",
+		.type_id = TYPE_c_file_unmap,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -10356,6 +12157,7 @@ constexpr type_info_procedure_c_file_unmap DEFAULT_typedata_procedure_c_file_unm
 constexpr type_info_procedure_c_file_ext_string_to_enum DEFAULT_typedata_procedure_c_file_ext_string_to_enum = {
 	.type_info = {
 		.type_name = "c_file_ext_string_to_enum",
+		.type_id = TYPE_c_file_ext_string_to_enum,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -10374,6 +12176,7 @@ constexpr type_info_procedure_c_file_ext_string_to_enum DEFAULT_typedata_procedu
 constexpr type_info_procedure_c_directory_exists DEFAULT_typedata_procedure_c_directory_exists = {
 	.type_info = {
 		.type_name = "c_directory_exists",
+		.type_id = TYPE_c_directory_exists,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -10392,6 +12195,7 @@ constexpr type_info_procedure_c_directory_exists DEFAULT_typedata_procedure_c_di
 constexpr type_info_procedure_c_directory_create_visit_data DEFAULT_typedata_procedure_c_directory_create_visit_data = {
 	.type_info = {
 		.type_name = "c_directory_create_visit_data",
+		.type_id = TYPE_c_directory_create_visit_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -10424,6 +12228,7 @@ constexpr type_info_procedure_c_directory_create_visit_data DEFAULT_typedata_pro
 constexpr type_info_procedure_c_directory_visit DEFAULT_typedata_procedure_c_directory_visit = {
 	.type_info = {
 		.type_name = "c_directory_visit",
+		.type_id = TYPE_c_directory_visit,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -10446,21 +12251,64 @@ constexpr type_info_procedure_c_directory_visit DEFAULT_typedata_procedure_c_dir
 		},
 	},
 };
+constexpr type_info_t DEFAULT_typedata_s32 = {
+	.type_name = "s32",
+	.type_id = TYPE_s32,
+	.size = athena_internal::safe_sizeof<s32>(),
+};
+constexpr type_info_procedure_c_directory_get_file_count DEFAULT_typedata_procedure_c_directory_get_file_count = {
+	.type_info = {
+		.type_name = "c_directory_get_file_count",
+		.type_id = TYPE_c_directory_get_file_count,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 4,
+	.return_type    = &DEFAULT_typedata_s32,
+	.argument_pointer = DEFAULT_typedata_procedure_c_directory_get_file_count.argument_array,
+	.arguments = {
+		.arena = {
+			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
+			.member_name   = "arena",
+			.parent        = &DEFAULT_typedata_procedure_c_directory_get_file_count.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.filepath = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "filepath",
+			.parent        = &DEFAULT_typedata_procedure_c_directory_get_file_count.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.recursive = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "recursive",
+			.parent        = &DEFAULT_typedata_procedure_c_directory_get_file_count.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.file_ext = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "file_ext",
+			.parent        = &DEFAULT_typedata_procedure_c_directory_get_file_count.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
 constexpr type_info_t DEFAULT_typedata_sys_handle_t = {
 	.type_name = "sys_handle_t",
+	.type_id = TYPE_sys_handle_t,
 	.size = athena_internal::safe_sizeof<sys_handle_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_u64 = {
-	.type_name = "u64",
-	.size = athena_internal::safe_sizeof<u64>(),
 };
 constexpr type_info_struct_file_watcher_t DEFAULT_typedata_structure_file_watcher_t = {
 	.type_info = {
 		.type_name = "file_watcher_t",
+		.type_id = TYPE_file_watcher_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<file_watcher_t>(),
 	},
-	.member_count   = 14,
+	.member_count   = 16,
 	.member_pointer = DEFAULT_typedata_structure_file_watcher_t.member_array,
 	.members = {
 		.is_valid = {
@@ -10535,6 +12383,22 @@ constexpr type_info_struct_file_watcher_t DEFAULT_typedata_structure_file_watche
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.recorded_change_events = {
+			.type_info     = &DEFAULT_typedata_structure_file_watcher_recorded_change_t.type_info,
+			.member_name   = "recorded_change_events",
+			.parent        = &DEFAULT_typedata_structure_file_watcher_t.type_info,
+			.offset        = offsetof(file_watcher_t, recorded_change_events),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.recorded_change_event_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "recorded_change_event_count",
+			.parent        = &DEFAULT_typedata_structure_file_watcher_t.type_info,
+			.offset        = offsetof(file_watcher_t, recorded_change_event_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.paths_to_watch = {
 			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
 			.member_name   = "paths_to_watch",
@@ -10581,12 +12445,21 @@ constexpr type_info_struct_file_watcher_t DEFAULT_typedata_structure_file_watche
 constexpr type_info_struct_file_watcher_recorded_change_t DEFAULT_typedata_structure_file_watcher_recorded_change_t = {
 	.type_info = {
 		.type_name = "file_watcher_recorded_change_t",
+		.type_id = TYPE_file_watcher_recorded_change_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<file_watcher_recorded_change_t>(),
 	},
-	.member_count   = 4,
+	.member_count   = 5,
 	.member_pointer = DEFAULT_typedata_structure_file_watcher_recorded_change_t.member_array,
 	.members = {
+		.redudant = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "redudant",
+			.parent        = &DEFAULT_typedata_structure_file_watcher_recorded_change_t.type_info,
+			.offset        = offsetof(file_watcher_recorded_change_t, redudant),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.full_path = {
 			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
 			.member_name   = "full_path",
@@ -10625,6 +12498,7 @@ constexpr type_info_struct_file_watcher_recorded_change_t DEFAULT_typedata_struc
 constexpr type_info_procedure_file_watcher_callback_pfn_t DEFAULT_typedata_procedure_file_watcher_callback_pfn_t = {
 	.type_info = {
 		.type_name = "file_watcher_callback_pfn_t",
+		.type_id = TYPE_file_watcher_callback_pfn_t,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -10657,6 +12531,7 @@ constexpr type_info_procedure_file_watcher_callback_pfn_t DEFAULT_typedata_proce
 constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structure_file_watcher_change_event_t = {
 	.type_info = {
 		.type_name = "file_watcher_change_event_t",
+		.type_id = TYPE_file_watcher_change_event_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<file_watcher_change_event_t>(),
 	},
@@ -10779,6 +12654,7 @@ constexpr type_info_struct_file_watcher_change_event_t DEFAULT_typedata_structur
 constexpr type_info_procedure_c_file_watcher_create DEFAULT_typedata_procedure_c_file_watcher_create = {
 	.type_info = {
 		.type_name = "c_file_watcher_create",
+		.type_id = TYPE_c_file_watcher_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -10825,6 +12701,7 @@ constexpr type_info_procedure_c_file_watcher_create DEFAULT_typedata_procedure_c
 constexpr type_info_procedure_c_file_watcher_add_path DEFAULT_typedata_procedure_c_file_watcher_add_path = {
 	.type_info = {
 		.type_name = "c_file_watcher_add_path",
+		.type_id = TYPE_c_file_watcher_add_path,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -10849,11 +12726,13 @@ constexpr type_info_procedure_c_file_watcher_add_path DEFAULT_typedata_procedure
 };
 constexpr type_info_t DEFAULT_typedata_sys_file_check_event_data_t = {
 	.type_name = "sys_file_check_event_data_t",
+	.type_id = TYPE_sys_file_check_event_data_t,
 	.size = athena_internal::safe_sizeof<sys_file_check_event_data_t>(),
 };
 constexpr type_info_procedure_c_file_watcher_issue_check_for_single_path DEFAULT_typedata_procedure_c_file_watcher_issue_check_for_single_path = {
 	.type_info = {
 		.type_name = "c_file_watcher_issue_check_for_single_path",
+		.type_id = TYPE_c_file_watcher_issue_check_for_single_path,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -10879,6 +12758,7 @@ constexpr type_info_procedure_c_file_watcher_issue_check_for_single_path DEFAULT
 constexpr type_info_procedure_c_file_watcher_issue_check_over_all_paths DEFAULT_typedata_procedure_c_file_watcher_issue_check_over_all_paths = {
 	.type_info = {
 		.type_name = "c_file_watcher_issue_check_over_all_paths",
+		.type_id = TYPE_c_file_watcher_issue_check_over_all_paths,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -10897,6 +12777,7 @@ constexpr type_info_procedure_c_file_watcher_issue_check_over_all_paths DEFAULT_
 constexpr type_info_procedure_c_file_watcher_add_change_event DEFAULT_typedata_procedure_c_file_watcher_add_change_event = {
 	.type_info = {
 		.type_name = "c_file_watcher_add_change_event",
+		.type_id = TYPE_c_file_watcher_add_change_event,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -10943,6 +12824,7 @@ constexpr type_info_procedure_c_file_watcher_add_change_event DEFAULT_typedata_p
 constexpr type_info_procedure_c_file_watcher_emit_changes DEFAULT_typedata_procedure_c_file_watcher_emit_changes = {
 	.type_info = {
 		.type_name = "c_file_watcher_emit_changes",
+		.type_id = TYPE_c_file_watcher_emit_changes,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -10958,17 +12840,38 @@ constexpr type_info_procedure_c_file_watcher_emit_changes DEFAULT_typedata_proce
 		},
 	},
 };
+constexpr type_info_procedure_c_file_watcher_process_changes DEFAULT_typedata_procedure_c_file_watcher_process_changes = {
+	.type_info = {
+		.type_name = "c_file_watcher_process_changes",
+		.type_id = TYPE_c_file_watcher_process_changes,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_c_file_watcher_process_changes.argument_array,
+	.arguments = {
+		.watcher = {
+			.type_info     = &DEFAULT_typedata_structure_file_watcher_t.type_info,
+			.member_name   = "watcher",
+			.parent        = &DEFAULT_typedata_procedure_c_file_watcher_process_changes.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr type_info_t DEFAULT_typedata_file_watcher_sys_watch_data_t = {
 	.type_name = "file_watcher_sys_watch_data_t",
+	.type_id = TYPE_file_watcher_sys_watch_data_t,
 	.size = athena_internal::safe_sizeof<file_watcher_sys_watch_data_t>(),
 };
 constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_context_t = {
 	.type_info = {
 		.type_name = "global_context_t",
+		.type_id = TYPE_global_context_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<global_context_t>(),
 	},
-	.member_count   = 9,
+	.member_count   = 10,
 	.member_pointer = DEFAULT_typedata_structure_global_context_t.member_array,
 	.members = {
 		.is_initialized = {
@@ -11027,6 +12930,14 @@ constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_co
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
+		.file_watcher = {
+			.type_info     = &DEFAULT_typedata_structure_file_watcher_t.type_info,
+			.member_name   = "file_watcher",
+			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
+			.offset        = offsetof(global_context_t, file_watcher),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.context_arena = {
 			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
 			.member_name   = "context_arena",
@@ -11049,6 +12960,7 @@ constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_co
 constexpr type_info_procedure_c_global_context_init DEFAULT_typedata_procedure_c_global_context_init = {
 	.type_info = {
 		.type_name = "c_global_context_init",
+		.type_id = TYPE_c_global_context_init,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
@@ -11057,6 +12969,7 @@ constexpr type_info_procedure_c_global_context_init DEFAULT_typedata_procedure_c
 constexpr type_info_procedure_c_global_context_reset_temporary_data DEFAULT_typedata_procedure_c_global_context_reset_temporary_data = {
 	.type_info = {
 		.type_name = "c_global_context_reset_temporary_data",
+		.type_id = TYPE_c_global_context_reset_temporary_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
@@ -11065,6 +12978,7 @@ constexpr type_info_procedure_c_global_context_reset_temporary_data DEFAULT_type
 constexpr type_info_procedure_c_global_context_reset_context_arena DEFAULT_typedata_procedure_c_global_context_reset_context_arena = {
 	.type_info = {
 		.type_name = "c_global_context_reset_context_arena",
+		.type_id = TYPE_c_global_context_reset_context_arena,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
@@ -11073,6 +12987,7 @@ constexpr type_info_procedure_c_global_context_reset_context_arena DEFAULT_typed
 constexpr type_info_procedure_gc_reset_context_arena DEFAULT_typedata_procedure_gc_reset_context_arena = {
 	.type_info = {
 		.type_name = "gc_reset_context_arena",
+		.type_id = TYPE_gc_reset_context_arena,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
@@ -11081,6 +12996,7 @@ constexpr type_info_procedure_gc_reset_context_arena DEFAULT_typedata_procedure_
 constexpr type_info_struct_threadpool_t DEFAULT_typedata_structure_threadpool_t = {
 	.type_info = {
 		.type_name = "threadpool_t",
+		.type_id = TYPE_threadpool_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<threadpool_t>(),
 	},
@@ -11141,10 +13057,11 @@ constexpr type_info_struct_threadpool_t DEFAULT_typedata_structure_threadpool_t 
 constexpr type_info_struct_renderer_state_t DEFAULT_typedata_structure_renderer_state_t = {
 	.type_info = {
 		.type_name = "renderer_state_t",
+		.type_id = TYPE_renderer_state_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<renderer_state_t>(),
 	},
-	.member_count   = 32,
+	.member_count   = 33,
 	.member_pointer = DEFAULT_typedata_structure_renderer_state_t.member_array,
 	.members = {
 		.window = {
@@ -11367,6 +13284,13 @@ constexpr type_info_struct_renderer_state_t DEFAULT_typedata_structure_renderer_
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
+		.backend_acquire_image_sampler = {
+			.type_info     = &DEFAULT_typedata_procedure_backend_acquire_image_sampler.type_info,
+			.member_name   = "backend_acquire_image_sampler",
+			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.flags         = 1024,
+			.pointer_depth = 0,
+		},
 		.backend_shader_create = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_shader_create.type_info,
 			.member_name   = "backend_shader_create",
@@ -11384,177 +13308,14 @@ constexpr type_info_struct_renderer_state_t DEFAULT_typedata_structure_renderer_
 	},
 };
 
-constexpr type_info_struct_asset_manager_t DEFAULT_typedata_structure_asset_manager_t = {
-	.type_info = {
-		.type_name = "asset_manager_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<asset_manager_t>(),
-	},
-	.member_count   = 20,
-	.member_pointer = DEFAULT_typedata_structure_asset_manager_t.member_array,
-	.members = {
-		.is_initialized = {
-			.type_info     = &DEFAULT_typedata_bool8,
-			.member_name   = "is_initialized",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, is_initialized),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.manager_arena = {
-			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
-			.member_name   = "manager_arena",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, manager_arena),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.freetype_handle = {
-			.type_info     = &DEFAULT_typedata_FT_Library,
-			.member_name   = "freetype_handle",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, freetype_handle),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.asset_files = {
-			.type_info     = &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
-			.member_name   = "asset_files",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, asset_files),
-			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.loaded_file_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "loaded_file_count",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, loaded_file_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.asset_load_queue = {
-			.type_info     = &DEFAULT_typedata_structure_asset_slot_t.type_info,
-			.member_name   = "asset_load_queue",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, asset_load_queue),
-			.flags         = 66,
-			.pointer_depth = 1,
-		},
-		.load_queue_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "load_queue_size",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, load_queue_size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.asset_unload_queue = {
-			.type_info     = &DEFAULT_typedata_structure_asset_slot_t.type_info,
-			.member_name   = "asset_unload_queue",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, asset_unload_queue),
-			.flags         = 66,
-			.pointer_depth = 1,
-		},
-		.unload_queue_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "unload_queue_size",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, unload_queue_size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.atlas_registry = {
-			.type_info     = &DEFAULT_typedata_structure_texture_atlas_registry_t.type_info,
-			.member_name   = "atlas_registry",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, atlas_registry),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.asset_allocator = {
-			.type_info     = &DEFAULT_typedata_structure_zone_allocator_t.type_info,
-			.member_name   = "asset_allocator",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, asset_allocator),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.asset_catalogs = {
-			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
-			.member_name   = "asset_catalogs",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, asset_catalogs),
-			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.texture_catalog = {
-			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
-			.member_name   = "texture_catalog",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, texture_catalog),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.shader_catalog = {
-			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
-			.member_name   = "shader_catalog",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, shader_catalog),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.material_catalog = {
-			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
-			.member_name   = "material_catalog",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, material_catalog),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.font_catalog = {
-			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
-			.member_name   = "font_catalog",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, font_catalog),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.sound_catalog = {
-			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
-			.member_name   = "sound_catalog",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, sound_catalog),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.font_manager = {
-			.type_info     = &DEFAULT_typedata_structure_font_manager_t.type_info,
-			.member_name   = "font_manager",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, font_manager),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, renderer_state),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-
 constexpr type_info_struct_input_manager_t DEFAULT_typedata_structure_input_manager_t = {
 	.type_info = {
 		.type_name = "input_manager_t",
+		.type_id = TYPE_input_manager_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<input_manager_t>(),
 	},
-	.member_count   = 6,
+	.member_count   = 7,
 	.member_pointer = DEFAULT_typedata_structure_input_manager_t.member_array,
 	.members = {
 		.keyboard_data = {
@@ -11611,6 +13372,7 @@ constexpr type_info_struct_input_manager_t DEFAULT_typedata_structure_input_mana
 constexpr type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_structure_hash_table_allocation_flags_t = {
 	.type_info = {
 		.type_name = "hash_table_allocation_flags_t",
+		.type_id = TYPE_hash_table_allocation_flags_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<hash_table_allocation_flags_t>(),
 	},
@@ -11689,6 +13451,7 @@ constexpr type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_struct
 constexpr type_info_procedure_c_hash_table_allocate_fn_t DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t = {
 	.type_info = {
 		.type_name = "c_hash_table_allocate_fn_t",
+		.type_id = TYPE_c_hash_table_allocate_fn_t,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -11721,6 +13484,7 @@ constexpr type_info_procedure_c_hash_table_allocate_fn_t DEFAULT_typedata_proced
 constexpr type_info_procedure_c_hash_table_free_fn_t DEFAULT_typedata_procedure_c_hash_table_free_fn_t = {
 	.type_info = {
 		.type_name = "c_hash_table_free_fn_t",
+		.type_id = TYPE_c_hash_table_free_fn_t,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -11743,13 +13507,10 @@ constexpr type_info_procedure_c_hash_table_free_fn_t DEFAULT_typedata_procedure_
 		},
 	},
 };
-constexpr type_info_t DEFAULT_typedata_byte = {
-	.type_name = "byte",
-	.size = athena_internal::safe_sizeof<byte>(),
-};
 constexpr type_info_procedure_c_hash_table_value_from_key DEFAULT_typedata_procedure_c_hash_table_value_from_key = {
 	.type_info = {
 		.type_name = "c_hash_table_value_from_key",
+		.type_id = TYPE_c_hash_table_value_from_key,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -11782,6 +13543,7 @@ constexpr type_info_procedure_c_hash_table_value_from_key DEFAULT_typedata_proce
 constexpr type_info_procedure_c_fnv_hash_value DEFAULT_typedata_procedure_c_fnv_hash_value = {
 	.type_info = {
 		.type_name = "c_fnv_hash_value",
+		.type_id = TYPE_c_fnv_hash_value,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -11807,6 +13569,7 @@ constexpr type_info_procedure_c_fnv_hash_value DEFAULT_typedata_procedure_c_fnv_
 constexpr type_info_procedure_c_combine_hashes DEFAULT_typedata_procedure_c_combine_hashes = {
 	.type_info = {
 		.type_name = "c_combine_hashes",
+		.type_id = TYPE_c_combine_hashes,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -11832,6 +13595,7 @@ constexpr type_info_procedure_c_combine_hashes DEFAULT_typedata_procedure_c_comb
 constexpr type_info_procedure_c_hash_table_default_alloc_impl DEFAULT_typedata_procedure_c_hash_table_default_alloc_impl = {
 	.type_info = {
 		.type_name = "c_hash_table_default_alloc_impl",
+		.type_id = TYPE_c_hash_table_default_alloc_impl,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -11864,6 +13628,7 @@ constexpr type_info_procedure_c_hash_table_default_alloc_impl DEFAULT_typedata_p
 constexpr type_info_procedure_c_hash_table_default_free_impl DEFAULT_typedata_procedure_c_hash_table_default_free_impl = {
 	.type_info = {
 		.type_name = "c_hash_table_default_free_impl",
+		.type_id = TYPE_c_hash_table_default_free_impl,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -11889,6 +13654,7 @@ constexpr type_info_procedure_c_hash_table_default_free_impl DEFAULT_typedata_pr
 constexpr type_info_struct_hash_table_header_t DEFAULT_typedata_structure_hash_table_header_t = {
 	.type_info = {
 		.type_name = "hash_table_header_t",
+		.type_id = TYPE_hash_table_header_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<hash_table_header_t>(),
 	},
@@ -11933,6 +13699,7 @@ constexpr type_info_struct_hash_table_header_t DEFAULT_typedata_structure_hash_t
 constexpr type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_log_level_t = {
 	.type_info = {
 		.type_name = "debug_log_level_t",
+		.type_id = TYPE_debug_log_level_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<debug_log_level_t>(),
 	},
@@ -12008,13 +13775,10 @@ constexpr type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_lo
 	},
 };
 
-constexpr type_info_t DEFAULT_typedata_s32 = {
-	.type_name = "s32",
-	.size = athena_internal::safe_sizeof<s32>(),
-};
 constexpr type_info_procedure__log DEFAULT_typedata_procedure__log = {
 	.type_info = {
 		.type_name = "_log",
+		.type_id = TYPE__log,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -12061,6 +13825,7 @@ constexpr type_info_procedure__log DEFAULT_typedata_procedure__log = {
 constexpr type_info_struct_memory_arena_footer_t DEFAULT_typedata_structure_memory_arena_footer_t = {
 	.type_info = {
 		.type_name = "memory_arena_footer_t",
+		.type_id = TYPE_memory_arena_footer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<memory_arena_footer_t>(),
 	},
@@ -12097,6 +13862,7 @@ constexpr type_info_struct_memory_arena_footer_t DEFAULT_typedata_structure_memo
 constexpr type_info_struct_scratch_arena_t DEFAULT_typedata_structure_scratch_arena_t = {
 	.type_info = {
 		.type_name = "scratch_arena_t",
+		.type_id = TYPE_scratch_arena_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<scratch_arena_t>(),
 	},
@@ -12133,6 +13899,7 @@ constexpr type_info_struct_scratch_arena_t DEFAULT_typedata_structure_scratch_ar
 constexpr type_info_procedure_c_arena_create DEFAULT_typedata_procedure_c_arena_create = {
 	.type_info = {
 		.type_name = "c_arena_create",
+		.type_id = TYPE_c_arena_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12151,6 +13918,7 @@ constexpr type_info_procedure_c_arena_create DEFAULT_typedata_procedure_c_arena_
 constexpr type_info_procedure_c_arena_destroy DEFAULT_typedata_procedure_c_arena_destroy = {
 	.type_info = {
 		.type_name = "c_arena_destroy",
+		.type_id = TYPE_c_arena_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12169,6 +13937,7 @@ constexpr type_info_procedure_c_arena_destroy DEFAULT_typedata_procedure_c_arena
 constexpr type_info_procedure_c_arena_push_size DEFAULT_typedata_procedure_c_arena_push_size = {
 	.type_info = {
 		.type_name = "c_arena_push_size",
+		.type_id = TYPE_c_arena_push_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -12194,6 +13963,7 @@ constexpr type_info_procedure_c_arena_push_size DEFAULT_typedata_procedure_c_are
 constexpr type_info_procedure_c_arena_bootstrap_allocate_struct_ DEFAULT_typedata_procedure_c_arena_bootstrap_allocate_struct_ = {
 	.type_info = {
 		.type_name = "c_arena_bootstrap_allocate_struct_",
+		.type_id = TYPE_c_arena_bootstrap_allocate_struct_,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -12226,6 +13996,7 @@ constexpr type_info_procedure_c_arena_bootstrap_allocate_struct_ DEFAULT_typedat
 constexpr type_info_procedure_c_arena_clear_block DEFAULT_typedata_procedure_c_arena_clear_block = {
 	.type_info = {
 		.type_name = "c_arena_clear_block",
+		.type_id = TYPE_c_arena_clear_block,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12244,6 +14015,7 @@ constexpr type_info_procedure_c_arena_clear_block DEFAULT_typedata_procedure_c_a
 constexpr type_info_procedure_c_arena_free_last_block DEFAULT_typedata_procedure_c_arena_free_last_block = {
 	.type_info = {
 		.type_name = "c_arena_free_last_block",
+		.type_id = TYPE_c_arena_free_last_block,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12262,6 +14034,7 @@ constexpr type_info_procedure_c_arena_free_last_block DEFAULT_typedata_procedure
 constexpr type_info_procedure_c_arena_reset DEFAULT_typedata_procedure_c_arena_reset = {
 	.type_info = {
 		.type_name = "c_arena_reset",
+		.type_id = TYPE_c_arena_reset,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12280,6 +14053,7 @@ constexpr type_info_procedure_c_arena_reset DEFAULT_typedata_procedure_c_arena_r
 constexpr type_info_procedure_c_arena_begin_temporary_memory DEFAULT_typedata_procedure_c_arena_begin_temporary_memory = {
 	.type_info = {
 		.type_name = "c_arena_begin_temporary_memory",
+		.type_id = TYPE_c_arena_begin_temporary_memory,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12298,6 +14072,7 @@ constexpr type_info_procedure_c_arena_begin_temporary_memory DEFAULT_typedata_pr
 constexpr type_info_procedure_c_arena_end_temporary_memory DEFAULT_typedata_procedure_c_arena_end_temporary_memory = {
 	.type_info = {
 		.type_name = "c_arena_end_temporary_memory",
+		.type_id = TYPE_c_arena_end_temporary_memory,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12313,17 +14088,15 @@ constexpr type_info_procedure_c_arena_end_temporary_memory DEFAULT_typedata_proc
 		},
 	},
 };
-constexpr type_info_t DEFAULT_typedata_bool32 = {
-	.type_name = "bool32",
-	.size = athena_internal::safe_sizeof<bool32>(),
-};
 constexpr type_info_t DEFAULT_typedata_u8 = {
 	.type_name = "u8",
+	.type_id = TYPE_u8,
 	.size = athena_internal::safe_sizeof<u8>(),
 };
 constexpr type_info_struct_arg_type_t DEFAULT_typedata_structure_arg_type_t = {
 	.type_info = {
 		.type_name = "arg_type_t",
+		.type_id = TYPE_arg_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<arg_type_t>(),
 	},
@@ -12380,6 +14153,7 @@ constexpr type_info_struct_arg_type_t DEFAULT_typedata_structure_arg_type_t = {
 constexpr type_info_struct_program_flag_data_t DEFAULT_typedata_structure_program_flag_data_t = {
 	.type_info = {
 		.type_name = "program_flag_data_t",
+		.type_id = TYPE_program_flag_data_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<program_flag_data_t>(),
 	},
@@ -12424,6 +14198,7 @@ constexpr type_info_struct_program_flag_data_t DEFAULT_typedata_structure_progra
 constexpr type_info_struct_program_flag_t DEFAULT_typedata_structure_program_flag_t = {
 	.type_info = {
 		.type_name = "program_flag_t",
+		.type_id = TYPE_program_flag_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<program_flag_t>(),
 	},
@@ -12484,6 +14259,7 @@ constexpr type_info_struct_program_flag_t DEFAULT_typedata_structure_program_fla
 constexpr type_info_struct_program_flag_state_t DEFAULT_typedata_structure_program_flag_state_t = {
 	.type_info = {
 		.type_name = "program_flag_state_t",
+		.type_id = TYPE_program_flag_state_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<program_flag_state_t>(),
 	},
@@ -12512,6 +14288,7 @@ constexpr type_info_struct_program_flag_state_t DEFAULT_typedata_structure_progr
 constexpr type_info_procedure_c_program_flag_add DEFAULT_typedata_procedure_c_program_flag_add = {
 	.type_info = {
 		.type_name = "c_program_flag_add",
+		.type_id = TYPE_c_program_flag_add,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -12537,6 +14314,7 @@ constexpr type_info_procedure_c_program_flag_add DEFAULT_typedata_procedure_c_pr
 constexpr type_info_procedure_c_program_flag_add_bool32 DEFAULT_typedata_procedure_c_program_flag_add_bool32 = {
 	.type_info = {
 		.type_name = "c_program_flag_add_bool32",
+		.type_id = TYPE_c_program_flag_add_bool32,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -12569,6 +14347,7 @@ constexpr type_info_procedure_c_program_flag_add_bool32 DEFAULT_typedata_procedu
 constexpr type_info_procedure_c_program_flag_add_size DEFAULT_typedata_procedure_c_program_flag_add_size = {
 	.type_info = {
 		.type_name = "c_program_flag_add_size",
+		.type_id = TYPE_c_program_flag_add_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -12598,13 +14377,10 @@ constexpr type_info_procedure_c_program_flag_add_size DEFAULT_typedata_procedure
 		},
 	},
 };
-constexpr type_info_t DEFAULT_typedata_float32 = {
-	.type_name = "float32",
-	.size = athena_internal::safe_sizeof<float32>(),
-};
 constexpr type_info_procedure_c_program_flag_add_float32 DEFAULT_typedata_procedure_c_program_flag_add_float32 = {
 	.type_info = {
 		.type_name = "c_program_flag_add_float32",
+		.type_id = TYPE_c_program_flag_add_float32,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -12637,6 +14413,7 @@ constexpr type_info_procedure_c_program_flag_add_float32 DEFAULT_typedata_proced
 constexpr type_info_procedure_c_program_flag_add_string DEFAULT_typedata_procedure_c_program_flag_add_string = {
 	.type_info = {
 		.type_name = "c_program_flag_add_string",
+		.type_id = TYPE_c_program_flag_add_string,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -12669,6 +14446,7 @@ constexpr type_info_procedure_c_program_flag_add_string DEFAULT_typedata_procedu
 constexpr type_info_procedure_c_program_flag_print_flag_list DEFAULT_typedata_procedure_c_program_flag_print_flag_list = {
 	.type_info = {
 		.type_name = "c_program_flag_print_flag_list",
+		.type_id = TYPE_c_program_flag_print_flag_list,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
@@ -12677,6 +14455,7 @@ constexpr type_info_procedure_c_program_flag_print_flag_list DEFAULT_typedata_pr
 constexpr type_info_procedure_c_program_flag_container_init DEFAULT_typedata_procedure_c_program_flag_container_init = {
 	.type_info = {
 		.type_name = "c_program_flag_container_init",
+		.type_id = TYPE_c_program_flag_container_init,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12695,6 +14474,7 @@ constexpr type_info_procedure_c_program_flag_container_init DEFAULT_typedata_pro
 constexpr type_info_procedure_c_program_flag_parse_args DEFAULT_typedata_procedure_c_program_flag_parse_args = {
 	.type_info = {
 		.type_name = "c_program_flag_parse_args",
+		.type_id = TYPE_c_program_flag_parse_args,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -12720,6 +14500,7 @@ constexpr type_info_procedure_c_program_flag_parse_args DEFAULT_typedata_procedu
 constexpr type_info_procedure_c_string_length DEFAULT_typedata_procedure_c_string_length = {
 	.type_info = {
 		.type_name = "c_string_length",
+		.type_id = TYPE_c_string_length,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12738,6 +14519,7 @@ constexpr type_info_procedure_c_string_length DEFAULT_typedata_procedure_c_strin
 constexpr type_info_procedure_c_string_null_terminated DEFAULT_typedata_procedure_c_string_null_terminated = {
 	.type_info = {
 		.type_name = "c_string_null_terminated",
+		.type_id = TYPE_c_string_null_terminated,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -12763,6 +14545,7 @@ constexpr type_info_procedure_c_string_null_terminated DEFAULT_typedata_procedur
 constexpr type_info_procedure_c_string_is_valid DEFAULT_typedata_procedure_c_string_is_valid = {
 	.type_info = {
 		.type_name = "c_string_is_valid",
+		.type_id = TYPE_c_string_is_valid,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12781,6 +14564,7 @@ constexpr type_info_procedure_c_string_is_valid DEFAULT_typedata_procedure_c_str
 constexpr type_info_procedure_c_string_create DEFAULT_typedata_procedure_c_string_create = {
 	.type_info = {
 		.type_name = "c_string_create",
+		.type_id = TYPE_c_string_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12799,6 +14583,7 @@ constexpr type_info_procedure_c_string_create DEFAULT_typedata_procedure_c_strin
 constexpr type_info_procedure_c_string_create_with_length DEFAULT_typedata_procedure_c_string_create_with_length = {
 	.type_info = {
 		.type_name = "c_string_create_with_length",
+		.type_id = TYPE_c_string_create_with_length,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -12824,6 +14609,7 @@ constexpr type_info_procedure_c_string_create_with_length DEFAULT_typedata_proce
 constexpr type_info_procedure_c_string_make_heap DEFAULT_typedata_procedure_c_string_make_heap = {
 	.type_info = {
 		.type_name = "c_string_make_heap",
+		.type_id = TYPE_c_string_make_heap,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -12849,6 +14635,7 @@ constexpr type_info_procedure_c_string_make_heap DEFAULT_typedata_procedure_c_st
 constexpr type_info_procedure_c_string_compare DEFAULT_typedata_procedure_c_string_compare = {
 	.type_info = {
 		.type_name = "c_string_compare",
+		.type_id = TYPE_c_string_compare,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -12874,6 +14661,7 @@ constexpr type_info_procedure_c_string_compare DEFAULT_typedata_procedure_c_stri
 constexpr type_info_procedure_c_string_ends_with DEFAULT_typedata_procedure_c_string_ends_with = {
 	.type_info = {
 		.type_name = "c_string_ends_with",
+		.type_id = TYPE_c_string_ends_with,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -12899,6 +14687,7 @@ constexpr type_info_procedure_c_string_ends_with DEFAULT_typedata_procedure_c_st
 constexpr type_info_procedure_c_string_concat DEFAULT_typedata_procedure_c_string_concat = {
 	.type_info = {
 		.type_name = "c_string_concat",
+		.type_id = TYPE_c_string_concat,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -12931,6 +14720,7 @@ constexpr type_info_procedure_c_string_concat DEFAULT_typedata_procedure_c_strin
 constexpr type_info_procedure_c_string_to_const_array DEFAULT_typedata_procedure_c_string_to_const_array = {
 	.type_info = {
 		.type_name = "c_string_to_const_array",
+		.type_id = TYPE_c_string_to_const_array,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -12949,6 +14739,7 @@ constexpr type_info_procedure_c_string_to_const_array DEFAULT_typedata_procedure
 constexpr type_info_procedure_c_string_to_upper DEFAULT_typedata_procedure_c_string_to_upper = {
 	.type_info = {
 		.type_name = "c_string_to_upper",
+		.type_id = TYPE_c_string_to_upper,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -12974,6 +14765,7 @@ constexpr type_info_procedure_c_string_to_upper DEFAULT_typedata_procedure_c_str
 constexpr type_info_procedure_c_string_sprintf DEFAULT_typedata_procedure_c_string_sprintf = {
 	.type_info = {
 		.type_name = "c_string_sprintf",
+		.type_id = TYPE_c_string_sprintf,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -13006,6 +14798,7 @@ constexpr type_info_procedure_c_string_sprintf DEFAULT_typedata_procedure_c_stri
 constexpr type_info_procedure_c_string_make_copy DEFAULT_typedata_procedure_c_string_make_copy = {
 	.type_info = {
 		.type_name = "c_string_make_copy",
+		.type_id = TYPE_c_string_make_copy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13031,6 +14824,7 @@ constexpr type_info_procedure_c_string_make_copy DEFAULT_typedata_procedure_c_st
 constexpr type_info_procedure_c_string_sub_from_left DEFAULT_typedata_procedure_c_string_sub_from_left = {
 	.type_info = {
 		.type_name = "c_string_sub_from_left",
+		.type_id = TYPE_c_string_sub_from_left,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13056,6 +14850,7 @@ constexpr type_info_procedure_c_string_sub_from_left DEFAULT_typedata_procedure_
 constexpr type_info_procedure_c_string_sub_from_right DEFAULT_typedata_procedure_c_string_sub_from_right = {
 	.type_info = {
 		.type_name = "c_string_sub_from_right",
+		.type_id = TYPE_c_string_sub_from_right,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13081,6 +14876,7 @@ constexpr type_info_procedure_c_string_sub_from_right DEFAULT_typedata_procedure
 constexpr type_info_procedure_c_string_substring DEFAULT_typedata_procedure_c_string_substring = {
 	.type_info = {
 		.type_name = "c_string_substring",
+		.type_id = TYPE_c_string_substring,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -13113,6 +14909,7 @@ constexpr type_info_procedure_c_string_substring DEFAULT_typedata_procedure_c_st
 constexpr type_info_procedure_c_string_advance_by DEFAULT_typedata_procedure_c_string_advance_by = {
 	.type_info = {
 		.type_name = "c_string_advance_by",
+		.type_id = TYPE_c_string_advance_by,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13138,6 +14935,7 @@ constexpr type_info_procedure_c_string_advance_by DEFAULT_typedata_procedure_c_s
 constexpr type_info_procedure_c_string_find_first_char_from_left DEFAULT_typedata_procedure_c_string_find_first_char_from_left = {
 	.type_info = {
 		.type_name = "c_string_find_first_char_from_left",
+		.type_id = TYPE_c_string_find_first_char_from_left,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13163,6 +14961,7 @@ constexpr type_info_procedure_c_string_find_first_char_from_left DEFAULT_typedat
 constexpr type_info_procedure_c_string_find_first_char_from_right DEFAULT_typedata_procedure_c_string_find_first_char_from_right = {
 	.type_info = {
 		.type_name = "c_string_find_first_char_from_right",
+		.type_id = TYPE_c_string_find_first_char_from_right,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13188,6 +14987,7 @@ constexpr type_info_procedure_c_string_find_first_char_from_right DEFAULT_typeda
 constexpr type_info_procedure_c_string_find_first_char_from_left_on_line DEFAULT_typedata_procedure_c_string_find_first_char_from_left_on_line = {
 	.type_info = {
 		.type_name = "c_string_find_first_char_from_left_on_line",
+		.type_id = TYPE_c_string_find_first_char_from_left_on_line,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13213,6 +15013,7 @@ constexpr type_info_procedure_c_string_find_first_char_from_left_on_line DEFAULT
 constexpr type_info_procedure_c_string_find_first_char_from_right_on_line DEFAULT_typedata_procedure_c_string_find_first_char_from_right_on_line = {
 	.type_info = {
 		.type_name = "c_string_find_first_char_from_right_on_line",
+		.type_id = TYPE_c_string_find_first_char_from_right_on_line,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -13245,6 +15046,7 @@ constexpr type_info_procedure_c_string_find_first_char_from_right_on_line DEFAUL
 constexpr type_info_procedure_c_string_get_filename_from_path DEFAULT_typedata_procedure_c_string_get_filename_from_path = {
 	.type_info = {
 		.type_name = "c_string_get_filename_from_path",
+		.type_id = TYPE_c_string_get_filename_from_path,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13263,6 +15065,7 @@ constexpr type_info_procedure_c_string_get_filename_from_path DEFAULT_typedata_p
 constexpr type_info_procedure_c_string_get_file_ext_from_path DEFAULT_typedata_procedure_c_string_get_file_ext_from_path = {
 	.type_info = {
 		.type_name = "c_string_get_file_ext_from_path",
+		.type_id = TYPE_c_string_get_file_ext_from_path,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13281,6 +15084,7 @@ constexpr type_info_procedure_c_string_get_file_ext_from_path DEFAULT_typedata_p
 constexpr type_info_procedure_c_string_get_filename_from_path_and_ext DEFAULT_typedata_procedure_c_string_get_filename_from_path_and_ext = {
 	.type_info = {
 		.type_name = "c_string_get_filename_from_path_and_ext",
+		.type_id = TYPE_c_string_get_filename_from_path_and_ext,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13299,6 +15103,7 @@ constexpr type_info_procedure_c_string_get_filename_from_path_and_ext DEFAULT_ty
 constexpr type_info_procedure_c_string_override_file_separators DEFAULT_typedata_procedure_c_string_override_file_separators = {
 	.type_info = {
 		.type_name = "c_string_override_file_separators",
+		.type_id = TYPE_c_string_override_file_separators,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13317,6 +15122,7 @@ constexpr type_info_procedure_c_string_override_file_separators DEFAULT_typedata
 constexpr type_info_procedure_c_string_is_whitespace DEFAULT_typedata_procedure_c_string_is_whitespace = {
 	.type_info = {
 		.type_name = "c_string_is_whitespace",
+		.type_id = TYPE_c_string_is_whitespace,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13335,6 +15141,7 @@ constexpr type_info_procedure_c_string_is_whitespace DEFAULT_typedata_procedure_
 constexpr type_info_procedure_c_string_is_end_of_line DEFAULT_typedata_procedure_c_string_is_end_of_line = {
 	.type_info = {
 		.type_name = "c_string_is_end_of_line",
+		.type_id = TYPE_c_string_is_end_of_line,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13353,6 +15160,7 @@ constexpr type_info_procedure_c_string_is_end_of_line DEFAULT_typedata_procedure
 constexpr type_info_procedure_c_string_eat_whitespace DEFAULT_typedata_procedure_c_string_eat_whitespace = {
 	.type_info = {
 		.type_name = "c_string_eat_whitespace",
+		.type_id = TYPE_c_string_eat_whitespace,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13371,6 +15179,7 @@ constexpr type_info_procedure_c_string_eat_whitespace DEFAULT_typedata_procedure
 constexpr type_info_procedure_c_string_get_whitespace_size DEFAULT_typedata_procedure_c_string_get_whitespace_size = {
 	.type_info = {
 		.type_name = "c_string_get_whitespace_size",
+		.type_id = TYPE_c_string_get_whitespace_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13389,6 +15198,7 @@ constexpr type_info_procedure_c_string_get_whitespace_size DEFAULT_typedata_proc
 constexpr type_info_procedure_c_string_get_current_line_size DEFAULT_typedata_procedure_c_string_get_current_line_size = {
 	.type_info = {
 		.type_name = "c_string_get_current_line_size",
+		.type_id = TYPE_c_string_get_current_line_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13407,6 +15217,7 @@ constexpr type_info_procedure_c_string_get_current_line_size DEFAULT_typedata_pr
 constexpr type_info_procedure_c_string_read_line DEFAULT_typedata_procedure_c_string_read_line = {
 	.type_info = {
 		.type_name = "c_string_read_line",
+		.type_id = TYPE_c_string_read_line,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13425,6 +15236,7 @@ constexpr type_info_procedure_c_string_read_line DEFAULT_typedata_procedure_c_st
 constexpr type_info_procedure_c_string_read_int DEFAULT_typedata_procedure_c_string_read_int = {
 	.type_info = {
 		.type_name = "c_string_read_int",
+		.type_id = TYPE_c_string_read_int,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13443,6 +15255,7 @@ constexpr type_info_procedure_c_string_read_int DEFAULT_typedata_procedure_c_str
 constexpr type_info_procedure_c_string_read_uint DEFAULT_typedata_procedure_c_string_read_uint = {
 	.type_info = {
 		.type_name = "c_string_read_uint",
+		.type_id = TYPE_c_string_read_uint,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13461,6 +15274,7 @@ constexpr type_info_procedure_c_string_read_uint DEFAULT_typedata_procedure_c_st
 constexpr type_info_procedure_c_string_read_float32 DEFAULT_typedata_procedure_c_string_read_float32 = {
 	.type_info = {
 		.type_name = "c_string_read_float32",
+		.type_id = TYPE_c_string_read_float32,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13478,11 +15292,13 @@ constexpr type_info_procedure_c_string_read_float32 DEFAULT_typedata_procedure_c
 };
 constexpr type_info_t DEFAULT_typedata_float64 = {
 	.type_name = "float64",
+	.type_id = TYPE_float64,
 	.size = athena_internal::safe_sizeof<float64>(),
 };
 constexpr type_info_procedure_c_string_read_float64 DEFAULT_typedata_procedure_c_string_read_float64 = {
 	.type_info = {
 		.type_name = "c_string_read_float64",
+		.type_id = TYPE_c_string_read_float64,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13501,6 +15317,7 @@ constexpr type_info_procedure_c_string_read_float64 DEFAULT_typedata_procedure_c
 constexpr type_info_procedure_c_string_find_all_instances_of DEFAULT_typedata_procedure_c_string_find_all_instances_of = {
 	.type_info = {
 		.type_name = "c_string_find_all_instances_of",
+		.type_id = TYPE_c_string_find_all_instances_of,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13526,6 +15343,7 @@ constexpr type_info_procedure_c_string_find_all_instances_of DEFAULT_typedata_pr
 constexpr type_info_procedure_c_string_replace_all_instances_of DEFAULT_typedata_procedure_c_string_replace_all_instances_of = {
 	.type_info = {
 		.type_name = "c_string_replace_all_instances_of",
+		.type_id = TYPE_c_string_replace_all_instances_of,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -13565,6 +15383,7 @@ constexpr type_info_procedure_c_string_replace_all_instances_of DEFAULT_typedata
 constexpr type_info_struct_string_builder_buffer_t DEFAULT_typedata_structure_string_builder_buffer_t = {
 	.type_info = {
 		.type_name = "string_builder_buffer_t",
+		.type_id = TYPE_string_builder_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<string_builder_buffer_t>(),
 	},
@@ -13609,6 +15428,7 @@ constexpr type_info_struct_string_builder_buffer_t DEFAULT_typedata_structure_st
 constexpr type_info_struct_string_builder_t DEFAULT_typedata_structure_string_builder_t = {
 	.type_info = {
 		.type_name = "string_builder_t",
+		.type_id = TYPE_string_builder_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<string_builder_t>(),
 	},
@@ -13677,6 +15497,7 @@ constexpr type_info_struct_string_builder_t DEFAULT_typedata_structure_string_bu
 constexpr type_info_procedure_c_string_builder_init DEFAULT_typedata_procedure_c_string_builder_init = {
 	.type_info = {
 		.type_name = "c_string_builder_init",
+		.type_id = TYPE_c_string_builder_init,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13702,6 +15523,7 @@ constexpr type_info_procedure_c_string_builder_init DEFAULT_typedata_procedure_c
 constexpr type_info_procedure_c_string_builder_deinit DEFAULT_typedata_procedure_c_string_builder_deinit = {
 	.type_info = {
 		.type_name = "c_string_builder_deinit",
+		.type_id = TYPE_c_string_builder_deinit,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13720,6 +15542,7 @@ constexpr type_info_procedure_c_string_builder_deinit DEFAULT_typedata_procedure
 constexpr type_info_procedure_c_string_builder_append_data DEFAULT_typedata_procedure_c_string_builder_append_data = {
 	.type_info = {
 		.type_name = "c_string_builder_append_data",
+		.type_id = TYPE_c_string_builder_append_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13745,6 +15568,7 @@ constexpr type_info_procedure_c_string_builder_append_data DEFAULT_typedata_proc
 constexpr type_info_procedure_c_string_builder_append_value DEFAULT_typedata_procedure_c_string_builder_append_value = {
 	.type_info = {
 		.type_name = "c_string_builder_append_value",
+		.type_id = TYPE_c_string_builder_append_value,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -13777,6 +15601,7 @@ constexpr type_info_procedure_c_string_builder_append_value DEFAULT_typedata_pro
 constexpr type_info_procedure_c_string_builder_get_current_string DEFAULT_typedata_procedure_c_string_builder_get_current_string = {
 	.type_info = {
 		.type_name = "c_string_builder_get_current_string",
+		.type_id = TYPE_c_string_builder_get_current_string,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13795,6 +15620,7 @@ constexpr type_info_procedure_c_string_builder_get_current_string DEFAULT_typeda
 constexpr type_info_procedure_c_string_builder_reset DEFAULT_typedata_procedure_c_string_builder_reset = {
 	.type_info = {
 		.type_name = "c_string_builder_reset",
+		.type_id = TYPE_c_string_builder_reset,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -13813,6 +15639,7 @@ constexpr type_info_procedure_c_string_builder_reset DEFAULT_typedata_procedure_
 constexpr type_info_procedure_c_string_builder_append_builder DEFAULT_typedata_procedure_c_string_builder_append_builder = {
 	.type_info = {
 		.type_name = "c_string_builder_append_builder",
+		.type_id = TYPE_c_string_builder_append_builder,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13838,6 +15665,7 @@ constexpr type_info_procedure_c_string_builder_append_builder DEFAULT_typedata_p
 constexpr type_info_procedure_c_string_builder_sprintf DEFAULT_typedata_procedure_c_string_builder_sprintf = {
 	.type_info = {
 		.type_name = "c_string_builder_sprintf",
+		.type_id = TYPE_c_string_builder_sprintf,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13863,6 +15691,7 @@ constexpr type_info_procedure_c_string_builder_sprintf DEFAULT_typedata_procedur
 constexpr type_info_procedure_c_string_builder_dump_to_file DEFAULT_typedata_procedure_c_string_builder_dump_to_file = {
 	.type_info = {
 		.type_name = "c_string_builder_dump_to_file",
+		.type_id = TYPE_c_string_builder_dump_to_file,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13888,6 +15717,7 @@ constexpr type_info_procedure_c_string_builder_dump_to_file DEFAULT_typedata_pro
 constexpr type_info_procedure_c_string_builder_flush_to_file DEFAULT_typedata_procedure_c_string_builder_flush_to_file = {
 	.type_info = {
 		.type_name = "c_string_builder_flush_to_file",
+		.type_id = TYPE_c_string_builder_flush_to_file,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -13912,231 +15742,13 @@ constexpr type_info_procedure_c_string_builder_flush_to_file DEFAULT_typedata_pr
 };
 constexpr type_info_t DEFAULT_typedata_string_builder_buffer = {
 	.type_name = "string_builder_buffer",
+	.type_id = TYPE_string_builder_buffer,
 	.size = athena_internal::safe_sizeof<string_builder_buffer>(),
-};
-constexpr type_info_struct_sys_thread_t DEFAULT_typedata_structure_sys_thread_t = {
-	.type_info = {
-		.type_name = "sys_thread_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<sys_thread_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_sys_thread_t.member_array,
-	.members = {
-		.handle = {
-			.type_info     = &DEFAULT_typedata_sys_thread_handle_t,
-			.member_name   = "handle",
-			.parent        = &DEFAULT_typedata_structure_sys_thread_t.type_info,
-			.offset        = offsetof(sys_thread_t, handle),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.thread_id = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "thread_id",
-			.parent        = &DEFAULT_typedata_structure_sys_thread_t.type_info,
-			.offset        = offsetof(sys_thread_t, thread_id),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.user_data = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "user_data",
-			.parent        = &DEFAULT_typedata_structure_sys_thread_t.type_info,
-			.offset        = offsetof(sys_thread_t, user_data),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-
-constexpr type_info_struct_sys_mutex_t DEFAULT_typedata_structure_sys_mutex_t = {
-	.type_info = {
-		.type_name = "sys_mutex_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<sys_mutex_t>(),
-	},
-	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_sys_mutex_t.member_array,
-	.members = {
-		.handle = {
-			.type_info     = &DEFAULT_typedata_sys_mutex_handle_t,
-			.member_name   = "handle",
-			.parent        = &DEFAULT_typedata_structure_sys_mutex_t.type_info,
-			.offset        = offsetof(sys_mutex_t, handle),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_sys_semaphore_t DEFAULT_typedata_structure_sys_semaphore_t = {
-	.type_info = {
-		.type_name = "sys_semaphore_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<sys_semaphore_t>(),
-	},
-	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_sys_semaphore_t.member_array,
-	.members = {
-		.handle = {
-			.type_info     = &DEFAULT_typedata_sys_semaphore_handle_t,
-			.member_name   = "handle",
-			.parent        = &DEFAULT_typedata_structure_sys_semaphore_t.type_info,
-			.offset        = offsetof(sys_semaphore_t, handle),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_ticket_mutex_t DEFAULT_typedata_structure_ticket_mutex_t = {
-	.type_info = {
-		.type_name = "ticket_mutex_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<ticket_mutex_t>(),
-	},
-	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_ticket_mutex_t.member_array,
-	.members = {
-		.next_ticket = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "next_ticket",
-			.parent        = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
-			.offset        = offsetof(ticket_mutex_t, next_ticket),
-			.flags         = 4,
-			.pointer_depth = 0,
-		},
-		.working_ticket = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "working_ticket",
-			.parent        = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
-			.offset        = offsetof(ticket_mutex_t, working_ticket),
-			.flags         = 4,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_procedure_c_ticket_mutex_take_ticket DEFAULT_typedata_procedure_c_ticket_mutex_take_ticket = {
-	.type_info = {
-		.type_name = "c_ticket_mutex_take_ticket",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_u64,
-	.argument_pointer = DEFAULT_typedata_procedure_c_ticket_mutex_take_ticket.argument_array,
-	.arguments = {
-		.mutex = {
-			.type_info     = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
-			.member_name   = "mutex",
-			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_take_ticket.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_c_ticket_mutex_try_wait DEFAULT_typedata_procedure_c_ticket_mutex_try_wait = {
-	.type_info = {
-		.type_name = "c_ticket_mutex_try_wait",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_bool8,
-	.argument_pointer = DEFAULT_typedata_procedure_c_ticket_mutex_try_wait.argument_array,
-	.arguments = {
-		.mutex = {
-			.type_info     = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
-			.member_name   = "mutex",
-			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_try_wait.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.ticket = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "ticket",
-			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_try_wait.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_c_ticket_mutex_wait DEFAULT_typedata_procedure_c_ticket_mutex_wait = {
-	.type_info = {
-		.type_name = "c_ticket_mutex_wait",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_ticket_mutex_wait.argument_array,
-	.arguments = {
-		.mutex = {
-			.type_info     = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
-			.member_name   = "mutex",
-			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_wait.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.ticket = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "ticket",
-			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_wait.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_c_ticket_mutex_advance_ticket DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket = {
-	.type_info = {
-		.type_name = "c_ticket_mutex_advance_ticket",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket.argument_array,
-	.arguments = {
-		.mutex = {
-			.type_info     = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
-			.member_name   = "mutex",
-			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_c_ticket_mutex_take_and_wait DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait = {
-	.type_info = {
-		.type_name = "c_ticket_mutex_take_and_wait",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait.argument_array,
-	.arguments = {
-		.mutex = {
-			.type_info     = &DEFAULT_typedata_structure_ticket_mutex_t.type_info,
-			.member_name   = "mutex",
-			.parent        = &DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_t DEFAULT_typedata_sys_thread_handle_t = {
-	.type_name = "sys_thread_handle_t",
-	.size = athena_internal::safe_sizeof<sys_thread_handle_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_sys_mutex_handle_t = {
-	.type_name = "sys_mutex_handle_t",
-	.size = athena_internal::safe_sizeof<sys_mutex_handle_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_sys_semaphore_handle_t = {
-	.type_name = "sys_semaphore_handle_t",
-	.size = athena_internal::safe_sizeof<sys_semaphore_handle_t>(),
 };
 constexpr type_info_procedure_work_order_fn DEFAULT_typedata_procedure_work_order_fn = {
 	.type_info = {
 		.type_name = "work_order_fn",
+		.type_id = TYPE_work_order_fn,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -14155,6 +15767,7 @@ constexpr type_info_procedure_work_order_fn DEFAULT_typedata_procedure_work_orde
 constexpr type_info_struct_work_completion_fence_t DEFAULT_typedata_structure_work_completion_fence_t = {
 	.type_info = {
 		.type_name = "work_completion_fence_t",
+		.type_id = TYPE_work_completion_fence_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<work_completion_fence_t>(),
 	},
@@ -14175,6 +15788,7 @@ constexpr type_info_struct_work_completion_fence_t DEFAULT_typedata_structure_wo
 constexpr type_info_struct_work_order_t DEFAULT_typedata_structure_work_order_t = {
 	.type_info = {
 		.type_name = "work_order_t",
+		.type_id = TYPE_work_order_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<work_order_t>(),
 	},
@@ -14219,6 +15833,7 @@ constexpr type_info_struct_work_order_t DEFAULT_typedata_structure_work_order_t 
 constexpr type_info_struct_work_list_t DEFAULT_typedata_structure_work_list_t = {
 	.type_info = {
 		.type_name = "work_list_t",
+		.type_id = TYPE_work_list_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<work_list_t>(),
 	},
@@ -14255,6 +15870,7 @@ constexpr type_info_struct_work_list_t DEFAULT_typedata_structure_work_list_t = 
 constexpr type_info_struct_thread_allocator_t DEFAULT_typedata_structure_thread_allocator_t = {
 	.type_info = {
 		.type_name = "thread_allocator_t",
+		.type_id = TYPE_thread_allocator_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<thread_allocator_t>(),
 	},
@@ -14291,6 +15907,7 @@ constexpr type_info_struct_thread_allocator_t DEFAULT_typedata_structure_thread_
 constexpr type_info_struct_worker_thread_t DEFAULT_typedata_structure_worker_thread_t = {
 	.type_info = {
 		.type_name = "worker_thread_t",
+		.type_id = TYPE_worker_thread_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<worker_thread_t>(),
 	},
@@ -14367,6 +15984,7 @@ constexpr type_info_struct_worker_thread_t DEFAULT_typedata_structure_worker_thr
 constexpr type_info_procedure_c_threadpool_init DEFAULT_typedata_procedure_c_threadpool_init = {
 	.type_info = {
 		.type_name = "c_threadpool_init",
+		.type_id = TYPE_c_threadpool_init,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -14413,6 +16031,7 @@ constexpr type_info_procedure_c_threadpool_init DEFAULT_typedata_procedure_c_thr
 constexpr type_info_procedure_c_threadpool_start DEFAULT_typedata_procedure_c_threadpool_start = {
 	.type_info = {
 		.type_name = "c_threadpool_start",
+		.type_id = TYPE_c_threadpool_start,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -14431,6 +16050,7 @@ constexpr type_info_procedure_c_threadpool_start DEFAULT_typedata_procedure_c_th
 constexpr type_info_procedure_c_threadpool_flush_work_orders DEFAULT_typedata_procedure_c_threadpool_flush_work_orders = {
 	.type_info = {
 		.type_name = "c_threadpool_flush_work_orders",
+		.type_id = TYPE_c_threadpool_flush_work_orders,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -14449,6 +16069,7 @@ constexpr type_info_procedure_c_threadpool_flush_work_orders DEFAULT_typedata_pr
 constexpr type_info_procedure_c_threadpool_wait_on_fence DEFAULT_typedata_procedure_c_threadpool_wait_on_fence = {
 	.type_info = {
 		.type_name = "c_threadpool_wait_on_fence",
+		.type_id = TYPE_c_threadpool_wait_on_fence,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -14474,6 +16095,7 @@ constexpr type_info_procedure_c_threadpool_wait_on_fence DEFAULT_typedata_proced
 constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_preprocessor_token_type_t = {
 	.type_info = {
 		.type_name = "preprocessor_token_type_t",
+		.type_id = TYPE_preprocessor_token_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<preprocessor_token_type_t>(),
 	},
@@ -14750,6 +16372,7 @@ constexpr type_info_struct_preprocessor_token_type_t DEFAULT_typedata_structure_
 constexpr type_info_struct_token_data_t DEFAULT_typedata_structure_token_data_t = {
 	.type_info = {
 		.type_name = "token_data_t",
+		.type_id = TYPE_token_data_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<token_data_t>(),
 	},
@@ -14778,6 +16401,7 @@ constexpr type_info_struct_token_data_t DEFAULT_typedata_structure_token_data_t 
 constexpr type_info_struct_tokenizer_t DEFAULT_typedata_structure_tokenizer_t = {
 	.type_info = {
 		.type_name = "tokenizer_t",
+		.type_id = TYPE_tokenizer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<tokenizer_t>(),
 	},
@@ -14846,6 +16470,7 @@ constexpr type_info_struct_tokenizer_t DEFAULT_typedata_structure_tokenizer_t = 
 constexpr type_info_procedure_c_tokenizer_get_next_token DEFAULT_typedata_procedure_c_tokenizer_get_next_token = {
 	.type_info = {
 		.type_name = "c_tokenizer_get_next_token",
+		.type_id = TYPE_c_tokenizer_get_next_token,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -14864,6 +16489,7 @@ constexpr type_info_procedure_c_tokenizer_get_next_token DEFAULT_typedata_proced
 constexpr type_info_procedure_c_tokenizer_peek_token DEFAULT_typedata_procedure_c_tokenizer_peek_token = {
 	.type_info = {
 		.type_name = "c_tokenizer_peek_token",
+		.type_id = TYPE_c_tokenizer_peek_token,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -14893,6 +16519,7 @@ constexpr type_info_procedure_c_tokenizer_peek_token DEFAULT_typedata_procedure_
 constexpr type_info_procedure_c_tokenizer_eat_lines DEFAULT_typedata_procedure_c_tokenizer_eat_lines = {
 	.type_info = {
 		.type_name = "c_tokenizer_eat_lines",
+		.type_id = TYPE_c_tokenizer_eat_lines,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -14925,6 +16552,7 @@ constexpr type_info_procedure_c_tokenizer_eat_lines DEFAULT_typedata_procedure_c
 constexpr type_info_procedure_c_tokenizer_token_numeric DEFAULT_typedata_procedure_c_tokenizer_token_numeric = {
 	.type_info = {
 		.type_name = "c_tokenizer_token_numeric",
+		.type_id = TYPE_c_tokenizer_token_numeric,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -14943,6 +16571,7 @@ constexpr type_info_procedure_c_tokenizer_token_numeric DEFAULT_typedata_procedu
 constexpr type_info_procedure_c_tokenizer_token_alphabetical DEFAULT_typedata_procedure_c_tokenizer_token_alphabetical = {
 	.type_info = {
 		.type_name = "c_tokenizer_token_alphabetical",
+		.type_id = TYPE_c_tokenizer_token_alphabetical,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -14961,6 +16590,7 @@ constexpr type_info_procedure_c_tokenizer_token_alphabetical DEFAULT_typedata_pr
 constexpr type_info_procedure_c_tokenizer_set_bookmark DEFAULT_typedata_procedure_c_tokenizer_set_bookmark = {
 	.type_info = {
 		.type_name = "c_tokenizer_set_bookmark",
+		.type_id = TYPE_c_tokenizer_set_bookmark,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -14986,6 +16616,7 @@ constexpr type_info_procedure_c_tokenizer_set_bookmark DEFAULT_typedata_procedur
 constexpr type_info_procedure_c_tokenizer_restore_bookmark DEFAULT_typedata_procedure_c_tokenizer_restore_bookmark = {
 	.type_info = {
 		.type_name = "c_tokenizer_restore_bookmark",
+		.type_id = TYPE_c_tokenizer_restore_bookmark,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15003,31 +16634,38 @@ constexpr type_info_procedure_c_tokenizer_restore_bookmark DEFAULT_typedata_proc
 };
 constexpr type_info_t DEFAULT_typedata_s16 = {
 	.type_name = "s16",
+	.type_id = TYPE_int16_t,
 	.size = athena_internal::safe_sizeof<s16>(),
 };
 constexpr type_info_t DEFAULT_typedata_s8 = {
 	.type_name = "s8",
+	.type_id = TYPE_int8_t,
 	.size = athena_internal::safe_sizeof<s8>(),
 };
 constexpr type_info_t DEFAULT_typedata_u16 = {
 	.type_name = "u16",
+	.type_id = TYPE_uint16_t,
 	.size = athena_internal::safe_sizeof<u16>(),
 };
 constexpr type_info_t DEFAULT_typedata_usize = {
 	.type_name = "usize",
+	.type_id = TYPE_size_t,
 	.size = athena_internal::safe_sizeof<usize>(),
 };
 constexpr type_info_t DEFAULT_typedata_real32 = {
 	.type_name = "real32",
+	.type_id = TYPE_float,
 	.size = athena_internal::safe_sizeof<real32>(),
 };
 constexpr type_info_t DEFAULT_typedata_real64 = {
 	.type_name = "real64",
+	.type_id = TYPE_double,
 	.size = athena_internal::safe_sizeof<real64>(),
 };
 constexpr type_info_struct_zone_allocator_block_t DEFAULT_typedata_structure_zone_allocator_block_t = {
 	.type_info = {
 		.type_name = "zone_allocator_block_t",
+		.type_id = TYPE_zone_allocator_block_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<zone_allocator_block_t>(),
 	},
@@ -15088,6 +16726,7 @@ constexpr type_info_struct_zone_allocator_block_t DEFAULT_typedata_structure_zon
 constexpr type_info_procedure_c_za_create DEFAULT_typedata_procedure_c_za_create = {
 	.type_info = {
 		.type_name = "c_za_create",
+		.type_id = TYPE_c_za_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15106,6 +16745,7 @@ constexpr type_info_procedure_c_za_create DEFAULT_typedata_procedure_c_za_create
 constexpr type_info_procedure_c_za_destroy DEFAULT_typedata_procedure_c_za_destroy = {
 	.type_info = {
 		.type_name = "c_za_destroy",
+		.type_id = TYPE_c_za_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15124,6 +16764,7 @@ constexpr type_info_procedure_c_za_destroy DEFAULT_typedata_procedure_c_za_destr
 constexpr type_info_procedure_c_za_alloc DEFAULT_typedata_procedure_c_za_alloc = {
 	.type_info = {
 		.type_name = "c_za_alloc",
+		.type_id = TYPE_c_za_alloc,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -15156,6 +16797,7 @@ constexpr type_info_procedure_c_za_alloc DEFAULT_typedata_procedure_c_za_alloc =
 constexpr type_info_procedure_c_za_free DEFAULT_typedata_procedure_c_za_free = {
 	.type_info = {
 		.type_name = "c_za_free",
+		.type_id = TYPE_c_za_free,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15181,6 +16823,7 @@ constexpr type_info_procedure_c_za_free DEFAULT_typedata_procedure_c_za_free = {
 constexpr type_info_procedure_c_za_free_zone_tag DEFAULT_typedata_procedure_c_za_free_zone_tag = {
 	.type_info = {
 		.type_name = "c_za_free_zone_tag",
+		.type_id = TYPE_c_za_free_zone_tag,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15206,6 +16849,7 @@ constexpr type_info_procedure_c_za_free_zone_tag DEFAULT_typedata_procedure_c_za
 constexpr type_info_procedure_c_za_free_zone_tag_range DEFAULT_typedata_procedure_c_za_free_zone_tag_range = {
 	.type_info = {
 		.type_name = "c_za_free_zone_tag_range",
+		.type_id = TYPE_c_za_free_zone_tag_range,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -15238,6 +16882,7 @@ constexpr type_info_procedure_c_za_free_zone_tag_range DEFAULT_typedata_procedur
 constexpr type_info_procedure_c_za_change_zone_tag DEFAULT_typedata_procedure_c_za_change_zone_tag = {
 	.type_info = {
 		.type_name = "c_za_change_zone_tag",
+		.type_id = TYPE_c_za_change_zone_tag,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -15270,6 +16915,7 @@ constexpr type_info_procedure_c_za_change_zone_tag DEFAULT_typedata_procedure_c_
 constexpr type_info_procedure_c_za_DEBUG_print_block_list DEFAULT_typedata_procedure_c_za_DEBUG_print_block_list = {
 	.type_info = {
 		.type_name = "c_za_DEBUG_print_block_list",
+		.type_id = TYPE_c_za_DEBUG_print_block_list,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15288,6 +16934,7 @@ constexpr type_info_procedure_c_za_DEBUG_print_block_list DEFAULT_typedata_proce
 constexpr type_info_procedure_c_za_DEBUG_validate_block_list DEFAULT_typedata_procedure_c_za_DEBUG_validate_block_list = {
 	.type_info = {
 		.type_name = "c_za_DEBUG_validate_block_list",
+		.type_id = TYPE_c_za_DEBUG_validate_block_list,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15305,11 +16952,13 @@ constexpr type_info_procedure_c_za_DEBUG_validate_block_list DEFAULT_typedata_pr
 };
 constexpr type_info_t DEFAULT_typedata_zone_allocator_block = {
 	.type_name = "zone_allocator_block",
+	.type_id = TYPE_zone_allocator_block,
 	.size = athena_internal::safe_sizeof<zone_allocator_block>(),
 };
 constexpr type_info_procedure_sys_align_to_page_size DEFAULT_typedata_procedure_sys_align_to_page_size = {
 	.type_info = {
 		.type_name = "sys_align_to_page_size",
+		.type_id = TYPE_sys_align_to_page_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15328,6 +16977,7 @@ constexpr type_info_procedure_sys_align_to_page_size DEFAULT_typedata_procedure_
 constexpr type_info_procedure_sys_allocate_memory DEFAULT_typedata_procedure_sys_allocate_memory = {
 	.type_info = {
 		.type_name = "sys_allocate_memory",
+		.type_id = TYPE_sys_allocate_memory,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15346,6 +16996,7 @@ constexpr type_info_procedure_sys_allocate_memory DEFAULT_typedata_procedure_sys
 constexpr type_info_procedure_sys_free_memory DEFAULT_typedata_procedure_sys_free_memory = {
 	.type_info = {
 		.type_name = "sys_free_memory",
+		.type_id = TYPE_sys_free_memory,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15371,6 +17022,7 @@ constexpr type_info_procedure_sys_free_memory DEFAULT_typedata_procedure_sys_fre
 constexpr type_info_procedure_sys_reallocate_memory DEFAULT_typedata_procedure_sys_reallocate_memory = {
 	.type_info = {
 		.type_name = "sys_reallocate_memory",
+		.type_id = TYPE_sys_reallocate_memory,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -15403,6 +17055,7 @@ constexpr type_info_procedure_sys_reallocate_memory DEFAULT_typedata_procedure_s
 constexpr type_info_procedure_sys_file_open DEFAULT_typedata_procedure_sys_file_open = {
 	.type_info = {
 		.type_name = "sys_file_open",
+		.type_id = TYPE_sys_file_open,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -15442,6 +17095,7 @@ constexpr type_info_procedure_sys_file_open DEFAULT_typedata_procedure_sys_file_
 constexpr type_info_procedure_sys_file_close DEFAULT_typedata_procedure_sys_file_close = {
 	.type_info = {
 		.type_name = "sys_file_close",
+		.type_id = TYPE_sys_file_close,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15460,6 +17114,7 @@ constexpr type_info_procedure_sys_file_close DEFAULT_typedata_procedure_sys_file
 constexpr type_info_procedure_sys_file_copy DEFAULT_typedata_procedure_sys_file_copy = {
 	.type_info = {
 		.type_name = "sys_file_copy",
+		.type_id = TYPE_sys_file_copy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15485,6 +17140,7 @@ constexpr type_info_procedure_sys_file_copy DEFAULT_typedata_procedure_sys_file_
 constexpr type_info_procedure_sys_file_get_size DEFAULT_typedata_procedure_sys_file_get_size = {
 	.type_info = {
 		.type_name = "sys_file_get_size",
+		.type_id = TYPE_sys_file_get_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15503,6 +17159,7 @@ constexpr type_info_procedure_sys_file_get_size DEFAULT_typedata_procedure_sys_f
 constexpr type_info_procedure_sys_file_read DEFAULT_typedata_procedure_sys_file_read = {
 	.type_info = {
 		.type_name = "sys_file_read",
+		.type_id = TYPE_sys_file_read,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -15542,6 +17199,7 @@ constexpr type_info_procedure_sys_file_read DEFAULT_typedata_procedure_sys_file_
 constexpr type_info_procedure_sys_file_write DEFAULT_typedata_procedure_sys_file_write = {
 	.type_info = {
 		.type_name = "sys_file_write",
+		.type_id = TYPE_sys_file_write,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -15574,6 +17232,7 @@ constexpr type_info_procedure_sys_file_write DEFAULT_typedata_procedure_sys_file
 constexpr type_info_procedure_sys_file_map DEFAULT_typedata_procedure_sys_file_map = {
 	.type_info = {
 		.type_name = "sys_file_map",
+		.type_id = TYPE_sys_file_map,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15592,6 +17251,7 @@ constexpr type_info_procedure_sys_file_map DEFAULT_typedata_procedure_sys_file_m
 constexpr type_info_procedure_sys_file_unmap DEFAULT_typedata_procedure_sys_file_unmap = {
 	.type_info = {
 		.type_name = "sys_file_unmap",
+		.type_id = TYPE_sys_file_unmap,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15610,6 +17270,7 @@ constexpr type_info_procedure_sys_file_unmap DEFAULT_typedata_procedure_sys_file
 constexpr type_info_procedure_sys_file_exists DEFAULT_typedata_procedure_sys_file_exists = {
 	.type_info = {
 		.type_name = "sys_file_exists",
+		.type_id = TYPE_sys_file_exists,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15628,6 +17289,7 @@ constexpr type_info_procedure_sys_file_exists DEFAULT_typedata_procedure_sys_fil
 constexpr type_info_procedure_sys_file_get_modtime_and_size DEFAULT_typedata_procedure_sys_file_get_modtime_and_size = {
 	.type_info = {
 		.type_name = "sys_file_get_modtime_and_size",
+		.type_id = TYPE_sys_file_get_modtime_and_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15646,6 +17308,7 @@ constexpr type_info_procedure_sys_file_get_modtime_and_size DEFAULT_typedata_pro
 constexpr type_info_procedure_sys_file_replace_or_rename DEFAULT_typedata_procedure_sys_file_replace_or_rename = {
 	.type_info = {
 		.type_name = "sys_file_replace_or_rename",
+		.type_id = TYPE_sys_file_replace_or_rename,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15671,6 +17334,7 @@ constexpr type_info_procedure_sys_file_replace_or_rename DEFAULT_typedata_proced
 constexpr type_info_procedure_sys_directory_exists DEFAULT_typedata_procedure_sys_directory_exists = {
 	.type_info = {
 		.type_name = "sys_directory_exists",
+		.type_id = TYPE_sys_directory_exists,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15689,6 +17353,7 @@ constexpr type_info_procedure_sys_directory_exists DEFAULT_typedata_procedure_sy
 constexpr type_info_procedure_sys_directory_get_file_count DEFAULT_typedata_procedure_sys_directory_get_file_count = {
 	.type_info = {
 		.type_name = "sys_directory_get_file_count",
+		.type_id = TYPE_sys_directory_get_file_count,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -15728,6 +17393,7 @@ constexpr type_info_procedure_sys_directory_get_file_count DEFAULT_typedata_proc
 constexpr type_info_procedure_sys_directory_get_current_working_dir DEFAULT_typedata_procedure_sys_directory_get_current_working_dir = {
 	.type_info = {
 		.type_name = "sys_directory_get_current_working_dir",
+		.type_id = TYPE_sys_directory_get_current_working_dir,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15753,6 +17419,7 @@ constexpr type_info_procedure_sys_directory_get_current_working_dir DEFAULT_type
 constexpr type_info_procedure_sys_directory_visit DEFAULT_typedata_procedure_sys_directory_visit = {
 	.type_info = {
 		.type_name = "sys_directory_visit",
+		.type_id = TYPE_sys_directory_visit,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15778,6 +17445,7 @@ constexpr type_info_procedure_sys_directory_visit DEFAULT_typedata_procedure_sys
 constexpr type_info_procedure_sys_load_library DEFAULT_typedata_procedure_sys_load_library = {
 	.type_info = {
 		.type_name = "sys_load_library",
+		.type_id = TYPE_sys_load_library,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15796,6 +17464,7 @@ constexpr type_info_procedure_sys_load_library DEFAULT_typedata_procedure_sys_lo
 constexpr type_info_procedure_sys_free_library DEFAULT_typedata_procedure_sys_free_library = {
 	.type_info = {
 		.type_name = "sys_free_library",
+		.type_id = TYPE_sys_free_library,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15814,6 +17483,7 @@ constexpr type_info_procedure_sys_free_library DEFAULT_typedata_procedure_sys_fr
 constexpr type_info_procedure_sys_get_proc_address DEFAULT_typedata_procedure_sys_get_proc_address = {
 	.type_info = {
 		.type_name = "sys_get_proc_address",
+		.type_id = TYPE_sys_get_proc_address,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15839,6 +17509,7 @@ constexpr type_info_procedure_sys_get_proc_address DEFAULT_typedata_procedure_sy
 constexpr type_info_procedure_sys_file_watcher_init_watch_data DEFAULT_typedata_procedure_sys_file_watcher_init_watch_data = {
 	.type_info = {
 		.type_name = "sys_file_watcher_init_watch_data",
+		.type_id = TYPE_sys_file_watcher_init_watch_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15864,6 +17535,7 @@ constexpr type_info_procedure_sys_file_watcher_init_watch_data DEFAULT_typedata_
 constexpr type_info_procedure_sys_file_watcher_add_path DEFAULT_typedata_procedure_sys_file_watcher_add_path = {
 	.type_info = {
 		.type_name = "sys_file_watcher_add_path",
+		.type_id = TYPE_sys_file_watcher_add_path,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15889,6 +17561,7 @@ constexpr type_info_procedure_sys_file_watcher_add_path DEFAULT_typedata_procedu
 constexpr type_info_procedure_sys_file_watcher_issue_check DEFAULT_typedata_procedure_sys_file_watcher_issue_check = {
 	.type_info = {
 		.type_name = "sys_file_watcher_issue_check",
+		.type_id = TYPE_sys_file_watcher_issue_check,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15914,9 +17587,10 @@ constexpr type_info_procedure_sys_file_watcher_issue_check DEFAULT_typedata_proc
 constexpr type_info_procedure_sys_file_watcher_process_changes DEFAULT_typedata_procedure_sys_file_watcher_process_changes = {
 	.type_info = {
 		.type_name = "sys_file_watcher_process_changes",
+		.type_id = TYPE_sys_file_watcher_process_changes,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 2,
+	.argument_count = 1,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_sys_file_watcher_process_changes.argument_array,
 	.arguments = {
@@ -15927,18 +17601,12 @@ constexpr type_info_procedure_sys_file_watcher_process_changes DEFAULT_typedata_
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.changed = {
-			.type_info     = &DEFAULT_typedata_bool8,
-			.member_name   = "changed",
-			.parent        = &DEFAULT_typedata_procedure_sys_file_watcher_process_changes.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
 	},
 };
 constexpr type_info_procedure_sys_get_thread_count DEFAULT_typedata_procedure_sys_get_thread_count = {
 	.type_info = {
 		.type_name = "sys_get_thread_count",
+		.type_id = TYPE_sys_get_thread_count,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
@@ -15947,6 +17615,7 @@ constexpr type_info_procedure_sys_get_thread_count DEFAULT_typedata_procedure_sy
 constexpr type_info_procedure_sys_semaphore_create DEFAULT_typedata_procedure_sys_semaphore_create = {
 	.type_info = {
 		.type_name = "sys_semaphore_create",
+		.type_id = TYPE_sys_semaphore_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -15972,6 +17641,7 @@ constexpr type_info_procedure_sys_semaphore_create DEFAULT_typedata_procedure_sy
 constexpr type_info_procedure_sys_semaphore_close DEFAULT_typedata_procedure_sys_semaphore_close = {
 	.type_info = {
 		.type_name = "sys_semaphore_close",
+		.type_id = TYPE_sys_semaphore_close,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -15990,6 +17660,7 @@ constexpr type_info_procedure_sys_semaphore_close DEFAULT_typedata_procedure_sys
 constexpr type_info_procedure_sys_semaphore_wait DEFAULT_typedata_procedure_sys_semaphore_wait = {
 	.type_info = {
 		.type_name = "sys_semaphore_wait",
+		.type_id = TYPE_sys_semaphore_wait,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -16015,6 +17686,7 @@ constexpr type_info_procedure_sys_semaphore_wait DEFAULT_typedata_procedure_sys_
 constexpr type_info_procedure_sys_semaphore_release DEFAULT_typedata_procedure_sys_semaphore_release = {
 	.type_info = {
 		.type_name = "sys_semaphore_release",
+		.type_id = TYPE_sys_semaphore_release,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -16040,6 +17712,7 @@ constexpr type_info_procedure_sys_semaphore_release DEFAULT_typedata_procedure_s
 constexpr type_info_procedure_sys_semaphore_destroy DEFAULT_typedata_procedure_sys_semaphore_destroy = {
 	.type_info = {
 		.type_name = "sys_semaphore_destroy",
+		.type_id = TYPE_sys_semaphore_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -16055,27 +17728,15 @@ constexpr type_info_procedure_sys_semaphore_destroy DEFAULT_typedata_procedure_s
 		},
 	},
 };
-constexpr type_info_procedure_thread_proc_t DEFAULT_typedata_procedure_thread_proc_t = {
-	.type_info = {
-		.type_name = "thread_proc_t",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_int,
-	.argument_pointer = DEFAULT_typedata_procedure_thread_proc_t.argument_array,
-	.arguments = {
-		.user_data = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "user_data",
-			.parent        = &DEFAULT_typedata_procedure_thread_proc_t.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
+constexpr type_info_t DEFAULT_typedata_thread_proc_t = {
+	.type_name = "thread_proc_t",
+	.type_id = TYPE_thread_proc_t,
+	.size = athena_internal::safe_sizeof<thread_proc_t>(),
 };
 constexpr type_info_procedure_sys_thread_create DEFAULT_typedata_procedure_sys_thread_create = {
 	.type_info = {
 		.type_name = "sys_thread_create",
+		.type_id = TYPE_sys_thread_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -16083,7 +17744,7 @@ constexpr type_info_procedure_sys_thread_create DEFAULT_typedata_procedure_sys_t
 	.argument_pointer = DEFAULT_typedata_procedure_sys_thread_create.argument_array,
 	.arguments = {
 		.proc = {
-			.type_info     = &DEFAULT_typedata_procedure_thread_proc_t.type_info,
+			.type_info     = &DEFAULT_typedata_thread_proc_t,
 			.member_name   = "proc",
 			.parent        = &DEFAULT_typedata_procedure_sys_thread_create.type_info,
 			.flags         = 2,
@@ -16108,6 +17769,7 @@ constexpr type_info_procedure_sys_thread_create DEFAULT_typedata_procedure_sys_t
 constexpr type_info_procedure_sys_thread_wait DEFAULT_typedata_procedure_sys_thread_wait = {
 	.type_info = {
 		.type_name = "sys_thread_wait",
+		.type_id = TYPE_sys_thread_wait,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -16133,6 +17795,7 @@ constexpr type_info_procedure_sys_thread_wait DEFAULT_typedata_procedure_sys_thr
 constexpr type_info_procedure_sys_thread_close_handle DEFAULT_typedata_procedure_sys_thread_close_handle = {
 	.type_info = {
 		.type_name = "sys_thread_close_handle",
+		.type_id = TYPE_sys_thread_close_handle,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -16151,6 +17814,7 @@ constexpr type_info_procedure_sys_thread_close_handle DEFAULT_typedata_procedure
 constexpr type_info_procedure_sys_mutex_create DEFAULT_typedata_procedure_sys_mutex_create = {
 	.type_info = {
 		.type_name = "sys_mutex_create",
+		.type_id = TYPE_sys_mutex_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
@@ -16159,6 +17823,7 @@ constexpr type_info_procedure_sys_mutex_create DEFAULT_typedata_procedure_sys_mu
 constexpr type_info_procedure_sys_mutex_free DEFAULT_typedata_procedure_sys_mutex_free = {
 	.type_info = {
 		.type_name = "sys_mutex_free",
+		.type_id = TYPE_sys_mutex_free,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -16177,6 +17842,7 @@ constexpr type_info_procedure_sys_mutex_free DEFAULT_typedata_procedure_sys_mute
 constexpr type_info_procedure_sys_mutex_lock DEFAULT_typedata_procedure_sys_mutex_lock = {
 	.type_info = {
 		.type_name = "sys_mutex_lock",
+		.type_id = TYPE_sys_mutex_lock,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -16202,6 +17868,7 @@ constexpr type_info_procedure_sys_mutex_lock DEFAULT_typedata_procedure_sys_mute
 constexpr type_info_procedure_sys_mutex_unlock DEFAULT_typedata_procedure_sys_mutex_unlock = {
 	.type_info = {
 		.type_name = "sys_mutex_unlock",
+		.type_id = TYPE_sys_mutex_unlock,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -16220,6 +17887,7 @@ constexpr type_info_procedure_sys_mutex_unlock DEFAULT_typedata_procedure_sys_mu
 constexpr type_info_procedure_sys_create_process DEFAULT_typedata_procedure_sys_create_process = {
 	.type_info = {
 		.type_name = "sys_create_process",
+		.type_id = TYPE_sys_create_process,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -16245,6 +17913,7 @@ constexpr type_info_procedure_sys_create_process DEFAULT_typedata_procedure_sys_
 constexpr type_info_procedure_sys_wait_for_process DEFAULT_typedata_procedure_sys_wait_for_process = {
 	.type_info = {
 		.type_name = "sys_wait_for_process",
+		.type_id = TYPE_sys_wait_for_process,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -16260,719 +17929,10 @@ constexpr type_info_procedure_sys_wait_for_process DEFAULT_typedata_procedure_sy
 		},
 	},
 };
-constexpr type_info_t DEFAULT_typedata_immediate_vertex_t = {
-	.type_name = "immediate_vertex_t",
-	.size = athena_internal::safe_sizeof<immediate_vertex_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_immediate_widget_data_t = {
-	.type_name = "immediate_widget_data_t",
-	.size = athena_internal::safe_sizeof<immediate_widget_data_t>(),
-};
-constexpr type_info_struct_render_command_list_t DEFAULT_typedata_structure_render_command_list_t = {
-	.type_info = {
-		.type_name = "render_command_list_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_list_t>(),
-	},
-	.member_count   = 27,
-	.member_pointer = DEFAULT_typedata_structure_render_command_list_t.member_array,
-	.members = {
-		.is_initialized = {
-			.type_info     = &DEFAULT_typedata_bool8,
-			.member_name   = "is_initialized",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, is_initialized),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, renderer_state),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.transient_arena = {
-			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
-			.member_name   = "transient_arena",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, transient_arena),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.command_arena = {
-			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
-			.member_name   = "command_arena",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, command_arena),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.commands = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_t.type_info,
-			.member_name   = "commands",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, commands),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.command_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "command_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, command_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.draw_instance_command_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "draw_instance_command_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, draw_instance_command_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.bind_shader_command_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "bind_shader_command_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, bind_shader_command_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.bind_render_target_command_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "bind_render_target_command_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, bind_render_target_command_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.bind_material_command_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "bind_material_command_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, bind_material_command_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.active_render_state = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.member_name   = "active_render_state",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_render_state),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.vertex_buffer_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "vertex_buffer_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, vertex_buffer_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.active_index_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.member_name   = "active_index_buffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_index_buffer),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.active_scissor_command = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_t.type_info,
-			.member_name   = "active_scissor_command",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_scissor_command),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.active_viewport_command = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_t.type_info,
-			.member_name   = "active_viewport_command",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_viewport_command),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.active_shader_program = {
-			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.member_name   = "active_shader_program",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_shader_program),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.vertex_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "vertex_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, vertex_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.instance_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "instance_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, instance_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.index_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "index_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, index_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.active_renderpass = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.member_name   = "active_renderpass",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_renderpass),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.presenting = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "presenting",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, presenting),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.image_shader_params = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
-			.member_name   = "image_shader_params",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, image_shader_params),
-			.flags         = 66,
-			.pointer_depth = 1,
-		},
-		.image_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "image_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, image_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.image_ids_to_bind = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "image_ids_to_bind",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, image_ids_to_bind),
-			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.bound_image_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "bound_image_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, bound_image_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.command_list_type = {
-			.type_info     = &DEFAULT_typedata_structure_command_list_type_t.type_info,
-			.member_name   = "command_list_type",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, command_list_type),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.backend_command_buffer = {
-			.type_info     = &DEFAULT_typedata_backend_command_buffer_t,
-			.member_name   = "backend_command_buffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, backend_command_buffer),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_vertex_buffer_t DEFAULT_typedata_structure_vertex_buffer_t = {
-	.type_info = {
-		.type_name = "vertex_buffer_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<vertex_buffer_t>(),
-	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_vertex_buffer_t.member_array,
-	.members = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.offset        = offsetof(vertex_buffer_t, buffer),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.vertex_data = {
-			.type_info     = &DEFAULT_typedata_byte,
-			.member_name   = "vertex_data",
-			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.offset        = offsetof(vertex_buffer_t, vertex_data),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.max_vertices = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "max_vertices",
-			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.offset        = offsetof(vertex_buffer_t, max_vertices),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.vertex_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "vertex_count",
-			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.offset        = offsetof(vertex_buffer_t, vertex_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_t DEFAULT_typedata_vec3_t = {
-	.type_name = "vec3_t",
-	.size = athena_internal::safe_sizeof<vec3_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_vec2_t = {
-	.type_name = "vec2_t",
-	.size = athena_internal::safe_sizeof<vec2_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_vec4_t = {
-	.type_name = "vec4_t",
-	.size = athena_internal::safe_sizeof<vec4_t>(),
-};
-constexpr type_info_struct_texture2D_t DEFAULT_typedata_structure_texture2D_t = {
-	.type_info = {
-		.type_name = "texture2D_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<texture2D_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_texture2D_t.member_array,
-	.members = {
-		.ID = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "ID",
-			.parent        = &DEFAULT_typedata_structure_texture2D_t.type_info,
-			.offset        = offsetof(texture2D_t, ID),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.bitmap = {
-			.type_info     = &DEFAULT_typedata_structure_bitmap_t.type_info,
-			.member_name   = "bitmap",
-			.parent        = &DEFAULT_typedata_structure_texture2D_t.type_info,
-			.offset        = offsetof(texture2D_t, bitmap),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.gpu_data = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
-			.member_name   = "gpu_data",
-			.parent        = &DEFAULT_typedata_structure_texture2D_t.type_info,
-			.offset        = offsetof(texture2D_t, gpu_data),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immediate_quad_ex = {
-	.type_info = {
-		.type_name = "immediate_quad_ex",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 11,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_immediate_quad_ex.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.position = {
-			.type_info     = &DEFAULT_typedata_vec3_t,
-			.member_name   = "position",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.render_size = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "render_size",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.render_color = {
-			.type_info     = &DEFAULT_typedata_vec4_t,
-			.member_name   = "render_color",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.uv_min = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "uv_min",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.uv_max = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "uv_max",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.padding = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "padding",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.sdf_info = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "sdf_info",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.padding0 = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "padding0",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.texture = {
-			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
-			.member_name   = "texture",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediate_rect = {
-	.type_info = {
-		.type_name = "immediate_rect",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 10,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.position = {
-			.type_info     = &DEFAULT_typedata_vec3_t,
-			.member_name   = "position",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.render_size = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "render_size",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.render_color = {
-			.type_info     = &DEFAULT_typedata_vec4_t,
-			.member_name   = "render_color",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.uv_min = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "uv_min",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.uv_max = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "uv_max",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.padding = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "padding",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.sdf_info = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "sdf_info",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.padding0 = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "padding0",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_struct_asset_handle_t DEFAULT_typedata_structure_asset_handle_t = {
-	.type_info = {
-		.type_name = "asset_handle_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<asset_handle_t>(),
-	},
-	.member_count   = 11,
-	.member_pointer = DEFAULT_typedata_structure_asset_handle_t.member_array,
-	.members = {
-		.is_valid = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "is_valid",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, is_valid),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.type = {
-			.type_info     = &DEFAULT_typedata_structure_asset_type_t.type_info,
-			.member_name   = "type",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, type),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.owner_asset_file_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "owner_asset_file_index",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, owner_asset_file_index),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.subtexture_data = {
-			.type_info     = &DEFAULT_typedata_structure_subtexture_data_t.type_info,
-			.member_name   = "subtexture_data",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, subtexture_data),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.slot = {
-			.type_info     = &DEFAULT_typedata_structure_asset_slot_t.type_info,
-			.member_name   = "slot",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, slot),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.asset_manager = {
-			.type_info     = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.member_name   = "asset_manager",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, asset_manager),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.catalog = {
-			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
-			.member_name   = "catalog",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, catalog),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.texture = {
-			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
-			.member_name   = "texture",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, texture),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.shader = {
-			.type_info     = &DEFAULT_typedata_structure_shader_t.type_info,
-			.member_name   = "shader",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, shader),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.material_info = {
-			.type_info     = &DEFAULT_typedata_structure_material_data_t.type_info,
-			.member_name   = "material_info",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, material_info),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.dynamic_render_font = {
-			.type_info     = &DEFAULT_typedata_structure_dynamic_render_font_t.type_info,
-			.member_name   = "dynamic_render_font",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, dynamic_render_font),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-
-constexpr type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediate_text = {
-	.type_info = {
-		.type_name = "immediate_text",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 9,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_immediate_text.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.vertex_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.member_name   = "vertex_buffer",
-			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.asset_manager = {
-			.type_info     = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.member_name   = "asset_manager",
-			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.asset_handle = {
-			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.member_name   = "asset_handle",
-			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.render_string = {
-			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
-			.member_name   = "render_string",
-			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.position = {
-			.type_info     = &DEFAULT_typedata_vec3_t,
-			.member_name   = "position",
-			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.text_color = {
-			.type_info     = &DEFAULT_typedata_vec4_t,
-			.member_name   = "text_color",
-			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.settings = {
-			.type_info     = &DEFAULT_typedata_float32,
-			.member_name   = "settings",
-			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.font_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "font_size",
-			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data = {
-	.type_info = {
-		.type_name = "immediate_put_data",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_immediate_put_data.argument_array,
-	.arguments = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.data = {
-			.type_info     = &DEFAULT_typedata_byte,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.element_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "element_size",
-			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.element_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "element_count",
-			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
 constexpr type_info_struct_render_image_filter_type_t DEFAULT_typedata_structure_render_image_filter_type_t = {
 	.type_info = {
 		.type_name = "render_image_filter_type_t",
+		.type_id = TYPE_render_image_filter_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_image_filter_type_t>(),
 	},
@@ -17018,6 +17978,7 @@ constexpr type_info_struct_render_image_filter_type_t DEFAULT_typedata_structure
 constexpr type_info_struct_render_image_wrapping_type_t DEFAULT_typedata_structure_render_image_wrapping_type_t = {
 	.type_info = {
 		.type_name = "render_image_wrapping_type_t",
+		.type_id = TYPE_render_image_wrapping_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_image_wrapping_type_t>(),
 	},
@@ -17074,6 +18035,7 @@ constexpr type_info_struct_render_image_wrapping_type_t DEFAULT_typedata_structu
 constexpr type_info_struct_render_image_usage_t DEFAULT_typedata_structure_render_image_usage_t = {
 	.type_info = {
 		.type_name = "render_image_usage_t",
+		.type_id = TYPE_render_image_usage_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_image_usage_t>(),
 	},
@@ -17152,6 +18114,7 @@ constexpr type_info_struct_render_image_usage_t DEFAULT_typedata_structure_rende
 constexpr type_info_struct_sampler_create_info_t DEFAULT_typedata_structure_sampler_create_info_t = {
 	.type_info = {
 		.type_name = "sampler_create_info_t",
+		.type_id = TYPE_sampler_create_info_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<sampler_create_info_t>(),
 	},
@@ -17228,6 +18191,7 @@ constexpr type_info_struct_sampler_create_info_t DEFAULT_typedata_structure_samp
 constexpr type_info_struct_image_create_info_t DEFAULT_typedata_structure_image_create_info_t = {
 	.type_info = {
 		.type_name = "image_create_info_t",
+		.type_id = TYPE_image_create_info_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<image_create_info_t>(),
 	},
@@ -17288,6 +18252,7 @@ constexpr type_info_struct_image_create_info_t DEFAULT_typedata_structure_image_
 constexpr type_info_struct_image_t DEFAULT_typedata_structure_image_t = {
 	.type_info = {
 		.type_name = "image_t",
+		.type_id = TYPE_image_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<image_t>(),
 	},
@@ -17324,6 +18289,7 @@ constexpr type_info_struct_image_t DEFAULT_typedata_structure_image_t = {
 constexpr type_info_procedure_s_renderer_image_create DEFAULT_typedata_procedure_s_renderer_image_create = {
 	.type_info = {
 		.type_name = "s_renderer_image_create",
+		.type_id = TYPE_s_renderer_image_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -17349,6 +18315,7 @@ constexpr type_info_procedure_s_renderer_image_create DEFAULT_typedata_procedure
 constexpr type_info_struct_bitmap_t DEFAULT_typedata_structure_bitmap_t = {
 	.type_info = {
 		.type_name = "bitmap_t",
+		.type_id = TYPE_bitmap_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<bitmap_t>(),
 	},
@@ -17401,6 +18368,7 @@ constexpr type_info_struct_bitmap_t DEFAULT_typedata_structure_bitmap_t = {
 constexpr type_info_procedure_s_renderer_image_create_from_bitmap DEFAULT_typedata_procedure_s_renderer_image_create_from_bitmap = {
 	.type_info = {
 		.type_name = "s_renderer_image_create_from_bitmap",
+		.type_id = TYPE_s_renderer_image_create_from_bitmap,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -17419,6 +18387,7 @@ constexpr type_info_procedure_s_renderer_image_create_from_bitmap DEFAULT_typeda
 constexpr type_info_procedure_s_renderer_image_destroy DEFAULT_typedata_procedure_s_renderer_image_destroy = {
 	.type_info = {
 		.type_name = "s_renderer_image_destroy",
+		.type_id = TYPE_s_renderer_image_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -17444,6 +18413,7 @@ constexpr type_info_procedure_s_renderer_image_destroy DEFAULT_typedata_procedur
 constexpr type_info_procedure_s_renderer_image_update_data DEFAULT_typedata_procedure_s_renderer_image_update_data = {
 	.type_info = {
 		.type_name = "s_renderer_image_update_data",
+		.type_id = TYPE_s_renderer_image_update_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -17468,29 +18438,13 @@ constexpr type_info_procedure_s_renderer_image_update_data DEFAULT_typedata_proc
 };
 constexpr type_info_t DEFAULT_typedata_backend_image_t = {
 	.type_name = "backend_image_t",
+	.type_id = TYPE_backend_image_t,
 	.size = athena_internal::safe_sizeof<backend_image_t>(),
-};
-constexpr type_info_procedure_sys_work_queue_entry_proc DEFAULT_typedata_procedure_sys_work_queue_entry_proc = {
-	.type_info = {
-		.type_name = "sys_work_queue_entry_proc",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_int,
-	.argument_pointer = DEFAULT_typedata_procedure_sys_work_queue_entry_proc.argument_array,
-	.arguments = {
-		.lpParam = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "lpParam",
-			.parent        = &DEFAULT_typedata_procedure_sys_work_queue_entry_proc.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
 };
 constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t = {
 	.type_info = {
 		.type_name = "asset_type_t",
+		.type_id = TYPE_asset_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<asset_type_t>(),
 	},
@@ -17580,23 +18534,13 @@ constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t 
 constexpr type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_asset_slot_load_status_t = {
 	.type_info = {
 		.type_name = "asset_slot_load_status_t",
+		.type_id = TYPE_asset_slot_load_status_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<asset_slot_load_status_t>(),
 	},
-	.member_count   = 7,
+	.member_count   = 6,
 	.member_pointer = DEFAULT_typedata_structure_asset_slot_load_status_t.member_array,
 	.members = {
-		.ASLS_Invalid = {
-			.type_info     = &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info,
-			.member_name   = "ASLS_Invalid",
-			.parent        = &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = ASLS_Invalid,
-			},
-		},
 		.ASLS_Unloaded = {
 			.type_info     = &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info,
 			.member_name   = "ASLS_Unloaded",
@@ -17669,6 +18613,7 @@ constexpr type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_a
 constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_format_t = {
 	.type_info = {
 		.type_name = "bitmap_format_t",
+		.type_id = TYPE_bitmap_format_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<bitmap_format_t>(),
 	},
@@ -17824,10 +18769,11 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 constexpr type_info_struct_subtexture_data_t DEFAULT_typedata_structure_subtexture_data_t = {
 	.type_info = {
 		.type_name = "subtexture_data_t",
+		.type_id = TYPE_subtexture_data_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<subtexture_data_t>(),
 	},
-	.member_count   = 6,
+	.member_count   = 8,
 	.member_pointer = DEFAULT_typedata_structure_subtexture_data_t.member_array,
 	.members = {
 		.uv_min = {
@@ -17862,6 +18808,14 @@ constexpr type_info_struct_subtexture_data_t DEFAULT_typedata_structure_subtextu
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.atlased_generation = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "atlased_generation",
+			.parent        = &DEFAULT_typedata_structure_subtexture_data_t.type_info,
+			.offset        = offsetof(subtexture_data_t, atlased_generation),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.atlas_subtexture_index = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "atlas_subtexture_index",
@@ -17878,16 +18832,25 @@ constexpr type_info_struct_subtexture_data_t DEFAULT_typedata_structure_subtextu
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
+		.packed_asset = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "packed_asset",
+			.parent        = &DEFAULT_typedata_structure_subtexture_data_t.type_info,
+			.offset        = offsetof(subtexture_data_t, packed_asset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 	},
 };
 
 constexpr type_info_struct_texture_atlas_t DEFAULT_typedata_structure_texture_atlas_t = {
 	.type_info = {
 		.type_name = "texture_atlas_t",
+		.type_id = TYPE_texture_atlas_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<texture_atlas_t>(),
 	},
-	.member_count   = 10,
+	.member_count   = 12,
 	.member_pointer = DEFAULT_typedata_structure_texture_atlas_t.member_array,
 	.members = {
 		.texture = {
@@ -17973,9 +18936,92 @@ constexpr type_info_struct_texture_atlas_t DEFAULT_typedata_structure_texture_at
 	},
 };
 
+constexpr type_info_struct_animation_source2D_t DEFAULT_typedata_structure_animation_source2D_t = {
+	.type_info = {
+		.type_name = "animation_source2D_t",
+		.type_id = TYPE_animation_source2D_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<animation_source2D_t>(),
+	},
+	.member_count   = 4,
+	.member_pointer = DEFAULT_typedata_structure_animation_source2D_t.member_array,
+	.members = {
+		.name = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "name",
+			.parent        = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
+			.offset        = offsetof(animation_source2D_t, name),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.texture = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "texture",
+			.parent        = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
+			.offset        = offsetof(animation_source2D_t, texture),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.frame_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "frame_count",
+			.parent        = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
+			.offset        = offsetof(animation_source2D_t, frame_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.frame_timer = {
+			.type_info     = &DEFAULT_typedata_structure_duration_counter_t.type_info,
+			.member_name   = "frame_timer",
+			.parent        = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
+			.offset        = offsetof(animation_source2D_t, frame_timer),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_animation2D_t DEFAULT_typedata_structure_animation2D_t = {
+	.type_info = {
+		.type_name = "animation2D_t",
+		.type_id = TYPE_animation2D_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<animation2D_t>(),
+	},
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_animation2D_t.member_array,
+	.members = {
+		.animation_info = {
+			.type_info     = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
+			.member_name   = "animation_info",
+			.parent        = &DEFAULT_typedata_structure_animation2D_t.type_info,
+			.offset        = offsetof(animation2D_t, animation_info),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.current_frame = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "current_frame",
+			.parent        = &DEFAULT_typedata_structure_animation2D_t.type_info,
+			.offset        = offsetof(animation2D_t, current_frame),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.frame_timer = {
+			.type_info     = &DEFAULT_typedata_structure_duration_counter_t.type_info,
+			.member_name   = "frame_timer",
+			.parent        = &DEFAULT_typedata_structure_animation2D_t.type_info,
+			.offset        = offsetof(animation2D_t, frame_timer),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
 constexpr type_info_struct_shader_t DEFAULT_typedata_structure_shader_t = {
 	.type_info = {
 		.type_name = "shader_t",
+		.type_id = TYPE_shader_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<shader_t>(),
 	},
@@ -18004,6 +19050,7 @@ constexpr type_info_struct_shader_t DEFAULT_typedata_structure_shader_t = {
 constexpr type_info_struct_material_instance_t DEFAULT_typedata_structure_material_instance_t = {
 	.type_info = {
 		.type_name = "material_instance_t",
+		.type_id = TYPE_material_instance_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<material_instance_t>(),
 	},
@@ -18072,6 +19119,7 @@ constexpr type_info_struct_material_instance_t DEFAULT_typedata_structure_materi
 constexpr type_info_struct_material_archetype_t DEFAULT_typedata_structure_material_archetype_t = {
 	.type_info = {
 		.type_name = "material_archetype_t",
+		.type_id = TYPE_material_archetype_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<material_archetype_t>(),
 	},
@@ -18140,6 +19188,7 @@ constexpr type_info_struct_material_archetype_t DEFAULT_typedata_structure_mater
 constexpr type_info_struct_stored_material_type_t DEFAULT_typedata_structure_stored_material_type_t = {
 	.type_info = {
 		.type_name = "stored_material_type_t",
+		.type_id = TYPE_stored_material_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<stored_material_type_t>(),
 	},
@@ -18185,6 +19234,7 @@ constexpr type_info_struct_stored_material_type_t DEFAULT_typedata_structure_sto
 constexpr type_info_struct_material_data_t DEFAULT_typedata_structure_material_data_t = {
 	.type_info = {
 		.type_name = "material_data_t",
+		.type_id = TYPE_material_data_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<material_data_t>(),
 	},
@@ -18221,6 +19271,7 @@ constexpr type_info_struct_material_data_t DEFAULT_typedata_structure_material_d
 constexpr type_info_procedure_FT_ROUND DEFAULT_typedata_procedure_FT_ROUND = {
 	.type_info = {
 		.type_name = "FT_ROUND",
+		.type_id = TYPE_FT_ROUND,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -18239,6 +19290,7 @@ constexpr type_info_procedure_FT_ROUND DEFAULT_typedata_procedure_FT_ROUND = {
 constexpr type_info_procedure_unicode_next_character DEFAULT_typedata_procedure_unicode_next_character = {
 	.type_info = {
 		.type_name = "unicode_next_character",
+		.type_id = TYPE_unicode_next_character,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -18257,6 +19309,7 @@ constexpr type_info_procedure_unicode_next_character DEFAULT_typedata_procedure_
 constexpr type_info_struct_glyph_metric_t DEFAULT_typedata_structure_glyph_metric_t = {
 	.type_info = {
 		.type_name = "glyph_metric_t",
+		.type_id = TYPE_glyph_metric_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<glyph_metric_t>(),
 	},
@@ -18357,6 +19410,7 @@ constexpr type_info_struct_glyph_metric_t DEFAULT_typedata_structure_glyph_metri
 constexpr type_info_struct_temporary_glyph_t DEFAULT_typedata_structure_temporary_glyph_t = {
 	.type_info = {
 		.type_name = "temporary_glyph_t",
+		.type_id = TYPE_temporary_glyph_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<temporary_glyph_t>(),
 	},
@@ -18417,6 +19471,7 @@ constexpr type_info_struct_temporary_glyph_t DEFAULT_typedata_structure_temporar
 constexpr type_info_struct_dynamic_render_font_page_t DEFAULT_typedata_structure_dynamic_render_font_page_t = {
 	.type_info = {
 		.type_name = "dynamic_render_font_page_t",
+		.type_id = TYPE_dynamic_render_font_page_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<dynamic_render_font_page_t>(),
 	},
@@ -18525,6 +19580,7 @@ constexpr type_info_struct_dynamic_render_font_page_t DEFAULT_typedata_structure
 constexpr type_info_struct_dynamic_render_font_varient_t DEFAULT_typedata_structure_dynamic_render_font_varient_t = {
 	.type_info = {
 		.type_name = "dynamic_render_font_varient_t",
+		.type_id = TYPE_dynamic_render_font_varient_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<dynamic_render_font_varient_t>(),
 	},
@@ -18641,10 +19697,11 @@ constexpr type_info_struct_dynamic_render_font_varient_t DEFAULT_typedata_struct
 constexpr type_info_struct_dynamic_render_font_t DEFAULT_typedata_structure_dynamic_render_font_t = {
 	.type_info = {
 		.type_name = "dynamic_render_font_t",
+		.type_id = TYPE_dynamic_render_font_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<dynamic_render_font_t>(),
 	},
-	.member_count   = 2,
+	.member_count   = 3,
 	.member_pointer = DEFAULT_typedata_structure_dynamic_render_font_t.member_array,
 	.members = {
 		.font_arena = {
@@ -18669,10 +19726,11 @@ constexpr type_info_struct_dynamic_render_font_t DEFAULT_typedata_structure_dyna
 constexpr type_info_struct_asset_slot_t DEFAULT_typedata_structure_asset_slot_t = {
 	.type_info = {
 		.type_name = "asset_slot_t",
+		.type_id = TYPE_asset_slot_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<asset_slot_t>(),
 	},
-	.member_count   = 12,
+	.member_count   = 16,
 	.member_pointer = DEFAULT_typedata_structure_asset_slot_t.member_array,
 	.members = {
 		.ID = {
@@ -18723,6 +19781,30 @@ constexpr type_info_struct_asset_slot_t DEFAULT_typedata_structure_asset_slot_t 
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
+		.subtexture_data = {
+			.type_info     = &DEFAULT_typedata_structure_subtexture_data_t.type_info,
+			.member_name   = "subtexture_data",
+			.parent        = &DEFAULT_typedata_structure_asset_slot_t.type_info,
+			.offset        = offsetof(asset_slot_t, subtexture_data),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.asset_manager = {
+			.type_info     = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.member_name   = "asset_manager",
+			.parent        = &DEFAULT_typedata_structure_asset_slot_t.type_info,
+			.offset        = offsetof(asset_slot_t, asset_manager),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.catalog = {
+			.type_info     = &DEFAULT_typedata_structure_asset_catalog_t.type_info,
+			.member_name   = "catalog",
+			.parent        = &DEFAULT_typedata_structure_asset_slot_t.type_info,
+			.offset        = offsetof(asset_slot_t, catalog),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
 		.package_generation = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "package_generation",
@@ -18737,6 +19819,14 @@ constexpr type_info_struct_asset_slot_t DEFAULT_typedata_structure_asset_slot_t 
 			.parent        = &DEFAULT_typedata_structure_asset_slot_t.type_info,
 			.offset        = offsetof(asset_slot_t, loaded_asset_index),
 			.flags         = 4,
+			.pointer_depth = 0,
+		},
+		.owner_asset_file_index = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "owner_asset_file_index",
+			.parent        = &DEFAULT_typedata_structure_asset_slot_t.type_info,
+			.offset        = offsetof(asset_slot_t, owner_asset_file_index),
+			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.texture = {
@@ -18774,84 +19864,101 @@ constexpr type_info_struct_asset_slot_t DEFAULT_typedata_structure_asset_slot_t 
 	},
 };
 
-constexpr type_info_struct_asset_manager_asset_file_data_t DEFAULT_typedata_structure_asset_manager_asset_file_data_t = {
+constexpr type_info_struct_asset_file_data_t DEFAULT_typedata_structure_asset_file_data_t = {
 	.type_info = {
-		.type_name = "asset_manager_asset_file_data_t",
+		.type_name = "asset_file_data_t",
+		.type_id = TYPE_asset_file_data_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<asset_manager_asset_file_data_t>(),
+		.size = athena_internal::safe_sizeof<asset_file_data_t>(),
 	},
-	.member_count   = 10,
-	.member_pointer = DEFAULT_typedata_structure_asset_manager_asset_file_data_t.member_array,
+	.member_count   = 13,
+	.member_pointer = DEFAULT_typedata_structure_asset_file_data_t.member_array,
 	.members = {
 		.is_initialized = {
 			.type_info     = &DEFAULT_typedata_bool8,
 			.member_name   = "is_initialized",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
-			.offset        = offsetof(asset_manager_asset_file_data_t, is_initialized),
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, is_initialized),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.ID = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "ID",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
-			.offset        = offsetof(asset_manager_asset_file_data_t, ID),
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, ID),
 			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.current_package_generation = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "current_package_generation",
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, current_package_generation),
+			.flags         = 4,
 			.pointer_depth = 0,
 		},
 		.init_arena = {
 			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
 			.member_name   = "init_arena",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
-			.offset        = offsetof(asset_manager_asset_file_data_t, init_arena),
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, init_arena),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.load_status = {
 			.type_info     = &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info,
 			.member_name   = "load_status",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
-			.offset        = offsetof(asset_manager_asset_file_data_t, load_status),
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, load_status),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.file_info = {
 			.type_info     = &DEFAULT_typedata_structure_file_t.type_info,
 			.member_name   = "file_info",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
-			.offset        = offsetof(asset_manager_asset_file_data_t, file_info),
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, file_info),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.raw_file_data = {
 			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
 			.member_name   = "raw_file_data",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
-			.offset        = offsetof(asset_manager_asset_file_data_t, raw_file_data),
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, raw_file_data),
 			.flags         = 0,
 			.pointer_depth = 0,
+		},
+		.header = {
+			.type_info     = &DEFAULT_typedata_jfd_file_header_t,
+			.member_name   = "header",
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, header),
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
 		.package_entries = {
 			.type_info     = &DEFAULT_typedata_jfd_package_entry_t,
 			.member_name   = "package_entries",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
-			.offset        = offsetof(asset_manager_asset_file_data_t, package_entries),
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, package_entries),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.package_entry_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "package_entry_count",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
-			.offset        = offsetof(asset_manager_asset_file_data_t, package_entry_count),
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, package_entry_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.header_data = {
 			.type_info     = &DEFAULT_typedata_jfd_file_header_t,
 			.member_name   = "header_data",
-			.parent        = &DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
-			.offset        = offsetof(asset_manager_asset_file_data_t, header_data),
+			.parent        = &DEFAULT_typedata_structure_asset_file_data_t.type_info,
+			.offset        = offsetof(asset_file_data_t, header_data),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
@@ -18861,10 +19968,11 @@ constexpr type_info_struct_asset_manager_asset_file_data_t DEFAULT_typedata_stru
 constexpr type_info_struct_asset_catalog_t DEFAULT_typedata_structure_asset_catalog_t = {
 	.type_info = {
 		.type_name = "asset_catalog_t",
+		.type_id = TYPE_asset_catalog_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<asset_catalog_t>(),
 	},
-	.member_count   = 5,
+	.member_count   = 6,
 	.member_pointer = DEFAULT_typedata_structure_asset_catalog_t.member_array,
 	.members = {
 		.ID = {
@@ -18905,6 +20013,7 @@ constexpr type_info_struct_asset_catalog_t DEFAULT_typedata_structure_asset_cata
 constexpr type_info_struct_texture_manager_t DEFAULT_typedata_structure_texture_manager_t = {
 	.type_info = {
 		.type_name = "texture_manager_t",
+		.type_id = TYPE_texture_manager_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<texture_manager_t>(),
 	},
@@ -18933,6 +20042,7 @@ constexpr type_info_struct_texture_manager_t DEFAULT_typedata_structure_texture_
 constexpr type_info_struct_font_manager_t DEFAULT_typedata_structure_font_manager_t = {
 	.type_info = {
 		.type_name = "font_manager_t",
+		.type_id = TYPE_font_manager_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<font_manager_t>(),
 	},
@@ -18961,6 +20071,7 @@ constexpr type_info_struct_font_manager_t DEFAULT_typedata_structure_font_manage
 constexpr type_info_struct_texture_atlas_registry_t DEFAULT_typedata_structure_texture_atlas_registry_t = {
 	.type_info = {
 		.type_name = "texture_atlas_registry_t",
+		.type_id = TYPE_texture_atlas_registry_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<texture_atlas_registry_t>(),
 	},
@@ -18989,6 +20100,7 @@ constexpr type_info_struct_texture_atlas_registry_t DEFAULT_typedata_structure_t
 constexpr type_info_procedure_s_asset_manager_init DEFAULT_typedata_procedure_s_asset_manager_init = {
 	.type_info = {
 		.type_name = "s_asset_manager_init",
+		.type_id = TYPE_s_asset_manager_init,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -19007,6 +20119,7 @@ constexpr type_info_procedure_s_asset_manager_init DEFAULT_typedata_procedure_s_
 constexpr type_info_procedure_s_asset_manager_update DEFAULT_typedata_procedure_s_asset_manager_update = {
 	.type_info = {
 		.type_name = "s_asset_manager_update",
+		.type_id = TYPE_s_asset_manager_update,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -19025,6 +20138,7 @@ constexpr type_info_procedure_s_asset_manager_update DEFAULT_typedata_procedure_
 constexpr type_info_procedure_s_asset_manager_queue_asset_load DEFAULT_typedata_procedure_s_asset_manager_queue_asset_load = {
 	.type_info = {
 		.type_name = "s_asset_manager_queue_asset_load",
+		.type_id = TYPE_s_asset_manager_queue_asset_load,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -19047,9 +20161,55 @@ constexpr type_info_procedure_s_asset_manager_queue_asset_load DEFAULT_typedata_
 		},
 	},
 };
+constexpr type_info_procedure_s_UTF32_convert_to_UTF8 DEFAULT_typedata_procedure_s_UTF32_convert_to_UTF8 = {
+	.type_info = {
+		.type_name = "s_UTF32_convert_to_UTF8",
+		.type_id = TYPE_s_UTF32_convert_to_UTF8,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_s_UTF32_convert_to_UTF8.argument_array,
+	.arguments = {
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_s_UTF32_convert_to_UTF8.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.character = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "character",
+			.parent        = &DEFAULT_typedata_procedure_s_UTF32_convert_to_UTF8.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_s_UTF8_convert_UTF32 DEFAULT_typedata_procedure_s_UTF8_convert_UTF32 = {
+	.type_info = {
+		.type_name = "s_UTF8_convert_UTF32",
+		.type_id = TYPE_s_UTF8_convert_UTF32,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_u32,
+	.argument_pointer = DEFAULT_typedata_procedure_s_UTF8_convert_UTF32.argument_array,
+	.arguments = {
+		.character = {
+			.type_info     = &DEFAULT_typedata_u8,
+			.member_name   = "character",
+			.parent        = &DEFAULT_typedata_procedure_s_UTF8_convert_UTF32.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr type_info_procedure_s_asset_manager_load_asset_file DEFAULT_typedata_procedure_s_asset_manager_load_asset_file = {
 	.type_info = {
 		.type_name = "s_asset_manager_load_asset_file",
+		.type_id = TYPE_s_asset_manager_load_asset_file,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -19072,9 +20232,36 @@ constexpr type_info_procedure_s_asset_manager_load_asset_file DEFAULT_typedata_p
 		},
 	},
 };
+constexpr type_info_procedure_s_asset_manager_signal_asset_file_reload DEFAULT_typedata_procedure_s_asset_manager_signal_asset_file_reload = {
+	.type_info = {
+		.type_name = "s_asset_manager_signal_asset_file_reload",
+		.type_id = TYPE_s_asset_manager_signal_asset_file_reload,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_s_asset_manager_signal_asset_file_reload.argument_array,
+	.arguments = {
+		.asset_manager = {
+			.type_info     = &DEFAULT_typedata_structure_asset_manager_t.type_info,
+			.member_name   = "asset_manager",
+			.parent        = &DEFAULT_typedata_procedure_s_asset_manager_signal_asset_file_reload.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.filename = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "filename",
+			.parent        = &DEFAULT_typedata_procedure_s_asset_manager_signal_asset_file_reload.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
 constexpr type_info_procedure_s_asset_manager_acquire_asset_handle DEFAULT_typedata_procedure_s_asset_manager_acquire_asset_handle = {
 	.type_info = {
 		.type_name = "s_asset_manager_acquire_asset_handle",
+		.type_id = TYPE_s_asset_manager_acquire_asset_handle,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -19100,6 +20287,7 @@ constexpr type_info_procedure_s_asset_manager_acquire_asset_handle DEFAULT_typed
 constexpr type_info_procedure_s_texture_atlas_create DEFAULT_typedata_procedure_s_texture_atlas_create = {
 	.type_info = {
 		.type_name = "s_texture_atlas_create",
+		.type_id = TYPE_s_texture_atlas_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -19146,6 +20334,7 @@ constexpr type_info_procedure_s_texture_atlas_create DEFAULT_typedata_procedure_
 constexpr type_info_procedure_s_texture_atlas_add_texture DEFAULT_typedata_procedure_s_texture_atlas_add_texture = {
 	.type_info = {
 		.type_name = "s_texture_atlas_add_texture",
+		.type_id = TYPE_s_texture_atlas_add_texture,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -19171,6 +20360,7 @@ constexpr type_info_procedure_s_texture_atlas_add_texture DEFAULT_typedata_proce
 constexpr type_info_procedure_s_texture_atlas_pack_added_textures DEFAULT_typedata_procedure_s_texture_atlas_pack_added_textures = {
 	.type_info = {
 		.type_name = "s_texture_atlas_pack_added_textures",
+		.type_id = TYPE_s_texture_atlas_pack_added_textures,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -19196,6 +20386,7 @@ constexpr type_info_procedure_s_texture_atlas_pack_added_textures DEFAULT_typeda
 constexpr type_info_procedure_s_asset_manager_set_handle_asset_data_pointer DEFAULT_typedata_procedure_s_asset_manager_set_handle_asset_data_pointer = {
 	.type_info = {
 		.type_name = "s_asset_manager_set_handle_asset_data_pointer",
+		.type_id = TYPE_s_asset_manager_set_handle_asset_data_pointer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -19221,6 +20412,7 @@ constexpr type_info_procedure_s_asset_manager_set_handle_asset_data_pointer DEFA
 constexpr type_info_procedure_s_asset_manager_get_asset_slot DEFAULT_typedata_procedure_s_asset_manager_get_asset_slot = {
 	.type_info = {
 		.type_name = "s_asset_manager_get_asset_slot",
+		.type_id = TYPE_s_asset_manager_get_asset_slot,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -19246,6 +20438,7 @@ constexpr type_info_procedure_s_asset_manager_get_asset_slot DEFAULT_typedata_pr
 constexpr type_info_procedure_s_asset_get_shader_from_handle DEFAULT_typedata_procedure_s_asset_get_shader_from_handle = {
 	.type_info = {
 		.type_name = "s_asset_get_shader_from_handle",
+		.type_id = TYPE_s_asset_get_shader_from_handle,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -19264,6 +20457,7 @@ constexpr type_info_procedure_s_asset_get_shader_from_handle DEFAULT_typedata_pr
 constexpr type_info_procedure_s_asset_get_texture_from_handle DEFAULT_typedata_procedure_s_asset_get_texture_from_handle = {
 	.type_info = {
 		.type_name = "s_asset_get_texture_from_handle",
+		.type_id = TYPE_s_asset_get_texture_from_handle,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -19282,6 +20476,7 @@ constexpr type_info_procedure_s_asset_get_texture_from_handle DEFAULT_typedata_p
 constexpr type_info_procedure_s_asset_get_material_data_from_handle DEFAULT_typedata_procedure_s_asset_get_material_data_from_handle = {
 	.type_info = {
 		.type_name = "s_asset_get_material_data_from_handle",
+		.type_id = TYPE_s_asset_get_material_data_from_handle,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -19300,6 +20495,7 @@ constexpr type_info_procedure_s_asset_get_material_data_from_handle DEFAULT_type
 constexpr type_info_procedure_s_asset_get_material_archetype_from_handle DEFAULT_typedata_procedure_s_asset_get_material_archetype_from_handle = {
 	.type_info = {
 		.type_name = "s_asset_get_material_archetype_from_handle",
+		.type_id = TYPE_s_asset_get_material_archetype_from_handle,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -19318,6 +20514,7 @@ constexpr type_info_procedure_s_asset_get_material_archetype_from_handle DEFAULT
 constexpr type_info_procedure_s_asset_get_material_instance_from_handle DEFAULT_typedata_procedure_s_asset_get_material_instance_from_handle = {
 	.type_info = {
 		.type_name = "s_asset_get_material_instance_from_handle",
+		.type_id = TYPE_s_asset_get_material_instance_from_handle,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -19336,6 +20533,7 @@ constexpr type_info_procedure_s_asset_get_material_instance_from_handle DEFAULT_
 constexpr type_info_procedure_s_asset_font_get_string_size DEFAULT_typedata_procedure_s_asset_font_get_string_size = {
 	.type_info = {
 		.type_name = "s_asset_font_get_string_size",
+		.type_id = TYPE_s_asset_font_get_string_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -19382,6 +20580,7 @@ constexpr type_info_procedure_s_asset_font_get_string_size DEFAULT_typedata_proc
 constexpr type_info_procedure_s_asset_font_acquire_font_at_size DEFAULT_typedata_procedure_s_asset_font_acquire_font_at_size = {
 	.type_info = {
 		.type_name = "s_asset_font_acquire_font_at_size",
+		.type_id = TYPE_s_asset_font_acquire_font_at_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -19414,6 +20613,7 @@ constexpr type_info_procedure_s_asset_font_acquire_font_at_size DEFAULT_typedata
 constexpr type_info_procedure_s_asset_font_fetch_glyph DEFAULT_typedata_procedure_s_asset_font_fetch_glyph = {
 	.type_info = {
 		.type_name = "s_asset_font_fetch_glyph",
+		.type_id = TYPE_s_asset_font_fetch_glyph,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -19445,11 +20645,13 @@ constexpr type_info_procedure_s_asset_font_fetch_glyph DEFAULT_typedata_procedur
 };
 constexpr type_info_t DEFAULT_typedata_backend_shader_t = {
 	.type_name = "backend_shader_t",
+	.type_id = TYPE_backend_shader_t,
 	.size = athena_internal::safe_sizeof<backend_shader_t>(),
 };
 constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_render_pipeline_state_t = {
 	.type_info = {
 		.type_name = "render_pipeline_state_t",
+		.type_id = TYPE_render_pipeline_state_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_pipeline_state_t>(),
 	},
@@ -19629,27 +20831,33 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 
 constexpr type_info_t DEFAULT_typedata_VkDescriptorSet = {
 	.type_name = "VkDescriptorSet",
+	.type_id = TYPE_VkDescriptorSet,
 	.size = athena_internal::safe_sizeof<VkDescriptorSet>(),
 };
 constexpr type_info_t DEFAULT_typedata_FT_Face = {
 	.type_name = "FT_Face",
+	.type_id = TYPE_FT_Face,
 	.size = athena_internal::safe_sizeof<FT_Face>(),
 };
 constexpr type_info_t DEFAULT_typedata_jfd_package_entry_t = {
 	.type_name = "jfd_package_entry_t",
+	.type_id = TYPE_jfd_package_entry_t,
 	.size = athena_internal::safe_sizeof<jfd_package_entry_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_jfd_file_header_t = {
 	.type_name = "jfd_file_header_t",
+	.type_id = TYPE_jfd_file_header_t,
 	.size = athena_internal::safe_sizeof<jfd_file_header_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_FT_Library = {
 	.type_name = "FT_Library",
+	.type_id = TYPE_FT_Library,
 	.size = athena_internal::safe_sizeof<FT_Library>(),
 };
 constexpr type_info_struct_controller_type_t DEFAULT_typedata_structure_controller_type_t = {
 	.type_info = {
 		.type_name = "controller_type_t",
+		.type_id = TYPE_controller_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<controller_type_t>(),
 	},
@@ -19706,6 +20914,7 @@ constexpr type_info_struct_controller_type_t DEFAULT_typedata_structure_controll
 constexpr type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_input_mouse_buttons_t = {
 	.type_info = {
 		.type_name = "input_mouse_buttons_t",
+		.type_id = TYPE_input_mouse_buttons_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<input_mouse_buttons_t>(),
 	},
@@ -19723,9 +20932,9 @@ constexpr type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_inpu
 				.u64 = 513,
 			},
 		},
-		.SDL_RIGHT_MOUSE = {
+		.SDL_MIDDLE_MOUSE = {
 			.type_info     = &DEFAULT_typedata_structure_input_mouse_buttons_t.type_info,
-			.member_name   = "SDL_RIGHT_MOUSE",
+			.member_name   = "SDL_MIDDLE_MOUSE",
 			.parent        = &DEFAULT_typedata_structure_input_mouse_buttons_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
@@ -19734,9 +20943,9 @@ constexpr type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_inpu
 				.u64 = 514,
 			},
 		},
-		.SDL_MIDDLE_MOUSE = {
+		.SDL_RIGHT_MOUSE = {
 			.type_info     = &DEFAULT_typedata_structure_input_mouse_buttons_t.type_info,
-			.member_name   = "SDL_MIDDLE_MOUSE",
+			.member_name   = "SDL_RIGHT_MOUSE",
 			.parent        = &DEFAULT_typedata_structure_input_mouse_buttons_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
@@ -19784,10 +20993,11 @@ constexpr type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_inpu
 constexpr type_info_struct_action_button_t DEFAULT_typedata_structure_action_button_t = {
 	.type_info = {
 		.type_name = "action_button_t",
+		.type_id = TYPE_action_button_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<action_button_t>(),
 	},
-	.member_count   = 4,
+	.member_count   = 7,
 	.member_pointer = DEFAULT_typedata_structure_action_button_t.member_array,
 	.members = {
 		.is_down = {
@@ -19814,6 +21024,30 @@ constexpr type_info_struct_action_button_t DEFAULT_typedata_structure_action_but
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.consumed_this_frame = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "consumed_this_frame",
+			.parent        = &DEFAULT_typedata_structure_action_button_t.type_info,
+			.offset        = offsetof(action_button_t, consumed_this_frame),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.keycode = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "keycode",
+			.parent        = &DEFAULT_typedata_structure_action_button_t.type_info,
+			.offset        = offsetof(action_button_t, keycode),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.scancode = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "scancode",
+			.parent        = &DEFAULT_typedata_structure_action_button_t.type_info,
+			.offset        = offsetof(action_button_t, scancode),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.half_transition_counter = {
 			.type_info     = &DEFAULT_typedata_u8,
 			.member_name   = "half_transition_counter",
@@ -19828,6 +21062,7 @@ constexpr type_info_struct_action_button_t DEFAULT_typedata_structure_action_but
 constexpr type_info_struct_keyboard_controller_data_t DEFAULT_typedata_structure_keyboard_controller_data_t = {
 	.type_info = {
 		.type_name = "keyboard_controller_data_t",
+		.type_id = TYPE_keyboard_controller_data_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<keyboard_controller_data_t>(),
 	},
@@ -19896,6 +21131,7 @@ constexpr type_info_struct_keyboard_controller_data_t DEFAULT_typedata_structure
 constexpr type_info_struct_analog_button_t DEFAULT_typedata_structure_analog_button_t = {
 	.type_info = {
 		.type_name = "analog_button_t",
+		.type_id = TYPE_analog_button_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<analog_button_t>(),
 	},
@@ -19924,6 +21160,7 @@ constexpr type_info_struct_analog_button_t DEFAULT_typedata_structure_analog_but
 constexpr type_info_struct_gamepad_controller_data_t DEFAULT_typedata_structure_gamepad_controller_data_t = {
 	.type_info = {
 		.type_name = "gamepad_controller_data_t",
+		.type_id = TYPE_gamepad_controller_data_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<gamepad_controller_data_t>(),
 	},
@@ -19989,13 +21226,224 @@ constexpr type_info_struct_gamepad_controller_data_t DEFAULT_typedata_structure_
 	},
 };
 
+constexpr type_info_struct_text_input_action_type_t DEFAULT_typedata_structure_text_input_action_type_t = {
+	.type_info = {
+		.type_name = "text_input_action_type_t",
+		.type_id = TYPE_text_input_action_type_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<text_input_action_type_t>(),
+	},
+	.member_count   = 4,
+	.member_pointer = DEFAULT_typedata_structure_text_input_action_type_t.member_array,
+	.members = {
+		.TEXT_INPUT_EVENT_NONE = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
+			.member_name   = "TEXT_INPUT_EVENT_NONE",
+			.parent        = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = TEXT_INPUT_EVENT_NONE,
+			},
+		},
+		.TEXT_INPUT_EVENT_PRESSED = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
+			.member_name   = "TEXT_INPUT_EVENT_PRESSED",
+			.parent        = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 2,
+			},
+		},
+		.TEXT_INPUT_EVENT_DOWN = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
+			.member_name   = "TEXT_INPUT_EVENT_DOWN",
+			.parent        = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 4,
+			},
+		},
+		.TEXT_INPUT_EVENT_RELEASED = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
+			.member_name   = "TEXT_INPUT_EVENT_RELEASED",
+			.parent        = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 8,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_text_input_modifier_flags DEFAULT_typedata_structure_text_input_modifier_flags = {
+	.type_info = {
+		.type_name = "text_input_modifier_flags",
+		.type_id = TYPE_text_input_modifier_flags,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<text_input_modifier_flags>(),
+	},
+	.member_count   = 4,
+	.member_pointer = DEFAULT_typedata_structure_text_input_modifier_flags.member_array,
+	.members = {
+		.TEXT_INPUT_MODIFIER_NONE = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
+			.member_name   = "TEXT_INPUT_MODIFIER_NONE",
+			.parent        = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 1,
+			},
+		},
+		.TEXT_INPUT_MODIFIER_SHIFT = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
+			.member_name   = "TEXT_INPUT_MODIFIER_SHIFT",
+			.parent        = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 2,
+			},
+		},
+		.TEXT_INPUT_MODIFIER_CTRL = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
+			.member_name   = "TEXT_INPUT_MODIFIER_CTRL",
+			.parent        = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 4,
+			},
+		},
+		.TEXT_INPUT_MODIFIER_ALT = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
+			.member_name   = "TEXT_INPUT_MODIFIER_ALT",
+			.parent        = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 8,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_text_input_event_type_t DEFAULT_typedata_structure_text_input_event_type_t = {
+	.type_info = {
+		.type_name = "text_input_event_type_t",
+		.type_id = TYPE_text_input_event_type_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<text_input_event_type_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_text_input_event_type_t.member_array,
+	.members = {
+		.TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_event_type_t.type_info,
+			.member_name   = "TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM",
+			.parent        = &DEFAULT_typedata_structure_text_input_event_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 1,
+			},
+		},
+		.TEXT_INPUT_EVENT_TYPE_INPUT_EVENT = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_event_type_t.type_info,
+			.member_name   = "TEXT_INPUT_EVENT_TYPE_INPUT_EVENT",
+			.parent        = &DEFAULT_typedata_structure_text_input_event_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 2,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_text_input_event_t DEFAULT_typedata_structure_text_input_event_t = {
+	.type_info = {
+		.type_name = "text_input_event_t",
+		.type_id = TYPE_text_input_event_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<text_input_event_t>(),
+	},
+	.member_count   = 6,
+	.member_pointer = DEFAULT_typedata_structure_text_input_event_t.member_array,
+	.members = {
+		.type = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "type",
+			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
+			.offset        = offsetof(text_input_event_t, type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.input_event_type = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "input_event_type",
+			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
+			.offset        = offsetof(text_input_event_t, input_event_type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.modifier_flags = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "modifier_flags",
+			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
+			.offset        = offsetof(text_input_event_t, modifier_flags),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.scancode = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "scancode",
+			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
+			.offset        = offsetof(text_input_event_t, scancode),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.keycode = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "keycode",
+			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
+			.offset        = offsetof(text_input_event_t, keycode),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.input_stream = {
+			.type_info     = &DEFAULT_typedata_u8,
+			.member_name   = "input_stream",
+			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
+			.offset        = offsetof(text_input_event_t, input_stream),
+			.flags         = 10,
+			.pointer_depth = 1,
+		},
+	},
+};
+
 constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_controller_t = {
 	.type_info = {
 		.type_name = "input_controller_t",
+		.type_id = TYPE_input_controller_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<input_controller_t>(),
 	},
-	.member_count   = 7,
+	.member_count   = 9,
 	.member_pointer = DEFAULT_typedata_structure_input_controller_t.member_array,
 	.members = {
 		.is_valid = {
@@ -20022,19 +21470,35 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.inputs_this_frame = {
+		.transient_action_inputs = {
 			.type_info     = &DEFAULT_typedata_structure_action_button_t.type_info,
-			.member_name   = "inputs_this_frame",
+			.member_name   = "transient_action_inputs",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, inputs_this_frame),
+			.offset        = offsetof(input_controller_t, transient_action_inputs),
 			.flags         = 66,
 			.pointer_depth = 1,
 		},
-		.frame_input_counter = {
+		.action_inputs_this_frame = {
 			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "frame_input_counter",
+			.member_name   = "action_inputs_this_frame",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, frame_input_counter),
+			.offset        = offsetof(input_controller_t, action_inputs_this_frame),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.transient_text_inputs = {
+			.type_info     = &DEFAULT_typedata_structure_text_input_event_t.type_info,
+			.member_name   = "transient_text_inputs",
+			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.offset        = offsetof(input_controller_t, transient_text_inputs),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.text_inputs_this_frame = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "text_inputs_this_frame",
+			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.offset        = offsetof(input_controller_t, text_inputs_this_frame),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -20060,6 +21524,7 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 constexpr type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure_game_action_binding_type_t = {
 	.type_info = {
 		.type_name = "game_action_binding_type_t",
+		.type_id = TYPE_game_action_binding_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<game_action_binding_type_t>(),
 	},
@@ -20116,6 +21581,7 @@ constexpr type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure
 constexpr type_info_struct_game_action_binding_t DEFAULT_typedata_structure_game_action_binding_t = {
 	.type_info = {
 		.type_name = "game_action_binding_t",
+		.type_id = TYPE_game_action_binding_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<game_action_binding_t>(),
 	},
@@ -20144,6 +21610,7 @@ constexpr type_info_struct_game_action_binding_t DEFAULT_typedata_structure_game
 constexpr type_info_struct_game_action_t DEFAULT_typedata_structure_game_action_t = {
 	.type_info = {
 		.type_name = "game_action_t",
+		.type_id = TYPE_game_action_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<game_action_t>(),
 	},
@@ -20180,6 +21647,7 @@ constexpr type_info_struct_game_action_t DEFAULT_typedata_structure_game_action_
 constexpr type_info_procedure_s_im_init_input_manager DEFAULT_typedata_procedure_s_im_init_input_manager = {
 	.type_info = {
 		.type_name = "s_im_init_input_manager",
+		.type_id = TYPE_s_im_init_input_manager,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -20197,11 +21665,13 @@ constexpr type_info_procedure_s_im_init_input_manager DEFAULT_typedata_procedure
 };
 constexpr type_info_t DEFAULT_typedata_SDL_Event = {
 	.type_name = "SDL_Event",
+	.type_id = TYPE_SDL_Event,
 	.size = athena_internal::safe_sizeof<SDL_Event>(),
 };
 constexpr type_info_procedure_s_im_handle_window_inputs DEFAULT_typedata_procedure_s_im_handle_window_inputs = {
 	.type_info = {
 		.type_name = "s_im_handle_window_inputs",
+		.type_id = TYPE_s_im_handle_window_inputs,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20227,6 +21697,7 @@ constexpr type_info_procedure_s_im_handle_window_inputs DEFAULT_typedata_procedu
 constexpr type_info_procedure_s_im_reset_controller_states DEFAULT_typedata_procedure_s_im_reset_controller_states = {
 	.type_info = {
 		.type_name = "s_im_reset_controller_states",
+		.type_id = TYPE_s_im_reset_controller_states,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -20245,6 +21716,7 @@ constexpr type_info_procedure_s_im_reset_controller_states DEFAULT_typedata_proc
 constexpr type_info_procedure_s_im_initialize_keyboard_controller DEFAULT_typedata_procedure_s_im_initialize_keyboard_controller = {
 	.type_info = {
 		.type_name = "s_im_initialize_keyboard_controller",
+		.type_id = TYPE_s_im_initialize_keyboard_controller,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20270,6 +21742,7 @@ constexpr type_info_procedure_s_im_initialize_keyboard_controller DEFAULT_typeda
 constexpr type_info_procedure_s_im_get_primary_controller DEFAULT_typedata_procedure_s_im_get_primary_controller = {
 	.type_info = {
 		.type_name = "s_im_get_primary_controller",
+		.type_id = TYPE_s_im_get_primary_controller,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -20288,6 +21761,7 @@ constexpr type_info_procedure_s_im_get_primary_controller DEFAULT_typedata_proce
 constexpr type_info_procedure_s_im_get_controller_at_index DEFAULT_typedata_procedure_s_im_get_controller_at_index = {
 	.type_info = {
 		.type_name = "s_im_get_controller_at_index",
+		.type_id = TYPE_s_im_get_controller_at_index,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20313,6 +21787,7 @@ constexpr type_info_procedure_s_im_get_controller_at_index DEFAULT_typedata_proc
 constexpr type_info_procedure_s_im_get_active_controller DEFAULT_typedata_procedure_s_im_get_active_controller = {
 	.type_info = {
 		.type_name = "s_im_get_active_controller",
+		.type_id = TYPE_s_im_get_active_controller,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -20331,6 +21806,7 @@ constexpr type_info_procedure_s_im_get_active_controller DEFAULT_typedata_proced
 constexpr type_info_procedure_s_im_set_active_controller DEFAULT_typedata_procedure_s_im_set_active_controller = {
 	.type_info = {
 		.type_name = "s_im_set_active_controller",
+		.type_id = TYPE_s_im_set_active_controller,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20356,6 +21832,7 @@ constexpr type_info_procedure_s_im_set_active_controller DEFAULT_typedata_proced
 constexpr type_info_procedure_s_im_set_primary_controller DEFAULT_typedata_procedure_s_im_set_primary_controller = {
 	.type_info = {
 		.type_name = "s_im_set_primary_controller",
+		.type_id = TYPE_s_im_set_primary_controller,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20381,6 +21858,7 @@ constexpr type_info_procedure_s_im_set_primary_controller DEFAULT_typedata_proce
 constexpr type_info_procedure_s_im_is_shift_key_down DEFAULT_typedata_procedure_s_im_is_shift_key_down = {
 	.type_info = {
 		.type_name = "s_im_is_shift_key_down",
+		.type_id = TYPE_s_im_is_shift_key_down,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -20399,6 +21877,7 @@ constexpr type_info_procedure_s_im_is_shift_key_down DEFAULT_typedata_procedure_
 constexpr type_info_procedure_s_im_is_control_key_down DEFAULT_typedata_procedure_s_im_is_control_key_down = {
 	.type_info = {
 		.type_name = "s_im_is_control_key_down",
+		.type_id = TYPE_s_im_is_control_key_down,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -20417,6 +21896,7 @@ constexpr type_info_procedure_s_im_is_control_key_down DEFAULT_typedata_procedur
 constexpr type_info_procedure_s_im_is_alt_key_down DEFAULT_typedata_procedure_s_im_is_alt_key_down = {
 	.type_info = {
 		.type_name = "s_im_is_alt_key_down",
+		.type_id = TYPE_s_im_is_alt_key_down,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -20434,11 +21914,13 @@ constexpr type_info_procedure_s_im_is_alt_key_down DEFAULT_typedata_procedure_s_
 };
 constexpr type_info_t DEFAULT_typedata_mat4_t = {
 	.type_name = "mat4_t",
+	.type_id = TYPE_mat4_t,
 	.size = athena_internal::safe_sizeof<mat4_t>(),
 };
 constexpr type_info_procedure_s_im_transform_mouse_data DEFAULT_typedata_procedure_s_im_transform_mouse_data = {
 	.type_info = {
 		.type_name = "s_im_transform_mouse_data",
+		.type_id = TYPE_s_im_transform_mouse_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -20478,6 +21960,7 @@ constexpr type_info_procedure_s_im_transform_mouse_data DEFAULT_typedata_procedu
 constexpr type_info_procedure_s_im_is_keyboard_key_pressed DEFAULT_typedata_procedure_s_im_is_keyboard_key_pressed = {
 	.type_info = {
 		.type_name = "s_im_is_keyboard_key_pressed",
+		.type_id = TYPE_s_im_is_keyboard_key_pressed,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20503,6 +21986,7 @@ constexpr type_info_procedure_s_im_is_keyboard_key_pressed DEFAULT_typedata_proc
 constexpr type_info_procedure_s_im_is_keyboard_key_down DEFAULT_typedata_procedure_s_im_is_keyboard_key_down = {
 	.type_info = {
 		.type_name = "s_im_is_keyboard_key_down",
+		.type_id = TYPE_s_im_is_keyboard_key_down,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20528,6 +22012,7 @@ constexpr type_info_procedure_s_im_is_keyboard_key_down DEFAULT_typedata_procedu
 constexpr type_info_procedure_s_im_is_keyboard_key_released DEFAULT_typedata_procedure_s_im_is_keyboard_key_released = {
 	.type_info = {
 		.type_name = "s_im_is_keyboard_key_released",
+		.type_id = TYPE_s_im_is_keyboard_key_released,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20553,6 +22038,7 @@ constexpr type_info_procedure_s_im_is_keyboard_key_released DEFAULT_typedata_pro
 constexpr type_info_procedure_s_im_consume_keyboard_key_press DEFAULT_typedata_procedure_s_im_consume_keyboard_key_press = {
 	.type_info = {
 		.type_name = "s_im_consume_keyboard_key_press",
+		.type_id = TYPE_s_im_consume_keyboard_key_press,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20578,6 +22064,7 @@ constexpr type_info_procedure_s_im_consume_keyboard_key_press DEFAULT_typedata_p
 constexpr type_info_procedure_s_im_consume_keyboard_key_down DEFAULT_typedata_procedure_s_im_consume_keyboard_key_down = {
 	.type_info = {
 		.type_name = "s_im_consume_keyboard_key_down",
+		.type_id = TYPE_s_im_consume_keyboard_key_down,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20603,6 +22090,7 @@ constexpr type_info_procedure_s_im_consume_keyboard_key_down DEFAULT_typedata_pr
 constexpr type_info_procedure_s_im_consume_keyboard_key_release DEFAULT_typedata_procedure_s_im_consume_keyboard_key_release = {
 	.type_info = {
 		.type_name = "s_im_consume_keyboard_key_release",
+		.type_id = TYPE_s_im_consume_keyboard_key_release,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20628,6 +22116,7 @@ constexpr type_info_procedure_s_im_consume_keyboard_key_release DEFAULT_typedata
 constexpr type_info_procedure_s_im_get_key_state DEFAULT_typedata_procedure_s_im_get_key_state = {
 	.type_info = {
 		.type_name = "s_im_get_key_state",
+		.type_id = TYPE_s_im_get_key_state,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20653,6 +22142,7 @@ constexpr type_info_procedure_s_im_get_key_state DEFAULT_typedata_procedure_s_im
 constexpr type_info_procedure_s_im_is_gamepad_button_pressed DEFAULT_typedata_procedure_s_im_is_gamepad_button_pressed = {
 	.type_info = {
 		.type_name = "s_im_is_gamepad_button_pressed",
+		.type_id = TYPE_s_im_is_gamepad_button_pressed,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20678,6 +22168,7 @@ constexpr type_info_procedure_s_im_is_gamepad_button_pressed DEFAULT_typedata_pr
 constexpr type_info_procedure_s_im_is_gamepad_button_down DEFAULT_typedata_procedure_s_im_is_gamepad_button_down = {
 	.type_info = {
 		.type_name = "s_im_is_gamepad_button_down",
+		.type_id = TYPE_s_im_is_gamepad_button_down,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20703,6 +22194,7 @@ constexpr type_info_procedure_s_im_is_gamepad_button_down DEFAULT_typedata_proce
 constexpr type_info_procedure_s_im_is_gamepad_button_released DEFAULT_typedata_procedure_s_im_is_gamepad_button_released = {
 	.type_info = {
 		.type_name = "s_im_is_gamepad_button_released",
+		.type_id = TYPE_s_im_is_gamepad_button_released,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20728,6 +22220,7 @@ constexpr type_info_procedure_s_im_is_gamepad_button_released DEFAULT_typedata_p
 constexpr type_info_procedure_s_im_consume_gamepad_button_press DEFAULT_typedata_procedure_s_im_consume_gamepad_button_press = {
 	.type_info = {
 		.type_name = "s_im_consume_gamepad_button_press",
+		.type_id = TYPE_s_im_consume_gamepad_button_press,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20753,6 +22246,7 @@ constexpr type_info_procedure_s_im_consume_gamepad_button_press DEFAULT_typedata
 constexpr type_info_procedure_s_im_consume_gamepad_button_down DEFAULT_typedata_procedure_s_im_consume_gamepad_button_down = {
 	.type_info = {
 		.type_name = "s_im_consume_gamepad_button_down",
+		.type_id = TYPE_s_im_consume_gamepad_button_down,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20778,6 +22272,7 @@ constexpr type_info_procedure_s_im_consume_gamepad_button_down DEFAULT_typedata_
 constexpr type_info_procedure_s_im_consume_gamepad_button_release DEFAULT_typedata_procedure_s_im_consume_gamepad_button_release = {
 	.type_info = {
 		.type_name = "s_im_consume_gamepad_button_release",
+		.type_id = TYPE_s_im_consume_gamepad_button_release,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20803,6 +22298,7 @@ constexpr type_info_procedure_s_im_consume_gamepad_button_release DEFAULT_typeda
 constexpr type_info_procedure_s_im_get_button_state DEFAULT_typedata_procedure_s_im_get_button_state = {
 	.type_info = {
 		.type_name = "s_im_get_button_state",
+		.type_id = TYPE_s_im_get_button_state,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -20827,15 +22323,18 @@ constexpr type_info_procedure_s_im_get_button_state DEFAULT_typedata_procedure_s
 };
 constexpr type_info_t DEFAULT_typedata_SDL_Gamepad = {
 	.type_name = "SDL_Gamepad",
+	.type_id = TYPE_SDL_Gamepad,
 	.size = athena_internal::safe_sizeof<SDL_Gamepad>(),
 };
 constexpr type_info_t DEFAULT_typedata_SDL_Joystick = {
 	.type_name = "SDL_Joystick",
+	.type_id = TYPE_SDL_Joystick,
 	.size = athena_internal::safe_sizeof<SDL_Joystick>(),
 };
 constexpr type_info_struct_camera_matrices_t DEFAULT_typedata_structure_camera_matrices_t = {
 	.type_info = {
 		.type_name = "camera_matrices_t",
+		.type_id = TYPE_camera_matrices_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<camera_matrices_t>(),
 	},
@@ -20864,6 +22363,7 @@ constexpr type_info_struct_camera_matrices_t DEFAULT_typedata_structure_camera_m
 constexpr type_info_struct_render_buffer_type_t DEFAULT_typedata_structure_render_buffer_type_t = {
 	.type_info = {
 		.type_name = "render_buffer_type_t",
+		.type_id = TYPE_render_buffer_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_buffer_type_t>(),
 	},
@@ -20909,6 +22409,7 @@ constexpr type_info_struct_render_buffer_type_t DEFAULT_typedata_structure_rende
 constexpr type_info_struct_render_buffer_advance_rate_t DEFAULT_typedata_structure_render_buffer_advance_rate_t = {
 	.type_info = {
 		.type_name = "render_buffer_advance_rate_t",
+		.type_id = TYPE_render_buffer_advance_rate_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_buffer_advance_rate_t>(),
 	},
@@ -20943,6 +22444,7 @@ constexpr type_info_struct_render_buffer_advance_rate_t DEFAULT_typedata_structu
 constexpr type_info_struct_render_buffer_memory_type_t DEFAULT_typedata_structure_render_buffer_memory_type_t = {
 	.type_info = {
 		.type_name = "render_buffer_memory_type_t",
+		.type_id = TYPE_render_buffer_memory_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_buffer_memory_type_t>(),
 	},
@@ -20977,6 +22479,7 @@ constexpr type_info_struct_render_buffer_memory_type_t DEFAULT_typedata_structur
 constexpr type_info_struct_render_buffer_desc_t DEFAULT_typedata_structure_render_buffer_desc_t = {
 	.type_info = {
 		.type_name = "render_buffer_desc_t",
+		.type_id = TYPE_render_buffer_desc_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_buffer_desc_t>(),
 	},
@@ -21037,6 +22540,7 @@ constexpr type_info_struct_render_buffer_desc_t DEFAULT_typedata_structure_rende
 constexpr type_info_struct_render_buffer_t DEFAULT_typedata_structure_render_buffer_t = {
 	.type_info = {
 		.type_name = "render_buffer_t",
+		.type_id = TYPE_render_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_buffer_t>(),
 	},
@@ -21129,6 +22633,7 @@ constexpr type_info_struct_render_buffer_t DEFAULT_typedata_structure_render_buf
 constexpr type_info_struct_index_buffer_t DEFAULT_typedata_structure_index_buffer_t = {
 	.type_info = {
 		.type_name = "index_buffer_t",
+		.type_id = TYPE_index_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<index_buffer_t>(),
 	},
@@ -21173,6 +22678,7 @@ constexpr type_info_struct_index_buffer_t DEFAULT_typedata_structure_index_buffe
 constexpr type_info_struct_uniform_constant_buffer_t DEFAULT_typedata_structure_uniform_constant_buffer_t = {
 	.type_info = {
 		.type_name = "uniform_constant_buffer_t",
+		.type_id = TYPE_uniform_constant_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<uniform_constant_buffer_t>(),
 	},
@@ -21217,6 +22723,7 @@ constexpr type_info_struct_uniform_constant_buffer_t DEFAULT_typedata_structure_
 constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_render_command_type_t = {
 	.type_info = {
 		.type_name = "render_command_type_t",
+		.type_id = TYPE_render_command_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_command_type_t>(),
 	},
@@ -21482,6 +22989,7 @@ constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_rend
 constexpr type_info_struct_render_command_header_t DEFAULT_typedata_structure_render_command_header_t = {
 	.type_info = {
 		.type_name = "render_command_header_t",
+		.type_id = TYPE_render_command_header_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_header_t>(),
 	},
@@ -21502,6 +23010,7 @@ constexpr type_info_struct_render_command_header_t DEFAULT_typedata_structure_re
 constexpr type_info_struct_render_command_begin_renderpass_t DEFAULT_typedata_structure_render_command_begin_renderpass_t = {
 	.type_info = {
 		.type_name = "render_command_begin_renderpass_t",
+		.type_id = TYPE_render_command_begin_renderpass_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_begin_renderpass_t>(),
 	},
@@ -21522,6 +23031,7 @@ constexpr type_info_struct_render_command_begin_renderpass_t DEFAULT_typedata_st
 constexpr type_info_struct_render_command_end_renderpass_t DEFAULT_typedata_structure_render_command_end_renderpass_t = {
 	.type_info = {
 		.type_name = "render_command_end_renderpass_t",
+		.type_id = TYPE_render_command_end_renderpass_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_end_renderpass_t>(),
 	},
@@ -21542,6 +23052,7 @@ constexpr type_info_struct_render_command_end_renderpass_t DEFAULT_typedata_stru
 constexpr type_info_struct_render_command_bind_vertex_buffer_t DEFAULT_typedata_structure_render_command_bind_vertex_buffer_t = {
 	.type_info = {
 		.type_name = "render_command_bind_vertex_buffer_t",
+		.type_id = TYPE_render_command_bind_vertex_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_bind_vertex_buffer_t>(),
 	},
@@ -21562,6 +23073,7 @@ constexpr type_info_struct_render_command_bind_vertex_buffer_t DEFAULT_typedata_
 constexpr type_info_struct_render_command_bind_index_buffer_t DEFAULT_typedata_structure_render_command_bind_index_buffer_t = {
 	.type_info = {
 		.type_name = "render_command_bind_index_buffer_t",
+		.type_id = TYPE_render_command_bind_index_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_bind_index_buffer_t>(),
 	},
@@ -21582,6 +23094,7 @@ constexpr type_info_struct_render_command_bind_index_buffer_t DEFAULT_typedata_s
 constexpr type_info_struct_render_command_update_texture_t DEFAULT_typedata_structure_render_command_update_texture_t = {
 	.type_info = {
 		.type_name = "render_command_update_texture_t",
+		.type_id = TYPE_render_command_update_texture_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_update_texture_t>(),
 	},
@@ -21610,6 +23123,7 @@ constexpr type_info_struct_render_command_update_texture_t DEFAULT_typedata_stru
 constexpr type_info_struct_render_command_bind_material_t DEFAULT_typedata_structure_render_command_bind_material_t = {
 	.type_info = {
 		.type_name = "render_command_bind_material_t",
+		.type_id = TYPE_render_command_bind_material_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_bind_material_t>(),
 	},
@@ -21638,6 +23152,7 @@ constexpr type_info_struct_render_command_bind_material_t DEFAULT_typedata_struc
 constexpr type_info_struct_render_command_bind_shader_t DEFAULT_typedata_structure_render_command_bind_shader_t = {
 	.type_info = {
 		.type_name = "render_command_bind_shader_t",
+		.type_id = TYPE_render_command_bind_shader_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_bind_shader_t>(),
 	},
@@ -21666,6 +23181,7 @@ constexpr type_info_struct_render_command_bind_shader_t DEFAULT_typedata_structu
 constexpr type_info_struct_render_command_set_viewport_t DEFAULT_typedata_structure_render_command_set_viewport_t = {
 	.type_info = {
 		.type_name = "render_command_set_viewport_t",
+		.type_id = TYPE_render_command_set_viewport_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_set_viewport_t>(),
 	},
@@ -21694,6 +23210,7 @@ constexpr type_info_struct_render_command_set_viewport_t DEFAULT_typedata_struct
 constexpr type_info_struct_render_command_set_scissor_t DEFAULT_typedata_structure_render_command_set_scissor_t = {
 	.type_info = {
 		.type_name = "render_command_set_scissor_t",
+		.type_id = TYPE_render_command_set_scissor_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_set_scissor_t>(),
 	},
@@ -21722,6 +23239,7 @@ constexpr type_info_struct_render_command_set_scissor_t DEFAULT_typedata_structu
 constexpr type_info_struct_render_command_update_push_constant_t DEFAULT_typedata_structure_render_command_update_push_constant_t = {
 	.type_info = {
 		.type_name = "render_command_update_push_constant_t",
+		.type_id = TYPE_render_command_update_push_constant_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_update_push_constant_t>(),
 	},
@@ -21758,6 +23276,7 @@ constexpr type_info_struct_render_command_update_push_constant_t DEFAULT_typedat
 constexpr type_info_struct_render_command_update_uniform_constant_buffer_t DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t = {
 	.type_info = {
 		.type_name = "render_command_update_uniform_constant_buffer_t",
+		.type_id = TYPE_render_command_update_uniform_constant_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_update_uniform_constant_buffer_t>(),
 	},
@@ -21810,6 +23329,7 @@ constexpr type_info_struct_render_command_update_uniform_constant_buffer_t DEFAU
 constexpr type_info_struct_render_command_update_render_buffer_contents_t DEFAULT_typedata_structure_render_command_update_render_buffer_contents_t = {
 	.type_info = {
 		.type_name = "render_command_update_render_buffer_contents_t",
+		.type_id = TYPE_render_command_update_render_buffer_contents_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_update_render_buffer_contents_t>(),
 	},
@@ -21846,6 +23366,7 @@ constexpr type_info_struct_render_command_update_render_buffer_contents_t DEFAUL
 constexpr type_info_struct_render_command_bind_texture_t DEFAULT_typedata_structure_render_command_bind_texture_t = {
 	.type_info = {
 		.type_name = "render_command_bind_texture_t",
+		.type_id = TYPE_render_command_bind_texture_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_bind_texture_t>(),
 	},
@@ -21866,6 +23387,7 @@ constexpr type_info_struct_render_command_bind_texture_t DEFAULT_typedata_struct
 constexpr type_info_struct_render_command_dispatch_compute_t DEFAULT_typedata_structure_render_command_dispatch_compute_t = {
 	.type_info = {
 		.type_name = "render_command_dispatch_compute_t",
+		.type_id = TYPE_render_command_dispatch_compute_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_dispatch_compute_t>(),
 	},
@@ -21902,6 +23424,7 @@ constexpr type_info_struct_render_command_dispatch_compute_t DEFAULT_typedata_st
 constexpr type_info_struct_render_command_set_pipeline_state_t DEFAULT_typedata_structure_render_command_set_pipeline_state_t = {
 	.type_info = {
 		.type_name = "render_command_set_pipeline_state_t",
+		.type_id = TYPE_render_command_set_pipeline_state_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_set_pipeline_state_t>(),
 	},
@@ -21922,6 +23445,7 @@ constexpr type_info_struct_render_command_set_pipeline_state_t DEFAULT_typedata_
 constexpr type_info_struct_render_command_draw_t DEFAULT_typedata_structure_render_command_draw_t = {
 	.type_info = {
 		.type_name = "render_command_draw_t",
+		.type_id = TYPE_render_command_draw_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_draw_t>(),
 	},
@@ -22006,6 +23530,7 @@ constexpr type_info_struct_render_command_draw_t DEFAULT_typedata_structure_rend
 constexpr type_info_struct_render_command_blit_image_t DEFAULT_typedata_structure_render_command_blit_image_t = {
 	.type_info = {
 		.type_name = "render_command_blit_image_t",
+		.type_id = TYPE_render_command_blit_image_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_blit_image_t>(),
 	},
@@ -22066,6 +23591,7 @@ constexpr type_info_struct_render_command_blit_image_t DEFAULT_typedata_structur
 constexpr type_info_struct_render_command_blit_renderpass_t DEFAULT_typedata_structure_render_command_blit_renderpass_t = {
 	.type_info = {
 		.type_name = "render_command_blit_renderpass_t",
+		.type_id = TYPE_render_command_blit_renderpass_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_blit_renderpass_t>(),
 	},
@@ -22094,6 +23620,7 @@ constexpr type_info_struct_render_command_blit_renderpass_t DEFAULT_typedata_str
 constexpr type_info_struct_render_command_present_frame_t DEFAULT_typedata_structure_render_command_present_frame_t = {
 	.type_info = {
 		.type_name = "render_command_present_frame_t",
+		.type_id = TYPE_render_command_present_frame_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_present_frame_t>(),
 	},
@@ -22114,6 +23641,7 @@ constexpr type_info_struct_render_command_present_frame_t DEFAULT_typedata_struc
 constexpr type_info_struct_render_command_t DEFAULT_typedata_structure_render_command_t = {
 	.type_info = {
 		.type_name = "render_command_t",
+		.type_id = TYPE_render_command_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<render_command_t>(),
 	},
@@ -22142,6 +23670,7 @@ constexpr type_info_struct_render_command_t DEFAULT_typedata_structure_render_co
 constexpr type_info_struct_command_list_type_t DEFAULT_typedata_structure_command_list_type_t = {
 	.type_info = {
 		.type_name = "command_list_type_t",
+		.type_id = TYPE_command_list_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<command_list_type_t>(),
 	},
@@ -22176,6 +23705,7 @@ constexpr type_info_struct_command_list_type_t DEFAULT_typedata_structure_comman
 constexpr type_info_struct_clear_value_t DEFAULT_typedata_structure_clear_value_t = {
 	.type_info = {
 		.type_name = "clear_value_t",
+		.type_id = TYPE_clear_value_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<clear_value_t>(),
 	},
@@ -22228,6 +23758,7 @@ constexpr type_info_struct_clear_value_t DEFAULT_typedata_structure_clear_value_
 constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_structure_renderpass_attachment_access_t = {
 	.type_info = {
 		.type_name = "renderpass_attachment_access_t",
+		.type_id = TYPE_renderpass_attachment_access_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<renderpass_attachment_access_t>(),
 	},
@@ -22284,6 +23815,7 @@ constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_struc
 constexpr type_info_struct_renderpass_attachment_load_operation_t DEFAULT_typedata_structure_renderpass_attachment_load_operation_t = {
 	.type_info = {
 		.type_name = "renderpass_attachment_load_operation_t",
+		.type_id = TYPE_renderpass_attachment_load_operation_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<renderpass_attachment_load_operation_t>(),
 	},
@@ -22329,6 +23861,7 @@ constexpr type_info_struct_renderpass_attachment_load_operation_t DEFAULT_typeda
 constexpr type_info_struct_renderpass_attachment_store_operation_t DEFAULT_typedata_structure_renderpass_attachment_store_operation_t = {
 	.type_info = {
 		.type_name = "renderpass_attachment_store_operation_t",
+		.type_id = TYPE_renderpass_attachment_store_operation_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<renderpass_attachment_store_operation_t>(),
 	},
@@ -22374,6 +23907,7 @@ constexpr type_info_struct_renderpass_attachment_store_operation_t DEFAULT_typed
 constexpr type_info_struct_renderpass_attachment_t DEFAULT_typedata_structure_renderpass_attachment_t = {
 	.type_info = {
 		.type_name = "renderpass_attachment_t",
+		.type_id = TYPE_renderpass_attachment_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<renderpass_attachment_t>(),
 	},
@@ -22426,6 +23960,7 @@ constexpr type_info_struct_renderpass_attachment_t DEFAULT_typedata_structure_re
 constexpr type_info_struct_renderpass_desc_t DEFAULT_typedata_structure_renderpass_desc_t = {
 	.type_info = {
 		.type_name = "renderpass_desc_t",
+		.type_id = TYPE_renderpass_desc_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<renderpass_desc_t>(),
 	},
@@ -22486,6 +24021,7 @@ constexpr type_info_struct_renderpass_desc_t DEFAULT_typedata_structure_renderpa
 constexpr type_info_struct_renderpass_key_t DEFAULT_typedata_structure_renderpass_key_t = {
 	.type_info = {
 		.type_name = "renderpass_key_t",
+		.type_id = TYPE_renderpass_key_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<renderpass_key_t>(),
 	},
@@ -22506,6 +24042,7 @@ constexpr type_info_struct_renderpass_key_t DEFAULT_typedata_structure_renderpas
 constexpr type_info_struct_renderpass_t DEFAULT_typedata_structure_renderpass_t = {
 	.type_info = {
 		.type_name = "renderpass_t",
+		.type_id = TYPE_renderpass_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<renderpass_t>(),
 	},
@@ -22629,11 +24166,13 @@ constexpr type_info_struct_renderpass_t DEFAULT_typedata_structure_renderpass_t 
 
 constexpr type_info_t DEFAULT_typedata_backend_renderer_t = {
 	.type_name = "backend_renderer_t",
+	.type_id = TYPE_backend_renderer_t,
 	.size = athena_internal::safe_sizeof<backend_renderer_t>(),
 };
 constexpr type_info_procedure_s_renderer_state_init DEFAULT_typedata_procedure_s_renderer_state_init = {
 	.type_info = {
 		.type_name = "s_renderer_state_init",
+		.type_id = TYPE_s_renderer_state_init,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -22659,6 +24198,7 @@ constexpr type_info_procedure_s_renderer_state_init DEFAULT_typedata_procedure_s
 constexpr type_info_procedure_s_renderer_handle_window_resize DEFAULT_typedata_procedure_s_renderer_handle_window_resize = {
 	.type_info = {
 		.type_name = "s_renderer_handle_window_resize",
+		.type_id = TYPE_s_renderer_handle_window_resize,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -22684,6 +24224,7 @@ constexpr type_info_procedure_s_renderer_handle_window_resize DEFAULT_typedata_p
 constexpr type_info_procedure_s_renderer_resize_render_targets DEFAULT_typedata_procedure_s_renderer_resize_render_targets = {
 	.type_info = {
 		.type_name = "s_renderer_resize_render_targets",
+		.type_id = TYPE_s_renderer_resize_render_targets,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -22709,6 +24250,7 @@ constexpr type_info_procedure_s_renderer_resize_render_targets DEFAULT_typedata_
 constexpr type_info_procedure_s_renderer_build_renderpass DEFAULT_typedata_procedure_s_renderer_build_renderpass = {
 	.type_info = {
 		.type_name = "s_renderer_build_renderpass",
+		.type_id = TYPE_s_renderer_build_renderpass,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -22734,6 +24276,7 @@ constexpr type_info_procedure_s_renderer_build_renderpass DEFAULT_typedata_proce
 constexpr type_info_procedure_s_renderer_resize_renderpass DEFAULT_typedata_procedure_s_renderer_resize_renderpass = {
 	.type_info = {
 		.type_name = "s_renderer_resize_renderpass",
+		.type_id = TYPE_s_renderer_resize_renderpass,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -22759,6 +24302,7 @@ constexpr type_info_procedure_s_renderer_resize_renderpass DEFAULT_typedata_proc
 constexpr type_info_procedure_s_renderer_get_constant_buffer DEFAULT_typedata_procedure_s_renderer_get_constant_buffer = {
 	.type_info = {
 		.type_name = "s_renderer_get_constant_buffer",
+		.type_id = TYPE_s_renderer_get_constant_buffer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -22784,6 +24328,7 @@ constexpr type_info_procedure_s_renderer_get_constant_buffer DEFAULT_typedata_pr
 constexpr type_info_procedure_s_renderer_render_buffer_create DEFAULT_typedata_procedure_s_renderer_render_buffer_create = {
 	.type_info = {
 		.type_name = "s_renderer_render_buffer_create",
+		.type_id = TYPE_s_renderer_render_buffer_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -22809,6 +24354,7 @@ constexpr type_info_procedure_s_renderer_render_buffer_create DEFAULT_typedata_p
 constexpr type_info_procedure_s_renderer_vertex_buffer_create DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create = {
 	.type_info = {
 		.type_name = "s_renderer_vertex_buffer_create",
+		.type_id = TYPE_s_renderer_vertex_buffer_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 6,
@@ -22862,6 +24408,7 @@ constexpr type_info_procedure_s_renderer_vertex_buffer_create DEFAULT_typedata_p
 constexpr type_info_procedure_s_renderer_index_buffer_create DEFAULT_typedata_procedure_s_renderer_index_buffer_create = {
 	.type_info = {
 		.type_name = "s_renderer_index_buffer_create",
+		.type_id = TYPE_s_renderer_index_buffer_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -22908,6 +24455,7 @@ constexpr type_info_procedure_s_renderer_index_buffer_create DEFAULT_typedata_pr
 constexpr type_info_procedure_s_renderer_render_buffer_copy_data DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data = {
 	.type_info = {
 		.type_name = "s_renderer_render_buffer_copy_data",
+		.type_id = TYPE_s_renderer_render_buffer_copy_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -22954,6 +24502,7 @@ constexpr type_info_procedure_s_renderer_render_buffer_copy_data DEFAULT_typedat
 constexpr type_info_procedure_s_renderer_get_command_list DEFAULT_typedata_procedure_s_renderer_get_command_list = {
 	.type_info = {
 		.type_name = "s_renderer_get_command_list",
+		.type_id = TYPE_s_renderer_get_command_list,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -22979,6 +24528,7 @@ constexpr type_info_procedure_s_renderer_get_command_list DEFAULT_typedata_proce
 constexpr type_info_procedure_s_renderer_is_texture_bound DEFAULT_typedata_procedure_s_renderer_is_texture_bound = {
 	.type_info = {
 		.type_name = "s_renderer_is_texture_bound",
+		.type_id = TYPE_s_renderer_is_texture_bound,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -23001,9 +24551,43 @@ constexpr type_info_procedure_s_renderer_is_texture_bound DEFAULT_typedata_proce
 		},
 	},
 };
+constexpr type_info_procedure_s_renderer_set_texture_filter_mode DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode = {
+	.type_info = {
+		.type_name = "s_renderer_set_texture_filter_mode",
+		.type_id = TYPE_s_renderer_set_texture_filter_mode,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 3,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode.argument_array,
+	.arguments = {
+		.render_state = {
+			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.member_name   = "render_state",
+			.parent        = &DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.texture = {
+			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
+			.member_name   = "texture",
+			.parent        = &DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.filter_mode = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "filter_mode",
+			.parent        = &DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
 constexpr type_info_procedure_s_renderer_find_texture_index DEFAULT_typedata_procedure_s_renderer_find_texture_index = {
 	.type_info = {
 		.type_name = "s_renderer_find_texture_index",
+		.type_id = TYPE_s_renderer_find_texture_index,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -23029,6 +24613,7 @@ constexpr type_info_procedure_s_renderer_find_texture_index DEFAULT_typedata_pro
 constexpr type_info_procedure_s_renderer_reset_command_list DEFAULT_typedata_procedure_s_renderer_reset_command_list = {
 	.type_info = {
 		.type_name = "s_renderer_reset_command_list",
+		.type_id = TYPE_s_renderer_reset_command_list,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -23047,6 +24632,7 @@ constexpr type_info_procedure_s_renderer_reset_command_list DEFAULT_typedata_pro
 constexpr type_info_procedure_r_cmd_renderpass_begin DEFAULT_typedata_procedure_r_cmd_renderpass_begin = {
 	.type_info = {
 		.type_name = "r_cmd_renderpass_begin",
+		.type_id = TYPE_r_cmd_renderpass_begin,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -23072,6 +24658,7 @@ constexpr type_info_procedure_r_cmd_renderpass_begin DEFAULT_typedata_procedure_
 constexpr type_info_procedure_r_cmd_renderpass_end DEFAULT_typedata_procedure_r_cmd_renderpass_end = {
 	.type_info = {
 		.type_name = "r_cmd_renderpass_end",
+		.type_id = TYPE_r_cmd_renderpass_end,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -23090,6 +24677,7 @@ constexpr type_info_procedure_r_cmd_renderpass_end DEFAULT_typedata_procedure_r_
 constexpr type_info_procedure_r_cmd_begin_render_group DEFAULT_typedata_procedure_r_cmd_begin_render_group = {
 	.type_info = {
 		.type_name = "r_cmd_begin_render_group",
+		.type_id = TYPE_r_cmd_begin_render_group,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -23108,6 +24696,7 @@ constexpr type_info_procedure_r_cmd_begin_render_group DEFAULT_typedata_procedur
 constexpr type_info_procedure_r_cmd_end_render_group DEFAULT_typedata_procedure_r_cmd_end_render_group = {
 	.type_info = {
 		.type_name = "r_cmd_end_render_group",
+		.type_id = TYPE_r_cmd_end_render_group,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -23126,6 +24715,7 @@ constexpr type_info_procedure_r_cmd_end_render_group DEFAULT_typedata_procedure_
 constexpr type_info_procedure_r_cmd_bind_index_buffer DEFAULT_typedata_procedure_r_cmd_bind_index_buffer = {
 	.type_info = {
 		.type_name = "r_cmd_bind_index_buffer",
+		.type_id = TYPE_r_cmd_bind_index_buffer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -23151,6 +24741,7 @@ constexpr type_info_procedure_r_cmd_bind_index_buffer DEFAULT_typedata_procedure
 constexpr type_info_procedure_r_cmd_set_scissor DEFAULT_typedata_procedure_r_cmd_set_scissor = {
 	.type_info = {
 		.type_name = "r_cmd_set_scissor",
+		.type_id = TYPE_r_cmd_set_scissor,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -23183,6 +24774,7 @@ constexpr type_info_procedure_r_cmd_set_scissor DEFAULT_typedata_procedure_r_cmd
 constexpr type_info_procedure_r_cmd_set_viewport DEFAULT_typedata_procedure_r_cmd_set_viewport = {
 	.type_info = {
 		.type_name = "r_cmd_set_viewport",
+		.type_id = TYPE_r_cmd_set_viewport,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -23215,6 +24807,7 @@ constexpr type_info_procedure_r_cmd_set_viewport DEFAULT_typedata_procedure_r_cm
 constexpr type_info_procedure_r_cmd_update_push_constants DEFAULT_typedata_procedure_r_cmd_update_push_constants = {
 	.type_info = {
 		.type_name = "r_cmd_update_push_constants",
+		.type_id = TYPE_r_cmd_update_push_constants,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -23254,6 +24847,7 @@ constexpr type_info_procedure_r_cmd_update_push_constants DEFAULT_typedata_proce
 constexpr type_info_procedure_r_cmd_update_buffer_contents DEFAULT_typedata_procedure_r_cmd_update_buffer_contents = {
 	.type_info = {
 		.type_name = "r_cmd_update_buffer_contents",
+		.type_id = TYPE_r_cmd_update_buffer_contents,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -23293,6 +24887,7 @@ constexpr type_info_procedure_r_cmd_update_buffer_contents DEFAULT_typedata_proc
 constexpr type_info_procedure_r_cmd_use_shader_program DEFAULT_typedata_procedure_r_cmd_use_shader_program = {
 	.type_info = {
 		.type_name = "r_cmd_use_shader_program",
+		.type_id = TYPE_r_cmd_use_shader_program,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -23318,6 +24913,7 @@ constexpr type_info_procedure_r_cmd_use_shader_program DEFAULT_typedata_procedur
 constexpr type_info_procedure_r_cmd_update_constant_buffer DEFAULT_typedata_procedure_r_cmd_update_constant_buffer = {
 	.type_info = {
 		.type_name = "r_cmd_update_constant_buffer",
+		.type_id = TYPE_r_cmd_update_constant_buffer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -23357,6 +24953,7 @@ constexpr type_info_procedure_r_cmd_update_constant_buffer DEFAULT_typedata_proc
 constexpr type_info_procedure_r_cmd_bind_texture_image DEFAULT_typedata_procedure_r_cmd_bind_texture_image = {
 	.type_info = {
 		.type_name = "r_cmd_bind_texture_image",
+		.type_id = TYPE_r_cmd_bind_texture_image,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -23382,6 +24979,7 @@ constexpr type_info_procedure_r_cmd_bind_texture_image DEFAULT_typedata_procedur
 constexpr type_info_procedure_r_cmd_bind_texture_from_handle DEFAULT_typedata_procedure_r_cmd_bind_texture_from_handle = {
 	.type_info = {
 		.type_name = "r_cmd_bind_texture_from_handle",
+		.type_id = TYPE_r_cmd_bind_texture_from_handle,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -23407,6 +25005,7 @@ constexpr type_info_procedure_r_cmd_bind_texture_from_handle DEFAULT_typedata_pr
 constexpr type_info_procedure_r_cmd_reset_render_state DEFAULT_typedata_procedure_r_cmd_reset_render_state = {
 	.type_info = {
 		.type_name = "r_cmd_reset_render_state",
+		.type_id = TYPE_r_cmd_reset_render_state,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -23432,6 +25031,7 @@ constexpr type_info_procedure_r_cmd_reset_render_state DEFAULT_typedata_procedur
 constexpr type_info_procedure_r_cmd_set_render_state DEFAULT_typedata_procedure_r_cmd_set_render_state = {
 	.type_info = {
 		.type_name = "r_cmd_set_render_state",
+		.type_id = TYPE_r_cmd_set_render_state,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -23457,6 +25057,7 @@ constexpr type_info_procedure_r_cmd_set_render_state DEFAULT_typedata_procedure_
 constexpr type_info_procedure_r_cmd_draw DEFAULT_typedata_procedure_r_cmd_draw = {
 	.type_info = {
 		.type_name = "r_cmd_draw",
+		.type_id = TYPE_r_cmd_draw,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -23503,6 +25104,7 @@ constexpr type_info_procedure_r_cmd_draw DEFAULT_typedata_procedure_r_cmd_draw =
 constexpr type_info_procedure_r_cmd_draw_indexed DEFAULT_typedata_procedure_r_cmd_draw_indexed = {
 	.type_info = {
 		.type_name = "r_cmd_draw_indexed",
+		.type_id = TYPE_r_cmd_draw_indexed,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -23549,6 +25151,7 @@ constexpr type_info_procedure_r_cmd_draw_indexed DEFAULT_typedata_procedure_r_cm
 constexpr type_info_procedure_r_cmd_dispatch_compute DEFAULT_typedata_procedure_r_cmd_dispatch_compute = {
 	.type_info = {
 		.type_name = "r_cmd_dispatch_compute",
+		.type_id = TYPE_r_cmd_dispatch_compute,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -23588,6 +25191,7 @@ constexpr type_info_procedure_r_cmd_dispatch_compute DEFAULT_typedata_procedure_
 constexpr type_info_procedure_r_cmd_blit_image DEFAULT_typedata_procedure_r_cmd_blit_image = {
 	.type_info = {
 		.type_name = "r_cmd_blit_image",
+		.type_id = TYPE_r_cmd_blit_image,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 7,
@@ -23648,6 +25252,7 @@ constexpr type_info_procedure_r_cmd_blit_image DEFAULT_typedata_procedure_r_cmd_
 constexpr type_info_procedure_r_cmd_blit_renderpass DEFAULT_typedata_procedure_r_cmd_blit_renderpass = {
 	.type_info = {
 		.type_name = "r_cmd_blit_renderpass",
+		.type_id = TYPE_r_cmd_blit_renderpass,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -23680,6 +25285,7 @@ constexpr type_info_procedure_r_cmd_blit_renderpass DEFAULT_typedata_procedure_r
 constexpr type_info_procedure_r_cmd_present DEFAULT_typedata_procedure_r_cmd_present = {
 	.type_info = {
 		.type_name = "r_cmd_present",
+		.type_id = TYPE_r_cmd_present,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -23705,6 +25311,7 @@ constexpr type_info_procedure_r_cmd_present DEFAULT_typedata_procedure_r_cmd_pre
 constexpr type_info_procedure_s_renderer_execute_backend_commands DEFAULT_typedata_procedure_s_renderer_execute_backend_commands = {
 	.type_info = {
 		.type_name = "s_renderer_execute_backend_commands",
+		.type_id = TYPE_s_renderer_execute_backend_commands,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -23723,6 +25330,7 @@ constexpr type_info_procedure_s_renderer_execute_backend_commands DEFAULT_typeda
 constexpr type_info_struct_vulkan_buffer_t DEFAULT_typedata_structure_vulkan_buffer_t = {
 	.type_info = {
 		.type_name = "vulkan_buffer_t",
+		.type_id = TYPE_vulkan_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_buffer_t>(),
 	},
@@ -23790,27 +25398,33 @@ constexpr type_info_struct_vulkan_buffer_t DEFAULT_typedata_structure_vulkan_buf
 
 constexpr type_info_t DEFAULT_typedata_backend_command_buffer_t = {
 	.type_name = "backend_command_buffer_t",
+	.type_id = TYPE_backend_command_buffer_t,
 	.size = athena_internal::safe_sizeof<backend_command_buffer_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_ivec4_t = {
 	.type_name = "ivec4_t",
+	.type_id = TYPE_ivec4_t,
 	.size = athena_internal::safe_sizeof<ivec4_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_backend_renderpass_handle_t = {
 	.type_name = "backend_renderpass_handle_t",
+	.type_id = TYPE_backend_renderpass_handle_t,
 	.size = athena_internal::safe_sizeof<backend_renderpass_handle_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_backend_framebuffer_handle_t = {
 	.type_name = "backend_framebuffer_handle_t",
+	.type_id = TYPE_backend_framebuffer_handle_t,
 	.size = athena_internal::safe_sizeof<backend_framebuffer_handle_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_SDL_Window = {
 	.type_name = "SDL_Window",
+	.type_id = TYPE_SDL_Window,
 	.size = athena_internal::safe_sizeof<SDL_Window>(),
 };
 constexpr type_info_procedure_backend_initialize DEFAULT_typedata_procedure_backend_initialize = {
 	.type_info = {
 		.type_name = "backend_initialize",
+		.type_id = TYPE_backend_initialize,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -23829,6 +25443,7 @@ constexpr type_info_procedure_backend_initialize DEFAULT_typedata_procedure_back
 constexpr type_info_procedure_backend_handle_window_resize DEFAULT_typedata_procedure_backend_handle_window_resize = {
 	.type_info = {
 		.type_name = "backend_handle_window_resize",
+		.type_id = TYPE_backend_handle_window_resize,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -23847,6 +25462,7 @@ constexpr type_info_procedure_backend_handle_window_resize DEFAULT_typedata_proc
 constexpr type_info_procedure_backend_render_frame DEFAULT_typedata_procedure_backend_render_frame = {
 	.type_info = {
 		.type_name = "backend_render_frame",
+		.type_id = TYPE_backend_render_frame,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
@@ -23855,6 +25471,7 @@ constexpr type_info_procedure_backend_render_frame DEFAULT_typedata_procedure_ba
 constexpr type_info_procedure_backend_buffer_create DEFAULT_typedata_procedure_backend_buffer_create = {
 	.type_info = {
 		.type_name = "backend_buffer_create",
+		.type_id = TYPE_backend_buffer_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -23873,6 +25490,7 @@ constexpr type_info_procedure_backend_buffer_create DEFAULT_typedata_procedure_b
 constexpr type_info_procedure_backend_buffer_copy_data DEFAULT_typedata_procedure_backend_buffer_copy_data = {
 	.type_info = {
 		.type_name = "backend_buffer_copy_data",
+		.type_id = TYPE_backend_buffer_copy_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -23912,6 +25530,7 @@ constexpr type_info_procedure_backend_buffer_copy_data DEFAULT_typedata_procedur
 constexpr type_info_procedure_backend_buffer_append_data DEFAULT_typedata_procedure_backend_buffer_append_data = {
 	.type_info = {
 		.type_name = "backend_buffer_append_data",
+		.type_id = TYPE_backend_buffer_append_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -23944,6 +25563,7 @@ constexpr type_info_procedure_backend_buffer_append_data DEFAULT_typedata_proced
 constexpr type_info_procedure_backend_constant_buffer_append_data DEFAULT_typedata_procedure_backend_constant_buffer_append_data = {
 	.type_info = {
 		.type_name = "backend_constant_buffer_append_data",
+		.type_id = TYPE_backend_constant_buffer_append_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -23976,6 +25596,7 @@ constexpr type_info_procedure_backend_constant_buffer_append_data DEFAULT_typeda
 constexpr type_info_procedure_backend_buffer_reset DEFAULT_typedata_procedure_backend_buffer_reset = {
 	.type_info = {
 		.type_name = "backend_buffer_reset",
+		.type_id = TYPE_backend_buffer_reset,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -23994,6 +25615,7 @@ constexpr type_info_procedure_backend_buffer_reset DEFAULT_typedata_procedure_ba
 constexpr type_info_procedure_backend_renderpass_initialize DEFAULT_typedata_procedure_backend_renderpass_initialize = {
 	.type_info = {
 		.type_name = "backend_renderpass_initialize",
+		.type_id = TYPE_backend_renderpass_initialize,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -24019,6 +25641,7 @@ constexpr type_info_procedure_backend_renderpass_initialize DEFAULT_typedata_pro
 constexpr type_info_procedure_backend_image_create DEFAULT_typedata_procedure_backend_image_create = {
 	.type_info = {
 		.type_name = "backend_image_create",
+		.type_id = TYPE_backend_image_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -24044,6 +25667,7 @@ constexpr type_info_procedure_backend_image_create DEFAULT_typedata_procedure_ba
 constexpr type_info_procedure_backend_image_destroy DEFAULT_typedata_procedure_backend_image_destroy = {
 	.type_info = {
 		.type_name = "backend_image_destroy",
+		.type_id = TYPE_backend_image_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -24062,6 +25686,7 @@ constexpr type_info_procedure_backend_image_destroy DEFAULT_typedata_procedure_b
 constexpr type_info_procedure_backend_image_update_contents DEFAULT_typedata_procedure_backend_image_update_contents = {
 	.type_info = {
 		.type_name = "backend_image_update_contents",
+		.type_id = TYPE_backend_image_update_contents,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -24077,9 +25702,29 @@ constexpr type_info_procedure_backend_image_update_contents DEFAULT_typedata_pro
 		},
 	},
 };
+constexpr type_info_procedure_backend_acquire_image_sampler DEFAULT_typedata_procedure_backend_acquire_image_sampler = {
+	.type_info = {
+		.type_name = "backend_acquire_image_sampler",
+		.type_id = TYPE_backend_acquire_image_sampler,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_backend_acquire_image_sampler.argument_array,
+	.arguments = {
+		.image = {
+			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.member_name   = "image",
+			.parent        = &DEFAULT_typedata_procedure_backend_acquire_image_sampler.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr type_info_procedure_backend_shader_create DEFAULT_typedata_procedure_backend_shader_create = {
 	.type_info = {
 		.type_name = "backend_shader_create",
+		.type_id = TYPE_backend_shader_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -24105,6 +25750,7 @@ constexpr type_info_procedure_backend_shader_create DEFAULT_typedata_procedure_b
 constexpr type_info_procedure_backend_get_command_buffer DEFAULT_typedata_procedure_backend_get_command_buffer = {
 	.type_info = {
 		.type_name = "backend_get_command_buffer",
+		.type_id = TYPE_backend_get_command_buffer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -24123,10 +25769,11 @@ constexpr type_info_procedure_backend_get_command_buffer DEFAULT_typedata_proced
 constexpr type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_state_t = {
 	.type_info = {
 		.type_name = "widget_state_t",
+		.type_id = TYPE_widget_state_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<widget_state_t>(),
 	},
-	.member_count   = 11,
+	.member_count   = 21,
 	.member_pointer = DEFAULT_typedata_structure_widget_state_t.member_array,
 	.members = {
 		.last_interacted_frame = {
@@ -24158,6 +25805,70 @@ constexpr type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_stat
 			.member_name   = "input_begin_within_bounds",
 			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
 			.offset        = offsetof(widget_state_t, input_begin_within_bounds),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.is_held = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "is_held",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, is_held),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.just_released = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "just_released",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, just_released),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.just_clicked = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "just_clicked",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, just_clicked),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.is_double_clicked = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "is_double_clicked",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, is_double_clicked),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.is_right_clicked = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "is_right_clicked",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, is_right_clicked),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.is_right_held = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "is_right_held",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, is_right_held),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.widget_text_render_start_offset = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "widget_text_render_start_offset",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, widget_text_render_start_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.widget_text_render_end_offset = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "widget_text_render_end_offset",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, widget_text_render_end_offset),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -24201,6 +25912,22 @@ constexpr type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_stat
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.absolute_minimum_render_size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "absolute_minimum_render_size",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, absolute_minimum_render_size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.resize_amount = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "resize_amount",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, resize_amount),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.render_color = {
 			.type_info     = &DEFAULT_typedata_vec4_t,
 			.member_name   = "render_color",
@@ -24223,6 +25950,7 @@ constexpr type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_stat
 constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signal_flags_t = {
 	.type_info = {
 		.type_name = "ui_signal_flags_t",
+		.type_id = TYPE_ui_signal_flags_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<ui_signal_flags_t>(),
 	},
@@ -24433,6 +26161,7 @@ constexpr type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signa
 constexpr type_info_struct_ui_signal_t DEFAULT_typedata_structure_ui_signal_t = {
 	.type_info = {
 		.type_name = "ui_signal_t",
+		.type_id = TYPE_ui_signal_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<ui_signal_t>(),
 	},
@@ -24461,10 +26190,11 @@ constexpr type_info_struct_ui_signal_t DEFAULT_typedata_structure_ui_signal_t = 
 constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flags_t = {
 	.type_info = {
 		.type_name = "widget_flags_t",
+		.type_id = TYPE_widget_flags_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<widget_flags_t>(),
 	},
-	.member_count   = 14,
+	.member_count   = 18,
 	.member_pointer = DEFAULT_typedata_structure_widget_flags_t.member_array,
 	.members = {
 		.UI_WIDGET_FLAG_INVALID = {
@@ -24511,6 +26241,17 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 				.u64 = 8,
 			},
 		},
+		.UI_WIDGET_FLAG_INTERACTABLE = {
+			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.member_name   = "UI_WIDGET_FLAG_INTERACTABLE",
+			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 16,
+			},
+		},
 		.UI_WIDGET_FLAG_MOUSE_CLICKABLE = {
 			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
 			.member_name   = "UI_WIDGET_FLAG_MOUSE_CLICKABLE",
@@ -24519,7 +26260,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.pointer_depth = 0,
 			.value = {
 				.type = 3,
-				.u64 = 16,
+				.u64 = 32,
 			},
 		},
 		.UI_WIDGET_FLAG_HOVERABLE = {
@@ -24530,73 +26271,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.pointer_depth = 0,
 			.value = {
 				.type = 3,
-				.u64 = 32,
-			},
-		},
-		.UI_WIDGET_FLAG_DRAW_TEXT = {
-			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.member_name   = "UI_WIDGET_FLAG_DRAW_TEXT",
-			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
 				.u64 = 64,
-			},
-		},
-		.UI_WIDGET_FLAG_DRAW_RECTANGLE = {
-			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.member_name   = "UI_WIDGET_FLAG_DRAW_RECTANGLE",
-			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 128,
-			},
-		},
-		.UI_WIDGET_FLAG_DRAW_BACKGROUND = {
-			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.member_name   = "UI_WIDGET_FLAG_DRAW_BACKGROUND",
-			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 256,
-			},
-		},
-		.UI_WIDGET_FLAG_DRAW_BORDER = {
-			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.member_name   = "UI_WIDGET_FLAG_DRAW_BORDER",
-			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 512,
-			},
-		},
-		.UI_WIDGET_FLAG_MAKE_CIRCULAR = {
-			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.member_name   = "UI_WIDGET_FLAG_MAKE_CIRCULAR",
-			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1024,
-			},
-		},
-		.UI_WIDGET_FLAG_FIXED_SIZE = {
-			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.member_name   = "UI_WIDGET_FLAG_FIXED_SIZE",
-			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 2048,
 			},
 		},
 		.UI_WIDGET_FLAG_LEFT_DRAGGABLE = {
@@ -24607,7 +26282,106 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.pointer_depth = 0,
 			.value = {
 				.type = 3,
+				.u64 = 128,
+			},
+		},
+		.UI_WIDGET_FLAG_DRAW_TEXT = {
+			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.member_name   = "UI_WIDGET_FLAG_DRAW_TEXT",
+			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 256,
+			},
+		},
+		.UI_WIDGET_FLAG_DRAW_RECTANGLE = {
+			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.member_name   = "UI_WIDGET_FLAG_DRAW_RECTANGLE",
+			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 512,
+			},
+		},
+		.UI_WIDGET_FLAG_DRAW_BACKGROUND = {
+			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.member_name   = "UI_WIDGET_FLAG_DRAW_BACKGROUND",
+			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 1024,
+			},
+		},
+		.UI_WIDGET_FLAG_DRAW_BORDER = {
+			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.member_name   = "UI_WIDGET_FLAG_DRAW_BORDER",
+			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 2048,
+			},
+		},
+		.UI_WIDGET_FLAG_MAKE_CIRCULAR = {
+			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.member_name   = "UI_WIDGET_FLAG_MAKE_CIRCULAR",
+			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
 				.u64 = 4096,
+			},
+		},
+		.UI_WIDGET_FLAG_FIXED_SIZE = {
+			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.member_name   = "UI_WIDGET_FLAG_FIXED_SIZE",
+			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 8192,
+			},
+		},
+		.UI_WIDGET_FLAG_HAS_TEXT_CONTENT = {
+			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.member_name   = "UI_WIDGET_FLAG_HAS_TEXT_CONTENT",
+			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 16384,
+			},
+		},
+		.UI_WIDGET_FLAG_RESIZEABLE = {
+			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.member_name   = "UI_WIDGET_FLAG_RESIZEABLE",
+			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 32768,
+			},
+		},
+		.UI_WIDGET_FLAG_DISPLAY_TEXTURE = {
+			.type_info     = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.member_name   = "UI_WIDGET_FLAG_DISPLAY_TEXTURE",
+			.parent        = &DEFAULT_typedata_structure_widget_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 65536,
 			},
 		},
 		.UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON = {
@@ -24618,7 +26392,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 			.pointer_depth = 0,
 			.value = {
 				.type = 3,
-				.u64 = 190,
+				.u64 = 638,
 			},
 		},
 	},
@@ -24627,6 +26401,7 @@ constexpr type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_flag
 constexpr type_info_struct_widget_layout_style_t DEFAULT_typedata_structure_widget_layout_style_t = {
 	.type_info = {
 		.type_name = "widget_layout_style_t",
+		.type_id = TYPE_widget_layout_style_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<widget_layout_style_t>(),
 	},
@@ -24661,6 +26436,7 @@ constexpr type_info_struct_widget_layout_style_t DEFAULT_typedata_structure_widg
 constexpr type_info_struct_widget_size_kind_t DEFAULT_typedata_structure_widget_size_kind_t = {
 	.type_info = {
 		.type_name = "widget_size_kind_t",
+		.type_id = TYPE_widget_size_kind_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<widget_size_kind_t>(),
 	},
@@ -24695,10 +26471,11 @@ constexpr type_info_struct_widget_size_kind_t DEFAULT_typedata_structure_widget_
 constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 	.type_info = {
 		.type_name = "widget_t",
+		.type_id = TYPE_widget_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<widget_t>(),
 	},
-	.member_count   = 34,
+	.member_count   = 35,
 	.member_pointer = DEFAULT_typedata_structure_widget_t.member_array,
 	.members = {
 		.ID = {
@@ -24742,20 +26519,12 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 			.pointer_depth = 0,
 		},
 		.widget_text_buffer = {
-			.type_info     = &DEFAULT_typedata_char,
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
 			.member_name   = "widget_text_buffer",
 			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
 			.offset        = offsetof(widget_t, widget_text_buffer),
-			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.widget_text_buffer_used = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "widget_text_buffer_used",
-			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
-			.offset        = offsetof(widget_t, widget_text_buffer_used),
-			.flags         = 0,
-			.pointer_depth = 0,
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
 		.toggled = {
 			.type_info     = &DEFAULT_typedata_bool32,
@@ -24797,8 +26566,16 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.resize_value = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "resize_value",
+			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
+			.offset        = offsetof(widget_t, resize_value),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.size_kind = {
-			.type_info     = &DEFAULT_typedata_structure_widget_size_kind_t.type_info,
+			.type_info     = &DEFAULT_typedata_ivec2_t,
 			.member_name   = "size_kind",
 			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
 			.offset        = offsetof(widget_t, size_kind),
@@ -24829,35 +26606,11 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.max_left_padding = {
-			.type_info     = &DEFAULT_typedata_float32,
-			.member_name   = "max_left_padding",
+		.max_widget_padding = {
+			.type_info     = &DEFAULT_typedata_vec4_t,
+			.member_name   = "max_widget_padding",
 			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
-			.offset        = offsetof(widget_t, max_left_padding),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.max_right_padding = {
-			.type_info     = &DEFAULT_typedata_float32,
-			.member_name   = "max_right_padding",
-			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
-			.offset        = offsetof(widget_t, max_right_padding),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.max_top_padding = {
-			.type_info     = &DEFAULT_typedata_float32,
-			.member_name   = "max_top_padding",
-			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
-			.offset        = offsetof(widget_t, max_top_padding),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.max_bottom_padding = {
-			.type_info     = &DEFAULT_typedata_float32,
-			.member_name   = "max_bottom_padding",
-			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
-			.offset        = offsetof(widget_t, max_bottom_padding),
+			.offset        = offsetof(widget_t, max_widget_padding),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -24866,6 +26619,14 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 			.member_name   = "child_spacing",
 			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
 			.offset        = offsetof(widget_t, child_spacing),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.scissor_rect = {
+			.type_info     = &DEFAULT_typedata_rectangle2_t,
+			.member_name   = "scissor_rect",
+			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
+			.offset        = offsetof(widget_t, scissor_rect),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -24925,6 +26686,30 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.display_texture = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "display_texture",
+			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
+			.offset        = offsetof(widget_t, display_texture),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.display_texture_uvmin = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "display_texture_uvmin",
+			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
+			.offset        = offsetof(widget_t, display_texture_uvmin),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.display_texture_uvmax = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "display_texture_uvmax",
+			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
+			.offset        = offsetof(widget_t, display_texture_uvmax),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.parent = {
 			.type_info     = &DEFAULT_typedata_structure_widget_t.type_info,
 			.member_name   = "parent",
@@ -24979,10 +26764,11 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 	.type_info = {
 		.type_name = "ui_state_t",
+		.type_id = TYPE_ui_state_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<ui_state_t>(),
 	},
-	.member_count   = 42,
+	.member_count   = 46,
 	.member_pointer = DEFAULT_typedata_structure_ui_state_t.member_array,
 	.members = {
 		.widget_arena = {
@@ -25001,11 +26787,35 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.frame_begun = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "frame_begun",
+			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.offset        = offsetof(ui_state_t, frame_begun),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.frame_ended = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "frame_ended",
+			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.offset        = offsetof(ui_state_t, frame_ended),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.input_focused = {
 			.type_info     = &DEFAULT_typedata_bool8,
 			.member_name   = "input_focused",
 			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.offset        = offsetof(ui_state_t, input_focused),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.left_mouse_clicked_this_frame = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "left_mouse_clicked_this_frame",
+			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.offset        = offsetof(ui_state_t, left_mouse_clicked_this_frame),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -25193,6 +27003,14 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.max_widget_size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "max_widget_size",
+			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.offset        = offsetof(ui_state_t, max_widget_size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.active_widget_padding = {
 			.type_info     = &DEFAULT_typedata_vec4_t,
 			.member_name   = "active_widget_padding",
@@ -25319,6 +27137,7 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 constexpr type_info_procedure_ui_state_init DEFAULT_typedata_procedure_ui_state_init = {
 	.type_info = {
 		.type_name = "ui_state_init",
+		.type_id = TYPE_ui_state_init,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -25365,6 +27184,7 @@ constexpr type_info_procedure_ui_state_init DEFAULT_typedata_procedure_ui_state_
 constexpr type_info_procedure_ui_state_update_widget_state DEFAULT_typedata_procedure_ui_state_update_widget_state = {
 	.type_info = {
 		.type_name = "ui_state_update_widget_state",
+		.type_id = TYPE_ui_state_update_widget_state,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -25380,9 +27200,29 @@ constexpr type_info_procedure_ui_state_update_widget_state DEFAULT_typedata_proc
 		},
 	},
 };
+constexpr type_info_procedure_ui_state_maybe_eat_inputs DEFAULT_typedata_procedure_ui_state_maybe_eat_inputs = {
+	.type_info = {
+		.type_name = "ui_state_maybe_eat_inputs",
+		.type_id = TYPE_ui_state_maybe_eat_inputs,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_ui_state_maybe_eat_inputs.argument_array,
+	.arguments = {
+		.ui_state = {
+			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.member_name   = "ui_state",
+			.parent        = &DEFAULT_typedata_procedure_ui_state_maybe_eat_inputs.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr type_info_procedure_ui_state_render_widgets DEFAULT_typedata_procedure_ui_state_render_widgets = {
 	.type_info = {
 		.type_name = "ui_state_render_widgets",
+		.type_id = TYPE_ui_state_render_widgets,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25408,6 +27248,7 @@ constexpr type_info_procedure_ui_state_render_widgets DEFAULT_typedata_procedure
 constexpr type_info_procedure_ui_state_set_default_widget_idle_color DEFAULT_typedata_procedure_ui_state_set_default_widget_idle_color = {
 	.type_info = {
 		.type_name = "ui_state_set_default_widget_idle_color",
+		.type_id = TYPE_ui_state_set_default_widget_idle_color,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25433,6 +27274,7 @@ constexpr type_info_procedure_ui_state_set_default_widget_idle_color DEFAULT_typ
 constexpr type_info_procedure_ui_state_set_default_widget_hover_color DEFAULT_typedata_procedure_ui_state_set_default_widget_hover_color = {
 	.type_info = {
 		.type_name = "ui_state_set_default_widget_hover_color",
+		.type_id = TYPE_ui_state_set_default_widget_hover_color,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25458,6 +27300,7 @@ constexpr type_info_procedure_ui_state_set_default_widget_hover_color DEFAULT_ty
 constexpr type_info_procedure_ui_state_set_default_widget_active_color DEFAULT_typedata_procedure_ui_state_set_default_widget_active_color = {
 	.type_info = {
 		.type_name = "ui_state_set_default_widget_active_color",
+		.type_id = TYPE_ui_state_set_default_widget_active_color,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25483,6 +27326,7 @@ constexpr type_info_procedure_ui_state_set_default_widget_active_color DEFAULT_t
 constexpr type_info_procedure_ui_widget_set_default_font_color DEFAULT_typedata_procedure_ui_widget_set_default_font_color = {
 	.type_info = {
 		.type_name = "ui_widget_set_default_font_color",
+		.type_id = TYPE_ui_widget_set_default_font_color,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25508,6 +27352,7 @@ constexpr type_info_procedure_ui_widget_set_default_font_color DEFAULT_typedata_
 constexpr type_info_procedure_ui_widget_set_default_font_size DEFAULT_typedata_procedure_ui_widget_set_default_font_size = {
 	.type_info = {
 		.type_name = "ui_widget_set_default_font_size",
+		.type_id = TYPE_ui_widget_set_default_font_size,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25533,6 +27378,7 @@ constexpr type_info_procedure_ui_widget_set_default_font_size DEFAULT_typedata_p
 constexpr type_info_procedure_ui_state_set_active_padding DEFAULT_typedata_procedure_ui_state_set_active_padding = {
 	.type_info = {
 		.type_name = "ui_state_set_active_padding",
+		.type_id = TYPE_ui_state_set_active_padding,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25558,6 +27404,7 @@ constexpr type_info_procedure_ui_state_set_active_padding DEFAULT_typedata_proce
 constexpr type_info_procedure_ui_widget_set_flags DEFAULT_typedata_procedure_ui_widget_set_flags = {
 	.type_info = {
 		.type_name = "ui_widget_set_flags",
+		.type_id = TYPE_ui_widget_set_flags,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25583,6 +27430,7 @@ constexpr type_info_procedure_ui_widget_set_flags DEFAULT_typedata_procedure_ui_
 constexpr type_info_procedure_ui_state_begin_frame DEFAULT_typedata_procedure_ui_state_begin_frame = {
 	.type_info = {
 		.type_name = "ui_state_begin_frame",
+		.type_id = TYPE_ui_state_begin_frame,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -25601,6 +27449,7 @@ constexpr type_info_procedure_ui_state_begin_frame DEFAULT_typedata_procedure_ui
 constexpr type_info_procedure_ui_state_end_frame DEFAULT_typedata_procedure_ui_state_end_frame = {
 	.type_info = {
 		.type_name = "ui_state_end_frame",
+		.type_id = TYPE_ui_state_end_frame,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25626,6 +27475,7 @@ constexpr type_info_procedure_ui_state_end_frame DEFAULT_typedata_procedure_ui_s
 constexpr type_info_procedure_ui_state_set_parent_layout DEFAULT_typedata_procedure_ui_state_set_parent_layout = {
 	.type_info = {
 		.type_name = "ui_state_set_parent_layout",
+		.type_id = TYPE_ui_state_set_parent_layout,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25651,6 +27501,7 @@ constexpr type_info_procedure_ui_state_set_parent_layout DEFAULT_typedata_proced
 constexpr type_info_procedure_ui_widget_set_layout DEFAULT_typedata_procedure_ui_widget_set_layout = {
 	.type_info = {
 		.type_name = "ui_widget_set_layout",
+		.type_id = TYPE_ui_widget_set_layout,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25676,6 +27527,7 @@ constexpr type_info_procedure_ui_widget_set_layout DEFAULT_typedata_procedure_ui
 constexpr type_info_procedure_ui_widget_push_parent DEFAULT_typedata_procedure_ui_widget_push_parent = {
 	.type_info = {
 		.type_name = "ui_widget_push_parent",
+		.type_id = TYPE_ui_widget_push_parent,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25701,6 +27553,7 @@ constexpr type_info_procedure_ui_widget_push_parent DEFAULT_typedata_procedure_u
 constexpr type_info_procedure_ui_widget_pop_parent DEFAULT_typedata_procedure_ui_widget_pop_parent = {
 	.type_info = {
 		.type_name = "ui_widget_pop_parent",
+		.type_id = TYPE_ui_widget_pop_parent,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -25719,6 +27572,7 @@ constexpr type_info_procedure_ui_widget_pop_parent DEFAULT_typedata_procedure_ui
 constexpr type_info_procedure_ui_widget_set_padding DEFAULT_typedata_procedure_ui_widget_set_padding = {
 	.type_info = {
 		.type_name = "ui_widget_set_padding",
+		.type_id = TYPE_ui_widget_set_padding,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25744,6 +27598,7 @@ constexpr type_info_procedure_ui_widget_set_padding DEFAULT_typedata_procedure_u
 constexpr type_info_procedure_ui_widget_seed DEFAULT_typedata_procedure_ui_widget_seed = {
 	.type_info = {
 		.type_name = "ui_widget_seed",
+		.type_id = TYPE_ui_widget_seed,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25769,6 +27624,7 @@ constexpr type_info_procedure_ui_widget_seed DEFAULT_typedata_procedure_ui_widge
 constexpr type_info_procedure_ui_widget_create DEFAULT_typedata_procedure_ui_widget_create = {
 	.type_info = {
 		.type_name = "ui_widget_create",
+		.type_id = TYPE_ui_widget_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -25801,9 +27657,10 @@ constexpr type_info_procedure_ui_widget_create DEFAULT_typedata_procedure_ui_wid
 constexpr type_info_procedure_ui_widget_panel DEFAULT_typedata_procedure_ui_widget_panel = {
 	.type_info = {
 		.type_name = "ui_widget_panel",
+		.type_id = TYPE_ui_widget_panel,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 6,
+	.argument_count = 8,
 	.return_type    = &DEFAULT_typedata_structure_ui_signal_t.type_info,
 	.argument_pointer = DEFAULT_typedata_procedure_ui_widget_panel.argument_array,
 	.arguments = {
@@ -25824,6 +27681,13 @@ constexpr type_info_procedure_ui_widget_panel DEFAULT_typedata_procedure_ui_widg
 		.position = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
 			.member_name   = "position",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_panel.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.minimum_render_size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "minimum_render_size",
 			.parent        = &DEFAULT_typedata_procedure_ui_widget_panel.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
@@ -25849,11 +27713,87 @@ constexpr type_info_procedure_ui_widget_panel DEFAULT_typedata_procedure_ui_widg
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.additional_flags = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "additional_flags",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_panel.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_ui_widget_draggable_panel DEFAULT_typedata_procedure_ui_widget_draggable_panel = {
+	.type_info = {
+		.type_name = "ui_widget_draggable_panel",
+		.type_id = TYPE_ui_widget_draggable_panel,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 8,
+	.return_type    = &DEFAULT_typedata_structure_ui_signal_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_ui_widget_draggable_panel.argument_array,
+	.arguments = {
+		.ui_state = {
+			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.member_name   = "ui_state",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.widget_name = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "widget_name",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.position = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "position",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.minimum_render_size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "minimum_render_size",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.child_spacing = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "child_spacing",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.padding = {
+			.type_info     = &DEFAULT_typedata_vec4_t,
+			.member_name   = "padding",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.background_color = {
+			.type_info     = &DEFAULT_typedata_vec4_t,
+			.member_name   = "background_color",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.additional_flags = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "additional_flags",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 	},
 };
 constexpr type_info_procedure_ui_widget_sized_button DEFAULT_typedata_procedure_ui_widget_sized_button = {
 	.type_info = {
 		.type_name = "ui_widget_sized_button",
+		.type_id = TYPE_ui_widget_sized_button,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -25893,6 +27833,7 @@ constexpr type_info_procedure_ui_widget_sized_button DEFAULT_typedata_procedure_
 constexpr type_info_procedure_ui_widget_text DEFAULT_typedata_procedure_ui_widget_text = {
 	.type_info = {
 		.type_name = "ui_widget_text",
+		.type_id = TYPE_ui_widget_text,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25918,6 +27859,7 @@ constexpr type_info_procedure_ui_widget_text DEFAULT_typedata_procedure_ui_widge
 constexpr type_info_procedure_ui_widget_labeled_button DEFAULT_typedata_procedure_ui_widget_labeled_button = {
 	.type_info = {
 		.type_name = "ui_widget_labeled_button",
+		.type_id = TYPE_ui_widget_labeled_button,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -25943,6 +27885,7 @@ constexpr type_info_procedure_ui_widget_labeled_button DEFAULT_typedata_procedur
 constexpr type_info_procedure_ui_widget_float_slider_bar DEFAULT_typedata_procedure_ui_widget_float_slider_bar = {
 	.type_info = {
 		.type_name = "ui_widget_float_slider_bar",
+		.type_id = TYPE_ui_widget_float_slider_bar,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -25986,12 +27929,18 @@ constexpr type_info_procedure_ui_widget_float_slider_bar DEFAULT_typedata_proced
 		},
 	},
 };
+constexpr type_info_t DEFAULT_typedata_ivec2_t = {
+	.type_name = "ivec2_t",
+	.type_id = TYPE_ivec2_t,
+	.size = athena_internal::safe_sizeof<ivec2_t>(),
+};
 constexpr type_info_procedure_ui_widget_spacer DEFAULT_typedata_procedure_ui_widget_spacer = {
 	.type_info = {
 		.type_name = "ui_widget_spacer",
+		.type_id = TYPE_ui_widget_spacer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 3,
+	.argument_count = 4,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_ui_widget_spacer.argument_array,
 	.arguments = {
@@ -26016,15 +27965,23 @@ constexpr type_info_procedure_ui_widget_spacer DEFAULT_typedata_procedure_ui_wid
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.size_kind = {
+			.type_info     = &DEFAULT_typedata_ivec2_t,
+			.member_name   = "size_kind",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_spacer.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 	},
 };
 constexpr type_info_procedure_ui_widget_rectangle DEFAULT_typedata_procedure_ui_widget_rectangle = {
 	.type_info = {
 		.type_name = "ui_widget_rectangle",
+		.type_id = TYPE_ui_widget_rectangle,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 3,
-	.return_type    = &DEFAULT_typedata_void,
+	.argument_count = 4,
+	.return_type    = &DEFAULT_typedata_structure_ui_signal_t.type_info,
 	.argument_pointer = DEFAULT_typedata_procedure_ui_widget_rectangle.argument_array,
 	.arguments = {
 		.ui_state = {
@@ -26048,14 +28005,22 @@ constexpr type_info_procedure_ui_widget_rectangle DEFAULT_typedata_procedure_ui_
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.size_kind = {
+			.type_info     = &DEFAULT_typedata_ivec2_t,
+			.member_name   = "size_kind",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_rectangle.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 	},
 };
 constexpr type_info_procedure_ui_widget_divider DEFAULT_typedata_procedure_ui_widget_divider = {
 	.type_info = {
 		.type_name = "ui_widget_divider",
+		.type_id = TYPE_ui_widget_divider,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 3,
+	.argument_count = 4,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_ui_widget_divider.argument_array,
 	.arguments = {
@@ -26080,56 +28045,118 @@ constexpr type_info_procedure_ui_widget_divider DEFAULT_typedata_procedure_ui_wi
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.size_kind = {
+			.type_info     = &DEFAULT_typedata_ivec2_t,
+			.member_name   = "size_kind",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_divider.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 	},
 };
-constexpr type_info_procedure_ui_widget_draggable_panel DEFAULT_typedata_procedure_ui_widget_draggable_panel = {
+constexpr type_info_procedure_ui_widget_textbox DEFAULT_typedata_procedure_ui_widget_textbox = {
 	.type_info = {
-		.type_name = "ui_widget_draggable_panel",
+		.type_name = "ui_widget_textbox",
+		.type_id = TYPE_ui_widget_textbox,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 6,
+	.argument_count = 4,
 	.return_type    = &DEFAULT_typedata_structure_ui_signal_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_ui_widget_draggable_panel.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_ui_widget_textbox.argument_array,
 	.arguments = {
 		.ui_state = {
 			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.member_name   = "ui_state",
-			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_textbox.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.widget_name = {
 			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
 			.member_name   = "widget_name",
-			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_textbox.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.position = {
+		.widget_text_content = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "widget_text_content",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_textbox.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.size = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "position",
-			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.member_name   = "size",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_textbox.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.child_spacing = {
+	},
+};
+constexpr type_info_procedure_ui_widget_texture DEFAULT_typedata_procedure_ui_widget_texture = {
+	.type_info = {
+		.type_name = "ui_widget_texture",
+		.type_id = TYPE_ui_widget_texture,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 8,
+	.return_type    = &DEFAULT_typedata_structure_ui_signal_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_ui_widget_texture.argument_array,
+	.arguments = {
+		.ui_state = {
+			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.member_name   = "ui_state",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_texture.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.widget_name = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "widget_name",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_texture.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.size = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "child_spacing",
-			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+			.member_name   = "size",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_texture.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.padding = {
-			.type_info     = &DEFAULT_typedata_vec4_t,
-			.member_name   = "padding",
-			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+		.texture = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "texture",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_texture.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.uv_min = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "uv_min",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_texture.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.background_color = {
-			.type_info     = &DEFAULT_typedata_vec4_t,
-			.member_name   = "background_color",
-			.parent        = &DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+		.uv_max = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "uv_max",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_texture.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.size_kind = {
+			.type_info     = &DEFAULT_typedata_ivec2_t,
+			.member_name   = "size_kind",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_texture.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.additional_flags = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "additional_flags",
+			.parent        = &DEFAULT_typedata_procedure_ui_widget_texture.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -26138,6 +28165,7 @@ constexpr type_info_procedure_ui_widget_draggable_panel DEFAULT_typedata_procedu
 constexpr type_info_procedure_ui_state_begin_row DEFAULT_typedata_procedure_ui_state_begin_row = {
 	.type_info = {
 		.type_name = "ui_state_begin_row",
+		.type_id = TYPE_ui_state_begin_row,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -26163,6 +28191,7 @@ constexpr type_info_procedure_ui_state_begin_row DEFAULT_typedata_procedure_ui_s
 constexpr type_info_procedure_ui_state_end_row DEFAULT_typedata_procedure_ui_state_end_row = {
 	.type_info = {
 		.type_name = "ui_state_end_row",
+		.type_id = TYPE_ui_state_end_row,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -26181,6 +28210,7 @@ constexpr type_info_procedure_ui_state_end_row DEFAULT_typedata_procedure_ui_sta
 constexpr type_info_procedure_ui_state_begin_column DEFAULT_typedata_procedure_ui_state_begin_column = {
 	.type_info = {
 		.type_name = "ui_state_begin_column",
+		.type_id = TYPE_ui_state_begin_column,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -26206,6 +28236,7 @@ constexpr type_info_procedure_ui_state_begin_column DEFAULT_typedata_procedure_u
 constexpr type_info_procedure_ui_state_end_column DEFAULT_typedata_procedure_ui_state_end_column = {
 	.type_info = {
 		.type_name = "ui_state_end_column",
+		.type_id = TYPE_ui_state_end_column,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -26223,11 +28254,13 @@ constexpr type_info_procedure_ui_state_end_column DEFAULT_typedata_procedure_ui_
 };
 constexpr type_info_t DEFAULT_typedata_rectangle2_t = {
 	.type_name = "rectangle2_t",
+	.type_id = TYPE_rectangle2_t,
 	.size = athena_internal::safe_sizeof<rectangle2_t>(),
 };
 constexpr type_info_struct_vulkan_allocation_usage_type_t DEFAULT_typedata_structure_vulkan_allocation_usage_type_t = {
 	.type_info = {
 		.type_name = "vulkan_allocation_usage_type_t",
+		.type_id = TYPE_vulkan_allocation_usage_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<vulkan_allocation_usage_type_t>(),
 	},
@@ -26284,6 +28317,7 @@ constexpr type_info_struct_vulkan_allocation_usage_type_t DEFAULT_typedata_struc
 constexpr type_info_struct_vulkan_allocation_info_t DEFAULT_typedata_structure_vulkan_allocation_info_t = {
 	.type_info = {
 		.type_name = "vulkan_allocation_info_t",
+		.type_id = TYPE_vulkan_allocation_info_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_allocation_info_t>(),
 	},
@@ -26352,6 +28386,7 @@ constexpr type_info_struct_vulkan_allocation_info_t DEFAULT_typedata_structure_v
 constexpr type_info_struct_vulkan_allocator_t DEFAULT_typedata_structure_vulkan_allocator_t = {
 	.type_info = {
 		.type_name = "vulkan_allocator_t",
+		.type_id = TYPE_vulkan_allocator_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_allocator_t>(),
 	},
@@ -26404,10 +28439,11 @@ constexpr type_info_struct_vulkan_allocator_t DEFAULT_typedata_structure_vulkan_
 constexpr type_info_struct_vulkan_context_t DEFAULT_typedata_structure_vulkan_context_t = {
 	.type_info = {
 		.type_name = "vulkan_context_t",
+		.type_id = TYPE_vulkan_context_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_context_t>(),
 	},
-	.member_count   = 64,
+	.member_count   = 67,
 	.member_pointer = DEFAULT_typedata_structure_vulkan_context_t.member_array,
 	.members = {
 		.initialization_arena = {
@@ -26914,12 +28950,29 @@ constexpr type_info_struct_vulkan_context_t DEFAULT_typedata_structure_vulkan_co
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.default_nearest_sampler_info = {
+			.type_info     = &DEFAULT_typedata_structure_vulkan_sampler_info_t.type_info,
+			.member_name   = "default_nearest_sampler_info",
+			.parent        = &DEFAULT_typedata_structure_vulkan_context_t.type_info,
+			.offset        = offsetof(vulkan_context_t, default_nearest_sampler_info),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.default_linear_sampler_info = {
+			.type_info     = &DEFAULT_typedata_structure_vulkan_sampler_info_t.type_info,
+			.member_name   = "default_linear_sampler_info",
+			.parent        = &DEFAULT_typedata_structure_vulkan_context_t.type_info,
+			.offset        = offsetof(vulkan_context_t, default_linear_sampler_info),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 	},
 };
 
 constexpr type_info_procedure_vk_allocator_create DEFAULT_typedata_procedure_vk_allocator_create = {
 	.type_info = {
 		.type_name = "vk_allocator_create",
+		.type_id = TYPE_vk_allocator_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -26945,6 +28998,7 @@ constexpr type_info_procedure_vk_allocator_create DEFAULT_typedata_procedure_vk_
 constexpr type_info_procedure_vk_allocator_destroy DEFAULT_typedata_procedure_vk_allocator_destroy = {
 	.type_info = {
 		.type_name = "vk_allocator_destroy",
+		.type_id = TYPE_vk_allocator_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -26962,11 +29016,13 @@ constexpr type_info_procedure_vk_allocator_destroy DEFAULT_typedata_procedure_vk
 };
 constexpr type_info_t DEFAULT_typedata_VkMemoryRequirements = {
 	.type_name = "VkMemoryRequirements",
+	.type_id = TYPE_VkMemoryRequirements,
 	.size = athena_internal::safe_sizeof<VkMemoryRequirements>(),
 };
 constexpr type_info_procedure_vk_allocator_allocate DEFAULT_typedata_procedure_vk_allocator_allocate = {
 	.type_info = {
 		.type_name = "vk_allocator_allocate",
+		.type_id = TYPE_vk_allocator_allocate,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -26999,6 +29055,7 @@ constexpr type_info_procedure_vk_allocator_allocate DEFAULT_typedata_procedure_v
 constexpr type_info_procedure_vk_allocator_free DEFAULT_typedata_procedure_vk_allocator_free = {
 	.type_info = {
 		.type_name = "vk_allocator_free",
+		.type_id = TYPE_vk_allocator_free,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -27023,31 +29080,38 @@ constexpr type_info_procedure_vk_allocator_free DEFAULT_typedata_procedure_vk_al
 };
 constexpr type_info_t DEFAULT_typedata_VkDeviceSize = {
 	.type_name = "VkDeviceSize",
+	.type_id = TYPE_VkDeviceSize,
 	.size = athena_internal::safe_sizeof<VkDeviceSize>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkMemoryPropertyFlags = {
 	.type_name = "VkMemoryPropertyFlags",
+	.type_id = TYPE_VkMemoryPropertyFlags,
 	.size = athena_internal::safe_sizeof<VkMemoryPropertyFlags>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkDeviceMemory = {
 	.type_name = "VkDeviceMemory",
+	.type_id = TYPE_VkDeviceMemory,
 	.size = athena_internal::safe_sizeof<VkDeviceMemory>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkAllocationCallbacks = {
 	.type_name = "VkAllocationCallbacks",
+	.type_id = TYPE_VkAllocationCallbacks,
 	.size = athena_internal::safe_sizeof<VkAllocationCallbacks>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkDevice = {
 	.type_name = "VkDevice",
+	.type_id = TYPE_VkDevice,
 	.size = athena_internal::safe_sizeof<VkDevice>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkCommandBuffer = {
 	.type_name = "VkCommandBuffer",
+	.type_id = TYPE_VkCommandBuffer,
 	.size = athena_internal::safe_sizeof<VkCommandBuffer>(),
 };
 constexpr type_info_procedure_vk_backend_buffer_copy_buffer DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_copy_buffer",
+		.type_id = TYPE_vk_backend_buffer_copy_buffer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 7,
@@ -27108,6 +29172,7 @@ constexpr type_info_procedure_vk_backend_buffer_copy_buffer DEFAULT_typedata_pro
 constexpr type_info_procedure_vk_backend_buffer_copy_data DEFAULT_typedata_procedure_vk_backend_buffer_copy_data = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_copy_data",
+		.type_id = TYPE_vk_backend_buffer_copy_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
@@ -27153,11 +29218,13 @@ constexpr type_info_procedure_vk_backend_buffer_copy_data DEFAULT_typedata_proce
 };
 constexpr type_info_t DEFAULT_typedata_VkBufferUsageFlags = {
 	.type_name = "VkBufferUsageFlags",
+	.type_id = TYPE_VkBufferUsageFlags,
 	.size = athena_internal::safe_sizeof<VkBufferUsageFlags>(),
 };
 constexpr type_info_procedure_vk_backend_buffer_create DEFAULT_typedata_procedure_vk_backend_buffer_create = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_create",
+		.type_id = TYPE_vk_backend_buffer_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -27197,6 +29264,7 @@ constexpr type_info_procedure_vk_backend_buffer_create DEFAULT_typedata_procedur
 constexpr type_info_procedure_vk_backend_buffer_destroy DEFAULT_typedata_procedure_vk_backend_buffer_destroy = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_destroy",
+		.type_id = TYPE_vk_backend_buffer_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -27222,6 +29290,7 @@ constexpr type_info_procedure_vk_backend_buffer_destroy DEFAULT_typedata_procedu
 constexpr type_info_procedure_vk_backend_buffer_resize DEFAULT_typedata_procedure_vk_backend_buffer_resize = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_resize",
+		.type_id = TYPE_vk_backend_buffer_resize,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -27261,6 +29330,7 @@ constexpr type_info_procedure_vk_backend_buffer_resize DEFAULT_typedata_procedur
 constexpr type_info_procedure_vk_backend_buffer_map DEFAULT_typedata_procedure_vk_backend_buffer_map = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_map",
+		.type_id = TYPE_vk_backend_buffer_map,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -27300,6 +29370,7 @@ constexpr type_info_procedure_vk_backend_buffer_map DEFAULT_typedata_procedure_v
 constexpr type_info_procedure_vk_backend_buffer_unmap DEFAULT_typedata_procedure_vk_backend_buffer_unmap = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_unmap",
+		.type_id = TYPE_vk_backend_buffer_unmap,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -27325,6 +29396,7 @@ constexpr type_info_procedure_vk_backend_buffer_unmap DEFAULT_typedata_procedure
 constexpr type_info_procedure_vk_backend_buffer_append_data DEFAULT_typedata_procedure_vk_backend_buffer_append_data = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_append_data",
+		.type_id = TYPE_vk_backend_buffer_append_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -27364,6 +29436,7 @@ constexpr type_info_procedure_vk_backend_buffer_append_data DEFAULT_typedata_pro
 constexpr type_info_procedure_vk_backend_buffer_reset DEFAULT_typedata_procedure_vk_backend_buffer_reset = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_reset",
+		.type_id = TYPE_vk_backend_buffer_reset,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -27382,6 +29455,7 @@ constexpr type_info_procedure_vk_backend_buffer_reset DEFAULT_typedata_procedure
 constexpr type_info_struct_vulkan_staging_info_t DEFAULT_typedata_structure_vulkan_staging_info_t = {
 	.type_info = {
 		.type_name = "vulkan_staging_info_t",
+		.type_id = TYPE_vulkan_staging_info_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_staging_info_t>(),
 	},
@@ -27426,6 +29500,7 @@ constexpr type_info_struct_vulkan_staging_info_t DEFAULT_typedata_structure_vulk
 constexpr type_info_struct_vulkan_staging_buffer_t DEFAULT_typedata_structure_vulkan_staging_buffer_t = {
 	.type_info = {
 		.type_name = "vulkan_staging_buffer_t",
+		.type_id = TYPE_vulkan_staging_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_staging_buffer_t>(),
 	},
@@ -27462,6 +29537,7 @@ constexpr type_info_struct_vulkan_staging_buffer_t DEFAULT_typedata_structure_vu
 constexpr type_info_procedure_vk_backend_staging_buffer_create DEFAULT_typedata_procedure_vk_backend_staging_buffer_create = {
 	.type_info = {
 		.type_name = "vk_backend_staging_buffer_create",
+		.type_id = TYPE_vk_backend_staging_buffer_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -27501,6 +29577,7 @@ constexpr type_info_procedure_vk_backend_staging_buffer_create DEFAULT_typedata_
 constexpr type_info_procedure_vk_backend_buffer_upload_staged_data DEFAULT_typedata_procedure_vk_backend_buffer_upload_staged_data = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_upload_staged_data",
+		.type_id = TYPE_vk_backend_buffer_upload_staged_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -27533,6 +29610,7 @@ constexpr type_info_procedure_vk_backend_buffer_upload_staged_data DEFAULT_typed
 constexpr type_info_procedure_vk_backend_buffer_flush_staging_buffer DEFAULT_typedata_procedure_vk_backend_buffer_flush_staging_buffer = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_flush_staging_buffer",
+		.type_id = TYPE_vk_backend_buffer_flush_staging_buffer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -27558,6 +29636,7 @@ constexpr type_info_procedure_vk_backend_buffer_flush_staging_buffer DEFAULT_typ
 constexpr type_info_procedure_vk_backend_buffer_stage_data DEFAULT_typedata_procedure_vk_backend_buffer_stage_data = {
 	.type_info = {
 		.type_name = "vk_backend_buffer_stage_data",
+		.type_id = TYPE_vk_backend_buffer_stage_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -27596,15 +29675,18 @@ constexpr type_info_procedure_vk_backend_buffer_stage_data DEFAULT_typedata_proc
 };
 constexpr type_info_t DEFAULT_typedata_VkBuffer = {
 	.type_name = "VkBuffer",
+	.type_id = TYPE_VkBuffer,
 	.size = athena_internal::safe_sizeof<VkBuffer>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkFence = {
 	.type_name = "VkFence",
+	.type_id = TYPE_VkFence,
 	.size = athena_internal::safe_sizeof<VkFence>(),
 };
 constexpr type_info_struct_renderer_effect_application_flags_t DEFAULT_typedata_structure_renderer_effect_application_flags_t = {
 	.type_info = {
 		.type_name = "renderer_effect_application_flags_t",
+		.type_id = TYPE_renderer_effect_application_flags_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<renderer_effect_application_flags_t>(),
 	},
@@ -27683,6 +29765,7 @@ constexpr type_info_struct_renderer_effect_application_flags_t DEFAULT_typedata_
 constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_structure_render_pipeline_blending_mode_t = {
 	.type_info = {
 		.type_name = "render_pipeline_blending_mode_t",
+		.type_id = TYPE_render_pipeline_blending_mode_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_pipeline_blending_mode_t>(),
 	},
@@ -27860,6 +29943,7 @@ constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_stru
 constexpr type_info_struct_render_pipeline_blending_equation_t DEFAULT_typedata_structure_render_pipeline_blending_equation_t = {
 	.type_info = {
 		.type_name = "render_pipeline_blending_equation_t",
+		.type_id = TYPE_render_pipeline_blending_equation_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_pipeline_blending_equation_t>(),
 	},
@@ -27927,6 +30011,7 @@ constexpr type_info_struct_render_pipeline_blending_equation_t DEFAULT_typedata_
 constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_structure_render_pipeline_depth_function_t = {
 	.type_info = {
 		.type_name = "render_pipeline_depth_function_t",
+		.type_id = TYPE_render_pipeline_depth_function_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_pipeline_depth_function_t>(),
 	},
@@ -28027,6 +30112,7 @@ constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_str
 constexpr type_info_struct_render_pipeline_polygon_mode_t DEFAULT_typedata_structure_render_pipeline_polygon_mode_t = {
 	.type_info = {
 		.type_name = "render_pipeline_polygon_mode_t",
+		.type_id = TYPE_render_pipeline_polygon_mode_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<render_pipeline_polygon_mode_t>(),
 	},
@@ -28061,10 +30147,11 @@ constexpr type_info_struct_render_pipeline_polygon_mode_t DEFAULT_typedata_struc
 constexpr type_info_struct_gpu_info_t DEFAULT_typedata_structure_gpu_info_t = {
 	.type_info = {
 		.type_name = "gpu_info_t",
+		.type_id = TYPE_gpu_info_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<gpu_info_t>(),
 	},
-	.member_count   = 6,
+	.member_count   = 10,
 	.member_pointer = DEFAULT_typedata_structure_gpu_info_t.member_array,
 	.members = {
 		.device = {
@@ -28121,6 +30208,7 @@ constexpr type_info_struct_gpu_info_t DEFAULT_typedata_structure_gpu_info_t = {
 constexpr type_info_struct_swapchain_info_t DEFAULT_typedata_structure_swapchain_info_t = {
 	.type_info = {
 		.type_name = "swapchain_info_t",
+		.type_id = TYPE_swapchain_info_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<swapchain_info_t>(),
 	},
@@ -28197,6 +30285,7 @@ constexpr type_info_struct_swapchain_info_t DEFAULT_typedata_structure_swapchain
 constexpr type_info_procedure_vk_backend_init DEFAULT_typedata_procedure_vk_backend_init = {
 	.type_info = {
 		.type_name = "vk_backend_init",
+		.type_id = TYPE_vk_backend_init,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -28221,11 +30310,13 @@ constexpr type_info_procedure_vk_backend_init DEFAULT_typedata_procedure_vk_back
 };
 constexpr type_info_t DEFAULT_typedata_VkResult = {
 	.type_name = "VkResult",
+	.type_id = TYPE_VkResult,
 	.size = athena_internal::safe_sizeof<VkResult>(),
 };
 constexpr type_info_procedure_vk_backend_vulkan_result_string DEFAULT_typedata_procedure_vk_backend_vulkan_result_string = {
 	.type_info = {
 		.type_name = "vk_backend_vulkan_result_string",
+		.type_id = TYPE_vk_backend_vulkan_result_string,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -28251,6 +30342,7 @@ constexpr type_info_procedure_vk_backend_vulkan_result_string DEFAULT_typedata_p
 constexpr type_info_procedure_vk_backend_result_is_success DEFAULT_typedata_procedure_vk_backend_result_is_success = {
 	.type_info = {
 		.type_name = "vk_backend_result_is_success",
+		.type_id = TYPE_vk_backend_result_is_success,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -28269,6 +30361,7 @@ constexpr type_info_procedure_vk_backend_result_is_success DEFAULT_typedata_proc
 constexpr type_info_procedure_vk_backend_handle_window_resize DEFAULT_typedata_procedure_vk_backend_handle_window_resize = {
 	.type_info = {
 		.type_name = "vk_backend_handle_window_resize",
+		.type_id = TYPE_vk_backend_handle_window_resize,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -28294,6 +30387,7 @@ constexpr type_info_procedure_vk_backend_handle_window_resize DEFAULT_typedata_p
 constexpr type_info_procedure_vk_backend_render_frame DEFAULT_typedata_procedure_vk_backend_render_frame = {
 	.type_info = {
 		.type_name = "vk_backend_render_frame",
+		.type_id = TYPE_vk_backend_render_frame,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -28311,11 +30405,13 @@ constexpr type_info_procedure_vk_backend_render_frame DEFAULT_typedata_procedure
 };
 constexpr type_info_t DEFAULT_typedata_VkPipeline = {
 	.type_name = "VkPipeline",
+	.type_id = TYPE_VkPipeline,
 	.size = athena_internal::safe_sizeof<VkPipeline>(),
 };
 constexpr type_info_struct_vulkan_shader_t DEFAULT_typedata_structure_vulkan_shader_t = {
 	.type_info = {
 		.type_name = "vulkan_shader_t",
+		.type_id = TYPE_vulkan_shader_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_shader_t>(),
 	},
@@ -28495,27 +30591,33 @@ constexpr type_info_struct_vulkan_shader_t DEFAULT_typedata_structure_vulkan_sha
 
 constexpr type_info_t DEFAULT_typedata_VkRenderPass = {
 	.type_name = "VkRenderPass",
+	.type_id = TYPE_VkRenderPass,
 	.size = athena_internal::safe_sizeof<VkRenderPass>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPipelineRasterizationStateCreateInfo = {
 	.type_name = "VkPipelineRasterizationStateCreateInfo",
+	.type_id = TYPE_VkPipelineRasterizationStateCreateInfo,
 	.size = athena_internal::safe_sizeof<VkPipelineRasterizationStateCreateInfo>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPipelineDepthStencilStateCreateInfo = {
 	.type_name = "VkPipelineDepthStencilStateCreateInfo",
+	.type_id = TYPE_VkPipelineDepthStencilStateCreateInfo,
 	.size = athena_internal::safe_sizeof<VkPipelineDepthStencilStateCreateInfo>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPipelineColorBlendAttachmentState = {
 	.type_name = "VkPipelineColorBlendAttachmentState",
+	.type_id = TYPE_VkPipelineColorBlendAttachmentState,
 	.size = athena_internal::safe_sizeof<VkPipelineColorBlendAttachmentState>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPipelineVertexInputStateCreateInfo = {
 	.type_name = "VkPipelineVertexInputStateCreateInfo",
+	.type_id = TYPE_VkPipelineVertexInputStateCreateInfo,
 	.size = athena_internal::safe_sizeof<VkPipelineVertexInputStateCreateInfo>(),
 };
 constexpr type_info_procedure_vk_backend_create_render_pipeline DEFAULT_typedata_procedure_vk_backend_create_render_pipeline = {
 	.type_info = {
 		.type_name = "vk_backend_create_render_pipeline",
+		.type_id = TYPE_vk_backend_create_render_pipeline,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 7,
@@ -28576,6 +30678,7 @@ constexpr type_info_procedure_vk_backend_create_render_pipeline DEFAULT_typedata
 constexpr type_info_procedure_vk_backend_renderpass_destroy DEFAULT_typedata_procedure_vk_backend_renderpass_destroy = {
 	.type_info = {
 		.type_name = "vk_backend_renderpass_destroy",
+		.type_id = TYPE_vk_backend_renderpass_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -28600,11 +30703,13 @@ constexpr type_info_procedure_vk_backend_renderpass_destroy DEFAULT_typedata_pro
 };
 constexpr type_info_t DEFAULT_typedata_VkFramebuffer = {
 	.type_name = "VkFramebuffer",
+	.type_id = TYPE_VkFramebuffer,
 	.size = athena_internal::safe_sizeof<VkFramebuffer>(),
 };
 constexpr type_info_procedure_vk_backend_framebuffer_destroy DEFAULT_typedata_procedure_vk_backend_framebuffer_destroy = {
 	.type_info = {
 		.type_name = "vk_backend_framebuffer_destroy",
+		.type_id = TYPE_vk_backend_framebuffer_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -28630,6 +30735,7 @@ constexpr type_info_procedure_vk_backend_framebuffer_destroy DEFAULT_typedata_pr
 constexpr type_info_procedure_vk_backend_initialize_RHI_renderpass DEFAULT_typedata_procedure_vk_backend_initialize_RHI_renderpass = {
 	.type_info = {
 		.type_name = "vk_backend_initialize_RHI_renderpass",
+		.type_id = TYPE_vk_backend_initialize_RHI_renderpass,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -28662,6 +30768,7 @@ constexpr type_info_procedure_vk_backend_initialize_RHI_renderpass DEFAULT_typed
 constexpr type_info_procedure_vk_backend_get_and_begin_scratch_command_buffer DEFAULT_typedata_procedure_vk_backend_get_and_begin_scratch_command_buffer = {
 	.type_info = {
 		.type_name = "vk_backend_get_and_begin_scratch_command_buffer",
+		.type_id = TYPE_vk_backend_get_and_begin_scratch_command_buffer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -28687,6 +30794,7 @@ constexpr type_info_procedure_vk_backend_get_and_begin_scratch_command_buffer DE
 constexpr type_info_procedure_vk_backend_submit_and_release_scratch_command_buffer DEFAULT_typedata_procedure_vk_backend_submit_and_release_scratch_command_buffer = {
 	.type_info = {
 		.type_name = "vk_backend_submit_and_release_scratch_command_buffer",
+		.type_id = TYPE_vk_backend_submit_and_release_scratch_command_buffer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -28712,6 +30820,7 @@ constexpr type_info_procedure_vk_backend_submit_and_release_scratch_command_buff
 constexpr type_info_procedure_vk_backend_allocate_descriptor_sets DEFAULT_typedata_procedure_vk_backend_allocate_descriptor_sets = {
 	.type_info = {
 		.type_name = "vk_backend_allocate_descriptor_sets",
+		.type_id = TYPE_vk_backend_allocate_descriptor_sets,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -28737,6 +30846,7 @@ constexpr type_info_procedure_vk_backend_allocate_descriptor_sets DEFAULT_typeda
 constexpr type_info_procedure_vk_backend_append_uniform_constant_buffer_data DEFAULT_typedata_procedure_vk_backend_append_uniform_constant_buffer_data = {
 	.type_info = {
 		.type_name = "vk_backend_append_uniform_constant_buffer_data",
+		.type_id = TYPE_vk_backend_append_uniform_constant_buffer_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -28776,6 +30886,7 @@ constexpr type_info_procedure_vk_backend_append_uniform_constant_buffer_data DEF
 constexpr type_info_procedure_vk_backend_framebuffer_create DEFAULT_typedata_procedure_vk_backend_framebuffer_create = {
 	.type_info = {
 		.type_name = "vk_backend_framebuffer_create",
+		.type_id = TYPE_vk_backend_framebuffer_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 6,
@@ -28828,19 +30939,23 @@ constexpr type_info_procedure_vk_backend_framebuffer_create DEFAULT_typedata_pro
 };
 constexpr type_info_t DEFAULT_typedata_VkImageLayout = {
 	.type_name = "VkImageLayout",
+	.type_id = TYPE_VkImageLayout,
 	.size = athena_internal::safe_sizeof<VkImageLayout>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkAttachmentLoadOp = {
 	.type_name = "VkAttachmentLoadOp",
+	.type_id = TYPE_VkAttachmentLoadOp,
 	.size = athena_internal::safe_sizeof<VkAttachmentLoadOp>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkAttachmentStoreOp = {
 	.type_name = "VkAttachmentStoreOp",
+	.type_id = TYPE_VkAttachmentStoreOp,
 	.size = athena_internal::safe_sizeof<VkAttachmentStoreOp>(),
 };
 constexpr type_info_procedure_vk_backend_renderpass_create DEFAULT_typedata_procedure_vk_backend_renderpass_create = {
 	.type_info = {
 		.type_name = "vk_backend_renderpass_create",
+		.type_id = TYPE_vk_backend_renderpass_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 8,
@@ -28907,75 +31022,93 @@ constexpr type_info_procedure_vk_backend_renderpass_create DEFAULT_typedata_proc
 };
 constexpr type_info_t DEFAULT_typedata_VkPhysicalDevice = {
 	.type_name = "VkPhysicalDevice",
+	.type_id = TYPE_VkPhysicalDevice,
 	.size = athena_internal::safe_sizeof<VkPhysicalDevice>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPhysicalDeviceProperties = {
 	.type_name = "VkPhysicalDeviceProperties",
+	.type_id = TYPE_VkPhysicalDeviceProperties,
 	.size = athena_internal::safe_sizeof<VkPhysicalDeviceProperties>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPhysicalDeviceMemoryProperties = {
 	.type_name = "VkPhysicalDeviceMemoryProperties",
+	.type_id = TYPE_VkPhysicalDeviceMemoryProperties,
 	.size = athena_internal::safe_sizeof<VkPhysicalDeviceMemoryProperties>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPhysicalDeviceFeatures = {
 	.type_name = "VkPhysicalDeviceFeatures",
+	.type_id = TYPE_VkPhysicalDeviceFeatures,
 	.size = athena_internal::safe_sizeof<VkPhysicalDeviceFeatures>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkSurfaceCapabilitiesKHR = {
 	.type_name = "VkSurfaceCapabilitiesKHR",
+	.type_id = TYPE_VkSurfaceCapabilitiesKHR,
 	.size = athena_internal::safe_sizeof<VkSurfaceCapabilitiesKHR>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkSwapchainKHR = {
 	.type_name = "VkSwapchainKHR",
+	.type_id = TYPE_VkSwapchainKHR,
 	.size = athena_internal::safe_sizeof<VkSwapchainKHR>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPresentModeKHR = {
 	.type_name = "VkPresentModeKHR",
+	.type_id = TYPE_VkPresentModeKHR,
 	.size = athena_internal::safe_sizeof<VkPresentModeKHR>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkSurfaceFormatKHR = {
 	.type_name = "VkSurfaceFormatKHR",
+	.type_id = TYPE_VkSurfaceFormatKHR,
 	.size = athena_internal::safe_sizeof<VkSurfaceFormatKHR>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkExtent2D = {
 	.type_name = "VkExtent2D",
+	.type_id = TYPE_VkExtent2D,
 	.size = athena_internal::safe_sizeof<VkExtent2D>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkImage = {
 	.type_name = "VkImage",
+	.type_id = TYPE_VkImage,
 	.size = athena_internal::safe_sizeof<VkImage>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkImageView = {
 	.type_name = "VkImageView",
+	.type_id = TYPE_VkImageView,
 	.size = athena_internal::safe_sizeof<VkImageView>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkInstance = {
 	.type_name = "VkInstance",
+	.type_id = TYPE_VkInstance,
 	.size = athena_internal::safe_sizeof<VkInstance>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkSurfaceKHR = {
 	.type_name = "VkSurfaceKHR",
+	.type_id = TYPE_VkSurfaceKHR,
 	.size = athena_internal::safe_sizeof<VkSurfaceKHR>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkDebugUtilsMessengerEXT = {
 	.type_name = "VkDebugUtilsMessengerEXT",
+	.type_id = TYPE_VkDebugUtilsMessengerEXT,
 	.size = athena_internal::safe_sizeof<VkDebugUtilsMessengerEXT>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkCommandPool = {
 	.type_name = "VkCommandPool",
+	.type_id = TYPE_VkCommandPool,
 	.size = athena_internal::safe_sizeof<VkCommandPool>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkQueue = {
 	.type_name = "VkQueue",
+	.type_id = TYPE_VkQueue,
 	.size = athena_internal::safe_sizeof<VkQueue>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkFormat = {
 	.type_name = "VkFormat",
+	.type_id = TYPE_VkFormat,
 	.size = athena_internal::safe_sizeof<VkFormat>(),
 };
 constexpr type_info_struct_vulkan_image_t DEFAULT_typedata_structure_vulkan_image_t = {
 	.type_info = {
 		.type_name = "vulkan_image_t",
+		.type_id = TYPE_vulkan_image_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_image_t>(),
 	},
@@ -28987,6 +31120,30 @@ constexpr type_info_struct_vulkan_image_t DEFAULT_typedata_structure_vulkan_imag
 			.member_name   = "is_valid",
 			.parent        = &DEFAULT_typedata_structure_vulkan_image_t.type_info,
 			.offset        = offsetof(vulkan_image_t, is_valid),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.width = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "width",
+			.parent        = &DEFAULT_typedata_structure_vulkan_image_t.type_info,
+			.offset        = offsetof(vulkan_image_t, width),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.height = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "height",
+			.parent        = &DEFAULT_typedata_structure_vulkan_image_t.type_info,
+			.offset        = offsetof(vulkan_image_t, height),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.sampler = {
+			.type_info     = &DEFAULT_typedata_VkSampler,
+			.member_name   = "sampler",
+			.parent        = &DEFAULT_typedata_structure_vulkan_image_t.type_info,
+			.offset        = offsetof(vulkan_image_t, sampler),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -29011,14 +31168,6 @@ constexpr type_info_struct_vulkan_image_t DEFAULT_typedata_structure_vulkan_imag
 			.member_name   = "view",
 			.parent        = &DEFAULT_typedata_structure_vulkan_image_t.type_info,
 			.offset        = offsetof(vulkan_image_t, view),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.sampler = {
-			.type_info     = &DEFAULT_typedata_VkSampler,
-			.member_name   = "sampler",
-			.parent        = &DEFAULT_typedata_structure_vulkan_image_t.type_info,
-			.offset        = offsetof(vulkan_image_t, sampler),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -29070,46 +31219,42 @@ constexpr type_info_struct_vulkan_image_t DEFAULT_typedata_structure_vulkan_imag
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.width = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "width",
-			.parent        = &DEFAULT_typedata_structure_vulkan_image_t.type_info,
-			.offset        = offsetof(vulkan_image_t, width),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.height = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "height",
-			.parent        = &DEFAULT_typedata_structure_vulkan_image_t.type_info,
-			.offset        = offsetof(vulkan_image_t, height),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
 	},
 };
 
 constexpr type_info_t DEFAULT_typedata_VkSemaphore = {
 	.type_name = "VkSemaphore",
+	.type_id = TYPE_VkSemaphore,
 	.size = athena_internal::safe_sizeof<VkSemaphore>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkDescriptorPool = {
 	.type_name = "VkDescriptorPool",
+	.type_id = TYPE_VkDescriptorPool,
 	.size = athena_internal::safe_sizeof<VkDescriptorPool>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkSampler = {
 	.type_name = "VkSampler",
+	.type_id = TYPE_VkSampler,
 	.size = athena_internal::safe_sizeof<VkSampler>(),
 };
 constexpr type_info_struct_vulkan_sampler_info_t DEFAULT_typedata_structure_vulkan_sampler_info_t = {
 	.type_info = {
 		.type_name = "vulkan_sampler_info_t",
+		.type_id = TYPE_vulkan_sampler_info_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_sampler_info_t>(),
 	},
-	.member_count   = 9,
+	.member_count   = 10,
 	.member_pointer = DEFAULT_typedata_structure_vulkan_sampler_info_t.member_array,
 	.members = {
+		.is_valid = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "is_valid",
+			.parent        = &DEFAULT_typedata_structure_vulkan_sampler_info_t.type_info,
+			.offset        = offsetof(vulkan_sampler_info_t, is_valid),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.min_filter = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "min_filter",
@@ -29188,6 +31333,7 @@ constexpr type_info_struct_vulkan_sampler_info_t DEFAULT_typedata_structure_vulk
 constexpr type_info_struct_vulkan_image_info_t DEFAULT_typedata_structure_vulkan_image_info_t = {
 	.type_info = {
 		.type_name = "vulkan_image_info_t",
+		.type_id = TYPE_vulkan_image_info_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_image_info_t>(),
 	},
@@ -29279,8 +31425,8 @@ constexpr type_info_struct_vulkan_image_info_t DEFAULT_typedata_structure_vulkan
 			.member_name   = "sampler_info",
 			.parent        = &DEFAULT_typedata_structure_vulkan_image_info_t.type_info,
 			.offset        = offsetof(vulkan_image_info_t, sampler_info),
-			.flags         = 2,
-			.pointer_depth = 1,
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 	},
 };
@@ -29288,6 +31434,7 @@ constexpr type_info_struct_vulkan_image_info_t DEFAULT_typedata_structure_vulkan
 constexpr type_info_procedure_vk_backend_image_create DEFAULT_typedata_procedure_vk_backend_image_create = {
 	.type_info = {
 		.type_name = "vk_backend_image_create",
+		.type_id = TYPE_vk_backend_image_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -29313,6 +31460,7 @@ constexpr type_info_procedure_vk_backend_image_create DEFAULT_typedata_procedure
 constexpr type_info_procedure_vk_backend_image_update_data DEFAULT_typedata_procedure_vk_backend_image_update_data = {
 	.type_info = {
 		.type_name = "vk_backend_image_update_data",
+		.type_id = TYPE_vk_backend_image_update_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -29338,6 +31486,7 @@ constexpr type_info_procedure_vk_backend_image_update_data DEFAULT_typedata_proc
 constexpr type_info_procedure_vk_backend_image_destroy DEFAULT_typedata_procedure_vk_backend_image_destroy = {
 	.type_info = {
 		.type_name = "vk_backend_image_destroy",
+		.type_id = TYPE_vk_backend_image_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -29363,6 +31512,7 @@ constexpr type_info_procedure_vk_backend_image_destroy DEFAULT_typedata_procedur
 constexpr type_info_procedure_vk_backend_sampler_create DEFAULT_typedata_procedure_vk_backend_sampler_create = {
 	.type_info = {
 		.type_name = "vk_backend_sampler_create",
+		.type_id = TYPE_vk_backend_sampler_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -29388,6 +31538,7 @@ constexpr type_info_procedure_vk_backend_sampler_create DEFAULT_typedata_procedu
 constexpr type_info_procedure_vk_backend_sampler_destroy DEFAULT_typedata_procedure_vk_backend_sampler_destroy = {
 	.type_info = {
 		.type_name = "vk_backend_sampler_destroy",
+		.type_id = TYPE_vk_backend_sampler_destroy,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -29412,19 +31563,23 @@ constexpr type_info_procedure_vk_backend_sampler_destroy DEFAULT_typedata_proced
 };
 constexpr type_info_t DEFAULT_typedata_VkPipelineStageFlags = {
 	.type_name = "VkPipelineStageFlags",
+	.type_id = TYPE_VkPipelineStageFlags,
 	.size = athena_internal::safe_sizeof<VkPipelineStageFlags>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkAccessFlags = {
 	.type_name = "VkAccessFlags",
+	.type_id = TYPE_VkAccessFlags,
 	.size = athena_internal::safe_sizeof<VkAccessFlags>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkImageSubresourceRange = {
 	.type_name = "VkImageSubresourceRange",
+	.type_id = TYPE_VkImageSubresourceRange,
 	.size = athena_internal::safe_sizeof<VkImageSubresourceRange>(),
 };
 constexpr type_info_procedure_vk_backend_image_change_layout DEFAULT_typedata_procedure_vk_backend_image_change_layout = {
 	.type_info = {
 		.type_name = "vk_backend_image_change_layout",
+		.type_id = TYPE_vk_backend_image_change_layout,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 10,
@@ -29506,6 +31661,7 @@ constexpr type_info_procedure_vk_backend_image_change_layout DEFAULT_typedata_pr
 constexpr type_info_procedure_vk_backend_image_init_from_image_handle DEFAULT_typedata_procedure_vk_backend_image_init_from_image_handle = {
 	.type_info = {
 		.type_name = "vk_backend_image_init_from_image_handle",
+		.type_id = TYPE_vk_backend_image_init_from_image_handle,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 4,
@@ -29545,6 +31701,7 @@ constexpr type_info_procedure_vk_backend_image_init_from_image_handle DEFAULT_ty
 constexpr type_info_procedure_vk_backend_image_blit DEFAULT_typedata_procedure_vk_backend_image_blit = {
 	.type_info = {
 		.type_name = "vk_backend_image_blit",
+		.type_id = TYPE_vk_backend_image_blit,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 12,
@@ -29640,6 +31797,7 @@ constexpr type_info_procedure_vk_backend_image_blit DEFAULT_typedata_procedure_v
 constexpr type_info_procedure_vk_backend_image_ensure_shader_readonly_optimal DEFAULT_typedata_procedure_vk_backend_image_ensure_shader_readonly_optimal = {
 	.type_info = {
 		.type_name = "vk_backend_image_ensure_shader_readonly_optimal",
+		.type_id = TYPE_vk_backend_image_ensure_shader_readonly_optimal,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -29665,6 +31823,7 @@ constexpr type_info_procedure_vk_backend_image_ensure_shader_readonly_optimal DE
 constexpr type_info_procedure_vk_backend_is_image_format_stencil_format DEFAULT_typedata_procedure_vk_backend_is_image_format_stencil_format = {
 	.type_info = {
 		.type_name = "vk_backend_is_image_format_stencil_format",
+		.type_id = TYPE_vk_backend_is_image_format_stencil_format,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -29683,6 +31842,7 @@ constexpr type_info_procedure_vk_backend_is_image_format_stencil_format DEFAULT_
 constexpr type_info_procedure_vk_backend_is_image_format_depth_format DEFAULT_typedata_procedure_vk_backend_is_image_format_depth_format = {
 	.type_info = {
 		.type_name = "vk_backend_is_image_format_depth_format",
+		.type_id = TYPE_vk_backend_is_image_format_depth_format,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -29701,6 +31861,7 @@ constexpr type_info_procedure_vk_backend_is_image_format_depth_format DEFAULT_ty
 constexpr type_info_procedure_vk_backend_transfer_image_to_intial_layout DEFAULT_typedata_procedure_vk_backend_transfer_image_to_intial_layout = {
 	.type_info = {
 		.type_name = "vk_backend_transfer_image_to_intial_layout",
+		.type_id = TYPE_vk_backend_transfer_image_to_intial_layout,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -29733,6 +31894,7 @@ constexpr type_info_procedure_vk_backend_transfer_image_to_intial_layout DEFAULT
 constexpr type_info_procedure_vk_backend_transfer_image_to_final_layout DEFAULT_typedata_procedure_vk_backend_transfer_image_to_final_layout = {
 	.type_info = {
 		.type_name = "vk_backend_transfer_image_to_final_layout",
+		.type_id = TYPE_vk_backend_transfer_image_to_final_layout,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
@@ -29765,6 +31927,7 @@ constexpr type_info_procedure_vk_backend_transfer_image_to_final_layout DEFAULT_
 constexpr type_info_procedure_vk_bitmap_format_to_vulkan_format DEFAULT_typedata_procedure_vk_bitmap_format_to_vulkan_format = {
 	.type_info = {
 		.type_name = "vk_bitmap_format_to_vulkan_format",
+		.type_id = TYPE_vk_bitmap_format_to_vulkan_format,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -29782,11 +31945,13 @@ constexpr type_info_procedure_vk_bitmap_format_to_vulkan_format DEFAULT_typedata
 };
 constexpr type_info_t DEFAULT_typedata_VkImageUsageFlags = {
 	.type_name = "VkImageUsageFlags",
+	.type_id = TYPE_VkImageUsageFlags,
 	.size = athena_internal::safe_sizeof<VkImageUsageFlags>(),
 };
 constexpr type_info_procedure_vk_image_usage_flags_from_image_format DEFAULT_typedata_procedure_vk_image_usage_flags_from_image_format = {
 	.type_info = {
 		.type_name = "vk_image_usage_flags_from_image_format",
+		.type_id = TYPE_vk_image_usage_flags_from_image_format,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -29805,6 +31970,7 @@ constexpr type_info_procedure_vk_image_usage_flags_from_image_format DEFAULT_typ
 constexpr type_info_procedure_vk_sampler_info_is_valid DEFAULT_typedata_procedure_vk_sampler_info_is_valid = {
 	.type_info = {
 		.type_name = "vk_sampler_info_is_valid",
+		.type_id = TYPE_vk_sampler_info_is_valid,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -29822,11 +31988,13 @@ constexpr type_info_procedure_vk_sampler_info_is_valid DEFAULT_typedata_procedur
 };
 constexpr type_info_t DEFAULT_typedata_VkFilter = {
 	.type_name = "VkFilter",
+	.type_id = TYPE_VkFilter,
 	.size = athena_internal::safe_sizeof<VkFilter>(),
 };
 constexpr type_info_procedure_vk_sampler_filter_type_to_vk_filter DEFAULT_typedata_procedure_vk_sampler_filter_type_to_vk_filter = {
 	.type_info = {
 		.type_name = "vk_sampler_filter_type_to_vk_filter",
+		.type_id = TYPE_vk_sampler_filter_type_to_vk_filter,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -29845,6 +32013,7 @@ constexpr type_info_procedure_vk_sampler_filter_type_to_vk_filter DEFAULT_typeda
 constexpr type_info_procedure_vk_is_depth_format DEFAULT_typedata_procedure_vk_is_depth_format = {
 	.type_info = {
 		.type_name = "vk_is_depth_format",
+		.type_id = TYPE_vk_is_depth_format,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
@@ -29863,6 +32032,7 @@ constexpr type_info_procedure_vk_is_depth_format DEFAULT_typedata_procedure_vk_i
 constexpr type_info_procedure_vk_get_image_initial_layout_from_usage DEFAULT_typedata_procedure_vk_get_image_initial_layout_from_usage = {
 	.type_info = {
 		.type_name = "vk_get_image_initial_layout_from_usage",
+		.type_id = TYPE_vk_get_image_initial_layout_from_usage,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -29888,6 +32058,7 @@ constexpr type_info_procedure_vk_get_image_initial_layout_from_usage DEFAULT_typ
 constexpr type_info_procedure_vk_get_image_final_layout_from_usage DEFAULT_typedata_procedure_vk_get_image_final_layout_from_usage = {
 	.type_info = {
 		.type_name = "vk_get_image_final_layout_from_usage",
+		.type_id = TYPE_vk_get_image_final_layout_from_usage,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -29910,13 +32081,41 @@ constexpr type_info_procedure_vk_get_image_final_layout_from_usage DEFAULT_typed
 		},
 	},
 };
+constexpr type_info_procedure_vk_backend_get_sampler DEFAULT_typedata_procedure_vk_backend_get_sampler = {
+	.type_info = {
+		.type_name = "vk_backend_get_sampler",
+		.type_id = TYPE_vk_backend_get_sampler,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_VkSampler,
+	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_get_sampler.argument_array,
+	.arguments = {
+		.vulkan_context = {
+			.type_info     = &DEFAULT_typedata_structure_vulkan_context_t.type_info,
+			.member_name   = "vulkan_context",
+			.parent        = &DEFAULT_typedata_procedure_vk_backend_get_sampler.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.sampler_info = {
+			.type_info     = &DEFAULT_typedata_structure_vulkan_sampler_info_t.type_info,
+			.member_name   = "sampler_info",
+			.parent        = &DEFAULT_typedata_procedure_vk_backend_get_sampler.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr type_info_t DEFAULT_typedata_VkImageAspectFlags = {
 	.type_name = "VkImageAspectFlags",
+	.type_id = TYPE_VkImageAspectFlags,
 	.size = athena_internal::safe_sizeof<VkImageAspectFlags>(),
 };
 constexpr type_info_struct_vulkan_shader_stage_t DEFAULT_typedata_structure_vulkan_shader_stage_t = {
 	.type_info = {
 		.type_name = "vulkan_shader_stage_t",
+		.type_id = TYPE_vulkan_shader_stage_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_shader_stage_t>(),
 	},
@@ -29945,6 +32144,7 @@ constexpr type_info_struct_vulkan_shader_stage_t DEFAULT_typedata_structure_vulk
 constexpr type_info_struct_vulkan_shader_binding_t DEFAULT_typedata_structure_vulkan_shader_binding_t = {
 	.type_info = {
 		.type_name = "vulkan_shader_binding_t",
+		.type_id = TYPE_vulkan_shader_binding_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_shader_binding_t>(),
 	},
@@ -29989,6 +32189,7 @@ constexpr type_info_struct_vulkan_shader_binding_t DEFAULT_typedata_structure_vu
 constexpr type_info_procedure_vk_backend_shader_create_spirv_reflect DEFAULT_typedata_procedure_vk_backend_shader_create_spirv_reflect = {
 	.type_info = {
 		.type_name = "vk_backend_shader_create_spirv_reflect",
+		.type_id = TYPE_vk_backend_shader_create_spirv_reflect,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -30014,6 +32215,7 @@ constexpr type_info_procedure_vk_backend_shader_create_spirv_reflect DEFAULT_typ
 constexpr type_info_procedure_vk_backend_shader_create_slang_reflect DEFAULT_typedata_procedure_vk_backend_shader_create_slang_reflect = {
 	.type_info = {
 		.type_name = "vk_backend_shader_create_slang_reflect",
+		.type_id = TYPE_vk_backend_shader_create_slang_reflect,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
@@ -30038,38 +32240,47 @@ constexpr type_info_procedure_vk_backend_shader_create_slang_reflect DEFAULT_typ
 };
 constexpr type_info_t DEFAULT_typedata_VkShaderModule = {
 	.type_name = "VkShaderModule",
+	.type_id = TYPE_VkShaderModule,
 	.size = athena_internal::safe_sizeof<VkShaderModule>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPipelineShaderStageCreateInfo = {
 	.type_name = "VkPipelineShaderStageCreateInfo",
+	.type_id = TYPE_VkPipelineShaderStageCreateInfo,
 	.size = athena_internal::safe_sizeof<VkPipelineShaderStageCreateInfo>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkDescriptorType = {
 	.type_name = "VkDescriptorType",
+	.type_id = TYPE_VkDescriptorType,
 	.size = athena_internal::safe_sizeof<VkDescriptorType>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkDescriptorSetLayout = {
 	.type_name = "VkDescriptorSetLayout",
+	.type_id = TYPE_VkDescriptorSetLayout,
 	.size = athena_internal::safe_sizeof<VkDescriptorSetLayout>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPushConstantRange = {
 	.type_name = "VkPushConstantRange",
+	.type_id = TYPE_VkPushConstantRange,
 	.size = athena_internal::safe_sizeof<VkPushConstantRange>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPipelineBindPoint = {
 	.type_name = "VkPipelineBindPoint",
+	.type_id = TYPE_VkPipelineBindPoint,
 	.size = athena_internal::safe_sizeof<VkPipelineBindPoint>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkPipelineLayout = {
 	.type_name = "VkPipelineLayout",
+	.type_id = TYPE_VkPipelineLayout,
 	.size = athena_internal::safe_sizeof<VkPipelineLayout>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkVertexInputBindingDescription = {
 	.type_name = "VkVertexInputBindingDescription",
+	.type_id = TYPE_VkVertexInputBindingDescription,
 	.size = athena_internal::safe_sizeof<VkVertexInputBindingDescription>(),
 };
 constexpr type_info_t DEFAULT_typedata_VkVertexInputAttributeDescription = {
 	.type_name = "VkVertexInputAttributeDescription",
+	.type_id = TYPE_VkVertexInputAttributeDescription,
 	.size = athena_internal::safe_sizeof<VkVertexInputAttributeDescription>(),
 };
 constexpr const type_info_t *const athena_type_information_array[] = {
@@ -30092,21 +32303,35 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_uint32_t,
 	&DEFAULT_typedata_uint64_t,
 	&DEFAULT_typedata_size_t,
+	&DEFAULT_typedata_structure_sys_thread_t.type_info,
+	&DEFAULT_typedata_structure_sys_mutex_t.type_info,
+	&DEFAULT_typedata_structure_sys_semaphore_t.type_info,
+	&DEFAULT_typedata_structure_ticket_mutex_t.type_info,
+	&DEFAULT_typedata_procedure_c_ticket_mutex_take_ticket.type_info,
+	&DEFAULT_typedata_procedure_c_ticket_mutex_try_wait.type_info,
+	&DEFAULT_typedata_procedure_c_ticket_mutex_wait.type_info,
+	&DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket.type_info,
+	&DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait.type_info,
+	&DEFAULT_typedata_structure_render_command_list_t.type_info,
+	&DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+	&DEFAULT_typedata_structure_texture2D_t.type_info,
+	&DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+	&DEFAULT_typedata_procedure_immediate_rect.type_info,
+	&DEFAULT_typedata_structure_asset_manager_t.type_info,
+	&DEFAULT_typedata_structure_asset_handle_t.type_info,
+	&DEFAULT_typedata_structure_string_t.type_info,
+	&DEFAULT_typedata_procedure_immediate_text.type_info,
+	&DEFAULT_typedata_procedure_immediate_put_data.type_info,
 	&DEFAULT_typedata_procedure_void_func.type_info,
-	&DEFAULT_typedata_structure_dynarray_header_t.type_info,
-	&DEFAULT_typedata_procedure__dynarray_create_impl.type_info,
-	&DEFAULT_typedata_procedure__dynarray_destroy_impl.type_info,
-	&DEFAULT_typedata_procedure__dynarray_grow_impl.type_info,
-	&DEFAULT_typedata_procedure__dynarray_insert_impl.type_info,
-	&DEFAULT_typedata_procedure__dynarray_remove_impl.type_info,
-	&DEFAULT_typedata_structure_file_extension_t.type_info,
+	&DEFAULT_typedata_structure_duration_counter_t.type_info,
+	&DEFAULT_typedata_procedure_begin.type_info,
+	&DEFAULT_typedata_procedure_end.type_info,
 	&DEFAULT_typedata_structure_file_t.type_info,
 	&DEFAULT_typedata_structure_mapped_file_t.type_info,
 	&DEFAULT_typedata_structure_file_data_t.type_info,
 	&DEFAULT_typedata_structure_overlap_io_data_t.type_info,
 	&DEFAULT_typedata_procedure_visit_files_pfn_t.type_info,
 	&DEFAULT_typedata_structure_visit_file_data_t.type_info,
-	&DEFAULT_typedata_structure_string_t.type_info,
 	&DEFAULT_typedata_procedure_c_file_open.type_info,
 	&DEFAULT_typedata_procedure_c_file_close.type_info,
 	&DEFAULT_typedata_procedure_c_file_copy.type_info,
@@ -30129,6 +32354,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_directory_exists.type_info,
 	&DEFAULT_typedata_procedure_c_directory_create_visit_data.type_info,
 	&DEFAULT_typedata_procedure_c_directory_visit.type_info,
+	&DEFAULT_typedata_procedure_c_directory_get_file_count.type_info,
 	&DEFAULT_typedata_structure_file_watcher_t.type_info,
 	&DEFAULT_typedata_structure_file_watcher_recorded_change_t.type_info,
 	&DEFAULT_typedata_procedure_file_watcher_callback_pfn_t.type_info,
@@ -30139,6 +32365,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_file_watcher_issue_check_over_all_paths.type_info,
 	&DEFAULT_typedata_procedure_c_file_watcher_add_change_event.type_info,
 	&DEFAULT_typedata_procedure_c_file_watcher_emit_changes.type_info,
+	&DEFAULT_typedata_procedure_c_file_watcher_process_changes.type_info,
 	&DEFAULT_typedata_structure_global_context_t.type_info,
 	&DEFAULT_typedata_procedure_c_global_context_init.type_info,
 	&DEFAULT_typedata_procedure_c_global_context_reset_temporary_data.type_info,
@@ -30146,7 +32373,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_gc_reset_context_arena.type_info,
 	&DEFAULT_typedata_structure_threadpool_t.type_info,
 	&DEFAULT_typedata_structure_renderer_state_t.type_info,
-	&DEFAULT_typedata_structure_asset_manager_t.type_info,
 	&DEFAULT_typedata_structure_input_manager_t.type_info,
 	&DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
 	&DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t.type_info,
@@ -30231,15 +32457,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_string_builder_sprintf.type_info,
 	&DEFAULT_typedata_procedure_c_string_builder_dump_to_file.type_info,
 	&DEFAULT_typedata_procedure_c_string_builder_flush_to_file.type_info,
-	&DEFAULT_typedata_structure_sys_thread_t.type_info,
-	&DEFAULT_typedata_structure_sys_mutex_t.type_info,
-	&DEFAULT_typedata_structure_sys_semaphore_t.type_info,
-	&DEFAULT_typedata_structure_ticket_mutex_t.type_info,
-	&DEFAULT_typedata_procedure_c_ticket_mutex_take_ticket.type_info,
-	&DEFAULT_typedata_procedure_c_ticket_mutex_try_wait.type_info,
-	&DEFAULT_typedata_procedure_c_ticket_mutex_wait.type_info,
-	&DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket.type_info,
-	&DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait.type_info,
 	&DEFAULT_typedata_procedure_work_order_fn.type_info,
 	&DEFAULT_typedata_structure_work_completion_fence_t.type_info,
 	&DEFAULT_typedata_structure_work_order_t.type_info,
@@ -30302,7 +32519,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_sys_semaphore_wait.type_info,
 	&DEFAULT_typedata_procedure_sys_semaphore_release.type_info,
 	&DEFAULT_typedata_procedure_sys_semaphore_destroy.type_info,
-	&DEFAULT_typedata_procedure_thread_proc_t.type_info,
 	&DEFAULT_typedata_procedure_sys_thread_create.type_info,
 	&DEFAULT_typedata_procedure_sys_thread_wait.type_info,
 	&DEFAULT_typedata_procedure_sys_thread_close_handle.type_info,
@@ -30312,14 +32528,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_sys_mutex_unlock.type_info,
 	&DEFAULT_typedata_procedure_sys_create_process.type_info,
 	&DEFAULT_typedata_procedure_sys_wait_for_process.type_info,
-	&DEFAULT_typedata_structure_render_command_list_t.type_info,
-	&DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-	&DEFAULT_typedata_structure_texture2D_t.type_info,
-	&DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-	&DEFAULT_typedata_procedure_immediate_rect.type_info,
-	&DEFAULT_typedata_structure_asset_handle_t.type_info,
-	&DEFAULT_typedata_procedure_immediate_text.type_info,
-	&DEFAULT_typedata_procedure_immediate_put_data.type_info,
 	&DEFAULT_typedata_structure_render_image_filter_type_t.type_info,
 	&DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
 	&DEFAULT_typedata_structure_render_image_usage_t.type_info,
@@ -30331,12 +32539,13 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_s_renderer_image_create_from_bitmap.type_info,
 	&DEFAULT_typedata_procedure_s_renderer_image_destroy.type_info,
 	&DEFAULT_typedata_procedure_s_renderer_image_update_data.type_info,
-	&DEFAULT_typedata_procedure_sys_work_queue_entry_proc.type_info,
 	&DEFAULT_typedata_structure_asset_type_t.type_info,
 	&DEFAULT_typedata_structure_asset_slot_load_status_t.type_info,
 	&DEFAULT_typedata_structure_bitmap_format_t.type_info,
 	&DEFAULT_typedata_structure_subtexture_data_t.type_info,
 	&DEFAULT_typedata_structure_texture_atlas_t.type_info,
+	&DEFAULT_typedata_structure_animation_source2D_t.type_info,
+	&DEFAULT_typedata_structure_animation2D_t.type_info,
 	&DEFAULT_typedata_structure_shader_t.type_info,
 	&DEFAULT_typedata_structure_material_instance_t.type_info,
 	&DEFAULT_typedata_structure_material_archetype_t.type_info,
@@ -30350,7 +32559,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_dynamic_render_font_varient_t.type_info,
 	&DEFAULT_typedata_structure_dynamic_render_font_t.type_info,
 	&DEFAULT_typedata_structure_asset_slot_t.type_info,
-	&DEFAULT_typedata_structure_asset_manager_asset_file_data_t.type_info,
+	&DEFAULT_typedata_structure_asset_file_data_t.type_info,
 	&DEFAULT_typedata_structure_asset_catalog_t.type_info,
 	&DEFAULT_typedata_structure_texture_manager_t.type_info,
 	&DEFAULT_typedata_structure_font_manager_t.type_info,
@@ -30358,7 +32567,10 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_s_asset_manager_init.type_info,
 	&DEFAULT_typedata_procedure_s_asset_manager_update.type_info,
 	&DEFAULT_typedata_procedure_s_asset_manager_queue_asset_load.type_info,
+	&DEFAULT_typedata_procedure_s_UTF32_convert_to_UTF8.type_info,
+	&DEFAULT_typedata_procedure_s_UTF8_convert_UTF32.type_info,
 	&DEFAULT_typedata_procedure_s_asset_manager_load_asset_file.type_info,
+	&DEFAULT_typedata_procedure_s_asset_manager_signal_asset_file_reload.type_info,
 	&DEFAULT_typedata_procedure_s_asset_manager_acquire_asset_handle.type_info,
 	&DEFAULT_typedata_procedure_s_texture_atlas_create.type_info,
 	&DEFAULT_typedata_procedure_s_texture_atlas_add_texture.type_info,
@@ -30380,6 +32592,10 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
 	&DEFAULT_typedata_structure_analog_button_t.type_info,
 	&DEFAULT_typedata_structure_gamepad_controller_data_t.type_info,
+	&DEFAULT_typedata_structure_text_input_action_type_t.type_info,
+	&DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
+	&DEFAULT_typedata_structure_text_input_event_type_t.type_info,
+	&DEFAULT_typedata_structure_text_input_event_t.type_info,
 	&DEFAULT_typedata_structure_input_controller_t.type_info,
 	&DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
 	&DEFAULT_typedata_structure_game_action_binding_t.type_info,
@@ -30462,6 +32678,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data.type_info,
 	&DEFAULT_typedata_procedure_s_renderer_get_command_list.type_info,
 	&DEFAULT_typedata_procedure_s_renderer_is_texture_bound.type_info,
+	&DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode.type_info,
 	&DEFAULT_typedata_procedure_s_renderer_find_texture_index.type_info,
 	&DEFAULT_typedata_procedure_s_renderer_reset_command_list.type_info,
 	&DEFAULT_typedata_procedure_r_cmd_renderpass_begin.type_info,
@@ -30499,6 +32716,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_backend_image_create.type_info,
 	&DEFAULT_typedata_procedure_backend_image_destroy.type_info,
 	&DEFAULT_typedata_procedure_backend_image_update_contents.type_info,
+	&DEFAULT_typedata_procedure_backend_acquire_image_sampler.type_info,
 	&DEFAULT_typedata_procedure_backend_shader_create.type_info,
 	&DEFAULT_typedata_procedure_backend_get_command_buffer.type_info,
 	&DEFAULT_typedata_structure_widget_state_t.type_info,
@@ -30511,6 +32729,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_ui_state_t.type_info,
 	&DEFAULT_typedata_procedure_ui_state_init.type_info,
 	&DEFAULT_typedata_procedure_ui_state_update_widget_state.type_info,
+	&DEFAULT_typedata_procedure_ui_state_maybe_eat_inputs.type_info,
 	&DEFAULT_typedata_procedure_ui_state_render_widgets.type_info,
 	&DEFAULT_typedata_procedure_ui_state_set_default_widget_idle_color.type_info,
 	&DEFAULT_typedata_procedure_ui_state_set_default_widget_hover_color.type_info,
@@ -30529,6 +32748,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_ui_widget_seed.type_info,
 	&DEFAULT_typedata_procedure_ui_widget_create.type_info,
 	&DEFAULT_typedata_procedure_ui_widget_panel.type_info,
+	&DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
 	&DEFAULT_typedata_procedure_ui_widget_sized_button.type_info,
 	&DEFAULT_typedata_procedure_ui_widget_text.type_info,
 	&DEFAULT_typedata_procedure_ui_widget_labeled_button.type_info,
@@ -30536,7 +32756,8 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_ui_widget_spacer.type_info,
 	&DEFAULT_typedata_procedure_ui_widget_rectangle.type_info,
 	&DEFAULT_typedata_procedure_ui_widget_divider.type_info,
-	&DEFAULT_typedata_procedure_ui_widget_draggable_panel.type_info,
+	&DEFAULT_typedata_procedure_ui_widget_textbox.type_info,
+	&DEFAULT_typedata_procedure_ui_widget_texture.type_info,
 	&DEFAULT_typedata_procedure_ui_state_begin_row.type_info,
 	&DEFAULT_typedata_procedure_ui_state_end_row.type_info,
 	&DEFAULT_typedata_procedure_ui_state_begin_column.type_info,
@@ -30610,6 +32831,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_vk_is_depth_format.type_info,
 	&DEFAULT_typedata_procedure_vk_get_image_initial_layout_from_usage.type_info,
 	&DEFAULT_typedata_procedure_vk_get_image_final_layout_from_usage.type_info,
+	&DEFAULT_typedata_procedure_vk_backend_get_sampler.type_info,
 	&DEFAULT_typedata_structure_vulkan_shader_stage_t.type_info,
 	&DEFAULT_typedata_structure_vulkan_shader_binding_t.type_info,
 	&DEFAULT_typedata_procedure_vk_backend_shader_create_spirv_reflect.type_info,
@@ -30618,25 +32840,103 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 
 namespace Athena {
 namespace MemberLists {
-enum class dynarray_header_t {
-	flags,
-	header_id,
-	capacity,
-	element_size,
-	indices_used,
-	total_allocated_bytes,
-	__padding1,
-	__padding2,
-}; // dynarray_header_t
-enum class file_extension_t {
-	FILE_EXT_INVALID,
-	FILE_EXT_TTF,
-	FILE_EXT_WAV,
-	FILE_EXT_PNG,
-	FILE_EXT_GLSL,
-	FILE_EXT_OS_DLL,
-	FILE_EXT_COUNT,
-}; // file_extension_t
+enum class sys_thread_t {
+	handle,
+	thread_id,
+	user_data,
+}; // sys_thread_t
+enum class sys_mutex_t {
+	handle,
+}; // sys_mutex_t
+enum class sys_semaphore_t {
+	handle,
+}; // sys_semaphore_t
+enum class ticket_mutex_t {
+	next_ticket,
+	working_ticket,
+}; // ticket_mutex_t
+enum class render_command_list_t {
+	is_initialized,
+	renderer_state,
+	transient_arena,
+	command_arena,
+	commands,
+	command_count,
+	draw_instance_command_count,
+	bind_shader_command_count,
+	bind_render_target_command_count,
+	bind_material_command_count,
+	active_render_state,
+	active_vertex_buffers,
+	vertex_buffer_count,
+	active_index_buffer,
+	active_scissor_command,
+	active_viewport_command,
+	active_shader_program,
+	vertex_offset,
+	instance_offset,
+	index_offset,
+	active_renderpass,
+	presenting,
+	image_shader_params,
+	image_count,
+	image_ids_to_bind,
+	bound_image_count,
+	command_list_type,
+	backend_command_buffer,
+}; // render_command_list_t
+enum class vertex_buffer_t {
+	buffer,
+	vertex_data,
+	max_vertices,
+	vertex_count,
+}; // vertex_buffer_t
+enum class texture2D_t {
+	ID,
+	bitmap,
+	gpu_data,
+}; // texture2D_t
+enum class asset_manager_t {
+	is_initialized,
+	manager_arena,
+	freetype_handle,
+	asset_files,
+	asset_name_to_file,
+	loaded_file_count,
+	asset_load_queue,
+	load_queue_size,
+	asset_unload_queue,
+	unload_queue_size,
+	atlas_registry,
+	asset_allocator,
+	asset_catalogs,
+	texture_catalog,
+	shader_catalog,
+	material_catalog,
+	font_catalog,
+	sound_catalog,
+	font_manager,
+	renderer_state,
+}; // asset_manager_t
+enum class asset_handle_t {
+	is_valid,
+	slot,
+	texture,
+	shader,
+	material_info,
+	dynamic_render_font,
+	animation_source2D,
+	animation2D,
+}; // asset_handle_t
+enum class string_t {
+	data,
+	count,
+}; // string_t
+enum class duration_counter_t {
+	duration_ms,
+	current_elapsed,
+	looped,
+}; // duration_counter_t
 enum class file_t {
 	handle,
 	file_name,
@@ -30674,10 +32974,6 @@ enum class visit_file_data_t {
 	recursive,
 	is_directory,
 }; // visit_file_data_t
-enum class string_t {
-	data,
-	count,
-}; // string_t
 enum class memory_arena_t {
 	is_initialized,
 	base,
@@ -30712,6 +33008,8 @@ enum class file_watcher_t {
 	watch_recursively,
 	observed_changes,
 	change_count,
+	recorded_change_events,
+	recorded_change_event_count,
 	paths_to_watch,
 	paths_watched,
 	notify_buffer_size,
@@ -30719,6 +33017,7 @@ enum class file_watcher_t {
 	issues_when_checking,
 }; // file_watcher_t
 enum class file_watcher_recorded_change_t {
+	redudant,
 	full_path,
 	old_filename,
 	changes,
@@ -30744,6 +33043,7 @@ enum class global_context_t {
 	renderer_state,
 	asset_manager,
 	input_manager,
+	file_watcher,
 	context_arena,
 	temporary_arena,
 }; // global_context_t
@@ -30786,31 +33086,10 @@ enum class renderer_state_t {
 	backend_image_create,
 	backend_image_destroy,
 	backend_image_update_contents,
+	backend_acquire_image_sampler,
 	backend_shader_create,
 	backend_get_command_buffer,
 }; // renderer_state_t
-enum class asset_manager_t {
-	is_initialized,
-	manager_arena,
-	freetype_handle,
-	asset_files,
-	asset_name_to_file,
-	loaded_file_count,
-	asset_load_queue,
-	load_queue_size,
-	asset_unload_queue,
-	unload_queue_size,
-	atlas_registry,
-	asset_allocator,
-	asset_catalogs,
-	texture_catalog,
-	shader_catalog,
-	material_catalog,
-	font_catalog,
-	sound_catalog,
-	font_manager,
-	renderer_state,
-}; // asset_manager_t
 enum class input_manager_t {
 	keyboard_data,
 	gamepad_data,
@@ -30818,6 +33097,7 @@ enum class input_manager_t {
 	active_controller_index,
 	connected_controller_count,
 	controllers,
+	game_actions,
 }; // input_manager_t
 enum class hash_table_allocation_flags_t {
 	HTAF_Invalid,
@@ -30890,21 +33170,6 @@ enum class string_builder_t {
 	bytes_used,
 	total_allocated,
 }; // string_builder_t
-enum class sys_thread_t {
-	handle,
-	thread_id,
-	user_data,
-}; // sys_thread_t
-enum class sys_mutex_t {
-	handle,
-}; // sys_mutex_t
-enum class sys_semaphore_t {
-	handle,
-}; // sys_semaphore_t
-enum class ticket_mutex_t {
-	next_ticket,
-	working_ticket,
-}; // ticket_mutex_t
 enum class work_completion_fence_t {
 	pending,
 }; // work_completion_fence_t
@@ -30981,59 +33246,6 @@ enum class zone_allocator_block_t {
 	next_block,
 	prev_block,
 }; // zone_allocator_block_t
-enum class render_command_list_t {
-	is_initialized,
-	renderer_state,
-	transient_arena,
-	command_arena,
-	commands,
-	command_count,
-	draw_instance_command_count,
-	bind_shader_command_count,
-	bind_render_target_command_count,
-	bind_material_command_count,
-	active_render_state,
-	vertex_buffer_count,
-	active_index_buffer,
-	active_scissor_command,
-	active_viewport_command,
-	active_shader_program,
-	vertex_offset,
-	instance_offset,
-	index_offset,
-	active_renderpass,
-	presenting,
-	image_shader_params,
-	image_count,
-	image_ids_to_bind,
-	bound_image_count,
-	command_list_type,
-	backend_command_buffer,
-}; // render_command_list_t
-enum class vertex_buffer_t {
-	buffer,
-	vertex_data,
-	max_vertices,
-	vertex_count,
-}; // vertex_buffer_t
-enum class texture2D_t {
-	ID,
-	bitmap,
-	gpu_data,
-}; // texture2D_t
-enum class asset_handle_t {
-	is_valid,
-	type,
-	owner_asset_file_index,
-	subtexture_data,
-	slot,
-	asset_manager,
-	catalog,
-	texture,
-	shader,
-	material_info,
-	dynamic_render_font,
-}; // asset_handle_t
 enum class render_image_filter_type_t {
 	IMAGE_FILTER_TYPE_INVALID,
 	IMAGE_FILTER_TYPE_NEAREST,
@@ -31093,7 +33305,6 @@ enum class asset_type_t {
 	AT_Count,
 }; // asset_type_t
 enum class asset_slot_load_status_t {
-	ASLS_Invalid,
 	ASLS_Unloaded,
 	ASLS_LoadQueued,
 	ASLS_Loaded,
@@ -31121,14 +33332,18 @@ enum class subtexture_data_t {
 	uv_max,
 	offset,
 	size,
+	atlased_generation,
 	atlas_subtexture_index,
 	atlas,
+	packed_asset,
 }; // subtexture_data_t
 enum class texture_atlas_t {
 	texture,
 	bitmap_data,
 	ID,
 	merge_counter,
+	textures_to_merge,
+	packed_subtextures,
 	packed_subtexture_count,
 	is_valid,
 	atlas_cursor_x,
@@ -31136,6 +33351,17 @@ enum class texture_atlas_t {
 	tallest_y,
 	atlas_size,
 }; // texture_atlas_t
+enum class animation_source2D_t {
+	name,
+	texture,
+	frame_count,
+	frame_timer,
+}; // animation_source2D_t
+enum class animation2D_t {
+	animation_info,
+	current_frame,
+	frame_timer,
+}; // animation2D_t
 enum class shader_t {
 	ID,
 	shader_data,
@@ -31222,6 +33448,7 @@ enum class dynamic_render_font_varient_t {
 enum class dynamic_render_font_t {
 	font_arena,
 	font_face,
+	varients,
 }; // dynamic_render_font_t
 enum class asset_slot_t {
 	ID,
@@ -31230,31 +33457,39 @@ enum class asset_slot_t {
 	name,
 	owner_asset_file,
 	package_entry,
+	subtexture_data,
+	asset_manager,
+	catalog,
 	package_generation,
 	loaded_asset_index,
+	owner_asset_file_index,
 	texture,
 	dynamic_render_font,
 	shader,
 	material,
 }; // asset_slot_t
-enum class asset_manager_asset_file_data_t {
+enum class asset_file_data_t {
 	is_initialized,
 	ID,
+	current_package_generation,
 	init_arena,
 	load_status,
 	file_info,
 	raw_file_data,
+	header,
 	package_entries,
 	package_entry_count,
 	entry_hash,
+	loaded_assets,
 	header_data,
-}; // asset_manager_asset_file_data_t
+}; // asset_file_data_t
 enum class asset_catalog_t {
 	ID,
 	catalog_type,
 	asset_manager,
 	default_asset,
 	asset_lookup,
+	loaded_assets,
 }; // asset_catalog_t
 enum class texture_manager_t {
 	atlases,
@@ -31292,8 +33527,8 @@ enum class controller_type_t {
 }; // controller_type_t
 enum class input_mouse_buttons_t {
 	SDL_LEFT_MOUSE,
-	SDL_RIGHT_MOUSE,
 	SDL_MIDDLE_MOUSE,
+	SDL_RIGHT_MOUSE,
 	SDL_X1_MOUSE,
 	SDL_X2_MOUSE,
 	SDL_MOUSE_BUTTON_COUNT,
@@ -31302,6 +33537,9 @@ enum class action_button_t {
 	is_down,
 	is_released,
 	is_pressed,
+	consumed_this_frame,
+	keycode,
+	scancode,
 	half_transition_counter,
 }; // action_button_t
 enum class keyboard_controller_data_t {
@@ -31326,12 +33564,38 @@ enum class gamepad_controller_data_t {
 	digital_buttons,
 	analog_buttons,
 }; // gamepad_controller_data_t
+enum class text_input_action_type_t {
+	TEXT_INPUT_EVENT_NONE,
+	TEXT_INPUT_EVENT_PRESSED,
+	TEXT_INPUT_EVENT_DOWN,
+	TEXT_INPUT_EVENT_RELEASED,
+}; // text_input_action_type_t
+enum class text_input_modifier_flags {
+	TEXT_INPUT_MODIFIER_NONE,
+	TEXT_INPUT_MODIFIER_SHIFT,
+	TEXT_INPUT_MODIFIER_CTRL,
+	TEXT_INPUT_MODIFIER_ALT,
+}; // text_input_modifier_flags
+enum class text_input_event_type_t {
+	TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM,
+	TEXT_INPUT_EVENT_TYPE_INPUT_EVENT,
+}; // text_input_event_type_t
+enum class text_input_event_t {
+	type,
+	input_event_type,
+	modifier_flags,
+	scancode,
+	keycode,
+	input_stream,
+}; // text_input_event_t
 enum class input_controller_t {
 	is_valid,
 	is_analog,
 	type,
-	inputs_this_frame,
-	frame_input_counter,
+	transient_action_inputs,
+	action_inputs_this_frame,
+	transient_text_inputs,
+	text_inputs_this_frame,
 	keyboard,
 	gamepad,
 }; // input_controller_t
@@ -31592,11 +33856,21 @@ enum class widget_state_t {
 	toggled,
 	dragging,
 	input_begin_within_bounds,
+	is_held,
+	just_released,
+	just_clicked,
+	is_double_clicked,
+	is_right_clicked,
+	is_right_held,
+	widget_text_render_start_offset,
+	widget_text_render_end_offset,
 	slider_value,
 	position,
 	offset,
 	initial_mouse_position,
 	render_size,
+	absolute_minimum_render_size,
+	resize_amount,
 	render_color,
 	widget_rect,
 }; // widget_state_t
@@ -31629,15 +33903,19 @@ enum class widget_flags_t {
 	UI_WIDGET_FLAG_IDLE_COLOR,
 	UI_WIDGET_FLAG_HOVER_COLOR,
 	UI_WIDGET_FLAG_ACTIVE_COLOR,
+	UI_WIDGET_FLAG_INTERACTABLE,
 	UI_WIDGET_FLAG_MOUSE_CLICKABLE,
 	UI_WIDGET_FLAG_HOVERABLE,
+	UI_WIDGET_FLAG_LEFT_DRAGGABLE,
 	UI_WIDGET_FLAG_DRAW_TEXT,
 	UI_WIDGET_FLAG_DRAW_RECTANGLE,
 	UI_WIDGET_FLAG_DRAW_BACKGROUND,
 	UI_WIDGET_FLAG_DRAW_BORDER,
 	UI_WIDGET_FLAG_MAKE_CIRCULAR,
 	UI_WIDGET_FLAG_FIXED_SIZE,
-	UI_WIDGET_FLAG_LEFT_DRAGGABLE,
+	UI_WIDGET_FLAG_HAS_TEXT_CONTENT,
+	UI_WIDGET_FLAG_RESIZEABLE,
+	UI_WIDGET_FLAG_DISPLAY_TEXTURE,
 	UI_WIDGET_FLAG_STANDARD_RECTANGLE_BUTTON,
 }; // widget_flags_t
 enum class widget_layout_style_t {
@@ -31655,21 +33933,19 @@ enum class widget_t {
 	state,
 	widget_name,
 	widget_text_buffer,
-	widget_text_buffer_used,
 	toggled,
 	parent_stack_depth,
 	font_size,
 	expected_position,
 	minimum_render_size,
+	resize_value,
 	size_kind,
 	parent_child_spacing,
 	parent_padding,
 	widget_padding,
-	max_left_padding,
-	max_right_padding,
-	max_top_padding,
-	max_bottom_padding,
+	max_widget_padding,
 	child_spacing,
+	scissor_rect,
 	idle_color,
 	hovered_color,
 	active_color,
@@ -31677,6 +33953,9 @@ enum class widget_t {
 	smoothness,
 	radius,
 	border_thickness,
+	display_texture,
+	display_texture_uvmin,
+	display_texture_uvmax,
 	parent,
 	first_child,
 	last_child,
@@ -31687,7 +33966,10 @@ enum class widget_t {
 enum class ui_state_t {
 	widget_arena,
 	section_count,
+	frame_begun,
+	frame_ended,
 	input_focused,
+	left_mouse_clicked_this_frame,
 	last_hot_ID,
 	last_active_ID,
 	hot_widget,
@@ -31712,6 +33994,7 @@ enum class ui_state_t {
 	default_widget_border_thickness,
 	mouse_position,
 	mouse_delta,
+	max_widget_size,
 	active_widget_padding,
 	widget_item_count,
 	frame_count,
@@ -31809,12 +34092,15 @@ enum class vulkan_context_t {
 	descriptor_sets,
 	descriptor_count,
 	staging_buffers,
+	staging_infos,
 	next_staging_info,
 	staging_command_pool,
 	staging_fences,
 	image_samplers,
 	default_nearest_sampler,
 	default_linear_sampler,
+	default_nearest_sampler_info,
+	default_linear_sampler_info,
 }; // vulkan_context_t
 enum class vulkan_staging_info_t {
 	target_buffer,
@@ -31880,6 +34166,10 @@ enum class gpu_info_t {
 	features,
 	surface_capabilities,
 	queue_family_count,
+	valid_surface_formats,
+	valid_present_modes,
+	queue_family_properties,
+	extension_properties,
 }; // gpu_info_t
 enum class swapchain_info_t {
 	handle,
@@ -31917,20 +34207,21 @@ enum class vulkan_shader_t {
 }; // vulkan_shader_t
 enum class vulkan_image_t {
 	is_valid,
+	width,
+	height,
+	sampler,
 	info,
 	handle,
 	view,
-	sampler,
 	layout,
 	renderpass_initial_layout,
 	renderpass_final_layout,
 	internal_format,
 	aspect_mask,
 	allocation,
-	width,
-	height,
 }; // vulkan_image_t
 enum class vulkan_sampler_info_t {
+	is_valid,
 	min_filter,
 	mag_filter,
 	wrapu,
@@ -31966,28 +34257,65 @@ enum class vulkan_shader_binding_t {
 }; // vulkan_shader_binding_t
 }; // namespace MemberLists
 namespace ArgumentLists {
-enum class _dynarray_create_impl {
+enum class c_ticket_mutex_take_ticket {
+	mutex,
+}; // c_ticket_mutex_take_ticket
+enum class c_ticket_mutex_try_wait {
+	mutex,
+	ticket,
+}; // c_ticket_mutex_try_wait
+enum class c_ticket_mutex_wait {
+	mutex,
+	ticket,
+}; // c_ticket_mutex_wait
+enum class c_ticket_mutex_advance_ticket {
+	mutex,
+}; // c_ticket_mutex_advance_ticket
+enum class c_ticket_mutex_take_and_wait {
+	mutex,
+}; // c_ticket_mutex_take_and_wait
+enum class immediate_quad_ex {
+	command_list,
+	buffer,
+	position,
+	render_size,
+	render_color,
+	uv_min,
+	uv_max,
+	padding,
+	sdf_info,
+	padding0,
+	texture,
+}; // immediate_quad_ex
+enum class immediate_rect {
+	command_list,
+	buffer,
+	position,
+	render_size,
+	render_color,
+	uv_min,
+	uv_max,
+	padding,
+	sdf_info,
+	padding0,
+}; // immediate_rect
+enum class immediate_text {
+	command_list,
+	vertex_buffer,
+	asset_manager,
+	asset_handle,
+	render_string,
+	position,
+	text_color,
+	settings,
+	font_size,
+}; // immediate_text
+enum class immediate_put_data {
+	buffer,
+	data,
 	element_size,
-}; // _dynarray_create_impl
-enum class _dynarray_destroy_impl {
-	array,
-}; // _dynarray_destroy_impl
-enum class _dynarray_grow_impl {
-	array,
-	element_size,
-	new_capacity,
-}; // _dynarray_grow_impl
-enum class _dynarray_insert_impl {
-	array,
-	element,
-	element_size,
-	index,
-}; // _dynarray_insert_impl
-enum class _dynarray_remove_impl {
-	array,
-	element_size,
-	index,
-}; // _dynarray_remove_impl
+	element_count,
+}; // immediate_put_data
 enum class visit_files_pfn_t {
 	visit_file_data,
 	user_data,
@@ -32078,6 +34406,12 @@ enum class c_directory_visit {
 	filepath,
 	visit_file_data,
 }; // c_directory_visit
+enum class c_directory_get_file_count {
+	arena,
+	filepath,
+	recursive,
+	file_ext,
+}; // c_directory_get_file_count
 enum class file_watcher_callback_pfn_t {
 	watcher,
 	change,
@@ -32111,6 +34445,9 @@ enum class c_file_watcher_add_change_event {
 enum class c_file_watcher_emit_changes {
 	watcher,
 }; // c_file_watcher_emit_changes
+enum class c_file_watcher_process_changes {
+	watcher,
+}; // c_file_watcher_process_changes
 enum class c_hash_table_allocate_fn_t {
 	allocator,
 	allocation_size,
@@ -32384,23 +34721,6 @@ enum class c_string_builder_flush_to_file {
 	file,
 	builder,
 }; // c_string_builder_flush_to_file
-enum class c_ticket_mutex_take_ticket {
-	mutex,
-}; // c_ticket_mutex_take_ticket
-enum class c_ticket_mutex_try_wait {
-	mutex,
-	ticket,
-}; // c_ticket_mutex_try_wait
-enum class c_ticket_mutex_wait {
-	mutex,
-	ticket,
-}; // c_ticket_mutex_wait
-enum class c_ticket_mutex_advance_ticket {
-	mutex,
-}; // c_ticket_mutex_advance_ticket
-enum class c_ticket_mutex_take_and_wait {
-	mutex,
-}; // c_ticket_mutex_take_and_wait
 enum class work_order_fn {
 	data,
 }; // work_order_fn
@@ -32580,7 +34900,6 @@ enum class sys_file_watcher_issue_check {
 }; // sys_file_watcher_issue_check
 enum class sys_file_watcher_process_changes {
 	watcher,
-	changed,
 }; // sys_file_watcher_process_changes
 enum class sys_semaphore_create {
 	initial_thread_count,
@@ -32600,9 +34919,6 @@ enum class sys_semaphore_release {
 enum class sys_semaphore_destroy {
 	semaphore,
 }; // sys_semaphore_destroy
-enum class thread_proc_t {
-	user_data,
-}; // thread_proc_t
 enum class sys_thread_create {
 	proc,
 	user_data,
@@ -32632,48 +34948,6 @@ enum class sys_create_process {
 enum class sys_wait_for_process {
 	process,
 }; // sys_wait_for_process
-enum class immediate_quad_ex {
-	command_list,
-	buffer,
-	position,
-	render_size,
-	render_color,
-	uv_min,
-	uv_max,
-	padding,
-	sdf_info,
-	padding0,
-	texture,
-}; // immediate_quad_ex
-enum class immediate_rect {
-	command_list,
-	buffer,
-	position,
-	render_size,
-	render_color,
-	uv_min,
-	uv_max,
-	padding,
-	sdf_info,
-	padding0,
-}; // immediate_rect
-enum class immediate_text {
-	command_list,
-	vertex_buffer,
-	asset_manager,
-	asset_handle,
-	render_string,
-	position,
-	text_color,
-	settings,
-	font_size,
-}; // immediate_text
-enum class immediate_put_data {
-	buffer,
-	data,
-	element_size,
-	element_count,
-}; // immediate_put_data
 enum class s_renderer_image_create {
 	render_state,
 	image_create_info,
@@ -32689,9 +34963,6 @@ enum class s_renderer_image_update_data {
 	renderer_state,
 	image,
 }; // s_renderer_image_update_data
-enum class sys_work_queue_entry_proc {
-	lpParam,
-}; // sys_work_queue_entry_proc
 enum class FT_ROUND {
 	X,
 }; // FT_ROUND
@@ -32708,10 +34979,21 @@ enum class s_asset_manager_queue_asset_load {
 	asset_manager,
 	slot,
 }; // s_asset_manager_queue_asset_load
+enum class s_UTF32_convert_to_UTF8 {
+	buffer,
+	character,
+}; // s_UTF32_convert_to_UTF8
+enum class s_UTF8_convert_UTF32 {
+	character,
+}; // s_UTF8_convert_UTF32
 enum class s_asset_manager_load_asset_file {
 	asset_manager,
 	filepath,
 }; // s_asset_manager_load_asset_file
+enum class s_asset_manager_signal_asset_file_reload {
+	asset_manager,
+	filename,
+}; // s_asset_manager_signal_asset_file_reload
 enum class s_asset_manager_acquire_asset_handle {
 	asset_manager,
 	name,
@@ -32932,6 +35214,11 @@ enum class s_renderer_is_texture_bound {
 	command_list,
 	texture,
 }; // s_renderer_is_texture_bound
+enum class s_renderer_set_texture_filter_mode {
+	render_state,
+	texture,
+	filter_mode,
+}; // s_renderer_set_texture_filter_mode
 enum class s_renderer_find_texture_index {
 	command_list,
 	ID,
@@ -33087,6 +35374,9 @@ enum class backend_image_destroy {
 enum class backend_image_update_contents {
 	image,
 }; // backend_image_update_contents
+enum class backend_acquire_image_sampler {
+	image,
+}; // backend_acquire_image_sampler
 enum class backend_shader_create {
 	shader,
 	shader_source,
@@ -33104,6 +35394,9 @@ enum class ui_state_init {
 enum class ui_state_update_widget_state {
 	ui_state,
 }; // ui_state_update_widget_state
+enum class ui_state_maybe_eat_inputs {
+	ui_state,
+}; // ui_state_maybe_eat_inputs
 enum class ui_state_render_widgets {
 	ui_state,
 	command_list,
@@ -33175,10 +35468,22 @@ enum class ui_widget_panel {
 	ui_state,
 	widget_name,
 	position,
+	minimum_render_size,
 	child_spacing,
 	padding,
 	background_color,
+	additional_flags,
 }; // ui_widget_panel
+enum class ui_widget_draggable_panel {
+	ui_state,
+	widget_name,
+	position,
+	minimum_render_size,
+	child_spacing,
+	padding,
+	background_color,
+	additional_flags,
+}; // ui_widget_draggable_panel
 enum class ui_widget_sized_button {
 	ui_state,
 	widget_name,
@@ -33204,25 +35509,36 @@ enum class ui_widget_spacer {
 	ui_state,
 	widget_name,
 	spacing_size,
+	size_kind,
 }; // ui_widget_spacer
 enum class ui_widget_rectangle {
 	ui_state,
 	widget_name,
 	size,
+	size_kind,
 }; // ui_widget_rectangle
 enum class ui_widget_divider {
 	ui_state,
 	widget_name,
 	size,
+	size_kind,
 }; // ui_widget_divider
-enum class ui_widget_draggable_panel {
+enum class ui_widget_textbox {
 	ui_state,
 	widget_name,
-	position,
-	child_spacing,
-	padding,
-	background_color,
-}; // ui_widget_draggable_panel
+	widget_text_content,
+	size,
+}; // ui_widget_textbox
+enum class ui_widget_texture {
+	ui_state,
+	widget_name,
+	size,
+	texture,
+	uv_min,
+	uv_max,
+	size_kind,
+	additional_flags,
+}; // ui_widget_texture
 enum class ui_state_begin_row {
 	ui_state,
 	parent,
@@ -33496,6 +35812,10 @@ enum class vk_get_image_final_layout_from_usage {
 	usage,
 	format,
 }; // vk_get_image_final_layout_from_usage
+enum class vk_backend_get_sampler {
+	vulkan_context,
+	sampler_info,
+}; // vk_backend_get_sampler
 enum class vk_backend_shader_create_spirv_reflect {
 	vulkan_context,
 	shader_source,
@@ -33663,6 +35983,95 @@ get_member(const type_info_struct_t *type_info, const char *member_name)
     return(result);
 }
 
+#ifdef C_STRING_H
+ATHENA_API const type_info_member_t*
+get_member(const type_info_t *type_info, string_t member_name) 
+{
+    const type_info_member_t *result = nullptr;
+    if(member_name.count > 0)
+    {
+        const type_info_struct_t *structure_info = (const type_info_struct_t*)type_info;
+        for(unsigned int member_index = 0;
+            member_index < structure_info->member_count;
+            ++member_index)
+        {
+            const type_info_member_t *member = structure_info->members + member_index;
+
+            int member_length = strlen(member->member_name);
+            if(member_length != member_name.count) continue;
+
+            if(c_string_compare(member_name, STR(member->type_info->type_name)))
+            {
+                result = member;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+
+ATHENA_API const type_info_member_t*
+get_member(const type_info_struct_t *structure_info, string_t member_name) 
+{
+    const type_info_member_t *result = nullptr;
+    if(member_name.count > 0)
+    {
+        for(unsigned int member_index = 0;
+            member_index < structure_info->member_count;
+            ++member_index)
+        {
+            const type_info_member_t *member = structure_info->members + member_index;
+
+            int member_length = strlen(member->member_name);
+            if(member_length != member_name.count) continue;
+
+            if(c_string_compare(member_name, STR(member->type_info->type_name)))
+            {
+                result = member;
+                break;
+            }
+        }
+    }
+
+    return(result);
+}
+#endif
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_member(const type_info_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+
+    Assert(info->metatype == ATHENA_METATYPE_STRUCT);
+    const type_info_struct_t *struct_info = Athena::as_structure(info);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= struct_info->member_count)
+    {
+        result = (struct_info->members + true_index);
+    }
+
+    return(result);
+}
+
+template <class T>
+ATHENA_API const type_info_member_t*
+get_member(const type_info_struct_t *info, T index)
+{
+    const type_info_member_t *result = nullptr;
+    Assert(info->type_info.metatype == ATHENA_METATYPE_STRUCT);
+
+    const unsigned int true_index = (static_cast<const unsigned int>(index));
+    if(true_index <= info->member_count)
+    {
+        result = (info->members + true_index);
+    }
+
+    return(result);
+}
+
 ATHENA_API const type_info_member_t*
 get_argument(const type_info_t *info, const char *name)
 {
@@ -33717,40 +36126,60 @@ get_argument(const type_info_procedure_t *info, const char *name)
 
     return(result);
 }
-
-template <class T>
+#ifdef C_STRING_H
 ATHENA_API const type_info_member_t*
-get_member(const type_info_t *info, T index)
+get_argument(const type_info_t *info, string_t name)
 {
     const type_info_member_t *result = nullptr;
-
-    Assert(info->metatype == ATHENA_METATYPE_STRUCT);
-    const type_info_struct_t *struct_info = Athena::as_structure(info);
-
-    const unsigned int true_index = (static_cast<const unsigned int>(index));
-    if(true_index <= struct_info->member_count)
+    if(name.count > 0)
     {
-        result = (struct_info->members + true_index);
+        const type_info_procedure_t *proc_info = Athena::as_procedure(info);
+        for(unsigned int argument_index = 0;
+            argument_index < proc_info->argument_count;
+            ++argument_index)
+        {
+            const type_info_member_t *argument = proc_info->arguments + argument_index;
+
+            int member_length = strlen(argument->member_name);
+            if(member_length != name.count) continue;
+
+            if(c_string_compare(name, STR(argument->type_info->type_name)))
+            {
+                result = argument;
+                break;
+            }
+        }
     }
 
     return(result);
 }
 
-template <class T>
 ATHENA_API const type_info_member_t*
-get_member(const type_info_struct_t *info, T index)
+get_argument(const type_info_procedure_t *proc_info, string_t name)
 {
     const type_info_member_t *result = nullptr;
-    Assert(info->type_info.metatype == ATHENA_METATYPE_STRUCT);
-
-    const unsigned int true_index = (static_cast<const unsigned int>(index));
-    if(true_index <= info->member_count)
+    if(name.count > 0)
     {
-        result = (info->members + true_index);
+        for(unsigned int argument_index = 0;
+            argument_index < proc_info->argument_count;
+            ++argument_index)
+        {
+            const type_info_member_t *argument = proc_info->arguments + argument_index;
+
+            int member_length = strlen(argument->member_name);
+            if(member_length != name.count) continue;
+
+            if(c_string_compare(name, STR(argument->type_info->type_name)))
+            {
+                result = argument;
+                break;
+            }
+        }
     }
 
     return(result);
 }
+#endif
 
 template <class T>
 ATHENA_API const type_info_member_t*

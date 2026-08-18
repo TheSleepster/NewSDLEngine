@@ -278,7 +278,7 @@ vk_backend_check_physical_device_support(gpu_info_t *info)
         ++required_index)
     {
         for(u32 gpu_ext_index = 0;
-            gpu_ext_index < c_dynarray_count(info->extension_properties);
+            gpu_ext_index < info->extension_properties.count;
             ++gpu_ext_index)
         {
             string_t required_extension = STR(g_device_extensions[required_index]);
@@ -324,28 +324,31 @@ vk_backend_create_instance(vulkan_context_t *vulkan_context)
         log_error("We have failed to get the SDL_Vulkan instance extensions... Error: '%s'\n", SDL_GetError());
         SDL_Quit();
     }
+
     platform_extension_count += 1;
-    DynArray_t(char*) extensions = c_dynarray_create(char*);
-    extensions = c_dynarray_reserve(extensions, platform_extension_count + 2);
+    dynarray_t<char*> extensions = {};
+    c_dynarray_reserve(&extensions, platform_extension_count + 2);
 
     // NOTE(Sleepster): DEBUG LAYERS 
     extensions[0] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
-    memcpy((byte*)extensions + (sizeof(char *)), SDL_extensions, (platform_extension_count - 1) * sizeof(char *));
+    memcpy((byte*)extensions.items + (sizeof(char *)), SDL_extensions, (platform_extension_count - 1) * sizeof(char *));
 
     const char *layer = "VK_LAYER_KHRONOS_validation\0";
-    DynArray_t(char*) validation_layers = c_dynarray_create(char*);
-    c_dynarray_push(validation_layers, layer);
+    dynarray_t<const char*> validation_layers = {};
+    c_dynarray_add(&validation_layers, &layer);
 
     u32 total_validation_layers = 0;
     vkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, 0));
 
-    DynArray_t(VkLayerProperties) found_validation_layers = c_dynarray_create(VkLayerProperties);
-    found_validation_layers = c_dynarray_reserve(found_validation_layers, total_validation_layers);
+    dynarray_t<VkLayerProperties> found_validation_layers = {};
+    c_dynarray_reserve(&found_validation_layers, total_validation_layers);
 
-    vkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, found_validation_layers));
-    c_dynarray_for(validation_layers, layer_index)
+    vkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, found_validation_layers.items));
+    for(u32 layer_index = 0;
+        layer_index < validation_layers.used;
+        ++layer_index)
     {
-        const char *layer_to_find = c_dynarray_get_value(validation_layers, layer_index);
+        const char *layer_to_find = validation_layers[layer_index];
         log_info("Searching for Vulkan validation layer: '%s'\n", layer_to_find);
 
         bool8 found = false;
@@ -369,11 +372,15 @@ vk_backend_create_instance(vulkan_context_t *vulkan_context)
         }
     }
 
+    defer(c_dynarray_free(&extensions));
+    defer(c_dynarray_free(&validation_layers));
+    defer(c_dynarray_free(&found_validation_layers));
+
     VkInstanceCreateInfo instance_info    = {};
     instance_info.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    instance_info.ppEnabledExtensionNames = extensions;
+    instance_info.ppEnabledExtensionNames = extensions.items;
     instance_info.enabledExtensionCount   = platform_extension_count;
-    instance_info.ppEnabledLayerNames     = validation_layers;
+    instance_info.ppEnabledLayerNames     = validation_layers.items;
     instance_info.enabledLayerCount       = 1;
     instance_info.pApplicationInfo        = &app_info;
 
@@ -397,12 +404,7 @@ vk_backend_create_instance(vulkan_context_t *vulkan_context)
 
 
     PFN_vkCreateDebugUtilsMessengerEXT vk_debug_func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vulkan_context->instance, "vkCreateDebugUtilsMessengerEXT");
-
     vkAssert(vk_debug_func(vulkan_context->instance, &vulkan_debug_info, vulkan_context->cpu_allocation_callbacks, &vulkan_context->debug_messenger));
-
-    c_dynarray_destroy(extensions);
-    c_dynarray_destroy(validation_layers);
-    c_dynarray_destroy(found_validation_layers);
 }
 
 /*
@@ -438,11 +440,10 @@ vk_backend_select_physical_device(vulkan_context_t *vulkan_context)
     VkPhysicalDevice *devices = c_arena_push_array(&vulkan_context->initialization_arena, VkPhysicalDevice, physical_device_counter);
     vkAssert(vkEnumeratePhysicalDevices(vulkan_context->instance, &physical_device_counter, devices));
 
-    DynArray_t(gpu_info_t) gpus;
-    gpus = c_dynarray_create(gpu_info_t);
-    gpus = c_dynarray_reserve(gpus, physical_device_counter);
+    dynarray_t<gpu_info_t> gpus;
+    c_dynarray_reserve(&gpus, physical_device_counter);
 
-    defer(c_dynarray_destroy(gpus));
+    defer(c_dynarray_free(&gpus));
 
     for(u32 device_index = 0;
         device_index < physical_device_counter;
@@ -451,42 +452,40 @@ vk_backend_select_physical_device(vulkan_context_t *vulkan_context)
         gpu_info_t *gpu_info = gpus + device_index;
         gpu_info->device     = devices[device_index];
 
-        gpu_info->queue_family_properties = c_dynarray_create(VkQueueFamilyProperties);
-        gpu_info->extension_properties    = c_dynarray_create(VkExtensionProperties);
-        gpu_info->valid_surface_formats   = c_dynarray_create(VkSurfaceFormatKHR);
-        gpu_info->valid_present_modes     = c_dynarray_create(VkPresentModeKHR);
+        // NOTE(Sleepster): Get queues 
         {
             u32 num_queues;
             vkGetPhysicalDeviceQueueFamilyProperties(gpu_info->device, &num_queues, null);
             Expect(num_queues > 0, "vkGetPhysicalDeviceQueueFamilyProperties returned a num_queues of 0...\n");
 
-            gpu_info->queue_family_properties = c_dynarray_reserve(gpu_info->queue_family_properties, num_queues);
+            c_dynarray_reserve(&gpu_info->queue_family_properties, num_queues);
 
-            vkGetPhysicalDeviceQueueFamilyProperties(gpu_info->device, &num_queues, gpu_info->queue_family_properties);
+            vkGetPhysicalDeviceQueueFamilyProperties(gpu_info->device, &num_queues, gpu_info->queue_family_properties.items);
             Expect(num_queues > 0, "vkGetPhysicalDeviceQueueFamilyProperties returned a num_queues of 0...\n");
         }
 
+        // NOTE(Sleepster): Get GPU extensions 
         {
             u32 num_extensions;
             vkEnumerateDeviceExtensionProperties(gpu_info->device, null, &num_extensions, null);
             Expect(num_extensions > 0, "vkEnumerateDeviceExtensionProperties returned a num_extensions of 0...\n");
 
-            gpu_info->extension_properties = c_dynarray_reserve(gpu_info->extension_properties, num_extensions);
+            c_dynarray_reserve(&gpu_info->extension_properties, num_extensions);
 
-            vkEnumerateDeviceExtensionProperties(gpu_info->device, null, &num_extensions, gpu_info->extension_properties);
+            vkEnumerateDeviceExtensionProperties(gpu_info->device, null, &num_extensions, gpu_info->extension_properties.items);
             Expect(num_extensions > 0, "vkEnumerateDeviceExtensionProperties returned a num_extensions of 0...\n");
         }
 
+        // NOTE(Sleepster): Get surface capabilities 
         vkAssert(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(gpu_info->device, vulkan_context->render_surface, &gpu_info->surface_capabilities));
-
         {
             u32 num_formats;
             vkGetPhysicalDeviceSurfaceFormatsKHR(gpu_info->device, vulkan_context->render_surface, &num_formats, 0);
             Expect(num_formats > 0, "vkGetPhysicalDeviceSurfaceFormatsKHR returned a num_formats of 0...\n");
 
-            gpu_info->valid_surface_formats = c_dynarray_reserve(gpu_info->valid_surface_formats, num_formats);
+            c_dynarray_reserve(&gpu_info->valid_surface_formats, num_formats);
 
-            vkGetPhysicalDeviceSurfaceFormatsKHR(gpu_info->device, vulkan_context->render_surface, &num_formats, gpu_info->valid_surface_formats);
+            vkGetPhysicalDeviceSurfaceFormatsKHR(gpu_info->device, vulkan_context->render_surface, &num_formats, gpu_info->valid_surface_formats.items);
             Expect(num_formats > 0, "vkGetPhysicalDeviceSurfaceFormatsKHR returned a num_formats of 0...\n");
         }
 
@@ -495,9 +494,9 @@ vk_backend_select_physical_device(vulkan_context_t *vulkan_context)
             vkGetPhysicalDeviceSurfacePresentModesKHR(gpu_info->device, vulkan_context->render_surface, &num_present_modes, null);
             Expect(num_present_modes > 0, "vkGetPhysicalDeviceSurfacePresentModesKHR returned a num_present_modes of 0...\n");
 
-            gpu_info->valid_present_modes = c_dynarray_reserve(gpu_info->valid_present_modes, num_present_modes);
+            c_dynarray_reserve(&gpu_info->valid_present_modes, num_present_modes);
 
-            vkGetPhysicalDeviceSurfacePresentModesKHR(gpu_info->device, vulkan_context->render_surface, &num_present_modes, gpu_info->valid_present_modes);
+            vkGetPhysicalDeviceSurfacePresentModesKHR(gpu_info->device, vulkan_context->render_surface, &num_present_modes, gpu_info->valid_present_modes.items);
             Expect(num_present_modes > 0, "vkGetPhysicalDeviceSurfacePresentModesKHR returned a num_present_modes of 0...\n");
         }
 
@@ -505,7 +504,7 @@ vk_backend_select_physical_device(vulkan_context_t *vulkan_context)
         vkGetPhysicalDeviceProperties(gpu_info->device, &gpu_info->properties);
         vkGetPhysicalDeviceFeatures(gpu_info->device, &gpu_info->features);
 
-        gpu_info->queue_family_count = c_dynarray_count(gpu_info->queue_family_properties);
+        gpu_info->queue_family_count = gpu_info->queue_family_properties.count;
     }
 
     // NOTE(Sleepster): Select the best fit device 
@@ -527,10 +526,10 @@ vk_backend_select_physical_device(vulkan_context_t *vulkan_context)
 
         if(vk_backend_check_physical_device_support(gpu))
         {
-            if(c_dynarray_count(gpu->valid_present_modes)   == 0) continue;
-            if(c_dynarray_count(gpu->valid_surface_formats) == 0) continue;
+            if(gpu->valid_present_modes.count   == 0) continue;
+            if(gpu->valid_surface_formats.count == 0) continue;
 
-            u32 family_count = c_dynarray_count(gpu->queue_family_properties);
+            u32 family_count = gpu->queue_family_properties.count;
             for(u32 queue_family_index = 0; 
                 queue_family_index < family_count; 
                 ++queue_family_index)
@@ -639,10 +638,8 @@ vk_backend_create_logical_device_and_queues
 void
 vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
 {
-    DynArray_t(VkDeviceQueueCreateInfo) queue_create_infos;
-    queue_create_infos = c_dynarray_create(VkDeviceQueueCreateInfo);
-
-    defer(c_dynarray_destroy(queue_create_infos));
+    dynarray_t<VkDeviceQueueCreateInfo> queue_create_infos = {};
+    defer(c_dynarray_free(&queue_create_infos));
 
     bool8 present_queue_shares_graphics_queue  = vulkan_context->graphics_queue_family_idx  == vulkan_context->present_queue_family_idx;
     bool8 transfer_queue_shares_graphics_queue = vulkan_context->graphics_queue_family_idx  == vulkan_context->transfer_queue_family_idx;
@@ -685,7 +682,7 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
         queue_info.queueCount = 1;
         queue_info.pQueuePriorities = &priority;
 
-        c_dynarray_push(queue_create_infos, queue_info);
+        c_dynarray_add(&queue_create_infos, &queue_info);
     }
 
 
@@ -706,7 +703,7 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
     device_create_info.sType                   =  VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     device_create_info.pNext                   = &device_11_features;
     device_create_info.queueCreateInfoCount    =  index_count;
-    device_create_info.pQueueCreateInfos       =  queue_create_infos;
+    device_create_info.pQueueCreateInfos       =  queue_create_infos.items;
     device_create_info.pEnabledFeatures        = &device_features;
     device_create_info.enabledExtensionCount   =  ArrayCount(g_device_extensions);
     device_create_info.ppEnabledExtensionNames =  g_device_extensions;
@@ -827,11 +824,11 @@ vk_backend_choose_surface_format
 */
 
 VkSurfaceFormatKHR
-vk_backend_choose_surface_format(DynArray_t(VkSurfaceFormatKHR) formats)
+vk_backend_choose_surface_format(dynarray_t<VkSurfaceFormatKHR> formats)
 {
     VkSurfaceFormatKHR result = {};
 
-    if(c_dynarray_count(formats) == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
+    if(formats.count == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
     {
         log_warning("No valid formats found... Defaulting to Normalized SRGB");
         result.format     = VK_FORMAT_B8G8R8A8_UNORM;
@@ -840,7 +837,7 @@ vk_backend_choose_surface_format(DynArray_t(VkSurfaceFormatKHR) formats)
     else
     {
         for(u32 format_index =0; 
-            format_index < c_dynarray_count(formats);
+            format_index < formats.count;
             ++format_index) 
         {
             VkSurfaceFormatKHR format = formats[format_index];
@@ -863,14 +860,14 @@ vk_backend_choose_present_mode
 */
 
 VkPresentModeKHR
-vk_backend_choose_present_mode(DynArray_t(VkPresentModeKHR) present_modes)
+vk_backend_choose_present_mode(dynarray_t<VkPresentModeKHR> present_modes)
 {
     // NOTE(Sleepster): We prefer mailbox, but if it doesn't exist of this device,
     // just use immediate mode.
     VkPresentModeKHR result = VK_PRESENT_MODE_FIFO_KHR;
     for(u32 present_index = 0;
-        present_index < c_dynarray_count(present_modes);
-        ++present_modes)
+        present_index < present_modes.count;
+        ++present_index)
     {
         VkPresentModeKHR mode = present_modes[present_index];
         if(mode == VK_PRESENT_MODE_MAILBOX_KHR)
@@ -2495,7 +2492,9 @@ vk_backend_bind_command_list_vertex_buffers(VkCommandBuffer *render_command_buff
 {
     VkBuffer *handles     = c_arena_push_array(&global_context->temporary_arena, VkBuffer,     command_list->vertex_buffer_count);
     VkDeviceSize *offsets = c_arena_push_array(&global_context->temporary_arena, VkDeviceSize, command_list->vertex_buffer_count);
-    c_dynarray_for(command_list->active_vertex_buffers, buffer_index)
+    for(u32 buffer_index = 0;
+        buffer_index < command_list->active_vertex_buffers.used;
+        ++buffer_index)
     {
         render_buffer_t *buffer = command_list->active_vertex_buffers[buffer_index];
         handles[buffer_index] = buffer->buffer.handle;
@@ -2757,7 +2756,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     render_command_bind_vertex_buffer_t *cmd = (render_command_bind_vertex_buffer_t*)command->data;
                     Assert(cmd->buffer->type == RenderBufferType_VertexBuffer);
 
-                    c_dynarray_push(command_list->active_vertex_buffers, cmd->buffer);
+                    c_dynarray_add(&command_list->active_vertex_buffers, &cmd->buffer);
                     ++command_list->vertex_buffer_count;
 
                     // TODO(Sleepster): Maybe this number should be stored and modified on an individual buffer basis
@@ -2919,7 +2918,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                 }break;
                 case RCT_Draw:
                 {
-                    Assert(command_list->active_vertex_buffers);
+                    Assert(command_list->active_vertex_buffers.items);
                     Assert(command_list->active_shader_program);
                     Assert(command_list->active_viewport_command);
                     Assert(command_list->active_scissor_command);
@@ -2940,12 +2939,12 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     command_list->image_count = 0;
                     command_list->bound_image_count = 0;
 
-                    c_dynarray_clear(&command_list->active_vertex_buffers);
+                    c_dynarray_reset(&command_list->active_vertex_buffers);
                     command_list->vertex_buffer_count = 0;
                 }break;
                 case RCT_DrawIndexed:
                 {
-                    Assert(command_list->active_vertex_buffers);
+                    Assert(command_list->active_vertex_buffers.items);
                     Assert(command_list->active_index_buffer);
                     Assert(command_list->active_shader_program);
                     Assert(command_list->active_viewport_command);
@@ -2970,7 +2969,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     command_list->image_count = 0;
                     command_list->bound_image_count = 0;
 
-                    c_dynarray_clear(&command_list->active_vertex_buffers);
+                    c_dynarray_reset(&command_list->active_vertex_buffers);
                     command_list->vertex_buffer_count = 0;
                 }break;
                 case RCT_BlitImage:

@@ -1,7 +1,7 @@
 #if !defined(C_DYNARRAY_H)
 /* ========================================================================
    $File: c_dynarray.h $
-   $Date: November 30 2025 08:02 pm $
+   $Date: August 17 2026 03:11 pm $
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
@@ -9,274 +9,346 @@
 #define C_DYNARRAY_H
 #include <c_base.h>
 #include <c_types.h>
+#include <string.h>
 
-#include <p_platform_data.h>
+/////////////////////////
+// STATIC ARRAY
+/////////////////////////
+//
+// TODO(Sleepster): Custom allocator overriding 
+//
+//  Perhaps just achieve this with variables like:
+//
+//  static array_allocate_impl_t current_array_allocator;
+//
+//  This way you can just set the allocator yourself with a function like:
+//
+//  void push_array_allocator();
+//  void pop_array_allocator();
 
-#ifdef DYNARRAY_IMPLEMENTATION
-# define DYNARRAY_API
-#else 
-# define DYNARRAY_API extern
-#endif
+#ifdef C_DYNARRAY_IMPLEMENTATION
+typedef void *c_array_allocate_impl_t(void *allocator, u32 allocation_size);
+typedef void *c_array_realloc_impl_t(void *allocator, void *memory, u32 new_size);
+typedef void  c_array_free_impl_t(void *allocator, void *memory);
 
-#define DYNARRAY_HEADER_DEBUG_ID (0xC0FFEE)
-
-// TODO(Sleepster): 
-// - [ ] Replace this with an STB style header file
-// - [ ] Allow the user to specify custom allocate/free/resize functions
-// - [ ] Allow the user to assign an "on_resize" callback
-
-typedef struct dynarray_header 
-{
-    u32   flags;
-    u32   header_id;
-    u32   capacity;
-    u32   element_size;
-    u32   indices_used;
-    u32   total_allocated_bytes;
-    u32   __padding1;
-    u32   __padding2;
-}dynarray_header_t;
-
-StaticAssert(sizeof(dynarray_header_t) % 16 == 0, "Dynamic Array header must be 16 byte aligned");
-
-#define DYNARRAY_INITIAL_SIZE  (4)
-#define DYNARRAY_GROWTH_FACTOR (2)
-
-DYNARRAY_API void* _dynarray_create_impl(u32 element_size);
-DYNARRAY_API void  _dynarray_destroy_impl(void **array);
-DYNARRAY_API void  _dynarray_grow_impl(void **array, u32 element_size, u32 new_capacity);
-DYNARRAY_API void  _dynarray_insert_impl(void **array, void *element, u32 element_size, u32 index);
-DYNARRAY_API void  _dynarray_remove_impl(void **array, u32 element_size, u32 index);
-
-#define DynArray_t(type) TypeOf((type*)null)
-
-#define c_dynarray_header(d_array_ptr) \
-    ((dynarray_header_t*)(d_array_ptr ? ((byte*)(d_array_ptr) - sizeof(dynarray_header_t)) : null))
-
-#define c_dynarray_create(type) ({              \
-    (type*)_dynarray_create_impl(sizeof(type)); \
- })
-
-#define c_dynarray_destroy(d_array) ({        \
-    _dynarray_destroy_impl((void**)&d_array); \
-    d_array = null;                           \
-                                              \
-    d_array;                                  \
-})
-
-#define c_dynarray_reserve(d_array, to_reserve) ({                                \
-    TypeOf(d_array)   *p_array = &(d_array);                                      \
-    dynarray_header_t *header  = (dynarray_header_t *)c_dynarray_header(d_array); \
-    Expect(header, "D_array header is invalid for macro reserve()...\n");         \
-    if(header->capacity < to_reserve) {                                           \
-        u32 new_capacity = Max(header->capacity * 2, to_reserve);                 \
-        _dynarray_grow_impl((void**)p_array, sizeof(*d_array), new_capacity);     \
-        header   = c_dynarray_header(*p_array);                                   \
-    }                                                                             \
-                                                                                  \
-    *p_array;                                                                     \
-})
-
-#define c_dynarray_add_element(d_array, element, index) ({                                                 \
-    TypeOf(d_array) *p_first = &(d_array);                                                                 \
-    dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(d_array);                            \
-    if(header == null) {                                                                                   \
-        *p_first = (TypeOf(d_array))_dynarray_create_impl(sizeof(*d_array));                               \
-        header = (dynarray_header_t*)c_dynarray_header(*p_first);                                          \
-    }                                                                                                      \
-                                                                                                           \
-    if(header->indices_used + 1 >= header->capacity) {                                                     \
-        _dynarray_grow_impl((void**)p_first, sizeof(*d_array), header->capacity * DYNARRAY_GROWTH_FACTOR); \
-        header = (dynarray_header_t*)c_dynarray_header(*p_first);                                          \
-    }                                                                                                      \
-    Expect(header, "Header for macro add_element is invalid...\n");                                        \
-    Expect(index < header->capacity, "index is >= capacity in add\n");                                     \
-    _dynarray_insert_impl((void**)p_first, (void*)&(element), sizeof(*d_array), index);                    \
-    header->indices_used += 1;                                                                             \
-                                                                                                           \
-    p_first;                                                                                               \
-})
-
-#define c_dynarray_remove_element(d_array, index) ({                    \
-    TypeOf(d_array) *p_first = &(d_array);                              \
-    TypeOf(*(d_array)) value = c_dynarray_get_value(d_array, index);    \
-    _dynarray_remove_impl((void**)p_first, sizeof(d_array[0]), index);  \
-    value;                                                              \
-})
-
-#define c_dynarray_push(d_array, value) ({                                         \
-    TypeOf(d_array) *p_first = &(d_array);                                         \
-    dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header((d_array));  \
-    if(!header) {                                                                  \
-        *p_first = (TypeOf(d_array))_dynarray_create_impl(sizeof(*d_array));       \
-        header = (dynarray_header_t*)c_dynarray_header((d_array));                 \
-    }                                                                              \
-    u32 index = header->indices_used;                                              \
-    p_first = c_dynarray_add_element(d_array, value, index);                       \
-    p_first;                                                                       \
-})
-
-#define c_dynarray_pop(d_array) ({                                                                 \
-        dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(d_array);                \
-        Expect(header, "DArray header is invalid...\n");                                           \
-        TypeOf(*(d_array)) r_value = c_dynarray_remove_element(d_array, header->indices_used - 1); \
-                                                                                                   \
-        r_value;                                                                                   \
-})
-
-#define c_dynarray_get_value(d_array, index) ({                                 \
-    dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(d_array); \
-    TypeOf(*(d_array)) value = {};                                              \
-    Expect(header, "Invalid d_array header...\n");                              \
-    if(header && (index) < header->indices_used) {                              \
-        value = d_array[(index)];                                               \
-    }                                                                           \
-    value;                                                                      \
-})
-
-#define c_dynarray_get_ptr(d_array, index) ({                                   \
-    dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(d_array); \
-    TypeOf(*(d_array)) *value = {};                                             \
-    Expect(header, "Invalid d_array header...\n");                              \
-    if(header && (index) < header->indices_used) {                              \
-        value = d_array + (index);                                              \
-    }                                                                           \
-    value;                                                                      \
-})
-
-#define c_dynarray_count(d_array) ({ \
-    dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(d_array); \
-    Expect(header, "Invalid d_array header...\n");                              \
-    u32 count = header->capacity;                                               \
-                                                                                \
-    count;                                                                      \
-})
-
-#define c_dynarray_clear(d_array) ({                                            \
-    dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(d_array); \
-    Expect(header != null, "Invalid d_array header...\n");                      \
-    ZeroMemory(d_array, header->capacity * sizeof(*d_array));                   \
-    header->indices_used = 0;                                                   \
-})
-
-#define c_dynarray_copy(A, B) ({ \
-    StaticAssert(TypesSame(*(A), *(B)), "arrays are not of equal type");                      \
-    Expect(A, "First argument to c_dynarray_copy is invalid...\n")                            \
-    dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(A);                     \
-    if(!(B)) {                                                                                \
-        (B) = c_dynarray_create(TypeOf(*A));                                                  \
-        (B) = c_dynarray_reserve(B, header->capacity);                                        \
-    }                                                                                         \
-    Expect(B, "Second argument is still invalid...\n");                                       \
-    Expect(header != null, "Invalid d_array header...\n");                                    \
-    byte *A_data = (byte*)A - sizeof(dynarray_header_t);                                      \
-    byte *B_data = (byte*)B - sizeof(dynarray_header_t);                                      \
-    memcpy(B_data, A_data, (header->indices_used * sizeof(*A)) + sizeof(dynarray_header_t));  \
-})
-
-#define c_dynarray_for_impl(d_array, iterator_name, counter)                                          \
-    dynarray_header_t *Glue(header, counter) = (dynarray_header_t *)c_dynarray_header(d_array);       \
-    Expect(Glue(header, counter), "Header is invalid, cannot loop...\n");                             \
-    for(u32 iterator_name = 0; iterator_name < Glue(header, counter)->indices_used; ++iterator_name)
-
-#define c_dynarray_for(d_array, iterator_name) \
-    c_dynarray_for_impl(d_array, iterator_name, __COUNTER__)
-
-#ifdef DYNARRAY_IMPLEMENTATION
-
-DYNARRAY_API void*
-_dynarray_create_impl(u32 element_size)
+void*
+c_dynarray_default_allocate_impl(void *allocator, u32 allocation_size)
 {
     void *result = null;
-
-    u32 allocation_size = Align16((element_size * DYNARRAY_INITIAL_SIZE) + (sizeof(dynarray_header_t)));
     result = malloc(allocation_size);
     ZeroMemory(result, allocation_size);
-
-    dynarray_header_t *header = (dynarray_header_t*)result;
-    result = (byte*)result + sizeof(dynarray_header_t);
-
-    header->total_allocated_bytes = allocation_size;
-
-    header->header_id    = DYNARRAY_HEADER_DEBUG_ID;
-    header->capacity     = DYNARRAY_INITIAL_SIZE;
-    header->element_size = element_size;
 
     return(result);
 }
 
-DYNARRAY_API void
-_dynarray_grow_impl(void **array, u32 element_size, u32 new_capacity)
+void*
+c_dynarray_default_realloc_impl(void *allocator, void *memory, u32 new_size)
 {
-    void *base   = ((byte*)*array - sizeof(dynarray_header_t));
-    void *result = base;
+    void *result = null;
+    result = realloc(memory, new_size);
 
-    Expect(array != null, "Array is invalid...\n");
-
-    dynarray_header_t *header = c_dynarray_header(*array); 
-    u64 old_size = header->capacity * element_size;
-    u64 new_size = new_capacity     * element_size;
-
-    result = realloc(base, (element_size * new_capacity) + sizeof(dynarray_header_t));
-    ZeroMemory((byte*)result + sizeof(dynarray_header_t) + old_size, new_size - old_size);
-    
-    result = (byte*)result + sizeof(dynarray_header_t);
-    *array = result;
-
-    header = c_dynarray_header(result); 
-    header->capacity = new_capacity;
-    header->total_allocated_bytes = new_size;
-
-    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
-    Expect(new_capacity > DYNARRAY_INITIAL_SIZE, "new capacity is <= Initial\n");
+    return(result);
 }
 
-DYNARRAY_API void
-_dynarray_destroy_impl(void **array)
+void
+c_dynarray_default_free_impl(void *allocator, void *memory)
 {
-    Expect(array != null, "Array is invalid...\n");
+    free(memory);
+}
+#endif
+// TODO(Sleepster): Custom allocator overriding 
 
-    dynarray_header_t *header = c_dynarray_header(*array); 
-    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
+template <typename T, u32 capacity>
+struct array_t
+{
+    T    items[capacity];
+    u32  count = capacity;
 
-    void *array_data = (byte *)*array - sizeof(dynarray_header_t);
-    free(array_data);
+    T &operator[](u32 index);
+    T *operator+(u32 index);
 
-    *array = null;
+    // NOTE(Sleepster): Stupid C++ stuff 
+    T *begin() { return items; }
+    T *end()   { return items + count; }
+
+    const T *begin() const { return items; }
+    const T *end()   const { return items + count; }
+};
+
+template <typename T, u32 count>
+T&
+array_t<T, count>::operator[](u32 index)
+{
+    Expect(index < this->count, "Array bounds check failed... index was: '%u' while count is: '%u'...\n", index, this->count);
+    return(this->items[index]);
 }
 
-DYNARRAY_API void
-_dynarray_insert_impl(void **array, void *element, u32 element_size, u32 index)
+template <typename T, u32 count>
+T*
+array_t<T, count>::operator+(u32 index)
 {
-    Expect(array != null, "Array is invalid...\n");
-
-    dynarray_header_t *header = c_dynarray_header(*array); 
-    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
-
-    byte *index_data = (byte*)*array + (element_size * index);
-    memcpy(index_data, element, element_size);
+    Expect(index < this->count, "Array bounds check failed... index was: '%u' while count is: '%u'...\n", index, this->count);
+    return(this->items + index);
 }
 
-DYNARRAY_API void
-_dynarray_remove_impl(void **array, u32 element_size, u32 index)
+// NOTE(Sleepster): Right now, this creates a ton of "use after free" bugs. Hopefully with our own allocator that's not a problem. 
+template <typename T, u32 count>
+void
+c_array_resize(array_t<T, count> *array, u32 new_count)
 {
-    Expect(array != null, "Array header is invalid...\n");
+    array->items    = (T*)reallocarray(array->items, sizeof(T), new_count);
+    array->count = new_count;
+}
 
-    dynarray_header_t *header = c_dynarray_header(*array); 
-    Expect(header->header_id == DYNARRAY_HEADER_DEBUG_ID, "Header ID is invalid...\n");
-    Expect(index <= header->indices_used, "Index is > to that of the header->size");
+template <typename T, u32 count>
+void
+c_array_clear(array_t<T, count> *array)
+{
+    memset(array->items, 0, sizeof(T) * array->count);
+}
 
-    byte *array_data = (byte*)*array;
-    if(index < header->indices_used - 1) 
+template <typename T, u32 count>
+s32
+c_array_find(array_t<T, count> *array, T *element)
+{
+    s32 result = -1;
+    for(u32 index = 0;
+        index < array->used;
+        ++index)
     {
-        byte *to   = array_data + (element_size * index);
-        byte *from = array_data + (element_size * (index + 1));
-
-        usize bytes_to_write = (header->indices_used - index - 1) * element_size;
-        memmove(to, from, bytes_to_write);
+        T *found = array->items + index;
+        if(memcmp(found, element, sizeof(T)) == 0)
+        {
+            result = index;
+            break;
+        }
     }
-    header->indices_used -= 1;
+
+    return(result);
 }
 
-#endif // DYNARRAY_IMPLEMENTATION
+/////////////////////////
+// DYNAMIC ARRAY
+/////////////////////////
+
+template <typename T>
+struct dynarray_t
+{
+    T   *items;
+    u32  count;
+    u32  used;
+
+    T &operator[](u32 index);
+    T *operator+(u32 index);
+
+    // NOTE(Sleepster): Stupid C++ crap 
+    T *begin() { return items; }
+    T *end()   { return items + used; }
+
+    const T *begin() const { return items; }
+    const T *end()   const { return items + used; }
+};
+
+template <typename T>
+T&
+dynarray_t<T>::operator[](u32 index)
+{
+    Expect(index < this->count, "Array bounds check failed... index was: '%u' while count is: '%u'...\n", index, this->count);
+    return(this->items[index]);
+}
+
+template <typename T>
+T*
+dynarray_t<T>::operator+(u32 index)
+{
+    Expect(index < this->count, "Array bounds check failed... index was: '%u' while count is: '%u'...\n", index, this->count);
+    return(this->items + index);
+}
+
+template <typename T>
+void
+c_dynarray_reserve(dynarray_t<T> *array, u32 to_reserve)
+{
+    if(to_reserve > array->count)
+    {
+        array->count = to_reserve;
+        array->items = (T*)reallocarray(array->items, sizeof(T), array->count);
+        Assert(array->items);
+
+        memset(array->items, 0, sizeof(T) * array->count);
+    }
+}
+
+template <typename T>
+T*
+c_dynarray_add(dynarray_t<T> *array, T *element)
+{
+    T *result = null;
+    if((array->used + 1) > array->count)
+    {
+        u32 old_count = array->count;
+
+        u32 new_count = Max(5, array->count * 2);
+        T  *new_items    = (T*)realloc(array->items, sizeof(T) * new_count);
+
+        array->count = new_count;
+        array->items    = new_items;
+
+        Assert(array->items);
+        if(old_count > 0)
+        {
+            void *offset_ptr = (void*)(array->items + old_count);
+            u32 copy_size    = (sizeof(T) * (array->count - old_count));
+
+            memset(offset_ptr, 0, copy_size);
+        }
+    }
+
+    result = array->items + array->used; 
+    array->items[array->used++] = *element;
+
+    return(result);
+}
+
+template <typename T>
+void
+c_dynarray_remove(dynarray_t<T> *array, u32 index)
+{
+    Assert(index <= array->count);
+
+    for(u32 this_index = index;
+        this_index < (array->used - 1);
+        ++this_index)
+    {
+        array->items[this_index] = array->items[this_index + 1];
+    }
+
+    --array->used;
+}
+
+template <typename T>
+T
+c_dynarray_pop(dynarray_t<T> *array)
+{
+    Assert(array->used - 1 >= 0);
+
+    T result = array->items[array->used];
+    --array->used;
+
+    return(result);
+}
+
+template <typename T>
+T*
+c_dynarray_pop_ptr(dynarray_t<T> *array)
+{
+    Assert(array->used - 1 >= 0);
+
+    T *result = array->items + array->used;
+    --array->used;
+
+    return(result);
+}
+
+template <typename T>
+s32
+c_dynarray_find(dynarray_t<T> *array, T *element)
+{
+    s32 result = -1;
+    for(u32 index = 0;
+        index < array->used;
+        ++index)
+    {
+        T *found = array->items + index;
+        if(memcmp(found, element, sizeof(T)) == 0)
+        {
+            result = index;
+            break;
+        }
+    }
+
+    return(result);
+}
+
+template <typename T>
+bool8
+c_dynarray_add_if_unique(dynarray_t<T> *array, T *element, s32 *index_out = null)
+{
+    bool8 added = false;
+
+    s32 index = c_dynarray_find(array, element);
+    if(index == -1)
+    {
+        c_dynarray_add(array, element);
+        if(index_out)
+        {
+            *index_out = array->used - 1;
+        }
+
+        added = true;
+    }
+
+    return(added);
+}
+
+template <typename T>
+void
+c_dynarray_insert_at(dynarray_t<T> *array, T *element, u32 index)
+{
+    array->items[index] = *element;
+}
+
+template <typename T>
+T
+c_dynarray_get_at_index(dynarray_t<T> *array, u32 index)
+{
+    T result = array->items[index];
+    return(result);
+}
+
+template <typename T>
+T*
+c_dynarray_get_ptr_at_index(dynarray_t<T> *array, u32 index)
+{
+    T* result = array->items + index;
+    return(result);
+}
+
+template <typename T>
+void
+c_dynarray_reset(dynarray_t<T> *array)
+{
+    array->used = 0;
+    memset(array->items, 0, sizeof(T) * array->count);
+}
+
+template <typename T>
+void
+c_dynarray_copy(dynarray_t<T> *destination, dynarray_t<T> *source)
+{
+    Assert(source->items);
+    Assert(source->count);
+    if(!destination->items || destination->count != source->count)
+    {
+        destination->items = (T*)realloc(destination->items, Align(sizeof(T) * source->count, 32));
+        Assert(destination->items);
+    }
+
+    destination->count = source->count;
+    destination->used     = source->used;
+
+    memcpy(destination->items, source->items, sizeof(T) * destination->count);
+}
+
+template <typename T>
+void
+c_dynarray_free(dynarray_t<T> *array)
+{
+    array->used  = 0;
+    array->count = 0;
+
+    free(array->items);
+}
+
 #endif // C_DYNARRAY_H
+

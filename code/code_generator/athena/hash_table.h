@@ -95,7 +95,10 @@ hash_table_create(u32                         max_entries,
     result.allocator        = allocator;
     result.allocate_fn      = allocate;
     result.free_fn          = free;
-    result.items            = (hash_element_t<T>*)result.allocate_fn(result.allocator, sizeof(hash_element_t<T>) * max_entries);
+    result.items            = (hash_element_t<T>*)malloc(sizeof(hash_element_t<T>) * max_entries);
+
+    Assert(result.items);
+    memset(result.items, 0, sizeof(hash_element_t<T>) * max_entries);
 
     return(result);
 }
@@ -140,7 +143,7 @@ hash_table_add_element(hash_table_t<T> *table, T *new_element, string_t key)
     hash_element_t<T> *element = hash_table_get_hash_element(table, index, key_hash);
     if(element->raw_key_hash == 0)
     {
-        dynarray_add(&table->used_entries, &element);
+        c_dynarray_add(&table->used_entries, &element);
     }
 
     // NOTE(Sleepster): Copies the element 

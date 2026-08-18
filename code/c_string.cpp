@@ -279,10 +279,11 @@ c_string_find_first_char_from_right_on_line(string_t string, char character, u32
     return(result);
 }
 
+// NOTE(Sleepster): Returns the string you passed as the filename should this not actually be a path and simply the file's name 
 string_t
 c_string_get_filename_from_path(string_t filepath)
 {
-    string_t result = {};
+    string_t result = filepath;
     s32 ext_start = c_string_find_first_char_from_right(filepath, '/');
     if(ext_start != -1)
     {

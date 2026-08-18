@@ -236,7 +236,9 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
                 result->node_type          = AST_NODE_TYPE_LITERAL;
                 result->type.value_literal = c_string_make_copy(&parser->arena, token->data);
 
+#if 0
                 printf("String literal: '%.*s' found when generating an expression...\n", (s32)token->data.count, token->data.data);
+#endif
             }break;
             case TOKEN_TYPE_OPEN_PAREN:
             {
@@ -894,8 +896,8 @@ generate_structure_AST(parser_t *parser)
             // NOTE(Sleepster): Copy the attributes 
             if(parser->current_attribute_list.used > 0)
             {
-                dynarray_copy(&structure_root->attributes, &parser->current_attribute_list);
-                dynarray_reset(&parser->current_attribute_list);
+                c_dynarray_copy(&structure_root->attributes, &parser->current_attribute_list);
+                c_dynarray_reset(&parser->current_attribute_list);
             }
 
             // NOTE(Sleepster): Handle inheritence 
@@ -1288,11 +1290,11 @@ handle_AST_attribute(parser_t *parser, string_t name)
         attrib.is_template = false;
 
         hash_table_add_element(&parser->recorded_attributes, &attrib, name);
-        dynarray_add(&parser->current_attribute_list, &attrib);
+        c_dynarray_add(&parser->current_attribute_list, &attrib);
     }
     else
     {
-        dynarray_add(&parser->current_attribute_list, found_attrib);
+        c_dynarray_add(&parser->current_attribute_list, found_attrib);
     }
 }
 
@@ -1301,6 +1303,12 @@ parse_structure_member(parser_t *parser, AST_node_t *structure, lexer_token_t *t
 {
     AST_node_t *result = null;
     lexer_token_t member_type = parser_get_next_lexer_token(parser);
+    if(member_type.token_type == TOKEN_TYPE_POUND)
+    {
+        handle_macro_expansion(parser, false);
+        return(result);
+    }
+
     if(member_type.token_type == TOKEN_TYPE_CLOSE_BRACE)
     {
         *token_out = member_type;
@@ -1450,6 +1458,9 @@ parse_structure_member(parser_t *parser, AST_node_t *structure, lexer_token_t *t
                 }
             }
         }
+        else if(asterisk_token.token_type == TOKEN_TYPE_LESS_THAN)
+        {
+        }
 
         // NOTE(Sleepster): If the asterisk token is an open paren then we need to verify 
         // this isn't some intrinsic like: 'alignas()' with an argument of '(some value)' like:
@@ -1485,7 +1496,7 @@ parse_structure_member(parser_t *parser, AST_node_t *structure, lexer_token_t *t
             {
                 member_name = parser_get_next_lexer_token(parser);
                 // NOTE(Sleepster): Eat the template params, we don't care. 
-                u32 template_depth = 0;
+                s32 template_depth = 1;
                 do {
                     member_name = parser_get_next_lexer_token(parser);
                     if(member_name.token_type == TOKEN_TYPE_LESS_THAN)
@@ -1499,7 +1510,7 @@ parse_structure_member(parser_t *parser, AST_node_t *structure, lexer_token_t *t
                 }while(template_depth > 0);
 
                 // NOTE(Sleepster): This gets us the name of the template param 
-                member_name = parser_peek_next_lexer_token(parser);
+                member_name = parser_get_next_lexer_token(parser);
             }
             else if(member_name.token_type == TOKEN_TYPE_OPEN_PAREN)
             {
@@ -1545,8 +1556,8 @@ parse_structure_member(parser_t *parser, AST_node_t *structure, lexer_token_t *t
             result = AST_create_new_node(&parser->arena, parser->active_decl_context);
             if(parser->current_attribute_list.used > 0)
             {
-                dynarray_copy(&result->attributes, &parser->current_attribute_list);
-                dynarray_reset(&parser->current_attribute_list);
+                c_dynarray_copy(&result->attributes, &parser->current_attribute_list);
+                c_dynarray_reset(&parser->current_attribute_list);
             }
 
             if(member_type.token_type == TOKEN_TYPE_IDENT)
@@ -1640,7 +1651,7 @@ generate_structure_AST(parser_t *parser)
     {
         if(attribute.is_template)
         {
-            dynarray_reset(&parser->current_attribute_list);
+            c_dynarray_reset(&parser->current_attribute_list);
             return(result);
         }
     }
@@ -1750,8 +1761,8 @@ generate_structure_AST(parser_t *parser)
         // NOTE(Sleepster): Copy the attributes 
         if(parser->current_attribute_list.used > 0)
         {
-            dynarray_copy(&structure->attributes, &parser->current_attribute_list);
-            dynarray_reset(&parser->current_attribute_list);
+            c_dynarray_copy(&structure->attributes, &parser->current_attribute_list);
+            c_dynarray_reset(&parser->current_attribute_list);
         }
 
         // NOTE(Sleepster): Handle inheritence 
@@ -1853,8 +1864,8 @@ generate_enum_AST(parser_t *parser)
         // NOTE(Sleepster): Copy the attributes 
         if(parser->current_attribute_list.used > 0)
         {
-            dynarray_copy(&enum_root->attributes, &parser->current_attribute_list);
-            dynarray_reset(&parser->current_attribute_list);
+            c_dynarray_copy(&enum_root->attributes, &parser->current_attribute_list);
+            c_dynarray_reset(&parser->current_attribute_list);
         }
 
         // NOTE(Sleepster): Record the name of the enum if there is one. 
@@ -1870,7 +1881,7 @@ generate_enum_AST(parser_t *parser)
 
         for(;;)
         {
-            if(token.token_type == TOKEN_TYPE_CLOSE_BRACE) break;
+            if(token.token_type == TOKEN_TYPE_CLOSE_BRACE || token.token_type == TOKEN_TYPE_EOF) break;
 
             lexer_token_t enum_member_token = parser_get_next_lexer_token(parser);
             if(enum_member_token.token_type == TOKEN_TYPE_CLOSE_BRACE)
@@ -1970,7 +1981,7 @@ generate_lambda_AST(parser_t     *parser,
     {
         if(attribute.is_template)
         {
-            dynarray_reset(&parser->current_attribute_list);
+            c_dynarray_reset(&parser->current_attribute_list);
             parse_lambda = false;
         }
     }
@@ -2010,13 +2021,15 @@ generate_lambda_AST(parser_t     *parser,
                          fprint_token(procedure_name_token));
         }
 
+#if 0
         printf("Found lambda: '%.*s'...\n", fprint_token(procedure_name_token));
+#endif
         lambda = AST_create_new_node(&parser->arena, parser->active_decl_context);
         lambda->lambda.return_type = return_type;
         if(parser->current_attribute_list.used > 0)
         {
-            dynarray_copy(&lambda->attributes, &parser->current_attribute_list);
-            dynarray_reset(&parser->current_attribute_list);
+            c_dynarray_copy(&lambda->attributes, &parser->current_attribute_list);
+            c_dynarray_reset(&parser->current_attribute_list);
         }
 
         argument_list_t list = parse_argument_list(parser, lambda);
@@ -2125,8 +2138,10 @@ generate_typedef_AST(parser_t *parser)
                     code_type_t *main_type = parser_search_for_code_type(parser, type_token.data);
                     parser_register_code_type(parser, c_string_make_copy(&parser->arena, alias_token.data), main_type);
 
+#if 0
                     printf("FOUND TYPE ALIAS: '%.*s' OF TYPE: '%.*s'...\n",
                            fprint_token(alias_token), fprint_token(type_token));
+#endif
                 }
                 else if(final_token.token_type == TOKEN_TYPE_OPEN_PAREN)
                 {
@@ -2140,7 +2155,9 @@ generate_typedef_AST(parser_t *parser)
         }break;
         case TOKEN_TYPE_EOF:
         {
+#if 0
             printf("Ignoring file: '%.*s'...\n", fprint_string(parser->filename));
+#endif
         }break;
     }
 

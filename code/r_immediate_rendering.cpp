@@ -125,7 +125,7 @@ immediate_text(render_command_list_t *command_list,
                u32                    font_size)
 {
     Assert(font_handle);
-    Assert(font_handle->type == AT_Font);
+    Assert(font_handle->slot->type == AT_Font);
 
     dynamic_render_font_varient_t *varient = s_asset_font_acquire_font_at_size(asset_manager, 
                                                                                font_handle, 

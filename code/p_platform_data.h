@@ -69,7 +69,7 @@ void*         sys_get_proc_address(void *library, string_t procedure);
 void  sys_file_watcher_init_watch_data(memory_arena_t *arena, file_watcher_sys_watch_data_t *watch_data);
 bool8 sys_file_watcher_add_path(file_watcher_t *watcher, string_t path);
 void  sys_file_watcher_issue_check(file_watcher_t *watcher, sys_file_check_event_data_t *directory_data);
-void  sys_file_watcher_process_changes(file_watcher_t *watcher, bool8 *changed);
+void  sys_file_watcher_process_changes(file_watcher_t *watcher);
 
 /*===========================================
   ============== MULTITHREADING =============

@@ -567,6 +567,6 @@ s_game_action_create(input_manager_t *input_manager,
     new_action.gamepad.type        = second_binding;
     new_action.gamepad.binding_id  = second_binding_type;
 
-    c_dynarray_push(input_manager->game_actions, new_action); 
+    c_dynarray_add(&input_manager->game_actions, &new_action); 
 }
 

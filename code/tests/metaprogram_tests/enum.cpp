@@ -30,6 +30,18 @@ typedef enum some_other_typedeffed_item_without_a_comma
     WOW_THIS_IS_TYPEDEFFED = (1 << 31)
 }some_other_typedeffed_item_without_a_comma_t;
 
+#define LIST(X) \
+    X(ENUM_THING, "Enum") \
+    X(OTHER_ENUM_THING, "Other Enum") \
+    X(OTHER_OTHER_ENUM_THING, "Other Other Enum")
+
+CODE_GEN_IGNORE_DECL
+enum {
+#define X(enum, string) enum,
+    LIST(X)
+#undef X
+};
+
 enum 
 {
     SOME_DELCARED_ENUM_TYPE

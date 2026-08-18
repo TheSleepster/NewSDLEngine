@@ -11,6 +11,7 @@
 #include <c_base.h>
 #include <c_memory_arena.h>
 #include <c_threadpool.h>
+#include <c_file_watcher.h>
 
 typedef struct vec2 vec2_t;
 
@@ -29,6 +30,7 @@ typedef struct global_context
     renderer_state_t *renderer_state;
     asset_manager_t  *asset_manager;
     input_manager_t  *input_manager;
+    file_watcher_t    file_watcher;
 
     // NOTE(Sleepster): Persistent allocations... Use sparingly... 
     memory_arena_t    context_arena;

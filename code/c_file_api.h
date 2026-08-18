@@ -24,15 +24,38 @@
 // NOTE(Sleepster): This is stupid... but C doesn't make this easier. 
 typedef struct zone_allocator zone_allocator_t;
 
-typedef enum file_extension
-{
-    FILE_EXT_INVALID,
-    FILE_EXT_TTF,
-    FILE_EXT_WAV,
-    FILE_EXT_PNG,
-    FILE_EXT_GLSL,
-    FILE_EXT_OS_DLL,
-    FILE_EXT_COUNT
+#ifndef CODE_GEN_IGNORE_DECL
+#define CODE_GEN_IGNORE_DECL
+#endif
+
+#ifdef OS_WINDOWS
+#define OS_DLL_EXT ".dll"
+#else
+#define OS_DLL_EXT ".so"
+#endif
+
+#define FILE_EXTENSION_ENUM_LIST(X) \
+    X(FILE_EXT_INVALID, "") \
+    X(FILE_EXT_TTF, ".ttf") \
+    X(FILE_EXT_OTF, ".otf") \
+    X(FILE_EXT_WAV, ".wav") \
+    X(FILE_EXT_OGG, ".ogg") \
+    X(FILE_EXT_PNG, ".png") \
+    X(FILE_EXT_DDS, ".dds") \
+    X(FILE_EXT_GLSL, ".glsl") \
+    X(FILE_EXT_SLANG, ".slang") \
+    X(FILE_EXT_SPV, ".spv") \
+    X(FILE_EXT_M_ARCH, ".m_arch") \
+    X(FILE_EXT_M_INSTANCE, ".m_inst") \
+    X(FILE_EXT_JFD, ".jfd") \
+    X(FILE_EXT_OS_DLL, OS_DLL_EXT) \
+    X(FILE_EXT_COUNT, "count")
+
+CODE_GEN_IGNORE_DECL
+typedef enum file_extension {
+#define X(enum, string) enum,
+    FILE_EXTENSION_ENUM_LIST(X)
+#undef X
 }file_extension_t;
 
 typedef struct file
@@ -78,6 +101,7 @@ typedef struct overlap_io_data
 
 struct visit_file_data;
 #define VISIT_FILES(name) void name(struct visit_file_data *visit_file_data, void *user_data)
+
 typedef VISIT_FILES(visit_files_pfn_t);
 
 typedef struct visit_file_data
@@ -132,6 +156,7 @@ u32               c_file_ext_string_to_enum(string_t file_ext);
 bool8             c_directory_exists(string_t filepath);
 visit_file_data_t c_directory_create_visit_data(visit_files_pfn_t *function, bool8 recursive, void *user_data);
 void              c_directory_visit(string_t filepath, visit_file_data_t *visit_file_data);
+s32               c_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 recursive, string_t file_ext);
 
 #endif // C_FILE_API_H
 

@@ -340,7 +340,7 @@ s_renderer_command_list_init(renderer_state_t *renderer_state, render_command_li
         list->transient_arena = c_arena_create(MB(10));
         list->command_arena   = c_arena_create(MB(30));
 
-        list->active_vertex_buffers = c_dynarray_create(render_buffer_t *);
+        //list->active_vertex_buffers = c_dynarray_create(render_buffer_t *);
     }
     else
     {
@@ -547,13 +547,13 @@ r_cmd_use_shader_program(render_command_list_t *command_list, asset_handle_t ass
     asset_slot_load_status_t load_status = asset_handle.slot->slot_state; 
     if(load_status != ASLS_Loaded)
     {
-        Assert(asset_handle.catalog);
+        Assert(asset_handle.slot->catalog);
         if(load_status == ASLS_Unloaded)
         {
             // signal for load
         }
         // apply a default texture
-        bind_shader->shader = asset_handle.catalog->default_asset;
+        bind_shader->shader = asset_handle.slot->catalog->default_asset;
     }
     else if(load_status == ASLS_Loaded)
     {
@@ -574,7 +574,7 @@ void
 r_cmd_bind_texture_from_handle(render_command_list_t *command_list, asset_handle_t *asset_handle)
 {
     Assert(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS);
-    Assert(asset_handle->type == AT_Bitmap);
+    Assert(asset_handle->slot->type == AT_Bitmap);
 
     render_command_t *command  = s_renderer_get_next_command(command_list);
     render_command_bind_texture_t *bind_texture = c_arena_push_struct(&command_list->command_arena, 
@@ -587,7 +587,7 @@ r_cmd_bind_texture_from_handle(render_command_list_t *command_list, asset_handle
             // signal for load
         }
         // apply a default texture
-        bind_texture->texture = &asset_handle->catalog->default_asset.texture->gpu_data;
+        bind_texture->texture = &asset_handle->slot->catalog->default_asset.texture->gpu_data;
         Assert(bind_texture->texture->ID != 0);
     }
     else if(load_status == ASLS_Loaded)

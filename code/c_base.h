@@ -13,10 +13,6 @@
 
 #include <stdlib.h>
 
-#ifndef CODE_GEN_IGNORE_FILE
-#define CODE_GEN_IGNORE_FILE
-#endif
-
 // TODO(Sleepster): Determine instruction set support (SSE2, SSE3, AVX, AVX2, etc...)
 
 // MSVC

@@ -99,6 +99,7 @@ struct code_type_t
 {
     u64               ID;
     bool8             is_registered;
+    bool8             is_inferred;
     string_t          identifier;
     string_t          owner_file;
     u32               code_metatype;
@@ -149,6 +150,7 @@ struct declaration_context_t
     declaration_context_t     *parent_scope;
 };
 
+constexpr u32 MAX_TEMPLATE_ARGUMENTS = 5;
 struct code_attribute_t
 {
     string_t name;
@@ -177,6 +179,9 @@ struct parser_t
     bool8                              should_parse;
 
     dynarray_t<code_attribute_t>       current_attribute_list;
+    // TODO(Sleepster): This stack is a problem because it contains a bunch of pointers
+    // to indices in recorded_del_contexts. I don't know why I thought this was a good idea.
+    // But it's not! Whenever we resize the recorded_del_contexts array, these are ALL invalidated...
     dynarray_t<declaration_context_t*> decl_context_stack;
     dynarray_t<declaration_context_t>  recorded_decl_contexts;
     declaration_context_t             *active_decl_context;

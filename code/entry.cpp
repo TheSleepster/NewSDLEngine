@@ -1,5 +1,5 @@
 /* ========================================================================
-   $File: main.c $
+   $File: entry.cpp $
    $Date: November 28 2025 06:40 pm $
    $Revision: $
    $Creator: Justin Lewis $
@@ -33,6 +33,43 @@
 #include <asset_file_packer/jfd_asset_file.h>
 
 int game_main(void);
+
+// TODO(Sleepster): Toggle this off in release 
+FILE_WATCHER_CALLBACK(main_file_watcher)
+{
+    asset_manager_t *asset_manager = global_context->asset_manager;
+    (void)asset_manager;
+
+    string_t file_ext = c_string_get_file_ext_from_path(change->full_path);
+    u32 ext_type = c_file_ext_string_to_enum(file_ext);
+
+    string_t filename = c_string_get_filename_from_path_and_ext(change->full_path);
+    //string_t old_filename = c_string_get_filename_from_path_and_ext(change->old_filename);
+    if(ext_type == FILE_EXT_JFD)
+    {
+        // TODO(Sleepster): For now, we just NEVER hotreload the asset package files since this seems to cause A LOT of problems. 
+
+        // NOTE(Sleepster): Delaying to prevent an error when reading the asset file too quickly:
+        // 'resource temporarily unavailable'
+        //s_asset_manager_signal_asset_file_reload(asset_manager, change->full_path);
+    }
+    else
+    {
+        if((change->changes & FWC_EVENT_MODIFIED))
+        {
+            asset_handle_t handle = s_asset_manager_acquire_asset_handle(asset_manager, filename);
+            if(handle.is_valid)
+            {
+                s_asset_manager_queue_asset_load(asset_manager, handle.slot);
+            }
+            else
+            {
+                log_error("Could not create a valid asset handle for asset by name of: '%.*s', this asset may not be valid or known to the asset system...\n",
+                          fprint_string(filename));
+            }
+        }
+    }
+}
 
 void
 process_window_events(renderer_state_t *renderer_state, input_manager_t *input_manager)
@@ -115,16 +152,15 @@ main(int argc, char **argv)
         s_im_init_input_manager(global_context->input_manager);
         s_renderer_state_init(global_context->renderer_state, vulkan_context);
 
+        global_context->file_watcher = c_file_watcher_create(FWC_EVENT_ALL, true, main_file_watcher, null, false);
+        c_file_watcher_add_path(&global_context->file_watcher, STR("../res/"));
+        c_file_watcher_issue_check_over_all_paths(&global_context->file_watcher);
+
         global_context->running = true;
         while(global_context->running)
         {
-            // TODO(Sleepster): Eventually hot reloading... 
             s32 value = game_main();
-            if(value == -1) 
-            {
-                // this is where we would reset and flush ALL state and reload the game DLL
-            }
-            else if(value == 0)
+            if(value == 0)
             {
                 global_context->running = false;
                 break;

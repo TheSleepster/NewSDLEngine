@@ -106,11 +106,6 @@ typedef struct string_builder
     string_builder_buffer_t     *current_buffer;
     s64                          default_buffer_block_size;
 
-#if 0
-    // NOTE(Sleepster): Just in case we don't need to allocate memory...
-    byte                         initial_buffer[DEFAULT_STRING_BUILDER_BUFFER_SIZE];
-#endif
-
     s64                          bytes_used;
     s64                          total_allocated;
 }string_builder_t;

@@ -63,7 +63,7 @@ typedef enum asset_type
 
 typedef enum asset_slot_state
 {
-    ASLS_Invalid,
+    //ASLS_Invalid,
     ASLS_Unloaded,
     ASLS_LoadQueued,
     ASLS_Loaded,
@@ -98,17 +98,8 @@ typedef enum bitmap_format
  */
 typedef struct asset_handle
 {
-    bool32             is_valid;
-    asset_type_t       type;
-    s32                owner_asset_file_index;
-
-    subtexture_data_t *subtexture_data;
-    asset_slot_t      *slot;
-
-    // TODO(Sleepster): 
-    // Not happy about these.. These should ONLY be used to signal loading or unloading of an asset's data
-    asset_manager_t   *asset_manager;
-    asset_catalog_t   *catalog;
+    bool32        is_valid;
+    asset_slot_t *slot;
     union {
         texture2D_t           *texture;
         shader_t              *shader;
@@ -150,8 +141,10 @@ typedef struct subtexture_data
     vec2_t           offset;
     vec2_t           size;
 
+    u32              atlased_generation;
     u32              atlas_subtexture_index;
     texture_atlas_t *atlas;
+    asset_handle_t   packed_asset;
 }subtexture_data_t;
 
 /* TODO(Sleepster): 
@@ -166,14 +159,14 @@ typedef struct texture_atlas
 
     u32                           ID;
     u32                           merge_counter;
-    DynArray_t(asset_handle_t*)   textures_to_merge;
+    dynarray_t<asset_handle_t*>   textures_to_merge;
 
     // TODO(Sleepster): 
     // Technically we need not "add" to this array, just pull from it. What do we do once we 
     // pull more than what's in it? Guess it's not a problem for now.
     //
     // If we run out of indices in here, just expand the size of the array?
-    DynArray_t(subtexture_data_t) packed_subtextures;
+    dynarray_t<subtexture_data_t> packed_subtextures;
     u32                           packed_subtexture_count;
     bool32                        is_valid;
 
@@ -455,7 +448,7 @@ struct dynamic_render_font_t
 {
     memory_arena_t                             font_arena;
     FT_Face                                    font_face;
-    DynArray_t(dynamic_render_font_varient_t*) varients;
+    dynarray_t<dynamic_render_font_varient_t*> varients;
 };
 
 /*===========================================
@@ -472,10 +465,15 @@ typedef struct asset_slot
     file_t                   owner_asset_file;
     jfd_package_entry_t     *package_entry;
 
+    subtexture_data_t       *subtexture_data;
+    asset_manager_t         *asset_manager;
+    asset_catalog_t         *catalog;
+
     // NOTE(Sleepster): Should only be modified using atomic_* functions 
     volatile u32             package_generation;
     // NOTE(Sleepster): This is here for access when reloading/unloading the asset. 
     volatile u32             loaded_asset_index;
+    s32                      owner_asset_file_index;
     union {
         texture2D_t           texture;
         dynamic_render_font_t dynamic_render_font;
@@ -485,23 +483,26 @@ typedef struct asset_slot
 }asset_slot_t;
 
 // NOTE(Sleepster): Everything file related lives and dies with this arena. 
-typedef struct asset_manager_asset_file_data
+typedef struct asset_file_data
 {
-    bool8                    is_initialized;
-    u32                      ID;
-    memory_arena_t           init_arena;
+    bool8                     is_initialized;
+    u32                       ID;
+    volatile u32              current_package_generation;
+    memory_arena_t            init_arena;
 
-    asset_slot_load_status_t load_status;
-    file_t                   file_info;
+    asset_slot_load_status_t  load_status;
+    file_t                    file_info;
  
-    string_t                 raw_file_data;
+    string_t                  raw_file_data;
 
-    jfd_package_entry_t     *package_entries;
-    u32                      package_entry_count;
-    HashTable_t(s32)         entry_hash;
+    jfd_file_header_t        *header;
+    jfd_package_entry_t      *package_entries;
+    u32                       package_entry_count;
+    HashTable_t(s32)          entry_hash;
 
-    jfd_file_header_t       *header_data;
-}asset_manager_asset_file_data_t;
+    dynarray_t<asset_slot_t*> loaded_assets;
+    jfd_file_header_t         *header_data;
+}asset_file_data_t;
 
 /*===========================================
   =========== ASSET MANAGER DATA ============
@@ -522,7 +523,7 @@ struct asset_catalog_t
 
     // TODO(Sleepster): Should this be a * to asset_slots?
     HashTable_t(asset_slot_t) asset_lookup;
-    DynArray_t(asset_slot_t*) loaded_assets;
+    dynarray_t<asset_slot_t*> loaded_assets;
 };
 
 struct texture_manager_t 
@@ -553,59 +554,58 @@ struct texture_atlas_registry_t
 // Simple. Doesn't deal with ref-counters or anything heap related.
 struct asset_manager_t
 {
-    bool8                           is_initialized;
-    memory_arena_t                  manager_arena;
+    bool8                     is_initialized;
+    memory_arena_t            manager_arena;
 
     // NOTE(Sleepster): For font generation at runtime.
-    FT_Library                      freetype_handle;
+    FT_Library                freetype_handle;
 
     // NOTE(Sleepster): Hash table for hashing asset filenames with thier associated asset file
     // Ex: "player.png" -> "/run_tree/res/main_asset_file.wad"
     // or even beter "player.png" -> index 0 of the asset_file array
-    asset_manager_asset_file_data_t asset_files[ASSET_MANAGER_MAX_ASSET_FILES];
-    HashTable_t(s32)                asset_name_to_file;
-    u32                             loaded_file_count;
+    asset_file_data_t         asset_files[ASSET_MANAGER_MAX_ASSET_FILES];
+    HashTable_t(s32)          asset_name_to_file;
+    u32                       loaded_file_count;
 
-    asset_slot_t                   *asset_load_queue[MAX_QUEUED_ASSETS];
-    u32                             load_queue_size;
+    asset_slot_t             *asset_load_queue[MAX_QUEUED_ASSETS];
+    u32                       load_queue_size;
         
-    asset_slot_t                   *asset_unload_queue[MAX_QUEUED_ASSETS];
-    u32                             unload_queue_size;
+    asset_slot_t             *asset_unload_queue[MAX_QUEUED_ASSETS];
+    u32                       unload_queue_size;
 
-    texture_atlas_registry_t        atlas_registry;
+    texture_atlas_registry_t  atlas_registry;
 
     // TODO(Sleepster): Replace this zone allocator thing. Not great for more than one thread... 
-    zone_allocator_t               *asset_allocator;
-    asset_catalog_t                 asset_catalogs[AT_Count];
-    asset_catalog_t                *texture_catalog;
-    asset_catalog_t                *shader_catalog;
-    asset_catalog_t                *material_catalog;
-    asset_catalog_t                *font_catalog;
-    asset_catalog_t                *sound_catalog;
+    zone_allocator_t         *asset_allocator;
+    asset_catalog_t           asset_catalogs[AT_Count];
+    asset_catalog_t          *texture_catalog;
+    asset_catalog_t          *shader_catalog;
+    asset_catalog_t          *material_catalog;
+    asset_catalog_t          *font_catalog;
+    asset_catalog_t          *sound_catalog;
 
-    font_manager_t                  font_manager;
-
-    renderer_state_t               *renderer_state;
+    font_manager_t            font_manager;
+    renderer_state_t         *renderer_state;
 };
 
-void  s_asset_manager_init(asset_manager_t *asset_manager);
-void  s_asset_manager_update(asset_manager_t *asset_manager);
+void s_asset_manager_init(asset_manager_t *asset_manager);
+void s_asset_manager_update(asset_manager_t *asset_manager);
 void s_asset_manager_queue_asset_load(asset_manager_t *asset_manager, asset_slot_t *slot);
 
 // TODO(Sleepster): Unicode.cpp 
 void s_UTF32_convert_to_UTF8(string_t *buffer, u32 character);
-u32 s_UTF8_convert_UTF32(u8 *character);
+u32  s_UTF8_convert_UTF32(u8 *character);
 
 bool8          s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath);
+void           s_asset_manager_signal_asset_file_reload(asset_manager_t *asset_manager, string_t filename);
 asset_handle_t s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name);
 
-texture_atlas_t* s_texture_atlas_create(asset_manager_t *asset_manager, u32 size, u32 channel_count, u32 format, u32 initial_subtexture_count);
-void s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle);
-void s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atlas_t *atlas);
+texture_atlas_t *s_texture_atlas_create(asset_manager_t *asset_manager, u32 size, u32 channel_count, u32 format, u32 initial_subtexture_count);
+void             s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle);
+void             s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atlas_t *atlas);
 
-true_inline void s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot_t *slot);
-
-internal_api asset_slot_t * s_asset_manager_get_asset_slot(asset_catalog_t *catalog, string_t name);
+true_inline void           s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot_t *slot);
+internal_api asset_slot_t *s_asset_manager_get_asset_slot(asset_catalog_t *catalog, string_t name);
 
 shader_t*             s_asset_get_shader_from_handle(asset_handle_t *handle);
 texture2D_t*          s_asset_get_texture_from_handle(asset_handle_t *handle);
@@ -613,8 +613,8 @@ material_data_t*      s_asset_get_material_data_from_handle(asset_handle_t *hand
 material_archetype_t* s_asset_get_material_archetype_from_handle(asset_handle_t *handle);
 material_instance_t*  s_asset_get_material_instance_from_handle(asset_handle_t *handle);
 
-vec2_t  s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, asset_handle_t *font_handle, u32 pixel_size, float32 *max_descender_out);
-dynamic_render_font_varient_t* s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t *font_handle, u32 font_size);
+vec2_t                         s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, asset_handle_t *font_handle, u32 pixel_size, float32 *max_descender_out);
+dynamic_render_font_varient_t *s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t *font_handle, u32 font_size);
 
 glyph_metric_t*
 s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,

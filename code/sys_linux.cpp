@@ -447,7 +447,9 @@ sys_file_get_modtime_and_size(string_t filepath)
 {
     file_data_t result = {};
     struct stat file_stats;
-    if(stat(C_STR(filepath), &file_stats) == 0)
+
+    const char *c_filepath = c_string_null_terminated(&global_context->temporary_arena, filepath);
+    if(stat(c_filepath, &file_stats) == 0)
     {
         result.file_size    = file_stats.st_size;
         result.last_modtime = file_stats.st_mtime;
@@ -456,7 +458,7 @@ sys_file_get_modtime_and_size(string_t filepath)
     }
     else
     {
-        log_error("Failure to get information about file '%s'... error: '%s'\n", filepath.data, strerror(errno));
+        log_error("Failure to get information about file '%.*s'... error: '%s'\n", fprint_string(filepath), strerror(errno));
     }
 
     return(result);
@@ -561,6 +563,7 @@ sys_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 rec
         log_error("Could not open a directory by name of: %s... make sure the string you pass is null-terminated...\n", filepath.data);
     }
 
+    closedir(directory);
     return(result);
 }
 
@@ -783,51 +786,74 @@ sys_file_watcher_init_watch_data(memory_arena_t *arena, file_watcher_sys_watch_d
     watch_data->inotify_data = c_arena_push_size(arena, KB(10));
 }
 
-bool8 
-sys_file_watcher_add_path(file_watcher_t *watcher, string_t path)
+internal_api bool8 
+sys_internal_file_watcher_add_path(file_watcher_t *watcher, u32 watch_flags, string_t filepath)
 {
     bool8 result = false;
-    string_t filepath = c_string_make_copy(&watcher->watcher_arena, path);
-
-    u32 flags = 0;
-    if(watcher->events_to_monitor & FWC_EVENT_ADDED)
-    {
-        flags |= IN_CREATE;
-    }
-    if(watcher->events_to_monitor & FWC_EVENT_MODIFIED)
-    {
-        flags |= IN_MODIFY|IN_CLOSE_WRITE;
-    }
-    if(watcher->events_to_monitor & FWC_EVENT_MOVED)
-    {
-        flags |= IN_MOVED_TO|IN_MOVED_FROM|IN_MOVE_SELF;
-    }
-    if(watcher->events_to_monitor & FWC_EVENT_ATTRIBUTE_CHANGE)
-    {
-        flags |= IN_ATTRIB;
-    }
-    if(watcher->events_to_monitor & FWC_EVENT_DELETED)
-    {
-        flags |= IN_DELETE|IN_DELETE_SELF;
-    }
-
     sys_file_check_event_data_t *directory = c_arena_push_struct(&watcher->watcher_arena, sys_file_check_event_data_t);
     if(directory)
     {
-        directory->file_data      = sys_file_open(path, false, false, false).handle;
-        directory->filename       = c_string_get_filename_from_path(path);
-        directory->inotify_handle = inotify_add_watch(watcher->sys_watch_data.inotify_instance, C_STR(filepath), flags);
-        if(directory->inotify_handle == -1)
+        directory->file_data      = sys_file_open(filepath, false, false, false).handle;
+        directory->filename       = c_string_get_filename_from_path(filepath);
+        directory->inotify_handle = inotify_add_watch(watcher->sys_watch_data.inotify_instance, C_STR(filepath), watch_flags);
+        if(directory->inotify_handle != -1)
+        {
+            u32 count = watcher->sys_watch_data.directory_data_count++;
+            watcher->sys_watch_data.directory_data[count] = directory; 
+
+            result = true;
+        }
+        else
         {
             log_error("Could not watch path '%s'... error: '%s'...\n", filepath.data, strerror(errno));
-            return(result);
         }
 
-        u32 count = watcher->sys_watch_data.directory_data_count++;
-        watcher->sys_watch_data.directory_data[count] = directory; 
-
-        result = true;
+        if(watcher->watch_recursively)
+        {
+            const char *c_filepath = c_string_null_terminated(&watcher->watcher_arena, filepath);
+            DIR *directory = opendir(c_filepath);
+            if(directory)
+            {
+                struct dirent *entry = null;
+                do {
+                    entry = readdir(directory);
+                    if(entry)
+                    {
+                        if(entry->d_type == DT_DIR)
+                        {
+                            if((strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)) 
+                            {
+                                string_t subdirectory = c_string_concat(&watcher->watcher_arena, filepath, STR(entry->d_name));
+                                Assert(sys_internal_file_watcher_add_path(watcher, watch_flags, subdirectory));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }while(entry);
+                closedir(directory);
+            }
+        }
     }
+
+    return(result);
+}
+
+bool8 
+sys_file_watcher_add_path(file_watcher_t *watcher, string_t filepath)
+{
+    bool8 result = false;
+
+    u32 watch_flags = 0;
+    if(watcher->events_to_monitor & FWC_EVENT_ADDED)            watch_flags |= IN_CREATE;
+    if(watcher->events_to_monitor & FWC_EVENT_MODIFIED)         watch_flags |= IN_MODIFY;
+    if(watcher->events_to_monitor & FWC_EVENT_MOVED)            watch_flags |= IN_MOVED_TO|IN_MOVED_FROM|IN_MOVE_SELF;
+    if(watcher->events_to_monitor & FWC_EVENT_ATTRIBUTE_CHANGE) watch_flags |= IN_ATTRIB;
+    if(watcher->events_to_monitor & FWC_EVENT_DELETED)          watch_flags |= IN_DELETE|IN_DELETE_SELF;
+
+    Assert(sys_internal_file_watcher_add_path(watcher, watch_flags, filepath));
     return(result);
 }
 
@@ -839,171 +865,136 @@ sys_file_watcher_issue_check(file_watcher_t *watcher, sys_file_check_event_data_
 }
 
 void
-sys_file_watcher_process_changes(file_watcher_t *watcher, bool8 *changed)
+sys_file_watcher_process_changes(file_watcher_t *watcher)
 {
-    file_watcher_sys_watch_data_t *osdata = &watcher->sys_watch_data;
-    s32 inotify_instance = osdata->inotify_instance;
-    if(inotify_instance == -1) return;
+    file_watcher_sys_watch_data_t *watch_data = &watcher->sys_watch_data;
+    Assert(watch_data->inotify_instance != -1);
 
-    s64 bytes_read = read(inotify_instance, osdata->inotify_data, KB(10));
-    if(bytes_read == -1)
+    s64 bytes_read = read(watch_data->inotify_instance, watch_data->inotify_data, KB(10));
+    if(bytes_read != -1 && bytes_read != 0)
     {
-        if(errno == EAGAIN || errno == EWOULDBLOCK)
+        s64 current_read_offset = 0;
+        while(current_read_offset < bytes_read)
         {
-            return;
+            struct inotify_event *event = (struct inotify_event*)(((byte*)watch_data->inotify_data) + current_read_offset);
+
+            sys_file_check_event_data_t *directory = null;
+            for(u32 directory_index = 0;
+                directory_index < watch_data->directory_data_count;
+                ++directory_index)
+            {
+                sys_file_check_event_data_t *found = watch_data->directory_data[directory_index];
+                if(found && found->inotify_handle == event->wd)
+                {
+                    directory = found;
+                    break;
+                }
+            }
+
+            if(directory)
+            {
+                string_t base_path = directory->filename;
+                string_t filename  = STR("");
+                if(event->len)
+                {
+                    filename = STR(event->name);
+                }
+
+                string_t fullpath = c_string_concat(&watcher->watcher_arena, base_path, filename);
+                if((event->mask & IN_Q_OVERFLOW) == 0)
+                {
+                    s32 change_events = 0;
+                    // NOTE(Sleepster): For now we don't want this behavior for IN_CLOSE_WRITE events since this
+                    // sends 2 "modify" events despite being the same change since IN_CLOSE_WRITE triggers when the program file
+                    // operating on the file calls fclose() or some deritive of it.
+                    //if(event->mask & IN_MODIFY || event->mask & IN_CLOSE_WRITE) change_events |= FWC_EVENT_MODIFIED;
+                    if(event->mask & IN_CREATE) change_events |= FWC_EVENT_ADDED;
+                    if(event->mask & IN_MODIFY) change_events |= FWC_EVENT_MODIFIED;
+                    if(event->mask & IN_ATTRIB) change_events |= FWC_EVENT_ATTRIBUTE_CHANGE;
+                    if(event->mask & IN_DELETE) change_events |= FWC_EVENT_DELETED;
+                    if(event->mask & IN_MOVED_FROM)
+                    {
+                        directory->old_filename = c_string_make_copy(&global_context->temporary_arena, fullpath);
+                        directory->last_move_cookie = event->cookie;
+                    }
+                    if(event->mask & IN_MOVED_TO)
+                    {
+                        if(directory->last_move_cookie != 0 && directory->last_move_cookie == event->cookie)
+                        {
+                            change_events |= (FWC_EVENT_MOVED | FWC_EVENT_RENAMED);
+
+                            string_t copy_old_fullname = c_string_make_copy(&global_context->temporary_arena, directory->old_filename);
+                            string_t copy_new_fullname = c_string_make_copy(&global_context->temporary_arena, filename);
+                            c_file_watcher_add_change_event(watcher, copy_new_fullname, copy_old_fullname, directory, change_events);
+
+                            directory->last_move_cookie = 0;
+                        }
+                        else
+                        {
+                            change_events |= FWC_EVENT_ADDED;
+                            string_t copy_new_fullname = c_string_make_copy(&global_context->temporary_arena, directory->filename);
+                            c_file_watcher_add_change_event(watcher, copy_new_fullname, STR(""), directory, change_events);
+                        }
+                    }
+
+                    bool8 is_recursive_emmision = ((event->mask & IN_MOVED_TO) && (directory->last_move_cookie == 0));
+                    if(!is_recursive_emmision)
+                    {
+                        if(change_events != 0 && !(event->mask & IN_MOVED_TO))
+                        {
+                            // NOTE(Sleepster): New Directory added. 
+                            if(watcher->watch_recursively && (event->mask & IN_ISDIR) && (event->mask & (IN_CREATE|IN_MOVED_TO)))
+                            {
+                                sys_file_watcher_add_path(watcher, fullpath);
+                            }
+                        }
+
+                        if(change_events != 0)
+                        {
+                            if(directory->old_filename.data)
+                            {
+                                string_t copy_old_fullname = c_string_make_copy(&global_context->temporary_arena, directory->old_filename);
+                                string_t copy_new_fullname = c_string_make_copy(&global_context->temporary_arena, filename);
+
+                                c_file_watcher_add_change_event(watcher, copy_new_fullname, copy_old_fullname, directory, change_events);
+                            }
+                            else
+                            {
+                                string_t copy_new_fullname = c_string_make_copy(&global_context->temporary_arena, filename);
+                                c_file_watcher_add_change_event(watcher, copy_new_fullname, STR(""), directory, change_events);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    c_file_watcher_add_change_event(watcher,
+                                                    directory->filename,
+                                                    STR(""),
+                                                    directory,
+                                                    FWC_EVENT_MODIFIED|FWC_EVENT_SCAN_CHILDREN);
+                }
+            }
+
+            s64 this_event_size = OffsetOf(struct inotify_event, name) + event->len;
+            current_read_offset += this_event_size;
         }
-        else
+    }
+    else if(bytes_read == -1)
+    {
+        if(errno != EAGAIN && errno != EWOULDBLOCK)
         {
             log_error("inotify read error: %s\n", strerror(errno));
             return;
         }
     }
-    if(bytes_read == 0) return;
-
-    u64 offset = 0;
-    while(offset < (u64)bytes_read)
-    {
-        struct inotify_event *event = (struct inotify_event*)((byte*)osdata->inotify_data + offset);
-
-        sys_file_check_event_data_t *directory_data = NULL;
-        for(u32 i = 0; i < watcher->sys_watch_data.directory_data_count; ++i)
-        {
-            sys_file_check_event_data_t *found = watcher->sys_watch_data.directory_data[i];
-            if(found && found->inotify_handle == event->wd)
-            {
-                directory_data = found;
-                break;
-            }
-        }
-
-        if(!directory_data)
-        {
-            u64 this_event_size = OffsetOf(struct inotify_event, name) + event->len;
-            offset += this_event_size;
-            continue;
-        }
-
-        string_t base_path = directory_data->filename;
-
-        string_t name_str = STR("");
-        if(event->len)
-        {
-            name_str = STR(event->name);
-        }
-
-        string_t full_path = c_string_concat(&global_context->temporary_arena, base_path, name_str);
-        c_string_override_file_separators(&full_path);
-
-        if(event->mask & IN_Q_OVERFLOW)
-        {
-            c_file_watcher_add_change_event(watcher,
-                                            directory_data->filename,
-                                            STR(""),
-                                            directory_data,
-                                            FWC_EVENT_MODIFIED|FWC_EVENT_SCAN_CHILDREN);
-        }
-        else
-        {
-            u32 change_events = 0;
-
-            if(event->mask & IN_CREATE)
-            {
-                change_events |= FWC_EVENT_ADDED;
-            }
-            if(event->mask & IN_MODIFY || event->mask & IN_CLOSE_WRITE)
-            {
-                change_events |= FWC_EVENT_MODIFIED;
-            }
-            if(event->mask & IN_ATTRIB)
-            {
-                change_events |= FWC_EVENT_ATTRIBUTE_CHANGE;
-            }
-            if(event->mask & IN_DELETE)
-            {
-                change_events |= FWC_EVENT_DELETED;
-            }
-
-            if(event->mask & IN_MOVED_FROM)
-            {
-                directory_data->old_filename = c_string_make_copy(&global_context->temporary_arena, full_path);
-                directory_data->last_move_cookie = event->cookie;
-            }
-            if(event->mask & IN_MOVED_TO)
-            {
-                if(directory_data->last_move_cookie != 0 && directory_data->last_move_cookie == event->cookie)
-                {
-                    change_events |= (FWC_EVENT_MOVED | FWC_EVENT_RENAMED);
-                    c_file_watcher_add_change_event(watcher, full_path, directory_data->old_filename, directory_data, change_events);
-
-                    directory_data->last_move_cookie = 0;
-                    directory_data->old_filename = STR("");
-                }
-                else
-                {
-                    change_events |= FWC_EVENT_ADDED;
-                    c_file_watcher_add_change_event(watcher, full_path, STR(""), directory_data, change_events);
-                }
-            }
-
-            bool emitted_by_prev_branch = ((event->mask & IN_MOVED_TO) && directory_data->last_move_cookie == 0 );
-            if(!emitted_by_prev_branch)
-            {
-                if(change_events != 0 && !(event->mask & IN_MOVED_TO))
-                {
-                    if(watcher->watch_recursively && (event->mask & IN_ISDIR) && (event->mask & (IN_CREATE|IN_MOVED_TO)))
-                    {
-                        u32 event_flags = 0;
-                        if(watcher->events_to_monitor & FWC_EVENT_ADDED)
-                        {
-                            event_flags |= IN_CREATE;
-                        }
-                        if(watcher->events_to_monitor & FWC_EVENT_MODIFIED)
-                        {
-                            event_flags |= IN_MODIFY | IN_CLOSE_WRITE;
-                        }
-                        if(watcher->events_to_monitor & FWC_EVENT_MOVED)
-                        {
-                            event_flags |= IN_MOVED_FROM | IN_MOVED_TO | IN_MOVE_SELF;
-                        }
-                        if(watcher->events_to_monitor & FWC_EVENT_ATTRIBUTE_CHANGE)
-                        {
-                            event_flags |= IN_ATTRIB;
-                        }
-                        if(watcher->events_to_monitor & FWC_EVENT_DELETED)
-                        {
-                            event_flags |= IN_DELETE | IN_DELETE_SELF;
-                        }
-
-                        int sub_wd = inotify_add_watch(inotify_instance,
-                                                       C_STR(full_path),
-                                                       event_flags);
-                        if(sub_wd != -1)
-                        {
-                            sys_file_check_event_data_t *new_dir = c_arena_push_struct(&watcher->watcher_arena, sys_file_check_event_data_t);
-                            if(new_dir)
-                            {
-                                new_dir->file_data = sys_file_open(full_path, false, false, false).handle;
-                                new_dir->filename  = c_string_make_copy(&watcher->watcher_arena, full_path);
-                                new_dir->inotify_handle = sub_wd;
-                                new_dir->last_move_cookie = 0;
-                                new_dir->old_filename = STR("");
-                                u32 idx = watcher->sys_watch_data.directory_data_count++;
-                                watcher->sys_watch_data.directory_data[idx] = new_dir;
-                            }
-                        }
-                    }
-
-                    c_file_watcher_add_change_event(watcher, full_path, STR(""), directory_data, change_events);
-                }
-            }
-        }
-
-        size_t this_event_size = sizeof(struct inotify_event);
-        offset += this_event_size;
-    }
 
     c_file_watcher_emit_changes(watcher);
 }
+
+/*===========================================
+  =============== DLL LOADING ===============
+  ===========================================*/
 
 void*
 sys_load_library(string_t filepath)
@@ -1013,6 +1004,7 @@ sys_load_library(string_t filepath)
     {
         log_fatal("Could not load library: %s... Error: %s...\n", C_STR(filepath), dlerror());
     }
+
     return result;
 }
 

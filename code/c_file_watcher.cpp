@@ -59,15 +59,15 @@ c_file_watcher_issue_check_over_all_paths(file_watcher_t *watcher)
 void
 c_file_watcher_process_changes(file_watcher_t *watcher)
 {
-    sys_file_watcher_process_changes(watcher, null);
+    sys_file_watcher_process_changes(watcher);
 }
 
 void
-c_file_watcher_add_change_event(file_watcher_t *watcher,
-                                string_t fullname,
-                                string_t old_filename,
+c_file_watcher_add_change_event(file_watcher_t              *watcher,
+                                string_t                     fullname,
+                                string_t                     old_filename,
                                 sys_file_check_event_data_t *watch_data,
-                                u32 changes)
+                                u32                          changes)
 {
     for(u32 file_change_index = 0;
         file_change_index < watcher->change_count;
@@ -88,6 +88,7 @@ c_file_watcher_add_change_event(file_watcher_t *watcher,
     new_change.changes               = changes;
     new_change.last_change_timestamp = SDL_GetTicks();
     new_change.old_filename          = old_filename;
+    new_change.redudant              = false;
 
     watcher->observed_changes[watcher->change_count] = new_change;
     watcher->change_count++;
@@ -99,18 +100,58 @@ c_file_watcher_emit_changes(file_watcher_t *watcher)
     Assert(watcher->callback);
     if(watcher->change_count == 0) return;
 
-    u32 max_changes = watcher->change_count;
+    // NOTE(Sleepster): Collapse many like-events into a single event 
+    u32 max_observed_changes = watcher->change_count;
     for(u32 file_change_index = 0;
-        file_change_index < max_changes;
+        file_change_index < max_observed_changes;
         ++file_change_index)
     {
         file_watcher_recorded_change_t *change = watcher->observed_changes + file_change_index;
+        if(!change->redudant)
+        {
+            for(u32 next_change_index = 0;
+                next_change_index < max_observed_changes;
+                ++next_change_index)
+            {
+                file_watcher_recorded_change_t *found = watcher->observed_changes + next_change_index;
+                if(found != change && !found->redudant)
+                {
+                    if(c_string_compare(found->full_path, change->full_path))
+                    {
+                        u64 delta_tsc = change->last_change_timestamp - found->last_change_timestamp;
+                        if(delta_tsc < 100)
+                        {
+                            change->changes |= found->changes;
+                            found->redudant  = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        if(!change->redudant)
+        {
+            watcher->recorded_change_events[watcher->recorded_change_event_count++] = *change;
+        }
+    }
+
+    // NOTE(Sleepster): Actually push the changes 
+    for(u32 file_change_index = 0;
+        file_change_index < watcher->recorded_change_event_count;
+        ++file_change_index)
+    {
+        file_watcher_recorded_change_t *change = watcher->recorded_change_events + file_change_index;
         if(change)
         {
             watcher->callback(watcher, change, watcher->user_data);
             watcher->change_count--;
         }
     }
-    ZeroMemory(watcher->observed_changes, sizeof(file_watcher_recorded_change_t) * max_changes);
+
+    ZeroMemory(watcher->observed_changes,       sizeof(file_watcher_recorded_change_t) * watcher->change_count);
+    ZeroMemory(watcher->recorded_change_events, sizeof(file_watcher_recorded_change_t) * watcher->recorded_change_event_count);
+
+    watcher->change_count = 0;
+    watcher->recorded_change_event_count = 0;
 }
 

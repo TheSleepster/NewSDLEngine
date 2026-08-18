@@ -93,9 +93,11 @@ parser_create_declaration_context(parser_t *parser, string_t scope_name, declara
         if(context.context_ID == context_ID && parent == context.parent_scope)
         {
             result = &context;
+#if 0
             printf("====================================\n");
             printf("Found declaration_context of: '%.*s'...\n", fprint_string(scope_name));
             printf("====================================\n");
+#endif
             break;
         }
     }
@@ -111,7 +113,8 @@ parser_create_declaration_context(parser_t *parser, string_t scope_name, declara
         new_context.context_ID    = context_ID;
         new_context.parent_scope  = parent;
 
-        result = dynarray_add(&parser->recorded_decl_contexts, &new_context);
+        result = c_dynarray_add(&parser->recorded_decl_contexts, &new_context);
+#if 0
         printf("====================================\n");
         printf("Recorded declaration_context of: '%.*s'...\n", fprint_string(scope_name));
         
@@ -120,6 +123,7 @@ parser_create_declaration_context(parser_t *parser, string_t scope_name, declara
             printf("Parent context is: '%.*s'...\n", fprint_string(parent->lexical_scope));
         }
         printf("====================================\n");
+#endif
     }
 
     return(result);
@@ -145,6 +149,7 @@ parser_create(string_t filename, string_t file_data)
     lexer_create(&parser->lexer, file_data);
     parser->macro_table         = hash_table_create<macro_info_t>(1024);
     parser->recorded_attributes = hash_table_create<code_attribute_t>(256);
+    c_dynarray_reserve(&parser->recorded_decl_contexts, 60);
 
     string_t scope_string = c_string_get_filename_from_path(filename);
     declaration_context_t *global_scope = parser_create_declaration_context(parser, c_string_make_copy(&permanent_arena, scope_string), null);
@@ -161,7 +166,7 @@ parser_create(string_t filename, string_t file_data)
                                 primitive->identifier);
     }
         
-    dynarray_add(&parser->decl_context_stack, &global_scope);
+    c_dynarray_add(&parser->decl_context_stack, &global_scope);
     parser->active_decl_context = parser->decl_context_stack[0];
 
     return(parser);
@@ -170,8 +175,8 @@ parser_create(string_t filename, string_t file_data)
 internal_api void
 parser_push_decl_context(parser_t *parser, declaration_context_t *context)
 {
-    dynarray_add(&parser->decl_context_stack, &context);
-    dynarray_add_if_unique(&parser->recorded_decl_contexts, context);
+    c_dynarray_add(&parser->decl_context_stack, &context);
+    c_dynarray_add_if_unique(&parser->recorded_decl_contexts, context);
 
     parser->active_decl_context = parser->decl_context_stack[parser->decl_context_stack.used - 1];
 }
@@ -186,7 +191,7 @@ parser_pop_decl_context(parser_t *parser)
                      fprint_string(parser->filename));
     }
 
-    dynarray_pop(&parser->decl_context_stack);
+    c_dynarray_pop(&parser->decl_context_stack);
     parser->active_decl_context = parser->decl_context_stack[parser->decl_context_stack.used - 1];
 }
 
@@ -214,7 +219,7 @@ initialize_default_language_info(void)
         keyword.identifier = c_string_make_copy(&permanent_arena, default_keyword_strings[index]);
         keyword.keyword_id = default_keyword_enums[index];
 
-        dynarray_add(&g_language_info.keywords, &keyword);
+        c_dynarray_add(&g_language_info.keywords, &keyword);
     }
 
     // NOTE(Sleepster): Primitives 
@@ -238,7 +243,7 @@ initialize_default_language_info(void)
         primitive.ID            = type_id;
         primitive.code_metatype = CODE_TYPE_PRIMITIVE;
         
-        dynarray_add(&g_language_info.language_primitive_types, &primitive);
+        c_dynarray_add(&g_language_info.language_primitive_types, &primitive);
     }
 }
 
@@ -257,7 +262,7 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
 
         // TODO(Sleepster): GROSS I look like a web programmer...
         dynarray_t<dynarray_t<lexer_token_t>> argument_tokens = {};
-        defer(for(auto &element: argument_tokens) { dynarray_free(&element); });
+        defer(for(auto &element: argument_tokens) { c_dynarray_free(&element); });
 
         u32 current_macro_depth = 1;
         while(current_macro_depth > 0)
@@ -269,7 +274,7 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
             while((token.token_type != TOKEN_TYPE_COMMA) || (this_macro_depth != current_macro_depth))
             {
                 if(token.token_type == TOKEN_TYPE_EOF) break;
-                dynarray_add(&tokens, &token);
+                c_dynarray_add(&tokens, &token);
 
                 token = lexer_get_next_token(&parser->lexer);
                 if(token.token_type == TOKEN_TYPE_CLOSE_PAREN) --current_macro_depth;
@@ -279,11 +284,11 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
             }
 
             if(token.token_type == TOKEN_TYPE_EOF) break;
-            dynarray_add(&argument_tokens, &tokens);
+            c_dynarray_add(&argument_tokens, &tokens);
         }
 
         dynarray_t<lexer_token_t> expansion_tokens = {};
-        defer(dynarray_free(&expansion_tokens));
+        defer(c_dynarray_free(&expansion_tokens));
 
         lexer_token_stream_t *macro_stream = &macro_info->expansion_token_stream;
         for(u32 token_index = 0;
@@ -308,7 +313,7 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
                             ++token_index)
                         {
                             lexer_token_t *token = &argument_inputs.items[token_index];
-                            dynarray_add(&expansion_tokens, token);
+                            c_dynarray_add(&expansion_tokens, token);
                         }
 
                         found = true;
@@ -318,7 +323,7 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
 
             if(!found)
             {
-                dynarray_add(&expansion_tokens, macro_token);
+                c_dynarray_add(&expansion_tokens, macro_token);
             }
         }
 
@@ -343,6 +348,7 @@ parser_fetch_next_token(parser_t *parser)
 
     lexer_token_t result;
     result = lexer_get_next_token(lexer);
+
     while(result.token_type == TOKEN_TYPE_EOF && lexer->next_token_stream > 0)
     {
         lexer_pop_token_stream(lexer);
@@ -361,19 +367,47 @@ parser_fetch_next_token(parser_t *parser)
     }
     else if(c_string_compare(result.data, STR("CODE_GEN_IGNORE_DECL")))
     {
+        lexer_token_t next_token = lexer_get_next_token(lexer);
+        if(next_token.token_type == TOKEN_TYPE_TYPEDEF)
+        {
+            next_token = lexer_get_next_token(lexer);
+        }
+
+        if(next_token.token_type == TOKEN_TYPE_STRUCT ||
+           next_token.token_type == TOKEN_TYPE_UNION  ||
+           next_token.token_type == TOKEN_TYPE_ENUM)
+        {
+            while(next_token.token_type != TOKEN_TYPE_OPEN_BRACE)
+            {
+                next_token = lexer_get_next_token(lexer);
+            }
+
+            consume_code_block(parser, &next_token);
+
+            lexer_token_t peek_token = lexer_peek_token(lexer);
+            if(peek_token.token_type != TOKEN_TYPE_SEMICOLON)
+            {
+                lexer_get_next_token(lexer);
+            }
+        }
+        else
+        {
+            lexer_eat_lines(&parser->arena, lexer, 1);
+        }
+#if 0
         string_t current_line = lexer_eat_lines(&parser->arena, lexer, 2);
         s32 brace_index = c_string_find_first_char_from_left(current_line, '{');
         if(brace_index != -1)
         {
             while(result.token_type != TOKEN_TYPE_OPEN_BRACE)
             {
-                result = parser_get_next_lexer_token(parser);
+                result = lexer_get_next_token(&parser->lexer);
             }
 
             u32 current_depth = 1;
             while(current_depth > 0)
             {
-                result = parser_get_next_lexer_token(parser);
+                result = lexer_get_next_token(&parser->lexer);
                 if(result.token_type == TOKEN_TYPE_OPEN_BRACE)
                 {
                     ++current_depth;
@@ -384,6 +418,7 @@ parser_fetch_next_token(parser_t *parser)
                 }
             }
         }
+#endif
 
         result = {
             .token_type = TOKEN_TYPE_UNKNOWN,
