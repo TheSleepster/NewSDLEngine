@@ -118,7 +118,7 @@ s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 n
 
     result.ID       = name_hash;
     result.bitmap   = s_asset_bitmap_init(pixels, width, height, channels, BMF_RGBA32_SRGB);
-    result.gpu_data = s_renderer_image_create_from_bitmap(&result.bitmap);
+    result.gpu_data = RHI_image_create_from_bitmap(&result.bitmap);
 
     return(result);
 }
@@ -127,12 +127,14 @@ s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 n
   =============== ANIMATION2D ===============
   =========================================== */
 
+#if 0
 animation_source2D_t
 s_asset_animation_source_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     animation_source2D_t result = {};
     return(result);
 }
+#endif
 
 /*===============================
   =========== SHADERS ===========
@@ -142,10 +144,10 @@ shader_t
 s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     shader_t result;
-    result.ID          = name_hash;
-    slot->ID           = name_hash;
+    result.ID = name_hash;
+    slot->ID  = name_hash;
 
-    asset_manager->renderer_state->backend_shader_create(&result, slot->package_entry->asset_data);
+    asset_manager->RHI_context->backend_shader_create(&result, slot->package_entry->asset_data);
 
     return(result);
 }
@@ -234,7 +236,7 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
         {
             case TT_HashTag:
             {
-                c_tokenizer_eat_lines(&global_context->temporary_arena, tokenizer, 1);
+                c_tokenizer_eat_lines(&gc->temporary_arena, tokenizer, 1);
             }break;
             case TT_Identifier:
             {
@@ -246,9 +248,9 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
                     if(c_string_compare(token.string, STR("render_pipeline_state")))
                     {
                         const type_info_member_t *render_pipeline_info = Athena::get_member(parent_type_data, STR("pipeline_state"));
-                        render_pipeline_state_t *state_data = (render_pipeline_state_t*)((byte*)parent_data + render_pipeline_info->offset);
+                        RHI_pipeline_state_t *state_data = (RHI_pipeline_state_t*)((byte*)parent_data + render_pipeline_info->offset);
 
-                        const type_info_t *type_data = Athena::type_info<render_pipeline_state_t>();
+                        const type_info_t *type_data = Athena::type_info<RHI_pipeline_state_t>();
                         material_file_parse_block_data(filename, state_data, tokenizer, type_data, token);
                     }
                     else
@@ -296,7 +298,7 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
         {
             case TT_HashTag:
             {
-                c_tokenizer_eat_lines(&global_context->temporary_arena, &tokenizer, 1);
+                c_tokenizer_eat_lines(&gc->temporary_arena, &tokenizer, 1);
             }break;
             case TT_Identifier:
             {
@@ -556,7 +558,7 @@ s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t
     Assert(font_handle->slot->type == AT_Font);
     dynamic_render_font_varient_t *result = null;
 
-    if(font_handle->is_valid)
+    if(*font_handle->is_valid)
     {
         dynamic_render_font_t *font = font_handle->dynamic_render_font;
         for(dynamic_render_font_varient_t *varient: font->varients)
@@ -867,8 +869,9 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_slot_t *sl
         }break;
     }
 
-    slot->slot_state    = ASLS_Loaded;
-    slot->asset_manager = asset_manager;
+    slot->slot_state           = ASLS_Loaded;
+    slot->is_valid_for_handles = true;
+    slot->asset_manager        = asset_manager;
     AtomicIncrement32(&slot->package_generation);
 }
 
@@ -1011,7 +1014,7 @@ s_asset_manager_update(asset_manager_t *asset_manager)
                 }
             }
 
-            string_t filepath = c_string_make_copy(&global_context->temporary_arena, asset_file->file_info.filepath);
+            string_t filepath = c_string_make_copy(&gc->temporary_arena, asset_file->file_info.filepath);
 
             c_dynarray_reset(&asset_file->loaded_assets);
             c_arena_reset(&asset_file->init_arena);
@@ -1087,29 +1090,29 @@ s_asset_manager_update(asset_manager_t *asset_manager)
 
             if(page->font_atlas->texture.gpu_data.ID != 0)
             {
-                s_renderer_image_update_data(asset_manager->renderer_state, &page->font_atlas->texture.gpu_data);
+                RHI_image_update_data(asset_manager->RHI_context, &page->font_atlas->texture.gpu_data);
             }
             else
             {
-                sampler_create_info_t sampler_info = {
-                    .filtering                  = IMAGE_FILTER_TYPE_LINEAR,
+                RHI_sampler_create_info_t sampler_info = {
+                    .filtering                  = RHI_IMAGE_FILTER_TYPE_LINEAR,
                     .anisotropy_enabled         = true,
                     .max_anisotropy             = 4,
-                    .wrapu                      = IMAGE_WRAPPING_CLAMP_TO_EDGE,
-                    .wrapv                      = IMAGE_WRAPPING_CLAMP_TO_EDGE,
+                    .wrapu                      = RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE,
+                    .wrapv                      = RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE,
                     .compare_ops_enabled        = false,
                     .use_normalized_coordinates = true,
                 };
 
-                image_create_info_t info = {
+                RHI_image_create_info_t info = {
                     .data         = page->font_atlas->texture.bitmap.pixels,
                     .width        = 4096,
                     .height       = 4096,
                     .format       = BMF_RGBA32_UNORM,
-                    .usage        = IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
+                    .usage        = RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
                     .sampler_info = sampler_info
                 };
-                asset_manager->renderer_state->backend_image_create(&info, &page->font_atlas->texture.gpu_data);
+                asset_manager->RHI_context->backend_image_create(&info, &page->font_atlas->texture.gpu_data);
             }
             page->is_dirty = false;
             page->temporary_glyph_count = 0;
@@ -1317,6 +1320,8 @@ s_asset_manager_queue_asset_load(asset_manager_t *asset_manager, asset_slot_t *s
             c_dynarray_remove(&slot->catalog->loaded_assets, (u32)index);
         }
 
+        slot->is_valid_for_handles = false;
+
         // NOTE(Sleepster): Free the data. 
         c_za_free(asset_manager->asset_allocator, slot->package_entry->asset_data.data);
         if(slot->type == AT_Bitmap && slot->texture.bitmap.pixels.data)
@@ -1372,15 +1377,11 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
 
         asset_slot_t *slot = s_asset_manager_get_asset_slot(catalog, name);
 
+        result.is_valid = &slot->is_valid_for_handles;
         result.slot     = slot;
         result.slot->ID = hash_value;
         result.slot->catalog = asset_manager->asset_catalogs + result.slot->type;
-        if(result.slot->slot_state == ASLS_Loaded)
-        {
-            // NOTE(Sleepster): If loaded, just set basic stuff 
-            result.is_valid = true;
-        }
-        else if(result.slot->slot_state == ASLS_Unloaded)
+        if(result.slot->slot_state == ASLS_Unloaded)
         {
             // NOTE(Sleepster): Otherwise, load it. 
             s_asset_manager_queue_asset_load(asset_manager, slot);
@@ -1535,21 +1536,21 @@ s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atla
             ++texture_index;
         }
 
-        image_create_info_t info = {
+        RHI_image_create_info_t info = {
             .data   = atlas->bitmap_data->pixels,
             .width  = atlas->bitmap_data->width,
             .height = atlas->bitmap_data->height,
             .format = BMF_RGBA32_SRGB,
-            .usage  = IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
+            .usage  = RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
         };
 
         if(atlas->texture.gpu_data.backend_image.handle == null)
         {
-            asset_manager->renderer_state->backend_image_create(&info, &atlas->texture.gpu_data);
+            asset_manager->RHI_context->backend_image_create(&info, &atlas->texture.gpu_data);
         }
         else
         {
-            asset_manager->renderer_state->backend_image_update_contents(&atlas->texture.gpu_data);
+            asset_manager->RHI_context->backend_image_update_contents(&atlas->texture.gpu_data);
         }
     }
     else

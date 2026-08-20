@@ -10,8 +10,8 @@
 #include <c_math.h>
 #include <c_string.h>
 
-#include <r_render_image.h>
-#include <s_render_RHI.h>
+#include <s_RHI_image.h>
+#include <s_RHI_core.h>
 #include <s_asset_manager.h>
 
 #include <meta/GENERATED_immediate_vertex.h>
@@ -20,10 +20,10 @@
 typedef vImmediateVertex_t     immediate_vertex_t;
 typedef  ImmediateWidgetData_t immediate_widget_data_t;
 
-void immediate_quad_ex(render_command_list_t *command_list, vertex_buffer_t *buffer, vec3_t position, vec2_t render_size, vec4_t render_color, vec2_t uv_min, vec2_t uv_max, vec2_t padding, vec2_t sdf_info, vec2_t padding0, texture2D_t *texture);
-void immediate_rect(render_command_list_t *command_list, vertex_buffer_t *buffer, vec3_t position, vec2_t render_size, vec4_t render_color, vec2_t uv_min, vec2_t uv_max, vec2_t padding, vec2_t sdf_info, vec2_t padding0);
-void immediate_text(render_command_list_t *command_list, vertex_buffer_t *vertex_buffer, asset_manager_t *asset_manager, asset_handle_t *asset_handle, string_t render_string, vec3_t position, vec4_t text_color, float32 settings, u32 font_size);
-void immediate_put_data(vertex_buffer_t *buffer, byte *data, u32 element_size, u32 element_count);
+void immediate_quad_ex(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer, vec3_t position, vec2_t render_size, vec4_t render_color, vec2_t uv_min, vec2_t uv_max, vec2_t padding, vec2_t sdf_info, vec2_t padding0, texture2D_t *texture);
+void immediate_rect(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer, vec3_t position, vec2_t render_size, vec4_t render_color, vec2_t uv_min, vec2_t uv_max, vec2_t padding, vec2_t sdf_info, vec2_t padding0);
+void immediate_text(RHI_command_list_t *command_list, RHI_vertex_buffer_t *vertex_buffer, asset_manager_t *asset_manager, asset_handle_t *asset_handle, string_t render_string, vec3_t position, vec4_t text_color, float32 settings, u32 font_size);
+void immediate_put_data(RHI_vertex_buffer_t *buffer, byte *data, u32 element_size, u32 element_count);
 
 #endif // R_IMMEDIATE_RENDERING_H
 

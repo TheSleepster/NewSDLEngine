@@ -60,12 +60,12 @@ vk_image_usage_flags_from_image_format(u32 format)
 
 // TODO(Sleepster): Should not be here. 
 bool8 
-vk_sampler_info_is_valid(image_create_info_t *create_info)
+vk_sampler_info_is_valid(RHI_image_create_info_t *create_info)
 {
     bool8 result = true;
-    if(create_info->sampler_info.filtering == IMAGE_FILTER_TYPE_INVALID ||
-       create_info->sampler_info.wrapu     == IMAGE_WRAPPING_INVALID    || 
-       create_info->sampler_info.wrapv     == IMAGE_WRAPPING_INVALID)
+    if(create_info->sampler_info.filtering == RHI_IMAGE_FILTER_TYPE_INVALID ||
+       create_info->sampler_info.wrapu     == RHI_IMAGE_WRAPPING_INVALID    || 
+       create_info->sampler_info.wrapv     == RHI_IMAGE_WRAPPING_INVALID)
     {
         result = false;
     }
@@ -79,11 +79,11 @@ vk_sampler_filter_type_to_vk_filter(u32 filter)
     VkFilter result;
     switch(filter)
     {
-        case IMAGE_FILTER_TYPE_NEAREST:
+        case RHI_IMAGE_FILTER_TYPE_NEAREST:
         {
             result = VK_FILTER_NEAREST;
         }break;
-        case IMAGE_FILTER_TYPE_LINEAR:
+        case RHI_IMAGE_FILTER_TYPE_LINEAR:
         {
             result = VK_FILTER_LINEAR;
         }break;
@@ -119,17 +119,17 @@ VkImageLayout
 vk_get_image_initial_layout_from_usage(u32 usage, u32 format)
 {
     VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
-    if(usage != IMAGE_USAGE_INVALID)
+    if(usage != RHI_IMAGE_USAGE_INVALID)
     {
-        if(usage & IMAGE_USAGE_SHADER_SAMPLED_IMAGE)
+        if(usage & RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE)
         {
             result = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         }
-        else if(usage & IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT)
+        else if(usage & RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT)
         {
             result = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         }
-        else if(usage & IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT)
+        else if(usage & RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT)
         {
             result = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
         }
@@ -146,9 +146,9 @@ VkImageLayout
 vk_get_image_final_layout_from_usage(u32 usage, u32 format)
 {
     VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
-    if(usage != IMAGE_USAGE_INVALID)
+    if(usage != RHI_IMAGE_USAGE_INVALID)
     {
-        if(usage & IMAGE_USAGE_BLIT_SOURCE)
+        if(usage & RHI_IMAGE_USAGE_BLIT_SOURCE)
         {
             result = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
         }

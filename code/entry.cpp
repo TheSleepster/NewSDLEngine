@@ -23,8 +23,8 @@
 #include <p_platform_data.h>
 
 #include <vk_backend_core.h>
-#include <r_render_image.h>
-#include <s_render_RHI.h>
+#include <s_RHI_image.h>
+#include <s_RHI_core.h>
 
 #include <s_nt_networking.h>
 #include <s_input_manager.h>
@@ -37,8 +37,7 @@ int game_main(void);
 // TODO(Sleepster): Toggle this off in release 
 FILE_WATCHER_CALLBACK(main_file_watcher)
 {
-    asset_manager_t *asset_manager = global_context->asset_manager;
-    (void)asset_manager;
+    asset_manager_t *asset_manager = gc->asset_manager;
 
     string_t file_ext = c_string_get_file_ext_from_path(change->full_path);
     u32 ext_type = c_file_ext_string_to_enum(file_ext);
@@ -58,7 +57,7 @@ FILE_WATCHER_CALLBACK(main_file_watcher)
         if((change->changes & FWC_EVENT_MODIFIED))
         {
             asset_handle_t handle = s_asset_manager_acquire_asset_handle(asset_manager, filename);
-            if(handle.is_valid)
+            if(*handle.is_valid == true)
             {
                 s_asset_manager_queue_asset_load(asset_manager, handle.slot);
             }
@@ -72,7 +71,7 @@ FILE_WATCHER_CALLBACK(main_file_watcher)
 }
 
 void
-process_window_events(renderer_state_t *renderer_state, input_manager_t *input_manager)
+process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager)
 {
     SDL_Event event;
     while(SDL_PollEvent(&event))
@@ -82,15 +81,15 @@ process_window_events(renderer_state_t *renderer_state, input_manager_t *input_m
         {
             case SDL_EVENT_QUIT:
             {
-                global_context->running = false;
+                gc->running = false;
             }break;
             case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
             {
                 s32 window_x = 0;
                 s32 window_y = 0;
-                SDL_GetWindowSizeInPixels(renderer_state->window, &window_x, &window_y);
+                SDL_GetWindowSizeInPixels(RHI_context->window, &window_x, &window_y);
 
-                s_renderer_handle_window_resize(renderer_state, vec2(window_x, window_y));
+                RHI_handle_window_resize(RHI_context, vec2(window_x, window_y));
             }break;
         }
     }
@@ -113,9 +112,9 @@ main(int argc, char **argv)
             SDL_VERSIONNUM_MICRO(linked));
 
     c_global_context_init();
-    global_context->renderer_state = c_arena_push_struct(&global_context->context_arena, renderer_state_t);
-    global_context->asset_manager  = c_arena_push_struct(&global_context->context_arena, asset_manager_t);
-    global_context->input_manager  = c_arena_push_struct(&global_context->context_arena, input_manager_t);
+    gc->RHI_context    = c_arena_push_struct(&gc->context_arena, RHI_context_t);
+    gc->asset_manager  = c_arena_push_struct(&gc->context_arena, asset_manager_t);
+    gc->input_manager  = c_arena_push_struct(&gc->context_arena, input_manager_t);
     if(SDL_Init(SDL_INIT_VIDEO))
     {
         s32            display_count = 0;
@@ -125,44 +124,44 @@ main(int argc, char **argv)
         const SDL_DisplayMode *display_data = SDL_GetCurrentDisplayMode(display_ids[0]);
         Expect(display_data, "Could not get the display_mode... error: '%s'...\n", SDL_GetError());
 
-        global_context->renderer_state->window_size = vec2(display_data->w, display_data->h);
-        global_context->renderer_state->window = SDL_CreateWindow("Vulkan...", 
-                                                 global_context->renderer_state->window_size.x,
-                                                 global_context->renderer_state->window_size.y, 
-                                                 SDL_WINDOW_VULKAN|SDL_WINDOW_RESIZABLE);
-        if(global_context->renderer_state->window == null)
+        gc->RHI_context->window_size = vec2(display_data->w, display_data->h);
+        gc->RHI_context->window = SDL_CreateWindow("Vulkan...", 
+                                                   gc->RHI_context->window_size.x,
+                                                   gc->RHI_context->window_size.y, 
+                                                   SDL_WINDOW_VULKAN|SDL_WINDOW_RESIZABLE);
+        if(gc->RHI_context->window == null)
         {
             log_fatal("Could not create SDL window... Error: '%s'...\n", SDL_GetError());
         }
 
-        SDL_StartTextInput(global_context->renderer_state->window);
+        SDL_StartTextInput(gc->RHI_context->window);
 
-        global_context->renderer_state->render_context = c_arena_push_struct(&global_context->context_arena, vulkan_context_t);
-        global_context->asset_manager->renderer_state  = global_context->renderer_state; 
-        vulkan_context_t *vulkan_context = (vulkan_context_t*)global_context->renderer_state->render_context;
+        gc->RHI_context->backend_render_context = c_arena_push_struct(&gc->context_arena, vulkan_context_t);
+        gc->asset_manager->RHI_context          = gc->RHI_context; 
+        vulkan_context_t *vulkan_context        = (vulkan_context_t*)gc->RHI_context->backend_render_context;
 
-        global_context->renderer_state->backend_initialize(global_context->renderer_state->window);
+        gc->RHI_context->backend_initialize(gc->RHI_context->window);
 
         // TODO(Sleepster): The count will need to be adjusted in the future. But this is fine for now 
         u32 thread_count = sys_get_thread_count() - 4;
-        c_threadpool_init(&global_context->main_threadpool, thread_count, MB(10), true, false);
+        c_threadpool_init(&gc->main_threadpool, thread_count, MB(10), true, false);
 
-        s_asset_manager_init(global_context->asset_manager);
+        s_asset_manager_init(gc->asset_manager);
 
-        s_im_init_input_manager(global_context->input_manager);
-        s_renderer_state_init(global_context->renderer_state, vulkan_context);
+        s_im_init_input_manager(gc->input_manager);
+        RHI_context_init(gc->RHI_context, vulkan_context);
 
-        global_context->file_watcher = c_file_watcher_create(FWC_EVENT_ALL, true, main_file_watcher, null, false);
-        c_file_watcher_add_path(&global_context->file_watcher, STR("../res/"));
-        c_file_watcher_issue_check_over_all_paths(&global_context->file_watcher);
+        gc->file_watcher = c_file_watcher_create(FWC_EVENT_ALL, true, main_file_watcher, null, false);
+        c_file_watcher_add_path(&gc->file_watcher, STR("../res/"));
+        c_file_watcher_issue_check_over_all_paths(&gc->file_watcher);
 
-        global_context->running = true;
-        while(global_context->running)
+        gc->running = true;
+        while(gc->running)
         {
             s32 value = game_main();
             if(value == 0)
             {
-                global_context->running = false;
+                gc->running = false;
                 break;
             }
         }

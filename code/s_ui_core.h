@@ -15,7 +15,7 @@
 #include <s_input_manager.h>
 
 #include <r_immediate_rendering.h>
-#include <s_render_RHI.h>
+#include <s_RHI_core.h>
 
 constexpr u32 MAX_PARENT_WIDGETS = 256;
 constexpr u32 MAX_WIDGETS        = 1024;
@@ -222,7 +222,7 @@ struct ui_state_t
     memory_arena_t                    persistent_data_arena;
     HashTable_t(widget_state_t)       widget_states;
 
-    renderer_state_t                 *renderer;
+    RHI_context_t                    *RHI_context;
     asset_manager_t                  *asset_manager;
     input_manager_t                  *input_manager;
 
@@ -256,20 +256,20 @@ struct ui_state_t
     u32                               parent_stack_top;
     u32                               interface_framebuffer;
 
-    vertex_buffer_t                   vertex_buffer;
-    render_buffer_t                   index_buffer;
+    RHI_vertex_buffer_t               vertex_buffer;
+    RHI_index_buffer_t                index_buffer;
 
     immediate_widget_data_t          *widget_instances;
     u32                               widget_instance_count;
 
-    uniform_constant_buffer_t        *widget_instance_data;
-    uniform_constant_buffer_t        *camera_matrices_buffer;
+    RHI_uniform_constant_buffer_t    *widget_instance_data;
+    RHI_uniform_constant_buffer_t    *camera_matrices_buffer;
 };
 
-void      ui_state_init(ui_state_t *ui_state, input_manager_t *input_manager, asset_manager_t *asset_manager, renderer_state_t *renderer_state, u32 renderpass_ID);
+void      ui_state_init(ui_state_t *ui_state, input_manager_t *input_manager, asset_manager_t *asset_manager, RHI_context_t *RHI_context, u32 renderpass_ID);
 void      ui_state_update_widget_state(ui_state_t *ui_state);
 void      ui_state_maybe_eat_inputs(ui_state_t *ui_state);
-void      ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_list);
+void      ui_state_render_widgets(ui_state_t *ui_state, RHI_command_list_t *command_list);
 
 true_inline void ui_state_set_default_widget_idle_color(ui_state_t *ui_state, vec4_t color);
 true_inline void ui_state_set_default_widget_hover_color(ui_state_t *ui_state, vec4_t color);
@@ -280,7 +280,7 @@ true_inline void ui_state_set_active_padding(ui_state_t *ui_state, vec4_t paddin
 true_inline void ui_widget_set_flags(widget_t *widget, u32 flags);
 
 true_inline void ui_state_begin_frame(ui_state_t *ui_state);
-true_inline void ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list);
+true_inline void ui_state_end_frame(ui_state_t *ui_state, RHI_command_list_t *command_list);
 true_inline void ui_state_set_parent_layout(ui_state_t *ui_state, u32 layout_style);
 
 true_inline void ui_widget_set_layout(widget_t *widget, u32 layout_style);

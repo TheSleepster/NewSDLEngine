@@ -18,15 +18,18 @@ c_duration_counter_init(duration_counter_t *counter, u64 duration_ms, bool8 loop
 bool8
 c_duration_counter_advance(duration_counter_t *counter, u64 advance_ms)
 {
-    bool8 looped = false;
+    bool8 ended = false;
     counter->current_elapsed += advance_ms;
     if(counter->current_elapsed >= counter->duration_ms)
     {
-        looped = true;
-        counter->current_elapsed = 0;
+        ended = true;
+        if(counter->looped == true)
+        {
+            counter->current_elapsed = 0;
+        }
     }
 
-    return(looped);
+    return(ended);
 }
 
 true_inline void

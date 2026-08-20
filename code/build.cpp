@@ -28,9 +28,9 @@
 #include <c_threadpool.h>
 #include <c_duration_counter.h>
 #include <c_tokenizer.h>
-#include <s_render_RHI.h>
+#include <s_RHI_core.h>
+#include <s_RHI_image.h>
 #include <r_immediate_rendering.h>
-#include <r_render_image.h>
 #include <s_asset_manager.h>
 #include <s_input_manager.h>
 #include <s_nt_networking.h>
@@ -50,7 +50,7 @@
 #include <DEBUG_profiling.cpp>
 #include <r_immediate_rendering.cpp>
 #include <s_input_manager.cpp>
-#include <s_render_RHI.cpp>
+#include <s_RHI_core.cpp>
 
 #include <p_platform_data.h>
 #include <vk_backend_allocator.h>
@@ -64,7 +64,7 @@
 #include <c_file_watcher.cpp>
 #include <p_platform_data.cpp>
 #include <s_nt_networking.cpp>
-#include <r_render_image.cpp>
+#include <s_RHI_image.cpp>
 #include <vk_backend_allocator.cpp>
 #include <vk_backend_buffer.cpp>
 #include <vk_backend_core.cpp>

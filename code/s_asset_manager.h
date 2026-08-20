@@ -25,7 +25,7 @@
 #include <c_dynarray.h>
 #include <c_duration_counter.h>
 
-#include <r_render_image.h>
+#include <s_RHI_image.h>
 #include <vk_backend_image.h>
 #include <vk_backend_shader.h>
 
@@ -41,8 +41,11 @@ typedef struct shader             shader_t;
 typedef struct material_archetype material_archetype_t;
 typedef struct material_instance  material_instance_t;
 typedef struct material_data      material_data_t;
+#if 0
 typedef struct animation_source2D animation_source2D_t;
 typedef struct animation2D        animation2D_t;
+#endif
+
 typedef struct jfd_package_entry  jfd_package_entry_t;
 typedef struct jfd_file_header    jfd_file_header_t;
 
@@ -98,15 +101,17 @@ typedef enum bitmap_format
  */
 typedef struct asset_handle
 {
-    bool32        is_valid;
+    bool32       *is_valid;
     asset_slot_t *slot;
     union {
         texture2D_t           *texture;
         shader_t              *shader;
         material_data_t       *material_info;
         dynamic_render_font_t *dynamic_render_font;
+#if 0
         animation_source2D_t  *animation_source2D;
         animation2D_t         *animation2D;
+#endif
     };
 }asset_handle_t;
 
@@ -128,9 +133,9 @@ typedef struct bitmap
 
 typedef struct texture2D
 {
-    u64      ID;
-    bitmap_t bitmap;
-    image_t  gpu_data;
+    u64         ID;
+    bitmap_t    bitmap;
+    RHI_image_t gpu_data;
 }texture2D_t;
 
 typedef struct subtexture_data
@@ -177,27 +182,6 @@ typedef struct texture_atlas
 }texture_atlas_t;
 
 /*===========================================
-  =============== ANIMATION2D ===============
-  =========================================== */
-
-typedef struct animation_source2D 
-{
-    // NOTE(Sleepster): Debug information 
-    string_t           name;
-
-    asset_handle_t     texture;
-    u32                frame_count;
-    duration_counter_t frame_timer;
-}animation_source2D_t;
-
-typedef struct animation2D
-{
-    animation_source2D_t *animation_info;
-    u32                   current_frame;
-    duration_counter_t    frame_timer;
-}animation2D_t;
-
-/*===========================================
   ================== SHADERS ================
   =========================================== */
 
@@ -205,7 +189,7 @@ typedef struct shader
 {
     u64              ID;
     backend_shader_t shader_data;
-}shader_t;
+}RHI_shader_t;
 
 #if 0
 // TODO(Sleepster): 
@@ -282,7 +266,7 @@ typedef struct material_instance
     u32                           renderer_effect_flags;
     u32                           shader_uniform_count;
 
-    render_pipeline_state_t       pipeline_state;
+    RHI_pipeline_state_t          pipeline_state;
     material_archetype_t         *archetype;
 }material_instance_t;
 
@@ -460,6 +444,7 @@ typedef struct asset_slot
     u64                      ID;
     asset_slot_load_status_t slot_state;
     asset_type_t             type;
+    bool32                   is_valid_for_handles;
     
     string_t                 name;
     file_t                   owner_asset_file;
@@ -585,7 +570,7 @@ struct asset_manager_t
     asset_catalog_t          *sound_catalog;
 
     font_manager_t            font_manager;
-    renderer_state_t         *renderer_state;
+    RHI_context_t            *RHI_context;
 };
 
 void s_asset_manager_init(asset_manager_t *asset_manager);

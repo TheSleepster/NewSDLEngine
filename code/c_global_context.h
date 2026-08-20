@@ -15,10 +15,9 @@
 
 typedef struct vec2 vec2_t;
 
-struct renderer_state_t;
+struct RHI_context_t;
 struct asset_manager_t;
-
-typedef struct input_manager  input_manager_t;
+typedef struct input_manager input_manager_t;
 
 typedef struct global_context
 {
@@ -27,7 +26,7 @@ typedef struct global_context
     bool8             should_reload;
 
     threadpool_t      main_threadpool;
-    renderer_state_t *renderer_state;
+    RHI_context_t    *RHI_context;
     asset_manager_t  *asset_manager;
     input_manager_t  *input_manager;
     file_watcher_t    file_watcher;
@@ -43,7 +42,7 @@ void c_global_context_reset_temporary_data();
 void c_global_context_reset_context_arena();
 void gc_reset_context_arena();
 
-extern thread_local global_context_t *global_context;
+extern thread_local global_context_t *gc;
 
 #endif // C_GLOBALS_H
 

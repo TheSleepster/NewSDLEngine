@@ -45,7 +45,9 @@ PSMain(VertexOutput_t VertexOutput)
 {
     PixelOutput_t result;
     
-    float4 TextureColor = TextureSampler.Sample(VertexOutput.vOutTexCoord);
+    // NOTE(Sleepster): We use sample level here for the default texture binding...
+    // This may be stupid and I honestly kinda don't like this but It's whatever for now
+    float4 TextureColor = TextureSampler.SampleLevel(VertexOutput.vOutTexCoord, 0);
     if(TextureColor.a <= 0.3) discard;
 
     result.vFragColor = float4(VertexOutput.vOutColor.rgb, TextureColor.a);

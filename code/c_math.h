@@ -427,7 +427,7 @@ MATH_API float64 f64_sin_breathe(float64 time, float64 modifier);
   ===========================================*/
 
 MATH_API vec2_t  vec2(float32 A, float32 B);
-MATH_API vec2_t  vec2_zero();
+MATH_API vec2_t  vec2_zero(void);
 MATH_API vec2_t  vec2_create(float32 A);
 MATH_API vec3_t  vec2_expand_vec3(vec2_t A, float32 B);
 MATH_API vec2_t  vec2_cast(ivec2_t A);
@@ -455,7 +455,7 @@ MATH_API void    vec2_clamp(vec2_t *value, vec2_t min, vec2_t max);
   ===========================================*/
 
 MATH_API vec3_t  vec3(float32 A, float32 B, float32 C);
-MATH_API vec3_t  vec3_zero();
+MATH_API vec3_t  vec3_zero(void);
 MATH_API vec3_t  vec3_create(float32 A);
 MATH_API vec3_t  vec3_cast(ivec3_t A);
 MATH_API vec3_t  vec3_multiply(vec3_t A, vec3_t B);
@@ -478,7 +478,7 @@ MATH_API float32 vec3_dot(vec3_t A, vec3_t B);
   ===========================================*/
 
 MATH_API vec4_t  vec4(float32 A, float32 B, float32 C, float32 D);
-MATH_API vec4_t  vec4_zero();
+MATH_API vec4_t  vec4_zero(void);
 MATH_API vec4_t  vec4_create(float32 A);
 MATH_API vec4_t  vec4_scale(vec4_t A, float32 B);
 MATH_API vec4_t  vec4_multiply(vec4_t A, vec4_t B);
@@ -494,7 +494,8 @@ MATH_API float32 vec4_dot(vec4_t A, vec4_t B);
   ================ IVECTOR 2 ================
   ===========================================*/
 
-MATH_API ivec2_t ivec2();
+MATH_API ivec2_t ivec2(s32 A, s32 B);
+MATH_API ivec2_t ivec2_zero(void);
 MATH_API ivec2_t ivec2_create(s32 A);
 MATH_API ivec2_t ivec2_create_int32(s32 A, s32 B);
 MATH_API ivec3_t ivec2_expand_ivec3(ivec2_t A, s32 B);
@@ -506,7 +507,7 @@ MATH_API ivec2_t ivec2_multiply(ivec2_t A, ivec2_t B);
   ================ IVECTOR 3 ================
   ===========================================*/
 
-MATH_API ivec3_t ivec3();
+MATH_API ivec3_t ivec3(void);
 MATH_API ivec3_t ivec3_create(s32 A);
 MATH_API ivec3_t ivec3_create_int32(s32 A, s32 B, s32 C);
 MATH_API ivec3_t ivec3_cast(vec3_t A);
@@ -516,7 +517,7 @@ MATH_API ivec3_t ivec3_multiply(ivec3_t A, ivec3_t B);
   ================ IVECTOR 4 ================
   ===========================================*/
 
-MATH_API ivec4_t ivec4();
+MATH_API ivec4_t ivec4(void);
 MATH_API ivec4_t ivec4_create(s32 A);
 MATH_API ivec4_t ivec4_create_int32(s32 A, s32 B, s32 C, s32 D);
 MATH_API ivec4_t ivec4_cast(vec4_t A);
@@ -1322,7 +1323,18 @@ vec4_unlerp(vec4_t A, vec4_t B, vec4_t X)
   ===========================================*/
 
 MATH_API ivec2_t
-ivec2()
+ivec2(s32 A, s32 B)
+{
+    ivec2_t result;
+        
+    result.x = A;
+    result.y = B;
+
+    return(result);
+}
+
+MATH_API ivec2_t
+ivec2_zero(void)
 {
     ivec2_t result = {};
     return(result);

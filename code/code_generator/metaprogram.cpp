@@ -398,7 +398,7 @@ get_metatype_kind_string(metatype_kind_t kind)
 #define X(enum, string) \
         case enum: \
         { \
-            result = c_string_make_copy(&global_context->temporary_arena, STR(string)); \
+            result = c_string_make_copy(&gc->temporary_arena, STR(string)); \
             goto exit; \
         }break; 
 
@@ -418,7 +418,7 @@ get_metatype_flag_string(metatype_flags_t flag)
 #define X(enum, value, string) \
         case enum: \
         { \
-            result = c_string_make_copy(&global_context->temporary_arena, STR(string)); \
+            result = c_string_make_copy(&gc->temporary_arena, STR(string)); \
             goto exit; \
         }break; 
 
@@ -725,7 +725,7 @@ parse_structure(ast_file_data *file_data,
 {
     meta_struct_t *result = null;
 
-    meta_struct_t *structure_info  = c_arena_push_struct(&global_context->temporary_arena, meta_struct_t);
+    meta_struct_t *structure_info  = c_arena_push_struct(&gc->temporary_arena, meta_struct_t);
     structure_info->members        = c_dynarray_create(meta_member_t);
     structure_info->structure_type = get_structure_type_from_string(structure_type.string);
     structure_info->type_data.parent_filename = file_data->filename;
@@ -850,12 +850,12 @@ parse_structure(ast_file_data *file_data,
                     log_warning("Found member element: '%.*s' within the structure: '%.*s'... This element is not valid and will not be parsed...\n",
                                 token.string.count, C_STR(token.string), structure_type.string.count, C_STR(structure_type.string));
 #endif
-                    c_tokenizer_eat_lines(&global_context->temporary_arena, &file_data->tokenizer, 1);
+                    c_tokenizer_eat_lines(&gc->temporary_arena, &file_data->tokenizer, 1);
                 }
             }break;
             case TT_OpeningParen:
             {
-                c_tokenizer_eat_lines(&global_context->temporary_arena, &file_data->tokenizer, 1);
+                c_tokenizer_eat_lines(&gc->temporary_arena, &file_data->tokenizer, 1);
             }break;
             case TT_ClosingBrace:
             {
@@ -946,7 +946,7 @@ build_struct_access_name(meta_struct_t *structure, u32 max_depth, u32 *current_d
     string_t result = {};
     string_t parent_string = {};
 
-    char *buffer = (char*)c_arena_push_size(&global_context->temporary_arena, 1024);
+    char *buffer = (char*)c_arena_push_size(&gc->temporary_arena, 1024);
     if(structure->parent)
     {
         // NOTE(Sleepster): We are down the stack, keep working up to the root. 
@@ -971,7 +971,7 @@ build_struct_access_name(meta_struct_t *structure, u32 max_depth, u32 *current_d
         // NOTE(Sleepster): We are the root node. 
         result = c_string_sprintf(buffer, 1024, "%.*s", structure->type_data.type_name.count, C_STR(structure->type_data.type_name));
     }
-    result = c_string_concat(&global_context->temporary_arena, parent_string, result);
+    result = c_string_concat(&gc->temporary_arena, parent_string, result);
 
     return(result);
 }
@@ -1254,7 +1254,7 @@ typedef struct type_info_data_mapping
             u32 current_depth = 0;
             string_t nested_name = build_struct_access_name(structure, structure->nesting_depth, &current_depth, false);
             string_t appending   = STR("GENERATED_DEFAULT_");
-            nested_name = c_string_concat(&global_context->temporary_arena, appending, nested_name);
+            nested_name = c_string_concat(&gc->temporary_arena, appending, nested_name);
 
             c_string_builder_sprintf(struct_info_builder, "const static type_info_struct_%.*s type_info_struct_%.*s_const_data = {\n", 
                                      struct_canonical_type_name.count, C_STR(struct_canonical_type_name),
@@ -1285,14 +1285,14 @@ typedef struct type_info_data_mapping
                 string_t canonical_type_name = get_canonical_type_name(&member->type_info);
 
                 c_string_builder_sprintf(type_member_enum_builder, "\tTYPE_%.*s_MEMBER_%.*s,\n", 
-                                         struct_canonical_type_name.count, C_STR(c_string_to_upper(&global_context->context_arena, struct_canonical_type_name)),
+                                         struct_canonical_type_name.count, C_STR(c_string_to_upper(&gc->context_arena, struct_canonical_type_name)),
                                          member->name.count,               C_STR(member->name));
 
                 if(member->type_info.kind == META_TYPE_KIND_Struct && 
                  ((member->type_info.modifier_flags & META_TYPE_FLAGS_PrivatelyDeclared) != 0))
                 {
-                    string_t type_name = c_string_concat(&global_context->temporary_arena, nested_name, STR("."));
-                    type_name = c_string_concat(&global_context->temporary_arena, type_name, canonical_type_name);
+                    string_t type_name = c_string_concat(&gc->temporary_arena, nested_name, STR("."));
+                    type_name = c_string_concat(&gc->temporary_arena, type_name, canonical_type_name);
                     c_string_builder_sprintf(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = %.*s, .modifier_flags = ",
                                              member->name.count,        C_STR(member->name),        // member_name
                                              member->name.count,        C_STR(member->name),        // .name 
@@ -1315,8 +1315,8 @@ typedef struct type_info_data_mapping
                                          member->type_info.pointer_depth, // pointer depth
                                          member->type_info.array_size);   // array size
                                                                           
-                string_t fullname = c_string_concat(&global_context->temporary_arena, nested_name, STR("."));
-                fullname = c_string_concat(&global_context->temporary_arena, fullname, member->name);
+                string_t fullname = c_string_concat(&gc->temporary_arena, nested_name, STR("."));
+                fullname = c_string_concat(&gc->temporary_arena, fullname, member->name);
                 c_string_builder_sprintf(struct_info_builder, ".size = sizeof(decltype(%.*s)), ", fullname.count, C_STR(fullname));
                 c_string_builder_sprintf(struct_info_builder, ".offset = OffsetOf(decltype(%.*s), %.*s)},\n", 
                                          nested_name.count, C_STR(nested_name),
@@ -1354,12 +1354,12 @@ typedef struct type_info_data_mapping
             {
                 meta_member_t *member = c_dynarray_get_ptr(enum_data->members, member_index);
                 c_string_builder_sprintf(type_table_builder, "\tX(TYPE_ENUM_LOOKUP_%.*s_MEMBER_%.*s, \"%.*s\") \\\n", 
-                                         enum_data->type_data.type_name.count, C_STR(c_string_to_upper(&global_context->context_arena, enum_data->type_data.type_name)),
+                                         enum_data->type_data.type_name.count, C_STR(c_string_to_upper(&gc->context_arena, enum_data->type_data.type_name)),
                                          member->name.count,                   C_STR(member->name),
                                          member->name.count,                   C_STR(member->name));
 
                 c_string_builder_sprintf(type_member_enum_builder, "\tTYPE_%.*s_MEMBER_%.*s,\n", 
-                                         enum_data->type_data.type_name.count, C_STR(c_string_to_upper(&global_context->context_arena, enum_data->type_data.type_name)),
+                                         enum_data->type_data.type_name.count, C_STR(c_string_to_upper(&gc->context_arena, enum_data->type_data.type_name)),
                                          member->name.count,                   C_STR(member->name));
 
                 c_string_builder_sprintf(struct_info_builder, "\t\t.%.*s = {.name = \"%.*s\", .type = TYPE_%.*s, .kind = META_TYPE_KIND_Enum, .modifier_flags = META_TYPE_FLAGS_None, .flag_counter = 0, .pointer_depth = 0, .array_size = 0, .size = sizeof(%.*s), .offset = %.*s},\n",
@@ -1400,8 +1400,8 @@ GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
         {
             u32 current_depth = 0;
             string_t nested_name = build_struct_access_name(type->metadata, type->metadata->nesting_depth - 1, &current_depth, false);
-            nested_name = c_string_concat(&global_context->temporary_arena, nested_name, STR("."));
-            nested_name = c_string_concat(&global_context->temporary_arena, nested_name, type->canonical_name);
+            nested_name = c_string_concat(&gc->temporary_arena, nested_name, STR("."));
+            nested_name = c_string_concat(&gc->temporary_arena, nested_name, type->canonical_name);
 
             c_string_builder_sprintf(type_table_builder, "\t{.name = \"%.*s\", .type = TYPE_%.*s, ",
                                      type->canonical_name.count, C_STR(type->canonical_name),
@@ -1475,7 +1475,7 @@ GENERATED_TYPE_INFO_ENUM_NAME_MAP_LIST(X)
 
                 c_string_builder_sprintf(type_table_builder, "\t{.name = \"%.*s\", .member_enum = TYPE_%.*s_MEMBER_%.*s, .type_info_ptr = (const type_info_struct*)&type_info_enum_%.*s_const_data},\n",
                                          member->name.count,        C_STR(member->name),                           // .name
-                                         canonical_enum_name.count, C_STR(c_string_to_upper(&global_context->context_arena, canonical_enum_name)), // .member_enum, first half
+                                         canonical_enum_name.count, C_STR(c_string_to_upper(&gc->context_arena, canonical_enum_name)), // .member_enum, first half
                                          member->name.count,        C_STR(member->name),                           // .member_enum, second half
                                          canonical_enum_name.count, C_STR(canonical_enum_name));                   // .struct_const_data
             }
@@ -1557,7 +1557,7 @@ c_meta_get_type_kind_string_from_enum(metatype_kind_t kind)
 #define X(enum, string)                                                                 \
         case enum:                                                                      \
         {                                                                               \
-            result = c_string_make_copy(&global_context->temporary_arena, STR(string)); \
+            result = c_string_make_copy(&gc->temporary_arena, STR(string)); \
             goto exit;                                                                  \
         }break; 
 
@@ -1594,7 +1594,7 @@ c_meta_get_type_flag_string_from_enum(metatype_flags_t flag)
 #define X(enum, value, string)                                                          \
         case enum:                                                                      \
         {                                                                               \
-            result = c_string_make_copy(&global_context->temporary_arena, STR(string)); \
+            result = c_string_make_copy(&gc->temporary_arena, STR(string)); \
             goto exit;                                                                  \
         }break; 
 
@@ -1649,7 +1649,7 @@ c_meta_get_struct_type_class_from_enum(meta_struct_type_t type)
 #define X(enum, string)                                                                 \
         case enum:                                                                      \
         {                                                                               \
-            result = c_string_make_copy(&global_context->temporary_arena, STR(string)); \
+            result = c_string_make_copy(&gc->temporary_arena, STR(string)); \
             goto exit;                                                                  \
         }break; 
 
@@ -1770,7 +1770,7 @@ c_meta_get_enum_member_mapping_string_from_enum(type_info_enum_member_mapping_t 
 #define X(enum, string)                                                                 \
         case enum:                                                                      \
         {                                                                               \
-            result = c_string_make_copy(&global_context->temporary_arena, STR(string)); \
+            result = c_string_make_copy(&gc->temporary_arena, STR(string)); \
             goto exit;                                                                  \
         }break; 
 
@@ -1986,7 +1986,7 @@ check_define_data(ast_file_data_t *file, token_data_t token)
                 char next_char = file->tokenizer.data.data[index + 1];
                 if(index != INVALID_ID && (next_char == '\n' || next_char == '\r'))
                 {
-                    c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
+                    c_tokenizer_eat_lines(&gc->temporary_arena, &file->tokenizer, 1);
 
                     bool8 parsing = true;
                     while(parsing)
@@ -1995,7 +1995,7 @@ check_define_data(ast_file_data_t *file, token_data_t token)
                         next_char = file->tokenizer.data.data[index + 1];
                         if(index != INVALID_ID && (next_char == '\n' || next_char == '\r'))
                         {
-                            c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
+                            c_tokenizer_eat_lines(&gc->temporary_arena, &file->tokenizer, 1);
                         }
                         else if(index != INVALID_ID && (next_char != '\n' && next_char != '\r'))
                         {
@@ -2003,14 +2003,14 @@ check_define_data(ast_file_data_t *file, token_data_t token)
                         }
                         else if(index == INVALID_ID)
                         {
-                            c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
+                            c_tokenizer_eat_lines(&gc->temporary_arena, &file->tokenizer, 1);
                             parsing = false;
                         }
                     }
                 }
                 else if(c_string_compare(token.string, STR("typedef")))
                 {
-                    c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
+                    c_tokenizer_eat_lines(&gc->temporary_arena, &file->tokenizer, 1);
                 }
                 else
                 {
@@ -2020,7 +2020,7 @@ check_define_data(ast_file_data_t *file, token_data_t token)
                     //   to the end of the line the macro expansion and store this in a "macros" hash table 
                     //   using the name of the macro as the key
                     token_data_t macro_name_token = c_tokenizer_get_next_token(&file->tokenizer);
-                    string_t expanded_macro_value = c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
+                    string_t expanded_macro_value = c_tokenizer_eat_lines(&gc->temporary_arena, &file->tokenizer, 1);
 
                     c_hash_table_insert_pair(&state.macro_hash, macro_name_token.string, expanded_macro_value);
                 }
@@ -2056,10 +2056,10 @@ build_file_ast(ast_file_data_t *file)
                     token_data_t token = c_tokenizer_get_next_token(&file->tokenizer);
                     while(token.type != TT_ClosingBrace)
                     {
-                        c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
+                        c_tokenizer_eat_lines(&gc->temporary_arena, &file->tokenizer, 1);
                         token = c_tokenizer_get_next_token(&file->tokenizer);
                     }
-                    c_tokenizer_eat_lines(&global_context->temporary_arena, &file->tokenizer, 1);
+                    c_tokenizer_eat_lines(&gc->temporary_arena, &file->tokenizer, 1);
                 }
 
                 if(c_string_compare(token.string, STR("struct")) || 
@@ -2096,7 +2096,7 @@ VISIT_FILES(generate_file_metadata)
         return;
     }
 
-    state.ast_file.filename       = c_string_make_copy(&global_context->temporary_arena, filename);
+    state.ast_file.filename       = c_string_make_copy(&gc->temporary_arena, filename);
     state.ast_file.tokenizer.data = c_file_read_entirety(filename);
     Assert(state.ast_file.tokenizer.data.data);
 

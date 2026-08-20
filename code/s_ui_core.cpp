@@ -143,7 +143,7 @@ ui_state_begin_frame(ui_state_t *ui_state)
 }
 
 true_inline void
-ui_state_end_frame(ui_state_t *ui_state, render_command_list_t *command_list)
+ui_state_end_frame(ui_state_t *ui_state, RHI_command_list_t *command_list)
 {
     Expect(ui_state->frame_begun == true, "Attempted to call 'ui_state_end_frame()' but 'ui_state_begin_frame()' was never called on this ui_state_t...\n");
     Expect(ui_state->frame_ended == false, "Attempted to call 'ui_state_end_frame()' but this has already been called on this ui_state_t this frame...\n");
@@ -239,7 +239,7 @@ place_widgets_in_hierarchy(widget_t *first_widget, vec2_t *placement_cursor, u32
 internal_api void
 place_all_widgets(ui_state_t *ui_state)
 {
-    renderpass_t *renderpass = ui_state->renderer->renderpasses + ui_state->interface_framebuffer;
+    RHI_renderpass_t *renderpass = ui_state->RHI_context->renderpasses + ui_state->interface_framebuffer;
     float32 half_width  = renderpass->render_width  * 0.5f;
     float32 half_height = renderpass->render_height * 0.5f;
 
@@ -602,7 +602,7 @@ ui_state_maybe_eat_inputs(ui_state_t *ui_state)
 void
 ui_state_update_widget_state(ui_state_t *ui_state)
 {
-    renderpass_t *renderpass = ui_state->renderer->renderpasses + ui_state->interface_framebuffer;
+    RHI_renderpass_t *renderpass = ui_state->RHI_context->renderpasses + ui_state->interface_framebuffer;
     
     float32 half_width  = renderpass->render_width  * 0.5f;
     float32 half_height = renderpass->render_height * 0.5f;
@@ -624,7 +624,7 @@ ui_state_update_widget_state(ui_state_t *ui_state)
 }
 
 internal_api void
-render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_list, widget_t *first_widget)
+render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, widget_t *first_widget)
 {
     widget_t *current_widget = first_widget;
     do {
@@ -722,9 +722,9 @@ render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_lis
         {
             if(current_widget->display_texture->texture)
             {
-                r_cmd_bind_texture_from_handle(command_list, current_widget->display_texture);
+                RHI_cmd_bind_texture_from_handle(command_list, current_widget->display_texture);
 
-                s32 texture_index = s_renderer_is_texture_bound(command_list, current_widget->display_texture->texture);
+                s32 texture_index = RHI_is_texture_bound(command_list, current_widget->display_texture->texture);
                 immediate_quad_ex(command_list,
                                   &ui_state->vertex_buffer,
                                   current_widget->state->position, 
@@ -750,9 +750,9 @@ render_widget_hierarchy(ui_state_t *ui_state, render_command_list_t *command_lis
 }
 
 void
-ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_list)
+ui_state_render_widgets(ui_state_t *ui_state, RHI_command_list_t *command_list)
 {
-    renderer_state_t *renderer_state = ui_state->renderer;
+    RHI_context_t *RHI_context = ui_state->RHI_context;
     asset_manager_t  *asset_manager  = ui_state->asset_manager;
     (void)asset_manager;
 
@@ -761,31 +761,32 @@ ui_state_render_widgets(ui_state_t *ui_state, render_command_list_t *command_lis
     {
         render_widget_hierarchy(ui_state, command_list, current_widget);
 
-        r_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
-        r_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
+        RHI_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
+        RHI_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
 
         // NOTE(Sleepster): First, draw the normal rectangle widgets
         {
-            render_pipeline_state_t pipeline_state = command_list->active_render_state;
-            pipeline_state.dst_color_blend_mode  = RBM_OneMinusSrcAlpha;
-            pipeline_state.src_alpha_blend_mode  = RBM_One;
-            pipeline_state.dst_alpha_blend_mode  = RBM_Zero;
+            RHI_pipeline_state_t pipeline_state = command_list->active_render_state;
+            pipeline_state.dst_color_blend_mode = RBM_OneMinusSrcAlpha;
+            pipeline_state.src_alpha_blend_mode = RBM_One;
+            pipeline_state.dst_alpha_blend_mode = RBM_Zero;
 
-            r_cmd_set_render_state(command_list, &pipeline_state);
-            r_cmd_use_shader_program(command_list, ui_state->widget_shader);
-            r_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
+            RHI_cmd_set_render_state(command_list, &pipeline_state);
+            RHI_cmd_use_shader_program(command_list, ui_state->widget_shader);
+            RHI_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
 
-            s32 window_width  = Max(renderer_state->window_size.x, 10);
-            s32 window_height = Max(renderer_state->window_size.y, 10);
+            s32 window_width  = Max(RHI_context->window_size.x, 10);
+            s32 window_height = Max(RHI_context->window_size.y, 10);
 
-            r_cmd_update_constant_buffer(command_list, ui_state->camera_matrices_buffer, &ui_state->current_camera,   sizeof(camera_matrices_t));
-            r_cmd_update_constant_buffer(command_list, ui_state->widget_instance_data,    ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
+            RHI_cmd_update_constant_buffer(command_list, ui_state->camera_matrices_buffer, &ui_state->current_camera,   sizeof(camera_matrices_t));
+            RHI_cmd_update_constant_buffer(command_list, ui_state->widget_instance_data,    ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
 
-            r_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
-            r_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
+            RHI_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
+            RHI_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
 
-            r_cmd_draw_indexed(command_list, ui_state->widget_item_count * 6, 0, 1, 0);
-            s_renderer_buffer_reset(ui_state->renderer, &ui_state->vertex_buffer);
+            RHI_cmd_draw_indexed(command_list, ui_state->widget_item_count * 6, 0, 1, 0);
+            RHI_buffer_reset(ui_state->RHI_context, &ui_state->vertex_buffer);
+            RHI_buffer_reset(ui_state->RHI_context, &ui_state->index_buffer);
             ui_state->widget_instance_count = 0;
         }
     }
@@ -808,7 +809,7 @@ void
 ui_state_init(ui_state_t       *ui_state, 
               input_manager_t  *input_manager,
               asset_manager_t  *asset_manager, 
-              renderer_state_t *renderer_state, 
+              RHI_context_t *RHI_context, 
               u32               renderpass_ID)
 {
     ZeroStruct(*ui_state);
@@ -820,7 +821,7 @@ ui_state_init(ui_state_t       *ui_state,
                        widget_hash_table_allocate_impl,
                        null);
 
-    ui_state->renderer              = renderer_state;
+    ui_state->RHI_context           = RHI_context;
     ui_state->asset_manager         = asset_manager;
     ui_state->interface_framebuffer = renderpass_ID;
     ui_state->parent_stack_top      = 1;
@@ -845,7 +846,7 @@ ui_state_init(ui_state_t       *ui_state,
     ui_state->ui_controller = s_im_get_primary_controller(input_manager);
     ui_state->widget_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_widget"));
 
-    u32 *indices = c_arena_push_array(&renderer_state->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
+    u32 *indices = c_arena_push_array(&RHI_context->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
     u32  index_offset = 0;
     for(u32 index = 0;
         index < 60000;
@@ -864,21 +865,21 @@ ui_state_init(ui_state_t       *ui_state,
     ui_state->interface_framebuffer = renderpass_ID;
     const u32 VERTEX_BUFFER_SIZE = 4 * MAX_WIDGETS;
     immediate_vertex_t *vertices = c_arena_push_array(&ui_state->persistent_data_arena, immediate_vertex_t, VERTEX_BUFFER_SIZE);
-    ui_state->vertex_buffer = s_renderer_vertex_buffer_create(renderer_state, 
-                                                              RenderBufferAllocationTypeMapped,
-                                                              RenderBufferAdvanceRate_PerElement,
-                                                              (byte*)vertices,
-                                                              sizeof(immediate_vertex_t),
-                                                              VERTEX_BUFFER_SIZE);
-    ui_state->index_buffer = s_renderer_index_buffer_create(renderer_state, 
-                                                            RenderBufferAllocationTypeGPUOnly,
-                                                            sizeof(u32),
-                                                            indices,
-                                                            sizeof(u32) * (6 * MAX_WIDGETS));
+    ui_state->vertex_buffer = RHI_vertex_buffer_create(RHI_context, 
+                                                       RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED,
+                                                       RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT,
+                                                       (byte*)vertices,
+                                                       sizeof(immediate_vertex_t),
+                                                       VERTEX_BUFFER_SIZE);
+    ui_state->index_buffer = RHI_index_buffer_create(RHI_context, 
+                                                     RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY,
+                                                     sizeof(u32),
+                                                     indices,
+                                                     sizeof(u32) * (6 * MAX_WIDGETS));
     const u32 INSTANCE_BUFFER_SIZE = MAX_WIDGETS;
     ui_state->widget_instances       = c_arena_push_array(&ui_state->persistent_data_arena, immediate_widget_data_t, INSTANCE_BUFFER_SIZE);
-    ui_state->widget_instance_data   = s_renderer_get_constant_buffer(renderer_state, STR("WidgetInstanceData"));
-    ui_state->camera_matrices_buffer = s_renderer_get_constant_buffer(renderer_state, STR("CameraMatrices"));
+    ui_state->widget_instance_data   = RHI_get_constant_buffer(RHI_context, STR("WidgetInstanceData"));
+    ui_state->camera_matrices_buffer = RHI_get_constant_buffer(RHI_context, STR("CameraMatrices"));
 }
 
 // NOTE(Sleepster): Widget functions
@@ -1422,7 +1423,7 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
         ui_widget_seed(ui_state, widget->ID);
         vec2_t slider_box_size = vec2((float32)bar_width * 0.1f, (float32)bar_height * button_scale_factor);
 
-        string_t box_name = c_string_concat(&global_context->temporary_arena, STR("SLIDER_BOX_"), widget_name);
+        string_t box_name = c_string_concat(&gc->temporary_arena, STR("SLIDER_BOX_"), widget_name);
         ui_signal_t slider_button = ui_widget_sized_button(ui_state, 
                                                            box_name, 
                                                            slider_box_size, 
@@ -1583,7 +1584,7 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
         {
             ui_widget_seed(ui_state, widget->ID);
 
-            string_t name = c_string_concat(&global_context->temporary_arena, STR("TEXT_BOX_CURSOR_"), widget_name);
+            string_t name = c_string_concat(&gc->temporary_arena, STR("TEXT_BOX_CURSOR_"), widget_name);
             ui_signal_t signal = ui_widget_rectangle(ui_state, name, vec2(12, size.y), {UI_WIDGET_SIZE_KIND_PIXELS, UI_WIDGET_SIZE_KIND_PIXELS});
 
             widget_t *rect = signal.widget;

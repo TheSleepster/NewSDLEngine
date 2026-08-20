@@ -36,8 +36,8 @@
 	X(sys_semaphore_handle_t, &DEFAULT_typedata_sys_semaphore_handle_t) \
 	X(immediate_vertex_t, &DEFAULT_typedata_immediate_vertex_t) \
 	X(immediate_widget_data_t, &DEFAULT_typedata_immediate_widget_data_t) \
-	X(render_command_list_t, &DEFAULT_typedata_structure_render_command_list_t.type_info) \
-	X(vertex_buffer_t, &DEFAULT_typedata_structure_vertex_buffer_t.type_info) \
+	X(RHI_command_list_t, &DEFAULT_typedata_structure_RHI_command_list_t.type_info) \
+	X(RHI_vertex_buffer_t, &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info) \
 	X(vec3_t, &DEFAULT_typedata_vec3_t) \
 	X(vec2_t, &DEFAULT_typedata_vec2_t) \
 	X(vec4_t, &DEFAULT_typedata_vec4_t) \
@@ -69,7 +69,7 @@
 	X(file_watcher_sys_watch_data_t, &DEFAULT_typedata_file_watcher_sys_watch_data_t) \
 	X(global_context_t, &DEFAULT_typedata_structure_global_context_t.type_info) \
 	X(threadpool_t, &DEFAULT_typedata_structure_threadpool_t.type_info) \
-	X(renderer_state_t, &DEFAULT_typedata_structure_renderer_state_t.type_info) \
+	X(RHI_context_t, &DEFAULT_typedata_structure_RHI_context_t.type_info) \
 	X(input_manager_t, &DEFAULT_typedata_structure_input_manager_t.type_info) \
 	X(hash_table_allocation_flags_t, &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info) \
 	X(hash_table_header_t, &DEFAULT_typedata_structure_hash_table_header_t.type_info) \
@@ -102,22 +102,13 @@
 	X(zone_allocator_block_t, &DEFAULT_typedata_structure_zone_allocator_block_t.type_info) \
 	X(zone_allocator_block, &DEFAULT_typedata_zone_allocator_block) \
 	X(thread_proc_t, &DEFAULT_typedata_thread_proc_t) \
-	X(render_image_filter_type_t, &DEFAULT_typedata_structure_render_image_filter_type_t.type_info) \
-	X(render_image_wrapping_type_t, &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info) \
-	X(render_image_usage_t, &DEFAULT_typedata_structure_render_image_usage_t.type_info) \
-	X(sampler_create_info_t, &DEFAULT_typedata_structure_sampler_create_info_t.type_info) \
-	X(image_create_info_t, &DEFAULT_typedata_structure_image_create_info_t.type_info) \
-	X(image_t, &DEFAULT_typedata_structure_image_t.type_info) \
-	X(bitmap_t, &DEFAULT_typedata_structure_bitmap_t.type_info) \
-	X(backend_image_t, &DEFAULT_typedata_backend_image_t) \
 	X(asset_type_t, &DEFAULT_typedata_structure_asset_type_t.type_info) \
 	X(asset_slot_load_status_t, &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info) \
 	X(bitmap_format_t, &DEFAULT_typedata_structure_bitmap_format_t.type_info) \
+	X(bitmap_t, &DEFAULT_typedata_structure_bitmap_t.type_info) \
 	X(subtexture_data_t, &DEFAULT_typedata_structure_subtexture_data_t.type_info) \
 	X(texture_atlas_t, &DEFAULT_typedata_structure_texture_atlas_t.type_info) \
-	X(animation_source2D_t, &DEFAULT_typedata_structure_animation_source2D_t.type_info) \
-	X(animation2D_t, &DEFAULT_typedata_structure_animation2D_t.type_info) \
-	X(shader_t, &DEFAULT_typedata_structure_shader_t.type_info) \
+	X(RHI_shader_t, &DEFAULT_typedata_structure_RHI_shader_t.type_info) \
 	X(material_instance_t, &DEFAULT_typedata_structure_material_instance_t.type_info) \
 	X(material_archetype_t, &DEFAULT_typedata_structure_material_archetype_t.type_info) \
 	X(stored_material_type_t, &DEFAULT_typedata_structure_stored_material_type_t.type_info) \
@@ -133,8 +124,10 @@
 	X(texture_manager_t, &DEFAULT_typedata_structure_texture_manager_t.type_info) \
 	X(font_manager_t, &DEFAULT_typedata_structure_font_manager_t.type_info) \
 	X(texture_atlas_registry_t, &DEFAULT_typedata_structure_texture_atlas_registry_t.type_info) \
+	X(shader_t, &DEFAULT_typedata_shader_t) \
+	X(RHI_image_t, &DEFAULT_typedata_structure_RHI_image_t.type_info) \
 	X(backend_shader_t, &DEFAULT_typedata_backend_shader_t) \
-	X(render_pipeline_state_t, &DEFAULT_typedata_structure_render_pipeline_state_t.type_info) \
+	X(RHI_pipeline_state_t, &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info) \
 	X(VkDescriptorSet, &DEFAULT_typedata_VkDescriptorSet) \
 	X(FT_Face, &DEFAULT_typedata_FT_Face) \
 	X(jfd_package_entry_t, &DEFAULT_typedata_jfd_package_entry_t) \
@@ -159,51 +152,57 @@
 	X(SDL_Gamepad, &DEFAULT_typedata_SDL_Gamepad) \
 	X(SDL_Joystick, &DEFAULT_typedata_SDL_Joystick) \
 	X(camera_matrices_t, &DEFAULT_typedata_structure_camera_matrices_t.type_info) \
-	X(render_buffer_type_t, &DEFAULT_typedata_structure_render_buffer_type_t.type_info) \
-	X(render_buffer_advance_rate_t, &DEFAULT_typedata_structure_render_buffer_advance_rate_t.type_info) \
-	X(render_buffer_memory_type_t, &DEFAULT_typedata_structure_render_buffer_memory_type_t.type_info) \
-	X(render_buffer_desc_t, &DEFAULT_typedata_structure_render_buffer_desc_t.type_info) \
-	X(render_buffer_t, &DEFAULT_typedata_structure_render_buffer_t.type_info) \
-	X(index_buffer_t, &DEFAULT_typedata_structure_index_buffer_t.type_info) \
-	X(uniform_constant_buffer_t, &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info) \
-	X(render_command_type_t, &DEFAULT_typedata_structure_render_command_type_t.type_info) \
-	X(render_command_header_t, &DEFAULT_typedata_structure_render_command_header_t.type_info) \
-	X(render_command_begin_renderpass_t, &DEFAULT_typedata_structure_render_command_begin_renderpass_t.type_info) \
-	X(render_command_end_renderpass_t, &DEFAULT_typedata_structure_render_command_end_renderpass_t.type_info) \
-	X(render_command_bind_vertex_buffer_t, &DEFAULT_typedata_structure_render_command_bind_vertex_buffer_t.type_info) \
-	X(render_command_bind_index_buffer_t, &DEFAULT_typedata_structure_render_command_bind_index_buffer_t.type_info) \
-	X(render_command_update_texture_t, &DEFAULT_typedata_structure_render_command_update_texture_t.type_info) \
-	X(render_command_bind_material_t, &DEFAULT_typedata_structure_render_command_bind_material_t.type_info) \
-	X(render_command_bind_shader_t, &DEFAULT_typedata_structure_render_command_bind_shader_t.type_info) \
-	X(render_command_set_viewport_t, &DEFAULT_typedata_structure_render_command_set_viewport_t.type_info) \
-	X(render_command_set_scissor_t, &DEFAULT_typedata_structure_render_command_set_scissor_t.type_info) \
-	X(render_command_update_push_constant_t, &DEFAULT_typedata_structure_render_command_update_push_constant_t.type_info) \
-	X(render_command_update_uniform_constant_buffer_t, &DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t.type_info) \
-	X(render_command_update_render_buffer_contents_t, &DEFAULT_typedata_structure_render_command_update_render_buffer_contents_t.type_info) \
-	X(render_command_bind_texture_t, &DEFAULT_typedata_structure_render_command_bind_texture_t.type_info) \
-	X(render_command_dispatch_compute_t, &DEFAULT_typedata_structure_render_command_dispatch_compute_t.type_info) \
-	X(render_command_set_pipeline_state_t, &DEFAULT_typedata_structure_render_command_set_pipeline_state_t.type_info) \
-	X(render_command_draw_t, &DEFAULT_typedata_structure_render_command_draw_t.type_info) \
-	X(render_command_blit_image_t, &DEFAULT_typedata_structure_render_command_blit_image_t.type_info) \
-	X(render_command_blit_renderpass_t, &DEFAULT_typedata_structure_render_command_blit_renderpass_t.type_info) \
-	X(render_command_present_frame_t, &DEFAULT_typedata_structure_render_command_present_frame_t.type_info) \
-	X(render_command_t, &DEFAULT_typedata_structure_render_command_t.type_info) \
-	X(command_list_type_t, &DEFAULT_typedata_structure_command_list_type_t.type_info) \
-	X(clear_value_t, &DEFAULT_typedata_structure_clear_value_t.type_info) \
-	X(renderpass_attachment_access_t, &DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info) \
-	X(renderpass_attachment_load_operation_t, &DEFAULT_typedata_structure_renderpass_attachment_load_operation_t.type_info) \
-	X(renderpass_attachment_store_operation_t, &DEFAULT_typedata_structure_renderpass_attachment_store_operation_t.type_info) \
-	X(renderpass_attachment_t, &DEFAULT_typedata_structure_renderpass_attachment_t.type_info) \
-	X(renderpass_desc_t, &DEFAULT_typedata_structure_renderpass_desc_t.type_info) \
-	X(renderpass_key_t, &DEFAULT_typedata_structure_renderpass_key_t.type_info) \
-	X(renderpass_t, &DEFAULT_typedata_structure_renderpass_t.type_info) \
-	X(backend_renderer_t, &DEFAULT_typedata_backend_renderer_t) \
-	X(vulkan_buffer_t, &DEFAULT_typedata_structure_vulkan_buffer_t.type_info) \
+	X(RHI_render_buffer_type_t, &DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info) \
+	X(RHI_render_buffer_advance_rate_t, &DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info) \
+	X(RHI_render_buffer_memory_type_t, &DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info) \
+	X(RHI_render_buffer_desc_t, &DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info) \
+	X(RHI_render_buffer_t, &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info) \
+	X(RHI_index_buffer_t, &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info) \
+	X(RHI_uniform_constant_buffer_t, &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info) \
+	X(RHI_command_type_t, &DEFAULT_typedata_structure_RHI_command_type_t.type_info) \
+	X(RHI_command_header_t, &DEFAULT_typedata_structure_RHI_command_header_t.type_info) \
+	X(RHI_command_begin_renderpass_t, &DEFAULT_typedata_structure_RHI_command_begin_renderpass_t.type_info) \
+	X(RHI_command_end_renderpass_t, &DEFAULT_typedata_structure_RHI_command_end_renderpass_t.type_info) \
+	X(RHI_command_bind_vertex_buffer_t, &DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.type_info) \
+	X(RHI_command_bind_index_buffer_t, &DEFAULT_typedata_structure_RHI_command_bind_index_buffer_t.type_info) \
+	X(RHI_command_update_texture_t, &DEFAULT_typedata_structure_RHI_command_update_texture_t.type_info) \
+	X(RHI_command_bind_material_t, &DEFAULT_typedata_structure_RHI_command_bind_material_t.type_info) \
+	X(RHI_command_bind_shader_t, &DEFAULT_typedata_structure_RHI_command_bind_shader_t.type_info) \
+	X(RHI_command_set_viewport_t, &DEFAULT_typedata_structure_RHI_command_set_viewport_t.type_info) \
+	X(RHI_command_set_scissor_t, &DEFAULT_typedata_structure_RHI_command_set_scissor_t.type_info) \
+	X(RHI_command_update_push_constant_t, &DEFAULT_typedata_structure_RHI_command_update_push_constant_t.type_info) \
+	X(RHI_command_update_uniform_constant_buffer_t, &DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t.type_info) \
+	X(RHI_command_update_render_buffer_contents_t, &DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t.type_info) \
+	X(RHI_command_bind_texture_t, &DEFAULT_typedata_structure_RHI_command_bind_texture_t.type_info) \
+	X(RHI_command_dispatch_compute_t, &DEFAULT_typedata_structure_RHI_command_dispatch_compute_t.type_info) \
+	X(RHI_command_set_pipeline_state_t, &DEFAULT_typedata_structure_RHI_command_set_pipeline_state_t.type_info) \
+	X(RHI_command_draw_t, &DEFAULT_typedata_structure_RHI_command_draw_t.type_info) \
+	X(RHI_command_blit_image_t, &DEFAULT_typedata_structure_RHI_command_blit_image_t.type_info) \
+	X(RHI_command_blit_renderpass_t, &DEFAULT_typedata_structure_RHI_command_blit_renderpass_t.type_info) \
+	X(RHI_command_present_frame_t, &DEFAULT_typedata_structure_RHI_command_present_frame_t.type_info) \
+	X(RHI_command_t, &DEFAULT_typedata_structure_RHI_command_t.type_info) \
+	X(RHI_command_list_type_t, &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info) \
+	X(RHI_clear_value_t, &DEFAULT_typedata_structure_RHI_clear_value_t.type_info) \
+	X(RHI_renderpass_attachment_access_t, &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info) \
+	X(RHI_renderpass_attachment_load_operation_t, &DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info) \
+	X(RHI_renderpass_attachment_store_operation_t, &DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info) \
+	X(RHI_renderpass_attachment_t, &DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info) \
+	X(RHI_renderpass_desc_t, &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info) \
+	X(RHI_renderpass_key_t, &DEFAULT_typedata_structure_RHI_renderpass_key_t.type_info) \
+	X(RHI_renderpass_t, &DEFAULT_typedata_structure_RHI_renderpass_t.type_info) \
+	X(backend_render_context_t, &DEFAULT_typedata_backend_render_context_t) \
+	X(RHI_image_create_info_t, &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info) \
+	X(backend_buffer_t, &DEFAULT_typedata_backend_buffer_t) \
 	X(backend_command_buffer_t, &DEFAULT_typedata_backend_command_buffer_t) \
 	X(ivec4_t, &DEFAULT_typedata_ivec4_t) \
 	X(backend_renderpass_handle_t, &DEFAULT_typedata_backend_renderpass_handle_t) \
 	X(backend_framebuffer_handle_t, &DEFAULT_typedata_backend_framebuffer_handle_t) \
 	X(SDL_Window, &DEFAULT_typedata_SDL_Window) \
+	X(RHI_image_filter_type_t, &DEFAULT_typedata_structure_RHI_image_filter_type_t.type_info) \
+	X(RHI_image_wrapping_type_t, &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info) \
+	X(RHI_image_usage_t, &DEFAULT_typedata_structure_RHI_image_usage_t.type_info) \
+	X(RHI_sampler_create_info_t, &DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info) \
+	X(backend_image_t, &DEFAULT_typedata_backend_image_t) \
 	X(widget_state_t, &DEFAULT_typedata_structure_widget_state_t.type_info) \
 	X(ui_signal_flags_t, &DEFAULT_typedata_structure_ui_signal_flags_t.type_info) \
 	X(ui_signal_t, &DEFAULT_typedata_structure_ui_signal_t.type_info) \
@@ -224,6 +223,7 @@
 	X(VkDeviceMemory, &DEFAULT_typedata_VkDeviceMemory) \
 	X(VkAllocationCallbacks, &DEFAULT_typedata_VkAllocationCallbacks) \
 	X(VkDevice, &DEFAULT_typedata_VkDevice) \
+	X(vulkan_buffer_t, &DEFAULT_typedata_structure_vulkan_buffer_t.type_info) \
 	X(VkCommandBuffer, &DEFAULT_typedata_VkCommandBuffer) \
 	X(VkBufferUsageFlags, &DEFAULT_typedata_VkBufferUsageFlags) \
 	X(vulkan_staging_info_t, &DEFAULT_typedata_structure_vulkan_staging_info_t.type_info) \
@@ -327,8 +327,8 @@
 	X(TYPE_sys_semaphore_handle_t) \
 	X(TYPE_immediate_vertex_t) \
 	X(TYPE_immediate_widget_data_t) \
-	X(TYPE_render_command_list_t) \
-	X(TYPE_vertex_buffer_t) \
+	X(TYPE_RHI_command_list_t) \
+	X(TYPE_RHI_vertex_buffer_t) \
 	X(TYPE_vec3_t) \
 	X(TYPE_vec2_t) \
 	X(TYPE_vec4_t) \
@@ -400,7 +400,7 @@
 	X(TYPE_c_global_context_reset_context_arena) \
 	X(TYPE_gc_reset_context_arena) \
 	X(TYPE_threadpool_t) \
-	X(TYPE_renderer_state_t) \
+	X(TYPE_RHI_context_t) \
 	X(TYPE_input_manager_t) \
 	X(TYPE_hash_table_allocation_flags_t) \
 	X(TYPE_c_hash_table_allocate_fn_t) \
@@ -561,26 +561,13 @@
 	X(TYPE_sys_mutex_unlock) \
 	X(TYPE_sys_create_process) \
 	X(TYPE_sys_wait_for_process) \
-	X(TYPE_render_image_filter_type_t) \
-	X(TYPE_render_image_wrapping_type_t) \
-	X(TYPE_render_image_usage_t) \
-	X(TYPE_sampler_create_info_t) \
-	X(TYPE_image_create_info_t) \
-	X(TYPE_image_t) \
-	X(TYPE_s_renderer_image_create) \
-	X(TYPE_bitmap_t) \
-	X(TYPE_s_renderer_image_create_from_bitmap) \
-	X(TYPE_s_renderer_image_destroy) \
-	X(TYPE_s_renderer_image_update_data) \
-	X(TYPE_backend_image_t) \
 	X(TYPE_asset_type_t) \
 	X(TYPE_asset_slot_load_status_t) \
 	X(TYPE_bitmap_format_t) \
+	X(TYPE_bitmap_t) \
 	X(TYPE_subtexture_data_t) \
 	X(TYPE_texture_atlas_t) \
-	X(TYPE_animation_source2D_t) \
-	X(TYPE_animation2D_t) \
-	X(TYPE_shader_t) \
+	X(TYPE_RHI_shader_t) \
 	X(TYPE_material_instance_t) \
 	X(TYPE_material_archetype_t) \
 	X(TYPE_stored_material_type_t) \
@@ -611,6 +598,7 @@
 	X(TYPE_s_texture_atlas_pack_added_textures) \
 	X(TYPE_s_asset_manager_set_handle_asset_data_pointer) \
 	X(TYPE_s_asset_manager_get_asset_slot) \
+	X(TYPE_shader_t) \
 	X(TYPE_s_asset_get_shader_from_handle) \
 	X(TYPE_s_asset_get_texture_from_handle) \
 	X(TYPE_s_asset_get_material_data_from_handle) \
@@ -619,9 +607,10 @@
 	X(TYPE_s_asset_font_get_string_size) \
 	X(TYPE_s_asset_font_acquire_font_at_size) \
 	X(TYPE_s_asset_font_fetch_glyph) \
+	X(TYPE_RHI_image_t) \
 	X(TYPE_dynarray_t) \
 	X(TYPE_backend_shader_t) \
-	X(TYPE_render_pipeline_state_t) \
+	X(TYPE_RHI_pipeline_state_t) \
 	X(TYPE_VkDescriptorSet) \
 	X(TYPE_glyphs) \
 	X(TYPE_FT_Face) \
@@ -677,85 +666,89 @@
 	X(TYPE_SDL_Gamepad) \
 	X(TYPE_SDL_Joystick) \
 	X(TYPE_camera_matrices_t) \
-	X(TYPE_render_buffer_type_t) \
-	X(TYPE_render_buffer_advance_rate_t) \
-	X(TYPE_render_buffer_memory_type_t) \
-	X(TYPE_render_buffer_desc_t) \
-	X(TYPE_render_buffer_t) \
-	X(TYPE_index_buffer_t) \
-	X(TYPE_uniform_constant_buffer_t) \
-	X(TYPE_render_command_type_t) \
-	X(TYPE_render_command_header_t) \
-	X(TYPE_render_command_begin_renderpass_t) \
-	X(TYPE_render_command_end_renderpass_t) \
-	X(TYPE_render_command_bind_vertex_buffer_t) \
-	X(TYPE_render_command_bind_index_buffer_t) \
-	X(TYPE_render_command_update_texture_t) \
-	X(TYPE_render_command_bind_material_t) \
-	X(TYPE_render_command_bind_shader_t) \
-	X(TYPE_render_command_set_viewport_t) \
-	X(TYPE_render_command_set_scissor_t) \
-	X(TYPE_render_command_update_push_constant_t) \
-	X(TYPE_render_command_update_uniform_constant_buffer_t) \
-	X(TYPE_render_command_update_render_buffer_contents_t) \
-	X(TYPE_render_command_bind_texture_t) \
-	X(TYPE_render_command_dispatch_compute_t) \
-	X(TYPE_render_command_set_pipeline_state_t) \
-	X(TYPE_render_command_draw_t) \
-	X(TYPE_render_command_blit_image_t) \
-	X(TYPE_render_command_blit_renderpass_t) \
-	X(TYPE_render_command_present_frame_t) \
-	X(TYPE_render_command_t) \
-	X(TYPE_command_list_type_t) \
-	X(TYPE_clear_value_t) \
-	X(TYPE_renderpass_attachment_access_t) \
-	X(TYPE_renderpass_attachment_load_operation_t) \
-	X(TYPE_renderpass_attachment_store_operation_t) \
-	X(TYPE_renderpass_attachment_t) \
-	X(TYPE_renderpass_desc_t) \
-	X(TYPE_renderpass_key_t) \
-	X(TYPE_renderpass_t) \
-	X(TYPE_backend_renderer_t) \
-	X(TYPE_s_renderer_state_init) \
-	X(TYPE_s_renderer_handle_window_resize) \
-	X(TYPE_s_renderer_resize_render_targets) \
-	X(TYPE_s_renderer_build_renderpass) \
-	X(TYPE_s_renderer_resize_renderpass) \
-	X(TYPE_s_renderer_get_constant_buffer) \
-	X(TYPE_s_renderer_render_buffer_create) \
-	X(TYPE_s_renderer_vertex_buffer_create) \
-	X(TYPE_s_renderer_index_buffer_create) \
-	X(TYPE_s_renderer_render_buffer_copy_data) \
-	X(TYPE_s_renderer_buffer_reset) \
-	X(TYPE_s_renderer_get_command_list) \
-	X(TYPE_s_renderer_is_texture_bound) \
-	X(TYPE_s_renderer_set_texture_filter_mode) \
-	X(TYPE_s_renderer_find_texture_index) \
-	X(TYPE_s_renderer_reset_command_list) \
-	X(TYPE_r_cmd_renderpass_begin) \
-	X(TYPE_r_cmd_renderpass_end) \
-	X(TYPE_r_cmd_begin_render_group) \
-	X(TYPE_r_cmd_end_render_group) \
-	X(TYPE_r_cmd_bind_vertex_buffer) \
-	X(TYPE_r_cmd_bind_index_buffer) \
-	X(TYPE_r_cmd_set_scissor) \
-	X(TYPE_r_cmd_set_viewport) \
-	X(TYPE_r_cmd_update_push_constants) \
-	X(TYPE_r_cmd_update_buffer_contents) \
-	X(TYPE_r_cmd_use_shader_program) \
-	X(TYPE_r_cmd_update_constant_buffer) \
-	X(TYPE_r_cmd_bind_texture_image) \
-	X(TYPE_r_cmd_bind_texture_from_handle) \
-	X(TYPE_r_cmd_reset_render_state) \
-	X(TYPE_r_cmd_set_render_state) \
-	X(TYPE_r_cmd_draw) \
-	X(TYPE_r_cmd_draw_indexed) \
-	X(TYPE_r_cmd_dispatch_compute) \
-	X(TYPE_r_cmd_blit_image) \
-	X(TYPE_r_cmd_blit_renderpass) \
-	X(TYPE_r_cmd_present) \
-	X(TYPE_s_renderer_execute_backend_commands) \
-	X(TYPE_vulkan_buffer_t) \
+	X(TYPE_RHI_render_buffer_type_t) \
+	X(TYPE_RHI_render_buffer_advance_rate_t) \
+	X(TYPE_RHI_render_buffer_memory_type_t) \
+	X(TYPE_RHI_render_buffer_desc_t) \
+	X(TYPE_RHI_render_buffer_t) \
+	X(TYPE_RHI_index_buffer_t) \
+	X(TYPE_RHI_uniform_constant_buffer_t) \
+	X(TYPE_RHI_command_type_t) \
+	X(TYPE_RHI_command_header_t) \
+	X(TYPE_RHI_command_begin_renderpass_t) \
+	X(TYPE_RHI_command_end_renderpass_t) \
+	X(TYPE_RHI_command_bind_vertex_buffer_t) \
+	X(TYPE_RHI_command_bind_index_buffer_t) \
+	X(TYPE_RHI_command_update_texture_t) \
+	X(TYPE_RHI_command_bind_material_t) \
+	X(TYPE_RHI_command_bind_shader_t) \
+	X(TYPE_RHI_command_set_viewport_t) \
+	X(TYPE_RHI_command_set_scissor_t) \
+	X(TYPE_RHI_command_update_push_constant_t) \
+	X(TYPE_RHI_command_update_uniform_constant_buffer_t) \
+	X(TYPE_RHI_command_update_render_buffer_contents_t) \
+	X(TYPE_RHI_command_bind_texture_t) \
+	X(TYPE_RHI_command_dispatch_compute_t) \
+	X(TYPE_RHI_command_set_pipeline_state_t) \
+	X(TYPE_RHI_command_draw_t) \
+	X(TYPE_RHI_command_blit_image_t) \
+	X(TYPE_RHI_command_blit_renderpass_t) \
+	X(TYPE_RHI_command_present_frame_t) \
+	X(TYPE_RHI_command_t) \
+	X(TYPE_RHI_command_list_type_t) \
+	X(TYPE_RHI_clear_value_t) \
+	X(TYPE_RHI_renderpass_attachment_access_t) \
+	X(TYPE_RHI_renderpass_attachment_load_operation_t) \
+	X(TYPE_RHI_renderpass_attachment_store_operation_t) \
+	X(TYPE_RHI_renderpass_attachment_t) \
+	X(TYPE_RHI_renderpass_desc_t) \
+	X(TYPE_RHI_renderpass_key_t) \
+	X(TYPE_RHI_renderpass_t) \
+	X(TYPE_backend_render_context_t) \
+	X(TYPE_RHI_context_init) \
+	X(TYPE_RHI_handle_window_resize) \
+	X(TYPE_RHI_resize_render_targets) \
+	X(TYPE_RHI_build_renderpass) \
+	X(TYPE_RHI_resize_renderpass) \
+	X(TYPE_RHI_get_constant_buffer) \
+	X(TYPE_RHI_render_buffer_create) \
+	X(TYPE_RHI_vertex_buffer_create) \
+	X(TYPE_RHI_index_buffer_create) \
+	X(TYPE_RHI_render_buffer_copy_data) \
+	X(TYPE_RHI_buffer_reset) \
+	X(TYPE_RHI_image_create_info_t) \
+	X(TYPE_RHI_image_create) \
+	X(TYPE_RHI_image_destroy) \
+	X(TYPE_RHI_image_update_data) \
+	X(TYPE_RHI_get_command_list) \
+	X(TYPE_RHI_find_texture_index) \
+	X(TYPE_RHI_reset_command_list) \
+	X(TYPE_RHI_is_texture_bound) \
+	X(TYPE_RHI_set_texture_filter_mode) \
+	X(TYPE_RHI_cmd_renderpass_begin) \
+	X(TYPE_RHI_cmd_renderpass_end) \
+	X(TYPE_RHI_cmd_begin_render_group) \
+	X(TYPE_RHI_cmd_end_render_group) \
+	X(TYPE_RHI_cmd_bind_vertex_buffer) \
+	X(TYPE_RHI_cmd_bind_index_buffer) \
+	X(TYPE_RHI_cmd_set_scissor) \
+	X(TYPE_RHI_cmd_set_viewport) \
+	X(TYPE_RHI_cmd_update_push_constants) \
+	X(TYPE_RHI_cmd_update_buffer_contents) \
+	X(TYPE_RHI_cmd_use_shader_program) \
+	X(TYPE_RHI_cmd_update_constant_buffer) \
+	X(TYPE_RHI_cmd_bind_texture_image) \
+	X(TYPE_RHI_cmd_bind_texture_from_handle) \
+	X(TYPE_RHI_cmd_reset_render_state) \
+	X(TYPE_RHI_cmd_set_render_state) \
+	X(TYPE_RHI_cmd_draw) \
+	X(TYPE_RHI_cmd_draw_indexed) \
+	X(TYPE_RHI_cmd_dispatch_compute) \
+	X(TYPE_RHI_cmd_blit_image) \
+	X(TYPE_RHI_cmd_blit_renderpass) \
+	X(TYPE_RHI_cmd_present) \
+	X(TYPE_RHI_execute_backend_commands) \
+	X(TYPE_backend_buffer_t) \
 	X(TYPE_backend_command_buffer_t) \
 	X(TYPE_ivec4_t) \
 	X(TYPE_backend_renderpass_handle_t) \
@@ -777,6 +770,12 @@
 	X(TYPE_backend_acquire_image_sampler) \
 	X(TYPE_backend_shader_create) \
 	X(TYPE_backend_get_command_buffer) \
+	X(TYPE_RHI_image_filter_type_t) \
+	X(TYPE_RHI_image_wrapping_type_t) \
+	X(TYPE_RHI_image_usage_t) \
+	X(TYPE_RHI_sampler_create_info_t) \
+	X(TYPE_RHI_image_create_from_bitmap) \
+	X(TYPE_backend_image_t) \
 	X(TYPE_widget_state_t) \
 	X(TYPE_ui_signal_flags_t) \
 	X(TYPE_ui_signal_t) \
@@ -837,6 +836,7 @@
 	X(TYPE_VkDeviceMemory) \
 	X(TYPE_VkAllocationCallbacks) \
 	X(TYPE_VkDevice) \
+	X(TYPE_vulkan_buffer_t) \
 	X(TYPE_VkCommandBuffer) \
 	X(TYPE_vk_backend_buffer_copy_buffer) \
 	X(TYPE_vk_backend_buffer_copy_data) \
@@ -1089,15 +1089,15 @@ struct type_info_procedure_c_ticket_mutex_take_and_wait {
 	};
 };
 
-struct type_info_struct_render_command_list_t {
+struct type_info_struct_RHI_command_list_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[28];
+		const type_info_member_t member_array[25];
 		struct {
 			const type_info_member_t is_initialized;
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t transient_arena;
 			const type_info_member_t command_arena;
 			const type_info_member_t commands;
@@ -1113,9 +1113,6 @@ struct type_info_struct_render_command_list_t {
 			const type_info_member_t active_scissor_command;
 			const type_info_member_t active_viewport_command;
 			const type_info_member_t active_shader_program;
-			const type_info_member_t vertex_offset;
-			const type_info_member_t instance_offset;
-			const type_info_member_t index_offset;
 			const type_info_member_t active_renderpass;
 			const type_info_member_t presenting;
 			const type_info_member_t image_shader_params;
@@ -1128,14 +1125,14 @@ struct type_info_struct_render_command_list_t {
 	};
 };
 
-struct type_info_struct_vertex_buffer_t {
+struct type_info_struct_RHI_vertex_buffer_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[4];
 		struct {
-			const type_info_member_t buffer;
+			const type_info_member_t buffer_data;
 			const type_info_member_t vertex_data;
 			const type_info_member_t max_vertices;
 			const type_info_member_t vertex_count;
@@ -1228,7 +1225,7 @@ struct type_info_struct_asset_manager_t {
 			const type_info_member_t font_catalog;
 			const type_info_member_t sound_catalog;
 			const type_info_member_t font_manager;
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 		}members;
 	};
 };
@@ -1238,7 +1235,7 @@ struct type_info_struct_asset_handle_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[8];
+		const type_info_member_t member_array[6];
 		struct {
 			const type_info_member_t is_valid;
 			const type_info_member_t slot;
@@ -1246,8 +1243,6 @@ struct type_info_struct_asset_handle_t {
 			const type_info_member_t shader;
 			const type_info_member_t material_info;
 			const type_info_member_t dynamic_render_font;
-			const type_info_member_t animation_source2D;
-			const type_info_member_t animation2D;
 		}members;
 	};
 };
@@ -1967,7 +1962,7 @@ struct type_info_struct_global_context_t {
 			const type_info_member_t running;
 			const type_info_member_t should_reload;
 			const type_info_member_t main_threadpool;
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t asset_manager;
 			const type_info_member_t input_manager;
 			const type_info_member_t file_watcher;
@@ -2022,7 +2017,7 @@ struct type_info_struct_threadpool_t {
 	};
 };
 
-struct type_info_struct_renderer_state_t {
+struct type_info_struct_RHI_context_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -2030,8 +2025,8 @@ struct type_info_struct_renderer_state_t {
 		const type_info_member_t member_array[33];
 		struct {
 			const type_info_member_t window;
-			const type_info_member_t render_context;
-			const type_info_member_t renderer_arena;
+			const type_info_member_t backend_render_context;
+			const type_info_member_t RHI_arena;
 			const type_info_member_t transient_arena;
 			const type_info_member_t command_lists;
 			const type_info_member_t command_list_count;
@@ -4242,173 +4237,6 @@ struct type_info_procedure_sys_wait_for_process {
 	};
 };
 
-struct type_info_struct_render_image_filter_type_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[3];
-		struct {
-			const type_info_member_t IMAGE_FILTER_TYPE_INVALID;
-			const type_info_member_t IMAGE_FILTER_TYPE_NEAREST;
-			const type_info_member_t IMAGE_FILTER_TYPE_LINEAR;
-		}members;
-	};
-};
-
-struct type_info_struct_render_image_wrapping_type_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[4];
-		struct {
-			const type_info_member_t IMAGE_WRAPPING_INVALID;
-			const type_info_member_t IMAGE_WRAPPING_CLAMP_TO_EDGE;
-			const type_info_member_t IMAGE_WRAPPING_CLAMP_TO_BORDER;
-			const type_info_member_t IMAGE_WRAPPING_REPEAT;
-		}members;
-	};
-};
-
-struct type_info_struct_render_image_usage_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[6];
-		struct {
-			const type_info_member_t IMAGE_USAGE_INVALID;
-			const type_info_member_t IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT;
-			const type_info_member_t IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT;
-			const type_info_member_t IMAGE_USAGE_SHADER_SAMPLED_IMAGE;
-			const type_info_member_t IMAGE_USAGE_BLIT_SOURCE;
-			const type_info_member_t IMAGE_USAGE_BLIT_DESTINATION;
-		}members;
-	};
-};
-
-struct type_info_struct_sampler_create_info_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[8];
-		struct {
-			const type_info_member_t filtering;
-			const type_info_member_t anisotropy_enabled;
-			const type_info_member_t max_anisotropy;
-			const type_info_member_t wrapu;
-			const type_info_member_t wrapv;
-			const type_info_member_t compare_ops_enabled;
-			const type_info_member_t compare_operation;
-			const type_info_member_t use_normalized_coordinates;
-		}members;
-	};
-};
-
-struct type_info_struct_image_create_info_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[6];
-		struct {
-			const type_info_member_t data;
-			const type_info_member_t width;
-			const type_info_member_t height;
-			const type_info_member_t format;
-			const type_info_member_t usage;
-			const type_info_member_t sampler_info;
-		}members;
-	};
-};
-
-struct type_info_struct_image_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[3];
-		struct {
-			const type_info_member_t ID;
-			const type_info_member_t create_info;
-			const type_info_member_t backend_image;
-		}members;
-	};
-};
-
-struct type_info_procedure_s_renderer_image_create {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t render_state;
-			const type_info_member_t image_create_info;
-		}arguments;
-	};
-};
-
-struct type_info_struct_bitmap_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[5];
-		struct {
-			const type_info_member_t width;
-			const type_info_member_t height;
-			const type_info_member_t channels;
-			const type_info_member_t format;
-			const type_info_member_t pixels;
-		}members;
-	};
-};
-
-struct type_info_procedure_s_renderer_image_create_from_bitmap {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t bitmap;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_renderer_image_destroy {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t renderer_state;
-			const type_info_member_t image;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_renderer_image_update_data {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t renderer_state;
-			const type_info_member_t image;
-		}arguments;
-	};
-};
-
 struct type_info_struct_asset_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -4469,6 +4297,22 @@ struct type_info_struct_bitmap_format_t {
 	};
 };
 
+struct type_info_struct_bitmap_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[5];
+		struct {
+			const type_info_member_t width;
+			const type_info_member_t height;
+			const type_info_member_t channels;
+			const type_info_member_t format;
+			const type_info_member_t pixels;
+		}members;
+	};
+};
+
 struct type_info_struct_subtexture_data_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -4511,36 +4355,7 @@ struct type_info_struct_texture_atlas_t {
 	};
 };
 
-struct type_info_struct_animation_source2D_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[4];
-		struct {
-			const type_info_member_t name;
-			const type_info_member_t texture;
-			const type_info_member_t frame_count;
-			const type_info_member_t frame_timer;
-		}members;
-	};
-};
-
-struct type_info_struct_animation2D_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[3];
-		struct {
-			const type_info_member_t animation_info;
-			const type_info_member_t current_frame;
-			const type_info_member_t frame_timer;
-		}members;
-	};
-};
-
-struct type_info_struct_shader_t {
+struct type_info_struct_RHI_shader_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -4749,11 +4564,12 @@ struct type_info_struct_asset_slot_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[16];
+		const type_info_member_t member_array[17];
 		struct {
 			const type_info_member_t ID;
 			const type_info_member_t slot_state;
 			const type_info_member_t type;
+			const type_info_member_t is_valid_for_handles;
 			const type_info_member_t name;
 			const type_info_member_t owner_asset_file;
 			const type_info_member_t package_entry;
@@ -5145,7 +4961,21 @@ struct type_info_procedure_s_asset_font_fetch_glyph {
 	};
 };
 
-struct type_info_struct_render_pipeline_state_t {
+struct type_info_struct_RHI_image_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[3];
+		struct {
+			const type_info_member_t ID;
+			const type_info_member_t create_info;
+			const type_info_member_t backend_image;
+		}members;
+	};
+};
+
+struct type_info_struct_RHI_pipeline_state_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -5777,47 +5607,47 @@ struct type_info_struct_camera_matrices_t {
 	};
 };
 
-struct type_info_struct_render_buffer_type_t {
+struct type_info_struct_RHI_render_buffer_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[3];
 		struct {
-			const type_info_member_t RenderBufferType_Invalid;
-			const type_info_member_t RenderBufferType_VertexBuffer;
-			const type_info_member_t RenderBufferType_IndexBuffer;
+			const type_info_member_t RHI_RENDER_BUFFER_TYPE_INVALID;
+			const type_info_member_t RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER;
+			const type_info_member_t RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER;
 		}members;
 	};
 };
 
-struct type_info_struct_render_buffer_advance_rate_t {
+struct type_info_struct_RHI_render_buffer_advance_rate_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[2];
 		struct {
-			const type_info_member_t RenderBufferAdvanceRate_PerElement;
-			const type_info_member_t RenderBufferAdvanceRate_PerInstance;
+			const type_info_member_t RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT;
+			const type_info_member_t RHI_RENDER_BUFFER_ADVANCE_RATE_PER_INSTANCE;
 		}members;
 	};
 };
 
-struct type_info_struct_render_buffer_memory_type_t {
+struct type_info_struct_RHI_render_buffer_memory_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[2];
 		struct {
-			const type_info_member_t RenderBufferAllocationTypeMapped;
-			const type_info_member_t RenderBufferAllocationTypeGPUOnly;
+			const type_info_member_t RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED;
+			const type_info_member_t RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY;
 		}members;
 	};
 };
 
-struct type_info_struct_render_buffer_desc_t {
+struct type_info_struct_RHI_render_buffer_desc_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -5834,7 +5664,7 @@ struct type_info_struct_render_buffer_desc_t {
 	};
 };
 
-struct type_info_struct_render_buffer_t {
+struct type_info_struct_RHI_render_buffer_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -5850,27 +5680,28 @@ struct type_info_struct_render_buffer_t {
 			const type_info_member_t buffer_elements_used;
 			const type_info_member_t working_offset;
 			const type_info_member_t mapped_data;
-			const type_info_member_t buffer;
+			const type_info_member_t buffer_info;
 		}members;
 	};
 };
 
-struct type_info_struct_index_buffer_t {
+struct type_info_struct_RHI_index_buffer_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[4];
+		const type_info_member_t member_array[5];
 		struct {
-			const type_info_member_t buffer;
+			const type_info_member_t buffer_data;
 			const type_info_member_t index_data;
 			const type_info_member_t max_indices;
 			const type_info_member_t index_count;
+			const type_info_member_t index_offset;
 		}members;
 	};
 };
 
-struct type_info_struct_uniform_constant_buffer_t {
+struct type_info_struct_RHI_uniform_constant_buffer_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -5885,41 +5716,41 @@ struct type_info_struct_uniform_constant_buffer_t {
 	};
 };
 
-struct type_info_struct_render_command_type_t {
+struct type_info_struct_RHI_command_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[23];
 		struct {
-			const type_info_member_t RCT_Invalid;
-			const type_info_member_t RCT_ClearRenderTarget;
-			const type_info_member_t RCT_BeginRenderpass;
-			const type_info_member_t RCT_EndRenderpass;
-			const type_info_member_t RCT_UpdateUniformConstantBuffer;
-			const type_info_member_t RCT_UpdatePushConstants;
-			const type_info_member_t RCT_UpdateBufferContents;
-			const type_info_member_t RCT_BindMaterial;
-			const type_info_member_t RCT_BindTexture;
-			const type_info_member_t RCT_BindShader;
-			const type_info_member_t RCT_BindVertexBuffer;
-			const type_info_member_t RCT_BindIndexBuffer;
-			const type_info_member_t RCT_SetViewport;
-			const type_info_member_t RCT_SetScissor;
-			const type_info_member_t RCT_SetRenderState;
-			const type_info_member_t RCT_ResetRenderState;
-			const type_info_member_t RCT_DispatchCompute;
-			const type_info_member_t RCT_Draw;
-			const type_info_member_t RCT_DrawIndexed;
-			const type_info_member_t RCT_BlitImage;
-			const type_info_member_t RCT_BlitRenderpass;
-			const type_info_member_t RCT_PresentFrame;
-			const type_info_member_t RCT_Count;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_INVALID;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_END_RENDERPASS;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_BIND_SHADER;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_SET_SCISSOR;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_DRAW;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_COUNT;
 		}members;
 	};
 };
 
-struct type_info_struct_render_command_header_t {
+struct type_info_struct_RHI_command_header_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -5931,7 +5762,7 @@ struct type_info_struct_render_command_header_t {
 	};
 };
 
-struct type_info_struct_render_command_begin_renderpass_t {
+struct type_info_struct_RHI_command_begin_renderpass_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -5943,7 +5774,7 @@ struct type_info_struct_render_command_begin_renderpass_t {
 	};
 };
 
-struct type_info_struct_render_command_end_renderpass_t {
+struct type_info_struct_RHI_command_end_renderpass_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -5955,31 +5786,31 @@ struct type_info_struct_render_command_end_renderpass_t {
 	};
 };
 
-struct type_info_struct_render_command_bind_vertex_buffer_t {
+struct type_info_struct_RHI_command_bind_vertex_buffer_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[1];
 		struct {
-			const type_info_member_t buffer;
+			const type_info_member_t vertex_buffer;
 		}members;
 	};
 };
 
-struct type_info_struct_render_command_bind_index_buffer_t {
+struct type_info_struct_RHI_command_bind_index_buffer_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[1];
 		struct {
-			const type_info_member_t buffer;
+			const type_info_member_t index_buffer;
 		}members;
 	};
 };
 
-struct type_info_struct_render_command_update_texture_t {
+struct type_info_struct_RHI_command_update_texture_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -5992,7 +5823,7 @@ struct type_info_struct_render_command_update_texture_t {
 	};
 };
 
-struct type_info_struct_render_command_bind_material_t {
+struct type_info_struct_RHI_command_bind_material_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6005,7 +5836,7 @@ struct type_info_struct_render_command_bind_material_t {
 	};
 };
 
-struct type_info_struct_render_command_bind_shader_t {
+struct type_info_struct_RHI_command_bind_shader_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6018,7 +5849,7 @@ struct type_info_struct_render_command_bind_shader_t {
 	};
 };
 
-struct type_info_struct_render_command_set_viewport_t {
+struct type_info_struct_RHI_command_set_viewport_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6031,7 +5862,7 @@ struct type_info_struct_render_command_set_viewport_t {
 	};
 };
 
-struct type_info_struct_render_command_set_scissor_t {
+struct type_info_struct_RHI_command_set_scissor_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6044,7 +5875,7 @@ struct type_info_struct_render_command_set_scissor_t {
 	};
 };
 
-struct type_info_struct_render_command_update_push_constant_t {
+struct type_info_struct_RHI_command_update_push_constant_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6058,7 +5889,7 @@ struct type_info_struct_render_command_update_push_constant_t {
 	};
 };
 
-struct type_info_struct_render_command_update_uniform_constant_buffer_t {
+struct type_info_struct_RHI_command_update_uniform_constant_buffer_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6074,7 +5905,7 @@ struct type_info_struct_render_command_update_uniform_constant_buffer_t {
 	};
 };
 
-struct type_info_struct_render_command_update_render_buffer_contents_t {
+struct type_info_struct_RHI_command_update_render_buffer_contents_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6088,7 +5919,7 @@ struct type_info_struct_render_command_update_render_buffer_contents_t {
 	};
 };
 
-struct type_info_struct_render_command_bind_texture_t {
+struct type_info_struct_RHI_command_bind_texture_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6100,7 +5931,7 @@ struct type_info_struct_render_command_bind_texture_t {
 	};
 };
 
-struct type_info_struct_render_command_dispatch_compute_t {
+struct type_info_struct_RHI_command_dispatch_compute_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6114,7 +5945,7 @@ struct type_info_struct_render_command_dispatch_compute_t {
 	};
 };
 
-struct type_info_struct_render_command_set_pipeline_state_t {
+struct type_info_struct_RHI_command_set_pipeline_state_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6126,7 +5957,7 @@ struct type_info_struct_render_command_set_pipeline_state_t {
 	};
 };
 
-struct type_info_struct_render_command_draw_t {
+struct type_info_struct_RHI_command_draw_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6146,7 +5977,7 @@ struct type_info_struct_render_command_draw_t {
 	};
 };
 
-struct type_info_struct_render_command_blit_image_t {
+struct type_info_struct_RHI_command_blit_image_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6163,7 +5994,7 @@ struct type_info_struct_render_command_blit_image_t {
 	};
 };
 
-struct type_info_struct_render_command_blit_renderpass_t {
+struct type_info_struct_RHI_command_blit_renderpass_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6176,7 +6007,7 @@ struct type_info_struct_render_command_blit_renderpass_t {
 	};
 };
 
-struct type_info_struct_render_command_present_frame_t {
+struct type_info_struct_RHI_command_present_frame_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6188,7 +6019,7 @@ struct type_info_struct_render_command_present_frame_t {
 	};
 };
 
-struct type_info_struct_render_command_t {
+struct type_info_struct_RHI_command_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6201,20 +6032,20 @@ struct type_info_struct_render_command_t {
 	};
 };
 
-struct type_info_struct_command_list_type_t {
+struct type_info_struct_RHI_command_list_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[2];
 		struct {
-			const type_info_member_t RENDER_COMMAND_LIST_TYPE_GRAPHICS;
-			const type_info_member_t RENDER_COMMAND_LIST_TYPE_COMPUTE;
+			const type_info_member_t RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS;
+			const type_info_member_t RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE;
 		}members;
 	};
 };
 
-struct type_info_struct_clear_value_t {
+struct type_info_struct_RHI_clear_value_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6230,50 +6061,50 @@ struct type_info_struct_clear_value_t {
 	};
 };
 
-struct type_info_struct_renderpass_attachment_access_t {
+struct type_info_struct_RHI_renderpass_attachment_access_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[4];
 		struct {
-			const type_info_member_t RenderpassAtachmentAccessInvalid;
-			const type_info_member_t RenderpassAttachmentAccessRead;
-			const type_info_member_t RenderpassAttachmentAccessWrite;
-			const type_info_member_t RenderpassAttachmentAccessReadWrite;
+			const type_info_member_t RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID;
+			const type_info_member_t RHI_RENDERPASS_ATTACHMENT_ACCESS_READ;
+			const type_info_member_t RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE;
+			const type_info_member_t RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE;
 		}members;
 	};
 };
 
-struct type_info_struct_renderpass_attachment_load_operation_t {
+struct type_info_struct_RHI_renderpass_attachment_load_operation_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[3];
 		struct {
-			const type_info_member_t RenderpassAttachmentLoadOperationInvalid;
-			const type_info_member_t RenderpassAttachmentLoadOperationClear;
-			const type_info_member_t RenderpassAttachmentLoadOperationLoad;
+			const type_info_member_t RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID;
+			const type_info_member_t RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR;
+			const type_info_member_t RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD;
 		}members;
 	};
 };
 
-struct type_info_struct_renderpass_attachment_store_operation_t {
+struct type_info_struct_RHI_renderpass_attachment_store_operation_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[3];
 		struct {
-			const type_info_member_t RenderpassAttachmentStoreOperationInvalid;
-			const type_info_member_t RenderpassAttachmentStoreOperationStore;
-			const type_info_member_t RenderpassAttachmentStoreOperationDontCare;
+			const type_info_member_t RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID;
+			const type_info_member_t RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE;
+			const type_info_member_t RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE;
 		}members;
 	};
 };
 
-struct type_info_struct_renderpass_attachment_t {
+struct type_info_struct_RHI_renderpass_attachment_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6289,7 +6120,7 @@ struct type_info_struct_renderpass_attachment_t {
 	};
 };
 
-struct type_info_struct_renderpass_desc_t {
+struct type_info_struct_RHI_renderpass_desc_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6300,13 +6131,13 @@ struct type_info_struct_renderpass_desc_t {
 			const type_info_member_t depth_stencil_attachment;
 			const type_info_member_t render_width;
 			const type_info_member_t render_height;
-			const type_info_member_t resize_with_window;
 			const type_info_member_t color_attachment_count;
+			const type_info_member_t resize_with_window;
 		}members;
 	};
 };
 
-struct type_info_struct_renderpass_key_t {
+struct type_info_struct_RHI_renderpass_key_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6318,7 +6149,7 @@ struct type_info_struct_renderpass_key_t {
 	};
 };
 
-struct type_info_struct_renderpass_t {
+struct type_info_struct_RHI_renderpass_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
@@ -6343,7 +6174,7 @@ struct type_info_struct_renderpass_t {
 	};
 };
 
-struct type_info_procedure_s_renderer_state_init {
+struct type_info_procedure_RHI_context_init {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6351,13 +6182,13 @@ struct type_info_procedure_s_renderer_state_init {
 	union {
 		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t render_context;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_s_renderer_handle_window_resize {
+struct type_info_procedure_RHI_handle_window_resize {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6365,13 +6196,13 @@ struct type_info_procedure_s_renderer_handle_window_resize {
 	union {
 		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t window_size;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_s_renderer_resize_render_targets {
+struct type_info_procedure_RHI_resize_render_targets {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6379,13 +6210,13 @@ struct type_info_procedure_s_renderer_resize_render_targets {
 	union {
 		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t window_size;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_s_renderer_build_renderpass {
+struct type_info_procedure_RHI_build_renderpass {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6393,13 +6224,13 @@ struct type_info_procedure_s_renderer_build_renderpass {
 	union {
 		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t renderpass_desc;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_s_renderer_resize_renderpass {
+struct type_info_procedure_RHI_resize_renderpass {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6407,13 +6238,13 @@ struct type_info_procedure_s_renderer_resize_renderpass {
 	union {
 		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t renderpass;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_s_renderer_get_constant_buffer {
+struct type_info_procedure_RHI_get_constant_buffer {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6421,13 +6252,13 @@ struct type_info_procedure_s_renderer_get_constant_buffer {
 	union {
 		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t uniform_name;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_s_renderer_render_buffer_create {
+struct type_info_procedure_RHI_render_buffer_create {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6435,13 +6266,13 @@ struct type_info_procedure_s_renderer_render_buffer_create {
 	union {
 		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t buffer_desc;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_s_renderer_vertex_buffer_create {
+struct type_info_procedure_RHI_vertex_buffer_create {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6449,7 +6280,7 @@ struct type_info_procedure_s_renderer_vertex_buffer_create {
 	union {
 		type_info_member_t argument_array[6];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t memory_type;
 			const type_info_member_t rate;
 			const type_info_member_t vertex_buffer_data;
@@ -6459,7 +6290,7 @@ struct type_info_procedure_s_renderer_vertex_buffer_create {
 	};
 };
 
-struct type_info_procedure_s_renderer_index_buffer_create {
+struct type_info_procedure_RHI_index_buffer_create {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6467,7 +6298,7 @@ struct type_info_procedure_s_renderer_index_buffer_create {
 	union {
 		type_info_member_t argument_array[5];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t memory_type;
 			const type_info_member_t element_size;
 			const type_info_member_t data;
@@ -6476,7 +6307,7 @@ struct type_info_procedure_s_renderer_index_buffer_create {
 	};
 };
 
-struct type_info_procedure_s_renderer_render_buffer_copy_data {
+struct type_info_procedure_RHI_render_buffer_copy_data {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6484,7 +6315,7 @@ struct type_info_procedure_s_renderer_render_buffer_copy_data {
 	union {
 		type_info_member_t argument_array[5];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t buffer;
 			const type_info_member_t data;
 			const type_info_member_t size;
@@ -6493,7 +6324,7 @@ struct type_info_procedure_s_renderer_render_buffer_copy_data {
 	};
 };
 
-struct type_info_procedure_s_renderer_buffer_reset {
+struct type_info_procedure_RHI_buffer_reset {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6501,13 +6332,30 @@ struct type_info_procedure_s_renderer_buffer_reset {
 	union {
 		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t buffer;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_s_renderer_get_command_list {
+struct type_info_struct_RHI_image_create_info_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[6];
+		struct {
+			const type_info_member_t data;
+			const type_info_member_t width;
+			const type_info_member_t height;
+			const type_info_member_t format;
+			const type_info_member_t usage;
+			const type_info_member_t sampler_info;
+		}members;
+	};
+};
+
+struct type_info_procedure_RHI_image_create {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6515,13 +6363,82 @@ struct type_info_procedure_s_renderer_get_command_list {
 	union {
 		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t render_state;
+			const type_info_member_t image_create_info;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_RHI_image_destroy {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t RHI_context;
+			const type_info_member_t image;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_RHI_image_update_data {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t backend_context;
+			const type_info_member_t image;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_RHI_get_command_list {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t RHI_context;
 			const type_info_member_t type;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_s_renderer_is_texture_bound {
+struct type_info_procedure_RHI_find_texture_index {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t command_list;
+			const type_info_member_t ID;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_RHI_reset_command_list {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t command_list;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_RHI_is_texture_bound {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6535,7 +6452,7 @@ struct type_info_procedure_s_renderer_is_texture_bound {
 	};
 };
 
-struct type_info_procedure_s_renderer_set_texture_filter_mode {
+struct type_info_procedure_RHI_set_texture_filter_mode {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6550,34 +6467,7 @@ struct type_info_procedure_s_renderer_set_texture_filter_mode {
 	};
 };
 
-struct type_info_procedure_s_renderer_find_texture_index {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t command_list;
-			const type_info_member_t ID;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_renderer_reset_command_list {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t command_list;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_r_cmd_renderpass_begin {
+struct type_info_procedure_RHI_cmd_renderpass_begin {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6591,7 +6481,7 @@ struct type_info_procedure_r_cmd_renderpass_begin {
 	};
 };
 
-struct type_info_procedure_r_cmd_renderpass_end {
+struct type_info_procedure_RHI_cmd_renderpass_end {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6604,7 +6494,7 @@ struct type_info_procedure_r_cmd_renderpass_end {
 	};
 };
 
-struct type_info_procedure_r_cmd_begin_render_group {
+struct type_info_procedure_RHI_cmd_begin_render_group {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6617,7 +6507,7 @@ struct type_info_procedure_r_cmd_begin_render_group {
 	};
 };
 
-struct type_info_procedure_r_cmd_end_render_group {
+struct type_info_procedure_RHI_cmd_end_render_group {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6630,7 +6520,7 @@ struct type_info_procedure_r_cmd_end_render_group {
 	};
 };
 
-struct type_info_procedure_r_cmd_bind_vertex_buffer {
+struct type_info_procedure_RHI_cmd_bind_vertex_buffer {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6644,7 +6534,7 @@ struct type_info_procedure_r_cmd_bind_vertex_buffer {
 	};
 };
 
-struct type_info_procedure_r_cmd_bind_index_buffer {
+struct type_info_procedure_RHI_cmd_bind_index_buffer {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6658,7 +6548,7 @@ struct type_info_procedure_r_cmd_bind_index_buffer {
 	};
 };
 
-struct type_info_procedure_r_cmd_set_scissor {
+struct type_info_procedure_RHI_cmd_set_scissor {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6673,7 +6563,7 @@ struct type_info_procedure_r_cmd_set_scissor {
 	};
 };
 
-struct type_info_procedure_r_cmd_set_viewport {
+struct type_info_procedure_RHI_cmd_set_viewport {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6688,7 +6578,7 @@ struct type_info_procedure_r_cmd_set_viewport {
 	};
 };
 
-struct type_info_procedure_r_cmd_update_push_constants {
+struct type_info_procedure_RHI_cmd_update_push_constants {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6704,7 +6594,7 @@ struct type_info_procedure_r_cmd_update_push_constants {
 	};
 };
 
-struct type_info_procedure_r_cmd_update_buffer_contents {
+struct type_info_procedure_RHI_cmd_update_buffer_contents {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6720,7 +6610,7 @@ struct type_info_procedure_r_cmd_update_buffer_contents {
 	};
 };
 
-struct type_info_procedure_r_cmd_use_shader_program {
+struct type_info_procedure_RHI_cmd_use_shader_program {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6734,7 +6624,7 @@ struct type_info_procedure_r_cmd_use_shader_program {
 	};
 };
 
-struct type_info_procedure_r_cmd_update_constant_buffer {
+struct type_info_procedure_RHI_cmd_update_constant_buffer {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6750,7 +6640,7 @@ struct type_info_procedure_r_cmd_update_constant_buffer {
 	};
 };
 
-struct type_info_procedure_r_cmd_bind_texture_image {
+struct type_info_procedure_RHI_cmd_bind_texture_image {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6764,7 +6654,7 @@ struct type_info_procedure_r_cmd_bind_texture_image {
 	};
 };
 
-struct type_info_procedure_r_cmd_bind_texture_from_handle {
+struct type_info_procedure_RHI_cmd_bind_texture_from_handle {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6778,7 +6668,7 @@ struct type_info_procedure_r_cmd_bind_texture_from_handle {
 	};
 };
 
-struct type_info_procedure_r_cmd_reset_render_state {
+struct type_info_procedure_RHI_cmd_reset_render_state {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6792,7 +6682,7 @@ struct type_info_procedure_r_cmd_reset_render_state {
 	};
 };
 
-struct type_info_procedure_r_cmd_set_render_state {
+struct type_info_procedure_RHI_cmd_set_render_state {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6806,7 +6696,7 @@ struct type_info_procedure_r_cmd_set_render_state {
 	};
 };
 
-struct type_info_procedure_r_cmd_draw {
+struct type_info_procedure_RHI_cmd_draw {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6823,7 +6713,7 @@ struct type_info_procedure_r_cmd_draw {
 	};
 };
 
-struct type_info_procedure_r_cmd_draw_indexed {
+struct type_info_procedure_RHI_cmd_draw_indexed {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6840,7 +6730,7 @@ struct type_info_procedure_r_cmd_draw_indexed {
 	};
 };
 
-struct type_info_procedure_r_cmd_dispatch_compute {
+struct type_info_procedure_RHI_cmd_dispatch_compute {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6856,7 +6746,7 @@ struct type_info_procedure_r_cmd_dispatch_compute {
 	};
 };
 
-struct type_info_procedure_r_cmd_blit_image {
+struct type_info_procedure_RHI_cmd_blit_image {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6875,7 +6765,7 @@ struct type_info_procedure_r_cmd_blit_image {
 	};
 };
 
-struct type_info_procedure_r_cmd_blit_renderpass {
+struct type_info_procedure_RHI_cmd_blit_renderpass {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6890,7 +6780,7 @@ struct type_info_procedure_r_cmd_blit_renderpass {
 	};
 };
 
-struct type_info_procedure_r_cmd_present {
+struct type_info_procedure_RHI_cmd_present {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6904,7 +6794,7 @@ struct type_info_procedure_r_cmd_present {
 	};
 };
 
-struct type_info_procedure_s_renderer_execute_backend_commands {
+struct type_info_procedure_RHI_execute_backend_commands {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6912,26 +6802,8 @@ struct type_info_procedure_s_renderer_execute_backend_commands {
 	union {
 		type_info_member_t argument_array[1];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 		}arguments;
-	};
-};
-
-struct type_info_struct_vulkan_buffer_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[7];
-		struct {
-			const type_info_member_t handle;
-			const type_info_member_t is_mapped;
-			const type_info_member_t size;
-			const type_info_member_t used;
-			const type_info_member_t usage_flags;
-			const type_info_member_t allocation;
-			const type_info_member_t last_used_timestamp;
-		}members;
 	};
 };
 
@@ -7134,6 +7006,84 @@ struct type_info_procedure_backend_get_command_buffer {
 	};
 };
 
+struct type_info_struct_RHI_image_filter_type_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[3];
+		struct {
+			const type_info_member_t RHI_IMAGE_FILTER_TYPE_INVALID;
+			const type_info_member_t RHI_IMAGE_FILTER_TYPE_NEAREST;
+			const type_info_member_t RHI_IMAGE_FILTER_TYPE_LINEAR;
+		}members;
+	};
+};
+
+struct type_info_struct_RHI_image_wrapping_type_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[4];
+		struct {
+			const type_info_member_t RHI_IMAGE_WRAPPING_INVALID;
+			const type_info_member_t RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE;
+			const type_info_member_t RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER;
+			const type_info_member_t RHI_IMAGE_WRAPPING_REPEAT;
+		}members;
+	};
+};
+
+struct type_info_struct_RHI_image_usage_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[6];
+		struct {
+			const type_info_member_t RHI_IMAGE_USAGE_INVALID;
+			const type_info_member_t RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT;
+			const type_info_member_t RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT;
+			const type_info_member_t RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE;
+			const type_info_member_t RHI_IMAGE_USAGE_BLIT_SOURCE;
+			const type_info_member_t RHI_IMAGE_USAGE_BLIT_DESTINATION;
+		}members;
+	};
+};
+
+struct type_info_struct_RHI_sampler_create_info_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[8];
+		struct {
+			const type_info_member_t filtering;
+			const type_info_member_t anisotropy_enabled;
+			const type_info_member_t max_anisotropy;
+			const type_info_member_t wrapu;
+			const type_info_member_t wrapv;
+			const type_info_member_t compare_operation;
+			const type_info_member_t compare_ops_enabled;
+			const type_info_member_t use_normalized_coordinates;
+		}members;
+	};
+};
+
+struct type_info_procedure_RHI_image_create_from_bitmap {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t bitmap;
+		}arguments;
+	};
+};
+
 struct type_info_struct_widget_state_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -7329,7 +7279,7 @@ struct type_info_struct_ui_state_t {
 			const type_info_member_t last_clicked_widget;
 			const type_info_member_t persistent_data_arena;
 			const type_info_member_t widget_states;
-			const type_info_member_t renderer;
+			const type_info_member_t RHI_context;
 			const type_info_member_t asset_manager;
 			const type_info_member_t input_manager;
 			const type_info_member_t current_camera;
@@ -7377,7 +7327,7 @@ struct type_info_procedure_ui_state_init {
 			const type_info_member_t ui_state;
 			const type_info_member_t input_manager;
 			const type_info_member_t asset_manager;
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t renderpass_ID;
 		}arguments;
 	};
@@ -8068,6 +8018,24 @@ struct type_info_procedure_vk_allocator_free {
 	};
 };
 
+struct type_info_struct_vulkan_buffer_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[7];
+		struct {
+			const type_info_member_t handle;
+			const type_info_member_t is_mapped;
+			const type_info_member_t size;
+			const type_info_member_t used;
+			const type_info_member_t usage_flags;
+			const type_info_member_t allocation;
+			const type_info_member_t last_used_timestamp;
+		}members;
+	};
+};
+
 struct type_info_procedure_vk_backend_buffer_copy_buffer {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -8586,7 +8554,7 @@ struct type_info_procedure_vk_backend_initialize_RHI_renderpass {
 	union {
 		type_info_member_t argument_array[3];
 		struct {
-			const type_info_member_t renderer_state;
+			const type_info_member_t RHI_context;
 			const type_info_member_t renderpass_desc;
 			const type_info_member_t renderpass;
 		}arguments;
@@ -9156,8 +9124,8 @@ extern const type_info_t DEFAULT_typedata_sys_mutex_handle_t;
 extern const type_info_t DEFAULT_typedata_sys_semaphore_handle_t;
 extern const type_info_t DEFAULT_typedata_immediate_vertex_t;
 extern const type_info_t DEFAULT_typedata_immediate_widget_data_t;
-extern const type_info_struct_render_command_list_t DEFAULT_typedata_structure_render_command_list_t;
-extern const type_info_struct_vertex_buffer_t DEFAULT_typedata_structure_vertex_buffer_t;
+extern const type_info_struct_RHI_command_list_t DEFAULT_typedata_structure_RHI_command_list_t;
+extern const type_info_struct_RHI_vertex_buffer_t DEFAULT_typedata_structure_RHI_vertex_buffer_t;
 extern const type_info_t DEFAULT_typedata_vec3_t;
 extern const type_info_t DEFAULT_typedata_vec2_t;
 extern const type_info_t DEFAULT_typedata_vec4_t;
@@ -9229,7 +9197,7 @@ extern const type_info_procedure_c_global_context_reset_temporary_data DEFAULT_t
 extern const type_info_procedure_c_global_context_reset_context_arena DEFAULT_typedata_procedure_c_global_context_reset_context_arena;
 extern const type_info_procedure_gc_reset_context_arena DEFAULT_typedata_procedure_gc_reset_context_arena;
 extern const type_info_struct_threadpool_t DEFAULT_typedata_structure_threadpool_t;
-extern const type_info_struct_renderer_state_t DEFAULT_typedata_structure_renderer_state_t;
+extern const type_info_struct_RHI_context_t DEFAULT_typedata_structure_RHI_context_t;
 extern const type_info_struct_input_manager_t DEFAULT_typedata_structure_input_manager_t;
 extern const type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_structure_hash_table_allocation_flags_t;
 extern const type_info_procedure_c_hash_table_allocate_fn_t DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t;
@@ -9396,26 +9364,13 @@ extern const type_info_procedure_sys_mutex_lock DEFAULT_typedata_procedure_sys_m
 extern const type_info_procedure_sys_mutex_unlock DEFAULT_typedata_procedure_sys_mutex_unlock;
 extern const type_info_procedure_sys_create_process DEFAULT_typedata_procedure_sys_create_process;
 extern const type_info_procedure_sys_wait_for_process DEFAULT_typedata_procedure_sys_wait_for_process;
-extern const type_info_struct_render_image_filter_type_t DEFAULT_typedata_structure_render_image_filter_type_t;
-extern const type_info_struct_render_image_wrapping_type_t DEFAULT_typedata_structure_render_image_wrapping_type_t;
-extern const type_info_struct_render_image_usage_t DEFAULT_typedata_structure_render_image_usage_t;
-extern const type_info_struct_sampler_create_info_t DEFAULT_typedata_structure_sampler_create_info_t;
-extern const type_info_struct_image_create_info_t DEFAULT_typedata_structure_image_create_info_t;
-extern const type_info_struct_image_t DEFAULT_typedata_structure_image_t;
-extern const type_info_procedure_s_renderer_image_create DEFAULT_typedata_procedure_s_renderer_image_create;
-extern const type_info_struct_bitmap_t DEFAULT_typedata_structure_bitmap_t;
-extern const type_info_procedure_s_renderer_image_create_from_bitmap DEFAULT_typedata_procedure_s_renderer_image_create_from_bitmap;
-extern const type_info_procedure_s_renderer_image_destroy DEFAULT_typedata_procedure_s_renderer_image_destroy;
-extern const type_info_procedure_s_renderer_image_update_data DEFAULT_typedata_procedure_s_renderer_image_update_data;
-extern const type_info_t DEFAULT_typedata_backend_image_t;
 extern const type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t;
 extern const type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_asset_slot_load_status_t;
 extern const type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_format_t;
+extern const type_info_struct_bitmap_t DEFAULT_typedata_structure_bitmap_t;
 extern const type_info_struct_subtexture_data_t DEFAULT_typedata_structure_subtexture_data_t;
 extern const type_info_struct_texture_atlas_t DEFAULT_typedata_structure_texture_atlas_t;
-extern const type_info_struct_animation_source2D_t DEFAULT_typedata_structure_animation_source2D_t;
-extern const type_info_struct_animation2D_t DEFAULT_typedata_structure_animation2D_t;
-extern const type_info_struct_shader_t DEFAULT_typedata_structure_shader_t;
+extern const type_info_struct_RHI_shader_t DEFAULT_typedata_structure_RHI_shader_t;
 extern const type_info_struct_material_instance_t DEFAULT_typedata_structure_material_instance_t;
 extern const type_info_struct_material_archetype_t DEFAULT_typedata_structure_material_archetype_t;
 extern const type_info_struct_stored_material_type_t DEFAULT_typedata_structure_stored_material_type_t;
@@ -9446,6 +9401,7 @@ extern const type_info_procedure_s_texture_atlas_add_texture DEFAULT_typedata_pr
 extern const type_info_procedure_s_texture_atlas_pack_added_textures DEFAULT_typedata_procedure_s_texture_atlas_pack_added_textures;
 extern const type_info_procedure_s_asset_manager_set_handle_asset_data_pointer DEFAULT_typedata_procedure_s_asset_manager_set_handle_asset_data_pointer;
 extern const type_info_procedure_s_asset_manager_get_asset_slot DEFAULT_typedata_procedure_s_asset_manager_get_asset_slot;
+extern const type_info_t DEFAULT_typedata_shader_t;
 extern const type_info_procedure_s_asset_get_shader_from_handle DEFAULT_typedata_procedure_s_asset_get_shader_from_handle;
 extern const type_info_procedure_s_asset_get_texture_from_handle DEFAULT_typedata_procedure_s_asset_get_texture_from_handle;
 extern const type_info_procedure_s_asset_get_material_data_from_handle DEFAULT_typedata_procedure_s_asset_get_material_data_from_handle;
@@ -9454,9 +9410,10 @@ extern const type_info_procedure_s_asset_get_material_instance_from_handle DEFAU
 extern const type_info_procedure_s_asset_font_get_string_size DEFAULT_typedata_procedure_s_asset_font_get_string_size;
 extern const type_info_procedure_s_asset_font_acquire_font_at_size DEFAULT_typedata_procedure_s_asset_font_acquire_font_at_size;
 extern const type_info_procedure_s_asset_font_fetch_glyph DEFAULT_typedata_procedure_s_asset_font_fetch_glyph;
+extern const type_info_struct_RHI_image_t DEFAULT_typedata_structure_RHI_image_t;
 extern const type_info_t DEFAULT_typedata_dynarray_t;
 extern const type_info_t DEFAULT_typedata_backend_shader_t;
-extern const type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_render_pipeline_state_t;
+extern const type_info_struct_RHI_pipeline_state_t DEFAULT_typedata_structure_RHI_pipeline_state_t;
 extern const type_info_t DEFAULT_typedata_VkDescriptorSet;
 extern const type_info_t DEFAULT_typedata_FT_Face;
 extern const type_info_t DEFAULT_typedata_jfd_package_entry_t;
@@ -9508,83 +9465,87 @@ extern const type_info_procedure_s_im_get_button_state DEFAULT_typedata_procedur
 extern const type_info_t DEFAULT_typedata_SDL_Gamepad;
 extern const type_info_t DEFAULT_typedata_SDL_Joystick;
 extern const type_info_struct_camera_matrices_t DEFAULT_typedata_structure_camera_matrices_t;
-extern const type_info_struct_render_buffer_type_t DEFAULT_typedata_structure_render_buffer_type_t;
-extern const type_info_struct_render_buffer_advance_rate_t DEFAULT_typedata_structure_render_buffer_advance_rate_t;
-extern const type_info_struct_render_buffer_memory_type_t DEFAULT_typedata_structure_render_buffer_memory_type_t;
-extern const type_info_struct_render_buffer_desc_t DEFAULT_typedata_structure_render_buffer_desc_t;
-extern const type_info_struct_render_buffer_t DEFAULT_typedata_structure_render_buffer_t;
-extern const type_info_struct_index_buffer_t DEFAULT_typedata_structure_index_buffer_t;
-extern const type_info_struct_uniform_constant_buffer_t DEFAULT_typedata_structure_uniform_constant_buffer_t;
-extern const type_info_struct_render_command_type_t DEFAULT_typedata_structure_render_command_type_t;
-extern const type_info_struct_render_command_header_t DEFAULT_typedata_structure_render_command_header_t;
-extern const type_info_struct_render_command_begin_renderpass_t DEFAULT_typedata_structure_render_command_begin_renderpass_t;
-extern const type_info_struct_render_command_end_renderpass_t DEFAULT_typedata_structure_render_command_end_renderpass_t;
-extern const type_info_struct_render_command_bind_vertex_buffer_t DEFAULT_typedata_structure_render_command_bind_vertex_buffer_t;
-extern const type_info_struct_render_command_bind_index_buffer_t DEFAULT_typedata_structure_render_command_bind_index_buffer_t;
-extern const type_info_struct_render_command_update_texture_t DEFAULT_typedata_structure_render_command_update_texture_t;
-extern const type_info_struct_render_command_bind_material_t DEFAULT_typedata_structure_render_command_bind_material_t;
-extern const type_info_struct_render_command_bind_shader_t DEFAULT_typedata_structure_render_command_bind_shader_t;
-extern const type_info_struct_render_command_set_viewport_t DEFAULT_typedata_structure_render_command_set_viewport_t;
-extern const type_info_struct_render_command_set_scissor_t DEFAULT_typedata_structure_render_command_set_scissor_t;
-extern const type_info_struct_render_command_update_push_constant_t DEFAULT_typedata_structure_render_command_update_push_constant_t;
-extern const type_info_struct_render_command_update_uniform_constant_buffer_t DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t;
-extern const type_info_struct_render_command_update_render_buffer_contents_t DEFAULT_typedata_structure_render_command_update_render_buffer_contents_t;
-extern const type_info_struct_render_command_bind_texture_t DEFAULT_typedata_structure_render_command_bind_texture_t;
-extern const type_info_struct_render_command_dispatch_compute_t DEFAULT_typedata_structure_render_command_dispatch_compute_t;
-extern const type_info_struct_render_command_set_pipeline_state_t DEFAULT_typedata_structure_render_command_set_pipeline_state_t;
-extern const type_info_struct_render_command_draw_t DEFAULT_typedata_structure_render_command_draw_t;
-extern const type_info_struct_render_command_blit_image_t DEFAULT_typedata_structure_render_command_blit_image_t;
-extern const type_info_struct_render_command_blit_renderpass_t DEFAULT_typedata_structure_render_command_blit_renderpass_t;
-extern const type_info_struct_render_command_present_frame_t DEFAULT_typedata_structure_render_command_present_frame_t;
-extern const type_info_struct_render_command_t DEFAULT_typedata_structure_render_command_t;
-extern const type_info_struct_command_list_type_t DEFAULT_typedata_structure_command_list_type_t;
-extern const type_info_struct_clear_value_t DEFAULT_typedata_structure_clear_value_t;
-extern const type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_structure_renderpass_attachment_access_t;
-extern const type_info_struct_renderpass_attachment_load_operation_t DEFAULT_typedata_structure_renderpass_attachment_load_operation_t;
-extern const type_info_struct_renderpass_attachment_store_operation_t DEFAULT_typedata_structure_renderpass_attachment_store_operation_t;
-extern const type_info_struct_renderpass_attachment_t DEFAULT_typedata_structure_renderpass_attachment_t;
-extern const type_info_struct_renderpass_desc_t DEFAULT_typedata_structure_renderpass_desc_t;
-extern const type_info_struct_renderpass_key_t DEFAULT_typedata_structure_renderpass_key_t;
-extern const type_info_struct_renderpass_t DEFAULT_typedata_structure_renderpass_t;
-extern const type_info_t DEFAULT_typedata_backend_renderer_t;
-extern const type_info_procedure_s_renderer_state_init DEFAULT_typedata_procedure_s_renderer_state_init;
-extern const type_info_procedure_s_renderer_handle_window_resize DEFAULT_typedata_procedure_s_renderer_handle_window_resize;
-extern const type_info_procedure_s_renderer_resize_render_targets DEFAULT_typedata_procedure_s_renderer_resize_render_targets;
-extern const type_info_procedure_s_renderer_build_renderpass DEFAULT_typedata_procedure_s_renderer_build_renderpass;
-extern const type_info_procedure_s_renderer_resize_renderpass DEFAULT_typedata_procedure_s_renderer_resize_renderpass;
-extern const type_info_procedure_s_renderer_get_constant_buffer DEFAULT_typedata_procedure_s_renderer_get_constant_buffer;
-extern const type_info_procedure_s_renderer_render_buffer_create DEFAULT_typedata_procedure_s_renderer_render_buffer_create;
-extern const type_info_procedure_s_renderer_vertex_buffer_create DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create;
-extern const type_info_procedure_s_renderer_index_buffer_create DEFAULT_typedata_procedure_s_renderer_index_buffer_create;
-extern const type_info_procedure_s_renderer_render_buffer_copy_data DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data;
-extern const type_info_procedure_s_renderer_get_command_list DEFAULT_typedata_procedure_s_renderer_get_command_list;
-extern const type_info_procedure_s_renderer_is_texture_bound DEFAULT_typedata_procedure_s_renderer_is_texture_bound;
-extern const type_info_procedure_s_renderer_set_texture_filter_mode DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode;
-extern const type_info_procedure_s_renderer_find_texture_index DEFAULT_typedata_procedure_s_renderer_find_texture_index;
-extern const type_info_procedure_s_renderer_reset_command_list DEFAULT_typedata_procedure_s_renderer_reset_command_list;
-extern const type_info_procedure_r_cmd_renderpass_begin DEFAULT_typedata_procedure_r_cmd_renderpass_begin;
-extern const type_info_procedure_r_cmd_renderpass_end DEFAULT_typedata_procedure_r_cmd_renderpass_end;
-extern const type_info_procedure_r_cmd_begin_render_group DEFAULT_typedata_procedure_r_cmd_begin_render_group;
-extern const type_info_procedure_r_cmd_end_render_group DEFAULT_typedata_procedure_r_cmd_end_render_group;
-extern const type_info_procedure_r_cmd_bind_index_buffer DEFAULT_typedata_procedure_r_cmd_bind_index_buffer;
-extern const type_info_procedure_r_cmd_set_scissor DEFAULT_typedata_procedure_r_cmd_set_scissor;
-extern const type_info_procedure_r_cmd_set_viewport DEFAULT_typedata_procedure_r_cmd_set_viewport;
-extern const type_info_procedure_r_cmd_update_push_constants DEFAULT_typedata_procedure_r_cmd_update_push_constants;
-extern const type_info_procedure_r_cmd_update_buffer_contents DEFAULT_typedata_procedure_r_cmd_update_buffer_contents;
-extern const type_info_procedure_r_cmd_use_shader_program DEFAULT_typedata_procedure_r_cmd_use_shader_program;
-extern const type_info_procedure_r_cmd_update_constant_buffer DEFAULT_typedata_procedure_r_cmd_update_constant_buffer;
-extern const type_info_procedure_r_cmd_bind_texture_image DEFAULT_typedata_procedure_r_cmd_bind_texture_image;
-extern const type_info_procedure_r_cmd_bind_texture_from_handle DEFAULT_typedata_procedure_r_cmd_bind_texture_from_handle;
-extern const type_info_procedure_r_cmd_reset_render_state DEFAULT_typedata_procedure_r_cmd_reset_render_state;
-extern const type_info_procedure_r_cmd_set_render_state DEFAULT_typedata_procedure_r_cmd_set_render_state;
-extern const type_info_procedure_r_cmd_draw DEFAULT_typedata_procedure_r_cmd_draw;
-extern const type_info_procedure_r_cmd_draw_indexed DEFAULT_typedata_procedure_r_cmd_draw_indexed;
-extern const type_info_procedure_r_cmd_dispatch_compute DEFAULT_typedata_procedure_r_cmd_dispatch_compute;
-extern const type_info_procedure_r_cmd_blit_image DEFAULT_typedata_procedure_r_cmd_blit_image;
-extern const type_info_procedure_r_cmd_blit_renderpass DEFAULT_typedata_procedure_r_cmd_blit_renderpass;
-extern const type_info_procedure_r_cmd_present DEFAULT_typedata_procedure_r_cmd_present;
-extern const type_info_procedure_s_renderer_execute_backend_commands DEFAULT_typedata_procedure_s_renderer_execute_backend_commands;
-extern const type_info_struct_vulkan_buffer_t DEFAULT_typedata_structure_vulkan_buffer_t;
+extern const type_info_struct_RHI_render_buffer_type_t DEFAULT_typedata_structure_RHI_render_buffer_type_t;
+extern const type_info_struct_RHI_render_buffer_advance_rate_t DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t;
+extern const type_info_struct_RHI_render_buffer_memory_type_t DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t;
+extern const type_info_struct_RHI_render_buffer_desc_t DEFAULT_typedata_structure_RHI_render_buffer_desc_t;
+extern const type_info_struct_RHI_render_buffer_t DEFAULT_typedata_structure_RHI_render_buffer_t;
+extern const type_info_struct_RHI_index_buffer_t DEFAULT_typedata_structure_RHI_index_buffer_t;
+extern const type_info_struct_RHI_uniform_constant_buffer_t DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t;
+extern const type_info_struct_RHI_command_type_t DEFAULT_typedata_structure_RHI_command_type_t;
+extern const type_info_struct_RHI_command_header_t DEFAULT_typedata_structure_RHI_command_header_t;
+extern const type_info_struct_RHI_command_begin_renderpass_t DEFAULT_typedata_structure_RHI_command_begin_renderpass_t;
+extern const type_info_struct_RHI_command_end_renderpass_t DEFAULT_typedata_structure_RHI_command_end_renderpass_t;
+extern const type_info_struct_RHI_command_bind_vertex_buffer_t DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t;
+extern const type_info_struct_RHI_command_bind_index_buffer_t DEFAULT_typedata_structure_RHI_command_bind_index_buffer_t;
+extern const type_info_struct_RHI_command_update_texture_t DEFAULT_typedata_structure_RHI_command_update_texture_t;
+extern const type_info_struct_RHI_command_bind_material_t DEFAULT_typedata_structure_RHI_command_bind_material_t;
+extern const type_info_struct_RHI_command_bind_shader_t DEFAULT_typedata_structure_RHI_command_bind_shader_t;
+extern const type_info_struct_RHI_command_set_viewport_t DEFAULT_typedata_structure_RHI_command_set_viewport_t;
+extern const type_info_struct_RHI_command_set_scissor_t DEFAULT_typedata_structure_RHI_command_set_scissor_t;
+extern const type_info_struct_RHI_command_update_push_constant_t DEFAULT_typedata_structure_RHI_command_update_push_constant_t;
+extern const type_info_struct_RHI_command_update_uniform_constant_buffer_t DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t;
+extern const type_info_struct_RHI_command_update_render_buffer_contents_t DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t;
+extern const type_info_struct_RHI_command_bind_texture_t DEFAULT_typedata_structure_RHI_command_bind_texture_t;
+extern const type_info_struct_RHI_command_dispatch_compute_t DEFAULT_typedata_structure_RHI_command_dispatch_compute_t;
+extern const type_info_struct_RHI_command_set_pipeline_state_t DEFAULT_typedata_structure_RHI_command_set_pipeline_state_t;
+extern const type_info_struct_RHI_command_draw_t DEFAULT_typedata_structure_RHI_command_draw_t;
+extern const type_info_struct_RHI_command_blit_image_t DEFAULT_typedata_structure_RHI_command_blit_image_t;
+extern const type_info_struct_RHI_command_blit_renderpass_t DEFAULT_typedata_structure_RHI_command_blit_renderpass_t;
+extern const type_info_struct_RHI_command_present_frame_t DEFAULT_typedata_structure_RHI_command_present_frame_t;
+extern const type_info_struct_RHI_command_t DEFAULT_typedata_structure_RHI_command_t;
+extern const type_info_struct_RHI_command_list_type_t DEFAULT_typedata_structure_RHI_command_list_type_t;
+extern const type_info_struct_RHI_clear_value_t DEFAULT_typedata_structure_RHI_clear_value_t;
+extern const type_info_struct_RHI_renderpass_attachment_access_t DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t;
+extern const type_info_struct_RHI_renderpass_attachment_load_operation_t DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t;
+extern const type_info_struct_RHI_renderpass_attachment_store_operation_t DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t;
+extern const type_info_struct_RHI_renderpass_attachment_t DEFAULT_typedata_structure_RHI_renderpass_attachment_t;
+extern const type_info_struct_RHI_renderpass_desc_t DEFAULT_typedata_structure_RHI_renderpass_desc_t;
+extern const type_info_struct_RHI_renderpass_key_t DEFAULT_typedata_structure_RHI_renderpass_key_t;
+extern const type_info_struct_RHI_renderpass_t DEFAULT_typedata_structure_RHI_renderpass_t;
+extern const type_info_t DEFAULT_typedata_backend_render_context_t;
+extern const type_info_procedure_RHI_context_init DEFAULT_typedata_procedure_RHI_context_init;
+extern const type_info_procedure_RHI_handle_window_resize DEFAULT_typedata_procedure_RHI_handle_window_resize;
+extern const type_info_procedure_RHI_resize_render_targets DEFAULT_typedata_procedure_RHI_resize_render_targets;
+extern const type_info_procedure_RHI_build_renderpass DEFAULT_typedata_procedure_RHI_build_renderpass;
+extern const type_info_procedure_RHI_resize_renderpass DEFAULT_typedata_procedure_RHI_resize_renderpass;
+extern const type_info_procedure_RHI_get_constant_buffer DEFAULT_typedata_procedure_RHI_get_constant_buffer;
+extern const type_info_procedure_RHI_render_buffer_create DEFAULT_typedata_procedure_RHI_render_buffer_create;
+extern const type_info_procedure_RHI_vertex_buffer_create DEFAULT_typedata_procedure_RHI_vertex_buffer_create;
+extern const type_info_procedure_RHI_index_buffer_create DEFAULT_typedata_procedure_RHI_index_buffer_create;
+extern const type_info_procedure_RHI_render_buffer_copy_data DEFAULT_typedata_procedure_RHI_render_buffer_copy_data;
+extern const type_info_struct_RHI_image_create_info_t DEFAULT_typedata_structure_RHI_image_create_info_t;
+extern const type_info_procedure_RHI_image_create DEFAULT_typedata_procedure_RHI_image_create;
+extern const type_info_procedure_RHI_image_destroy DEFAULT_typedata_procedure_RHI_image_destroy;
+extern const type_info_procedure_RHI_image_update_data DEFAULT_typedata_procedure_RHI_image_update_data;
+extern const type_info_procedure_RHI_get_command_list DEFAULT_typedata_procedure_RHI_get_command_list;
+extern const type_info_procedure_RHI_find_texture_index DEFAULT_typedata_procedure_RHI_find_texture_index;
+extern const type_info_procedure_RHI_reset_command_list DEFAULT_typedata_procedure_RHI_reset_command_list;
+extern const type_info_procedure_RHI_is_texture_bound DEFAULT_typedata_procedure_RHI_is_texture_bound;
+extern const type_info_procedure_RHI_set_texture_filter_mode DEFAULT_typedata_procedure_RHI_set_texture_filter_mode;
+extern const type_info_procedure_RHI_cmd_renderpass_begin DEFAULT_typedata_procedure_RHI_cmd_renderpass_begin;
+extern const type_info_procedure_RHI_cmd_renderpass_end DEFAULT_typedata_procedure_RHI_cmd_renderpass_end;
+extern const type_info_procedure_RHI_cmd_begin_render_group DEFAULT_typedata_procedure_RHI_cmd_begin_render_group;
+extern const type_info_procedure_RHI_cmd_end_render_group DEFAULT_typedata_procedure_RHI_cmd_end_render_group;
+extern const type_info_procedure_RHI_cmd_bind_index_buffer DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer;
+extern const type_info_procedure_RHI_cmd_set_scissor DEFAULT_typedata_procedure_RHI_cmd_set_scissor;
+extern const type_info_procedure_RHI_cmd_set_viewport DEFAULT_typedata_procedure_RHI_cmd_set_viewport;
+extern const type_info_procedure_RHI_cmd_update_push_constants DEFAULT_typedata_procedure_RHI_cmd_update_push_constants;
+extern const type_info_procedure_RHI_cmd_update_buffer_contents DEFAULT_typedata_procedure_RHI_cmd_update_buffer_contents;
+extern const type_info_procedure_RHI_cmd_use_shader_program DEFAULT_typedata_procedure_RHI_cmd_use_shader_program;
+extern const type_info_procedure_RHI_cmd_update_constant_buffer DEFAULT_typedata_procedure_RHI_cmd_update_constant_buffer;
+extern const type_info_procedure_RHI_cmd_bind_texture_image DEFAULT_typedata_procedure_RHI_cmd_bind_texture_image;
+extern const type_info_procedure_RHI_cmd_bind_texture_from_handle DEFAULT_typedata_procedure_RHI_cmd_bind_texture_from_handle;
+extern const type_info_procedure_RHI_cmd_reset_render_state DEFAULT_typedata_procedure_RHI_cmd_reset_render_state;
+extern const type_info_procedure_RHI_cmd_set_render_state DEFAULT_typedata_procedure_RHI_cmd_set_render_state;
+extern const type_info_procedure_RHI_cmd_draw DEFAULT_typedata_procedure_RHI_cmd_draw;
+extern const type_info_procedure_RHI_cmd_draw_indexed DEFAULT_typedata_procedure_RHI_cmd_draw_indexed;
+extern const type_info_procedure_RHI_cmd_dispatch_compute DEFAULT_typedata_procedure_RHI_cmd_dispatch_compute;
+extern const type_info_procedure_RHI_cmd_blit_image DEFAULT_typedata_procedure_RHI_cmd_blit_image;
+extern const type_info_procedure_RHI_cmd_blit_renderpass DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass;
+extern const type_info_procedure_RHI_cmd_present DEFAULT_typedata_procedure_RHI_cmd_present;
+extern const type_info_procedure_RHI_execute_backend_commands DEFAULT_typedata_procedure_RHI_execute_backend_commands;
+extern const type_info_t DEFAULT_typedata_backend_buffer_t;
 extern const type_info_t DEFAULT_typedata_backend_command_buffer_t;
 extern const type_info_t DEFAULT_typedata_ivec4_t;
 extern const type_info_t DEFAULT_typedata_backend_renderpass_handle_t;
@@ -9605,6 +9566,12 @@ extern const type_info_procedure_backend_image_update_contents DEFAULT_typedata_
 extern const type_info_procedure_backend_acquire_image_sampler DEFAULT_typedata_procedure_backend_acquire_image_sampler;
 extern const type_info_procedure_backend_shader_create DEFAULT_typedata_procedure_backend_shader_create;
 extern const type_info_procedure_backend_get_command_buffer DEFAULT_typedata_procedure_backend_get_command_buffer;
+extern const type_info_struct_RHI_image_filter_type_t DEFAULT_typedata_structure_RHI_image_filter_type_t;
+extern const type_info_struct_RHI_image_wrapping_type_t DEFAULT_typedata_structure_RHI_image_wrapping_type_t;
+extern const type_info_struct_RHI_image_usage_t DEFAULT_typedata_structure_RHI_image_usage_t;
+extern const type_info_struct_RHI_sampler_create_info_t DEFAULT_typedata_structure_RHI_sampler_create_info_t;
+extern const type_info_procedure_RHI_image_create_from_bitmap DEFAULT_typedata_procedure_RHI_image_create_from_bitmap;
+extern const type_info_t DEFAULT_typedata_backend_image_t;
 extern const type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_state_t;
 extern const type_info_struct_ui_signal_flags_t DEFAULT_typedata_structure_ui_signal_flags_t;
 extern const type_info_struct_ui_signal_t DEFAULT_typedata_structure_ui_signal_t;
@@ -9664,6 +9631,7 @@ extern const type_info_t DEFAULT_typedata_VkMemoryPropertyFlags;
 extern const type_info_t DEFAULT_typedata_VkDeviceMemory;
 extern const type_info_t DEFAULT_typedata_VkAllocationCallbacks;
 extern const type_info_t DEFAULT_typedata_VkDevice;
+extern const type_info_struct_vulkan_buffer_t DEFAULT_typedata_structure_vulkan_buffer_t;
 extern const type_info_t DEFAULT_typedata_VkCommandBuffer;
 extern const type_info_procedure_vk_backend_buffer_copy_buffer DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer;
 extern const type_info_procedure_vk_backend_buffer_copy_data DEFAULT_typedata_procedure_vk_backend_buffer_copy_data;
@@ -10151,274 +10119,250 @@ constexpr type_info_t DEFAULT_typedata_immediate_widget_data_t = {
 	.type_id = TYPE_immediate_widget_data_t,
 	.size = athena_internal::safe_sizeof<immediate_widget_data_t>(),
 };
-constexpr type_info_struct_render_command_list_t DEFAULT_typedata_structure_render_command_list_t = {
+constexpr type_info_struct_RHI_command_list_t DEFAULT_typedata_structure_RHI_command_list_t = {
 	.type_info = {
-		.type_name = "render_command_list_t",
-		.type_id = TYPE_render_command_list_t,
+		.type_name = "RHI_command_list_t",
+		.type_id = TYPE_RHI_command_list_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_list_t>(),
+		.size = athena_internal::safe_sizeof<RHI_command_list_t>(),
 	},
-	.member_count   = 28,
-	.member_pointer = DEFAULT_typedata_structure_render_command_list_t.member_array,
+	.member_count   = 25,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_list_t.member_array,
 	.members = {
 		.is_initialized = {
 			.type_info     = &DEFAULT_typedata_bool8,
 			.member_name   = "is_initialized",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, is_initialized),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, is_initialized),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, renderer_state),
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, RHI_context),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.transient_arena = {
 			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
 			.member_name   = "transient_arena",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, transient_arena),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, transient_arena),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.command_arena = {
 			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
 			.member_name   = "command_arena",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, command_arena),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, command_arena),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.commands = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_t.type_info,
 			.member_name   = "commands",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, commands),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, commands),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.command_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "command_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, command_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, command_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.draw_instance_command_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "draw_instance_command_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, draw_instance_command_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, draw_instance_command_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.bind_shader_command_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "bind_shader_command_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, bind_shader_command_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, bind_shader_command_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.bind_render_target_command_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "bind_render_target_command_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, bind_render_target_command_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, bind_render_target_command_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.bind_material_command_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "bind_material_command_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, bind_material_command_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, bind_material_command_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.active_render_state = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
 			.member_name   = "active_render_state",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_render_state),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_render_state),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.vertex_buffer_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "vertex_buffer_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, vertex_buffer_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, vertex_buffer_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.active_index_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
 			.member_name   = "active_index_buffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_index_buffer),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_index_buffer),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.active_scissor_command = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_t.type_info,
 			.member_name   = "active_scissor_command",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_scissor_command),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_scissor_command),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.active_viewport_command = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_t.type_info,
 			.member_name   = "active_viewport_command",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_viewport_command),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_viewport_command),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.active_shader_program = {
 			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
 			.member_name   = "active_shader_program",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_shader_program),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_shader_program),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.vertex_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "vertex_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, vertex_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.instance_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "instance_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, instance_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.index_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "index_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, index_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
 		.active_renderpass = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
 			.member_name   = "active_renderpass",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, active_renderpass),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_renderpass),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.presenting = {
 			.type_info     = &DEFAULT_typedata_bool32,
 			.member_name   = "presenting",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, presenting),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, presenting),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.image_shader_params = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "image_shader_params",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, image_shader_params),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, image_shader_params),
 			.flags         = 66,
 			.pointer_depth = 1,
 		},
 		.image_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "image_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, image_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, image_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.image_ids_to_bind = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "image_ids_to_bind",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, image_ids_to_bind),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, image_ids_to_bind),
 			.flags         = 64,
 			.pointer_depth = 0,
 		},
 		.bound_image_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "bound_image_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, bound_image_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, bound_image_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.command_list_type = {
-			.type_info     = &DEFAULT_typedata_structure_command_list_type_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
 			.member_name   = "command_list_type",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, command_list_type),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, command_list_type),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.backend_command_buffer = {
 			.type_info     = &DEFAULT_typedata_backend_command_buffer_t,
 			.member_name   = "backend_command_buffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.offset        = offsetof(render_command_list_t, backend_command_buffer),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, backend_command_buffer),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
 
-constexpr type_info_struct_vertex_buffer_t DEFAULT_typedata_structure_vertex_buffer_t = {
+constexpr type_info_struct_RHI_vertex_buffer_t DEFAULT_typedata_structure_RHI_vertex_buffer_t = {
 	.type_info = {
-		.type_name = "vertex_buffer_t",
-		.type_id = TYPE_vertex_buffer_t,
+		.type_name = "RHI_vertex_buffer_t",
+		.type_id = TYPE_RHI_vertex_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<vertex_buffer_t>(),
+		.size = athena_internal::safe_sizeof<RHI_vertex_buffer_t>(),
 	},
 	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_vertex_buffer_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_vertex_buffer_t.member_array,
 	.members = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.offset        = offsetof(vertex_buffer_t, buffer),
+		.buffer_data = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.member_name   = "buffer_data",
+			.parent        = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.offset        = offsetof(RHI_vertex_buffer_t, buffer_data),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.vertex_data = {
 			.type_info     = &DEFAULT_typedata_byte,
 			.member_name   = "vertex_data",
-			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.offset        = offsetof(vertex_buffer_t, vertex_data),
+			.parent        = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.offset        = offsetof(RHI_vertex_buffer_t, vertex_data),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.max_vertices = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "max_vertices",
-			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.offset        = offsetof(vertex_buffer_t, max_vertices),
+			.parent        = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.offset        = offsetof(RHI_vertex_buffer_t, max_vertices),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.vertex_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "vertex_count",
-			.parent        = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-			.offset        = offsetof(vertex_buffer_t, vertex_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.offset        = offsetof(RHI_vertex_buffer_t, vertex_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -10467,7 +10411,7 @@ constexpr type_info_struct_texture2D_t DEFAULT_typedata_structure_texture2D_t = 
 			.pointer_depth = 0,
 		},
 		.gpu_data = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "gpu_data",
 			.parent        = &DEFAULT_typedata_structure_texture2D_t.type_info,
 			.offset        = offsetof(texture2D_t, gpu_data),
@@ -10488,14 +10432,14 @@ constexpr type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immed
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_quad_ex.argument_array,
 	.arguments = {
 		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 			.member_name   = "command_list",
 			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 			.member_name   = "buffer",
 			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
 			.flags         = 2,
@@ -10577,14 +10521,14 @@ constexpr type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediat
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect.argument_array,
 	.arguments = {
 		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 			.member_name   = "command_list",
 			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 			.member_name   = "buffer",
 			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
 			.flags         = 2,
@@ -10802,11 +10746,11 @@ constexpr type_info_struct_asset_manager_t DEFAULT_typedata_structure_asset_mana
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
 			.parent        = &DEFAULT_typedata_structure_asset_manager_t.type_info,
-			.offset        = offsetof(asset_manager_t, renderer_state),
+			.offset        = offsetof(asset_manager_t, RHI_context),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
@@ -10820,7 +10764,7 @@ constexpr type_info_struct_asset_handle_t DEFAULT_typedata_structure_asset_handl
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<asset_handle_t>(),
 	},
-	.member_count   = 8,
+	.member_count   = 6,
 	.member_pointer = DEFAULT_typedata_structure_asset_handle_t.member_array,
 	.members = {
 		.is_valid = {
@@ -10828,8 +10772,8 @@ constexpr type_info_struct_asset_handle_t DEFAULT_typedata_structure_asset_handl
 			.member_name   = "is_valid",
 			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
 			.offset        = offsetof(asset_handle_t, is_valid),
-			.flags         = 0,
-			.pointer_depth = 0,
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
 		.slot = {
 			.type_info     = &DEFAULT_typedata_structure_asset_slot_t.type_info,
@@ -10848,7 +10792,7 @@ constexpr type_info_struct_asset_handle_t DEFAULT_typedata_structure_asset_handl
 			.pointer_depth = 1,
 		},
 		.shader = {
-			.type_info     = &DEFAULT_typedata_structure_shader_t.type_info,
+			.type_info     = &DEFAULT_typedata_shader_t,
 			.member_name   = "shader",
 			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
 			.offset        = offsetof(asset_handle_t, shader),
@@ -10868,22 +10812,6 @@ constexpr type_info_struct_asset_handle_t DEFAULT_typedata_structure_asset_handl
 			.member_name   = "dynamic_render_font",
 			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
 			.offset        = offsetof(asset_handle_t, dynamic_render_font),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.animation_source2D = {
-			.type_info     = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
-			.member_name   = "animation_source2D",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, animation_source2D),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.animation2D = {
-			.type_info     = &DEFAULT_typedata_structure_animation2D_t.type_info,
-			.member_name   = "animation2D",
-			.parent        = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.offset        = offsetof(asset_handle_t, animation2D),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
@@ -10935,14 +10863,14 @@ constexpr type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediat
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_text.argument_array,
 	.arguments = {
 		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 			.member_name   = "command_list",
 			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.vertex_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 			.member_name   = "vertex_buffer",
 			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
 			.flags         = 2,
@@ -11015,7 +10943,7 @@ constexpr type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_imme
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_put_data.argument_array,
 	.arguments = {
 		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 			.member_name   = "buffer",
 			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
 			.flags         = 2,
@@ -12907,11 +12835,11 @@ constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_co
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
 			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
-			.offset        = offsetof(global_context_t, renderer_state),
+			.offset        = offsetof(global_context_t, RHI_context),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
@@ -13055,254 +12983,254 @@ constexpr type_info_struct_threadpool_t DEFAULT_typedata_structure_threadpool_t 
 	},
 };
 
-constexpr type_info_struct_renderer_state_t DEFAULT_typedata_structure_renderer_state_t = {
+constexpr type_info_struct_RHI_context_t DEFAULT_typedata_structure_RHI_context_t = {
 	.type_info = {
-		.type_name = "renderer_state_t",
-		.type_id = TYPE_renderer_state_t,
+		.type_name = "RHI_context_t",
+		.type_id = TYPE_RHI_context_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<renderer_state_t>(),
+		.size = athena_internal::safe_sizeof<RHI_context_t>(),
 	},
 	.member_count   = 33,
-	.member_pointer = DEFAULT_typedata_structure_renderer_state_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_context_t.member_array,
 	.members = {
 		.window = {
 			.type_info     = &DEFAULT_typedata_SDL_Window,
 			.member_name   = "window",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, window),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, window),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.render_context = {
-			.type_info     = &DEFAULT_typedata_backend_renderer_t,
-			.member_name   = "render_context",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, render_context),
+		.backend_render_context = {
+			.type_info     = &DEFAULT_typedata_backend_render_context_t,
+			.member_name   = "backend_render_context",
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, backend_render_context),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.renderer_arena = {
+		.RHI_arena = {
 			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
-			.member_name   = "renderer_arena",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, renderer_arena),
+			.member_name   = "RHI_arena",
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, RHI_arena),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.transient_arena = {
 			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
 			.member_name   = "transient_arena",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, transient_arena),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, transient_arena),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.command_lists = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 			.member_name   = "command_lists",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, command_lists),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, command_lists),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.command_list_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "command_list_count",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, command_list_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, command_list_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.used_constant_buffers = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "used_constant_buffers",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, used_constant_buffers),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, used_constant_buffers),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.total_render_instances = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "total_render_instances",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, total_render_instances),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, total_render_instances),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.total_materials = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "total_materials",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, total_materials),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, total_materials),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.total_shaders = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "total_shaders",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, total_shaders),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, total_shaders),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.total_buffers = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "total_buffers",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, total_buffers),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, total_buffers),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.window_size = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
 			.member_name   = "window_size",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, window_size),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, window_size),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.current_window_size_generation = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "current_window_size_generation",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, current_window_size_generation),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, current_window_size_generation),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.last_window_size_generation = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "last_window_size_generation",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, last_window_size_generation),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, last_window_size_generation),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.renderpasses = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
 			.member_name   = "renderpasses",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, renderpasses),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, renderpasses),
 			.flags         = 64,
 			.pointer_depth = 0,
 		},
 		.renderpass_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "renderpass_count",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, renderpass_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, renderpass_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.present_command = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_present_frame_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_present_frame_t.type_info,
 			.member_name   = "present_command",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.offset        = offsetof(renderer_state_t, present_command),
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.offset        = offsetof(RHI_context_t, present_command),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.backend_initialize = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_initialize.type_info,
 			.member_name   = "backend_initialize",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_handle_window_resize = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_handle_window_resize.type_info,
 			.member_name   = "backend_handle_window_resize",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_render_frame = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_render_frame.type_info,
 			.member_name   = "backend_render_frame",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_buffer_create = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_buffer_create.type_info,
 			.member_name   = "backend_buffer_create",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_buffer_copy_data = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_buffer_copy_data.type_info,
 			.member_name   = "backend_buffer_copy_data",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_buffer_append_data = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_buffer_append_data.type_info,
 			.member_name   = "backend_buffer_append_data",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_constant_buffer_append_data = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_constant_buffer_append_data.type_info,
 			.member_name   = "backend_constant_buffer_append_data",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_buffer_reset = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_buffer_reset.type_info,
 			.member_name   = "backend_buffer_reset",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_renderpass_initialize = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_renderpass_initialize.type_info,
 			.member_name   = "backend_renderpass_initialize",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_image_create = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_image_create.type_info,
 			.member_name   = "backend_image_create",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_image_destroy = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_image_destroy.type_info,
 			.member_name   = "backend_image_destroy",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_image_update_contents = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_image_update_contents.type_info,
 			.member_name   = "backend_image_update_contents",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_acquire_image_sampler = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_acquire_image_sampler.type_info,
 			.member_name   = "backend_acquire_image_sampler",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_shader_create = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_shader_create.type_info,
 			.member_name   = "backend_shader_create",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
 		.backend_get_command_buffer = {
 			.type_info     = &DEFAULT_typedata_procedure_backend_get_command_buffer.type_info,
 			.member_name   = "backend_get_command_buffer",
-			.parent        = &DEFAULT_typedata_structure_renderer_state_t.type_info,
+			.parent        = &DEFAULT_typedata_structure_RHI_context_t.type_info,
 			.flags         = 1024,
 			.pointer_depth = 0,
 		},
@@ -17930,518 +17858,6 @@ constexpr type_info_procedure_sys_wait_for_process DEFAULT_typedata_procedure_sy
 		},
 	},
 };
-constexpr type_info_struct_render_image_filter_type_t DEFAULT_typedata_structure_render_image_filter_type_t = {
-	.type_info = {
-		.type_name = "render_image_filter_type_t",
-		.type_id = TYPE_render_image_filter_type_t,
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<render_image_filter_type_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_render_image_filter_type_t.member_array,
-	.members = {
-		.IMAGE_FILTER_TYPE_INVALID = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_filter_type_t.type_info,
-			.member_name   = "IMAGE_FILTER_TYPE_INVALID",
-			.parent        = &DEFAULT_typedata_structure_render_image_filter_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = IMAGE_FILTER_TYPE_INVALID,
-			},
-		},
-		.IMAGE_FILTER_TYPE_NEAREST = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_filter_type_t.type_info,
-			.member_name   = "IMAGE_FILTER_TYPE_NEAREST",
-			.parent        = &DEFAULT_typedata_structure_render_image_filter_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = IMAGE_FILTER_TYPE_NEAREST,
-			},
-		},
-		.IMAGE_FILTER_TYPE_LINEAR = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_filter_type_t.type_info,
-			.member_name   = "IMAGE_FILTER_TYPE_LINEAR",
-			.parent        = &DEFAULT_typedata_structure_render_image_filter_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = IMAGE_FILTER_TYPE_LINEAR,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_render_image_wrapping_type_t DEFAULT_typedata_structure_render_image_wrapping_type_t = {
-	.type_info = {
-		.type_name = "render_image_wrapping_type_t",
-		.type_id = TYPE_render_image_wrapping_type_t,
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<render_image_wrapping_type_t>(),
-	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_render_image_wrapping_type_t.member_array,
-	.members = {
-		.IMAGE_WRAPPING_INVALID = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-			.member_name   = "IMAGE_WRAPPING_INVALID",
-			.parent        = &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = IMAGE_WRAPPING_INVALID,
-			},
-		},
-		.IMAGE_WRAPPING_CLAMP_TO_EDGE = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-			.member_name   = "IMAGE_WRAPPING_CLAMP_TO_EDGE",
-			.parent        = &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = IMAGE_WRAPPING_CLAMP_TO_EDGE,
-			},
-		},
-		.IMAGE_WRAPPING_CLAMP_TO_BORDER = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-			.member_name   = "IMAGE_WRAPPING_CLAMP_TO_BORDER",
-			.parent        = &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = IMAGE_WRAPPING_CLAMP_TO_BORDER,
-			},
-		},
-		.IMAGE_WRAPPING_REPEAT = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-			.member_name   = "IMAGE_WRAPPING_REPEAT",
-			.parent        = &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = IMAGE_WRAPPING_REPEAT,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_render_image_usage_t DEFAULT_typedata_structure_render_image_usage_t = {
-	.type_info = {
-		.type_name = "render_image_usage_t",
-		.type_id = TYPE_render_image_usage_t,
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<render_image_usage_t>(),
-	},
-	.member_count   = 6,
-	.member_pointer = DEFAULT_typedata_structure_render_image_usage_t.member_array,
-	.members = {
-		.IMAGE_USAGE_INVALID = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.member_name   = "IMAGE_USAGE_INVALID",
-			.parent        = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.member_name   = "IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT",
-			.parent        = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 2,
-			},
-		},
-		.IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.member_name   = "IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT",
-			.parent        = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 4,
-			},
-		},
-		.IMAGE_USAGE_SHADER_SAMPLED_IMAGE = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.member_name   = "IMAGE_USAGE_SHADER_SAMPLED_IMAGE",
-			.parent        = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 8,
-			},
-		},
-		.IMAGE_USAGE_BLIT_SOURCE = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.member_name   = "IMAGE_USAGE_BLIT_SOURCE",
-			.parent        = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 16,
-			},
-		},
-		.IMAGE_USAGE_BLIT_DESTINATION = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.member_name   = "IMAGE_USAGE_BLIT_DESTINATION",
-			.parent        = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 32,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_sampler_create_info_t DEFAULT_typedata_structure_sampler_create_info_t = {
-	.type_info = {
-		.type_name = "sampler_create_info_t",
-		.type_id = TYPE_sampler_create_info_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<sampler_create_info_t>(),
-	},
-	.member_count   = 8,
-	.member_pointer = DEFAULT_typedata_structure_sampler_create_info_t.member_array,
-	.members = {
-		.filtering = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_filter_type_t.type_info,
-			.member_name   = "filtering",
-			.parent        = &DEFAULT_typedata_structure_sampler_create_info_t.type_info,
-			.offset        = offsetof(sampler_create_info_t, filtering),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.anisotropy_enabled = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "anisotropy_enabled",
-			.parent        = &DEFAULT_typedata_structure_sampler_create_info_t.type_info,
-			.offset        = offsetof(sampler_create_info_t, anisotropy_enabled),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.max_anisotropy = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "max_anisotropy",
-			.parent        = &DEFAULT_typedata_structure_sampler_create_info_t.type_info,
-			.offset        = offsetof(sampler_create_info_t, max_anisotropy),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.wrapu = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-			.member_name   = "wrapu",
-			.parent        = &DEFAULT_typedata_structure_sampler_create_info_t.type_info,
-			.offset        = offsetof(sampler_create_info_t, wrapu),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.wrapv = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-			.member_name   = "wrapv",
-			.parent        = &DEFAULT_typedata_structure_sampler_create_info_t.type_info,
-			.offset        = offsetof(sampler_create_info_t, wrapv),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.compare_ops_enabled = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "compare_ops_enabled",
-			.parent        = &DEFAULT_typedata_structure_sampler_create_info_t.type_info,
-			.offset        = offsetof(sampler_create_info_t, compare_ops_enabled),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.compare_operation = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "compare_operation",
-			.parent        = &DEFAULT_typedata_structure_sampler_create_info_t.type_info,
-			.offset        = offsetof(sampler_create_info_t, compare_operation),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.use_normalized_coordinates = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "use_normalized_coordinates",
-			.parent        = &DEFAULT_typedata_structure_sampler_create_info_t.type_info,
-			.offset        = offsetof(sampler_create_info_t, use_normalized_coordinates),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_image_create_info_t DEFAULT_typedata_structure_image_create_info_t = {
-	.type_info = {
-		.type_name = "image_create_info_t",
-		.type_id = TYPE_image_create_info_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<image_create_info_t>(),
-	},
-	.member_count   = 6,
-	.member_pointer = DEFAULT_typedata_structure_image_create_info_t.member_array,
-	.members = {
-		.data = {
-			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_structure_image_create_info_t.type_info,
-			.offset        = offsetof(image_create_info_t, data),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.width = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "width",
-			.parent        = &DEFAULT_typedata_structure_image_create_info_t.type_info,
-			.offset        = offsetof(image_create_info_t, width),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.height = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "height",
-			.parent        = &DEFAULT_typedata_structure_image_create_info_t.type_info,
-			.offset        = offsetof(image_create_info_t, height),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.format = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "format",
-			.parent        = &DEFAULT_typedata_structure_image_create_info_t.type_info,
-			.offset        = offsetof(image_create_info_t, format),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.usage = {
-			.type_info     = &DEFAULT_typedata_structure_render_image_usage_t.type_info,
-			.member_name   = "usage",
-			.parent        = &DEFAULT_typedata_structure_image_create_info_t.type_info,
-			.offset        = offsetof(image_create_info_t, usage),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.sampler_info = {
-			.type_info     = &DEFAULT_typedata_structure_sampler_create_info_t.type_info,
-			.member_name   = "sampler_info",
-			.parent        = &DEFAULT_typedata_structure_image_create_info_t.type_info,
-			.offset        = offsetof(image_create_info_t, sampler_info),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_image_t DEFAULT_typedata_structure_image_t = {
-	.type_info = {
-		.type_name = "image_t",
-		.type_id = TYPE_image_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<image_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_image_t.member_array,
-	.members = {
-		.ID = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "ID",
-			.parent        = &DEFAULT_typedata_structure_image_t.type_info,
-			.offset        = offsetof(image_t, ID),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.create_info = {
-			.type_info     = &DEFAULT_typedata_structure_image_create_info_t.type_info,
-			.member_name   = "create_info",
-			.parent        = &DEFAULT_typedata_structure_image_t.type_info,
-			.offset        = offsetof(image_t, create_info),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.backend_image = {
-			.type_info     = &DEFAULT_typedata_backend_image_t,
-			.member_name   = "backend_image",
-			.parent        = &DEFAULT_typedata_structure_image_t.type_info,
-			.offset        = offsetof(image_t, backend_image),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_procedure_s_renderer_image_create DEFAULT_typedata_procedure_s_renderer_image_create = {
-	.type_info = {
-		.type_name = "s_renderer_image_create",
-		.type_id = TYPE_s_renderer_image_create,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_structure_image_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_image_create.argument_array,
-	.arguments = {
-		.render_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "render_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_image_create.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.image_create_info = {
-			.type_info     = &DEFAULT_typedata_structure_image_create_info_t.type_info,
-			.member_name   = "image_create_info",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_image_create.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_struct_bitmap_t DEFAULT_typedata_structure_bitmap_t = {
-	.type_info = {
-		.type_name = "bitmap_t",
-		.type_id = TYPE_bitmap_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<bitmap_t>(),
-	},
-	.member_count   = 5,
-	.member_pointer = DEFAULT_typedata_structure_bitmap_t.member_array,
-	.members = {
-		.width = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "width",
-			.parent        = &DEFAULT_typedata_structure_bitmap_t.type_info,
-			.offset        = offsetof(bitmap_t, width),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.height = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "height",
-			.parent        = &DEFAULT_typedata_structure_bitmap_t.type_info,
-			.offset        = offsetof(bitmap_t, height),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.channels = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "channels",
-			.parent        = &DEFAULT_typedata_structure_bitmap_t.type_info,
-			.offset        = offsetof(bitmap_t, channels),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.format = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "format",
-			.parent        = &DEFAULT_typedata_structure_bitmap_t.type_info,
-			.offset        = offsetof(bitmap_t, format),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.pixels = {
-			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
-			.member_name   = "pixels",
-			.parent        = &DEFAULT_typedata_structure_bitmap_t.type_info,
-			.offset        = offsetof(bitmap_t, pixels),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_procedure_s_renderer_image_create_from_bitmap DEFAULT_typedata_procedure_s_renderer_image_create_from_bitmap = {
-	.type_info = {
-		.type_name = "s_renderer_image_create_from_bitmap",
-		.type_id = TYPE_s_renderer_image_create_from_bitmap,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_structure_image_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_image_create_from_bitmap.argument_array,
-	.arguments = {
-		.bitmap = {
-			.type_info     = &DEFAULT_typedata_structure_bitmap_t.type_info,
-			.member_name   = "bitmap",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_image_create_from_bitmap.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_renderer_image_destroy DEFAULT_typedata_procedure_s_renderer_image_destroy = {
-	.type_info = {
-		.type_name = "s_renderer_image_destroy",
-		.type_id = TYPE_s_renderer_image_destroy,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_image_destroy.argument_array,
-	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_image_destroy.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
-			.member_name   = "image",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_image_destroy.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_renderer_image_update_data DEFAULT_typedata_procedure_s_renderer_image_update_data = {
-	.type_info = {
-		.type_name = "s_renderer_image_update_data",
-		.type_id = TYPE_s_renderer_image_update_data,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_image_update_data.argument_array,
-	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_image_update_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
-			.member_name   = "image",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_image_update_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_t DEFAULT_typedata_backend_image_t = {
-	.type_name = "backend_image_t",
-	.type_id = TYPE_backend_image_t,
-	.size = athena_internal::safe_sizeof<backend_image_t>(),
-};
 constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t = {
 	.type_info = {
 		.type_name = "asset_type_t",
@@ -18778,6 +18194,59 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 	},
 };
 
+constexpr type_info_struct_bitmap_t DEFAULT_typedata_structure_bitmap_t = {
+	.type_info = {
+		.type_name = "bitmap_t",
+		.type_id = TYPE_bitmap_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<bitmap_t>(),
+	},
+	.member_count   = 5,
+	.member_pointer = DEFAULT_typedata_structure_bitmap_t.member_array,
+	.members = {
+		.width = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "width",
+			.parent        = &DEFAULT_typedata_structure_bitmap_t.type_info,
+			.offset        = offsetof(bitmap_t, width),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.height = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "height",
+			.parent        = &DEFAULT_typedata_structure_bitmap_t.type_info,
+			.offset        = offsetof(bitmap_t, height),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.channels = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "channels",
+			.parent        = &DEFAULT_typedata_structure_bitmap_t.type_info,
+			.offset        = offsetof(bitmap_t, channels),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.format = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "format",
+			.parent        = &DEFAULT_typedata_structure_bitmap_t.type_info,
+			.offset        = offsetof(bitmap_t, format),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.pixels = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "pixels",
+			.parent        = &DEFAULT_typedata_structure_bitmap_t.type_info,
+			.offset        = offsetof(bitmap_t, pixels),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
 constexpr type_info_struct_subtexture_data_t DEFAULT_typedata_structure_subtexture_data_t = {
 	.type_info = {
 		.type_name = "subtexture_data_t",
@@ -18948,111 +18417,29 @@ constexpr type_info_struct_texture_atlas_t DEFAULT_typedata_structure_texture_at
 	},
 };
 
-constexpr type_info_struct_animation_source2D_t DEFAULT_typedata_structure_animation_source2D_t = {
+constexpr type_info_struct_RHI_shader_t DEFAULT_typedata_structure_RHI_shader_t = {
 	.type_info = {
-		.type_name = "animation_source2D_t",
-		.type_id = TYPE_animation_source2D_t,
+		.type_name = "RHI_shader_t",
+		.type_id = TYPE_RHI_shader_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<animation_source2D_t>(),
-	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_animation_source2D_t.member_array,
-	.members = {
-		.name = {
-			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
-			.member_name   = "name",
-			.parent        = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
-			.offset        = offsetof(animation_source2D_t, name),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.texture = {
-			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.member_name   = "texture",
-			.parent        = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
-			.offset        = offsetof(animation_source2D_t, texture),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.frame_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "frame_count",
-			.parent        = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
-			.offset        = offsetof(animation_source2D_t, frame_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.frame_timer = {
-			.type_info     = &DEFAULT_typedata_structure_duration_counter_t.type_info,
-			.member_name   = "frame_timer",
-			.parent        = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
-			.offset        = offsetof(animation_source2D_t, frame_timer),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_animation2D_t DEFAULT_typedata_structure_animation2D_t = {
-	.type_info = {
-		.type_name = "animation2D_t",
-		.type_id = TYPE_animation2D_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<animation2D_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_animation2D_t.member_array,
-	.members = {
-		.animation_info = {
-			.type_info     = &DEFAULT_typedata_structure_animation_source2D_t.type_info,
-			.member_name   = "animation_info",
-			.parent        = &DEFAULT_typedata_structure_animation2D_t.type_info,
-			.offset        = offsetof(animation2D_t, animation_info),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.current_frame = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "current_frame",
-			.parent        = &DEFAULT_typedata_structure_animation2D_t.type_info,
-			.offset        = offsetof(animation2D_t, current_frame),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.frame_timer = {
-			.type_info     = &DEFAULT_typedata_structure_duration_counter_t.type_info,
-			.member_name   = "frame_timer",
-			.parent        = &DEFAULT_typedata_structure_animation2D_t.type_info,
-			.offset        = offsetof(animation2D_t, frame_timer),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_shader_t DEFAULT_typedata_structure_shader_t = {
-	.type_info = {
-		.type_name = "shader_t",
-		.type_id = TYPE_shader_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<shader_t>(),
+		.size = athena_internal::safe_sizeof<RHI_shader_t>(),
 	},
 	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_shader_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_shader_t.member_array,
 	.members = {
 		.ID = {
 			.type_info     = &DEFAULT_typedata_u64,
 			.member_name   = "ID",
-			.parent        = &DEFAULT_typedata_structure_shader_t.type_info,
-			.offset        = offsetof(shader_t, ID),
+			.parent        = &DEFAULT_typedata_structure_RHI_shader_t.type_info,
+			.offset        = offsetof(RHI_shader_t, ID),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.shader_data = {
 			.type_info     = &DEFAULT_typedata_backend_shader_t,
 			.member_name   = "shader_data",
-			.parent        = &DEFAULT_typedata_structure_shader_t.type_info,
-			.offset        = offsetof(shader_t, shader_data),
+			.parent        = &DEFAULT_typedata_structure_RHI_shader_t.type_info,
+			.offset        = offsetof(RHI_shader_t, shader_data),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -19110,7 +18497,7 @@ constexpr type_info_struct_material_instance_t DEFAULT_typedata_structure_materi
 			.pointer_depth = 0,
 		},
 		.pipeline_state = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
 			.member_name   = "pipeline_state",
 			.parent        = &DEFAULT_typedata_structure_material_instance_t.type_info,
 			.offset        = offsetof(material_instance_t, pipeline_state),
@@ -19742,7 +19129,7 @@ constexpr type_info_struct_asset_slot_t DEFAULT_typedata_structure_asset_slot_t 
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<asset_slot_t>(),
 	},
-	.member_count   = 16,
+	.member_count   = 17,
 	.member_pointer = DEFAULT_typedata_structure_asset_slot_t.member_array,
 	.members = {
 		.ID = {
@@ -19766,6 +19153,14 @@ constexpr type_info_struct_asset_slot_t DEFAULT_typedata_structure_asset_slot_t 
 			.member_name   = "type",
 			.parent        = &DEFAULT_typedata_structure_asset_slot_t.type_info,
 			.offset        = offsetof(asset_slot_t, type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.is_valid_for_handles = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "is_valid_for_handles",
+			.parent        = &DEFAULT_typedata_structure_asset_slot_t.type_info,
+			.offset        = offsetof(asset_slot_t, is_valid_for_handles),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -19858,7 +19253,7 @@ constexpr type_info_struct_asset_slot_t DEFAULT_typedata_structure_asset_slot_t 
 			.pointer_depth = 0,
 		},
 		.shader = {
-			.type_info     = &DEFAULT_typedata_structure_shader_t.type_info,
+			.type_info     = &DEFAULT_typedata_shader_t,
 			.member_name   = "shader",
 			.parent        = &DEFAULT_typedata_structure_asset_slot_t.type_info,
 			.offset        = offsetof(asset_slot_t, shader),
@@ -20447,6 +19842,11 @@ constexpr type_info_procedure_s_asset_manager_get_asset_slot DEFAULT_typedata_pr
 		},
 	},
 };
+constexpr type_info_t DEFAULT_typedata_shader_t = {
+	.type_name = "shader_t",
+	.type_id = TYPE_shader_t,
+	.size = athena_internal::safe_sizeof<shader_t>(),
+};
 constexpr type_info_procedure_s_asset_get_shader_from_handle DEFAULT_typedata_procedure_s_asset_get_shader_from_handle = {
 	.type_info = {
 		.type_name = "s_asset_get_shader_from_handle",
@@ -20454,7 +19854,7 @@ constexpr type_info_procedure_s_asset_get_shader_from_handle DEFAULT_typedata_pr
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_structure_shader_t.type_info,
+	.return_type    = &DEFAULT_typedata_shader_t,
 	.argument_pointer = DEFAULT_typedata_procedure_s_asset_get_shader_from_handle.argument_array,
 	.arguments = {
 		.handle = {
@@ -20655,26 +20055,63 @@ constexpr type_info_procedure_s_asset_font_fetch_glyph DEFAULT_typedata_procedur
 		},
 	},
 };
+constexpr type_info_struct_RHI_image_t DEFAULT_typedata_structure_RHI_image_t = {
+	.type_info = {
+		.type_name = "RHI_image_t",
+		.type_id = TYPE_RHI_image_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_image_t>(),
+	},
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_RHI_image_t.member_array,
+	.members = {
+		.ID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "ID",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.offset        = offsetof(RHI_image_t, ID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.create_info = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
+			.member_name   = "create_info",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.offset        = offsetof(RHI_image_t, create_info),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.backend_image = {
+			.type_info     = &DEFAULT_typedata_backend_image_t,
+			.member_name   = "backend_image",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.offset        = offsetof(RHI_image_t, backend_image),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
 constexpr type_info_t DEFAULT_typedata_backend_shader_t = {
 	.type_name = "backend_shader_t",
 	.type_id = TYPE_backend_shader_t,
 	.size = athena_internal::safe_sizeof<backend_shader_t>(),
 };
-constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_render_pipeline_state_t = {
+constexpr type_info_struct_RHI_pipeline_state_t DEFAULT_typedata_structure_RHI_pipeline_state_t = {
 	.type_info = {
-		.type_name = "render_pipeline_state_t",
-		.type_id = TYPE_render_pipeline_state_t,
+		.type_name = "RHI_pipeline_state_t",
+		.type_id = TYPE_RHI_pipeline_state_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_pipeline_state_t>(),
+		.size = athena_internal::safe_sizeof<RHI_pipeline_state_t>(),
 	},
 	.member_count   = 14,
-	.member_pointer = DEFAULT_typedata_structure_render_pipeline_state_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_pipeline_state_t.member_array,
 	.members = {
 		.blend_enabled = {
 			.type_info     = &DEFAULT_typedata_bool32,
 			.member_name   = "blend_enabled",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, blend_enabled),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, blend_enabled),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20685,8 +20122,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.src_color_blend_mode = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "src_color_blend_mode",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, src_color_blend_mode),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, src_color_blend_mode),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20697,8 +20134,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.dst_color_blend_mode = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "dst_color_blend_mode",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, dst_color_blend_mode),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, dst_color_blend_mode),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20709,8 +20146,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.src_alpha_blend_mode = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "src_alpha_blend_mode",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, src_alpha_blend_mode),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, src_alpha_blend_mode),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20721,8 +20158,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.dst_alpha_blend_mode = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "dst_alpha_blend_mode",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, dst_alpha_blend_mode),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, dst_alpha_blend_mode),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20733,8 +20170,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.color_blend_op = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "color_blend_op",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, color_blend_op),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, color_blend_op),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20745,8 +20182,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.alpha_blend_op = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "alpha_blend_op",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, alpha_blend_op),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, alpha_blend_op),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20757,8 +20194,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.depth_testing_enabled = {
 			.type_info     = &DEFAULT_typedata_bool32,
 			.member_name   = "depth_testing_enabled",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, depth_testing_enabled),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, depth_testing_enabled),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20769,8 +20206,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.depth_writing_enabled = {
 			.type_info     = &DEFAULT_typedata_bool32,
 			.member_name   = "depth_writing_enabled",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, depth_writing_enabled),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, depth_writing_enabled),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20781,8 +20218,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.depth_func = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "depth_func",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, depth_func),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, depth_func),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20793,8 +20230,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.stencil_enabled = {
 			.type_info     = &DEFAULT_typedata_bool32,
 			.member_name   = "stencil_enabled",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, stencil_enabled),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, stencil_enabled),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20805,8 +20242,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.stencil_state = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "stencil_state",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, stencil_state),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, stencil_state),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20817,8 +20254,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.stencil_keep = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "stencil_keep",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, stencil_keep),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, stencil_keep),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -20829,8 +20266,8 @@ constexpr type_info_struct_render_pipeline_state_t DEFAULT_typedata_structure_re
 		.polygon_mode = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "polygon_mode",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.offset        = offsetof(render_pipeline_state_t, polygon_mode),
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, polygon_mode),
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -22372,20 +21809,20 @@ constexpr type_info_struct_camera_matrices_t DEFAULT_typedata_structure_camera_m
 	},
 };
 
-constexpr type_info_struct_render_buffer_type_t DEFAULT_typedata_structure_render_buffer_type_t = {
+constexpr type_info_struct_RHI_render_buffer_type_t DEFAULT_typedata_structure_RHI_render_buffer_type_t = {
 	.type_info = {
-		.type_name = "render_buffer_type_t",
-		.type_id = TYPE_render_buffer_type_t,
+		.type_name = "RHI_render_buffer_type_t",
+		.type_id = TYPE_RHI_render_buffer_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<render_buffer_type_t>(),
+		.size = athena_internal::safe_sizeof<RHI_render_buffer_type_t>(),
 	},
 	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_render_buffer_type_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_render_buffer_type_t.member_array,
 	.members = {
-		.RenderBufferType_Invalid = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_type_t.type_info,
-			.member_name   = "RenderBufferType_Invalid",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_type_t.type_info,
+		.RHI_RENDER_BUFFER_TYPE_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
+			.member_name   = "RHI_RENDER_BUFFER_TYPE_INVALID",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -22393,10 +21830,10 @@ constexpr type_info_struct_render_buffer_type_t DEFAULT_typedata_structure_rende
 				.u64 = 1,
 			},
 		},
-		.RenderBufferType_VertexBuffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_type_t.type_info,
-			.member_name   = "RenderBufferType_VertexBuffer",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_type_t.type_info,
+		.RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
+			.member_name   = "RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -22404,10 +21841,10 @@ constexpr type_info_struct_render_buffer_type_t DEFAULT_typedata_structure_rende
 				.u64 = 2,
 			},
 		},
-		.RenderBufferType_IndexBuffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_type_t.type_info,
-			.member_name   = "RenderBufferType_IndexBuffer",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_type_t.type_info,
+		.RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
+			.member_name   = "RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -22418,20 +21855,20 @@ constexpr type_info_struct_render_buffer_type_t DEFAULT_typedata_structure_rende
 	},
 };
 
-constexpr type_info_struct_render_buffer_advance_rate_t DEFAULT_typedata_structure_render_buffer_advance_rate_t = {
+constexpr type_info_struct_RHI_render_buffer_advance_rate_t DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t = {
 	.type_info = {
-		.type_name = "render_buffer_advance_rate_t",
-		.type_id = TYPE_render_buffer_advance_rate_t,
+		.type_name = "RHI_render_buffer_advance_rate_t",
+		.type_id = TYPE_RHI_render_buffer_advance_rate_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<render_buffer_advance_rate_t>(),
+		.size = athena_internal::safe_sizeof<RHI_render_buffer_advance_rate_t>(),
 	},
 	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_render_buffer_advance_rate_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.member_array,
 	.members = {
-		.RenderBufferAdvanceRate_PerElement = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_advance_rate_t.type_info,
-			.member_name   = "RenderBufferAdvanceRate_PerElement",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_advance_rate_t.type_info,
+		.RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info,
+			.member_name   = "RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -22439,10 +21876,10 @@ constexpr type_info_struct_render_buffer_advance_rate_t DEFAULT_typedata_structu
 				.u64 = 1,
 			},
 		},
-		.RenderBufferAdvanceRate_PerInstance = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_advance_rate_t.type_info,
-			.member_name   = "RenderBufferAdvanceRate_PerInstance",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_advance_rate_t.type_info,
+		.RHI_RENDER_BUFFER_ADVANCE_RATE_PER_INSTANCE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info,
+			.member_name   = "RHI_RENDER_BUFFER_ADVANCE_RATE_PER_INSTANCE",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -22453,20 +21890,20 @@ constexpr type_info_struct_render_buffer_advance_rate_t DEFAULT_typedata_structu
 	},
 };
 
-constexpr type_info_struct_render_buffer_memory_type_t DEFAULT_typedata_structure_render_buffer_memory_type_t = {
+constexpr type_info_struct_RHI_render_buffer_memory_type_t DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t = {
 	.type_info = {
-		.type_name = "render_buffer_memory_type_t",
-		.type_id = TYPE_render_buffer_memory_type_t,
+		.type_name = "RHI_render_buffer_memory_type_t",
+		.type_id = TYPE_RHI_render_buffer_memory_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<render_buffer_memory_type_t>(),
+		.size = athena_internal::safe_sizeof<RHI_render_buffer_memory_type_t>(),
 	},
 	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_render_buffer_memory_type_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.member_array,
 	.members = {
-		.RenderBufferAllocationTypeMapped = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_memory_type_t.type_info,
-			.member_name   = "RenderBufferAllocationTypeMapped",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_memory_type_t.type_info,
+		.RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info,
+			.member_name   = "RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -22474,10 +21911,10 @@ constexpr type_info_struct_render_buffer_memory_type_t DEFAULT_typedata_structur
 				.u64 = 1,
 			},
 		},
-		.RenderBufferAllocationTypeGPUOnly = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_memory_type_t.type_info,
-			.member_name   = "RenderBufferAllocationTypeGPUOnly",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_memory_type_t.type_info,
+		.RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info,
+			.member_name   = "RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -22488,1299 +21925,1307 @@ constexpr type_info_struct_render_buffer_memory_type_t DEFAULT_typedata_structur
 	},
 };
 
-constexpr type_info_struct_render_buffer_desc_t DEFAULT_typedata_structure_render_buffer_desc_t = {
+constexpr type_info_struct_RHI_render_buffer_desc_t DEFAULT_typedata_structure_RHI_render_buffer_desc_t = {
 	.type_info = {
-		.type_name = "render_buffer_desc_t",
-		.type_id = TYPE_render_buffer_desc_t,
+		.type_name = "RHI_render_buffer_desc_t",
+		.type_id = TYPE_RHI_render_buffer_desc_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_buffer_desc_t>(),
+		.size = athena_internal::safe_sizeof<RHI_render_buffer_desc_t>(),
 	},
 	.member_count   = 6,
-	.member_pointer = DEFAULT_typedata_structure_render_buffer_desc_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_render_buffer_desc_t.member_array,
 	.members = {
 		.type = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_type_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
 			.member_name   = "type",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_desc_t.type_info,
-			.offset        = offsetof(render_buffer_desc_t, type),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_desc_t, type),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.allocation_type = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_memory_type_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info,
 			.member_name   = "allocation_type",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_desc_t.type_info,
-			.offset        = offsetof(render_buffer_desc_t, allocation_type),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_desc_t, allocation_type),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.advance_rate = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_advance_rate_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info,
 			.member_name   = "advance_rate",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_desc_t.type_info,
-			.offset        = offsetof(render_buffer_desc_t, advance_rate),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_desc_t, advance_rate),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.buffer_capacity = {
 			.type_info     = &DEFAULT_typedata_u64,
 			.member_name   = "buffer_capacity",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_desc_t.type_info,
-			.offset        = offsetof(render_buffer_desc_t, buffer_capacity),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_desc_t, buffer_capacity),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.element_size = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "element_size",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_desc_t.type_info,
-			.offset        = offsetof(render_buffer_desc_t, element_size),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_desc_t, element_size),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.initial_data = {
 			.type_info     = &DEFAULT_typedata_void,
 			.member_name   = "initial_data",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_desc_t.type_info,
-			.offset        = offsetof(render_buffer_desc_t, initial_data),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_desc_t, initial_data),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
 
-constexpr type_info_struct_render_buffer_t DEFAULT_typedata_structure_render_buffer_t = {
+constexpr type_info_struct_RHI_render_buffer_t DEFAULT_typedata_structure_RHI_render_buffer_t = {
 	.type_info = {
-		.type_name = "render_buffer_t",
-		.type_id = TYPE_render_buffer_t,
+		.type_name = "RHI_render_buffer_t",
+		.type_id = TYPE_RHI_render_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_buffer_t>(),
+		.size = athena_internal::safe_sizeof<RHI_render_buffer_t>(),
 	},
 	.member_count   = 10,
-	.member_pointer = DEFAULT_typedata_structure_render_buffer_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_render_buffer_t.member_array,
 	.members = {
 		.type = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_type_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
 			.member_name   = "type",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.offset        = offsetof(render_buffer_t, type),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_t, type),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.allocation_type = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_memory_type_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info,
 			.member_name   = "allocation_type",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.offset        = offsetof(render_buffer_t, allocation_type),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_t, allocation_type),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.constant_buffer_hash_ID = {
 			.type_info     = &DEFAULT_typedata_u64,
 			.member_name   = "constant_buffer_hash_ID",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.offset        = offsetof(render_buffer_t, constant_buffer_hash_ID),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_t, constant_buffer_hash_ID),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.buffer_ID = {
 			.type_info     = &DEFAULT_typedata_u64,
 			.member_name   = "buffer_ID",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.offset        = offsetof(render_buffer_t, buffer_ID),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_t, buffer_ID),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.buffer_capacity = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "buffer_capacity",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.offset        = offsetof(render_buffer_t, buffer_capacity),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_t, buffer_capacity),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.buffer_element_size = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "buffer_element_size",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.offset        = offsetof(render_buffer_t, buffer_element_size),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_t, buffer_element_size),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.buffer_elements_used = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "buffer_elements_used",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.offset        = offsetof(render_buffer_t, buffer_elements_used),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_t, buffer_elements_used),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.working_offset = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "working_offset",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.offset        = offsetof(render_buffer_t, working_offset),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_t, working_offset),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.mapped_data = {
 			.type_info     = &DEFAULT_typedata_byte,
 			.member_name   = "mapped_data",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.offset        = offsetof(render_buffer_t, mapped_data),
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_t, mapped_data),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.offset        = offsetof(render_buffer_t, buffer),
+		.buffer_info = {
+			.type_info     = &DEFAULT_typedata_backend_buffer_t,
+			.member_name   = "buffer_info",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.offset        = offsetof(RHI_render_buffer_t, buffer_info),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
 
-constexpr type_info_struct_index_buffer_t DEFAULT_typedata_structure_index_buffer_t = {
+constexpr type_info_struct_RHI_index_buffer_t DEFAULT_typedata_structure_RHI_index_buffer_t = {
 	.type_info = {
-		.type_name = "index_buffer_t",
-		.type_id = TYPE_index_buffer_t,
+		.type_name = "RHI_index_buffer_t",
+		.type_id = TYPE_RHI_index_buffer_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<index_buffer_t>(),
+		.size = athena_internal::safe_sizeof<RHI_index_buffer_t>(),
 	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_index_buffer_t.member_array,
+	.member_count   = 5,
+	.member_pointer = DEFAULT_typedata_structure_RHI_index_buffer_t.member_array,
 	.members = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_structure_index_buffer_t.type_info,
-			.offset        = offsetof(index_buffer_t, buffer),
+		.buffer_data = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.member_name   = "buffer_data",
+			.parent        = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+			.offset        = offsetof(RHI_index_buffer_t, buffer_data),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.index_data = {
 			.type_info     = &DEFAULT_typedata_byte,
 			.member_name   = "index_data",
-			.parent        = &DEFAULT_typedata_structure_index_buffer_t.type_info,
-			.offset        = offsetof(index_buffer_t, index_data),
+			.parent        = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+			.offset        = offsetof(RHI_index_buffer_t, index_data),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.max_indices = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "max_indices",
-			.parent        = &DEFAULT_typedata_structure_index_buffer_t.type_info,
-			.offset        = offsetof(index_buffer_t, max_indices),
+			.parent        = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+			.offset        = offsetof(RHI_index_buffer_t, max_indices),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.index_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "index_count",
-			.parent        = &DEFAULT_typedata_structure_index_buffer_t.type_info,
-			.offset        = offsetof(index_buffer_t, index_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_uniform_constant_buffer_t DEFAULT_typedata_structure_uniform_constant_buffer_t = {
-	.type_info = {
-		.type_name = "uniform_constant_buffer_t",
-		.type_id = TYPE_uniform_constant_buffer_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<uniform_constant_buffer_t>(),
-	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_uniform_constant_buffer_t.member_array,
-	.members = {
-		.mapped_data = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "mapped_data",
-			.parent        = &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
-			.offset        = offsetof(uniform_constant_buffer_t, mapped_data),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
-			.offset        = offsetof(uniform_constant_buffer_t, size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
-			.offset        = offsetof(uniform_constant_buffer_t, offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.uniform_hash_index = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "uniform_hash_index",
-			.parent        = &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
-			.offset        = offsetof(uniform_constant_buffer_t, uniform_hash_index),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_type_t DEFAULT_typedata_structure_render_command_type_t = {
-	.type_info = {
-		.type_name = "render_command_type_t",
-		.type_id = TYPE_render_command_type_t,
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<render_command_type_t>(),
-	},
-	.member_count   = 23,
-	.member_pointer = DEFAULT_typedata_structure_render_command_type_t.member_array,
-	.members = {
-		.RCT_Invalid = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_Invalid",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_Invalid,
-			},
-		},
-		.RCT_ClearRenderTarget = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_ClearRenderTarget",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_ClearRenderTarget,
-			},
-		},
-		.RCT_BeginRenderpass = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_BeginRenderpass",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_BeginRenderpass,
-			},
-		},
-		.RCT_EndRenderpass = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_EndRenderpass",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_EndRenderpass,
-			},
-		},
-		.RCT_UpdateUniformConstantBuffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_UpdateUniformConstantBuffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_UpdateUniformConstantBuffer,
-			},
-		},
-		.RCT_UpdatePushConstants = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_UpdatePushConstants",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_UpdatePushConstants,
-			},
-		},
-		.RCT_UpdateBufferContents = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_UpdateBufferContents",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_UpdateBufferContents,
-			},
-		},
-		.RCT_BindMaterial = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_BindMaterial",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_BindMaterial,
-			},
-		},
-		.RCT_BindTexture = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_BindTexture",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_BindTexture,
-			},
-		},
-		.RCT_BindShader = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_BindShader",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_BindShader,
-			},
-		},
-		.RCT_BindVertexBuffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_BindVertexBuffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_BindVertexBuffer,
-			},
-		},
-		.RCT_BindIndexBuffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_BindIndexBuffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_BindIndexBuffer,
-			},
-		},
-		.RCT_SetViewport = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_SetViewport",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_SetViewport,
-			},
-		},
-		.RCT_SetScissor = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_SetScissor",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_SetScissor,
-			},
-		},
-		.RCT_SetRenderState = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_SetRenderState",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_SetRenderState,
-			},
-		},
-		.RCT_ResetRenderState = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_ResetRenderState",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_ResetRenderState,
-			},
-		},
-		.RCT_DispatchCompute = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_DispatchCompute",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_DispatchCompute,
-			},
-		},
-		.RCT_Draw = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_Draw",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_Draw,
-			},
-		},
-		.RCT_DrawIndexed = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_DrawIndexed",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_DrawIndexed,
-			},
-		},
-		.RCT_BlitImage = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_BlitImage",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_BlitImage,
-			},
-		},
-		.RCT_BlitRenderpass = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_BlitRenderpass",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_BlitRenderpass,
-			},
-		},
-		.RCT_PresentFrame = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_PresentFrame",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_PresentFrame,
-			},
-		},
-		.RCT_Count = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "RCT_Count",
-			.parent        = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RCT_Count,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_header_t DEFAULT_typedata_structure_render_command_header_t = {
-	.type_info = {
-		.type_name = "render_command_header_t",
-		.type_id = TYPE_render_command_header_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_header_t>(),
-	},
-	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_render_command_header_t.member_array,
-	.members = {
-		.command_type = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_type_t.type_info,
-			.member_name   = "command_type",
-			.parent        = &DEFAULT_typedata_structure_render_command_header_t.type_info,
-			.offset        = offsetof(render_command_header_t, command_type),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_begin_renderpass_t DEFAULT_typedata_structure_render_command_begin_renderpass_t = {
-	.type_info = {
-		.type_name = "render_command_begin_renderpass_t",
-		.type_id = TYPE_render_command_begin_renderpass_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_begin_renderpass_t>(),
-	},
-	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_render_command_begin_renderpass_t.member_array,
-	.members = {
-		.ID = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "ID",
-			.parent        = &DEFAULT_typedata_structure_render_command_begin_renderpass_t.type_info,
-			.offset        = offsetof(render_command_begin_renderpass_t, ID),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_end_renderpass_t DEFAULT_typedata_structure_render_command_end_renderpass_t = {
-	.type_info = {
-		.type_name = "render_command_end_renderpass_t",
-		.type_id = TYPE_render_command_end_renderpass_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_end_renderpass_t>(),
-	},
-	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_render_command_end_renderpass_t.member_array,
-	.members = {
-		.ID = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "ID",
-			.parent        = &DEFAULT_typedata_structure_render_command_end_renderpass_t.type_info,
-			.offset        = offsetof(render_command_end_renderpass_t, ID),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_bind_vertex_buffer_t DEFAULT_typedata_structure_render_command_bind_vertex_buffer_t = {
-	.type_info = {
-		.type_name = "render_command_bind_vertex_buffer_t",
-		.type_id = TYPE_render_command_bind_vertex_buffer_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_bind_vertex_buffer_t>(),
-	},
-	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_render_command_bind_vertex_buffer_t.member_array,
-	.members = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_bind_vertex_buffer_t.type_info,
-			.offset        = offsetof(render_command_bind_vertex_buffer_t, buffer),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_bind_index_buffer_t DEFAULT_typedata_structure_render_command_bind_index_buffer_t = {
-	.type_info = {
-		.type_name = "render_command_bind_index_buffer_t",
-		.type_id = TYPE_render_command_bind_index_buffer_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_bind_index_buffer_t>(),
-	},
-	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_render_command_bind_index_buffer_t.member_array,
-	.members = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_bind_index_buffer_t.type_info,
-			.offset        = offsetof(render_command_bind_index_buffer_t, buffer),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_update_texture_t DEFAULT_typedata_structure_render_command_update_texture_t = {
-	.type_info = {
-		.type_name = "render_command_update_texture_t",
-		.type_id = TYPE_render_command_update_texture_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_update_texture_t>(),
-	},
-	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_render_command_update_texture_t.member_array,
-	.members = {
-		.bitmap = {
-			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.member_name   = "bitmap",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_texture_t.type_info,
-			.offset        = offsetof(render_command_update_texture_t, bitmap),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_texture_t.type_info,
-			.offset        = offsetof(render_command_update_texture_t, buffer),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_bind_material_t DEFAULT_typedata_structure_render_command_bind_material_t = {
-	.type_info = {
-		.type_name = "render_command_bind_material_t",
-		.type_id = TYPE_render_command_bind_material_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_bind_material_t>(),
-	},
-	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_render_command_bind_material_t.member_array,
-	.members = {
-		.materialID = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "materialID",
-			.parent        = &DEFAULT_typedata_structure_render_command_bind_material_t.type_info,
-			.offset        = offsetof(render_command_bind_material_t, materialID),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.material = {
-			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.member_name   = "material",
-			.parent        = &DEFAULT_typedata_structure_render_command_bind_material_t.type_info,
-			.offset        = offsetof(render_command_bind_material_t, material),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_bind_shader_t DEFAULT_typedata_structure_render_command_bind_shader_t = {
-	.type_info = {
-		.type_name = "render_command_bind_shader_t",
-		.type_id = TYPE_render_command_bind_shader_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_bind_shader_t>(),
-	},
-	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_render_command_bind_shader_t.member_array,
-	.members = {
-		.shaderID = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "shaderID",
-			.parent        = &DEFAULT_typedata_structure_render_command_bind_shader_t.type_info,
-			.offset        = offsetof(render_command_bind_shader_t, shaderID),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.shader = {
-			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.member_name   = "shader",
-			.parent        = &DEFAULT_typedata_structure_render_command_bind_shader_t.type_info,
-			.offset        = offsetof(render_command_bind_shader_t, shader),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_set_viewport_t DEFAULT_typedata_structure_render_command_set_viewport_t = {
-	.type_info = {
-		.type_name = "render_command_set_viewport_t",
-		.type_id = TYPE_render_command_set_viewport_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_set_viewport_t>(),
-	},
-	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_render_command_set_viewport_t.member_array,
-	.members = {
-		.offset = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_set_viewport_t.type_info,
-			.offset        = offsetof(render_command_set_viewport_t, offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_structure_render_command_set_viewport_t.type_info,
-			.offset        = offsetof(render_command_set_viewport_t, size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_set_scissor_t DEFAULT_typedata_structure_render_command_set_scissor_t = {
-	.type_info = {
-		.type_name = "render_command_set_scissor_t",
-		.type_id = TYPE_render_command_set_scissor_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_set_scissor_t>(),
-	},
-	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_render_command_set_scissor_t.member_array,
-	.members = {
-		.offset = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_set_scissor_t.type_info,
-			.offset        = offsetof(render_command_set_scissor_t, offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_structure_render_command_set_scissor_t.type_info,
-			.offset        = offsetof(render_command_set_scissor_t, size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_update_push_constant_t DEFAULT_typedata_structure_render_command_update_push_constant_t = {
-	.type_info = {
-		.type_name = "render_command_update_push_constant_t",
-		.type_id = TYPE_render_command_update_push_constant_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_update_push_constant_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_render_command_update_push_constant_t.member_array,
-	.members = {
-		.data = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_push_constant_t.type_info,
-			.offset        = offsetof(render_command_update_push_constant_t, data),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_push_constant_t.type_info,
-			.offset        = offsetof(render_command_update_push_constant_t, size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_push_constant_t.type_info,
-			.offset        = offsetof(render_command_update_push_constant_t, offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_update_uniform_constant_buffer_t DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t = {
-	.type_info = {
-		.type_name = "render_command_update_uniform_constant_buffer_t",
-		.type_id = TYPE_render_command_update_uniform_constant_buffer_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_update_uniform_constant_buffer_t>(),
-	},
-	.member_count   = 5,
-	.member_pointer = DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t.member_array,
-	.members = {
-		.backend_uniform_buffer_ptr = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "backend_uniform_buffer_ptr",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t.type_info,
-			.offset        = offsetof(render_command_update_uniform_constant_buffer_t, backend_uniform_buffer_ptr),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t.type_info,
-			.offset        = offsetof(render_command_update_uniform_constant_buffer_t, buffer),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.uniform_hash_index = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "uniform_hash_index",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t.type_info,
-			.offset        = offsetof(render_command_update_uniform_constant_buffer_t, uniform_hash_index),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.constant_data_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "constant_data_size",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t.type_info,
-			.offset        = offsetof(render_command_update_uniform_constant_buffer_t, constant_data_size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.constant_buffer_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "constant_buffer_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t.type_info,
-			.offset        = offsetof(render_command_update_uniform_constant_buffer_t, constant_buffer_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_update_render_buffer_contents_t DEFAULT_typedata_structure_render_command_update_render_buffer_contents_t = {
-	.type_info = {
-		.type_name = "render_command_update_render_buffer_contents_t",
-		.type_id = TYPE_render_command_update_render_buffer_contents_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_update_render_buffer_contents_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_render_command_update_render_buffer_contents_t.member_array,
-	.members = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_render_buffer_contents_t.type_info,
-			.offset        = offsetof(render_command_update_render_buffer_contents_t, buffer),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_render_buffer_contents_t.type_info,
-			.offset        = offsetof(render_command_update_render_buffer_contents_t, offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.data_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "data_size",
-			.parent        = &DEFAULT_typedata_structure_render_command_update_render_buffer_contents_t.type_info,
-			.offset        = offsetof(render_command_update_render_buffer_contents_t, data_size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_bind_texture_t DEFAULT_typedata_structure_render_command_bind_texture_t = {
-	.type_info = {
-		.type_name = "render_command_bind_texture_t",
-		.type_id = TYPE_render_command_bind_texture_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_bind_texture_t>(),
-	},
-	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_render_command_bind_texture_t.member_array,
-	.members = {
-		.texture = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
-			.member_name   = "texture",
-			.parent        = &DEFAULT_typedata_structure_render_command_bind_texture_t.type_info,
-			.offset        = offsetof(render_command_bind_texture_t, texture),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_dispatch_compute_t DEFAULT_typedata_structure_render_command_dispatch_compute_t = {
-	.type_info = {
-		.type_name = "render_command_dispatch_compute_t",
-		.type_id = TYPE_render_command_dispatch_compute_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_dispatch_compute_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_render_command_dispatch_compute_t.member_array,
-	.members = {
-		.invoke_x = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "invoke_x",
-			.parent        = &DEFAULT_typedata_structure_render_command_dispatch_compute_t.type_info,
-			.offset        = offsetof(render_command_dispatch_compute_t, invoke_x),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.invoke_y = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "invoke_y",
-			.parent        = &DEFAULT_typedata_structure_render_command_dispatch_compute_t.type_info,
-			.offset        = offsetof(render_command_dispatch_compute_t, invoke_y),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.invoke_z = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "invoke_z",
-			.parent        = &DEFAULT_typedata_structure_render_command_dispatch_compute_t.type_info,
-			.offset        = offsetof(render_command_dispatch_compute_t, invoke_z),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_set_pipeline_state_t DEFAULT_typedata_structure_render_command_set_pipeline_state_t = {
-	.type_info = {
-		.type_name = "render_command_set_pipeline_state_t",
-		.type_id = TYPE_render_command_set_pipeline_state_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_set_pipeline_state_t>(),
-	},
-	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_render_command_set_pipeline_state_t.member_array,
-	.members = {
-		.pipeline_state = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.member_name   = "pipeline_state",
-			.parent        = &DEFAULT_typedata_structure_render_command_set_pipeline_state_t.type_info,
-			.offset        = offsetof(render_command_set_pipeline_state_t, pipeline_state),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_render_command_draw_t DEFAULT_typedata_structure_render_command_draw_t = {
-	.type_info = {
-		.type_name = "render_command_draw_t",
-		.type_id = TYPE_render_command_draw_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_draw_t>(),
-	},
-	.member_count   = 9,
-	.member_pointer = DEFAULT_typedata_structure_render_command_draw_t.member_array,
-	.members = {
-		.bound_images = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
-			.member_name   = "bound_images",
-			.parent        = &DEFAULT_typedata_structure_render_command_draw_t.type_info,
-			.offset        = offsetof(render_command_draw_t, bound_images),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.bound_image_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "bound_image_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_draw_t.type_info,
-			.offset        = offsetof(render_command_draw_t, bound_image_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.backend_vertex_buffer_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "backend_vertex_buffer_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_draw_t.type_info,
-			.offset        = offsetof(render_command_draw_t, backend_vertex_buffer_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.vertices_to_draw = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "vertices_to_draw",
-			.parent        = &DEFAULT_typedata_structure_render_command_draw_t.type_info,
-			.offset        = offsetof(render_command_draw_t, vertices_to_draw),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.vertex_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "vertex_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_draw_t.type_info,
-			.offset        = offsetof(render_command_draw_t, vertex_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.indices_to_draw = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "indices_to_draw",
-			.parent        = &DEFAULT_typedata_structure_render_command_draw_t.type_info,
-			.offset        = offsetof(render_command_draw_t, indices_to_draw),
+			.parent        = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+			.offset        = offsetof(RHI_index_buffer_t, index_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.index_offset = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "index_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_draw_t.type_info,
-			.offset        = offsetof(render_command_draw_t, index_offset),
+			.parent        = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+			.offset        = offsetof(RHI_index_buffer_t, index_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_uniform_constant_buffer_t DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t = {
+	.type_info = {
+		.type_name = "RHI_uniform_constant_buffer_t",
+		.type_id = TYPE_RHI_uniform_constant_buffer_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_uniform_constant_buffer_t>(),
+	},
+	.member_count   = 4,
+	.member_pointer = DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.member_array,
+	.members = {
+		.mapped_data = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "mapped_data",
+			.parent        = &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
+			.offset        = offsetof(RHI_uniform_constant_buffer_t, mapped_data),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "size",
+			.parent        = &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
+			.offset        = offsetof(RHI_uniform_constant_buffer_t, size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
+			.offset        = offsetof(RHI_uniform_constant_buffer_t, offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.uniform_hash_index = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "uniform_hash_index",
+			.parent        = &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
+			.offset        = offsetof(RHI_uniform_constant_buffer_t, uniform_hash_index),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_type_t DEFAULT_typedata_structure_RHI_command_type_t = {
+	.type_info = {
+		.type_name = "RHI_command_type_t",
+		.type_id = TYPE_RHI_command_type_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<RHI_command_type_t>(),
+	},
+	.member_count   = 23,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_type_t.member_array,
+	.members = {
+		.RHI_RENDER_COMMAND_TYPE_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_INVALID",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_INVALID,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_END_RENDERPASS = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_END_RENDERPASS",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_END_RENDERPASS,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_BIND_SHADER = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_BIND_SHADER",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_BIND_SHADER,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_SET_SCISSOR = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_SET_SCISSOR",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_SET_SCISSOR,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_DRAW = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_DRAW",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_DRAW,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_COUNT = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_COUNT",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_COUNT,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_header_t DEFAULT_typedata_structure_RHI_command_header_t = {
+	.type_info = {
+		.type_name = "RHI_command_header_t",
+		.type_id = TYPE_RHI_command_header_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_header_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_header_t.member_array,
+	.members = {
+		.command_type = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "command_type",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_header_t.type_info,
+			.offset        = offsetof(RHI_command_header_t, command_type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_begin_renderpass_t DEFAULT_typedata_structure_RHI_command_begin_renderpass_t = {
+	.type_info = {
+		.type_name = "RHI_command_begin_renderpass_t",
+		.type_id = TYPE_RHI_command_begin_renderpass_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_begin_renderpass_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_begin_renderpass_t.member_array,
+	.members = {
+		.ID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "ID",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_begin_renderpass_t.type_info,
+			.offset        = offsetof(RHI_command_begin_renderpass_t, ID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_end_renderpass_t DEFAULT_typedata_structure_RHI_command_end_renderpass_t = {
+	.type_info = {
+		.type_name = "RHI_command_end_renderpass_t",
+		.type_id = TYPE_RHI_command_end_renderpass_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_end_renderpass_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_end_renderpass_t.member_array,
+	.members = {
+		.ID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "ID",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_end_renderpass_t.type_info,
+			.offset        = offsetof(RHI_command_end_renderpass_t, ID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_bind_vertex_buffer_t DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t = {
+	.type_info = {
+		.type_name = "RHI_command_bind_vertex_buffer_t",
+		.type_id = TYPE_RHI_command_bind_vertex_buffer_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_bind_vertex_buffer_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.member_array,
+	.members = {
+		.vertex_buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.member_name   = "vertex_buffer",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.type_info,
+			.offset        = offsetof(RHI_command_bind_vertex_buffer_t, vertex_buffer),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_bind_index_buffer_t DEFAULT_typedata_structure_RHI_command_bind_index_buffer_t = {
+	.type_info = {
+		.type_name = "RHI_command_bind_index_buffer_t",
+		.type_id = TYPE_RHI_command_bind_index_buffer_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_bind_index_buffer_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_bind_index_buffer_t.member_array,
+	.members = {
+		.index_buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+			.member_name   = "index_buffer",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_index_buffer_t.type_info,
+			.offset        = offsetof(RHI_command_bind_index_buffer_t, index_buffer),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_update_texture_t DEFAULT_typedata_structure_RHI_command_update_texture_t = {
+	.type_info = {
+		.type_name = "RHI_command_update_texture_t",
+		.type_id = TYPE_RHI_command_update_texture_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_update_texture_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_update_texture_t.member_array,
+	.members = {
+		.bitmap = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "bitmap",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_texture_t.type_info,
+			.offset        = offsetof(RHI_command_update_texture_t, bitmap),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_texture_t.type_info,
+			.offset        = offsetof(RHI_command_update_texture_t, buffer),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_bind_material_t DEFAULT_typedata_structure_RHI_command_bind_material_t = {
+	.type_info = {
+		.type_name = "RHI_command_bind_material_t",
+		.type_id = TYPE_RHI_command_bind_material_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_bind_material_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_bind_material_t.member_array,
+	.members = {
+		.materialID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "materialID",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_material_t.type_info,
+			.offset        = offsetof(RHI_command_bind_material_t, materialID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.material = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "material",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_material_t.type_info,
+			.offset        = offsetof(RHI_command_bind_material_t, material),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_bind_shader_t DEFAULT_typedata_structure_RHI_command_bind_shader_t = {
+	.type_info = {
+		.type_name = "RHI_command_bind_shader_t",
+		.type_id = TYPE_RHI_command_bind_shader_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_bind_shader_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_bind_shader_t.member_array,
+	.members = {
+		.shaderID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "shaderID",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_shader_t.type_info,
+			.offset        = offsetof(RHI_command_bind_shader_t, shaderID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.shader = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "shader",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_shader_t.type_info,
+			.offset        = offsetof(RHI_command_bind_shader_t, shader),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_set_viewport_t DEFAULT_typedata_structure_RHI_command_set_viewport_t = {
+	.type_info = {
+		.type_name = "RHI_command_set_viewport_t",
+		.type_id = TYPE_RHI_command_set_viewport_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_set_viewport_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_set_viewport_t.member_array,
+	.members = {
+		.offset = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_set_viewport_t.type_info,
+			.offset        = offsetof(RHI_command_set_viewport_t, offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "size",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_set_viewport_t.type_info,
+			.offset        = offsetof(RHI_command_set_viewport_t, size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_set_scissor_t DEFAULT_typedata_structure_RHI_command_set_scissor_t = {
+	.type_info = {
+		.type_name = "RHI_command_set_scissor_t",
+		.type_id = TYPE_RHI_command_set_scissor_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_set_scissor_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_set_scissor_t.member_array,
+	.members = {
+		.offset = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_set_scissor_t.type_info,
+			.offset        = offsetof(RHI_command_set_scissor_t, offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "size",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_set_scissor_t.type_info,
+			.offset        = offsetof(RHI_command_set_scissor_t, size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_update_push_constant_t DEFAULT_typedata_structure_RHI_command_update_push_constant_t = {
+	.type_info = {
+		.type_name = "RHI_command_update_push_constant_t",
+		.type_id = TYPE_RHI_command_update_push_constant_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_update_push_constant_t>(),
+	},
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_update_push_constant_t.member_array,
+	.members = {
+		.data = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "data",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_push_constant_t.type_info,
+			.offset        = offsetof(RHI_command_update_push_constant_t, data),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "size",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_push_constant_t.type_info,
+			.offset        = offsetof(RHI_command_update_push_constant_t, size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_push_constant_t.type_info,
+			.offset        = offsetof(RHI_command_update_push_constant_t, offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_update_uniform_constant_buffer_t DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t = {
+	.type_info = {
+		.type_name = "RHI_command_update_uniform_constant_buffer_t",
+		.type_id = TYPE_RHI_command_update_uniform_constant_buffer_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_update_uniform_constant_buffer_t>(),
+	},
+	.member_count   = 5,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t.member_array,
+	.members = {
+		.backend_uniform_buffer_ptr = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "backend_uniform_buffer_ptr",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t.type_info,
+			.offset        = offsetof(RHI_command_update_uniform_constant_buffer_t, backend_uniform_buffer_ptr),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t.type_info,
+			.offset        = offsetof(RHI_command_update_uniform_constant_buffer_t, buffer),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.uniform_hash_index = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "uniform_hash_index",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t.type_info,
+			.offset        = offsetof(RHI_command_update_uniform_constant_buffer_t, uniform_hash_index),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.constant_data_size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "constant_data_size",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t.type_info,
+			.offset        = offsetof(RHI_command_update_uniform_constant_buffer_t, constant_data_size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.constant_buffer_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "constant_buffer_offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t.type_info,
+			.offset        = offsetof(RHI_command_update_uniform_constant_buffer_t, constant_buffer_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_update_render_buffer_contents_t DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t = {
+	.type_info = {
+		.type_name = "RHI_command_update_render_buffer_contents_t",
+		.type_id = TYPE_RHI_command_update_render_buffer_contents_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_update_render_buffer_contents_t>(),
+	},
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t.member_array,
+	.members = {
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t.type_info,
+			.offset        = offsetof(RHI_command_update_render_buffer_contents_t, buffer),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t.type_info,
+			.offset        = offsetof(RHI_command_update_render_buffer_contents_t, offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.data_size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "data_size",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t.type_info,
+			.offset        = offsetof(RHI_command_update_render_buffer_contents_t, data_size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_bind_texture_t DEFAULT_typedata_structure_RHI_command_bind_texture_t = {
+	.type_info = {
+		.type_name = "RHI_command_bind_texture_t",
+		.type_id = TYPE_RHI_command_bind_texture_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_bind_texture_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_bind_texture_t.member_array,
+	.members = {
+		.texture = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.member_name   = "texture",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_texture_t.type_info,
+			.offset        = offsetof(RHI_command_bind_texture_t, texture),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_dispatch_compute_t DEFAULT_typedata_structure_RHI_command_dispatch_compute_t = {
+	.type_info = {
+		.type_name = "RHI_command_dispatch_compute_t",
+		.type_id = TYPE_RHI_command_dispatch_compute_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_dispatch_compute_t>(),
+	},
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_dispatch_compute_t.member_array,
+	.members = {
+		.invoke_x = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "invoke_x",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_dispatch_compute_t.type_info,
+			.offset        = offsetof(RHI_command_dispatch_compute_t, invoke_x),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.invoke_y = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "invoke_y",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_dispatch_compute_t.type_info,
+			.offset        = offsetof(RHI_command_dispatch_compute_t, invoke_y),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.invoke_z = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "invoke_z",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_dispatch_compute_t.type_info,
+			.offset        = offsetof(RHI_command_dispatch_compute_t, invoke_z),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_set_pipeline_state_t DEFAULT_typedata_structure_RHI_command_set_pipeline_state_t = {
+	.type_info = {
+		.type_name = "RHI_command_set_pipeline_state_t",
+		.type_id = TYPE_RHI_command_set_pipeline_state_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_set_pipeline_state_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_set_pipeline_state_t.member_array,
+	.members = {
+		.pipeline_state = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.member_name   = "pipeline_state",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_set_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_command_set_pipeline_state_t, pipeline_state),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_draw_t DEFAULT_typedata_structure_RHI_command_draw_t = {
+	.type_info = {
+		.type_name = "RHI_command_draw_t",
+		.type_id = TYPE_RHI_command_draw_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_command_draw_t>(),
+	},
+	.member_count   = 9,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_draw_t.member_array,
+	.members = {
+		.bound_images = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.member_name   = "bound_images",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_draw_t.type_info,
+			.offset        = offsetof(RHI_command_draw_t, bound_images),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.bound_image_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "bound_image_count",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_draw_t.type_info,
+			.offset        = offsetof(RHI_command_draw_t, bound_image_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.backend_vertex_buffer_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "backend_vertex_buffer_offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_draw_t.type_info,
+			.offset        = offsetof(RHI_command_draw_t, backend_vertex_buffer_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.vertices_to_draw = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertices_to_draw",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_draw_t.type_info,
+			.offset        = offsetof(RHI_command_draw_t, vertices_to_draw),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.vertex_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_draw_t.type_info,
+			.offset        = offsetof(RHI_command_draw_t, vertex_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.indices_to_draw = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "indices_to_draw",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_draw_t.type_info,
+			.offset        = offsetof(RHI_command_draw_t, indices_to_draw),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.index_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "index_offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_draw_t.type_info,
+			.offset        = offsetof(RHI_command_draw_t, index_offset),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.instance_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "instance_count",
-			.parent        = &DEFAULT_typedata_structure_render_command_draw_t.type_info,
-			.offset        = offsetof(render_command_draw_t, instance_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_draw_t.type_info,
+			.offset        = offsetof(RHI_command_draw_t, instance_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.first_instance = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "first_instance",
-			.parent        = &DEFAULT_typedata_structure_render_command_draw_t.type_info,
-			.offset        = offsetof(render_command_draw_t, first_instance),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_draw_t.type_info,
+			.offset        = offsetof(RHI_command_draw_t, first_instance),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
 
-constexpr type_info_struct_render_command_blit_image_t DEFAULT_typedata_structure_render_command_blit_image_t = {
+constexpr type_info_struct_RHI_command_blit_image_t DEFAULT_typedata_structure_RHI_command_blit_image_t = {
 	.type_info = {
-		.type_name = "render_command_blit_image_t",
-		.type_id = TYPE_render_command_blit_image_t,
+		.type_name = "RHI_command_blit_image_t",
+		.type_id = TYPE_RHI_command_blit_image_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_blit_image_t>(),
+		.size = athena_internal::safe_sizeof<RHI_command_blit_image_t>(),
 	},
 	.member_count   = 6,
-	.member_pointer = DEFAULT_typedata_structure_render_command_blit_image_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_blit_image_t.member_array,
 	.members = {
 		.source_image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "source_image",
-			.parent        = &DEFAULT_typedata_structure_render_command_blit_image_t.type_info,
-			.offset        = offsetof(render_command_blit_image_t, source_image),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_blit_image_t.type_info,
+			.offset        = offsetof(RHI_command_blit_image_t, source_image),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.dest_image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "dest_image",
-			.parent        = &DEFAULT_typedata_structure_render_command_blit_image_t.type_info,
-			.offset        = offsetof(render_command_blit_image_t, dest_image),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_blit_image_t.type_info,
+			.offset        = offsetof(RHI_command_blit_image_t, dest_image),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.source_offset = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
 			.member_name   = "source_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_blit_image_t.type_info,
-			.offset        = offsetof(render_command_blit_image_t, source_offset),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_blit_image_t.type_info,
+			.offset        = offsetof(RHI_command_blit_image_t, source_offset),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.source_size = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
 			.member_name   = "source_size",
-			.parent        = &DEFAULT_typedata_structure_render_command_blit_image_t.type_info,
-			.offset        = offsetof(render_command_blit_image_t, source_size),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_blit_image_t.type_info,
+			.offset        = offsetof(RHI_command_blit_image_t, source_size),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.dest_offset = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
 			.member_name   = "dest_offset",
-			.parent        = &DEFAULT_typedata_structure_render_command_blit_image_t.type_info,
-			.offset        = offsetof(render_command_blit_image_t, dest_offset),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_blit_image_t.type_info,
+			.offset        = offsetof(RHI_command_blit_image_t, dest_offset),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.dest_size = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
 			.member_name   = "dest_size",
-			.parent        = &DEFAULT_typedata_structure_render_command_blit_image_t.type_info,
-			.offset        = offsetof(render_command_blit_image_t, dest_size),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_blit_image_t.type_info,
+			.offset        = offsetof(RHI_command_blit_image_t, dest_size),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
 
-constexpr type_info_struct_render_command_blit_renderpass_t DEFAULT_typedata_structure_render_command_blit_renderpass_t = {
+constexpr type_info_struct_RHI_command_blit_renderpass_t DEFAULT_typedata_structure_RHI_command_blit_renderpass_t = {
 	.type_info = {
-		.type_name = "render_command_blit_renderpass_t",
-		.type_id = TYPE_render_command_blit_renderpass_t,
+		.type_name = "RHI_command_blit_renderpass_t",
+		.type_id = TYPE_RHI_command_blit_renderpass_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_blit_renderpass_t>(),
+		.size = athena_internal::safe_sizeof<RHI_command_blit_renderpass_t>(),
 	},
 	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_render_command_blit_renderpass_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_blit_renderpass_t.member_array,
 	.members = {
 		.source = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
 			.member_name   = "source",
-			.parent        = &DEFAULT_typedata_structure_render_command_blit_renderpass_t.type_info,
-			.offset        = offsetof(render_command_blit_renderpass_t, source),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_blit_renderpass_t.type_info,
+			.offset        = offsetof(RHI_command_blit_renderpass_t, source),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.destination = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
 			.member_name   = "destination",
-			.parent        = &DEFAULT_typedata_structure_render_command_blit_renderpass_t.type_info,
-			.offset        = offsetof(render_command_blit_renderpass_t, destination),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_blit_renderpass_t.type_info,
+			.offset        = offsetof(RHI_command_blit_renderpass_t, destination),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
 
-constexpr type_info_struct_render_command_present_frame_t DEFAULT_typedata_structure_render_command_present_frame_t = {
+constexpr type_info_struct_RHI_command_present_frame_t DEFAULT_typedata_structure_RHI_command_present_frame_t = {
 	.type_info = {
-		.type_name = "render_command_present_frame_t",
-		.type_id = TYPE_render_command_present_frame_t,
+		.type_name = "RHI_command_present_frame_t",
+		.type_id = TYPE_RHI_command_present_frame_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_present_frame_t>(),
+		.size = athena_internal::safe_sizeof<RHI_command_present_frame_t>(),
 	},
 	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_render_command_present_frame_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_present_frame_t.member_array,
 	.members = {
 		.presentation_source = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "presentation_source",
-			.parent        = &DEFAULT_typedata_structure_render_command_present_frame_t.type_info,
-			.offset        = offsetof(render_command_present_frame_t, presentation_source),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_present_frame_t.type_info,
+			.offset        = offsetof(RHI_command_present_frame_t, presentation_source),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
 
-constexpr type_info_struct_render_command_t DEFAULT_typedata_structure_render_command_t = {
+constexpr type_info_struct_RHI_command_t DEFAULT_typedata_structure_RHI_command_t = {
 	.type_info = {
-		.type_name = "render_command_t",
-		.type_id = TYPE_render_command_t,
+		.type_name = "RHI_command_t",
+		.type_id = TYPE_RHI_command_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<render_command_t>(),
+		.size = athena_internal::safe_sizeof<RHI_command_t>(),
 	},
 	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_render_command_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_t.member_array,
 	.members = {
 		.header = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_header_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_header_t.type_info,
 			.member_name   = "header",
-			.parent        = &DEFAULT_typedata_structure_render_command_t.type_info,
-			.offset        = offsetof(render_command_t, header),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_t.type_info,
+			.offset        = offsetof(RHI_command_t, header),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.data = {
 			.type_info     = &DEFAULT_typedata_void,
 			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_structure_render_command_t.type_info,
-			.offset        = offsetof(render_command_t, data),
+			.parent        = &DEFAULT_typedata_structure_RHI_command_t.type_info,
+			.offset        = offsetof(RHI_command_t, data),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
 
-constexpr type_info_struct_command_list_type_t DEFAULT_typedata_structure_command_list_type_t = {
+constexpr type_info_struct_RHI_command_list_type_t DEFAULT_typedata_structure_RHI_command_list_type_t = {
 	.type_info = {
-		.type_name = "command_list_type_t",
-		.type_id = TYPE_command_list_type_t,
+		.type_name = "RHI_command_list_type_t",
+		.type_id = TYPE_RHI_command_list_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<command_list_type_t>(),
+		.size = athena_internal::safe_sizeof<RHI_command_list_type_t>(),
 	},
 	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_command_list_type_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_list_type_t.member_array,
 	.members = {
-		.RENDER_COMMAND_LIST_TYPE_GRAPHICS = {
-			.type_info     = &DEFAULT_typedata_structure_command_list_type_t.type_info,
-			.member_name   = "RENDER_COMMAND_LIST_TYPE_GRAPHICS",
-			.parent        = &DEFAULT_typedata_structure_command_list_type_t.type_info,
+		.RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
 				.type  = 2,
-				.int64 = RENDER_COMMAND_LIST_TYPE_GRAPHICS,
+				.int64 = RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS,
 			},
 		},
-		.RENDER_COMMAND_LIST_TYPE_COMPUTE = {
-			.type_info     = &DEFAULT_typedata_structure_command_list_type_t.type_info,
-			.member_name   = "RENDER_COMMAND_LIST_TYPE_COMPUTE",
-			.parent        = &DEFAULT_typedata_structure_command_list_type_t.type_info,
+		.RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
 				.type  = 2,
-				.int64 = RENDER_COMMAND_LIST_TYPE_COMPUTE,
+				.int64 = RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE,
 			},
 		},
 	},
 };
 
-constexpr type_info_struct_clear_value_t DEFAULT_typedata_structure_clear_value_t = {
+constexpr type_info_struct_RHI_clear_value_t DEFAULT_typedata_structure_RHI_clear_value_t = {
 	.type_info = {
-		.type_name = "clear_value_t",
-		.type_id = TYPE_clear_value_t,
+		.type_name = "RHI_clear_value_t",
+		.type_id = TYPE_RHI_clear_value_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<clear_value_t>(),
+		.size = athena_internal::safe_sizeof<RHI_clear_value_t>(),
 	},
 	.member_count   = 5,
-	.member_pointer = DEFAULT_typedata_structure_clear_value_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_clear_value_t.member_array,
 	.members = {
 		.float_color = {
 			.type_info     = &DEFAULT_typedata_vec4_t,
 			.member_name   = "float_color",
-			.parent        = &DEFAULT_typedata_structure_clear_value_t.type_info,
-			.offset        = offsetof(clear_value_t, float_color),
+			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.offset        = offsetof(RHI_clear_value_t, float_color),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.int_color = {
 			.type_info     = &DEFAULT_typedata_ivec4_t,
 			.member_name   = "int_color",
-			.parent        = &DEFAULT_typedata_structure_clear_value_t.type_info,
-			.offset        = offsetof(clear_value_t, int_color),
+			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.offset        = offsetof(RHI_clear_value_t, int_color),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.uint_color = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "uint_color",
-			.parent        = &DEFAULT_typedata_structure_clear_value_t.type_info,
-			.offset        = offsetof(clear_value_t, uint_color),
+			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.offset        = offsetof(RHI_clear_value_t, uint_color),
 			.flags         = 64,
 			.pointer_depth = 0,
 		},
 		.depth = {
 			.type_info     = &DEFAULT_typedata_float32,
 			.member_name   = "depth",
-			.parent        = &DEFAULT_typedata_structure_clear_value_t.type_info,
-			.offset        = offsetof(clear_value_t, depth),
+			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.offset        = offsetof(RHI_clear_value_t, depth),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.stencil = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "stencil",
-			.parent        = &DEFAULT_typedata_structure_clear_value_t.type_info,
-			.offset        = offsetof(clear_value_t, stencil),
+			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.offset        = offsetof(RHI_clear_value_t, stencil),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
 
-constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_structure_renderpass_attachment_access_t = {
+constexpr type_info_struct_RHI_renderpass_attachment_access_t DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t = {
 	.type_info = {
-		.type_name = "renderpass_attachment_access_t",
-		.type_id = TYPE_renderpass_attachment_access_t,
+		.type_name = "RHI_renderpass_attachment_access_t",
+		.type_id = TYPE_RHI_renderpass_attachment_access_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<renderpass_attachment_access_t>(),
+		.size = athena_internal::safe_sizeof<RHI_renderpass_attachment_access_t>(),
 	},
 	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_renderpass_attachment_access_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.member_array,
 	.members = {
-		.RenderpassAtachmentAccessInvalid = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info,
-			.member_name   = "RenderpassAtachmentAccessInvalid",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info,
+		.RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
+			.member_name   = "RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -23788,10 +23233,10 @@ constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_struc
 				.u64 = 1,
 			},
 		},
-		.RenderpassAttachmentAccessRead = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info,
-			.member_name   = "RenderpassAttachmentAccessRead",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info,
+		.RHI_RENDERPASS_ATTACHMENT_ACCESS_READ = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
+			.member_name   = "RHI_RENDERPASS_ATTACHMENT_ACCESS_READ",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -23799,10 +23244,10 @@ constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_struc
 				.u64 = 2,
 			},
 		},
-		.RenderpassAttachmentAccessWrite = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info,
-			.member_name   = "RenderpassAttachmentAccessWrite",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info,
+		.RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
+			.member_name   = "RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -23810,10 +23255,10 @@ constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_struc
 				.u64 = 4,
 			},
 		},
-		.RenderpassAttachmentAccessReadWrite = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info,
-			.member_name   = "RenderpassAttachmentAccessReadWrite",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info,
+		.RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
+			.member_name   = "RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -23824,20 +23269,20 @@ constexpr type_info_struct_renderpass_attachment_access_t DEFAULT_typedata_struc
 	},
 };
 
-constexpr type_info_struct_renderpass_attachment_load_operation_t DEFAULT_typedata_structure_renderpass_attachment_load_operation_t = {
+constexpr type_info_struct_RHI_renderpass_attachment_load_operation_t DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t = {
 	.type_info = {
-		.type_name = "renderpass_attachment_load_operation_t",
-		.type_id = TYPE_renderpass_attachment_load_operation_t,
+		.type_name = "RHI_renderpass_attachment_load_operation_t",
+		.type_id = TYPE_RHI_renderpass_attachment_load_operation_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<renderpass_attachment_load_operation_t>(),
+		.size = athena_internal::safe_sizeof<RHI_renderpass_attachment_load_operation_t>(),
 	},
 	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_renderpass_attachment_load_operation_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.member_array,
 	.members = {
-		.RenderpassAttachmentLoadOperationInvalid = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_load_operation_t.type_info,
-			.member_name   = "RenderpassAttachmentLoadOperationInvalid",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_load_operation_t.type_info,
+		.RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info,
+			.member_name   = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -23845,10 +23290,10 @@ constexpr type_info_struct_renderpass_attachment_load_operation_t DEFAULT_typeda
 				.u64 = 1,
 			},
 		},
-		.RenderpassAttachmentLoadOperationClear = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_load_operation_t.type_info,
-			.member_name   = "RenderpassAttachmentLoadOperationClear",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_load_operation_t.type_info,
+		.RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info,
+			.member_name   = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -23856,10 +23301,10 @@ constexpr type_info_struct_renderpass_attachment_load_operation_t DEFAULT_typeda
 				.u64 = 2,
 			},
 		},
-		.RenderpassAttachmentLoadOperationLoad = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_load_operation_t.type_info,
-			.member_name   = "RenderpassAttachmentLoadOperationLoad",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_load_operation_t.type_info,
+		.RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info,
+			.member_name   = "RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -23870,20 +23315,20 @@ constexpr type_info_struct_renderpass_attachment_load_operation_t DEFAULT_typeda
 	},
 };
 
-constexpr type_info_struct_renderpass_attachment_store_operation_t DEFAULT_typedata_structure_renderpass_attachment_store_operation_t = {
+constexpr type_info_struct_RHI_renderpass_attachment_store_operation_t DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t = {
 	.type_info = {
-		.type_name = "renderpass_attachment_store_operation_t",
-		.type_id = TYPE_renderpass_attachment_store_operation_t,
+		.type_name = "RHI_renderpass_attachment_store_operation_t",
+		.type_id = TYPE_RHI_renderpass_attachment_store_operation_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<renderpass_attachment_store_operation_t>(),
+		.size = athena_internal::safe_sizeof<RHI_renderpass_attachment_store_operation_t>(),
 	},
 	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_renderpass_attachment_store_operation_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.member_array,
 	.members = {
-		.RenderpassAttachmentStoreOperationInvalid = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_store_operation_t.type_info,
-			.member_name   = "RenderpassAttachmentStoreOperationInvalid",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_store_operation_t.type_info,
+		.RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info,
+			.member_name   = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -23891,10 +23336,10 @@ constexpr type_info_struct_renderpass_attachment_store_operation_t DEFAULT_typed
 				.u64 = 1,
 			},
 		},
-		.RenderpassAttachmentStoreOperationStore = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_store_operation_t.type_info,
-			.member_name   = "RenderpassAttachmentStoreOperationStore",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_store_operation_t.type_info,
+		.RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info,
+			.member_name   = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -23902,10 +23347,10 @@ constexpr type_info_struct_renderpass_attachment_store_operation_t DEFAULT_typed
 				.u64 = 2,
 			},
 		},
-		.RenderpassAttachmentStoreOperationDontCare = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_store_operation_t.type_info,
-			.member_name   = "RenderpassAttachmentStoreOperationDontCare",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_store_operation_t.type_info,
+		.RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info,
+			.member_name   = "RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
@@ -23916,1498 +23361,1573 @@ constexpr type_info_struct_renderpass_attachment_store_operation_t DEFAULT_typed
 	},
 };
 
-constexpr type_info_struct_renderpass_attachment_t DEFAULT_typedata_structure_renderpass_attachment_t = {
+constexpr type_info_struct_RHI_renderpass_attachment_t DEFAULT_typedata_structure_RHI_renderpass_attachment_t = {
 	.type_info = {
-		.type_name = "renderpass_attachment_t",
-		.type_id = TYPE_renderpass_attachment_t,
+		.type_name = "RHI_renderpass_attachment_t",
+		.type_id = TYPE_RHI_renderpass_attachment_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<renderpass_attachment_t>(),
+		.size = athena_internal::safe_sizeof<RHI_renderpass_attachment_t>(),
 	},
 	.member_count   = 5,
-	.member_pointer = DEFAULT_typedata_structure_renderpass_attachment_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_renderpass_attachment_t.member_array,
 	.members = {
 		.access = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
 			.member_name   = "access",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_t.type_info,
-			.offset        = offsetof(renderpass_attachment_t, access),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info,
+			.offset        = offsetof(RHI_renderpass_attachment_t, access),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.load_operation = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_load_operation_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info,
 			.member_name   = "load_operation",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_t.type_info,
-			.offset        = offsetof(renderpass_attachment_t, load_operation),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info,
+			.offset        = offsetof(RHI_renderpass_attachment_t, load_operation),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.store_operation = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_store_operation_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info,
 			.member_name   = "store_operation",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_t.type_info,
-			.offset        = offsetof(renderpass_attachment_t, store_operation),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info,
+			.offset        = offsetof(RHI_renderpass_attachment_t, store_operation),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "image",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_t.type_info,
-			.offset        = offsetof(renderpass_attachment_t, image),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info,
+			.offset        = offsetof(RHI_renderpass_attachment_t, image),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.clear_value = {
-			.type_info     = &DEFAULT_typedata_structure_clear_value_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
 			.member_name   = "clear_value",
-			.parent        = &DEFAULT_typedata_structure_renderpass_attachment_t.type_info,
-			.offset        = offsetof(renderpass_attachment_t, clear_value),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info,
+			.offset        = offsetof(RHI_renderpass_attachment_t, clear_value),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
 
-constexpr type_info_struct_renderpass_desc_t DEFAULT_typedata_structure_renderpass_desc_t = {
+constexpr type_info_struct_RHI_renderpass_desc_t DEFAULT_typedata_structure_RHI_renderpass_desc_t = {
 	.type_info = {
-		.type_name = "renderpass_desc_t",
-		.type_id = TYPE_renderpass_desc_t,
+		.type_name = "RHI_renderpass_desc_t",
+		.type_id = TYPE_RHI_renderpass_desc_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<renderpass_desc_t>(),
+		.size = athena_internal::safe_sizeof<RHI_renderpass_desc_t>(),
 	},
 	.member_count   = 6,
-	.member_pointer = DEFAULT_typedata_structure_renderpass_desc_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_renderpass_desc_t.member_array,
 	.members = {
 		.color_attachments = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info,
 			.member_name   = "color_attachments",
-			.parent        = &DEFAULT_typedata_structure_renderpass_desc_t.type_info,
-			.offset        = offsetof(renderpass_desc_t, color_attachments),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
+			.offset        = offsetof(RHI_renderpass_desc_t, color_attachments),
 			.flags         = 64,
 			.pointer_depth = 0,
 		},
 		.depth_stencil_attachment = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info,
 			.member_name   = "depth_stencil_attachment",
-			.parent        = &DEFAULT_typedata_structure_renderpass_desc_t.type_info,
-			.offset        = offsetof(renderpass_desc_t, depth_stencil_attachment),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
+			.offset        = offsetof(RHI_renderpass_desc_t, depth_stencil_attachment),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.render_width = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "render_width",
-			.parent        = &DEFAULT_typedata_structure_renderpass_desc_t.type_info,
-			.offset        = offsetof(renderpass_desc_t, render_width),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
+			.offset        = offsetof(RHI_renderpass_desc_t, render_width),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.render_height = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "render_height",
-			.parent        = &DEFAULT_typedata_structure_renderpass_desc_t.type_info,
-			.offset        = offsetof(renderpass_desc_t, render_height),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.resize_with_window = {
-			.type_info     = &DEFAULT_typedata_bool8,
-			.member_name   = "resize_with_window",
-			.parent        = &DEFAULT_typedata_structure_renderpass_desc_t.type_info,
-			.offset        = offsetof(renderpass_desc_t, resize_with_window),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
+			.offset        = offsetof(RHI_renderpass_desc_t, render_height),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.color_attachment_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "color_attachment_count",
-			.parent        = &DEFAULT_typedata_structure_renderpass_desc_t.type_info,
-			.offset        = offsetof(renderpass_desc_t, color_attachment_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
+			.offset        = offsetof(RHI_renderpass_desc_t, color_attachment_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.resize_with_window = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "resize_with_window",
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
+			.offset        = offsetof(RHI_renderpass_desc_t, resize_with_window),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
 
-constexpr type_info_struct_renderpass_key_t DEFAULT_typedata_structure_renderpass_key_t = {
+constexpr type_info_struct_RHI_renderpass_key_t DEFAULT_typedata_structure_RHI_renderpass_key_t = {
 	.type_info = {
-		.type_name = "renderpass_key_t",
-		.type_id = TYPE_renderpass_key_t,
+		.type_name = "RHI_renderpass_key_t",
+		.type_id = TYPE_RHI_renderpass_key_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<renderpass_key_t>(),
+		.size = athena_internal::safe_sizeof<RHI_renderpass_key_t>(),
 	},
 	.member_count   = 1,
-	.member_pointer = DEFAULT_typedata_structure_renderpass_key_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_renderpass_key_t.member_array,
 	.members = {
 		.attachment_formats = {
 			.type_info     = &DEFAULT_typedata_structure_bitmap_format_t.type_info,
 			.member_name   = "attachment_formats",
-			.parent        = &DEFAULT_typedata_structure_renderpass_key_t.type_info,
-			.offset        = offsetof(renderpass_key_t, attachment_formats),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_key_t.type_info,
+			.offset        = offsetof(RHI_renderpass_key_t, attachment_formats),
 			.flags         = 64,
 			.pointer_depth = 0,
 		},
 	},
 };
 
-constexpr type_info_struct_renderpass_t DEFAULT_typedata_structure_renderpass_t = {
+constexpr type_info_struct_RHI_renderpass_t DEFAULT_typedata_structure_RHI_renderpass_t = {
 	.type_info = {
-		.type_name = "renderpass_t",
-		.type_id = TYPE_renderpass_t,
+		.type_name = "RHI_renderpass_t",
+		.type_id = TYPE_RHI_renderpass_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<renderpass_t>(),
+		.size = athena_internal::safe_sizeof<RHI_renderpass_t>(),
 	},
 	.member_count   = 14,
-	.member_pointer = DEFAULT_typedata_structure_renderpass_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_RHI_renderpass_t.member_array,
 	.members = {
 		.ID = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "ID",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, ID),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, ID),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.renderpass_key = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_key_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_key_t.type_info,
 			.member_name   = "renderpass_key",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, renderpass_key),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, renderpass_key),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.create_info = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_desc_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
 			.member_name   = "create_info",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, create_info),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, create_info),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.renderpass_handle = {
 			.type_info     = &DEFAULT_typedata_backend_renderpass_handle_t,
 			.member_name   = "renderpass_handle",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, renderpass_handle),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, renderpass_handle),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.framebuffer_handle = {
 			.type_info     = &DEFAULT_typedata_backend_framebuffer_handle_t,
 			.member_name   = "framebuffer_handle",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, framebuffer_handle),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, framebuffer_handle),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.depth_stencil_attachment = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info,
 			.member_name   = "depth_stencil_attachment",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, depth_stencil_attachment),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, depth_stencil_attachment),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.color_attachments = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_attachment_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info,
 			.member_name   = "color_attachments",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, color_attachments),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, color_attachments),
 			.flags         = 64,
 			.pointer_depth = 0,
 		},
 		.color_attachment_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "color_attachment_count",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, color_attachment_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, color_attachment_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.total_attachment_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "total_attachment_count",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, total_attachment_count),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, total_attachment_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.render_width = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "render_width",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, render_width),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, render_width),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.render_height = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "render_height",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, render_height),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, render_height),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.attachment_clear_values = {
-			.type_info     = &DEFAULT_typedata_structure_clear_value_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
 			.member_name   = "attachment_clear_values",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, attachment_clear_values),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, attachment_clear_values),
 			.flags         = 64,
 			.pointer_depth = 0,
 		},
 		.has_depth_stencil_attachment = {
 			.type_info     = &DEFAULT_typedata_bool8,
 			.member_name   = "has_depth_stencil_attachment",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, has_depth_stencil_attachment),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, has_depth_stencil_attachment),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.resize_with_window = {
 			.type_info     = &DEFAULT_typedata_bool8,
 			.member_name   = "resize_with_window",
-			.parent        = &DEFAULT_typedata_structure_renderpass_t.type_info,
-			.offset        = offsetof(renderpass_t, resize_with_window),
+			.parent        = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.offset        = offsetof(RHI_renderpass_t, resize_with_window),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
 
-constexpr type_info_t DEFAULT_typedata_backend_renderer_t = {
-	.type_name = "backend_renderer_t",
-	.type_id = TYPE_backend_renderer_t,
-	.size = athena_internal::safe_sizeof<backend_renderer_t>(),
+constexpr type_info_t DEFAULT_typedata_backend_render_context_t = {
+	.type_name = "backend_render_context_t",
+	.type_id = TYPE_backend_render_context_t,
+	.size = athena_internal::safe_sizeof<backend_render_context_t>(),
 };
-constexpr type_info_procedure_s_renderer_state_init DEFAULT_typedata_procedure_s_renderer_state_init = {
+constexpr type_info_procedure_RHI_context_init DEFAULT_typedata_procedure_RHI_context_init = {
 	.type_info = {
-		.type_name = "s_renderer_state_init",
-		.type_id = TYPE_s_renderer_state_init,
+		.type_name = "RHI_context_init",
+		.type_id = TYPE_RHI_context_init,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_state_init.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_context_init.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_state_init.type_info,
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_context_init.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.render_context = {
-			.type_info     = &DEFAULT_typedata_backend_renderer_t,
+			.type_info     = &DEFAULT_typedata_backend_render_context_t,
 			.member_name   = "render_context",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_state_init.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_context_init.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
-constexpr type_info_procedure_s_renderer_handle_window_resize DEFAULT_typedata_procedure_s_renderer_handle_window_resize = {
+constexpr type_info_procedure_RHI_handle_window_resize DEFAULT_typedata_procedure_RHI_handle_window_resize = {
 	.type_info = {
-		.type_name = "s_renderer_handle_window_resize",
-		.type_id = TYPE_s_renderer_handle_window_resize,
+		.type_name = "RHI_handle_window_resize",
+		.type_id = TYPE_RHI_handle_window_resize,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_handle_window_resize.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_handle_window_resize.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_handle_window_resize.type_info,
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_handle_window_resize.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.window_size = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
 			.member_name   = "window_size",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_handle_window_resize.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_handle_window_resize.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure_s_renderer_resize_render_targets DEFAULT_typedata_procedure_s_renderer_resize_render_targets = {
+constexpr type_info_procedure_RHI_resize_render_targets DEFAULT_typedata_procedure_RHI_resize_render_targets = {
 	.type_info = {
-		.type_name = "s_renderer_resize_render_targets",
-		.type_id = TYPE_s_renderer_resize_render_targets,
+		.type_name = "RHI_resize_render_targets",
+		.type_id = TYPE_RHI_resize_render_targets,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_resize_render_targets.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_resize_render_targets.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_resize_render_targets.type_info,
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_resize_render_targets.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.window_size = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
 			.member_name   = "window_size",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_resize_render_targets.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_resize_render_targets.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure_s_renderer_build_renderpass DEFAULT_typedata_procedure_s_renderer_build_renderpass = {
+constexpr type_info_procedure_RHI_build_renderpass DEFAULT_typedata_procedure_RHI_build_renderpass = {
 	.type_info = {
-		.type_name = "s_renderer_build_renderpass",
-		.type_id = TYPE_s_renderer_build_renderpass,
+		.type_name = "RHI_build_renderpass",
+		.type_id = TYPE_RHI_build_renderpass,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_u32,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_build_renderpass.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_build_renderpass.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_build_renderpass.type_info,
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_build_renderpass.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.renderpass_desc = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_desc_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
 			.member_name   = "renderpass_desc",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_build_renderpass.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_build_renderpass.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
-constexpr type_info_procedure_s_renderer_resize_renderpass DEFAULT_typedata_procedure_s_renderer_resize_renderpass = {
+constexpr type_info_procedure_RHI_resize_renderpass DEFAULT_typedata_procedure_RHI_resize_renderpass = {
 	.type_info = {
-		.type_name = "s_renderer_resize_renderpass",
-		.type_id = TYPE_s_renderer_resize_renderpass,
+		.type_name = "RHI_resize_renderpass",
+		.type_id = TYPE_RHI_resize_renderpass,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_resize_renderpass.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_resize_renderpass.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_resize_renderpass.type_info,
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_resize_renderpass.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.renderpass = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
 			.member_name   = "renderpass",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_resize_renderpass.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_resize_renderpass.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
-constexpr type_info_procedure_s_renderer_get_constant_buffer DEFAULT_typedata_procedure_s_renderer_get_constant_buffer = {
+constexpr type_info_procedure_RHI_get_constant_buffer DEFAULT_typedata_procedure_RHI_get_constant_buffer = {
 	.type_info = {
-		.type_name = "s_renderer_get_constant_buffer",
-		.type_id = TYPE_s_renderer_get_constant_buffer,
+		.type_name = "RHI_get_constant_buffer",
+		.type_id = TYPE_RHI_get_constant_buffer,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_get_constant_buffer.argument_array,
+	.return_type    = &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_get_constant_buffer.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_get_constant_buffer.type_info,
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_get_constant_buffer.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.uniform_name = {
 			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
 			.member_name   = "uniform_name",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_get_constant_buffer.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_get_constant_buffer.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure_s_renderer_render_buffer_create DEFAULT_typedata_procedure_s_renderer_render_buffer_create = {
+constexpr type_info_procedure_RHI_render_buffer_create DEFAULT_typedata_procedure_RHI_render_buffer_create = {
 	.type_info = {
-		.type_name = "s_renderer_render_buffer_create",
-		.type_id = TYPE_s_renderer_render_buffer_create,
+		.type_name = "RHI_render_buffer_create",
+		.type_id = TYPE_RHI_render_buffer_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_render_buffer_create.argument_array,
+	.return_type    = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_render_buffer_create.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_render_buffer_create.type_info,
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_render_buffer_create.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.buffer_desc = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_desc_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info,
 			.member_name   = "buffer_desc",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_render_buffer_create.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_render_buffer_create.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
-constexpr type_info_procedure_s_renderer_vertex_buffer_create DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create = {
+constexpr type_info_procedure_RHI_vertex_buffer_create DEFAULT_typedata_procedure_RHI_vertex_buffer_create = {
 	.type_info = {
-		.type_name = "s_renderer_vertex_buffer_create",
-		.type_id = TYPE_s_renderer_vertex_buffer_create,
+		.type_name = "RHI_vertex_buffer_create",
+		.type_id = TYPE_RHI_vertex_buffer_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 6,
-	.return_type    = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create.argument_array,
+	.return_type    = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_vertex_buffer_create.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create.type_info,
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_vertex_buffer_create.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.memory_type = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_memory_type_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info,
 			.member_name   = "memory_type",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_vertex_buffer_create.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.rate = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_advance_rate_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info,
 			.member_name   = "rate",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_vertex_buffer_create.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.vertex_buffer_data = {
 			.type_info     = &DEFAULT_typedata_byte,
 			.member_name   = "vertex_buffer_data",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_vertex_buffer_create.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.vertex_size = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "vertex_size",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_vertex_buffer_create.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.max_vertices = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "max_vertices",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_vertex_buffer_create.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure_s_renderer_index_buffer_create DEFAULT_typedata_procedure_s_renderer_index_buffer_create = {
+constexpr type_info_procedure_RHI_index_buffer_create DEFAULT_typedata_procedure_RHI_index_buffer_create = {
 	.type_info = {
-		.type_name = "s_renderer_index_buffer_create",
-		.type_id = TYPE_s_renderer_index_buffer_create,
+		.type_name = "RHI_index_buffer_create",
+		.type_id = TYPE_RHI_index_buffer_create,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
-	.return_type    = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_index_buffer_create.argument_array,
+	.return_type    = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_index_buffer_create.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_index_buffer_create.type_info,
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_index_buffer_create.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.memory_type = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_memory_type_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info,
 			.member_name   = "memory_type",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_index_buffer_create.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_index_buffer_create.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.element_size = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "element_size",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_index_buffer_create.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_index_buffer_create.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.data = {
 			.type_info     = &DEFAULT_typedata_void,
 			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_index_buffer_create.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_index_buffer_create.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.size = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_index_buffer_create.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_index_buffer_create.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure_s_renderer_render_buffer_copy_data DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data = {
+constexpr type_info_procedure_RHI_render_buffer_copy_data DEFAULT_typedata_procedure_RHI_render_buffer_copy_data = {
 	.type_info = {
-		.type_name = "s_renderer_render_buffer_copy_data",
-		.type_id = TYPE_s_renderer_render_buffer_copy_data,
+		.type_name = "RHI_render_buffer_copy_data",
+		.type_id = TYPE_RHI_render_buffer_copy_data,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 5,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_render_buffer_copy_data.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data.type_info,
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_render_buffer_copy_data.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
 			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_render_buffer_copy_data.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.data = {
 			.type_info     = &DEFAULT_typedata_void,
 			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_render_buffer_copy_data.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.size = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_render_buffer_copy_data.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.offset = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_render_buffer_copy_data.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure_s_renderer_get_command_list DEFAULT_typedata_procedure_s_renderer_get_command_list = {
+constexpr type_info_struct_RHI_image_create_info_t DEFAULT_typedata_structure_RHI_image_create_info_t = {
 	.type_info = {
-		.type_name = "s_renderer_get_command_list",
-		.type_id = TYPE_s_renderer_get_command_list,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_get_command_list.argument_array,
-	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_get_command_list.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.type = {
-			.type_info     = &DEFAULT_typedata_structure_command_list_type_t.type_info,
-			.member_name   = "type",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_get_command_list.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_renderer_is_texture_bound DEFAULT_typedata_procedure_s_renderer_is_texture_bound = {
-	.type_info = {
-		.type_name = "s_renderer_is_texture_bound",
-		.type_id = TYPE_s_renderer_is_texture_bound,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_s32,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_is_texture_bound.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_is_texture_bound.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.texture = {
-			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
-			.member_name   = "texture",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_is_texture_bound.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_renderer_set_texture_filter_mode DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode = {
-	.type_info = {
-		.type_name = "s_renderer_set_texture_filter_mode",
-		.type_id = TYPE_s_renderer_set_texture_filter_mode,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 3,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode.argument_array,
-	.arguments = {
-		.render_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "render_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.texture = {
-			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
-			.member_name   = "texture",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.filter_mode = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "filter_mode",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_renderer_find_texture_index DEFAULT_typedata_procedure_s_renderer_find_texture_index = {
-	.type_info = {
-		.type_name = "s_renderer_find_texture_index",
-		.type_id = TYPE_s_renderer_find_texture_index,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_s32,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_find_texture_index.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_find_texture_index.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.ID = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "ID",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_find_texture_index.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_renderer_reset_command_list DEFAULT_typedata_procedure_s_renderer_reset_command_list = {
-	.type_info = {
-		.type_name = "s_renderer_reset_command_list",
-		.type_id = TYPE_s_renderer_reset_command_list,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_reset_command_list.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_reset_command_list.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_renderpass_begin DEFAULT_typedata_procedure_r_cmd_renderpass_begin = {
-	.type_info = {
-		.type_name = "r_cmd_renderpass_begin",
-		.type_id = TYPE_r_cmd_renderpass_begin,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_renderpass_begin.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_renderpass_begin.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.renderpassID = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "renderpassID",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_renderpass_begin.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_renderpass_end DEFAULT_typedata_procedure_r_cmd_renderpass_end = {
-	.type_info = {
-		.type_name = "r_cmd_renderpass_end",
-		.type_id = TYPE_r_cmd_renderpass_end,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_renderpass_end.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_renderpass_end.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_begin_render_group DEFAULT_typedata_procedure_r_cmd_begin_render_group = {
-	.type_info = {
-		.type_name = "r_cmd_begin_render_group",
-		.type_id = TYPE_r_cmd_begin_render_group,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_begin_render_group.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_begin_render_group.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_end_render_group DEFAULT_typedata_procedure_r_cmd_end_render_group = {
-	.type_info = {
-		.type_name = "r_cmd_end_render_group",
-		.type_id = TYPE_r_cmd_end_render_group,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_end_render_group.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_end_render_group.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_bind_index_buffer DEFAULT_typedata_procedure_r_cmd_bind_index_buffer = {
-	.type_info = {
-		.type_name = "r_cmd_bind_index_buffer",
-		.type_id = TYPE_r_cmd_bind_index_buffer,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_bind_index_buffer.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_bind_index_buffer.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_bind_index_buffer.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_set_scissor DEFAULT_typedata_procedure_r_cmd_set_scissor = {
-	.type_info = {
-		.type_name = "r_cmd_set_scissor",
-		.type_id = TYPE_r_cmd_set_scissor,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 3,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_set_scissor.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_set_scissor.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.offset = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_set_scissor.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_set_scissor.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_set_viewport DEFAULT_typedata_procedure_r_cmd_set_viewport = {
-	.type_info = {
-		.type_name = "r_cmd_set_viewport",
-		.type_id = TYPE_r_cmd_set_viewport,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 3,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_set_viewport.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_set_viewport.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.offset = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_set_viewport.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_set_viewport.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_update_push_constants DEFAULT_typedata_procedure_r_cmd_update_push_constants = {
-	.type_info = {
-		.type_name = "r_cmd_update_push_constants",
-		.type_id = TYPE_r_cmd_update_push_constants,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_update_push_constants.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_push_constants.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_push_constants.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_push_constants.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.data = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_push_constants.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_update_buffer_contents DEFAULT_typedata_procedure_r_cmd_update_buffer_contents = {
-	.type_info = {
-		.type_name = "r_cmd_update_buffer_contents",
-		.type_id = TYPE_r_cmd_update_buffer_contents,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_update_buffer_contents.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_buffer_contents.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_buffer_contents.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.data = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_buffer_contents.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.data_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "data_size",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_buffer_contents.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_use_shader_program DEFAULT_typedata_procedure_r_cmd_use_shader_program = {
-	.type_info = {
-		.type_name = "r_cmd_use_shader_program",
-		.type_id = TYPE_r_cmd_use_shader_program,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_use_shader_program.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_use_shader_program.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.program = {
-			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.member_name   = "program",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_use_shader_program.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_update_constant_buffer DEFAULT_typedata_procedure_r_cmd_update_constant_buffer = {
-	.type_info = {
-		.type_name = "r_cmd_update_constant_buffer",
-		.type_id = TYPE_r_cmd_update_constant_buffer,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_update_constant_buffer.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_constant_buffer.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_constant_buffer.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.data = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_constant_buffer.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.data_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "data_size",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_update_constant_buffer.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_bind_texture_image DEFAULT_typedata_procedure_r_cmd_bind_texture_image = {
-	.type_info = {
-		.type_name = "r_cmd_bind_texture_image",
-		.type_id = TYPE_r_cmd_bind_texture_image,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_bind_texture_image.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_bind_texture_image.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.texture = {
-			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
-			.member_name   = "texture",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_bind_texture_image.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_bind_texture_from_handle DEFAULT_typedata_procedure_r_cmd_bind_texture_from_handle = {
-	.type_info = {
-		.type_name = "r_cmd_bind_texture_from_handle",
-		.type_id = TYPE_r_cmd_bind_texture_from_handle,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_bind_texture_from_handle.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_bind_texture_from_handle.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.asset_handle = {
-			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.member_name   = "asset_handle",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_bind_texture_from_handle.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_reset_render_state DEFAULT_typedata_procedure_r_cmd_reset_render_state = {
-	.type_info = {
-		.type_name = "r_cmd_reset_render_state",
-		.type_id = TYPE_r_cmd_reset_render_state,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_reset_render_state.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_reset_render_state.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.render_pipeline_state = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.member_name   = "render_pipeline_state",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_reset_render_state.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_set_render_state DEFAULT_typedata_procedure_r_cmd_set_render_state = {
-	.type_info = {
-		.type_name = "r_cmd_set_render_state",
-		.type_id = TYPE_r_cmd_set_render_state,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_set_render_state.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_set_render_state.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.render_pipeline_state = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
-			.member_name   = "render_pipeline_state",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_set_render_state.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_draw DEFAULT_typedata_procedure_r_cmd_draw = {
-	.type_info = {
-		.type_name = "r_cmd_draw",
-		.type_id = TYPE_r_cmd_draw,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 5,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_draw.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_draw.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.vertex_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "vertex_count",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_draw.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.vertex_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "vertex_offset",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_draw.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.instance_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "instance_count",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_draw.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.first_instance = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "first_instance",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_draw.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_draw_indexed DEFAULT_typedata_procedure_r_cmd_draw_indexed = {
-	.type_info = {
-		.type_name = "r_cmd_draw_indexed",
-		.type_id = TYPE_r_cmd_draw_indexed,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 5,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_draw_indexed.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_draw_indexed.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.index_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "index_count",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_draw_indexed.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.index_offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "index_offset",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_draw_indexed.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.instance_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "instance_count",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_draw_indexed.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.first_instance = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "first_instance",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_draw_indexed.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_dispatch_compute DEFAULT_typedata_procedure_r_cmd_dispatch_compute = {
-	.type_info = {
-		.type_name = "r_cmd_dispatch_compute",
-		.type_id = TYPE_r_cmd_dispatch_compute,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_dispatch_compute.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_dispatch_compute.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.invoke_x = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "invoke_x",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_dispatch_compute.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.invoke_y = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "invoke_y",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_dispatch_compute.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.invoke_z = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "invoke_z",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_dispatch_compute.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_blit_image DEFAULT_typedata_procedure_r_cmd_blit_image = {
-	.type_info = {
-		.type_name = "r_cmd_blit_image",
-		.type_id = TYPE_r_cmd_blit_image,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 7,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_blit_image.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_blit_image.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.source_image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
-			.member_name   = "source_image",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_blit_image.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.dest_image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
-			.member_name   = "dest_image",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_blit_image.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.source_offset = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "source_offset",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_blit_image.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.source_blit_size = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "source_blit_size",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_blit_image.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.dest_offset = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "dest_offset",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_blit_image.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.dest_blit_size = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "dest_blit_size",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_blit_image.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_blit_renderpass DEFAULT_typedata_procedure_r_cmd_blit_renderpass = {
-	.type_info = {
-		.type_name = "r_cmd_blit_renderpass",
-		.type_id = TYPE_r_cmd_blit_renderpass,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 3,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_blit_renderpass.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_blit_renderpass.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.source_ID = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "source_ID",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_blit_renderpass.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.destination_ID = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "destination_ID",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_blit_renderpass.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_r_cmd_present DEFAULT_typedata_procedure_r_cmd_present = {
-	.type_info = {
-		.type_name = "r_cmd_present",
-		.type_id = TYPE_r_cmd_present,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_r_cmd_present.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_present.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.presentation_source = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
-			.member_name   = "presentation_source",
-			.parent        = &DEFAULT_typedata_procedure_r_cmd_present.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_renderer_execute_backend_commands DEFAULT_typedata_procedure_s_renderer_execute_backend_commands = {
-	.type_info = {
-		.type_name = "s_renderer_execute_backend_commands",
-		.type_id = TYPE_s_renderer_execute_backend_commands,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_renderer_execute_backend_commands.argument_array,
-	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
-			.parent        = &DEFAULT_typedata_procedure_s_renderer_execute_backend_commands.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_struct_vulkan_buffer_t DEFAULT_typedata_structure_vulkan_buffer_t = {
-	.type_info = {
-		.type_name = "vulkan_buffer_t",
-		.type_id = TYPE_vulkan_buffer_t,
+		.type_name = "RHI_image_create_info_t",
+		.type_id = TYPE_RHI_image_create_info_t,
 		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<vulkan_buffer_t>(),
+		.size = athena_internal::safe_sizeof<RHI_image_create_info_t>(),
 	},
-	.member_count   = 7,
-	.member_pointer = DEFAULT_typedata_structure_vulkan_buffer_t.member_array,
+	.member_count   = 6,
+	.member_pointer = DEFAULT_typedata_structure_RHI_image_create_info_t.member_array,
 	.members = {
-		.handle = {
-			.type_info     = &DEFAULT_typedata_VkBuffer,
-			.member_name   = "handle",
-			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
-			.offset        = offsetof(vulkan_buffer_t, handle),
+		.data = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "data",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
+			.offset        = offsetof(RHI_image_create_info_t, data),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.is_mapped = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "is_mapped",
-			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
-			.offset        = offsetof(vulkan_buffer_t, is_mapped),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
-			.offset        = offsetof(vulkan_buffer_t, size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.used = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "used",
-			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
-			.offset        = offsetof(vulkan_buffer_t, used),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.usage_flags = {
-			.type_info     = &DEFAULT_typedata_VkBufferUsageFlags,
-			.member_name   = "usage_flags",
-			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
-			.offset        = offsetof(vulkan_buffer_t, usage_flags),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.allocation = {
-			.type_info     = &DEFAULT_typedata_structure_vulkan_allocation_info_t.type_info,
-			.member_name   = "allocation",
-			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
-			.offset        = offsetof(vulkan_buffer_t, allocation),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.last_used_timestamp = {
+		.width = {
 			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "last_used_timestamp",
-			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
-			.offset        = offsetof(vulkan_buffer_t, last_used_timestamp),
+			.member_name   = "width",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
+			.offset        = offsetof(RHI_image_create_info_t, width),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.height = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "height",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
+			.offset        = offsetof(RHI_image_create_info_t, height),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.format = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "format",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
+			.offset        = offsetof(RHI_image_create_info_t, format),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.usage = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.member_name   = "usage",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
+			.offset        = offsetof(RHI_image_create_info_t, usage),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.sampler_info = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info,
+			.member_name   = "sampler_info",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
+			.offset        = offsetof(RHI_image_create_info_t, sampler_info),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
 
+constexpr type_info_procedure_RHI_image_create DEFAULT_typedata_procedure_RHI_image_create = {
+	.type_info = {
+		.type_name = "RHI_image_create",
+		.type_id = TYPE_RHI_image_create,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_image_create.argument_array,
+	.arguments = {
+		.render_state = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "render_state",
+			.parent        = &DEFAULT_typedata_procedure_RHI_image_create.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.image_create_info = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
+			.member_name   = "image_create_info",
+			.parent        = &DEFAULT_typedata_procedure_RHI_image_create.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_image_destroy DEFAULT_typedata_procedure_RHI_image_destroy = {
+	.type_info = {
+		.type_name = "RHI_image_destroy",
+		.type_id = TYPE_RHI_image_destroy,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_image_destroy.argument_array,
+	.arguments = {
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_image_destroy.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.image = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.member_name   = "image",
+			.parent        = &DEFAULT_typedata_procedure_RHI_image_destroy.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_image_update_data DEFAULT_typedata_procedure_RHI_image_update_data = {
+	.type_info = {
+		.type_name = "RHI_image_update_data",
+		.type_id = TYPE_RHI_image_update_data,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_image_update_data.argument_array,
+	.arguments = {
+		.backend_context = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "backend_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_image_update_data.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.image = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.member_name   = "image",
+			.parent        = &DEFAULT_typedata_procedure_RHI_image_update_data.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_get_command_list DEFAULT_typedata_procedure_RHI_get_command_list = {
+	.type_info = {
+		.type_name = "RHI_get_command_list",
+		.type_id = TYPE_RHI_get_command_list,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_get_command_list.argument_array,
+	.arguments = {
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_get_command_list.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.type = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
+			.member_name   = "type",
+			.parent        = &DEFAULT_typedata_procedure_RHI_get_command_list.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_find_texture_index DEFAULT_typedata_procedure_RHI_find_texture_index = {
+	.type_info = {
+		.type_name = "RHI_find_texture_index",
+		.type_id = TYPE_RHI_find_texture_index,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_s32,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_find_texture_index.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_find_texture_index.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.ID = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "ID",
+			.parent        = &DEFAULT_typedata_procedure_RHI_find_texture_index.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_reset_command_list DEFAULT_typedata_procedure_RHI_reset_command_list = {
+	.type_info = {
+		.type_name = "RHI_reset_command_list",
+		.type_id = TYPE_RHI_reset_command_list,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_reset_command_list.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_reset_command_list.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_is_texture_bound DEFAULT_typedata_procedure_RHI_is_texture_bound = {
+	.type_info = {
+		.type_name = "RHI_is_texture_bound",
+		.type_id = TYPE_RHI_is_texture_bound,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_s32,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_is_texture_bound.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_is_texture_bound.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.texture = {
+			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
+			.member_name   = "texture",
+			.parent        = &DEFAULT_typedata_procedure_RHI_is_texture_bound.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_set_texture_filter_mode DEFAULT_typedata_procedure_RHI_set_texture_filter_mode = {
+	.type_info = {
+		.type_name = "RHI_set_texture_filter_mode",
+		.type_id = TYPE_RHI_set_texture_filter_mode,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 3,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_set_texture_filter_mode.argument_array,
+	.arguments = {
+		.render_state = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "render_state",
+			.parent        = &DEFAULT_typedata_procedure_RHI_set_texture_filter_mode.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.texture = {
+			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
+			.member_name   = "texture",
+			.parent        = &DEFAULT_typedata_procedure_RHI_set_texture_filter_mode.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.filter_mode = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "filter_mode",
+			.parent        = &DEFAULT_typedata_procedure_RHI_set_texture_filter_mode.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_renderpass_begin DEFAULT_typedata_procedure_RHI_cmd_renderpass_begin = {
+	.type_info = {
+		.type_name = "RHI_cmd_renderpass_begin",
+		.type_id = TYPE_RHI_cmd_renderpass_begin,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_renderpass_begin.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_renderpass_begin.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.renderpassID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "renderpassID",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_renderpass_begin.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_renderpass_end DEFAULT_typedata_procedure_RHI_cmd_renderpass_end = {
+	.type_info = {
+		.type_name = "RHI_cmd_renderpass_end",
+		.type_id = TYPE_RHI_cmd_renderpass_end,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_renderpass_end.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_renderpass_end.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_begin_render_group DEFAULT_typedata_procedure_RHI_cmd_begin_render_group = {
+	.type_info = {
+		.type_name = "RHI_cmd_begin_render_group",
+		.type_id = TYPE_RHI_cmd_begin_render_group,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_begin_render_group.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_begin_render_group.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_end_render_group DEFAULT_typedata_procedure_RHI_cmd_end_render_group = {
+	.type_info = {
+		.type_name = "RHI_cmd_end_render_group",
+		.type_id = TYPE_RHI_cmd_end_render_group,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_end_render_group.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_end_render_group.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_bind_index_buffer DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer = {
+	.type_info = {
+		.type_name = "RHI_cmd_bind_index_buffer",
+		.type_id = TYPE_RHI_cmd_bind_index_buffer,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_set_scissor DEFAULT_typedata_procedure_RHI_cmd_set_scissor = {
+	.type_info = {
+		.type_name = "RHI_cmd_set_scissor",
+		.type_id = TYPE_RHI_cmd_set_scissor,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 3,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_set_scissor.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_scissor.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.offset = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "offset",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_scissor.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "size",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_scissor.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_set_viewport DEFAULT_typedata_procedure_RHI_cmd_set_viewport = {
+	.type_info = {
+		.type_name = "RHI_cmd_set_viewport",
+		.type_id = TYPE_RHI_cmd_set_viewport,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 3,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_set_viewport.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_viewport.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.offset = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "offset",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_viewport.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "size",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_viewport.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_update_push_constants DEFAULT_typedata_procedure_RHI_cmd_update_push_constants = {
+	.type_info = {
+		.type_name = "RHI_cmd_update_push_constants",
+		.type_id = TYPE_RHI_cmd_update_push_constants,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 4,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_update_push_constants.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_push_constants.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "offset",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_push_constants.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "size",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_push_constants.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.data = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "data",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_push_constants.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_update_buffer_contents DEFAULT_typedata_procedure_RHI_cmd_update_buffer_contents = {
+	.type_info = {
+		.type_name = "RHI_cmd_update_buffer_contents",
+		.type_id = TYPE_RHI_cmd_update_buffer_contents,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 4,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_update_buffer_contents.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_buffer_contents.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_buffer_contents.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.data = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "data",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_buffer_contents.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.data_size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "data_size",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_buffer_contents.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_use_shader_program DEFAULT_typedata_procedure_RHI_cmd_use_shader_program = {
+	.type_info = {
+		.type_name = "RHI_cmd_use_shader_program",
+		.type_id = TYPE_RHI_cmd_use_shader_program,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_use_shader_program.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_use_shader_program.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.program = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "program",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_use_shader_program.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_update_constant_buffer DEFAULT_typedata_procedure_RHI_cmd_update_constant_buffer = {
+	.type_info = {
+		.type_name = "RHI_cmd_update_constant_buffer",
+		.type_id = TYPE_RHI_cmd_update_constant_buffer,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 4,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_update_constant_buffer.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_constant_buffer.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_constant_buffer.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.data = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "data",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_constant_buffer.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.data_size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "data_size",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_update_constant_buffer.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_bind_texture_image DEFAULT_typedata_procedure_RHI_cmd_bind_texture_image = {
+	.type_info = {
+		.type_name = "RHI_cmd_bind_texture_image",
+		.type_id = TYPE_RHI_cmd_bind_texture_image,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_bind_texture_image.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_texture_image.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.texture = {
+			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
+			.member_name   = "texture",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_texture_image.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_bind_texture_from_handle DEFAULT_typedata_procedure_RHI_cmd_bind_texture_from_handle = {
+	.type_info = {
+		.type_name = "RHI_cmd_bind_texture_from_handle",
+		.type_id = TYPE_RHI_cmd_bind_texture_from_handle,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_bind_texture_from_handle.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_texture_from_handle.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.asset_handle = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "asset_handle",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_texture_from_handle.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_reset_render_state DEFAULT_typedata_procedure_RHI_cmd_reset_render_state = {
+	.type_info = {
+		.type_name = "RHI_cmd_reset_render_state",
+		.type_id = TYPE_RHI_cmd_reset_render_state,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_reset_render_state.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_reset_render_state.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.render_pipeline_state = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.member_name   = "render_pipeline_state",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_reset_render_state.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_set_render_state DEFAULT_typedata_procedure_RHI_cmd_set_render_state = {
+	.type_info = {
+		.type_name = "RHI_cmd_set_render_state",
+		.type_id = TYPE_RHI_cmd_set_render_state,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_set_render_state.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_render_state.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.render_pipeline_state = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.member_name   = "render_pipeline_state",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_render_state.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_draw DEFAULT_typedata_procedure_RHI_cmd_draw = {
+	.type_info = {
+		.type_name = "RHI_cmd_draw",
+		.type_id = TYPE_RHI_cmd_draw,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 5,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_draw.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.vertex_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_count",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.vertex_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_offset",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.instance_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "instance_count",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.first_instance = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "first_instance",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_draw_indexed DEFAULT_typedata_procedure_RHI_cmd_draw_indexed = {
+	.type_info = {
+		.type_name = "RHI_cmd_draw_indexed",
+		.type_id = TYPE_RHI_cmd_draw_indexed,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 5,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_draw_indexed.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw_indexed.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.index_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "index_count",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw_indexed.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.index_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "index_offset",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw_indexed.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.instance_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "instance_count",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw_indexed.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.first_instance = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "first_instance",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw_indexed.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_dispatch_compute DEFAULT_typedata_procedure_RHI_cmd_dispatch_compute = {
+	.type_info = {
+		.type_name = "RHI_cmd_dispatch_compute",
+		.type_id = TYPE_RHI_cmd_dispatch_compute,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 4,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_dispatch_compute.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_dispatch_compute.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.invoke_x = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "invoke_x",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_dispatch_compute.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.invoke_y = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "invoke_y",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_dispatch_compute.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.invoke_z = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "invoke_z",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_dispatch_compute.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_blit_image DEFAULT_typedata_procedure_RHI_cmd_blit_image = {
+	.type_info = {
+		.type_name = "RHI_cmd_blit_image",
+		.type_id = TYPE_RHI_cmd_blit_image,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 7,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_blit_image.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_blit_image.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.source_image = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.member_name   = "source_image",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_blit_image.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.dest_image = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.member_name   = "dest_image",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_blit_image.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.source_offset = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "source_offset",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_blit_image.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.source_blit_size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "source_blit_size",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_blit_image.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.dest_offset = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "dest_offset",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_blit_image.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.dest_blit_size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "dest_blit_size",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_blit_image.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_blit_renderpass DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass = {
+	.type_info = {
+		.type_name = "RHI_cmd_blit_renderpass",
+		.type_id = TYPE_RHI_cmd_blit_renderpass,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 3,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.source_ID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "source_ID",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.destination_ID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "destination_ID",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_cmd_present DEFAULT_typedata_procedure_RHI_cmd_present = {
+	.type_info = {
+		.type_name = "RHI_cmd_present",
+		.type_id = TYPE_RHI_cmd_present,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_present.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_present.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.presentation_source = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.member_name   = "presentation_source",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_present.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_execute_backend_commands DEFAULT_typedata_procedure_RHI_execute_backend_commands = {
+	.type_info = {
+		.type_name = "RHI_execute_backend_commands",
+		.type_id = TYPE_RHI_execute_backend_commands,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_execute_backend_commands.argument_array,
+	.arguments = {
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_execute_backend_commands.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_t DEFAULT_typedata_backend_buffer_t = {
+	.type_name = "backend_buffer_t",
+	.type_id = TYPE_backend_buffer_t,
+	.size = athena_internal::safe_sizeof<backend_buffer_t>(),
+};
 constexpr type_info_t DEFAULT_typedata_backend_command_buffer_t = {
 	.type_name = "backend_command_buffer_t",
 	.type_id = TYPE_backend_command_buffer_t,
@@ -25487,11 +25007,11 @@ constexpr type_info_procedure_backend_buffer_create DEFAULT_typedata_procedure_b
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_structure_render_buffer_t.type_info,
+	.return_type    = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
 	.argument_pointer = DEFAULT_typedata_procedure_backend_buffer_create.argument_array,
 	.arguments = {
 		.buffer_desc = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_desc_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info,
 			.member_name   = "buffer_desc",
 			.parent        = &DEFAULT_typedata_procedure_backend_buffer_create.type_info,
 			.flags         = 2,
@@ -25510,7 +25030,7 @@ constexpr type_info_procedure_backend_buffer_copy_data DEFAULT_typedata_procedur
 	.argument_pointer = DEFAULT_typedata_procedure_backend_buffer_copy_data.argument_array,
 	.arguments = {
 		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
 			.member_name   = "buffer",
 			.parent        = &DEFAULT_typedata_procedure_backend_buffer_copy_data.type_info,
 			.flags         = 2,
@@ -25550,7 +25070,7 @@ constexpr type_info_procedure_backend_buffer_append_data DEFAULT_typedata_proced
 	.argument_pointer = DEFAULT_typedata_procedure_backend_buffer_append_data.argument_array,
 	.arguments = {
 		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
 			.member_name   = "buffer",
 			.parent        = &DEFAULT_typedata_procedure_backend_buffer_append_data.type_info,
 			.flags         = 2,
@@ -25616,7 +25136,7 @@ constexpr type_info_procedure_backend_buffer_reset DEFAULT_typedata_procedure_ba
 	.argument_pointer = DEFAULT_typedata_procedure_backend_buffer_reset.argument_array,
 	.arguments = {
 		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
 			.member_name   = "buffer",
 			.parent        = &DEFAULT_typedata_procedure_backend_buffer_reset.type_info,
 			.flags         = 2,
@@ -25635,14 +25155,14 @@ constexpr type_info_procedure_backend_renderpass_initialize DEFAULT_typedata_pro
 	.argument_pointer = DEFAULT_typedata_procedure_backend_renderpass_initialize.argument_array,
 	.arguments = {
 		.desc = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_desc_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
 			.member_name   = "desc",
 			.parent        = &DEFAULT_typedata_procedure_backend_renderpass_initialize.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.renderpass = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
 			.member_name   = "renderpass",
 			.parent        = &DEFAULT_typedata_procedure_backend_renderpass_initialize.type_info,
 			.flags         = 2,
@@ -25661,14 +25181,14 @@ constexpr type_info_procedure_backend_image_create DEFAULT_typedata_procedure_ba
 	.argument_pointer = DEFAULT_typedata_procedure_backend_image_create.argument_array,
 	.arguments = {
 		.create_info = {
-			.type_info     = &DEFAULT_typedata_structure_image_create_info_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
 			.member_name   = "create_info",
 			.parent        = &DEFAULT_typedata_procedure_backend_image_create.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "image",
 			.parent        = &DEFAULT_typedata_procedure_backend_image_create.type_info,
 			.flags         = 2,
@@ -25687,7 +25207,7 @@ constexpr type_info_procedure_backend_image_destroy DEFAULT_typedata_procedure_b
 	.argument_pointer = DEFAULT_typedata_procedure_backend_image_destroy.argument_array,
 	.arguments = {
 		.image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "image",
 			.parent        = &DEFAULT_typedata_procedure_backend_image_destroy.type_info,
 			.flags         = 2,
@@ -25706,7 +25226,7 @@ constexpr type_info_procedure_backend_image_update_contents DEFAULT_typedata_pro
 	.argument_pointer = DEFAULT_typedata_procedure_backend_image_update_contents.argument_array,
 	.arguments = {
 		.image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "image",
 			.parent        = &DEFAULT_typedata_procedure_backend_image_update_contents.type_info,
 			.flags         = 2,
@@ -25725,7 +25245,7 @@ constexpr type_info_procedure_backend_acquire_image_sampler DEFAULT_typedata_pro
 	.argument_pointer = DEFAULT_typedata_procedure_backend_acquire_image_sampler.argument_array,
 	.arguments = {
 		.image = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "image",
 			.parent        = &DEFAULT_typedata_procedure_backend_acquire_image_sampler.type_info,
 			.flags         = 2,
@@ -25744,7 +25264,7 @@ constexpr type_info_procedure_backend_shader_create DEFAULT_typedata_procedure_b
 	.argument_pointer = DEFAULT_typedata_procedure_backend_shader_create.argument_array,
 	.arguments = {
 		.shader = {
-			.type_info     = &DEFAULT_typedata_structure_shader_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_shader_t.type_info,
 			.member_name   = "shader",
 			.parent        = &DEFAULT_typedata_procedure_backend_shader_create.type_info,
 			.flags         = 2,
@@ -25770,13 +25290,296 @@ constexpr type_info_procedure_backend_get_command_buffer DEFAULT_typedata_proced
 	.argument_pointer = DEFAULT_typedata_procedure_backend_get_command_buffer.argument_array,
 	.arguments = {
 		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 			.member_name   = "command_list",
 			.parent        = &DEFAULT_typedata_procedure_backend_get_command_buffer.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
+};
+constexpr type_info_struct_RHI_image_filter_type_t DEFAULT_typedata_structure_RHI_image_filter_type_t = {
+	.type_info = {
+		.type_name = "RHI_image_filter_type_t",
+		.type_id = TYPE_RHI_image_filter_type_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<RHI_image_filter_type_t>(),
+	},
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_RHI_image_filter_type_t.member_array,
+	.members = {
+		.RHI_IMAGE_FILTER_TYPE_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_filter_type_t.type_info,
+			.member_name   = "RHI_IMAGE_FILTER_TYPE_INVALID",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_filter_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_IMAGE_FILTER_TYPE_INVALID,
+			},
+		},
+		.RHI_IMAGE_FILTER_TYPE_NEAREST = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_filter_type_t.type_info,
+			.member_name   = "RHI_IMAGE_FILTER_TYPE_NEAREST",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_filter_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_IMAGE_FILTER_TYPE_NEAREST,
+			},
+		},
+		.RHI_IMAGE_FILTER_TYPE_LINEAR = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_filter_type_t.type_info,
+			.member_name   = "RHI_IMAGE_FILTER_TYPE_LINEAR",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_filter_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_IMAGE_FILTER_TYPE_LINEAR,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_image_wrapping_type_t DEFAULT_typedata_structure_RHI_image_wrapping_type_t = {
+	.type_info = {
+		.type_name = "RHI_image_wrapping_type_t",
+		.type_id = TYPE_RHI_image_wrapping_type_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<RHI_image_wrapping_type_t>(),
+	},
+	.member_count   = 4,
+	.member_pointer = DEFAULT_typedata_structure_RHI_image_wrapping_type_t.member_array,
+	.members = {
+		.RHI_IMAGE_WRAPPING_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+			.member_name   = "RHI_IMAGE_WRAPPING_INVALID",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_IMAGE_WRAPPING_INVALID,
+			},
+		},
+		.RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+			.member_name   = "RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE,
+			},
+		},
+		.RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+			.member_name   = "RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER,
+			},
+		},
+		.RHI_IMAGE_WRAPPING_REPEAT = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+			.member_name   = "RHI_IMAGE_WRAPPING_REPEAT",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_IMAGE_WRAPPING_REPEAT,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_image_usage_t DEFAULT_typedata_structure_RHI_image_usage_t = {
+	.type_info = {
+		.type_name = "RHI_image_usage_t",
+		.type_id = TYPE_RHI_image_usage_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<RHI_image_usage_t>(),
+	},
+	.member_count   = 6,
+	.member_pointer = DEFAULT_typedata_structure_RHI_image_usage_t.member_array,
+	.members = {
+		.RHI_IMAGE_USAGE_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.member_name   = "RHI_IMAGE_USAGE_INVALID",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 1,
+			},
+		},
+		.RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.member_name   = "RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 2,
+			},
+		},
+		.RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.member_name   = "RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 4,
+			},
+		},
+		.RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.member_name   = "RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 8,
+			},
+		},
+		.RHI_IMAGE_USAGE_BLIT_SOURCE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.member_name   = "RHI_IMAGE_USAGE_BLIT_SOURCE",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 16,
+			},
+		},
+		.RHI_IMAGE_USAGE_BLIT_DESTINATION = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.member_name   = "RHI_IMAGE_USAGE_BLIT_DESTINATION",
+			.parent        = &DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 32,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_sampler_create_info_t DEFAULT_typedata_structure_RHI_sampler_create_info_t = {
+	.type_info = {
+		.type_name = "RHI_sampler_create_info_t",
+		.type_id = TYPE_RHI_sampler_create_info_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<RHI_sampler_create_info_t>(),
+	},
+	.member_count   = 8,
+	.member_pointer = DEFAULT_typedata_structure_RHI_sampler_create_info_t.member_array,
+	.members = {
+		.filtering = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_filter_type_t.type_info,
+			.member_name   = "filtering",
+			.parent        = &DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info,
+			.offset        = offsetof(RHI_sampler_create_info_t, filtering),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.anisotropy_enabled = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "anisotropy_enabled",
+			.parent        = &DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info,
+			.offset        = offsetof(RHI_sampler_create_info_t, anisotropy_enabled),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.max_anisotropy = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "max_anisotropy",
+			.parent        = &DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info,
+			.offset        = offsetof(RHI_sampler_create_info_t, max_anisotropy),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.wrapu = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+			.member_name   = "wrapu",
+			.parent        = &DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info,
+			.offset        = offsetof(RHI_sampler_create_info_t, wrapu),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.wrapv = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+			.member_name   = "wrapv",
+			.parent        = &DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info,
+			.offset        = offsetof(RHI_sampler_create_info_t, wrapv),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.compare_operation = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "compare_operation",
+			.parent        = &DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info,
+			.offset        = offsetof(RHI_sampler_create_info_t, compare_operation),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.compare_ops_enabled = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "compare_ops_enabled",
+			.parent        = &DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info,
+			.offset        = offsetof(RHI_sampler_create_info_t, compare_ops_enabled),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.use_normalized_coordinates = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "use_normalized_coordinates",
+			.parent        = &DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info,
+			.offset        = offsetof(RHI_sampler_create_info_t, use_normalized_coordinates),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_procedure_RHI_image_create_from_bitmap DEFAULT_typedata_procedure_RHI_image_create_from_bitmap = {
+	.type_info = {
+		.type_name = "RHI_image_create_from_bitmap",
+		.type_id = TYPE_RHI_image_create_from_bitmap,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_image_create_from_bitmap.argument_array,
+	.arguments = {
+		.bitmap = {
+			.type_info     = &DEFAULT_typedata_structure_bitmap_t.type_info,
+			.member_name   = "bitmap",
+			.parent        = &DEFAULT_typedata_procedure_RHI_image_create_from_bitmap.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_t DEFAULT_typedata_backend_image_t = {
+	.type_name = "backend_image_t",
+	.type_id = TYPE_backend_image_t,
+	.size = athena_internal::safe_sizeof<backend_image_t>(),
 };
 constexpr type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_state_t = {
 	.type_info = {
@@ -26879,11 +26682,11 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.renderer = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer",
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
 			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
-			.offset        = offsetof(ui_state_t, renderer),
+			.offset        = offsetof(ui_state_t, RHI_context),
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
@@ -27096,7 +26899,7 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.pointer_depth = 0,
 		},
 		.vertex_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 			.member_name   = "vertex_buffer",
 			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.offset        = offsetof(ui_state_t, vertex_buffer),
@@ -27104,7 +26907,7 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.pointer_depth = 0,
 		},
 		.index_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_render_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
 			.member_name   = "index_buffer",
 			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.offset        = offsetof(ui_state_t, index_buffer),
@@ -27128,7 +26931,7 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.pointer_depth = 0,
 		},
 		.widget_instance_data = {
-			.type_info     = &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
 			.member_name   = "widget_instance_data",
 			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.offset        = offsetof(ui_state_t, widget_instance_data),
@@ -27136,7 +26939,7 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.pointer_depth = 1,
 		},
 		.camera_matrices_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
 			.member_name   = "camera_matrices_buffer",
 			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.offset        = offsetof(ui_state_t, camera_matrices_buffer),
@@ -27177,9 +26980,9 @@ constexpr type_info_procedure_ui_state_init DEFAULT_typedata_procedure_ui_state_
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
 			.parent        = &DEFAULT_typedata_procedure_ui_state_init.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
@@ -27249,7 +27052,7 @@ constexpr type_info_procedure_ui_state_render_widgets DEFAULT_typedata_procedure
 			.pointer_depth = 1,
 		},
 		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 			.member_name   = "command_list",
 			.parent        = &DEFAULT_typedata_procedure_ui_state_render_widgets.type_info,
 			.flags         = 2,
@@ -27476,7 +27279,7 @@ constexpr type_info_procedure_ui_state_end_frame DEFAULT_typedata_procedure_ui_s
 			.pointer_depth = 1,
 		},
 		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_render_command_list_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 			.member_name   = "command_list",
 			.parent        = &DEFAULT_typedata_procedure_ui_state_end_frame.type_info,
 			.flags         = 2,
@@ -29115,6 +28918,75 @@ constexpr type_info_t DEFAULT_typedata_VkDevice = {
 	.type_id = TYPE_VkDevice,
 	.size = athena_internal::safe_sizeof<VkDevice>(),
 };
+constexpr type_info_struct_vulkan_buffer_t DEFAULT_typedata_structure_vulkan_buffer_t = {
+	.type_info = {
+		.type_name = "vulkan_buffer_t",
+		.type_id = TYPE_vulkan_buffer_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<vulkan_buffer_t>(),
+	},
+	.member_count   = 7,
+	.member_pointer = DEFAULT_typedata_structure_vulkan_buffer_t.member_array,
+	.members = {
+		.handle = {
+			.type_info     = &DEFAULT_typedata_VkBuffer,
+			.member_name   = "handle",
+			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
+			.offset        = offsetof(vulkan_buffer_t, handle),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.is_mapped = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "is_mapped",
+			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
+			.offset        = offsetof(vulkan_buffer_t, is_mapped),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.size = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "size",
+			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
+			.offset        = offsetof(vulkan_buffer_t, size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.used = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "used",
+			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
+			.offset        = offsetof(vulkan_buffer_t, used),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.usage_flags = {
+			.type_info     = &DEFAULT_typedata_VkBufferUsageFlags,
+			.member_name   = "usage_flags",
+			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
+			.offset        = offsetof(vulkan_buffer_t, usage_flags),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.allocation = {
+			.type_info     = &DEFAULT_typedata_structure_vulkan_allocation_info_t.type_info,
+			.member_name   = "allocation",
+			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
+			.offset        = offsetof(vulkan_buffer_t, allocation),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.last_used_timestamp = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "last_used_timestamp",
+			.parent        = &DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
+			.offset        = offsetof(vulkan_buffer_t, last_used_timestamp),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
 constexpr type_info_t DEFAULT_typedata_VkCommandBuffer = {
 	.type_name = "VkCommandBuffer",
 	.type_id = TYPE_VkCommandBuffer,
@@ -30754,22 +30626,22 @@ constexpr type_info_procedure_vk_backend_initialize_RHI_renderpass DEFAULT_typed
 	.return_type    = &DEFAULT_typedata_u32,
 	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_initialize_RHI_renderpass.argument_array,
 	.arguments = {
-		.renderer_state = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_state_t.type_info,
-			.member_name   = "renderer_state",
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
 			.parent        = &DEFAULT_typedata_procedure_vk_backend_initialize_RHI_renderpass.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.renderpass_desc = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_desc_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
 			.member_name   = "renderpass_desc",
 			.parent        = &DEFAULT_typedata_procedure_vk_backend_initialize_RHI_renderpass.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.renderpass = {
-			.type_info     = &DEFAULT_typedata_structure_renderpass_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
 			.member_name   = "renderpass",
 			.parent        = &DEFAULT_typedata_procedure_vk_backend_initialize_RHI_renderpass.type_info,
 			.flags         = 2,
@@ -30920,7 +30792,7 @@ constexpr type_info_procedure_vk_backend_framebuffer_create DEFAULT_typedata_pro
 			.pointer_depth = 0,
 		},
 		.attachments = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "attachments",
 			.parent        = &DEFAULT_typedata_procedure_vk_backend_framebuffer_create.type_info,
 			.flags         = 2,
@@ -30982,7 +30854,7 @@ constexpr type_info_procedure_vk_backend_renderpass_create DEFAULT_typedata_proc
 			.pointer_depth = 1,
 		},
 		.attachments = {
-			.type_info     = &DEFAULT_typedata_structure_image_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
 			.member_name   = "attachments",
 			.parent        = &DEFAULT_typedata_procedure_vk_backend_renderpass_create.type_info,
 			.flags         = 2,
@@ -31990,7 +31862,7 @@ constexpr type_info_procedure_vk_sampler_info_is_valid DEFAULT_typedata_procedur
 	.argument_pointer = DEFAULT_typedata_procedure_vk_sampler_info_is_valid.argument_array,
 	.arguments = {
 		.create_info = {
-			.type_info     = &DEFAULT_typedata_structure_image_create_info_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
 			.member_name   = "create_info",
 			.parent        = &DEFAULT_typedata_procedure_vk_sampler_info_is_valid.type_info,
 			.flags         = 2,
@@ -32324,8 +32196,8 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_ticket_mutex_wait.type_info,
 	&DEFAULT_typedata_procedure_c_ticket_mutex_advance_ticket.type_info,
 	&DEFAULT_typedata_procedure_c_ticket_mutex_take_and_wait.type_info,
-	&DEFAULT_typedata_structure_render_command_list_t.type_info,
-	&DEFAULT_typedata_structure_vertex_buffer_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+	&DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 	&DEFAULT_typedata_structure_texture2D_t.type_info,
 	&DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
 	&DEFAULT_typedata_procedure_immediate_rect.type_info,
@@ -32384,7 +32256,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_global_context_reset_context_arena.type_info,
 	&DEFAULT_typedata_procedure_gc_reset_context_arena.type_info,
 	&DEFAULT_typedata_structure_threadpool_t.type_info,
-	&DEFAULT_typedata_structure_renderer_state_t.type_info,
+	&DEFAULT_typedata_structure_RHI_context_t.type_info,
 	&DEFAULT_typedata_structure_input_manager_t.type_info,
 	&DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
 	&DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t.type_info,
@@ -32540,25 +32412,13 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_sys_mutex_unlock.type_info,
 	&DEFAULT_typedata_procedure_sys_create_process.type_info,
 	&DEFAULT_typedata_procedure_sys_wait_for_process.type_info,
-	&DEFAULT_typedata_structure_render_image_filter_type_t.type_info,
-	&DEFAULT_typedata_structure_render_image_wrapping_type_t.type_info,
-	&DEFAULT_typedata_structure_render_image_usage_t.type_info,
-	&DEFAULT_typedata_structure_sampler_create_info_t.type_info,
-	&DEFAULT_typedata_structure_image_create_info_t.type_info,
-	&DEFAULT_typedata_structure_image_t.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_image_create.type_info,
-	&DEFAULT_typedata_structure_bitmap_t.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_image_create_from_bitmap.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_image_destroy.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_image_update_data.type_info,
 	&DEFAULT_typedata_structure_asset_type_t.type_info,
 	&DEFAULT_typedata_structure_asset_slot_load_status_t.type_info,
 	&DEFAULT_typedata_structure_bitmap_format_t.type_info,
+	&DEFAULT_typedata_structure_bitmap_t.type_info,
 	&DEFAULT_typedata_structure_subtexture_data_t.type_info,
 	&DEFAULT_typedata_structure_texture_atlas_t.type_info,
-	&DEFAULT_typedata_structure_animation_source2D_t.type_info,
-	&DEFAULT_typedata_structure_animation2D_t.type_info,
-	&DEFAULT_typedata_structure_shader_t.type_info,
+	&DEFAULT_typedata_structure_RHI_shader_t.type_info,
 	&DEFAULT_typedata_structure_material_instance_t.type_info,
 	&DEFAULT_typedata_structure_material_archetype_t.type_info,
 	&DEFAULT_typedata_structure_stored_material_type_t.type_info,
@@ -32597,7 +32457,8 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_s_asset_font_get_string_size.type_info,
 	&DEFAULT_typedata_procedure_s_asset_font_acquire_font_at_size.type_info,
 	&DEFAULT_typedata_procedure_s_asset_font_fetch_glyph.type_info,
-	&DEFAULT_typedata_structure_render_pipeline_state_t.type_info,
+	&DEFAULT_typedata_structure_RHI_image_t.type_info,
+	&DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
 	&DEFAULT_typedata_structure_controller_type_t.type_info,
 	&DEFAULT_typedata_structure_input_mouse_buttons_t.type_info,
 	&DEFAULT_typedata_structure_action_button_t.type_info,
@@ -32640,82 +32501,85 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_s_im_consume_gamepad_button_release.type_info,
 	&DEFAULT_typedata_procedure_s_im_get_button_state.type_info,
 	&DEFAULT_typedata_structure_camera_matrices_t.type_info,
-	&DEFAULT_typedata_structure_render_buffer_type_t.type_info,
-	&DEFAULT_typedata_structure_render_buffer_advance_rate_t.type_info,
-	&DEFAULT_typedata_structure_render_buffer_memory_type_t.type_info,
-	&DEFAULT_typedata_structure_render_buffer_desc_t.type_info,
-	&DEFAULT_typedata_structure_render_buffer_t.type_info,
-	&DEFAULT_typedata_structure_index_buffer_t.type_info,
-	&DEFAULT_typedata_structure_uniform_constant_buffer_t.type_info,
-	&DEFAULT_typedata_structure_render_command_type_t.type_info,
-	&DEFAULT_typedata_structure_render_command_header_t.type_info,
-	&DEFAULT_typedata_structure_render_command_begin_renderpass_t.type_info,
-	&DEFAULT_typedata_structure_render_command_end_renderpass_t.type_info,
-	&DEFAULT_typedata_structure_render_command_bind_vertex_buffer_t.type_info,
-	&DEFAULT_typedata_structure_render_command_bind_index_buffer_t.type_info,
-	&DEFAULT_typedata_structure_render_command_update_texture_t.type_info,
-	&DEFAULT_typedata_structure_render_command_bind_material_t.type_info,
-	&DEFAULT_typedata_structure_render_command_bind_shader_t.type_info,
-	&DEFAULT_typedata_structure_render_command_set_viewport_t.type_info,
-	&DEFAULT_typedata_structure_render_command_set_scissor_t.type_info,
-	&DEFAULT_typedata_structure_render_command_update_push_constant_t.type_info,
-	&DEFAULT_typedata_structure_render_command_update_uniform_constant_buffer_t.type_info,
-	&DEFAULT_typedata_structure_render_command_update_render_buffer_contents_t.type_info,
-	&DEFAULT_typedata_structure_render_command_bind_texture_t.type_info,
-	&DEFAULT_typedata_structure_render_command_dispatch_compute_t.type_info,
-	&DEFAULT_typedata_structure_render_command_set_pipeline_state_t.type_info,
-	&DEFAULT_typedata_structure_render_command_draw_t.type_info,
-	&DEFAULT_typedata_structure_render_command_blit_image_t.type_info,
-	&DEFAULT_typedata_structure_render_command_blit_renderpass_t.type_info,
-	&DEFAULT_typedata_structure_render_command_present_frame_t.type_info,
-	&DEFAULT_typedata_structure_render_command_t.type_info,
-	&DEFAULT_typedata_structure_command_list_type_t.type_info,
-	&DEFAULT_typedata_structure_clear_value_t.type_info,
-	&DEFAULT_typedata_structure_renderpass_attachment_access_t.type_info,
-	&DEFAULT_typedata_structure_renderpass_attachment_load_operation_t.type_info,
-	&DEFAULT_typedata_structure_renderpass_attachment_store_operation_t.type_info,
-	&DEFAULT_typedata_structure_renderpass_attachment_t.type_info,
-	&DEFAULT_typedata_structure_renderpass_desc_t.type_info,
-	&DEFAULT_typedata_structure_renderpass_key_t.type_info,
-	&DEFAULT_typedata_structure_renderpass_t.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_state_init.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_handle_window_resize.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_resize_render_targets.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_build_renderpass.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_resize_renderpass.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_get_constant_buffer.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_render_buffer_create.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_vertex_buffer_create.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_index_buffer_create.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_render_buffer_copy_data.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_get_command_list.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_is_texture_bound.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_set_texture_filter_mode.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_find_texture_index.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_reset_command_list.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_renderpass_begin.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_renderpass_end.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_begin_render_group.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_end_render_group.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_bind_index_buffer.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_set_scissor.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_set_viewport.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_update_push_constants.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_update_buffer_contents.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_use_shader_program.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_update_constant_buffer.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_bind_texture_image.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_bind_texture_from_handle.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_reset_render_state.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_set_render_state.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_draw.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_draw_indexed.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_dispatch_compute.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_blit_image.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_blit_renderpass.type_info,
-	&DEFAULT_typedata_procedure_r_cmd_present.type_info,
-	&DEFAULT_typedata_procedure_s_renderer_execute_backend_commands.type_info,
-	&DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
+	&DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
+	&DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info,
+	&DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info,
+	&DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info,
+	&DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+	&DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+	&DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_header_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_begin_renderpass_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_end_renderpass_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_bind_index_buffer_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_update_texture_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_bind_material_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_bind_shader_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_set_viewport_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_set_scissor_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_update_push_constant_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_bind_texture_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_dispatch_compute_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_set_pipeline_state_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_draw_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_blit_image_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_blit_renderpass_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_present_frame_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
+	&DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+	&DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
+	&DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info,
+	&DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info,
+	&DEFAULT_typedata_structure_RHI_renderpass_attachment_t.type_info,
+	&DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info,
+	&DEFAULT_typedata_structure_RHI_renderpass_key_t.type_info,
+	&DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+	&DEFAULT_typedata_procedure_RHI_context_init.type_info,
+	&DEFAULT_typedata_procedure_RHI_handle_window_resize.type_info,
+	&DEFAULT_typedata_procedure_RHI_resize_render_targets.type_info,
+	&DEFAULT_typedata_procedure_RHI_build_renderpass.type_info,
+	&DEFAULT_typedata_procedure_RHI_resize_renderpass.type_info,
+	&DEFAULT_typedata_procedure_RHI_get_constant_buffer.type_info,
+	&DEFAULT_typedata_procedure_RHI_render_buffer_create.type_info,
+	&DEFAULT_typedata_procedure_RHI_vertex_buffer_create.type_info,
+	&DEFAULT_typedata_procedure_RHI_index_buffer_create.type_info,
+	&DEFAULT_typedata_procedure_RHI_render_buffer_copy_data.type_info,
+	&DEFAULT_typedata_structure_RHI_image_create_info_t.type_info,
+	&DEFAULT_typedata_procedure_RHI_image_create.type_info,
+	&DEFAULT_typedata_procedure_RHI_image_destroy.type_info,
+	&DEFAULT_typedata_procedure_RHI_image_update_data.type_info,
+	&DEFAULT_typedata_procedure_RHI_get_command_list.type_info,
+	&DEFAULT_typedata_procedure_RHI_find_texture_index.type_info,
+	&DEFAULT_typedata_procedure_RHI_reset_command_list.type_info,
+	&DEFAULT_typedata_procedure_RHI_is_texture_bound.type_info,
+	&DEFAULT_typedata_procedure_RHI_set_texture_filter_mode.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_renderpass_begin.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_renderpass_end.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_begin_render_group.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_end_render_group.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_set_scissor.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_set_viewport.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_update_push_constants.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_update_buffer_contents.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_use_shader_program.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_update_constant_buffer.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_bind_texture_image.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_bind_texture_from_handle.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_reset_render_state.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_set_render_state.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_draw.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_draw_indexed.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_dispatch_compute.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_blit_image.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_present.type_info,
+	&DEFAULT_typedata_procedure_RHI_execute_backend_commands.type_info,
 	&DEFAULT_typedata_procedure_backend_initialize.type_info,
 	&DEFAULT_typedata_procedure_backend_handle_window_resize.type_info,
 	&DEFAULT_typedata_procedure_backend_render_frame.type_info,
@@ -32731,6 +32595,11 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_backend_acquire_image_sampler.type_info,
 	&DEFAULT_typedata_procedure_backend_shader_create.type_info,
 	&DEFAULT_typedata_procedure_backend_get_command_buffer.type_info,
+	&DEFAULT_typedata_structure_RHI_image_filter_type_t.type_info,
+	&DEFAULT_typedata_structure_RHI_image_wrapping_type_t.type_info,
+	&DEFAULT_typedata_structure_RHI_image_usage_t.type_info,
+	&DEFAULT_typedata_structure_RHI_sampler_create_info_t.type_info,
+	&DEFAULT_typedata_procedure_RHI_image_create_from_bitmap.type_info,
 	&DEFAULT_typedata_structure_widget_state_t.type_info,
 	&DEFAULT_typedata_structure_ui_signal_flags_t.type_info,
 	&DEFAULT_typedata_structure_ui_signal_t.type_info,
@@ -32782,6 +32651,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_vk_allocator_destroy.type_info,
 	&DEFAULT_typedata_procedure_vk_allocator_allocate.type_info,
 	&DEFAULT_typedata_procedure_vk_allocator_free.type_info,
+	&DEFAULT_typedata_structure_vulkan_buffer_t.type_info,
 	&DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer.type_info,
 	&DEFAULT_typedata_procedure_vk_backend_buffer_copy_data.type_info,
 	&DEFAULT_typedata_procedure_vk_backend_buffer_create.type_info,
@@ -32867,9 +32737,9 @@ enum class ticket_mutex_t {
 	next_ticket,
 	working_ticket,
 }; // ticket_mutex_t
-enum class render_command_list_t {
+enum class RHI_command_list_t {
 	is_initialized,
-	renderer_state,
+	RHI_context,
 	transient_arena,
 	command_arena,
 	commands,
@@ -32885,9 +32755,6 @@ enum class render_command_list_t {
 	active_scissor_command,
 	active_viewport_command,
 	active_shader_program,
-	vertex_offset,
-	instance_offset,
-	index_offset,
 	active_renderpass,
 	presenting,
 	image_shader_params,
@@ -32896,13 +32763,13 @@ enum class render_command_list_t {
 	bound_image_count,
 	command_list_type,
 	backend_command_buffer,
-}; // render_command_list_t
-enum class vertex_buffer_t {
-	buffer,
+}; // RHI_command_list_t
+enum class RHI_vertex_buffer_t {
+	buffer_data,
 	vertex_data,
 	max_vertices,
 	vertex_count,
-}; // vertex_buffer_t
+}; // RHI_vertex_buffer_t
 enum class texture2D_t {
 	ID,
 	bitmap,
@@ -32928,7 +32795,7 @@ enum class asset_manager_t {
 	font_catalog,
 	sound_catalog,
 	font_manager,
-	renderer_state,
+	RHI_context,
 }; // asset_manager_t
 enum class asset_handle_t {
 	is_valid,
@@ -32937,8 +32804,6 @@ enum class asset_handle_t {
 	shader,
 	material_info,
 	dynamic_render_font,
-	animation_source2D,
-	animation2D,
 }; // asset_handle_t
 enum class string_t {
 	data,
@@ -33052,7 +32917,7 @@ enum class global_context_t {
 	running,
 	should_reload,
 	main_threadpool,
-	renderer_state,
+	RHI_context,
 	asset_manager,
 	input_manager,
 	file_watcher,
@@ -33067,10 +32932,10 @@ enum class threadpool_t {
 	threads_flushed,
 	next_worker_index,
 }; // threadpool_t
-enum class renderer_state_t {
+enum class RHI_context_t {
 	window,
-	render_context,
-	renderer_arena,
+	backend_render_context,
+	RHI_arena,
 	transient_arena,
 	command_lists,
 	command_list_count,
@@ -33101,7 +32966,7 @@ enum class renderer_state_t {
 	backend_acquire_image_sampler,
 	backend_shader_create,
 	backend_get_command_buffer,
-}; // renderer_state_t
+}; // RHI_context_t
 enum class input_manager_t {
 	keyboard_data,
 	gamepad_data,
@@ -33258,55 +33123,6 @@ enum class zone_allocator_block_t {
 	next_block,
 	prev_block,
 }; // zone_allocator_block_t
-enum class render_image_filter_type_t {
-	IMAGE_FILTER_TYPE_INVALID,
-	IMAGE_FILTER_TYPE_NEAREST,
-	IMAGE_FILTER_TYPE_LINEAR,
-}; // render_image_filter_type_t
-enum class render_image_wrapping_type_t {
-	IMAGE_WRAPPING_INVALID,
-	IMAGE_WRAPPING_CLAMP_TO_EDGE,
-	IMAGE_WRAPPING_CLAMP_TO_BORDER,
-	IMAGE_WRAPPING_REPEAT,
-}; // render_image_wrapping_type_t
-enum class render_image_usage_t {
-	IMAGE_USAGE_INVALID,
-	IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT,
-	IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT,
-	IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
-	IMAGE_USAGE_BLIT_SOURCE,
-	IMAGE_USAGE_BLIT_DESTINATION,
-}; // render_image_usage_t
-enum class sampler_create_info_t {
-	filtering,
-	anisotropy_enabled,
-	max_anisotropy,
-	wrapu,
-	wrapv,
-	compare_ops_enabled,
-	compare_operation,
-	use_normalized_coordinates,
-}; // sampler_create_info_t
-enum class image_create_info_t {
-	data,
-	width,
-	height,
-	format,
-	usage,
-	sampler_info,
-}; // image_create_info_t
-enum class image_t {
-	ID,
-	create_info,
-	backend_image,
-}; // image_t
-enum class bitmap_t {
-	width,
-	height,
-	channels,
-	format,
-	pixels,
-}; // bitmap_t
 enum class asset_type_t {
 	AT_Invalid,
 	AT_Bitmap,
@@ -33340,6 +33156,13 @@ enum class bitmap_format_t {
 	BMF_D32_SFLOAT,
 	BMF_Count,
 }; // bitmap_format_t
+enum class bitmap_t {
+	width,
+	height,
+	channels,
+	format,
+	pixels,
+}; // bitmap_t
 enum class subtexture_data_t {
 	uv_min,
 	uv_max,
@@ -33364,21 +33187,10 @@ enum class texture_atlas_t {
 	tallest_y,
 	atlas_size,
 }; // texture_atlas_t
-enum class animation_source2D_t {
-	name,
-	texture,
-	frame_count,
-	frame_timer,
-}; // animation_source2D_t
-enum class animation2D_t {
-	animation_info,
-	current_frame,
-	frame_timer,
-}; // animation2D_t
-enum class shader_t {
+enum class RHI_shader_t {
 	ID,
 	shader_data,
-}; // shader_t
+}; // RHI_shader_t
 enum class material_instance_t {
 	ID,
 	version,
@@ -33467,6 +33279,7 @@ enum class asset_slot_t {
 	ID,
 	slot_state,
 	type,
+	is_valid_for_handles,
 	name,
 	owner_asset_file,
 	package_entry,
@@ -33516,7 +33329,12 @@ enum class texture_atlas_registry_t {
 	atlases,
 	current_atlas_count,
 }; // texture_atlas_registry_t
-enum class render_pipeline_state_t {
+enum class RHI_image_t {
+	ID,
+	create_info,
+	backend_image,
+}; // RHI_image_t
+enum class RHI_pipeline_state_t {
 	blend_enabled,
 	src_color_blend_mode,
 	dst_color_blend_mode,
@@ -33531,7 +33349,7 @@ enum class render_pipeline_state_t {
 	stencil_state,
 	stencil_keep,
 	polygon_mode,
-}; // render_pipeline_state_t
+}; // RHI_pipeline_state_t
 enum class controller_type_t {
 	IM_CONTROLLER_INVALID,
 	IM_CONTROLLER_GAMEPAD,
@@ -33631,28 +33449,28 @@ enum class camera_matrices_t {
 	view_matrix,
 	projection_matrix,
 }; // camera_matrices_t
-enum class render_buffer_type_t {
-	RenderBufferType_Invalid,
-	RenderBufferType_VertexBuffer,
-	RenderBufferType_IndexBuffer,
-}; // render_buffer_type_t
-enum class render_buffer_advance_rate_t {
-	RenderBufferAdvanceRate_PerElement,
-	RenderBufferAdvanceRate_PerInstance,
-}; // render_buffer_advance_rate_t
-enum class render_buffer_memory_type_t {
-	RenderBufferAllocationTypeMapped,
-	RenderBufferAllocationTypeGPUOnly,
-}; // render_buffer_memory_type_t
-enum class render_buffer_desc_t {
+enum class RHI_render_buffer_type_t {
+	RHI_RENDER_BUFFER_TYPE_INVALID,
+	RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER,
+	RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER,
+}; // RHI_render_buffer_type_t
+enum class RHI_render_buffer_advance_rate_t {
+	RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT,
+	RHI_RENDER_BUFFER_ADVANCE_RATE_PER_INSTANCE,
+}; // RHI_render_buffer_advance_rate_t
+enum class RHI_render_buffer_memory_type_t {
+	RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED,
+	RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY,
+}; // RHI_render_buffer_memory_type_t
+enum class RHI_render_buffer_desc_t {
 	type,
 	allocation_type,
 	advance_rate,
 	buffer_capacity,
 	element_size,
 	initial_data,
-}; // render_buffer_desc_t
-enum class render_buffer_t {
+}; // RHI_render_buffer_desc_t
+enum class RHI_render_buffer_t {
 	type,
 	allocation_type,
 	constant_buffer_hash_ID,
@@ -33662,109 +33480,110 @@ enum class render_buffer_t {
 	buffer_elements_used,
 	working_offset,
 	mapped_data,
-	buffer,
-}; // render_buffer_t
-enum class index_buffer_t {
-	buffer,
+	buffer_info,
+}; // RHI_render_buffer_t
+enum class RHI_index_buffer_t {
+	buffer_data,
 	index_data,
 	max_indices,
 	index_count,
-}; // index_buffer_t
-enum class uniform_constant_buffer_t {
+	index_offset,
+}; // RHI_index_buffer_t
+enum class RHI_uniform_constant_buffer_t {
 	mapped_data,
 	size,
 	offset,
 	uniform_hash_index,
-}; // uniform_constant_buffer_t
-enum class render_command_type_t {
-	RCT_Invalid,
-	RCT_ClearRenderTarget,
-	RCT_BeginRenderpass,
-	RCT_EndRenderpass,
-	RCT_UpdateUniformConstantBuffer,
-	RCT_UpdatePushConstants,
-	RCT_UpdateBufferContents,
-	RCT_BindMaterial,
-	RCT_BindTexture,
-	RCT_BindShader,
-	RCT_BindVertexBuffer,
-	RCT_BindIndexBuffer,
-	RCT_SetViewport,
-	RCT_SetScissor,
-	RCT_SetRenderState,
-	RCT_ResetRenderState,
-	RCT_DispatchCompute,
-	RCT_Draw,
-	RCT_DrawIndexed,
-	RCT_BlitImage,
-	RCT_BlitRenderpass,
-	RCT_PresentFrame,
-	RCT_Count,
-}; // render_command_type_t
-enum class render_command_header_t {
+}; // RHI_uniform_constant_buffer_t
+enum class RHI_command_type_t {
+	RHI_RENDER_COMMAND_TYPE_INVALID,
+	RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET,
+	RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS,
+	RHI_RENDER_COMMAND_TYPE_END_RENDERPASS,
+	RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER,
+	RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS,
+	RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS,
+	RHI_RENDER_COMMAND_TYPE_BIND_MATERIAL,
+	RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE,
+	RHI_RENDER_COMMAND_TYPE_BIND_SHADER,
+	RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER,
+	RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER,
+	RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT,
+	RHI_RENDER_COMMAND_TYPE_SET_SCISSOR,
+	RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE,
+	RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE,
+	RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE,
+	RHI_RENDER_COMMAND_TYPE_DRAW,
+	RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED,
+	RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE,
+	RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS,
+	RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME,
+	RHI_RENDER_COMMAND_TYPE_COUNT,
+}; // RHI_command_type_t
+enum class RHI_command_header_t {
 	command_type,
-}; // render_command_header_t
-enum class render_command_begin_renderpass_t {
+}; // RHI_command_header_t
+enum class RHI_command_begin_renderpass_t {
 	ID,
-}; // render_command_begin_renderpass_t
-enum class render_command_end_renderpass_t {
+}; // RHI_command_begin_renderpass_t
+enum class RHI_command_end_renderpass_t {
 	ID,
-}; // render_command_end_renderpass_t
-enum class render_command_bind_vertex_buffer_t {
-	buffer,
-}; // render_command_bind_vertex_buffer_t
-enum class render_command_bind_index_buffer_t {
-	buffer,
-}; // render_command_bind_index_buffer_t
-enum class render_command_update_texture_t {
+}; // RHI_command_end_renderpass_t
+enum class RHI_command_bind_vertex_buffer_t {
+	vertex_buffer,
+}; // RHI_command_bind_vertex_buffer_t
+enum class RHI_command_bind_index_buffer_t {
+	index_buffer,
+}; // RHI_command_bind_index_buffer_t
+enum class RHI_command_update_texture_t {
 	bitmap,
 	buffer,
-}; // render_command_update_texture_t
-enum class render_command_bind_material_t {
+}; // RHI_command_update_texture_t
+enum class RHI_command_bind_material_t {
 	materialID,
 	material,
-}; // render_command_bind_material_t
-enum class render_command_bind_shader_t {
+}; // RHI_command_bind_material_t
+enum class RHI_command_bind_shader_t {
 	shaderID,
 	shader,
-}; // render_command_bind_shader_t
-enum class render_command_set_viewport_t {
+}; // RHI_command_bind_shader_t
+enum class RHI_command_set_viewport_t {
 	offset,
 	size,
-}; // render_command_set_viewport_t
-enum class render_command_set_scissor_t {
+}; // RHI_command_set_viewport_t
+enum class RHI_command_set_scissor_t {
 	offset,
 	size,
-}; // render_command_set_scissor_t
-enum class render_command_update_push_constant_t {
+}; // RHI_command_set_scissor_t
+enum class RHI_command_update_push_constant_t {
 	data,
 	size,
 	offset,
-}; // render_command_update_push_constant_t
-enum class render_command_update_uniform_constant_buffer_t {
+}; // RHI_command_update_push_constant_t
+enum class RHI_command_update_uniform_constant_buffer_t {
 	backend_uniform_buffer_ptr,
 	buffer,
 	uniform_hash_index,
 	constant_data_size,
 	constant_buffer_offset,
-}; // render_command_update_uniform_constant_buffer_t
-enum class render_command_update_render_buffer_contents_t {
+}; // RHI_command_update_uniform_constant_buffer_t
+enum class RHI_command_update_render_buffer_contents_t {
 	buffer,
 	offset,
 	data_size,
-}; // render_command_update_render_buffer_contents_t
-enum class render_command_bind_texture_t {
+}; // RHI_command_update_render_buffer_contents_t
+enum class RHI_command_bind_texture_t {
 	texture,
-}; // render_command_bind_texture_t
-enum class render_command_dispatch_compute_t {
+}; // RHI_command_bind_texture_t
+enum class RHI_command_dispatch_compute_t {
 	invoke_x,
 	invoke_y,
 	invoke_z,
-}; // render_command_dispatch_compute_t
-enum class render_command_set_pipeline_state_t {
+}; // RHI_command_dispatch_compute_t
+enum class RHI_command_set_pipeline_state_t {
 	pipeline_state,
-}; // render_command_set_pipeline_state_t
-enum class render_command_draw_t {
+}; // RHI_command_set_pipeline_state_t
+enum class RHI_command_draw_t {
 	bound_images,
 	bound_image_count,
 	backend_vertex_buffer_offset,
@@ -33774,72 +33593,72 @@ enum class render_command_draw_t {
 	index_offset,
 	instance_count,
 	first_instance,
-}; // render_command_draw_t
-enum class render_command_blit_image_t {
+}; // RHI_command_draw_t
+enum class RHI_command_blit_image_t {
 	source_image,
 	dest_image,
 	source_offset,
 	source_size,
 	dest_offset,
 	dest_size,
-}; // render_command_blit_image_t
-enum class render_command_blit_renderpass_t {
+}; // RHI_command_blit_image_t
+enum class RHI_command_blit_renderpass_t {
 	source,
 	destination,
-}; // render_command_blit_renderpass_t
-enum class render_command_present_frame_t {
+}; // RHI_command_blit_renderpass_t
+enum class RHI_command_present_frame_t {
 	presentation_source,
-}; // render_command_present_frame_t
-enum class render_command_t {
+}; // RHI_command_present_frame_t
+enum class RHI_command_t {
 	header,
 	data,
-}; // render_command_t
-enum class command_list_type_t {
-	RENDER_COMMAND_LIST_TYPE_GRAPHICS,
-	RENDER_COMMAND_LIST_TYPE_COMPUTE,
-}; // command_list_type_t
-enum class clear_value_t {
+}; // RHI_command_t
+enum class RHI_command_list_type_t {
+	RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS,
+	RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE,
+}; // RHI_command_list_type_t
+enum class RHI_clear_value_t {
 	float_color,
 	int_color,
 	uint_color,
 	depth,
 	stencil,
-}; // clear_value_t
-enum class renderpass_attachment_access_t {
-	RenderpassAtachmentAccessInvalid,
-	RenderpassAttachmentAccessRead,
-	RenderpassAttachmentAccessWrite,
-	RenderpassAttachmentAccessReadWrite,
-}; // renderpass_attachment_access_t
-enum class renderpass_attachment_load_operation_t {
-	RenderpassAttachmentLoadOperationInvalid,
-	RenderpassAttachmentLoadOperationClear,
-	RenderpassAttachmentLoadOperationLoad,
-}; // renderpass_attachment_load_operation_t
-enum class renderpass_attachment_store_operation_t {
-	RenderpassAttachmentStoreOperationInvalid,
-	RenderpassAttachmentStoreOperationStore,
-	RenderpassAttachmentStoreOperationDontCare,
-}; // renderpass_attachment_store_operation_t
-enum class renderpass_attachment_t {
+}; // RHI_clear_value_t
+enum class RHI_renderpass_attachment_access_t {
+	RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID,
+	RHI_RENDERPASS_ATTACHMENT_ACCESS_READ,
+	RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE,
+	RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE,
+}; // RHI_renderpass_attachment_access_t
+enum class RHI_renderpass_attachment_load_operation_t {
+	RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID,
+	RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_CLEAR,
+	RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD,
+}; // RHI_renderpass_attachment_load_operation_t
+enum class RHI_renderpass_attachment_store_operation_t {
+	RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID,
+	RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_STORE,
+	RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE,
+}; // RHI_renderpass_attachment_store_operation_t
+enum class RHI_renderpass_attachment_t {
 	access,
 	load_operation,
 	store_operation,
 	image,
 	clear_value,
-}; // renderpass_attachment_t
-enum class renderpass_desc_t {
+}; // RHI_renderpass_attachment_t
+enum class RHI_renderpass_desc_t {
 	color_attachments,
 	depth_stencil_attachment,
 	render_width,
 	render_height,
-	resize_with_window,
 	color_attachment_count,
-}; // renderpass_desc_t
-enum class renderpass_key_t {
+	resize_with_window,
+}; // RHI_renderpass_desc_t
+enum class RHI_renderpass_key_t {
 	attachment_formats,
-}; // renderpass_key_t
-enum class renderpass_t {
+}; // RHI_renderpass_key_t
+enum class RHI_renderpass_t {
 	ID,
 	renderpass_key,
 	create_info,
@@ -33854,16 +33673,44 @@ enum class renderpass_t {
 	attachment_clear_values,
 	has_depth_stencil_attachment,
 	resize_with_window,
-}; // renderpass_t
-enum class vulkan_buffer_t {
-	handle,
-	is_mapped,
-	size,
-	used,
-	usage_flags,
-	allocation,
-	last_used_timestamp,
-}; // vulkan_buffer_t
+}; // RHI_renderpass_t
+enum class RHI_image_create_info_t {
+	data,
+	width,
+	height,
+	format,
+	usage,
+	sampler_info,
+}; // RHI_image_create_info_t
+enum class RHI_image_filter_type_t {
+	RHI_IMAGE_FILTER_TYPE_INVALID,
+	RHI_IMAGE_FILTER_TYPE_NEAREST,
+	RHI_IMAGE_FILTER_TYPE_LINEAR,
+}; // RHI_image_filter_type_t
+enum class RHI_image_wrapping_type_t {
+	RHI_IMAGE_WRAPPING_INVALID,
+	RHI_IMAGE_WRAPPING_CLAMP_TO_EDGE,
+	RHI_IMAGE_WRAPPING_CLAMP_TO_BORDER,
+	RHI_IMAGE_WRAPPING_REPEAT,
+}; // RHI_image_wrapping_type_t
+enum class RHI_image_usage_t {
+	RHI_IMAGE_USAGE_INVALID,
+	RHI_IMAGE_USAGE_RENDERPASS_COLOR_ATTACHMENT,
+	RHI_IMAGE_USAGE_RENDERPASS_DEPTH_ATTACHMENT,
+	RHI_IMAGE_USAGE_SHADER_SAMPLED_IMAGE,
+	RHI_IMAGE_USAGE_BLIT_SOURCE,
+	RHI_IMAGE_USAGE_BLIT_DESTINATION,
+}; // RHI_image_usage_t
+enum class RHI_sampler_create_info_t {
+	filtering,
+	anisotropy_enabled,
+	max_anisotropy,
+	wrapu,
+	wrapv,
+	compare_operation,
+	compare_ops_enabled,
+	use_normalized_coordinates,
+}; // RHI_sampler_create_info_t
 enum class widget_state_t {
 	last_interacted_frame,
 	toggled,
@@ -33990,7 +33837,7 @@ enum class ui_state_t {
 	last_clicked_widget,
 	persistent_data_arena,
 	widget_states,
-	renderer,
+	RHI_context,
 	asset_manager,
 	input_manager,
 	current_camera,
@@ -34115,6 +33962,15 @@ enum class vulkan_context_t {
 	default_nearest_sampler_info,
 	default_linear_sampler_info,
 }; // vulkan_context_t
+enum class vulkan_buffer_t {
+	handle,
+	is_mapped,
+	size,
+	used,
+	usage_flags,
+	allocation,
+	last_used_timestamp,
+}; // vulkan_buffer_t
 enum class vulkan_staging_info_t {
 	target_buffer,
 	upload_size,
@@ -34961,21 +34817,6 @@ enum class sys_create_process {
 enum class sys_wait_for_process {
 	process,
 }; // sys_wait_for_process
-enum class s_renderer_image_create {
-	render_state,
-	image_create_info,
-}; // s_renderer_image_create
-enum class s_renderer_image_create_from_bitmap {
-	bitmap,
-}; // s_renderer_image_create_from_bitmap
-enum class s_renderer_image_destroy {
-	renderer_state,
-	image,
-}; // s_renderer_image_destroy
-enum class s_renderer_image_update_data {
-	renderer_state,
-	image,
-}; // s_renderer_image_update_data
 enum class FT_ROUND {
 	X,
 }; // FT_ROUND
@@ -35169,162 +35010,174 @@ enum class s_im_get_button_state {
 	controller,
 	button_index,
 }; // s_im_get_button_state
-enum class s_renderer_state_init {
-	renderer_state,
+enum class RHI_context_init {
+	RHI_context,
 	render_context,
-}; // s_renderer_state_init
-enum class s_renderer_handle_window_resize {
-	renderer_state,
+}; // RHI_context_init
+enum class RHI_handle_window_resize {
+	RHI_context,
 	window_size,
-}; // s_renderer_handle_window_resize
-enum class s_renderer_resize_render_targets {
-	renderer_state,
+}; // RHI_handle_window_resize
+enum class RHI_resize_render_targets {
+	RHI_context,
 	window_size,
-}; // s_renderer_resize_render_targets
-enum class s_renderer_build_renderpass {
-	renderer_state,
+}; // RHI_resize_render_targets
+enum class RHI_build_renderpass {
+	RHI_context,
 	renderpass_desc,
-}; // s_renderer_build_renderpass
-enum class s_renderer_resize_renderpass {
-	renderer_state,
+}; // RHI_build_renderpass
+enum class RHI_resize_renderpass {
+	RHI_context,
 	renderpass,
-}; // s_renderer_resize_renderpass
-enum class s_renderer_get_constant_buffer {
-	renderer_state,
+}; // RHI_resize_renderpass
+enum class RHI_get_constant_buffer {
+	RHI_context,
 	uniform_name,
-}; // s_renderer_get_constant_buffer
-enum class s_renderer_render_buffer_create {
-	renderer_state,
+}; // RHI_get_constant_buffer
+enum class RHI_render_buffer_create {
+	RHI_context,
 	buffer_desc,
-}; // s_renderer_render_buffer_create
-enum class s_renderer_vertex_buffer_create {
-	renderer_state,
+}; // RHI_render_buffer_create
+enum class RHI_vertex_buffer_create {
+	RHI_context,
 	memory_type,
 	rate,
 	vertex_buffer_data,
 	vertex_size,
 	max_vertices,
-}; // s_renderer_vertex_buffer_create
-enum class s_renderer_index_buffer_create {
-	renderer_state,
+}; // RHI_vertex_buffer_create
+enum class RHI_index_buffer_create {
+	RHI_context,
 	memory_type,
 	element_size,
 	data,
 	size,
-}; // s_renderer_index_buffer_create
-enum class s_renderer_render_buffer_copy_data {
-	renderer_state,
+}; // RHI_index_buffer_create
+enum class RHI_render_buffer_copy_data {
+	RHI_context,
 	buffer,
 	data,
 	size,
 	offset,
-}; // s_renderer_render_buffer_copy_data
-enum class s_renderer_get_command_list {
-	renderer_state,
+}; // RHI_render_buffer_copy_data
+enum class RHI_image_create {
+	render_state,
+	image_create_info,
+}; // RHI_image_create
+enum class RHI_image_destroy {
+	RHI_context,
+	image,
+}; // RHI_image_destroy
+enum class RHI_image_update_data {
+	backend_context,
+	image,
+}; // RHI_image_update_data
+enum class RHI_get_command_list {
+	RHI_context,
 	type,
-}; // s_renderer_get_command_list
-enum class s_renderer_is_texture_bound {
+}; // RHI_get_command_list
+enum class RHI_find_texture_index {
+	command_list,
+	ID,
+}; // RHI_find_texture_index
+enum class RHI_reset_command_list {
+	command_list,
+}; // RHI_reset_command_list
+enum class RHI_is_texture_bound {
 	command_list,
 	texture,
-}; // s_renderer_is_texture_bound
-enum class s_renderer_set_texture_filter_mode {
+}; // RHI_is_texture_bound
+enum class RHI_set_texture_filter_mode {
 	render_state,
 	texture,
 	filter_mode,
-}; // s_renderer_set_texture_filter_mode
-enum class s_renderer_find_texture_index {
-	command_list,
-	ID,
-}; // s_renderer_find_texture_index
-enum class s_renderer_reset_command_list {
-	command_list,
-}; // s_renderer_reset_command_list
-enum class r_cmd_renderpass_begin {
+}; // RHI_set_texture_filter_mode
+enum class RHI_cmd_renderpass_begin {
 	command_list,
 	renderpassID,
-}; // r_cmd_renderpass_begin
-enum class r_cmd_renderpass_end {
+}; // RHI_cmd_renderpass_begin
+enum class RHI_cmd_renderpass_end {
 	command_list,
-}; // r_cmd_renderpass_end
-enum class r_cmd_begin_render_group {
+}; // RHI_cmd_renderpass_end
+enum class RHI_cmd_begin_render_group {
 	command_list,
-}; // r_cmd_begin_render_group
-enum class r_cmd_end_render_group {
+}; // RHI_cmd_begin_render_group
+enum class RHI_cmd_end_render_group {
 	command_list,
-}; // r_cmd_end_render_group
-enum class r_cmd_bind_index_buffer {
+}; // RHI_cmd_end_render_group
+enum class RHI_cmd_bind_index_buffer {
 	command_list,
 	buffer,
-}; // r_cmd_bind_index_buffer
-enum class r_cmd_set_scissor {
+}; // RHI_cmd_bind_index_buffer
+enum class RHI_cmd_set_scissor {
 	command_list,
 	offset,
 	size,
-}; // r_cmd_set_scissor
-enum class r_cmd_set_viewport {
+}; // RHI_cmd_set_scissor
+enum class RHI_cmd_set_viewport {
 	command_list,
 	offset,
 	size,
-}; // r_cmd_set_viewport
-enum class r_cmd_update_push_constants {
+}; // RHI_cmd_set_viewport
+enum class RHI_cmd_update_push_constants {
 	command_list,
 	offset,
 	size,
 	data,
-}; // r_cmd_update_push_constants
-enum class r_cmd_update_buffer_contents {
+}; // RHI_cmd_update_push_constants
+enum class RHI_cmd_update_buffer_contents {
 	command_list,
 	buffer,
 	data,
 	data_size,
-}; // r_cmd_update_buffer_contents
-enum class r_cmd_use_shader_program {
+}; // RHI_cmd_update_buffer_contents
+enum class RHI_cmd_use_shader_program {
 	command_list,
 	program,
-}; // r_cmd_use_shader_program
-enum class r_cmd_update_constant_buffer {
+}; // RHI_cmd_use_shader_program
+enum class RHI_cmd_update_constant_buffer {
 	command_list,
 	buffer,
 	data,
 	data_size,
-}; // r_cmd_update_constant_buffer
-enum class r_cmd_bind_texture_image {
+}; // RHI_cmd_update_constant_buffer
+enum class RHI_cmd_bind_texture_image {
 	command_list,
 	texture,
-}; // r_cmd_bind_texture_image
-enum class r_cmd_bind_texture_from_handle {
+}; // RHI_cmd_bind_texture_image
+enum class RHI_cmd_bind_texture_from_handle {
 	command_list,
 	asset_handle,
-}; // r_cmd_bind_texture_from_handle
-enum class r_cmd_reset_render_state {
+}; // RHI_cmd_bind_texture_from_handle
+enum class RHI_cmd_reset_render_state {
 	command_list,
 	render_pipeline_state,
-}; // r_cmd_reset_render_state
-enum class r_cmd_set_render_state {
+}; // RHI_cmd_reset_render_state
+enum class RHI_cmd_set_render_state {
 	command_list,
 	render_pipeline_state,
-}; // r_cmd_set_render_state
-enum class r_cmd_draw {
+}; // RHI_cmd_set_render_state
+enum class RHI_cmd_draw {
 	command_list,
 	vertex_count,
 	vertex_offset,
 	instance_count,
 	first_instance,
-}; // r_cmd_draw
-enum class r_cmd_draw_indexed {
+}; // RHI_cmd_draw
+enum class RHI_cmd_draw_indexed {
 	command_list,
 	index_count,
 	index_offset,
 	instance_count,
 	first_instance,
-}; // r_cmd_draw_indexed
-enum class r_cmd_dispatch_compute {
+}; // RHI_cmd_draw_indexed
+enum class RHI_cmd_dispatch_compute {
 	command_list,
 	invoke_x,
 	invoke_y,
 	invoke_z,
-}; // r_cmd_dispatch_compute
-enum class r_cmd_blit_image {
+}; // RHI_cmd_dispatch_compute
+enum class RHI_cmd_blit_image {
 	command_list,
 	source_image,
 	dest_image,
@@ -35332,19 +35185,19 @@ enum class r_cmd_blit_image {
 	source_blit_size,
 	dest_offset,
 	dest_blit_size,
-}; // r_cmd_blit_image
-enum class r_cmd_blit_renderpass {
+}; // RHI_cmd_blit_image
+enum class RHI_cmd_blit_renderpass {
 	command_list,
 	source_ID,
 	destination_ID,
-}; // r_cmd_blit_renderpass
-enum class r_cmd_present {
+}; // RHI_cmd_blit_renderpass
+enum class RHI_cmd_present {
 	command_list,
 	presentation_source,
-}; // r_cmd_present
-enum class s_renderer_execute_backend_commands {
-	renderer_state,
-}; // s_renderer_execute_backend_commands
+}; // RHI_cmd_present
+enum class RHI_execute_backend_commands {
+	RHI_context,
+}; // RHI_execute_backend_commands
 enum class backend_initialize {
 	window,
 }; // backend_initialize
@@ -35397,11 +35250,14 @@ enum class backend_shader_create {
 enum class backend_get_command_buffer {
 	command_list,
 }; // backend_get_command_buffer
+enum class RHI_image_create_from_bitmap {
+	bitmap,
+}; // RHI_image_create_from_bitmap
 enum class ui_state_init {
 	ui_state,
 	input_manager,
 	asset_manager,
-	renderer_state,
+	RHI_context,
 	renderpass_ID,
 }; // ui_state_init
 enum class ui_state_update_widget_state {
@@ -35690,7 +35546,7 @@ enum class vk_backend_framebuffer_destroy {
 	framebuffer,
 }; // vk_backend_framebuffer_destroy
 enum class vk_backend_initialize_RHI_renderpass {
-	renderer_state,
+	RHI_context,
 	renderpass_desc,
 	renderpass,
 }; // vk_backend_initialize_RHI_renderpass

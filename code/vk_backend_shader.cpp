@@ -7,7 +7,7 @@
 #include <spirv_reflect.h>
 
 #include <vk_backend_shader.h>
-#include <s_render_RHI.h>
+#include <s_RHI_core.h>
 
 #include <c_tokenizer.h>
 
@@ -423,7 +423,7 @@ vk_backend_shader_create_spirv_reflect(vulkan_context_t *vulkan_context, string_
             shader_binding->name               = STR(binding->name);
             shader_binding->descriptor_count   = binding->count;
             shader_binding->buffer_hash_index  = c_fnv_hash_value(shader_binding->name.data, shader_binding->name.count);
-            shader_binding->buffer_hash_index %= MAX_CONSTANT_BUFFERS;
+            shader_binding->buffer_hash_index %= RHI_MAX_CONSTANT_BUFFERS;
 
             ++result.binding_count;
         }
@@ -937,7 +937,7 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
                                     current_vertex_buffer->inputRate = current_buffer_input_rate;
 
                                     current_vertex_buffer_stride = 0;
-                                    current_structure_name = c_string_make_copy(&global_context->temporary_arena, structure_name);
+                                    current_structure_name = c_string_make_copy(&gc->temporary_arena, structure_name);
                                 }
                                 current_buffer_input_rate = structure_name.data[0] == 'i' ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX;
                                 current_structure_name    = structure_name;
@@ -1098,7 +1098,7 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
                 shader_binding->descriptor_count   = descriptor_count;
                 shader_binding->name               = STR(variable->getName());
                 shader_binding->buffer_hash_index  = c_fnv_hash_value(shader_binding->name.data, shader_binding->name.count);
-                shader_binding->buffer_hash_index %= MAX_CONSTANT_BUFFERS;
+                shader_binding->buffer_hash_index %= RHI_MAX_CONSTANT_BUFFERS;
 
                 ++result.binding_count;
                 ++binding_count;

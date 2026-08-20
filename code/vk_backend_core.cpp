@@ -5,14 +5,13 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <vk_backend_core.h>
-#include <s_render_RHI.h>
+#include <s_RHI_core.h>
 #include <vk_backend_shader.h>
 #include <c_string.h>
 #include <c_file_api.h>
 
-#include <r_render_image.h>
+#include <s_RHI_image.h>
 #include <s_asset_manager.h>
-#include <s_render_RHI.h>
 
 #define MAX_POOL_SET_TYPES (5)
 
@@ -1699,10 +1698,10 @@ vk_backend_create_pipeline_from_render_state
 */
 
 VkPipeline
-vk_backend_create_pipeline_from_render_state(vulkan_context_t        *vulkan_context,
-                                             vulkan_shader_t         *shader,
-                                             VkRenderPass             renderpass,
-                                             render_pipeline_state_t *state)
+vk_backend_create_pipeline_from_render_state(vulkan_context_t     *vulkan_context,
+                                             vulkan_shader_t      *shader,
+                                             VkRenderPass          renderpass,
+                                             RHI_pipeline_state_t *state)
 {
     Assert(shader->shader_id > 0);
 
@@ -1888,7 +1887,7 @@ vk_backend_create_renderpass
 
 VkRenderPass
 vk_backend_renderpass_create(vulkan_context_t    *vulkan_context, 
-                             image_t             *attachments,
+                             RHI_image_t         *attachments,
                              u32                  attachment_count,
                              VkImageLayout       *initial_layouts,
                              VkImageLayout       *final_layouts,
@@ -1901,10 +1900,10 @@ vk_backend_renderpass_create(vulkan_context_t    *vulkan_context,
     u32 color_attachment_count    = 0;
     bool32 depth_attachment_found = false;
 
-    VkAttachmentDescription attachment_descs[MAX_RENDER_TARGET_ATTACHMENTS] = {};
-    VkAttachmentReference   attachment_refs[MAX_RENDER_TARGET_ATTACHMENTS]  = {};
+    VkAttachmentDescription attachment_descs[RHI_MAX_RENDER_TARGET_ATTACHMENTS] = {};
+    VkAttachmentReference   attachment_refs[RHI_MAX_RENDER_TARGET_ATTACHMENTS]  = {};
 
-    VkAttachmentReference   color_attachments[MAX_RENDER_TARGET_ATTACHMENTS] = {};
+    VkAttachmentReference   color_attachments[RHI_MAX_RENDER_TARGET_ATTACHMENTS] = {};
     VkAttachmentReference   depth_attachment = {};
     for(u32 attachment_index = 0;
         attachment_index < attachment_count;
@@ -2007,7 +2006,7 @@ vk_backend_ramebuffer_create
 VkFramebuffer
 vk_backend_framebuffer_create(vulkan_context_t  *vulkan_context, 
                               VkRenderPass       renderpass,
-                              image_t           *attachments,
+                              RHI_image_t       *attachments,
                               u32                attachment_count, 
                               u32                width,
                               u32                height)
@@ -2059,9 +2058,9 @@ s_renderer_vulkan_attachment_type
 */
 
 internal_api true_inline VkImageLayout
-s_renderer_vulkan_attachment_type(renderpass_attachment_t *attachment)
+s_renderer_vulkan_attachment_type(RHI_renderpass_attachment_t *attachment)
 {
-    image_t *image = attachment->image;
+    RHI_image_t *image = attachment->image;
 
     VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
     switch(image->create_info.format)
@@ -2096,12 +2095,12 @@ vulkan_load_op
 */
 
 internal_api true_inline VkAttachmentLoadOp
-vulkan_load_op(renderpass_attachment_load_operation_t load_op)
+vulkan_load_op(RHI_renderpass_attachment_load_operation_t load_op)
 {
-    Assert(load_op != RenderpassAttachmentLoadOperationInvalid);
+    Assert(load_op != RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID);
 
     VkAttachmentLoadOp result = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    if(load_op == RenderpassAttachmentLoadOperationLoad)
+    if(load_op == RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD)
     {
         result = VK_ATTACHMENT_LOAD_OP_LOAD;
     }
@@ -2117,10 +2116,10 @@ s_renderer_vulkan_store_op
 
 // NOTE(Sleepster): This is pointless right now, but we may want to expand the abilities here.
 internal_api true_inline VkAttachmentStoreOp
-vulkan_store_op(renderpass_attachment_store_operation_t store_op)
+vulkan_store_op(RHI_renderpass_attachment_store_operation_t store_op)
 {
     VkAttachmentStoreOp result = VK_ATTACHMENT_STORE_OP_STORE;
-    if(store_op == RenderpassAttachmentStoreOperationDontCare)
+    if(store_op == RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_DONT_CARE)
     {
         result = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     }
@@ -2135,7 +2134,7 @@ is_depth_attachment_valid
 */
 
 internal_api true_inline bool8
-is_depth_attachment_valid(renderpass_attachment_t *depth_attachment)
+is_depth_attachment_valid(RHI_renderpass_attachment_t *depth_attachment)
 {
     bool8 result = true;
     if(depth_attachment->image->backend_image.handle == null)
@@ -2153,33 +2152,33 @@ vk_backend_initialize_RHI_renderpass
 */
 
 u32
-vk_backend_initialize_RHI_renderpass(renderer_state_t *renderer_state, renderpass_desc_t *renderpass_desc, renderpass_t *renderpass)
+vk_backend_initialize_RHI_renderpass(RHI_context_t *RHI_context, RHI_renderpass_desc_t *renderpass_desc, RHI_renderpass_t *renderpass)
 {
     u32 result = 0;
-    vulkan_context_t *vulkan_context = (vulkan_context_t *)renderer_state->render_context;
+    vulkan_context_t *vulkan_context = (vulkan_context_t *)RHI_context->backend_render_context;
 
     // TODO(Sleepster): 
     // We obviously don't want to put raw vulkan code in here because that's stupid... 
     // however, we have no choice right now
-    image_t             image_attachments[MAX_RENDER_TARGET_ATTACHMENTS] = {};
-    VkImageLayout       initial_layouts[MAX_RENDER_TARGET_ATTACHMENTS]   = {};
-    VkImageLayout       final_layouts[MAX_RENDER_TARGET_ATTACHMENTS]     = {};
-    VkAttachmentLoadOp  load_operations[MAX_RENDER_TARGET_ATTACHMENTS]   = {};
-    VkAttachmentStoreOp store_operations[MAX_RENDER_TARGET_ATTACHMENTS]  = {};
-    VkImageLayout       attachment_types[MAX_RENDER_TARGET_ATTACHMENTS]  = {};
+    RHI_image_t         image_attachments[RHI_MAX_RENDER_TARGET_ATTACHMENTS] = {};
+    VkImageLayout       initial_layouts[RHI_MAX_RENDER_TARGET_ATTACHMENTS]   = {};
+    VkImageLayout       final_layouts[RHI_MAX_RENDER_TARGET_ATTACHMENTS]     = {};
+    VkAttachmentLoadOp  load_operations[RHI_MAX_RENDER_TARGET_ATTACHMENTS]   = {};
+    VkAttachmentStoreOp store_operations[RHI_MAX_RENDER_TARGET_ATTACHMENTS]  = {};
+    VkImageLayout       attachment_types[RHI_MAX_RENDER_TARGET_ATTACHMENTS]  = {};
 
     u32 attachment_count = renderpass_desc->color_attachment_count;
     for(u32 color_attachment_index = 0;
         color_attachment_index < renderpass_desc->color_attachment_count;
         ++color_attachment_index)
     {
-        renderpass_attachment_t *color_attachment = renderpass_desc->color_attachments + color_attachment_index;
-        Assert(color_attachment->load_operation  != RenderpassAttachmentLoadOperationInvalid);
-        Assert(color_attachment->store_operation != RenderpassAttachmentStoreOperationInvalid);
+        RHI_renderpass_attachment_t *color_attachment = renderpass_desc->color_attachments + color_attachment_index;
+        Assert(color_attachment->load_operation  != RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_INVALID);
+        Assert(color_attachment->store_operation != RHI_RENDERPASS_ATTACHMENT_STORE_OPERATION_INVALID);
 
         VkImageLayout final_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         VkImageLayout initial_layout;
-        if(color_attachment->load_operation == RenderpassAttachmentLoadOperationLoad)
+        if(color_attachment->load_operation == RHI_RENDERPASS_ATTACHMENT_LOAD_OPERATION_LOAD)
         {
             initial_layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         }
@@ -2201,9 +2200,9 @@ vk_backend_initialize_RHI_renderpass(renderer_state_t *renderer_state, renderpas
     renderpass->has_depth_stencil_attachment = is_depth_attachment_valid(&renderpass_desc->depth_stencil_attachment);
     if(renderpass->has_depth_stencil_attachment)
     {
-        renderpass_attachment_t *depth_stencil_attachment = &renderpass_desc->depth_stencil_attachment;
+        RHI_renderpass_attachment_t *depth_stencil_attachment = &renderpass_desc->depth_stencil_attachment;
         u32 attachment_index = renderpass_desc->color_attachment_count;
-        Assert(attachment_index < MAX_RENDER_TARGET_ATTACHMENTS);
+        Assert(attachment_index < RHI_MAX_RENDER_TARGET_ATTACHMENTS);
 
         ++attachment_count;
 
@@ -2317,9 +2316,9 @@ vk_backend_append_uniform_constant_buffer_data(vulkan_context_t *vulkan_context,
 }
 
 void
-vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context, 
-                                  renderer_state_t *renderer_state, 
-                                  render_command_list_t *command_list)
+vk_backend_commit_descriptor_data(vulkan_context_t   *vulkan_context, 
+                                  RHI_context_t      *RHI_context, 
+                                  RHI_command_list_t *command_list)
 {
     // NOTE(Sleepster): 
     //
@@ -2367,8 +2366,8 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                     VkDescriptorBufferInfo *buffer_info = buffer_infos + buffer_count++;
 
                     // TODO(Sleepster):  is_dirty... only update if we need too...
-                    uniform_constant_buffer_t *constant_buffer = c_hash_table_get_value_ptr_at_index(&renderer_state->constant_buffer_hash, 
-                                                                                                     binding->buffer_hash_index);
+                    RHI_uniform_constant_buffer_t *constant_buffer = c_hash_table_get_value_ptr_at_index(&RHI_context->constant_buffer_hash, 
+                                                                                                          binding->buffer_hash_index);
                     buffer_info->buffer = current_uniform_buffer->handle;
                     buffer_info->offset = constant_buffer->offset;
                     buffer_info->range  = constant_buffer->size;
@@ -2391,7 +2390,7 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                     {
                         VkDescriptorImageInfo *image_info = base_info + image_index;
 
-                        image_t *image = command_list->image_shader_params[image_index];
+                        RHI_image_t *image = command_list->image_shader_params[image_index];
                         if(image)
                         {
                             vulkan_image_t *vulkan_data = &image->backend_image;
@@ -2403,7 +2402,8 @@ vk_backend_commit_descriptor_data(vulkan_context_t *vulkan_context,
                         }
                         else
                         {
-                            image_t *image = command_list->image_shader_params[0];
+                            RHI_image_t *image = command_list->image_shader_params[0];
+                            Assert(image);
 
                             vulkan_image_t *vulkan_data = &image->backend_image;
                             vk_backend_image_ensure_shader_readonly_optimal(vulkan_context, vulkan_data);
@@ -2488,16 +2488,16 @@ vk_backend_perform_image_blit(vulkan_context_t *vulkan_context,
 }
 
 internal_api void
-vk_backend_bind_command_list_vertex_buffers(VkCommandBuffer *render_command_buffer, render_command_list_t *command_list)
+vk_backend_bind_command_list_vertex_buffers(VkCommandBuffer *render_command_buffer, RHI_command_list_t *command_list)
 {
-    VkBuffer *handles     = c_arena_push_array(&global_context->temporary_arena, VkBuffer,     command_list->vertex_buffer_count);
-    VkDeviceSize *offsets = c_arena_push_array(&global_context->temporary_arena, VkDeviceSize, command_list->vertex_buffer_count);
+    VkBuffer *handles     = c_arena_push_array(&gc->temporary_arena, VkBuffer,     command_list->vertex_buffer_count);
+    VkDeviceSize *offsets = c_arena_push_array(&gc->temporary_arena, VkDeviceSize, command_list->vertex_buffer_count);
     for(u32 buffer_index = 0;
         buffer_index < command_list->active_vertex_buffers.used;
         ++buffer_index)
     {
-        render_buffer_t *buffer = command_list->active_vertex_buffers[buffer_index];
-        handles[buffer_index] = buffer->buffer.handle;
+        RHI_render_buffer_t *buffer = command_list->active_vertex_buffers[buffer_index];
+        handles[buffer_index] = buffer->buffer_info.handle;
         offsets[buffer_index] = 000000000; // TODO(Sleepster): maybe allow a "per buffer" offset.
     }
 
@@ -2511,7 +2511,7 @@ vk_backend_render_frame
 */
 
 void
-vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *renderer_state)
+vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_context)
 {
     // NOTE(Sleepster): This is for measuring how long GPU resources have been unused. 
     vulkan_context->frame_tsc = rdtsc();
@@ -2588,31 +2588,31 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
     // NOTE(Sleepster): Execute Render Commands  
     for(u32 command_list_index = 0;
-        command_list_index < renderer_state->command_list_count;
+        command_list_index < RHI_context->command_list_count;
         ++command_list_index)
     {
-        render_command_list_t *command_list = renderer_state->command_lists + command_list_index;
+        RHI_command_list_t *command_list = RHI_context->command_lists + command_list_index;
         for(u32 command_index = 0;
             command_index < command_list->command_count;
             ++command_index)
         {
             Expect(command_list->presenting == false, "Command was ordered to be executed after presentation has been ordered... this is an error...\n");
 
-            render_command_t *command = command_list->commands + command_index;
+            RHI_command_t *command = command_list->commands + command_index;
             switch(command->header.command_type)
             {
-                case RCT_BeginRenderpass:
+                case RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS:
                 {
-                    render_command_begin_renderpass_t *cmd = (render_command_begin_renderpass_t*)command->data;
-                    renderpass_t *renderpass = renderer_state->renderpasses + cmd->ID;
+                    RHI_command_begin_renderpass_t *cmd = (RHI_command_begin_renderpass_t*)command->data;
+                    RHI_renderpass_t *renderpass = RHI_context->renderpasses + cmd->ID;
 
                     // NOTE(Sleepster): Initialize the clear values... 
-                    VkClearValue clear_values[MAX_RENDER_TARGET_ATTACHMENTS];
+                    VkClearValue clear_values[RHI_MAX_RENDER_TARGET_ATTACHMENTS];
                     for(u32 attachment_index = 0;
                         attachment_index < renderpass->total_attachment_count;
                         ++attachment_index)
                     {
-                        clear_value_t *value      = renderpass->attachment_clear_values + attachment_index;
+                        RHI_clear_value_t *value  = renderpass->attachment_clear_values + attachment_index;
                         VkClearValue *clear_value = clear_values + attachment_index;
 
                         memcpy((void*)&clear_value->color, 
@@ -2624,7 +2624,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         color_attachment_index < renderpass->color_attachment_count;
                         ++color_attachment_index)
                     {
-                        renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
+                        RHI_renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
                         if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_initial_layout)
                         {
                             vulkan_image_t *image = &attachment->image->backend_image;
@@ -2634,7 +2634,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     if(renderpass->has_depth_stencil_attachment)
                     {
-                        renderpass_attachment_t *attachment = &renderpass->depth_stencil_attachment;
+                        RHI_renderpass_attachment_t *attachment = &renderpass->depth_stencil_attachment;
                         if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_initial_layout)
                         {
                             vulkan_image_t *image = &attachment->image->backend_image;
@@ -2656,9 +2656,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         color_attachment_index < renderpass->color_attachment_count;
                         ++color_attachment_index)
                     {
-                        renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
-                        if(attachment->access == RenderpassAttachmentAccessRead || 
-                           attachment->access == RenderpassAttachmentAccessReadWrite)
+                        RHI_renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
+                        if(attachment->access == RHI_RENDERPASS_ATTACHMENT_ACCESS_READ || 
+                           attachment->access == RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE)
                         {
                             // NOTE(Sleepster): 
                             // This assert is here so that we can catch instances where the caller's intent may have unintended consequences,
@@ -2671,19 +2671,19 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     command_list->active_renderpass = renderpass;
                 }break;
-                case RCT_EndRenderpass:
+                case RHI_RENDER_COMMAND_TYPE_END_RENDERPASS:
                 {
                     Assert(command_list->active_renderpass != null);
                     vkCmdEndRenderPass(render_command_buffer);
 
-                    render_command_end_renderpass_t *cmd = (render_command_end_renderpass_t*)command->data;
-                    renderpass_t *renderpass = renderer_state->renderpasses + cmd->ID;
+                    RHI_command_end_renderpass_t *cmd = (RHI_command_end_renderpass_t*)command->data;
+                    RHI_renderpass_t *renderpass = RHI_context->renderpasses + cmd->ID;
 
                     for(u32 color_attachment_index = 0;
                         color_attachment_index < renderpass->color_attachment_count;
                         ++color_attachment_index)
                     {
-                        renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
+                        RHI_renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
                         if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_final_layout)
                         {
                             vulkan_image_t *image = &attachment->image->backend_image;
@@ -2693,7 +2693,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     if(renderpass->has_depth_stencil_attachment)
                     {
-                        renderpass_attachment_t *attachment = &renderpass->depth_stencil_attachment;
+                        RHI_renderpass_attachment_t *attachment = &renderpass->depth_stencil_attachment;
                         if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_final_layout)
                         {
                             vulkan_image_t *image = &attachment->image->backend_image;
@@ -2703,11 +2703,11 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     command_list->active_renderpass = null;
                 }break;
-                case RCT_BlitRenderpass:
+                case RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS:
                 {
-                    render_command_blit_renderpass_t *cmd = (render_command_blit_renderpass_t*)command->data;
-                    renderpass_t *source = cmd->source;
-                    renderpass_t *dest   = cmd->destination;
+                    RHI_command_blit_renderpass_t *cmd = (RHI_command_blit_renderpass_t*)command->data;
+                    RHI_renderpass_t *source = cmd->source;
+                    RHI_renderpass_t *dest   = cmd->destination;
 
                     // TODO(Sleepster): 
                     // This is a separate render command because We will need to perform some mutex / semaphore sync stuff to stop the 
@@ -2717,8 +2717,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         render_attachment_index < source->color_attachment_count;
                         ++render_attachment_index)
                     {
-                        renderpass_attachment_t *source_attachment      = source->color_attachments + render_attachment_index;
-                        renderpass_attachment_t *destination_attachment = dest->color_attachments   + render_attachment_index;
+                        RHI_renderpass_attachment_t *source_attachment      = source->color_attachments + render_attachment_index;
+                        RHI_renderpass_attachment_t *destination_attachment = dest->color_attachments   + render_attachment_index;
 
                         vec2_t source_blit_size = vec2(source_attachment->image->create_info.width,
                                                        source_attachment->image->create_info.height);
@@ -2735,8 +2735,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     if(source->has_depth_stencil_attachment)
                     {
-                        renderpass_attachment_t *source_depth      = &source->depth_stencil_attachment;
-                        renderpass_attachment_t *destination_depth = &dest->depth_stencil_attachment;
+                        RHI_renderpass_attachment_t *source_depth      = &source->depth_stencil_attachment;
+                        RHI_renderpass_attachment_t *destination_depth = &dest->depth_stencil_attachment;
 
                         vec2_t source_blit_size = vec2(source_depth->image->create_info.width,
                                                        source_depth->image->create_info.height);
@@ -2751,40 +2751,36 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                                                       destination_blit_size);
                     }
                 }break;
-                case RCT_BindVertexBuffer:
+                case RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER:
                 {
-                    render_command_bind_vertex_buffer_t *cmd = (render_command_bind_vertex_buffer_t*)command->data;
-                    Assert(cmd->buffer->type == RenderBufferType_VertexBuffer);
+                    RHI_command_bind_vertex_buffer_t *cmd = (RHI_command_bind_vertex_buffer_t*)command->data;
+                    Assert(cmd->vertex_buffer->type == RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER);
 
-                    c_dynarray_add(&command_list->active_vertex_buffers, &cmd->buffer);
+                    c_dynarray_add(&command_list->active_vertex_buffers, &cmd->vertex_buffer);
                     ++command_list->vertex_buffer_count;
-
-                    // TODO(Sleepster): Maybe this number should be stored and modified on an individual buffer basis
-                    command_list->vertex_offset = 0;
                 }break;
-                case RCT_BindIndexBuffer:
+                case RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER:
                 {
-                    render_command_bind_index_buffer_t *cmd = (render_command_bind_index_buffer_t*)command->data;
-                    Assert(cmd->buffer->type == RenderBufferType_IndexBuffer);
+                    RHI_command_bind_index_buffer_t *cmd = (RHI_command_bind_index_buffer_t*)command->data;
+                    Assert(cmd->index_buffer->buffer_data.type == RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER);
 
                     VkDeviceSize offset = 0;
-                    vkCmdBindIndexBuffer(render_command_buffer, cmd->buffer->buffer.handle, offset, VK_INDEX_TYPE_UINT32); 
+                    vkCmdBindIndexBuffer(render_command_buffer, cmd->index_buffer->buffer_data.buffer_info.handle, offset, VK_INDEX_TYPE_UINT32); 
 
-                    command_list->active_index_buffer = cmd->buffer;
-                    command_list->index_offset        = 0;
+                    command_list->active_index_buffer = cmd->index_buffer;
                 }break;
-                case RCT_BindShader:
+                case RHI_RENDER_COMMAND_TYPE_BIND_SHADER:
                 {
                     Assert(command_list->active_renderpass != null);
 
-                    render_command_bind_shader_t *cmd = (render_command_bind_shader_t*)command->data;
+                    RHI_command_bind_shader_t *cmd = (RHI_command_bind_shader_t*)command->data;
                     vulkan_shader_t *shader = &cmd->shader.shader->shader_data;
                     u64 hash_index = 0;
                     if(shader->pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
                     {
                         struct shader_pipeline_key_t {
-                            renderpass_key_t        renderpass;
-                            render_pipeline_state_t pipeline_state;
+                            RHI_renderpass_key_t renderpass;
+                            RHI_pipeline_state_t pipeline_state;
                         }pipeline_key;
 
                         pipeline_key.pipeline_state = command_list->active_render_state;
@@ -2807,9 +2803,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     vkCmdBindPipeline(render_command_buffer, shader->pipeline_type, shader_pipeline);
                     command_list->active_shader_program = &cmd->shader;
                 }break;
-                case RCT_BindTexture:
+                case RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE:
                 {
-                    render_command_bind_texture_t *cmd = (render_command_bind_texture_t*)command->data;
+                    RHI_command_bind_texture_t *cmd = (RHI_command_bind_texture_t*)command->data;
                     if(cmd->texture->backend_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
                     {
                         // TODO(Sleepster): This is awful and brings sadness to families across the world... Too bad I don't care... 
@@ -2841,9 +2837,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
 
                     command_list->image_shader_params[command_list->image_count++] = cmd->texture;
                 }break;
-                case RCT_SetViewport:
+                case RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT:
                 {
-                    render_command_set_viewport_t *cmd = (render_command_set_viewport_t*)command->data;
+                    RHI_command_set_viewport_t *cmd = (RHI_command_set_viewport_t*)command->data;
 
                     VkPhysicalDeviceLimits *limits = &vulkan_context->gpu.properties.limits;
                     s32 device_max_width  = limits->maxViewportDimensions[0];
@@ -2861,9 +2857,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     vkCmdSetViewport(render_command_buffer, 0, 1, &viewport);
                     command_list->active_viewport_command = command;
                 }break;
-                case RCT_SetScissor:
+                case RHI_RENDER_COMMAND_TYPE_SET_SCISSOR:
                 {
-                    render_command_set_scissor_t *cmd = (render_command_set_scissor_t*)command->data;
+                    RHI_command_set_scissor_t *cmd = (RHI_command_set_scissor_t*)command->data;
                     VkRect2D scissor = {
                         .offset = {
                             (s32)cmd->offset.x,
@@ -2878,10 +2874,10 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     vkCmdSetScissor(render_command_buffer, 0, 1, &scissor);
                     command_list->active_scissor_command = command;
                 }break;
-                case RCT_UpdatePushConstants:
+                case RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS:
                 {
                     Assert(command_list->active_shader_program);
-                    render_command_update_push_constant_t *cmd = (render_command_update_push_constant_t *)command->data;
+                    RHI_command_update_push_constant_t *cmd = (RHI_command_update_push_constant_t *)command->data;
 
                     vulkan_shader_t *shader = &command_list->active_shader_program->shader->shader_data;
                     if(shader->push_constant_count > 0 && shader->push_constant_count == 1)
@@ -2894,29 +2890,29 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                         log_fatal("Failure. This shader lacks push constants...\n");
                     }
                 }break;
-                case RCT_UpdateUniformConstantBuffer:
+                case RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER:
                 {
-                    render_command_update_uniform_constant_buffer_t *cmd = (render_command_update_uniform_constant_buffer_t*)command->data;
-                    uniform_constant_buffer_t *buffer = cmd->buffer;
+                    RHI_command_update_uniform_constant_buffer_t *cmd = (RHI_command_update_uniform_constant_buffer_t*)command->data;
+                    RHI_uniform_constant_buffer_t *buffer = cmd->buffer;
                     Assert(buffer);
 
                     buffer->offset = cmd->constant_buffer_offset;
                 }break;
-                case RCT_SetRenderState:
+                case RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE:
                 {
-                    render_command_set_pipeline_state_t *cmd = (render_command_set_pipeline_state_t*)command->data;
+                    RHI_command_set_pipeline_state_t *cmd = (RHI_command_set_pipeline_state_t*)command->data;
                     command_list->active_render_state = cmd->pipeline_state;
                 }break;
-                case RCT_ResetRenderState:
+                case RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE:
                 {
                     command_list->active_render_state = g_pipeline_default_state_key;
                 }break;
-                case RCT_DispatchCompute:
+                case RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE:
                 {
-                    render_command_dispatch_compute_t *cmd = ( render_command_dispatch_compute_t*)command->data;
+                    RHI_command_dispatch_compute_t *cmd = (RHI_command_dispatch_compute_t*)command->data;
                     vkCmdDispatch(render_command_buffer, cmd->invoke_x, cmd->invoke_y, cmd->invoke_z);
                 }break;
-                case RCT_Draw:
+                case RHI_RENDER_COMMAND_TYPE_DRAW:
                 {
                     Assert(command_list->active_vertex_buffers.items);
                     Assert(command_list->active_shader_program);
@@ -2924,25 +2920,25 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     Assert(command_list->active_scissor_command);
 
                     vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
-                    vk_backend_commit_descriptor_data(vulkan_context, renderer_state, command_list);
+                    vk_backend_commit_descriptor_data(vulkan_context, RHI_context, command_list);
 
-                    render_command_draw_t *cmd = (render_command_draw_t*)command->data;
+                    RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
                     vkCmdDraw(render_command_buffer, 
                               cmd->vertices_to_draw, 
                               cmd->instance_count, 
-                              cmd->vertex_offset  + command_list->vertex_offset, 
-                              cmd->first_instance + command_list->instance_offset);
-
-                    command_list->vertex_offset   += cmd->vertices_to_draw;
-                    command_list->instance_offset += 0;
+                              cmd->vertex_offset, 
+                              cmd->first_instance);
 
                     command_list->image_count = 0;
                     command_list->bound_image_count = 0;
 
                     c_dynarray_reset(&command_list->active_vertex_buffers);
-                    command_list->vertex_buffer_count = 0;
+
+                    // NOTE(Sleepster): Resetting this to prevent garbage images from being pushed to the shader. 
+                    // We exlude the first image index due to the fact that this is typically the default texture
+                    ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params));
                 }break;
-                case RCT_DrawIndexed:
+                case RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED:
                 {
                     Assert(command_list->active_vertex_buffers.items);
                     Assert(command_list->active_index_buffer);
@@ -2951,30 +2947,32 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                     Assert(command_list->active_scissor_command);
 
                     vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
-                    vk_backend_commit_descriptor_data(vulkan_context, renderer_state, command_list);
+                    vk_backend_commit_descriptor_data(vulkan_context, RHI_context, command_list);
 
-                    render_command_draw_t *cmd = (render_command_draw_t*)command->data;
+                    RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
                     vkCmdDrawIndexed(render_command_buffer, 
                                      cmd->indices_to_draw, 
                                      cmd->instance_count, 
-                                     cmd->index_offset, 
-                                     cmd->vertex_offset + command_list->vertex_offset, 
-                                     0);
+                                     cmd->index_offset + command_list->active_index_buffer->index_offset, 
+                                     cmd->vertex_offset, 
+                                     cmd->first_instance);
 
-
-                    command_list->vertex_offset   += ((cmd->indices_to_draw / 6) * 4);
-                    command_list->index_offset    +=  cmd->indices_to_draw;
-                    command_list->instance_offset +=  cmd->instance_count;
 
                     command_list->image_count = 0;
                     command_list->bound_image_count = 0;
 
+                    command_list->active_index_buffer->index_offset += cmd->indices_to_draw;
+
+                    // NOTE(Sleepster): Resetting this to prevent garbage images from being pushed to the shader. 
+                    // We exlude the first image index due to the fact that this is typically the default texture
+                    ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params));
+
                     c_dynarray_reset(&command_list->active_vertex_buffers);
                     command_list->vertex_buffer_count = 0;
                 }break;
-                case RCT_BlitImage:
+                case RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE:
                 {
-                    render_command_blit_image_t *cmd = (render_command_blit_image_t*)command->data;
+                    RHI_command_blit_image_t *cmd = (RHI_command_blit_image_t*)command->data;
                     vk_backend_perform_image_blit(vulkan_context, 
                                                   render_command_buffer, 
                                                  &cmd->source_image->backend_image,
@@ -2984,13 +2982,15 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                                                   cmd->dest_offset,
                                                   cmd->dest_size);
                 }break;
-                case RCT_PresentFrame:
+                case RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME:
                 {
-                    render_command_present_frame_t *cmd = (render_command_present_frame_t *)command->data;
-                    renderer_state->present_command = cmd;
+                    RHI_command_present_frame_t *cmd = (RHI_command_present_frame_t *)command->data;
+                    RHI_context->present_command = cmd;
                 }break;
             }
         }
+
+        command_list->active_index_buffer->index_offset = 0;
 
         command_list->presenting                       = false;
         command_list->active_index_buffer              = null;
@@ -3005,9 +3005,6 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
         command_list->draw_instance_command_count      = 0;
         command_list->command_count                    = 0;
         command_list->vertex_buffer_count              = 0;
-        command_list->vertex_offset                    = 0;
-        command_list->instance_offset                  = 0;
-        command_list->index_offset                     = 0;
 
         command_list->active_render_state     = g_pipeline_default_state_key; 
         command_list->active_renderpass       = null;
@@ -3017,9 +3014,9 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
         command_list->active_shader_program   = null;
     }
 
-    if(renderer_state->present_command)
+    if(RHI_context->present_command)
     {
-        image_t        *source     = renderer_state->present_command->presentation_source;
+        RHI_image_t        *source = RHI_context->present_command->presentation_source;
         vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
 
         Assert(source);
@@ -3056,8 +3053,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *rend
                               source_range,
                               destination_range);
     }
-    renderer_state->command_list_count = 0;
-    renderer_state->present_command    = null;
+    RHI_context->command_list_count = 0;
+    RHI_context->present_command    = null;
 
     // NOTE(Sleepster): 
     // Change the layout of the swapchain image if we must.
@@ -3132,10 +3129,10 @@ renderer_state_t::backend_initialize
 =============
 */
 
-void renderer_state_t::
+void RHI_context_t::
 backend_initialize(SDL_Window *window)
 {
-    vk_backend_init(this->render_context, window);
+    vk_backend_init(this->backend_render_context, window);
 }
 
 /*
@@ -3144,10 +3141,10 @@ renderer_state_t::backend_handle_window_resize
 =============
 */
 
-void renderer_state_t::
+void RHI_context_t::
 backend_handle_window_resize(vec2_t window_size)
 {
-    vulkan_context_t *vulkan_context = this->render_context;
+    vulkan_context_t *vulkan_context = this->backend_render_context;
 
     vulkan_context->last_window_width  = vulkan_context->current_window_width;
     vulkan_context->last_window_height = vulkan_context->current_window_height;
@@ -3165,10 +3162,10 @@ renderer_state_t::backend_render_frame
 =============
 */
 
-true_inline void renderer_state_t::
+true_inline void RHI_context_t::
 backend_render_frame(void)
 {
-    vk_backend_render_frame(this->render_context, this);
+    vk_backend_render_frame(this->backend_render_context, this);
 }
 
 /*
@@ -3177,12 +3174,12 @@ renderer_state_t::backend_buffer_create
 =============
 */
 
-render_buffer_t renderer_state_t::
-backend_buffer_create(render_buffer_desc_t *buffer_desc)
+RHI_render_buffer_t RHI_context_t::
+backend_buffer_create(RHI_render_buffer_desc_t *buffer_desc)
 {
-    render_buffer_t buffer;
+    RHI_render_buffer_t buffer;
 
-    buffer.buffer_ID           = c_fnv_hash_value((byte*)buffer_desc, sizeof(render_buffer_desc_t));
+    buffer.buffer_ID           = c_fnv_hash_value((byte*)buffer_desc, sizeof(RHI_render_buffer_desc_t));
     buffer.type                = buffer_desc->type;
     buffer.buffer_capacity     = buffer_desc->buffer_capacity;
     buffer.buffer_element_size = buffer_desc->element_size;
@@ -3190,34 +3187,34 @@ backend_buffer_create(render_buffer_desc_t *buffer_desc)
 
     VkBufferUsageFlags             usage_flags      = (VkBufferUsageFlagBits)0;
     vulkan_allocation_usage_type_t allocation_flags = (vulkan_allocation_usage_type_t)0;
-    Assert(buffer_desc->type != RenderBufferType_Invalid);
+    Assert(buffer_desc->type != RHI_RENDER_BUFFER_TYPE_INVALID);
 
     usage_flags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-    if(buffer_desc->type == RenderBufferType_IndexBuffer)
+    if(buffer_desc->type == RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER)
     {
         usage_flags |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
     }
-    else if (buffer_desc->type == RenderBufferType_VertexBuffer)
+    else if (buffer_desc->type == RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER)
     {
         usage_flags |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
     }
 
-    if(buffer_desc->allocation_type == RenderBufferAllocationTypeMapped)
+    if(buffer_desc->allocation_type == RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED)
     {
         allocation_flags = VULKAN_MEMORY_USAGE_CPU_TO_GPU; 
     }
-    else if(buffer_desc->allocation_type == RenderBufferAllocationTypeGPUOnly)
+    else if(buffer_desc->allocation_type == RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY)
     {
         allocation_flags = VULKAN_MEMORY_USAGE_GPU_ONLY;
     }
 
-    buffer.buffer = vk_backend_buffer_create(this->render_context, 
-                                             buffer_desc->buffer_capacity,
-                                             usage_flags,
-                                             allocation_flags);
-    if(buffer.buffer.is_mapped)
+    buffer.buffer_info = vk_backend_buffer_create(this->backend_render_context, 
+                                                  buffer_desc->buffer_capacity,
+                                                  usage_flags,
+                                                  allocation_flags);
+    if(buffer.buffer_info.is_mapped)
     {
-        buffer.mapped_data = buffer.buffer.allocation.mapped_data;
+        buffer.mapped_data = buffer.buffer_info.allocation.mapped_data;
     }
 
     return(buffer);
@@ -3229,10 +3226,10 @@ renderer_state_t::backend_buffer_copy_data
 =============
 */
 
-true_inline void renderer_state_t::
-backend_buffer_copy_data(render_buffer_t *buffer, void *data, u32 size, u32 offset)
+true_inline void RHI_context_t::
+backend_buffer_copy_data(RHI_render_buffer_t *buffer, void *data, u32 size, u32 offset)
 {
-    vk_backend_buffer_copy_data(this->render_context, &buffer->buffer, data, size, offset);
+    vk_backend_buffer_copy_data(this->backend_render_context, &buffer->buffer_info, data, size, offset);
 }
 
 /*
@@ -3241,11 +3238,11 @@ renderer_state_t::backend_constant_buffer_append_data
 =============
 */
 
-true_inline void* renderer_state_t::
+true_inline void* RHI_context_t::
 backend_constant_buffer_append_data(void *data, u32 data_size, u32 *buffer_offset_out)
 {
     void *result = null;
-    result = vk_backend_append_uniform_constant_buffer_data(this->render_context, data, data_size, buffer_offset_out);
+    result = vk_backend_append_uniform_constant_buffer_data(this->backend_render_context, data, data_size, buffer_offset_out);
 
     return(result);
 }
@@ -3256,16 +3253,16 @@ renderer_state_t::backend_buffer_append_data
 =============
 */
 
-true_inline void renderer_state_t::
-backend_buffer_append_data(render_buffer_t *buffer, void *data, u32 data_size)
+true_inline void RHI_context_t::
+backend_buffer_append_data(RHI_render_buffer_t *buffer, void *data, u32 data_size)
 {
-    vk_backend_buffer_append_data(this->render_context, &buffer->buffer, data, data_size);
+    vk_backend_buffer_append_data(this->backend_render_context, &buffer->buffer_info, data, data_size);
 }
 
-true_inline void renderer_state_t::
-backend_buffer_reset(render_buffer_t *buffer)
+true_inline void RHI_context_t::
+backend_buffer_reset(RHI_render_buffer_t *buffer)
 {
-    vk_backend_buffer_reset(&buffer->buffer);
+    vk_backend_buffer_reset(&buffer->buffer_info);
 }
 
 /*
@@ -3274,8 +3271,8 @@ renderer_state_t::backend_renderpass_initialize
 =============
 */
 
-true_inline u32 renderer_state_t::
-backend_renderpass_initialize(renderpass_desc_t *desc, renderpass_t *renderpass)
+true_inline u32 RHI_context_t::
+backend_renderpass_initialize(RHI_renderpass_desc_t *desc, RHI_renderpass_t *renderpass)
 {
     u32 result = INVALID_ID;
     result = vk_backend_initialize_RHI_renderpass(this, desc, renderpass);
@@ -3289,10 +3286,10 @@ renderer_state_t::backend_image_create
 =============
 */
 
-void renderer_state_t::
-backend_image_create(image_create_info_t *create_info, image_t *image)
+void RHI_context_t::
+backend_image_create(RHI_image_create_info_t *create_info, RHI_image_t *image)
 {
-    image->ID = c_fnv_hash_value((byte*)create_info, sizeof(image_create_info_t));
+    image->ID = c_fnv_hash_value((byte*)create_info, sizeof(RHI_image_create_info_t));
 
     VkImageUsageFlags usage_flags = vk_image_usage_flags_from_image_format(create_info->format);
     VkImageLayout initial_layout  = vk_get_image_initial_layout_from_usage((u32)create_info->usage, create_info->format);
@@ -3315,7 +3312,7 @@ backend_image_create(image_create_info_t *create_info, image_t *image)
     if(vk_sampler_info_is_valid(create_info))
     {
         // TODO(Sleepster): For now compare operations are disabled. I don't want to deal with them right now... 
-        sampler_create_info_t *image_sampler = &create_info->sampler_info;
+        RHI_sampler_create_info_t *image_sampler = &create_info->sampler_info;
         VkFilter filter = vk_sampler_filter_type_to_vk_filter(image_sampler->filtering);
 
         sampler_info = {
@@ -3345,7 +3342,7 @@ backend_image_create(image_create_info_t *create_info, image_t *image)
 #endif
 
     Assert(image->backend_image.is_valid == false);
-    image->backend_image = vk_backend_image_create(this->render_context, &info);
+    image->backend_image = vk_backend_image_create(this->backend_render_context, &info);
 }
 
 /*
@@ -3354,12 +3351,12 @@ renderer_state_t::backend_image_destroy
 =============
 */
 
-true_inline void renderer_state_t::
-backend_image_destroy(image_t *image)
+true_inline void RHI_context_t::
+backend_image_destroy(RHI_image_t *image)
 {
     Assert(image->backend_image.is_valid == true);
     Expect(image->backend_image.handle, "This image does not have a valid handle...\n");
-    vk_backend_image_destroy(this->render_context, &image->backend_image);
+    vk_backend_image_destroy(this->backend_render_context, &image->backend_image);
 }
 
 /*
@@ -3368,19 +3365,19 @@ renderer_state_t::backend_image_update_contents
 =============
 */
 
-true_inline void renderer_state_t::
-backend_image_update_contents(image_t *image)
+true_inline void RHI_context_t::
+backend_image_update_contents(RHI_image_t *image)
 {
-    vk_backend_image_update_data(this->render_context, &image->backend_image);
+    vk_backend_image_update_data(this->backend_render_context, &image->backend_image);
 }
 
 // NOTE(Sleepster): Samplers are given to each texture by default on creation, this is used only for
 // application of NEW samplers
-true_inline void renderer_state_t::
-backend_acquire_image_sampler(image_t *image)
+true_inline void RHI_context_t::
+backend_acquire_image_sampler(RHI_image_t *image)
 {
-    vulkan_image_info_t   *vk_image_info = &image->backend_image.info;
-    sampler_create_info_t *sampler_info  = &image->create_info.sampler_info;
+    vulkan_image_info_t   *vk_image_info    = &image->backend_image.info;
+    RHI_sampler_create_info_t *sampler_info = &image->create_info.sampler_info;
 
     VkFilter filter = vk_sampler_filter_type_to_vk_filter(sampler_info->filtering);
     vk_image_info->sampler_info = {
@@ -3395,7 +3392,7 @@ backend_acquire_image_sampler(image_t *image)
         .use_normalized_coordinates = sampler_info->use_normalized_coordinates
     };
 
-    image->backend_image.sampler = vk_backend_get_sampler(this->render_context, &image->backend_image.info.sampler_info);
+    image->backend_image.sampler = vk_backend_get_sampler(this->backend_render_context, &image->backend_image.info.sampler_info);
 }
 
 /*
@@ -3404,13 +3401,13 @@ renderer_state_t::backend_shader_create
 =============
 */
 
-true_inline void renderer_state_t::
-backend_shader_create(shader_t *shader, string_t shader_source)
+true_inline void RHI_context_t::
+backend_shader_create(RHI_shader_t *shader, string_t shader_source)
 {
 #if 0
-    shader->shader_data = vk_backend_shader_create_spirv_reflect(this->render_context, shader_source);
+    shader->shader_data = vk_backend_shader_create_spirv_reflect(this->backend_render_context, shader_source);
 #else 
-    shader->shader_data = vk_backend_shader_create_slang_reflect(this->render_context, shader_source);
+    shader->shader_data = vk_backend_shader_create_slang_reflect(this->backend_render_context, shader_source);
 #endif
 }
 
@@ -3421,15 +3418,15 @@ renderer_state_t::backend_get_command_buffer
 =============
 */
 
-true_inline backend_command_buffer_t renderer_state_t::
-backend_get_command_buffer(render_command_list_t *command_list)
+true_inline backend_command_buffer_t RHI_context_t::
+backend_get_command_buffer(RHI_command_list_t *command_list)
 {
     VkCommandBuffer result = VK_NULL_HANDLE;
 
-    vulkan_context_t *vulkan_context = this->render_context;
+    vulkan_context_t *vulkan_context = this->backend_render_context;
     if(command_list->backend_command_buffer == VK_NULL_HANDLE)
     {
-        if(command_list->command_list_type == RENDER_COMMAND_LIST_TYPE_GRAPHICS)
+        if(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS)
         {
             VkCommandBuffer graphics_command_buffer = *vulkan_context->render_command_buffer;
             (void)graphics_command_buffer;

@@ -23,7 +23,7 @@
 #include <vk_backend_buffer.h>
 #include <vk_backend_allocator.h>
 
-struct image_t;
+struct RHI_image_t;
 typedef struct material_archetype material_archetype_t;
 
 constexpr u32 MAX_FRAMES_IN_FLIGHT         = 3;
@@ -91,7 +91,7 @@ typedef enum render_pipeline_polygon_mode
     RENDER_PIPELINE_POLYGON_MODE_LINE,
 }render_pipeline_polygon_mode_t;
 
-typedef struct render_pipeline_state
+typedef struct RHI_pipeline_state 
 {
     bool32 blend_enabled         = true;
     u32    src_color_blend_mode  = RBM_SrcAlpha;
@@ -112,7 +112,7 @@ typedef struct render_pipeline_state
     u32    stencil_keep          = 0;
 
     u32    polygon_mode          = 0;
-}render_pipeline_state_t;
+}RHI_pipeline_state_t;
 
 struct gpu_info_t 
 {
@@ -242,16 +242,17 @@ struct vulkan_context_t
 
 struct vulkan_image_t;
 struct vulkan_shader_t;
-struct renderer_state_t;
-struct renderpass_t;
-struct renderpass_desc_t;
+struct RHI_context_t;
+struct RHI_renderpass_t;
+struct RHI_renderpass_desc_t;
 
-typedef vulkan_context_t backend_renderer_t;
+typedef vulkan_context_t backend_render_context_t;
 typedef VkCommandBuffer  backend_command_buffer_t;
 typedef VkRenderPass     backend_renderpass_handle_t;
 typedef VkFramebuffer    backend_framebuffer_handle_t;
 typedef vulkan_image_t   backend_image_t;
 typedef vulkan_shader_t  backend_shader_t;
+typedef vulkan_buffer_t  backend_buffer_t;
 
 // NOTE(Sleepster): 
 //
@@ -306,7 +307,7 @@ global_variable constexpr VkPipelineColorBlendAttachmentState g_pipeline_default
     .colorWriteMask      = VK_COLOR_COMPONENT_R_BIT|VK_COLOR_COMPONENT_G_BIT|VK_COLOR_COMPONENT_B_BIT|VK_COLOR_COMPONENT_A_BIT
 };
 
-global_variable constexpr render_pipeline_state_t g_pipeline_default_state_key = {};
+global_variable constexpr RHI_pipeline_state g_pipeline_default_state_key = {};
 
 #define vkAssert(result) ({                                                \
     if(!vk_backend_result_is_success(result))                              \
@@ -322,11 +323,11 @@ bool8       vk_backend_result_is_success(VkResult result);
 void        vk_backend_handle_window_resize(vulkan_context_t *vulkan_context, vec2_t window_size);
 void        vk_backend_render_frame(vulkan_context_t *vulkan_context);
 VkPipeline  vk_backend_create_render_pipeline(vulkan_context_t *vulkan_context, vulkan_shader_t *shader, VkRenderPass renderpass, const VkPipelineRasterizationStateCreateInfo *rasterization_state, const VkPipelineDepthStencilStateCreateInfo *depth_stencil_state, const VkPipelineColorBlendAttachmentState *blend_settings, VkPipelineVertexInputStateCreateInfo *pipeline_vertex_input_state);
-void        vk_backend_render_frame(vulkan_context_t *vulkan_context, renderer_state_t *renderer_state);
+void        vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_context);
 void        vk_backend_renderpass_destroy(vulkan_context_t *vulkan_context, VkRenderPass renderpass);
 void        vk_backend_framebuffer_destroy(vulkan_context_t *vulkan_context, VkFramebuffer framebuffer);
 void        vk_backend_renderpass_destroy(vulkan_context_t *vulkan_context, VkRenderPass renderpass);
-u32         vk_backend_initialize_RHI_renderpass(renderer_state_t *renderer_state, renderpass_desc_t *renderpass_desc, renderpass_t *renderpass);
+u32         vk_backend_initialize_RHI_renderpass(RHI_context_t *RHI_context, RHI_renderpass_desc_t *renderpass_desc, RHI_renderpass_t *renderpass);
 
 VkCommandBuffer  vk_backend_get_and_begin_scratch_command_buffer(vulkan_context_t *vulkan_context, bool8 is_primary);
 void             vk_backend_submit_and_release_scratch_command_buffer(vulkan_context_t *vulkan_context, VkCommandBuffer *command_buffer);
@@ -337,14 +338,14 @@ void* vk_backend_append_uniform_constant_buffer_data(vulkan_context_t *vulkan_co
 VkFramebuffer
 vk_backend_framebuffer_create(vulkan_context_t  *vulkan_context, 
                               VkRenderPass       renderpass,
-                              image_t           *attachments,
+                              RHI_image_t       *attachments,
                               u32                attachment_count, 
                               u32                width,
                               u32                height);
 
 VkRenderPass
 vk_backend_renderpass_create(vulkan_context_t    *vulkan_context, 
-                             image_t             *attachments,
+                             RHI_image_t         *attachments,
                              u32                  attachment_count,
                              VkImageLayout       *initial_layouts,
                              VkImageLayout       *final_layouts,

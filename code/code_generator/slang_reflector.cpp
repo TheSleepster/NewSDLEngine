@@ -113,7 +113,7 @@ VISIT_FILES(shader_file_callback)
     if(c_string_compare(file_ext, STR(".slang")) || 
        c_string_compare(file_ext, STR(".slm")))
     {
-        c_threadpool_push_work_order(&global_context->main_threadpool, [file_manager, filename, fullname]() {
+        c_threadpool_push_work_order(&gc->main_threadpool, [file_manager, filename, fullname]() {
             if(thread_arena.is_initialized == false)
             {
                 thread_arena = c_arena_create(MB(20));
@@ -226,7 +226,7 @@ VISIT_FILES(shader_file_callback)
     else if(c_string_compare(file_ext, STR(".slh")))
     {
         // NOTE(Sleepster): We could just use a normal "&" here but I just don't care and this is more explicit 
-        c_threadpool_push_work_order(&global_context->main_threadpool, [file_manager, filename, fullname]() {
+        c_threadpool_push_work_order(&gc->main_threadpool, [file_manager, filename, fullname]() {
             if(thread_arena.is_initialized == false)
             {
                 thread_arena = c_arena_create(MB(20));
@@ -492,7 +492,7 @@ main(int argc, char **argv)
     c_global_context_init();
 
     u32 thread_count = sys_get_thread_count();
-    c_threadpool_init(&global_context->main_threadpool, thread_count, MB(1), true, true);
+    c_threadpool_init(&gc->main_threadpool, thread_count, MB(1), true, true);
 
     char  **shader_input_directory      = c_program_flag_add_string("-shader_input_path", "shaders/", "This is the location that the preprocessor will search for shaders when a #include directive is found.\n");
     char  **shader_output_directory     = c_program_flag_add_string("-shader_output_dir", "../build/", "This is the output location for the newly generated .slang files");
@@ -517,7 +517,7 @@ main(int argc, char **argv)
 
     visit_file_data_t visit_info = c_directory_create_visit_data(shader_file_callback, true, &file_manager);
     c_directory_visit(STR(*shader_input_directory), &visit_info);
-    c_threadpool_flush_work_orders(&global_context->main_threadpool);
+    c_threadpool_flush_work_orders(&gc->main_threadpool);
 
     return(0);
 }

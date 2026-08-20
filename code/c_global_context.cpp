@@ -11,29 +11,29 @@
 vec2_t g_window_size = {};
 bool8 g_running      = false;
 
-thread_local global_context_t *global_context = null;
+thread_local global_context_t *gc = null;
 
 void
 c_global_context_init()
 {
-    Assert(!global_context);
+    Assert(!gc);
 
-    global_context = c_arena_bootstrap_allocate_struct(global_context_t, context_arena, MB(100));
-    global_context->temporary_arena = c_arena_create(MB(200));
-    Assert(global_context != null);
+    gc = c_arena_bootstrap_allocate_struct(global_context_t, context_arena, MB(100));
+    gc->temporary_arena = c_arena_create(MB(200));
+    Assert(gc != null);
 
     // TODO(Sleepster): why the hell is this an undefined reference????
-    global_context->is_initialized = true;
+    gc->is_initialized = true;
 }
 
 void
 c_global_context_reset_temporary_data()
 {
-    c_arena_reset(&global_context->temporary_arena);
+    c_arena_reset(&gc->temporary_arena);
 }
 
 void
 c_global_context_reset_context_arena()
 {
-    c_arena_reset(&global_context->context_arena);
+    c_arena_reset(&gc->context_arena);
 }
