@@ -245,7 +245,6 @@ typedef void void_func(void);
 #define MB(x) (KB((x))  * 1024ULL)
 #define GB(x) (MB((x))  * 1024ULL)
 
-
 // NOTE(Sleepster): C++
 #ifdef __cplusplus
 #define TypesSame(A, B) (true) 

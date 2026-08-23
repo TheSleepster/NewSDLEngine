@@ -24,6 +24,9 @@ c_global_context_init()
 
     // TODO(Sleepster): why the hell is this an undefined reference????
     gc->is_initialized = true;
+
+    gc->tick_rate    = 1.0 / 60.0;
+    gc->tick_rate_ms = gc->tick_rate * 1000;
 }
 
 void

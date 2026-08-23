@@ -156,7 +156,7 @@ vk_allocator_allocate(vulkan_allocator_t            *allocator,
     VkResult code = vkAllocateMemory(allocator->device, &memory_allocation_info, allocator->cpu_allocation_callbacks, &result.memory);
     if(!vk_backend_result_is_success(code))
     {
-        Expect(false, "Failed to allocate memory for the depth buffer...\n");
+        Expect(false, "Failed to allocate the approprite amount / kind of memory for this allocation...\n");
     }
 
     result.allocation_size = requirements->size;

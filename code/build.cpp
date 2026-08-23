@@ -35,6 +35,7 @@
 #include <s_input_manager.h>
 #include <s_nt_networking.h>
 #include <s_ui_core.h>
+#include <s_entity.h>
 
 // NOTE(Sleepster): Engine 
 //#include <meta/GENERATED_program_RTTI.h>
@@ -77,4 +78,5 @@
 
 // NOTE(Sleepster): Game 
 #include <s_ui_core.cpp>
+#include <s_entity.cpp>
 #include <main.cpp>

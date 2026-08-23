@@ -35,6 +35,9 @@ typedef struct global_context
     memory_arena_t    context_arena;
     // NOTE(Sleepster): Resets with each call to gc_reset_temporary_data() 
     memory_arena_t    temporary_arena;
+
+    float64           tick_rate;
+    float64           tick_rate_ms;
 }global_context_t;
 
 void c_global_context_init();

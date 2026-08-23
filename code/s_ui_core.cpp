@@ -92,12 +92,12 @@ ui_state_begin_frame(ui_state_t *ui_state)
         action_button_t *left_mouse  = s_im_get_key_state(ui_state->ui_controller, SDL_LEFT_MOUSE);
         action_button_t *right_mouse = s_im_get_key_state(ui_state->ui_controller, SDL_RIGHT_MOUSE);
 
-        bool8 is_held           = left_mouse->is_down;
-        bool8 just_released     = left_mouse->is_released;
-        bool8 just_clicked      = left_mouse->is_pressed;
+        bool8 is_held           = (left_mouse->flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
+        bool8 just_released     = (left_mouse->flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
+        bool8 just_clicked      = (left_mouse->flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
+        bool8 is_right_clicked  = (right_mouse->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
+        bool8 is_right_held     = (right_mouse->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
         bool8 is_double_clicked = left_mouse->half_transition_counter >= 2;
-        bool8 is_right_clicked  = right_mouse->is_pressed;
-        bool8 is_right_held     = right_mouse->is_down;
 
         ui_state->left_mouse_clicked_this_frame = just_clicked;
         widget_t *top_most_widget = find_top_level_in_bounds_widget(ui_state,

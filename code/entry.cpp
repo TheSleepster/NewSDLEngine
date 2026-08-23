@@ -115,7 +115,7 @@ main(int argc, char **argv)
     gc->RHI_context    = c_arena_push_struct(&gc->context_arena, RHI_context_t);
     gc->asset_manager  = c_arena_push_struct(&gc->context_arena, asset_manager_t);
     gc->input_manager  = c_arena_push_struct(&gc->context_arena, input_manager_t);
-    if(SDL_Init(SDL_INIT_VIDEO))
+    if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMEPAD))
     {
         s32            display_count = 0;
         SDL_DisplayID *display_ids   = SDL_GetDisplays(&display_count);

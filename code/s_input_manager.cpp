@@ -6,15 +6,81 @@
    ======================================================================== */
 #include <s_input_manager.h>
 
-// NOTE(Sleepster): 
-//
-// These events should instead be handled inside of the entry.cpp file and instead of directly interacting
-// with the input manager like we are now, we should instead create two things:
-//
-// 1.) An input event buffer inside the event manager that stores input events from the start of this frame
-// 2.) An api to allow us to set what keys / gamepad buttons have been pressed.
-//
-// TODO(Sleepster): May want to adjust this to record a "controller ID" when a new device is read
+input_controller_t*
+s_im_find_controller_by_ID(input_manager_t *input_manager, u32 ID, s32 *index_out)
+{
+    input_controller_t *result = null;
+
+    for(u32 controller_index = 0;
+        controller_index < MAX_INPUT_CONTROLLERS;
+        ++controller_index)
+    {
+        input_controller_t *found = input_manager->controllers + controller_index;
+        if(found->ID == ID)
+        {
+            result = found;
+            if(index_out)
+            {
+                *index_out = controller_index;
+            }
+
+            break;
+        }
+    }
+
+    return(result);
+}
+
+input_controller_t*
+s_im_find_first_keyboard_controller(input_manager_t *input_manager, s32 *index_out)
+{
+    input_controller_t *result = null;
+
+    for(u32 controller_index = 0;
+        controller_index < MAX_INPUT_CONTROLLERS;
+        ++controller_index)
+    {
+        input_controller_t *found = input_manager->controllers + controller_index;
+        if(found->type == IM_CONTROLLER_KEYBOARD)
+        {
+            result = found;
+            if(index_out)
+            {
+                *index_out = controller_index;
+            }
+
+            break;
+        }
+    }
+
+    return(result);
+}
+
+input_controller_t*
+s_im_find_first_gamepad_controller(input_manager_t *input_manager, s32 *index_out)
+{
+    input_controller_t *result = null;
+
+    for(u32 controller_index = 0;
+        controller_index < MAX_INPUT_CONTROLLERS;
+        ++controller_index)
+    {
+        input_controller_t *found = input_manager->controllers + controller_index;
+        if(found->type == IM_CONTROLLER_GAMEPAD)
+        {
+            result = found;
+            if(index_out)
+            {
+                *index_out = controller_index;
+            }
+
+            break;
+        }
+    }
+
+    return(result);
+}
+
 void
 s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
 {
@@ -29,11 +95,12 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
             if(SDL_IsGamepad(event->gdevice.which))
             {
                 new_controller.gamepad.gamepad_id = event->gdevice.which;
+                new_controller.ID = event->gdevice.which;
                     
-                new_controller.gamepad.gamepad_data = SDL_OpenGamepad(new_controller.gamepad.gamepad_id);
-                new_controller.gamepad.stick_data   = SDL_GetGamepadJoystick(new_controller.gamepad.gamepad_data);
-                new_controller.gamepad.has_rumble   = SDL_RumbleGamepad(new_controller.gamepad.gamepad_data, 0xffff, 0xffff, 100000);
-
+                new_controller.gamepad.gamepad_data   = SDL_OpenGamepad(new_controller.gamepad.gamepad_id);
+                new_controller.gamepad.stick_data     = SDL_GetGamepadJoystick(new_controller.gamepad.gamepad_data);
+                new_controller.gamepad.has_rumble     = SDL_RumbleGamepad(new_controller.gamepad.gamepad_data, 0xffff, 0xffff, 1);
+                new_controller.gamepad.stick_deadzone = INPUT_MANAGER_GAMEPAD_DEFAULT_DEADZONE;
                 if(input_manager->connected_controller_count < MAX_INPUT_CONTROLLERS)
                 {
                     log_info("Controller '%s' connected...\n", SDL_GetGamepadName(new_controller.gamepad.gamepad_data));
@@ -72,24 +139,54 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
                     SDL_CloseJoystick(controller->gamepad.stick_data);
 
                     ZeroStruct(*controller);
-                    input_manager->connected_controller_count -= 1;
 
                     break;
                 }
             }
+
+            --input_manager->connected_controller_count;
+        }break;
+        case SDL_EVENT_KEYBOARD_ADDED:
+        {
+            input_controller_t *controller = input_manager->controllers + input_manager->connected_controller_count++;
+            s_im_initialize_keyboard_controller(controller, event->kdevice.which);
+        }break;
+        case SDL_EVENT_KEYBOARD_REMOVED:
+        {
+            input_controller_t *controller = s_im_find_controller_by_ID(input_manager, event->kdevice.which, null);
+            ZeroStruct(*controller);
         }break;
         case SDL_EVENT_KEY_UP:
         case SDL_EVENT_KEY_DOWN:
         {
-            input_controller_t *controller = input_manager->controllers;
+            input_controller_t *controller = s_im_get_primary_controller(input_manager);
+            if(controller->ID != event->key.which)
+            {
+                s32 index = 0;
+                controller = s_im_find_controller_by_ID(input_manager, event->key.which, &index);
+                input_manager->primary_controller_index = index;
+            }
             Assert(controller->type == IM_CONTROLLER_KEYBOARD);
 
             u32 key_index = event->key.scancode;
 
             action_button_t *action_key = controller->keyboard.input + key_index;
-            action_key->is_pressed      = (event->key.down && !event->key.repeat);
-            action_key->is_down         =  event->key.down;
-            action_key->is_released     = (event->key.down == false);
+            bool8 is_pressed  = (event->key.down && !event->key.repeat);
+            bool8 is_down     =  event->key.down;
+            bool8 is_released = (event->key.down == false);
+            if(is_pressed)
+            {
+                action_key->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
+            }
+            if(is_down)
+            {
+                action_key->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
+            }
+            if(is_released)
+            {
+                action_key->flags  = (action_key->flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
+                action_key->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
+            }
 
             controller->keyboard.is_shift_key_down   = (event->key.mod & SDL_KMOD_SHIFT) != 0;
             controller->keyboard.is_control_key_down = (event->key.mod & SDL_KMOD_CTRL)  != 0;
@@ -118,7 +215,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
                 if(event->type == SDL_EVENT_KEY_DOWN)
                 {
                     flags |= TEXT_INPUT_EVENT_PRESSED;
-                    if(action_key->is_down)
+                    if(action_key->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN)
                     {
                         flags = TEXT_INPUT_EVENT_DOWN;
                     }
@@ -152,7 +249,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
         }break;
         case SDL_EVENT_TEXT_INPUT:
         {
-            input_controller_t *controller = input_manager->controllers;
+            input_controller_t *controller = input_manager->controllers + input_manager->primary_controller_index;
             Assert(controller->type == IM_CONTROLLER_KEYBOARD);
 
             text_input_event_t text_event = {};
@@ -164,31 +261,47 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
         case SDL_EVENT_MOUSE_MOTION:
         {
             input_controller_t *controller = s_im_get_primary_controller(input_manager);
-            if(controller->type == IM_CONTROLLER_KEYBOARD)
+            if(controller->type != IM_CONTROLLER_KEYBOARD)
             {
-                float32 old_mouse_pos_x = controller->keyboard.current_mouse_pos.x; 
-                float32 old_mouse_pos_y = controller->keyboard.current_mouse_pos.y;
-
-                controller->keyboard.current_mouse_pos.x = event->motion.x;
-                controller->keyboard.current_mouse_pos.y = event->motion.y;
-
-                controller->keyboard.mouse_delta = vec2_subtract(controller->keyboard.current_mouse_pos, vec2(old_mouse_pos_x, old_mouse_pos_y));
+                s32 index = 0;
+                controller = s_im_find_first_keyboard_controller(input_manager, &index);
             }
+
+            float32 old_mouse_pos_x = controller->keyboard.current_mouse_pos.x; 
+            float32 old_mouse_pos_y = controller->keyboard.current_mouse_pos.y;
+
+            controller->keyboard.current_mouse_pos.x = event->motion.x;
+            controller->keyboard.current_mouse_pos.y = event->motion.y;
+
+            controller->keyboard.mouse_delta = vec2_subtract(controller->keyboard.current_mouse_pos, vec2(old_mouse_pos_x, old_mouse_pos_y));
         }break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
         {
             input_controller_t *controller = s_im_get_primary_controller(input_manager);
+            if(controller->type != IM_CONTROLLER_KEYBOARD)
+            {
+                s32 index = 0;
+                controller = s_im_find_first_keyboard_controller(input_manager, &index);
+                input_manager->primary_controller_index = index;
+            }
+
             Assert(controller->type == IM_CONTROLLER_KEYBOARD);
             u32 key_index = event->button.button + SDL_SCANCODE_COUNT;
 
             action_button_t *button = controller->keyboard.input + key_index;
             button->half_transition_counter += 1;
             button->scancode = key_index;
+            if(event->button.down)
+            {
+                button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN|INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
+            }
+            else if(!event->button.down)
+            {
+                button->flags  = (button->flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
+                button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
+            }
 
-            button->is_pressed  =  event->button.down;
-            button->is_released = !event->button.down;
-            button->is_down     =  event->button.down;
             if(controller->action_inputs_this_frame < MAX_BUFFERED_INPUTS)
             {
                 controller->transient_action_inputs[controller->action_inputs_this_frame++] = button;
@@ -196,6 +309,15 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
         }break;
         case SDL_EVENT_MOUSE_WHEEL: 
         {
+            input_controller_t *controller = s_im_get_primary_controller(input_manager);
+            if(controller->type != IM_CONTROLLER_KEYBOARD)
+            {
+                s32 index = 0;
+                controller = s_im_find_first_keyboard_controller(input_manager, &index);
+
+                input_manager->primary_controller_index = index;
+            }
+
             s32 scroll_amount = event->wheel.integer_y;
             log_info("Scrolled...: '%d'\n", scroll_amount);
         }break;
@@ -203,12 +325,32 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
         case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
         {
             input_controller_t *controller = s_im_get_primary_controller(input_manager);
-            action_button_t *button = controller->gamepad.digital_buttons + event->gbutton.button;
-                
+            if(controller->ID != event->gbutton.which)
+            {
+                s32 index = 0;
+                controller = s_im_find_first_gamepad_controller(input_manager, &index);
+
+                input_manager->primary_controller_index = index;
+            }
+
+            action_button_t *button = controller->gamepad.buttons + event->gbutton.button;
             SDL_GamepadButtonEvent button_data = event->gbutton; 
-            button->is_pressed  = ((button_data.down == true) && (button->half_transition_counter <= 1));
-            button->is_down     = (button_data.down  == true);
-            button->is_released = (button_data.down  == false);
+
+            bool8 is_pressed  = ((button_data.down == true) && (button->half_transition_counter <= 1));
+            bool8 is_down     = (button_data.down  == true);
+            bool8 is_released = (button_data.down  == false);
+            if(is_pressed)
+            {
+                button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
+            }
+            if(is_down)
+            {
+                button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
+            }
+            if(is_released)
+            {
+                button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
+            }
 
             button->half_transition_counter += 1;
             if(controller->action_inputs_this_frame < MAX_BUFFERED_INPUTS)
@@ -219,9 +361,22 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
         case SDL_EVENT_GAMEPAD_AXIS_MOTION:
         {
             input_controller_t *controller = s_im_get_primary_controller(input_manager);
-            analog_button_t    *analog_button = controller->gamepad.analog_buttons + event->gaxis.axis;
+            if(controller->ID != event->gaxis.which)
+            {
+                s32 index = 0;
+                controller = s_im_find_first_gamepad_controller(input_manager, &index);
 
-            analog_button->value = event->gaxis.value;
+                input_manager->primary_controller_index = index;
+            }
+
+            action_button_t *analog_button = controller->gamepad.buttons + (SDL_GAMEPAD_BUTTON_COUNT + event->gaxis.axis);
+
+            analog_button->analog_value = event->gaxis.value;
+            if(analog_button->analog_value > 0)
+            {
+                analog_button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
+                analog_button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
+            }
         }break;
     }
 }
@@ -245,32 +400,32 @@ s_im_reset_controller_states(input_manager_t *input_manager)
                         ++key_index)
                     {
                         action_button_t *button = controller->keyboard.input + key_index;
+                        bool8 is_down = button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
 
                         button->half_transition_counter = 0;
-                        button->is_pressed  = false;
-                        button->is_released = false;
-                        button->consumed_this_frame = false;
+                        button->flags = 0;
+                        if(is_down)
+                        {
+                            button->flags = INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
+                        }
                     }
                 }break;
                 case IM_CONTROLLER_GAMEPAD:
                 {
                     for(u32 button_index = 0;
-                        button_index < SDL_GAMEPAD_BUTTON_COUNT;
+                        button_index < (SDL_GAMEPAD_BUTTON_COUNT + SDL_GAMEPAD_AXIS_COUNT);
                         ++button_index)
                     {
-                        action_button *button = controller->gamepad.digital_buttons + button_index;
-                        button->half_transition_counter = 0;
-                        button->is_pressed  = false;
-                        button->is_released = false;
-                        button->consumed_this_frame = false;
-                    }
+                        action_button *button = controller->gamepad.buttons + button_index;
+                        bool8 is_down = button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
 
-                    for(u32 analog_button_index = 0;
-                        analog_button_index < SDL_GAMEPAD_AXIS_COUNT;
-                        ++analog_button_index)
-                    {
-                        analog_button_t *button = controller->gamepad.analog_buttons + analog_button_index;
-                        button->value = 0;
+                        button->half_transition_counter = 0;
+                        button->flags = 0;
+                        //button->analog_value = 0;
+                        if(is_down)
+                        {
+                            button->flags = INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
+                        }
                     }
                 }break;
                 default: {InvalidCodePath;}break;
@@ -288,21 +443,19 @@ s_im_reset_controller_states(input_manager_t *input_manager)
 void
 s_im_init_input_manager(input_manager_t *input_manager)
 {
-    s_im_initialize_keyboard_controller(input_manager, 0);
     input_manager->primary_controller_index = 0;
 }
 
 void
-s_im_initialize_keyboard_controller(input_manager_t *input_manager, s32 index)
+s_im_initialize_keyboard_controller(input_controller_t *controller, u32 ID)
 {
-    input_controller_t *controller = input_manager->controllers + index;
     ZeroStruct(*controller);
 
     controller->is_valid  = true;
     controller->is_analog = false;
     controller->type      = IM_CONTROLLER_KEYBOARD;
+    controller->ID        = ID;
 }
-
 
 input_controller_t *
 s_im_get_primary_controller(input_manager_t *input_manager)
@@ -380,7 +533,7 @@ s_im_is_keyboard_key_pressed(input_controller_t *controller, s32 key_index)
 
     action_button_t *button = controller->keyboard.input + key_index;
 
-    result = button->is_pressed;
+    result = (button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
     return(result);
 }
 
@@ -392,7 +545,7 @@ s_im_is_keyboard_key_down(input_controller_t *controller, s32 key_index)
 
     action_button_t *button = controller->keyboard.input + key_index;
 
-    result = button->is_down;
+    result = (button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
     return(result);
 }
 
@@ -404,7 +557,7 @@ s_im_is_keyboard_key_released(input_controller_t *controller, s32 key_index)
 
     action_button_t *button = controller->keyboard.input + key_index;
 
-    result = button->is_released;
+    result = (button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
     return(result);
 }
 
@@ -414,7 +567,8 @@ s_im_consume_keyboard_key_press(input_controller_t *controller, s32 key_index)
     Assert(controller->type == IM_CONTROLLER_KEYBOARD);
 
     action_button_t *button         = controller->keyboard.input + key_index;
-    button->is_pressed              = false;
+
+    button->flags = (button->flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
     button->half_transition_counter = 0;
 }
 
@@ -424,7 +578,7 @@ s_im_consume_keyboard_key_down(input_controller_t *controller, s32 key_index)
     Assert(controller->type == IM_CONTROLLER_KEYBOARD);
 
     action_button_t *button         = controller->keyboard.input + key_index;
-    button->is_down                 = false;
+    button->flags = (button->flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
     button->half_transition_counter = 0;
 }
 
@@ -434,7 +588,7 @@ s_im_consume_keyboard_key_release(input_controller_t *controller, s32 key_index)
     Assert(controller->type == IM_CONTROLLER_KEYBOARD);
 
     action_button_t *button         = controller->keyboard.input + key_index;
-    button->is_released             = false;
+    button->flags = (button->flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
     button->half_transition_counter = 0;
 }
 
@@ -472,6 +626,30 @@ s_im_get_key_state(input_controller_t *controller, s32 key_index)
     return(button);
 }
 
+internal_api vec2_t
+s_im_measure_keyboard_axis_2D(input_controller_t *controller, game_action_mapping_t *mapping)
+{
+    vec2_t result = {};
+    if(s_im_is_keyboard_key_down(controller, mapping->bindings[0].binding_id))
+    {
+        result.y += 1.0;
+    }
+    if(s_im_is_keyboard_key_down(controller, mapping->bindings[1].binding_id))
+    {
+        result.y += -1.0;
+    }
+    if(s_im_is_keyboard_key_down(controller, mapping->bindings[2].binding_id))
+    {
+        result.x += -1.0;
+    }
+    if(s_im_is_keyboard_key_down(controller, mapping->bindings[3].binding_id))
+    {
+        result.x += 1.0;
+    }
+
+    return(result);
+}
+
 /*=============================================
   =============== GAMEPAD INPUT ===============
   =============================================*/
@@ -482,9 +660,9 @@ s_im_is_gamepad_button_pressed(input_controller_t *controller, s32 button_index)
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
     bool8 result = false;
 
-    action_button_t *button = controller->gamepad.digital_buttons + button_index;
+    action_button_t *button = controller->gamepad.buttons + button_index;
 
-    result = button->is_pressed;
+    result = (button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
     return(result);
 }
 
@@ -494,9 +672,9 @@ s_im_is_gamepad_button_down(input_controller_t *controller, s32 button_index)
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
     bool8 result = false;
 
-    action_button_t *button = controller->gamepad.digital_buttons + button_index;
+    action_button_t *button = controller->gamepad.buttons + button_index;
 
-    result = (button->is_down || button->is_pressed);
+    result = (button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
     return(result);
 }
 
@@ -506,9 +684,8 @@ s_im_is_gamepad_button_released(input_controller_t *controller, s32 button_index
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
     bool8 result = false;
 
-    action_button_t *button = controller->gamepad.digital_buttons + button_index;
-
-    result = button->is_released;
+    action_button_t *button = controller->gamepad.buttons + button_index;
+    result = (button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
     return(result);
 }
 
@@ -517,8 +694,8 @@ s_im_consume_gamepad_button_press(input_controller_t *controller, s32 button_ind
 {
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
 
-    action_button_t *button         = controller->gamepad.digital_buttons + button_index;
-    button->is_pressed              = false;
+    action_button_t *button         = controller->gamepad.buttons + button_index;
+    button->flags = (button->flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
     button->half_transition_counter = 0;
 }
 
@@ -527,8 +704,8 @@ s_im_consume_gamepad_button_down(input_controller_t *controller, s32 button_inde
 {
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
 
-    action_button_t *button         = controller->gamepad.digital_buttons + button_index;
-    button->is_down                 = false;
+    action_button_t *button         = controller->gamepad.buttons + button_index;
+    button->flags = (button->flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
     button->half_transition_counter = 0;
 }
 
@@ -537,36 +714,232 @@ s_im_consume_gamepad_button_release(input_controller_t *controller, s32 button_i
 {
     Assert(controller->type == IM_CONTROLLER_GAMEPAD);
 
-    action_button_t *button         = controller->gamepad.digital_buttons + button_index;
-    button->is_released             = false;
+    action_button_t *button         = controller->gamepad.buttons + button_index;
+    button->flags = (button->flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
     button->half_transition_counter = 0;
 }
 
-inline action_button_t*
-s_im_get_button_state(input_controller_t *controller, s32 button_index)
+action_button_t*
+s_im_gamepad_get_button_state(input_controller_t *controller, s32 button_index)
 {
-    action_button_t *button = controller->gamepad.digital_buttons + button_index;
+    action_button_t *button = controller->gamepad.buttons + button_index;
     return(button);
+}
+
+s16
+s_im_gamepad_get_axis_value(input_controller_t *controller, s32 axis_id)
+{
+    Expect(controller->type == IM_CONTROLLER_GAMEPAD, "Must be a gamepad...\n");
+    s16 result = 0;
+    result = controller->gamepad.buttons[SDL_GAMEPAD_BUTTON_COUNT + axis_id].analog_value;
+
+    return(result);
+}
+
+internal_api vec2_t
+s_im_measure_gamepad_axis_2D(input_controller_t *controller, game_action_mapping_t *mapping)
+{
+    vec2_t result = {};
+
+    game_action_binding_t *up_down    = &mapping->bindings[0];
+    game_action_binding_t *left_right = &mapping->bindings[1];
+
+    Expect(up_down->binding_type    == INPUT_MANAGER_BINDING_TYPE_JOYSTICK, "Sorry, for controllers we only support joysticks for axis bindings...");
+    Expect(left_right->binding_type == INPUT_MANAGER_BINDING_TYPE_JOYSTICK, "Sorry, for controllers we only support joysticks for axis bindings...");
+
+    s16 up_down_value    = s_im_gamepad_get_axis_value(controller, up_down->binding_id);
+    s16 left_right_value = s_im_gamepad_get_axis_value(controller, left_right->binding_id);
+
+    float32 up_down_normalized    = up_down_value    < 0 ? (float32)up_down_value    / 32768.0f : (float32)up_down_value    / 32767.0f;
+    float32 left_right_normalized = left_right_value < 0 ? (float32)left_right_value / 32768.0f : (float32)left_right_value / 32767.0f;
+
+    // NOTE(Sleepster): SDL reports up as negative, down as positive. Flip so +Y == up.
+    result = {left_right_normalized, -up_down_normalized};
+
+    float32 magnitude = vec2_length(result);
+    if(magnitude > controller->gamepad.stick_deadzone)
+    {
+        float32 scaled_magnitude = (magnitude - controller->gamepad.stick_deadzone) / (1.0f - controller->gamepad.stick_deadzone);
+        scaled_magnitude = Clamp(scaled_magnitude, 0.0f, 1.0f);
+
+        result = vec2_multiply(result, vec2_create(scaled_magnitude / magnitude));
+    }
+    else
+    {
+        result = vec2_zero();
+    }
+
+    return(result);
 }
 
 /*===============================================
   =============== GAME ACTION API ===============
   ===============================================*/
 
-void
-s_game_action_create(input_manager_t *input_manager, 
-                     string_t         name, 
-                     u32              first_binding, 
-                     u32              first_binding_type, 
-                     u32              second_binding, 
-                     u32              second_binding_type)
+game_action_t*
+s_im_game_action_create(input_manager_t           *input_manager, 
+                        string_t                   action_name, 
+                        game_action_mapping_type_t mapping_type)
 {
-    game_action_t new_action       = {};
-    new_action.keyboard.type       = first_binding_type;
-    new_action.keyboard.binding_id = first_binding;
-    new_action.gamepad.type        = second_binding;
-    new_action.gamepad.binding_id  = second_binding_type;
+    game_action_t *result = null;
 
-    c_dynarray_add(&input_manager->game_actions, &new_action); 
+    game_action_t new_action = {
+        .action_binding_type = mapping_type,
+        .name                = action_name
+    };
+    c_dynarray_add(&input_manager->game_actions, &new_action);
+    result = &input_manager->game_actions[input_manager->game_actions.used - 1];
+
+    return(result);
 }
 
+void
+s_im_game_action_add_mapping(game_action_t *action, game_action_mapping_t *mapping)
+{
+    Expect((action->mapping_count + 1) <= MAX_GAME_ACTION_MAPPINGS, "Attempted to add more mappings to a game_action than allowed... the max is 4...\n");
+    action->mappings[action->mapping_count++] = *mapping;
+}
+
+void
+s_im_game_action_reset_mappings(game_action_t *action)
+{
+    ZeroMemory(action->mappings, sizeof(game_action_mapping_t) * MAX_GAME_ACTION_MAPPINGS);
+    action->mapping_count = 0;
+}
+
+s32
+s_im_game_action_read_button_state(input_controller_t *controller, game_action_t *action)
+{
+    s32 result = 0;
+
+    game_action_mapping_t *mapping = null;
+    for(s32 mapping_index = 0;
+        mapping_index < action->mapping_count;
+        ++mapping_index)
+    {
+        game_action_mapping_t *found = action->mappings + mapping_index;
+        if(found->controller_type == controller->type)
+        {
+            mapping = found;
+            break;
+        }
+    }
+
+    if(mapping)
+    {
+        switch(mapping->controller_type)
+        {
+            case IM_CONTROLLER_KEYBOARD:
+            {
+                action_button_t *button = s_im_get_key_state(controller, mapping->bindings[0].binding_id);
+                result = button->flags;
+            }
+            case IM_CONTROLLER_GAMEPAD:
+            {
+                action_button_t *button = s_im_gamepad_get_button_state(controller, mapping->bindings[0].binding_id);
+                result = button->flags;
+            }break;
+        }
+    }
+    else
+    {
+        Expect(false, "There is no valid binding for this controller type associated with this game action!\n");
+    }
+
+    return(result);
+}
+
+float32
+s_im_game_action_read_axis1D_value(input_controller_t *controller, game_action_t *action)
+{
+    float32 result = 0.0f;
+
+    game_action_mapping_t *mapping = null;
+    for(s32 mapping_index = 0;
+        mapping_index < action->mapping_count;
+        ++mapping_index)
+    {
+        game_action_mapping_t *found = action->mappings + mapping_index;
+        if(found->controller_type == controller->type)
+        {
+            mapping = found;
+            break;
+        }
+    }
+
+    if(mapping)
+    {
+        switch(mapping->controller_type)
+        {
+            case IM_CONTROLLER_KEYBOARD:
+            {
+                action_button_t *left_button  = s_im_get_key_state(controller, mapping->bindings[0].binding_id);
+                action_button_t *right_button = s_im_get_key_state(controller, mapping->bindings[1].binding_id);
+                if(left_button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN)
+                {
+                    result += 1.0f;
+                }
+
+                if(right_button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN)
+                {
+                    result += -1.0f;
+                }
+            }break;
+            case IM_CONTROLLER_GAMEPAD:
+            {
+                s16 value = s_im_gamepad_get_axis_value(controller, mapping->bindings[0].binding_id);
+                float32 value_normalized = ((float32)value / S16_MAX);
+
+                // NOTE(Sleepster): We don't use the deadzone... 
+                result = value_normalized;
+            }break;
+        }
+    }
+    else
+    {
+        Expect(false, "There is no valid binding for this controller type associated with this game action!\n");
+    }
+
+    return(result);
+}
+
+vec2_t
+s_im_game_action_read_axis2D_value(input_controller_t *controller, game_action_t *action)
+{
+    vec2_t result = {};
+
+    game_action_mapping_t *mapping = null;
+    for(s32 mapping_index = 0;
+        mapping_index < action->mapping_count;
+        ++mapping_index)
+    {
+        game_action_mapping_t *found = action->mappings + mapping_index;
+        if(found->controller_type == controller->type)
+        {
+            mapping = found;
+            break;
+        }
+    }
+
+    // NOTE(Sleepster): If there is a valid mapping, measure it. 
+    if(mapping)
+    {
+        switch(mapping->controller_type)
+        {
+            case IM_CONTROLLER_KEYBOARD:
+            {
+                result = s_im_measure_keyboard_axis_2D(controller, mapping);
+            }break;
+            case IM_CONTROLLER_GAMEPAD:
+            {
+                result = s_im_measure_gamepad_axis_2D(controller, mapping);
+            }break;
+        }
+    }
+    else
+    {
+        Expect(false, "There is no valid binding for this controller type associated with this game action!\n");
+    }
+
+    return(result);
+}

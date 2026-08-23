@@ -127,6 +127,22 @@ c_array_find(array_t<T, count> *array, T *element)
     return(result);
 }
 
+template <typename T, u32 count>
+void
+c_array_remove(array_t<T, count> *array, u32 index)
+{
+    Assert(index <= array->count);
+
+    for(u32 this_index = index;
+        this_index < (array->used - 1);
+        ++this_index)
+    {
+        array->items[this_index] = array->items[this_index + 1];
+    }
+
+    --array->used;
+}
+
 /////////////////////////
 // DYNAMIC ARRAY
 /////////////////////////
@@ -189,10 +205,11 @@ c_dynarray_add(dynarray_t<T> *array, T *element)
         u32 old_count = array->count;
 
         u32 new_count = Max(5, array->count * 2);
-        T  *new_items    = (T*)realloc(array->items, sizeof(T) * new_count);
+        T  *new_items = (T*)realloc(array->items, sizeof(T) * new_count);
+        ZeroMemory(new_items, sizeof(T) * new_count);
 
         array->count = new_count;
-        array->items    = new_items;
+        array->items = new_items;
 
         Assert(array->items);
         if(old_count > 0)
