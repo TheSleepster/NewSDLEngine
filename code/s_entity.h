@@ -44,6 +44,7 @@ enum entity_flags_t
     ENTITY_FLAG_HAS_SPRITE     = BIT(7),
     ENTITY_FLAG_HAS_COLLIDER   = BIT(8),
     ENTITY_FLAG_ANIMATED       = BIT(9),
+    ENTITY_FLAG_IS_GROUND      = BIT(10),
 };
 
 // NOTE(Sleepster): owner_client_id is used to assign ownership of an entity 
@@ -78,6 +79,7 @@ struct entity_t
 
     // NOTE(Sleepster): Colliders
     rectangle2_t    bounding_box;
+    bool8           collision;
 };
 
 struct entity_manager_t

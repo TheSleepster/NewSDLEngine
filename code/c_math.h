@@ -627,6 +627,7 @@ MATH_API mat4_t mat4_inverse_ortho(mat4_t orthographic_projection);
   ==============================================*/
 
 MATH_API rectangle2_t rect2_create(vec2_t position, vec2_t size);
+MATH_API rectangle2_t rect2_create_from_min_max(vec2_t min, vec2_t max);
 MATH_API vec2_t       rect2_get_size(rectangle2_t rect);
 MATH_API vec2_t       rect2_get_position(rectangle2_t rect);
 MATH_API void         rect2_shift_by(rectangle2_t *rect, vec2_t shift);
@@ -2277,6 +2278,19 @@ rect2_create(vec2_t position, vec2_t size)
     result.max       = vec2_add(position, size);
     result.half_size = vec2_scale(size, 0.5f);
     result.center    = vec2_add(position, result.half_size);
+
+    return(result);
+}
+
+
+MATH_API rectangle2_t 
+rect2_create_from_min_max(vec2_t min, vec2_t max)
+{
+    rectangle2_t result;
+    result.min       = min;
+    result.max       = max;
+    result.half_size = vec2_multiply(vec2_subtract(min, max), vec2(0.5, 0.5));
+    result.center    = vec2_add(result.min, result.half_size);
 
     return(result);
 }

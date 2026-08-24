@@ -121,6 +121,8 @@ constexpr float32 MAX_ENTITY_ACCELERATION = 100;
 global_variable string_t global_test_textbox_string = {}; 
 // TODO(Sleepster): DEBUG CODE 
 
+entity_t *minkowski_rectangle = {};
+
 // NOTE(Sleepster): DEBUG CODE
 internal_api void
 handle_debug_ui_menu(ui_state_t *main_ui, RHI_context_t *RHI_context, asset_handle_t *player_sprite)
@@ -379,11 +381,12 @@ entity_test_collider_create(game_state_t *game_state, vec2_t position, vec2_t si
 internal_api void
 render_collider(render_state_t *render_state, RHI_command_list_t *command_list, entity_t *entity)
 {
+    vec4_t color = (entity != minkowski_rectangle) ? vec4(0.5f, 0.0f, 0.0f, 0.2f) : vec4(0.0f, 0.6f, 0.0f, 0.3f);
     immediate_rect(command_list, 
-                  &render_state->vertex_buffer,
+                   &render_state->vertex_buffer,
                    vec2_expand_vec3(entity->bounding_box.min, 0.6f),
                    vec2_multiply(entity->bounding_box.half_size, vec2(2, 2)),
-                   vec4(0.5f, 0.0, 0.0, 0.2f),
+                   color,
                    vec2_zero(),
                    vec2_zero(),
                    vec2_zero(),
@@ -460,6 +463,7 @@ entity_render(render_state_t *render_state, RHI_command_list_t *command_list, en
 internal_api void
 create_test_environment(game_state_t *game_state, asset_manager_t *asset_manager)
 {
+#if 1
     entity_t *top_wall    = entity_test_collider_create(game_state, vec2(-160,  80), vec2(320, 20));
     entity_t *bottom_wall = entity_test_collider_create(game_state, vec2(-160, -90), vec2(320, 20));
     entity_t *left_wall   = entity_test_collider_create(game_state, vec2(-160, -80), vec2(20,  180));
@@ -469,6 +473,9 @@ create_test_environment(game_state_t *game_state, asset_manager_t *asset_manager
     (void)bottom_wall;
     (void)left_wall;
     (void)right_wall;
+#else
+    entity_t *top_wall = entity_test_collider_create(game_state, vec2(-25, -25), vec2(50, 50));
+#endif
 }
 
 internal_api void
@@ -707,10 +714,8 @@ game_state_simulate(game_state_t *game_state)
     entity_query_t gravity_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_ACTOR|ENTITY_FLAG_GRAVITIC);
     for(entity_t *entity: gravity_query)
     {
-        //f32_approach(&entity->velocity.y, entity->max_acceleration.y, game_state->gravity, gc->tick_rate);
+        f32_approach(&entity->velocity.y, entity->max_acceleration.y, game_state->gravity, gc->tick_rate);
     }
-
-#if 0
     entity_query_t collision_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_HAS_COLLIDER);
     entity_query_t actor_query     = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_ACTOR|ENTITY_FLAG_HAS_COLLIDER);
     for(entity_t *entity: actor_query)
@@ -725,17 +730,22 @@ game_state_simulate(game_state_t *game_state)
                     raytest_t sweep = rect2_sweep_test(entity->bounding_box, current_velocity, test_entity->bounding_box);
                     if(sweep.hit)
                     {
-                        current_velocity = vec2_scale(current_velocity, sweep.time);
-
-                        if(sweep.normal.x != 0.0f) entity->velocity.x = 0.0f;
-                        if(sweep.normal.y != 0.0f) entity->velocity.y = 0.0f;
+                        if(sweep.normal.x != 0.0f) 
+                        {
+                            current_velocity.x = current_velocity.x * sweep.time;
+                        }
+                        if(sweep.normal.y != 0.0f) 
+                        {
+                            current_velocity.y = current_velocity.y * sweep.time;
+                        }
                     }
                 }
 
+#if 0
                 // NOTE(Sleepster): Stationary Response
                 {
                     rectangle2_t predicted_hitbox = entity->bounding_box;
-                    rect2_shift_by(&predicted_hitbox, current_velocity);
+                    rect2_shift_by(&predicted_hitbox, vec2_multiply(current_velocity, vec2_create(gc->tick_rate)));
 
                     // TODO(Sleepster): Epsilon 
                     rectangle2_t minkowski = rect2_minkowski_difference(predicted_hitbox, test_entity->bounding_box);
@@ -744,17 +754,13 @@ game_state_simulate(game_state_t *game_state)
                     {
                         vec2_t overlap_vector = rect2_get_vector_depth(minkowski);
                         current_velocity      = vec2_add(current_velocity, overlap_vector);
-
-                        if(overlap_vector.x != 0) entity->velocity.x = 0.0f;
-                        if(overlap_vector.y != 0) entity->velocity.y = 0.0f;
                     }
                 }
-
+#endif
                 entity->velocity = current_velocity;
             }
         }
     }
-#endif
 
     entity_query_t transform_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_ACTOR);
     for(entity_t *entity: transform_query)
@@ -822,6 +828,7 @@ game_main(void)
 
     // GAME INIT
     entity_player_create(&game_state, asset_manager);
+    minkowski_rectangle = entity_test_collider_create(&game_state, vec2_zero(), vec2_zero());
     create_test_environment(&game_state, asset_manager);
     // GAME INIT
 

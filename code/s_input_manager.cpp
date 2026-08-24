@@ -160,91 +160,94 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
         case SDL_EVENT_KEY_DOWN:
         {
             input_controller_t *controller = s_im_get_primary_controller(input_manager);
-            if(controller->ID != event->key.which)
+            if(controller->is_valid)
             {
-                s32 index = 0;
-                controller = s_im_find_controller_by_ID(input_manager, event->key.which, &index);
-                input_manager->primary_controller_index = index;
-            }
-            Assert(controller->type == IM_CONTROLLER_KEYBOARD);
-
-            u32 key_index = event->key.scancode;
-
-            action_button_t *action_key = controller->keyboard.input + key_index;
-            bool8 is_pressed  = (event->key.down && !event->key.repeat);
-            bool8 is_down     =  event->key.down;
-            bool8 is_released = (event->key.down == false);
-            if(is_pressed)
-            {
-                action_key->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
-            }
-            if(is_down)
-            {
-                action_key->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
-            }
-            if(is_released)
-            {
-                action_key->flags  = (action_key->flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
-                action_key->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
-            }
-
-            controller->keyboard.is_shift_key_down   = (event->key.mod & SDL_KMOD_SHIFT) != 0;
-            controller->keyboard.is_control_key_down = (event->key.mod & SDL_KMOD_CTRL)  != 0;
-            controller->keyboard.is_alt_key_down     = (event->key.mod & SDL_KMOD_ALT)   != 0;
-
-            action_key->keycode  = SDL_GetKeyFromScancode(event->key.scancode, event->key.mod, false);
-            action_key->scancode = event->key.scancode;
-
-            action_key->half_transition_counter += 1;
-            if(controller->action_inputs_this_frame < MAX_BUFFERED_INPUTS)
-            {
-                controller->transient_action_inputs[controller->action_inputs_this_frame++] = action_key;
-            }
-
-            if(key_index < SDL_SCANCODE_COUNT &&
-               event->type == SDL_EVENT_KEY_DOWN &&
-              (action_key->keycode & SDLK_SCANCODE_MASK) == 0)
-            {
-                text_input_event_t text_event = {};
-                text_event.type     = TEXT_INPUT_EVENT_TYPE_INPUT_EVENT;
-                text_event.scancode = key_index;
-                text_event.keycode  = action_key->keycode;
-
-                // NOTE(Sleepster): Set the input event type 
-                u32 flags = 0;
-                if(event->type == SDL_EVENT_KEY_DOWN)
+                if(controller->ID != event->key.which)
                 {
-                    flags |= TEXT_INPUT_EVENT_PRESSED;
-                    if(action_key->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN)
+                    s32 index = 0;
+                    controller = s_im_find_controller_by_ID(input_manager, event->key.which, &index);
+                    input_manager->primary_controller_index = index;
+                }
+                Assert(controller->type == IM_CONTROLLER_KEYBOARD);
+
+                u32 key_index = event->key.scancode;
+
+                action_button_t *action_key = controller->keyboard.input + key_index;
+                bool8 is_pressed  = (event->key.down && !event->key.repeat);
+                bool8 is_down     =  event->key.down;
+                bool8 is_released = (event->key.down == false);
+                if(is_pressed)
+                {
+                    action_key->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
+                }
+                if(is_down)
+                {
+                    action_key->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
+                }
+                if(is_released)
+                {
+                    action_key->flags  = (action_key->flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
+                    action_key->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
+                }
+
+                controller->keyboard.is_shift_key_down   = (event->key.mod & SDL_KMOD_SHIFT) != 0;
+                controller->keyboard.is_control_key_down = (event->key.mod & SDL_KMOD_CTRL)  != 0;
+                controller->keyboard.is_alt_key_down     = (event->key.mod & SDL_KMOD_ALT)   != 0;
+
+                action_key->keycode  = SDL_GetKeyFromScancode(event->key.scancode, event->key.mod, false);
+                action_key->scancode = event->key.scancode;
+
+                action_key->half_transition_counter += 1;
+                if(controller->action_inputs_this_frame < MAX_BUFFERED_INPUTS)
+                {
+                    controller->transient_action_inputs[controller->action_inputs_this_frame++] = action_key;
+                }
+
+                if(key_index < SDL_SCANCODE_COUNT &&
+                   event->type == SDL_EVENT_KEY_DOWN &&
+                   (action_key->keycode & SDLK_SCANCODE_MASK) == 0)
+                {
+                    text_input_event_t text_event = {};
+                    text_event.type     = TEXT_INPUT_EVENT_TYPE_INPUT_EVENT;
+                    text_event.scancode = key_index;
+                    text_event.keycode  = action_key->keycode;
+
+                    // NOTE(Sleepster): Set the input event type 
+                    u32 flags = 0;
+                    if(event->type == SDL_EVENT_KEY_DOWN)
                     {
-                        flags = TEXT_INPUT_EVENT_DOWN;
+                        flags |= TEXT_INPUT_EVENT_PRESSED;
+                        if(action_key->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN)
+                        {
+                            flags = TEXT_INPUT_EVENT_DOWN;
+                        }
                     }
-                }
-                else if(event->type == SDL_EVENT_KEY_UP)
-                {
-                    flags |= TEXT_INPUT_EVENT_RELEASED;
-                }
-                text_event.input_event_type = flags;
+                    else if(event->type == SDL_EVENT_KEY_UP)
+                    {
+                        flags |= TEXT_INPUT_EVENT_RELEASED;
+                    }
+                    text_event.input_event_type = flags;
 
-                // NOTE(Sleepster): Set the modifiers 
-                u32 modifier_flags = 0;
-                if((event->key.mod & SDL_KMOD_SHIFT))
-                {
-                    modifier_flags |= TEXT_INPUT_MODIFIER_SHIFT;
-                }
+                    // NOTE(Sleepster): Set the modifiers 
+                    u32 modifier_flags = 0;
+                    if((event->key.mod & SDL_KMOD_SHIFT))
+                    {
+                        modifier_flags |= TEXT_INPUT_MODIFIER_SHIFT;
+                    }
 
-                if((event->key.mod & SDL_KMOD_CTRL))
-                {
-                    modifier_flags |= TEXT_INPUT_MODIFIER_CTRL;
-                }
+                    if((event->key.mod & SDL_KMOD_CTRL))
+                    {
+                        modifier_flags |= TEXT_INPUT_MODIFIER_CTRL;
+                    }
 
-                if((event->key.mod & SDL_KMOD_ALT))
-                {
-                    modifier_flags |= TEXT_INPUT_MODIFIER_ALT;
-                }
+                    if((event->key.mod & SDL_KMOD_ALT))
+                    {
+                        modifier_flags |= TEXT_INPUT_MODIFIER_ALT;
+                    }
 
-                text_event.modifier_flags = modifier_flags;
-                controller->transient_text_inputs[controller->text_inputs_this_frame++] = text_event;
+                    text_event.modifier_flags = modifier_flags;
+                    controller->transient_text_inputs[controller->text_inputs_this_frame++] = text_event;
+                }
             }
         }break;
         case SDL_EVENT_TEXT_INPUT:
