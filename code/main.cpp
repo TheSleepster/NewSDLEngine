@@ -114,8 +114,8 @@ enum player_animation_state_t
 constexpr u32 GAME_FRAMEBUFFER_WIDTH  = 320;
 constexpr u32 GAME_FRAMEBUFFER_HEIGHT = 180;
 
-constexpr float32 COLLISION_EPSILON   = 0.01f;
-constexpr float32 MAX_ENTITY_VELOCITY = 40;
+constexpr float32 COLLISION_EPSILON       = 0.01f;
+constexpr float32 MAX_ENTITY_ACCELERATION = 100;
 
 // TODO(Sleepster): DEBUG CODE 
 global_variable string_t global_test_textbox_string = {}; 
@@ -310,8 +310,10 @@ entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager)
 
     result->animations      = c_arena_push_array(&gc->context_arena, animation2D_t, PLAYER_ANIMATION_STATE_COUNT);
     result->animation_count = PLAYER_ANIMATION_STATE_COUNT;
+    result->bounding_box    = rect2_create(result->position, result->size);
 
-    result->bounding_box = rect2_create(result->position, result->size);
+    result->friction         = vec2_create(100);
+    result->max_acceleration = vec2_create(100);
 
     // idle
     local_persist duration_counter_t idle_counter = {
@@ -680,21 +682,35 @@ game_state_simulate(game_state_t *game_state)
     entity_query_t player_query = s_entity_query_archetype(game_state->entity_manager, ENTITY_ARCHETYPE_PLAYER);
     for(entity_t *entity: player_query)
     {
-        vec2_t movement_axis_velocity = vec2_scale(vec2_scale(game_state->input_info.movement_axis, 100), gc->tick_rate);
-        entity->velocity.x += movement_axis_velocity.x;
-        entity->velocity.y += movement_axis_velocity.y;
+        vec2_t movement_axis_value = game_state->input_info.movement_axis;
 
-        if(entity->velocity.x != 0) entity_transition_animation(entity, PLAYER_ANIMATION_STATE_RUNNING);
-        else                        entity_transition_animation(entity, PLAYER_ANIMATION_STATE_IDLE);
+        entity->acceleration.x += movement_axis_value.x * 100;
+        entity->acceleration.y += movement_axis_value.y * 100;
+
+        vec2_clamp(&entity->acceleration, -entity->max_acceleration, entity->max_acceleration);
+        if(movement_axis_value.x == 0.0f)
+        {
+            entity->acceleration.x = 0.0f;
+        }
+        if(movement_axis_value.y == 0.0f)
+        {
+            entity->acceleration.y = 0.0f;
+        }
+
+        entity->velocity.x = entity->velocity.x + ((entity->acceleration.x) * gc->tick_rate);
+        entity->velocity.y = entity->velocity.y + ((entity->acceleration.y) * gc->tick_rate);
+
+        if(entity->acceleration.x != 0) entity_transition_animation(entity, PLAYER_ANIMATION_STATE_RUNNING);
+        else                            entity_transition_animation(entity, PLAYER_ANIMATION_STATE_IDLE);
     }
 
     entity_query_t gravity_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_ACTOR|ENTITY_FLAG_GRAVITIC);
     for(entity_t *entity: gravity_query)
     {
-        entity->velocity.y += (game_state->gravity * gc->tick_rate);
-        entity->velocity.y  = Clamp(entity->velocity.y, -MAX_ENTITY_VELOCITY, MAX_ENTITY_VELOCITY);
+        //f32_approach(&entity->velocity.y, entity->max_acceleration.y, game_state->gravity, gc->tick_rate);
     }
 
+#if 0
     entity_query_t collision_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_HAS_COLLIDER);
     entity_query_t actor_query     = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_ACTOR|ENTITY_FLAG_HAS_COLLIDER);
     for(entity_t *entity: actor_query)
@@ -738,6 +754,7 @@ game_state_simulate(game_state_t *game_state)
             }
         }
     }
+#endif
 
     entity_query_t transform_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_ACTOR);
     for(entity_t *entity: transform_query)

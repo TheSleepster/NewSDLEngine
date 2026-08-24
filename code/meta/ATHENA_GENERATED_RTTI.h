@@ -5070,7 +5070,7 @@ struct type_info_struct_entity_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[16];
+		const type_info_member_t member_array[18];
 		struct {
 			const type_info_member_t ID;
 			const type_info_member_t archetype;
@@ -5080,6 +5080,8 @@ struct type_info_struct_entity_t {
 			const type_info_member_t position;
 			const type_info_member_t velocity;
 			const type_info_member_t acceleration;
+			const type_info_member_t max_acceleration;
+			const type_info_member_t friction;
 			const type_info_member_t size;
 			const type_info_member_t rotation;
 			const type_info_member_t direction_x;
@@ -20833,7 +20835,7 @@ constexpr type_info_struct_entity_t DEFAULT_typedata_structure_entity_t = {
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<entity_t>(),
 	},
-	.member_count   = 16,
+	.member_count   = 18,
 	.member_pointer = DEFAULT_typedata_structure_entity_t.member_array,
 	.members = {
 		.ID = {
@@ -20897,6 +20899,22 @@ constexpr type_info_struct_entity_t DEFAULT_typedata_structure_entity_t = {
 			.member_name   = "acceleration",
 			.parent        = &DEFAULT_typedata_structure_entity_t.type_info,
 			.offset        = offsetof(entity_t, acceleration),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.max_acceleration = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "max_acceleration",
+			.parent        = &DEFAULT_typedata_structure_entity_t.type_info,
+			.offset        = offsetof(entity_t, max_acceleration),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.friction = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "friction",
+			.parent        = &DEFAULT_typedata_structure_entity_t.type_info,
+			.offset        = offsetof(entity_t, friction),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -34572,6 +34590,8 @@ enum class entity_t {
 	position,
 	velocity,
 	acceleration,
+	max_acceleration,
+	friction,
 	size,
 	rotation,
 	direction_x,

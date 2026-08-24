@@ -408,6 +408,7 @@ MATH_API void    f32_approach(float32 *value, float32 target, float32 rate, floa
 MATH_API float32 f32_ease_out_quad(float32 x);
 MATH_API float32 f32_sin_breathe_normalized(float32 time, float32 modifier, float32 min, float32 max);
 MATH_API float32 f32_sin_breathe(float32 time, float32 modifier);
+MATH_API s32     f32_get_sign(float32 value);
 
 /*===========================================
   ================== FLOAT64 ================
@@ -705,6 +706,18 @@ MATH_API true_inline float32
 f32_sin_breathe(float32 time, float32 modifier)
 {
     return(sinf(time * modifier));
+}
+
+MATH_API true_inline s32 
+f32_get_sign(float32 value)
+{
+    s32 result = 1;
+    if(value < 0.0f)
+    {
+        result = -1;
+    }
+
+    return(result);
 }
 
 /*===========================================
@@ -2406,27 +2419,27 @@ rect2_get_vector_depth(rectangle2_t rect)
     result.x = rect.min.x;
     result.y = 0.0f;
 
-    if (Abs(rect.max.x) < min_distance)
+    if(Abs(rect.max.x) < min_distance)
     {
         min_distance = Abs(rect.max.x);
         result.x = rect.max.x;
         result.y = 0.0f;
     }
 
-    if (Abs(rect.min.y) < min_distance)
+    if(Abs(rect.min.y) < min_distance)
     {
         min_distance = Abs(rect.min.y);
         result.x = 0.0f;
         result.y = rect.min.y;
     }
 
-    if (Abs(rect.max.y) < min_distance)
+    if(Abs(rect.max.y) < min_distance)
     {
         result.x = 0.0f;
         result.y = rect.max.y;
     }
 
-    return result;
+    return(result);
 }
 #endif // MATH_IMPLEMENTATION
 
@@ -2459,6 +2472,16 @@ operator-(vec2_t &A, vec2_t &B)
 
     result.x = A.x - B.x;
     result.y = A.y - B.y;
+
+    return(result);
+}
+inline vec2_t 
+operator-(vec2_t &A)
+{
+    vec2_t result;
+
+    result.x = -A.x;
+    result.y = -A.y;
 
     return(result);
 }
@@ -2560,7 +2583,6 @@ operator>(vec2_t &A, vec2_t &B)
     return(result);
 }
 
-
 inline bool8
 operator==(vec2_t &A, vec2_t &B)
 {
@@ -2574,7 +2596,31 @@ operator==(vec2_t &A, vec2_t &B)
 }
 
 inline bool8
+operator==(vec2_t A, vec2_t B)
+{
+    bool8 result = false;
+    if((A.x == B.x) && (A.y == B.y))
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+inline bool8
 operator!=(vec2_t &A, vec2_t &B)
+{
+    bool8 result = false;
+    if((A.x != B.x) || (A.y != B.y))
+    {
+        result = true;
+    }
+
+    return(result);
+}
+
+inline bool8
+operator!=(vec2_t A, vec2_t B)
 {
     bool8 result = false;
     if((A.x != B.x) || (A.y != B.y))

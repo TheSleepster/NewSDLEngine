@@ -60,7 +60,11 @@ struct entity_t
     vec2_t          render_position;
     vec2_t          position;
     vec2_t          velocity;
+
     vec2_t          acceleration;
+    vec2_t          max_acceleration;
+    vec2_t          friction;
+
     vec2_t          size;
     float32         rotation;
 
