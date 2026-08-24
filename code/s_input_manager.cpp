@@ -160,14 +160,15 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
         case SDL_EVENT_KEY_DOWN:
         {
             input_controller_t *controller = s_im_get_primary_controller(input_manager);
+            if(controller->ID != event->key.which)
+            {
+                s32 index = 0;
+                controller = s_im_find_controller_by_ID(input_manager, event->key.which, &index);
+                input_manager->primary_controller_index = index;
+            }
+
             if(controller->is_valid)
             {
-                if(controller->ID != event->key.which)
-                {
-                    s32 index = 0;
-                    controller = s_im_find_controller_by_ID(input_manager, event->key.which, &index);
-                    input_manager->primary_controller_index = index;
-                }
                 Assert(controller->type == IM_CONTROLLER_KEYBOARD);
 
                 u32 key_index = event->key.scancode;
@@ -836,17 +837,13 @@ s_im_game_action_read_button_state(input_controller_t *controller, game_action_t
             {
                 action_button_t *button = s_im_get_key_state(controller, mapping->bindings[0].binding_id);
                 result = button->flags;
-            }
+            }break;
             case IM_CONTROLLER_GAMEPAD:
             {
                 action_button_t *button = s_im_gamepad_get_button_state(controller, mapping->bindings[0].binding_id);
                 result = button->flags;
             }break;
         }
-    }
-    else
-    {
-        Expect(false, "There is no valid binding for this controller type associated with this game action!\n");
     }
 
     return(result);
@@ -898,10 +895,6 @@ s_im_game_action_read_axis1D_value(input_controller_t *controller, game_action_t
             }break;
         }
     }
-    else
-    {
-        Expect(false, "There is no valid binding for this controller type associated with this game action!\n");
-    }
 
     return(result);
 }
@@ -938,10 +931,6 @@ s_im_game_action_read_axis2D_value(input_controller_t *controller, game_action_t
                 result = s_im_measure_gamepad_axis_2D(controller, mapping);
             }break;
         }
-    }
-    else
-    {
-        Expect(false, "There is no valid binding for this controller type associated with this game action!\n");
     }
 
     return(result);

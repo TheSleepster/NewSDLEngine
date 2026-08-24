@@ -660,14 +660,32 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
         .controller_type = IM_CONTROLLER_GAMEPAD
     };
     s_im_game_action_add_mapping(jump_action, &gamepad_jump_mapping);
-
     game_state->mappings.jump = jump_action;
+
+    // NOTE(Sleepster): Dash 
+    game_action_t *dash_action = s_im_game_action_create(input_manager, STR("Dash"), INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON);
+    game_action_mapping_t keyboard_dash_mapping = (game_action_mapping_t) {
+        .bindings = {{SDL_SCANCODE_LSHIFT}},
+        .binding_count = 1,
+        .controller_type = IM_CONTROLLER_KEYBOARD
+    };
+    s_im_game_action_add_mapping(dash_action, &keyboard_dash_mapping);
+
+    game_action_mapping_t gamepad_dash_mapping = (game_action_mapping_t) {
+        .bindings = {{SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1}},
+        .binding_count = 1,
+        .controller_type = IM_CONTROLLER_GAMEPAD
+    };
+    s_im_game_action_add_mapping(dash_action, &gamepad_dash_mapping);
+    game_state->mappings.dash = dash_action;
 }
 
 internal_api void
 poll_player_input(game_state_t *game_state)
 {
     game_state->input_info.movement_axis = s_im_game_action_read_axis2D_value(game_state->controller, game_state->mappings.move);
+    game_state->input_info.jumped        = GameActionPressed(s_im_game_action_read_button_state(game_state->controller, game_state->mappings.jump));
+    game_state->input_info.dashed        = GameActionPressed(s_im_game_action_read_button_state(game_state->controller, game_state->mappings.dash));
 }
 
 internal_api void
@@ -686,22 +704,29 @@ entity_transition_animation(entity_t *entity, u32 new_state)
 internal_api void
 game_state_simulate(game_state_t *game_state)
 {
+    vec2_t movement_axis_value = game_state->input_info.movement_axis;
+    bool8 jumped               = game_state->input_info.jumped;
+    bool8 dashed               = game_state->input_info.dashed;
+    if(jumped)
+    {
+        printf("Jumping...\n");   
+    }
+
     entity_query_t player_query = s_entity_query_archetype(game_state->entity_manager, ENTITY_ARCHETYPE_PLAYER);
     for(entity_t *entity: player_query)
     {
-        vec2_t movement_axis_value = game_state->input_info.movement_axis;
-
+        // NOTE(Sleepster): X Movement 
         entity->acceleration.x += movement_axis_value.x * 100;
-        entity->acceleration.y += movement_axis_value.y * 100;
-
         vec2_clamp(&entity->acceleration, -entity->max_acceleration, entity->max_acceleration);
         if(movement_axis_value.x == 0.0f)
         {
             entity->acceleration.x = 0.0f;
         }
-        if(movement_axis_value.y == 0.0f)
+
+        // NOTE(Sleepster): Y Movement
+        if(jumped)
         {
-            entity->acceleration.y = 0.0f;
+            entity->acceleration.y = entity->max_acceleration.y * 1.0f;
         }
 
         entity->velocity.x = entity->velocity.x + ((entity->acceleration.x) * gc->tick_rate);
@@ -714,8 +739,9 @@ game_state_simulate(game_state_t *game_state)
     entity_query_t gravity_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_ACTOR|ENTITY_FLAG_GRAVITIC);
     for(entity_t *entity: gravity_query)
     {
-        f32_approach(&entity->velocity.y, entity->max_acceleration.y, game_state->gravity, gc->tick_rate);
+        f32_approach(&entity->acceleration.y, entity->max_acceleration.y, game_state->gravity, gc->tick_rate);
     }
+
     entity_query_t collision_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_HAS_COLLIDER);
     entity_query_t actor_query     = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_ACTOR|ENTITY_FLAG_HAS_COLLIDER);
     for(entity_t *entity: actor_query)
@@ -849,6 +875,8 @@ game_main(void)
         s_im_reset_controller_states(input_manager);
         process_window_events(render_state.RHI_context, input_manager);
 
+        poll_player_input(&game_state);
+
         game_state.controller = s_im_get_primary_controller(input_manager);
 
         c_file_watcher_process_changes(&gc->file_watcher);
@@ -856,8 +884,6 @@ game_main(void)
         {
             handle_debug_ui_menu(main_ui, render_state.RHI_context, &player_sprite);
         }
-
-        poll_player_input(&game_state);
 
         // NOTE(Sleepster): Debug menu 
         if(game_state.controller->type == IM_CONTROLLER_KEYBOARD)
