@@ -129,7 +129,7 @@ c_array_find(array_t<T, count> *array, T *element)
 
 template <typename T, u32 count>
 void
-c_array_remove(array_t<T, count> *array, u32 index)
+c_dynarray_remove(array_t<T, count> *array, u32 index)
 {
     Assert(index <= array->count);
 

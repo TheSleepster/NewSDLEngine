@@ -874,12 +874,10 @@ game_main(void)
     {
         s_im_reset_controller_states(input_manager);
         process_window_events(render_state.RHI_context, input_manager);
+        c_file_watcher_process_changes(&gc->file_watcher);
 
         poll_player_input(&game_state);
-
         game_state.controller = s_im_get_primary_controller(input_manager);
-
-        c_file_watcher_process_changes(&gc->file_watcher);
         if(game_state.open_debug_menu)
         {
             handle_debug_ui_menu(main_ui, render_state.RHI_context, &player_sprite);

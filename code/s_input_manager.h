@@ -61,6 +61,80 @@ typedef struct text_input_event
 }text_input_event_t;
 
 // TEXT INPUT INFORMATION
+// GAME ACTIONS
+
+// NOTE(Sleepster):
+// For Axis2Ds we assume that for controller map bindings:
+//
+// index 0: Up + Down
+// index 1: Left + Right
+//
+// And for keyboards:
+// index 0: Up
+// index 1: Down
+// index 2: Left
+// index 3: Right
+//
+// While for Axis1Ds:
+//
+// controller:
+//  index 0: Left + Right
+//  
+// keyboard:
+//  index 0: Left
+//  index 1: Right
+//
+// and buttons:
+//
+// index 0: button
+
+constexpr s32 MAX_GAME_ACTION_BINDINGS = 4;
+constexpr s32 MAX_GAME_ACTION_MAPPINGS = 4;
+
+constexpr float32 INPUT_MANAGER_GAMEPAD_DEFAULT_DEADZONE = 0.20f; 
+
+typedef enum game_action_mapping_type
+{
+    INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID,
+    INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON,
+    INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D,
+    INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D,
+    INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT
+}game_action_mapping_type_t;
+
+typedef enum game_action_binding_type
+{
+    INPUT_MANAGER_BINDING_TYPE_BUTTON,
+    INPUT_MANAGER_BINDING_TYPE_JOYSTICK,
+}game_action_binding_type_t;
+
+typedef struct game_action_binding
+{
+    u32 binding_id;
+    u32 binding_type;
+}game_action_binding_t;
+
+typedef struct game_action_mapping
+{
+    game_action_binding_t bindings[MAX_GAME_ACTION_BINDINGS];
+    s32                   binding_count;
+    u32                   controller_type;
+}game_action_mapping_t;
+
+typedef struct game_action
+{
+    u32                   action_binding_type;
+    game_action_mapping_t mappings[MAX_GAME_ACTION_MAPPINGS];
+    s32                   mapping_count;
+
+    string_t              name;
+    // TODO(Sleepster): Maybe we want to cache the values related to the input axis and such?
+    // vec2_t  axis2D_value;
+    // float32 axis1D_value;
+    // s32     button_flags;
+}game_action_t;
+
+// GAME ACTIONS
 
 typedef enum action_button_flags
 {
@@ -144,81 +218,6 @@ typedef struct input_controller
         gamepad_controller_data_t  gamepad;
     };
 }input_controller_t;
-
-// GAME ACTIONS
-
-// NOTE(Sleepster):
-// For Axis2Ds we assume that for controller map bindings:
-//
-// index 0: Up + Down
-// index 1: Left + Right
-//
-// And for keyboards:
-// index 0: Up
-// index 1: Down
-// index 2: Left
-// index 3: Right
-//
-// While for Axis1Ds:
-//
-// controller:
-//  index 0: Left + Right
-//  
-// keyboard:
-//  index 0: Left
-//  index 1: Right
-//
-// and buttons:
-//
-// index 0: button
-
-constexpr s32 MAX_GAME_ACTION_BINDINGS = 4;
-constexpr s32 MAX_GAME_ACTION_MAPPINGS = 4;
-
-constexpr float32 INPUT_MANAGER_GAMEPAD_DEFAULT_DEADZONE = 0.20f; 
-
-typedef enum game_action_mapping_type
-{
-    INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID,
-    INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON,
-    INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D,
-    INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D,
-    INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT
-}game_action_mapping_type_t;
-
-typedef enum game_action_binding_type
-{
-    INPUT_MANAGER_BINDING_TYPE_BUTTON,
-    INPUT_MANAGER_BINDING_TYPE_JOYSTICK,
-}game_action_binding_type_t;
-
-typedef struct game_action_binding
-{
-    u32 binding_id;
-    u32 binding_type;
-}game_action_binding_t;
-
-typedef struct game_action_mapping
-{
-    game_action_binding_t bindings[MAX_GAME_ACTION_BINDINGS];
-    s32                   binding_count;
-    u32                   controller_type;
-}game_action_mapping_t;
-
-typedef struct game_action
-{
-    u32                   action_binding_type;
-    game_action_mapping_t mappings[MAX_GAME_ACTION_MAPPINGS];
-    s32                   mapping_count;
-
-    string_t              name;
-    // TODO(Sleepster): Maybe we want to cache the values related to the input axis and such?
-    // vec2_t  axis2D_value;
-    // float32 axis1D_value;
-    // s32     button_flags;
-}game_action_t;
-
-// GAME ACTIONS
 
 // NOTE(Sleepster): Hey, the keyboard connected to the PC is ALWAYS the primary device 
 typedef struct input_manager

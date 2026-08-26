@@ -144,6 +144,11 @@
 	X(text_input_modifier_flags, &DEFAULT_typedata_structure_text_input_modifier_flags.type_info) \
 	X(text_input_event_type_t, &DEFAULT_typedata_structure_text_input_event_type_t.type_info) \
 	X(text_input_event_t, &DEFAULT_typedata_structure_text_input_event_t.type_info) \
+	X(game_action_mapping_type_t, &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info) \
+	X(game_action_binding_type_t, &DEFAULT_typedata_structure_game_action_binding_type_t.type_info) \
+	X(game_action_binding_t, &DEFAULT_typedata_structure_game_action_binding_t.type_info) \
+	X(game_action_mapping_t, &DEFAULT_typedata_structure_game_action_mapping_t.type_info) \
+	X(game_action_t, &DEFAULT_typedata_structure_game_action_t.type_info) \
 	X(action_button_flags_t, &DEFAULT_typedata_structure_action_button_flags_t.type_info) \
 	X(input_mouse_buttons_t, &DEFAULT_typedata_structure_input_mouse_buttons_t.type_info) \
 	X(action_button_t, &DEFAULT_typedata_structure_action_button_t.type_info) \
@@ -151,11 +156,6 @@
 	X(gamepad_controller_data_t, &DEFAULT_typedata_structure_gamepad_controller_data_t.type_info) \
 	X(controller_type_t, &DEFAULT_typedata_structure_controller_type_t.type_info) \
 	X(input_controller_t, &DEFAULT_typedata_structure_input_controller_t.type_info) \
-	X(game_action_mapping_type_t, &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info) \
-	X(game_action_binding_type_t, &DEFAULT_typedata_structure_game_action_binding_type_t.type_info) \
-	X(game_action_binding_t, &DEFAULT_typedata_structure_game_action_binding_t.type_info) \
-	X(game_action_mapping_t, &DEFAULT_typedata_structure_game_action_mapping_t.type_info) \
-	X(game_action_t, &DEFAULT_typedata_structure_game_action_t.type_info) \
 	X(SDL_Event, &DEFAULT_typedata_SDL_Event) \
 	X(mat4_t, &DEFAULT_typedata_mat4_t) \
 	X(SDL_Gamepad, &DEFAULT_typedata_SDL_Gamepad) \
@@ -644,6 +644,11 @@
 	X(TYPE_text_input_modifier_flags) \
 	X(TYPE_text_input_event_type_t) \
 	X(TYPE_text_input_event_t) \
+	X(TYPE_game_action_mapping_type_t) \
+	X(TYPE_game_action_binding_type_t) \
+	X(TYPE_game_action_binding_t) \
+	X(TYPE_game_action_mapping_t) \
+	X(TYPE_game_action_t) \
 	X(TYPE_action_button_flags_t) \
 	X(TYPE_input_mouse_buttons_t) \
 	X(TYPE_action_button_t) \
@@ -651,11 +656,6 @@
 	X(TYPE_gamepad_controller_data_t) \
 	X(TYPE_controller_type_t) \
 	X(TYPE_input_controller_t) \
-	X(TYPE_game_action_mapping_type_t) \
-	X(TYPE_game_action_binding_type_t) \
-	X(TYPE_game_action_binding_t) \
-	X(TYPE_game_action_mapping_t) \
-	X(TYPE_game_action_t) \
 	X(TYPE_s_im_init_input_manager) \
 	X(TYPE_SDL_Event) \
 	X(TYPE_s_im_handle_window_inputs) \
@@ -5256,6 +5256,77 @@ struct type_info_struct_text_input_event_t {
 	};
 };
 
+struct type_info_struct_game_action_mapping_type_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[5];
+		struct {
+			const type_info_member_t INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID;
+			const type_info_member_t INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON;
+			const type_info_member_t INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D;
+			const type_info_member_t INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D;
+			const type_info_member_t INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT;
+		}members;
+	};
+};
+
+struct type_info_struct_game_action_binding_type_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[2];
+		struct {
+			const type_info_member_t INPUT_MANAGER_BINDING_TYPE_BUTTON;
+			const type_info_member_t INPUT_MANAGER_BINDING_TYPE_JOYSTICK;
+		}members;
+	};
+};
+
+struct type_info_struct_game_action_binding_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[2];
+		struct {
+			const type_info_member_t binding_id;
+			const type_info_member_t binding_type;
+		}members;
+	};
+};
+
+struct type_info_struct_game_action_mapping_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[3];
+		struct {
+			const type_info_member_t bindings;
+			const type_info_member_t binding_count;
+			const type_info_member_t controller_type;
+		}members;
+	};
+};
+
+struct type_info_struct_game_action_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[4];
+		struct {
+			const type_info_member_t action_binding_type;
+			const type_info_member_t mappings;
+			const type_info_member_t mapping_count;
+			const type_info_member_t name;
+		}members;
+	};
+};
+
 struct type_info_struct_action_button_flags_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -5374,77 +5445,6 @@ struct type_info_struct_input_controller_t {
 			const type_info_member_t text_inputs_this_frame;
 			const type_info_member_t keyboard;
 			const type_info_member_t gamepad;
-		}members;
-	};
-};
-
-struct type_info_struct_game_action_mapping_type_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[5];
-		struct {
-			const type_info_member_t INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID;
-			const type_info_member_t INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON;
-			const type_info_member_t INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D;
-			const type_info_member_t INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D;
-			const type_info_member_t INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT;
-		}members;
-	};
-};
-
-struct type_info_struct_game_action_binding_type_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[2];
-		struct {
-			const type_info_member_t INPUT_MANAGER_BINDING_TYPE_BUTTON;
-			const type_info_member_t INPUT_MANAGER_BINDING_TYPE_JOYSTICK;
-		}members;
-	};
-};
-
-struct type_info_struct_game_action_binding_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[2];
-		struct {
-			const type_info_member_t binding_id;
-			const type_info_member_t binding_type;
-		}members;
-	};
-};
-
-struct type_info_struct_game_action_mapping_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[3];
-		struct {
-			const type_info_member_t bindings;
-			const type_info_member_t binding_count;
-			const type_info_member_t controller_type;
-		}members;
-	};
-};
-
-struct type_info_struct_game_action_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[4];
-		struct {
-			const type_info_member_t action_binding_type;
-			const type_info_member_t mappings;
-			const type_info_member_t mapping_count;
-			const type_info_member_t name;
 		}members;
 	};
 };
@@ -9747,6 +9747,11 @@ extern const type_info_struct_text_input_action_type_t DEFAULT_typedata_structur
 extern const type_info_struct_text_input_modifier_flags DEFAULT_typedata_structure_text_input_modifier_flags;
 extern const type_info_struct_text_input_event_type_t DEFAULT_typedata_structure_text_input_event_type_t;
 extern const type_info_struct_text_input_event_t DEFAULT_typedata_structure_text_input_event_t;
+extern const type_info_struct_game_action_mapping_type_t DEFAULT_typedata_structure_game_action_mapping_type_t;
+extern const type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure_game_action_binding_type_t;
+extern const type_info_struct_game_action_binding_t DEFAULT_typedata_structure_game_action_binding_t;
+extern const type_info_struct_game_action_mapping_t DEFAULT_typedata_structure_game_action_mapping_t;
+extern const type_info_struct_game_action_t DEFAULT_typedata_structure_game_action_t;
 extern const type_info_struct_action_button_flags_t DEFAULT_typedata_structure_action_button_flags_t;
 extern const type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_input_mouse_buttons_t;
 extern const type_info_struct_action_button_t DEFAULT_typedata_structure_action_button_t;
@@ -9754,11 +9759,6 @@ extern const type_info_struct_keyboard_controller_data_t DEFAULT_typedata_struct
 extern const type_info_struct_gamepad_controller_data_t DEFAULT_typedata_structure_gamepad_controller_data_t;
 extern const type_info_struct_controller_type_t DEFAULT_typedata_structure_controller_type_t;
 extern const type_info_struct_input_controller_t DEFAULT_typedata_structure_input_controller_t;
-extern const type_info_struct_game_action_mapping_type_t DEFAULT_typedata_structure_game_action_mapping_type_t;
-extern const type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure_game_action_binding_type_t;
-extern const type_info_struct_game_action_binding_t DEFAULT_typedata_structure_game_action_binding_t;
-extern const type_info_struct_game_action_mapping_t DEFAULT_typedata_structure_game_action_mapping_t;
-extern const type_info_struct_game_action_t DEFAULT_typedata_structure_game_action_t;
 extern const type_info_procedure_s_im_init_input_manager DEFAULT_typedata_procedure_s_im_init_input_manager;
 extern const type_info_t DEFAULT_typedata_SDL_Event;
 extern const type_info_procedure_s_im_handle_window_inputs DEFAULT_typedata_procedure_s_im_handle_window_inputs;
@@ -21443,6 +21443,220 @@ constexpr type_info_struct_text_input_event_t DEFAULT_typedata_structure_text_in
 	},
 };
 
+constexpr type_info_struct_game_action_mapping_type_t DEFAULT_typedata_structure_game_action_mapping_type_t = {
+	.type_info = {
+		.type_name = "game_action_mapping_type_t",
+		.type_id = TYPE_game_action_mapping_type_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<game_action_mapping_type_t>(),
+	},
+	.member_count   = 5,
+	.member_pointer = DEFAULT_typedata_structure_game_action_mapping_type_t.member_array,
+	.members = {
+		.INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+			.member_name   = "INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID",
+			.parent        = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID,
+			},
+		},
+		.INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON = {
+			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+			.member_name   = "INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON",
+			.parent        = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON,
+			},
+		},
+		.INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D = {
+			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+			.member_name   = "INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D",
+			.parent        = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D,
+			},
+		},
+		.INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D = {
+			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+			.member_name   = "INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D",
+			.parent        = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D,
+			},
+		},
+		.INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT = {
+			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+			.member_name   = "INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT",
+			.parent        = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure_game_action_binding_type_t = {
+	.type_info = {
+		.type_name = "game_action_binding_type_t",
+		.type_id = TYPE_game_action_binding_type_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<game_action_binding_type_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_game_action_binding_type_t.member_array,
+	.members = {
+		.INPUT_MANAGER_BINDING_TYPE_BUTTON = {
+			.type_info     = &DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
+			.member_name   = "INPUT_MANAGER_BINDING_TYPE_BUTTON",
+			.parent        = &DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_MANAGER_BINDING_TYPE_BUTTON,
+			},
+		},
+		.INPUT_MANAGER_BINDING_TYPE_JOYSTICK = {
+			.type_info     = &DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
+			.member_name   = "INPUT_MANAGER_BINDING_TYPE_JOYSTICK",
+			.parent        = &DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_MANAGER_BINDING_TYPE_JOYSTICK,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_game_action_binding_t DEFAULT_typedata_structure_game_action_binding_t = {
+	.type_info = {
+		.type_name = "game_action_binding_t",
+		.type_id = TYPE_game_action_binding_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<game_action_binding_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_game_action_binding_t.member_array,
+	.members = {
+		.binding_id = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "binding_id",
+			.parent        = &DEFAULT_typedata_structure_game_action_binding_t.type_info,
+			.offset        = offsetof(game_action_binding_t, binding_id),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.binding_type = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "binding_type",
+			.parent        = &DEFAULT_typedata_structure_game_action_binding_t.type_info,
+			.offset        = offsetof(game_action_binding_t, binding_type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_game_action_mapping_t DEFAULT_typedata_structure_game_action_mapping_t = {
+	.type_info = {
+		.type_name = "game_action_mapping_t",
+		.type_id = TYPE_game_action_mapping_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<game_action_mapping_t>(),
+	},
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_game_action_mapping_t.member_array,
+	.members = {
+		.bindings = {
+			.type_info     = &DEFAULT_typedata_structure_game_action_binding_t.type_info,
+			.member_name   = "bindings",
+			.parent        = &DEFAULT_typedata_structure_game_action_mapping_t.type_info,
+			.offset        = offsetof(game_action_mapping_t, bindings),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.binding_count = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "binding_count",
+			.parent        = &DEFAULT_typedata_structure_game_action_mapping_t.type_info,
+			.offset        = offsetof(game_action_mapping_t, binding_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.controller_type = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "controller_type",
+			.parent        = &DEFAULT_typedata_structure_game_action_mapping_t.type_info,
+			.offset        = offsetof(game_action_mapping_t, controller_type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_game_action_t DEFAULT_typedata_structure_game_action_t = {
+	.type_info = {
+		.type_name = "game_action_t",
+		.type_id = TYPE_game_action_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<game_action_t>(),
+	},
+	.member_count   = 4,
+	.member_pointer = DEFAULT_typedata_structure_game_action_t.member_array,
+	.members = {
+		.action_binding_type = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "action_binding_type",
+			.parent        = &DEFAULT_typedata_structure_game_action_t.type_info,
+			.offset        = offsetof(game_action_t, action_binding_type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.mappings = {
+			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_t.type_info,
+			.member_name   = "mappings",
+			.parent        = &DEFAULT_typedata_structure_game_action_t.type_info,
+			.offset        = offsetof(game_action_t, mappings),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.mapping_count = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "mapping_count",
+			.parent        = &DEFAULT_typedata_structure_game_action_t.type_info,
+			.offset        = offsetof(game_action_t, mapping_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.name = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "name",
+			.parent        = &DEFAULT_typedata_structure_game_action_t.type_info,
+			.offset        = offsetof(game_action_t, name),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
 constexpr type_info_struct_action_button_flags_t DEFAULT_typedata_structure_action_button_flags_t = {
 	.type_info = {
 		.type_name = "action_button_flags_t",
@@ -21936,220 +22150,6 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 			.member_name   = "gamepad",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
 			.offset        = offsetof(input_controller_t, gamepad),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_game_action_mapping_type_t DEFAULT_typedata_structure_game_action_mapping_type_t = {
-	.type_info = {
-		.type_name = "game_action_mapping_type_t",
-		.type_id = TYPE_game_action_mapping_type_t,
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<game_action_mapping_type_t>(),
-	},
-	.member_count   = 5,
-	.member_pointer = DEFAULT_typedata_structure_game_action_mapping_type_t.member_array,
-	.members = {
-		.INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.member_name   = "INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID",
-			.parent        = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID,
-			},
-		},
-		.INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.member_name   = "INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON",
-			.parent        = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON,
-			},
-		},
-		.INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.member_name   = "INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D",
-			.parent        = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D,
-			},
-		},
-		.INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.member_name   = "INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D",
-			.parent        = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D,
-			},
-		},
-		.INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.member_name   = "INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT",
-			.parent        = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure_game_action_binding_type_t = {
-	.type_info = {
-		.type_name = "game_action_binding_type_t",
-		.type_id = TYPE_game_action_binding_type_t,
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<game_action_binding_type_t>(),
-	},
-	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_game_action_binding_type_t.member_array,
-	.members = {
-		.INPUT_MANAGER_BINDING_TYPE_BUTTON = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
-			.member_name   = "INPUT_MANAGER_BINDING_TYPE_BUTTON",
-			.parent        = &DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = INPUT_MANAGER_BINDING_TYPE_BUTTON,
-			},
-		},
-		.INPUT_MANAGER_BINDING_TYPE_JOYSTICK = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
-			.member_name   = "INPUT_MANAGER_BINDING_TYPE_JOYSTICK",
-			.parent        = &DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = INPUT_MANAGER_BINDING_TYPE_JOYSTICK,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_game_action_binding_t DEFAULT_typedata_structure_game_action_binding_t = {
-	.type_info = {
-		.type_name = "game_action_binding_t",
-		.type_id = TYPE_game_action_binding_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<game_action_binding_t>(),
-	},
-	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_game_action_binding_t.member_array,
-	.members = {
-		.binding_id = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "binding_id",
-			.parent        = &DEFAULT_typedata_structure_game_action_binding_t.type_info,
-			.offset        = offsetof(game_action_binding_t, binding_id),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.binding_type = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "binding_type",
-			.parent        = &DEFAULT_typedata_structure_game_action_binding_t.type_info,
-			.offset        = offsetof(game_action_binding_t, binding_type),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_game_action_mapping_t DEFAULT_typedata_structure_game_action_mapping_t = {
-	.type_info = {
-		.type_name = "game_action_mapping_t",
-		.type_id = TYPE_game_action_mapping_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<game_action_mapping_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_game_action_mapping_t.member_array,
-	.members = {
-		.bindings = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_binding_t.type_info,
-			.member_name   = "bindings",
-			.parent        = &DEFAULT_typedata_structure_game_action_mapping_t.type_info,
-			.offset        = offsetof(game_action_mapping_t, bindings),
-			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.binding_count = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "binding_count",
-			.parent        = &DEFAULT_typedata_structure_game_action_mapping_t.type_info,
-			.offset        = offsetof(game_action_mapping_t, binding_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.controller_type = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "controller_type",
-			.parent        = &DEFAULT_typedata_structure_game_action_mapping_t.type_info,
-			.offset        = offsetof(game_action_mapping_t, controller_type),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_game_action_t DEFAULT_typedata_structure_game_action_t = {
-	.type_info = {
-		.type_name = "game_action_t",
-		.type_id = TYPE_game_action_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<game_action_t>(),
-	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_game_action_t.member_array,
-	.members = {
-		.action_binding_type = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "action_binding_type",
-			.parent        = &DEFAULT_typedata_structure_game_action_t.type_info,
-			.offset        = offsetof(game_action_t, action_binding_type),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.mappings = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_t.type_info,
-			.member_name   = "mappings",
-			.parent        = &DEFAULT_typedata_structure_game_action_t.type_info,
-			.offset        = offsetof(game_action_t, mappings),
-			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.mapping_count = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "mapping_count",
-			.parent        = &DEFAULT_typedata_structure_game_action_t.type_info,
-			.offset        = offsetof(game_action_t, mapping_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.name = {
-			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
-			.member_name   = "name",
-			.parent        = &DEFAULT_typedata_structure_game_action_t.type_info,
-			.offset        = offsetof(game_action_t, name),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -33687,6 +33687,11 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
 	&DEFAULT_typedata_structure_text_input_event_type_t.type_info,
 	&DEFAULT_typedata_structure_text_input_event_t.type_info,
+	&DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
+	&DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
+	&DEFAULT_typedata_structure_game_action_binding_t.type_info,
+	&DEFAULT_typedata_structure_game_action_mapping_t.type_info,
+	&DEFAULT_typedata_structure_game_action_t.type_info,
 	&DEFAULT_typedata_structure_action_button_flags_t.type_info,
 	&DEFAULT_typedata_structure_input_mouse_buttons_t.type_info,
 	&DEFAULT_typedata_structure_action_button_t.type_info,
@@ -33694,11 +33699,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_gamepad_controller_data_t.type_info,
 	&DEFAULT_typedata_structure_controller_type_t.type_info,
 	&DEFAULT_typedata_structure_input_controller_t.type_info,
-	&DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-	&DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
-	&DEFAULT_typedata_structure_game_action_binding_t.type_info,
-	&DEFAULT_typedata_structure_game_action_mapping_t.type_info,
-	&DEFAULT_typedata_structure_game_action_t.type_info,
 	&DEFAULT_typedata_procedure_s_im_init_input_manager.type_info,
 	&DEFAULT_typedata_procedure_s_im_handle_window_inputs.type_info,
 	&DEFAULT_typedata_procedure_s_im_reset_controller_states.type_info,
@@ -34659,6 +34659,32 @@ enum class text_input_event_t {
 	keycode,
 	input_stream,
 }; // text_input_event_t
+enum class game_action_mapping_type_t {
+	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID,
+	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON,
+	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D,
+	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D,
+	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT,
+}; // game_action_mapping_type_t
+enum class game_action_binding_type_t {
+	INPUT_MANAGER_BINDING_TYPE_BUTTON,
+	INPUT_MANAGER_BINDING_TYPE_JOYSTICK,
+}; // game_action_binding_type_t
+enum class game_action_binding_t {
+	binding_id,
+	binding_type,
+}; // game_action_binding_t
+enum class game_action_mapping_t {
+	bindings,
+	binding_count,
+	controller_type,
+}; // game_action_mapping_t
+enum class game_action_t {
+	action_binding_type,
+	mappings,
+	mapping_count,
+	name,
+}; // game_action_t
 enum class action_button_flags_t {
 	INPUT_MANAGER_ACTION_BUTTON_FLAG_NONE,
 	INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED,
@@ -34718,32 +34744,6 @@ enum class input_controller_t {
 	keyboard,
 	gamepad,
 }; // input_controller_t
-enum class game_action_mapping_type_t {
-	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID,
-	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON,
-	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS1D,
-	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D,
-	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_COUNT,
-}; // game_action_mapping_type_t
-enum class game_action_binding_type_t {
-	INPUT_MANAGER_BINDING_TYPE_BUTTON,
-	INPUT_MANAGER_BINDING_TYPE_JOYSTICK,
-}; // game_action_binding_type_t
-enum class game_action_binding_t {
-	binding_id,
-	binding_type,
-}; // game_action_binding_t
-enum class game_action_mapping_t {
-	bindings,
-	binding_count,
-	controller_type,
-}; // game_action_mapping_t
-enum class game_action_t {
-	action_binding_type,
-	mappings,
-	mapping_count,
-	name,
-}; // game_action_t
 enum class camera_matrices_t {
 	view_matrix,
 	projection_matrix,
