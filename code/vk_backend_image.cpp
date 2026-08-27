@@ -371,13 +371,13 @@ vk_backend_get_sampler(vulkan_context_t *vulkan_context, vulkan_sampler_info_t *
         .data  = (byte*)sampler_info,
         .count = sizeof(vulkan_sampler_info_t)
     };
-    VkSampler sampler = c_hash_table_get_value(&vulkan_context->image_samplers, sampler_data);
+    VkSampler sampler = c_hash_table_get_element(&vulkan_context->image_samplers, sampler_data);
     if(sampler == VK_NULL_HANDLE)
     {
         sampler = vk_backend_sampler_create(vulkan_context, sampler_info);
         Assert(sampler);
 
-        c_hash_table_insert_pair(&vulkan_context->image_samplers, sampler_data, sampler);
+        c_hash_table_add_element(&vulkan_context->image_samplers, &sampler, sampler_data);
     }
     Assert(sampler);
 

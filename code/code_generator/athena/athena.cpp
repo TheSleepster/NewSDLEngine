@@ -10,17 +10,14 @@
 
 #define PROGRAM_FLAG_HANDLER_IMPLEMENTATION
 #define DYNARRAY_IMPLEMENTATION 
-
+#define HASH_TABLE_IMPLEMENTATION
 
 #include <c_file_api.h>
 #include <c_string.h>
 #include <c_program_flag_handler.h>
 #include <c_math.h>
 #include <c_dynarray.h>
-
-// EXPERIMENTAL
-#include "hash_table.h"
-// EXPERIMENTAL
+#include <c_hash_table.h>
 
 #include <p_platform_data.h>
 
@@ -77,8 +74,8 @@
  * - [X] Nested macros are unaccounted for, macro expansion is not recursive and MUST be recursive
  *
  * - [X] Enums must be allowed in expressions.
- * - [X] Templated members such as "hash_table_t<Type> types" would blow up the parser
- * - [X] In the same way as above, templated members like "hash_table_t<Type> *table" would blow up the parser
+ * - [X] Templated members such as "c_hash_table_t<Type> types" would blow up the parser
+ * - [X] In the same way as above, templated members like "c_hash_table_t<Type> *table" would blow up the parser
  * - [X] C++ style [[attributes]] are not handled...
  * - [X] When we find an identifier in the place of an expected number, we should try to find the enum value as well..
  * - [X] No default definition of types like NULL or nullptr
@@ -146,7 +143,7 @@ type_id_from_identifier(string_t string)
     u64 result = 0;
     Expect(string.count > 0, "String passed to 'type_id_from_identifier()' was of size 0...\n");
 
-    result = hash_table_hash_key(string);
+    result = c_hash_table_hash_key(string);
 
     return(result);
 }
@@ -523,7 +520,7 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
             lexer_token_t name_token  = lexer_get_next_token(lexer);
             if(!c_string_compare(name_token.data, STR("X")))
             {
-                macro_info_t *macro_entry = hash_table_get_element_ptr(&parser->macro_table, name_token.data);
+                macro_info_t *macro_entry = c_hash_table_get_element_ptr(&parser->macro_table, name_token.data);
                 if(!macro_entry->is_set)
                 {
                     macro_info_t macro_info = {};
@@ -560,7 +557,7 @@ handle_macro_expansion(parser_t *parser, bool8 record_macro)
 #endif
                     }
 
-                    hash_table_add_element(&parser->macro_table, &macro_info, name_token.data);
+                    c_hash_table_add_element(&parser->macro_table, &macro_info, name_token.data);
                 }
                 else
                 {
@@ -726,14 +723,13 @@ consolidate_macro_tables(void)
         ++parser_index)
     {
         parser_t *parser = g_symbol_table.file_parsers + parser_index;
-
 #if 0
         printf("File handled: '%.*s'...\n", fprint_string(parser->filename));
 #endif
         for(const auto &element: parser->macro_table.used_entries)
         {
             macro_info_t *macro = &element->item;
-            hash_table_add_element(&g_symbol_table.defined_global_macro_table, macro, macro->name);
+            c_hash_table_add_element(&g_symbol_table.defined_global_macro_table, macro, macro->name);
 
 #if 0
             printf("Macro added: '%.*s'...\n", fprint_string(macro->name));
@@ -798,7 +794,7 @@ record_file_constants(parser_t *parser)
 
                 if(node)
                 {
-                    hash_table_add_element(&parser->active_decl_context->code_decls, &node, node->identifier);
+                    c_hash_table_add_element(&parser->active_decl_context->code_decls, &node, node->identifier);
                 }
             }break;
         }
@@ -1036,7 +1032,7 @@ consolidate_AST_nodes(void)
                     // then structures & enums are similar, instead:
                     //
                     // structure hash id + decl_context hash + identifier
-                    hash_table_add_element(&recorded_context->code_decls, &code_decl, code_decl->identifier);
+                    c_hash_table_add_element(&recorded_context->code_decls, &code_decl, code_decl->identifier);
                 }
 
                 // NOTE(Sleepster): Do the same for each of the types, this is safe regardless of if they are 
@@ -1044,10 +1040,10 @@ consolidate_AST_nodes(void)
                 for(auto &local_type: decl_context.local_types.used_entries)
                 {
                     code_type_t *type = local_type->item;
-                    code_type_t *table_type = hash_table_get_element(&recorded_context->local_types, type->identifier);
+                    code_type_t *table_type = c_hash_table_get_element(&recorded_context->local_types, type->identifier);
                     if((!table_type || !table_type->is_registered) || (type->type_data && !table_type->type_data))
                     {
-                        hash_table_add_element(&recorded_context->local_types, &type, type->identifier);
+                        c_hash_table_add_element(&recorded_context->local_types, &type, type->identifier);
                     }
                 }
             }
@@ -1092,40 +1088,40 @@ deduce_AST_node_type_data(void)
                             type->code_metatype = CODE_TYPE_ENUM;
 
                             u64 scopeID      = code_decl->decl_context->context_ID;
-                            u64 identifierID = hash_table_hash_key(type->identifier);
-                            u64 metatypeID   = hash_table_combine_hashes(0x9329329ULL, identifierID);
+                            u64 identifierID = c_hash_table_hash_key(type->identifier);
+                            u64 metatypeID   = c_hash_table_combine_hashes(0x9329329ULL, identifierID);
 
-                            type->ID = hash_table_combine_hashes(metatypeID, scopeID);
+                            type->ID = c_hash_table_combine_hashes(metatypeID, scopeID);
                         }break;
                         case AST_NODE_TYPE_STRUCTURE:
                         {
                             type->code_metatype = CODE_TYPE_STRUCTURE;
 
                             u64 scopeID      = code_decl->decl_context->context_ID;
-                            u64 identifierID = hash_table_hash_key(type->identifier);
-                            u64 metatypeID   = hash_table_combine_hashes(0x9329329ULL, identifierID);
+                            u64 identifierID = c_hash_table_hash_key(type->identifier);
+                            u64 metatypeID   = c_hash_table_combine_hashes(0x9329329ULL, identifierID);
 
-                            type->ID = hash_table_combine_hashes(metatypeID, scopeID);
+                            type->ID = c_hash_table_combine_hashes(metatypeID, scopeID);
                         }break;
                         case AST_NODE_TYPE_LAMBDA:
                         {
                             type->code_metatype = CODE_TYPE_LAMBDA;
 
                             u64 scopeID      = code_decl->decl_context->context_ID;
-                            u64 identifierID = hash_table_hash_key(type->identifier);
-                            u64 metatypeID   = hash_table_combine_hashes(0x695743742ULL, identifierID);
+                            u64 identifierID = c_hash_table_hash_key(type->identifier);
+                            u64 metatypeID   = c_hash_table_combine_hashes(0x695743742ULL, identifierID);
 
                             u64 argumentID = 0;
                             for(AST_node_t *current_argument = code_decl->lambda.first_argument;
                                 current_argument;
                                 current_argument = current_argument->next_sibling)
                             {
-                                u64 key_value = hash_table_hash_key(current_argument->type.code_type->identifier);
-                                argumentID    = hash_table_combine_hashes(key_value, argumentID);
+                                u64 key_value = c_hash_table_hash_key(current_argument->type.code_type->identifier);
+                                argumentID    = c_hash_table_combine_hashes(key_value, argumentID);
                             }
 
-                            u64 newID = hash_table_combine_hashes(metatypeID, scopeID);
-                            type->ID = hash_table_combine_hashes(newID, argumentID);
+                            u64 newID = c_hash_table_combine_hashes(metatypeID, scopeID);
+                            type->ID = c_hash_table_combine_hashes(newID, argumentID);
                         }break;
                         default:
                         {
@@ -1201,10 +1197,10 @@ consolidate_AST_types(void)
             code_type_t *type = element->item;
             Assert(type->identifier.count > 0 && type->identifier.data != 0);
 
-            code_type_t *found = hash_table_get_element(&g_symbol_table.type_table, type->identifier);
+            code_type_t *found = c_hash_table_get_element(&g_symbol_table.type_table, type->identifier);
             if(!found || (type->type_data != null && found->type_data == null))
             {
-                hash_table_add_element(&g_symbol_table.type_table, &type, type->identifier);
+                c_hash_table_add_element(&g_symbol_table.type_table, &type, type->identifier);
             }
         }
     }
@@ -1426,7 +1422,8 @@ athena_excluded_type(string_t type_name)
 {
     bool8 result = false;
     if(c_string_compare(type_name, STR("dynarray_t")) ||
-       c_string_compare(type_name, STR("hash_table_t")))
+       c_string_compare(type_name, STR("hash_table_t")) ||
+       c_string_compare(type_name, STR("array_t")))
     {
         result = true;
     }
@@ -1454,7 +1451,7 @@ output_type_info_member_data(string_builder_t *builder, code_type_t *type, AST_n
         c_string_builder_sprintf(builder, "\t\t.%.*s = {\n", fprint_string(current_member->identifier));
         c_string_builder_sprintf(builder, "\t\t\t.type_info     = &DEFAULT_typedata_");
 
-        code_type_t *type_data = hash_table_get_element(&g_symbol_table.type_table, current_member->type.code_type->identifier);
+        code_type_t *type_data = c_hash_table_get_element(&g_symbol_table.type_table, current_member->type.code_type->identifier);
         switch(type_data->code_metatype)
         {
             case CODE_TYPE_STRUCTURE:
@@ -1937,7 +1934,7 @@ extern const type_info_t *const athena_type_information_array[];
                                     c_string_builder_sprintf(&file_builder, "\t.argument_count = %d,\n", type_data->lambda.argument_count);
                                     c_string_builder_sprintf(&file_builder, "\t.return_type    = &DEFAULT_typedata_");
 
-                                    code_type_t *return_type = hash_table_get_element(&g_symbol_table.type_table, type_data->lambda.return_type->type.code_type->identifier);
+                                    code_type_t *return_type = c_hash_table_get_element(&g_symbol_table.type_table, type_data->lambda.return_type->type.code_type->identifier);
                                     switch(return_type->code_metatype)
                                     {
                                         case CODE_TYPE_ENUM:
@@ -2757,6 +2754,9 @@ main(int argc, char **argv)
     // NOTE(Sleepster): Thread init 
     permanent_arena = c_arena_create(MB(10));
     transient_arena = c_arena_create(MB(10));
+
+    c_dynarray_reserve(&state.filenames,    100);
+    c_dynarray_reserve(&state.parser_table, 100);
 
     // NOTE(Sleepster): This is a global READ ONLY dataset
     initialize_default_language_info();

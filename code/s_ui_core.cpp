@@ -30,7 +30,7 @@ find_top_level_in_bounds_widget(ui_state_t *ui_state, widget_t *widget, vec2_t m
             }
         }
 
-        widget_state_t *state = ui_state->widget_states.data + widget->ID;
+        widget_state_t *state = &(ui_state->widget_states.items[widget->ID]).item;
         state->is_held = false;
         state->just_released = false;
         state->just_clicked = false;
@@ -81,7 +81,7 @@ ui_state_begin_frame(ui_state_t *ui_state)
         widget_t *current_widget = ui_state->first_widget;
         if(ui_state->hot_widget)
         {
-            widget_state_t *state = ui_state->widget_states.data + ui_state->hot_widget->ID;
+            widget_state_t *state = &(ui_state->widget_states.items[ui_state->hot_widget->ID]).item;
             bool8 within_bounds = rect2_point_in_rect(state->widget_rect, current_mouse_position);
             if(!within_bounds)
             {
@@ -128,7 +128,7 @@ ui_state_begin_frame(ui_state_t *ui_state)
 
         if(ui_state->active_widget)
         {
-            widget_state_t *state = ui_state->widget_states.data + ui_state->active_widget->ID;
+            widget_state_t *state = &(ui_state->widget_states.items[ui_state->active_widget->ID]).item;
 
             state->is_held = is_held;
             state->just_released = just_released;
@@ -796,8 +796,8 @@ ui_state_render_widgets(ui_state_t *ui_state, RHI_command_list_t *command_list)
     }
 }
 
-internal_api
-C_HASH_TABLE_ALLOCATE_IMPL(widget_hash_table_allocate_impl)
+internal_api void*
+widget_hash_table_allocate_impl(void *allocator, u32 allocation_size)
 {
     void *result = null;
     result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
@@ -815,12 +815,10 @@ ui_state_init(ui_state_t       *ui_state,
     ZeroStruct(*ui_state);
     ui_state->widget_arena = c_arena_create(MB(10));
     ui_state->persistent_data_arena = c_arena_create(MB(100));
-    c_hash_table_init(&ui_state->widget_states, 
-                       2096, 
-                      &ui_state->persistent_data_arena, 
-                       widget_hash_table_allocate_impl,
-                       null);
-
+    ui_state->widget_states = c_hash_table_create<widget_state_t>(2096, 
+                                                                  &ui_state->persistent_data_arena, 
+                                                                  widget_hash_table_allocate_impl,
+                                                                  null);
     ui_state->RHI_context           = RHI_context;
     ui_state->asset_manager         = asset_manager;
     ui_state->interface_framebuffer = renderpass_ID;
@@ -1010,13 +1008,13 @@ ui_widget_hash(ui_state_t *ui_state, widget_t *widget)
 {
     u64 result = 0;
 
-    result = (c_fnv_hash_value(widget->widget_name.data, widget->widget_name.count));
+    result = (c_hash_table_hash_key(widget->widget_name));
     if(ui_state->ui_seed != 0)
     {
-        result = c_combine_hashes(result, ui_state->ui_seed);
+        result = c_hash_table_combine_hashes(result, ui_state->ui_seed);
     }
 
-    result %= ui_state->widget_states.header.max_entries;
+    result %= ui_state->widget_states.max_entries;
     return(result);
 }
 
@@ -1072,7 +1070,7 @@ ui_widget_create(ui_state_t *ui_state, string_t widget_name, u32 widget_flags)
     result->widget_flags        = widget_flags;
     result->ID                  = ui_widget_hash(ui_state, result);
     result->parent_stack_depth  = ui_widget_determine_depth(ui_state);
-    result->state               = ui_state->widget_states.data + result->ID;
+    result->state               = &ui_state->widget_states.items[result->ID].item;
     result->widget_padding      = ui_state->active_widget_padding;
 
     result->smoothness          = ui_state->default_widget_SDF_smoothness;
@@ -1180,7 +1178,7 @@ ui_widget_get_signals(ui_state_t *ui_state, widget_t *widget)
     result.widget = widget;
     if(ui_state->hot_widget == widget && (ui_state->hot_widget->widget_flags & UI_WIDGET_FLAG_INTERACTABLE))
     {
-        widget_state_t *widget_state = ui_state->widget_states.data + widget->ID;
+        widget_state_t *widget_state = &ui_state->widget_states.items[widget->ID].item;
 
         if((widget->widget_flags & UI_WIDGET_FLAG_HOVERABLE))
         {
@@ -1468,7 +1466,7 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
 
     result = ui_widget_get_signals(ui_state, widget);
 
-    widget_state_t *widget_state = ui_state->widget_states.data + widget->ID;
+    widget_state_t *widget_state = &ui_state->widget_states.items[widget->ID].item;
     if(ui_pressed(result))
     {
         widget_state->toggled = true;

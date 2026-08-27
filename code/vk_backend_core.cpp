@@ -1583,7 +1583,8 @@ vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
 #endif
 
 
-C_HASH_TABLE_ALLOCATE_IMPL(memory_arena_hash_allocate)
+void*
+memory_arena_hash_allocate(void *allocator, u32 allocation_size)
 {
     void *result = null;
     result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
@@ -1643,11 +1644,10 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
     }
 
     // NOTE(Sleepster): Initialize the sampler hash table. 
-    c_hash_table_init(&vulkan_context->image_samplers, 
-                       1024, 
-                      &vulkan_context->permanent_arena, 
-                       memory_arena_hash_allocate,
-                       null);
+    vulkan_context->image_samplers = c_hash_table_create<VkSampler>(1024, 
+                                                                    &vulkan_context->permanent_arena, 
+                                                                    memory_arena_hash_allocate,
+                                                                    null);
 
     vulkan_context->default_nearest_sampler_info = {
         .is_valid           = true,
@@ -1687,8 +1687,8 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
         .count = sizeof(vulkan_sampler_info_t)
     };
 
-    c_hash_table_insert_pair(&vulkan_context->image_samplers, nearest_sampler_data, vulkan_context->default_nearest_sampler);
-    c_hash_table_insert_pair(&vulkan_context->image_samplers, linear_sampler_data,  vulkan_context->default_linear_sampler);
+    c_hash_table_add_element(&vulkan_context->image_samplers, &vulkan_context->default_nearest_sampler, nearest_sampler_data);
+    c_hash_table_add_element(&vulkan_context->image_samplers, &vulkan_context->default_linear_sampler,  linear_sampler_data);
 }
 
 /*
@@ -2366,8 +2366,9 @@ vk_backend_commit_descriptor_data(vulkan_context_t   *vulkan_context,
                     VkDescriptorBufferInfo *buffer_info = buffer_infos + buffer_count++;
 
                     // TODO(Sleepster):  is_dirty... only update if we need too...
-                    RHI_uniform_constant_buffer_t *constant_buffer = c_hash_table_get_value_ptr_at_index(&RHI_context->constant_buffer_hash, 
-                                                                                                          binding->buffer_hash_index);
+                    //
+                    // ALSO DON'T DO THIS WITH THE HASH TABLE!!!
+                    RHI_uniform_constant_buffer_t *constant_buffer = &(RHI_context->constant_buffer_hash.items + binding->buffer_hash_index)->item;
                     buffer_info->buffer = current_uniform_buffer->handle;
                     buffer_info->offset = constant_buffer->offset;
                     buffer_info->range  = constant_buffer->size;
@@ -2786,18 +2787,18 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                         pipeline_key.pipeline_state = command_list->active_render_state;
                         pipeline_key.renderpass     = command_list->active_renderpass->renderpass_key;
 
-                        hash_index = (c_fnv_hash_value((u8*)&pipeline_key, sizeof(shader_pipeline_key_t))) % MAX_SHADER_PIPELINE_COUNT;
+                        hash_index = (c_hash_table_hash_key(string_t{(u8*)&pipeline_key, sizeof(shader_pipeline_key_t)})) % MAX_SHADER_PIPELINE_COUNT;
                     }
 
                     // TODO(Sleepster): Maybe we don't want to touch the stuff accessed by the command_list... threading issues.
-                    VkPipeline shader_pipeline = shader->pipeline_hash.data[hash_index];
+                    VkPipeline shader_pipeline = (shader->pipeline_hash.items[hash_index]).item;
                     if(shader_pipeline == VK_NULL_HANDLE)
                     {
-                        shader->pipeline_hash.data[hash_index] = vk_backend_create_pipeline_from_render_state(vulkan_context, 
-                                                                                                              shader, 
-                                                                                                              command_list->active_renderpass->renderpass_handle,
-                                                                                                              &command_list->active_render_state);
-                        shader_pipeline = shader->pipeline_hash.data[hash_index];
+                        (shader->pipeline_hash.items[hash_index]).item = vk_backend_create_pipeline_from_render_state(vulkan_context, 
+                                                                                                                      shader, 
+                                                                                                                      command_list->active_renderpass->renderpass_handle,
+                                                                                                                     &command_list->active_render_state);
+                        shader_pipeline = (shader->pipeline_hash.items[hash_index]).item;
                     }
 
                     vkCmdBindPipeline(render_command_buffer, shader->pipeline_type, shader_pipeline);
@@ -3179,7 +3180,7 @@ backend_buffer_create(RHI_render_buffer_desc_t *buffer_desc)
 {
     RHI_render_buffer_t buffer;
 
-    buffer.buffer_ID           = c_fnv_hash_value((byte*)buffer_desc, sizeof(RHI_render_buffer_desc_t));
+    buffer.buffer_ID           = c_hash_table_hash_key(string_t{(byte*)buffer_desc, sizeof(RHI_render_buffer_desc_t)});
     buffer.type                = buffer_desc->type;
     buffer.buffer_capacity     = buffer_desc->buffer_capacity;
     buffer.buffer_element_size = buffer_desc->element_size;
@@ -3289,7 +3290,7 @@ renderer_state_t::backend_image_create
 void RHI_context_t::
 backend_image_create(RHI_image_create_info_t *create_info, RHI_image_t *image)
 {
-    image->ID = c_fnv_hash_value((byte*)create_info, sizeof(RHI_image_create_info_t));
+    image->ID = c_hash_table_hash_key(string_t{(byte*)create_info, sizeof(RHI_image_create_info_t)});
 
     VkImageUsageFlags usage_flags = vk_image_usage_flags_from_image_format(create_info->format);
     VkImageLayout initial_layout  = vk_get_image_initial_layout_from_usage((u32)create_info->usage, create_info->format);

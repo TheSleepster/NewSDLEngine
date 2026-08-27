@@ -220,7 +220,7 @@ struct ui_state_t
 
     // NOTE(Sleepster): Persists between frames... 
     memory_arena_t                    persistent_data_arena;
-    HashTable_t(widget_state_t)       widget_states;
+    hash_table_t<widget_state_t>      widget_states;
 
     RHI_context_t                    *RHI_context;
     asset_manager_t                  *asset_manager;

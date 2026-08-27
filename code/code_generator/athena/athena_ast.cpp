@@ -512,7 +512,7 @@ evaluate_expression_AST(AST_node_t *expression)
                 }                    
                 else
                 {
-                    AST_node_t *node = hash_table_get_element(&expression->decl_context->enum_symbols, expression->identifier);
+                    AST_node_t *node = c_hash_table_get_element(&expression->decl_context->enum_symbols, expression->identifier);
                     if(node && node->identifier.data != null)
                     {
                         if(node->expression.evaluated)
@@ -1174,14 +1174,14 @@ generate_structure_AST(parser_t *parser)
                 result->type.code_type = type;
             }
 
-            AST_node_t *node = hash_table_get_element(&parser->active_decl_context->code_decls, result->identifier);
+            AST_node_t *node = c_hash_table_get_element(&parser->active_decl_context->code_decls, result->identifier);
             if(node)
             {
                 node->next_overload = result;
             }
             else
             {
-                hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
+                c_hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
             }
         }
         else
@@ -1282,14 +1282,14 @@ consume_member_lambda_code_block(parser_t *parser, lexer_token_t member_type, le
 internal_api void
 handle_AST_attribute(parser_t *parser, string_t name)
 {
-    code_attribute_t *found_attrib = hash_table_get_element_ptr(&parser->recorded_attributes, name);
+    code_attribute_t *found_attrib = c_hash_table_get_element_ptr(&parser->recorded_attributes, name);
     if(found_attrib->name.data == null || found_attrib->name.count == 0)
     {
         code_attribute_t attrib = {};
         attrib.name        = c_string_make_copy(&parser->arena, name);
         attrib.is_template = false;
 
-        hash_table_add_element(&parser->recorded_attributes, &attrib, name);
+        c_hash_table_add_element(&parser->recorded_attributes, &attrib, name);
         c_dynarray_add(&parser->current_attribute_list, &attrib);
     }
     else
@@ -1818,14 +1818,14 @@ generate_structure_AST(parser_t *parser)
         result->type.code_type = type;
     }
 
-    AST_node_t *node = hash_table_get_element(&parser->active_decl_context->code_decls, result->identifier);
+    AST_node_t *node = c_hash_table_get_element(&parser->active_decl_context->code_decls, result->identifier);
     if(node)
     {
         node->next_overload = result;
     }
     else
     {
-        hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
+        c_hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
     }
 
     return(result);
@@ -1907,7 +1907,7 @@ generate_enum_AST(parser_t *parser)
             }
             
             AST_add_member(enum_root, member);
-            hash_table_add_element(&parser->active_decl_context->enum_symbols, &member, member->identifier);
+            c_hash_table_add_element(&parser->active_decl_context->enum_symbols, &member, member->identifier);
         }
 
         token = parser_get_next_lexer_token(parser);
@@ -1941,14 +1941,14 @@ generate_enum_AST(parser_t *parser)
         }
     }
 
-    AST_node_t *node = hash_table_get_element(&parser->active_decl_context->code_decls, result->identifier);
+    AST_node_t *node = c_hash_table_get_element(&parser->active_decl_context->code_decls, result->identifier);
     if(node)
     {
         node->next_overload = result;
     }
     else
     {
-        hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
+        c_hash_table_add_element(&parser->active_decl_context->code_decls, &result, result->identifier);
     }
 
     return(result);
@@ -2041,14 +2041,14 @@ generate_lambda_AST(parser_t     *parser,
         lambda->identifier = c_string_make_copy(&parser->arena, procedure_name_token.data);
         lambda->type       = parser_create_lambda_type(parser, lambda);
 
-        AST_node_t *node = hash_table_get_element(&parser->active_decl_context->code_decls, lambda->identifier);
+        AST_node_t *node = c_hash_table_get_element(&parser->active_decl_context->code_decls, lambda->identifier);
         if(node)
         {
             add_AST_overload(node, lambda);
         }
         else
         {
-            hash_table_add_element(&parser->active_decl_context->code_decls, &lambda, lambda->identifier);
+            c_hash_table_add_element(&parser->active_decl_context->code_decls, &lambda, lambda->identifier);
         }
 
         // NOTE(Sleepster): If the last token here is an open paren, this is a procedure body,

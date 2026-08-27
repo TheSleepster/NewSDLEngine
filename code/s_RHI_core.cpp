@@ -31,7 +31,7 @@ RHI_context_init(RHI_context_t *RHI_context, backend_render_context_t *render_co
     RHI_context->transient_arena = c_arena_create(MB(100));
 
     RHI_context->command_lists   = c_arena_push_array(&RHI_context->RHI_arena, RHI_command_list_t, RHI_MAX_COMMAND_LISTS);
-    c_hash_table_init(&RHI_context->constant_buffer_hash, RHI_MAX_CONSTANT_BUFFERS);
+    RHI_context->constant_buffer_hash = c_hash_table_create<RHI_uniform_constant_buffer_t>(RHI_MAX_CONSTANT_BUFFERS);
 
     RHI_context->backend_render_context = render_context;
 }
@@ -322,10 +322,10 @@ RHI_uniform_constant_buffer_t*
 RHI_get_constant_buffer(RHI_context_t *RHI_context, string_t uniform_name)
 {
     RHI_uniform_constant_buffer_t *result = null;
-    result = c_hash_table_get_value_ptr(&RHI_context->constant_buffer_hash, uniform_name);
+    result = c_hash_table_get_element_ptr(&RHI_context->constant_buffer_hash, uniform_name);
     if(result)
     {
-        result->uniform_hash_index  = c_fnv_hash_value(uniform_name.data, uniform_name.count);
+        result->uniform_hash_index  = c_hash_table_hash_key(uniform_name);
         result->uniform_hash_index %= RHI_MAX_CONSTANT_BUFFERS;
     }
     else

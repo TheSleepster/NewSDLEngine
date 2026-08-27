@@ -390,7 +390,7 @@ struct dynamic_render_font_page_t
     dynamic_render_font_t         *parent_font;
     dynamic_render_font_varient_t *varient;
     texture_atlas_t               *font_atlas;
-    HashTable_t(glyph_metric_t*)   glyphs;
+    hash_table_t<glyph_metric_t*>  glyphs;
     u32                            loaded_glyph_count;
 
     // NOTE(Sleepster): 
@@ -483,7 +483,7 @@ typedef struct asset_file_data
     jfd_file_header_t        *header;
     jfd_package_entry_t      *package_entries;
     u32                       package_entry_count;
-    HashTable_t(s32)          entry_hash;
+    hash_table_t<s32>         entry_hash;
 
     dynarray_t<asset_slot_t*> loaded_assets;
     jfd_file_header_t         *header_data;
@@ -500,15 +500,15 @@ constexpr u32 MAX_QUEUED_ASSETS = 256;
 // as a normal texture stored inside of the texture catalog... it keeps everything centralized and meaningful.
 struct asset_catalog_t
 {
-    u32                       ID;
-    asset_type_t              catalog_type;
-    asset_manager_t          *asset_manager;
+    u32                        ID;
+    asset_type_t               catalog_type;
+    asset_manager_t           *asset_manager;
 
-    asset_handle_t            default_asset;
+    asset_handle_t             default_asset;
 
     // TODO(Sleepster): Should this be a * to asset_slots?
-    HashTable_t(asset_slot_t) asset_lookup;
-    dynarray_t<asset_slot_t*> loaded_assets;
+    hash_table_t<asset_slot_t> asset_lookup;
+    dynarray_t<asset_slot_t*>  loaded_assets;
 };
 
 struct texture_manager_t 
@@ -549,7 +549,7 @@ struct asset_manager_t
     // Ex: "player.png" -> "/run_tree/res/main_asset_file.wad"
     // or even beter "player.png" -> index 0 of the asset_file array
     asset_file_data_t         asset_files[ASSET_MANAGER_MAX_ASSET_FILES];
-    HashTable_t(s32)          asset_name_to_file;
+    hash_table_t<s32>         asset_name_to_file;
     u32                       loaded_file_count;
 
     asset_slot_t             *asset_load_queue[MAX_QUEUED_ASSETS];

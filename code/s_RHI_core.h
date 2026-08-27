@@ -460,31 +460,31 @@ struct RHI_renderpass_t
 
 struct RHI_context_t
 {
-    SDL_Window                                *window;
-    backend_render_context_t                  *backend_render_context;
+    SDL_Window                                 *window;
+    backend_render_context_t                   *backend_render_context;
 
-    memory_arena_t                             RHI_arena;
-    memory_arena_t                             transient_arena;
+    memory_arena_t                              RHI_arena;
+    memory_arena_t                              transient_arena;
 
-    RHI_command_list_t                        *command_lists;
-    u32                                        command_list_count;
+    RHI_command_list_t                         *command_lists;
+    u32                                         command_list_count;
 
-    HashTable_t(RHI_uniform_constant_buffer_t) constant_buffer_hash;
-    u32                                        used_constant_buffers;
+    hash_table_t<RHI_uniform_constant_buffer_t> constant_buffer_hash;
+    u32                                         used_constant_buffers;
 
-    u32                                        total_render_instances;
-    u32                                        total_materials;
-    u32                                        total_shaders;
-    u32                                        total_buffers;
+    u32                                         total_render_instances;
+    u32                                         total_materials;
+    u32                                         total_shaders;
+    u32                                         total_buffers;
 
-    vec2_t                                     window_size;
-    u32                                        current_window_size_generation;
-    u32                                        last_window_size_generation;
+    vec2_t                                      window_size;
+    u32                                         current_window_size_generation;
+    u32                                         last_window_size_generation;
 
-    RHI_renderpass_t                           renderpasses[100];
-    u32                                        renderpass_count;
+    RHI_renderpass_t                            renderpasses[100];
+    u32                                         renderpass_count;
 
-    RHI_command_present_frame_t               *present_command;
+    RHI_command_present_frame_t                *present_command;
 
     void                     backend_initialize(SDL_Window *window);
     void                     backend_handle_window_resize(vec2_t window_size);

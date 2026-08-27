@@ -58,9 +58,9 @@ struct vulkan_shader_t
 
     VkPipeline                           pipeline;
 
-    HashTable_t(VkPipeline)              pipeline_hash;
-    u32                                  used_pipeline_indices[MAX_SHADER_PIPELINE_COUNT];
-    u32                                  used_pipeline_count;
+    hash_table_t<VkPipeline>             pipeline_hash;
+    //u32                                  used_pipeline_indices[MAX_SHADER_PIPELINE_COUNT];
+    //u32                                  used_pipeline_count;
 
     vulkan_shader_binding_t              bindings[MAX_DESCRIPTOR_SET_BINDINGS];
     u32                                  binding_count;

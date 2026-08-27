@@ -72,8 +72,6 @@
 	X(RHI_context_t, &DEFAULT_typedata_structure_RHI_context_t.type_info) \
 	X(input_manager_t, &DEFAULT_typedata_structure_input_manager_t.type_info) \
 	X(float64, &DEFAULT_typedata_float64) \
-	X(hash_table_allocation_flags_t, &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info) \
-	X(hash_table_header_t, &DEFAULT_typedata_structure_hash_table_header_t.type_info) \
 	X(debug_log_level_t, &DEFAULT_typedata_structure_debug_log_level_t.type_info) \
 	X(memory_arena_footer_t, &DEFAULT_typedata_structure_memory_arena_footer_t.type_info) \
 	X(scratch_arena_t, &DEFAULT_typedata_structure_scratch_arena_t.type_info) \
@@ -140,10 +138,6 @@
 	X(entity_query_t, &DEFAULT_typedata_structure_entity_query_t.type_info) \
 	X(animation2D_t, &DEFAULT_typedata_animation2D_t) \
 	X(rectangle2_t, &DEFAULT_typedata_rectangle2_t) \
-	X(text_input_action_type_t, &DEFAULT_typedata_structure_text_input_action_type_t.type_info) \
-	X(text_input_modifier_flags, &DEFAULT_typedata_structure_text_input_modifier_flags.type_info) \
-	X(text_input_event_type_t, &DEFAULT_typedata_structure_text_input_event_type_t.type_info) \
-	X(text_input_event_t, &DEFAULT_typedata_structure_text_input_event_t.type_info) \
 	X(game_action_mapping_type_t, &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info) \
 	X(game_action_binding_type_t, &DEFAULT_typedata_structure_game_action_binding_type_t.type_info) \
 	X(game_action_binding_t, &DEFAULT_typedata_structure_game_action_binding_t.type_info) \
@@ -154,10 +148,11 @@
 	X(action_button_t, &DEFAULT_typedata_structure_action_button_t.type_info) \
 	X(keyboard_controller_data_t, &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info) \
 	X(gamepad_controller_data_t, &DEFAULT_typedata_structure_gamepad_controller_data_t.type_info) \
-	X(controller_type_t, &DEFAULT_typedata_structure_controller_type_t.type_info) \
+	X(input_event_type_t, &DEFAULT_typedata_structure_input_event_type_t.type_info) \
+	X(input_controller_type_t, &DEFAULT_typedata_structure_input_controller_type_t.type_info) \
+	X(input_axis_t, &DEFAULT_typedata_structure_input_axis_t.type_info) \
+	X(input_event_t, &DEFAULT_typedata_structure_input_event_t.type_info) \
 	X(input_controller_t, &DEFAULT_typedata_structure_input_controller_t.type_info) \
-	X(SDL_Event, &DEFAULT_typedata_SDL_Event) \
-	X(mat4_t, &DEFAULT_typedata_mat4_t) \
 	X(SDL_Gamepad, &DEFAULT_typedata_SDL_Gamepad) \
 	X(SDL_Joystick, &DEFAULT_typedata_SDL_Joystick) \
 	X(camera_matrices_t, &DEFAULT_typedata_structure_camera_matrices_t.type_info) \
@@ -201,6 +196,7 @@
 	X(RHI_renderpass_t, &DEFAULT_typedata_structure_RHI_renderpass_t.type_info) \
 	X(backend_render_context_t, &DEFAULT_typedata_backend_render_context_t) \
 	X(RHI_image_create_info_t, &DEFAULT_typedata_structure_RHI_image_create_info_t.type_info) \
+	X(mat4_t, &DEFAULT_typedata_mat4_t) \
 	X(backend_buffer_t, &DEFAULT_typedata_backend_buffer_t) \
 	X(backend_command_buffer_t, &DEFAULT_typedata_backend_command_buffer_t) \
 	X(ivec4_t, &DEFAULT_typedata_ivec4_t) \
@@ -411,15 +407,12 @@
 	X(TYPE_RHI_context_t) \
 	X(TYPE_input_manager_t) \
 	X(TYPE_float64) \
-	X(TYPE_hash_table_allocation_flags_t) \
-	X(TYPE_c_hash_table_allocate_fn_t) \
-	X(TYPE_c_hash_table_free_fn_t) \
-	X(TYPE_c_hash_table_value_from_key) \
-	X(TYPE_c_fnv_hash_value) \
-	X(TYPE_c_combine_hashes) \
-	X(TYPE_c_hash_table_default_alloc_impl) \
-	X(TYPE_c_hash_table_default_free_impl) \
-	X(TYPE_hash_table_header_t) \
+	X(TYPE_c_hash_table_hash_key) \
+	X(TYPE_c_hash_table_combine_hashes) \
+	X(TYPE_c_hash_table_default_allocate) \
+	X(TYPE_c_hash_table_default_free) \
+	X(TYPE_hash_table_allocate_impl_t) \
+	X(TYPE_hash_table_free_impl_t) \
 	X(TYPE_debug_log_level_t) \
 	X(TYPE__log) \
 	X(TYPE_memory_arena_footer_t) \
@@ -620,14 +613,11 @@
 	X(TYPE_backend_shader_t) \
 	X(TYPE_RHI_pipeline_state_t) \
 	X(TYPE_VkDescriptorSet) \
-	X(TYPE_glyphs) \
+	X(TYPE_hash_table_t) \
 	X(TYPE_FT_Face) \
 	X(TYPE_jfd_package_entry_t) \
 	X(TYPE_jfd_file_header_t) \
-	X(TYPE_entry_hash) \
-	X(TYPE_asset_lookup) \
 	X(TYPE_FT_Library) \
-	X(TYPE_asset_name_to_file) \
 	X(TYPE_entity_archetype_t) \
 	X(TYPE_entity_flags_t) \
 	X(TYPE_entity_t) \
@@ -640,10 +630,6 @@
 	X(TYPE_s_entity_query_archetype) \
 	X(TYPE_animation2D_t) \
 	X(TYPE_rectangle2_t) \
-	X(TYPE_text_input_action_type_t) \
-	X(TYPE_text_input_modifier_flags) \
-	X(TYPE_text_input_event_type_t) \
-	X(TYPE_text_input_event_t) \
 	X(TYPE_game_action_mapping_type_t) \
 	X(TYPE_game_action_binding_type_t) \
 	X(TYPE_game_action_binding_t) \
@@ -654,45 +640,14 @@
 	X(TYPE_action_button_t) \
 	X(TYPE_keyboard_controller_data_t) \
 	X(TYPE_gamepad_controller_data_t) \
-	X(TYPE_controller_type_t) \
+	X(TYPE_input_event_type_t) \
+	X(TYPE_input_controller_type_t) \
+	X(TYPE_input_axis_t) \
+	X(TYPE_input_event_t) \
 	X(TYPE_input_controller_t) \
-	X(TYPE_s_im_init_input_manager) \
-	X(TYPE_SDL_Event) \
-	X(TYPE_s_im_handle_window_inputs) \
-	X(TYPE_s_im_reset_controller_states) \
-	X(TYPE_s_im_initialize_keyboard_controller) \
-	X(TYPE_s_im_get_primary_controller) \
-	X(TYPE_s_im_get_controller_at_index) \
-	X(TYPE_s_im_get_active_controller) \
-	X(TYPE_s_im_set_active_controller) \
-	X(TYPE_s_im_set_primary_controller) \
-	X(TYPE_s_im_is_shift_key_down) \
-	X(TYPE_s_im_is_control_key_down) \
-	X(TYPE_s_im_is_alt_key_down) \
-	X(TYPE_mat4_t) \
-	X(TYPE_s_im_transform_mouse_data) \
-	X(TYPE_s_im_is_keyboard_key_pressed) \
-	X(TYPE_s_im_is_keyboard_key_down) \
-	X(TYPE_s_im_is_keyboard_key_released) \
-	X(TYPE_s_im_consume_keyboard_key_press) \
-	X(TYPE_s_im_consume_keyboard_key_down) \
-	X(TYPE_s_im_consume_keyboard_key_release) \
-	X(TYPE_s_im_get_key_state) \
-	X(TYPE_s_im_is_gamepad_button_pressed) \
-	X(TYPE_s_im_is_gamepad_button_down) \
-	X(TYPE_s_im_is_gamepad_button_released) \
-	X(TYPE_s_im_consume_gamepad_button_press) \
-	X(TYPE_s_im_consume_gamepad_button_down) \
-	X(TYPE_s_im_consume_gamepad_button_release) \
-	X(TYPE_s_im_gamepad_get_button_state) \
-	X(TYPE_s_im_game_action_create) \
-	X(TYPE_s_im_game_action_add_mapping) \
-	X(TYPE_s_im_game_action_reset_mappings) \
-	X(TYPE_s_im_game_action_read_button_state) \
-	X(TYPE_s_im_game_action_read_axis1D_value) \
-	X(TYPE_s_im_game_action_read_axis2D_value) \
 	X(TYPE_SDL_Gamepad) \
 	X(TYPE_SDL_Joystick) \
+	X(TYPE_array_t) \
 	X(TYPE_camera_matrices_t) \
 	X(TYPE_RHI_render_buffer_type_t) \
 	X(TYPE_RHI_render_buffer_advance_rate_t) \
@@ -776,13 +731,13 @@
 	X(TYPE_RHI_cmd_blit_renderpass) \
 	X(TYPE_RHI_cmd_present) \
 	X(TYPE_RHI_execute_backend_commands) \
+	X(TYPE_mat4_t) \
 	X(TYPE_backend_buffer_t) \
 	X(TYPE_backend_command_buffer_t) \
 	X(TYPE_ivec4_t) \
 	X(TYPE_backend_renderpass_handle_t) \
 	X(TYPE_backend_framebuffer_handle_t) \
 	X(TYPE_SDL_Window) \
-	X(TYPE_constant_buffer_hash) \
 	X(TYPE_backend_initialize) \
 	X(TYPE_backend_handle_window_resize) \
 	X(TYPE_backend_render_frame) \
@@ -848,7 +803,6 @@
 	X(TYPE_ui_state_end_row) \
 	X(TYPE_ui_state_begin_column) \
 	X(TYPE_ui_state_end_column) \
-	X(TYPE_widget_states) \
 	X(TYPE_vulkan_allocation_usage_type_t) \
 	X(TYPE_vulkan_allocation_info_t) \
 	X(TYPE_vulkan_allocator_t) \
@@ -937,7 +891,6 @@
 	X(TYPE_vulkan_image_t) \
 	X(TYPE_VkSemaphore) \
 	X(TYPE_VkDescriptorPool) \
-	X(TYPE_image_samplers) \
 	X(TYPE_VkSampler) \
 	X(TYPE_vulkan_sampler_info_t) \
 	X(TYPE_vulkan_image_info_t) \
@@ -981,7 +934,6 @@
 	X(TYPE_VkPipelineLayout) \
 	X(TYPE_VkVertexInputBindingDescription) \
 	X(TYPE_VkVertexInputAttributeDescription) \
-	X(TYPE_pipeline_hash) \
 
 enum athena_unique_type_ID_list {
 #define X(enum) enum,
@@ -2095,95 +2047,32 @@ struct type_info_struct_input_manager_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[7];
-		struct {
-			const type_info_member_t keyboard_data;
-			const type_info_member_t gamepad_data;
-			const type_info_member_t primary_controller_index;
-			const type_info_member_t active_controller_index;
-			const type_info_member_t connected_controller_count;
-			const type_info_member_t controllers;
-			const type_info_member_t game_actions;
-		}members;
-	};
-};
-
-struct type_info_struct_hash_table_allocation_flags_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
 		const type_info_member_t member_array[6];
 		struct {
-			const type_info_member_t HTAF_Invalid;
-			const type_info_member_t HTAF_Static;
-			const type_info_member_t HTAF_KeyCopy;
-			const type_info_member_t HTAF_ValueCopy;
-			const type_info_member_t HTAF_Garbage;
-			const type_info_member_t HTAF_None;
+			const type_info_member_t event_count;
+			const type_info_member_t connected_controller_count;
+			const type_info_member_t active_controller_index;
+			const type_info_member_t game_actions;
+			const type_info_member_t controllers;
+			const type_info_member_t events;
 		}members;
 	};
 };
 
-struct type_info_procedure_c_hash_table_allocate_fn_t {
+struct type_info_procedure_c_hash_table_hash_key {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[3];
-		struct {
-			const type_info_member_t allocator;
-			const type_info_member_t allocation_size;
-			const type_info_member_t allocation_flags;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_c_hash_table_free_fn_t {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t allocator;
-			const type_info_member_t data;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_c_hash_table_value_from_key {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[3];
+		type_info_member_t argument_array[1];
 		struct {
 			const type_info_member_t key;
-			const type_info_member_t key_size;
-			const type_info_member_t max_table_entries;
 		}arguments;
 	};
 };
 
-struct type_info_procedure_c_fnv_hash_value {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t key;
-			const type_info_member_t key_size;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_c_combine_hashes {
+struct type_info_procedure_c_hash_table_combine_hashes {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -2197,22 +2086,7 @@ struct type_info_procedure_c_combine_hashes {
 	};
 };
 
-struct type_info_procedure_c_hash_table_default_alloc_impl {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[3];
-		struct {
-			const type_info_member_t allocator;
-			const type_info_member_t allocation_size;
-			const type_info_member_t allocation_flags;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_c_hash_table_default_free_impl {
+struct type_info_procedure_c_hash_table_default_allocate {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -2221,23 +2095,50 @@ struct type_info_procedure_c_hash_table_default_free_impl {
 		type_info_member_t argument_array[2];
 		struct {
 			const type_info_member_t allocator;
-			const type_info_member_t data;
+			const type_info_member_t allocation_size;
 		}arguments;
 	};
 };
 
-struct type_info_struct_hash_table_header_t {
+struct type_info_procedure_c_hash_table_default_free {
 	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
 	union {
-		const type_info_member_t member_array[4];
+		type_info_member_t argument_array[2];
 		struct {
-			const type_info_member_t max_entries;
-			const type_info_member_t flags;
-			const type_info_member_t current_entry_count;
-			const type_info_member_t debug_id;
-		}members;
+			const type_info_member_t allocator;
+			const type_info_member_t memory;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_hash_table_allocate_impl_t {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t allocator;
+			const type_info_member_t allocation_size;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_hash_table_free_impl_t {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t allocator;
+			const type_info_member_t memory;
+		}arguments;
 	};
 };
 
@@ -5196,66 +5097,6 @@ struct type_info_procedure_s_entity_query_archetype {
 	};
 };
 
-struct type_info_struct_text_input_action_type_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[4];
-		struct {
-			const type_info_member_t TEXT_INPUT_EVENT_NONE;
-			const type_info_member_t TEXT_INPUT_EVENT_PRESSED;
-			const type_info_member_t TEXT_INPUT_EVENT_DOWN;
-			const type_info_member_t TEXT_INPUT_EVENT_RELEASED;
-		}members;
-	};
-};
-
-struct type_info_struct_text_input_modifier_flags {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[4];
-		struct {
-			const type_info_member_t TEXT_INPUT_MODIFIER_NONE;
-			const type_info_member_t TEXT_INPUT_MODIFIER_SHIFT;
-			const type_info_member_t TEXT_INPUT_MODIFIER_CTRL;
-			const type_info_member_t TEXT_INPUT_MODIFIER_ALT;
-		}members;
-	};
-};
-
-struct type_info_struct_text_input_event_type_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[2];
-		struct {
-			const type_info_member_t TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM;
-			const type_info_member_t TEXT_INPUT_EVENT_TYPE_INPUT_EVENT;
-		}members;
-	};
-};
-
-struct type_info_struct_text_input_event_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[6];
-		struct {
-			const type_info_member_t type;
-			const type_info_member_t input_event_type;
-			const type_info_member_t modifier_flags;
-			const type_info_member_t scancode;
-			const type_info_member_t keycode;
-			const type_info_member_t input_stream;
-		}members;
-	};
-};
-
 struct type_info_struct_game_action_mapping_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -5372,7 +5213,7 @@ struct type_info_struct_action_button_t {
 			const type_info_member_t scancode;
 			const type_info_member_t flags;
 			const type_info_member_t analog_value;
-			const type_info_member_t half_transition_counter;
+			const type_info_member_t half_transition_count;
 		}members;
 	};
 };
@@ -5413,17 +5254,73 @@ struct type_info_struct_gamepad_controller_data_t {
 	};
 };
 
-struct type_info_struct_controller_type_t {
+struct type_info_struct_input_event_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[4];
+		const type_info_member_t member_array[5];
 		struct {
-			const type_info_member_t IM_CONTROLLER_INVALID;
-			const type_info_member_t IM_CONTROLLER_GAMEPAD;
-			const type_info_member_t IM_CONTROLLER_KEYBOARD;
-			const type_info_member_t IM_CONTROLLER_COUNT;
+			const type_info_member_t INPUT_EVENT_TYPE_PRESSED;
+			const type_info_member_t INPUT_EVENT_TYPE_DOWN;
+			const type_info_member_t INPUT_EVENT_TYPE_RELEASED;
+			const type_info_member_t INPUT_EVENT_TYPE_AXIS_MOVED;
+			const type_info_member_t INPUT_EVENT_TYPE_TEXT_INPUT;
+		}members;
+	};
+};
+
+struct type_info_struct_input_controller_type_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[3];
+		struct {
+			const type_info_member_t INPUT_CONTROLLER_TYPE_INVALID;
+			const type_info_member_t INPUT_CONTROLLER_TYPE_KEYBOARD;
+			const type_info_member_t INPUT_CONTROLLER_TYPE_GAMEPAD;
+		}members;
+	};
+};
+
+struct type_info_struct_input_axis_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[10];
+		struct {
+			const type_info_member_t INPUT_AXIS_MOUSE_X;
+			const type_info_member_t INPUT_AXIS_MOUSE_Y;
+			const type_info_member_t INPUT_AXIS_MOUSE_WHEEL_X;
+			const type_info_member_t INPUT_AXIS_MOUSE_WHEEL_Y;
+			const type_info_member_t INPUT_AXIS_GAMEPAD_LEFT_X;
+			const type_info_member_t INPUT_AXIS_GAMEPAD_LEFT_Y;
+			const type_info_member_t INPUT_AXIS_GAMEPAD_RIGHT_X;
+			const type_info_member_t INPUT_AXIS_GAMEPAD_RIGHT_Y;
+			const type_info_member_t INPUT_AXIS_GAMEPAD_LEFT_TRIGGER;
+			const type_info_member_t INPUT_AXIS_GAMEPAD_RIGHT_TRIGGER;
+		}members;
+	};
+};
+
+struct type_info_struct_input_event_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[9];
+		struct {
+			const type_info_member_t type;
+			const type_info_member_t input_type;
+			const type_info_member_t consumed;
+			const type_info_member_t inputID;
+			const type_info_member_t scancode;
+			const type_info_member_t controllerID;
+			const type_info_member_t timestampMS;
+			const type_info_member_t input_stream;
+			const type_info_member_t axis_value;
 		}members;
 	};
 };
@@ -5433,476 +5330,16 @@ struct type_info_struct_input_controller_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[10];
+		const type_info_member_t member_array[7];
 		struct {
-			const type_info_member_t is_valid;
-			const type_info_member_t is_analog;
 			const type_info_member_t type;
 			const type_info_member_t ID;
-			const type_info_member_t transient_action_inputs;
-			const type_info_member_t action_inputs_this_frame;
-			const type_info_member_t transient_text_inputs;
-			const type_info_member_t text_inputs_this_frame;
-			const type_info_member_t keyboard;
+			const type_info_member_t controller_index;
+			const type_info_member_t event_count;
+			const type_info_member_t events;
 			const type_info_member_t gamepad;
+			const type_info_member_t keyboard;
 		}members;
-	};
-};
-
-struct type_info_procedure_s_im_init_input_manager {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t input_manager;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_handle_window_inputs {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t event;
-			const type_info_member_t input_manager;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_reset_controller_states {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t input_manager;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_initialize_keyboard_controller {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t ID;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_get_primary_controller {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t input_manager;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_get_controller_at_index {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t input_manager;
-			const type_info_member_t index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_get_active_controller {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t input_manager;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_set_active_controller {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t input_manager;
-			const type_info_member_t controller_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_set_primary_controller {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t input_manager;
-			const type_info_member_t controller_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_is_shift_key_down {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t controller;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_is_control_key_down {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t controller;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_is_alt_key_down {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t controller;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_transform_mouse_data {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[4];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t surface_size;
-			const type_info_member_t view_matrix;
-			const type_info_member_t projection_matrix;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_is_keyboard_key_pressed {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t key_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_is_keyboard_key_down {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t key_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_is_keyboard_key_released {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t key_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_consume_keyboard_key_press {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t key_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_consume_keyboard_key_down {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t key_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_consume_keyboard_key_release {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t key_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_get_key_state {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t key_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_is_gamepad_button_pressed {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t button_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_is_gamepad_button_down {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t button_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_is_gamepad_button_released {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t button_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_consume_gamepad_button_press {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t button_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_consume_gamepad_button_down {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t button_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_consume_gamepad_button_release {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t button_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_gamepad_get_button_state {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t button_index;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_game_action_create {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[3];
-		struct {
-			const type_info_member_t input_manager;
-			const type_info_member_t action_name;
-			const type_info_member_t mapping_type;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_game_action_add_mapping {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t action;
-			const type_info_member_t mapping;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_game_action_reset_mappings {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t action;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_game_action_read_button_state {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t action;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_game_action_read_axis1D_value {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t action;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_s_im_game_action_read_axis2D_value {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t controller;
-			const type_info_member_t action;
-		}arguments;
 	};
 };
 
@@ -8783,7 +8220,7 @@ struct type_info_struct_vulkan_shader_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[22];
+		const type_info_member_t member_array[20];
 		struct {
 			const type_info_member_t shader_id;
 			const type_info_member_t DEBUG_name;
@@ -8803,8 +8240,6 @@ struct type_info_struct_vulkan_shader_t {
 			const type_info_member_t default_pipeline;
 			const type_info_member_t pipeline;
 			const type_info_member_t pipeline_hash;
-			const type_info_member_t used_pipeline_indices;
-			const type_info_member_t used_pipeline_count;
 			const type_info_member_t bindings;
 			const type_info_member_t binding_count;
 		}members;
@@ -9512,15 +8947,12 @@ extern const type_info_struct_threadpool_t DEFAULT_typedata_structure_threadpool
 extern const type_info_struct_RHI_context_t DEFAULT_typedata_structure_RHI_context_t;
 extern const type_info_struct_input_manager_t DEFAULT_typedata_structure_input_manager_t;
 extern const type_info_t DEFAULT_typedata_float64;
-extern const type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_structure_hash_table_allocation_flags_t;
-extern const type_info_procedure_c_hash_table_allocate_fn_t DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t;
-extern const type_info_procedure_c_hash_table_free_fn_t DEFAULT_typedata_procedure_c_hash_table_free_fn_t;
-extern const type_info_procedure_c_hash_table_value_from_key DEFAULT_typedata_procedure_c_hash_table_value_from_key;
-extern const type_info_procedure_c_fnv_hash_value DEFAULT_typedata_procedure_c_fnv_hash_value;
-extern const type_info_procedure_c_combine_hashes DEFAULT_typedata_procedure_c_combine_hashes;
-extern const type_info_procedure_c_hash_table_default_alloc_impl DEFAULT_typedata_procedure_c_hash_table_default_alloc_impl;
-extern const type_info_procedure_c_hash_table_default_free_impl DEFAULT_typedata_procedure_c_hash_table_default_free_impl;
-extern const type_info_struct_hash_table_header_t DEFAULT_typedata_structure_hash_table_header_t;
+extern const type_info_procedure_c_hash_table_hash_key DEFAULT_typedata_procedure_c_hash_table_hash_key;
+extern const type_info_procedure_c_hash_table_combine_hashes DEFAULT_typedata_procedure_c_hash_table_combine_hashes;
+extern const type_info_procedure_c_hash_table_default_allocate DEFAULT_typedata_procedure_c_hash_table_default_allocate;
+extern const type_info_procedure_c_hash_table_default_free DEFAULT_typedata_procedure_c_hash_table_default_free;
+extern const type_info_procedure_hash_table_allocate_impl_t DEFAULT_typedata_procedure_hash_table_allocate_impl_t;
+extern const type_info_procedure_hash_table_free_impl_t DEFAULT_typedata_procedure_hash_table_free_impl_t;
 extern const type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_log_level_t;
 extern const type_info_procedure__log DEFAULT_typedata_procedure__log;
 extern const type_info_struct_memory_arena_footer_t DEFAULT_typedata_structure_memory_arena_footer_t;
@@ -9727,6 +9159,7 @@ extern const type_info_t DEFAULT_typedata_dynarray_t;
 extern const type_info_t DEFAULT_typedata_backend_shader_t;
 extern const type_info_struct_RHI_pipeline_state_t DEFAULT_typedata_structure_RHI_pipeline_state_t;
 extern const type_info_t DEFAULT_typedata_VkDescriptorSet;
+extern const type_info_t DEFAULT_typedata_hash_table_t;
 extern const type_info_t DEFAULT_typedata_FT_Face;
 extern const type_info_t DEFAULT_typedata_jfd_package_entry_t;
 extern const type_info_t DEFAULT_typedata_jfd_file_header_t;
@@ -9743,10 +9176,6 @@ extern const type_info_procedure_s_entity_query_flags_exact DEFAULT_typedata_pro
 extern const type_info_procedure_s_entity_query_archetype DEFAULT_typedata_procedure_s_entity_query_archetype;
 extern const type_info_t DEFAULT_typedata_animation2D_t;
 extern const type_info_t DEFAULT_typedata_rectangle2_t;
-extern const type_info_struct_text_input_action_type_t DEFAULT_typedata_structure_text_input_action_type_t;
-extern const type_info_struct_text_input_modifier_flags DEFAULT_typedata_structure_text_input_modifier_flags;
-extern const type_info_struct_text_input_event_type_t DEFAULT_typedata_structure_text_input_event_type_t;
-extern const type_info_struct_text_input_event_t DEFAULT_typedata_structure_text_input_event_t;
 extern const type_info_struct_game_action_mapping_type_t DEFAULT_typedata_structure_game_action_mapping_type_t;
 extern const type_info_struct_game_action_binding_type_t DEFAULT_typedata_structure_game_action_binding_type_t;
 extern const type_info_struct_game_action_binding_t DEFAULT_typedata_structure_game_action_binding_t;
@@ -9757,45 +9186,14 @@ extern const type_info_struct_input_mouse_buttons_t DEFAULT_typedata_structure_i
 extern const type_info_struct_action_button_t DEFAULT_typedata_structure_action_button_t;
 extern const type_info_struct_keyboard_controller_data_t DEFAULT_typedata_structure_keyboard_controller_data_t;
 extern const type_info_struct_gamepad_controller_data_t DEFAULT_typedata_structure_gamepad_controller_data_t;
-extern const type_info_struct_controller_type_t DEFAULT_typedata_structure_controller_type_t;
+extern const type_info_struct_input_event_type_t DEFAULT_typedata_structure_input_event_type_t;
+extern const type_info_struct_input_controller_type_t DEFAULT_typedata_structure_input_controller_type_t;
+extern const type_info_struct_input_axis_t DEFAULT_typedata_structure_input_axis_t;
+extern const type_info_struct_input_event_t DEFAULT_typedata_structure_input_event_t;
 extern const type_info_struct_input_controller_t DEFAULT_typedata_structure_input_controller_t;
-extern const type_info_procedure_s_im_init_input_manager DEFAULT_typedata_procedure_s_im_init_input_manager;
-extern const type_info_t DEFAULT_typedata_SDL_Event;
-extern const type_info_procedure_s_im_handle_window_inputs DEFAULT_typedata_procedure_s_im_handle_window_inputs;
-extern const type_info_procedure_s_im_reset_controller_states DEFAULT_typedata_procedure_s_im_reset_controller_states;
-extern const type_info_procedure_s_im_initialize_keyboard_controller DEFAULT_typedata_procedure_s_im_initialize_keyboard_controller;
-extern const type_info_procedure_s_im_get_primary_controller DEFAULT_typedata_procedure_s_im_get_primary_controller;
-extern const type_info_procedure_s_im_get_controller_at_index DEFAULT_typedata_procedure_s_im_get_controller_at_index;
-extern const type_info_procedure_s_im_get_active_controller DEFAULT_typedata_procedure_s_im_get_active_controller;
-extern const type_info_procedure_s_im_set_active_controller DEFAULT_typedata_procedure_s_im_set_active_controller;
-extern const type_info_procedure_s_im_set_primary_controller DEFAULT_typedata_procedure_s_im_set_primary_controller;
-extern const type_info_procedure_s_im_is_shift_key_down DEFAULT_typedata_procedure_s_im_is_shift_key_down;
-extern const type_info_procedure_s_im_is_control_key_down DEFAULT_typedata_procedure_s_im_is_control_key_down;
-extern const type_info_procedure_s_im_is_alt_key_down DEFAULT_typedata_procedure_s_im_is_alt_key_down;
-extern const type_info_t DEFAULT_typedata_mat4_t;
-extern const type_info_procedure_s_im_transform_mouse_data DEFAULT_typedata_procedure_s_im_transform_mouse_data;
-extern const type_info_procedure_s_im_is_keyboard_key_pressed DEFAULT_typedata_procedure_s_im_is_keyboard_key_pressed;
-extern const type_info_procedure_s_im_is_keyboard_key_down DEFAULT_typedata_procedure_s_im_is_keyboard_key_down;
-extern const type_info_procedure_s_im_is_keyboard_key_released DEFAULT_typedata_procedure_s_im_is_keyboard_key_released;
-extern const type_info_procedure_s_im_consume_keyboard_key_press DEFAULT_typedata_procedure_s_im_consume_keyboard_key_press;
-extern const type_info_procedure_s_im_consume_keyboard_key_down DEFAULT_typedata_procedure_s_im_consume_keyboard_key_down;
-extern const type_info_procedure_s_im_consume_keyboard_key_release DEFAULT_typedata_procedure_s_im_consume_keyboard_key_release;
-extern const type_info_procedure_s_im_get_key_state DEFAULT_typedata_procedure_s_im_get_key_state;
-extern const type_info_procedure_s_im_is_gamepad_button_pressed DEFAULT_typedata_procedure_s_im_is_gamepad_button_pressed;
-extern const type_info_procedure_s_im_is_gamepad_button_down DEFAULT_typedata_procedure_s_im_is_gamepad_button_down;
-extern const type_info_procedure_s_im_is_gamepad_button_released DEFAULT_typedata_procedure_s_im_is_gamepad_button_released;
-extern const type_info_procedure_s_im_consume_gamepad_button_press DEFAULT_typedata_procedure_s_im_consume_gamepad_button_press;
-extern const type_info_procedure_s_im_consume_gamepad_button_down DEFAULT_typedata_procedure_s_im_consume_gamepad_button_down;
-extern const type_info_procedure_s_im_consume_gamepad_button_release DEFAULT_typedata_procedure_s_im_consume_gamepad_button_release;
-extern const type_info_procedure_s_im_gamepad_get_button_state DEFAULT_typedata_procedure_s_im_gamepad_get_button_state;
-extern const type_info_procedure_s_im_game_action_create DEFAULT_typedata_procedure_s_im_game_action_create;
-extern const type_info_procedure_s_im_game_action_add_mapping DEFAULT_typedata_procedure_s_im_game_action_add_mapping;
-extern const type_info_procedure_s_im_game_action_reset_mappings DEFAULT_typedata_procedure_s_im_game_action_reset_mappings;
-extern const type_info_procedure_s_im_game_action_read_button_state DEFAULT_typedata_procedure_s_im_game_action_read_button_state;
-extern const type_info_procedure_s_im_game_action_read_axis1D_value DEFAULT_typedata_procedure_s_im_game_action_read_axis1D_value;
-extern const type_info_procedure_s_im_game_action_read_axis2D_value DEFAULT_typedata_procedure_s_im_game_action_read_axis2D_value;
 extern const type_info_t DEFAULT_typedata_SDL_Gamepad;
 extern const type_info_t DEFAULT_typedata_SDL_Joystick;
+extern const type_info_t DEFAULT_typedata_array_t;
 extern const type_info_struct_camera_matrices_t DEFAULT_typedata_structure_camera_matrices_t;
 extern const type_info_struct_RHI_render_buffer_type_t DEFAULT_typedata_structure_RHI_render_buffer_type_t;
 extern const type_info_struct_RHI_render_buffer_advance_rate_t DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t;
@@ -9877,6 +9275,7 @@ extern const type_info_procedure_RHI_cmd_blit_image DEFAULT_typedata_procedure_R
 extern const type_info_procedure_RHI_cmd_blit_renderpass DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass;
 extern const type_info_procedure_RHI_cmd_present DEFAULT_typedata_procedure_RHI_cmd_present;
 extern const type_info_procedure_RHI_execute_backend_commands DEFAULT_typedata_procedure_RHI_execute_backend_commands;
+extern const type_info_t DEFAULT_typedata_mat4_t;
 extern const type_info_t DEFAULT_typedata_backend_buffer_t;
 extern const type_info_t DEFAULT_typedata_backend_command_buffer_t;
 extern const type_info_t DEFAULT_typedata_ivec4_t;
@@ -13591,55 +12990,31 @@ constexpr type_info_struct_input_manager_t DEFAULT_typedata_structure_input_mana
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<input_manager_t>(),
 	},
-	.member_count   = 7,
+	.member_count   = 6,
 	.member_pointer = DEFAULT_typedata_structure_input_manager_t.member_array,
 	.members = {
-		.keyboard_data = {
-			.type_info     = &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
-			.member_name   = "keyboard_data",
+		.event_count = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "event_count",
 			.parent        = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.offset        = offsetof(input_manager_t, keyboard_data),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.gamepad_data = {
-			.type_info     = &DEFAULT_typedata_structure_gamepad_controller_data_t.type_info,
-			.member_name   = "gamepad_data",
-			.parent        = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.offset        = offsetof(input_manager_t, gamepad_data),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.primary_controller_index = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "primary_controller_index",
-			.parent        = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.offset        = offsetof(input_manager_t, primary_controller_index),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.active_controller_index = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "active_controller_index",
-			.parent        = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.offset        = offsetof(input_manager_t, active_controller_index),
+			.offset        = offsetof(input_manager_t, event_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.connected_controller_count = {
-			.type_info     = &DEFAULT_typedata_u32,
+			.type_info     = &DEFAULT_typedata_s32,
 			.member_name   = "connected_controller_count",
 			.parent        = &DEFAULT_typedata_structure_input_manager_t.type_info,
 			.offset        = offsetof(input_manager_t, connected_controller_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.controllers = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controllers",
+		.active_controller_index = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "active_controller_index",
 			.parent        = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.offset        = offsetof(input_manager_t, controllers),
-			.flags         = 64,
+			.offset        = offsetof(input_manager_t, active_controller_index),
+			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
@@ -13650,333 +13025,155 @@ constexpr type_info_t DEFAULT_typedata_float64 = {
 	.type_id = TYPE_float64,
 	.size = athena_internal::safe_sizeof<float64>(),
 };
-constexpr type_info_struct_hash_table_allocation_flags_t DEFAULT_typedata_structure_hash_table_allocation_flags_t = {
+constexpr type_info_procedure_c_hash_table_hash_key DEFAULT_typedata_procedure_c_hash_table_hash_key = {
 	.type_info = {
-		.type_name = "hash_table_allocation_flags_t",
-		.type_id = TYPE_hash_table_allocation_flags_t,
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<hash_table_allocation_flags_t>(),
-	},
-	.member_count   = 6,
-	.member_pointer = DEFAULT_typedata_structure_hash_table_allocation_flags_t.member_array,
-	.members = {
-		.HTAF_Invalid = {
-			.type_info     = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.member_name   = "HTAF_Invalid",
-			.parent        = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = HTAF_Invalid,
-			},
-		},
-		.HTAF_Static = {
-			.type_info     = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.member_name   = "HTAF_Static",
-			.parent        = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = HTAF_Static,
-			},
-		},
-		.HTAF_KeyCopy = {
-			.type_info     = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.member_name   = "HTAF_KeyCopy",
-			.parent        = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = HTAF_KeyCopy,
-			},
-		},
-		.HTAF_ValueCopy = {
-			.type_info     = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.member_name   = "HTAF_ValueCopy",
-			.parent        = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = HTAF_ValueCopy,
-			},
-		},
-		.HTAF_Garbage = {
-			.type_info     = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.member_name   = "HTAF_Garbage",
-			.parent        = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = HTAF_Garbage,
-			},
-		},
-		.HTAF_None = {
-			.type_info     = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.member_name   = "HTAF_None",
-			.parent        = &DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = HTAF_None,
-			},
-		},
-	},
-};
-
-constexpr type_info_procedure_c_hash_table_allocate_fn_t DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t = {
-	.type_info = {
-		.type_name = "c_hash_table_allocate_fn_t",
-		.type_id = TYPE_c_hash_table_allocate_fn_t,
+		.type_name = "c_hash_table_hash_key",
+		.type_id = TYPE_c_hash_table_hash_key,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 3,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t.argument_array,
-	.arguments = {
-		.allocator = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "allocator",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.allocation_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "allocation_size",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.allocation_flags = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "allocation_flags",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_c_hash_table_free_fn_t DEFAULT_typedata_procedure_c_hash_table_free_fn_t = {
-	.type_info = {
-		.type_name = "c_hash_table_free_fn_t",
-		.type_id = TYPE_c_hash_table_free_fn_t,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_hash_table_free_fn_t.argument_array,
-	.arguments = {
-		.allocator = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "allocator",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_free_fn_t.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.data = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_free_fn_t.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_c_hash_table_value_from_key DEFAULT_typedata_procedure_c_hash_table_value_from_key = {
-	.type_info = {
-		.type_name = "c_hash_table_value_from_key",
-		.type_id = TYPE_c_hash_table_value_from_key,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 3,
+	.argument_count = 1,
 	.return_type    = &DEFAULT_typedata_u64,
-	.argument_pointer = DEFAULT_typedata_procedure_c_hash_table_value_from_key.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_c_hash_table_hash_key.argument_array,
 	.arguments = {
 		.key = {
-			.type_info     = &DEFAULT_typedata_byte,
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
 			.member_name   = "key",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_value_from_key.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.key_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "key_size",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_value_from_key.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.max_table_entries = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "max_table_entries",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_value_from_key.type_info,
+			.parent        = &DEFAULT_typedata_procedure_c_hash_table_hash_key.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure_c_fnv_hash_value DEFAULT_typedata_procedure_c_fnv_hash_value = {
+constexpr type_info_procedure_c_hash_table_combine_hashes DEFAULT_typedata_procedure_c_hash_table_combine_hashes = {
 	.type_info = {
-		.type_name = "c_fnv_hash_value",
-		.type_id = TYPE_c_fnv_hash_value,
+		.type_name = "c_hash_table_combine_hashes",
+		.type_id = TYPE_c_hash_table_combine_hashes,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_u64,
-	.argument_pointer = DEFAULT_typedata_procedure_c_fnv_hash_value.argument_array,
-	.arguments = {
-		.key = {
-			.type_info     = &DEFAULT_typedata_byte,
-			.member_name   = "key",
-			.parent        = &DEFAULT_typedata_procedure_c_fnv_hash_value.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.key_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "key_size",
-			.parent        = &DEFAULT_typedata_procedure_c_fnv_hash_value.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_c_combine_hashes DEFAULT_typedata_procedure_c_combine_hashes = {
-	.type_info = {
-		.type_name = "c_combine_hashes",
-		.type_id = TYPE_c_combine_hashes,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_u64,
-	.argument_pointer = DEFAULT_typedata_procedure_c_combine_hashes.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_c_hash_table_combine_hashes.argument_array,
 	.arguments = {
 		.A = {
 			.type_info     = &DEFAULT_typedata_u64,
 			.member_name   = "A",
-			.parent        = &DEFAULT_typedata_procedure_c_combine_hashes.type_info,
+			.parent        = &DEFAULT_typedata_procedure_c_hash_table_combine_hashes.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.B = {
 			.type_info     = &DEFAULT_typedata_u64,
 			.member_name   = "B",
-			.parent        = &DEFAULT_typedata_procedure_c_combine_hashes.type_info,
+			.parent        = &DEFAULT_typedata_procedure_c_hash_table_combine_hashes.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure_c_hash_table_default_alloc_impl DEFAULT_typedata_procedure_c_hash_table_default_alloc_impl = {
+constexpr type_info_procedure_c_hash_table_default_allocate DEFAULT_typedata_procedure_c_hash_table_default_allocate = {
 	.type_info = {
-		.type_name = "c_hash_table_default_alloc_impl",
-		.type_id = TYPE_c_hash_table_default_alloc_impl,
+		.type_name = "c_hash_table_default_allocate",
+		.type_id = TYPE_c_hash_table_default_allocate,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 3,
+	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_hash_table_default_alloc_impl.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_c_hash_table_default_allocate.argument_array,
 	.arguments = {
 		.allocator = {
 			.type_info     = &DEFAULT_typedata_void,
 			.member_name   = "allocator",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_default_alloc_impl.type_info,
+			.parent        = &DEFAULT_typedata_procedure_c_hash_table_default_allocate.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.allocation_size = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "allocation_size",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_default_alloc_impl.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.allocation_flags = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "allocation_flags",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_default_alloc_impl.type_info,
+			.parent        = &DEFAULT_typedata_procedure_c_hash_table_default_allocate.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-constexpr type_info_procedure_c_hash_table_default_free_impl DEFAULT_typedata_procedure_c_hash_table_default_free_impl = {
+constexpr type_info_procedure_c_hash_table_default_free DEFAULT_typedata_procedure_c_hash_table_default_free = {
 	.type_info = {
-		.type_name = "c_hash_table_default_free_impl",
-		.type_id = TYPE_c_hash_table_default_free_impl,
+		.type_name = "c_hash_table_default_free",
+		.type_id = TYPE_c_hash_table_default_free,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_c_hash_table_default_free_impl.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_c_hash_table_default_free.argument_array,
 	.arguments = {
 		.allocator = {
 			.type_info     = &DEFAULT_typedata_void,
 			.member_name   = "allocator",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_default_free_impl.type_info,
+			.parent        = &DEFAULT_typedata_procedure_c_hash_table_default_free.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.data = {
+		.memory = {
 			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_c_hash_table_default_free_impl.type_info,
+			.member_name   = "memory",
+			.parent        = &DEFAULT_typedata_procedure_c_hash_table_default_free.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
-constexpr type_info_struct_hash_table_header_t DEFAULT_typedata_structure_hash_table_header_t = {
+constexpr type_info_procedure_hash_table_allocate_impl_t DEFAULT_typedata_procedure_hash_table_allocate_impl_t = {
 	.type_info = {
-		.type_name = "hash_table_header_t",
-		.type_id = TYPE_hash_table_header_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<hash_table_header_t>(),
+		.type_name = "hash_table_allocate_impl_t",
+		.type_id = TYPE_hash_table_allocate_impl_t,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_hash_table_header_t.member_array,
-	.members = {
-		.max_entries = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "max_entries",
-			.parent        = &DEFAULT_typedata_structure_hash_table_header_t.type_info,
-			.offset        = offsetof(hash_table_header_t, max_entries),
-			.flags         = 0,
-			.pointer_depth = 0,
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_hash_table_allocate_impl_t.argument_array,
+	.arguments = {
+		.allocator = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "allocator",
+			.parent        = &DEFAULT_typedata_procedure_hash_table_allocate_impl_t.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
-		.flags = {
+		.allocation_size = {
 			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "flags",
-			.parent        = &DEFAULT_typedata_structure_hash_table_header_t.type_info,
-			.offset        = offsetof(hash_table_header_t, flags),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.current_entry_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "current_entry_count",
-			.parent        = &DEFAULT_typedata_structure_hash_table_header_t.type_info,
-			.offset        = offsetof(hash_table_header_t, current_entry_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.debug_id = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "debug_id",
-			.parent        = &DEFAULT_typedata_structure_hash_table_header_t.type_info,
-			.offset        = offsetof(hash_table_header_t, debug_id),
+			.member_name   = "allocation_size",
+			.parent        = &DEFAULT_typedata_procedure_hash_table_allocate_impl_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
 };
-
+constexpr type_info_procedure_hash_table_free_impl_t DEFAULT_typedata_procedure_hash_table_free_impl_t = {
+	.type_info = {
+		.type_name = "hash_table_free_impl_t",
+		.type_id = TYPE_hash_table_free_impl_t,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_hash_table_free_impl_t.argument_array,
+	.arguments = {
+		.allocator = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "allocator",
+			.parent        = &DEFAULT_typedata_procedure_hash_table_free_impl_t.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.memory = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "memory",
+			.parent        = &DEFAULT_typedata_procedure_hash_table_free_impl_t.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr type_info_struct_debug_log_level_t DEFAULT_typedata_structure_debug_log_level_t = {
 	.type_info = {
 		.type_name = "debug_log_level_t",
@@ -21233,216 +20430,6 @@ constexpr type_info_t DEFAULT_typedata_rectangle2_t = {
 	.type_id = TYPE_rectangle2_t,
 	.size = athena_internal::safe_sizeof<rectangle2_t>(),
 };
-constexpr type_info_struct_text_input_action_type_t DEFAULT_typedata_structure_text_input_action_type_t = {
-	.type_info = {
-		.type_name = "text_input_action_type_t",
-		.type_id = TYPE_text_input_action_type_t,
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<text_input_action_type_t>(),
-	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_text_input_action_type_t.member_array,
-	.members = {
-		.TEXT_INPUT_EVENT_NONE = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
-			.member_name   = "TEXT_INPUT_EVENT_NONE",
-			.parent        = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = TEXT_INPUT_EVENT_NONE,
-			},
-		},
-		.TEXT_INPUT_EVENT_PRESSED = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
-			.member_name   = "TEXT_INPUT_EVENT_PRESSED",
-			.parent        = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 2,
-			},
-		},
-		.TEXT_INPUT_EVENT_DOWN = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
-			.member_name   = "TEXT_INPUT_EVENT_DOWN",
-			.parent        = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 4,
-			},
-		},
-		.TEXT_INPUT_EVENT_RELEASED = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
-			.member_name   = "TEXT_INPUT_EVENT_RELEASED",
-			.parent        = &DEFAULT_typedata_structure_text_input_action_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 8,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_text_input_modifier_flags DEFAULT_typedata_structure_text_input_modifier_flags = {
-	.type_info = {
-		.type_name = "text_input_modifier_flags",
-		.type_id = TYPE_text_input_modifier_flags,
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<text_input_modifier_flags>(),
-	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_text_input_modifier_flags.member_array,
-	.members = {
-		.TEXT_INPUT_MODIFIER_NONE = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
-			.member_name   = "TEXT_INPUT_MODIFIER_NONE",
-			.parent        = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.TEXT_INPUT_MODIFIER_SHIFT = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
-			.member_name   = "TEXT_INPUT_MODIFIER_SHIFT",
-			.parent        = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 2,
-			},
-		},
-		.TEXT_INPUT_MODIFIER_CTRL = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
-			.member_name   = "TEXT_INPUT_MODIFIER_CTRL",
-			.parent        = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 4,
-			},
-		},
-		.TEXT_INPUT_MODIFIER_ALT = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
-			.member_name   = "TEXT_INPUT_MODIFIER_ALT",
-			.parent        = &DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 8,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_text_input_event_type_t DEFAULT_typedata_structure_text_input_event_type_t = {
-	.type_info = {
-		.type_name = "text_input_event_type_t",
-		.type_id = TYPE_text_input_event_type_t,
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<text_input_event_type_t>(),
-	},
-	.member_count   = 2,
-	.member_pointer = DEFAULT_typedata_structure_text_input_event_type_t.member_array,
-	.members = {
-		.TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_event_type_t.type_info,
-			.member_name   = "TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM",
-			.parent        = &DEFAULT_typedata_structure_text_input_event_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.TEXT_INPUT_EVENT_TYPE_INPUT_EVENT = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_event_type_t.type_info,
-			.member_name   = "TEXT_INPUT_EVENT_TYPE_INPUT_EVENT",
-			.parent        = &DEFAULT_typedata_structure_text_input_event_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 2,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_text_input_event_t DEFAULT_typedata_structure_text_input_event_t = {
-	.type_info = {
-		.type_name = "text_input_event_t",
-		.type_id = TYPE_text_input_event_t,
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.size = athena_internal::safe_sizeof<text_input_event_t>(),
-	},
-	.member_count   = 6,
-	.member_pointer = DEFAULT_typedata_structure_text_input_event_t.member_array,
-	.members = {
-		.type = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "type",
-			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
-			.offset        = offsetof(text_input_event_t, type),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.input_event_type = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "input_event_type",
-			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
-			.offset        = offsetof(text_input_event_t, input_event_type),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.modifier_flags = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "modifier_flags",
-			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
-			.offset        = offsetof(text_input_event_t, modifier_flags),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.scancode = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "scancode",
-			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
-			.offset        = offsetof(text_input_event_t, scancode),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.keycode = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "keycode",
-			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
-			.offset        = offsetof(text_input_event_t, keycode),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.input_stream = {
-			.type_info     = &DEFAULT_typedata_u8,
-			.member_name   = "input_stream",
-			.parent        = &DEFAULT_typedata_structure_text_input_event_t.type_info,
-			.offset        = offsetof(text_input_event_t, input_stream),
-			.flags         = 10,
-			.pointer_depth = 1,
-		},
-	},
-};
-
 constexpr type_info_struct_game_action_mapping_type_t DEFAULT_typedata_structure_game_action_mapping_type_t = {
 	.type_info = {
 		.type_name = "game_action_mapping_type_t",
@@ -21857,11 +20844,11 @@ constexpr type_info_struct_action_button_t DEFAULT_typedata_structure_action_but
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.half_transition_counter = {
-			.type_info     = &DEFAULT_typedata_u8,
-			.member_name   = "half_transition_counter",
+		.half_transition_count = {
+			.type_info     = &DEFAULT_typedata_s16,
+			.member_name   = "half_transition_count",
 			.parent        = &DEFAULT_typedata_structure_action_button_t.type_info,
-			.offset        = offsetof(action_button_t, half_transition_counter),
+			.offset        = offsetof(action_button_t, half_transition_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -22006,59 +20993,324 @@ constexpr type_info_struct_gamepad_controller_data_t DEFAULT_typedata_structure_
 	},
 };
 
-constexpr type_info_struct_controller_type_t DEFAULT_typedata_structure_controller_type_t = {
+constexpr type_info_struct_input_event_type_t DEFAULT_typedata_structure_input_event_type_t = {
 	.type_info = {
-		.type_name = "controller_type_t",
-		.type_id = TYPE_controller_type_t,
+		.type_name = "input_event_type_t",
+		.type_id = TYPE_input_event_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<controller_type_t>(),
+		.size = athena_internal::safe_sizeof<input_event_type_t>(),
 	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_controller_type_t.member_array,
+	.member_count   = 5,
+	.member_pointer = DEFAULT_typedata_structure_input_event_type_t.member_array,
 	.members = {
-		.IM_CONTROLLER_INVALID = {
-			.type_info     = &DEFAULT_typedata_structure_controller_type_t.type_info,
-			.member_name   = "IM_CONTROLLER_INVALID",
-			.parent        = &DEFAULT_typedata_structure_controller_type_t.type_info,
+		.INPUT_EVENT_TYPE_PRESSED = {
+			.type_info     = &DEFAULT_typedata_structure_input_event_type_t.type_info,
+			.member_name   = "INPUT_EVENT_TYPE_PRESSED",
+			.parent        = &DEFAULT_typedata_structure_input_event_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
 				.type  = 2,
-				.int64 = IM_CONTROLLER_INVALID,
+				.int64 = INPUT_EVENT_TYPE_PRESSED,
 			},
 		},
-		.IM_CONTROLLER_GAMEPAD = {
-			.type_info     = &DEFAULT_typedata_structure_controller_type_t.type_info,
-			.member_name   = "IM_CONTROLLER_GAMEPAD",
-			.parent        = &DEFAULT_typedata_structure_controller_type_t.type_info,
+		.INPUT_EVENT_TYPE_DOWN = {
+			.type_info     = &DEFAULT_typedata_structure_input_event_type_t.type_info,
+			.member_name   = "INPUT_EVENT_TYPE_DOWN",
+			.parent        = &DEFAULT_typedata_structure_input_event_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
 				.type  = 2,
-				.int64 = IM_CONTROLLER_GAMEPAD,
+				.int64 = INPUT_EVENT_TYPE_DOWN,
 			},
 		},
-		.IM_CONTROLLER_KEYBOARD = {
-			.type_info     = &DEFAULT_typedata_structure_controller_type_t.type_info,
-			.member_name   = "IM_CONTROLLER_KEYBOARD",
-			.parent        = &DEFAULT_typedata_structure_controller_type_t.type_info,
+		.INPUT_EVENT_TYPE_RELEASED = {
+			.type_info     = &DEFAULT_typedata_structure_input_event_type_t.type_info,
+			.member_name   = "INPUT_EVENT_TYPE_RELEASED",
+			.parent        = &DEFAULT_typedata_structure_input_event_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
 				.type  = 2,
-				.int64 = IM_CONTROLLER_KEYBOARD,
+				.int64 = INPUT_EVENT_TYPE_RELEASED,
 			},
 		},
-		.IM_CONTROLLER_COUNT = {
-			.type_info     = &DEFAULT_typedata_structure_controller_type_t.type_info,
-			.member_name   = "IM_CONTROLLER_COUNT",
-			.parent        = &DEFAULT_typedata_structure_controller_type_t.type_info,
+		.INPUT_EVENT_TYPE_AXIS_MOVED = {
+			.type_info     = &DEFAULT_typedata_structure_input_event_type_t.type_info,
+			.member_name   = "INPUT_EVENT_TYPE_AXIS_MOVED",
+			.parent        = &DEFAULT_typedata_structure_input_event_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
 				.type  = 2,
-				.int64 = IM_CONTROLLER_COUNT,
+				.int64 = INPUT_EVENT_TYPE_AXIS_MOVED,
 			},
+		},
+		.INPUT_EVENT_TYPE_TEXT_INPUT = {
+			.type_info     = &DEFAULT_typedata_structure_input_event_type_t.type_info,
+			.member_name   = "INPUT_EVENT_TYPE_TEXT_INPUT",
+			.parent        = &DEFAULT_typedata_structure_input_event_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_EVENT_TYPE_TEXT_INPUT,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_input_controller_type_t DEFAULT_typedata_structure_input_controller_type_t = {
+	.type_info = {
+		.type_name = "input_controller_type_t",
+		.type_id = TYPE_input_controller_type_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<input_controller_type_t>(),
+	},
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_input_controller_type_t.member_array,
+	.members = {
+		.INPUT_CONTROLLER_TYPE_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
+			.member_name   = "INPUT_CONTROLLER_TYPE_INVALID",
+			.parent        = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_CONTROLLER_TYPE_INVALID,
+			},
+		},
+		.INPUT_CONTROLLER_TYPE_KEYBOARD = {
+			.type_info     = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
+			.member_name   = "INPUT_CONTROLLER_TYPE_KEYBOARD",
+			.parent        = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_CONTROLLER_TYPE_KEYBOARD,
+			},
+		},
+		.INPUT_CONTROLLER_TYPE_GAMEPAD = {
+			.type_info     = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
+			.member_name   = "INPUT_CONTROLLER_TYPE_GAMEPAD",
+			.parent        = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_CONTROLLER_TYPE_GAMEPAD,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_input_axis_t DEFAULT_typedata_structure_input_axis_t = {
+	.type_info = {
+		.type_name = "input_axis_t",
+		.type_id = TYPE_input_axis_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<input_axis_t>(),
+	},
+	.member_count   = 10,
+	.member_pointer = DEFAULT_typedata_structure_input_axis_t.member_array,
+	.members = {
+		.INPUT_AXIS_MOUSE_X = {
+			.type_info     = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.member_name   = "INPUT_AXIS_MOUSE_X",
+			.parent        = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_AXIS_MOUSE_X,
+			},
+		},
+		.INPUT_AXIS_MOUSE_Y = {
+			.type_info     = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.member_name   = "INPUT_AXIS_MOUSE_Y",
+			.parent        = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_AXIS_MOUSE_Y,
+			},
+		},
+		.INPUT_AXIS_MOUSE_WHEEL_X = {
+			.type_info     = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.member_name   = "INPUT_AXIS_MOUSE_WHEEL_X",
+			.parent        = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_AXIS_MOUSE_WHEEL_X,
+			},
+		},
+		.INPUT_AXIS_MOUSE_WHEEL_Y = {
+			.type_info     = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.member_name   = "INPUT_AXIS_MOUSE_WHEEL_Y",
+			.parent        = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_AXIS_MOUSE_WHEEL_Y,
+			},
+		},
+		.INPUT_AXIS_GAMEPAD_LEFT_X = {
+			.type_info     = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.member_name   = "INPUT_AXIS_GAMEPAD_LEFT_X",
+			.parent        = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_AXIS_GAMEPAD_LEFT_X,
+			},
+		},
+		.INPUT_AXIS_GAMEPAD_LEFT_Y = {
+			.type_info     = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.member_name   = "INPUT_AXIS_GAMEPAD_LEFT_Y",
+			.parent        = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_AXIS_GAMEPAD_LEFT_Y,
+			},
+		},
+		.INPUT_AXIS_GAMEPAD_RIGHT_X = {
+			.type_info     = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.member_name   = "INPUT_AXIS_GAMEPAD_RIGHT_X",
+			.parent        = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_AXIS_GAMEPAD_RIGHT_X,
+			},
+		},
+		.INPUT_AXIS_GAMEPAD_RIGHT_Y = {
+			.type_info     = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.member_name   = "INPUT_AXIS_GAMEPAD_RIGHT_Y",
+			.parent        = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_AXIS_GAMEPAD_RIGHT_Y,
+			},
+		},
+		.INPUT_AXIS_GAMEPAD_LEFT_TRIGGER = {
+			.type_info     = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.member_name   = "INPUT_AXIS_GAMEPAD_LEFT_TRIGGER",
+			.parent        = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_AXIS_GAMEPAD_LEFT_TRIGGER,
+			},
+		},
+		.INPUT_AXIS_GAMEPAD_RIGHT_TRIGGER = {
+			.type_info     = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.member_name   = "INPUT_AXIS_GAMEPAD_RIGHT_TRIGGER",
+			.parent        = &DEFAULT_typedata_structure_input_axis_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_AXIS_GAMEPAD_RIGHT_TRIGGER,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_input_event_t DEFAULT_typedata_structure_input_event_t = {
+	.type_info = {
+		.type_name = "input_event_t",
+		.type_id = TYPE_input_event_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<input_event_t>(),
+	},
+	.member_count   = 9,
+	.member_pointer = DEFAULT_typedata_structure_input_event_t.member_array,
+	.members = {
+		.type = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "type",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.input_type = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "input_type",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, input_type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.consumed = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "consumed",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, consumed),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.inputID = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "inputID",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, inputID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.scancode = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "scancode",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, scancode),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.controllerID = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "controllerID",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, controllerID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.timestampMS = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "timestampMS",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, timestampMS),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.input_stream = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "input_stream",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, input_stream),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.axis_value = {
+			.type_info     = &DEFAULT_typedata_float32,
+			.member_name   = "axis_value",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, axis_value),
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 	},
 };
@@ -22070,27 +21322,11 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<input_controller_t>(),
 	},
-	.member_count   = 10,
+	.member_count   = 7,
 	.member_pointer = DEFAULT_typedata_structure_input_controller_t.member_array,
 	.members = {
-		.is_valid = {
-			.type_info     = &DEFAULT_typedata_bool8,
-			.member_name   = "is_valid",
-			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, is_valid),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.is_analog = {
-			.type_info     = &DEFAULT_typedata_bool8,
-			.member_name   = "is_analog",
-			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, is_analog),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
 		.type = {
-			.type_info     = &DEFAULT_typedata_structure_controller_type_t.type_info,
+			.type_info     = &DEFAULT_typedata_s32,
 			.member_name   = "type",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
 			.offset        = offsetof(input_controller_t, type),
@@ -22098,50 +21334,26 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 			.pointer_depth = 0,
 		},
 		.ID = {
-			.type_info     = &DEFAULT_typedata_u32,
+			.type_info     = &DEFAULT_typedata_s32,
 			.member_name   = "ID",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
 			.offset        = offsetof(input_controller_t, ID),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.transient_action_inputs = {
-			.type_info     = &DEFAULT_typedata_structure_action_button_t.type_info,
-			.member_name   = "transient_action_inputs",
+		.controller_index = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "controller_index",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, transient_action_inputs),
-			.flags         = 66,
-			.pointer_depth = 1,
-		},
-		.action_inputs_this_frame = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "action_inputs_this_frame",
-			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, action_inputs_this_frame),
+			.offset        = offsetof(input_controller_t, controller_index),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.transient_text_inputs = {
-			.type_info     = &DEFAULT_typedata_structure_text_input_event_t.type_info,
-			.member_name   = "transient_text_inputs",
+		.event_count = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "event_count",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, transient_text_inputs),
-			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.text_inputs_this_frame = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "text_inputs_this_frame",
-			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, text_inputs_this_frame),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.keyboard = {
-			.type_info     = &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
-			.member_name   = "keyboard",
-			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, keyboard),
+			.offset        = offsetof(input_controller_t, event_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -22153,842 +21365,17 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.keyboard = {
+			.type_info     = &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
+			.member_name   = "keyboard",
+			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.offset        = offsetof(input_controller_t, keyboard),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 	},
 };
 
-constexpr type_info_procedure_s_im_init_input_manager DEFAULT_typedata_procedure_s_im_init_input_manager = {
-	.type_info = {
-		.type_name = "s_im_init_input_manager",
-		.type_id = TYPE_s_im_init_input_manager,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_init_input_manager.argument_array,
-	.arguments = {
-		.input_manager = {
-			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_init_input_manager.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_t DEFAULT_typedata_SDL_Event = {
-	.type_name = "SDL_Event",
-	.type_id = TYPE_SDL_Event,
-	.size = athena_internal::safe_sizeof<SDL_Event>(),
-};
-constexpr type_info_procedure_s_im_handle_window_inputs DEFAULT_typedata_procedure_s_im_handle_window_inputs = {
-	.type_info = {
-		.type_name = "s_im_handle_window_inputs",
-		.type_id = TYPE_s_im_handle_window_inputs,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_handle_window_inputs.argument_array,
-	.arguments = {
-		.event = {
-			.type_info     = &DEFAULT_typedata_SDL_Event,
-			.member_name   = "event",
-			.parent        = &DEFAULT_typedata_procedure_s_im_handle_window_inputs.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.input_manager = {
-			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_handle_window_inputs.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_reset_controller_states DEFAULT_typedata_procedure_s_im_reset_controller_states = {
-	.type_info = {
-		.type_name = "s_im_reset_controller_states",
-		.type_id = TYPE_s_im_reset_controller_states,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_reset_controller_states.argument_array,
-	.arguments = {
-		.input_manager = {
-			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_reset_controller_states.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_initialize_keyboard_controller DEFAULT_typedata_procedure_s_im_initialize_keyboard_controller = {
-	.type_info = {
-		.type_name = "s_im_initialize_keyboard_controller",
-		.type_id = TYPE_s_im_initialize_keyboard_controller,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_initialize_keyboard_controller.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_initialize_keyboard_controller.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.ID = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "ID",
-			.parent        = &DEFAULT_typedata_procedure_s_im_initialize_keyboard_controller.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_get_primary_controller DEFAULT_typedata_procedure_s_im_get_primary_controller = {
-	.type_info = {
-		.type_name = "s_im_get_primary_controller",
-		.type_id = TYPE_s_im_get_primary_controller,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_structure_input_controller_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_get_primary_controller.argument_array,
-	.arguments = {
-		.input_manager = {
-			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_get_primary_controller.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_get_controller_at_index DEFAULT_typedata_procedure_s_im_get_controller_at_index = {
-	.type_info = {
-		.type_name = "s_im_get_controller_at_index",
-		.type_id = TYPE_s_im_get_controller_at_index,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_structure_input_controller_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_get_controller_at_index.argument_array,
-	.arguments = {
-		.input_manager = {
-			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_get_controller_at_index.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_get_controller_at_index.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_get_active_controller DEFAULT_typedata_procedure_s_im_get_active_controller = {
-	.type_info = {
-		.type_name = "s_im_get_active_controller",
-		.type_id = TYPE_s_im_get_active_controller,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_structure_input_controller_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_get_active_controller.argument_array,
-	.arguments = {
-		.input_manager = {
-			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_get_active_controller.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_set_active_controller DEFAULT_typedata_procedure_s_im_set_active_controller = {
-	.type_info = {
-		.type_name = "s_im_set_active_controller",
-		.type_id = TYPE_s_im_set_active_controller,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_set_active_controller.argument_array,
-	.arguments = {
-		.input_manager = {
-			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_set_active_controller.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.controller_index = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "controller_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_set_active_controller.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_set_primary_controller DEFAULT_typedata_procedure_s_im_set_primary_controller = {
-	.type_info = {
-		.type_name = "s_im_set_primary_controller",
-		.type_id = TYPE_s_im_set_primary_controller,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_set_primary_controller.argument_array,
-	.arguments = {
-		.input_manager = {
-			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_set_primary_controller.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.controller_index = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "controller_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_set_primary_controller.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_is_shift_key_down DEFAULT_typedata_procedure_s_im_is_shift_key_down = {
-	.type_info = {
-		.type_name = "s_im_is_shift_key_down",
-		.type_id = TYPE_s_im_is_shift_key_down,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_bool8,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_shift_key_down.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_shift_key_down.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_is_control_key_down DEFAULT_typedata_procedure_s_im_is_control_key_down = {
-	.type_info = {
-		.type_name = "s_im_is_control_key_down",
-		.type_id = TYPE_s_im_is_control_key_down,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_bool8,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_control_key_down.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_control_key_down.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_is_alt_key_down DEFAULT_typedata_procedure_s_im_is_alt_key_down = {
-	.type_info = {
-		.type_name = "s_im_is_alt_key_down",
-		.type_id = TYPE_s_im_is_alt_key_down,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_bool8,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_alt_key_down.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_alt_key_down.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_t DEFAULT_typedata_mat4_t = {
-	.type_name = "mat4_t",
-	.type_id = TYPE_mat4_t,
-	.size = athena_internal::safe_sizeof<mat4_t>(),
-};
-constexpr type_info_procedure_s_im_transform_mouse_data DEFAULT_typedata_procedure_s_im_transform_mouse_data = {
-	.type_info = {
-		.type_name = "s_im_transform_mouse_data",
-		.type_id = TYPE_s_im_transform_mouse_data,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_vec2_t,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_transform_mouse_data.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_transform_mouse_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.surface_size = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "surface_size",
-			.parent        = &DEFAULT_typedata_procedure_s_im_transform_mouse_data.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.view_matrix = {
-			.type_info     = &DEFAULT_typedata_mat4_t,
-			.member_name   = "view_matrix",
-			.parent        = &DEFAULT_typedata_procedure_s_im_transform_mouse_data.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.projection_matrix = {
-			.type_info     = &DEFAULT_typedata_mat4_t,
-			.member_name   = "projection_matrix",
-			.parent        = &DEFAULT_typedata_procedure_s_im_transform_mouse_data.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_is_keyboard_key_pressed DEFAULT_typedata_procedure_s_im_is_keyboard_key_pressed = {
-	.type_info = {
-		.type_name = "s_im_is_keyboard_key_pressed",
-		.type_id = TYPE_s_im_is_keyboard_key_pressed,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_bool8,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_keyboard_key_pressed.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_keyboard_key_pressed.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.key_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "key_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_keyboard_key_pressed.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_is_keyboard_key_down DEFAULT_typedata_procedure_s_im_is_keyboard_key_down = {
-	.type_info = {
-		.type_name = "s_im_is_keyboard_key_down",
-		.type_id = TYPE_s_im_is_keyboard_key_down,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_bool8,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_keyboard_key_down.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_keyboard_key_down.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.key_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "key_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_keyboard_key_down.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_is_keyboard_key_released DEFAULT_typedata_procedure_s_im_is_keyboard_key_released = {
-	.type_info = {
-		.type_name = "s_im_is_keyboard_key_released",
-		.type_id = TYPE_s_im_is_keyboard_key_released,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_bool8,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_keyboard_key_released.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_keyboard_key_released.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.key_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "key_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_keyboard_key_released.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_consume_keyboard_key_press DEFAULT_typedata_procedure_s_im_consume_keyboard_key_press = {
-	.type_info = {
-		.type_name = "s_im_consume_keyboard_key_press",
-		.type_id = TYPE_s_im_consume_keyboard_key_press,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_consume_keyboard_key_press.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_keyboard_key_press.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.key_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "key_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_keyboard_key_press.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_consume_keyboard_key_down DEFAULT_typedata_procedure_s_im_consume_keyboard_key_down = {
-	.type_info = {
-		.type_name = "s_im_consume_keyboard_key_down",
-		.type_id = TYPE_s_im_consume_keyboard_key_down,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_consume_keyboard_key_down.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_keyboard_key_down.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.key_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "key_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_keyboard_key_down.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_consume_keyboard_key_release DEFAULT_typedata_procedure_s_im_consume_keyboard_key_release = {
-	.type_info = {
-		.type_name = "s_im_consume_keyboard_key_release",
-		.type_id = TYPE_s_im_consume_keyboard_key_release,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_consume_keyboard_key_release.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_keyboard_key_release.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.key_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "key_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_keyboard_key_release.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_get_key_state DEFAULT_typedata_procedure_s_im_get_key_state = {
-	.type_info = {
-		.type_name = "s_im_get_key_state",
-		.type_id = TYPE_s_im_get_key_state,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_structure_action_button_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_get_key_state.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_get_key_state.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.key_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "key_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_get_key_state.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_is_gamepad_button_pressed DEFAULT_typedata_procedure_s_im_is_gamepad_button_pressed = {
-	.type_info = {
-		.type_name = "s_im_is_gamepad_button_pressed",
-		.type_id = TYPE_s_im_is_gamepad_button_pressed,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_bool8,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_gamepad_button_pressed.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_gamepad_button_pressed.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.button_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "button_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_gamepad_button_pressed.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_is_gamepad_button_down DEFAULT_typedata_procedure_s_im_is_gamepad_button_down = {
-	.type_info = {
-		.type_name = "s_im_is_gamepad_button_down",
-		.type_id = TYPE_s_im_is_gamepad_button_down,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_bool8,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_gamepad_button_down.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_gamepad_button_down.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.button_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "button_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_gamepad_button_down.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_is_gamepad_button_released DEFAULT_typedata_procedure_s_im_is_gamepad_button_released = {
-	.type_info = {
-		.type_name = "s_im_is_gamepad_button_released",
-		.type_id = TYPE_s_im_is_gamepad_button_released,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_bool8,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_gamepad_button_released.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_gamepad_button_released.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.button_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "button_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_is_gamepad_button_released.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_consume_gamepad_button_press DEFAULT_typedata_procedure_s_im_consume_gamepad_button_press = {
-	.type_info = {
-		.type_name = "s_im_consume_gamepad_button_press",
-		.type_id = TYPE_s_im_consume_gamepad_button_press,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_consume_gamepad_button_press.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_gamepad_button_press.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.button_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "button_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_gamepad_button_press.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_consume_gamepad_button_down DEFAULT_typedata_procedure_s_im_consume_gamepad_button_down = {
-	.type_info = {
-		.type_name = "s_im_consume_gamepad_button_down",
-		.type_id = TYPE_s_im_consume_gamepad_button_down,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_consume_gamepad_button_down.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_gamepad_button_down.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.button_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "button_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_gamepad_button_down.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_consume_gamepad_button_release DEFAULT_typedata_procedure_s_im_consume_gamepad_button_release = {
-	.type_info = {
-		.type_name = "s_im_consume_gamepad_button_release",
-		.type_id = TYPE_s_im_consume_gamepad_button_release,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_consume_gamepad_button_release.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_gamepad_button_release.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.button_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "button_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_consume_gamepad_button_release.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_gamepad_get_button_state DEFAULT_typedata_procedure_s_im_gamepad_get_button_state = {
-	.type_info = {
-		.type_name = "s_im_gamepad_get_button_state",
-		.type_id = TYPE_s_im_gamepad_get_button_state,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_structure_action_button_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_gamepad_get_button_state.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_gamepad_get_button_state.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.button_index = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "button_index",
-			.parent        = &DEFAULT_typedata_procedure_s_im_gamepad_get_button_state.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_game_action_create DEFAULT_typedata_procedure_s_im_game_action_create = {
-	.type_info = {
-		.type_name = "s_im_game_action_create",
-		.type_id = TYPE_s_im_game_action_create,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 3,
-	.return_type    = &DEFAULT_typedata_structure_game_action_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_game_action_create.argument_array,
-	.arguments = {
-		.input_manager = {
-			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_create.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.action_name = {
-			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
-			.member_name   = "action_name",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_create.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.mapping_type = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
-			.member_name   = "mapping_type",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_create.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_game_action_add_mapping DEFAULT_typedata_procedure_s_im_game_action_add_mapping = {
-	.type_info = {
-		.type_name = "s_im_game_action_add_mapping",
-		.type_id = TYPE_s_im_game_action_add_mapping,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_game_action_add_mapping.argument_array,
-	.arguments = {
-		.action = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_t.type_info,
-			.member_name   = "action",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_add_mapping.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.mapping = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_mapping_t.type_info,
-			.member_name   = "mapping",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_add_mapping.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_game_action_reset_mappings DEFAULT_typedata_procedure_s_im_game_action_reset_mappings = {
-	.type_info = {
-		.type_name = "s_im_game_action_reset_mappings",
-		.type_id = TYPE_s_im_game_action_reset_mappings,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_game_action_reset_mappings.argument_array,
-	.arguments = {
-		.action = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_t.type_info,
-			.member_name   = "action",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_reset_mappings.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_game_action_read_button_state DEFAULT_typedata_procedure_s_im_game_action_read_button_state = {
-	.type_info = {
-		.type_name = "s_im_game_action_read_button_state",
-		.type_id = TYPE_s_im_game_action_read_button_state,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_s32,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_game_action_read_button_state.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_read_button_state.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.action = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_t.type_info,
-			.member_name   = "action",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_read_button_state.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_game_action_read_axis1D_value DEFAULT_typedata_procedure_s_im_game_action_read_axis1D_value = {
-	.type_info = {
-		.type_name = "s_im_game_action_read_axis1D_value",
-		.type_id = TYPE_s_im_game_action_read_axis1D_value,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_float32,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_game_action_read_axis1D_value.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_read_axis1D_value.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.action = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_t.type_info,
-			.member_name   = "action",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_read_axis1D_value.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_s_im_game_action_read_axis2D_value DEFAULT_typedata_procedure_s_im_game_action_read_axis2D_value = {
-	.type_info = {
-		.type_name = "s_im_game_action_read_axis2D_value",
-		.type_id = TYPE_s_im_game_action_read_axis2D_value,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_vec2_t,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_game_action_read_axis2D_value.argument_array,
-	.arguments = {
-		.controller = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_read_axis2D_value.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.action = {
-			.type_info     = &DEFAULT_typedata_structure_game_action_t.type_info,
-			.member_name   = "action",
-			.parent        = &DEFAULT_typedata_procedure_s_im_game_action_read_axis2D_value.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
 constexpr type_info_t DEFAULT_typedata_SDL_Gamepad = {
 	.type_name = "SDL_Gamepad",
 	.type_id = TYPE_SDL_Gamepad,
@@ -26141,6 +24528,11 @@ constexpr type_info_procedure_RHI_execute_backend_commands DEFAULT_typedata_proc
 			.pointer_depth = 1,
 		},
 	},
+};
+constexpr type_info_t DEFAULT_typedata_mat4_t = {
+	.type_name = "mat4_t",
+	.type_id = TYPE_mat4_t,
+	.size = athena_internal::safe_sizeof<mat4_t>(),
 };
 constexpr type_info_t DEFAULT_typedata_backend_buffer_t = {
 	.type_name = "backend_buffer_t",
@@ -31513,7 +29905,7 @@ constexpr type_info_struct_vulkan_shader_t DEFAULT_typedata_structure_vulkan_sha
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<vulkan_shader_t>(),
 	},
-	.member_count   = 22,
+	.member_count   = 20,
 	.member_pointer = DEFAULT_typedata_structure_vulkan_shader_t.member_array,
 	.members = {
 		.shader_id = {
@@ -31649,22 +30041,6 @@ constexpr type_info_struct_vulkan_shader_t DEFAULT_typedata_structure_vulkan_sha
 			.member_name   = "pipeline",
 			.parent        = &DEFAULT_typedata_structure_vulkan_shader_t.type_info,
 			.offset        = offsetof(vulkan_shader_t, pipeline),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.used_pipeline_indices = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "used_pipeline_indices",
-			.parent        = &DEFAULT_typedata_structure_vulkan_shader_t.type_info,
-			.offset        = offsetof(vulkan_shader_t, used_pipeline_indices),
-			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.used_pipeline_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "used_pipeline_count",
-			.parent        = &DEFAULT_typedata_structure_vulkan_shader_t.type_info,
-			.offset        = offsetof(vulkan_shader_t, used_pipeline_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -33472,15 +31848,12 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_threadpool_t.type_info,
 	&DEFAULT_typedata_structure_RHI_context_t.type_info,
 	&DEFAULT_typedata_structure_input_manager_t.type_info,
-	&DEFAULT_typedata_structure_hash_table_allocation_flags_t.type_info,
-	&DEFAULT_typedata_procedure_c_hash_table_allocate_fn_t.type_info,
-	&DEFAULT_typedata_procedure_c_hash_table_free_fn_t.type_info,
-	&DEFAULT_typedata_procedure_c_hash_table_value_from_key.type_info,
-	&DEFAULT_typedata_procedure_c_fnv_hash_value.type_info,
-	&DEFAULT_typedata_procedure_c_combine_hashes.type_info,
-	&DEFAULT_typedata_procedure_c_hash_table_default_alloc_impl.type_info,
-	&DEFAULT_typedata_procedure_c_hash_table_default_free_impl.type_info,
-	&DEFAULT_typedata_structure_hash_table_header_t.type_info,
+	&DEFAULT_typedata_procedure_c_hash_table_hash_key.type_info,
+	&DEFAULT_typedata_procedure_c_hash_table_combine_hashes.type_info,
+	&DEFAULT_typedata_procedure_c_hash_table_default_allocate.type_info,
+	&DEFAULT_typedata_procedure_c_hash_table_default_free.type_info,
+	&DEFAULT_typedata_procedure_hash_table_allocate_impl_t.type_info,
+	&DEFAULT_typedata_procedure_hash_table_free_impl_t.type_info,
 	&DEFAULT_typedata_structure_debug_log_level_t.type_info,
 	&DEFAULT_typedata_procedure__log.type_info,
 	&DEFAULT_typedata_structure_memory_arena_footer_t.type_info,
@@ -33683,10 +32056,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_s_entity_query_flags.type_info,
 	&DEFAULT_typedata_procedure_s_entity_query_flags_exact.type_info,
 	&DEFAULT_typedata_procedure_s_entity_query_archetype.type_info,
-	&DEFAULT_typedata_structure_text_input_action_type_t.type_info,
-	&DEFAULT_typedata_structure_text_input_modifier_flags.type_info,
-	&DEFAULT_typedata_structure_text_input_event_type_t.type_info,
-	&DEFAULT_typedata_structure_text_input_event_t.type_info,
 	&DEFAULT_typedata_structure_game_action_mapping_type_t.type_info,
 	&DEFAULT_typedata_structure_game_action_binding_type_t.type_info,
 	&DEFAULT_typedata_structure_game_action_binding_t.type_info,
@@ -33697,41 +32066,11 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_action_button_t.type_info,
 	&DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
 	&DEFAULT_typedata_structure_gamepad_controller_data_t.type_info,
-	&DEFAULT_typedata_structure_controller_type_t.type_info,
+	&DEFAULT_typedata_structure_input_event_type_t.type_info,
+	&DEFAULT_typedata_structure_input_controller_type_t.type_info,
+	&DEFAULT_typedata_structure_input_axis_t.type_info,
+	&DEFAULT_typedata_structure_input_event_t.type_info,
 	&DEFAULT_typedata_structure_input_controller_t.type_info,
-	&DEFAULT_typedata_procedure_s_im_init_input_manager.type_info,
-	&DEFAULT_typedata_procedure_s_im_handle_window_inputs.type_info,
-	&DEFAULT_typedata_procedure_s_im_reset_controller_states.type_info,
-	&DEFAULT_typedata_procedure_s_im_initialize_keyboard_controller.type_info,
-	&DEFAULT_typedata_procedure_s_im_get_primary_controller.type_info,
-	&DEFAULT_typedata_procedure_s_im_get_controller_at_index.type_info,
-	&DEFAULT_typedata_procedure_s_im_get_active_controller.type_info,
-	&DEFAULT_typedata_procedure_s_im_set_active_controller.type_info,
-	&DEFAULT_typedata_procedure_s_im_set_primary_controller.type_info,
-	&DEFAULT_typedata_procedure_s_im_is_shift_key_down.type_info,
-	&DEFAULT_typedata_procedure_s_im_is_control_key_down.type_info,
-	&DEFAULT_typedata_procedure_s_im_is_alt_key_down.type_info,
-	&DEFAULT_typedata_procedure_s_im_transform_mouse_data.type_info,
-	&DEFAULT_typedata_procedure_s_im_is_keyboard_key_pressed.type_info,
-	&DEFAULT_typedata_procedure_s_im_is_keyboard_key_down.type_info,
-	&DEFAULT_typedata_procedure_s_im_is_keyboard_key_released.type_info,
-	&DEFAULT_typedata_procedure_s_im_consume_keyboard_key_press.type_info,
-	&DEFAULT_typedata_procedure_s_im_consume_keyboard_key_down.type_info,
-	&DEFAULT_typedata_procedure_s_im_consume_keyboard_key_release.type_info,
-	&DEFAULT_typedata_procedure_s_im_get_key_state.type_info,
-	&DEFAULT_typedata_procedure_s_im_is_gamepad_button_pressed.type_info,
-	&DEFAULT_typedata_procedure_s_im_is_gamepad_button_down.type_info,
-	&DEFAULT_typedata_procedure_s_im_is_gamepad_button_released.type_info,
-	&DEFAULT_typedata_procedure_s_im_consume_gamepad_button_press.type_info,
-	&DEFAULT_typedata_procedure_s_im_consume_gamepad_button_down.type_info,
-	&DEFAULT_typedata_procedure_s_im_consume_gamepad_button_release.type_info,
-	&DEFAULT_typedata_procedure_s_im_gamepad_get_button_state.type_info,
-	&DEFAULT_typedata_procedure_s_im_game_action_create.type_info,
-	&DEFAULT_typedata_procedure_s_im_game_action_add_mapping.type_info,
-	&DEFAULT_typedata_procedure_s_im_game_action_reset_mappings.type_info,
-	&DEFAULT_typedata_procedure_s_im_game_action_read_button_state.type_info,
-	&DEFAULT_typedata_procedure_s_im_game_action_read_axis1D_value.type_info,
-	&DEFAULT_typedata_procedure_s_im_game_action_read_axis2D_value.type_info,
 	&DEFAULT_typedata_structure_camera_matrices_t.type_info,
 	&DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
 	&DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info,
@@ -34202,28 +32541,13 @@ enum class RHI_context_t {
 	backend_get_command_buffer,
 }; // RHI_context_t
 enum class input_manager_t {
-	keyboard_data,
-	gamepad_data,
-	primary_controller_index,
-	active_controller_index,
+	event_count,
 	connected_controller_count,
-	controllers,
+	active_controller_index,
 	game_actions,
+	controllers,
+	events,
 }; // input_manager_t
-enum class hash_table_allocation_flags_t {
-	HTAF_Invalid,
-	HTAF_Static,
-	HTAF_KeyCopy,
-	HTAF_ValueCopy,
-	HTAF_Garbage,
-	HTAF_None,
-}; // hash_table_allocation_flags_t
-enum class hash_table_header_t {
-	max_entries,
-	flags,
-	current_entry_count,
-	debug_id,
-}; // hash_table_header_t
 enum class debug_log_level_t {
 	SL_LOG_DEBUG,
 	SL_LOG_TRACE,
@@ -34635,30 +32959,6 @@ enum class entity_query_t {
 	begin,
 	end,
 }; // entity_query_t
-enum class text_input_action_type_t {
-	TEXT_INPUT_EVENT_NONE,
-	TEXT_INPUT_EVENT_PRESSED,
-	TEXT_INPUT_EVENT_DOWN,
-	TEXT_INPUT_EVENT_RELEASED,
-}; // text_input_action_type_t
-enum class text_input_modifier_flags {
-	TEXT_INPUT_MODIFIER_NONE,
-	TEXT_INPUT_MODIFIER_SHIFT,
-	TEXT_INPUT_MODIFIER_CTRL,
-	TEXT_INPUT_MODIFIER_ALT,
-}; // text_input_modifier_flags
-enum class text_input_event_type_t {
-	TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM,
-	TEXT_INPUT_EVENT_TYPE_INPUT_EVENT,
-}; // text_input_event_type_t
-enum class text_input_event_t {
-	type,
-	input_event_type,
-	modifier_flags,
-	scancode,
-	keycode,
-	input_stream,
-}; // text_input_event_t
 enum class game_action_mapping_type_t {
 	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_INVALID,
 	INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON,
@@ -34706,7 +33006,7 @@ enum class action_button_t {
 	scancode,
 	flags,
 	analog_value,
-	half_transition_counter,
+	half_transition_count,
 }; // action_button_t
 enum class keyboard_controller_data_t {
 	input,
@@ -34726,23 +33026,49 @@ enum class gamepad_controller_data_t {
 	stick_deadzone,
 	buttons,
 }; // gamepad_controller_data_t
-enum class controller_type_t {
-	IM_CONTROLLER_INVALID,
-	IM_CONTROLLER_GAMEPAD,
-	IM_CONTROLLER_KEYBOARD,
-	IM_CONTROLLER_COUNT,
-}; // controller_type_t
+enum class input_event_type_t {
+	INPUT_EVENT_TYPE_PRESSED,
+	INPUT_EVENT_TYPE_DOWN,
+	INPUT_EVENT_TYPE_RELEASED,
+	INPUT_EVENT_TYPE_AXIS_MOVED,
+	INPUT_EVENT_TYPE_TEXT_INPUT,
+}; // input_event_type_t
+enum class input_controller_type_t {
+	INPUT_CONTROLLER_TYPE_INVALID,
+	INPUT_CONTROLLER_TYPE_KEYBOARD,
+	INPUT_CONTROLLER_TYPE_GAMEPAD,
+}; // input_controller_type_t
+enum class input_axis_t {
+	INPUT_AXIS_MOUSE_X,
+	INPUT_AXIS_MOUSE_Y,
+	INPUT_AXIS_MOUSE_WHEEL_X,
+	INPUT_AXIS_MOUSE_WHEEL_Y,
+	INPUT_AXIS_GAMEPAD_LEFT_X,
+	INPUT_AXIS_GAMEPAD_LEFT_Y,
+	INPUT_AXIS_GAMEPAD_RIGHT_X,
+	INPUT_AXIS_GAMEPAD_RIGHT_Y,
+	INPUT_AXIS_GAMEPAD_LEFT_TRIGGER,
+	INPUT_AXIS_GAMEPAD_RIGHT_TRIGGER,
+}; // input_axis_t
+enum class input_event_t {
+	type,
+	input_type,
+	consumed,
+	inputID,
+	scancode,
+	controllerID,
+	timestampMS,
+	input_stream,
+	axis_value,
+}; // input_event_t
 enum class input_controller_t {
-	is_valid,
-	is_analog,
 	type,
 	ID,
-	transient_action_inputs,
-	action_inputs_this_frame,
-	transient_text_inputs,
-	text_inputs_this_frame,
-	keyboard,
+	controller_index,
+	event_count,
+	events,
 	gamepad,
+	keyboard,
 }; // input_controller_t
 enum class camera_matrices_t {
 	view_matrix,
@@ -35368,8 +33694,6 @@ enum class vulkan_shader_t {
 	default_pipeline,
 	pipeline,
 	pipeline_hash,
-	used_pipeline_indices,
-	used_pipeline_count,
 	bindings,
 	binding_count,
 }; // vulkan_shader_t
@@ -35616,37 +33940,29 @@ enum class c_file_watcher_emit_changes {
 enum class c_file_watcher_process_changes {
 	watcher,
 }; // c_file_watcher_process_changes
-enum class c_hash_table_allocate_fn_t {
-	allocator,
-	allocation_size,
-	allocation_flags,
-}; // c_hash_table_allocate_fn_t
-enum class c_hash_table_free_fn_t {
-	allocator,
-	data,
-}; // c_hash_table_free_fn_t
-enum class c_hash_table_value_from_key {
+enum class c_hash_table_hash_key {
 	key,
-	key_size,
-	max_table_entries,
-}; // c_hash_table_value_from_key
-enum class c_fnv_hash_value {
-	key,
-	key_size,
-}; // c_fnv_hash_value
-enum class c_combine_hashes {
+}; // c_hash_table_hash_key
+enum class c_hash_table_combine_hashes {
 	A,
 	B,
-}; // c_combine_hashes
-enum class c_hash_table_default_alloc_impl {
+}; // c_hash_table_combine_hashes
+enum class c_hash_table_default_allocate {
 	allocator,
 	allocation_size,
-	allocation_flags,
-}; // c_hash_table_default_alloc_impl
-enum class c_hash_table_default_free_impl {
+}; // c_hash_table_default_allocate
+enum class c_hash_table_default_free {
 	allocator,
-	data,
-}; // c_hash_table_default_free_impl
+	memory,
+}; // c_hash_table_default_free
+enum class hash_table_allocate_impl_t {
+	allocator,
+	allocation_size,
+}; // hash_table_allocate_impl_t
+enum class hash_table_free_impl_t {
+	allocator,
+	memory,
+}; // hash_table_free_impl_t
 enum class _log {
 	log_level,
 	message,
@@ -36227,133 +34543,6 @@ enum class s_entity_query_archetype {
 	entity_manager,
 	archetype,
 }; // s_entity_query_archetype
-enum class s_im_init_input_manager {
-	input_manager,
-}; // s_im_init_input_manager
-enum class s_im_handle_window_inputs {
-	event,
-	input_manager,
-}; // s_im_handle_window_inputs
-enum class s_im_reset_controller_states {
-	input_manager,
-}; // s_im_reset_controller_states
-enum class s_im_initialize_keyboard_controller {
-	controller,
-	ID,
-}; // s_im_initialize_keyboard_controller
-enum class s_im_get_primary_controller {
-	input_manager,
-}; // s_im_get_primary_controller
-enum class s_im_get_controller_at_index {
-	input_manager,
-	index,
-}; // s_im_get_controller_at_index
-enum class s_im_get_active_controller {
-	input_manager,
-}; // s_im_get_active_controller
-enum class s_im_set_active_controller {
-	input_manager,
-	controller_index,
-}; // s_im_set_active_controller
-enum class s_im_set_primary_controller {
-	input_manager,
-	controller_index,
-}; // s_im_set_primary_controller
-enum class s_im_is_shift_key_down {
-	controller,
-}; // s_im_is_shift_key_down
-enum class s_im_is_control_key_down {
-	controller,
-}; // s_im_is_control_key_down
-enum class s_im_is_alt_key_down {
-	controller,
-}; // s_im_is_alt_key_down
-enum class s_im_transform_mouse_data {
-	controller,
-	surface_size,
-	view_matrix,
-	projection_matrix,
-}; // s_im_transform_mouse_data
-enum class s_im_is_keyboard_key_pressed {
-	controller,
-	key_index,
-}; // s_im_is_keyboard_key_pressed
-enum class s_im_is_keyboard_key_down {
-	controller,
-	key_index,
-}; // s_im_is_keyboard_key_down
-enum class s_im_is_keyboard_key_released {
-	controller,
-	key_index,
-}; // s_im_is_keyboard_key_released
-enum class s_im_consume_keyboard_key_press {
-	controller,
-	key_index,
-}; // s_im_consume_keyboard_key_press
-enum class s_im_consume_keyboard_key_down {
-	controller,
-	key_index,
-}; // s_im_consume_keyboard_key_down
-enum class s_im_consume_keyboard_key_release {
-	controller,
-	key_index,
-}; // s_im_consume_keyboard_key_release
-enum class s_im_get_key_state {
-	controller,
-	key_index,
-}; // s_im_get_key_state
-enum class s_im_is_gamepad_button_pressed {
-	controller,
-	button_index,
-}; // s_im_is_gamepad_button_pressed
-enum class s_im_is_gamepad_button_down {
-	controller,
-	button_index,
-}; // s_im_is_gamepad_button_down
-enum class s_im_is_gamepad_button_released {
-	controller,
-	button_index,
-}; // s_im_is_gamepad_button_released
-enum class s_im_consume_gamepad_button_press {
-	controller,
-	button_index,
-}; // s_im_consume_gamepad_button_press
-enum class s_im_consume_gamepad_button_down {
-	controller,
-	button_index,
-}; // s_im_consume_gamepad_button_down
-enum class s_im_consume_gamepad_button_release {
-	controller,
-	button_index,
-}; // s_im_consume_gamepad_button_release
-enum class s_im_gamepad_get_button_state {
-	controller,
-	button_index,
-}; // s_im_gamepad_get_button_state
-enum class s_im_game_action_create {
-	input_manager,
-	action_name,
-	mapping_type,
-}; // s_im_game_action_create
-enum class s_im_game_action_add_mapping {
-	action,
-	mapping,
-}; // s_im_game_action_add_mapping
-enum class s_im_game_action_reset_mappings {
-	action,
-}; // s_im_game_action_reset_mappings
-enum class s_im_game_action_read_button_state {
-	controller,
-	action,
-}; // s_im_game_action_read_button_state
-enum class s_im_game_action_read_axis1D_value {
-	controller,
-	action,
-}; // s_im_game_action_read_axis1D_value
-enum class s_im_game_action_read_axis2D_value {
-	controller,
-	action,
-}; // s_im_game_action_read_axis2D_value
 enum class RHI_context_init {
 	RHI_context,
 	render_context,

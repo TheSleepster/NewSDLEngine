@@ -93,6 +93,57 @@ process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager
             }break;
         }
     }
+
+    // NOTE(Sleepster): Consume redundant events
+    u32 redundant_events[MAX_INPUT_EVENTS] = {};
+    u32 events_to_remove = 0;
+
+    for(s32 event_index = 0;
+        event_index < input_manager->event_count - 1;
+        ++event_index)
+    {
+        input_event_t *event      = input_manager->events + (event_index);
+        input_event_t *next_event = input_manager->events + (event_index + 1);
+        if(is_same_event(event, next_event))
+        {
+            redundant_events[events_to_remove++] = (event_index + 1);
+            if(event->input_stream.data == null && next_event->input_stream.data != null)
+            {
+                event->input_stream = next_event->input_stream;
+            }
+        }
+    }
+
+    for(u32 removal_index = 0;
+        removal_index < events_to_remove;
+        ++removal_index)
+    {
+        u32 index = redundant_events[removal_index];
+        c_array_remove(&input_manager->events, index, input_manager->event_count - removal_index);
+    }
+
+    input_manager->event_count -= events_to_remove;
+
+    // NOTE(Sleepster): Dispatch to the according controller 
+    u64 most_recent_timestamp = 0;
+    for(s32 event_index = 0;
+        event_index < input_manager->event_count;
+        ++event_index)
+    {
+        input_event_t *event = input_manager->events + event_index;
+        input_controller_t *controller = null;
+        if(event->input_type == INPUT_CONTROLLER_TYPE_KEYBOARD) controller = find_controller_by_ID(input_manager, event->controllerID, null);
+        else                                                    controller = find_controller_by_ID(input_manager, event->controllerID, null);
+        Assert(controller);
+
+        append_input_event(&controller->events, &controller->event_count, event);
+        if(event->timestampMS >= most_recent_timestamp)
+        {
+            input_manager->active_controller_index = controller->controller_index;
+            most_recent_timestamp = event->timestampMS;
+        }
+    }
+    input_manager->event_count = 0;
 }
 
 int

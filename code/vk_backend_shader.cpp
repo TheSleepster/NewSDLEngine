@@ -11,8 +11,8 @@
 
 #include <c_tokenizer.h>
 
-internal_api
-C_HASH_TABLE_ALLOCATE_IMPL(shader_arena_allocate)
+internal_api void*
+shader_arena_allocate(void *allocator, u32 allocation_size)
 {
     void *result = null;
     result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
@@ -369,20 +369,17 @@ vk_backend_shader_create_spirv_reflect(vulkan_context_t *vulkan_context, string_
     // while compute shaders are fine with just one.
     if(result.pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
     {
-        c_hash_table_init(&result.pipeline_hash, 
-                          MAX_SHADER_PIPELINE_COUNT, 
-                          &result.shader_arena,
-                          shader_arena_allocate,
-                          null);
-        ZeroMemory(result.pipeline_hash.data, sizeof(VkPipeline) * MAX_SHADER_PIPELINE_COUNT);
+        result.pipeline_hash = c_hash_table_create<VkPipeline>(MAX_SHADER_PIPELINE_COUNT, 
+                                                               &result.shader_arena,
+                                                               shader_arena_allocate,
+                                                               null);
     }
     else
     {
-        c_hash_table_init(&result.pipeline_hash, 
-                          1, 
-                          &result.shader_arena,
-                          shader_arena_allocate,
-                          null);
+        result.pipeline_hash = c_hash_table_create<VkPipeline>(1, 
+                                                               &result.shader_arena,
+                                                               shader_arena_allocate,
+                                                               null);
     }
 
     // NOTE(Sleepster): This should be fine for getting the descriptor set data for now.
@@ -422,7 +419,7 @@ vk_backend_shader_create_spirv_reflect(vulkan_context_t *vulkan_context, string_
             shader_binding->type               = set_binding->descriptorType;
             shader_binding->name               = STR(binding->name);
             shader_binding->descriptor_count   = binding->count;
-            shader_binding->buffer_hash_index  = c_fnv_hash_value(shader_binding->name.data, shader_binding->name.count);
+            shader_binding->buffer_hash_index  = c_hash_table_hash_key(string_t{shader_binding->name.data, shader_binding->name.count});
             shader_binding->buffer_hash_index %= RHI_MAX_CONSTANT_BUFFERS;
 
             ++result.binding_count;
@@ -461,18 +458,18 @@ vk_backend_shader_create_spirv_reflect(vulkan_context_t *vulkan_context, string_
             .data  = (u8*)&g_pipeline_default_state_key,
             .count = sizeof(g_pipeline_default_state_key)
         };
-        u64 pipeline_state_hash = c_fnv_hash_value(pipeline_key_data.data, pipeline_key_data.count);
+        u64 pipeline_state_hash = c_hash_table_hash_key(pipeline_key_data);
         pipeline_state_hash %= MAX_SHADER_PIPELINE_COUNT; 
 
         result.shader_id = pipeline_state_hash;
-        result.pipeline_hash.data[pipeline_state_hash] = vk_backend_create_render_pipeline(vulkan_context, 
-                                                                                          &result, 
-                                                                                           vulkan_context->primary_renderpass,
-                                                                                          &g_pipeline_default_rasterization_state, 
-                                                                                          &g_pipeline_default_depth_stencil_state,
-                                                                                          &g_pipeline_default_blend_settings,
-                                                                                          &result.pipeline_vertex_input_state);
-        result.default_pipeline = result.pipeline_hash.data[pipeline_state_hash];
+        (result.pipeline_hash.items[pipeline_state_hash]).item = vk_backend_create_render_pipeline(vulkan_context, 
+                                                                                                   &result, 
+                                                                                                   vulkan_context->primary_renderpass,
+                                                                                                   &g_pipeline_default_rasterization_state, 
+                                                                                                   &g_pipeline_default_depth_stencil_state,
+                                                                                                   &g_pipeline_default_blend_settings,
+                                                                                                   &result.pipeline_vertex_input_state);
+        result.default_pipeline = (result.pipeline_hash.items[pipeline_state_hash]).item;
     }
     else if(result.pipeline_type == VK_PIPELINE_BIND_POINT_COMPUTE)
     {
@@ -481,7 +478,7 @@ vk_backend_shader_create_spirv_reflect(vulkan_context_t *vulkan_context, string_
         pipeline_info.layout = result.pipeline_layout;
         pipeline_info.stage  = result.stages->pipeline_stage_create_info;
 
-        vkAssert(vkCreateComputePipelines(vulkan_context->device, null, 1, &pipeline_info, null, &result.pipeline_hash.data[0]));
+        vkAssert(vkCreateComputePipelines(vulkan_context->device, null, 1, &pipeline_info, null, &(result.pipeline_hash.items[0]).item));
     }
 
     return(result);
@@ -1097,7 +1094,7 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
                 shader_binding->type               = descriptor_type;
                 shader_binding->descriptor_count   = descriptor_count;
                 shader_binding->name               = STR(variable->getName());
-                shader_binding->buffer_hash_index  = c_fnv_hash_value(shader_binding->name.data, shader_binding->name.count);
+                shader_binding->buffer_hash_index  = c_hash_table_hash_key(shader_binding->name);
                 shader_binding->buffer_hash_index %= RHI_MAX_CONSTANT_BUFFERS;
 
                 ++result.binding_count;
@@ -1121,20 +1118,17 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
     // while compute shaders are fine with just one.
     if(result.pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
     {
-        c_hash_table_init(&result.pipeline_hash, 
-                          MAX_SHADER_PIPELINE_COUNT, 
-                          &result.shader_arena,
-                          shader_arena_allocate,
-                          null);
-        ZeroMemory(result.pipeline_hash.data, sizeof(VkPipeline) * MAX_SHADER_PIPELINE_COUNT);
+        result.pipeline_hash = c_hash_table_create<VkPipeline>(MAX_SHADER_PIPELINE_COUNT, 
+                                                               &result.shader_arena,
+                                                               shader_arena_allocate,
+                                                               null);
     }
     else
     {
-        c_hash_table_init(&result.pipeline_hash, 
-                          1, 
-                          &result.shader_arena,
-                          shader_arena_allocate,
-                          null);
+        result.pipeline_hash = c_hash_table_create<VkPipeline>(1, 
+                                                               &result.shader_arena,
+                                                               shader_arena_allocate,
+                                                               null);
     }
 
     VkPipelineLayoutCreateInfo pipeline_layout_info = {
@@ -1156,18 +1150,18 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
             .data  = (u8*)&g_pipeline_default_state_key,
             .count = sizeof(g_pipeline_default_state_key)
         };
-        u64 pipeline_state_hash = c_fnv_hash_value(pipeline_key_data.data, pipeline_key_data.count);
+        u64 pipeline_state_hash = c_hash_table_hash_key(pipeline_key_data);
         pipeline_state_hash %= MAX_SHADER_PIPELINE_COUNT; 
 
         result.shader_id = pipeline_state_hash;
-        result.pipeline_hash.data[pipeline_state_hash] = vk_backend_create_render_pipeline(vulkan_context, 
-                                                                                          &result, 
-                                                                                           vulkan_context->primary_renderpass,
-                                                                                          &g_pipeline_default_rasterization_state, 
-                                                                                          &g_pipeline_default_depth_stencil_state,
-                                                                                          &g_pipeline_default_blend_settings,
-                                                                                          &result.pipeline_vertex_input_state);
-        result.default_pipeline = result.pipeline_hash.data[pipeline_state_hash];
+        (result.pipeline_hash.items[pipeline_state_hash]).item = vk_backend_create_render_pipeline(vulkan_context, 
+                                                                                                   &result, 
+                                                                                                   vulkan_context->primary_renderpass,
+                                                                                                   &g_pipeline_default_rasterization_state, 
+                                                                                                   &g_pipeline_default_depth_stencil_state,
+                                                                                                   &g_pipeline_default_blend_settings,
+                                                                                                   &result.pipeline_vertex_input_state);
+        result.default_pipeline = (result.pipeline_hash.items[pipeline_state_hash]).item;
     }
     else if(result.pipeline_type == VK_PIPELINE_BIND_POINT_COMPUTE)
     {
@@ -1176,7 +1170,7 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
         pipeline_info.layout = result.pipeline_layout;
         pipeline_info.stage  = result.stages->pipeline_stage_create_info;
 
-        vkAssert(vkCreateComputePipelines(vulkan_context->device, null, 1, &pipeline_info, null, &result.pipeline_hash.data[0]));
+        vkAssert(vkCreateComputePipelines(vulkan_context->device, null, 1, &pipeline_info, null, &(result.pipeline_hash.items[0]).item));
     }
 
     return(result);

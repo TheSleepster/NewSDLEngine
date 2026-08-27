@@ -9,6 +9,7 @@
 #define C_DYNARRAY_H
 #include <c_base.h>
 #include <c_types.h>
+#include <c_math.h>
 #include <string.h>
 
 /////////////////////////
@@ -129,18 +130,20 @@ c_array_find(array_t<T, count> *array, T *element)
 
 template <typename T, u32 count>
 void
-c_dynarray_remove(array_t<T, count> *array, u32 index)
+c_array_remove(array_t<T, count> *array, u32 index, s32 max_index)
 {
     Assert(index <= array->count);
+    if(max_index == -1)
+    {
+        max_index = count;
+    }
 
-    for(u32 this_index = index;
-        this_index < (array->used - 1);
+    for(s32 this_index = index;
+        this_index < max_index;
         ++this_index)
     {
         array->items[this_index] = array->items[this_index + 1];
     }
-
-    --array->used;
 }
 
 /////////////////////////
@@ -202,23 +205,16 @@ c_dynarray_add(dynarray_t<T> *array, T *element)
     T *result = null;
     if((array->used + 1) > array->count)
     {
-        u32 old_count = array->count;
+        //u32 old_count = array->count;
 
+        // NOTE(Sleepster): realloc does the memcpy for us. We don't need to do it
         u32 new_count = Max(5, array->count * 2);
         T  *new_items = (T*)realloc(array->items, sizeof(T) * new_count);
-        ZeroMemory(new_items, sizeof(T) * new_count);
 
         array->count = new_count;
         array->items = new_items;
 
         Assert(array->items);
-        if(old_count > 0)
-        {
-            void *offset_ptr = (void*)(array->items + old_count);
-            u32 copy_size    = (sizeof(T) * (array->count - old_count));
-
-            memset(offset_ptr, 0, copy_size);
-        }
     }
 
     result = array->items + array->used; 

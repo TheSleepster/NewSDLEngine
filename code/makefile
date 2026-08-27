@@ -137,6 +137,7 @@ define UNITY_FILE_CONTENT
 #define MATH_IMPLEMENTATION
 #define HASH_TABLE_IMPLEMENTATION
 #define DYNARRAY_IMPLEMENTATION
+#include <math.h>
 $(C_INCLUDES)
 #include "$(PLATFORM_SRC)"
 #include "sandbox/$(notdir $1)"

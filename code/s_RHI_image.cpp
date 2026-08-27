@@ -11,7 +11,7 @@ RHI_image_t
 RHI_image_create(RHI_context_t *RHI_context, RHI_image_create_info_t *image_create_info)
 {
     RHI_image_t result = {};
-    result.ID          = c_fnv_hash_value((byte*)image_create_info, sizeof(RHI_image_create_info_t));
+    result.ID          = c_hash_table_hash_key(string_t{(byte*)image_create_info, sizeof(RHI_image_create_info_t)});
     result.create_info = *image_create_info;
 
     RHI_context->backend_image_create(image_create_info, &result);

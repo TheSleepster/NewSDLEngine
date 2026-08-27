@@ -32,8 +32,8 @@
 internal_api void  asset_file_load_packages(asset_manager_t *asset_manager, asset_file_data_t *asset_file, jfd_file_header_t *header);
 internal_api bool8 initialize_asset_file_contents(asset_manager_t *asset_manager, asset_file_data_t *asset_file, string_t filepath);
 
-internal_api
-C_HASH_TABLE_ALLOCATE_IMPL(asset_manager_hash_arena_allocate)
+internal_api void*
+asset_manager_hash_arena_allocate(void *allocator, u32 allocation_size)
 {
     void *result = null;
     result = c_arena_push_size((memory_arena_t*)allocator, allocation_size);
@@ -346,11 +346,11 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
     // Right now my assumption is that if you want to make use of this material, you should just load the shader now
     // rather than wait for way later to load it when we're rendering. Seems bad to delay it that long... But who knows
     // Maybe this is bad and that's a better idea.
-    archetype.ID              = c_fnv_hash_value(archetype.name.data, archetype.name.count);
-    archetype.shader_handle   = s_asset_manager_acquire_asset_handle(asset_manager, archetype.shader_binary_name);
+    archetype.ID            = c_hash_table_hash_key(archetype.name);
+    archetype.shader_handle = s_asset_manager_acquire_asset_handle(asset_manager, archetype.shader_binary_name);
 
-    result.material_type      = SMT_Archetype;
-    result.archetype          = archetype;
+    result.material_type    = SMT_Archetype;
+    result.archetype        = archetype;
 
     return(result);
 }
@@ -459,12 +459,10 @@ s_asset_font_create_new_page(asset_manager_t *asset_manager, dynamic_render_font
     new_page->parent_font = varient->parent_font;
     new_page->font_atlas  = s_texture_atlas_create(asset_manager, 4096, 4, BMF_RGB24_UNORM, 0);
     new_page->varient     = varient;
-    c_hash_table_init(&new_page->glyphs, 
-                      2087, 
-                      arena, 
-                     &asset_manager_hash_arena_allocate, 
-                      null);
-
+    new_page->glyphs      = c_hash_table_create<glyph_metric_t*>(2087, 
+                                                                 arena, 
+                                                                 &asset_manager_hash_arena_allocate, 
+                                                                 null);
     return(new_page);
 }
 
@@ -640,7 +638,7 @@ s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
             current_page;
             current_page = current_page->next_page)
         {
-            glyph_metric_t *found = c_hash_table_get_value(&current_page->glyphs, codepoint_data);
+            glyph_metric_t *found = c_hash_table_get_element(&current_page->glyphs, codepoint_data);
             if(found)
             {
                 result   = found;
@@ -658,8 +656,7 @@ s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
             if(!last_page->is_full)
             {
                 glyph_metric_t *new_glyph = c_arena_push_struct(&varient->parent_font->font_arena, glyph_metric_t);
-                c_hash_table_insert_pair(&last_page->glyphs, codepoint_data, new_glyph);
-
+                c_hash_table_add_element(&last_page->glyphs, &new_glyph, codepoint_data);
                 our_page = last_page;
             }
             else
@@ -673,7 +670,7 @@ s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
         Assert(our_page);
         Assert(our_page->is_full == false);
 
-        result = c_hash_table_get_value(&our_page->glyphs, codepoint_data);
+        result = c_hash_table_get_element(&our_page->glyphs, codepoint_data);
         if(result->is_fetched == false)
         {
             result->is_fetched = true;
@@ -905,11 +902,8 @@ asset_catalog_load_default_asset(asset_catalog_t *catalog)
         }break;
     }
     Assert(catalog->asset_manager);
-
-    u64 entry_count = catalog->asset_manager->asset_name_to_file.header.max_entries;
-    u64 hash_value  = c_hash_table_value_from_key(default_asset_name.data, 
-                                                  default_asset_name.count, 
-                                                  entry_count);
+    u64 hash_value  = c_hash_table_value_from_key(&catalog->asset_manager->asset_name_to_file, 
+                                                   default_asset_name); 
 
     result.slot = s_asset_manager_get_asset_slot(catalog, default_asset_name);
     result.slot->catalog = catalog;
@@ -933,14 +927,13 @@ s_asset_manager_init(asset_manager_t *asset_manager)
     asset_manager->manager_arena   = c_arena_create(MB(100));
     asset_manager->asset_allocator = c_za_create(GB(1));
 
-    c_hash_table_init(&asset_manager->asset_name_to_file, 
-                       ASSET_CATALOG_MAX_LOOKUPS, 
-                      &asset_manager->manager_arena, 
-                       asset_manager_hash_arena_allocate,
-                       null);
+    asset_manager->asset_name_to_file = c_hash_table_create<s32>(ASSET_CATALOG_MAX_LOOKUPS, 
+                                                                 &asset_manager->manager_arena, 
+                                                                 asset_manager_hash_arena_allocate,
+                                                                 null);
 
     // NOTE(Sleepster): Initializing all entries to -1 
-    memset(asset_manager->asset_name_to_file.data, -1, sizeof(s32) * ASSET_CATALOG_MAX_LOOKUPS);
+    //memset(asset_manager->asset_name_to_file.data, -1, sizeof(s32) * ASSET_CATALOG_MAX_LOOKUPS);
 
     asset_manager->texture_catalog  = asset_manager->asset_catalogs + AT_Bitmap;
     asset_manager->shader_catalog   = asset_manager->asset_catalogs + AT_Shader;
@@ -953,14 +946,13 @@ s_asset_manager_init(asset_manager_t *asset_manager)
         ++catalog_index)
     {
         asset_catalog_t *catalog = asset_manager->asset_catalogs + catalog_index;
-        catalog->asset_manager = asset_manager;
-        c_hash_table_init(&catalog->asset_lookup, 
-                           ASSET_CATALOG_MAX_LOOKUPS, 
-                          &asset_manager->manager_arena, 
-                           asset_manager_hash_arena_allocate,
-                           null);
+        catalog->asset_manager   = asset_manager;
+        catalog->asset_lookup    = c_hash_table_create<asset_slot_t>(ASSET_CATALOG_MAX_LOOKUPS, 
+                                                                     &asset_manager->manager_arena, 
+                                                                     asset_manager_hash_arena_allocate,
+                                                                     null);
 
-        catalog->catalog_type  = (asset_type_t)catalog_index;
+        catalog->catalog_type = (asset_type_t)catalog_index;
 
         Assert(catalog->catalog_type < AT_Count);
         Assert(catalog->catalog_type > AT_Invalid);
@@ -1152,17 +1144,19 @@ asset_file_load_packages(asset_manager_t *asset_manager, asset_file_data_t *asse
 
         current_file_offset    += entry->entry_header->total_entry_size;
 
-        c_hash_table_insert_pair(&asset_file->entry_hash, entry->filename, (s32)entry_index);
-        c_hash_table_insert_pair(&asset_manager->asset_name_to_file, entry->filename, (s32)asset_file->ID);
-        u64 hash_value = c_hash_table_value_from_key(entry->filename.data, 
-                                                     entry->filename.count, 
-                                                     asset_manager->asset_name_to_file.header.max_entries);
+        s32 signed_entry_index = (s32)entry_index;
+        s32 file_ID = asset_file->ID;
+
+        c_hash_table_add_element(&asset_file->entry_hash, &signed_entry_index, entry->filename);
+        c_hash_table_add_element(&asset_manager->asset_name_to_file, &file_ID, entry->filename);
+        u64 hash_value = c_hash_table_value_from_key(&asset_manager->asset_name_to_file, 
+                                                     entry->filename);
 
         log_debug("Inserting asset with name: '%s' with a name length of: '%d' into the name_to_file hash with file_index: '%d' hash_value: '%llu'...\n", 
                   C_STR(entry->filename), entry->filename.count, asset_file->ID, hash_value);
 
         asset_catalog_t *catalog = asset_manager->asset_catalogs + entry->entry_header->asset_type;
-        asset_slot_t    *slot    = c_hash_table_get_value_ptr(&catalog->asset_lookup, entry->filename);
+        asset_slot_t    *slot    = c_hash_table_get_element_ptr(&catalog->asset_lookup, entry->filename);
 
         Assert(entry->entry_header->asset_type == catalog->catalog_type);
         Assert(slot);
@@ -1199,11 +1193,10 @@ initialize_asset_file_contents(asset_manager_t *asset_manager, asset_file_data_t
 
         asset_file->header          = header;
         asset_file->package_entries = c_arena_push_array(&asset_file->init_arena, jfd_package_entry_t, header->entry_count);
-        c_hash_table_init(&asset_file->entry_hash, 
-                           ASSET_CATALOG_MAX_LOOKUPS, 
-                          &asset_file->init_arena, 
-                           asset_manager_hash_arena_allocate,
-                           null);
+        asset_file->entry_hash = c_hash_table_create<s32>(ASSET_CATALOG_MAX_LOOKUPS, 
+                                                          &asset_file->init_arena, 
+                                                          asset_manager_hash_arena_allocate,
+                                                          null);
 
         // NOTE(Sleepster): Load the packages 
         asset_file_load_packages(asset_manager, asset_file, header);
@@ -1275,7 +1268,7 @@ internal_api asset_slot_t *
 s_asset_manager_get_asset_slot(asset_catalog_t *catalog, string_t name)
 {
     asset_slot *result = null;
-    result = c_hash_table_get_value_ptr(&catalog->asset_lookup, name);
+    result = c_hash_table_get_element_ptr(&catalog->asset_lookup, name);
     if(result == null)
     {
         log_error("Failure to fetch asset '%s' from this catalog...\n", C_STR(name));
@@ -1357,13 +1350,13 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
 {
     asset_handle_t result;
 
-    u64 hash_value = c_hash_table_value_from_key(name.data, name.count, asset_manager->asset_name_to_file.header.max_entries);
+    u64 hash_value = c_hash_table_value_from_key(&asset_manager->asset_name_to_file, name);
     log_info("hash index for: '%.*s' is '%llu'...\n", fprint_string(name), hash_value);
-    s32 file_index = c_hash_table_get_value(&asset_manager->asset_name_to_file, name);
+    s32 file_index = c_hash_table_get_element(&asset_manager->asset_name_to_file, name);
     if(file_index != -1)
     {
         asset_file_data_t *asset_file = asset_manager->asset_files + file_index;
-        s32 asset_entry_index = c_hash_table_get_value(&asset_file->entry_hash, name);
+        s32 asset_entry_index = c_hash_table_get_element(&asset_file->entry_hash, name);
         // NOTE(Sleepster): This just SHOULD NOT be possible... 
         //                  An assert here would imply that we found the file inside of a package, but cannot locate it.
         //                  Which in any case is a bug and should be fixed immediately.

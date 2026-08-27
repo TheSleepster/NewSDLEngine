@@ -232,7 +232,7 @@ struct vulkan_context_t
     VkCommandPool                       staging_command_pool;
     VkFence                             staging_fences;
 
-    HashTable_t(VkSampler)              image_samplers;
+    hash_table_t<VkSampler>             image_samplers;
     VkSampler                           default_nearest_sampler;
     VkSampler                           default_linear_sampler;
 

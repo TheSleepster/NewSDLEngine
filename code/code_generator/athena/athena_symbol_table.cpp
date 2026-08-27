@@ -60,8 +60,8 @@ symbol_table_init(string_t filepath, bool8 recursive)
     g_symbol_table.file_count   = file_count;
     g_symbol_table.file_parsers = c_arena_push_array(&permanent_arena, parser_t, g_symbol_table.file_count); 
 
-    g_symbol_table.defined_global_macro_table = hash_table_create<macro_info_t>(1024);
-    g_symbol_table.type_table                 = hash_table_create<code_type_t*>(24571);
+    g_symbol_table.defined_global_macro_table = c_hash_table_create<macro_info_t>(1024);
+    g_symbol_table.type_table                 = c_hash_table_create<code_type_t*>(24571);
     g_symbol_table.is_initialized = true;
 }
 
@@ -71,7 +71,7 @@ symbol_table_find_code_declaration(string_t identifier)
     AST_node_t *result = null;
     for(auto &decl_context: g_symbol_table.declaration_contexts)
     {
-        result = hash_table_get_element(&decl_context.code_decls, identifier);
+        result = c_hash_table_get_element(&decl_context.code_decls, identifier);
         if(result)
         {
             break;
@@ -87,7 +87,7 @@ parser_create_declaration_context(parser_t *parser, string_t scope_name, declara
 {
     declaration_context_t *result = null;
 
-    u64 context_ID = hash_table_hash_key(scope_name);
+    u64 context_ID = c_hash_table_hash_key(scope_name);
     for(auto &context: parser->recorded_decl_contexts)
     {
         if(context.context_ID == context_ID && parent == context.parent_scope)
@@ -106,9 +106,9 @@ parser_create_declaration_context(parser_t *parser, string_t scope_name, declara
     {
         // NOTE(Sleepster): lexical_scope's string shares the lifetime of the string you passed in.
         declaration_context_t  new_context = {};
-        new_context.local_types   = hash_table_create<code_type_t*>(9192);
-        new_context.code_decls    = hash_table_create<AST_node_t*>(9192);
-        new_context.enum_symbols  = hash_table_create<AST_node_t*>(2048);
+        new_context.local_types   = c_hash_table_create<code_type_t*>(9192);
+        new_context.code_decls    = c_hash_table_create<AST_node_t*>(9192);
+        new_context.enum_symbols  = c_hash_table_create<AST_node_t*>(2048);
         new_context.lexical_scope = scope_name;
         new_context.context_ID    = context_ID;
         new_context.parent_scope  = parent;
@@ -147,8 +147,8 @@ parser_create(string_t filename, string_t file_data)
     
     // NOTE(Sleepster): This has to pass the lexer by pointer or we get a weird use-after-return stack bug. 
     lexer_create(&parser->lexer, file_data);
-    parser->macro_table         = hash_table_create<macro_info_t>(1024);
-    parser->recorded_attributes = hash_table_create<code_attribute_t>(256);
+    parser->macro_table         = c_hash_table_create<macro_info_t>(1024);
+    parser->recorded_attributes = c_hash_table_create<code_attribute_t>(256);
     c_dynarray_reserve(&parser->recorded_decl_contexts, 60);
 
     string_t scope_string = c_string_get_filename_from_path(filename);
@@ -161,7 +161,7 @@ parser_create(string_t filename, string_t file_data)
         ++primitive_index)
     {
         code_type_t *primitive = g_language_info.language_primitive_types + primitive_index;
-        hash_table_add_element(&global_scope->local_types, 
+        c_hash_table_add_element(&global_scope->local_types, 
                                &primitive, 
                                 primitive->identifier);
     }
@@ -234,9 +234,9 @@ initialize_default_language_info(void)
         ++index)
     {
         string_t type_name = default_primitive_types[index];
-        u64 type_id = hash_table_hash_key(type_name);
+        u64 type_id = c_hash_table_hash_key(type_name);
 
-        //code_type_t primitive    = hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, type_id);
+        //code_type_t primitive    = c_hash_table_get_element_ptr_at_index(&g_symbol_table.type_table, type_id);
         code_type_t primitive   = {};
         primitive.is_registered = true;
         primitive.identifier    = c_string_make_copy(&permanent_arena, type_name);
@@ -428,7 +428,7 @@ parser_fetch_next_token(parser_t *parser)
 
     if(result.token_type != TOKEN_TYPE_EOF)
     {
-        macro_info_t *macro = hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, result.data);
+        macro_info_t *macro = c_hash_table_get_element_ptr(&g_symbol_table.defined_global_macro_table, result.data);
         if(macro->is_set)
         {
             lexer_token_stream_t macro_stream = parser_substitute_macro_arguments(parser, result, macro);
@@ -512,7 +512,7 @@ parser_search_for_code_type(parser_t *parser, string_t identifier)
         --index)
     {
         declaration_context_t *decl_context = parser->decl_context_stack[index];
-        code_type_t *found = hash_table_get_element(&decl_context->local_types, identifier);
+        code_type_t *found = c_hash_table_get_element(&decl_context->local_types, identifier);
         if(found && found->is_registered)
         {
             result = found;
@@ -542,7 +542,7 @@ parser_register_code_type(parser_t *parser, string_t identifier, code_type_t *ty
         result = c_arena_push_struct(&parser->arena, code_type_t); 
         init_code_type(result, parser, identifier, type_alias);
 
-        hash_table_add_element(&parser->active_decl_context->local_types, &result, identifier);
+        c_hash_table_add_element(&parser->active_decl_context->local_types, &result, identifier);
     }
 
     result->alias_of = type_alias;
