@@ -32,17 +32,24 @@ enum game_action_binding_type_t
     INPUT_MANAGER_BINDING_TYPE_JOYSTICK,
 };
 
+struct input_binding_state_t
+{
+    s32 flags;
+    s32 half_transition_count;
+    s32 ID;
+};
+
 struct game_action_binding_t
 {
-    u32 binding_id;
-    u32 binding_type;
+    s32 bindingID;
+    s32 binding_type;
 };
 
 struct game_action_mapping_t
 {
     game_action_binding_t bindings[MAX_GAME_ACTION_BINDINGS];
     s32                   binding_count;
-    u32                   controller_type;
+    s32                   controller_type;
 };
 
 struct game_action_t
@@ -52,10 +59,9 @@ struct game_action_t
     s32                   mapping_count;
 
     string_t              name;
-    // TODO(Sleepster): Maybe we want to cache the values related to the input axis and such?
-    // vec2_t  axis2D_value;
-    // float32 axis1D_value;
-    // s32     button_flags;
+    vec2_t                axis2D_value;
+    float32               axis1D_value;
+    s32                   button_flags;
 };
 
 
@@ -83,49 +89,56 @@ enum input_mouse_buttons_t
     SDL_MOUSE_BUTTON_COUNT = 5
 };
 
+enum keyboard_modifier_flags 
+{
+    KEYBOARD_MODIFIER_NONE   = BIT(0),
+    KEYBOARD_MODIFIER_LALT   = BIT(1),
+    KEYBOARD_MODIFIER_LCTRL  = BIT(2),
+    KEYBOARD_MODIFIER_LSHIFT = BIT(3),
+    KEYBOARD_MODIFIER_RALT   = BIT(4),
+    KEYBOARD_MODIFIER_RCTRL  = BIT(5),
+    KEYBOARD_MODIFIER_RSHIFT = BIT(6),
+};
+
 struct action_button_t
 {
     // NOTE(Sleepster): UTF32 keycode 
-    u32 keycode;
-    u32 scancode;
-    u32 flags;
-    s16 analog_value;
-    s16 half_transition_count;
+    u32    keycode;
+    u32    scancode;
+    u32    flags;
+    // NOTE(Sleepster): 1D analog values only occupy the .x member. 
+    vec2_t analog_value;
+    s16    half_transition_count;
 };
 
 struct keyboard_controller_data_t
 {
-    // NOTE(Sleepster): Input data is stored here and reset every frame,
-    // but this seems to counteract the REASON for the event driven inputs...
     action_button_t  input[MAX_KEYBOARD_BUTTONS];
+    u32              modifier_flags;
 
     vec2_t           current_mouse_pos;
     vec2_t           last_mouse_pos;
     vec2_t           mouse_delta;
 
-    bool8            is_shift_key_down;
-    bool8            is_control_key_down;
-    bool8            is_alt_key_down;
+    vec2_t           mouse_wheel_delta;
+    vec2_t           current_mouse_wheel;
 };
 
 struct gamepad_controller_data_t
 {
     SDL_Gamepad    *gamepad_data;
-    SDL_Joystick   *stick_data;
-    u32             gamepad_id;
+    u32             gamepadID;
 
     bool8           has_rumble;
     s32             rumble_value;
     float32         stick_deadzone;
 
-    // NOTE(Sleepster): Input data is stored here and reset every frame,
-    // but this seems to counteract the REASON for the event driven inputs...
     action_button_t buttons[SDL_GAMEPAD_BUTTON_COUNT + SDL_GAMEPAD_AXIS_COUNT];
 };
 
 // NOTE(Sleepster): Input Events 
 constexpr s32 MAX_INPUT_EVENTS = 100;
-constexpr s32 MAX_INPUT_CONTROLLERS = 4;
+constexpr u32 MAX_INPUT_CONTROLLERS = 4;
 
 enum input_event_type_t
 {
@@ -145,33 +158,32 @@ enum input_controller_type_t
 
 enum input_axis_t
 {
-    INPUT_AXIS_MOUSE_X,
-    INPUT_AXIS_MOUSE_Y,
-    INPUT_AXIS_MOUSE_WHEEL_X,
-    INPUT_AXIS_MOUSE_WHEEL_Y,
-
+    // NOTE(Sleepster): Gamepad 
     INPUT_AXIS_GAMEPAD_LEFT_X,
     INPUT_AXIS_GAMEPAD_LEFT_Y,
     INPUT_AXIS_GAMEPAD_RIGHT_X,
     INPUT_AXIS_GAMEPAD_RIGHT_Y,
     INPUT_AXIS_GAMEPAD_LEFT_TRIGGER,
     INPUT_AXIS_GAMEPAD_RIGHT_TRIGGER,
+
+    // NOTE(Sleepster): Mouse 
+    INPUT_AXIS_MOUSE,
+    INPUT_AXIS_MOUSE_WHEEL,
 };
 
 // NOTE(Sleepster): -1 on any of the ID's means that it is "Invalid" 
 struct input_event_t
 {
-    u32      type;
-    u32      input_type;
+    s32      type;
+    s32      input_type;
     bool32   consumed;
 
     s32      inputID;      // key / gamepad button
-    s32      scancode;     // SDL_Scancode
     s32      controllerID; // owner controller
     u64      timestampMS;
 
     string_t input_stream;
-    float32  axis_value;
+    vec2_t   axis_value;
 };
 
 // NOTE(Sleepster): I don't want this here... but the C++ compiler is too stupid to see it in the "Input Controllers" section 
@@ -200,6 +212,33 @@ struct input_manager_t
     array_t<input_controller_t, MAX_INPUT_CONTROLLERS> controllers;
     array_t<input_event_t,      MAX_INPUT_EVENTS>      events;
 };
+
+#define GameActionPressed(action)  ((action->button_flags) & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED)
+#define GameActionDown(action)     ((action->button_flags) & INPUT_MANAGER_ACTION_BUTTON_DOWN)
+#define GameActionReleased(action) ((action->button_flags) & INPUT_MANAGER_ACTION_BUTTON_RELEASED)
+
+// INTERFACE
+void s_im_init_input_manager(input_manager_t *input_manager);
+void s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager);
+void s_im_clear_controller_events(input_controller_t *controller);
+
+input_controller_t* s_im_find_controller_by_ID(input_manager_t *input_manager, s32 ID, s32 *index_out);
+input_controller_t* s_im_find_first_gamepad_controller(input_manager_t *input_manager, s32 *index_out);
+input_controller_t* s_im_find_first_keyboard_controller(input_manager_t *input_manager, s32 *index_out);
+vec2_t              s_im_transform_mouse_data(input_controller_t *controller, vec2_t surface_size, mat4_t view_matrix, mat4_t projection_matrix);
+
+input_binding_state_t s_im_get_button_binding_state(input_controller_t *controller, game_action_binding_t *binding);
+float32               s_im_get_axis_value(input_controller_t *controller, game_action_binding_t *binding);
+
+game_action_t* s_im_game_action_create(input_manager_t *input_manager, string_t action_name, game_action_mapping_type_t mapping_type);
+void           s_im_game_action_add_mapping(game_action_t *action, game_action_mapping_t *mapping);
+void           s_im_game_action_reset_mappings(game_action_t *action);
+void           s_im_game_action_process_button_state(input_controller_t *controller, game_action_t *action);
+void           s_im_game_action_process_axis1D_state(input_controller_t *controller, game_action_t *action);
+void           s_im_game_action_process_axis2D_state(input_controller_t *controller, game_action_t *action);
+
+void s_im_update_game_action_states(input_manager_t *input_manager, input_controller_t *controller);
+action_button_t* s_im_get_controller_action_button(input_controller_t *controller, s32 inputID);
 
 #endif // S_INPUT_MANAGER_H
 

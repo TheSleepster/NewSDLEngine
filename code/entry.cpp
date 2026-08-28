@@ -132,8 +132,12 @@ process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager
     {
         input_event_t *event = input_manager->events + event_index;
         input_controller_t *controller = null;
-        if(event->input_type == INPUT_CONTROLLER_TYPE_KEYBOARD) controller = find_controller_by_ID(input_manager, event->controllerID, null);
-        else                                                    controller = find_controller_by_ID(input_manager, event->controllerID, null);
+        if(event->input_type == INPUT_CONTROLLER_TYPE_KEYBOARD) controller = s_im_find_first_keyboard_controller(input_manager, null);
+        else                                                    
+        {
+            int x = 0;
+            controller = s_im_find_first_gamepad_controller(input_manager, null);
+        }
         Assert(controller);
 
         append_input_event(&controller->events, &controller->event_count, event);

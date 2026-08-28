@@ -151,9 +151,9 @@ $(BUILD_DIR)/sandbox_%$(EXE_EXT): $(CODE_DIR)/sandbox/%.cpp $(C_FILES) | $(BUILD
 # ==============================================================================
 # Engine / Game Build
 # ==============================================================================
-# $(BUILD_DIR)/game_DEBUG$(EXE_EXT): $(CODE_DIR)/build.cpp $(CODE_DIR)/meta/ATHENA_GENERATED_RTTI.h | $(BUILD_DIR)
-# 	@echo "[BUILDING GAME ENGINE]"
-# 	$(SILENT) $(CXX) $(COMMON_INCLUDE_PATHS) $< $(COMMON_COMPILE_FLAGS) $(PLATFORM_LINKER_FLAGS) -o $@
+$(BUILD_DIR)/game_DEBUG$(EXE_EXT): $(CODE_DIR)/build.cpp $(CODE_DIR)/meta/ATHENA_GENERATED_RTTI.h | $(BUILD_DIR)
+	@echo "[BUILDING GAME ENGINE]"
+	$(SILENT) $(CXX) $(COMMON_INCLUDE_PATHS) $< $(COMMON_COMPILE_FLAGS) $(PLATFORM_LINKER_FLAGS) -o $@
 
 clean:
 	@$(RM_CMD)

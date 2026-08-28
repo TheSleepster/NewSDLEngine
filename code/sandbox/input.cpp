@@ -373,6 +373,13 @@ s_im_game_action_reset_mappings(game_action_t *action)
     action->mapping_count = 0;
 }
 
+struct binding_state_t
+{
+    s32 flags;
+    s32 half_transition_count;
+    s32 ID;
+};
+
 s32
 s_im_get_button_binding_state(input_controller_t *controller, game_action_binding_t *binding)
 {
@@ -902,37 +909,6 @@ main(void)
         }
         event_handler.event_count = 0;
 
-        // NOTE(Sleepster): (fake) UI LOOP 
-        input_controller_t *controller = event_handler.controllers + event_handler.active_controller_index;
-        for(s32 event_index = 0;
-            event_index < controller->event_count;
-            ++event_index)
-        {
-            input_event_t *event = controller->events + event_index;
-            if(!event->consumed)
-            {
-                switch(event->type)
-                {
-                    case INPUT_EVENT_TYPE_PRESSED:
-                    {
-                        printf("Simulated UI Event: '%c' %s...\n", event->inputID, "Pressed");
-                    }break;
-                    case INPUT_EVENT_TYPE_DOWN:
-                    {
-                        printf("Simulated UI Event: '%c' '%s'...\n", event->inputID, "Down");
-                    }break;
-                    case INPUT_EVENT_TYPE_RELEASED:
-                    {
-                        printf("Simulated UI Event: '%c' '%s'...\n", event->inputID, "Released");
-                    }break;
-                    case INPUT_EVENT_TYPE_AXIS_MOVED:
-                    {
-                        printf("Simulated UI Event: '%s'...\n", "Axis Motion");
-                    }break;
-                }
-            }
-        }
-
         // NOTE(Sleepster): Simulate 
         if(delta_time >= (gc->tick_rate * 2.0f))
         {
@@ -942,12 +918,45 @@ main(void)
         dt_accumulator += delta_time;
         while(dt_accumulator >= gc->tick_rate)
         {
+            input_controller_t *controller = event_handler.controllers + event_handler.active_controller_index;
+#if 0
+            // NOTE(Sleepster): (fake) UI LOOP 
+            for(s32 event_index = 0;
+                event_index < controller->event_count;
+                ++event_index)
+            {
+                input_event_t *event = controller->events + event_index;
+                if(!event->consumed)
+                {
+                    switch(event->type)
+                    {
+                        case INPUT_EVENT_TYPE_PRESSED:
+                        {
+                            printf("Simulated UI Event: '%c' %s...\n", event->inputID, "Pressed");
+                        }break;
+                        case INPUT_EVENT_TYPE_DOWN:
+                        {
+                            printf("Simulated UI Event: '%c' '%s'...\n", event->inputID, "Down");
+                        }break;
+                        case INPUT_EVENT_TYPE_RELEASED:
+                        {
+                            printf("Simulated UI Event: '%c' '%s'...\n", event->inputID, "Released");
+                        }break;
+                        case INPUT_EVENT_TYPE_AXIS_MOVED:
+                        {
+                            printf("Simulated UI Event: '%s'...\n", "Axis Motion");
+                        }break;
+                    }
+                }
+            }
+#endif
+
             // NOTE(Sleepster): Resolve the game_actions
             for(game_action_t &action: event_handler.game_actions)
             {
-                action.axis2D_value = vec2_zero();
-                action.axis1D_value = 0.0f;
-                action.button_flags = ((action.button_flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED) | ((action.button_flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED)));
+                action.axis2D_value  = vec2_zero();
+                action.axis1D_value  = 0.0f;
+                action.button_flags &= ~(INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED | INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
                 switch(action.action_binding_type)
                 {
                     case INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON:
@@ -964,11 +973,9 @@ main(void)
                     }break;
                 }
             }
+            controller->event_count = 0;
 
-            if(movement_action->axis2D_value.x != 0 || movement_action->axis2D_value.y != 0)
-            {
-                printf("Axis value: '%.02f', '%.02f'...\n", movement_action->axis2D_value.x, movement_action->axis2D_value.y);
-            }
+            printf("Axis value: '%.02f', '%.02f'...\n", movement_action->axis2D_value.x, movement_action->axis2D_value.y);
 
             if(jump_action->button_flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED)
             {
@@ -978,7 +985,6 @@ main(void)
             dt_accumulator -= gc->tick_rate;
         }
         // NOTE(Sleepster): Simulate 
-        controller->event_count = 0;
 
         SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
         SDL_RenderClear(renderer);

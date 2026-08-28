@@ -1,6 +1,6 @@
 [
   {
-    "file": "../build/unity_input.cpp",
+    "file": "../code/build.cpp",
     "arguments": [
       "/usr/bin/clang++",
       "-I../code/",
@@ -11,7 +11,7 @@
       "-I../run_tree/deps/vulkan/VMA/",
       "-I../run_tree/deps/vulkan/spirv_reflect/include/",
       "-I../run_tree/deps/Freetype/include/",
-      "../build/unity_input.cpp",
+      "../code/build.cpp",
       "-g",
       "-O0",
       "-fno-inline-functions",
@@ -44,9 +44,9 @@
       "-Wno-vla-cxx-extension",
       "-Wno-reorder-init-list",
       "-o",
-      "../build/sandbox_input"
+      "../build/game_DEBUG"
     ],
     "directory": "/mnt/windows_drive/Users/ibjal/Documents/C++Stuff/NewSDLEngine/code",
-    "output": "../build/sandbox_input"
+    "output": "../build/game_DEBUG"
   }
 ]

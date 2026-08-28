@@ -165,7 +165,7 @@ handle_debug_ui_menu(ui_state_t *main_ui, RHI_context_t *RHI_context, asset_hand
 
         if(main_panel.widget->toggled)
         {
-            ui_widget_divider(main_ui, 
+ui_widget_divider(main_ui, 
                               STR("main menu divider"), 
                               vec2(0.9, 5.0f), 
                               {UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, UI_WIDGET_SIZE_KIND_PIXELS});
@@ -630,7 +630,7 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
     game_action_mapping_t keyboard_movement_mapping = (game_action_mapping_t) {
         .bindings = {{SDL_SCANCODE_W}, {SDL_SCANCODE_S}, {SDL_SCANCODE_A}, {SDL_SCANCODE_D}},
         .binding_count = 4,
-        .controller_type = IM_CONTROLLER_KEYBOARD
+        .controller_type = INPUT_CONTROLLER_TYPE_KEYBOARD
     };
     s_im_game_action_add_mapping(movement_action, &keyboard_movement_mapping);
 
@@ -640,7 +640,7 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
             {SDL_GAMEPAD_AXIS_LEFTX, INPUT_MANAGER_BINDING_TYPE_JOYSTICK}
         },
         .binding_count   = 2,
-        .controller_type = IM_CONTROLLER_GAMEPAD 
+        .controller_type = INPUT_CONTROLLER_TYPE_GAMEPAD 
     };
     s_im_game_action_add_mapping(movement_action, &controller_movement_mapping);
     game_state->mappings.move = movement_action;
@@ -650,14 +650,14 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
     game_action_mapping_t keyboard_jump_mapping = (game_action_mapping_t) {
         .bindings = {{SDL_SCANCODE_SPACE}},
         .binding_count = 1,
-        .controller_type = IM_CONTROLLER_KEYBOARD
+        .controller_type = INPUT_CONTROLLER_TYPE_KEYBOARD
     };
     s_im_game_action_add_mapping(jump_action, &keyboard_jump_mapping);
 
     game_action_mapping_t gamepad_jump_mapping = (game_action_mapping_t) {
         .bindings = {{SDL_GAMEPAD_BUTTON_SOUTH}},
         .binding_count = 1,
-        .controller_type = IM_CONTROLLER_GAMEPAD
+        .controller_type = INPUT_CONTROLLER_TYPE_GAMEPAD
     };
     s_im_game_action_add_mapping(jump_action, &gamepad_jump_mapping);
     game_state->mappings.jump = jump_action;
@@ -667,14 +667,14 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
     game_action_mapping_t keyboard_dash_mapping = (game_action_mapping_t) {
         .bindings = {{SDL_SCANCODE_LSHIFT}},
         .binding_count = 1,
-        .controller_type = IM_CONTROLLER_KEYBOARD
+        .controller_type = INPUT_CONTROLLER_TYPE_KEYBOARD 
     };
     s_im_game_action_add_mapping(dash_action, &keyboard_dash_mapping);
 
     game_action_mapping_t gamepad_dash_mapping = (game_action_mapping_t) {
         .bindings = {{SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1}},
         .binding_count = 1,
-        .controller_type = IM_CONTROLLER_GAMEPAD
+        .controller_type = INPUT_CONTROLLER_TYPE_GAMEPAD
     };
     s_im_game_action_add_mapping(dash_action, &gamepad_dash_mapping);
     game_state->mappings.dash = dash_action;
@@ -683,9 +683,9 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
 internal_api void
 poll_player_input(game_state_t *game_state)
 {
-    game_state->input_info.movement_axis = s_im_game_action_read_axis2D_value(game_state->controller, game_state->mappings.move);
-    game_state->input_info.jumped        = GameActionPressed(s_im_game_action_read_button_state(game_state->controller, game_state->mappings.jump));
-    game_state->input_info.dashed        = GameActionPressed(s_im_game_action_read_button_state(game_state->controller, game_state->mappings.dash));
+    game_state->input_info.movement_axis = game_state->mappings.move->axis2D_value;
+    game_state->input_info.jumped        = GameActionPressed(game_state->mappings.jump);
+    game_state->input_info.dashed        = GameActionPressed(game_state->mappings.dash);
 }
 
 internal_api void
@@ -707,6 +707,7 @@ game_state_simulate(game_state_t *game_state)
     vec2_t movement_axis_value = game_state->input_info.movement_axis;
     bool8 jumped               = game_state->input_info.jumped;
     bool8 dashed               = game_state->input_info.dashed;
+    (void)dashed;
     if(jumped)
     {
         printf("Jumping...\n");   
@@ -824,7 +825,7 @@ game_main(void)
     render_state_t render_state = {};
     game_state_t game_state     = {};
 
-    game_state.controller = s_im_get_primary_controller(gc->input_manager);
+    game_state.controller     = gc->input_manager->controllers.items;
     game_state.entity_manager = c_arena_push_struct(&gc->context_arena, entity_manager_t);
     game_state.entity_manager->transient_storage = c_arena_create(MB(100));
 
@@ -872,24 +873,23 @@ game_main(void)
     //float32 delta_time_ms = 0;
     while(gc->running)
     {
-        s_im_reset_controller_states(input_manager);
+        //s_im_reset_controller_states(input_manager);
         process_window_events(render_state.RHI_context, input_manager);
         c_file_watcher_process_changes(&gc->file_watcher);
 
-        poll_player_input(&game_state);
-        game_state.controller = s_im_get_primary_controller(input_manager);
+        game_state.controller = input_manager->controllers + input_manager->active_controller_index;
         if(game_state.open_debug_menu)
         {
             handle_debug_ui_menu(main_ui, render_state.RHI_context, &player_sprite);
         }
 
         // NOTE(Sleepster): Debug menu 
-        if(game_state.controller->type == IM_CONTROLLER_KEYBOARD)
+        if(game_state.controller->type == INPUT_CONTROLLER_TYPE_KEYBOARD)
         {
-            if(s_im_is_keyboard_key_pressed(game_state.controller, SDL_SCANCODE_SEMICOLON))
-            {
-                game_state.open_debug_menu = !game_state.open_debug_menu;
-            }
+            //if(s_im_is_keyboard_key_pressed(game_state.controller, SDL_SCANCODE_SEMICOLON))
+            //{
+                //game_state.open_debug_menu = !game_state.open_debug_menu;
+            //}
         }
 
         // NOTE(Sleepster): Simulate loop 
@@ -898,12 +898,85 @@ game_main(void)
             delta_time = gc->tick_rate * 2.0f;
         }
 
-        dt_accumulator += delta_time;
+        bool8 first_tick = true;
+        dt_accumulator  += delta_time;
         while(dt_accumulator >= gc->tick_rate)
         {
-            game_state.input_info.movement_axis = vec2_normalize(game_state.input_info.movement_axis);
-            game_state_simulate(&game_state);
+            if(first_tick)
+            {
+                // NOTE(Sleepster): Apply events. 
+                for(s32 controller_index = 0;
+                    controller_index < input_manager->connected_controller_count;
+                    ++controller_index)
+                {
+                    input_controller_t *current_controller = input_manager->controllers + controller_index;
+                    for(s32 event_index = 0;
+                        event_index < current_controller->event_count;
+                        ++event_index)
+                    {
+                        input_event_t *event = current_controller->events + event_index;
+                        if(!event->consumed && event->input_type == current_controller->type)
+                        {
+                            action_button_t *button = s_im_get_controller_action_button(current_controller, event->inputID);
+                            switch(event->type)
+                            {
+                                case INPUT_EVENT_TYPE_PRESSED:
+                                {
+                                    button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
+                                    button->flags &= ~INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
 
+                                    ++button->half_transition_count;
+                                }break;
+                                case INPUT_EVENT_TYPE_DOWN:
+                                {
+                                    button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
+                                    button->flags &= ~INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
+                                }break;
+                                case INPUT_EVENT_TYPE_RELEASED:
+                                {
+                                    button->flags |=  INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
+                                    button->flags &= ~(INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN|INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
+
+                                    ++button->half_transition_count;
+                                }break;
+                                case INPUT_EVENT_TYPE_AXIS_MOVED:
+                                {
+                                    if(current_controller->type == INPUT_CONTROLLER_TYPE_KEYBOARD)
+                                    {
+                                        if(event->inputID == INPUT_AXIS_MOUSE)
+                                        {
+                                            current_controller->keyboard.last_mouse_pos    = current_controller->keyboard.current_mouse_pos;
+                                            current_controller->keyboard.current_mouse_pos = event->axis_value;
+                                            current_controller->keyboard.mouse_delta       = event->axis_value - current_controller->keyboard.last_mouse_pos;
+                                        }
+                                        else if(event->inputID == INPUT_AXIS_MOUSE_WHEEL)
+                                        {
+                                            current_controller->keyboard.mouse_wheel_delta   = event->axis_value - current_controller->keyboard.current_mouse_wheel;
+                                            current_controller->keyboard.current_mouse_wheel = event->axis_value;
+                                        }
+                                        else
+                                        {
+                                            InvalidCodePath;
+                                        }
+                                    }
+                                    if(current_controller->type == INPUT_CONTROLLER_TYPE_GAMEPAD)
+                                    {
+                                        button->analog_value = event->axis_value;
+                                    }
+                                }break;
+                            }
+                        }
+                    }
+                }
+
+                s_im_clear_controller_events(game_state.controller);
+                s_im_update_game_action_states(input_manager, game_state.controller);
+
+                first_tick = false;
+            }
+
+            poll_player_input(&game_state);
+            game_state_simulate(&game_state);
             dt_accumulator -= gc->tick_rate;
         }
         game_state.render_alpha = (float32)(dt_accumulator / gc->tick_rate);

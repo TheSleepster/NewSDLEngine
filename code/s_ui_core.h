@@ -218,6 +218,11 @@ struct ui_state_t
     widget_t                         *active_widget;
     widget_t                         *last_clicked_widget;
 
+    input_binding_state_t             left_mouse;
+    input_binding_state_t             right_mouse;
+    vec2_t                            mouse_position;
+    vec2_t                            mouse_delta;
+
     // NOTE(Sleepster): Persists between frames... 
     memory_arena_t                    persistent_data_arena;
     hash_table_t<widget_state_t>      widget_states;
@@ -241,8 +246,6 @@ struct ui_state_t
     float32                           default_widget_SDF_smoothness;
     float32                           default_widget_border_thickness;
 
-    vec2_t                            mouse_position;
-    vec2_t                            mouse_delta;
     vec2_t                            max_widget_size;
     vec4_t                            active_widget_padding;
     u32                               widget_item_count;

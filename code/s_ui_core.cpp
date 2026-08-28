@@ -72,6 +72,7 @@ ui_state_begin_frame(ui_state_t *ui_state)
     ui_state->left_mouse_clicked_this_frame = false;
     ui_state->frame_begun = true;
     ui_state->frame_ended = false;
+    ui_state->ui_controller = s_im_find_first_keyboard_controller(ui_state->input_manager, null);
 
     if(ui_state->first_widget != null)
     {
@@ -89,15 +90,13 @@ ui_state_begin_frame(ui_state_t *ui_state)
                 ui_state->hot_widget = null;
             }
         }
-        action_button_t *left_mouse  = s_im_get_key_state(ui_state->ui_controller, SDL_LEFT_MOUSE);
-        action_button_t *right_mouse = s_im_get_key_state(ui_state->ui_controller, SDL_RIGHT_MOUSE);
 
-        bool8 is_held           = (left_mouse->flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
-        bool8 just_released     = (left_mouse->flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
-        bool8 just_clicked      = (left_mouse->flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
-        bool8 is_right_clicked  = (right_mouse->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
-        bool8 is_right_held     = (right_mouse->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
-        bool8 is_double_clicked = left_mouse->half_transition_counter >= 2;
+        bool8 is_held           = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
+        bool8 just_released     = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
+        bool8 just_clicked      = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
+        bool8 is_right_clicked  = (ui_state->right_mouse.flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
+        bool8 is_right_held     = (ui_state->right_mouse.flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
+        bool8 is_double_clicked = ui_state->left_mouse.half_transition_count >= 2;
 
         ui_state->left_mouse_clicked_this_frame = just_clicked;
         widget_t *top_most_widget = find_top_level_in_bounds_widget(ui_state,
@@ -568,35 +567,6 @@ ui_state_update_widget_hierarchy(ui_state_t *ui_state)
 void
 ui_state_maybe_eat_inputs(ui_state_t *ui_state)
 {
-    input_controller_t *input = ui_state->ui_controller;
-    if((input->text_inputs_this_frame > 0) && ui_state->input_focused)
-    {
-        for(u32 input_index = 0;
-            input_index < input->text_inputs_this_frame;
-            ++input_index)
-        {
-            text_input_event_t *event = &ui_state->ui_controller->transient_text_inputs[input_index];
-            if(event->type == TEXT_INPUT_EVENT_TYPE_INPUT_EVENT)
-            {
-                action_button_t *key = input->keyboard.input + event->scancode;
-                switch(event->input_event_type)
-                {
-                    case TEXT_INPUT_EVENT_PRESSED:
-                    {
-                        s_im_consume_keyboard_key_press(input, key->scancode);
-                    }break;
-                    case TEXT_INPUT_EVENT_DOWN:
-                    {
-                        s_im_consume_keyboard_key_down(input, key->scancode);
-                    }break;
-                    case TEXT_INPUT_EVENT_RELEASED:
-                    {
-                        s_im_consume_keyboard_key_release(input, key->scancode);
-                    }break;
-                }
-            }
-        }
-    }
 }
 
 void
@@ -841,7 +811,6 @@ ui_state_init(ui_state_t       *ui_state,
     // NOTE(Sleepster): Theme stuff 
 
     ui_state->input_manager = input_manager;
-    ui_state->ui_controller = s_im_get_primary_controller(input_manager);
     ui_state->widget_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_widget"));
 
     u32 *indices = c_arena_push_array(&RHI_context->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
@@ -1479,17 +1448,18 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
     if(widget_state->toggled)
     {
         // NOTE(Sleepster): Handle text input
-        for(u32 input_event_index = 0;
-            input_event_index < ui_state->ui_controller->text_inputs_this_frame;
-            ++input_event_index)
+        for(s32 event_index = 0;
+            event_index < ui_state->ui_controller->event_count;
+            ++event_index)
         {
             // NOTE(Sleepster): Eventually render a range of characters 
             // (such as indices 10 - 32 for items that run off the end, a way of fitting text into a small box like other apps)
             // rather than the whole string 
-            text_input_event_t *input = &ui_state->ui_controller->transient_text_inputs[input_event_index];
+            input_event_t *input = ui_state->ui_controller->events + event_index;
 
             // NOTE(Sleepster): Input stream, like WM_CHAR events 
-            if(input->type == TEXT_INPUT_EVENT_TYPE_CHARACTER_STREAM)
+#if 0
+            if()
             {
                 // NOTE(Sleepster): Safe to use here since SDL GUARANTEES that this will be null terminated 
                 s32 input_length = strlen((const char *)input->input_stream);
@@ -1529,6 +1499,8 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
                     }
                 }
             }
+#endif
+            input->consumed = true;
         }
 
         widget_state->widget_text_render_start_offset = 0;
