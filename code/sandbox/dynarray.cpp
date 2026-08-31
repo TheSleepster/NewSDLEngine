@@ -9,6 +9,7 @@
 #include <c_types.h>
 #include <c_base.h>
 
+#if 0
 /////////////////////////
 // STATIC ARRAY
 /////////////////////////
@@ -26,12 +27,12 @@
 
 #define C_ARRAY_IMPLEMENTATION
 #ifdef C_ARRAY_IMPLEMENTATION
-typedef void *c_array_allocate_impl_t(void *allocator, u32 allocation_size);
-typedef void *c_array_realloc_impl_t(void *allocator, void *memory, u32 new_size);
+typedef void *c_array_allocate_impl_t(void *allocator, s32 allocation_size);
+typedef void *c_array_realloc_impl_t(void *allocator, void *memory, s32 new_size);
 typedef void  c_array_free_impl_t(void *allocator, void *memory);
 
 void*
-c_array_default_allocate_impl(void *allocator, u32 allocation_size)
+c_array_default_allocate_impl(void *allocator, s32 allocation_size)
 {
     void *result = null;
     result = malloc(allocation_size);
@@ -41,7 +42,7 @@ c_array_default_allocate_impl(void *allocator, u32 allocation_size)
 }
 
 void*
-c_array_default_realloc_impl(void *allocator, void *memory, u32 new_size)
+c_array_default_realloc_impl(void *allocator, void *memory, s32 new_size)
 {
     void *result = null;
     result = realloc(memory, new_size);
@@ -57,14 +58,14 @@ c_array_default_free_impl(void *allocator, void *memory)
 #endif
 // TODO(Sleepster): Custom allocator overriding 
 
-template <typename T, u32 capacity>
+template <typename T, s32 capacity>
 struct array_t
 {
     T    items[capacity];
-    u32  count = capacity;
+    s32  count = capacity;
 
-    T &operator[](u32 index);
-    T *operator+(u32 index);
+    T &operator[](s32 index);
+    T *operator+(s32 index);
 
     // NOTE(Sleepster): Stupid C++ stuff 
     T *begin() { return items; }
@@ -74,44 +75,44 @@ struct array_t
     const T *end()   const { return items + count; }
 };
 
-template <typename T, u32 capacity>
+template <typename T, s32 capacity>
 T&
-array_t<T, capacity>::operator[](u32 index)
+array_t<T, capacity>::operator[](s32 index)
 {
     Expect(index < this->count, "Array bounds check failed... index was: '%u' while capacity is: '%u'...\n", index, this->count);
     return(this->items[index]);
 }
 
-template <typename T, u32 capacity>
+template <typename T, s32 capacity>
 T*
-array_t<T, capacity>::operator+(u32 index)
+array_t<T, capacity>::operator+(s32 index)
 {
     Expect(index < this->count, "Array bounds check failed... index was: '%u' while capacity is: '%u'...\n", index, this->count);
     return(this->items + index);
 }
 
 // NOTE(Sleepster): Right now, this creates a ton of "use after free" bugs. Hopefully with our own allocator that's not a problem. 
-template <typename T, u32 capacity>
+template <typename T, s32 capacity>
 void
-c_array_resize(array_t<T, capacity> *array, u32 new_capacity)
+c_array_resize(array_t<T, capacity> *array, s32 new_capacity)
 {
     array->items    = (T*)reallocarray(array->items, sizeof(T), new_capacity);
     array->capacity = new_capacity;
 }
 
-template <typename T, u32 capacity>
+template <typename T, s32 capacity>
 void
 c_array_clear(array_t<T, capacity> *array)
 {
     memset(array->items, 0, sizeof(T) * array->capacity);
 }
 
-template <typename T, u32 capacity>
+template <typename T, s32 capacity>
 s32
 c_array_find(array_t<T, capacity> *array, T *element)
 {
     s32 result = -1;
-    for(u32 index = 0;
+    for(s32 index = 0;
         index < array->used;
         ++index)
     {
@@ -134,11 +135,11 @@ template <typename T>
 struct dynarray_t
 {
     T   *items;
-    u32  capacity;
-    u32  used;
+    s32  capacity;
+    s32  used;
 
-    T &operator[](u32 index);
-    T *operator+(u32 index);
+    T &operator[](s32 index);
+    T *operator+(s32 index);
 
     // NOTE(Sleepster): Stupid C++ crap 
     T *begin() { return items; }
@@ -150,7 +151,7 @@ struct dynarray_t
 
 template <typename T>
 T&
-dynarray_t<T>::operator[](u32 index)
+dynarray_t<T>::operator[](s32 index)
 {
     Expect(index < this->capacity, "Array bounds check failed... index was: '%u' while capacity is: '%u'...\n", index, this->capacity);
     return(this->items[index]);
@@ -158,7 +159,7 @@ dynarray_t<T>::operator[](u32 index)
 
 template <typename T>
 T*
-dynarray_t<T>::operator+(u32 index)
+dynarray_t<T>::operator+(s32 index)
 {
     Expect(index < this->capacity, "Array bounds check failed... index was: '%u' while capacity is: '%u'...\n", index, this->capacity);
     return(this->items + index);
@@ -166,7 +167,7 @@ dynarray_t<T>::operator+(u32 index)
 
 template <typename T>
 void
-c_dynarray_reserve(dynarray_t<T> *array, u32 to_reserve)
+c_dynarray_reserve(dynarray_t<T> *array, s32 to_reserve)
 {
     if(to_reserve > array->capacity)
     {
@@ -185,7 +186,7 @@ c_dynarray_add(dynarray_t<T> *array, T *element)
     T *result = null;
     if((array->used + 1) > array->capacity)
     {
-        u32 old_capacity = array->capacity;
+        s32 old_capacity = array->capacity;
 
         // TODO(Sleepster): THIS IS REALLLLLLLLY BAD. Change this once we have our own malloc 
         array->capacity = Max(60, array->capacity * 2);
@@ -195,7 +196,7 @@ c_dynarray_add(dynarray_t<T> *array, T *element)
         if(old_capacity > 0)
         {
             void *offset_ptr = (void*)(array->items + old_capacity);
-            u32 copy_size    = (sizeof(T) * (array->capacity - old_capacity));
+            s32 copy_size    = (sizeof(T) * (array->capacity - old_capacity));
 
             memset(offset_ptr, 0, copy_size);
         }
@@ -209,11 +210,11 @@ c_dynarray_add(dynarray_t<T> *array, T *element)
 
 template <typename T>
 void
-c_dynarray_remove(dynarray_t<T> *array, u32 index)
+c_dynarray_remove(dynarray_t<T> *array, s32 index)
 {
     Assert(index <= array->capacity);
 
-    for(u32 this_index = index;
+    for(s32 this_index = index;
         this_index < (array->used - 1);
         ++this_index)
     {
@@ -252,7 +253,7 @@ s32
 c_dynarray_find(dynarray_t<T> *array, T *element)
 {
     s32 result = -1;
-    for(u32 index = 0;
+    for(s32 index = 0;
         index < array->used;
         ++index)
     {
@@ -290,14 +291,14 @@ c_dynarray_add_if_unique(dynarray_t<T> *array, T *element, s32 *index_out = null
 
 template <typename T>
 void
-c_dynarray_insert_at(dynarray_t<T> *array, T *element, u32 index)
+c_dynarray_insert_at(dynarray_t<T> *array, T *element, s32 index)
 {
     array->items[index] = *element;
 }
 
 template <typename T>
 T
-c_dynarray_get_at_index(dynarray_t<T> *array, u32 index)
+c_dynarray_get_at_index(dynarray_t<T> *array, s32 index)
 {
     T result = array->items[index];
     return(result);
@@ -305,7 +306,7 @@ c_dynarray_get_at_index(dynarray_t<T> *array, u32 index)
 
 template <typename T>
 T*
-c_dynarray_get_ptr_at_index(dynarray_t<T> *array, u32 index)
+c_dynarray_get_ptr_at_index(dynarray_t<T> *array, s32 index)
 {
     T* result = array->items + index;
     return(result);
@@ -350,10 +351,10 @@ c_dynarray_free(dynarray_t<T> *array)
 /////////////////////////
 // MAIN 
 /////////////////////////
+#endif
 
 int
 main(void)
 {
-    array_t<int, 100> test_array;
     return(0);
 }

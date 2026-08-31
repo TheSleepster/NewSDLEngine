@@ -119,31 +119,27 @@ process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager
         ++removal_index)
     {
         u32 index = redundant_events[removal_index];
-        c_array_remove(&input_manager->events, index, input_manager->event_count - removal_index);
+        c_array_remove(input_manager->events, index, input_manager->event_count - removal_index);
     }
 
     input_manager->event_count -= events_to_remove;
 
-    // NOTE(Sleepster): Dispatch to the according controller 
+    // NOTE(Sleepster): Dispatch to the according device 
     u64 most_recent_timestamp = 0;
     for(s32 event_index = 0;
         event_index < input_manager->event_count;
         ++event_index)
     {
         input_event_t *event = input_manager->events + event_index;
-        input_controller_t *controller = null;
-        if(event->input_type == INPUT_CONTROLLER_TYPE_KEYBOARD) controller = s_im_find_first_keyboard_controller(input_manager, null);
-        else                                                    
-        {
-            int x = 0;
-            controller = s_im_find_first_gamepad_controller(input_manager, null);
-        }
-        Assert(controller);
+        input_device_t *device = null;
+        if(event->input_type == INPUT_DEVICE_TYPE_KEYBOARD) device = s_im_find_first_keyboard_device(input_manager, null);
+        else                                                device = s_im_find_first_gamepad_device(input_manager, null);
 
-        append_input_event(&controller->events, &controller->event_count, event);
+        Assert(device);
+        append_input_event(device->events, &device->event_count, event);
         if(event->timestampMS >= most_recent_timestamp)
         {
-            input_manager->active_controller_index = controller->controller_index;
+            input_manager->active_device_index = device->device_index;
             most_recent_timestamp = event->timestampMS;
         }
     }
@@ -167,9 +163,9 @@ main(int argc, char **argv)
             SDL_VERSIONNUM_MICRO(linked));
 
     c_global_context_init();
-    gc->RHI_context    = c_arena_push_struct(&gc->context_arena, RHI_context_t);
-    gc->asset_manager  = c_arena_push_struct(&gc->context_arena, asset_manager_t);
-    gc->input_manager  = c_arena_push_struct(&gc->context_arena, input_manager_t);
+    gc->RHI_context    = c_arena_push_struct(&gc->persistent_arena, RHI_context_t);
+    gc->asset_manager  = c_arena_push_struct(&gc->persistent_arena, asset_manager_t);
+    gc->input_manager  = c_arena_push_struct(&gc->persistent_arena, input_manager_t);
     if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMEPAD))
     {
         s32            display_count = 0;
@@ -191,7 +187,7 @@ main(int argc, char **argv)
 
         SDL_StartTextInput(gc->RHI_context->window);
 
-        gc->RHI_context->backend_render_context = c_arena_push_struct(&gc->context_arena, vulkan_context_t);
+        gc->RHI_context->backend_render_context = c_arena_push_struct(&gc->persistent_arena, vulkan_context_t);
         gc->asset_manager->RHI_context          = gc->RHI_context; 
         vulkan_context_t *vulkan_context        = (vulkan_context_t*)gc->RHI_context->backend_render_context;
 

@@ -6,14 +6,19 @@
    ======================================================================== */
 #include <s_input_manager.h>
 
-template <u32 capacity>
+void
+s_im_init_input_manager(input_manager_t *input_manager)
+{
+    *input_manager = {};
+}
+
 internal_api void
-append_input_event(array_t<input_event_t, capacity> *event_array, int *count_ptr, input_event_t *event)
+append_input_event(array_view_t<input_event_t> event_array, int *count_ptr, input_event_t *event)
 {
     int count = *count_ptr;
     if(count + 1 < MAX_INPUT_EVENTS)
     {
-        event_array->items[count] = *event;
+        event_array.items[count] = *event;
         ++(*count_ptr);
     }
     else
@@ -30,8 +35,8 @@ is_same_event(input_event_t *event0, input_event_t *event1)
     u64 time1 = event1->timestampMS;
 
     s64 delta_time = (time0 > time1) ? (time0 - time1) : (time1 - time0);
-    if((delta_time <= 2) || 
-       ((event0->controllerID == event1->controllerID) && 
+    if((delta_time <= 1) || 
+       ((event0->deviceID == event1->deviceID) && 
         (event0->type == event1->type)))
     {
         result = true;
@@ -55,31 +60,31 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
     {
         case SDL_EVENT_KEYBOARD_ADDED:
         {
-            input_controller_t new_controller = {};
-            new_controller.type             = INPUT_CONTROLLER_TYPE_KEYBOARD;
-            new_controller.ID               = event->kdevice.which;
-            new_controller.controller_index = input_manager->connected_controller_count;
+            input_device_t new_device = {};
+            new_device.type         = INPUT_DEVICE_TYPE_KEYBOARD;
+            new_device.ID           = event->kdevice.which;
+            new_device.device_index = input_manager->connected_device_count;
 
-            input_manager->controllers[input_manager->connected_controller_count++] = new_controller;
+            input_manager->devices[input_manager->connected_device_count++] = new_device;
         }break;
         case SDL_EVENT_KEYBOARD_REMOVED:
         {
             s32 index = 0;
-            input_controller_t *controller = s_im_find_controller_by_ID(input_manager, event->kdevice.which, &index);
+            input_device_t *device = s_im_find_device_by_ID(input_manager, event->kdevice.which, &index);
 
-            c_array_remove(&input_manager->controllers, index, input_manager->connected_controller_count);
-            controller->ID = -1;
-            controller->controller_index = -1;
+            c_array_remove(input_manager->devices, index, input_manager->connected_device_count);
+            device->ID           = -1;
+            device->device_index = -1;
 
-            --input_manager->connected_controller_count;
+            --input_manager->connected_device_count;
         }break;
         case SDL_EVENT_KEY_DOWN:
         case SDL_EVENT_KEY_UP:
         {
             input_event_t input_event = {};
-            input_event.input_type    = INPUT_CONTROLLER_TYPE_KEYBOARD;
+            input_event.input_type    = INPUT_DEVICE_TYPE_KEYBOARD;
             input_event.inputID       = event->key.scancode;
-            input_event.controllerID  = event->key.which;
+            input_event.deviceID      = event->key.which;
             input_event.timestampMS   = SDL_GetTicks();
 
             bool8 pressed  =  event->key.down;
@@ -90,202 +95,338 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
             if(down)     input_event.type = INPUT_EVENT_TYPE_DOWN;
             if(released) input_event.type = INPUT_EVENT_TYPE_RELEASED;
 
-            append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
+            append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
         case SDL_EVENT_TEXT_INPUT:
         {
             input_event_t input_event = {};
-            input_event.input_type    = INPUT_CONTROLLER_TYPE_KEYBOARD;
+            input_event.input_type    = INPUT_DEVICE_TYPE_KEYBOARD;
             input_event.type          = INPUT_EVENT_TYPE_TEXT_INPUT;
             input_event.inputID       = -1;
-            input_event.controllerID  = -1;
-            input_event.input_stream  = STR(event->text.text);
+            input_event.deviceID      = -1;
+            input_event.input_stream  = c_string_make_copy(&gc->simulation_arena, STR(event->text.text));
             input_event.timestampMS   = SDL_GetTicks();
 
-            append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
+            append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
         {
-            input_controller_t *controller = s_im_find_first_keyboard_controller(input_manager, null);
+            input_device_t *device = s_im_find_first_keyboard_device(input_manager, null);
             u32 buttonID = event->button.button + SDL_SCANCODE_COUNT; 
 
             input_event_t input_event = {};
-            input_event.input_type = INPUT_CONTROLLER_TYPE_KEYBOARD;
+            input_event.input_type = INPUT_DEVICE_TYPE_KEYBOARD;
             if(event->button.clicks > 0)
             {
-                input_event.type          = INPUT_EVENT_TYPE_PRESSED;
-                input_event.inputID       = buttonID;
-                input_event.controllerID  = controller->ID;
-                input_event.timestampMS   = SDL_GetTicks();
+                input_event.type        = INPUT_EVENT_TYPE_PRESSED;
+                input_event.inputID     = buttonID;
+                input_event.deviceID    = device->ID;
+                input_event.timestampMS = SDL_GetTicks();
 
-                append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
+                append_input_event(input_manager->events, &input_manager->event_count, &input_event);
             }
 
-            input_event.type          = INPUT_EVENT_TYPE_DOWN;
-            input_event.inputID       = buttonID;
-            input_event.controllerID  = controller->ID;
+            input_event.type      = INPUT_EVENT_TYPE_DOWN;
+            input_event.inputID   = buttonID;
+            input_event.deviceID  = device->ID;
 
             // NOTE(Sleepster): This is a REAL magic number. It's job? To give just enough of an offset on the timestamp
             // that this does not get consumed as a duplicate event->
             input_event.timestampMS   = SDL_GetTicks() + 4;
 
-            append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
+            append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
         case SDL_EVENT_MOUSE_BUTTON_UP:
         {
-            input_controller_t *controller = s_im_find_first_keyboard_controller(input_manager, null);
+            input_device_t *device = s_im_find_first_keyboard_device(input_manager, null);
             u32 buttonID = event->button.button + SDL_SCANCODE_COUNT; 
 
             input_event_t input_event = {};
-            input_event.input_type    = INPUT_CONTROLLER_TYPE_KEYBOARD;
+            input_event.input_type    = INPUT_DEVICE_TYPE_KEYBOARD;
             input_event.type          = INPUT_EVENT_TYPE_RELEASED;
             input_event.inputID       = buttonID;
-            input_event.controllerID  = controller->ID;
+            input_event.deviceID      = device->ID;
             input_event.timestampMS   = SDL_GetTicks();
 
-            append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
+            append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
         case SDL_EVENT_MOUSE_WHEEL: 
         {
-            input_controller_t *controller = s_im_find_first_keyboard_controller(input_manager, null);
+            input_device_t *device = s_im_find_first_keyboard_device(input_manager, null);
 
             input_event_t input_event = {};
-            input_event.input_type    = INPUT_CONTROLLER_TYPE_KEYBOARD;
+            input_event.input_type    = INPUT_DEVICE_TYPE_KEYBOARD;
             input_event.type          = INPUT_EVENT_TYPE_AXIS_MOVED;
             input_event.inputID       = INPUT_AXIS_MOUSE_WHEEL;
-            input_event.controllerID  = controller->ID;
+            input_event.deviceID      = device->ID;
             input_event.timestampMS   = SDL_GetTicks();
             input_event.axis_value    = vec2(event->wheel.integer_x, event->wheel.integer_y);
 
-            append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
+            append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
         case SDL_EVENT_MOUSE_MOTION:
         {
-            input_controller_t *controller = s_im_find_first_keyboard_controller(input_manager, null);
+            input_device_t *device = s_im_find_first_keyboard_device(input_manager, null);
 
             input_event_t input_event = {};
-            input_event.input_type    = INPUT_CONTROLLER_TYPE_KEYBOARD;
+            input_event.input_type    = INPUT_DEVICE_TYPE_KEYBOARD;
             input_event.type          = INPUT_EVENT_TYPE_AXIS_MOVED;
-            input_event.controllerID  = controller->ID;
+            input_event.deviceID      = device->ID;
             input_event.inputID       = INPUT_AXIS_MOUSE;
             input_event.timestampMS   = SDL_GetTicks();
             input_event.axis_value    = vec2(event->motion.x, event->motion.y);
 
-            append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
+            append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
         case SDL_EVENT_GAMEPAD_ADDED:
         {
-            input_controller_t new_controller = {};
-            new_controller.type             = INPUT_CONTROLLER_TYPE_GAMEPAD;
-            new_controller.ID               = event->gdevice.which;
-            new_controller.controller_index = input_manager->connected_controller_count;
+            input_device_t new_device = {};
+            new_device.type         = INPUT_DEVICE_TYPE_GAMEPAD;
+            new_device.ID           = event->gdevice.which;
+            new_device.device_index = input_manager->connected_device_count;
 
-            new_controller.gamepad.gamepad_data = SDL_OpenGamepad(event->gdevice.which);
-            if(!new_controller.gamepad.gamepad_data)
+            new_device.gamepad_data.handle = SDL_OpenGamepad(event->gdevice.which);
+            if(!new_device.gamepad_data.handle)
             {
                 log_error("Failure opening a gamepad controller... SDL_Error: '%s'..\n", SDL_GetError());
             }
-            new_controller.gamepad.has_rumble     = SDL_RumbleGamepad(new_controller.gamepad.gamepad_data, 0x1, 0x1, 1);
-            new_controller.gamepad.stick_deadzone = INPUT_MANAGER_GAMEPAD_DEFAULT_DEADZONE;
+            new_device.gamepad_data.has_rumble     = SDL_RumbleGamepad(new_device.gamepad_data.handle, 0x1, 0x1, 1);
+            new_device.gamepad_data.stick_deadzone = INPUT_MANAGER_GAMEPAD_DEFAULT_DEADZONE;
 
-            input_manager->controllers[input_manager->connected_controller_count++] = new_controller;
-            log_info("Controller '%s' connected...\n", SDL_GetGamepadName(new_controller.gamepad.gamepad_data));
+            input_manager->devices[input_manager->connected_device_count++] = new_device;
+            log_info("Controller '%s' connected...\n", SDL_GetGamepadName(new_device.gamepad_data.handle));
         }break;
         case SDL_EVENT_GAMEPAD_REMOVED:
         {
             s32 index = 0;
-            input_controller_t *controller = s_im_find_controller_by_ID(input_manager, event->gdevice.which, &index);
-            SDL_CloseGamepad(controller->gamepad.gamepad_data);
-            ZeroStruct(*controller);
+            input_device_t *device = s_im_find_device_by_ID(input_manager, event->gdevice.which, &index);
+            SDL_CloseGamepad(device->gamepad_data.handle);
+            ZeroStruct(*device);
 
-            controller->ID = -1;
-            controller->controller_index = -1;
+            device->ID = -1;
+            device->device_index = -1;
 
-            c_array_remove(&input_manager->controllers, index, input_manager->connected_controller_count);
-            --input_manager->connected_controller_count;
+            c_array_remove(input_manager->devices, index, input_manager->connected_device_count);
+            --input_manager->connected_device_count;
         }break;
         case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
         {
-            input_controller_t *controller = s_im_find_controller_by_ID(input_manager, event->gbutton.which, null);
-            action_button_t *button = s_im_get_controller_action_button(controller, event->gbutton.button);
-            if(((button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED) == 0) &&
-               ((button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN) == 0))
-            {
-                input_event_t input_event = {};
-                input_event.input_type    = INPUT_CONTROLLER_TYPE_GAMEPAD;
-                input_event.inputID       = event->gbutton.button;
-                input_event.controllerID  = controller->ID;
-                input_event.timestampMS   = SDL_GetTicks();
-                input_event.type = INPUT_EVENT_TYPE_PRESSED;
+            input_device_t *device = s_im_find_device_by_ID(input_manager, event->gbutton.which, null);
 
-                append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
-            }
-            else
-            {
-                input_event_t input_event = {};
-                input_event.input_type    = INPUT_CONTROLLER_TYPE_GAMEPAD;
-                input_event.inputID       = event->gbutton.button;
-                input_event.controllerID  = controller->ID;
-                input_event.timestampMS   = SDL_GetTicks() + 4;
-                input_event.type = INPUT_EVENT_TYPE_DOWN;
+            input_event_t input_event = {};
+            input_event.input_type    = INPUT_DEVICE_TYPE_GAMEPAD;
+            input_event.inputID       = event->gbutton.button;
+            input_event.deviceID      = device->ID;
+            input_event.timestampMS   = SDL_GetTicks();
+            input_event.type = INPUT_EVENT_TYPE_PRESSED;
 
-                append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
-            }
+            append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
         case SDL_EVENT_GAMEPAD_BUTTON_UP:
         {
-            input_controller_t *controller = s_im_find_controller_by_ID(input_manager, event->gbutton.which, null);
+            input_device_t *device = s_im_find_device_by_ID(input_manager, event->gbutton.which, null);
 
             input_event_t input_event = {};
-            input_event.input_type    = INPUT_CONTROLLER_TYPE_GAMEPAD;
+            input_event.input_type    = INPUT_DEVICE_TYPE_GAMEPAD;
             input_event.inputID       = event->gbutton.button;
-            input_event.controllerID  = controller->ID;
+            input_event.deviceID      = device->ID;
             input_event.timestampMS   = SDL_GetTicks();
             input_event.type          = INPUT_EVENT_TYPE_RELEASED;
 
-            append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
+            append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
         case SDL_EVENT_GAMEPAD_AXIS_MOTION:
         {
-            input_controller_t *controller = s_im_find_controller_by_ID(input_manager, event->gbutton.which, null);
+            input_device_t *device = s_im_find_device_by_ID(input_manager, event->gbutton.which, null);
+
             input_event_t input_event = {};
-            input_event.input_type    = INPUT_CONTROLLER_TYPE_GAMEPAD;
+            input_event.input_type    = INPUT_DEVICE_TYPE_GAMEPAD;
             input_event.inputID       = SDL_axis_to_input_axis(event->gaxis.axis);
-            input_event.controllerID  = controller->ID;
+            input_event.deviceID      = device->ID;
             input_event.timestampMS   = SDL_GetTicks();
             input_event.type          = INPUT_EVENT_TYPE_AXIS_MOVED;
             input_event.axis_value    = vec2(event->gaxis.value, 0.0f);
 
-            append_input_event(&input_manager->events, &input_manager->event_count, &input_event);
+            append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
     }
 }
 
 void
-s_im_clear_controller_events(input_controller_t *controller)
+s_im_clear_controller_transient_state(input_controller_t *controller)
 {
-    controller->event_count = 0;
+    // NOTE(Sleepster): Reset the transient state of the device's controller. 
+    for(s32 button_index = 0;
+        button_index < controller->action_button_interactions; 
+        ++button_index)
+    {
+        action_button_t *button = controller->action_buttons_interacted_with_this_frame[button_index];
+        // NOTE(Sleepster): These are transient flags, they last one frame. 
+        //
+        // I'm not really sure about setting this here... the problem is that if someone calls s_im_get_button_binding_state
+        // for an action this will CLEAR the transient flags here instead of later on. Therefore if someone later wishes to check if 
+        // an action_button is pressed or released, this state will have been cleared even though it should still be read as down.
+        if(controller->type == INPUT_DEVICE_TYPE_GAMEPAD)
+        {
+            // NOTE(Sleepster): I'm not happy about having to do this... however SDL only sends a single event for gamepads unlike 
+            // how they handle keydown events. Why the difference? Honestly I have no idea and it's annoying.. but here we are.
+            bool8 down = SDL_GetGamepadButton(controller->device->gamepad_data.handle, (SDL_GamepadButton)button_index);
+            if(down && (button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED))
+            {
+                button->flags &= ~INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED; 
+            }
+        }
+        else if(controller->type == INPUT_DEVICE_TYPE_KEYBOARD)
+        {
+            if(button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED)
+            {
+                button->flags &= ~INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
+                button->flags |=  INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
+            }
+        }
+    }
+
+    c_array_clear(controller->action_buttons_interacted_with_this_frame);
+    controller->action_button_interactions = 0;
 }
 
 void
-s_im_init_input_manager(input_manager_t *input_manager)
+s_im_clear_device_events(input_device_t *device)
 {
-    *input_manager = {};
+    device->event_count = 0;
+    for(s32 controller_index = 0;
+        controller_index < device->used_controller_count;
+        ++controller_index)
+    {
+        input_controller_t *controller = device->controllers + controller_index;
+        s_im_clear_controller_transient_state(controller);
+    }
+}
+
+void
+s_im_apply_events_to_controller(input_controller_t         *controller, 
+                                array_view_t<input_event_t> events, 
+                                bool8                       auto_consume)
+{
+    for(s32 event_index = 0;
+        event_index < events.count;
+        ++event_index)
+    {
+        input_event_t *event = events + event_index;
+        if(!event->consumed && event->input_type == controller->type)
+        {
+            action_button_t *button = s_im_get_controller_action_button(controller, event->inputID);
+            switch(event->type)
+            {
+                case INPUT_EVENT_TYPE_PRESSED:
+                {
+                    if((button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN) == 0)
+                    {
+                        button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
+
+                        ++button->half_transition_count;
+
+                        s32 index = c_array_add_if_unique(controller->action_buttons_interacted_with_this_frame, 
+                                                          &button, 
+                                                          controller->action_button_interactions);
+                        if(index == -1)
+                        {
+                            ++controller->action_button_interactions;
+                        }
+                    }
+                }break;
+                case INPUT_EVENT_TYPE_DOWN:
+                {
+                    button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
+                    s32 index = c_array_add_if_unique(controller->action_buttons_interacted_with_this_frame, 
+                                                      &button, 
+                                                      controller->action_button_interactions);
+                    if(index == -1)
+                    {
+                        ++controller->action_button_interactions;
+                    }
+                }break;
+                case INPUT_EVENT_TYPE_RELEASED:
+                {
+                    button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
+                    button->flags &= ~INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
+
+                    ++button->half_transition_count;
+                    s32 index = c_array_add_if_unique(controller->action_buttons_interacted_with_this_frame, 
+                                                      &button, 
+                                                      controller->action_button_interactions);
+                    if(index == -1)
+                    {
+                        ++controller->action_button_interactions;
+                    }
+                }break;
+                case INPUT_EVENT_TYPE_AXIS_MOVED:
+                {
+                    if(controller->type == INPUT_DEVICE_TYPE_KEYBOARD)
+                    {
+                        if(event->inputID == INPUT_AXIS_MOUSE)
+                        {
+                            controller->device->keyboard_data.last_mouse_pos    = controller->device->keyboard_data.current_mouse_pos;
+                            controller->device->keyboard_data.current_mouse_pos = event->axis_value;
+                            controller->device->keyboard_data.mouse_delta       = event->axis_value - controller->device->keyboard_data.last_mouse_pos;
+                        }
+                        else if(event->inputID == INPUT_AXIS_MOUSE_WHEEL)
+                        {
+                            controller->device->keyboard_data.mouse_wheel_delta   = event->axis_value - controller->device->keyboard_data.current_mouse_wheel;
+                            controller->device->keyboard_data.current_mouse_wheel = event->axis_value;
+                        }
+                        else
+                        {
+                            InvalidCodePath;
+                        }
+                    }
+                    if(controller->type == INPUT_DEVICE_TYPE_GAMEPAD)
+                    {
+                        button->analog_value = event->axis_value;
+                    }
+                }break;
+            }
+
+            if(auto_consume) event->consumed = true;
+        }
+    }
 }
 
 input_controller_t*
-s_im_find_controller_by_ID(input_manager_t *input_manager, s32 ID, s32 *index_out)
+s_im_get_controller_from_active_device(input_manager_t *input_manager, input_controller_t *controller)
 {
-    input_controller_t *result = null;
-    for(u32 controller_index = 0;
-        controller_index < MAX_INPUT_CONTROLLERS;
-        ++controller_index)
+    input_controller_t *result = controller;
+    input_device_t *device = input_manager->devices + input_manager->active_device_index;
+    if(!controller || (device->type != controller->type))
     {
-        input_controller_t *controller = input_manager->controllers + controller_index;
-        if(controller->ID == ID)
+        if(device->type != INPUT_DEVICE_TYPE_INVALID)
         {
-            result = controller;
-            if(index_out) *index_out = controller_index; 
+            result = device->controllers + device->used_controller_count++;
+            result->type   = device->type;
+            result->device = device;
+        }
+        else
+        {
+            log_error("Cannot create a game controller, there are no physical devices of this kind detected...\n");
+        }
+    }
+
+    return(result);
+}
+
+input_device_t*
+s_im_find_device_by_ID(input_manager_t *input_manager, s32 ID, s32 *index_out)
+{
+    input_device_t *result = null;
+    for(u32 device_index = 0;
+        device_index < MAX_PHYSICAL_DEVICE_CONNECTIONS;
+        ++device_index)
+    {
+        input_device_t *device = input_manager->devices + device_index;
+        if(device->ID == ID)
+        {
+            result = device;
+            if(index_out) *index_out = device_index; 
 
             break;
         }
@@ -294,19 +435,19 @@ s_im_find_controller_by_ID(input_manager_t *input_manager, s32 ID, s32 *index_ou
     return(result);
 }
 
-input_controller_t*
-s_im_find_first_gamepad_controller(input_manager_t *input_manager, s32 *index_out)
+input_device_t*
+s_im_find_first_gamepad_device(input_manager_t *input_manager, s32 *index_out)
 {
-    input_controller_t *result = null;
-    for(u32 controller_index = 0;
-        controller_index < MAX_INPUT_CONTROLLERS;
-        ++controller_index)
+    input_device_t *result = null;
+    for(u32 device_index = 0;
+        device_index < MAX_PHYSICAL_DEVICE_CONNECTIONS;
+        ++device_index)
     {
-        input_controller_t *controller = input_manager->controllers + controller_index;
-        if(controller->type == INPUT_CONTROLLER_TYPE_GAMEPAD)
+        input_device_t *device = input_manager->devices + device_index;
+        if(device->type == INPUT_DEVICE_TYPE_GAMEPAD)
         {
-            result = controller;
-            if(index_out) *index_out = controller_index; 
+            result = device;
+            if(index_out) *index_out = device_index; 
 
             break;
         }
@@ -315,19 +456,19 @@ s_im_find_first_gamepad_controller(input_manager_t *input_manager, s32 *index_ou
     return(result);
 }
 
-input_controller_t*
-s_im_find_first_keyboard_controller(input_manager_t *input_manager, s32 *index_out)
+input_device_t*
+s_im_find_first_keyboard_device(input_manager_t *input_manager, s32 *index_out)
 {
-    input_controller_t *result = null;
-    for(u32 controller_index = 0;
-        controller_index < MAX_INPUT_CONTROLLERS;
-        ++controller_index)
+    input_device_t *result = null;
+    for(u32 device_index = 0;
+        device_index < MAX_PHYSICAL_DEVICE_CONNECTIONS;
+        ++device_index)
     {
-        input_controller_t *controller = input_manager->controllers + controller_index;
-        if(controller->type == INPUT_CONTROLLER_TYPE_KEYBOARD)
+        input_device_t *device = input_manager->devices + device_index;
+        if(device->type == INPUT_DEVICE_TYPE_KEYBOARD)
         {
-            result = controller;
-            if(index_out) *index_out = controller_index; 
+            result = device;
+            if(index_out) *index_out = device_index; 
 
             break;
         }
@@ -344,7 +485,7 @@ s_im_transform_mouse_data(input_controller_t *controller,
 {
     vec2_t result = {};
 
-    vec2_t mouse_pos   = controller->keyboard.current_mouse_pos;
+    vec2_t mouse_pos   = controller->device->keyboard_data.current_mouse_pos;
     vec2_t window_size = surface_size;
     vec4_t ndc_pos     = vec4((mouse_pos.x / (window_size.x * 0.5f)) - 1.0f, 1.0f - (mouse_pos.y / (window_size.y * 0.5f)), 0.0f, 1.0f);
 
@@ -362,45 +503,7 @@ input_binding_state_t
 s_im_get_button_binding_state(input_controller_t *controller, game_action_binding_t *binding)
 {
     input_binding_state_t result = {};
-
-#if 0
-    s32 flags = 0;
-    for(s32 event_index = 0;
-        event_index < controller->event_count;
-        ++event_index)
-    {
-        input_event_t *event = controller->events + event_index; 
-        if((event->input_type == controller->type && !event->consumed) &&
-           (binding->bindingID == event->inputID))
-        {
-            switch(event->type)
-            {
-                case INPUT_EVENT_TYPE_PRESSED:
-                {
-                    flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
-                    flags |= (flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
-
-                    ++result.half_transition_count;
-                }break;
-                case INPUT_EVENT_TYPE_DOWN:
-                {
-                    flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
-                    flags |= (flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
-                }break;
-                case INPUT_EVENT_TYPE_RELEASED:
-                {
-                    flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
-                    flags |= (flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
-                    flags |= (flags & ~INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
-
-                    ++result.half_transition_count;
-                }break;
-            }
-        }
-    }
-#else
     action_button_t *button = s_im_get_controller_action_button(controller, binding->bindingID);
-#endif
 
     result.flags = button->flags;
     result.ID    = binding->bindingID;
@@ -412,21 +515,9 @@ float32
 s_im_get_axis_value(input_controller_t *controller, game_action_binding_t *binding)
 {
     float32 result = 0;
+    if(controller->type == INPUT_DEVICE_TYPE_KEYBOARD)
+    {
 #if 0
-    for(s32 event_index = 0;
-        event_index < controller->event_count;
-        ++event_index)
-    {
-        input_event_t *event = controller->events + event_index; 
-        if((event->input_type == controller->type && !event->consumed) &&
-           (event->type == INPUT_EVENT_TYPE_AXIS_MOVED) && event->inputID == binding->bindingID)
-        {
-            result = event->axis_value;
-        }
-    }
-#else
-    if(controller->type == INPUT_CONTROLLER_TYPE_KEYBOARD)
-    {
         if(binding->bindingID == INPUT_AXIS_MOUSE)
         {
         }
@@ -437,13 +528,15 @@ s_im_get_axis_value(input_controller_t *controller, game_action_binding_t *bindi
         {
             InvalidCodePath;
         }
+#else
+        InvalidCodePath;
+#endif
     }
-    if(controller->type == INPUT_CONTROLLER_TYPE_GAMEPAD)
+    if(controller->type == INPUT_DEVICE_TYPE_GAMEPAD)
     {
         action_button_t *button = s_im_get_controller_action_button(controller, binding->bindingID + SDL_GAMEPAD_BUTTON_COUNT);
         result = button->analog_value.x;
     }
-#endif
 
     return(result);
 }
@@ -525,7 +618,7 @@ s_im_game_action_process_axis1D_state(input_controller_t *controller, game_actio
     {
         switch(mapping->controller_type)
         {
-            case INPUT_CONTROLLER_TYPE_KEYBOARD:
+            case INPUT_DEVICE_TYPE_KEYBOARD:
             {
                 input_binding_state_t button0 = s_im_get_button_binding_state(controller, &mapping->bindings[0]);
                 input_binding_state_t button1 = s_im_get_button_binding_state(controller, &mapping->bindings[1]);
@@ -541,7 +634,7 @@ s_im_game_action_process_axis1D_state(input_controller_t *controller, game_actio
 
                 action->axis1D_value = axis_value;
             }break;
-            case INPUT_CONTROLLER_TYPE_GAMEPAD:
+            case INPUT_DEVICE_TYPE_GAMEPAD:
             {
                 action->axis1D_value = s_im_get_axis_value(controller, &mapping->bindings[0]);
             }break;
@@ -571,7 +664,7 @@ s_im_game_action_process_axis2D_state(input_controller_t *controller, game_actio
     {
         switch(mapping->controller_type)
         {
-            case INPUT_CONTROLLER_TYPE_KEYBOARD:
+            case INPUT_DEVICE_TYPE_KEYBOARD:
             {
                 // NOTE(Sleepster): We need to actually use the action_buttons again. Put simply, the bug is because
                 //  we're looking at transient events rather than the previous states. If we set axis_value to that of
@@ -608,14 +701,10 @@ s_im_game_action_process_axis2D_state(input_controller_t *controller, game_actio
                     axis_value.x += 1.0;
                 }
             }break;
-            case INPUT_CONTROLLER_TYPE_GAMEPAD:
+            case INPUT_DEVICE_TYPE_GAMEPAD:
             {
                 float32 Yaxis = s_im_get_axis_value(controller, &mapping->bindings[0]);
                 float32 Xaxis = s_im_get_axis_value(controller, &mapping->bindings[1]);
-                if(Xaxis > 0.0f)
-                {
-                    int x = 0;
-                }
 
                 float32 Yaxis_normalized = Yaxis < 0.0f ? Yaxis / 32768.0f : Yaxis / 32767.0f;
                 float32 Xaxis_normalized = Xaxis < 0.0f ? Xaxis / 32768.0f : Xaxis / 32767.0f;
@@ -624,9 +713,9 @@ s_im_game_action_process_axis2D_state(input_controller_t *controller, game_actio
                 axis_value = {Xaxis_normalized, -Yaxis_normalized};
 
                 float32 magnitude = vec2_length(axis_value);
-                if(magnitude > controller->gamepad.stick_deadzone)
+                if(magnitude > controller->device->gamepad_data.stick_deadzone)
                 {
-                    float32 scaled_magnitude = (magnitude - controller->gamepad.stick_deadzone) / (1.0f - controller->gamepad.stick_deadzone);
+                    float32 scaled_magnitude = (magnitude - controller->device->gamepad_data.stick_deadzone) / (1.0f - controller->device->gamepad_data.stick_deadzone);
                     scaled_magnitude = Clamp(scaled_magnitude, 0.0f, 1.0f);
 
                     axis_value = vec2_multiply(axis_value, vec2_create(scaled_magnitude / magnitude));
@@ -673,15 +762,56 @@ s_im_get_controller_action_button(input_controller_t *controller, s32 inputID)
     action_button_t *result = null;
     switch(controller->type)
     {
-        case INPUT_CONTROLLER_TYPE_KEYBOARD:
+        case INPUT_DEVICE_TYPE_KEYBOARD:
         {
             result = controller->keyboard.input + inputID;
         }break;
-        case INPUT_CONTROLLER_TYPE_GAMEPAD:
+        case INPUT_DEVICE_TYPE_GAMEPAD:
         {
             result = controller->gamepad.buttons + inputID;
         }break;
     }
 
+    return(result);
+}
+
+// IS PRESSED API
+
+bool8
+s_im_is_button_pressed(input_controller_t *controller, s32 inputID)
+{
+    bool8 result = false;
+
+    action_button_t *button = null;
+    if(controller->type == INPUT_DEVICE_TYPE_KEYBOARD) button = controller->keyboard.input  + inputID;
+    if(controller->type == INPUT_DEVICE_TYPE_GAMEPAD)  button = controller->gamepad.buttons + inputID;
+
+    result = (button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
+    return(result);
+}
+
+bool8
+s_im_is_button_down(input_controller_t *controller, s32 inputID)
+{
+    bool8 result = false;
+
+    action_button_t *button = null;
+    if(controller->type == INPUT_DEVICE_TYPE_KEYBOARD) button = controller->keyboard.input  + inputID;
+    if(controller->type == INPUT_DEVICE_TYPE_GAMEPAD)  button = controller->gamepad.buttons + inputID;
+
+    result = (button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
+    return(result);
+}
+
+bool8
+s_im_is_button_released(input_controller_t *controller, s32 inputID)
+{
+    bool8 result = false;
+
+    action_button_t *button = null;
+    if(controller->type == INPUT_DEVICE_TYPE_KEYBOARD) button = controller->keyboard.input  + inputID;
+    if(controller->type == INPUT_DEVICE_TYPE_GAMEPAD)  button = controller->gamepad.buttons + inputID;
+
+    result = (button->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
     return(result);
 }

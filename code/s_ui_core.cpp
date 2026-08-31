@@ -7,11 +7,26 @@
 #include <s_ui_core.h>
 #include <r_immediate_rendering.h>
 
+internal_api void* widget_hash_table_allocate_impl(void *allocator, u32 allocation_size);
+void ui_state_update_widget_state(ui_state_t *ui_state);
+
+internal_api void ui_state_update_widget_hierarchy(ui_state_t *ui_state);
+internal_api void size_all_widgets(ui_state_t *ui_state);
+internal_api void place_all_widgets(ui_state_t *ui_state);
+internal_api void render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, widget_t *first_widget);
+
+/*
+=============
+find_top_level_in_bounds_widget
+
+Helper for ui_state_poll_input_events
+=============
+*/
+
 internal_api widget_t* 
 find_top_level_in_bounds_widget(ui_state_t *ui_state, widget_t *widget, vec2_t mouse_position)
 {
     widget_t *result = null;
-
     widget_t *first_widget = widget;
     do {
         if(widget->first_child)
@@ -59,6 +74,479 @@ find_top_level_in_bounds_widget(ui_state_t *ui_state, widget_t *widget, vec2_t m
     return(result);
 }
 
+/*
+=============
+ui_state_init
+=============
+*/
+
+void
+ui_state_init(ui_state_t       *ui_state, 
+              input_manager_t  *input_manager,
+              asset_manager_t  *asset_manager, 
+              RHI_context_t *RHI_context, 
+              u32               renderpass_ID)
+{
+    ZeroStruct(*ui_state);
+
+    ui_state->ui_events.count = MAX_INPUT_EVENTS;
+    ui_state->widget_arena    = c_arena_create(MB(10));
+    ui_state->polling_arena   = c_arena_create(MB(50));
+    ui_state->persistent_data_arena = c_arena_create(MB(100));
+    ui_state->widget_states = c_hash_table_create<widget_state_t>(2096, 
+                                                                 &ui_state->persistent_data_arena, 
+                                                                  widget_hash_table_allocate_impl,
+                                                                  null);
+    ui_state->RHI_context           = RHI_context;
+    ui_state->asset_manager         = asset_manager;
+    ui_state->interface_framebuffer = renderpass_ID;
+    ui_state->parent_stack_top      = 1;
+    ui_state->hot_widget            = null;
+    ui_state->active_widget         = null;
+
+    // NOTE(Sleepster): Theme stuff 
+    ui_state->default_font = s_asset_manager_acquire_asset_handle(asset_manager, STR("LiberationMono_Regular"));
+
+    ui_state->default_widget_idle_color       = vec4(1.0, 1.0, 1.0, 1.0);
+    ui_state->default_widget_hover_color      = vec4(1.0, 0.0, 0.0, 1.0);
+    ui_state->default_widget_active_color     = vec4(0.0, 1.0, 0.0, 1.0);
+    ui_state->default_widget_border_color     = vec4(0.0, 0.0, 0.0, 1.0);
+    ui_state->default_font_color              = vec4(0.0, 0.0, 0.0, 1.0);
+
+    ui_state->default_font_size               = 32;
+    ui_state->default_widget_SDF_smoothness   = 1.0f;
+    ui_state->default_widget_border_thickness = 5;
+    // NOTE(Sleepster): Theme stuff 
+
+    ui_state->input_manager = input_manager;
+    ui_state->widget_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_widget"));
+
+    u32 *indices = c_arena_push_array(&RHI_context->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
+    u32  index_offset = 0;
+    for(u32 index = 0;
+        index < 60000;
+        index += 6)
+    {
+        indices[index + 0] = index_offset + 0;
+        indices[index + 1] = index_offset + 1;
+        indices[index + 2] = index_offset + 2;
+        indices[index + 3] = index_offset + 2;
+        indices[index + 4] = index_offset + 3;
+        indices[index + 5] = index_offset + 0;
+
+        index_offset += 4;
+    }
+
+    ui_state->interface_framebuffer = renderpass_ID;
+    const u32 VERTEX_BUFFER_SIZE = 4 * MAX_WIDGETS;
+    immediate_vertex_t *vertices = c_arena_push_array(&ui_state->persistent_data_arena, immediate_vertex_t, VERTEX_BUFFER_SIZE);
+    ui_state->vertex_buffer = RHI_vertex_buffer_create(RHI_context, 
+                                                       RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED,
+                                                       RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT,
+                                                       (byte*)vertices,
+                                                       sizeof(immediate_vertex_t),
+                                                       VERTEX_BUFFER_SIZE);
+    ui_state->index_buffer = RHI_index_buffer_create(RHI_context, 
+                                                     RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY,
+                                                     sizeof(u32),
+                                                     indices,
+                                                     sizeof(u32) * (6 * MAX_WIDGETS));
+    const u32 INSTANCE_BUFFER_SIZE = MAX_WIDGETS;
+    ui_state->widget_instances       = c_arena_push_array(&ui_state->persistent_data_arena, immediate_widget_data_t, INSTANCE_BUFFER_SIZE);
+    ui_state->widget_instance_data   = RHI_get_constant_buffer(RHI_context, STR("WidgetInstanceData"));
+    ui_state->camera_matrices_buffer = RHI_get_constant_buffer(RHI_context, STR("CameraMatrices"));
+}
+
+/*
+=============
+ui_state_poll_input_events
+
+This function must be called explicitly to update
+the current inputs stored inside of the ui_state.
+It must be called after ui_state_get_input_events.
+
+If you call this before that function, then you will
+have no events to poll...
+=============
+*/
+
+void
+ui_state_poll_input_events(ui_state_t *ui_state)
+{
+    if(ui_state->frame_begun)
+    {
+        input_controller_t *controller = ui_state->ui_controller;
+        if(controller)
+        {
+            s_im_apply_events_to_controller(ui_state->ui_controller, ui_state->ui_events, false);
+        }
+        else
+        {
+            log_warning("NO valid UI_controller...\n");
+        }
+    }
+
+    if(ui_state->ui_controller)
+    {
+        action_button_t *left_mouse  = s_im_get_controller_action_button(ui_state->ui_controller, SDL_LEFT_MOUSE);
+        action_button_t *right_mouse = s_im_get_controller_action_button(ui_state->ui_controller, SDL_RIGHT_MOUSE);
+
+        ui_state->left_mouse = {
+            .flags = left_mouse->flags,
+            .half_transition_count = left_mouse->half_transition_count,
+            .ID = SDL_LEFT_MOUSE
+        };
+
+        ui_state->right_mouse = {
+            .flags = right_mouse->flags,
+            .half_transition_count = right_mouse->half_transition_count,
+            .ID = SDL_RIGHT_MOUSE
+        };
+
+        if(ui_state->first_widget != null)
+        {
+            vec2_t current_mouse_position = ui_state->mouse_position;
+
+            // NOTE(Sleepster): Determine top most widget for the hierarchy 
+            widget_t *current_widget = ui_state->first_widget;
+            if(ui_state->hot_widget)
+            {
+                widget_state_t *state = &(ui_state->widget_states.items[ui_state->hot_widget->ID]).item;
+                bool8 within_bounds = rect2_point_in_rect(state->widget_rect, current_mouse_position);
+                if(!within_bounds)
+                {
+                    ui_state->last_hot_ID = ui_state->hot_widget->ID;
+                    ui_state->hot_widget = null;
+                }
+            }
+
+            bool8 is_held           = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
+            bool8 just_released     = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
+            bool8 just_clicked      = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
+            bool8 is_right_clicked  = (ui_state->right_mouse.flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
+            bool8 is_right_held     = (ui_state->right_mouse.flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
+            bool8 is_double_clicked = ui_state->left_mouse.half_transition_count >= 2;
+
+            ui_state->left_mouse_clicked_this_frame = just_clicked;
+            widget_t *top_most_widget = find_top_level_in_bounds_widget(ui_state,
+                                                                        current_widget, 
+                                                                        current_mouse_position);
+            if(ui_state->hot_widget)
+            {
+                ui_state->last_hot_ID = ui_state->hot_widget->ID;
+                ui_state->hot_widget  = top_most_widget;
+            }
+            else
+            {
+                ui_state->hot_widget  = top_most_widget;
+            }
+
+            if(just_clicked || is_right_clicked)
+            {
+                if(ui_state->active_widget)
+                {
+                    ui_state->last_active_ID = ui_state->active_widget->ID;
+                    ui_state->active_widget  = top_most_widget;
+                }
+                else
+                {
+                    ui_state->active_widget  = top_most_widget;
+                }
+            }
+
+            if(ui_state->active_widget)
+            {
+                widget_state_t *state = &(ui_state->widget_states.items[ui_state->active_widget->ID]).item;
+
+                state->is_held = is_held;
+                state->just_released = just_released;
+                state->just_clicked = just_clicked;
+                state->is_double_clicked = is_double_clicked;
+                state->is_right_clicked = is_right_clicked;
+                state->is_right_held = is_right_held;
+            }
+        }
+    }
+}
+
+/*
+=============
+ui_state_get_input_events
+
+This function is what actually GATHERS the input
+events that you can then poll for. The reason this
+API is seperate is because the ui_state itself stores
+input events in case it is updated at a different rate
+from that of it's ui_controller.
+=============
+*/
+
+void
+ui_state_get_input_events(ui_state_t *ui_state)
+{
+    if(ui_state->ui_controller && ui_state->input_focused)
+    {
+        c_arena_reset(&ui_state->polling_arena);
+
+        input_device_t *device = ui_state->ui_controller->device;
+        ui_state->ui_event_count = 0;
+        for(s32 event_index = 0;
+            event_index < device->events.count;
+            ++event_index)
+        {
+            input_event_t *event = device->events + event_index;
+            ui_state->ui_events[ui_state->ui_event_count] = *event;
+
+            event->consumed = true;
+            if(event->input_stream.count > 0)
+            {
+                input_event_t *text_event = &ui_state->ui_events[ui_state->ui_event_count];
+                text_event->input_stream = c_string_make_copy(&ui_state->polling_arena, text_event->input_stream);
+            }
+
+            ++ui_state->ui_event_count;
+        }
+    }
+}
+
+/*
+=============
+ui_state_update_widget_state
+=============
+*/
+
+void
+ui_state_update_widget_state(ui_state_t *ui_state)
+{
+    RHI_renderpass_t *renderpass = ui_state->RHI_context->renderpasses + ui_state->interface_framebuffer;
+    ui_state->ui_controller = s_im_get_controller_from_active_device(ui_state->input_manager, ui_state->ui_controller);
+    ui_state_poll_input_events(ui_state);
+    
+    float32 half_width  = renderpass->render_width  * 0.5f;
+    float32 half_height = renderpass->render_height * 0.5f;
+
+    ui_state->current_camera = {
+        .view_matrix       = mat4_identity(),
+        .projection_matrix = mat4_RHDX_ortho(-half_width, half_width, -half_height, half_height, 0.0f, 1.0f)
+    };
+
+    vec2_t last_mouse = ui_state->mouse_position;
+    ui_state->mouse_position = s_im_transform_mouse_data(ui_state->ui_controller, 
+                                                         vec2(renderpass->render_width, renderpass->render_height), 
+                                                         ui_state->current_camera.view_matrix,
+                                                         ui_state->current_camera.projection_matrix);
+    ui_state->mouse_delta     = vec2_subtract(ui_state->mouse_position, last_mouse);
+    ui_state->max_widget_size = vec2(renderpass->render_width, renderpass->render_height);
+
+    ui_state_update_widget_hierarchy(ui_state);
+}
+
+/*
+=============
+ui_state_update_widget_hierarchy
+=============
+*/
+
+internal_api void
+ui_state_update_widget_hierarchy(ui_state_t *ui_state)
+{
+    // NOTE(Sleepster): Get the total size of the hierarchy
+    size_all_widgets(ui_state);
+    // NOTE(Sleepster): Place the widgets in the hierarchy, honoring the sizing and padding
+    place_all_widgets(ui_state);
+}
+
+/*
+=============
+render_widget_hierarchy
+=============
+*/
+
+void
+ui_state_render_widgets(ui_state_t *ui_state, RHI_command_list_t *command_list)
+{
+    RHI_context_t *RHI_context = ui_state->RHI_context;
+    asset_manager_t  *asset_manager  = ui_state->asset_manager;
+    (void)asset_manager;
+
+    widget_t *current_widget = ui_state->first_widget;
+    if(current_widget)
+    {
+        render_widget_hierarchy(ui_state, command_list, current_widget);
+
+        RHI_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
+        RHI_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
+
+        // NOTE(Sleepster): First, draw the normal rectangle widgets
+        {
+            RHI_pipeline_state_t pipeline_state = command_list->active_render_state;
+            pipeline_state.dst_color_blend_mode = RBM_OneMinusSrcAlpha;
+            pipeline_state.src_alpha_blend_mode = RBM_One;
+            pipeline_state.dst_alpha_blend_mode = RBM_Zero;
+
+            RHI_cmd_set_render_state(command_list, &pipeline_state);
+            RHI_cmd_use_shader_program(command_list, ui_state->widget_shader);
+            RHI_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
+
+            s32 window_width  = Max(RHI_context->window_size.x, 10);
+            s32 window_height = Max(RHI_context->window_size.y, 10);
+
+            RHI_cmd_update_constant_buffer(command_list, ui_state->camera_matrices_buffer, &ui_state->current_camera,   sizeof(camera_matrices_t));
+            RHI_cmd_update_constant_buffer(command_list, ui_state->widget_instance_data,    ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
+
+            RHI_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
+            RHI_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
+
+            RHI_cmd_draw_indexed(command_list, ui_state->widget_item_count * 6, 0, 1, 0);
+            RHI_buffer_reset(ui_state->RHI_context, &ui_state->vertex_buffer);
+            RHI_buffer_reset(ui_state->RHI_context, &ui_state->index_buffer);
+            ui_state->widget_instance_count = 0;
+        }
+    }
+    else
+    {
+        log_warning("Called ui_state_render_widgets on an empty ui_state_t... there are no widgets attached!!!\n");
+    }
+}
+
+/*
+=============
+render_widget_hierarchy
+=============
+*/
+
+internal_api void
+render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, widget_t *first_widget)
+{
+    widget_t *current_widget = first_widget;
+    do {
+        vec2_t half_size = vec2(current_widget->state->render_size.x * 0.5f, 
+                                current_widget->state->render_size.y * 0.5f);
+
+        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_RECTANGLE)
+        {
+            current_widget->widget_instance_data         = ui_state->widget_instances + ui_state->widget_instance_count;
+            current_widget->widget_instance_data->iFlags = current_widget->widget_flags;
+
+            // NOTE(Sleepster): We're probably setting a ton of redundant data... TOO BAD!! 
+            current_widget->widget_instance_data->iBorderColor     = current_widget->border_color;
+            current_widget->widget_instance_data->iBorderThickness = current_widget->border_thickness;
+            current_widget->widget_instance_data->iHalfSize        = half_size;
+            current_widget->widget_instance_data->iRadius          = current_widget->radius;
+            current_widget->widget_instance_data->iSDFSmoothness   = current_widget->smoothness;
+
+            immediate_rect(command_list,
+                          &ui_state->vertex_buffer,
+                           current_widget->state->position, 
+                           current_widget->state->render_size,
+                           current_widget->state->render_color,
+                           vec2_negate(half_size),
+                           half_size,
+                           vec2(0, ui_state->widget_instance_count),
+                           vec2_zero(),
+                           vec2_zero());
+
+            ++ui_state->widget_item_count;
+            ++ui_state->widget_instance_count;
+        }
+
+        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
+        {
+            immediate_rect(command_list,
+                          &ui_state->vertex_buffer,
+                           current_widget->state->position, 
+                           current_widget->state->render_size,
+                           current_widget->state->render_color,
+                           current_widget->state->position.xy,
+                           vec2_add(current_widget->state->position.xy, current_widget->state->render_size),
+                           vec2(0, 0),
+                           vec2_zero(),
+                           vec2_zero());
+
+            ++ui_state->widget_item_count;
+        }
+
+        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
+        {
+            InvalidCodePath;
+        }
+
+        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_TEXT)
+        {
+            vec3_t text_render_position = vec3(current_widget->state->position.x + current_widget->widget_padding.left,
+                                               current_widget->state->position.y + current_widget->widget_padding.bottom,
+                                               current_widget->state->position.z + -0.01); // some Epsilon
+            if((current_widget->widget_flags & UI_WIDGET_FLAG_HAS_TEXT_CONTENT) == 0)
+            {
+                immediate_text(command_list, 
+                              &ui_state->vertex_buffer, 
+                               ui_state->asset_manager,
+                              &ui_state->default_font,
+                               current_widget->widget_name,
+                               text_render_position, 
+                               ui_state->default_font_color,
+                               2.0,
+                               current_widget->font_size);
+
+                ui_state->widget_item_count += current_widget->widget_name.count;
+            }
+            else
+            {
+                string_t widget_text = {
+                    .data  = (u8*)(current_widget->widget_text_buffer->data + current_widget->state->widget_text_render_start_offset),
+                    .count = current_widget->state->widget_text_render_end_offset,
+                };
+                immediate_text(command_list, 
+                              &ui_state->vertex_buffer, 
+                               ui_state->asset_manager,
+                              &ui_state->default_font,
+                               widget_text,
+                               text_render_position, 
+                               ui_state->default_font_color,
+                               2.0,
+                               current_widget->font_size);
+
+                ui_state->widget_item_count += widget_text.count;
+            }
+        }
+
+        if(current_widget->widget_flags & UI_WIDGET_FLAG_DISPLAY_TEXTURE)
+        {
+            if(current_widget->display_texture->texture)
+            {
+                RHI_cmd_bind_texture_from_handle(command_list, current_widget->display_texture);
+
+                s32 texture_index = RHI_is_texture_bound(command_list, current_widget->display_texture->texture);
+                immediate_quad_ex(command_list,
+                                  &ui_state->vertex_buffer,
+                                  current_widget->state->position, 
+                                  current_widget->state->render_size,
+                                  current_widget->state->render_color,
+                                  current_widget->display_texture_uvmin,
+                                  current_widget->display_texture_uvmax,
+                                  vec2(1.0, texture_index),
+                                  vec2(current_widget->display_texture->texture->gpu_data.create_info.sampler_info.filtering, 0.0),
+                                  vec2_zero(),
+                                  current_widget->display_texture->texture);
+                ++ui_state->widget_item_count;
+            }
+        }
+
+        if(current_widget->first_child)
+        {
+            render_widget_hierarchy(ui_state, command_list, current_widget->first_child);
+        }
+
+        current_widget = current_widget->next_sibling;
+    }while(current_widget != first_widget);
+}
+
+/*
+=============
+ui_state_begin_frame
+=============
+*/
+
 void
 ui_state_begin_frame(ui_state_t *ui_state)
 {
@@ -72,74 +560,15 @@ ui_state_begin_frame(ui_state_t *ui_state)
     ui_state->left_mouse_clicked_this_frame = false;
     ui_state->frame_begun = true;
     ui_state->frame_ended = false;
-    ui_state->ui_controller = s_im_find_first_keyboard_controller(ui_state->input_manager, null);
-
-    if(ui_state->first_widget != null)
-    {
-        vec2_t current_mouse_position = ui_state->mouse_position;
-
-        // NOTE(Sleepster): Determine top most widget for the hierarchy 
-        widget_t *current_widget = ui_state->first_widget;
-        if(ui_state->hot_widget)
-        {
-            widget_state_t *state = &(ui_state->widget_states.items[ui_state->hot_widget->ID]).item;
-            bool8 within_bounds = rect2_point_in_rect(state->widget_rect, current_mouse_position);
-            if(!within_bounds)
-            {
-                ui_state->last_hot_ID = ui_state->hot_widget->ID;
-                ui_state->hot_widget = null;
-            }
-        }
-
-        bool8 is_held           = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
-        bool8 just_released     = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
-        bool8 just_clicked      = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
-        bool8 is_right_clicked  = (ui_state->right_mouse.flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
-        bool8 is_right_held     = (ui_state->right_mouse.flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
-        bool8 is_double_clicked = ui_state->left_mouse.half_transition_count >= 2;
-
-        ui_state->left_mouse_clicked_this_frame = just_clicked;
-        widget_t *top_most_widget = find_top_level_in_bounds_widget(ui_state,
-                                                                    current_widget, 
-                                                                    current_mouse_position);
-        if(ui_state->hot_widget)
-        {
-            ui_state->last_hot_ID = ui_state->hot_widget->ID;
-            ui_state->hot_widget  = top_most_widget;
-        }
-        else
-        {
-            ui_state->hot_widget  = top_most_widget;
-        }
-
-        if(just_clicked || is_right_clicked)
-        {
-            if(ui_state->active_widget)
-            {
-                ui_state->last_active_ID = ui_state->active_widget->ID;
-                ui_state->active_widget  = top_most_widget;
-            }
-            else
-            {
-                ui_state->active_widget  = top_most_widget;
-            }
-        }
-
-        if(ui_state->active_widget)
-        {
-            widget_state_t *state = &(ui_state->widget_states.items[ui_state->active_widget->ID]).item;
-
-            state->is_held = is_held;
-            state->just_released = just_released;
-            state->just_clicked = just_clicked;
-            state->is_double_clicked = is_double_clicked;
-            state->is_right_clicked = is_right_clicked;
-            state->is_right_held = is_right_held;
-        }
-    }
 
     c_arena_reset(&ui_state->widget_arena);
 }
+
+/*
+=============
+ui_state_end_frame
+=============
+*/
 
 true_inline void
 ui_state_end_frame(ui_state_t *ui_state, RHI_command_list_t *command_list)
@@ -151,9 +580,20 @@ ui_state_end_frame(ui_state_t *ui_state, RHI_command_list_t *command_list)
     ui_state_render_widgets(ui_state, command_list);
     ui_state->frame_ended = true;
     ui_state->frame_begun = false;
+    s_im_clear_controller_transient_state(ui_state->ui_controller);
+    if(ui_state->input_focused)
+    {
+        s_im_clear_device_events(ui_state->ui_controller->device);
+    }
 
     ++ui_state->frame_count;
 }
+
+/*
+================================
+UI_STATE WIDGET PROPERTIES
+================================
+*/
 
 true_inline void
 ui_state_begin_row(ui_state_t *ui_state, widget_t *parent)
@@ -186,6 +626,12 @@ ui_state_set_active_padding(ui_state_t *ui_state, vec4_t padding)
 {
     ui_state->active_widget_padding = padding;
 }
+
+/*
+================================
+UI_STATE WIDGET PROPERTIES
+================================
+*/
 
 internal_api void
 place_widgets_in_hierarchy(widget_t *first_widget, vec2_t *placement_cursor, u32 layout_style)
@@ -272,134 +718,6 @@ place_all_widgets(ui_state_t *ui_state)
     }
 }
 
-#if 0
-internal_api vec2_t 
-determine_hierarchy_size(ui_state_t *ui_state, widget_t *widget)
-{
-    vec2_t result = {};
-    if((widget->widget_flags & UI_WIDGET_FLAG_FIXED_SIZE) == 0)
-    {
-        if(widget->size_kind.x == UI_WIDGET_SIZE_KIND_PIXELS || 
-           widget->size_kind.y == UI_WIDGET_SIZE_KIND_PIXELS)
-        {
-            // NOTE(Sleepster): Resizable widgets 
-            result = widget->minimum_render_size;
-            if(widget->first_child)
-            {
-                vec2_t children_total = vec2_zero();
-                widget_t *current_widget = widget->first_child;
-                do {
-                    vec2_t subhierarchy_size = determine_hierarchy_size(ui_state, current_widget);
-                    if(current_widget->size_kind.x != UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT ||
-                       current_widget->size_kind.y != UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT)
-                    {
-                        bool8 has_next_sibling = (current_widget->next_sibling != widget->first_child);
-                        if(widget->layout_style == UI_WIDGET_LAYOUT_STYLE_HORIZONTAL)
-                        {
-                            children_total.x += subhierarchy_size.x;
-                            children_total.y  = Max(children_total.y, subhierarchy_size.y);
-
-                            if(has_next_sibling) children_total.x += widget->child_spacing.x;
-                        }
-                        else
-                        {
-                            children_total.x  = Max(children_total.x, subhierarchy_size.x);
-                            children_total.y += subhierarchy_size.y;
-
-                            if(has_next_sibling) children_total.y += widget->child_spacing.y;
-                        }
-                    }
-
-                    current_widget = current_widget->next_sibling;
-                }while(current_widget != widget->first_child);
-
-                result.x = Max(result.x, children_total.x);
-                result.y = Max(result.y, children_total.y);
-            }
-
-            widget->state->render_size = vec2(result.x + widget->max_left_padding + widget->max_right_padding,
-                                              result.y + widget->max_top_padding  + widget->max_bottom_padding);
-
-            // NOTE(Sleepster): Set what the size of the widget is before any operations that may change this number 
-            widget->state->absolute_minimum_render_size = widget->state->render_size;
-
-            // NOTE(Sleepster): Handle resize 
-            if(widget->widget_flags & UI_WIDGET_FLAG_RESIZEABLE)
-            {
-                widget->state->resize_amount = vec2_add(widget->resize_value, widget->state->resize_amount);
-                widget->state->render_size   = vec2_add(widget->state->render_size, vec2_multiply(widget->state->resize_amount, vec2(1.0f, -1.0f)));
-
-                // NOTE(Sleepster): Fix "underflow" of the widget minimum size
-                if(widget->state->render_size.x < widget->state->absolute_minimum_render_size.x)
-                {
-                    float32 difference = widget->state->absolute_minimum_render_size.x - widget->state->render_size.x;
-                    widget->state->resize_amount.x += difference;
-                }
-
-                if(widget->state->render_size.y < widget->state->absolute_minimum_render_size.y)
-                {
-                    float32 difference = widget->state->absolute_minimum_render_size.y - widget->state->render_size.y;
-                    widget->state->resize_amount.y -= difference;
-                }
-
-                widget->state->render_size.x = Max(widget->state->render_size.x, widget->state->absolute_minimum_render_size.x);
-                widget->state->render_size.y = Max(widget->state->render_size.y, widget->state->absolute_minimum_render_size.y);
-
-                // NOTE(Sleepster): Fix "Overflow" of the max widget size
-                if(widget->state->render_size.x > ui_state->max_widget_size.x)
-                {
-                    float32 difference = widget->state->render_size.x - ui_state->max_widget_size.x;
-                    widget->state->render_size.x = ui_state->max_widget_size.y;
-
-                    widget->state->resize_amount.x -= difference;
-                }
-
-                if(widget->state->render_size.y > ui_state->max_widget_size.y)
-                {
-                    float32 difference = widget->state->render_size.y - ui_state->max_widget_size.y;
-                    widget->state->render_size.y = ui_state->max_widget_size.y;
-
-                    widget->state->resize_amount.y += difference;
-                }
-            }
-        }
-        else if(widget->size_kind.x == UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT ||
-                widget->size_kind.y == UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT)
-        {
-            Expect(widget->parent, "Widget size is set too 'UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT', but this widget does not HAVE a parent...\n");
-
-            widget->minimum_render_size.x = Clamp(widget->minimum_render_size.x, 0.0, 1.0);
-            widget->minimum_render_size.y = Clamp(widget->minimum_render_size.y, 0.0, 1.0);
-
-            vec2_t render_size;
-            render_size.x = widget->parent->state->render_size.x - (widget->max_left_padding + widget->max_right_padding),
-            render_size.y = widget->parent->state->render_size.y - (widget->max_top_padding  + widget->max_bottom_padding),
-            widget->state->render_size = vec2_multiply(render_size, widget->minimum_render_size);
-        }
-    }
-    else
-    {
-        // NOTE(Sleepster): If this is a statically sized widget 
-        widget->state->render_size = vec2(widget->minimum_render_size.x + widget->max_left_padding   + widget->max_right_padding,
-                                          widget->minimum_render_size.y + widget->max_bottom_padding + widget->max_top_padding);
-
-        widget->state->absolute_minimum_render_size = widget->state->render_size;
-
-        // NOTE(Sleepster): Even if our size doesn't change, we must still do the sizing of our children 
-        if(widget->first_child)
-        {
-            widget_t *current_widget = widget->first_child;
-            do {
-                determine_hierarchy_size(ui_state, current_widget);
-                current_widget = current_widget->next_sibling;
-            }while(current_widget != widget->first_child);
-        }
-    }
-
-    result = widget->state->render_size;
-    return(result);
-}
-#else
 internal_api vec2_t
 determine_hierarchy_size(ui_state_t *ui_state, widget_t *widget)
 {
@@ -540,7 +858,6 @@ determine_hierarchy_size(ui_state_t *ui_state, widget_t *widget)
 
     return(result);
 }
-#endif
 
 internal_api void
 size_all_widgets(ui_state_t *ui_state)
@@ -555,217 +872,6 @@ size_all_widgets(ui_state_t *ui_state)
     }
 }
 
-internal_api void
-ui_state_update_widget_hierarchy(ui_state_t *ui_state)
-{
-    // NOTE(Sleepster): Get the total size of the hierarchy
-    size_all_widgets(ui_state);
-    // NOTE(Sleepster): Place the widgets in the hierarchy, honoring the sizing and padding
-    place_all_widgets(ui_state);
-}
-
-void
-ui_state_maybe_eat_inputs(ui_state_t *ui_state)
-{
-}
-
-void
-ui_state_update_widget_state(ui_state_t *ui_state)
-{
-    RHI_renderpass_t *renderpass = ui_state->RHI_context->renderpasses + ui_state->interface_framebuffer;
-    
-    float32 half_width  = renderpass->render_width  * 0.5f;
-    float32 half_height = renderpass->render_height * 0.5f;
-
-    ui_state->current_camera = {
-        .view_matrix       = mat4_identity(),
-        .projection_matrix = mat4_RHDX_ortho(-half_width, half_width, -half_height, half_height, 0.0f, 1.0f)
-    };
-
-    vec2_t last_mouse = ui_state->mouse_position;
-    ui_state->mouse_position = s_im_transform_mouse_data(ui_state->ui_controller, 
-                                                         vec2(renderpass->render_width, renderpass->render_height), 
-                                                         ui_state->current_camera.view_matrix,
-                                                         ui_state->current_camera.projection_matrix);
-    ui_state->mouse_delta     = vec2_subtract(ui_state->mouse_position, last_mouse);
-    ui_state->max_widget_size = vec2(renderpass->render_width, renderpass->render_height);
-
-    ui_state_update_widget_hierarchy(ui_state);
-}
-
-internal_api void
-render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, widget_t *first_widget)
-{
-    widget_t *current_widget = first_widget;
-    do {
-        vec2_t half_size = vec2(current_widget->state->render_size.x * 0.5f, 
-                                current_widget->state->render_size.y * 0.5f);
-
-        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_RECTANGLE)
-        {
-            current_widget->widget_instance_data         = ui_state->widget_instances + ui_state->widget_instance_count;
-            current_widget->widget_instance_data->iFlags = current_widget->widget_flags;
-
-            // NOTE(Sleepster): We're probably setting a ton of redundant data... TOO BAD!! 
-            current_widget->widget_instance_data->iBorderColor     = current_widget->border_color;
-            current_widget->widget_instance_data->iBorderThickness = current_widget->border_thickness;
-            current_widget->widget_instance_data->iHalfSize        = half_size;
-            current_widget->widget_instance_data->iRadius          = current_widget->radius;
-            current_widget->widget_instance_data->iSDFSmoothness   = current_widget->smoothness;
-
-            immediate_rect(command_list,
-                          &ui_state->vertex_buffer,
-                           current_widget->state->position, 
-                           current_widget->state->render_size,
-                           current_widget->state->render_color,
-                           vec2_negate(half_size),
-                           half_size,
-                           vec2(0, ui_state->widget_instance_count),
-                           vec2_zero(),
-                           vec2_zero());
-
-            ++ui_state->widget_item_count;
-            ++ui_state->widget_instance_count;
-        }
-
-        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
-        {
-            immediate_rect(command_list,
-                          &ui_state->vertex_buffer,
-                           current_widget->state->position, 
-                           current_widget->state->render_size,
-                           current_widget->state->render_color,
-                           current_widget->state->position.xy,
-                           vec2_add(current_widget->state->position.xy, current_widget->state->render_size),
-                           vec2(0, 0),
-                           vec2_zero(),
-                           vec2_zero());
-
-            ++ui_state->widget_item_count;
-        }
-
-        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
-        {
-            InvalidCodePath;
-        }
-
-        if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_TEXT)
-        {
-            vec3_t text_render_position = vec3(current_widget->state->position.x + current_widget->widget_padding.left,
-                                               current_widget->state->position.y + current_widget->widget_padding.bottom,
-                                               current_widget->state->position.z + -0.01); // some Epsilon
-            if((current_widget->widget_flags & UI_WIDGET_FLAG_HAS_TEXT_CONTENT) == 0)
-            {
-                immediate_text(command_list, 
-                              &ui_state->vertex_buffer, 
-                               ui_state->asset_manager,
-                              &ui_state->default_font,
-                               current_widget->widget_name,
-                               text_render_position, 
-                               ui_state->default_font_color,
-                               2.0,
-                               current_widget->font_size);
-
-                ui_state->widget_item_count += current_widget->widget_name.count;
-            }
-            else
-            {
-                string_t widget_text = {
-                    .data  = (u8*)(current_widget->widget_text_buffer->data + current_widget->state->widget_text_render_start_offset),
-                    .count = current_widget->state->widget_text_render_end_offset,
-                };
-                immediate_text(command_list, 
-                              &ui_state->vertex_buffer, 
-                               ui_state->asset_manager,
-                              &ui_state->default_font,
-                               widget_text,
-                               text_render_position, 
-                               ui_state->default_font_color,
-                               2.0,
-                               current_widget->font_size);
-
-                ui_state->widget_item_count += widget_text.count;
-            }
-        }
-
-        if(current_widget->widget_flags & UI_WIDGET_FLAG_DISPLAY_TEXTURE)
-        {
-            if(current_widget->display_texture->texture)
-            {
-                RHI_cmd_bind_texture_from_handle(command_list, current_widget->display_texture);
-
-                s32 texture_index = RHI_is_texture_bound(command_list, current_widget->display_texture->texture);
-                immediate_quad_ex(command_list,
-                                  &ui_state->vertex_buffer,
-                                  current_widget->state->position, 
-                                  current_widget->state->render_size,
-                                  current_widget->state->render_color,
-                                  current_widget->display_texture_uvmin,
-                                  current_widget->display_texture_uvmax,
-                                  vec2(1.0, texture_index),
-                                  vec2(current_widget->display_texture->texture->gpu_data.create_info.sampler_info.filtering, 0.0),
-                                  vec2_zero(),
-                                  current_widget->display_texture->texture);
-                ++ui_state->widget_item_count;
-            }
-        }
-
-        if(current_widget->first_child)
-        {
-            render_widget_hierarchy(ui_state, command_list, current_widget->first_child);
-        }
-
-        current_widget = current_widget->next_sibling;
-    }while(current_widget != first_widget);
-}
-
-void
-ui_state_render_widgets(ui_state_t *ui_state, RHI_command_list_t *command_list)
-{
-    RHI_context_t *RHI_context = ui_state->RHI_context;
-    asset_manager_t  *asset_manager  = ui_state->asset_manager;
-    (void)asset_manager;
-
-    widget_t *current_widget = ui_state->first_widget;
-    if(current_widget)
-    {
-        render_widget_hierarchy(ui_state, command_list, current_widget);
-
-        RHI_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
-        RHI_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
-
-        // NOTE(Sleepster): First, draw the normal rectangle widgets
-        {
-            RHI_pipeline_state_t pipeline_state = command_list->active_render_state;
-            pipeline_state.dst_color_blend_mode = RBM_OneMinusSrcAlpha;
-            pipeline_state.src_alpha_blend_mode = RBM_One;
-            pipeline_state.dst_alpha_blend_mode = RBM_Zero;
-
-            RHI_cmd_set_render_state(command_list, &pipeline_state);
-            RHI_cmd_use_shader_program(command_list, ui_state->widget_shader);
-            RHI_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
-
-            s32 window_width  = Max(RHI_context->window_size.x, 10);
-            s32 window_height = Max(RHI_context->window_size.y, 10);
-
-            RHI_cmd_update_constant_buffer(command_list, ui_state->camera_matrices_buffer, &ui_state->current_camera,   sizeof(camera_matrices_t));
-            RHI_cmd_update_constant_buffer(command_list, ui_state->widget_instance_data,    ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
-
-            RHI_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
-            RHI_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
-
-            RHI_cmd_draw_indexed(command_list, ui_state->widget_item_count * 6, 0, 1, 0);
-            RHI_buffer_reset(ui_state->RHI_context, &ui_state->vertex_buffer);
-            RHI_buffer_reset(ui_state->RHI_context, &ui_state->index_buffer);
-            ui_state->widget_instance_count = 0;
-        }
-    }
-    else
-    {
-        log_warning("Called ui_state_render_widgets on an empty ui_state_t... there are no widgets attached!!!\n");
-    }
-}
-
 internal_api void*
 widget_hash_table_allocate_impl(void *allocator, u32 allocation_size)
 {
@@ -775,81 +881,11 @@ widget_hash_table_allocate_impl(void *allocator, u32 allocation_size)
     return(result);
 }
 
-void
-ui_state_init(ui_state_t       *ui_state, 
-              input_manager_t  *input_manager,
-              asset_manager_t  *asset_manager, 
-              RHI_context_t *RHI_context, 
-              u32               renderpass_ID)
-{
-    ZeroStruct(*ui_state);
-    ui_state->widget_arena = c_arena_create(MB(10));
-    ui_state->persistent_data_arena = c_arena_create(MB(100));
-    ui_state->widget_states = c_hash_table_create<widget_state_t>(2096, 
-                                                                  &ui_state->persistent_data_arena, 
-                                                                  widget_hash_table_allocate_impl,
-                                                                  null);
-    ui_state->RHI_context           = RHI_context;
-    ui_state->asset_manager         = asset_manager;
-    ui_state->interface_framebuffer = renderpass_ID;
-    ui_state->parent_stack_top      = 1;
-    ui_state->hot_widget            = null;
-    ui_state->active_widget         = null;
-
-    // NOTE(Sleepster): Theme stuff 
-    ui_state->default_font = s_asset_manager_acquire_asset_handle(asset_manager, STR("LiberationMono_Regular"));
-
-    ui_state->default_widget_idle_color       = vec4(1.0, 1.0, 1.0, 1.0);
-    ui_state->default_widget_hover_color      = vec4(1.0, 0.0, 0.0, 1.0);
-    ui_state->default_widget_active_color     = vec4(0.0, 1.0, 0.0, 1.0);
-    ui_state->default_widget_border_color     = vec4(0.0, 0.0, 0.0, 1.0);
-    ui_state->default_font_color              = vec4(0.0, 0.0, 0.0, 1.0);
-
-    ui_state->default_font_size               = 32;
-    ui_state->default_widget_SDF_smoothness   = 1.0f;
-    ui_state->default_widget_border_thickness = 5;
-    // NOTE(Sleepster): Theme stuff 
-
-    ui_state->input_manager = input_manager;
-    ui_state->widget_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_widget"));
-
-    u32 *indices = c_arena_push_array(&RHI_context->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
-    u32  index_offset = 0;
-    for(u32 index = 0;
-        index < 60000;
-        index += 6)
-    {
-        indices[index + 0] = index_offset + 0;
-        indices[index + 1] = index_offset + 1;
-        indices[index + 2] = index_offset + 2;
-        indices[index + 3] = index_offset + 2;
-        indices[index + 4] = index_offset + 3;
-        indices[index + 5] = index_offset + 0;
-
-        index_offset += 4;
-    }
-
-    ui_state->interface_framebuffer = renderpass_ID;
-    const u32 VERTEX_BUFFER_SIZE = 4 * MAX_WIDGETS;
-    immediate_vertex_t *vertices = c_arena_push_array(&ui_state->persistent_data_arena, immediate_vertex_t, VERTEX_BUFFER_SIZE);
-    ui_state->vertex_buffer = RHI_vertex_buffer_create(RHI_context, 
-                                                       RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED,
-                                                       RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT,
-                                                       (byte*)vertices,
-                                                       sizeof(immediate_vertex_t),
-                                                       VERTEX_BUFFER_SIZE);
-    ui_state->index_buffer = RHI_index_buffer_create(RHI_context, 
-                                                     RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY,
-                                                     sizeof(u32),
-                                                     indices,
-                                                     sizeof(u32) * (6 * MAX_WIDGETS));
-    const u32 INSTANCE_BUFFER_SIZE = MAX_WIDGETS;
-    ui_state->widget_instances       = c_arena_push_array(&ui_state->persistent_data_arena, immediate_widget_data_t, INSTANCE_BUFFER_SIZE);
-    ui_state->widget_instance_data   = RHI_get_constant_buffer(RHI_context, STR("WidgetInstanceData"));
-    ui_state->camera_matrices_buffer = RHI_get_constant_buffer(RHI_context, STR("CameraMatrices"));
-}
-
-// NOTE(Sleepster): Widget functions
+/*
+================================
+UI_STATE WIDGET PROPERTIES
+================================
+*/
 
 true_inline void
 ui_widget_set_flags(widget_t *widget, u32 flags)
@@ -1390,7 +1426,7 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
         ui_widget_seed(ui_state, widget->ID);
         vec2_t slider_box_size = vec2((float32)bar_width * 0.1f, (float32)bar_height * button_scale_factor);
 
-        string_t box_name = c_string_concat(&gc->temporary_arena, STR("SLIDER_BOX_"), widget_name);
+        string_t box_name = c_string_concat(&gc->transient_arena, STR("SLIDER_BOX_"), widget_name);
         ui_signal_t slider_button = ui_widget_sized_button(ui_state, 
                                                            box_name, 
                                                            slider_box_size, 
@@ -1445,8 +1481,34 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
         widget_state->toggled = false;
     }
 
-    if(widget_state->toggled)
+    if(widget_state->toggled && ui_state->input_focused)
     {
+        for(u32 event_index = 0;
+            event_index < ui_state->ui_event_count;
+            ++event_index)
+        {
+            input_event_t *event = ui_state->ui_events + event_index;
+            if(event->input_stream.count > 0)
+            {
+                if(!event->consumed)
+                {
+                    event->consumed = true;
+                    for(s32 stream_index = 0;
+                        stream_index < event->input_stream.count;
+                        ++stream_index)
+                    {
+                        s32 index = widget->widget_text_buffer->count + stream_index;
+                        widget->widget_text_buffer->data[index] = event->input_stream.data[stream_index];
+                    }
+
+                    widget->widget_text_buffer->count += event->input_stream.count;
+                }
+            }
+            else
+            {
+            }
+        }
+#if 0
         // NOTE(Sleepster): Handle text input
         for(s32 event_index = 0;
             event_index < ui_state->ui_controller->event_count;
@@ -1458,7 +1520,6 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
             input_event_t *input = ui_state->ui_controller->events + event_index;
 
             // NOTE(Sleepster): Input stream, like WM_CHAR events 
-#if 0
             if()
             {
                 // NOTE(Sleepster): Safe to use here since SDL GUARANTEES that this will be null terminated 
@@ -1499,9 +1560,9 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
                     }
                 }
             }
-#endif
             input->consumed = true;
         }
+#endif
 
         widget_state->widget_text_render_start_offset = 0;
         widget_state->widget_text_render_end_offset   = widget->widget_text_buffer->count;
@@ -1554,7 +1615,7 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
         {
             ui_widget_seed(ui_state, widget->ID);
 
-            string_t name = c_string_concat(&gc->temporary_arena, STR("TEXT_BOX_CURSOR_"), widget_name);
+            string_t name = c_string_concat(&gc->transient_arena, STR("TEXT_BOX_CURSOR_"), widget_name);
             ui_signal_t signal = ui_widget_rectangle(ui_state, name, vec2(12, size.y), {UI_WIDGET_SIZE_KIND_PIXELS, UI_WIDGET_SIZE_KIND_PIXELS});
 
             widget_t *rect = signal.widget;

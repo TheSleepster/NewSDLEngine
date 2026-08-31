@@ -18,8 +18,9 @@ c_global_context_init()
 {
     Assert(!gc);
 
-    gc = c_arena_bootstrap_allocate_struct(global_context_t, context_arena, MB(100));
-    gc->temporary_arena = c_arena_create(MB(200));
+    gc = c_arena_bootstrap_allocate_struct(global_context_t, persistent_arena, MB(100));
+    gc->transient_arena  = c_arena_create(MB(200));
+    gc->simulation_arena = c_arena_create(MB(200));
     Assert(gc != null);
 
     // TODO(Sleepster): why the hell is this an undefined reference????
@@ -30,13 +31,19 @@ c_global_context_init()
 }
 
 void
-c_global_context_reset_temporary_data()
+c_global_context_reset_transient_arena()
 {
-    c_arena_reset(&gc->temporary_arena);
+    c_arena_reset(&gc->transient_arena);
 }
 
 void
-c_global_context_reset_context_arena()
+c_global_context_reset_persistent_arena()
 {
-    c_arena_reset(&gc->context_arena);
+    c_arena_reset(&gc->persistent_arena);
+}
+
+void
+c_global_context_reset_simulation_arena()
+{
+    c_arena_reset(&gc->simulation_arena);
 }

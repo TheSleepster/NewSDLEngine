@@ -276,7 +276,7 @@ vk_backend_check_physical_device_support(gpu_info_t *info)
         required_index < required_exts;
         ++required_index)
     {
-        for(u32 gpu_ext_index = 0;
+        for(s32 gpu_ext_index = 0;
             gpu_ext_index < info->extension_properties.count;
             ++gpu_ext_index)
         {
@@ -343,7 +343,7 @@ vk_backend_create_instance(vulkan_context_t *vulkan_context)
     c_dynarray_reserve(&found_validation_layers, total_validation_layers);
 
     vkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, found_validation_layers.items));
-    for(u32 layer_index = 0;
+    for(s32 layer_index = 0;
         layer_index < validation_layers.used;
         ++layer_index)
     {
@@ -835,7 +835,7 @@ vk_backend_choose_surface_format(dynarray_t<VkSurfaceFormatKHR> formats)
     }
     else
     {
-        for(u32 format_index =0; 
+        for(s32 format_index =0; 
             format_index < formats.count;
             ++format_index) 
         {
@@ -864,7 +864,7 @@ vk_backend_choose_present_mode(dynarray_t<VkPresentModeKHR> present_modes)
     // NOTE(Sleepster): We prefer mailbox, but if it doesn't exist of this device,
     // just use immediate mode.
     VkPresentModeKHR result = VK_PRESENT_MODE_FIFO_KHR;
-    for(u32 present_index = 0;
+    for(s32 present_index = 0;
         present_index < present_modes.count;
         ++present_index)
     {
@@ -1678,12 +1678,12 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
     vulkan_context->default_linear_sampler  = vk_backend_sampler_create(vulkan_context, &vulkan_context->default_linear_sampler_info);
 
     string_t nearest_sampler_data = {
-        .data  = (byte*)&nearest_sampler_data,
+        .data  = (byte*)&vulkan_context->default_nearest_sampler_info,
         .count = sizeof(vulkan_sampler_info_t)
     };
 
     string_t linear_sampler_data = {
-        .data  = (byte*)&linear_sampler_data,
+        .data  = (byte*)&vulkan_context->default_linear_sampler_info,
         .count = sizeof(vulkan_sampler_info_t)
     };
 
@@ -2491,9 +2491,9 @@ vk_backend_perform_image_blit(vulkan_context_t *vulkan_context,
 internal_api void
 vk_backend_bind_command_list_vertex_buffers(VkCommandBuffer *render_command_buffer, RHI_command_list_t *command_list)
 {
-    VkBuffer *handles     = c_arena_push_array(&gc->temporary_arena, VkBuffer,     command_list->vertex_buffer_count);
-    VkDeviceSize *offsets = c_arena_push_array(&gc->temporary_arena, VkDeviceSize, command_list->vertex_buffer_count);
-    for(u32 buffer_index = 0;
+    VkBuffer *handles     = c_arena_push_array(&gc->transient_arena, VkBuffer,     command_list->vertex_buffer_count);
+    VkDeviceSize *offsets = c_arena_push_array(&gc->transient_arena, VkDeviceSize, command_list->vertex_buffer_count);
+    for(s32 buffer_index = 0;
         buffer_index < command_list->active_vertex_buffers.used;
         ++buffer_index)
     {

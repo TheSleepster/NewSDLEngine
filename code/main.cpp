@@ -137,6 +137,15 @@ handle_debug_ui_menu(ui_state_t *main_ui, RHI_context_t *RHI_context, asset_hand
                                                        vec4(10, 10, 10, 10), 
                                                        vec4(0.4, 0.4, 0.4, 0.5),
                                                        0);
+    if(rect2_point_in_rect(main_panel.widget->state->widget_rect, main_ui->mouse_position))
+    {
+        main_ui->input_focused = true;
+    }
+    else
+    {
+        main_ui->input_focused = false;
+    }
+
     ui_column(main_ui, main_panel.widget)
     {
         ui_widget_set_default_font_size(main_ui, 40);
@@ -165,7 +174,7 @@ handle_debug_ui_menu(ui_state_t *main_ui, RHI_context_t *RHI_context, asset_hand
 
         if(main_panel.widget->toggled)
         {
-ui_widget_divider(main_ui, 
+            ui_widget_divider(main_ui, 
                               STR("main menu divider"), 
                               vec2(0.9, 5.0f), 
                               {UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, UI_WIDGET_SIZE_KIND_PIXELS});
@@ -230,16 +239,7 @@ ui_widget_divider(main_ui,
 
             ui_widget_labeled_button(main_ui, STR("Enable Editor"));
 
-            ui_signal_t textbox = ui_widget_textbox(main_ui, STR("Information Box"), &global_test_textbox_string, {400, 20});
-            if(textbox.widget->state->toggled)
-            {
-                main_ui->input_focused = true;
-            }
-            else
-            {
-                main_ui->input_focused = false;
-            }
-
+            ui_widget_textbox(main_ui, STR("Information Box"), &global_test_textbox_string, {400, 20});
             ui_signal_t editor_select_panel = ui_widget_panel(main_ui, 
                                                               STR("editor_select_panel"),
                                                               vec2(0, 0), 
@@ -288,8 +288,6 @@ ui_widget_divider(main_ui,
                 }
             }
         }
-
-        ui_state_maybe_eat_inputs(main_ui);
     }
 }
 
@@ -310,7 +308,7 @@ entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager)
     result->size     = vec2(15, 18);
     result->animation_state = PLAYER_ANIMATION_STATE_RUNNING;
 
-    result->animations      = c_arena_push_array(&gc->context_arena, animation2D_t, PLAYER_ANIMATION_STATE_COUNT);
+    result->animations      = c_arena_push_array(&gc->persistent_arena, animation2D_t, PLAYER_ANIMATION_STATE_COUNT);
     result->animation_count = PLAYER_ANIMATION_STATE_COUNT;
     result->bounding_box    = rect2_create(result->position, result->size);
 
@@ -630,7 +628,7 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
     game_action_mapping_t keyboard_movement_mapping = (game_action_mapping_t) {
         .bindings = {{SDL_SCANCODE_W}, {SDL_SCANCODE_S}, {SDL_SCANCODE_A}, {SDL_SCANCODE_D}},
         .binding_count = 4,
-        .controller_type = INPUT_CONTROLLER_TYPE_KEYBOARD
+        .controller_type = INPUT_DEVICE_TYPE_KEYBOARD
     };
     s_im_game_action_add_mapping(movement_action, &keyboard_movement_mapping);
 
@@ -640,7 +638,7 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
             {SDL_GAMEPAD_AXIS_LEFTX, INPUT_MANAGER_BINDING_TYPE_JOYSTICK}
         },
         .binding_count   = 2,
-        .controller_type = INPUT_CONTROLLER_TYPE_GAMEPAD 
+        .controller_type = INPUT_DEVICE_TYPE_GAMEPAD 
     };
     s_im_game_action_add_mapping(movement_action, &controller_movement_mapping);
     game_state->mappings.move = movement_action;
@@ -650,14 +648,14 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
     game_action_mapping_t keyboard_jump_mapping = (game_action_mapping_t) {
         .bindings = {{SDL_SCANCODE_SPACE}},
         .binding_count = 1,
-        .controller_type = INPUT_CONTROLLER_TYPE_KEYBOARD
+        .controller_type = INPUT_DEVICE_TYPE_KEYBOARD
     };
     s_im_game_action_add_mapping(jump_action, &keyboard_jump_mapping);
 
     game_action_mapping_t gamepad_jump_mapping = (game_action_mapping_t) {
         .bindings = {{SDL_GAMEPAD_BUTTON_SOUTH}},
         .binding_count = 1,
-        .controller_type = INPUT_CONTROLLER_TYPE_GAMEPAD
+        .controller_type = INPUT_DEVICE_TYPE_GAMEPAD
     };
     s_im_game_action_add_mapping(jump_action, &gamepad_jump_mapping);
     game_state->mappings.jump = jump_action;
@@ -667,14 +665,14 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
     game_action_mapping_t keyboard_dash_mapping = (game_action_mapping_t) {
         .bindings = {{SDL_SCANCODE_LSHIFT}},
         .binding_count = 1,
-        .controller_type = INPUT_CONTROLLER_TYPE_KEYBOARD 
+        .controller_type = INPUT_DEVICE_TYPE_KEYBOARD 
     };
     s_im_game_action_add_mapping(dash_action, &keyboard_dash_mapping);
 
     game_action_mapping_t gamepad_dash_mapping = (game_action_mapping_t) {
         .bindings = {{SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1}},
         .binding_count = 1,
-        .controller_type = INPUT_CONTROLLER_TYPE_GAMEPAD
+        .controller_type = INPUT_DEVICE_TYPE_GAMEPAD
     };
     s_im_game_action_add_mapping(dash_action, &gamepad_dash_mapping);
     game_state->mappings.dash = dash_action;
@@ -825,8 +823,8 @@ game_main(void)
     render_state_t render_state = {};
     game_state_t game_state     = {};
 
-    game_state.controller     = gc->input_manager->controllers.items;
-    game_state.entity_manager = c_arena_push_struct(&gc->context_arena, entity_manager_t);
+    //game_state.controller     = s_im_get_controller_from_active_device(input_manager, game_state.controller);
+    game_state.entity_manager = c_arena_push_struct(&gc->persistent_arena, entity_manager_t);
     game_state.entity_manager->transient_storage = c_arena_create(MB(100));
 
     game_state.gravity = -9.8f;
@@ -850,7 +848,7 @@ game_main(void)
     s_texture_atlas_add_texture(atlas, &player_sprite);
     s_texture_atlas_add_texture(atlas, &player_sprite_sheet);
 
-    global_test_textbox_string.data  = c_arena_push_array(&gc->context_arena, byte, 256);
+    global_test_textbox_string.data  = c_arena_push_array(&gc->persistent_arena, byte, 256);
     global_test_textbox_string.count = 0;
 
     // GAME INIT
@@ -877,19 +875,10 @@ game_main(void)
         process_window_events(render_state.RHI_context, input_manager);
         c_file_watcher_process_changes(&gc->file_watcher);
 
-        game_state.controller = input_manager->controllers + input_manager->active_controller_index;
+        game_state.controller = s_im_get_controller_from_active_device(input_manager, game_state.controller);
         if(game_state.open_debug_menu)
         {
             handle_debug_ui_menu(main_ui, render_state.RHI_context, &player_sprite);
-        }
-
-        // NOTE(Sleepster): Debug menu 
-        if(game_state.controller->type == INPUT_CONTROLLER_TYPE_KEYBOARD)
-        {
-            //if(s_im_is_keyboard_key_pressed(game_state.controller, SDL_SCANCODE_SEMICOLON))
-            //{
-                //game_state.open_debug_menu = !game_state.open_debug_menu;
-            //}
         }
 
         // NOTE(Sleepster): Simulate loop 
@@ -904,75 +893,24 @@ game_main(void)
         {
             if(first_tick)
             {
+                ui_state_get_input_events(main_ui);
                 // NOTE(Sleepster): Apply events. 
-                for(s32 controller_index = 0;
-                    controller_index < input_manager->connected_controller_count;
-                    ++controller_index)
+                s_im_apply_events_to_controller(game_state.controller, game_state.controller->device->events, true);
+
+                // NOTE(Sleepster): Debug menu 
+                if(game_state.controller->type == INPUT_DEVICE_TYPE_KEYBOARD)
                 {
-                    input_controller_t *current_controller = input_manager->controllers + controller_index;
-                    for(s32 event_index = 0;
-                        event_index < current_controller->event_count;
-                        ++event_index)
+                    if(s_im_is_button_pressed(game_state.controller, SDL_SCANCODE_SEMICOLON))
                     {
-                        input_event_t *event = current_controller->events + event_index;
-                        if(!event->consumed && event->input_type == current_controller->type)
-                        {
-                            action_button_t *button = s_im_get_controller_action_button(current_controller, event->inputID);
-                            switch(event->type)
-                            {
-                                case INPUT_EVENT_TYPE_PRESSED:
-                                {
-                                    button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
-                                    button->flags &= ~INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
-
-                                    ++button->half_transition_count;
-                                }break;
-                                case INPUT_EVENT_TYPE_DOWN:
-                                {
-                                    button->flags |= INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN;
-                                    button->flags &= ~INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED;
-                                }break;
-                                case INPUT_EVENT_TYPE_RELEASED:
-                                {
-                                    button->flags |=  INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED;
-                                    button->flags &= ~(INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN|INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
-
-                                    ++button->half_transition_count;
-                                }break;
-                                case INPUT_EVENT_TYPE_AXIS_MOVED:
-                                {
-                                    if(current_controller->type == INPUT_CONTROLLER_TYPE_KEYBOARD)
-                                    {
-                                        if(event->inputID == INPUT_AXIS_MOUSE)
-                                        {
-                                            current_controller->keyboard.last_mouse_pos    = current_controller->keyboard.current_mouse_pos;
-                                            current_controller->keyboard.current_mouse_pos = event->axis_value;
-                                            current_controller->keyboard.mouse_delta       = event->axis_value - current_controller->keyboard.last_mouse_pos;
-                                        }
-                                        else if(event->inputID == INPUT_AXIS_MOUSE_WHEEL)
-                                        {
-                                            current_controller->keyboard.mouse_wheel_delta   = event->axis_value - current_controller->keyboard.current_mouse_wheel;
-                                            current_controller->keyboard.current_mouse_wheel = event->axis_value;
-                                        }
-                                        else
-                                        {
-                                            InvalidCodePath;
-                                        }
-                                    }
-                                    if(current_controller->type == INPUT_CONTROLLER_TYPE_GAMEPAD)
-                                    {
-                                        button->analog_value = event->axis_value;
-                                    }
-                                }break;
-                            }
-                        }
+                        game_state.open_debug_menu = !game_state.open_debug_menu;
                     }
                 }
 
-                s_im_clear_controller_events(game_state.controller);
                 s_im_update_game_action_states(input_manager, game_state.controller);
+                s_im_clear_device_events(game_state.controller->device);
 
                 first_tick = false;
+                c_global_context_reset_simulation_arena();
             }
 
             poll_player_input(&game_state);
@@ -1111,7 +1049,7 @@ game_main(void)
         RHI_buffer_reset(render_state.RHI_context, &render_state.index_buffer);
 
         s_asset_manager_update(asset_manager);
-        c_global_context_reset_temporary_data();
+        c_global_context_reset_transient_arena();
         c_arena_reset(&game_state.entity_manager->transient_storage);
 
         current_tsc = SDL_GetPerformanceCounter();

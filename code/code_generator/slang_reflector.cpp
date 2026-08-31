@@ -45,7 +45,7 @@ struct slang_reflector_module_t
 struct file_manager_t
 {
     ticket_mutex_t         mutex;
-    HashTable_t(string_t)  loaded_files;
+    hash_table_t<string_t> loaded_files;
 
     string_t               shader_directory;
     string_t               output_directory;
@@ -119,7 +119,7 @@ VISIT_FILES(shader_file_callback)
                 thread_arena = c_arena_create(MB(20));
             }
 
-            string_t *file_data = c_hash_table_get_value_ptr(&file_manager->loaded_files, filename);
+            string_t *file_data = c_hash_table_get_element_ptr(&file_manager->loaded_files, filename);
             if(file_data->count == 0)
             {
                 *file_data = c_file_read_entirety(fullname);
@@ -158,9 +158,9 @@ VISIT_FILES(shader_file_callback)
                                 // NOTE(Sleepster): Eat the ">" character... 
                                 c_tokenizer_get_next_token(tokenizer);
 
-                                u64 ID  = c_fnv_hash_value(included_filename.data, included_filename.count);
-                                    ID %= file_manager->loaded_files.header.max_entries;
-                                string_t *included_file = file_manager->loaded_files.data + ID;
+                                u64 ID  = c_hash_table_hash_key(included_filename);
+                                    ID %= file_manager->loaded_files.max_entries;
+                                string_t *included_file = file_manager->loaded_files + ID;
 
                                 string_t working_filedata = *included_file;
                                 if(included_file->count == 0)
@@ -232,7 +232,7 @@ VISIT_FILES(shader_file_callback)
                 thread_arena = c_arena_create(MB(20));
             }
 
-            string_t *file_data = c_hash_table_get_value_ptr(&file_manager->loaded_files, filename);
+            string_t *file_data = c_hash_table_get_element_ptr(&file_manager->loaded_files, filename);
             if(file_data->count == 0)
             {
                 *file_data = c_file_read_entirety(fullname);
@@ -513,7 +513,7 @@ main(int argc, char **argv)
     file_manager.shader_directory = STR(*shader_input_directory);
     file_manager.output_directory = STR(*shader_output_directory);
     file_manager.generated_c_files_output_directory = STR(*metagen_c_header_output_dir);
-    c_hash_table_init(&file_manager.loaded_files, 2048);
+    file_manager.loaded_files = c_hash_table_create<string_t>(2048);
 
     visit_file_data_t visit_info = c_directory_create_visit_data(shader_file_callback, true, &file_manager);
     c_directory_visit(STR(*shader_input_directory), &visit_info);

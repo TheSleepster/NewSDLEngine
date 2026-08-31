@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 struct input_event_t;
+struct input_device_t;
 
 // NOTE(Sleepster): Game Actions 
 constexpr s32 MAX_GAME_ACTION_BINDINGS = 4;
@@ -34,7 +35,7 @@ enum game_action_binding_type_t
 
 struct input_binding_state_t
 {
-    s32 flags;
+    u32 flags;
     s32 half_transition_count;
     s32 ID;
 };
@@ -115,30 +116,17 @@ struct keyboard_controller_data_t
 {
     action_button_t  input[MAX_KEYBOARD_BUTTONS];
     u32              modifier_flags;
-
-    vec2_t           current_mouse_pos;
-    vec2_t           last_mouse_pos;
-    vec2_t           mouse_delta;
-
-    vec2_t           mouse_wheel_delta;
-    vec2_t           current_mouse_wheel;
 };
 
 struct gamepad_controller_data_t
 {
-    SDL_Gamepad    *gamepad_data;
-    u32             gamepadID;
-
-    bool8           has_rumble;
-    s32             rumble_value;
-    float32         stick_deadzone;
-
     action_button_t buttons[SDL_GAMEPAD_BUTTON_COUNT + SDL_GAMEPAD_AXIS_COUNT];
 };
 
 // NOTE(Sleepster): Input Events 
 constexpr s32 MAX_INPUT_EVENTS = 100;
-constexpr u32 MAX_INPUT_CONTROLLERS = 4;
+constexpr u32 MAX_INPUT_CONTROLLERS = 10;
+constexpr u32 MAX_PHYSICAL_DEVICE_CONNECTIONS = 4;
 
 enum input_event_type_t
 {
@@ -149,11 +137,11 @@ enum input_event_type_t
     INPUT_EVENT_TYPE_TEXT_INPUT,
 };
 
-enum input_controller_type_t
+enum input_device_type_t
 {
-    INPUT_CONTROLLER_TYPE_INVALID,
-    INPUT_CONTROLLER_TYPE_KEYBOARD,
-    INPUT_CONTROLLER_TYPE_GAMEPAD,
+    INPUT_DEVICE_TYPE_INVALID,
+    INPUT_DEVICE_TYPE_KEYBOARD,
+    INPUT_DEVICE_TYPE_GAMEPAD,
 };
 
 enum input_axis_t
@@ -178,8 +166,8 @@ struct input_event_t
     s32      input_type;
     bool32   consumed;
 
-    s32      inputID;      // key / gamepad button
-    s32      controllerID; // owner controller
+    s32      inputID;    // key / gamepad button
+    s32      deviceID;   // owner device 
     u64      timestampMS;
 
     string_t input_stream;
@@ -187,30 +175,67 @@ struct input_event_t
 };
 
 // NOTE(Sleepster): I don't want this here... but the C++ compiler is too stupid to see it in the "Input Controllers" section 
+//
+// Also, this is NOT simply for "there is a keyboard and a gamepad connected to the system",
+// This is simply a sandbox of data needed to work with the physical device. 
+//
+// Meaning, 1 physical device can have MANY input_controller_t's.
+//
+// The physical controller should STORE the events, while the logical controllers should consume the events.
+//
+// the event list will be "first come first serve" with the logical devices.
 struct input_controller_t
 {
-    s32 type;
-    s32 ID;
-    s32 controller_index;
+    s32             type;
+    input_device_t *device;
 
-    s32                                      event_count;
-    array_t<input_event_t, MAX_INPUT_EVENTS> events;
+    s32                                         action_button_interactions;
+    array_t<action_button_t*, MAX_INPUT_EVENTS> action_buttons_interacted_with_this_frame;
     union {
         gamepad_controller_data_t  gamepad;
         keyboard_controller_data_t keyboard;
     };
 };
 
-// TODO(Sleepster): 
+struct input_device_t
+{
+    s32 type;
+    s32 ID;
+    s32 device_index;
+    s32 event_count;
+    s32 used_controller_count;
+    array_t<input_event_t, MAX_INPUT_EVENTS>           events;
+    array_t<input_controller_t, MAX_INPUT_CONTROLLERS> controllers;
+
+    // NOTE(Sleepster): Device owned data. 
+    union {
+        struct {
+            s32             rumble_value;
+            SDL_Gamepad    *handle;
+            bool8           has_rumble;
+            float32         stick_deadzone;
+        }gamepad_data;
+
+        struct {
+            vec2_t           current_mouse_pos;
+            vec2_t           last_mouse_pos;
+            vec2_t           mouse_delta;
+
+            vec2_t           mouse_wheel_delta;
+            vec2_t           current_mouse_wheel;
+        }keyboard_data;
+    };
+};
+
 struct input_manager_t 
 {
-    s32 event_count;
-    s32 connected_controller_count;
-    s32 active_controller_index;
+    s32                       event_count;
+    s32                       connected_device_count;
+    s32                       active_device_index;
+    dynarray_t<game_action_t> game_actions;
 
-    dynarray_t<game_action_t>                          game_actions;
-    array_t<input_controller_t, MAX_INPUT_CONTROLLERS> controllers;
-    array_t<input_event_t,      MAX_INPUT_EVENTS>      events;
+    array_t<input_event_t,  MAX_INPUT_EVENTS>                events;
+    array_t<input_device_t, MAX_PHYSICAL_DEVICE_CONNECTIONS> devices;
 };
 
 #define GameActionPressed(action)  ((action->button_flags) & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED)
@@ -220,11 +245,16 @@ struct input_manager_t
 // INTERFACE
 void s_im_init_input_manager(input_manager_t *input_manager);
 void s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager);
-void s_im_clear_controller_events(input_controller_t *controller);
+void s_im_apply_events_to_controller(input_controller_t *controller, array_view_t<input_event_t> events, bool8 auto_consume);
+void s_im_clear_device_events(input_device_t *device);
+void s_im_clear_controller_transient_state(input_controller_t *controller);
 
-input_controller_t* s_im_find_controller_by_ID(input_manager_t *input_manager, s32 ID, s32 *index_out);
-input_controller_t* s_im_find_first_gamepad_controller(input_manager_t *input_manager, s32 *index_out);
-input_controller_t* s_im_find_first_keyboard_controller(input_manager_t *input_manager, s32 *index_out);
+input_device_t* s_im_find_device_by_ID(input_manager_t *input_manager, s32 ID, s32 *index_out);
+input_device_t* s_im_find_first_keyboard_device(input_manager_t *input_manager, s32 *index_out);
+input_device_t* s_im_find_first_gamepad_device(input_manager_t *input_manager, s32 *index_out);
+
+input_controller_t* s_im_get_controller_from_active_device(input_manager_t *input_manager, input_controller_t *controller);
+
 vec2_t              s_im_transform_mouse_data(input_controller_t *controller, vec2_t surface_size, mat4_t view_matrix, mat4_t projection_matrix);
 
 input_binding_state_t s_im_get_button_binding_state(input_controller_t *controller, game_action_binding_t *binding);

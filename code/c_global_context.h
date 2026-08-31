@@ -32,18 +32,20 @@ typedef struct global_context
     file_watcher_t    file_watcher;
 
     // NOTE(Sleepster): Persistent allocations... Use sparingly... 
-    memory_arena_t    context_arena;
+    memory_arena_t    persistent_arena;
     // NOTE(Sleepster): Resets with each call to gc_reset_temporary_data() 
-    memory_arena_t    temporary_arena;
+    memory_arena_t    transient_arena;
+    // NOTE(Sleepster): Another arena you can reset whenever... Typically for simulation ticks
+    memory_arena_t    simulation_arena;
 
     float64           tick_rate;
     float64           tick_rate_ms;
 }global_context_t;
 
 void c_global_context_init();
-void c_global_context_reset_temporary_data();
-void c_global_context_reset_context_arena();
-void gc_reset_context_arena();
+void c_global_context_reset_transient_arena();
+void c_global_context_reset_persistent_arena();
+void c_global_context_reset_simulation_arena();
 
 extern thread_local global_context_t *gc;
 

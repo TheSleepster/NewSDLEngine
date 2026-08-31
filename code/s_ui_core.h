@@ -204,6 +204,7 @@ struct ui_state_t
 {
     // NOTE(Sleepster): Lasts one frame...
     memory_arena_t                    widget_arena;
+    memory_arena_t                    polling_arena;
     u32                               section_count;
 
     bool8                             frame_begun;
@@ -220,6 +221,10 @@ struct ui_state_t
 
     input_binding_state_t             left_mouse;
     input_binding_state_t             right_mouse;
+
+    array_t<input_event_t, 100>       ui_events;
+    u32                               ui_event_count;
+
     vec2_t                            mouse_position;
     vec2_t                            mouse_delta;
 
@@ -269,9 +274,13 @@ struct ui_state_t
     RHI_uniform_constant_buffer_t    *camera_matrices_buffer;
 };
 
-void      ui_state_init(ui_state_t *ui_state, input_manager_t *input_manager, asset_manager_t *asset_manager, RHI_context_t *RHI_context, u32 renderpass_ID);
+void             ui_state_init(ui_state_t *ui_state, input_manager_t *input_manager, asset_manager_t *asset_manager, RHI_context_t *RHI_context, u32 renderpass_ID);
+void             ui_state_poll_input_events(ui_state_t *ui_state);
+
+true_inline void ui_state_begin_frame(ui_state_t *ui_state);
+true_inline void ui_state_end_frame(ui_state_t *ui_state, RHI_command_list_t *command_list);
+
 void      ui_state_update_widget_state(ui_state_t *ui_state);
-void      ui_state_maybe_eat_inputs(ui_state_t *ui_state);
 void      ui_state_render_widgets(ui_state_t *ui_state, RHI_command_list_t *command_list);
 
 true_inline void ui_state_set_default_widget_idle_color(ui_state_t *ui_state, vec4_t color);
@@ -282,8 +291,6 @@ true_inline void ui_widget_set_default_font_size(ui_state_t *ui_state, u32 font_
 true_inline void ui_state_set_active_padding(ui_state_t *ui_state, vec4_t padding);
 true_inline void ui_widget_set_flags(widget_t *widget, u32 flags);
 
-true_inline void ui_state_begin_frame(ui_state_t *ui_state);
-true_inline void ui_state_end_frame(ui_state_t *ui_state, RHI_command_list_t *command_list);
 true_inline void ui_state_set_parent_layout(ui_state_t *ui_state, u32 layout_style);
 
 true_inline void ui_widget_set_layout(widget_t *widget, u32 layout_style);

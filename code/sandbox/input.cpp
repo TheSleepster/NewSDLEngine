@@ -272,7 +272,7 @@ find_controller_of_type(input_event_handler_t *event_handler, s32 type)
     return(result);
 }
 
-template <u32 capacity>
+template <int capacity>
 void
 append_input_event(array_t<input_event_t, capacity> *event_array, int *count_ptr, input_event_t *event)
 {
@@ -660,7 +660,7 @@ main(void)
                     s32 index = 0;
                     input_controller_t *controller = find_controller_by_ID(&event_handler, event.kdevice.which, &index);
 
-                    c_array_remove(&event_handler.controllers, index, event_handler.connected_controller_count);
+                    c_array_remove(event_handler.controllers, index, event_handler.connected_controller_count);
                     controller->ID = -1;
                     controller->controller_index = -1;
 
@@ -802,7 +802,7 @@ main(void)
                     controller->ID = -1;
                     controller->controller_index = -1;
 
-                    c_array_remove(&event_handler.controllers, index, event_handler.connected_controller_count);
+                    c_array_remove(event_handler.controllers, index, event_handler.connected_controller_count);
                     --event_handler.connected_controller_count;
                 }break;
                 case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
@@ -883,7 +883,7 @@ main(void)
             ++removal_index)
         {
             u32 index = redundant_events[removal_index];
-            c_array_remove(&event_handler.events, index, event_handler.event_count - removal_index);
+            c_array_remove(event_handler.events, index, event_handler.event_count - removal_index);
         }
 
         event_handler.event_count -= events_to_remove;
@@ -919,7 +919,6 @@ main(void)
         while(dt_accumulator >= gc->tick_rate)
         {
             input_controller_t *controller = event_handler.controllers + event_handler.active_controller_index;
-#if 0
             // NOTE(Sleepster): (fake) UI LOOP 
             for(s32 event_index = 0;
                 event_index < controller->event_count;
@@ -949,8 +948,8 @@ main(void)
                     }
                 }
             }
-#endif
 
+#if 0
             // NOTE(Sleepster): Resolve the game_actions
             for(game_action_t &action: event_handler.game_actions)
             {
@@ -973,10 +972,9 @@ main(void)
                     }break;
                 }
             }
-            controller->event_count = 0;
-
             printf("Axis value: '%.02f', '%.02f'...\n", movement_action->axis2D_value.x, movement_action->axis2D_value.y);
-
+#endif
+            controller->event_count = 0;
             if(jump_action->button_flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED)
             {
                 printf("jumped pressed\n");

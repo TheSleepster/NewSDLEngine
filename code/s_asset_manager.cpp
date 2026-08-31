@@ -236,7 +236,7 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
         {
             case TT_HashTag:
             {
-                c_tokenizer_eat_lines(&gc->temporary_arena, tokenizer, 1);
+                c_tokenizer_eat_lines(&gc->transient_arena, tokenizer, 1);
             }break;
             case TT_Identifier:
             {
@@ -298,7 +298,7 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
         {
             case TT_HashTag:
             {
-                c_tokenizer_eat_lines(&gc->temporary_arena, &tokenizer, 1);
+                c_tokenizer_eat_lines(&gc->transient_arena, &tokenizer, 1);
             }break;
             case TT_Identifier:
             {
@@ -1006,7 +1006,7 @@ s_asset_manager_update(asset_manager_t *asset_manager)
                 }
             }
 
-            string_t filepath = c_string_make_copy(&gc->temporary_arena, asset_file->file_info.filepath);
+            string_t filepath = c_string_make_copy(&gc->transient_arena, asset_file->file_info.filepath);
 
             c_dynarray_reset(&asset_file->loaded_assets);
             c_arena_reset(&asset_file->init_arena);

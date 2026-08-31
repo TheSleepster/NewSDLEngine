@@ -1051,7 +1051,7 @@ consolidate_AST_nodes(void)
         }
 
         // NOTE(Sleepster): Consolidate attributes 
-        for(u32 entry_index = 0;
+        for(s32 entry_index = 0;
             entry_index < parser->recorded_attributes.used_entries.used;
             ++entry_index)
         {
@@ -1249,7 +1249,7 @@ internal_api void
 parse_directory_type_data(void)
 {
     // NOTE(Sleepster): Read the data for each of the files and create their parsers 
-    for(u32 iterator = 0;
+    for(s32 iterator = 0;
         iterator < state.filenames.used;
         ++iterator)
     {
@@ -1261,7 +1261,7 @@ parse_directory_type_data(void)
     }
 
 #if 1
-    for(u32 file_index = 0;
+    for(s32 file_index = 0;
         file_index < state.filenames.used;
         ++file_index)
     {
@@ -1277,7 +1277,7 @@ parse_directory_type_data(void)
 
     consolidate_macro_tables();
 
-    for(u32 iterator = 0;
+    for(s32 iterator = 0;
         iterator < state.filenames.used;
         ++iterator)
     {
@@ -1423,7 +1423,8 @@ athena_excluded_type(string_t type_name)
     bool8 result = false;
     if(c_string_compare(type_name, STR("dynarray_t")) ||
        c_string_compare(type_name, STR("hash_table_t")) ||
-       c_string_compare(type_name, STR("array_t")))
+       c_string_compare(type_name, STR("array_t")) ||
+       c_string_compare(type_name, STR("array_view_t")))
     {
         result = true;
     }
@@ -1665,7 +1666,7 @@ athena_handle_type_info(const char *char_filepath, const char *output_path, bool
     c_string_builder_append_data(&file_builder, STR("#if !defined(ATHENA_GENERATED_FILE_H)\n#define ATHENA_GENERATED_FILE_H\n\n"));
     // NOTE(Sleepster): Define X macro for each of the types 
     c_string_builder_sprintf(&file_builder, "#define ATHENA_RTTI_COMPLETE_TYPE_LIST(X) \\\n");
-    for(u32 type_index = 0;
+    for(s32 type_index = 0;
         type_index < g_symbol_table.type_table.used_entries.used;
         ++type_index)
     {
@@ -1715,7 +1716,7 @@ athena_handle_type_info(const char *char_filepath, const char *output_path, bool
     }
     c_string_builder_append_data(&file_builder, STR("\n"));
     c_string_builder_append_data(&file_builder, STR("#define ATHENA_UNIQUE_TYPE_ID_LIST(X) \\\n"));
-    for(u32 type_index = 0;
+    for(s32 type_index = 0;
         type_index < g_symbol_table.type_table.used_entries.used;
         ++type_index)
     {    
@@ -1759,7 +1760,7 @@ CODE_GEN_IGNORE_FILE
 extern const type_info_t *const athena_type_information_array[];
 )"));
     // NOTE(Sleepster): Create the type structures. 
-    for(u32 type_index = 0;
+    for(s32 type_index = 0;
         type_index < g_symbol_table.type_table.used_entries.used;
         ++type_index)
     {
@@ -1831,7 +1832,7 @@ extern const type_info_t *const athena_type_information_array[];
     }
 
     // NOTE(Sleepster): Forward declare their items. 
-    for(u32 type_index = 0;
+    for(s32 type_index = 0;
         type_index < g_symbol_table.type_table.used_entries.used;
         ++type_index)
     {
@@ -1886,7 +1887,7 @@ extern const type_info_t *const athena_type_information_array[];
     c_string_builder_append_data(&file_builder, STR("\n"));
 
     // NOTE(Sleepster): Create a default version for these. 
-    for(u32 type_index = 0;
+    for(s32 type_index = 0;
         type_index < g_symbol_table.type_table.used_entries.used;
         ++type_index)
     {
@@ -2003,7 +2004,7 @@ extern const type_info_t *const athena_type_information_array[];
 
     // NOTE(Sleepster): Create the type array and link the enums to the types. 
     c_string_builder_sprintf(&file_builder, "constexpr const type_info_t *const athena_type_information_array[] = {\n");
-    for(u32 type_index = 0;
+    for(s32 type_index = 0;
         type_index < g_symbol_table.type_table.used_entries.used;
         ++type_index)
     {
@@ -2079,7 +2080,7 @@ extern const type_info_t *const athena_type_information_array[];
     c_string_builder_sprintf(&file_builder, "namespace Athena {\n");
     c_string_builder_sprintf(&file_builder, "namespace MemberLists {\n");
     // NOTE(Sleepster): Output enum classes for the access of members easily 
-    for(u32 type_index = 0;
+    for(s32 type_index = 0;
         type_index < g_symbol_table.type_table.used_entries.used;
         ++type_index)
     {
@@ -2137,7 +2138,7 @@ extern const type_info_t *const athena_type_information_array[];
 
     // NOTE(Sleepster): Then print out the arguments for each function
     c_string_builder_sprintf(&file_builder, "namespace ArgumentLists {\n");
-    for(u32 type_index = 0;
+    for(s32 type_index = 0;
         type_index < g_symbol_table.type_table.used_entries.used;
         ++type_index)
     {
@@ -2198,7 +2199,7 @@ extern const type_info_t *const athena_type_information_array[];
     for(const code_attribute_t &attrib: g_symbol_table.code_attributes)
     {
         c_string_builder_sprintf(&file_builder, "constexpr const type_info_t *ATTRIBUTE_%.*s_array[] = {\n", fprint_string(attrib.name));
-        for(u32 type_index = 0;
+        for(s32 type_index = 0;
             type_index < g_symbol_table.type_table.used_entries.used;
             ++type_index)
         {

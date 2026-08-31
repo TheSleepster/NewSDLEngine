@@ -180,7 +180,8 @@ template <typename... Args>
 internal_api void
 print(string_t message, Args... arguments)
 {
-    u32 argument_count = get_packed_argument_count(arguments...);
+    s32 argument_count = get_packed_argument_count(arguments...);
+    (void)argument_count;
 
     string_builder_t builder = {};
     c_string_builder_init(&builder, KB(100));

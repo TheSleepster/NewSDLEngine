@@ -156,7 +156,7 @@ parser_create(string_t filename, string_t file_data)
     Expect(g_language_info.language_primitive_types.items != null,
            "Cannot initialize the parser without primtive type information... Make sure you call initialize_default_language_info() before you call this function!\n");
 
-    for(u32 primitive_index = 0;
+    for(s32 primitive_index = 0;
         primitive_index < g_language_info.language_primitive_types.used;
         ++primitive_index)
     {
@@ -308,7 +308,7 @@ parser_substitute_macro_arguments(parser_t *parser, lexer_token_t macro_name, ma
                     dynarray_t<lexer_token_t> argument_inputs = argument_tokens.items[argument_index];
                     if(argument_tokens.items)
                     {
-                        for(u32 token_index = 0;
+                        for(s32 token_index = 0;
                             token_index < argument_inputs.used;
                             ++token_index)
                         {

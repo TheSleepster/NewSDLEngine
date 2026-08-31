@@ -934,7 +934,7 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
                                     current_vertex_buffer->inputRate = current_buffer_input_rate;
 
                                     current_vertex_buffer_stride = 0;
-                                    current_structure_name = c_string_make_copy(&gc->temporary_arena, structure_name);
+                                    current_structure_name = c_string_make_copy(&gc->transient_arena, structure_name);
                                 }
                                 current_buffer_input_rate = structure_name.data[0] == 'i' ? VK_VERTEX_INPUT_RATE_INSTANCE : VK_VERTEX_INPUT_RATE_VERTEX;
                                 current_structure_name    = structure_name;

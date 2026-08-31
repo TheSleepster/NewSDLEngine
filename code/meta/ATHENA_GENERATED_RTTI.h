@@ -50,6 +50,7 @@
 	X(duration_counter_t, &DEFAULT_typedata_structure_duration_counter_t.type_info) \
 	X(bool32, &DEFAULT_typedata_bool32) \
 	X(T, &DEFAULT_typedata_T) \
+	X(s32, &DEFAULT_typedata_s32) \
 	X(file_t, &DEFAULT_typedata_structure_file_t.type_info) \
 	X(mapped_file_t, &DEFAULT_typedata_structure_mapped_file_t.type_info) \
 	X(file_data_t, &DEFAULT_typedata_structure_file_data_t.type_info) \
@@ -60,7 +61,6 @@
 	X(zone_allocator_t, &DEFAULT_typedata_structure_zone_allocator_t.type_info) \
 	X(za_allocation_tag_t, &DEFAULT_typedata_structure_za_allocation_tag_t.type_info) \
 	X(s64, &DEFAULT_typedata_s64) \
-	X(s32, &DEFAULT_typedata_s32) \
 	X(sys_handle_t, &DEFAULT_typedata_sys_handle_t) \
 	X(file_watcher_t, &DEFAULT_typedata_structure_file_watcher_t.type_info) \
 	X(file_watcher_recorded_change_t, &DEFAULT_typedata_structure_file_watcher_recorded_change_t.type_info) \
@@ -151,10 +151,11 @@
 	X(keyboard_controller_data_t, &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info) \
 	X(gamepad_controller_data_t, &DEFAULT_typedata_structure_gamepad_controller_data_t.type_info) \
 	X(input_event_type_t, &DEFAULT_typedata_structure_input_event_type_t.type_info) \
-	X(input_controller_type_t, &DEFAULT_typedata_structure_input_controller_type_t.type_info) \
+	X(input_device_type_t, &DEFAULT_typedata_structure_input_device_type_t.type_info) \
 	X(input_axis_t, &DEFAULT_typedata_structure_input_axis_t.type_info) \
 	X(input_event_t, &DEFAULT_typedata_structure_input_event_t.type_info) \
 	X(input_controller_t, &DEFAULT_typedata_structure_input_controller_t.type_info) \
+	X(input_device_t, &DEFAULT_typedata_structure_input_device_t.type_info) \
 	X(SDL_Event, &DEFAULT_typedata_SDL_Event) \
 	X(mat4_t, &DEFAULT_typedata_mat4_t) \
 	X(SDL_Gamepad, &DEFAULT_typedata_SDL_Gamepad) \
@@ -354,6 +355,7 @@
 	X(TYPE_T) \
 	X(TYPE_begin) \
 	X(TYPE_end) \
+	X(TYPE_s32) \
 	X(TYPE_file_t) \
 	X(TYPE_mapped_file_t) \
 	X(TYPE_file_data_t) \
@@ -384,7 +386,6 @@
 	X(TYPE_c_directory_exists) \
 	X(TYPE_c_directory_create_visit_data) \
 	X(TYPE_c_directory_visit) \
-	X(TYPE_s32) \
 	X(TYPE_c_directory_get_file_count) \
 	X(TYPE_sys_handle_t) \
 	X(TYPE_file_watcher_t) \
@@ -402,9 +403,9 @@
 	X(TYPE_file_watcher_sys_watch_data_t) \
 	X(TYPE_global_context_t) \
 	X(TYPE_c_global_context_init) \
-	X(TYPE_c_global_context_reset_temporary_data) \
-	X(TYPE_c_global_context_reset_context_arena) \
-	X(TYPE_gc_reset_context_arena) \
+	X(TYPE_c_global_context_reset_transient_arena) \
+	X(TYPE_c_global_context_reset_persistent_arena) \
+	X(TYPE_c_global_context_reset_simulation_arena) \
 	X(TYPE_threadpool_t) \
 	X(TYPE_RHI_context_t) \
 	X(TYPE_input_manager_t) \
@@ -645,17 +646,22 @@
 	X(TYPE_keyboard_controller_data_t) \
 	X(TYPE_gamepad_controller_data_t) \
 	X(TYPE_input_event_type_t) \
-	X(TYPE_input_controller_type_t) \
+	X(TYPE_input_device_type_t) \
 	X(TYPE_input_axis_t) \
 	X(TYPE_input_event_t) \
 	X(TYPE_input_controller_t) \
+	X(TYPE_input_device_t) \
 	X(TYPE_s_im_init_input_manager) \
 	X(TYPE_SDL_Event) \
 	X(TYPE_s_im_handle_window_inputs) \
-	X(TYPE_s_im_clear_controller_events) \
-	X(TYPE_s_im_find_controller_by_ID) \
-	X(TYPE_s_im_find_first_gamepad_controller) \
-	X(TYPE_s_im_find_first_keyboard_controller) \
+	X(TYPE_array_view_t) \
+	X(TYPE_s_im_apply_events_to_controller) \
+	X(TYPE_s_im_clear_device_events) \
+	X(TYPE_s_im_clear_controller_transient_state) \
+	X(TYPE_s_im_find_device_by_ID) \
+	X(TYPE_s_im_find_first_keyboard_device) \
+	X(TYPE_s_im_find_first_gamepad_device) \
+	X(TYPE_s_im_get_controller_from_active_device) \
 	X(TYPE_mat4_t) \
 	X(TYPE_s_im_transform_mouse_data) \
 	X(TYPE_s_im_get_button_binding_state) \
@@ -668,8 +674,10 @@
 	X(TYPE_s_im_game_action_process_axis2D_state) \
 	X(TYPE_s_im_update_game_action_states) \
 	X(TYPE_s_im_get_controller_action_button) \
-	X(TYPE_SDL_Gamepad) \
 	X(TYPE_array_t) \
+	X(TYPE_gamepad_data) \
+	X(TYPE_keyboard_data) \
+	X(TYPE_SDL_Gamepad) \
 	X(TYPE_camera_matrices_t) \
 	X(TYPE_RHI_render_buffer_type_t) \
 	X(TYPE_RHI_render_buffer_advance_rate_t) \
@@ -789,8 +797,10 @@
 	X(TYPE_widget_t) \
 	X(TYPE_ui_state_t) \
 	X(TYPE_ui_state_init) \
+	X(TYPE_ui_state_poll_input_events) \
+	X(TYPE_ui_state_begin_frame) \
+	X(TYPE_ui_state_end_frame) \
 	X(TYPE_ui_state_update_widget_state) \
-	X(TYPE_ui_state_maybe_eat_inputs) \
 	X(TYPE_ui_state_render_widgets) \
 	X(TYPE_ui_state_set_default_widget_idle_color) \
 	X(TYPE_ui_state_set_default_widget_hover_color) \
@@ -799,8 +809,6 @@
 	X(TYPE_ui_widget_set_default_font_size) \
 	X(TYPE_ui_state_set_active_padding) \
 	X(TYPE_ui_widget_set_flags) \
-	X(TYPE_ui_state_begin_frame) \
-	X(TYPE_ui_state_end_frame) \
 	X(TYPE_ui_state_set_parent_layout) \
 	X(TYPE_ui_widget_set_layout) \
 	X(TYPE_ui_widget_push_parent) \
@@ -1956,7 +1964,7 @@ struct type_info_struct_global_context_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[12];
+		const type_info_member_t member_array[13];
 		struct {
 			const type_info_member_t is_initialized;
 			const type_info_member_t running;
@@ -1966,8 +1974,9 @@ struct type_info_struct_global_context_t {
 			const type_info_member_t asset_manager;
 			const type_info_member_t input_manager;
 			const type_info_member_t file_watcher;
-			const type_info_member_t context_arena;
-			const type_info_member_t temporary_arena;
+			const type_info_member_t persistent_arena;
+			const type_info_member_t transient_arena;
+			const type_info_member_t simulation_arena;
 			const type_info_member_t tick_rate;
 			const type_info_member_t tick_rate_ms;
 		}members;
@@ -1981,21 +1990,21 @@ struct type_info_procedure_c_global_context_init {
 	const type_info_member_t *argument_pointer;
 };
 
-struct type_info_procedure_c_global_context_reset_temporary_data {
+struct type_info_procedure_c_global_context_reset_transient_arena {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 };
 
-struct type_info_procedure_c_global_context_reset_context_arena {
+struct type_info_procedure_c_global_context_reset_persistent_arena {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 };
 
-struct type_info_procedure_gc_reset_context_arena {
+struct type_info_procedure_c_global_context_reset_simulation_arena {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -2071,11 +2080,11 @@ struct type_info_struct_input_manager_t {
 		const type_info_member_t member_array[6];
 		struct {
 			const type_info_member_t event_count;
-			const type_info_member_t connected_controller_count;
-			const type_info_member_t active_controller_index;
+			const type_info_member_t connected_device_count;
+			const type_info_member_t active_device_index;
 			const type_info_member_t game_actions;
-			const type_info_member_t controllers;
 			const type_info_member_t events;
+			const type_info_member_t devices;
 		}members;
 	};
 };
@@ -5279,15 +5288,10 @@ struct type_info_struct_keyboard_controller_data_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[7];
+		const type_info_member_t member_array[2];
 		struct {
 			const type_info_member_t input;
 			const type_info_member_t modifier_flags;
-			const type_info_member_t current_mouse_pos;
-			const type_info_member_t last_mouse_pos;
-			const type_info_member_t mouse_delta;
-			const type_info_member_t mouse_wheel_delta;
-			const type_info_member_t current_mouse_wheel;
 		}members;
 	};
 };
@@ -5297,13 +5301,8 @@ struct type_info_struct_gamepad_controller_data_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[6];
+		const type_info_member_t member_array[1];
 		struct {
-			const type_info_member_t gamepad_data;
-			const type_info_member_t gamepadID;
-			const type_info_member_t has_rumble;
-			const type_info_member_t rumble_value;
-			const type_info_member_t stick_deadzone;
 			const type_info_member_t buttons;
 		}members;
 	};
@@ -5325,16 +5324,16 @@ struct type_info_struct_input_event_type_t {
 	};
 };
 
-struct type_info_struct_input_controller_type_t {
+struct type_info_struct_input_device_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
 		const type_info_member_t member_array[3];
 		struct {
-			const type_info_member_t INPUT_CONTROLLER_TYPE_INVALID;
-			const type_info_member_t INPUT_CONTROLLER_TYPE_KEYBOARD;
-			const type_info_member_t INPUT_CONTROLLER_TYPE_GAMEPAD;
+			const type_info_member_t INPUT_DEVICE_TYPE_INVALID;
+			const type_info_member_t INPUT_DEVICE_TYPE_KEYBOARD;
+			const type_info_member_t INPUT_DEVICE_TYPE_GAMEPAD;
 		}members;
 	};
 };
@@ -5369,7 +5368,7 @@ struct type_info_struct_input_event_t {
 			const type_info_member_t input_type;
 			const type_info_member_t consumed;
 			const type_info_member_t inputID;
-			const type_info_member_t controllerID;
+			const type_info_member_t deviceID;
 			const type_info_member_t timestampMS;
 			const type_info_member_t input_stream;
 			const type_info_member_t axis_value;
@@ -5382,15 +5381,34 @@ struct type_info_struct_input_controller_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[7];
+		const type_info_member_t member_array[6];
+		struct {
+			const type_info_member_t type;
+			const type_info_member_t device;
+			const type_info_member_t action_button_interactions;
+			const type_info_member_t action_buttons_interacted_with_this_frame;
+			const type_info_member_t gamepad;
+			const type_info_member_t keyboard;
+		}members;
+	};
+};
+
+struct type_info_struct_input_device_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[9];
 		struct {
 			const type_info_member_t type;
 			const type_info_member_t ID;
-			const type_info_member_t controller_index;
+			const type_info_member_t device_index;
 			const type_info_member_t event_count;
+			const type_info_member_t used_controller_count;
 			const type_info_member_t events;
-			const type_info_member_t gamepad;
-			const type_info_member_t keyboard;
+			const type_info_member_t controllers;
+			const type_info_member_t gamepad_data;
+			const type_info_member_t keyboard_data;
 		}members;
 	};
 };
@@ -5422,7 +5440,35 @@ struct type_info_procedure_s_im_handle_window_inputs {
 	};
 };
 
-struct type_info_procedure_s_im_clear_controller_events {
+struct type_info_procedure_s_im_apply_events_to_controller {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[3];
+		struct {
+			const type_info_member_t controller;
+			const type_info_member_t events;
+			const type_info_member_t auto_consume;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_s_im_clear_device_events {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t device;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_s_im_clear_controller_transient_state {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -5435,7 +5481,7 @@ struct type_info_procedure_s_im_clear_controller_events {
 	};
 };
 
-struct type_info_procedure_s_im_find_controller_by_ID {
+struct type_info_procedure_s_im_find_device_by_ID {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -5450,7 +5496,7 @@ struct type_info_procedure_s_im_find_controller_by_ID {
 	};
 };
 
-struct type_info_procedure_s_im_find_first_gamepad_controller {
+struct type_info_procedure_s_im_find_first_keyboard_device {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -5464,7 +5510,7 @@ struct type_info_procedure_s_im_find_first_gamepad_controller {
 	};
 };
 
-struct type_info_procedure_s_im_find_first_keyboard_controller {
+struct type_info_procedure_s_im_find_first_gamepad_device {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -5474,6 +5520,20 @@ struct type_info_procedure_s_im_find_first_keyboard_controller {
 		struct {
 			const type_info_member_t input_manager;
 			const type_info_member_t index_out;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_s_im_get_controller_from_active_device {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t input_manager;
+			const type_info_member_t controller;
 		}arguments;
 	};
 };
@@ -7304,9 +7364,10 @@ struct type_info_struct_ui_state_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[48];
+		const type_info_member_t member_array[51];
 		struct {
 			const type_info_member_t widget_arena;
+			const type_info_member_t polling_arena;
 			const type_info_member_t section_count;
 			const type_info_member_t frame_begun;
 			const type_info_member_t frame_ended;
@@ -7319,6 +7380,8 @@ struct type_info_struct_ui_state_t {
 			const type_info_member_t last_clicked_widget;
 			const type_info_member_t left_mouse;
 			const type_info_member_t right_mouse;
+			const type_info_member_t ui_events;
+			const type_info_member_t ui_event_count;
 			const type_info_member_t mouse_position;
 			const type_info_member_t mouse_delta;
 			const type_info_member_t persistent_data_arena;
@@ -7375,7 +7438,7 @@ struct type_info_procedure_ui_state_init {
 	};
 };
 
-struct type_info_procedure_ui_state_update_widget_state {
+struct type_info_procedure_ui_state_poll_input_events {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -7388,7 +7451,34 @@ struct type_info_procedure_ui_state_update_widget_state {
 	};
 };
 
-struct type_info_procedure_ui_state_maybe_eat_inputs {
+struct type_info_procedure_ui_state_begin_frame {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t ui_state;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_ui_state_end_frame {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t ui_state;
+			const type_info_member_t command_list;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_ui_state_update_widget_state {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -7509,33 +7599,6 @@ struct type_info_procedure_ui_widget_set_flags {
 		struct {
 			const type_info_member_t widget;
 			const type_info_member_t flags;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_ui_state_begin_frame {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t ui_state;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_ui_state_end_frame {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t ui_state;
-			const type_info_member_t command_list;
 		}arguments;
 	};
 };
@@ -9185,6 +9248,7 @@ extern const type_info_t DEFAULT_typedata_bool32;
 extern const type_info_t DEFAULT_typedata_T;
 extern const type_info_procedure_begin DEFAULT_typedata_procedure_begin;
 extern const type_info_procedure_end DEFAULT_typedata_procedure_end;
+extern const type_info_t DEFAULT_typedata_s32;
 extern const type_info_struct_file_t DEFAULT_typedata_structure_file_t;
 extern const type_info_struct_mapped_file_t DEFAULT_typedata_structure_mapped_file_t;
 extern const type_info_struct_file_data_t DEFAULT_typedata_structure_file_data_t;
@@ -9215,7 +9279,6 @@ extern const type_info_procedure_c_file_ext_string_to_enum DEFAULT_typedata_proc
 extern const type_info_procedure_c_directory_exists DEFAULT_typedata_procedure_c_directory_exists;
 extern const type_info_procedure_c_directory_create_visit_data DEFAULT_typedata_procedure_c_directory_create_visit_data;
 extern const type_info_procedure_c_directory_visit DEFAULT_typedata_procedure_c_directory_visit;
-extern const type_info_t DEFAULT_typedata_s32;
 extern const type_info_procedure_c_directory_get_file_count DEFAULT_typedata_procedure_c_directory_get_file_count;
 extern const type_info_t DEFAULT_typedata_sys_handle_t;
 extern const type_info_struct_file_watcher_t DEFAULT_typedata_structure_file_watcher_t;
@@ -9233,9 +9296,9 @@ extern const type_info_procedure_c_file_watcher_process_changes DEFAULT_typedata
 extern const type_info_t DEFAULT_typedata_file_watcher_sys_watch_data_t;
 extern const type_info_struct_global_context_t DEFAULT_typedata_structure_global_context_t;
 extern const type_info_procedure_c_global_context_init DEFAULT_typedata_procedure_c_global_context_init;
-extern const type_info_procedure_c_global_context_reset_temporary_data DEFAULT_typedata_procedure_c_global_context_reset_temporary_data;
-extern const type_info_procedure_c_global_context_reset_context_arena DEFAULT_typedata_procedure_c_global_context_reset_context_arena;
-extern const type_info_procedure_gc_reset_context_arena DEFAULT_typedata_procedure_gc_reset_context_arena;
+extern const type_info_procedure_c_global_context_reset_transient_arena DEFAULT_typedata_procedure_c_global_context_reset_transient_arena;
+extern const type_info_procedure_c_global_context_reset_persistent_arena DEFAULT_typedata_procedure_c_global_context_reset_persistent_arena;
+extern const type_info_procedure_c_global_context_reset_simulation_arena DEFAULT_typedata_procedure_c_global_context_reset_simulation_arena;
 extern const type_info_struct_threadpool_t DEFAULT_typedata_structure_threadpool_t;
 extern const type_info_struct_RHI_context_t DEFAULT_typedata_structure_RHI_context_t;
 extern const type_info_struct_input_manager_t DEFAULT_typedata_structure_input_manager_t;
@@ -9482,17 +9545,22 @@ extern const type_info_struct_action_button_t DEFAULT_typedata_structure_action_
 extern const type_info_struct_keyboard_controller_data_t DEFAULT_typedata_structure_keyboard_controller_data_t;
 extern const type_info_struct_gamepad_controller_data_t DEFAULT_typedata_structure_gamepad_controller_data_t;
 extern const type_info_struct_input_event_type_t DEFAULT_typedata_structure_input_event_type_t;
-extern const type_info_struct_input_controller_type_t DEFAULT_typedata_structure_input_controller_type_t;
+extern const type_info_struct_input_device_type_t DEFAULT_typedata_structure_input_device_type_t;
 extern const type_info_struct_input_axis_t DEFAULT_typedata_structure_input_axis_t;
 extern const type_info_struct_input_event_t DEFAULT_typedata_structure_input_event_t;
 extern const type_info_struct_input_controller_t DEFAULT_typedata_structure_input_controller_t;
+extern const type_info_struct_input_device_t DEFAULT_typedata_structure_input_device_t;
 extern const type_info_procedure_s_im_init_input_manager DEFAULT_typedata_procedure_s_im_init_input_manager;
 extern const type_info_t DEFAULT_typedata_SDL_Event;
 extern const type_info_procedure_s_im_handle_window_inputs DEFAULT_typedata_procedure_s_im_handle_window_inputs;
-extern const type_info_procedure_s_im_clear_controller_events DEFAULT_typedata_procedure_s_im_clear_controller_events;
-extern const type_info_procedure_s_im_find_controller_by_ID DEFAULT_typedata_procedure_s_im_find_controller_by_ID;
-extern const type_info_procedure_s_im_find_first_gamepad_controller DEFAULT_typedata_procedure_s_im_find_first_gamepad_controller;
-extern const type_info_procedure_s_im_find_first_keyboard_controller DEFAULT_typedata_procedure_s_im_find_first_keyboard_controller;
+extern const type_info_t DEFAULT_typedata_array_view_t;
+extern const type_info_procedure_s_im_apply_events_to_controller DEFAULT_typedata_procedure_s_im_apply_events_to_controller;
+extern const type_info_procedure_s_im_clear_device_events DEFAULT_typedata_procedure_s_im_clear_device_events;
+extern const type_info_procedure_s_im_clear_controller_transient_state DEFAULT_typedata_procedure_s_im_clear_controller_transient_state;
+extern const type_info_procedure_s_im_find_device_by_ID DEFAULT_typedata_procedure_s_im_find_device_by_ID;
+extern const type_info_procedure_s_im_find_first_keyboard_device DEFAULT_typedata_procedure_s_im_find_first_keyboard_device;
+extern const type_info_procedure_s_im_find_first_gamepad_device DEFAULT_typedata_procedure_s_im_find_first_gamepad_device;
+extern const type_info_procedure_s_im_get_controller_from_active_device DEFAULT_typedata_procedure_s_im_get_controller_from_active_device;
 extern const type_info_t DEFAULT_typedata_mat4_t;
 extern const type_info_procedure_s_im_transform_mouse_data DEFAULT_typedata_procedure_s_im_transform_mouse_data;
 extern const type_info_procedure_s_im_get_button_binding_state DEFAULT_typedata_procedure_s_im_get_button_binding_state;
@@ -9505,8 +9573,8 @@ extern const type_info_procedure_s_im_game_action_process_axis1D_state DEFAULT_t
 extern const type_info_procedure_s_im_game_action_process_axis2D_state DEFAULT_typedata_procedure_s_im_game_action_process_axis2D_state;
 extern const type_info_procedure_s_im_update_game_action_states DEFAULT_typedata_procedure_s_im_update_game_action_states;
 extern const type_info_procedure_s_im_get_controller_action_button DEFAULT_typedata_procedure_s_im_get_controller_action_button;
-extern const type_info_t DEFAULT_typedata_SDL_Gamepad;
 extern const type_info_t DEFAULT_typedata_array_t;
+extern const type_info_t DEFAULT_typedata_SDL_Gamepad;
 extern const type_info_struct_camera_matrices_t DEFAULT_typedata_structure_camera_matrices_t;
 extern const type_info_struct_RHI_render_buffer_type_t DEFAULT_typedata_structure_RHI_render_buffer_type_t;
 extern const type_info_struct_RHI_render_buffer_advance_rate_t DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t;
@@ -9624,8 +9692,10 @@ extern const type_info_struct_widget_size_kind_t DEFAULT_typedata_structure_widg
 extern const type_info_struct_widget_t DEFAULT_typedata_structure_widget_t;
 extern const type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t;
 extern const type_info_procedure_ui_state_init DEFAULT_typedata_procedure_ui_state_init;
+extern const type_info_procedure_ui_state_poll_input_events DEFAULT_typedata_procedure_ui_state_poll_input_events;
+extern const type_info_procedure_ui_state_begin_frame DEFAULT_typedata_procedure_ui_state_begin_frame;
+extern const type_info_procedure_ui_state_end_frame DEFAULT_typedata_procedure_ui_state_end_frame;
 extern const type_info_procedure_ui_state_update_widget_state DEFAULT_typedata_procedure_ui_state_update_widget_state;
-extern const type_info_procedure_ui_state_maybe_eat_inputs DEFAULT_typedata_procedure_ui_state_maybe_eat_inputs;
 extern const type_info_procedure_ui_state_render_widgets DEFAULT_typedata_procedure_ui_state_render_widgets;
 extern const type_info_procedure_ui_state_set_default_widget_idle_color DEFAULT_typedata_procedure_ui_state_set_default_widget_idle_color;
 extern const type_info_procedure_ui_state_set_default_widget_hover_color DEFAULT_typedata_procedure_ui_state_set_default_widget_hover_color;
@@ -9634,8 +9704,6 @@ extern const type_info_procedure_ui_widget_set_default_font_color DEFAULT_typeda
 extern const type_info_procedure_ui_widget_set_default_font_size DEFAULT_typedata_procedure_ui_widget_set_default_font_size;
 extern const type_info_procedure_ui_state_set_active_padding DEFAULT_typedata_procedure_ui_state_set_active_padding;
 extern const type_info_procedure_ui_widget_set_flags DEFAULT_typedata_procedure_ui_widget_set_flags;
-extern const type_info_procedure_ui_state_begin_frame DEFAULT_typedata_procedure_ui_state_begin_frame;
-extern const type_info_procedure_ui_state_end_frame DEFAULT_typedata_procedure_ui_state_end_frame;
 extern const type_info_procedure_ui_state_set_parent_layout DEFAULT_typedata_procedure_ui_state_set_parent_layout;
 extern const type_info_procedure_ui_widget_set_layout DEFAULT_typedata_procedure_ui_widget_set_layout;
 extern const type_info_procedure_ui_widget_push_parent DEFAULT_typedata_procedure_ui_widget_push_parent;
@@ -11085,6 +11153,11 @@ constexpr type_info_procedure_end DEFAULT_typedata_procedure_end = {
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_T,
 };
+constexpr type_info_t DEFAULT_typedata_s32 = {
+	.type_name = "s32",
+	.type_id = TYPE_s32,
+	.size = athena_internal::safe_sizeof<s32>(),
+};
 constexpr type_info_struct_file_t DEFAULT_typedata_structure_file_t = {
 	.type_info = {
 		.type_name = "file_t",
@@ -12222,11 +12295,6 @@ constexpr type_info_procedure_c_directory_visit DEFAULT_typedata_procedure_c_dir
 		},
 	},
 };
-constexpr type_info_t DEFAULT_typedata_s32 = {
-	.type_name = "s32",
-	.type_id = TYPE_s32,
-	.size = athena_internal::safe_sizeof<s32>(),
-};
 constexpr type_info_procedure_c_directory_get_file_count DEFAULT_typedata_procedure_c_directory_get_file_count = {
 	.type_info = {
 		.type_name = "c_directory_get_file_count",
@@ -12842,7 +12910,7 @@ constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_co
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<global_context_t>(),
 	},
-	.member_count   = 12,
+	.member_count   = 13,
 	.member_pointer = DEFAULT_typedata_structure_global_context_t.member_array,
 	.members = {
 		.is_initialized = {
@@ -12909,19 +12977,27 @@ constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_co
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.context_arena = {
+		.persistent_arena = {
 			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
-			.member_name   = "context_arena",
+			.member_name   = "persistent_arena",
 			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
-			.offset        = offsetof(global_context_t, context_arena),
+			.offset        = offsetof(global_context_t, persistent_arena),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.temporary_arena = {
+		.transient_arena = {
 			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
-			.member_name   = "temporary_arena",
+			.member_name   = "transient_arena",
 			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
-			.offset        = offsetof(global_context_t, temporary_arena),
+			.offset        = offsetof(global_context_t, transient_arena),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.simulation_arena = {
+			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
+			.member_name   = "simulation_arena",
+			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
+			.offset        = offsetof(global_context_t, simulation_arena),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -12953,28 +13029,28 @@ constexpr type_info_procedure_c_global_context_init DEFAULT_typedata_procedure_c
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
 };
-constexpr type_info_procedure_c_global_context_reset_temporary_data DEFAULT_typedata_procedure_c_global_context_reset_temporary_data = {
+constexpr type_info_procedure_c_global_context_reset_transient_arena DEFAULT_typedata_procedure_c_global_context_reset_transient_arena = {
 	.type_info = {
-		.type_name = "c_global_context_reset_temporary_data",
-		.type_id = TYPE_c_global_context_reset_temporary_data,
+		.type_name = "c_global_context_reset_transient_arena",
+		.type_id = TYPE_c_global_context_reset_transient_arena,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
 };
-constexpr type_info_procedure_c_global_context_reset_context_arena DEFAULT_typedata_procedure_c_global_context_reset_context_arena = {
+constexpr type_info_procedure_c_global_context_reset_persistent_arena DEFAULT_typedata_procedure_c_global_context_reset_persistent_arena = {
 	.type_info = {
-		.type_name = "c_global_context_reset_context_arena",
-		.type_id = TYPE_c_global_context_reset_context_arena,
+		.type_name = "c_global_context_reset_persistent_arena",
+		.type_id = TYPE_c_global_context_reset_persistent_arena,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
 	.return_type    = &DEFAULT_typedata_void,
 };
-constexpr type_info_procedure_gc_reset_context_arena DEFAULT_typedata_procedure_gc_reset_context_arena = {
+constexpr type_info_procedure_c_global_context_reset_simulation_arena DEFAULT_typedata_procedure_c_global_context_reset_simulation_arena = {
 	.type_info = {
-		.type_name = "gc_reset_context_arena",
-		.type_id = TYPE_gc_reset_context_arena,
+		.type_name = "c_global_context_reset_simulation_arena",
+		.type_id = TYPE_c_global_context_reset_simulation_arena,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 0,
@@ -13313,19 +13389,19 @@ constexpr type_info_struct_input_manager_t DEFAULT_typedata_structure_input_mana
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.connected_controller_count = {
+		.connected_device_count = {
 			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "connected_controller_count",
+			.member_name   = "connected_device_count",
 			.parent        = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.offset        = offsetof(input_manager_t, connected_controller_count),
+			.offset        = offsetof(input_manager_t, connected_device_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.active_controller_index = {
+		.active_device_index = {
 			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "active_controller_index",
+			.member_name   = "active_device_index",
 			.parent        = &DEFAULT_typedata_structure_input_manager_t.type_info,
-			.offset        = offsetof(input_manager_t, active_controller_index),
+			.offset        = offsetof(input_manager_t, active_device_index),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -20856,7 +20932,7 @@ constexpr type_info_struct_input_binding_state_t DEFAULT_typedata_structure_inpu
 	.member_pointer = DEFAULT_typedata_structure_input_binding_state_t.member_array,
 	.members = {
 		.flags = {
-			.type_info     = &DEFAULT_typedata_s32,
+			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "flags",
 			.parent        = &DEFAULT_typedata_structure_input_binding_state_t.type_info,
 			.offset        = offsetof(input_binding_state_t, flags),
@@ -21325,7 +21401,7 @@ constexpr type_info_struct_keyboard_controller_data_t DEFAULT_typedata_structure
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<keyboard_controller_data_t>(),
 	},
-	.member_count   = 7,
+	.member_count   = 2,
 	.member_pointer = DEFAULT_typedata_structure_keyboard_controller_data_t.member_array,
 	.members = {
 		.input = {
@@ -21344,46 +21420,6 @@ constexpr type_info_struct_keyboard_controller_data_t DEFAULT_typedata_structure
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.current_mouse_pos = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "current_mouse_pos",
-			.parent        = &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
-			.offset        = offsetof(keyboard_controller_data_t, current_mouse_pos),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.last_mouse_pos = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "last_mouse_pos",
-			.parent        = &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
-			.offset        = offsetof(keyboard_controller_data_t, last_mouse_pos),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.mouse_delta = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "mouse_delta",
-			.parent        = &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
-			.offset        = offsetof(keyboard_controller_data_t, mouse_delta),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.mouse_wheel_delta = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "mouse_wheel_delta",
-			.parent        = &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
-			.offset        = offsetof(keyboard_controller_data_t, mouse_wheel_delta),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.current_mouse_wheel = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "current_mouse_wheel",
-			.parent        = &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
-			.offset        = offsetof(keyboard_controller_data_t, current_mouse_wheel),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
 	},
 };
 
@@ -21394,49 +21430,9 @@ constexpr type_info_struct_gamepad_controller_data_t DEFAULT_typedata_structure_
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<gamepad_controller_data_t>(),
 	},
-	.member_count   = 6,
+	.member_count   = 1,
 	.member_pointer = DEFAULT_typedata_structure_gamepad_controller_data_t.member_array,
 	.members = {
-		.gamepad_data = {
-			.type_info     = &DEFAULT_typedata_SDL_Gamepad,
-			.member_name   = "gamepad_data",
-			.parent        = &DEFAULT_typedata_structure_gamepad_controller_data_t.type_info,
-			.offset        = offsetof(gamepad_controller_data_t, gamepad_data),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.gamepadID = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "gamepadID",
-			.parent        = &DEFAULT_typedata_structure_gamepad_controller_data_t.type_info,
-			.offset        = offsetof(gamepad_controller_data_t, gamepadID),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.has_rumble = {
-			.type_info     = &DEFAULT_typedata_bool8,
-			.member_name   = "has_rumble",
-			.parent        = &DEFAULT_typedata_structure_gamepad_controller_data_t.type_info,
-			.offset        = offsetof(gamepad_controller_data_t, has_rumble),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.rumble_value = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "rumble_value",
-			.parent        = &DEFAULT_typedata_structure_gamepad_controller_data_t.type_info,
-			.offset        = offsetof(gamepad_controller_data_t, rumble_value),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.stick_deadzone = {
-			.type_info     = &DEFAULT_typedata_float32,
-			.member_name   = "stick_deadzone",
-			.parent        = &DEFAULT_typedata_structure_gamepad_controller_data_t.type_info,
-			.offset        = offsetof(gamepad_controller_data_t, stick_deadzone),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
 		.buttons = {
 			.type_info     = &DEFAULT_typedata_structure_action_button_t.type_info,
 			.member_name   = "buttons",
@@ -21516,47 +21512,47 @@ constexpr type_info_struct_input_event_type_t DEFAULT_typedata_structure_input_e
 	},
 };
 
-constexpr type_info_struct_input_controller_type_t DEFAULT_typedata_structure_input_controller_type_t = {
+constexpr type_info_struct_input_device_type_t DEFAULT_typedata_structure_input_device_type_t = {
 	.type_info = {
-		.type_name = "input_controller_type_t",
-		.type_id = TYPE_input_controller_type_t,
+		.type_name = "input_device_type_t",
+		.type_id = TYPE_input_device_type_t,
 		.metatype  = ATHENA_METATYPE_ENUM,
-		.size = athena_internal::safe_sizeof<input_controller_type_t>(),
+		.size = athena_internal::safe_sizeof<input_device_type_t>(),
 	},
 	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_input_controller_type_t.member_array,
+	.member_pointer = DEFAULT_typedata_structure_input_device_type_t.member_array,
 	.members = {
-		.INPUT_CONTROLLER_TYPE_INVALID = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
-			.member_name   = "INPUT_CONTROLLER_TYPE_INVALID",
-			.parent        = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
+		.INPUT_DEVICE_TYPE_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_input_device_type_t.type_info,
+			.member_name   = "INPUT_DEVICE_TYPE_INVALID",
+			.parent        = &DEFAULT_typedata_structure_input_device_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
 				.type  = 2,
-				.int64 = INPUT_CONTROLLER_TYPE_INVALID,
+				.int64 = INPUT_DEVICE_TYPE_INVALID,
 			},
 		},
-		.INPUT_CONTROLLER_TYPE_KEYBOARD = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
-			.member_name   = "INPUT_CONTROLLER_TYPE_KEYBOARD",
-			.parent        = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
+		.INPUT_DEVICE_TYPE_KEYBOARD = {
+			.type_info     = &DEFAULT_typedata_structure_input_device_type_t.type_info,
+			.member_name   = "INPUT_DEVICE_TYPE_KEYBOARD",
+			.parent        = &DEFAULT_typedata_structure_input_device_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
 				.type  = 2,
-				.int64 = INPUT_CONTROLLER_TYPE_KEYBOARD,
+				.int64 = INPUT_DEVICE_TYPE_KEYBOARD,
 			},
 		},
-		.INPUT_CONTROLLER_TYPE_GAMEPAD = {
-			.type_info     = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
-			.member_name   = "INPUT_CONTROLLER_TYPE_GAMEPAD",
-			.parent        = &DEFAULT_typedata_structure_input_controller_type_t.type_info,
+		.INPUT_DEVICE_TYPE_GAMEPAD = {
+			.type_info     = &DEFAULT_typedata_structure_input_device_type_t.type_info,
+			.member_name   = "INPUT_DEVICE_TYPE_GAMEPAD",
+			.parent        = &DEFAULT_typedata_structure_input_device_type_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
 				.type  = 2,
-				.int64 = INPUT_CONTROLLER_TYPE_GAMEPAD,
+				.int64 = INPUT_DEVICE_TYPE_GAMEPAD,
 			},
 		},
 	},
@@ -21705,11 +21701,11 @@ constexpr type_info_struct_input_event_t DEFAULT_typedata_structure_input_event_
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.controllerID = {
+		.deviceID = {
 			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "controllerID",
+			.member_name   = "deviceID",
 			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
-			.offset        = offsetof(input_event_t, controllerID),
+			.offset        = offsetof(input_event_t, deviceID),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -21747,7 +21743,7 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<input_controller_t>(),
 	},
-	.member_count   = 7,
+	.member_count   = 6,
 	.member_pointer = DEFAULT_typedata_structure_input_controller_t.member_array,
 	.members = {
 		.type = {
@@ -21758,27 +21754,19 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.ID = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "ID",
+		.device = {
+			.type_info     = &DEFAULT_typedata_structure_input_device_t.type_info,
+			.member_name   = "device",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, ID),
-			.flags         = 0,
-			.pointer_depth = 0,
+			.offset        = offsetof(input_controller_t, device),
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
-		.controller_index = {
+		.action_button_interactions = {
 			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "controller_index",
+			.member_name   = "action_button_interactions",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, controller_index),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.event_count = {
-			.type_info     = &DEFAULT_typedata_s32,
-			.member_name   = "event_count",
-			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
-			.offset        = offsetof(input_controller_t, event_count),
+			.offset        = offsetof(input_controller_t, action_button_interactions),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -21795,6 +21783,59 @@ constexpr type_info_struct_input_controller_t DEFAULT_typedata_structure_input_c
 			.member_name   = "keyboard",
 			.parent        = &DEFAULT_typedata_structure_input_controller_t.type_info,
 			.offset        = offsetof(input_controller_t, keyboard),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_input_device_t DEFAULT_typedata_structure_input_device_t = {
+	.type_info = {
+		.type_name = "input_device_t",
+		.type_id = TYPE_input_device_t,
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.size = athena_internal::safe_sizeof<input_device_t>(),
+	},
+	.member_count   = 9,
+	.member_pointer = DEFAULT_typedata_structure_input_device_t.member_array,
+	.members = {
+		.type = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "type",
+			.parent        = &DEFAULT_typedata_structure_input_device_t.type_info,
+			.offset        = offsetof(input_device_t, type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.ID = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "ID",
+			.parent        = &DEFAULT_typedata_structure_input_device_t.type_info,
+			.offset        = offsetof(input_device_t, ID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.device_index = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "device_index",
+			.parent        = &DEFAULT_typedata_structure_input_device_t.type_info,
+			.offset        = offsetof(input_device_t, device_index),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.event_count = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "event_count",
+			.parent        = &DEFAULT_typedata_structure_input_device_t.type_info,
+			.offset        = offsetof(input_device_t, event_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.used_controller_count = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "used_controller_count",
+			.parent        = &DEFAULT_typedata_structure_input_device_t.type_info,
+			.offset        = offsetof(input_device_t, used_controller_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -21851,105 +21892,176 @@ constexpr type_info_procedure_s_im_handle_window_inputs DEFAULT_typedata_procedu
 		},
 	},
 };
-constexpr type_info_procedure_s_im_clear_controller_events DEFAULT_typedata_procedure_s_im_clear_controller_events = {
+constexpr type_info_procedure_s_im_apply_events_to_controller DEFAULT_typedata_procedure_s_im_apply_events_to_controller = {
 	.type_info = {
-		.type_name = "s_im_clear_controller_events",
-		.type_id = TYPE_s_im_clear_controller_events,
+		.type_name = "s_im_apply_events_to_controller",
+		.type_id = TYPE_s_im_apply_events_to_controller,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
-	.argument_count = 1,
+	.argument_count = 3,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_clear_controller_events.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_apply_events_to_controller.argument_array,
 	.arguments = {
 		.controller = {
 			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
 			.member_name   = "controller",
-			.parent        = &DEFAULT_typedata_procedure_s_im_clear_controller_events.type_info,
+			.parent        = &DEFAULT_typedata_procedure_s_im_apply_events_to_controller.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.auto_consume = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "auto_consume",
+			.parent        = &DEFAULT_typedata_procedure_s_im_apply_events_to_controller.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_s_im_clear_device_events DEFAULT_typedata_procedure_s_im_clear_device_events = {
+	.type_info = {
+		.type_name = "s_im_clear_device_events",
+		.type_id = TYPE_s_im_clear_device_events,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_clear_device_events.argument_array,
+	.arguments = {
+		.device = {
+			.type_info     = &DEFAULT_typedata_structure_input_device_t.type_info,
+			.member_name   = "device",
+			.parent        = &DEFAULT_typedata_procedure_s_im_clear_device_events.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
-constexpr type_info_procedure_s_im_find_controller_by_ID DEFAULT_typedata_procedure_s_im_find_controller_by_ID = {
+constexpr type_info_procedure_s_im_clear_controller_transient_state DEFAULT_typedata_procedure_s_im_clear_controller_transient_state = {
 	.type_info = {
-		.type_name = "s_im_find_controller_by_ID",
-		.type_id = TYPE_s_im_find_controller_by_ID,
+		.type_name = "s_im_clear_controller_transient_state",
+		.type_id = TYPE_s_im_clear_controller_transient_state,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_clear_controller_transient_state.argument_array,
+	.arguments = {
+		.controller = {
+			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.member_name   = "controller",
+			.parent        = &DEFAULT_typedata_procedure_s_im_clear_controller_transient_state.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_s_im_find_device_by_ID DEFAULT_typedata_procedure_s_im_find_device_by_ID = {
+	.type_info = {
+		.type_name = "s_im_find_device_by_ID",
+		.type_id = TYPE_s_im_find_device_by_ID,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 3,
-	.return_type    = &DEFAULT_typedata_structure_input_controller_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_find_controller_by_ID.argument_array,
+	.return_type    = &DEFAULT_typedata_structure_input_device_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_find_device_by_ID.argument_array,
 	.arguments = {
 		.input_manager = {
 			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
 			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_find_controller_by_ID.type_info,
+			.parent        = &DEFAULT_typedata_procedure_s_im_find_device_by_ID.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.ID = {
 			.type_info     = &DEFAULT_typedata_s32,
 			.member_name   = "ID",
-			.parent        = &DEFAULT_typedata_procedure_s_im_find_controller_by_ID.type_info,
+			.parent        = &DEFAULT_typedata_procedure_s_im_find_device_by_ID.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.index_out = {
 			.type_info     = &DEFAULT_typedata_s32,
 			.member_name   = "index_out",
-			.parent        = &DEFAULT_typedata_procedure_s_im_find_controller_by_ID.type_info,
+			.parent        = &DEFAULT_typedata_procedure_s_im_find_device_by_ID.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
-constexpr type_info_procedure_s_im_find_first_gamepad_controller DEFAULT_typedata_procedure_s_im_find_first_gamepad_controller = {
+constexpr type_info_procedure_s_im_find_first_keyboard_device DEFAULT_typedata_procedure_s_im_find_first_keyboard_device = {
 	.type_info = {
-		.type_name = "s_im_find_first_gamepad_controller",
-		.type_id = TYPE_s_im_find_first_gamepad_controller,
+		.type_name = "s_im_find_first_keyboard_device",
+		.type_id = TYPE_s_im_find_first_keyboard_device,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_structure_input_controller_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_find_first_gamepad_controller.argument_array,
+	.return_type    = &DEFAULT_typedata_structure_input_device_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_find_first_keyboard_device.argument_array,
 	.arguments = {
 		.input_manager = {
 			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
 			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_find_first_gamepad_controller.type_info,
+			.parent        = &DEFAULT_typedata_procedure_s_im_find_first_keyboard_device.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.index_out = {
 			.type_info     = &DEFAULT_typedata_s32,
 			.member_name   = "index_out",
-			.parent        = &DEFAULT_typedata_procedure_s_im_find_first_gamepad_controller.type_info,
+			.parent        = &DEFAULT_typedata_procedure_s_im_find_first_keyboard_device.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 	},
 };
-constexpr type_info_procedure_s_im_find_first_keyboard_controller DEFAULT_typedata_procedure_s_im_find_first_keyboard_controller = {
+constexpr type_info_procedure_s_im_find_first_gamepad_device DEFAULT_typedata_procedure_s_im_find_first_gamepad_device = {
 	.type_info = {
-		.type_name = "s_im_find_first_keyboard_controller",
-		.type_id = TYPE_s_im_find_first_keyboard_controller,
+		.type_name = "s_im_find_first_gamepad_device",
+		.type_id = TYPE_s_im_find_first_gamepad_device,
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 	},
 	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_structure_input_controller_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_s_im_find_first_keyboard_controller.argument_array,
+	.return_type    = &DEFAULT_typedata_structure_input_device_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_find_first_gamepad_device.argument_array,
 	.arguments = {
 		.input_manager = {
 			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
 			.member_name   = "input_manager",
-			.parent        = &DEFAULT_typedata_procedure_s_im_find_first_keyboard_controller.type_info,
+			.parent        = &DEFAULT_typedata_procedure_s_im_find_first_gamepad_device.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
 		.index_out = {
 			.type_info     = &DEFAULT_typedata_s32,
 			.member_name   = "index_out",
-			.parent        = &DEFAULT_typedata_procedure_s_im_find_first_keyboard_controller.type_info,
+			.parent        = &DEFAULT_typedata_procedure_s_im_find_first_gamepad_device.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_s_im_get_controller_from_active_device DEFAULT_typedata_procedure_s_im_get_controller_from_active_device = {
+	.type_info = {
+		.type_name = "s_im_get_controller_from_active_device",
+		.type_id = TYPE_s_im_get_controller_from_active_device,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_structure_input_controller_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_get_controller_from_active_device.argument_array,
+	.arguments = {
+		.input_manager = {
+			.type_info     = &DEFAULT_typedata_structure_input_manager_t.type_info,
+			.member_name   = "input_manager",
+			.parent        = &DEFAULT_typedata_procedure_s_im_get_controller_from_active_device.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.controller = {
+			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.member_name   = "controller",
+			.parent        = &DEFAULT_typedata_procedure_s_im_get_controller_from_active_device.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
@@ -27068,7 +27180,7 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<ui_state_t>(),
 	},
-	.member_count   = 48,
+	.member_count   = 51,
 	.member_pointer = DEFAULT_typedata_structure_ui_state_t.member_array,
 	.members = {
 		.widget_arena = {
@@ -27076,6 +27188,14 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.member_name   = "widget_arena",
 			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.offset        = offsetof(ui_state_t, widget_arena),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.polling_arena = {
+			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
+			.member_name   = "polling_arena",
+			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.offset        = offsetof(ui_state_t, polling_arena),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -27172,6 +27292,14 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.member_name   = "right_mouse",
 			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.offset        = offsetof(ui_state_t, right_mouse),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.ui_event_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "ui_event_count",
+			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.offset        = offsetof(ui_state_t, ui_event_count),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -27497,6 +27625,70 @@ constexpr type_info_procedure_ui_state_init DEFAULT_typedata_procedure_ui_state_
 		},
 	},
 };
+constexpr type_info_procedure_ui_state_poll_input_events DEFAULT_typedata_procedure_ui_state_poll_input_events = {
+	.type_info = {
+		.type_name = "ui_state_poll_input_events",
+		.type_id = TYPE_ui_state_poll_input_events,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_ui_state_poll_input_events.argument_array,
+	.arguments = {
+		.ui_state = {
+			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.member_name   = "ui_state",
+			.parent        = &DEFAULT_typedata_procedure_ui_state_poll_input_events.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_ui_state_begin_frame DEFAULT_typedata_procedure_ui_state_begin_frame = {
+	.type_info = {
+		.type_name = "ui_state_begin_frame",
+		.type_id = TYPE_ui_state_begin_frame,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_ui_state_begin_frame.argument_array,
+	.arguments = {
+		.ui_state = {
+			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.member_name   = "ui_state",
+			.parent        = &DEFAULT_typedata_procedure_ui_state_begin_frame.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_ui_state_end_frame DEFAULT_typedata_procedure_ui_state_end_frame = {
+	.type_info = {
+		.type_name = "ui_state_end_frame",
+		.type_id = TYPE_ui_state_end_frame,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_ui_state_end_frame.argument_array,
+	.arguments = {
+		.ui_state = {
+			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.member_name   = "ui_state",
+			.parent        = &DEFAULT_typedata_procedure_ui_state_end_frame.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_ui_state_end_frame.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr type_info_procedure_ui_state_update_widget_state DEFAULT_typedata_procedure_ui_state_update_widget_state = {
 	.type_info = {
 		.type_name = "ui_state_update_widget_state",
@@ -27511,25 +27703,6 @@ constexpr type_info_procedure_ui_state_update_widget_state DEFAULT_typedata_proc
 			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.member_name   = "ui_state",
 			.parent        = &DEFAULT_typedata_procedure_ui_state_update_widget_state.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_ui_state_maybe_eat_inputs DEFAULT_typedata_procedure_ui_state_maybe_eat_inputs = {
-	.type_info = {
-		.type_name = "ui_state_maybe_eat_inputs",
-		.type_id = TYPE_ui_state_maybe_eat_inputs,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_ui_state_maybe_eat_inputs.argument_array,
-	.arguments = {
-		.ui_state = {
-			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
-			.member_name   = "ui_state",
-			.parent        = &DEFAULT_typedata_procedure_ui_state_maybe_eat_inputs.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
@@ -27740,51 +27913,6 @@ constexpr type_info_procedure_ui_widget_set_flags DEFAULT_typedata_procedure_ui_
 			.parent        = &DEFAULT_typedata_procedure_ui_widget_set_flags.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_ui_state_begin_frame DEFAULT_typedata_procedure_ui_state_begin_frame = {
-	.type_info = {
-		.type_name = "ui_state_begin_frame",
-		.type_id = TYPE_ui_state_begin_frame,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_ui_state_begin_frame.argument_array,
-	.arguments = {
-		.ui_state = {
-			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
-			.member_name   = "ui_state",
-			.parent        = &DEFAULT_typedata_procedure_ui_state_begin_frame.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_ui_state_end_frame DEFAULT_typedata_procedure_ui_state_end_frame = {
-	.type_info = {
-		.type_name = "ui_state_end_frame",
-		.type_id = TYPE_ui_state_end_frame,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_ui_state_end_frame.argument_array,
-	.arguments = {
-		.ui_state = {
-			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
-			.member_name   = "ui_state",
-			.parent        = &DEFAULT_typedata_procedure_ui_state_end_frame.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_ui_state_end_frame.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
 		},
 	},
 };
@@ -32732,9 +32860,9 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_file_watcher_process_changes.type_info,
 	&DEFAULT_typedata_structure_global_context_t.type_info,
 	&DEFAULT_typedata_procedure_c_global_context_init.type_info,
-	&DEFAULT_typedata_procedure_c_global_context_reset_temporary_data.type_info,
-	&DEFAULT_typedata_procedure_c_global_context_reset_context_arena.type_info,
-	&DEFAULT_typedata_procedure_gc_reset_context_arena.type_info,
+	&DEFAULT_typedata_procedure_c_global_context_reset_transient_arena.type_info,
+	&DEFAULT_typedata_procedure_c_global_context_reset_persistent_arena.type_info,
+	&DEFAULT_typedata_procedure_c_global_context_reset_simulation_arena.type_info,
 	&DEFAULT_typedata_structure_threadpool_t.type_info,
 	&DEFAULT_typedata_structure_RHI_context_t.type_info,
 	&DEFAULT_typedata_structure_input_manager_t.type_info,
@@ -32959,16 +33087,20 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
 	&DEFAULT_typedata_structure_gamepad_controller_data_t.type_info,
 	&DEFAULT_typedata_structure_input_event_type_t.type_info,
-	&DEFAULT_typedata_structure_input_controller_type_t.type_info,
+	&DEFAULT_typedata_structure_input_device_type_t.type_info,
 	&DEFAULT_typedata_structure_input_axis_t.type_info,
 	&DEFAULT_typedata_structure_input_event_t.type_info,
 	&DEFAULT_typedata_structure_input_controller_t.type_info,
+	&DEFAULT_typedata_structure_input_device_t.type_info,
 	&DEFAULT_typedata_procedure_s_im_init_input_manager.type_info,
 	&DEFAULT_typedata_procedure_s_im_handle_window_inputs.type_info,
-	&DEFAULT_typedata_procedure_s_im_clear_controller_events.type_info,
-	&DEFAULT_typedata_procedure_s_im_find_controller_by_ID.type_info,
-	&DEFAULT_typedata_procedure_s_im_find_first_gamepad_controller.type_info,
-	&DEFAULT_typedata_procedure_s_im_find_first_keyboard_controller.type_info,
+	&DEFAULT_typedata_procedure_s_im_apply_events_to_controller.type_info,
+	&DEFAULT_typedata_procedure_s_im_clear_device_events.type_info,
+	&DEFAULT_typedata_procedure_s_im_clear_controller_transient_state.type_info,
+	&DEFAULT_typedata_procedure_s_im_find_device_by_ID.type_info,
+	&DEFAULT_typedata_procedure_s_im_find_first_keyboard_device.type_info,
+	&DEFAULT_typedata_procedure_s_im_find_first_gamepad_device.type_info,
+	&DEFAULT_typedata_procedure_s_im_get_controller_from_active_device.type_info,
 	&DEFAULT_typedata_procedure_s_im_transform_mouse_data.type_info,
 	&DEFAULT_typedata_procedure_s_im_get_button_binding_state.type_info,
 	&DEFAULT_typedata_procedure_s_im_get_axis_value.type_info,
@@ -33089,8 +33221,10 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_widget_t.type_info,
 	&DEFAULT_typedata_structure_ui_state_t.type_info,
 	&DEFAULT_typedata_procedure_ui_state_init.type_info,
+	&DEFAULT_typedata_procedure_ui_state_poll_input_events.type_info,
+	&DEFAULT_typedata_procedure_ui_state_begin_frame.type_info,
+	&DEFAULT_typedata_procedure_ui_state_end_frame.type_info,
 	&DEFAULT_typedata_procedure_ui_state_update_widget_state.type_info,
-	&DEFAULT_typedata_procedure_ui_state_maybe_eat_inputs.type_info,
 	&DEFAULT_typedata_procedure_ui_state_render_widgets.type_info,
 	&DEFAULT_typedata_procedure_ui_state_set_default_widget_idle_color.type_info,
 	&DEFAULT_typedata_procedure_ui_state_set_default_widget_hover_color.type_info,
@@ -33099,8 +33233,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_ui_widget_set_default_font_size.type_info,
 	&DEFAULT_typedata_procedure_ui_state_set_active_padding.type_info,
 	&DEFAULT_typedata_procedure_ui_widget_set_flags.type_info,
-	&DEFAULT_typedata_procedure_ui_state_begin_frame.type_info,
-	&DEFAULT_typedata_procedure_ui_state_end_frame.type_info,
 	&DEFAULT_typedata_procedure_ui_state_set_parent_layout.type_info,
 	&DEFAULT_typedata_procedure_ui_widget_set_layout.type_info,
 	&DEFAULT_typedata_procedure_ui_widget_push_parent.type_info,
@@ -33401,8 +33533,9 @@ enum class global_context_t {
 	asset_manager,
 	input_manager,
 	file_watcher,
-	context_arena,
-	temporary_arena,
+	persistent_arena,
+	transient_arena,
+	simulation_arena,
 	tick_rate,
 	tick_rate_ms,
 }; // global_context_t
@@ -33451,11 +33584,11 @@ enum class RHI_context_t {
 }; // RHI_context_t
 enum class input_manager_t {
 	event_count,
-	connected_controller_count,
-	active_controller_index,
+	connected_device_count,
+	active_device_index,
 	game_actions,
-	controllers,
 	events,
+	devices,
 }; // input_manager_t
 enum class debug_log_level_t {
 	SL_LOG_DEBUG,
@@ -33937,18 +34070,8 @@ enum class action_button_t {
 enum class keyboard_controller_data_t {
 	input,
 	modifier_flags,
-	current_mouse_pos,
-	last_mouse_pos,
-	mouse_delta,
-	mouse_wheel_delta,
-	current_mouse_wheel,
 }; // keyboard_controller_data_t
 enum class gamepad_controller_data_t {
-	gamepad_data,
-	gamepadID,
-	has_rumble,
-	rumble_value,
-	stick_deadzone,
 	buttons,
 }; // gamepad_controller_data_t
 enum class input_event_type_t {
@@ -33958,11 +34081,11 @@ enum class input_event_type_t {
 	INPUT_EVENT_TYPE_AXIS_MOVED,
 	INPUT_EVENT_TYPE_TEXT_INPUT,
 }; // input_event_type_t
-enum class input_controller_type_t {
-	INPUT_CONTROLLER_TYPE_INVALID,
-	INPUT_CONTROLLER_TYPE_KEYBOARD,
-	INPUT_CONTROLLER_TYPE_GAMEPAD,
-}; // input_controller_type_t
+enum class input_device_type_t {
+	INPUT_DEVICE_TYPE_INVALID,
+	INPUT_DEVICE_TYPE_KEYBOARD,
+	INPUT_DEVICE_TYPE_GAMEPAD,
+}; // input_device_type_t
 enum class input_axis_t {
 	INPUT_AXIS_GAMEPAD_LEFT_X,
 	INPUT_AXIS_GAMEPAD_LEFT_Y,
@@ -33978,20 +34101,30 @@ enum class input_event_t {
 	input_type,
 	consumed,
 	inputID,
-	controllerID,
+	deviceID,
 	timestampMS,
 	input_stream,
 	axis_value,
 }; // input_event_t
 enum class input_controller_t {
 	type,
-	ID,
-	controller_index,
-	event_count,
-	events,
+	device,
+	action_button_interactions,
+	action_buttons_interacted_with_this_frame,
 	gamepad,
 	keyboard,
 }; // input_controller_t
+enum class input_device_t {
+	type,
+	ID,
+	device_index,
+	event_count,
+	used_controller_count,
+	events,
+	controllers,
+	gamepad_data,
+	keyboard_data,
+}; // input_device_t
 enum class camera_matrices_t {
 	view_matrix,
 	projection_matrix,
@@ -34372,6 +34505,7 @@ enum class widget_t {
 }; // widget_t
 enum class ui_state_t {
 	widget_arena,
+	polling_arena,
 	section_count,
 	frame_begun,
 	frame_ended,
@@ -34384,6 +34518,8 @@ enum class ui_state_t {
 	last_clicked_widget,
 	left_mouse,
 	right_mouse,
+	ui_events,
+	ui_event_count,
 	mouse_position,
 	mouse_delta,
 	persistent_data_arena,
@@ -35474,22 +35610,34 @@ enum class s_im_handle_window_inputs {
 	event,
 	input_manager,
 }; // s_im_handle_window_inputs
-enum class s_im_clear_controller_events {
+enum class s_im_apply_events_to_controller {
 	controller,
-}; // s_im_clear_controller_events
-enum class s_im_find_controller_by_ID {
+	events,
+	auto_consume,
+}; // s_im_apply_events_to_controller
+enum class s_im_clear_device_events {
+	device,
+}; // s_im_clear_device_events
+enum class s_im_clear_controller_transient_state {
+	controller,
+}; // s_im_clear_controller_transient_state
+enum class s_im_find_device_by_ID {
 	input_manager,
 	ID,
 	index_out,
-}; // s_im_find_controller_by_ID
-enum class s_im_find_first_gamepad_controller {
+}; // s_im_find_device_by_ID
+enum class s_im_find_first_keyboard_device {
 	input_manager,
 	index_out,
-}; // s_im_find_first_gamepad_controller
-enum class s_im_find_first_keyboard_controller {
+}; // s_im_find_first_keyboard_device
+enum class s_im_find_first_gamepad_device {
 	input_manager,
 	index_out,
-}; // s_im_find_first_keyboard_controller
+}; // s_im_find_first_gamepad_device
+enum class s_im_get_controller_from_active_device {
+	input_manager,
+	controller,
+}; // s_im_get_controller_from_active_device
 enum class s_im_transform_mouse_data {
 	controller,
 	surface_size,
@@ -35786,12 +35934,19 @@ enum class ui_state_init {
 	RHI_context,
 	renderpass_ID,
 }; // ui_state_init
+enum class ui_state_poll_input_events {
+	ui_state,
+}; // ui_state_poll_input_events
+enum class ui_state_begin_frame {
+	ui_state,
+}; // ui_state_begin_frame
+enum class ui_state_end_frame {
+	ui_state,
+	command_list,
+}; // ui_state_end_frame
 enum class ui_state_update_widget_state {
 	ui_state,
 }; // ui_state_update_widget_state
-enum class ui_state_maybe_eat_inputs {
-	ui_state,
-}; // ui_state_maybe_eat_inputs
 enum class ui_state_render_widgets {
 	ui_state,
 	command_list,
@@ -35824,13 +35979,6 @@ enum class ui_widget_set_flags {
 	widget,
 	flags,
 }; // ui_widget_set_flags
-enum class ui_state_begin_frame {
-	ui_state,
-}; // ui_state_begin_frame
-enum class ui_state_end_frame {
-	ui_state,
-	command_list,
-}; // ui_state_end_frame
 enum class ui_state_set_parent_layout {
 	ui_state,
 	layout_style,

@@ -3,6 +3,7 @@
 #define MATH_IMPLEMENTATION
 #define HASH_TABLE_IMPLEMENTATION
 #define DYNARRAY_IMPLEMENTATION
+#include <math.h>
 #include "c_duration_counter.cpp"
  #include "c_file_api.cpp"
  #include "c_file_watcher.cpp"

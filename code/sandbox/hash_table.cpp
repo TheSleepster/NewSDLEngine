@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if 0
 typedef void *hash_table_allocate_impl_t(void *allocator, u32 allocation_size);
 typedef void  hash_table_free_impl_t(void *allocator, void *memory);
 
@@ -185,10 +186,12 @@ hash_table_clear_element_item(hash_table_t<T> *table, string_t key)
     hash_element_t<T> *element = hash_table_get_hash_element(table, index, key_hash);
     ZeroStruct(element->item);
 }
+#endif
 
 int
 main(void)
 {
+#if 0
     hash_table_t<u32> table = hash_table_create<u32>(4096);
 
     u32 test_element = 938;
@@ -199,4 +202,6 @@ main(void)
 
     printf("test_element: '%d'...\n", test_element);
     printf("new_element: '%d'...\n", new_element);
+#endif
+    return(0);
 }

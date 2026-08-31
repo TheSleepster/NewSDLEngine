@@ -264,7 +264,7 @@ T*
 hash_table_t<T>::operator+(u32 index)
 {
     Expect(index < this->max_entries, "Array bounds check failed... index was: '%u' while count is: '%u'...\n", index, this->max_entries);
-    return((this->items + index)->item);
+    return(&(this->items + index)->item);
 }
 
 #endif // C_HASH_TABLE_H
