@@ -350,7 +350,7 @@ s_im_game_action_create(input_event_handler_t     *event_handler,
     game_action_t *result = null;
 
     game_action_t new_action = {
-        .action_binding_type = mapping_type,
+        .action_binding_type = (u32)mapping_type,
         .name                = action_name
     };
     c_dynarray_add(&event_handler->game_actions, &new_action);

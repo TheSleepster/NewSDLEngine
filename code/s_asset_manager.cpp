@@ -25,10 +25,6 @@
 
 #include <asset_file_packer/jfd_asset_file.h>
 
-#if 0
-#include <meta/ATHENA_GENERATED_RTTI.h>
-#endif
-
 internal_api void  asset_file_load_packages(asset_manager_t *asset_manager, asset_file_data_t *asset_file, jfd_file_header_t *header);
 internal_api bool8 initialize_asset_file_contents(asset_manager_t *asset_manager, asset_file_data_t *asset_file, string_t filepath);
 

@@ -24,6 +24,7 @@
 #include <c_string.cpp>
 #include <c_threadpool.cpp>
 #include <c_tokenizer.cpp>
+#include <c_file_watcher.cpp>
 
 // NOTE(Sleepster): 
 //

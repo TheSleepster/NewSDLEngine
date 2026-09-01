@@ -552,7 +552,7 @@ sys_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 rec
                 char subdirectory[1024];
                 snprintf(subdirectory, sizeof(subdirectory), "%s/%s", C_STR(filepath), file_entry->d_name);
 
-                result += sys_directory_get_file_count(arena, filepath, recursive, file_ext);
+                result += sys_directory_get_file_count(arena, STR(subdirectory), recursive, file_ext);
             }
 
             file_entry = readdir(directory);

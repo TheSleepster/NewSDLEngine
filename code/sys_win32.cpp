@@ -378,6 +378,70 @@ sys_directory_exists(string_t filepath)
     return(result);
 }
 
+s32
+sys_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 recursive, string_t file_ext)
+{
+    s32 result = -1;
+    
+    const char *c_str_filepath = c_string_null_terminated(arena, filepath);
+
+    // Win32 requires a wildcard to iterate through a directory (e.g., "path/*")
+    char search_path[MAX_PATH];
+    snprintf(search_path, sizeof(search_path), "%s/*", c_str_filepath);
+
+    WIN32_FIND_DATAA find_data;
+    HANDLE find_handle = FindFirstFileA(search_path, &find_data);
+
+    if(find_handle != INVALID_HANDLE_VALUE)
+    {
+        result = 0;
+        do {
+            // Check if the current entry is a directory
+            bool8 is_directory = (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+            if(!is_directory)
+            {
+                // It is a regular file
+                if(file_ext.data == null)
+                {
+                    ++result;
+                }
+                else
+                {
+                    string_t filename = STR(find_data.cFileName);
+                    string_t file_extension = c_string_get_file_ext_from_path(filename);
+                    if(c_string_compare(file_ext, file_extension))
+                    {
+                        ++result;
+                    }
+                }
+            }
+            else if(recursive)
+            {
+                // It is a directory, skip "." and ".."
+                if (strcmp(find_data.cFileName, ".") == 0 || strcmp(find_data.cFileName, "..") == 0) 
+                {
+                    continue;
+                }
+
+                char subdirectory[MAX_PATH];
+                snprintf(subdirectory, sizeof(subdirectory), "%s/%s", c_str_filepath, find_data.cFileName);
+
+                result += sys_directory_get_file_count(arena, STR(subdirectory), recursive, file_ext);
+            }
+
+        } while(FindNextFileA(find_handle, &find_data));
+
+        FindClose(find_handle);
+    }
+    else
+    {
+        log_error("Could not open a directory by name of: %s... make sure the string you pass is null-terminated...\n", filepath.data);
+    }
+
+    return(result);
+}
+
 #if 0
 void
 sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
@@ -476,12 +540,20 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
         bool8 is_directory = ((find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0);
         if(is_directory)
         {
+            char wildcard_name[256];
+            sprintf(wildcard_name, "%s/*", fullpath.data);
+
+            string_t dir_name;
+            dir_name.count = c_string_length(wildcard_name);
+            dir_name.data  = (byte *)wildcard_name;
+
+
             if(strcmp(find_data.cFileName, ".") != 0 && strcmp(find_data.cFileName, "..") != 0)
             {
                 visit_file_data->is_directory = true;
                 if(visit_file_data->recursive)
                 {
-                    sys_directory_visit(fullpath, visit_file_data);
+                    sys_directory_visit(dir_name, visit_file_data);
                 }
             }
         }

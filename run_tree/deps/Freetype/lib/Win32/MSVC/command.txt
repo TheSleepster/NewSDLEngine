@@ -1,0 +1,87 @@
+.:
+total 4456
+drwxr-xr-x 4 justin users    4096 Aug 22 13:32 .
+drwxr-xr-x 9 justin users    4096 Aug  8 21:59 ..
+-rw-r--r-- 1 justin users       0 Aug 22 13:32 command.txt
+-rw-r--r-- 1 justin users 4542602 Aug  8 21:59 freetype.lib
+drwxr-xr-x 3 justin users    4096 Aug 13 20:13 include
+drwxr-xr-x 2 justin users    4096 Aug  8 21:59 release dll
+
+./include:
+total 16
+drwxr-xr-x 3 justin users 4096 Aug 13 20:13 .
+drwxr-xr-x 4 justin users 4096 Aug 22 13:32 ..
+drwxr-xr-x 3 justin users 4096 Aug  8 21:59 freetype
+-rw-r--r-- 1 justin users  990 Aug 13 20:13 ft2build.h
+
+./include/freetype:
+total 880
+drwxr-xr-x 3 justin users   4096 Aug  8 21:59 .
+drwxr-xr-x 3 justin users   4096 Aug 13 20:13 ..
+drwxr-xr-x 2 justin users   4096 Aug  8 21:59 config
+-rw-r--r-- 1 justin users 178794 Aug  8 21:59 freetype.h
+-rw-r--r-- 1 justin users   5470 Aug  8 21:59 ftadvanc.h
+-rw-r--r-- 1 justin users   2638 Aug  8 21:59 ftbbox.h
+-rw-r--r-- 1 justin users   5322 Aug  8 21:59 ftbdf.h
+-rw-r--r-- 1 justin users   9051 Aug  8 21:59 ftbitmap.h
+-rw-r--r-- 1 justin users   2786 Aug  8 21:59 ftbzip2.h
+-rw-r--r-- 1 justin users  34179 Aug  8 21:59 ftcache.h
+-rw-r--r-- 1 justin users   2933 Aug  8 21:59 ftchapters.h
+-rw-r--r-- 1 justin users   4022 Aug  8 21:59 ftcid.h
+-rw-r--r-- 1 justin users  50199 Aug  8 21:59 ftcolor.h
+-rw-r--r-- 1 justin users  47533 Aug  8 21:59 ftdriver.h
+-rw-r--r-- 1 justin users  12559 Aug  8 21:59 fterrdef.h
+-rw-r--r-- 1 justin users   9301 Aug  8 21:59 fterrors.h
+-rw-r--r-- 1 justin users   2213 Aug  8 21:59 ftfntfmt.h
+-rw-r--r-- 1 justin users   4138 Aug  8 21:59 ftgasp.h
+-rw-r--r-- 1 justin users  20912 Aug  8 21:59 ftglyph.h
+-rw-r--r-- 1 justin users  10625 Aug  8 21:59 ftgxval.h
+-rw-r--r-- 1 justin users   4211 Aug  8 21:59 ftgzip.h
+-rw-r--r-- 1 justin users  41833 Aug  8 21:59 ftimage.h
+-rw-r--r-- 1 justin users  10696 Aug  8 21:59 ftincrem.h
+-rw-r--r-- 1 justin users  11744 Aug  8 21:59 ftlcdfil.h
+-rw-r--r-- 1 justin users   7100 Aug  8 21:59 ftlist.h
+-rw-r--r-- 1 justin users   4130 Aug  8 21:59 ftlogging.h
+-rw-r--r-- 1 justin users   2768 Aug  8 21:59 ftlzw.h
+-rw-r--r-- 1 justin users   7771 Aug  8 21:59 ftmac.h
+-rw-r--r-- 1 justin users  23797 Aug  8 21:59 ftmm.h
+-rw-r--r-- 1 justin users  22544 Aug  8 21:59 ftmodapi.h
+-rw-r--r-- 1 justin users   6675 Aug  8 21:59 ftmoderr.h
+-rw-r--r-- 1 justin users   5346 Aug  8 21:59 ftotval.h
+-rw-r--r-- 1 justin users  17402 Aug  8 21:59 ftoutln.h
+-rw-r--r-- 1 justin users   6041 Aug  8 21:59 ftparams.h
+-rw-r--r-- 1 justin users   4908 Aug  8 21:59 ftpfr.h
+-rw-r--r-- 1 justin users   6625 Aug  8 21:59 ftrender.h
+-rw-r--r-- 1 justin users   4288 Aug  8 21:59 ftsizes.h
+-rw-r--r-- 1 justin users   7730 Aug  8 21:59 ftsnames.h
+-rw-r--r-- 1 justin users  21773 Aug  8 21:59 ftstroke.h
+-rw-r--r-- 1 justin users   4483 Aug  8 21:59 ftsynth.h
+-rw-r--r-- 1 justin users   8502 Aug  8 21:59 ftsystem.h
+-rw-r--r-- 1 justin users   7411 Aug  8 21:59 fttrigon.h
+-rw-r--r-- 1 justin users  14735 Aug  8 21:59 fttypes.h
+-rw-r--r-- 1 justin users   7965 Aug  8 21:59 ftwinfnt.h
+-rw-r--r-- 1 justin users  10457 Aug  8 21:59 otsvg.h
+-rw-r--r-- 1 justin users  23188 Aug  8 21:59 t1tables.h
+-rw-r--r-- 1 justin users  58769 Aug  8 21:59 ttnameid.h
+-rw-r--r-- 1 justin users  25227 Aug  8 21:59 tttables.h
+-rw-r--r-- 1 justin users   5145 Aug  8 21:59 tttags.h
+
+./include/freetype/config:
+total 108
+drwxr-xr-x 2 justin users  4096 Aug  8 21:59 .
+drwxr-xr-x 3 justin users  4096 Aug  8 21:59 ..
+-rw-r--r-- 1 justin users  1614 Aug  8 21:59 ftconfig.h
+-rw-r--r-- 1 justin users 23919 Aug  8 21:59 ftheader.h
+-rw-r--r-- 1 justin users  1443 Aug  8 21:59 ftmodule.h
+-rw-r--r-- 1 justin users 39628 Aug  8 21:59 ftoption.h
+-rw-r--r-- 1 justin users  4576 Aug  8 21:59 ftstdlib.h
+-rw-r--r-- 1 justin users  7072 Aug  8 21:59 integer-types.h
+-rw-r--r-- 1 justin users  1597 Aug  8 21:59 mac-support.h
+-rw-r--r-- 1 justin users  4207 Aug  8 21:59 public-macros.h
+
+./release dll:
+total 732
+drwxr-xr-x 2 justin users   4096 Aug  8 21:59 .
+drwxr-xr-x 4 justin users   4096 Aug 22 13:32 ..
+-rw-r--r-- 1 justin users 688128 Aug  8 21:59 freetype.dll
+-rw-r--r-- 1 justin users  49398 Aug  8 21:59 freetype.lib

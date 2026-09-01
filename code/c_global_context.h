@@ -58,7 +58,7 @@ void c_global_context_reset_transient_arena();
 void c_global_context_reset_persistent_arena();
 void c_global_context_reset_simulation_arena();
 
-extern thread_local global_context_t *gc;
+static global_context_t *gc;
 
 #endif // C_GLOBALS_H
 

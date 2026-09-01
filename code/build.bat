@@ -1,1 +1,1 @@
-make -k -j12 SILENT=@ DEBUG_BUILD=1
+make -k -j12 COMPILER=clang++ assets SILENT=@ DEBUG_BUILD=1

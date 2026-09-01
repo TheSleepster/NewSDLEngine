@@ -1,5 +1,10 @@
 // raddbg 0.9.22 project file
 
+recent_file: path: "../code/asset_file_packer/jfd_file_packer.cpp"
+recent_file: path: "W:/NewSDLEngine/code/sys_win32.cpp"
+recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/string/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/string/strnlen.cpp"
+recent_file: path: "W:/NewSDLEngine/code/c_log.h"
+recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/stdio/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/stdio/output.cpp"
 recent_file: path: "../code/tests/file_packer.cpp"
 recent_file: path: "../code/asset_file_packer/new_file_packer.cpp"
 recent_file: path: "../code/sys_win32.cpp"
@@ -47,10 +52,8 @@ recent_file: path: "../code/tests/threadpool.cpp"
 recent_file: path: "../../../../../../Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt/stdio.h"
 recent_file: path: "../code/c_threadpool.cpp"
 recent_file: path: "../code/tests/threadpool.cpp"
-recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/stdio/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/stdio/output.cpp"
 recent_file: path: "../code/c_threadpool.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/heap/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/heap/free_base.cpp"
-recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/string/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/string/strnlen.cpp"
 recent_file: path: "d:/os/obj/amd64fre/minkernel/crts/ucrt/src/appcrt/string/mt/objfre/amd64/minkernel/crts/ucrt/src/appcrt/string/amd64/strcmp.asm"
 target:
 {
@@ -67,39 +70,12 @@ target:
 }
 target:
 {
-  executable: "../build/test_dynarray.exe"
-  working_directory: "../build"
-}
-target:
-{
-  executable: "../build/test_networking.exe"
-  working_directory: "../build"
-}
-target:
-{
-  executable: "../build/test_threadpool.exe"
-  working_directory: "../build"
-}
-target:
-{
-  executable: "../build/test_memory_arena.exe"
-  working_directory: "../build"
-}
-target:
-{
-  executable: "../build/asset_file_packer.exe"
-  working_directory: "../run_tree/res"
-  enabled: 0
-}
-target:
-{
-  executable: "../build/test_file_packer.exe"
+  executable: "../build/jfd_asset_file_packer.exe"
   working_directory: "../run_tree/res"
   enabled: 1
 }
-target:
+breakpoint:
 {
-  executable: "../build/asset_file_packer2.exe"
-  working_directory: "../run_tree/res"
-  enabled: 0
+  source_location: "../code/asset_file_packer/jfd_file_packer.cpp:153:1"
+  hit_count: 0
 }
