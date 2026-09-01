@@ -37,11 +37,19 @@
 #include <s_ui_core.h>
 #include <s_entity.h>
 
-// NOTE(Sleepster): Engine 
 //#include <meta/GENERATED_program_RTTI.h>
 #include <code_generator/athena//athena.h>
 #include <meta/ATHENA_GENERATED_RTTI.h>
 
+// NOTE(Sleepster): Game 
+#if defined(GAME_DLL_BUILD) || defined(RELEASE)
+#include <s_ui_core.cpp>
+#include <s_entity.cpp>
+#include <main.cpp>
+#endif
+
+#if defined(ENGINE_BUILD)
+// NOTE(Sleepster): Engine 
 #include <c_global_context.cpp>
 #include <c_memory_arena.cpp>
 #include <c_string.cpp>
@@ -75,8 +83,4 @@
 
 #include <p_platform_data.cpp>
 #include <entry.cpp>
-
-// NOTE(Sleepster): Game 
-#include <s_ui_core.cpp>
-#include <s_entity.cpp>
-#include <main.cpp>
+#endif

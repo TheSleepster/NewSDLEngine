@@ -200,12 +200,19 @@ struct widget_t
     immediate_widget_data_t *widget_instance_data; 
 };
 
+enum ui_keyboard_flags_t
+{
+    UI_KEYBOARD_FLAG_NONE  = BIT(0),
+    UI_KEYBOARD_FLAG_LCTRL = BIT(1)
+};
+
 struct ui_state_t
 {
     // NOTE(Sleepster): Lasts one frame...
     memory_arena_t                    widget_arena;
     memory_arena_t                    polling_arena;
     u32                               section_count;
+    u32                               keyboard_flags;
 
     bool8                             frame_begun;
     bool8                             frame_ended;

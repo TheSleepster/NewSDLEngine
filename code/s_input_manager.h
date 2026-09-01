@@ -115,7 +115,6 @@ struct action_button_t
 struct keyboard_controller_data_t
 {
     action_button_t  input[MAX_KEYBOARD_BUTTONS];
-    u32              modifier_flags;
 };
 
 struct gamepad_controller_data_t
@@ -167,6 +166,7 @@ struct input_event_t
     bool32   consumed;
 
     s32      inputID;    // key / gamepad button
+    s32      hardwareID;
     s32      deviceID;   // owner device 
     u64      timestampMS;
 
@@ -259,6 +259,10 @@ vec2_t              s_im_transform_mouse_data(input_controller_t *controller, ve
 
 input_binding_state_t s_im_get_button_binding_state(input_controller_t *controller, game_action_binding_t *binding);
 float32               s_im_get_axis_value(input_controller_t *controller, game_action_binding_t *binding);
+
+bool8                 s_im_is_button_pressed(input_controller_t *controller, s32 inputID);
+bool8                 s_im_is_button_down(input_controller_t *controller, s32 inputID);
+bool8                 s_im_is_button_released(input_controller_t *controller, s32 inputID);
 
 game_action_t* s_im_game_action_create(input_manager_t *input_manager, string_t action_name, game_action_mapping_type_t mapping_type);
 void           s_im_game_action_add_mapping(game_action_t *action, game_action_mapping_t *mapping);

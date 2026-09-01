@@ -85,6 +85,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
             input_event.input_type    = INPUT_DEVICE_TYPE_KEYBOARD;
             input_event.inputID       = event->key.scancode;
             input_event.deviceID      = event->key.which;
+            input_event.hardwareID    = event->key.key;
             input_event.timestampMS   = SDL_GetTicks();
 
             bool8 pressed  =  event->key.down;
@@ -316,6 +317,8 @@ s_im_apply_events_to_controller(input_controller_t         *controller,
         if(!event->consumed && event->input_type == controller->type)
         {
             action_button_t *button = s_im_get_controller_action_button(controller, event->inputID);
+            button->scancode = event->inputID;
+            button->keycode  = event->hardwareID;
             switch(event->type)
             {
                 case INPUT_EVENT_TYPE_PRESSED:

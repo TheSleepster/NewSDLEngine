@@ -73,6 +73,8 @@ struct render_state_t
     RHI_vertex_buffer_t vertex_buffer;
     RHI_index_buffer_t  index_buffer;
 
+    RHI_uniform_constant_buffer_t *camera_matrices_buffer;
+
     u32                 game_renderpass_ID;
     u32                 fullscreen_renderpass_ID; 
 
@@ -81,6 +83,11 @@ struct render_state_t
 
 struct game_state_t
 {
+    bool8               is_initialized;
+
+    render_state_t      render_state;
+    ui_state_t         *main_ui;
+
     input_controller_t *controller;
     entity_manager_t   *entity_manager;
     float64             render_alpha;
@@ -120,8 +127,6 @@ constexpr float32 MAX_ENTITY_ACCELERATION = 100;
 // TODO(Sleepster): DEBUG CODE 
 global_variable string_t global_test_textbox_string = {}; 
 // TODO(Sleepster): DEBUG CODE 
-
-entity_t *minkowski_rectangle = {};
 
 // NOTE(Sleepster): DEBUG CODE
 internal_api void
@@ -364,9 +369,9 @@ entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager)
 }
 
 internal_api entity_t*
-entity_test_collider_create(game_state_t *game_state, vec2_t position, vec2_t size)
+entity_test_collider_create(game_state_t *game_state, vec2_t position, vec2_t size, u32 flags)
 {
-    entity_t *result = s_entity_create(game_state->entity_manager, ENTITY_ARCHETYPE_COLLIDER, ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_HAS_COLLIDER);
+    entity_t *result = s_entity_create(game_state->entity_manager, ENTITY_ARCHETYPE_COLLIDER, ((ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_STATIC) | flags));
     result->archetype = ENTITY_ARCHETYPE_COLLIDER;
     result->position  = position;
     result->size      = size;
@@ -379,7 +384,7 @@ entity_test_collider_create(game_state_t *game_state, vec2_t position, vec2_t si
 internal_api void
 render_collider(render_state_t *render_state, RHI_command_list_t *command_list, entity_t *entity)
 {
-    vec4_t color = (entity != minkowski_rectangle) ? vec4(0.5f, 0.0f, 0.0f, 0.2f) : vec4(0.0f, 0.6f, 0.0f, 0.3f);
+    vec4_t color = vec4(0.5f, 0.0f, 0.0f, 0.2f);
     immediate_rect(command_list, 
                    &render_state->vertex_buffer,
                    vec2_expand_vec3(entity->bounding_box.min, 0.6f),
@@ -462,10 +467,10 @@ internal_api void
 create_test_environment(game_state_t *game_state, asset_manager_t *asset_manager)
 {
 #if 1
-    entity_t *top_wall    = entity_test_collider_create(game_state, vec2(-160,  80), vec2(320, 20));
-    entity_t *bottom_wall = entity_test_collider_create(game_state, vec2(-160, -90), vec2(320, 20));
-    entity_t *left_wall   = entity_test_collider_create(game_state, vec2(-160, -80), vec2(20,  180));
-    entity_t *right_wall  = entity_test_collider_create(game_state, vec2( 140, -80), vec2(20,  180));
+    entity_t *top_wall    = entity_test_collider_create(game_state, vec2(-160,  80), vec2(320, 20),  0);
+    entity_t *bottom_wall = entity_test_collider_create(game_state, vec2(-160, -90), vec2(320, 20),  ENTITY_FLAG_IS_GROUND);
+    entity_t *left_wall   = entity_test_collider_create(game_state, vec2(-160, -80), vec2(20,  180), 0);
+    entity_t *right_wall  = entity_test_collider_create(game_state, vec2( 140, -80), vec2(20,  180), 0);
 
     (void)top_wall;
     (void)bottom_wall;
@@ -706,26 +711,23 @@ game_state_simulate(game_state_t *game_state)
     bool8 jumped               = game_state->input_info.jumped;
     bool8 dashed               = game_state->input_info.dashed;
     (void)dashed;
-    if(jumped)
-    {
-        printf("Jumping...\n");   
-    }
 
     entity_query_t player_query = s_entity_query_archetype(game_state->entity_manager, ENTITY_ARCHETYPE_PLAYER);
     for(entity_t *entity: player_query)
     {
         // NOTE(Sleepster): X Movement 
         entity->acceleration.x += movement_axis_value.x * 100;
-        vec2_clamp(&entity->acceleration, -entity->max_acceleration, entity->max_acceleration);
+        entity->acceleration.x  = Clamp(entity->acceleration.x, -entity->max_acceleration.x, entity->max_acceleration.x);
         if(movement_axis_value.x == 0.0f)
         {
             entity->acceleration.x = 0.0f;
         }
 
         // NOTE(Sleepster): Y Movement
-        if(jumped)
+        if(jumped && (entity->flags & ENTITY_FLAG_GROUNDED))
         {
-            entity->acceleration.y = entity->max_acceleration.y * 1.0f;
+            entity->acceleration.y = entity->max_acceleration.y * 0.5f;
+            entity->flags &= ~ENTITY_FLAG_GROUNDED;
         }
 
         entity->velocity.x = entity->velocity.x + ((entity->acceleration.x) * gc->tick_rate);
@@ -738,7 +740,12 @@ game_state_simulate(game_state_t *game_state)
     entity_query_t gravity_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_ACTOR|ENTITY_FLAG_GRAVITIC);
     for(entity_t *entity: gravity_query)
     {
-        f32_approach(&entity->acceleration.y, entity->max_acceleration.y, game_state->gravity, gc->tick_rate);
+        //f32_approach(&entity->acceleration.y, entity->max_acceleration.y, game_state->gravity, gc->tick_rate);
+        entity->acceleration.y += (game_state->gravity * gc->tick_rate);
+        if(entity->flags & ENTITY_FLAG_GROUNDED)
+        {
+            entity->acceleration.y = 0;
+        }
     }
 
     entity_query_t collision_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_HAS_COLLIDER);
@@ -762,6 +769,11 @@ game_state_simulate(game_state_t *game_state)
                         if(sweep.normal.y != 0.0f) 
                         {
                             current_velocity.y = current_velocity.y * sweep.time;
+                        }
+
+                        if(test_entity->flags & ENTITY_FLAG_IS_GROUND)
+                        {
+                            entity->flags |= ENTITY_FLAG_GROUNDED;
                         }
                     }
                 }
@@ -811,29 +823,52 @@ game_state_simulate(game_state_t *game_state)
     }
 }
 
-int
-game_main(void)
+external int
+game_main(global_context_t *_global_context)
 {
-    srand(rdtsc());
+    gc = _global_context;
+    Assert(gc);
+    if(!gc->game_state)
+    {
+        gc->game_state = c_arena_push_struct(&gc->persistent_arena, game_state_t);
+        gc->game_state->main_ui = c_arena_push_struct(&gc->persistent_arena, ui_state_t);
+    }
 
-    input_manager_t  *input_manager = gc->input_manager;
-    asset_manager_t  *asset_manager = gc->asset_manager;
-    ui_state_t       *main_ui       = Alloc(ui_state_t);
+    game_state_t     *game_state    =  gc->game_state;
+    input_manager_t  *input_manager =  gc->input_manager;
+    asset_manager_t  *asset_manager =  gc->asset_manager;
+    render_state_t   *render_state  = &game_state->render_state;
+    ui_state_t       *main_ui       =  game_state->main_ui;
+    if(!game_state->is_initialized)
+    {
+        srand(rdtsc());
 
-    render_state_t render_state = {};
-    game_state_t game_state     = {};
+        //game_state->controller     = s_im_get_controller_from_active_device(input_manager, game_state->controller);
+        game_state->entity_manager = c_arena_push_struct(&gc->persistent_arena, entity_manager_t);
+        game_state->entity_manager->transient_storage = c_arena_create(MB(100));
 
-    //game_state.controller     = s_im_get_controller_from_active_device(input_manager, game_state.controller);
-    game_state.entity_manager = c_arena_push_struct(&gc->persistent_arena, entity_manager_t);
-    game_state.entity_manager->transient_storage = c_arena_create(MB(100));
+        game_state->gravity = -9.8f;
 
-    game_state.gravity = -9.8f;
+        render_state->RHI_context = gc->RHI_context;
+        r_init_render_state(render_state);
+        render_state->camera_matrices_buffer = RHI_get_constant_buffer(render_state->RHI_context, STR("CameraMatrices"));
 
-    render_state.RHI_context = gc->RHI_context;
-    r_init_render_state(&render_state);
-    RHI_uniform_constant_buffer_t *camera_matrices_buffer = RHI_get_constant_buffer(render_state.RHI_context, STR("CameraMatrices"));
+        ui_state_init(main_ui, input_manager, asset_manager, render_state->RHI_context, render_state->fullscreen_renderpass_ID);
 
-    ui_state_init(main_ui, input_manager, asset_manager, render_state.RHI_context, render_state.fullscreen_renderpass_ID);
+        global_test_textbox_string.data  = c_arena_push_array(&gc->persistent_arena, byte, 256);
+        global_test_textbox_string.count = 0;
+
+        // GAME INIT
+        entity_player_create(game_state, asset_manager);
+        create_test_environment(game_state, asset_manager);
+        // GAME INIT
+
+        // NOTE(Sleepster): Init bindings 
+        game_state_init_bindings(game_state, gc->input_manager);
+        // NOTE(Sleepster): Init bindings 
+
+        game_state->is_initialized = true;
+    }
 
     // TODO(Sleepster): Some system for managing and storing loaded assets (oh... so like an asset_manager????) so we don't need to constantly create
     // handles.
@@ -848,19 +883,6 @@ game_main(void)
     s_texture_atlas_add_texture(atlas, &player_sprite);
     s_texture_atlas_add_texture(atlas, &player_sprite_sheet);
 
-    global_test_textbox_string.data  = c_arena_push_array(&gc->persistent_arena, byte, 256);
-    global_test_textbox_string.count = 0;
-
-    // GAME INIT
-    entity_player_create(&game_state, asset_manager);
-    minkowski_rectangle = entity_test_collider_create(&game_state, vec2_zero(), vec2_zero());
-    create_test_environment(&game_state, asset_manager);
-    // GAME INIT
-
-    // NOTE(Sleepster): Init bindings 
-    game_state_init_bindings(&game_state, gc->input_manager);
-    // NOTE(Sleepster): Init bindings 
-
     u64 perf_count_freq = SDL_GetPerformanceFrequency();
     u64 last_tsc        = SDL_GetPerformanceCounter();
     u64 current_tsc     = 0;
@@ -872,13 +894,15 @@ game_main(void)
     while(gc->running)
     {
         //s_im_reset_controller_states(input_manager);
-        process_window_events(render_state.RHI_context, input_manager);
+        process_window_events(render_state->RHI_context, input_manager);
+#ifndef RELEASE
         c_file_watcher_process_changes(&gc->file_watcher);
+#endif
 
-        game_state.controller = s_im_get_controller_from_active_device(input_manager, game_state.controller);
-        if(game_state.open_debug_menu)
+        game_state->controller = s_im_get_controller_from_active_device(input_manager, game_state->controller);
+        if(game_state->open_debug_menu)
         {
-            handle_debug_ui_menu(main_ui, render_state.RHI_context, &player_sprite);
+            handle_debug_ui_menu(main_ui, render_state->RHI_context, &player_sprite);
         }
 
         // NOTE(Sleepster): Simulate loop 
@@ -895,50 +919,55 @@ game_main(void)
             {
                 ui_state_get_input_events(main_ui);
                 // NOTE(Sleepster): Apply events. 
-                s_im_apply_events_to_controller(game_state.controller, game_state.controller->device->events, true);
+                s_im_apply_events_to_controller(game_state->controller, game_state->controller->device->events, true);
 
                 // NOTE(Sleepster): Debug menu 
-                if(game_state.controller->type == INPUT_DEVICE_TYPE_KEYBOARD)
+                if(game_state->controller->type == INPUT_DEVICE_TYPE_KEYBOARD)
                 {
-                    if(s_im_is_button_pressed(game_state.controller, SDL_SCANCODE_SEMICOLON))
+                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_SEMICOLON))
                     {
-                        game_state.open_debug_menu = !game_state.open_debug_menu;
+                        game_state->open_debug_menu = !game_state->open_debug_menu;
+                    }
+
+                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_BACKSLASH))
+                    {
+                        gc->recording_input = !gc->recording_input;
                     }
                 }
 
-                s_im_update_game_action_states(input_manager, game_state.controller);
-                s_im_clear_device_events(game_state.controller->device);
+                s_im_update_game_action_states(input_manager, game_state->controller);
+                s_im_clear_device_events(game_state->controller->device);
 
                 first_tick = false;
                 c_global_context_reset_simulation_arena();
             }
 
-            poll_player_input(&game_state);
-            game_state_simulate(&game_state);
+            poll_player_input(game_state);
+            game_state_simulate(game_state);
             dt_accumulator -= gc->tick_rate;
         }
-        game_state.render_alpha = (float32)(dt_accumulator / gc->tick_rate);
+        game_state->render_alpha = (float32)(dt_accumulator / gc->tick_rate);
 
-        RHI_command_list_t *command_list = RHI_get_command_list(render_state.RHI_context, RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+        RHI_command_list_t *command_list = RHI_get_command_list(render_state->RHI_context, RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
         {
             // NOTE(Sleepster): Draw entities 
             {
                 for(u32 entity_index = 0;
-                    entity_index < game_state.entity_manager->active_entities;
+                    entity_index < game_state->entity_manager->active_entities;
                     ++entity_index)
                 {
-                    entity_t *entity = game_state.entity_manager->entities + entity_index;
+                    entity_t *entity = game_state->entity_manager->entities + entity_index;
                     Assert(entity->flags & ENTITY_FLAG_IS_VALID);
 
-                    entity->render_position = vec2_lerp(entity->last_position, entity->position, game_state.render_alpha);
-                    entity_render(&render_state, command_list, entity);
+                    entity->render_position = vec2_lerp(entity->last_position, entity->position, game_state->render_alpha);
+                    entity_render(render_state, command_list, entity);
                 }
 
-                RHI_cmd_update_buffer_contents(command_list, &render_state.vertex_buffer);
-                RHI_cmd_renderpass_begin(command_list, render_state.game_renderpass_ID);
+                RHI_cmd_update_buffer_contents(command_list, &render_state->vertex_buffer);
+                RHI_cmd_renderpass_begin(command_list, render_state->game_renderpass_ID);
 
-                RHI_cmd_bind_vertex_buffer(command_list, &render_state.vertex_buffer);
-                RHI_cmd_bind_index_buffer(command_list,  &render_state.index_buffer);
+                RHI_cmd_bind_vertex_buffer(command_list, &render_state->vertex_buffer);
+                RHI_cmd_bind_index_buffer(command_list,  &render_state->index_buffer);
                 RHI_cmd_use_shader_program(command_list,  immediate_textured);
 
                 s32 window_width  = Max(GAME_FRAMEBUFFER_WIDTH, 10);
@@ -948,30 +977,30 @@ game_main(void)
                     .view_matrix       = mat4_identity(),
                     .projection_matrix = mat4_RHDX_ortho(window_width * -0.5f, window_width * 0.5, window_height * -0.5, window_height * 0.5, -1, 1)
                 };
-                RHI_cmd_update_constant_buffer(command_list, camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
+                RHI_cmd_update_constant_buffer(command_list, render_state->camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
 
                 RHI_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
                 RHI_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
 
-                RHI_cmd_draw_indexed(command_list, (render_state.vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
+                RHI_cmd_draw_indexed(command_list, (render_state->vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
 
-                render_state.vertex_buffer.vertex_count = 0;
+                render_state->vertex_buffer.vertex_count = 0;
             }
 
             // NOTE(Sleepster): Draw misc 
             {
                 for(u32 entity_index = 0;
-                    entity_index < game_state.entity_manager->active_entities;
+                    entity_index < game_state->entity_manager->active_entities;
                     ++entity_index)
                 {
-                    entity_t *entity = game_state.entity_manager->entities + entity_index;
-                    render_collider(&render_state, command_list, entity);
+                    entity_t *entity = game_state->entity_manager->entities + entity_index;
+                    render_collider(render_state, command_list, entity);
                 }
 
-                RHI_cmd_update_buffer_contents(command_list, &render_state.vertex_buffer);
+                RHI_cmd_update_buffer_contents(command_list, &render_state->vertex_buffer);
 
-                RHI_cmd_bind_vertex_buffer(command_list, &render_state.vertex_buffer);
-                RHI_cmd_bind_index_buffer(command_list,  &render_state.index_buffer);
+                RHI_cmd_bind_vertex_buffer(command_list, &render_state->vertex_buffer);
+                RHI_cmd_bind_index_buffer(command_list,  &render_state->index_buffer);
                 RHI_cmd_use_shader_program(command_list,  immediate_rectangle);
 
                 RHI_pipeline_state_t collider_blending = {};
@@ -986,23 +1015,23 @@ game_main(void)
                 RHI_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
                 RHI_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
 
-                RHI_cmd_draw_indexed(command_list, (render_state.vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
+                RHI_cmd_draw_indexed(command_list, (render_state->vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
                 RHI_cmd_renderpass_end(command_list);
 
-                render_state.vertex_buffer.vertex_count = 0;
+                render_state->vertex_buffer.vertex_count = 0;
             }
         }
 
         // NOTE(Sleepster): Fullscreen Renderpass 
         {
-            RHI_cmd_blit_renderpass(command_list, render_state.game_renderpass_ID, render_state.fullscreen_renderpass_ID);
-            RHI_cmd_renderpass_begin(command_list, render_state.fullscreen_renderpass_ID);
+            RHI_cmd_blit_renderpass(command_list, render_state->game_renderpass_ID, render_state->fullscreen_renderpass_ID);
+            RHI_cmd_renderpass_begin(command_list, render_state->fullscreen_renderpass_ID);
 
-            RHI_cmd_bind_vertex_buffer(command_list, &render_state.vertex_buffer);
-            RHI_cmd_bind_index_buffer(command_list,  &render_state.index_buffer);
+            RHI_cmd_bind_vertex_buffer(command_list, &render_state->vertex_buffer);
+            RHI_cmd_bind_index_buffer(command_list,  &render_state->index_buffer);
 
-            s32 window_width  = Max(render_state.RHI_context->window_size.x, 10);
-            s32 window_height = Max(render_state.RHI_context->window_size.y, 10);
+            s32 window_width  = Max(render_state->RHI_context->window_size.x, 10);
+            s32 window_height = Max(render_state->RHI_context->window_size.y, 10);
 
             s32 half_window_width  = window_width  * 0.5f;
             s32 half_window_height = window_height * 0.5f;
@@ -1011,7 +1040,7 @@ game_main(void)
                 .view_matrix       = mat4_identity(),
                 .projection_matrix = mat4_RHDX_ortho(-half_window_width, half_window_width, -half_window_height, half_window_height, -1, 1)
             };
-            RHI_cmd_update_constant_buffer(command_list, camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
+            RHI_cmd_update_constant_buffer(command_list, render_state->camera_matrices_buffer, &camera_matrix_buffer_data, sizeof(camera_matrix_buffer_data));
 
             RHI_pipeline_state_t font_state = {};
             font_state.blend_enabled = false;
@@ -1023,34 +1052,48 @@ game_main(void)
             RHI_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
             RHI_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
             immediate_text(command_list, 
-                          &render_state.vertex_buffer, 
+                          &render_state->vertex_buffer, 
                           asset_manager, 
                           &basic_font, 
-                          STR("This is a test string..."), 
+                          STR("Whatever dood."), 
                           vec3(-300, 150, 0.0f), 
                           vec4(1.0f, 1.0f, 1.0f, 1.0f), 
                           0.0f, 
                           32);
 
-            RHI_cmd_update_buffer_contents(command_list, &render_state.vertex_buffer);
-            RHI_cmd_draw_indexed(command_list, (render_state.vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
+            RHI_cmd_update_buffer_contents(command_list, &render_state->vertex_buffer);
+            RHI_cmd_draw_indexed(command_list, (render_state->vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
 
             // NOTE(Sleepster): Draw UI 
-            if(game_state.open_debug_menu && main_ui->frame_begun)
+            if(game_state->open_debug_menu && main_ui->frame_begun)
             {
                 ui_state_end_frame(main_ui, command_list);
             }
             RHI_cmd_renderpass_end(command_list);
         }
-        RHI_cmd_present(command_list, &render_state.fullscreen_color_buffer);
+        RHI_cmd_present(command_list, &render_state->fullscreen_color_buffer);
 
-        RHI_execute_backend_commands(render_state.RHI_context);
-        RHI_buffer_reset(render_state.RHI_context, &render_state.vertex_buffer);
-        RHI_buffer_reset(render_state.RHI_context, &render_state.index_buffer);
+        RHI_execute_backend_commands(render_state->RHI_context);
+        RHI_buffer_reset(render_state->RHI_context, &render_state->vertex_buffer);
+        RHI_buffer_reset(render_state->RHI_context, &render_state->index_buffer);
 
         s_asset_manager_update(asset_manager);
         c_global_context_reset_transient_arena();
-        c_arena_reset(&game_state.entity_manager->transient_storage);
+        c_arena_reset(&game_state->entity_manager->transient_storage);
+
+#ifndef RELEASE
+            file_data_t file_data = c_file_get_file_system_info(gc->game_dll_path);
+            if(file_data.last_modtime != gc->game_dll_data.last_modtime)
+            {
+                gc->game_dll_data = file_data;
+                gc->should_reload = true;
+            }
+
+            if(gc->should_reload)
+            {
+                return(-1);
+            }
+#endif
 
         current_tsc = SDL_GetPerformanceCounter();
         delta_tsc   = current_tsc - last_tsc;

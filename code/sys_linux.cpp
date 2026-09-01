@@ -1002,7 +1002,7 @@ sys_load_library(string_t filepath)
     void *result = dlopen(C_STR(filepath), RTLD_NOW);
     if(result == null)
     {
-        log_fatal("Could not load library: %s... Error: %s...\n", C_STR(filepath), dlerror());
+        log_warning("Could not load library: %s... Error: %s...\n", C_STR(filepath), dlerror());
     }
 
     return result;

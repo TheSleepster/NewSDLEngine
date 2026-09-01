@@ -5,6 +5,7 @@ ifeq ($(OS),Windows_NT)
     PLATFORM       := WINDOWS
     OS_DEFINE      := -DOS_WINDOWS=1
     EXE_EXT        := .exe
+    DLL_EXT        := .dll
     PLATFORM_LIBS  := -lopengl32 -luser32 -lgdi32 -lwinmm -lshell32 -lole32 -luuid -lversion -ladvapi32 -lsetupapi -lcfgmgr32 -loleaut32 -limm32 -lWs2_32 -lm
     PLATFORM_SRC   := sys_win32.cpp
     RM_CMD         := if exist $(subst /,\,$(BUILD_DIR)) rmdir /s /q $(subst /,\,$(BUILD_DIR))
@@ -20,11 +21,13 @@ else
         OS_DEFINE     := -DOS_LINUX=1
         PLATFORM_LIBS := -lm -ldl -lpthread
         PLATFORM_SRC  := sys_linux.cpp
+        DLL_EXT       := .so
     else ifeq ($(UNAME_S),Darwin)
         PLATFORM      := MAC
         OS_DEFINE     := -DOS_MAC=1
         PLATFORM_LIBS := -framework Cocoa -framework OpenGL -lm
         PLATFORM_SRC  := sys_mac.cpp
+        DLL_EXT       := .dylib
     endif
 endif
 
@@ -32,7 +35,8 @@ endif
 # Settings 
 # ==============================================================================
 
-SILENT ?=
+SILENT  ?=
+RELEASE ?=
 
 # ==============================================================================
 # Compiler & Common Flags
@@ -46,6 +50,8 @@ COMMON_INCLUDE_PATHS := -I../code/ -I../run_tree/deps/vulkan/Include/ -I../run_t
 
 PLATFORM_LINKER_FLAGS := -lm -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static -lfreetype -lvulkan -lspirv_reflect -lslang -lslang-compiler
 GAME_LINKER_FLAGS     := -lm -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static
+
+GAME_DLL_COMPILE_FLAGS := $(filter-out -flto, $(COMMON_COMPILE_FLAGS))
 
 # ==============================================================================
 # Paths & Dynamic File Discovery
@@ -72,11 +78,12 @@ SHADERS   := $(shell find $(CODE_DIR)/shaders -type f)
 RES_FILES := $(filter-out $(RUN_TREE)/res/asset_stamp, $(wildcard $(RUN_TREE)/res/*))
 
 # Default Goal
-.PHONY: all clean assets shaders engine sandboxes tests
+.PHONY: all clean assets shaders engine sandboxes tests game_dll
 
-all: engine shaders assets sandboxes tests
+all: engine game_dll shaders assets sandboxes tests
 
 engine: $(BUILD_DIR)/game_DEBUG$(EXE_EXT)
+game_dll: $(BUILD_DIR)/game_DLL$(DLL_EXT)
 shaders: $(BUILD_DIR)/shader_stamp
 assets: $(RUN_TREE)/res/asset_stamp
 sandboxes: $(SANDBOX_EXES)
@@ -155,7 +162,12 @@ $(BUILD_DIR)/sandbox_%$(EXE_EXT): $(CODE_DIR)/sandbox/%.cpp $(C_FILES) | $(BUILD
 # ==============================================================================
 $(BUILD_DIR)/game_DEBUG$(EXE_EXT): $(CODE_DIR)/build.cpp $(CODE_DIR)/meta/ATHENA_GENERATED_RTTI.h | $(BUILD_DIR)
 	@echo "[BUILDING GAME ENGINE]"
-	$(SILENT) $(CXX) $(COMMON_INCLUDE_PATHS) $< $(COMMON_COMPILE_FLAGS) $(PLATFORM_LINKER_FLAGS) -o $@
+	$(SILENT) $(CXX) $(RELEASE) -DENGINE_BUILD=1 $(COMMON_INCLUDE_PATHS) $< $(COMMON_COMPILE_FLAGS) $(PLATFORM_LINKER_FLAGS) -rdynamic -o $@
+
+$(BUILD_DIR)/game_DLL$(DLL_EXT): $(CODE_DIR)/build.cpp $(CODE_DIR)/meta/ATHENA_GENERATED_RTTI.h | $(BUILD_DIR)
+	@echo "[BUILDING GAME DLL]"
+	$(SILENT) $(CXX) -DGAME_DLL_BUILD=1 -fPIC -shared $(COMMON_INCLUDE_PATHS) $< $(GAME_DLL_COMPILE_FLAGS) $(PLATFORM_LINKER_FLAGS) -Wl,--allow-shlib-undefined -MMD -MP -MF$(@).d -MT$@ -o $@.tmp
+	$(SILENT) mv -f $@.tmp $@
 
 clean:
 	@$(RM_CMD)

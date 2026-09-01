@@ -132,6 +132,8 @@
 #define local_persist   static
 #define internal_api    static
 
+#define external extern "C"
+
 #if COMPILER_CLANG || COMPILER_GCC
 # define thread_static   __thread
 #elif defined(COMPILER_CL)

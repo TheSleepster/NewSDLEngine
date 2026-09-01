@@ -12,12 +12,14 @@
 #include <c_memory_arena.h>
 #include <c_threadpool.h>
 #include <c_file_watcher.h>
+#include <c_file_api.h>
 
 typedef struct vec2 vec2_t;
 
 struct RHI_context_t;
 struct asset_manager_t;
 struct input_manager_t;
+struct game_state_t;
 
 typedef struct global_context
 {
@@ -26,6 +28,7 @@ typedef struct global_context
     bool8             should_reload;
 
     threadpool_t      main_threadpool;
+    game_state_t     *game_state;
     RHI_context_t    *RHI_context;
     asset_manager_t  *asset_manager;
     input_manager_t  *input_manager;
@@ -40,6 +43,14 @@ typedef struct global_context
 
     float64           tick_rate;
     float64           tick_rate_ms;
+
+    // TODO(Sleepster): These should be disabled in release mode... but Athena is causing issues so whatever 
+    void             *game_library;
+    string_t          game_dll_path;
+    file_data_t       game_dll_data;
+
+    file_t            input_manager_playback_file;
+    bool8             recording_input;
 }global_context_t;
 
 void c_global_context_init();

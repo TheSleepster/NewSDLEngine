@@ -69,6 +69,7 @@
 	X(file_watcher_sys_watch_data_t, &DEFAULT_typedata_file_watcher_sys_watch_data_t) \
 	X(global_context_t, &DEFAULT_typedata_structure_global_context_t.type_info) \
 	X(threadpool_t, &DEFAULT_typedata_structure_threadpool_t.type_info) \
+	X(game_state_t, &DEFAULT_typedata_game_state_t) \
 	X(RHI_context_t, &DEFAULT_typedata_structure_RHI_context_t.type_info) \
 	X(input_manager_t, &DEFAULT_typedata_structure_input_manager_t.type_info) \
 	X(float64, &DEFAULT_typedata_float64) \
@@ -218,6 +219,7 @@
 	X(widget_layout_style_t, &DEFAULT_typedata_structure_widget_layout_style_t.type_info) \
 	X(widget_size_kind_t, &DEFAULT_typedata_structure_widget_size_kind_t.type_info) \
 	X(widget_t, &DEFAULT_typedata_structure_widget_t.type_info) \
+	X(ui_keyboard_flags_t, &DEFAULT_typedata_structure_ui_keyboard_flags_t.type_info) \
 	X(ui_state_t, &DEFAULT_typedata_structure_ui_state_t.type_info) \
 	X(ivec2_t, &DEFAULT_typedata_ivec2_t) \
 	X(vulkan_allocation_usage_type_t, &DEFAULT_typedata_structure_vulkan_allocation_usage_type_t.type_info) \
@@ -351,6 +353,9 @@
 	X(TYPE_immediate_put_data) \
 	X(TYPE_void_func) \
 	X(TYPE_duration_counter_t) \
+	X(TYPE_c_duration_counter_init) \
+	X(TYPE_c_duration_counter_advance) \
+	X(TYPE_c_duration_counter_reset) \
 	X(TYPE_bool32) \
 	X(TYPE_T) \
 	X(TYPE_begin) \
@@ -407,6 +412,7 @@
 	X(TYPE_c_global_context_reset_persistent_arena) \
 	X(TYPE_c_global_context_reset_simulation_arena) \
 	X(TYPE_threadpool_t) \
+	X(TYPE_game_state_t) \
 	X(TYPE_RHI_context_t) \
 	X(TYPE_input_manager_t) \
 	X(TYPE_float64) \
@@ -442,6 +448,7 @@
 	X(TYPE_c_program_flag_print_flag_list) \
 	X(TYPE_c_program_flag_container_init) \
 	X(TYPE_c_program_flag_parse_args) \
+	X(TYPE_STR) \
 	X(TYPE_c_string_length) \
 	X(TYPE_c_string_null_terminated) \
 	X(TYPE_c_string_is_valid) \
@@ -666,6 +673,9 @@
 	X(TYPE_s_im_transform_mouse_data) \
 	X(TYPE_s_im_get_button_binding_state) \
 	X(TYPE_s_im_get_axis_value) \
+	X(TYPE_s_im_is_button_pressed) \
+	X(TYPE_s_im_is_button_down) \
+	X(TYPE_s_im_is_button_released) \
 	X(TYPE_s_im_game_action_create) \
 	X(TYPE_s_im_game_action_add_mapping) \
 	X(TYPE_s_im_game_action_reset_mappings) \
@@ -795,6 +805,7 @@
 	X(TYPE_widget_layout_style_t) \
 	X(TYPE_widget_size_kind_t) \
 	X(TYPE_widget_t) \
+	X(TYPE_ui_keyboard_flags_t) \
 	X(TYPE_ui_state_t) \
 	X(TYPE_ui_state_init) \
 	X(TYPE_ui_state_poll_input_events) \
@@ -1323,6 +1334,48 @@ struct type_info_struct_duration_counter_t {
 			const type_info_member_t current_elapsed;
 			const type_info_member_t looped;
 		}members;
+	};
+};
+
+struct type_info_procedure_c_duration_counter_init {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[3];
+		struct {
+			const type_info_member_t counter;
+			const type_info_member_t duration_ms;
+			const type_info_member_t looped;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_c_duration_counter_advance {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t counter;
+			const type_info_member_t advance_ms;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_c_duration_counter_reset {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t counter;
+		}arguments;
 	};
 };
 
@@ -1964,12 +2017,13 @@ struct type_info_struct_global_context_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[13];
+		const type_info_member_t member_array[19];
 		struct {
 			const type_info_member_t is_initialized;
 			const type_info_member_t running;
 			const type_info_member_t should_reload;
 			const type_info_member_t main_threadpool;
+			const type_info_member_t game_state;
 			const type_info_member_t RHI_context;
 			const type_info_member_t asset_manager;
 			const type_info_member_t input_manager;
@@ -1979,6 +2033,11 @@ struct type_info_struct_global_context_t {
 			const type_info_member_t simulation_arena;
 			const type_info_member_t tick_rate;
 			const type_info_member_t tick_rate_ms;
+			const type_info_member_t game_library;
+			const type_info_member_t game_dll_path;
+			const type_info_member_t game_dll_data;
+			const type_info_member_t input_manager_playback_file;
+			const type_info_member_t recording_input;
 		}members;
 	};
 };
@@ -2518,6 +2577,19 @@ struct type_info_procedure_c_program_flag_parse_args {
 		struct {
 			const type_info_member_t argc;
 			const type_info_member_t argv;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_STR {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t c_string;
 		}arguments;
 	};
 };
@@ -4980,7 +5052,7 @@ struct type_info_struct_entity_flags_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[11];
+		const type_info_member_t member_array[12];
 		struct {
 			const type_info_member_t ENTITY_FLAG_NONE;
 			const type_info_member_t ENTITY_FLAG_IS_VALID;
@@ -4988,11 +5060,12 @@ struct type_info_struct_entity_flags_t {
 			const type_info_member_t ENTITY_FLAG_ALIVE;
 			const type_info_member_t ENTITY_FLAG_GRAVITIC;
 			const type_info_member_t ENTITY_FLAG_ACTOR;
-			const type_info_member_t ENTTIY_FLAG_STATIC;
+			const type_info_member_t ENTITY_FLAG_STATIC;
 			const type_info_member_t ENTITY_FLAG_HAS_SPRITE;
 			const type_info_member_t ENTITY_FLAG_HAS_COLLIDER;
 			const type_info_member_t ENTITY_FLAG_ANIMATED;
 			const type_info_member_t ENTITY_FLAG_IS_GROUND;
+			const type_info_member_t ENTITY_FLAG_GROUNDED;
 		}members;
 	};
 };
@@ -5288,10 +5361,9 @@ struct type_info_struct_keyboard_controller_data_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[2];
+		const type_info_member_t member_array[1];
 		struct {
 			const type_info_member_t input;
-			const type_info_member_t modifier_flags;
 		}members;
 	};
 };
@@ -5362,12 +5434,13 @@ struct type_info_struct_input_event_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[8];
+		const type_info_member_t member_array[9];
 		struct {
 			const type_info_member_t type;
 			const type_info_member_t input_type;
 			const type_info_member_t consumed;
 			const type_info_member_t inputID;
+			const type_info_member_t hardwareID;
 			const type_info_member_t deviceID;
 			const type_info_member_t timestampMS;
 			const type_info_member_t input_stream;
@@ -5578,6 +5651,48 @@ struct type_info_procedure_s_im_get_axis_value {
 		struct {
 			const type_info_member_t controller;
 			const type_info_member_t binding;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_s_im_is_button_pressed {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t controller;
+			const type_info_member_t inputID;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_s_im_is_button_down {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t controller;
+			const type_info_member_t inputID;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_s_im_is_button_released {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t controller;
+			const type_info_member_t inputID;
 		}arguments;
 	};
 };
@@ -7359,16 +7474,30 @@ struct type_info_struct_widget_t {
 	};
 };
 
+struct type_info_struct_ui_keyboard_flags_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[2];
+		struct {
+			const type_info_member_t UI_KEYBOARD_FLAG_NONE;
+			const type_info_member_t UI_KEYBOARD_FLAG_LCTRL;
+		}members;
+	};
+};
+
 struct type_info_struct_ui_state_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[51];
+		const type_info_member_t member_array[52];
 		struct {
 			const type_info_member_t widget_arena;
 			const type_info_member_t polling_arena;
 			const type_info_member_t section_count;
+			const type_info_member_t keyboard_flags;
 			const type_info_member_t frame_begun;
 			const type_info_member_t frame_ended;
 			const type_info_member_t input_focused;
@@ -9244,6 +9373,9 @@ extern const type_info_t DEFAULT_typedata_byte;
 extern const type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data;
 extern const type_info_procedure_void_func DEFAULT_typedata_procedure_void_func;
 extern const type_info_struct_duration_counter_t DEFAULT_typedata_structure_duration_counter_t;
+extern const type_info_procedure_c_duration_counter_init DEFAULT_typedata_procedure_c_duration_counter_init;
+extern const type_info_procedure_c_duration_counter_advance DEFAULT_typedata_procedure_c_duration_counter_advance;
+extern const type_info_procedure_c_duration_counter_reset DEFAULT_typedata_procedure_c_duration_counter_reset;
 extern const type_info_t DEFAULT_typedata_bool32;
 extern const type_info_t DEFAULT_typedata_T;
 extern const type_info_procedure_begin DEFAULT_typedata_procedure_begin;
@@ -9300,6 +9432,7 @@ extern const type_info_procedure_c_global_context_reset_transient_arena DEFAULT_
 extern const type_info_procedure_c_global_context_reset_persistent_arena DEFAULT_typedata_procedure_c_global_context_reset_persistent_arena;
 extern const type_info_procedure_c_global_context_reset_simulation_arena DEFAULT_typedata_procedure_c_global_context_reset_simulation_arena;
 extern const type_info_struct_threadpool_t DEFAULT_typedata_structure_threadpool_t;
+extern const type_info_t DEFAULT_typedata_game_state_t;
 extern const type_info_struct_RHI_context_t DEFAULT_typedata_structure_RHI_context_t;
 extern const type_info_struct_input_manager_t DEFAULT_typedata_structure_input_manager_t;
 extern const type_info_t DEFAULT_typedata_float64;
@@ -9335,6 +9468,7 @@ extern const type_info_procedure_c_program_flag_add_string DEFAULT_typedata_proc
 extern const type_info_procedure_c_program_flag_print_flag_list DEFAULT_typedata_procedure_c_program_flag_print_flag_list;
 extern const type_info_procedure_c_program_flag_container_init DEFAULT_typedata_procedure_c_program_flag_container_init;
 extern const type_info_procedure_c_program_flag_parse_args DEFAULT_typedata_procedure_c_program_flag_parse_args;
+extern const type_info_procedure_STR DEFAULT_typedata_procedure_STR;
 extern const type_info_procedure_c_string_length DEFAULT_typedata_procedure_c_string_length;
 extern const type_info_procedure_c_string_null_terminated DEFAULT_typedata_procedure_c_string_null_terminated;
 extern const type_info_procedure_c_string_is_valid DEFAULT_typedata_procedure_c_string_is_valid;
@@ -9565,6 +9699,9 @@ extern const type_info_t DEFAULT_typedata_mat4_t;
 extern const type_info_procedure_s_im_transform_mouse_data DEFAULT_typedata_procedure_s_im_transform_mouse_data;
 extern const type_info_procedure_s_im_get_button_binding_state DEFAULT_typedata_procedure_s_im_get_button_binding_state;
 extern const type_info_procedure_s_im_get_axis_value DEFAULT_typedata_procedure_s_im_get_axis_value;
+extern const type_info_procedure_s_im_is_button_pressed DEFAULT_typedata_procedure_s_im_is_button_pressed;
+extern const type_info_procedure_s_im_is_button_down DEFAULT_typedata_procedure_s_im_is_button_down;
+extern const type_info_procedure_s_im_is_button_released DEFAULT_typedata_procedure_s_im_is_button_released;
 extern const type_info_procedure_s_im_game_action_create DEFAULT_typedata_procedure_s_im_game_action_create;
 extern const type_info_procedure_s_im_game_action_add_mapping DEFAULT_typedata_procedure_s_im_game_action_add_mapping;
 extern const type_info_procedure_s_im_game_action_reset_mappings DEFAULT_typedata_procedure_s_im_game_action_reset_mappings;
@@ -9638,7 +9775,6 @@ extern const type_info_procedure_RHI_cmd_renderpass_begin DEFAULT_typedata_proce
 extern const type_info_procedure_RHI_cmd_renderpass_end DEFAULT_typedata_procedure_RHI_cmd_renderpass_end;
 extern const type_info_procedure_RHI_cmd_begin_render_group DEFAULT_typedata_procedure_RHI_cmd_begin_render_group;
 extern const type_info_procedure_RHI_cmd_end_render_group DEFAULT_typedata_procedure_RHI_cmd_end_render_group;
-extern const type_info_procedure_RHI_cmd_bind_index_buffer DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer;
 extern const type_info_procedure_RHI_cmd_set_scissor DEFAULT_typedata_procedure_RHI_cmd_set_scissor;
 extern const type_info_procedure_RHI_cmd_set_viewport DEFAULT_typedata_procedure_RHI_cmd_set_viewport;
 extern const type_info_procedure_RHI_cmd_update_push_constants DEFAULT_typedata_procedure_RHI_cmd_update_push_constants;
@@ -9690,6 +9826,7 @@ extern const type_info_struct_widget_flags_t DEFAULT_typedata_structure_widget_f
 extern const type_info_struct_widget_layout_style_t DEFAULT_typedata_structure_widget_layout_style_t;
 extern const type_info_struct_widget_size_kind_t DEFAULT_typedata_structure_widget_size_kind_t;
 extern const type_info_struct_widget_t DEFAULT_typedata_structure_widget_t;
+extern const type_info_struct_ui_keyboard_flags_t DEFAULT_typedata_structure_ui_keyboard_flags_t;
 extern const type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t;
 extern const type_info_procedure_ui_state_init DEFAULT_typedata_procedure_ui_state_init;
 extern const type_info_procedure_ui_state_poll_input_events DEFAULT_typedata_procedure_ui_state_poll_input_events;
@@ -11128,6 +11265,84 @@ constexpr type_info_struct_duration_counter_t DEFAULT_typedata_structure_duratio
 	},
 };
 
+constexpr type_info_procedure_c_duration_counter_init DEFAULT_typedata_procedure_c_duration_counter_init = {
+	.type_info = {
+		.type_name = "c_duration_counter_init",
+		.type_id = TYPE_c_duration_counter_init,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 3,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_c_duration_counter_init.argument_array,
+	.arguments = {
+		.counter = {
+			.type_info     = &DEFAULT_typedata_structure_duration_counter_t.type_info,
+			.member_name   = "counter",
+			.parent        = &DEFAULT_typedata_procedure_c_duration_counter_init.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.duration_ms = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "duration_ms",
+			.parent        = &DEFAULT_typedata_procedure_c_duration_counter_init.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.looped = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "looped",
+			.parent        = &DEFAULT_typedata_procedure_c_duration_counter_init.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_c_duration_counter_advance DEFAULT_typedata_procedure_c_duration_counter_advance = {
+	.type_info = {
+		.type_name = "c_duration_counter_advance",
+		.type_id = TYPE_c_duration_counter_advance,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_bool8,
+	.argument_pointer = DEFAULT_typedata_procedure_c_duration_counter_advance.argument_array,
+	.arguments = {
+		.counter = {
+			.type_info     = &DEFAULT_typedata_structure_duration_counter_t.type_info,
+			.member_name   = "counter",
+			.parent        = &DEFAULT_typedata_procedure_c_duration_counter_advance.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.advance_ms = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "advance_ms",
+			.parent        = &DEFAULT_typedata_procedure_c_duration_counter_advance.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_c_duration_counter_reset DEFAULT_typedata_procedure_c_duration_counter_reset = {
+	.type_info = {
+		.type_name = "c_duration_counter_reset",
+		.type_id = TYPE_c_duration_counter_reset,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_c_duration_counter_reset.argument_array,
+	.arguments = {
+		.counter = {
+			.type_info     = &DEFAULT_typedata_structure_duration_counter_t.type_info,
+			.member_name   = "counter",
+			.parent        = &DEFAULT_typedata_procedure_c_duration_counter_reset.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr type_info_t DEFAULT_typedata_bool32 = {
 	.type_name = "bool32",
 	.type_id = TYPE_bool32,
@@ -12910,7 +13125,7 @@ constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_co
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<global_context_t>(),
 	},
-	.member_count   = 13,
+	.member_count   = 19,
 	.member_pointer = DEFAULT_typedata_structure_global_context_t.member_array,
 	.members = {
 		.is_initialized = {
@@ -12944,6 +13159,14 @@ constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_co
 			.offset        = offsetof(global_context_t, main_threadpool),
 			.flags         = 0,
 			.pointer_depth = 0,
+		},
+		.game_state = {
+			.type_info     = &DEFAULT_typedata_game_state_t,
+			.member_name   = "game_state",
+			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
+			.offset        = offsetof(global_context_t, game_state),
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
 		.RHI_context = {
 			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
@@ -13014,6 +13237,46 @@ constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_co
 			.member_name   = "tick_rate_ms",
 			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
 			.offset        = offsetof(global_context_t, tick_rate_ms),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.game_library = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "game_library",
+			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
+			.offset        = offsetof(global_context_t, game_library),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.game_dll_path = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "game_dll_path",
+			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
+			.offset        = offsetof(global_context_t, game_dll_path),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.game_dll_data = {
+			.type_info     = &DEFAULT_typedata_structure_file_data_t.type_info,
+			.member_name   = "game_dll_data",
+			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
+			.offset        = offsetof(global_context_t, game_dll_data),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.input_manager_playback_file = {
+			.type_info     = &DEFAULT_typedata_structure_file_t.type_info,
+			.member_name   = "input_manager_playback_file",
+			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
+			.offset        = offsetof(global_context_t, input_manager_playback_file),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.recording_input = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "recording_input",
+			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
+			.offset        = offsetof(global_context_t, recording_input),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -13117,6 +13380,11 @@ constexpr type_info_struct_threadpool_t DEFAULT_typedata_structure_threadpool_t 
 	},
 };
 
+constexpr type_info_t DEFAULT_typedata_game_state_t = {
+	.type_name = "game_state_t",
+	.type_id = TYPE_game_state_t,
+	.size = athena_internal::safe_sizeof<game_state_t>(),
+};
 constexpr type_info_struct_RHI_context_t DEFAULT_typedata_structure_RHI_context_t = {
 	.type_info = {
 		.type_name = "RHI_context_t",
@@ -14360,6 +14628,25 @@ constexpr type_info_procedure_c_program_flag_parse_args DEFAULT_typedata_procedu
 			.parent        = &DEFAULT_typedata_procedure_c_program_flag_parse_args.type_info,
 			.flags         = 2,
 			.pointer_depth = 2,
+		},
+	},
+};
+constexpr type_info_procedure_STR DEFAULT_typedata_procedure_STR = {
+	.type_info = {
+		.type_name = "STR",
+		.type_id = TYPE_STR,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_structure_string_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_STR.argument_array,
+	.arguments = {
+		.c_string = {
+			.type_info     = &DEFAULT_typedata_char,
+			.member_name   = "c_string",
+			.parent        = &DEFAULT_typedata_procedure_STR.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
 	},
 };
@@ -20299,7 +20586,7 @@ constexpr type_info_struct_entity_flags_t DEFAULT_typedata_structure_entity_flag
 		.metatype  = ATHENA_METATYPE_ENUM,
 		.size = athena_internal::safe_sizeof<entity_flags_t>(),
 	},
-	.member_count   = 11,
+	.member_count   = 12,
 	.member_pointer = DEFAULT_typedata_structure_entity_flags_t.member_array,
 	.members = {
 		.ENTITY_FLAG_NONE = {
@@ -20368,9 +20655,9 @@ constexpr type_info_struct_entity_flags_t DEFAULT_typedata_structure_entity_flag
 				.u64 = 32,
 			},
 		},
-		.ENTTIY_FLAG_STATIC = {
+		.ENTITY_FLAG_STATIC = {
 			.type_info     = &DEFAULT_typedata_structure_entity_flags_t.type_info,
-			.member_name   = "ENTTIY_FLAG_STATIC",
+			.member_name   = "ENTITY_FLAG_STATIC",
 			.parent        = &DEFAULT_typedata_structure_entity_flags_t.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
@@ -20421,6 +20708,17 @@ constexpr type_info_struct_entity_flags_t DEFAULT_typedata_structure_entity_flag
 			.value = {
 				.type = 3,
 				.u64 = 1024,
+			},
+		},
+		.ENTITY_FLAG_GROUNDED = {
+			.type_info     = &DEFAULT_typedata_structure_entity_flags_t.type_info,
+			.member_name   = "ENTITY_FLAG_GROUNDED",
+			.parent        = &DEFAULT_typedata_structure_entity_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 2048,
 			},
 		},
 	},
@@ -21401,7 +21699,7 @@ constexpr type_info_struct_keyboard_controller_data_t DEFAULT_typedata_structure
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<keyboard_controller_data_t>(),
 	},
-	.member_count   = 2,
+	.member_count   = 1,
 	.member_pointer = DEFAULT_typedata_structure_keyboard_controller_data_t.member_array,
 	.members = {
 		.input = {
@@ -21410,14 +21708,6 @@ constexpr type_info_struct_keyboard_controller_data_t DEFAULT_typedata_structure
 			.parent        = &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
 			.offset        = offsetof(keyboard_controller_data_t, input),
 			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.modifier_flags = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "modifier_flags",
-			.parent        = &DEFAULT_typedata_structure_keyboard_controller_data_t.type_info,
-			.offset        = offsetof(keyboard_controller_data_t, modifier_flags),
-			.flags         = 0,
 			.pointer_depth = 0,
 		},
 	},
@@ -21666,7 +21956,7 @@ constexpr type_info_struct_input_event_t DEFAULT_typedata_structure_input_event_
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<input_event_t>(),
 	},
-	.member_count   = 8,
+	.member_count   = 9,
 	.member_pointer = DEFAULT_typedata_structure_input_event_t.member_array,
 	.members = {
 		.type = {
@@ -21698,6 +21988,14 @@ constexpr type_info_struct_input_event_t DEFAULT_typedata_structure_input_event_
 			.member_name   = "inputID",
 			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
 			.offset        = offsetof(input_event_t, inputID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.hardwareID = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "hardwareID",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, hardwareID),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -22161,6 +22459,84 @@ constexpr type_info_procedure_s_im_get_axis_value DEFAULT_typedata_procedure_s_i
 			.parent        = &DEFAULT_typedata_procedure_s_im_get_axis_value.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_s_im_is_button_pressed DEFAULT_typedata_procedure_s_im_is_button_pressed = {
+	.type_info = {
+		.type_name = "s_im_is_button_pressed",
+		.type_id = TYPE_s_im_is_button_pressed,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_bool8,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_button_pressed.argument_array,
+	.arguments = {
+		.controller = {
+			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.member_name   = "controller",
+			.parent        = &DEFAULT_typedata_procedure_s_im_is_button_pressed.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.inputID = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "inputID",
+			.parent        = &DEFAULT_typedata_procedure_s_im_is_button_pressed.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_s_im_is_button_down DEFAULT_typedata_procedure_s_im_is_button_down = {
+	.type_info = {
+		.type_name = "s_im_is_button_down",
+		.type_id = TYPE_s_im_is_button_down,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_bool8,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_button_down.argument_array,
+	.arguments = {
+		.controller = {
+			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.member_name   = "controller",
+			.parent        = &DEFAULT_typedata_procedure_s_im_is_button_down.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.inputID = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "inputID",
+			.parent        = &DEFAULT_typedata_procedure_s_im_is_button_down.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_s_im_is_button_released DEFAULT_typedata_procedure_s_im_is_button_released = {
+	.type_info = {
+		.type_name = "s_im_is_button_released",
+		.type_id = TYPE_s_im_is_button_released,
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_bool8,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_is_button_released.argument_array,
+	.arguments = {
+		.controller = {
+			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.member_name   = "controller",
+			.parent        = &DEFAULT_typedata_procedure_s_im_is_button_released.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.inputID = {
+			.type_info     = &DEFAULT_typedata_s32,
+			.member_name   = "inputID",
+			.parent        = &DEFAULT_typedata_procedure_s_im_is_button_released.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 	},
 };
@@ -24905,32 +25281,6 @@ constexpr type_info_procedure_RHI_cmd_end_render_group DEFAULT_typedata_procedur
 		},
 	},
 };
-constexpr type_info_procedure_RHI_cmd_bind_index_buffer DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer = {
-	.type_info = {
-		.type_name = "RHI_cmd_bind_index_buffer",
-		.type_id = TYPE_RHI_cmd_bind_index_buffer,
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
 constexpr type_info_procedure_RHI_cmd_set_scissor DEFAULT_typedata_procedure_RHI_cmd_set_scissor = {
 	.type_info = {
 		.type_name = "RHI_cmd_set_scissor",
@@ -27173,6 +27523,41 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 	},
 };
 
+constexpr type_info_struct_ui_keyboard_flags_t DEFAULT_typedata_structure_ui_keyboard_flags_t = {
+	.type_info = {
+		.type_name = "ui_keyboard_flags_t",
+		.type_id = TYPE_ui_keyboard_flags_t,
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.size = athena_internal::safe_sizeof<ui_keyboard_flags_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_ui_keyboard_flags_t.member_array,
+	.members = {
+		.UI_KEYBOARD_FLAG_NONE = {
+			.type_info     = &DEFAULT_typedata_structure_ui_keyboard_flags_t.type_info,
+			.member_name   = "UI_KEYBOARD_FLAG_NONE",
+			.parent        = &DEFAULT_typedata_structure_ui_keyboard_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 1,
+			},
+		},
+		.UI_KEYBOARD_FLAG_LCTRL = {
+			.type_info     = &DEFAULT_typedata_structure_ui_keyboard_flags_t.type_info,
+			.member_name   = "UI_KEYBOARD_FLAG_LCTRL",
+			.parent        = &DEFAULT_typedata_structure_ui_keyboard_flags_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 2,
+			},
+		},
+	},
+};
+
 constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 	.type_info = {
 		.type_name = "ui_state_t",
@@ -27180,7 +27565,7 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 		.metatype  = ATHENA_METATYPE_STRUCT,
 		.size = athena_internal::safe_sizeof<ui_state_t>(),
 	},
-	.member_count   = 51,
+	.member_count   = 52,
 	.member_pointer = DEFAULT_typedata_structure_ui_state_t.member_array,
 	.members = {
 		.widget_arena = {
@@ -27204,6 +27589,14 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.member_name   = "section_count",
 			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.offset        = offsetof(ui_state_t, section_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.keyboard_flags = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "keyboard_flags",
+			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.offset        = offsetof(ui_state_t, keyboard_flags),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -32816,6 +33209,9 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_immediate_put_data.type_info,
 	&DEFAULT_typedata_procedure_void_func.type_info,
 	&DEFAULT_typedata_structure_duration_counter_t.type_info,
+	&DEFAULT_typedata_procedure_c_duration_counter_init.type_info,
+	&DEFAULT_typedata_procedure_c_duration_counter_advance.type_info,
+	&DEFAULT_typedata_procedure_c_duration_counter_reset.type_info,
 	&DEFAULT_typedata_procedure_begin.type_info,
 	&DEFAULT_typedata_procedure_end.type_info,
 	&DEFAULT_typedata_structure_file_t.type_info,
@@ -32897,6 +33293,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_program_flag_print_flag_list.type_info,
 	&DEFAULT_typedata_procedure_c_program_flag_container_init.type_info,
 	&DEFAULT_typedata_procedure_c_program_flag_parse_args.type_info,
+	&DEFAULT_typedata_procedure_STR.type_info,
 	&DEFAULT_typedata_procedure_c_string_length.type_info,
 	&DEFAULT_typedata_procedure_c_string_null_terminated.type_info,
 	&DEFAULT_typedata_procedure_c_string_is_valid.type_info,
@@ -33104,6 +33501,9 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_s_im_transform_mouse_data.type_info,
 	&DEFAULT_typedata_procedure_s_im_get_button_binding_state.type_info,
 	&DEFAULT_typedata_procedure_s_im_get_axis_value.type_info,
+	&DEFAULT_typedata_procedure_s_im_is_button_pressed.type_info,
+	&DEFAULT_typedata_procedure_s_im_is_button_down.type_info,
+	&DEFAULT_typedata_procedure_s_im_is_button_released.type_info,
 	&DEFAULT_typedata_procedure_s_im_game_action_create.type_info,
 	&DEFAULT_typedata_procedure_s_im_game_action_add_mapping.type_info,
 	&DEFAULT_typedata_procedure_s_im_game_action_reset_mappings.type_info,
@@ -33174,7 +33574,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_RHI_cmd_renderpass_end.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_begin_render_group.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_end_render_group.type_info,
-	&DEFAULT_typedata_procedure_RHI_cmd_bind_index_buffer.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_set_scissor.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_set_viewport.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_update_push_constants.type_info,
@@ -33219,6 +33618,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_widget_layout_style_t.type_info,
 	&DEFAULT_typedata_structure_widget_size_kind_t.type_info,
 	&DEFAULT_typedata_structure_widget_t.type_info,
+	&DEFAULT_typedata_structure_ui_keyboard_flags_t.type_info,
 	&DEFAULT_typedata_structure_ui_state_t.type_info,
 	&DEFAULT_typedata_procedure_ui_state_init.type_info,
 	&DEFAULT_typedata_procedure_ui_state_poll_input_events.type_info,
@@ -33529,6 +33929,7 @@ enum class global_context_t {
 	running,
 	should_reload,
 	main_threadpool,
+	game_state,
 	RHI_context,
 	asset_manager,
 	input_manager,
@@ -33538,6 +33939,11 @@ enum class global_context_t {
 	simulation_arena,
 	tick_rate,
 	tick_rate_ms,
+	game_library,
+	game_dll_path,
+	game_dll_data,
+	input_manager_playback_file,
+	recording_input,
 }; // global_context_t
 enum class threadpool_t {
 	work_avaliable_semaphore,
@@ -33963,11 +34369,12 @@ enum class entity_flags_t {
 	ENTITY_FLAG_ALIVE,
 	ENTITY_FLAG_GRAVITIC,
 	ENTITY_FLAG_ACTOR,
-	ENTTIY_FLAG_STATIC,
+	ENTITY_FLAG_STATIC,
 	ENTITY_FLAG_HAS_SPRITE,
 	ENTITY_FLAG_HAS_COLLIDER,
 	ENTITY_FLAG_ANIMATED,
 	ENTITY_FLAG_IS_GROUND,
+	ENTITY_FLAG_GROUNDED,
 }; // entity_flags_t
 enum class entity_t {
 	ID,
@@ -34069,7 +34476,6 @@ enum class action_button_t {
 }; // action_button_t
 enum class keyboard_controller_data_t {
 	input,
-	modifier_flags,
 }; // keyboard_controller_data_t
 enum class gamepad_controller_data_t {
 	buttons,
@@ -34101,6 +34507,7 @@ enum class input_event_t {
 	input_type,
 	consumed,
 	inputID,
+	hardwareID,
 	deviceID,
 	timestampMS,
 	input_stream,
@@ -34503,10 +34910,15 @@ enum class widget_t {
 	prev_sibling,
 	widget_instance_data,
 }; // widget_t
+enum class ui_keyboard_flags_t {
+	UI_KEYBOARD_FLAG_NONE,
+	UI_KEYBOARD_FLAG_LCTRL,
+}; // ui_keyboard_flags_t
 enum class ui_state_t {
 	widget_arena,
 	polling_arena,
 	section_count,
+	keyboard_flags,
 	frame_begun,
 	frame_ended,
 	input_focused,
@@ -34868,6 +35280,18 @@ enum class immediate_put_data {
 	element_size,
 	element_count,
 }; // immediate_put_data
+enum class c_duration_counter_init {
+	counter,
+	duration_ms,
+	looped,
+}; // c_duration_counter_init
+enum class c_duration_counter_advance {
+	counter,
+	advance_ms,
+}; // c_duration_counter_advance
+enum class c_duration_counter_reset {
+	counter,
+}; // c_duration_counter_reset
 enum class visit_files_pfn_t {
 	visit_file_data,
 	user_data,
@@ -35091,6 +35515,9 @@ enum class c_program_flag_parse_args {
 	argc,
 	argv,
 }; // c_program_flag_parse_args
+enum class STR {
+	c_string,
+}; // STR
 enum class c_string_length {
 	c_string,
 }; // c_string_length
@@ -35652,6 +36079,18 @@ enum class s_im_get_axis_value {
 	controller,
 	binding,
 }; // s_im_get_axis_value
+enum class s_im_is_button_pressed {
+	controller,
+	inputID,
+}; // s_im_is_button_pressed
+enum class s_im_is_button_down {
+	controller,
+	inputID,
+}; // s_im_is_button_down
+enum class s_im_is_button_released {
+	controller,
+	inputID,
+}; // s_im_is_button_released
 enum class s_im_game_action_create {
 	input_manager,
 	action_name,
@@ -35779,10 +36218,6 @@ enum class RHI_cmd_begin_render_group {
 enum class RHI_cmd_end_render_group {
 	command_list,
 }; // RHI_cmd_end_render_group
-enum class RHI_cmd_bind_index_buffer {
-	command_list,
-	buffer,
-}; // RHI_cmd_bind_index_buffer
 enum class RHI_cmd_set_scissor {
 	command_list,
 	offset,

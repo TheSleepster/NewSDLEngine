@@ -129,7 +129,7 @@ string_t
 c_string_make_copy(memory_arena_t *arena, string_t string)
 {
     string_t result;
-    result.data = (byte*)c_arena_push_array(arena, byte, string.count);
+    result.data = (byte*)c_arena_push_array(arena, byte, string.count + 1);
     if(result.data)
     {
         result.count = string.count;

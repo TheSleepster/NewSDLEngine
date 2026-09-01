@@ -32,9 +32,14 @@
 
 #include <asset_file_packer/jfd_asset_file.h>
 
-int game_main(void);
+#ifndef RELEASE 
+typedef int game_main_t(global_context_t *_global_context);
+global_variable game_main_t *game_main;
+#else
+int game_main(global_context_t *_global_context);
+#endif
 
-// TODO(Sleepster): Toggle this off in release 
+#ifndef RELEASE
 FILE_WATCHER_CALLBACK(main_file_watcher)
 {
     asset_manager_t *asset_manager = gc->asset_manager;
@@ -63,12 +68,13 @@ FILE_WATCHER_CALLBACK(main_file_watcher)
             }
             else
             {
-                log_error("Could not create a valid asset handle for asset by name of: '%.*s', this asset may not be valid or known to the asset system...\n",
-                          fprint_string(filename));
+                log_warning("Could not create a valid asset handle for asset by name of: '%.*s', this asset may not be valid or known to the asset system...\n",
+                            fprint_string(filename));
             }
         }
     }
 }
+#endif
 
 void
 process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager)
@@ -202,19 +208,50 @@ main(int argc, char **argv)
         s_im_init_input_manager(gc->input_manager);
         RHI_context_init(gc->RHI_context, vulkan_context);
 
+#ifndef RELEASE
         gc->file_watcher = c_file_watcher_create(FWC_EVENT_ALL, true, main_file_watcher, null, false);
         c_file_watcher_add_path(&gc->file_watcher, STR("../res/"));
         c_file_watcher_issue_check_over_all_paths(&gc->file_watcher);
 
+        gc->input_manager_playback_file = c_file_open(STR("input_manager_playback_file.inpdat"), true);
+
+        // NOTE(Sleepster): Load the game code 
+        gc->game_library  = sys_load_library(game_dll_name);
+        gc->game_dll_path = c_string_make_copy(&gc->persistent_arena, game_dll_name);
+        gc->game_dll_data = c_file_get_file_system_info(game_dll_name);
+        Assert(gc->game_library);
+
+        game_main = (game_main_t*)sys_get_proc_address(gc->game_library, STR("game_main"));
+        Assert(game_main);
+#endif
+
         gc->running = true;
         while(gc->running)
         {
-            s32 value = game_main();
+            s32 value = game_main(gc);
             if(value == 0)
             {
                 gc->running = false;
                 break;
             }
+
+#ifndef RELEASE
+            // NOTE(Sleepster): Reload the game code 
+            if(gc->should_reload)
+            {
+                SDL_Delay(10);
+                sys_free_library(gc->game_library);
+
+                gc->game_library  = sys_load_library(gc->game_dll_path);
+                Assert(gc->game_library);
+
+                game_main = (game_main_t*)sys_get_proc_address(gc->game_library, STR("game_main"));
+                Assert(game_main);
+
+                log_info("DLL reloaded...\n");
+                gc->should_reload = false;
+            }
+#endif
         }
     }
     else

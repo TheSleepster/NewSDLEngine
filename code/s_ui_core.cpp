@@ -188,8 +188,15 @@ ui_state_poll_input_events(ui_state_t *ui_state)
 
     if(ui_state->ui_controller)
     {
+        ui_state->keyboard_flags = 0;
+
         action_button_t *left_mouse  = s_im_get_controller_action_button(ui_state->ui_controller, SDL_LEFT_MOUSE);
         action_button_t *right_mouse = s_im_get_controller_action_button(ui_state->ui_controller, SDL_RIGHT_MOUSE);
+        action_button_t *lctrl       = s_im_get_controller_action_button(ui_state->ui_controller, SDL_SCANCODE_LCTRL);
+        if(lctrl->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN)
+        {
+            ui_state->keyboard_flags |= UI_KEYBOARD_FLAG_LCTRL; 
+        }
 
         ui_state->left_mouse = {
             .flags = left_mouse->flags,
@@ -1488,11 +1495,11 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
             ++event_index)
         {
             input_event_t *event = ui_state->ui_events + event_index;
-            if(event->input_stream.count > 0)
+            if(!event->consumed)
             {
-                if(!event->consumed)
+                event->consumed = true;
+                if(event->input_stream.count > 0)
                 {
-                    event->consumed = true;
                     for(s32 stream_index = 0;
                         stream_index < event->input_stream.count;
                         ++stream_index)
@@ -1503,66 +1510,29 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
 
                     widget->widget_text_buffer->count += event->input_stream.count;
                 }
-            }
-            else
-            {
-            }
-        }
-#if 0
-        // NOTE(Sleepster): Handle text input
-        for(s32 event_index = 0;
-            event_index < ui_state->ui_controller->event_count;
-            ++event_index)
-        {
-            // NOTE(Sleepster): Eventually render a range of characters 
-            // (such as indices 10 - 32 for items that run off the end, a way of fitting text into a small box like other apps)
-            // rather than the whole string 
-            input_event_t *input = ui_state->ui_controller->events + event_index;
-
-            // NOTE(Sleepster): Input stream, like WM_CHAR events 
-            if()
-            {
-                // NOTE(Sleepster): Safe to use here since SDL GUARANTEES that this will be null terminated 
-                s32 input_length = strlen((const char *)input->input_stream);
-                if(input_length > 0)
+                else
                 {
-                    for(s32 stream_index = 0;
-                        stream_index < input_length;
-                        ++stream_index)
+                    action_button_t *input = s_im_get_controller_action_button(ui_state->ui_controller, event->inputID);
+                    // NOTE(Sleepster): Backspace 
+                    if(input->keycode == 0x08 && (event->type == INPUT_EVENT_TYPE_PRESSED))
                     {
-                        s32 index = widget->widget_text_buffer->count + stream_index;
-                        widget->widget_text_buffer->data[index] = input->input_stream[stream_index];
-                    }
-
-                    widget->widget_text_buffer->count += input_length;
-                }
-            }
-            else
-            {
-                // NOTE(Sleepster): Special non-character items like backspace, delete, etc. 
-                if(input->keycode == 0x08)
-                {
-                    if((input->modifier_flags & TEXT_INPUT_MODIFIER_CTRL) == 0)
-                    {
-                        widget->widget_text_buffer->data[widget->widget_text_buffer->count] = '\0';
-                        widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 1, 0);
-                    }
-                    else
-                    {
-                        for(s32 index = -4;
-                            index != 0;
-                            ++index)
+                        s32 backspace_amount = 1;
+                        if(ui_state->keyboard_flags & UI_KEYBOARD_FLAG_LCTRL)
                         {
-                            s32 char_index = Max(widget->widget_text_buffer->count + index, 0);
-                            widget->widget_text_buffer->data[char_index] = '\0';
+                            backspace_amount = 4;
                         }
-                        widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 4, 0);
+
+                        for(s32 backspace_index = 0;
+                            backspace_index < backspace_amount;
+                            ++backspace_index)
+                        {
+                            widget->widget_text_buffer->data[widget->widget_text_buffer->count] = '\0';
+                            widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 1, 0);
+                        }
                     }
                 }
             }
-            input->consumed = true;
         }
-#endif
 
         widget_state->widget_text_render_start_offset = 0;
         widget_state->widget_text_render_end_offset   = widget->widget_text_buffer->count;

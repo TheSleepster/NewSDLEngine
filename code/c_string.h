@@ -77,9 +77,14 @@ u32      c_string_find_all_instances_of(string_t string, u8 character);
 string_t c_string_replace_all_instances_of(memory_arena_t *arena, string_t string, u8 character, u8 replacement);
 
 // MACROS
-#define STR(x)                (string_t){.data = (byte*)x, .count = c_string_length(x)}
 #define C_STR(x)              ((const char *)x.data)
 #define fprint_string(string) (s32)((string).count), C_STR((string))
+
+constexpr string_t
+STR(const char *c_string)
+{
+    return((string_t){.data = (byte*)c_string, .count = c_string_length(c_string)});
+}
 
 ///////////////////////////////////////////
 // STRING BUILDER

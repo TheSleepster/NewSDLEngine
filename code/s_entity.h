@@ -40,11 +40,12 @@ enum entity_flags_t
     ENTITY_FLAG_ALIVE          = BIT(3),
     ENTITY_FLAG_GRAVITIC       = BIT(4),
     ENTITY_FLAG_ACTOR          = BIT(5),
-    ENTTIY_FLAG_STATIC         = BIT(6),
+    ENTITY_FLAG_STATIC         = BIT(6),
     ENTITY_FLAG_HAS_SPRITE     = BIT(7),
     ENTITY_FLAG_HAS_COLLIDER   = BIT(8),
     ENTITY_FLAG_ANIMATED       = BIT(9),
     ENTITY_FLAG_IS_GROUND      = BIT(10),
+    ENTITY_FLAG_GROUNDED       = BIT(11),
 };
 
 // NOTE(Sleepster): owner_client_id is used to assign ownership of an entity 

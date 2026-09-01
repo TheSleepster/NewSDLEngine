@@ -20,5 +20,9 @@ struct duration_counter_t
     bool32 looped;
 };
 
+void  c_duration_counter_init(duration_counter_t *counter, u64 duration_ms, bool8 looped);
+bool8 c_duration_counter_advance(duration_counter_t *counter, u64 advance_ms);
+true_inline void c_duration_counter_reset(duration_counter_t *counter);
+
 #endif // C_DURATION_COUNTER_H
 
