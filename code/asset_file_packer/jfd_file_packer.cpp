@@ -102,6 +102,8 @@ parse_arguments(s32 arg_count, char **args)
 internal_api
 VISIT_FILES(gather_all_asset_file_entries)
 {
+    (void)user_data;
+
     string_t filename = visit_file_data->filename;
     string_t filepath = visit_file_data->fullname;
     string_t file_ext = c_string_get_file_ext_from_path(filename);

@@ -18,7 +18,7 @@
 // MSVC
 #if defined(_MSC_VER)
 #define COMPILER_CL 1
-#if defined(_WIN_32)
+#if defined(_WIN32)
 #define OS_WINDOWS 1
 #endif
 
@@ -36,7 +36,7 @@
 // CLANG
 #elif defined(__clang__)
 # define COMPILER_CLANG 1
-#if defined(_WIN_32)
+#if defined(_WIN32) || defined(__MINGW32__) || defined(__MINGW64__)
 # define OS_WINDOWS 1
 #elif defined(__gnu_linux__)
 # define OS_LINUX 1
@@ -62,7 +62,7 @@
 // GNU C
 #elif defined(__GNUC__)
 # define COMPILER_GCC 1
-#if defined(_WIN_32)
+#if defined(_WIN32) || defined(__MINGW32__) || defined(__MINGW64__)
 # define OS_WINDOWS 1
 #elif defined(__gnu_linux__)
 # define OS_LINUX 1

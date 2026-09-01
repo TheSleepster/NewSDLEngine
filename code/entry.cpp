@@ -40,6 +40,8 @@ int game_main(global_context_t *_global_context);
 #endif
 
 #ifndef RELEASE
+
+// TODO(Sleepster): HANDLE THE HOTRELOADING IN HERE!!!!!!! 
 FILE_WATCHER_CALLBACK(main_file_watcher)
 {
     (void)watcher;

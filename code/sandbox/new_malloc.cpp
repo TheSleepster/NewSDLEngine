@@ -9,6 +9,7 @@
 #include <c_base.h>
 #include <c_types.h>
 #include <p_platform_data.h>
+#if 0
 
 struct virtual_memory_region_t 
 {
@@ -155,11 +156,13 @@ slalloc_impl(u64 allocation_size)
 
     return(result);
 }
+#endif
 
 int
 main(void)
 {
     printf("Hello, World!\n");
+#if 0
 
     for(u64 index = 0;
         index < 1000000;
@@ -171,6 +174,7 @@ main(void)
         *test_value  = 4;
         *test_value2 = 6;
     }
+#endif
 
     return(0);
 }

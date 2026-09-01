@@ -9,7 +9,6 @@
       "-I../run_tree/deps/",
       "-I../run_tree/deps/SDL3/include/",
       "-I../run_tree/deps/Freetype/include/",
-      "-I../run_tree/deps/vulkan/slang/include/",
       "../code/build.cpp",
       "-g",
       "-O0",

@@ -25,6 +25,8 @@
 #include <c_file_watcher.cpp>
 #include <c_zone_allocator.cpp>
 
+#if OS_LINUX
+
 #define TEST_SECTION __attribute__((used, section("test_table")))
 #define TEST(name)                                                   \
     static void name(void);                                          \
@@ -127,12 +129,14 @@ test_manager_init(test_manager_t *manager)
     manager->entries     = __start_test_table;
     manager->entry_count = (u32)(__stop_test_table - __start_test_table);
 }
+#endif
 
 int
 main(void)
 {
     c_global_context_init();
 
+#if OS_LINUX
     test_manager_t manager = {};
     test_manager_init(&manager);
 
@@ -141,4 +145,5 @@ main(void)
     test_results_t results = test_manager_run_tests(&manager);
     log_info("Tests finished running...\n\nTotal tests: '%u'\nTests Passed: '%u'\nTests Failed: '%u'\n", 
              results.tests_total, results.tests_passed, results.tests_failed);
+#endif
 }
