@@ -196,7 +196,7 @@ RHI_vertex_buffer_create(RHI_context_t                   *RHI_context,
 {
     RHI_vertex_buffer_t result;
     RHI_render_buffer_desc_t buffer_desc = {
-        .type = RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER,
+        .type            = RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER,
         .allocation_type = memory_type,
         .buffer_capacity = vertex_size * max_vertices,
         .element_size    = vertex_size,
@@ -207,6 +207,7 @@ RHI_vertex_buffer_create(RHI_context_t                   *RHI_context,
     result.vertex_count = 0;
     result.max_vertices = max_vertices;
     result.vertex_data  = vertex_buffer_data;
+    result.advance_rate = (u32)rate;
 
     return(result);
 }
@@ -429,7 +430,7 @@ RHI_command_list_init
 */
 
 internal_api void
-RHI_command_list_init(RHI_context_t *RHI_context, RHI_command_list_t *list)
+RHI_command_list_init(RHI_command_list_t *list)
 {
     if(list->is_initialized == false)
     {
@@ -475,7 +476,7 @@ RHI_get_command_list(RHI_context_t *RHI_context, RHI_command_list_type_t type)
     result->RHI_context       = RHI_context;
     result->command_list_type = type;
 
-    RHI_command_list_init(RHI_context, result);
+    RHI_command_list_init(result);
     Assert(result->is_initialized == true);
     Assert(result->transient_arena.is_initialized == true);
     Assert(result->command_arena.is_initialized   == true);
@@ -871,7 +872,7 @@ RHI_cmd_reset_render_state
 */
 
 void
-RHI_cmd_reset_render_state(RHI_command_list_t *command_list, RHI_pipeline_state_t *render_pipeline_state)
+RHI_cmd_reset_render_state(RHI_command_list_t *command_list)
 {
     RHI_command_t *command  = RHI_get_next_command(command_list);
     command->header.command_type = RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE;

@@ -163,7 +163,7 @@ typedef struct texture_atlas
     bitmap_t                     *bitmap_data;
 
     u32                           ID;
-    u32                           merge_counter;
+    s32                           merge_counter;
     dynarray_t<asset_handle_t*>   textures_to_merge;
 
     // TODO(Sleepster): 

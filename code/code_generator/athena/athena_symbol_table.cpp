@@ -358,8 +358,8 @@ parser_fetch_next_token(parser_t *parser)
     if(c_string_compare(result.data, STR("CODE_GEN_IGNORE_FILE")))
     {
         result = {
-            .token_type = TOKEN_TYPE_EOF,
             .data       = {},
+            .token_type = TOKEN_TYPE_EOF,
         };
 
         parser->should_parse = false;
@@ -421,8 +421,8 @@ parser_fetch_next_token(parser_t *parser)
 #endif
 
         result = {
-            .token_type = TOKEN_TYPE_UNKNOWN,
             .data       = {},
+            .token_type = TOKEN_TYPE_UNKNOWN,
         };
     }
 
@@ -495,12 +495,6 @@ get_metatype_string(u32 metatype)
         default: return "null";
 #undef X
     }
-}
-
-internal_api code_type_t*
-parser_get_code_type(parser_t *parser, string_t identifier, u64 ID)
-{
-    return((code_type_t*)null);
 }
 
 internal_api code_type_t*

@@ -925,7 +925,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
 
                             string_t copy_old_fullname = c_string_make_copy(&gc->transient_arena, directory->old_filename);
                             string_t copy_new_fullname = c_string_make_copy(&gc->transient_arena, filename);
-                            c_file_watcher_add_change_event(watcher, copy_new_fullname, copy_old_fullname, directory, change_events);
+                            c_file_watcher_add_change_event(watcher, copy_new_fullname, copy_old_fullname, change_events);
 
                             directory->last_move_cookie = 0;
                         }
@@ -933,7 +933,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                         {
                             change_events |= FWC_EVENT_ADDED;
                             string_t copy_new_fullname = c_string_make_copy(&gc->transient_arena, directory->filename);
-                            c_file_watcher_add_change_event(watcher, copy_new_fullname, STR(""), directory, change_events);
+                            c_file_watcher_add_change_event(watcher, copy_new_fullname, STR(""), change_events);
                         }
                     }
 
@@ -956,12 +956,12 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                                 string_t copy_old_fullname = c_string_make_copy(&gc->transient_arena, directory->old_filename);
                                 string_t copy_new_fullname = c_string_make_copy(&gc->transient_arena, filename);
 
-                                c_file_watcher_add_change_event(watcher, copy_new_fullname, copy_old_fullname, directory, change_events);
+                                c_file_watcher_add_change_event(watcher, copy_new_fullname, copy_old_fullname, change_events);
                             }
                             else
                             {
                                 string_t copy_new_fullname = c_string_make_copy(&gc->transient_arena, filename);
-                                c_file_watcher_add_change_event(watcher, copy_new_fullname, STR(""), directory, change_events);
+                                c_file_watcher_add_change_event(watcher, copy_new_fullname, STR(""), change_events);
                             }
                         }
                     }
@@ -971,7 +971,6 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                     c_file_watcher_add_change_event(watcher,
                                                     directory->filename,
                                                     STR(""),
-                                                    directory,
                                                     FWC_EVENT_MODIFIED|FWC_EVENT_SCAN_CHILDREN);
                 }
             }

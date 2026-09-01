@@ -47,7 +47,6 @@ asset_manager_hash_arena_allocate(void *allocator, u32 allocation_size)
 
 bitmap_t
 s_asset_bitmap_create(asset_manager_t *asset_manager, 
-                      asset_slot_t    *asset_slot, 
                       u32              width,
                       u32              height, 
                       u32              channels,
@@ -98,7 +97,7 @@ s_asset_bitmap_create(asset_manager_t *asset_manager, s32 width, s32 height, s32
 }
 
 texture2D_t 
-s_asset_texture_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
+s_asset_texture_create(asset_slot_t *slot, u64 name_hash)
 {
     texture2D_t result = {};
     string_t asset_data = slot->package_entry->asset_data;
@@ -226,7 +225,7 @@ material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *toke
 }
 
 void 
-material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t *tokenizer, const type_info_t *parent_type_data, token_data_t name_token)
+material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t *tokenizer, const type_info_t *parent_type_data)
 {
     token_data_t token = c_tokenizer_get_next_token(tokenizer);
     while(token.type != TT_ClosingBrace)
@@ -251,7 +250,7 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
                         RHI_pipeline_state_t *state_data = (RHI_pipeline_state_t*)((byte*)parent_data + render_pipeline_info->offset);
 
                         const type_info_t *type_data = Athena::type_info<RHI_pipeline_state_t>();
-                        material_file_parse_block_data(filename, state_data, tokenizer, type_data, token);
+                        material_file_parse_block_data(filename, state_data, tokenizer, type_data);
                     }
                     else
                     {
@@ -318,12 +317,12 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
                     if(c_string_compare(token.string, STR("material_archetype"))) 
                     {
                         struct_info = Athena::type_info(STR("material_archetype_t"));
-                        material_file_parse_block_data(slot->owner_asset_file.file_name, &archetype, &tokenizer, struct_info, token);
+                        material_file_parse_block_data(slot->owner_asset_file.file_name, &archetype, &tokenizer, struct_info);
                     }
                     else if(c_string_compare(token.string, STR("base_instance")))
                     {
                         struct_info = Athena::type_info(STR("material_archetype_t"));
-                        material_file_parse_block_data(slot->owner_asset_file.file_name, &archetype.base_instance, &tokenizer, struct_info, token);
+                        material_file_parse_block_data(slot->owner_asset_file.file_name, &archetype.base_instance, &tokenizer, struct_info);
                     }
                     else 
                     {
@@ -840,7 +839,7 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_slot_t *sl
     {
         case AT_Bitmap:
         {
-            slot->texture = s_asset_texture_create(asset_manager, slot, name_hash);
+            slot->texture = s_asset_texture_create(slot, name_hash);
             log_info("Loading texture data for bitmap: '%s'...\n", C_STR(slot->name));
         }break;
         case AT_Shader:

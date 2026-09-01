@@ -8,8 +8,7 @@
 #include <c_string.h>
 #include <c_memory_arena.h>
 
-
 int
-main(int argc, char **argv)
+main(void)
 {
 }

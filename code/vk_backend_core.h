@@ -257,9 +257,16 @@ typedef vulkan_buffer_t  backend_buffer_t;
 // NOTE(Sleepster): 
 //
 // These store the default behavior of the API as constants.
+//
+// Also, this IS used... but for some reason g++ seems to think it's not
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+
 global_variable const char *g_device_extensions[] = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
+
+#pragma GCC diagnostic pop
 
 global_variable const VkDynamicState g_pipeline_dynamic_states[] = {
     VK_DYNAMIC_STATE_VIEWPORT,
@@ -278,13 +285,13 @@ global_variable constexpr VkPipelineRasterizationStateCreateInfo g_pipeline_defa
         .depthClampEnable        = false,
         .rasterizerDiscardEnable = false,
         .polygonMode             = VK_POLYGON_MODE_FILL,
-        .lineWidth               = 1.0f,
         .cullMode                = VK_CULL_MODE_BACK_BIT,
         .frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE,
         .depthBiasEnable         = false,
         .depthBiasConstantFactor = 0.0f,
         .depthBiasClamp          = 0.0f,
         .depthBiasSlopeFactor    = 0.0f,
+        .lineWidth               = 1.0f,
 };
 
 global_variable constexpr VkPipelineDepthStencilStateCreateInfo g_pipeline_default_depth_stencil_state = {

@@ -11,6 +11,8 @@
 #include <c_types.h>
 #include <c_math.h>
 #include <string.h>
+#include <stdlib.h>
+#include <malloc.h>
 
 // TODO(Sleepster): Custom allocator overriding 
 //
@@ -223,7 +225,8 @@ template <typename T, s32 count>
 s32
 c_array_find(array_t<T, count> &array, T *element)
 {
-    c_array_find(static_cast<array_view_t<T>>(array), element);
+    s32 result = c_array_find(static_cast<array_view_t<T>>(array), element);
+    return(result);
 }
 
 template <typename T, s32 count>
@@ -286,7 +289,7 @@ c_dynarray_reserve(dynarray_t<T> *array, s32 to_reserve)
     if(to_reserve > array->count)
     {
         array->count = to_reserve;
-        array->items = (T*)reallocarray(array->items, sizeof(T), array->count);
+        array->items = (T*)realloc(array->items, sizeof(T) * array->count);
         Assert(array->items);
 
         memset(array->items, 0, sizeof(T) * array->count);

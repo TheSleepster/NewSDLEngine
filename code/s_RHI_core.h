@@ -91,6 +91,7 @@ struct RHI_vertex_buffer_t
     byte               *vertex_data;
     u32                 max_vertices;
     u32                 vertex_count;
+    u32                 advance_rate;
 };
 
 struct RHI_index_buffer_t
@@ -416,13 +417,13 @@ struct RHI_renderpass_attachment_t
 // depth attachments and stencil attachments were merged into a single depthStencilAttachment
 struct RHI_renderpass_desc_t
 {
-    RHI_renderpass_attachment_t color_attachments[RHI_MAX_RENDER_TARGET_ATTACHMENTS];
-    RHI_renderpass_attachment_t depth_stencil_attachment;
-
     u32                         render_width;
     u32                         render_height;
     u32                         color_attachment_count;
     bool8                       resize_with_window;
+
+    RHI_renderpass_attachment_t color_attachments[RHI_MAX_RENDER_TARGET_ATTACHMENTS];
+    RHI_renderpass_attachment_t depth_stencil_attachment;
 };
 
 struct RHI_renderpass_key_t
@@ -557,7 +558,7 @@ void RHI_cmd_use_shader_program(RHI_command_list_t *command_list, asset_handle_t
 void RHI_cmd_update_constant_buffer(RHI_command_list_t *command_list, RHI_uniform_constant_buffer_t *buffer, void *data, u32 data_size);
 void RHI_cmd_bind_texture_image(RHI_command_list_t *command_list, texture2D_t *texture);
 void RHI_cmd_bind_texture_from_handle(RHI_command_list_t *command_list, asset_handle_t *asset_handle);
-void RHI_cmd_reset_render_state(RHI_command_list_t *command_list, RHI_pipeline_state_t *render_pipeline_state);
+void RHI_cmd_reset_render_state(RHI_command_list_t *command_list);
 void RHI_cmd_set_render_state(RHI_command_list_t *command_list, RHI_pipeline_state_t *render_pipeline_state);
 void RHI_cmd_draw(RHI_command_list_t *command_list, u32 vertex_count, u32 vertex_offset, u32 instance_count, u32 first_instance);
 void RHI_cmd_draw_indexed(RHI_command_list_t *command_list, u32 index_count, u32 index_offset, u32 instance_count, u32 first_instance);

@@ -78,6 +78,7 @@ sys_reallocate_memory(void *offset, u64 old_size, u64 allocation_size)
 void
 sys_free_memory(void *data, usize free_size)
 {
+    (void)free_size;
     VirtualFree(data, 0, MEM_RELEASE);
 }
 
@@ -377,6 +378,7 @@ sys_directory_exists(string_t filepath)
     return(result);
 }
 
+#if 0
 void
 sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 {
@@ -386,10 +388,11 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
     HANDLE          find_handle = INVALID_HANDLE_VALUE;
 
     u32 cursor = 0;
-    DynArray_t(string_t) directories = c_dynarray_create(string_t);
-    c_dynarray_push(directories, filepath);
-    dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(directories); 
+    dynarray_t<string_t> directories = {};
+    c_dynarray_add(&directories, filepath);
+    defer(c_dynarray_free(&directories));
 
+    dynarray_header_t *header = (dynarray_header_t*)c_dynarray_header(directories); 
     while(cursor < header->size)
     {
         string_t directory_name = c_dynarray_get_value(directories, cursor);
@@ -413,9 +416,9 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
         while(true)
         {
             char *name = find_data.cFileName;
-            visit_file_data->filename  = c_string_make_heap(&global_context->temporary_arena, STR(name));
-            string_t temp_name         = c_string_concat(&global_context->temporary_arena, directory_name, STR("/"));
-            visit_file_data->fullname  = c_string_concat(&global_context->temporary_arena, temp_name, visit_file_data->filename);
+            visit_file_data->filename  = c_string_make_heap(&gc->transient_arena, STR(name));
+            string_t temp_name         = c_string_concat(&gc->transient_arena, directory_name, STR("/"));
+            visit_file_data->fullname  = c_string_concat(&gc->transient_arena, temp_name, visit_file_data->filename);
  
             bool8 is_directory = (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
             if(is_directory)
@@ -425,7 +428,7 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
                     visit_file_data->is_directory = true;
                     if(visit_file_data->recursive)
                     {
-                        byte *data = (byte*)c_arena_push_array(&global_context->temporary_arena, byte, visit_file_data->fullname.count);
+                        byte *data = (byte*)c_arena_push_array(&gc->transient_arena, byte, visit_file_data->fullname.count);
                         memcpy(data, visit_file_data->fullname.data, visit_file_data->fullname.count);
                         data[visit_file_data->fullname.count] = '\0';
 
@@ -450,8 +453,55 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 
         FindClose(find_handle);
     }
+}
+#endif
 
-    c_dynarray_destroy(directories);
+void
+sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
+{
+    Assert(visit_file_data);
+
+    const char *c_string = c_string_null_terminated(&gc->transient_arena, filepath);
+
+    WIN32_FIND_DATA find_data;
+    HANDLE file_handle = FindFirstFileEx(c_string, FindExInfoBasic, &find_data, FindExSearchNameMatch, null, FindExSearchNameMatch);
+    while(file_handle)
+    {
+        char *filename = find_data.cFileName;
+        string_t fullpath = c_string_concat(&gc->transient_arena, filepath, STR(filename));
+
+        visit_file_data->filename = c_string_make_copy(&gc->transient_arena, STR(filename));
+        visit_file_data->fullname = fullpath;
+
+        bool8 is_directory = ((find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0);
+        if(is_directory)
+        {
+            if(strcmp(find_data.cFileName, ".") != 0 && strcmp(find_data.cFileName, "..") != 0)
+            {
+                visit_file_data->is_directory = true;
+                if(visit_file_data->recursive)
+                {
+                    sys_directory_visit(fullpath, visit_file_data);
+                }
+            }
+        }
+        else
+        {
+            visit_file_data->is_directory = false;
+            if(visit_file_data->function != null)
+            {
+                visit_file_data->function(visit_file_data, visit_file_data->user_data);
+            }
+        }
+
+        bool8 success = FindNextFile(file_handle, &find_data);
+        if(!success) 
+        {
+            break;
+        }
+    }
+
+    FindClose(file_handle);
 }
 
 void*
@@ -659,6 +709,8 @@ sys_mutex_unlock(sys_mutex_t *mutex)
 void
 sys_file_watcher_init_watch_data(memory_arena_t *arena, file_watcher_sys_watch_data_t *watch_data)
 {
+    (void)arena;
+    (void) watch_data;
 }
 
 string_t
@@ -667,7 +719,7 @@ c_string_utf8_to_wide(string_t input)
     string_t result;
 
     u32 needed = MultiByteToWideChar(CP_UTF8, 0, (char*)input.data, input.count, null, 0);
-    byte *buffer = (byte*)c_arena_push_size(&global_context->temporary_arena, sizeof(u16) * needed);
+    byte *buffer = (byte*)c_arena_push_size(&gc->transient_arena, sizeof(u16) * needed);
     u32 count = MultiByteToWideChar(CP_UTF8, 0, (char*)input.data, input.count, (LPWSTR)buffer, needed);
 
     result.data  = buffer;
@@ -798,7 +850,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
             if(bytes_transferred == 0)
             {
                 // NOTE(Sleepster): This means we've overflowed our buffer... 
-                c_file_watcher_add_change_event(watcher, watch_data->filename, STR(""), watch_data, FWC_EVENT_MODIFIED|FWC_EVENT_SCAN_CHILDREN);
+                c_file_watcher_add_change_event(watcher, watch_data->filename, STR(""), FWC_EVENT_MODIFIED|FWC_EVENT_SCAN_CHILDREN);
                 continue;
             }
 
@@ -822,7 +874,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                     filename[filename_count] = '\0';
 
                     string_t filename_str = STR(filename);
-                    filename_str = c_string_concat(&global_context->temporary_arena, watch_data->filename, filename_str);
+                    filename_str = c_string_concat(&gc->transient_arena, watch_data->filename, filename_str);
                     c_string_override_file_separators(&filename_str);
 
                     u32 change_events = 0;
@@ -843,23 +895,23 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                                 change_events |= FWC_EVENT_SCAN_CHILDREN;
                             }
 
-                            c_file_watcher_add_change_event(watcher, filename_str, new_filename, watch_data, change_events);
+                            c_file_watcher_add_change_event(watcher, filename_str, new_filename, change_events);
                         }break;
                         case FILE_ACTION_RENAMED_OLD_NAME:
                         {
                             change_events |= FWC_EVENT_MOVED|FWC_EVENT_RENAMED;
-                            watch_data->old_filename = c_string_make_copy(&global_context->temporary_arena, filename_str);
+                            watch_data->old_filename = c_string_make_copy(&gc->transient_arena, filename_str);
                         }break;
                         case FILE_ACTION_RENAMED_NEW_NAME:
                         {
                             change_events |= FWC_EVENT_MOVED|FWC_EVENT_RENAMED;
-                            c_file_watcher_add_change_event(watcher, filename_str, watch_data->old_filename, watch_data, change_events);
+                            c_file_watcher_add_change_event(watcher, filename_str, watch_data->old_filename, change_events);
                         }break;
                         case FILE_ACTION_REMOVED:
                         {
                             change_events |= FWC_EVENT_DELETED;
 
-                            c_file_watcher_add_change_event(watcher, filename_str, new_filename, watch_data, change_events);
+                            c_file_watcher_add_change_event(watcher, filename_str, new_filename, change_events);
                         }break;
                         default:
                         {

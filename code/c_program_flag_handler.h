@@ -26,9 +26,9 @@ typedef enum arg_type
 
 typedef union program_flag_data
 {
-    bool32  bool32;
-    u64     u64;
-    float32 float32;
+    bool32  boolean;
+    u64     unsigned64_value;
+    float32 float_value;
     char   *string;
 }program_flag_data_t;
 
@@ -87,12 +87,12 @@ c_program_flag_add_bool32(char *flag_name, bool32 default_value, char *flag_desc
 
     program_flag_t *flag = c_program_flag_add(flag_name, flag_description);
 
-    flag->arg_value.bool32         = default_value;
-    flag->default_arg_value.bool32 = default_value;
-    flag->arg_type                 = FLAG_TYPE_BOOL;
-    flag->is_valid                 = true;
+    flag->arg_value.boolean         = default_value;
+    flag->default_arg_value.boolean = default_value;
+    flag->arg_type                  = FLAG_TYPE_BOOL;
+    flag->is_valid                  = true;
 
-    result = &flag->arg_value.bool32;
+    result = &flag->arg_value.boolean;
     return(result);
 }
 
@@ -102,12 +102,12 @@ c_program_flag_add_size(char *flag_name, u64 default_value, char *flag_descripti
     u64 *result = null;
 
     program_flag_t *flag = c_program_flag_add(flag_name, flag_description);
-    flag->arg_value.u64         = default_value;
-    flag->default_arg_value.u64 = default_value;
-    flag->arg_type              = FLAG_TYPE_U64,
-    flag->is_valid              = true;
+    flag->arg_value.unsigned64_value         = default_value;
+    flag->default_arg_value.unsigned64_value = default_value;
+    flag->arg_type                           = FLAG_TYPE_U64,
+    flag->is_valid                           = true;
 
-    result = &flag->arg_value.u64;
+    result = &flag->arg_value.unsigned64_value;
     return(result);
 }
 
@@ -117,12 +117,12 @@ c_program_flag_add_float32(char *flag_name, float32 default_value, char *flag_de
     float32 *result = null;
 
     program_flag_t *flag = c_program_flag_add(flag_name, flag_description);
-    flag->arg_value.float32         = default_value;
-    flag->arg_type                  = FLAG_TYPE_FLOAT32,
-    flag->default_arg_value.float32 = default_value;
-    flag->is_valid                  = true;
+    flag->arg_value.float_value         = default_value;
+    flag->arg_type                      = FLAG_TYPE_FLOAT32,
+    flag->default_arg_value.float_value = default_value;
+    flag->is_valid                      = true;
 
-    result = &flag->arg_value.float32;
+    result = &flag->arg_value.float_value;
     return(result);
 }
 
@@ -155,19 +155,19 @@ c_program_flag_print_flag_list(void)
             case FLAG_TYPE_BOOL:
             {
                 log_info("-%s <bool>\n", flag->name);
-                log_info("\tDefault Value is: '%s'\n", flag->default_arg_value.bool32 == false ? "false" : "true");
+                log_info("\tDefault Value is: '%s'\n", flag->default_arg_value.boolean == false ? "false" : "true");
                 log_info("\t%s\n", flag->description);
             }break;
             case FLAG_TYPE_U64:
             { 
                 log_info("-%s <u64>\n", flag->name);
-                log_info("\tDefault Value is: '%llu'\n", flag->default_arg_value.u64);
+                log_info("\tDefault Value is: '%llu'\n", flag->default_arg_value.unsigned64_value);
                 log_info("\t%s\n", flag->description);
             }break;
             case FLAG_TYPE_FLOAT32:
             {
                 log_info("-%s <float32>\n", flag->name);
-                log_info("\tDefault Value is: '%f'\n", flag->default_arg_value.float32);
+                log_info("\tDefault Value is: '%f'\n", flag->default_arg_value.float_value);
                 log_info("\t%s\n", flag->description);
             }break;
             case FLAG_TYPE_STRING:
@@ -246,21 +246,21 @@ c_program_flag_parse_args(s32 argc, char **argv)
                             bool_value = false;
                         }
 
-                        flag->arg_value.bool32 = bool_value;
+                        flag->arg_value.boolean = bool_value;
                         
                         goto next;
                     }break;
                     case FLAG_TYPE_U64:
                     {
                         char *end_ptr;
-                        flag->arg_value.u64 = strtoull((char*)value, &end_ptr, 10);
+                        flag->arg_value.unsigned64_value = strtoull((char*)value, &end_ptr, 10);
 
                         goto next;
                     }break;
                     case FLAG_TYPE_FLOAT32:
                     {
                         char *end_ptr;
-                        flag->arg_value.float32 = strtof((char*)value, &end_ptr);
+                        flag->arg_value.float_value = strtof((char*)value, &end_ptr);
 
                         goto next;
                     }break;

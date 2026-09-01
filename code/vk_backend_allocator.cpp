@@ -17,6 +17,7 @@ find_memory_index
 internal_api s32
 find_memory_index(gpu_info_t *gpu, u32 memory_type_bits, vulkan_allocation_usage_type_t usage_type)
 {
+    (void)memory_type_bits; // in case we need it later
     s32 result = -1;
 
     VkMemoryPropertyFlags required  = 0;

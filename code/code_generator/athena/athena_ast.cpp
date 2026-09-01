@@ -247,7 +247,7 @@ generate_nud_prefix_AST(parser_t *parser, lexer_token_t *token)
             }break;
             default: 
             {
-                if(token->token_type != TOKEN_TYPE_IDENT & token->token_type != TOKEN_TYPE_NULL && token->token_type != TOKEN_TYPE_NULLPTR)
+                if(token->token_type != TOKEN_TYPE_IDENT && token->token_type != TOKEN_TYPE_NULL && token->token_type != TOKEN_TYPE_NULLPTR)
                 {
                     report_error(parser, 
                                  "Expected an identifier as the last option here... instead found: '%.*s'... It is of token_type: '%s'\n",
@@ -612,7 +612,7 @@ evaluate_expression_AST(AST_node_t *expression)
 }
 
 internal_api argument_list_t 
-parse_argument_list(parser_t *parser, AST_node_t *parent)
+parse_argument_list(parser_t *parser)
 {
     argument_list_t result = {};
 
@@ -2032,7 +2032,7 @@ generate_lambda_AST(parser_t     *parser,
             c_dynarray_reset(&parser->current_attribute_list);
         }
 
-        argument_list_t list = parse_argument_list(parser, lambda);
+        argument_list_t list = parse_argument_list(parser);
         lambda->lambda.first_argument = list.first_argument;
         lambda->lambda.argument_count = list.argument_count;
 
@@ -2170,7 +2170,7 @@ create_template_attribute(parser_t *parser)
     code_attribute_t result = {};
     result.is_template = true;
     
-    argument_list_t list = parse_argument_list(parser, null);
+    argument_list_t list = parse_argument_list(parser);
     result.template_data.arguments      = list.first_argument;
     result.template_data.argument_count = list.argument_count;
 

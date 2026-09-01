@@ -32,6 +32,9 @@ Vk_backend_debug_log_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      messag
                               const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
                               void*                                       user_data)
 {
+    (void)user_data;
+    (void)message_type;
+
     switch(message_severity)
     {
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
@@ -221,8 +224,8 @@ vk_backend_get_and_begin_scratch_command_buffer(vulkan_context_t *vulkan_context
     VkCommandBufferAllocateInfo command_buffer_allocate_info = {
         .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
         .commandPool        = vulkan_context->graphics_command_pool,
-        .commandBufferCount = 1,
-        .level              = is_primary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY
+        .level              = is_primary ? VK_COMMAND_BUFFER_LEVEL_PRIMARY : VK_COMMAND_BUFFER_LEVEL_SECONDARY,
+        .commandBufferCount = 1
     };
     vkAssert(vkAllocateCommandBuffers(vulkan_context->device, &command_buffer_allocate_info, &result));
 
@@ -439,7 +442,7 @@ vk_backend_select_physical_device(vulkan_context_t *vulkan_context)
     VkPhysicalDevice *devices = c_arena_push_array(&vulkan_context->initialization_arena, VkPhysicalDevice, physical_device_counter);
     vkAssert(vkEnumeratePhysicalDevices(vulkan_context->instance, &physical_device_counter, devices));
 
-    dynarray_t<gpu_info_t> gpus;
+    dynarray_t<gpu_info_t> gpus = {};
     c_dynarray_reserve(&gpus, physical_device_counter);
 
     defer(c_dynarray_free(&gpus));
@@ -1030,16 +1033,15 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
         vkAssert(vkCreateImageView(vulkan_context->device, &view_info, vulkan_context->cpu_allocation_callbacks, &vulkan_context->swapchain.views[image_index]));
         
         vulkan_image_info_t info = {
+            .width          = vulkan_context->current_window_width,
+            .height         = vulkan_context->current_window_height,
+            .sample_count   = VK_SAMPLE_COUNT_1_BIT,
+            .mip_count      = 1,
             .format         = view_info.format,
             .initial_layout = VK_IMAGE_LAYOUT_UNDEFINED,
             .final_layout   = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-            .mip_count      = 1,
-            .sample_count   = VK_SAMPLE_COUNT_1_BIT,
-            .width          = vulkan_context->current_window_width,
-            .height         = vulkan_context->current_window_height,
         };
-        *swapchain_image = vk_backend_image_init_from_image_handle(vulkan_context, 
-                                                                   vulkan_context->swapchain.images[image_index], 
+        *swapchain_image = vk_backend_image_init_from_image_handle(vulkan_context->swapchain.images[image_index], 
                                                                   &vulkan_context->swapchain.views[image_index], 
                                                                   &info);
         swapchain_image->renderpass_final_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
@@ -1303,14 +1305,16 @@ vk_backend_create_renderpasses(vulkan_context_t *vulkan_context)
 
     VkSubpassDescription primary_subpass = {
         .pipelineBindPoint       = VK_PIPELINE_BIND_POINT_GRAPHICS,
-        .colorAttachmentCount    = 1,
-        .pColorAttachments       = &color_attachment_reference,
-        .pDepthStencilAttachment = &depth_attachment_reference,
         // NOTE(Sleepster): These supply imput to the shader
         .inputAttachmentCount    = 0,
         .pInputAttachments       = null,
+        // NOTE(Sleepster): Color attachments 
+        .colorAttachmentCount    = 1,
+        .pColorAttachments       = &color_attachment_reference,
         // NOTE(Sleepster): Multisampling resolution 
         .pResolveAttachments     = null,
+        // NOTE(Sleepster): Depth 
+        .pDepthStencilAttachment = &depth_attachment_reference,
         // NOTE(Sleepster): Items that should be preserved between subpasses and future renderpasses
         .preserveAttachmentCount = 0,
         .pPreserveAttachments    = null
@@ -1319,24 +1323,24 @@ vk_backend_create_renderpasses(vulkan_context_t *vulkan_context)
     // NOTE(Sleepster): We only have 1 subpass, so it's VK_SUBPASS_EXTERNAL here. 
     VkSubpassDependency subpass_dependencies = {
         .srcSubpass      = VK_SUBPASS_EXTERNAL,
-        .dstSubpass      = null,
+        .dstSubpass      = 0,
         .srcStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-        .srcAccessMask   = 0,
         .dstStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        .srcAccessMask   = 0,
         .dstAccessMask   = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
         .dependencyFlags = 0
     };
 
     VkRenderPassCreateInfo renderpass_create_info = {
         .sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+        .pNext           = null,
+        .flags           = 0,
         .attachmentCount = ArrayCount(attachments),
         .pAttachments    = attachments,
         .subpassCount    = 1,
         .pSubpasses      = &primary_subpass,
         .dependencyCount = 1,
         .pDependencies   = &subpass_dependencies,
-        .pNext           = null,
-        .flags           = 0
     };
     vkAssert(vkCreateRenderPass(vulkan_context->device, 
                                &renderpass_create_info, 
@@ -1365,10 +1369,14 @@ vk_backend_begin_renderpass(vulkan_context_t *vulkan_context,
     renderpass_info.renderPass  = renderpass;
     renderpass_info.framebuffer = framebuffer;
     renderpass_info.renderArea = {
-        .offset.x = 0,
-        .offset.y = 0,
-        .extent.width  = width,
-        .extent.height = height 
+        .offset = {
+            .x = 0,
+            .y = 0,
+        },
+        .extent = {
+            .width  = width,
+            .height = height,
+        },
     };
 
     renderpass_info.clearValueCount = attachment_count;
@@ -1651,27 +1659,25 @@ vk_backend_create_descriptor_pools(vulkan_context_t *vulkan_context)
 
     vulkan_context->default_nearest_sampler_info = {
         .is_valid           = true,
-        .anisotropy_enabled = false,
-        .compare_enabled    = false,
-        .max_anisotropy     = 1,
         .min_filter         = VK_FILTER_NEAREST,
         .mag_filter         = VK_FILTER_NEAREST,
         .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
         .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-
+        .anisotropy_enabled = false,
+        .max_anisotropy     = 1,
+        .compare_enabled    = false,
         .use_normalized_coordinates = false,
     };
 
     vulkan_context->default_linear_sampler_info = {
         .is_valid           = true,
-        .anisotropy_enabled = true,
-        .compare_enabled    = false,
-        .max_anisotropy     = 4,
         .min_filter         = VK_FILTER_LINEAR,
         .mag_filter         = VK_FILTER_LINEAR,
         .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
         .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-
+        .anisotropy_enabled = true,
+        .max_anisotropy     = 4,
+        .compare_enabled    = false,
         .use_normalized_coordinates = true,
     };
     vulkan_context->default_nearest_sampler = vk_backend_sampler_create(vulkan_context, &vulkan_context->default_nearest_sampler_info);
@@ -1711,13 +1717,13 @@ vk_backend_create_pipeline_from_render_state(vulkan_context_t     *vulkan_contex
         .depthClampEnable        = false,
         .rasterizerDiscardEnable = false,
         .polygonMode             = VK_POLYGON_MODE_FILL,
-        .lineWidth               = 1.0f,
         .cullMode                = VK_CULL_MODE_BACK_BIT,
         .frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE,
         .depthBiasEnable         = false,
         .depthBiasConstantFactor = 0.0f,
         .depthBiasClamp          = 0.0f,
         .depthBiasSlopeFactor    = 0.0f,
+        .lineWidth               = 1.0f,
     };
 
     const VkPipelineDepthStencilStateCreateInfo depth_stencil_state = {
@@ -1780,8 +1786,8 @@ vk_backend_create_render_pipeline(vulkan_context_t                             *
     VkPipeline result = {};
     VkPipelineMultisampleStateCreateInfo multisampling_state = {
         .sType                 = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-        .sampleShadingEnable   = false,
         .rasterizationSamples  = VK_SAMPLE_COUNT_1_BIT,
+        .sampleShadingEnable   = false,
         .minSampleShading      = 1.0f,
         .pSampleMask           = 0,
         .alphaToCoverageEnable = false,
@@ -1798,8 +1804,8 @@ vk_backend_create_render_pipeline(vulkan_context_t                             *
 
     VkPipelineDynamicStateCreateInfo dynamic_state_data = {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-        .pDynamicStates    = g_pipeline_dynamic_states,
-        .dynamicStateCount = ArrayCount(g_pipeline_dynamic_states)
+        .dynamicStateCount = ArrayCount(g_pipeline_dynamic_states),
+        .pDynamicStates    = g_pipeline_dynamic_states
     };
 
     VkPipelineInputAssemblyStateCreateInfo assembly_state = {
@@ -1837,14 +1843,14 @@ vk_backend_create_render_pipeline(vulkan_context_t                             *
         .sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
         .viewportCount = 1,
         .pViewports    = &viewport,
-        .pScissors     = &scissor,
-        .scissorCount  = 1
+        .scissorCount  = 1,
+        .pScissors     = &scissor
     };
 
     VkGraphicsPipelineCreateInfo pipeline_create_info = {
         .sType               =  VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-        .pStages             =  stage_create_infos,
         .stageCount          =  shader->stage_count,
+        .pStages             =  stage_create_infos,
         .pVertexInputState   =  pipeline_vertex_input_state,
         .pInputAssemblyState = &assembly_state,
         .pViewportState      = &viewport_info,
@@ -1968,7 +1974,7 @@ vk_backend_renderpass_create(vulkan_context_t    *vulkan_context,
     // TODO(Sleepster): Does this need to exist? Do we need to allow this to be customizable?
     VkSubpassDependency primary_subpass_deps = {};
     primary_subpass_deps.srcSubpass      = VK_SUBPASS_EXTERNAL;
-    primary_subpass_deps.dstSubpass      = null;
+    primary_subpass_deps.dstSubpass      = 0;
     primary_subpass_deps.srcStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     primary_subpass_deps.srcAccessMask   = 0;
     primary_subpass_deps.dstStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
@@ -2310,7 +2316,7 @@ vk_backend_append_uniform_constant_buffer_data(vulkan_context_t *vulkan_context,
     // NOTE(Sleepster): We just use the minStorageBufferOffsetAlignment since it's probably bigger than uniform buffer alignment requirements...
     // if it isn't? Crap.
     u32 data_size = Align(data_size_init, vulkan_context->gpu.properties.limits.minUniformBufferOffsetAlignment);
-    result = vk_backend_buffer_append_data(vulkan_context, &vulkan_context->constant_buffer_data, user_data, data_size);
+    result = vk_backend_buffer_append_data(&vulkan_context->constant_buffer_data, user_data, data_size);
 
     return(result);
 }
@@ -2450,27 +2456,27 @@ vk_backend_perform_image_blit(vulkan_context_t *vulkan_context,
 {
     if(source->layout != source->renderpass_initial_layout)
     {
-        vk_backend_transfer_image_to_intial_layout(vulkan_context, render_command_buffer, source);
+        vk_backend_transfer_image_to_intial_layout(render_command_buffer, source);
     }
 
     if(destination->layout != destination->renderpass_initial_layout)
     {
-        vk_backend_transfer_image_to_intial_layout(vulkan_context, render_command_buffer, destination);
+        vk_backend_transfer_image_to_intial_layout(render_command_buffer, destination);
     }
 
     VkImageSubresourceRange source_range = {
         .aspectMask     = source->aspect_mask,
-        .baseArrayLayer = 0,
         .baseMipLevel   = 0,
-        .layerCount     = 1,
         .levelCount     = 1,
+        .baseArrayLayer = 0,
+        .layerCount     = 1,
     };
 
     VkImageSubresourceRange destination_range = {
         .aspectMask     = source->aspect_mask,
         .baseMipLevel   = 0,
-        .baseArrayLayer = 0,
         .levelCount     = 1,
+        .baseArrayLayer = 0,
         .layerCount     = 1,
     };
 
@@ -2568,13 +2574,12 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
     vk_backend_buffer_flush_staging_buffer(vulkan_context, scratch_command_buffer);
     if(vulkan_context->constant_buffer_data.used > 0)
     {
-        vk_backend_buffer_copy_buffer(vulkan_context, 
-                                     &vulkan_context->constant_buffer_data, 
-                                     &vulkan_context->shader_uniform_buffers[vulkan_context->current_frame_index],
-                                      scratch_command_buffer,
-                                      0,
-                                      vulkan_context->constant_buffer_data.used,
-                                      0);
+        vk_backend_buffer_copy_buffer(&vulkan_context->constant_buffer_data, 
+                                      &vulkan_context->shader_uniform_buffers[vulkan_context->current_frame_index],
+                                       scratch_command_buffer,
+                                       0,
+                                       vulkan_context->constant_buffer_data.used,
+                                       0);
     }
 
     vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
@@ -2629,7 +2634,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                         if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_initial_layout)
                         {
                             vulkan_image_t *image = &attachment->image->backend_image;
-                            vk_backend_transfer_image_to_intial_layout(vulkan_context, render_command_buffer, image);
+                            vk_backend_transfer_image_to_intial_layout(render_command_buffer, image);
                         }
                     }
 
@@ -2639,7 +2644,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                         if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_initial_layout)
                         {
                             vulkan_image_t *image = &attachment->image->backend_image;
-                            vk_backend_transfer_image_to_intial_layout(vulkan_context, render_command_buffer, image);
+                            vk_backend_transfer_image_to_intial_layout(render_command_buffer, image);
                         }
                     }
 
@@ -2688,7 +2693,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                         if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_final_layout)
                         {
                             vulkan_image_t *image = &attachment->image->backend_image;
-                            vk_backend_transfer_image_to_final_layout(vulkan_context, render_command_buffer, image);
+                            vk_backend_transfer_image_to_final_layout(render_command_buffer, image);
                         }
                     }
 
@@ -2698,7 +2703,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                         if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_final_layout)
                         {
                             vulkan_image_t *image = &attachment->image->backend_image;
-                            vk_backend_transfer_image_to_final_layout(vulkan_context, render_command_buffer, image);
+                            vk_backend_transfer_image_to_final_layout(render_command_buffer, image);
                         }
                     }
 
@@ -2813,13 +2818,12 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                         VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
                         VkImageSubresourceRange source_range = {
                             .aspectMask     = cmd->texture->backend_image.aspect_mask,
-                            .baseArrayLayer = 0,
                             .baseMipLevel   = 0,
-                            .layerCount     = 1,
                             .levelCount     = 1,
+                            .baseArrayLayer = 0,
+                            .layerCount     = 1,
                         };
-                        vk_backend_image_change_layout(vulkan_context, 
-                                                       scratch_buffer,
+                        vk_backend_image_change_layout(scratch_buffer,
                                                        cmd->texture->backend_image.handle, 
                                                        cmd->texture->backend_image.layout,
                                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
@@ -3027,17 +3031,17 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
 
         VkImageSubresourceRange source_range = {
             .aspectMask     = source->backend_image.aspect_mask,
-            .baseArrayLayer = 0,
             .baseMipLevel   = 0,
-            .layerCount     = 1,
             .levelCount     = 1,
+            .baseArrayLayer = 0,
+            .layerCount     = 1,
         };
 
         VkImageSubresourceRange destination_range = {
             .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
             .baseMipLevel   = 0,
-            .baseArrayLayer = 0,
             .levelCount     = 1,
+            .baseArrayLayer = 0,
             .layerCount     = 1,
         };
 
@@ -3070,8 +3074,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
     
     if(backbuffer->layout != VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
     {
-        vk_backend_image_change_layout(vulkan_context, 
-                                       render_command_buffer,
+        vk_backend_image_change_layout(render_command_buffer,
                                        backbuffer->handle,
                                        backbuffer->layout,
                                        VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
@@ -3090,18 +3093,18 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
     VkSubmitInfo submit_info  = {
         .sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO,
 
+        // NOTE(Sleepster): The Semaphore(s) that ensures the operation cannot begin until the image is avaliable 
+        .waitSemaphoreCount   = 1,
+        .pWaitSemaphores      = vulkan_context->image_acquired_semaphore,
+        .pWaitDstStageMask    = stage_flags,
+
         // NOTE(Sleepster): Command buffer()s that will be run 
         .commandBufferCount   = 1,
         .pCommandBuffers      = vulkan_context->render_command_buffer,
 
         // NOTE(Sleepster): The Semaphore(s) that signal when the queue is finished executing the commands
         .signalSemaphoreCount = 1,
-        .pSignalSemaphores    = vulkan_context->render_complete_semaphore,
-
-        // NOTE(Sleepster): The Semaphore(s) that ensures the operation cannot begin until the image is avaliable 
-        .waitSemaphoreCount   = 1,
-        .pWaitSemaphores      = vulkan_context->image_acquired_semaphore,
-        .pWaitDstStageMask    = stage_flags
+        .pSignalSemaphores    = vulkan_context->render_complete_semaphore
     };
     vkAssert(vkQueueSubmit(vulkan_context->graphics_queue, 1, &submit_info, *vulkan_context->image_render_idle_fence));
 
@@ -3257,7 +3260,7 @@ renderer_state_t::backend_buffer_append_data
 true_inline void RHI_context_t::
 backend_buffer_append_data(RHI_render_buffer_t *buffer, void *data, u32 data_size)
 {
-    vk_backend_buffer_append_data(this->backend_render_context, &buffer->buffer_info, data, data_size);
+    vk_backend_buffer_append_data(&buffer->buffer_info, data, data_size);
 }
 
 true_inline void RHI_context_t::
@@ -3293,8 +3296,8 @@ backend_image_create(RHI_image_create_info_t *create_info, RHI_image_t *image)
     image->ID = c_hash_table_hash_key(string_t{(byte*)create_info, sizeof(RHI_image_create_info_t)});
 
     VkImageUsageFlags usage_flags = vk_image_usage_flags_from_image_format(create_info->format);
-    VkImageLayout initial_layout  = vk_get_image_initial_layout_from_usage((u32)create_info->usage, create_info->format);
-    VkImageLayout final_layout    = vk_get_image_final_layout_from_usage((u32)create_info->usage, create_info->format);
+    VkImageLayout initial_layout  = vk_get_image_initial_layout_from_usage((u32)create_info->usage);
+    VkImageLayout final_layout    = vk_get_image_final_layout_from_usage((u32)create_info->usage);
 
     // NOTE(Sleepster): Only 2D images
     vulkan_image_info_t info = {};
@@ -3318,15 +3321,14 @@ backend_image_create(RHI_image_create_info_t *create_info, RHI_image_t *image)
 
         sampler_info = {
             .is_valid           = true,
-            .anisotropy_enabled = image_sampler->anisotropy_enabled,
-            .max_anisotropy     = image_sampler->max_anisotropy,
-            .compare_enabled    = false,
-            .compare_operation  = 0,
             .min_filter         = filter,
             .mag_filter         = filter,
             .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
             .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
-
+            .anisotropy_enabled = image_sampler->anisotropy_enabled,
+            .max_anisotropy     = image_sampler->max_anisotropy,
+            .compare_enabled    = false,
+            .compare_operation  = 0,
             .use_normalized_coordinates = image_sampler->use_normalized_coordinates
         };
 
@@ -3383,13 +3385,13 @@ backend_acquire_image_sampler(RHI_image_t *image)
     VkFilter filter = vk_sampler_filter_type_to_vk_filter(sampler_info->filtering);
     vk_image_info->sampler_info = {
         .is_valid           = true,
-        .anisotropy_enabled = sampler_info->anisotropy_enabled,
-        .compare_enabled    = false,
-        .compare_operation  = 0,
         .min_filter         = filter,
         .mag_filter         = filter,
         .wrapu              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
         .wrapv              = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+        .anisotropy_enabled = sampler_info->anisotropy_enabled,
+        .compare_enabled    = false,
+        .compare_operation  = 0,
         .use_normalized_coordinates = sampler_info->use_normalized_coordinates
     };
 

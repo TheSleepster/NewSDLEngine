@@ -265,9 +265,7 @@ typedef mat2_t float2x2;
 typedef mat3_t float3x3;
 typedef mat4_t float4x4;
 
-typedef uint   u32;
-typedef int    s32;
-typedef float  float32;
+typedef u32    uint;
 
 )"));
 

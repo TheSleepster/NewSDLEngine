@@ -80,11 +80,17 @@ string_t c_string_replace_all_instances_of(memory_arena_t *arena, string_t strin
 #define C_STR(x)              ((const char *)x.data)
 #define fprint_string(string) (s32)((string).count), C_STR((string))
 
+// NOTE(Sleepster): We just want to ignore this reinterpret_cast<> warning... 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-constexpr"
+
 constexpr string_t
 STR(const char *c_string)
 {
     return((string_t){.data = (byte*)c_string, .count = c_string_length(c_string)});
 }
+
+#pragma GCC diagnostic pop
 
 ///////////////////////////////////////////
 // STRING BUILDER

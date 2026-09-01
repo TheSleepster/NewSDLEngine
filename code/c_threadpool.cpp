@@ -21,8 +21,8 @@
 #include <c_memory_arena.h>
 #include <c_threadpool.h>
 
-int thread_proc_entry(void *user_data);
 internal_api bool8 c_thread_steal_work_order(worker_thread_t *theif_thread);
+PLATFORM_THREAD_PROC(thread_proc_entry);
 
 /*
 =============
@@ -237,8 +237,7 @@ thread_proc_entry
 =============
 */
 
-int
-thread_proc_entry(void *user_data)
+PLATFORM_THREAD_PROC(thread_proc_entry)
 {
     worker_thread_t *thread = (worker_thread_t *)user_data;
     for(;;)
@@ -276,7 +275,7 @@ sleep:
             AtomicStore32(&thread->allocator.used, 0);
             AtomicDecrement(&thread->threadpool->threads_flushed);
 
-            u32 threads_flushed = AtomicLoad32(&thread->threadpool->threads_flushed);
+            s32 threads_flushed = AtomicLoad32(&thread->threadpool->threads_flushed);
             Assert(threads_flushed >= 0);
         }
     }

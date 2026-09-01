@@ -1611,7 +1611,7 @@ ui_widget_texture(ui_state_t     *ui_state,
 {
     ui_signal_t result = {};
 
-    widget_t *widget = ui_widget_create(ui_state, widget_name, UI_WIDGET_FLAG_DISPLAY_TEXTURE);
+    widget_t *widget = ui_widget_create(ui_state, widget_name, (UI_WIDGET_FLAG_DISPLAY_TEXTURE|additional_flags));
     widget->minimum_render_size   = size;
     widget->size_kind             = size_kind;
     widget->display_texture       = texture;

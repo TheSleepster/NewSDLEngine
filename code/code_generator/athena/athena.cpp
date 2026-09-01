@@ -1224,6 +1224,8 @@ parse_single_file(string_t filename)
 
 VISIT_FILES(gather_files_in_directory)
 {
+    (void)user_data;
+
     string_t filename = visit_file_data->fullname;
     string_t file_ext = c_string_get_file_ext_from_path(filename);
     if(!c_string_compare(file_ext, STR(".h")))
@@ -1383,9 +1385,6 @@ output_basic_type_info(string_builder_t *builder, code_type_t *type, u32 indent_
         type_string = c_string_replace_all_instances_of(&permanent_arena, type->identifier, ' ', '_');
     }
 
-    ident(builder, indent_level);
-    c_string_builder_sprintf(builder, ".type_id = TYPE_%.*s,\n", fprint_string(type_string));
-
     if(type->code_metatype != CODE_TYPE_UNDEFINED)
     {
         ident(builder, indent_level);
@@ -1410,6 +1409,9 @@ output_basic_type_info(string_builder_t *builder, code_type_t *type, u32 indent_
             }break;
         }
     }
+
+    ident(builder, indent_level);
+    c_string_builder_sprintf(builder, ".type_id = TYPE_%.*s,\n", fprint_string(type_string));
     if(!c_string_compare(type->identifier, STR("void")) && type->code_metatype != CODE_TYPE_LAMBDA)
     {
         ident(builder, indent_level);
@@ -2704,6 +2706,7 @@ template<typename T>
 ATHENA_API const type_info_t*
 type_info(T &item)
 {
+    (void)item;
     return(type_info<T>());
 }
 

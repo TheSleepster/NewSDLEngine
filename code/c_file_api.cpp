@@ -59,8 +59,7 @@ c_file_read(file_t             *file_data,
             u32                 bytes_to_read, 
             memory_arena_t     *arena, 
             zone_allocator_t   *zone, 
-            za_allocation_tag_t tag,
-            bool8               create)
+            za_allocation_tag_t tag)
 {
     Assert(file_data->handle != INVALID_FILE_HANDLE);
 
@@ -131,7 +130,7 @@ c_file_read_entirety(string_t            filepath,
     Assert(file_data.handle != INVALID_FILE_HANDLE);
 
     s64 file_size = c_file_get_size(&file_data);
-    result = c_file_read(&file_data, file_size, arena, zone, tag, true);
+    result = c_file_read(&file_data, file_size, arena, zone, tag);
     if(result.data == null)
     {
         log_error("Failure to read file: '%s'...\n", C_STR(filepath));

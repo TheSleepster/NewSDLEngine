@@ -26,6 +26,8 @@
         #include <immintrin.h>
         #include <x86intrin.h>
 
+        // NOTE(Sleepster): For both Windows and GCC their true inline variants make us explode...
+        // when trying to use DLL hot-reloading
         #if OS_WINDOWS 
             // NOTE(Sleepster): Read time stamp counter...
             #define rdtsc()                  __rdtsc()
@@ -33,7 +35,11 @@
 
             // NOTE(Sleepster): 3 intructions to get the thread ID as opposed to the 8 from GetCurrentThreadID on Windows
             #define GetThreadID() *((u32*)(((u8*)__readgsqword(0x30)) + 0x48))
+#if 0
             #define true_inline __forceinline
+#else
+            #define true_inline 
+#endif
         #elif OS_LINUX
             #include <unistd.h>
             // NOTE(Sleepster): Read time stamp counter...
@@ -41,7 +47,15 @@
             #define rdtscp(processor_id_out) (0) 
 
             #define GetThreadID() gettid() 
-            #define true_inline __attribute__((always_inline))
+            #ifdef COMPILER_GCC 
+#if 0
+                #define true_inline __attribute__((always_inline)) inline
+#else
+                #define true_inline
+#endif
+            #elif COMPILER_CLANG
+                #define true_inline __attribute__((always_inline))
+            #endif
         #elif OS_MAC
             #error "LMAO what hte fuck are you doing here???"
         #endif

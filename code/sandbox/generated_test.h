@@ -729,6 +729,7 @@ template<typename T>
 ATHENA_API const type_info_t*
 type_info(T &item)
 {
+    (void)item;
     return(type_info<T>());
 }
 

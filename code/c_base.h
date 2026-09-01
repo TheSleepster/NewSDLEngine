@@ -69,7 +69,7 @@
 #elif defined(__APPLE__) && defined(__MACH__)
 # define OS_MAC 1
 #else
-# error OS not detected...
+# warning OS not detected...
 #endif
     
 // ARCH

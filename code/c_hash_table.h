@@ -51,6 +51,8 @@ c_hash_table_combine_hashes(u64 A, u64 B)
 HASH_API void*
 c_hash_table_default_allocate(void *allocator, u32 allocation_size)
 {
+    (void)allocator;
+
     void *result = null;
     result = malloc(allocation_size);
     ZeroMemory(result, allocation_size);
@@ -61,6 +63,7 @@ c_hash_table_default_allocate(void *allocator, u32 allocation_size)
 HASH_API void
 c_hash_table_default_free(void *allocator, void *memory)
 {
+    (void)allocator;
     free(memory);
 }
 #endif

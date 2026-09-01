@@ -42,6 +42,9 @@ int game_main(global_context_t *_global_context);
 #ifndef RELEASE
 FILE_WATCHER_CALLBACK(main_file_watcher)
 {
+    (void)watcher;
+    (void)user_data;
+
     asset_manager_t *asset_manager = gc->asset_manager;
 
     string_t file_ext = c_string_get_file_ext_from_path(change->full_path);
@@ -153,7 +156,7 @@ process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager
 }
 
 int
-main(int argc, char **argv)
+main(void)
 {
     const int linked   = SDL_GetVersion();
     const int compiled = SDL_VERSION;

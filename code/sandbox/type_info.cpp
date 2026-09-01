@@ -28,6 +28,7 @@ struct test_structure
 void
 attribute_test_function(int apples = 4)
 {
+    (void)apples;
 }
 
 #define ATHENA_IMPLMENTATION
@@ -35,7 +36,7 @@ attribute_test_function(int apples = 4)
 #include "generated_test.h"
 
 int
-main(int argc, char **argv)
+main(void)
 {
     test_structure item = {};
     const type_info_t *info = Athena::type_info(item);
@@ -126,6 +127,7 @@ get_packed_argument_count(Args... arguments)
 internal_api void 
 output_type_data(string_t message, string_builder_t *builder)
 {
+    (void)builder;
     fprintf(stdout, "%.*s", fprint_string(message));
 }
 
@@ -133,6 +135,10 @@ template <typename T>
 internal_api void 
 output_type_data(string_t message, string_builder_t *builder, T &item)
 {
+    (void)message;
+    (void)builder;
+    (void)item;
+
     const type_info_t *info = Athena::type_info(item);
     switch(info->metatype)
     {

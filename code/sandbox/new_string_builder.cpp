@@ -61,6 +61,7 @@ string_builder_init(new_string_builder_t *builder, s64 buffer_size)
 void
 string_builder_deinit(new_string_builder_t *builder)
 {
+    (void)builder;
 }
 
 internal_api new_string_builder_buffer_t*

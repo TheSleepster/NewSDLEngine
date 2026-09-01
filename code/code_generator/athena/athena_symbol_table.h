@@ -8,7 +8,7 @@
 
 #define ATHENA_SYMBOL_TABLE_H
 
-constexpr u32 MAX_PEEK_AHEAD_TOKENS = 32;
+constexpr s32 MAX_PEEK_AHEAD_TOKENS = 32;
 
 #define DEFAULT_KEYWORD_LIST(X)                                    \
     X("Invalid",   TOKEN_KEYWORD_INVALID,   TOKEN_TYPE_UNKNOWN)    \
@@ -192,7 +192,7 @@ struct parser_t
     u32                                buffered_token_count;
 
     parser_bookmark_t                  bookmarks[MAX_PEEK_AHEAD_TOKENS];
-    u32                                current_bookmark_count;
+    s32                                current_bookmark_count;
 
     hash_table_t<macro_info_t>         macro_table;
     hash_table_t<code_attribute_t>     recorded_attributes;

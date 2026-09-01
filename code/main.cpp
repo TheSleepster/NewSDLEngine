@@ -466,6 +466,7 @@ entity_render(render_state_t *render_state, RHI_command_list_t *command_list, en
 internal_api void
 create_test_environment(game_state_t *game_state, asset_manager_t *asset_manager)
 {
+    (void)asset_manager;
 #if 1
     entity_t *top_wall    = entity_test_collider_create(game_state, vec2(-160,  80), vec2(320, 20),  0);
     entity_t *bottom_wall = entity_test_collider_create(game_state, vec2(-160, -90), vec2(320, 20),  ENTITY_FLAG_IS_GROUND);
@@ -519,8 +520,8 @@ r_init_render_state(render_state_t *render_state)
         game_renderpass_desc = {
             .render_width           = GAME_FRAMEBUFFER_WIDTH,
             .render_height          = GAME_FRAMEBUFFER_HEIGHT,
-            .resize_with_window     = false,
             .color_attachment_count = 1,
+            .resize_with_window     = false,
             .color_attachments = {
                 [0] = {
                     .access          = RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE,
@@ -567,8 +568,8 @@ r_init_render_state(render_state_t *render_state)
         fullscreen_renderpass_desc = {
             .render_width           = (u32)render_state->RHI_context->window_size.x,
             .render_height          = (u32)render_state->RHI_context->window_size.y,
-            .resize_with_window     = true,
             .color_attachment_count = 1,
+            .resize_with_window     = true,
             .color_attachments = {
                 [0] = {
                     .access          = RHI_RENDERPASS_ATTACHMENT_ACCESS_WRITE,

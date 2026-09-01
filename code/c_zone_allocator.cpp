@@ -222,7 +222,7 @@ c_za_free_zone_tag_range(zone_allocator_t *zone, za_allocation_tag_t low_tag, za
 }
 
 void
-c_za_change_zone_tag(zone_allocator_t *zone, void *pointer, za_allocation_tag_t new_tag)
+c_za_change_zone_tag(void *pointer, za_allocation_tag_t new_tag)
 {
     zone_allocator_block_t *block = (zone_allocator_block_t *)((byte*)pointer - sizeof(zone_allocator_block_t));
     if(block->block_id != DEBUG_ZONE_ID)

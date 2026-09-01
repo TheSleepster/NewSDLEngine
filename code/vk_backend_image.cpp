@@ -116,7 +116,7 @@ vk_is_depth_format(u32 format)
 
 // TODO(Sleepster): None of this should be here...
 VkImageLayout
-vk_get_image_initial_layout_from_usage(u32 usage, u32 format)
+vk_get_image_initial_layout_from_usage(u32 usage)
 {
     VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
     if(usage != RHI_IMAGE_USAGE_INVALID)
@@ -143,7 +143,7 @@ vk_get_image_initial_layout_from_usage(u32 usage, u32 format)
 }
 
 VkImageLayout
-vk_get_image_final_layout_from_usage(u32 usage, u32 format)
+vk_get_image_final_layout_from_usage(u32 usage)
 {
     VkImageLayout result = VK_IMAGE_LAYOUT_UNDEFINED;
     if(usage != RHI_IMAGE_USAGE_INVALID)
@@ -169,8 +169,7 @@ vk_backend_image_update_from_buffer
 */
 
 void
-vk_backend_image_update_from_buffer(vulkan_context_t *vulkan_context, 
-                                    vulkan_image_t   *image, 
+vk_backend_image_update_from_buffer(vulkan_image_t   *image, 
                                     vulkan_buffer_t  *buffer, 
                                     VkCommandBuffer   command_buffer)
 {
@@ -179,15 +178,15 @@ vk_backend_image_update_from_buffer(vulkan_context_t *vulkan_context,
         .bufferRowLength   = 0,
         .bufferImageHeight = 0,
         .imageSubresource = {
-            .layerCount     = 1,
-            .baseArrayLayer = 0,
             .aspectMask     = image->aspect_mask,
             .mipLevel       = 0,
+            .baseArrayLayer = 0,
+            .layerCount     = 1
         },
         .imageExtent = {
-            .depth  = 1,
             .width  = image->width,
-            .height = image->height
+            .height = image->height,
+            .depth  = 1
         }
     };
 
@@ -212,17 +211,16 @@ vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *i
 
     VkImageSubresourceRange src_range = {
         .aspectMask     = image->aspect_mask,
-        .baseArrayLayer = 0,
         .baseMipLevel   = 0,
-        .layerCount     = 1,
         .levelCount     = 1,
+        .baseArrayLayer = 0,
+        .layerCount     = 1,
     };
     VkMemoryRequirements memory_requirements;
     vkGetImageMemoryRequirements(vulkan_context->device, image->handle, &memory_requirements);
 
     VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
-    vk_backend_image_change_layout(vulkan_context, 
-                                   scratch_buffer,
+    vk_backend_image_change_layout(scratch_buffer,
                                    image->handle, 
                                    image->layout,
                                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
@@ -239,11 +237,10 @@ vk_backend_image_update_data(vulkan_context_t *vulkan_context, vulkan_image_t *i
                                                            VULKAN_MEMORY_USAGE_CPU_TO_GPU); 
 
     vk_backend_buffer_copy_data(vulkan_context, &copy_buffer, image_info->data.data, image_info->data.count, 0);
-    vk_backend_image_update_from_buffer(vulkan_context, image, &copy_buffer, scratch_buffer);
+    vk_backend_image_update_from_buffer(image, &copy_buffer, scratch_buffer);
 
     // TODO(Sleepster): Why do we just assume GRAPHICS here? SHADER_READ_ONLY???
-    vk_backend_image_change_layout(vulkan_context, 
-                                   scratch_buffer,
+    vk_backend_image_change_layout(scratch_buffer,
                                    image->handle, 
                                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
@@ -490,8 +487,7 @@ vk_backend_image_init_from_image_handle
 */
 
 vulkan_image_t
-vk_backend_image_init_from_image_handle(vulkan_context_t    *vulkan_context, 
-                                        VkImage              image, 
+vk_backend_image_init_from_image_handle(VkImage              image, 
                                         VkImageView         *view,
                                         vulkan_image_info_t *info)
 {
@@ -514,17 +510,16 @@ vk_backend_transfer_image_to_intial_layout
 */
 
 void
-vk_backend_transfer_image_to_intial_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image)
+vk_backend_transfer_image_to_intial_layout(VkCommandBuffer render_command_buffer, vulkan_image_t *image)
 {
     VkImageSubresourceRange range = {
         .aspectMask     = image->aspect_mask,
-        .baseArrayLayer = 0,
         .baseMipLevel   = 0,
-        .layerCount     = 1,
         .levelCount     = 1,
+        .baseArrayLayer = 0,
+        .layerCount     = 1
     };
-    vk_backend_image_change_layout(vulkan_context, 
-                                   render_command_buffer,
+    vk_backend_image_change_layout(render_command_buffer,
                                    image->handle, 
                                    image->layout,
                                    image->renderpass_initial_layout,
@@ -544,19 +539,18 @@ vk_backend_transfer_image_to_final_layout
 */
 
 void
-vk_backend_transfer_image_to_final_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image)
+vk_backend_transfer_image_to_final_layout(VkCommandBuffer render_command_buffer, vulkan_image_t *image)
 {
     Assert(image->aspect_mask != 0);
 
     VkImageSubresourceRange range = {
         .aspectMask     = image->aspect_mask,
-        .baseArrayLayer = 0,
         .baseMipLevel   = 0,
-        .layerCount     = 1,
         .levelCount     = 1,
+        .baseArrayLayer = 0,
+        .layerCount     = 1,
     };
-    vk_backend_image_change_layout(vulkan_context, 
-                                   render_command_buffer,
+    vk_backend_image_change_layout(render_command_buffer,
                                    image->handle, 
                                    image->layout,
                                    image->renderpass_final_layout,
@@ -578,8 +572,7 @@ vk_backend_image_change_layout
 
 // TODO(Sleepster): Compute shaders will need to be able too see this stuff too
 void
-vk_backend_image_change_layout(vulkan_context_t       *vulkan_context, 
-                               VkCommandBuffer         command_buffer,
+vk_backend_image_change_layout(VkCommandBuffer         command_buffer,
                                VkImage                 image, 
                                VkImageLayout           current_layout,
                                VkImageLayout           target_layout, 
@@ -703,8 +696,7 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
     VkPipelineStageFlags source_pipeline_stage_flags = vk_get_image_pipeline_stage_flags(source_image);
 
     // NOTE(Sleepster): transition the color buffer to TRANSFER_SRC 
-    vk_backend_image_change_layout(vulkan_context, 
-                                   *vulkan_context->render_command_buffer,
+    vk_backend_image_change_layout(*vulkan_context->render_command_buffer,
                                    source_image->handle,
                                    source_initial_layout,
                                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
@@ -716,8 +708,7 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
     source_image->layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 
     // NOTE(Sleepster): transition the swapchain image to TRANSFER_DST 
-    vk_backend_image_change_layout(vulkan_context, 
-                                   *vulkan_context->render_command_buffer,
+    vk_backend_image_change_layout(*vulkan_context->render_command_buffer,
                                    destination_image->handle,
                                    destination_initial_layout,
                                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -735,20 +726,26 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
 
     // NOTE(Sleepster): Do the blit 
     VkImageBlit blit_region = {
-        .srcSubresource.aspectMask     = source_range.aspectMask,
-        .srcSubresource.mipLevel       = 0,
-        .srcSubresource.baseArrayLayer = 0,
-        .srcSubresource.layerCount     = 1,
-        .srcOffsets[0] = (VkOffset3D){(s32)source_offset.x,            (s32)source_offset.y,            0},
-        .srcOffsets[1] = (VkOffset3D){(s32)clamped_source_blit_size.x, (s32)clamped_source_blit_size.y, 1},
-
-        .dstSubresource.aspectMask = destination_range.aspectMask,
-        .dstSubresource.mipLevel = 0, 
-        .dstSubresource.baseArrayLayer = 0,
-        .dstSubresource.layerCount = 1,
-
-        .dstOffsets[0] = (VkOffset3D){(s32)destination_offset.x,     (s32)destination_offset.y,     0},
-        .dstOffsets[1] = (VkOffset3D){(s32)clamped_dest_blit_size.x, (s32)clamped_dest_blit_size.y, 1},
+        .srcSubresource = {
+            .aspectMask     = source_range.aspectMask,
+            .mipLevel       = 0,
+            .baseArrayLayer = 0,
+            .layerCount     = 1,
+        },
+        .srcOffsets = {
+            (VkOffset3D){(s32)source_offset.x,            (s32)source_offset.y,            0},
+            (VkOffset3D){(s32)clamped_source_blit_size.x, (s32)clamped_source_blit_size.y, 1},
+        },
+        .dstSubresource = {
+            .aspectMask     = destination_range.aspectMask,
+            .mipLevel       = 0,
+            .baseArrayLayer = 0,
+            .layerCount     = 1,
+        },
+        .dstOffsets = {
+            (VkOffset3D){(s32)destination_offset.x,     (s32)destination_offset.y,     0},
+            (VkOffset3D){(s32)clamped_dest_blit_size.x, (s32)clamped_dest_blit_size.y, 1},
+        },
     };
     vkCmdBlitImage(*vulkan_context->render_command_buffer,
                    source_image->handle,
@@ -760,8 +757,7 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                    VK_FILTER_NEAREST);
 
     // NOTE(Sleepster): Transfer the images back to what they were before the blit 
-    vk_backend_image_change_layout(vulkan_context, 
-                                   *vulkan_context->render_command_buffer,
+    vk_backend_image_change_layout(*vulkan_context->render_command_buffer,
                                    source_image->handle,
                                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                                    source_initial_layout,
@@ -772,8 +768,7 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                                    source_range);
     source_image->layout = source_initial_layout;
 
-    vk_backend_image_change_layout(vulkan_context, 
-                                   *vulkan_context->render_command_buffer,
+    vk_backend_image_change_layout(*vulkan_context->render_command_buffer,
                                    destination_image->handle,
                                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                    destination_final_layout,
@@ -800,13 +795,12 @@ vk_backend_image_ensure_shader_readonly_optimal(vulkan_context_t *vulkan_context
         VkCommandBuffer scratch_command_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
         VkImageSubresourceRange src_range = {
             .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-            .baseArrayLayer = 0,
             .baseMipLevel   = 0,
-            .layerCount     = 1,
             .levelCount     = 1,
+            .baseArrayLayer = 0,
+            .layerCount     = 1,
         };
-        vk_backend_image_change_layout(vulkan_context,
-                                       scratch_command_buffer,
+        vk_backend_image_change_layout(scratch_command_buffer,
                                        image->handle,
                                        image->layout,
                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,

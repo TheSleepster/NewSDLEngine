@@ -4,8 +4,6 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-#include <spirv_reflect.h>
-
 #include <vk_backend_shader.h>
 #include <s_RHI_core.h>
 
@@ -20,6 +18,7 @@ shader_arena_allocate(void *allocator, u32 allocation_size)
     return(result);
 }
 
+#if 0
 VkDescriptorType 
 vk_backend_spv_reflect_to_vulkan_descriptor(SpvReflectDescriptorType spv_type)
 {
@@ -65,133 +64,6 @@ vk_backend_spv_shader_stage_to_vulkan_stage(SpvReflectShaderStageFlagBits spv_st
     if(spv_stage & SPV_REFLECT_SHADER_STAGE_COMPUTE_BIT)                 result |= VK_SHADER_STAGE_COMPUTE_BIT;
     
     return(result);
-}
-
-internal_api u32 
-vk_backend_get_vk_format_size(VkFormat format)
-{
-    switch(format)
-    {
-        // 8-bit
-        case VK_FORMAT_R8_UNORM:
-        case VK_FORMAT_R8_SNORM:
-        case VK_FORMAT_R8_UINT:
-        case VK_FORMAT_R8_SINT:
-        {
-            return(1);
-        }break;
-
-        case VK_FORMAT_R8G8_UNORM:
-        case VK_FORMAT_R8G8_SNORM:
-        case VK_FORMAT_R8G8_UINT:
-        case VK_FORMAT_R8G8_SINT:
-        {
-            return(2);
-        }break;
-
-        case VK_FORMAT_R8G8B8A8_UNORM:
-        case VK_FORMAT_R8G8B8A8_SNORM:
-        case VK_FORMAT_R8G8B8A8_UINT:
-        case VK_FORMAT_R8G8B8A8_SINT:
-        case VK_FORMAT_R8G8B8A8_SRGB:
-        case VK_FORMAT_B8G8R8A8_UNORM:
-        case VK_FORMAT_B8G8R8A8_SRGB:
-        {
-            return(4);
-        }break;
-
-        // 16-bit
-        case VK_FORMAT_R16_UNORM:
-        case VK_FORMAT_R16_SNORM:
-        case VK_FORMAT_R16_UINT:
-        case VK_FORMAT_R16_SINT:
-        case VK_FORMAT_R16_SFLOAT:
-        {
-            return(2);
-        }break;
-
-        case VK_FORMAT_R16G16_UNORM:
-        case VK_FORMAT_R16G16_SNORM:
-        case VK_FORMAT_R16G16_UINT:
-        case VK_FORMAT_R16G16_SINT:
-        case VK_FORMAT_R16G16_SFLOAT:
-        {
-            return(4);
-        }break;
-
-        case VK_FORMAT_R16G16B16A16_UNORM:
-        case VK_FORMAT_R16G16B16A16_SNORM:
-        case VK_FORMAT_R16G16B16A16_UINT:
-        case VK_FORMAT_R16G16B16A16_SINT:
-        case VK_FORMAT_R16G16B16A16_SFLOAT:
-        {
-            return(8);
-        }break;
-
-        // 32-bit
-        case VK_FORMAT_R32_UINT:
-        case VK_FORMAT_R32_SINT:
-        case VK_FORMAT_R32_SFLOAT:
-        {
-            return(4);
-        }break;
-
-        case VK_FORMAT_R32G32_UINT:
-        case VK_FORMAT_R32G32_SINT:
-        case VK_FORMAT_R32G32_SFLOAT:
-        {
-            return(8);
-        }break;
-
-        case VK_FORMAT_R32G32B32_UINT:
-        case VK_FORMAT_R32G32B32_SINT:
-        case VK_FORMAT_R32G32B32_SFLOAT:
-        {
-            return(12);
-        }break;
-
-        case VK_FORMAT_R32G32B32A32_UINT:
-        case VK_FORMAT_R32G32B32A32_SINT:
-        case VK_FORMAT_R32G32B32A32_SFLOAT:
-        {
-            return(16);
-        }break;
-
-        // 64-bit
-        case VK_FORMAT_R64_UINT:
-        case VK_FORMAT_R64_SINT:
-        case VK_FORMAT_R64_SFLOAT:
-        {
-            return(8);
-        }break;
-
-        case VK_FORMAT_R64G64_UINT:
-        case VK_FORMAT_R64G64_SINT:
-        case VK_FORMAT_R64G64_SFLOAT:
-        {
-            return(16);
-        }break;
-
-        case VK_FORMAT_R64G64B64_UINT:
-        case VK_FORMAT_R64G64B64_SINT:
-        case VK_FORMAT_R64G64B64_SFLOAT:
-        {
-            return(24);
-        }break;
-
-        case VK_FORMAT_R64G64B64A64_UINT:
-        case VK_FORMAT_R64G64B64A64_SINT:
-        case VK_FORMAT_R64G64B64A64_SFLOAT:
-        {
-            return(32);
-        }break;
-
-        default:
-        {
-            Expect(false, "Unhandled VkFormat in vk_backend_get_vk_format_size");
-            return(0);
-        }break;
-    }
 }
 
 vulkan_shader_t
@@ -483,6 +355,135 @@ vk_backend_shader_create_spirv_reflect(vulkan_context_t *vulkan_context, string_
 
     return(result);
 }
+#endif
+
+internal_api u32 
+vk_backend_get_vk_format_size(VkFormat format)
+{
+    switch(format)
+    {
+        // 8-bit
+        case VK_FORMAT_R8_UNORM:
+        case VK_FORMAT_R8_SNORM:
+        case VK_FORMAT_R8_UINT:
+        case VK_FORMAT_R8_SINT:
+        {
+            return(1);
+        }break;
+
+        case VK_FORMAT_R8G8_UNORM:
+        case VK_FORMAT_R8G8_SNORM:
+        case VK_FORMAT_R8G8_UINT:
+        case VK_FORMAT_R8G8_SINT:
+        {
+            return(2);
+        }break;
+
+        case VK_FORMAT_R8G8B8A8_UNORM:
+        case VK_FORMAT_R8G8B8A8_SNORM:
+        case VK_FORMAT_R8G8B8A8_UINT:
+        case VK_FORMAT_R8G8B8A8_SINT:
+        case VK_FORMAT_R8G8B8A8_SRGB:
+        case VK_FORMAT_B8G8R8A8_UNORM:
+        case VK_FORMAT_B8G8R8A8_SRGB:
+        {
+            return(4);
+        }break;
+
+        // 16-bit
+        case VK_FORMAT_R16_UNORM:
+        case VK_FORMAT_R16_SNORM:
+        case VK_FORMAT_R16_UINT:
+        case VK_FORMAT_R16_SINT:
+        case VK_FORMAT_R16_SFLOAT:
+        {
+            return(2);
+        }break;
+
+        case VK_FORMAT_R16G16_UNORM:
+        case VK_FORMAT_R16G16_SNORM:
+        case VK_FORMAT_R16G16_UINT:
+        case VK_FORMAT_R16G16_SINT:
+        case VK_FORMAT_R16G16_SFLOAT:
+        {
+            return(4);
+        }break;
+
+        case VK_FORMAT_R16G16B16A16_UNORM:
+        case VK_FORMAT_R16G16B16A16_SNORM:
+        case VK_FORMAT_R16G16B16A16_UINT:
+        case VK_FORMAT_R16G16B16A16_SINT:
+        case VK_FORMAT_R16G16B16A16_SFLOAT:
+        {
+            return(8);
+        }break;
+
+        // 32-bit
+        case VK_FORMAT_R32_UINT:
+        case VK_FORMAT_R32_SINT:
+        case VK_FORMAT_R32_SFLOAT:
+        {
+            return(4);
+        }break;
+
+        case VK_FORMAT_R32G32_UINT:
+        case VK_FORMAT_R32G32_SINT:
+        case VK_FORMAT_R32G32_SFLOAT:
+        {
+            return(8);
+        }break;
+
+        case VK_FORMAT_R32G32B32_UINT:
+        case VK_FORMAT_R32G32B32_SINT:
+        case VK_FORMAT_R32G32B32_SFLOAT:
+        {
+            return(12);
+        }break;
+
+        case VK_FORMAT_R32G32B32A32_UINT:
+        case VK_FORMAT_R32G32B32A32_SINT:
+        case VK_FORMAT_R32G32B32A32_SFLOAT:
+        {
+            return(16);
+        }break;
+
+        // 64-bit
+        case VK_FORMAT_R64_UINT:
+        case VK_FORMAT_R64_SINT:
+        case VK_FORMAT_R64_SFLOAT:
+        {
+            return(8);
+        }break;
+
+        case VK_FORMAT_R64G64_UINT:
+        case VK_FORMAT_R64G64_SINT:
+        case VK_FORMAT_R64G64_SFLOAT:
+        {
+            return(16);
+        }break;
+
+        case VK_FORMAT_R64G64B64_UINT:
+        case VK_FORMAT_R64G64B64_SINT:
+        case VK_FORMAT_R64G64B64_SFLOAT:
+        {
+            return(24);
+        }break;
+
+        case VK_FORMAT_R64G64B64A64_UINT:
+        case VK_FORMAT_R64G64B64A64_SINT:
+        case VK_FORMAT_R64G64B64A64_SFLOAT:
+        {
+            return(32);
+        }break;
+
+        default:
+        {
+            Expect(false, "Unhandled VkFormat in vk_backend_get_vk_format_size");
+            return(0);
+        }break;
+    }
+}
+
 
 #include <slang/slang.h>
 #include <slang/slang-com-ptr.h>

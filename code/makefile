@@ -39,17 +39,42 @@ SILENT  ?=
 RELEASE ?=
 
 # ==============================================================================
-# Compiler & Common Flags
+# Compiler Selection
 # ==============================================================================
+# Choose which toolchain to build with:
+#   make                    -> clang++  (default)
+#   make COMPILER=g++       -> g++
+#   make COMPILER=mingw     -> x86_64-w64-mingw32-g++
+#
+# Each compiler gets its own independent flag set below.
 
-# address sanitizer: -fsanitize=address -fno-omit-frame-pointer
-CXX                  := clang++
-COMMON_COMPILE_FLAGS := -g -O0 -fno-inline-functions -std=c++11 -Wno-unknown-attributes -Wformat -Wnullability-completeness -flto -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
-COMMON_RELEASE_FLAGS := -O3 -std=c++11 -Wno-unknown-attributes -Wformat -Wnullability-completeness -flto -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
-COMMON_INCLUDE_PATHS := -I../code/ -I../run_tree/deps/vulkan/Include/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/glad/include/ -I../run_tree/deps/vulkan/VMA/ -I../run_tree/deps/vulkan/spirv_reflect/include/ -I../run_tree/deps/Freetype/include/
+COMPILER ?= clang++ 
 
-PLATFORM_LINKER_FLAGS := -lm -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static -lfreetype -lvulkan -lspirv_reflect -lslang -lslang-compiler
-GAME_LINKER_FLAGS     := -lm -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/spirv_reflect/lib/ -lSDL3-Static
+# address sanitizer (Clang/GCC): -fsanitize=address -fno-omit-frame-pointer
+
+ifeq ($(COMPILER),clang++)
+$(info Building with clang++)
+    CXX                  := clang++
+    COMMON_COMPILE_FLAGS := -g -O0 -fno-inline-functions -std=c++11 -Wno-unknown-attributes -Wformat -Wnullability-completeness -flto -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-writable-strings -Wno-deprecated -Wno-c99-designator 
+    COMMON_RELEASE_FLAGS := -O3 -std=c++11 -Wno-unknown-attributes -Wformat -Wnullability-completeness -flto -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-incompatible-pointer-types -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-pointer-integer-compare -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-vla-cxx-extension -Wno-reorder-init-list
+else ifeq ($(COMPILER),g++)
+$(info Building with g++)
+    CXX                  := g++
+    COMMON_COMPILE_FLAGS := -g -O0 -fno-inline-functions -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder -Wno-pointer-arith -Wno-write-strings -Wno-class-memaccess -Wno-sfinae-incomplete -Wno-format-truncation -Wno-implicit-fallthrough
+    COMMON_RELEASE_FLAGS := -O3 -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder -Wno-pointer-arith
+else ifeq ($(COMPILER),mingw)
+$(info Building with MinGW)
+    CXX                  := x86_64-w64-mingw32-g++
+    COMMON_COMPILE_FLAGS := -DOS_WINDOWS -lmingw32 -g -O0 -fno-inline-functions -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder -Wno-pointer-arith -Wno-write-strings -Wno-class-memaccess -Wno-sfinae-incomplete -Wno-format-truncation -Wno-implicit-fallthrough
+    COMMON_RELEASE_FLAGS := -lmingw32 -O3 -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder
+else
+    $(error Unknown COMPILER '$(COMPILER)'. Valid options are: CLANG, GXX, WINEGXX)
+endif
+
+COMMON_INCLUDE_PATHS := -I../code/ -I../run_tree/deps/vulkan/Include/ -I../run_tree/deps/ -I../run_tree/deps/SDL3/include/ -I../run_tree/deps/Freetype/include/ -I../run_tree/deps/vulkan/slang/include/
+
+PLATFORM_LINKER_FLAGS := -lm -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -L../run_tree/deps/vulkan/slang/lib/ -lSDL3-Static -lfreetype -lvulkan -lslang -lslang-compiler
+GAME_LINKER_FLAGS     := -lm -L../run_tree/deps/vulkan -L../run_tree/deps -L../run_tree/deps/SDL3/lib/ -L../run_tree/deps/Freetype/ -lSDL3-Static -lfreetype -lvulkan -lslang -lslang-compiler
 
 GAME_DLL_COMPILE_FLAGS := $(filter-out -flto, $(COMMON_COMPILE_FLAGS))
 
@@ -162,7 +187,7 @@ $(BUILD_DIR)/sandbox_%$(EXE_EXT): $(CODE_DIR)/sandbox/%.cpp $(C_FILES) | $(BUILD
 # ==============================================================================
 $(BUILD_DIR)/game_DEBUG$(EXE_EXT): $(CODE_DIR)/build.cpp $(CODE_DIR)/meta/ATHENA_GENERATED_RTTI.h | $(BUILD_DIR)
 	@echo "[BUILDING GAME ENGINE]"
-	$(SILENT) $(CXX) $(RELEASE) -DENGINE_BUILD=1 $(COMMON_INCLUDE_PATHS) $< $(COMMON_COMPILE_FLAGS) $(PLATFORM_LINKER_FLAGS) -rdynamic -o $@
+	$(SILENT) $(CXX) $(RELEASE) -DENGINE_BUILD=1 $(COMMON_INCLUDE_PATHS) $< $(COMMON_COMPILE_FLAGS) $(PLATFORM_LINKER_FLAGS) -o $@
 
 $(BUILD_DIR)/game_DLL$(DLL_EXT): $(CODE_DIR)/build.cpp $(CODE_DIR)/meta/ATHENA_GENERATED_RTTI.h | $(BUILD_DIR)
 	@echo "[BUILDING GAME DLL]"

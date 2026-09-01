@@ -593,32 +593,32 @@ mat4_RHGL_ortho(float32 left,
                 float32 right,
                 float32 bottom,
                 float32 top,
-                float32 near,
-                float32 far);
+                float32 near_plane,
+                float32 far_plane);
 
 MATH_API mat4_t
 mat4_LHGL_ortho(float32 left,
                 float32 right,
                 float32 bottom,
                 float32 top,
-                float32 near,
-                float32 far);
+                float32 near_plane,
+                float32 far_plane);
 
 MATH_API mat4_t
 mat4_RHDX_ortho(float32 left,
                 float32 right,
                 float32 bottom,
                 float32 top,
-                float32 near,
-                float32 far);
+                float32 near_plane,
+                float32 far_plane);
 
 MATH_API mat4_t
 mat4_LHDX_ortho(float32 left,
                 float32 right,
                 float32 bottom,
                 float32 top,
-                float32 near,
-                float32 far);
+                float32 near_plane,
+                float32 far_plane);
 
 MATH_API mat4_t mat4_inverse_ortho(mat4_t orthographic_projection);
 
@@ -2176,48 +2176,48 @@ mat4_inverse_determinant(mat4_t A)
   =========== GRAPHICS TRANSFORMS ===========
   ===========================================*/
 
-// NOTE(Sleepster): Near and far plane are -1 - 1 OpenGL standard.
+// NOTE(Sleepster): Near and far_plane plane are -1 - 1 OpenGL standard.
 MATH_API mat4_t
 mat4_RHGL_ortho(float32 left,
                 float32 right,
                 float32 bottom,
                 float32 top,
-                float32 near,
-                float32 far)
+                float32 near_plane,
+                float32 far_plane)
 {
     mat4_t result = mat4_identity();
 
     result.elements[0][0] = 2.0f / (right - left);
     result.elements[1][1] = 2.0f / (top - bottom);
-    result.elements[2][2] = 2.0f / (near - far);
+    result.elements[2][2] = 2.0f / (near_plane - far_plane);
     result.elements[3][3] = 1.0f;
 
     result.elements[3][0] = (left   + right) / (left - right);
     result.elements[3][1] = (bottom + top)   / (bottom - top);
-    result.elements[3][2] = (near   + far)   / (near - far);
+    result.elements[3][2] = (near_plane   + far_plane)   / (near_plane - far_plane);
 
     return(result);
 }
 
-// NOTE(Sleepster): Near and far plane are 0 - 1 DirectX standard.
+// NOTE(Sleepster): Near and far_plane plane are 0 - 1 DirectX standard.
 MATH_API mat4_t
 mat4_RHDX_ortho(float32 left,
                 float32 right,
                 float32 bottom,
                 float32 top,
-                float32 near,
-                float32 far)
+                float32 near_plane,
+                float32 far_plane)
 {
     mat4_t result = mat4_identity();
 
     result.elements[0][0] = 2.0f / (right - left);
     result.elements[1][1] = 2.0f / (top - bottom);
-    result.elements[2][2] = 1.0f / (far - near);
+    result.elements[2][2] = 1.0f / (far_plane - near_plane);
     result.elements[3][3] = 1.0f;
 
     result.elements[3][0] = (left + right) / (left - right);
     result.elements[3][1] = (bottom + top) / (bottom - top);
-    result.elements[3][2] = -near / (far - near); 
+    result.elements[3][2] = -near_plane / (far_plane - near_plane); 
 
     return(result);
 }
@@ -2227,10 +2227,10 @@ mat4_LHGL_ortho(float32 left,
                 float32 right,
                 float32 bottom,
                 float32 top,
-                float32 near,
-                float32 far)
+                float32 near_plane,
+                float32 far_plane)
 {
-    mat4_t result = mat4_RHGL_ortho(left, right, bottom, top, near, far);
+    mat4_t result = mat4_RHGL_ortho(left, right, bottom, top, near_plane, far_plane);
     result.elements[2][2] = -result.elements[2][2];
 
     return(result);
@@ -2241,10 +2241,10 @@ mat4_LHDX_ortho(float32 left,
                 float32 right,
                 float32 bottom,
                 float32 top,
-                float32 near,
-                float32 far)
+                float32 near_plane,
+                float32 far_plane)
 {
-    mat4_t result = mat4_RHDX_ortho(left, right, bottom, top, near, far);
+    mat4_t result = mat4_RHDX_ortho(left, right, bottom, top, near_plane, far_plane);
     result.elements[2][2] = -result.elements[2][2];
 
     return(result);

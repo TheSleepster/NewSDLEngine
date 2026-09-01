@@ -63,7 +63,7 @@ byte*             c_za_alloc(zone_allocator_t *zone, u64 size_init, za_allocatio
 void              c_za_free(zone_allocator_t  *zone, void *data);
 void              c_za_free_zone_tag(zone_allocator_t *zone, za_allocation_tag_t tag);
 void              c_za_free_zone_tag_range(zone_allocator_t *zone, za_allocation_tag_t low_tag, za_allocation_tag_t high_tag);
-void              c_za_change_zone_tag(zone_allocator_t *zone, void *pointer, za_allocation_tag_t new_tag);
+void              c_za_change_zone_tag(void *pointer, za_allocation_tag_t new_tag);
 
 // DEBUG FUNCTIONS
 void c_za_DEBUG_print_block_list(zone_allocator_t *zone);

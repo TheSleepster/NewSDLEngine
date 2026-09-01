@@ -15,6 +15,7 @@
 #include <vk_backend_allocator.h>
 
 struct RHI_image_create_info_t;
+struct vulkan_buffer_t;
 struct vulkan_context_t;
 
 struct vulkan_sampler_info_t
@@ -73,10 +74,10 @@ void           vk_backend_image_update_data(vulkan_context_t *vulkan_context, vu
 void           vk_backend_image_destroy(vulkan_context_t *vulkan_context, vulkan_image_t *image);
 VkSampler      vk_backend_sampler_create(vulkan_context_t *vulkan_context, vulkan_sampler_info_t *info);
 void           vk_backend_sampler_destroy(vulkan_context_t *vulkan_context, VkSampler sampler);
+void           vk_backend_image_update_from_buffer(vulkan_image_t *image, vulkan_buffer_t *buffer, VkCommandBuffer command_buffer);
 
 void
-vk_backend_image_change_layout(vulkan_context_t       *vulkan_context, 
-                               VkCommandBuffer         command_buffer,
+vk_backend_image_change_layout(VkCommandBuffer         command_buffer,
                                VkImage                 image, 
                                VkImageLayout           current_layout,
                                VkImageLayout           target_layout, 
@@ -87,8 +88,7 @@ vk_backend_image_change_layout(vulkan_context_t       *vulkan_context,
                                VkImageSubresourceRange range);
 
 vulkan_image_t
-vk_backend_image_init_from_image_handle(vulkan_context_t    *vulkan_context, 
-                                        VkImage              image, 
+vk_backend_image_init_from_image_handle(VkImage              image, 
                                         VkImageView         *view,
                                         vulkan_image_info_t *info);
 
@@ -110,16 +110,16 @@ void  vk_backend_image_ensure_shader_readonly_optimal(vulkan_context_t *vulkan_c
 bool8 vk_backend_is_image_format_stencil_format(vulkan_image_t *image);
 bool8 vk_backend_is_image_format_depth_format(vulkan_image_t *image);
 
-void vk_backend_transfer_image_to_intial_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image);
-void vk_backend_transfer_image_to_final_layout(vulkan_context_t *vulkan_context, VkCommandBuffer render_command_buffer, vulkan_image_t *image);
+void vk_backend_transfer_image_to_intial_layout(VkCommandBuffer render_command_buffer, vulkan_image_t *image);
+void vk_backend_transfer_image_to_final_layout(VkCommandBuffer render_command_buffer, vulkan_image_t *image);
 
 VkFormat          vk_bitmap_format_to_vulkan_format(u32 bitmap_format);
 VkImageUsageFlags vk_image_usage_flags_from_image_format(u32 format);
 bool8             vk_sampler_info_is_valid(RHI_image_create_info_t *create_info);
 VkFilter          vk_sampler_filter_type_to_vk_filter(u32 filter);
 bool8             vk_is_depth_format(u32 format);
-VkImageLayout     vk_get_image_initial_layout_from_usage(u32 usage, u32 format);
-VkImageLayout     vk_get_image_final_layout_from_usage(u32 usage, u32 format);
+VkImageLayout     vk_get_image_initial_layout_from_usage(u32 usage);
+VkImageLayout     vk_get_image_final_layout_from_usage(u32 usage);
 VkSampler         vk_backend_get_sampler(vulkan_context_t *vulkan_context, vulkan_sampler_info_t *sampler_info);
      
 #endif // VK_BACKEND_IMAGE_H

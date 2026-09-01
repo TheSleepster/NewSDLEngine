@@ -74,7 +74,7 @@ vk_backend_buffer_append_data
 */
 
 void*
-vk_backend_buffer_append_data(vulkan_context_t *vulkan_context, vulkan_buffer_t *buffer, void *data, u32 size)
+vk_backend_buffer_append_data(vulkan_buffer_t *buffer, void *data, u32 size)
 {
     Assert(buffer->allocation.mapped_data != null);
     Assert(size <= buffer->allocation.allocation_size);
@@ -99,8 +99,7 @@ vk_backend_buffer_copy_buffer
 // TODO(Sleepster): Maybe the backend should just store a bunch of these commands that just need to get done arbitrarily in no 
 // particular order with a fence instead of just creating a command buffer here and just shooting it off.
 void
-vk_backend_buffer_copy_buffer(vulkan_context_t *vulkan_context,
-                              vulkan_buffer_t  *source_buffer,
+vk_backend_buffer_copy_buffer(vulkan_buffer_t  *source_buffer,
                               vulkan_buffer_t  *destination_buffer,
                               VkCommandBuffer   scratch_buffer,
                               u64               source_offset,
@@ -182,7 +181,7 @@ vk_backend_buffer_resize(vulkan_context_t *vulkan_context, vulkan_buffer_t *buff
                                                           new_size, 
                                                           buffer->usage_flags, 
                                                           buffer->allocation.allocation_type);
-    vk_backend_buffer_copy_buffer(vulkan_context, buffer, &new_buffer, command_buffer, 0, buffer->size, 0);
+    vk_backend_buffer_copy_buffer(buffer, &new_buffer, command_buffer, 0, buffer->size, 0);
     vk_backend_buffer_destroy(vulkan_context, buffer);
 
     *buffer = new_buffer;

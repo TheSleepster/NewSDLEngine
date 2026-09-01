@@ -8,6 +8,7 @@
 #define HASH_TABLE_IMPLEMENTATION
 #define DYNARRAY_IMPLEMENTATION
 #define ATHENA_IMPLMENTATION
+#define PROGRAM_FLAG_HANDLER_IMPLEMENTATION
 
 #include <c_base.h>
 #include <c_types.h>

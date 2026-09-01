@@ -57,7 +57,6 @@ _log(debug_log_level_t log_level,
     bool8 is_error = (log_level >= SL_LOG_ERROR);
 
     char buffer[32000];
-    memset(buffer, 0, sizeof(buffer));
 
     va_list arg_ptr;
     va_start(arg_ptr, line);
@@ -65,13 +64,12 @@ _log(debug_log_level_t log_level,
     va_end(arg_ptr);
 
     char out_buffer[32000];
-    memset(out_buffer, 0, sizeof(out_buffer));
-
     TicketMutexScope(&log_mutex)
     {
         if(is_error)
         {
-            sprintf(out_buffer, 
+            snprintf(out_buffer, 
+                    sizeof(out_buffer),
                     "%s%s[File: %s, Line: %d, Function: %s]: %s\033[0m\n", 
                     color_schemes[log_level], 
                     info_strings[log_level], 
@@ -84,7 +82,8 @@ _log(debug_log_level_t log_level,
         }
         else
         {
-            sprintf(out_buffer, 
+            snprintf(out_buffer, 
+                    sizeof(out_buffer),
                     "%s%s%s\033[0m", 
                     color_schemes[log_level], 
                     info_strings[log_level], 

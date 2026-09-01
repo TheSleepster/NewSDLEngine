@@ -66,7 +66,6 @@ void
 c_file_watcher_add_change_event(file_watcher_t              *watcher,
                                 string_t                     fullname,
                                 string_t                     old_filename,
-                                sys_file_check_event_data_t *watch_data,
                                 u32                          changes)
 {
     for(u32 file_change_index = 0;
