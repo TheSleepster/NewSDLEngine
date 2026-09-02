@@ -86,6 +86,8 @@ T&
 array_view_t<T>::operator[](s32 index)
 {
     Expect(index < this->count, "Array bounds check failed... index was: '%u' while count is: '%u'...\n", index, this->count);
+    Expect(index >= 0, "Array bounds check failed... index was: '%u' which is less than 0...\n", index);
+
     return(this->items[index]);
 }
 
@@ -94,6 +96,8 @@ T*
 array_view_t<T>::operator+(s32 index)
 {
     Expect(index < this->count, "Array bounds check failed... index was: '%u' while count is: '%u'...\n", index, this->count);
+    Expect(index >= 0, "Array bounds check failed... index was: '%u' which is less than 0...\n", index);
+
     return(this->items + index);
 }
 
@@ -202,6 +206,8 @@ T&
 array_t<T, count>::operator[](s32 index)
 {
     Expect(index < this->count, "Array bounds check failed... index was: '%u' while count is: '%u'...\n", index, this->count);
+    Expect(index >= 0, "Array bounds check failed... index was: '%u' which is less than 0...\n", index);
+
     return(this->items[index]);
 }
 
@@ -210,6 +216,8 @@ T*
 array_t<T, count>::operator+(s32 index)
 {
     Expect(index < this->count, "Array bounds check failed... index was: '%u' while count is: '%u'...\n", index, this->count);
+    Expect(index >= 0, "Array bounds check failed... index was: '%u' which is less than 0...\n", index);
+
     return(this->items + index);
 }
 

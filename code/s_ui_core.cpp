@@ -188,7 +188,6 @@ ui_state_poll_input_events(ui_state_t *ui_state)
 
     if(ui_state->ui_controller)
     {
-        printf("UI MOUSE POSITION: '%.02f' '%0.2f'...\n", ui_state->mouse_position.x, ui_state->mouse_position.y);
         ui_state->keyboard_flags = 0;
 
         action_button_t *left_mouse  = s_im_get_controller_action_button(ui_state->ui_controller, SDL_LEFT_MOUSE);
@@ -1191,43 +1190,29 @@ ui_widget_get_signals(ui_state_t *ui_state, widget_t *widget)
     if(ui_state->hot_widget == widget && (ui_state->hot_widget->widget_flags & UI_WIDGET_FLAG_INTERACTABLE))
     {
         widget_state_t *widget_state = &ui_state->widget_states.items[widget->ID].item;
-
-        if((widget->widget_flags & UI_WIDGET_FLAG_HOVERABLE))
+        if((widget->widget_flags & UI_WIDGET_FLAG_HOVERABLE) && widget == ui_state->hot_widget)
         {
             result.signal_flags |= UI_SIGNAL_FLAG_HOVERING;
         }
 
-        if((widget->widget_flags & UI_WIDGET_FLAG_MOUSE_CLICKABLE))
+        if((widget->widget_flags & UI_WIDGET_FLAG_MOUSE_CLICKABLE) || 
+           (widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE))
         {
             if(widget_state->just_clicked)
             {
                 result.signal_flags |= UI_SIGNAL_FLAG_LEFT_CLICKED; 
             }
-
             if(widget_state->is_held)
             {
                 result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOWN;
             }
-
             if(widget_state->just_released)
             {
                 result.signal_flags |= UI_SIGNAL_FLAG_LEFT_RELEASED;
             }
-
             if(widget_state->is_double_clicked)
             {
                 result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOUBLE_CLICKED;
-            }
-        }
-        else if((widget->widget_flags & UI_WIDGET_FLAG_LEFT_DRAGGABLE))
-        {
-            if(widget_state->just_clicked)
-            {
-                result.signal_flags |= UI_SIGNAL_FLAG_LEFT_CLICKED;
-            }
-            if(widget_state->is_held)
-            {
-                result.signal_flags |= UI_SIGNAL_FLAG_LEFT_DOWN;
             }
         }
 
@@ -1274,7 +1259,7 @@ ui_widget_panel(ui_state_t *ui_state,
     ui_signal_t result = ui_widget_get_signals(ui_state, widget);
     if(additional_flags & UI_WIDGET_FLAG_RESIZEABLE)
     {
-        if(ui_right_mouse_down(result))
+        if(ui_right_mouse_down(result) && ui_state->active_widget == widget)
         {
             float32 resize_x = ui_state->mouse_delta.x;
             float32 resize_y = ui_state->mouse_delta.y;

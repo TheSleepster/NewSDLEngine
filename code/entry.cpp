@@ -129,7 +129,7 @@ process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager
         removal_index < events_to_remove;
         ++removal_index)
     {
-        u32 index = redundant_events[removal_index];
+        u32 index = (redundant_events[removal_index] - removal_index);
         c_array_remove(input_manager->events, index, input_manager->event_count - removal_index);
     }
 

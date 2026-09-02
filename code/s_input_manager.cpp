@@ -31,15 +31,25 @@ internal_api bool8
 is_same_event(input_event_t *event0, input_event_t *event1)
 {
     bool8 result = false;
-    u64 time0 = event0->timestampMS;
-    u64 time1 = event1->timestampMS;
-
-    s64 delta_time = (time0 > time1) ? (time0 - time1) : (time1 - time0);
-    if((delta_time <= 1) || 
-       ((event0->deviceID == event1->deviceID) && 
-        (event0->type == event1->type)))
+    if((event0->type     == event1->type) &&
+       (event0->deviceID == event1->deviceID) &&
+       (event0->inputID  == event1->inputID))
     {
         result = true;
+    }
+    else
+    {
+        u64 time0 = event0->timestampMS;
+        u64 time1 = event1->timestampMS;
+
+        s64 delta_time = (time0 > time1) ? (time0 - time1) : (time1 - time0);
+        if((delta_time <= 1) &&
+           (event0->type != INPUT_EVENT_TYPE_TEXT_INPUT) &&
+           (event1->type == INPUT_EVENT_TYPE_TEXT_INPUT) &&
+           (event1->input_stream.count != 0))
+        {
+            result = true;
+        }
     }
 
     return(result);
