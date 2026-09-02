@@ -19,7 +19,7 @@ internal_api void render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list
 =============
 find_top_level_in_bounds_widget
 
-Helper for ui_state_poll_input_events
+Helper for ui_state_init
 =============
 */
 
@@ -84,7 +84,7 @@ void
 ui_state_init(ui_state_t       *ui_state, 
               input_manager_t  *input_manager,
               asset_manager_t  *asset_manager, 
-              RHI_context_t *RHI_context, 
+              RHI_context_t    *RHI_context, 
               u32               renderpass_ID)
 {
     ZeroStruct(*ui_state);
@@ -328,7 +328,6 @@ ui_state_update_widget_state(ui_state_t *ui_state)
 {
     RHI_renderpass_t *renderpass = ui_state->RHI_context->renderpasses + ui_state->interface_framebuffer;
     ui_state->ui_controller = s_im_get_controller_from_active_device(ui_state->input_manager, ui_state->ui_controller);
-    ui_state_poll_input_events(ui_state);
     
     float32 half_width  = renderpass->render_width  * 0.5f;
     float32 half_height = renderpass->render_height * 0.5f;
@@ -569,6 +568,7 @@ ui_state_begin_frame(ui_state_t *ui_state)
     ui_state->frame_begun = true;
     ui_state->frame_ended = false;
 
+    ui_state_poll_input_events(ui_state);
     c_arena_reset(&ui_state->widget_arena);
 }
 
@@ -588,7 +588,6 @@ ui_state_end_frame(ui_state_t *ui_state, RHI_command_list_t *command_list)
     ui_state_render_widgets(ui_state, command_list);
     ui_state->frame_ended = true;
     ui_state->frame_begun = false;
-    s_im_clear_controller_transient_state(ui_state->ui_controller);
     if(ui_state->input_focused)
     {
         s_im_clear_device_events(ui_state->ui_controller->device);

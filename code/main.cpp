@@ -902,9 +902,9 @@ game_main(global_context_t *_global_context)
         game_state->controller = s_im_get_controller_from_active_device(input_manager, game_state->controller);
         if(game_state->open_debug_menu)
         {
+            ui_state_get_input_events(main_ui);
             handle_debug_ui_menu(main_ui, render_state->RHI_context, &player_sprite);
         }
-        ui_state_get_input_events(main_ui);
 
         // NOTE(Sleepster): Simulate loop 
         if(delta_time >= (gc->tick_rate * 2.0f))
