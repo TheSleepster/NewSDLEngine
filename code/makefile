@@ -6,9 +6,9 @@
 #   make RELEASE=1              release build (no DLL hot-reload artifact)
 #   make COMPILER=mingw         Linux -> Windows cross build via MinGW
 #   make COMPILER=clang++ PLATFORM=WINDOWS   Linux -> Windows via clang cross target
-#   make game_dll                rebuild ONLY the hot-reload DLL (engine keeps running)
+#   make game_dll               rebuild ONLY the hot-reload DLL (engine keeps running)
 #   make -j$(nproc)             parallelize independent targets (sandboxes, shaders,
-#                                assets, tests all build concurrently with the engine)
+#                               assets, tests all build concurrently with the engine)
 #   make clean
 #
 # Layout of this file:
@@ -103,7 +103,7 @@ endif
 
 # --- clang++ : shared warning/flag base, debug and release only differ by a
 #     handful of flags on top, so we factor it instead of hand-duplicating.
-CLANG_WARN_BASE := -std=c++11 -Wno-unknown-attributes -Wformat -Wnullability-completeness -flto -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-writable-strings -Wno-deprecated -Wno-c99-designator
+CLANG_WARN_BASE    := -std=c++11 -Wno-unknown-attributes -Wformat -Wnullability-completeness -flto -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-writable-strings -Wno-deprecated -Wno-c99-designator
 CLANG_DEBUG_ONLY   := -g -O0 -fno-inline-functions
 CLANG_RELEASE_ONLY := -O3 -Wno-unused-parameter -Wno-incompatible-pointer-types -Wno-pointer-integer-compare -Wno-vla-cxx-extension -Wno-reorder-init-list
 

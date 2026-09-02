@@ -188,6 +188,7 @@ ui_state_poll_input_events(ui_state_t *ui_state)
 
     if(ui_state->ui_controller)
     {
+        printf("UI MOUSE POSITION: '%.02f' '%0.2f'...\n", ui_state->mouse_position.x, ui_state->mouse_position.y);
         ui_state->keyboard_flags = 0;
 
         action_button_t *left_mouse  = s_im_get_controller_action_button(ui_state->ui_controller, SDL_LEFT_MOUSE);
@@ -304,7 +305,7 @@ ui_state_get_input_events(ui_state_t *ui_state)
             input_event_t *event = device->events + event_index;
             ui_state->ui_events[ui_state->ui_event_count] = *event;
 
-            event->consumed = true;
+            ZeroStruct(*event);
             if(event->input_stream.count > 0)
             {
                 input_event_t *text_event = &ui_state->ui_events[ui_state->ui_event_count];
@@ -1490,6 +1491,7 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
 
     if(widget_state->toggled && ui_state->input_focused)
     {
+        bool8 backspaced = false;
         for(u32 event_index = 0;
             event_index < ui_state->ui_event_count;
             ++event_index)
@@ -1514,8 +1516,12 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
                 {
                     action_button_t *input = s_im_get_controller_action_button(ui_state->ui_controller, event->inputID);
                     // NOTE(Sleepster): Backspace 
-                    if(input->keycode == 0x08 && (event->type == INPUT_EVENT_TYPE_PRESSED))
+                    if(input->keycode == 0x08 && 
+                       ((event->type == INPUT_EVENT_TYPE_DOWN) || event->type == INPUT_EVENT_TYPE_PRESSED) && 
+                       !backspaced)
                     {
+                        backspaced = true;
+
                         s32 backspace_amount = 1;
                         if(ui_state->keyboard_flags & UI_KEYBOARD_FLAG_LCTRL)
                         {

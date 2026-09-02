@@ -5384,8 +5384,9 @@ struct type_info_struct_input_event_type_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[5];
+		const type_info_member_t member_array[6];
 		struct {
+			const type_info_member_t INPUT_EVENT_TYPE_INVALID;
 			const type_info_member_t INPUT_EVENT_TYPE_PRESSED;
 			const type_info_member_t INPUT_EVENT_TYPE_DOWN;
 			const type_info_member_t INPUT_EVENT_TYPE_RELEASED;
@@ -21730,9 +21731,20 @@ constexpr type_info_struct_input_event_type_t DEFAULT_typedata_structure_input_e
 		.type_id = TYPE_input_event_type_t,
 		.size = athena_internal::safe_sizeof<input_event_type_t>(),
 	},
-	.member_count   = 5,
+	.member_count   = 6,
 	.member_pointer = DEFAULT_typedata_structure_input_event_type_t.member_array,
 	.members = {
+		.INPUT_EVENT_TYPE_INVALID = {
+			.type_info     = &DEFAULT_typedata_structure_input_event_type_t.type_info,
+			.member_name   = "INPUT_EVENT_TYPE_INVALID",
+			.parent        = &DEFAULT_typedata_structure_input_event_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = INPUT_EVENT_TYPE_INVALID,
+			},
+		},
 		.INPUT_EVENT_TYPE_PRESSED = {
 			.type_info     = &DEFAULT_typedata_structure_input_event_type_t.type_info,
 			.member_name   = "INPUT_EVENT_TYPE_PRESSED",
@@ -34442,6 +34454,7 @@ enum class gamepad_controller_data_t {
 	buttons,
 }; // gamepad_controller_data_t
 enum class input_event_type_t {
+	INPUT_EVENT_TYPE_INVALID,
 	INPUT_EVENT_TYPE_PRESSED,
 	INPUT_EVENT_TYPE_DOWN,
 	INPUT_EVENT_TYPE_RELEASED,

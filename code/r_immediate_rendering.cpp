@@ -138,15 +138,16 @@ immediate_text(RHI_command_list_t    *command_list,
             ++character_index)
         {
             u8 *character = render_string.data + character_index;
-            Assert(*character > 0);
-
-            glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
-            if(metrics->is_valid)
+            if(*character != '0')
             {
-                s32 texture_index = RHI_is_texture_bound(command_list, &metrics->owner_atlas->texture);
-                if(texture_index == -1)
+                glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
+                if(metrics->is_valid)
                 {
-                    RHI_cmd_bind_texture_image(command_list, &metrics->owner_atlas->texture);
+                    s32 texture_index = RHI_is_texture_bound(command_list, &metrics->owner_atlas->texture);
+                    if(texture_index == -1)
+                    {
+                        RHI_cmd_bind_texture_image(command_list, &metrics->owner_atlas->texture);
+                    }
                 }
             }
         }
@@ -156,29 +157,30 @@ immediate_text(RHI_command_list_t    *command_list,
             ++character_index)
         {
             u8 *character = render_string.data + character_index;
-            Assert(*character > 0);
-
-            glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
-            if(metrics->is_valid)
+            if(*character != '0')
             {
-                s32 texture_index = RHI_is_texture_bound(command_list, &metrics->owner_atlas->texture);
-                immediate_quad_ex(command_list,
-                                  vertex_buffer,
-                                  vec2_expand_vec3(vec2_subtract(render_position, vec2(0, metrics->offset_y)), position.z),
-                                  vec2(metrics->width, metrics->height),
-                                  text_color,
-                                  metrics->atlas_offset,
-                                  vec2_add(metrics->atlas_offset, metrics->atlas_size),
-                                  vec2(settings, texture_index),
-                                  vec2_zero(),
-                                  vec2_zero(),
-                                  &metrics->owner_atlas->texture);
+                glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
+                if(metrics->is_valid)
+                {
+                    s32 texture_index = RHI_is_texture_bound(command_list, &metrics->owner_atlas->texture);
+                    immediate_quad_ex(command_list,
+                                      vertex_buffer,
+                                      vec2_expand_vec3(vec2_subtract(render_position, vec2(0, metrics->offset_y)), position.z),
+                                      vec2(metrics->width, metrics->height),
+                                      text_color,
+                                      metrics->atlas_offset,
+                                      vec2_add(metrics->atlas_offset, metrics->atlas_size),
+                                      vec2(settings, texture_index),
+                                      vec2_zero(),
+                                      vec2_zero(),
+                                      &metrics->owner_atlas->texture);
 
-                render_position.x += metrics->advance;
-            }
-            else
-            {
-                log_info("Glyph data for character: '%c' is not valid yet...\n", *character);
+                    render_position.x += metrics->advance;
+                }
+                else
+                {
+                    log_info("Glyph data for character: '%c' is not valid yet...\n", *character);
+                }
             }
         }
     }

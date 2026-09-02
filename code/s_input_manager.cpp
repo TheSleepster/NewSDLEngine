@@ -314,7 +314,7 @@ s_im_apply_events_to_controller(input_controller_t         *controller,
         ++event_index)
     {
         input_event_t *event = events + event_index;
-        if(!event->consumed && event->input_type == controller->type)
+        if(!event->consumed && event->type != INPUT_EVENT_TYPE_INVALID && event->input_type == controller->type)
         {
             action_button_t *button = s_im_get_controller_action_button(controller, event->inputID);
             button->scancode = event->inputID;

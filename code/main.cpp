@@ -899,12 +899,12 @@ game_main(global_context_t *_global_context)
 #ifndef RELEASE
         c_file_watcher_process_changes(&gc->file_watcher);
 #endif
-
         game_state->controller = s_im_get_controller_from_active_device(input_manager, game_state->controller);
         if(game_state->open_debug_menu)
         {
             handle_debug_ui_menu(main_ui, render_state->RHI_context, &player_sprite);
         }
+        ui_state_get_input_events(main_ui);
 
         // NOTE(Sleepster): Simulate loop 
         if(delta_time >= (gc->tick_rate * 2.0f))
@@ -918,7 +918,6 @@ game_main(global_context_t *_global_context)
         {
             if(first_tick)
             {
-                ui_state_get_input_events(main_ui);
                 // NOTE(Sleepster): Apply events. 
                 s_im_apply_events_to_controller(game_state->controller, game_state->controller->device->events, true);
 
@@ -1056,7 +1055,7 @@ game_main(global_context_t *_global_context)
                           &render_state->vertex_buffer, 
                           asset_manager, 
                           &basic_font, 
-                          STR("Whatever dood."), 
+                          STR("Whatever MDASND HHTGSD."), 
                           vec3(-300, 150, 0.0f), 
                           vec4(1.0f, 1.0f, 1.0f, 1.0f), 
                           0.0f, 

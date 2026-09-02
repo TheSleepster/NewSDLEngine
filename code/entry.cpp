@@ -218,7 +218,7 @@ main(void)
         c_file_watcher_add_path(&gc->file_watcher, STR("../res/"));
         c_file_watcher_issue_check_over_all_paths(&gc->file_watcher);
 
-        gc->input_manager_playback_file = c_file_open(STR("input_manager_playback_file.inpdat"), true);
+        gc->input_manager_playback_file = c_file_open(STR("../input_manager_playback_file.inpdat"), true);
 
         // NOTE(Sleepster): Load the game code 
         gc->game_library  = sys_load_library(game_dll_name);
@@ -226,6 +226,7 @@ main(void)
         gc->game_dll_data = c_file_get_file_system_info(game_dll_name);
         Assert(gc->game_library);
 
+        
         game_main = (game_main_t*)sys_get_proc_address(gc->game_library, STR("game_main"));
         Assert(game_main);
 #endif
@@ -244,7 +245,7 @@ main(void)
             // NOTE(Sleepster): Reload the game code 
             if(gc->should_reload)
             {
-                SDL_Delay(10);
+                SDL_Delay(5);
                 sys_free_library(gc->game_library);
 
                 gc->game_library  = sys_load_library(gc->game_dll_path);
