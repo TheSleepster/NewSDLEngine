@@ -33,11 +33,22 @@ typedef struct sockaddr_in      sockaddr_in_t;
 /*===========================================
   ============== OS MEMORY API ==============
   ===========================================*/
+enum os_memory_access_flags
+{
+    OS_MEMORY_ACCESS_FLAG_NONE    = BIT(0),
+    OS_MEMORY_ACCESS_FLAG_READ    = BIT(1),
+    OS_MEMORY_ACCESS_FLAG_WRITE   = BIT(2),
+    OS_MEMORY_ACCESS_FLAG_EXECUTE = BIT(3),
+    OS_MEMORY_ACCESS_FLAG_ALL     = OS_MEMORY_ACCESS_FLAG_READ|OS_MEMORY_ACCESS_FLAG_WRITE|OS_MEMORY_ACCESS_FLAG_EXECUTE
+};
+
+u64   sys_get_virtual_memory_page_size(void);
 u32   sys_align_to_page_size(u32 size);
 
-void* sys_allocate_memory(usize allocation_size);
+void* sys_allocate_memory(void *base_address, usize allocation_size);
 void  sys_free_memory(void *data, usize free_size);
 void* sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size);
+bool8 sys_set_memory_access_flags(void *memory, u64 memory_size, int access_flags);
 
 /*===========================================
   ============== FILE IO STUFF ==============
@@ -76,7 +87,7 @@ void  sys_file_watcher_process_changes(file_watcher_t *watcher);
 /*===========================================
   ============== MULTITHREADING =============
   ===========================================*/
-s32             sys_get_thread_count();
+s32             sys_get_thread_count(void);
 sys_semaphore_t sys_semaphore_create(s32 initial_thread_count, s32 max_thread_count);
 void            sys_semaphore_close(sys_semaphore_t *semaphore);
 void            sys_semaphore_wait(sys_semaphore_t *semaphore, u64 wait_duration_ms);
@@ -85,7 +96,7 @@ bool8           sys_semaphore_destroy(sys_semaphore_t *semaphore);
 sys_thread_t    sys_thread_create(thread_proc_t *proc, void *user_data, bool8 close_handle);
 void            sys_thread_wait(sys_semaphore_t *semaphore, u64 wait_duration_ms);
 bool8           sys_thread_close_handle(sys_thread_t *thread_data);
-sys_mutex_t     sys_mutex_create();
+sys_mutex_t     sys_mutex_create(void);
 void            sys_mutex_free(sys_mutex_t *mutex);
 bool8           sys_mutex_lock(sys_mutex_t *mutex, bool8 should_block);
 bool8           sys_mutex_unlock(sys_mutex_t *mutex);

@@ -15,7 +15,7 @@ c_arena_create(u64 block_size)
     memory_arena_t result = {};
 
     block_size            = block_size - sizeof(memory_arena_footer_t);
-    result.base           = (byte*)sys_allocate_memory(block_size);
+    result.base           = (byte*)sys_allocate_memory(null, block_size);
     result.used           = 0;
     result.block_size     = block_size;
     result.block_counter += 1;
@@ -69,7 +69,7 @@ c_arena_push_size(memory_arena_t *arena, u64 size_init)
         u64 new_block_size = size > (arena->block_size + sizeof(memory_arena_footer_t)) ? size : arena->block_size;
 
         arena->block_size = new_block_size - sizeof(memory_arena_footer_t);
-        arena->base       = (byte *)sys_allocate_memory(new_block_size);
+        arena->base       = (byte *)sys_allocate_memory(null, new_block_size);
         arena->used       = 0;
         arena->block_counter += 1;
 

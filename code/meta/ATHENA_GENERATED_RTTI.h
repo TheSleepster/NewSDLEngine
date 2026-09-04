@@ -100,6 +100,7 @@
 	X(real64, &DEFAULT_typedata_real64) \
 	X(zone_allocator_block_t, &DEFAULT_typedata_structure_zone_allocator_block_t.type_info) \
 	X(zone_allocator_block, &DEFAULT_typedata_zone_allocator_block) \
+	X(os_memory_access_flags, &DEFAULT_typedata_structure_os_memory_access_flags.type_info) \
 	X(thread_proc_t, &DEFAULT_typedata_thread_proc_t) \
 	X(asset_type_t, &DEFAULT_typedata_structure_asset_type_t.type_info) \
 	X(asset_slot_load_status_t, &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info) \
@@ -530,10 +531,13 @@
 	X(TYPE_c_za_DEBUG_print_block_list) \
 	X(TYPE_c_za_DEBUG_validate_block_list) \
 	X(TYPE_zone_allocator_block) \
+	X(TYPE_os_memory_access_flags) \
+	X(TYPE_sys_get_virtual_memory_page_size) \
 	X(TYPE_sys_align_to_page_size) \
 	X(TYPE_sys_allocate_memory) \
 	X(TYPE_sys_free_memory) \
 	X(TYPE_sys_reallocate_memory) \
+	X(TYPE_sys_set_memory_access_flags) \
 	X(TYPE_sys_file_open) \
 	X(TYPE_sys_file_close) \
 	X(TYPE_sys_file_copy) \
@@ -3717,6 +3721,29 @@ struct type_info_procedure_c_za_DEBUG_validate_block_list {
 	};
 };
 
+struct type_info_struct_os_memory_access_flags {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[5];
+		struct {
+			const type_info_member_t OS_MEMORY_ACCESS_FLAG_NONE;
+			const type_info_member_t OS_MEMORY_ACCESS_FLAG_READ;
+			const type_info_member_t OS_MEMORY_ACCESS_FLAG_WRITE;
+			const type_info_member_t OS_MEMORY_ACCESS_FLAG_EXECUTE;
+			const type_info_member_t OS_MEMORY_ACCESS_FLAG_ALL;
+		}members;
+	};
+};
+
+struct type_info_procedure_sys_get_virtual_memory_page_size {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+};
+
 struct type_info_procedure_sys_align_to_page_size {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -3736,8 +3763,9 @@ struct type_info_procedure_sys_allocate_memory {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[1];
+		type_info_member_t argument_array[2];
 		struct {
+			const type_info_member_t base_address;
 			const type_info_member_t allocation_size;
 		}arguments;
 	};
@@ -3768,6 +3796,21 @@ struct type_info_procedure_sys_reallocate_memory {
 			const type_info_member_t base;
 			const type_info_member_t old_size;
 			const type_info_member_t allocation_size;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_sys_set_memory_access_flags {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[3];
+		struct {
+			const type_info_member_t memory;
+			const type_info_member_t memory_size;
+			const type_info_member_t access_flags;
 		}arguments;
 	};
 };
@@ -9562,10 +9605,13 @@ extern const type_info_procedure_c_za_change_zone_tag DEFAULT_typedata_procedure
 extern const type_info_procedure_c_za_DEBUG_print_block_list DEFAULT_typedata_procedure_c_za_DEBUG_print_block_list;
 extern const type_info_procedure_c_za_DEBUG_validate_block_list DEFAULT_typedata_procedure_c_za_DEBUG_validate_block_list;
 extern const type_info_t DEFAULT_typedata_zone_allocator_block;
+extern const type_info_struct_os_memory_access_flags DEFAULT_typedata_structure_os_memory_access_flags;
+extern const type_info_procedure_sys_get_virtual_memory_page_size DEFAULT_typedata_procedure_sys_get_virtual_memory_page_size;
 extern const type_info_procedure_sys_align_to_page_size DEFAULT_typedata_procedure_sys_align_to_page_size;
 extern const type_info_procedure_sys_allocate_memory DEFAULT_typedata_procedure_sys_allocate_memory;
 extern const type_info_procedure_sys_free_memory DEFAULT_typedata_procedure_sys_free_memory;
 extern const type_info_procedure_sys_reallocate_memory DEFAULT_typedata_procedure_sys_reallocate_memory;
+extern const type_info_procedure_sys_set_memory_access_flags DEFAULT_typedata_procedure_sys_set_memory_access_flags;
 extern const type_info_procedure_sys_file_open DEFAULT_typedata_procedure_sys_file_open;
 extern const type_info_procedure_sys_file_close DEFAULT_typedata_procedure_sys_file_close;
 extern const type_info_procedure_sys_file_copy DEFAULT_typedata_procedure_sys_file_copy;
@@ -17093,6 +17139,83 @@ constexpr type_info_t DEFAULT_typedata_zone_allocator_block = {
 	.type_id = TYPE_zone_allocator_block,
 	.size = athena_internal::safe_sizeof<zone_allocator_block>(),
 };
+constexpr type_info_struct_os_memory_access_flags DEFAULT_typedata_structure_os_memory_access_flags = {
+	.type_info = {
+		.type_name = "os_memory_access_flags",
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.type_id = TYPE_os_memory_access_flags,
+		.size = athena_internal::safe_sizeof<os_memory_access_flags>(),
+	},
+	.member_count   = 5,
+	.member_pointer = DEFAULT_typedata_structure_os_memory_access_flags.member_array,
+	.members = {
+		.OS_MEMORY_ACCESS_FLAG_NONE = {
+			.type_info     = &DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+			.member_name   = "OS_MEMORY_ACCESS_FLAG_NONE",
+			.parent        = &DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 1,
+			},
+		},
+		.OS_MEMORY_ACCESS_FLAG_READ = {
+			.type_info     = &DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+			.member_name   = "OS_MEMORY_ACCESS_FLAG_READ",
+			.parent        = &DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 2,
+			},
+		},
+		.OS_MEMORY_ACCESS_FLAG_WRITE = {
+			.type_info     = &DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+			.member_name   = "OS_MEMORY_ACCESS_FLAG_WRITE",
+			.parent        = &DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 4,
+			},
+		},
+		.OS_MEMORY_ACCESS_FLAG_EXECUTE = {
+			.type_info     = &DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+			.member_name   = "OS_MEMORY_ACCESS_FLAG_EXECUTE",
+			.parent        = &DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 8,
+			},
+		},
+		.OS_MEMORY_ACCESS_FLAG_ALL = {
+			.type_info     = &DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+			.member_name   = "OS_MEMORY_ACCESS_FLAG_ALL",
+			.parent        = &DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 14,
+			},
+		},
+	},
+};
+
+constexpr type_info_procedure_sys_get_virtual_memory_page_size DEFAULT_typedata_procedure_sys_get_virtual_memory_page_size = {
+	.type_info = {
+		.type_name = "sys_get_virtual_memory_page_size",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_sys_get_virtual_memory_page_size,
+	},
+	.argument_count = 0,
+	.return_type    = &DEFAULT_typedata_u64,
+};
 constexpr type_info_procedure_sys_align_to_page_size DEFAULT_typedata_procedure_sys_align_to_page_size = {
 	.type_info = {
 		.type_name = "sys_align_to_page_size",
@@ -17118,10 +17241,17 @@ constexpr type_info_procedure_sys_allocate_memory DEFAULT_typedata_procedure_sys
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_sys_allocate_memory,
 	},
-	.argument_count = 1,
+	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_sys_allocate_memory.argument_array,
 	.arguments = {
+		.base_address = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "base_address",
+			.parent        = &DEFAULT_typedata_procedure_sys_allocate_memory.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
 		.allocation_size = {
 			.type_info     = &DEFAULT_typedata_usize,
 			.member_name   = "allocation_size",
@@ -17185,6 +17315,39 @@ constexpr type_info_procedure_sys_reallocate_memory DEFAULT_typedata_procedure_s
 			.type_info     = &DEFAULT_typedata_u64,
 			.member_name   = "allocation_size",
 			.parent        = &DEFAULT_typedata_procedure_sys_reallocate_memory.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_sys_set_memory_access_flags DEFAULT_typedata_procedure_sys_set_memory_access_flags = {
+	.type_info = {
+		.type_name = "sys_set_memory_access_flags",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_sys_set_memory_access_flags,
+	},
+	.argument_count = 3,
+	.return_type    = &DEFAULT_typedata_bool8,
+	.argument_pointer = DEFAULT_typedata_procedure_sys_set_memory_access_flags.argument_array,
+	.arguments = {
+		.memory = {
+			.type_info     = &DEFAULT_typedata_void,
+			.member_name   = "memory",
+			.parent        = &DEFAULT_typedata_procedure_sys_set_memory_access_flags.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.memory_size = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "memory_size",
+			.parent        = &DEFAULT_typedata_procedure_sys_set_memory_access_flags.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.access_flags = {
+			.type_info     = &DEFAULT_typedata_int,
+			.member_name   = "access_flags",
+			.parent        = &DEFAULT_typedata_procedure_sys_set_memory_access_flags.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -33344,10 +33507,13 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_za_change_zone_tag.type_info,
 	&DEFAULT_typedata_procedure_c_za_DEBUG_print_block_list.type_info,
 	&DEFAULT_typedata_procedure_c_za_DEBUG_validate_block_list.type_info,
+	&DEFAULT_typedata_structure_os_memory_access_flags.type_info,
+	&DEFAULT_typedata_procedure_sys_get_virtual_memory_page_size.type_info,
 	&DEFAULT_typedata_procedure_sys_align_to_page_size.type_info,
 	&DEFAULT_typedata_procedure_sys_allocate_memory.type_info,
 	&DEFAULT_typedata_procedure_sys_free_memory.type_info,
 	&DEFAULT_typedata_procedure_sys_reallocate_memory.type_info,
+	&DEFAULT_typedata_procedure_sys_set_memory_access_flags.type_info,
 	&DEFAULT_typedata_procedure_sys_file_open.type_info,
 	&DEFAULT_typedata_procedure_sys_file_close.type_info,
 	&DEFAULT_typedata_procedure_sys_file_copy.type_info,
@@ -34102,6 +34268,13 @@ enum class zone_allocator_block_t {
 	next_block,
 	prev_block,
 }; // zone_allocator_block_t
+enum class os_memory_access_flags {
+	OS_MEMORY_ACCESS_FLAG_NONE,
+	OS_MEMORY_ACCESS_FLAG_READ,
+	OS_MEMORY_ACCESS_FLAG_WRITE,
+	OS_MEMORY_ACCESS_FLAG_EXECUTE,
+	OS_MEMORY_ACCESS_FLAG_ALL,
+}; // os_memory_access_flags
 enum class asset_type_t {
 	AT_Invalid,
 	AT_Bitmap,
@@ -35747,6 +35920,7 @@ enum class sys_align_to_page_size {
 	size,
 }; // sys_align_to_page_size
 enum class sys_allocate_memory {
+	base_address,
 	allocation_size,
 }; // sys_allocate_memory
 enum class sys_free_memory {
@@ -35758,6 +35932,11 @@ enum class sys_reallocate_memory {
 	old_size,
 	allocation_size,
 }; // sys_reallocate_memory
+enum class sys_set_memory_access_flags {
+	memory,
+	memory_size,
+	access_flags,
+}; // sys_set_memory_access_flags
 enum class sys_file_open {
 	filepath,
 	for_writing,

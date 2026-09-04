@@ -39,7 +39,7 @@
 #include <s_entity.h>
 
 //#include <meta/GENERATED_program_RTTI.h>
-#include <code_generator/athena//athena.h>
+#include <code_generator/athena/athena.h>
 #include <meta/ATHENA_GENERATED_RTTI.h>
 
 // NOTE(Sleepster): Game 

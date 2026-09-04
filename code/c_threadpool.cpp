@@ -45,7 +45,7 @@ c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocato
         ZeroStruct(*thread);
 
         thread_allocator_t *allocator = &thread->allocator;
-        allocator->buffer  = (byte*)sys_allocate_memory(thread_allocator_size);
+        allocator->buffer  = (byte*)sys_allocate_memory(null, thread_allocator_size);
         allocator->size    = thread_allocator_size;
 
         thread->is_started = false;

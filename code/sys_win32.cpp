@@ -24,11 +24,20 @@ typedef struct multithreading_work_queue_manager multithreading_work_queue_manag
 // MEMORY FUNCTIONS
 /////////////////////
 
+u64 
+sys_get_virtual_memory_page_size(void)
+{    
+    SYSTEM_INFO info;
+    GetSystemInfo(&info);
+
+    return(info.dwPageSize);
+}
+
 void*
-sys_allocate_memory(usize allocation_size)
+sys_allocate_memory(void *base_address, usize allocation_size)
 {
     void *result = null;
-    result = VirtualAlloc(0, allocation_size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+    result = VirtualAlloc(base_address, allocation_size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
     if(!result)
     {
         DWORD error = GetLastError();
@@ -80,6 +89,59 @@ sys_free_memory(void *data, usize free_size)
 {
     (void)free_size;
     VirtualFree(data, 0, MEM_RELEASE);
+}
+
+bool8  
+sys_set_memory_access_flags(void *memory, u64 memory_size, int access_flags)
+{
+    bool8 result = true;
+
+    DWORD protection;
+    if((access_flags & OS_MEMORY_ACCESS_FLAG_EXECUTE) &&
+       (access_flags & OS_MEMORY_ACCESS_FLAG_WRITE))
+    {
+        protection = PAGE_EXECUTE_READWRITE;
+    }
+    else if(access_flags & OS_MEMORY_ACCESS_FLAG_EXECUTE)
+    {
+        protection = (access_flags & OS_MEMORY_ACCESS_FLAG_READ) ? PAGE_EXECUTE_READ : PAGE_EXECUTE;
+    }
+    else if(access_flags & OS_MEMORY_ACCESS_FLAG_WRITE)
+    {
+        protection = PAGE_READWRITE;
+    }
+    else if(access_flags & OS_MEMORY_ACCESS_FLAG_READ)
+    {
+        protection = PAGE_READONLY;
+    }
+    else
+    {
+        protection = PAGE_NOACCESS;
+    }
+
+    DWORD old_protected_flags = 0;
+    result = VirtualProtect(memory, memory_size, protection, &old_protected_flags);
+    if(!result)
+    {
+        result = false;
+
+        DWORD error = GetLastError();
+        LPSTR message_buffer = 0;
+        FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_IGNORE_INSERTS,
+                       null,           
+                       error,          
+                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                       (LPSTR)&message_buffer, 
+                       0,              
+                       null);
+
+        log_error("Attempt to VirtualProtect() memory of address: '%p', with size '%llu' has failed... Error code: '%s'...\n", 
+                  memory,
+                  memory_size,
+                  message_buffer);
+    }
+
+    return(result);
 }
 
 ///////////////////////////////////
@@ -741,7 +803,7 @@ sys_mutex_lock(sys_mutex_t *mutex, const bool8 should_block)
     if(!should_block)
     {
         DWORD value = WaitForSingleObject(mutex->handle, INFINITE);
-        while(value == WAIT_OBJECT_0)
+        if(value == WAIT_OBJECT_0)
         {
             result = true;
         }

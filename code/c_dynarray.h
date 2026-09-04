@@ -108,13 +108,14 @@ c_array_clear(array_view_t<T> array)
     memset(array.items, 0, sizeof(T) * array.count);
 }
 
+// TODO(Sleepster): Maybe pass max index here? @speed
 template <typename T>
 s32
 c_array_find(array_view_t<T> array, T *element)
 {
     s32 result = -1;
     for(s32 index = 0;
-        index < array.used;
+        index < array.count;
         ++index)
     {
         T *found = array.items + index;
@@ -138,6 +139,7 @@ c_array_remove(array_view_t<T> array, s32 index, s32 max_index)
         max_index = array.count;
     }
 
+    // TODO(Sleepster): @speed Speed this up! 
     for(s32 this_index = index;
         this_index < max_index;
         ++this_index)

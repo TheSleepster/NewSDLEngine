@@ -929,9 +929,14 @@ game_main(global_context_t *_global_context)
                         game_state->open_debug_menu = !game_state->open_debug_menu;
                     }
 
-                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_BACKSLASH))
+                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_L))
                     {
                         gc->recording_input = !gc->recording_input;
+                    }
+
+                    if(gc->recording_input)
+                    {
+                        // ???
                     }
                 }
 

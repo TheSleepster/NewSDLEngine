@@ -10,41 +10,633 @@
 #include <c_types.h>
 #include <p_platform_data.h>
 
-#define DEBUG_BLOCK_ID (0xF0C0FF)
+#define DEBUG_SECTION_ID (0xF0C0FFUL)
+#define DEBUG_PAGE_ID    (0x000FF0CC)
+#define DEBUG 1
 
-struct memory_node_t
+constexpr u32     MAX_MEMORY_SECTIONS = 512;
+constexpr float32 PROTECTED_ALLOCATION_SIZE_FACTOR = 0.05;
+
+constexpr u64     ALLOCATOR_DEFAULT_PAGE_SECTION_SIZE = MB(10);
+constexpr u64     ALLOCATOR_MIN_UNIQUE_PAGE_SIZE      = MB(10);
+
+thread_local s32 this_thread_index = -1;
+
+enum memory_allocator_tag_t
 {
-    byte *start;
-    s64   size;
+    TAG_CLEAR,            // unused section
+    TAG_STATIC,           // manually freed
+    TAG_TEMP,             // "garbage collected"
+    TAG_CACHE,            // can be reclaimed whenever
+    TAG_COUNT
 };
 
-struct memory_header_t
+// TODO(Sleepster): Perhaps these need to store the page they're owned by? 
+struct memory_section_t 
 {
     s32   ID;
-    s32   _reserved;
-    s64   block_size;
-    byte *base;
+    s32   memory_tag;
+    s64   section_size;
+#ifdef DEBUG
+    // NOTE(Sleepster): Here because in DEBUG mode we must
+    // know the offset to the OS protected memory page.
+    s64   user_allocation_size;
+#endif
+    byte *section_base;
+    void *owner_page;
+
+    memory_section_t *next_section;
+    memory_section_t *prev_section;
 };
+
+struct memory_page_t
+{
+    u64               ID;
+    u64               page_size;
+    memory_section_t  first_section;
+    memory_section_t *cursor;
+    byte             *page_base;
+
+    // NOTE(Sleepster): The central allocator ignores the prev_page! 
+    memory_page_t    *next_page;
+    memory_page_t    *prev_page;
+
+    bool32            in_use;
+};
+
+struct tag_section_array_t 
+{
+    array_t<memory_section_t*, MAX_MEMORY_SECTIONS> array;
+    s32 count;
+};
+
+struct allocator_thread_context_t
+{
+    memory_page_t      *first_page;
+    memory_page_t      *current_page;
+    tag_section_array_t tag_array[TAG_COUNT];
+};
+
+struct memory_allocator_t
+{
+    void             *memory;
+    s64               max_capacity;
+    s64               os_page_size;
+    volatile s32      thread_count;
+
+    sys_mutex_t       mutex;
+    volatile  u64     next_page_offset;
+    allocator_thread_context_t thread_contexts[MAX_THREAD_COUNT];
+};
+
+static memory_allocator_t allocator = {};
+
+static void *alloc(u64 size, s32 tag);
+static void  free_alloc(void *memory);
+static void  free_tagged_allocations(s32 tag);
+static void  free_tagged_allocation_range(s32 min_tag, s32 max_tag);
+
+/*
+==============================================
+get_tag_name
+==============================================
+*/
+
+static char*
+get_tag_name(s32 tag)
+{
+    char *result = null;
+    switch(tag)
+    {
+        case TAG_CLEAR:  { result = "TAG_CLEAR";  }break;
+        case TAG_STATIC: { result = "TAG_STATIC"; }break;
+        case TAG_TEMP:   { result = "TAG_TEMP";   }break;
+        case TAG_CACHE:  { result = "TAG_CACHE";  }break;
+    }
+
+    return(result);
+}
+
+/*
+==============================================
+print_allocator_section_list
+==============================================
+*/
+
+static void
+print_allocator_info(void)
+{
+    allocator_thread_context_t *context = allocator.thread_contexts + this_thread_index;
+
+    s32 section_count = 0;
+    u64 total_zone_usage_size = 0;
+    log_info("Allocator Section List:\n");
+    memory_section_t *current_section = context->first_page->cursor; 
+    do {
+        char *tag_name = get_tag_name(current_section->memory_tag);
+        log_info("\tSection at '%p': size = %llu, allocated = '%s', tag = '%s', id = '%u'...\n",
+                 current_section, 
+                 current_section->section_size, 
+                 current_section->memory_tag != TAG_CLEAR ? "true" : "false",
+                 tag_name,
+                 current_section->ID);
+
+        ++section_count;
+        total_zone_usage_size += current_section->section_size;
+
+        current_section = current_section->next_section;
+    }while(current_section != context->first_page->cursor);
+
+    log_info("\n");
+    log_info("Allocator Stats:\n");
+    log_info("\tTotal Number of Sections: '%d'...\n", section_count);
+    log_info("\tMemory used by sections: '%d'...\n", section_count * sizeof(memory_section_t));
+    log_info("\n");
+    log_info("\tAllocator size is: '%llu'...\n", allocator.max_capacity);
+    log_info("\tTotal size used by zones: '%llu'...\n", total_zone_usage_size);
+
+    s64 total_size = total_zone_usage_size + (section_count * sizeof(memory_section_t));
+    log_info("\tTotal size used (with sizeof(memory_section_t)): '%llu'...\n", total_size);
+    if(total_size > allocator.max_capacity)
+    {
+        log_error("The total size used by the allocator is greater than it's capacity!\n");
+    }
+
+    log_info("\n");
+    log_info("Allocation Tag Information:\n");
+    for(s32 tag_index = TAG_CLEAR;
+        tag_index < TAG_COUNT;
+        ++tag_index)
+    {
+        tag_section_array_t *array = context->tag_array + tag_index;
+        if(array->count > 0)
+        {
+            log_info("\tAllocation Tag '%s':\n", get_tag_name(tag_index));
+            log_info("\t\tAllocation count: '%d'\n", array->count);
+
+            u64 total_size = 0;
+            for(memory_section_t *section: array->array)
+            {
+                if(section)
+                {
+                    total_size += section->section_size;
+                }
+            }
+            log_info("\t\tTotal size: '%llu'\n", total_size);
+        }
+    }
+}
+
+/*
+==============================================
+memory_allocator_init
+==============================================
+*/
+
+static void
+memory_allocator_init(void *base_address, u64 total_allocation)
+{
+    allocator.memory        = sys_allocate_memory(base_address, total_allocation);
+    allocator.max_capacity  = total_allocation;
+    allocator.os_page_size  = sys_get_virtual_memory_page_size();
+    allocator.next_page_offset = allocator.os_page_size;
+
+    allocator.mutex = sys_mutex_create();
+#if 0
+    // TODO(Sleepster): Stop this, instead track PAGES 
+    allocator.first_page.ID = DEBUG_PAGE_ID;
+    allocator.first_page.first_section.ID           = DEBUG_SECTION_ID;
+    allocator.first_page.first_section.memory_tag   = TAG_CLEAR;
+    allocator.first_page.first_section.section_size = total_allocation - sizeof(memory_section_t); 
+    allocator.first_page.first_section.section_base = ((byte*)allocator.memory + sizeof(memory_section_t));
+
+    allocator.first_page.first_section.next_section = &allocator.first_page.first_section;
+    allocator.first_page.first_section.prev_section = &allocator.first_page.first_section;
+
+    allocator.first_page.cursor = &allocator.first_page.first_section;
+#endif
+}
+
+#ifndef DEBUG
+/*
+==============================================
+alloc_impl
+
+Used in release, a much faster path that avoids all the
+debug stuff like extra memory mapping and VirtualProtect()
+
+!!!!!!!!!!!!!!!!!!
+IGNORED FOR NOW, WE'RE ONLY USING THE DEBUG ONE
+!!!!!!!!!!!!!!!!!!
+==============================================
+*/
+
+static void*
+alloc_impl(u64 size, s32 tag)
+{
+    void *result = null;
+
+    memory_section_t *valid_section   = null;
+    memory_section_t *current_section = allocator.cursor;
+    for(;;)
+    {
+        if(current_section->memory_tag == TAG_CLEAR)
+        {
+            valid_section = current_section;
+            break;
+        }
+
+        current_section = current_section->next_section;
+        if(current_section == allocator.cursor) break;
+    }
+
+    if(valid_section)
+    {
+        s64 allocation_size   = (size + sizeof(memory_section_t));
+        s64 allocation_offset = (valid_section->section_size) - allocation_size;
+
+        memory_section_t *allocation = (memory_section_t*)(valid_section->section_base + allocation_offset);
+        valid_section->section_size  = allocation_offset;
+
+        allocation->ID = DEBUG_SECTION_ID;
+        allocation->memory_tag   = tag;
+        allocation->section_size = size;
+        allocation->section_base = ((byte*)allocation + sizeof(memory_section_t));
+
+        allocation->next_section = valid_section->next_section;
+        valid_section->next_section->prev_section = allocation;
+        valid_section->next_section = allocation;
+
+        result = (void*)allocation->section_base;
+        if(tag != TAG_CLEAR)
+        {
+            tag_section_array_t *array = allocator.tag_array + tag;
+            array->array[array->count++] = allocation;
+        }
+    }
+
+    return(result);
+}
+#else
+
+// TODO(Sleepster): Make it so this function grabs the next 10MB page section
+// from the central allocator using AtomicCompareExchange64()
+//
+// The central allocator will only have a next pointer, and thus this is fine.
+// However, when requesting a page.
+
+/*
+==============================================
+thread_get_next_page
+==============================================
+*/
+
+static memory_page_t*
+thread_get_next_page(u64 new_page_size)
+{
+    memory_page_t *result = null;
+    new_page_size = (Align(Max(new_page_size, ALLOCATOR_DEFAULT_PAGE_SECTION_SIZE), allocator.os_page_size));
+
+    sys_mutex_lock(&allocator.mutex, true);
+    u64 next_page_offset = allocator.next_page_offset;
+    allocator.next_page_offset += new_page_size;
+    sys_mutex_unlock(&allocator.mutex);
+
+    result = (memory_page_t*)((byte*)allocator.memory + next_page_offset);
+    result->page_base = (byte*)result + sizeof(memory_page_t);
+
+    result->first_section.ID           = DEBUG_SECTION_ID;
+    result->first_section.memory_tag   = TAG_CLEAR;
+    result->first_section.section_base = result->page_base;
+    result->first_section.section_size = new_page_size - sizeof(memory_page_t);
+    result->first_section.owner_page   = result;
+
+    result->first_section.next_section = &result->first_section;
+    result->first_section.prev_section = &result->first_section;
+    result->cursor                     = &result->first_section;
+
+    return(result);
+}
+
+/*
+==============================================
+register_thread_for_allocator
+==============================================
+*/
+
+static void
+register_thread_for_allocator(void)
+{
+    this_thread_index = AtomicIncrement32(&allocator.thread_count);
+    allocator_thread_context_t *context = allocator.thread_contexts + this_thread_index;
+    context->first_page   = thread_get_next_page(ALLOCATOR_DEFAULT_PAGE_SECTION_SIZE);
+    context->current_page = context->first_page;
+
+    context->current_page->next_page = null;
+    context->current_page->prev_page = null;
+
+    context->current_page->first_section.owner_page = context->current_page;
+}
+
+/*
+==============================================
+alloc_impl
+
+Used in debug build, meant to prevent us from performing
+buffer overflows and such
+==============================================
+*/
+
+static void*
+alloc_impl(u64 size, s32 tag)
+{
+    void *result = null;
+    if(this_thread_index == -1)
+    {
+        register_thread_for_allocator();
+    }
+    
+    allocator_thread_context_t *context = allocator.thread_contexts + this_thread_index;
+
+    s64 user_allocation_size  = Align((size + sizeof(memory_section_t)), allocator.os_page_size);
+    s64 total_allocation_size = user_allocation_size + allocator.os_page_size; 
+
+    while(!result) 
+    {
+        memory_section_t *valid_section    = null;
+        memory_section_t *current_section  = context->current_page->cursor;
+        memory_section_t *starting_section = context->current_page->cursor->prev_section;
+        for(;;)
+        {
+            // NOTE(Sleepster): Free cached blocks as they are found... 
+            if(current_section->memory_tag == TAG_CACHE)
+            {
+
+                memory_section_t *this_section = current_section;
+                current_section = this_section->prev_section;
+                free_alloc(this_section->section_base);
+            }
+            else
+            {
+                // NOTE(Sleepster): See if this is both cleared and can hold our allocation... 
+                if(current_section->memory_tag == TAG_CLEAR &&
+                   current_section->section_size >= total_allocation_size)
+                {
+                    valid_section = current_section;
+                    break;
+                }
+
+                current_section = current_section->next_section;
+            }
+
+            if(current_section == starting_section) 
+            {
+                break;
+            }
+        }
+
+        if(valid_section)
+        {
+            // NOTE(Sleepster): Remove the item from the free list 
+            tag_section_array_t *tag_array = context->tag_array + TAG_CLEAR;
+            array_view_t<memory_section_t*> view = tag_array->array;
+            s32 index = c_array_find(view, &valid_section);
+            if(index != -1)
+            {
+                c_array_remove(view, index, tag_array->count);
+                --tag_array->count;
+            }
+
+            // NOTE(Sleepster): The start of the guard page 
+            s64 section_offset = valid_section->section_size - allocator.os_page_size;
+            // NOTE(Sleepster): Beginning of the user allocation 
+            section_offset -= (sizeof(memory_section_t) + user_allocation_size);
+
+            memory_section_t *allocation = (memory_section_t*)(valid_section->section_base + section_offset);
+            valid_section->section_size -= total_allocation_size;
+
+            allocation->ID = DEBUG_SECTION_ID;
+            allocation->memory_tag   = tag;
+            allocation->section_size = total_allocation_size;
+            allocation->section_base = ((byte*)allocation + sizeof(memory_section_t));
+
+            allocation->next_section = valid_section->next_section;
+            allocation->prev_section = valid_section;
+            allocation->owner_page   = valid_section->owner_page;
+            valid_section->next_section->prev_section = allocation;
+            valid_section->next_section = allocation;
+
+            result = (void*)allocation->section_base;
+            if(tag != TAG_CLEAR)
+            {
+                tag_section_array_t *array = context->tag_array + tag;
+
+                array->array[array->count++] = allocation;
+            }
+
+            allocation->user_allocation_size = user_allocation_size;
+
+            void *protected_address = allocation->section_base + user_allocation_size;
+            Assert(sys_set_memory_access_flags(protected_address, allocator.os_page_size, OS_MEMORY_ACCESS_FLAG_NONE));
+        }
+        else
+        {
+            //log_error("Failure to find a block of size: '%llu' for this allocation...\n", total_allocation_size);
+            if(!context->current_page->next_page)
+            {
+                context->current_page = thread_get_next_page(ALLOCATOR_DEFAULT_PAGE_SECTION_SIZE);
+                context->current_page->first_section.owner_page = context->current_page;
+
+                tag_section_array_t *array = (context->tag_array + TAG_CLEAR);
+                array->array[array->count++] = &context->current_page->first_section;
+            }
+        }
+    }
+
+    return(result);
+}
+#endif
+
+/*
+==============================================
+alloc
+==============================================
+*/
+
+static void*
+alloc(u64 size, s32 tag)
+{
+    void *result = alloc_impl(size, tag);
+    return(result);
+}
+
+/*
+==============================================
+free_alloc
+==============================================
+*/
+
+static void
+free_alloc(void *memory)
+{
+    allocator_thread_context_t *context = allocator.thread_contexts + this_thread_index;
+
+    memory_section_t *section = (memory_section_t*)((byte*)memory - sizeof(memory_section_t));
+    Assert(section->ID == DEBUG_SECTION_ID);
+    Assert(section->memory_tag != TAG_CLEAR);
+
+    // NOTE(Sleepster): Add to the free list 
+    tag_section_array_t *tag_array = context->tag_array + section->memory_tag;
+    array_view_t<memory_section_t*> view = tag_array->array;
+    s32 index = c_array_find(view, &section);
+    if(index != -1)
+    {
+        c_array_remove(view, index, tag_array->count);
+        --tag_array->count;
+    }
+
+#ifdef DEBUG
+    void *protected_address = section->section_base + section->user_allocation_size;
+    Assert(sys_set_memory_access_flags(protected_address, allocator.os_page_size, OS_MEMORY_ACCESS_FLAG_READ|OS_MEMORY_ACCESS_FLAG_WRITE));
+#endif
+
+    section->memory_tag = TAG_CLEAR;
+    tag_section_array_t *array = context->tag_array + section->memory_tag;
+    array->array[array->count++] = section;
+
+    if(section->next_section != section && section->next_section->memory_tag == TAG_CLEAR)
+    {
+        memory_section_t *next_section = section->next_section;
+        section->section_size += sizeof(memory_section_t) + next_section->section_size;
+        section->next_section  = next_section->next_section;
+
+        next_section->next_section->prev_section = section;
+        context->current_page->cursor = section;
+    }
+
+    if(section->prev_section != section && section->prev_section->memory_tag == TAG_CLEAR)
+    {
+        memory_section_t *previous_section = section->prev_section;
+        previous_section->section_size += sizeof(memory_section_t) + section->section_size;
+        previous_section->next_section  = section->next_section;
+
+        section->next_section->prev_section = previous_section;
+        context->current_page->cursor = previous_section;
+    }
+}
+
+/*
+==============================================
+free_tagged_allocations
+==============================================
+*/
+
+static void
+free_tagged_allocations(s32 tag)
+{
+    Assert(tag != TAG_CLEAR);
+
+    allocator_thread_context_t *context = allocator.thread_contexts + this_thread_index;
+    tag_section_array_t *array = context->tag_array + tag;
+
+    memory_section_t *section = array->array[0];
+    while(section)
+    {
+        void *address = section->section_base;
+        free_alloc(address);
+
+        section = array->array[0];
+    }
+
+    array->count = 0;
+}
+
+/*
+==============================================
+free_tagged_allocation_range
+==============================================
+*/
+
+static void
+free_tagged_allocation_range(s32 min_tag, s32 max_tag)
+{
+    for(s32 tag = min_tag;
+        tag <= max_tag;
+        ++tag)
+    {
+        free_tagged_allocations(tag);
+    }
+}
+
+static
+PLATFORM_THREAD_PROC(test_thread_proc)
+{
+    (void)user_data;
+    for(s32 index = 0;
+        index < 30;
+        ++index)
+    {
+        //alloc(KB(1), TAG_CACHE);
+    }
+
+    return(0);
+}
 
 int
 main(void)
 {
-    byte *memory = (byte*)sys_allocate_memory(GB(16));
+    void *DEBUG_base_address = (void*)TB(2);
+    memory_allocator_init(DEBUG_base_address, MB(100));
 
-    u64 allocation = MB(100);
+    sys_thread_t handle = sys_thread_create(test_thread_proc, null, true);
+    (void)handle;
 
-    memory_header_t *header = (memory_header_t*)memory;
-    memory += sizeof(memory_header_t);
-    header->base = memory;
-    header->ID   = DEBUG_BLOCK_ID;
-
-    memory += sizeof(allocation);
+    log_info("Sizeof(memory) = %llu..\n", 1000);
+    log_info("Sizeof(memory_section_t) = %llu..\n", sizeof(memory_section_t));
 #if 0
-    u64 DEBUG_buffer = MB(10);
-    sys_set_memory_properties(memory, READ_PROTECTED|WRITE_PROTECTED|EXECUTE_PROTECTED, DEBUG_buffer);
-    memory += DEBUG_buffer;
-#endif
+    void *test_value0 = alloc(MB(5), TAG_STATIC);
+    log_trace("1st...\n");
+    print_allocator_info();
+
+    void *test_value1 = alloc(MB(2), TAG_CACHE);
+    void *test_value2 = alloc(MB(2), TAG_CACHE);
+    log_trace("2nd...\n");
+    print_allocator_info();
+
+    log_trace("3rd...\n");
+    void *test_value4 = alloc(MB(4), TAG_STATIC);
+    print_allocator_info();
+
+    log_trace("4th...\n");
+    free_tagged_allocation_range(TAG_STATIC, TAG_CACHE);
+    print_allocator_info();
+
+    for(u32 index = 0;
+        index < 101;
+        ++index)
+    {
+        int *value = (((int*)test_value0 + index));
+        *value = 4;
+    }
     
-    printf("Hello, World!\n");
+    (void)test_value1;
+    (void)test_value2;
+    (void)test_value4;
+#endif
+
+    int *test_value0 = (int*)alloc(MB(4), TAG_STATIC);
+    *test_value0 = 4;
+
+    alloc(MB(4), TAG_STATIC);
+    alloc(MB(4), TAG_STATIC);
+    alloc(MB(4), TAG_STATIC);
+    alloc(MB(4), TAG_STATIC);
+
+    print_allocator_info();
+    free_alloc(test_value0);
+
+    //free_tagged_allocation_range(TAG_STATIC, TAG_CACHE);
+    //print_allocator_info();
+
     return(0);
 }

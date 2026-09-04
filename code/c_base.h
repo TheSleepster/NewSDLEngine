@@ -246,6 +246,7 @@ typedef void void_func(void);
 #define KB(x) ((u64)(x) * 1024ULL)
 #define MB(x) (KB((x))  * 1024ULL)
 #define GB(x) (MB((x))  * 1024ULL)
+#define TB(x) (GB((x))  * 1024ULL)
 
 // NOTE(Sleepster): C++
 #ifdef __cplusplus

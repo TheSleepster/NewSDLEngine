@@ -15,7 +15,7 @@ zone_allocator_t*
 c_za_create(u64 block_size)
 {
     zone_allocator_t *result = null;
-    void *base          = sys_allocate_memory(block_size + sizeof(zone_allocator_t));
+    void *base          = sys_allocate_memory(null, block_size + sizeof(zone_allocator_t));
 
     result              = (zone_allocator_t*)base;
     result->base        = (u8*)base + sizeof(zone_allocator_t);

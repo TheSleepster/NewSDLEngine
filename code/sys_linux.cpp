@@ -32,6 +32,12 @@
 #include <poll.h>
 #include <stdlib.h>
 
+u64
+sys_get_virtual_memory_page_size(void)
+{
+    return(sysconf(_SC_PAGESIZE));
+}
+
 u64 
 sys_align_to_page_size(u64 size)
 {
@@ -54,10 +60,10 @@ sys_align_to_page_size(u64 size)
 // But, this needs more work.
 
 void*
-sys_allocate_memory(usize allocation_size)
+sys_allocate_memory(void *base_address, usize allocation_size)
 {
     u64 true_allocation = sys_align_to_page_size(allocation_size);
-    void *data = mmap(0, true_allocation, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+    void *data = mmap(base_address, true_allocation, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
     if(data == MAP_FAILED)
     {
         int error = errno;
@@ -96,7 +102,8 @@ sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
     }
     else
     {
-        result = sys_allocate_memory(allocation_size);
+        // TODO(Sleepster): Oof 
+        result = sys_allocate_memory(null, allocation_size);
     }
 
     return(result);
@@ -110,6 +117,35 @@ sys_free_memory(void *data, usize free_size)
         int error = errno;
         log_fatal("munmap failed... error: (%s), code: '%d'...\n", strerror(error), error);
     }
+}
+
+bool8
+sys_set_memory_access_flags(void *memory, u64 memory_size, int access_flags)
+{
+    bool8 result = true;
+
+    int os_memory_flags = 0;
+    if(access_flags & OS_MEMORY_ACCESS_FLAG_NONE)
+    {
+        // stop reading, writing, or executing
+    }
+    if(access_flags & OS_MEMORY_ACCESS_FLAG_READ)    { os_memory_flags |= PROT_READ;  }
+    if(access_flags & OS_MEMORY_ACCESS_FLAG_WRITE)   { os_memory_flags |= PROT_WRITE; }
+    if(access_flags & OS_MEMORY_ACCESS_FLAG_EXECUTE) { os_memory_flags |= PROT_EXEC;  }
+
+    s32 success = mprotect(memory, memory_size, os_memory_flags);
+    if(success != 0)
+    {
+        int error = errno;
+        log_error("Attempt to mprotect() memory of address: '%p', with size '%llu' has failed... Error code: '%s'...\n", 
+                  memory,
+                  memory_size,
+                  strerror(error));
+
+        result = false;
+    }
+
+    return(result);
 }
 
 //////////////////////
@@ -699,7 +735,7 @@ sys_thread_t
 sys_thread_create(thread_proc_t *proc, void *user_data, bool8 close_handle)
 {
     sys_thread_t result;
-    result.handle    = SDL_CreateThread((SDL_ThreadFunction)proc, null, user_data);
+    result.handle = SDL_CreateThread((SDL_ThreadFunction)proc, null, user_data);
     if(result.handle)
     {
         result.user_data = user_data;
@@ -758,7 +794,11 @@ sys_mutex_lock(sys_mutex_t *mutex, const bool8 should_block)
     while(result == false)
     {
         result = SDL_TryLockMutex(mutex->handle);
-        if(!should_block) break;
+        if(!should_block) 
+        {
+            result = true;
+            break;
+        }
     }
     return(result);
 }

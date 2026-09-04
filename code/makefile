@@ -103,9 +103,9 @@ endif
 
 # --- clang++ : shared warning/flag base, debug and release only differ by a
 #     handful of flags on top, so we factor it instead of hand-duplicating.
-CLANG_WARN_BASE    := -std=c++11 -Wno-unknown-attributes -Wformat -Wnullability-completeness -flto -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-writable-strings -Wno-deprecated -Wno-c99-designator
+CLANG_WARN_BASE    := -std=c++11 -Wno-unknown-attributes -Wformat -Wnullability-completeness -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-writable-strings -Wno-deprecated -Wno-c99-designator
 CLANG_DEBUG_ONLY   := -g -O0 -fno-inline-functions
-CLANG_RELEASE_ONLY := -O3 -Wno-unused-parameter -Wno-incompatible-pointer-types -Wno-pointer-integer-compare -Wno-vla-cxx-extension -Wno-reorder-init-list
+CLANG_RELEASE_ONLY := -O3 -Wno-unused-parameter -Wno-incompatible-pointer-types -flto -Wno-pointer-integer-compare -Wno-vla-cxx-extension -Wno-reorder-init-list
 
 # --- g++ : same idea.
 GPP_WARN_BASE     := -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder -Wno-pointer-arith -Wno-write-strings -Wno-class-memaccess -Wno-sfinae-incomplete -Wno-format-truncation -Wno-implicit-fallthrough -Wno-attributes
@@ -114,7 +114,7 @@ GPP_RELEASE_ONLY  := -O3
 
 # --- mingw : debug/release warning sets genuinely diverge (not a clean subset),
 #     kept explicit rather than force-fit into a shared base.
-MINGW_DEBUG_FLAGS   := -g -O0 -fno-inline-functions -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder -Wno-pointer-arith -Wno-write-strings -Wno-class-memaccess -Wno-sfinae-incomplete -Wno-format-truncation -Wno-implicit-fallthrough -Wno-attributes
+MINGW_DEBUG_FLAGS   := -gcodeview -g -O0 -fno-inline-functions -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder -Wno-pointer-arith -Wno-write-strings -Wno-class-memaccess -Wno-sfinae-incomplete -Wno-format-truncation -Wno-implicit-fallthrough -Wno-attributes
 MINGW_RELEASE_FLAGS := -O3 -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder
 
 ifeq ($(COMPILER),clang++)
@@ -236,7 +236,7 @@ link_flags = -L../run_tree/deps/vulkan -L../run_tree/deps -L$1 -L$2 $(EXTRA_LIB_
 
 GAME_LINKER_FLAGS      := $(call link_flags,$(SDL_LIB_PATH),$(FREETYPE_LIB_PATH)) $(PLATFORM_LIBS)
 PLATFORM_LINKER_FLAGS  := $(PLATFORM_EXPORT_FLAGS) $(GAME_LINKER_FLAGS)
-GAME_DLL_COMPILE_FLAGS := $(filter-out -flto, $(ACTIVE_CXX_FLAGS))
+GAME_DLL_COMPILE_FLAGS := $(ACTIVE_CXX_FLAGS)
 
 # ------------------------------------------------------------------------------
 # 9. Host Tools (athena, shader_reflector, asset packer always run on HOST)
@@ -317,6 +317,8 @@ assets:    $(RUN_TREE)/res/asset_stamp
 sandboxes: $(SANDBOX_EXES)
 tests:     $(BUILD_DIR)/test_manager$(EXE_EXT)
 
+$(info [Building for OS: $(PLATFORM) From: $(HOST_PLATFORM) Using Compiler: $(COMPILER)])
+
 # Make de-duplicates a target's recipe across parallel jobs, so every rule
 # below that lists `| $(BUILD_DIR)` is safe under `make -j` without a race.
 $(BUILD_DIR):
@@ -327,7 +329,7 @@ $(BUILD_DIR):
 # ------------------------------------------------------------------------------
 $(BUILD_DIR)/athena$(HOST_EXE_EXT): $(wildcard $(CODE_DIR)/code_generator/athena/*) | $(BUILD_DIR)
 	@echo "[BUILDING ATHENA]"
-	$(SILENT)$(HOST_CXX) $(COMMON_INCLUDE_PATHS) $(CODE_DIR)/code_generator/athena/athena.cpp -g -O0 $(HOST_CXX_FLAGS) $(DEP_ARGS) $(HOST_LINKER_FLAGS) -flto -o $@
+	$(SILENT)$(HOST_CXX) $(COMMON_INCLUDE_PATHS) $(CODE_DIR)/code_generator/athena/athena.cpp -O3 $(HOST_CXX_FLAGS) $(DEP_ARGS) $(HOST_LINKER_FLAGS) -flto -o $@
 
 $(RTTI_HEADER): $(BUILD_DIR)/athena$(HOST_EXE_EXT) $(wildcard $(CODE_DIR)/*.cpp $(CODE_DIR)/*.h)
 	@echo "[RUNNING ATHENA]"
@@ -339,7 +341,7 @@ $(BUILD_DIR)/test_manager$(EXE_EXT): $(CODE_DIR)/tests/test_manager.cpp $(wildca
 
 $(BUILD_DIR)/shader_reflector$(HOST_EXE_EXT): $(CODE_DIR)/code_generator/slang_reflector.cpp | $(BUILD_DIR)
 	@echo "[BUILDING SHADER REFLECTOR]"
-	$(SILENT)$(HOST_CXX) $(COMMON_INCLUDE_PATHS) $< $(HOST_CXX_FLAGS) $(DEP_ARGS) $(HOST_LINKER_FLAGS) -o $@
+	$(SILENT)$(HOST_CXX) $(COMMON_INCLUDE_PATHS) $< -O3 $(HOST_CXX_FLAGS) $(DEP_ARGS) -flto $(HOST_LINKER_FLAGS) -o $@
 
 $(BUILD_DIR)/shader_stamp: $(BUILD_DIR)/shader_reflector$(HOST_EXE_EXT) $(SHADERS)
 	@echo "[RUNNING SHADER REFLECTOR]"
@@ -350,7 +352,7 @@ $(BUILD_DIR)/shader_stamp: $(BUILD_DIR)/shader_reflector$(HOST_EXE_EXT) $(SHADER
 
 $(BUILD_DIR)/jfd_asset_file_packer$(HOST_EXE_EXT): $(wildcard $(CODE_DIR)/asset_file_packer/*) | $(BUILD_DIR)
 	@echo "[BUILDING ASSET FILE PACKER]"
-	$(SILENT) $(HOST_CXX) $(COMMON_INCLUDE_PATHS) $(CODE_DIR)/asset_file_packer/jfd_file_packer.cpp $(HOST_CXX_FLAGS) $(DEP_ARGS) -flto $(HOST_LINKER_FLAGS) -o $@
+	$(SILENT) $(HOST_CXX) $(COMMON_INCLUDE_PATHS) $(CODE_DIR)/asset_file_packer/jfd_file_packer.cpp -O3 $(HOST_CXX_FLAGS) $(DEP_ARGS) -flto $(HOST_LINKER_FLAGS) -o $@
 
 $(RUN_TREE)/res/asset_stamp: $(BUILD_DIR)/jfd_asset_file_packer$(HOST_EXE_EXT) $(BUILD_DIR)/shader_stamp $(RES_FILES)
 	@echo "[RUNNING ASSET FILE PACKER]"
@@ -389,16 +391,14 @@ $(BUILD_DIR)/sandbox_%$(EXE_EXT): $(CODE_DIR)/sandbox/%.cpp $(C_FILES) | $(BUILD
 # a relink completely harmless to an already-running process on every OS.
 $(BUILD_DIR)/game_DEBUG$(EXE_EXT): $(CODE_DIR)/build.cpp $(RTTI_HEADER) | $(BUILD_DIR)
 	@echo "[BUILDING GAME ENGINE]"
-	$(SILENT) $(CXX) $(CXX_TARGET_FLAGS) $(ENGINE_MACROS) $(COMMON_INCLUDE_PATHS) $< $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(HOST_EXPORT_FLAGS) -o $@.tmp
+	$(SILENT) $(CXX) -fuse-ld=lld $(CXX_TARGET_FLAGS) $(ENGINE_MACROS) $(COMMON_INCLUDE_PATHS) $< $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(HOST_EXPORT_FLAGS) -o $@.tmp
 	$(SILENT) mv -f $@.tmp $@
 
-$(BUILD_DIR)/game_DLL$(DLL_EXT): $(CODE_DIR)/build.cpp $(RTTI_HEADER) $(BUILD_DIR)/game_DEBUG$(EXE_EXT) | $(BUILD_DIR)
+# on Windows we need this as a dependency: $(BUILD_DIR)/game_DEBUG$(EXE_EXT) 
+$(BUILD_DIR)/game_DLL$(DLL_EXT): $(CODE_DIR)/build.cpp $(RTTI_HEADER) | $(BUILD_DIR)
 	@echo "[BUILDING GAME DLL]"
-	$(SILENT) $(CXX) $(CXX_TARGET_FLAGS) -DGAME_DLL_BUILD=1 -fPIC -shared $(COMMON_INCLUDE_PATHS) $< $(GAME_DLL_COMPILE_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(GAME_DLL_EXTRA_LINK) -Wl,--allow-shlib-undefined -o $@.tmp
+	$(SILENT) $(CXX) -fuse-ld=lld $(CXX_TARGET_FLAGS) -DGAME_DLL_BUILD=1 -fPIC -shared $(COMMON_INCLUDE_PATHS) $< $(GAME_DLL_COMPILE_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(GAME_DLL_EXTRA_LINK) -Wl,--allow-shlib-undefined -o $@.tmp
 	$(SILENT) mv -f $@.tmp $@
-
-print_info:
-	@echo "[Building for OS: $(PLATFORM) From: $(HOST_PLATFORM) Using Compiler: $(COMPILER)]"
 
 clean:
 	@$(RM_CMD)
