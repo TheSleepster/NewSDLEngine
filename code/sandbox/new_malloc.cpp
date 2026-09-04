@@ -409,7 +409,7 @@ alloc_impl(u64 size, s32 tag)
 
             // NOTE(Sleepster): The start of the guard page 
             s64 section_offset = valid_section->section_size - allocator.os_page_size;
-            // NOTE(Sleepster): Beginning of the user allocation 
+            // NOTE(Sleepster): Beginning of the section 
             section_offset -= (sizeof(memory_section_t) + user_allocation_size);
 
             memory_section_t *allocation = (memory_section_t*)(valid_section->section_base + section_offset);
@@ -418,7 +418,7 @@ alloc_impl(u64 size, s32 tag)
             allocation->ID = DEBUG_SECTION_ID;
             allocation->memory_tag   = tag;
             allocation->section_size = total_allocation_size;
-            allocation->section_base = ((byte*)allocation + sizeof(memory_section_t));
+            allocation->section_base = ((byte*)allocation + sizeof(memory_section_t)); // offset by sizeof(memory_section_t) for the user storage
 
             allocation->next_section = valid_section->next_section;
             allocation->prev_section = valid_section;
@@ -426,16 +426,16 @@ alloc_impl(u64 size, s32 tag)
             valid_section->next_section->prev_section = allocation;
             valid_section->next_section = allocation;
 
+            allocation->user_allocation_size = user_allocation_size;
+
             result = (void*)allocation->section_base;
             if(tag != TAG_CLEAR)
             {
                 tag_section_array_t *array = context->tag_array + tag;
-
                 array->array[array->count++] = allocation;
             }
 
-            allocation->user_allocation_size = user_allocation_size;
-
+            // NOTE(Sleepster): Start of the guard page. 
             void *protected_address = allocation->section_base + user_allocation_size;
             Assert(sys_set_memory_access_flags(protected_address, allocator.os_page_size, OS_MEMORY_ACCESS_FLAG_NONE));
         }
@@ -473,9 +473,12 @@ alloc(u64 size, s32 tag)
 /*
 ==============================================
 free_alloc
+
+DEBUG VERSION
 ==============================================
 */
 
+#ifdef DEBUG
 static void
 free_alloc(void *memory)
 {
@@ -495,10 +498,8 @@ free_alloc(void *memory)
         --tag_array->count;
     }
 
-#ifdef DEBUG
     void *protected_address = section->section_base + section->user_allocation_size;
     Assert(sys_set_memory_access_flags(protected_address, allocator.os_page_size, OS_MEMORY_ACCESS_FLAG_READ|OS_MEMORY_ACCESS_FLAG_WRITE));
-#endif
 
     section->memory_tag = TAG_CLEAR;
     tag_section_array_t *array = context->tag_array + section->memory_tag;
@@ -507,7 +508,7 @@ free_alloc(void *memory)
     if(section->next_section != section && section->next_section->memory_tag == TAG_CLEAR)
     {
         memory_section_t *next_section = section->next_section;
-        section->section_size += sizeof(memory_section_t) + next_section->section_size;
+        section->section_size += next_section->section_size;
         section->next_section  = next_section->next_section;
 
         next_section->next_section->prev_section = section;
@@ -517,13 +518,21 @@ free_alloc(void *memory)
     if(section->prev_section != section && section->prev_section->memory_tag == TAG_CLEAR)
     {
         memory_section_t *previous_section = section->prev_section;
-        previous_section->section_size += sizeof(memory_section_t) + section->section_size;
+        previous_section->section_size += section->section_size;
         previous_section->next_section  = section->next_section;
 
         section->next_section->prev_section = previous_section;
         context->current_page->cursor = previous_section;
     }
 }
+#else
+static void
+free_alloc(void *memory)
+{
+    static_assert(false, "Not Implemented...\n");
+}
+
+#endif
 
 /*
 ==============================================
