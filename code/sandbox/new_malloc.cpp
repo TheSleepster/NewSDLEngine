@@ -63,9 +63,9 @@ struct memory_page_t
         u64 allocation_stats[TAG_COUNT];
         struct {
             u64 total_free;
-            u64 total_cached;
-            u64 total_temp;
             u64 total_static;
+            u64 total_temp;
+            u64 total_cached;
         };
     };
 
@@ -274,7 +274,7 @@ thread_get_next_page(u64 new_page_size)
         result->first_section.next_section = &result->first_section;
         result->first_section.prev_section = &result->first_section;
         result->cursor                     = &result->first_section;
-        result->total_free                 = new_page_size;
+        result->total_free                 = new_page_size - sizeof(memory_page_t);
 
         result->next_page = null;
         result->prev_page = null;
@@ -454,9 +454,7 @@ alloc_impl(u64 size, s32 tag)
                 if(new_page)
                 {
                     context->current_page = new_page;
-                    context->current_page->first_section.owner_page = old_current_page;
-
-                    new_page->next_page = old_current_page;
+                    context->current_page->first_section.owner_page = context->current_page;
                     context->current_page->prev_page = old_current_page;
 
                     tag_section_array_t *array = (context->tag_array + TAG_CLEAR);
@@ -560,6 +558,13 @@ free_alloc(void *memory)
        section->prev_section->section_base + section->prev_section->section_size == section->section_base)
     {
         memory_section_t *previous_section = section->prev_section;
+        s32 index = c_array_find(view, &previous_section);
+        if(index != -1)
+        {
+            c_array_remove(view, index, free_list->count);
+            --free_list->count;
+        }
+
         previous_section->section_size += section->section_size;
         previous_section->next_section  = section->next_section;
 
