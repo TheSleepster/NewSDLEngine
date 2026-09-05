@@ -83,20 +83,20 @@
     /* =============================================================
        ====================== ATOMIC INCREMENT =====================
        ============================================================= */
-        // NOTE(Sleepster): Increments the value, returns the newly incremented value. 
-        #define AtomicIncrement16(ptr) __atomic_fetch_add((volatile s16*)(ptr), 1, __ATOMIC_SEQ_CST)
-        #define AtomicIncrement32(ptr) __atomic_fetch_add((volatile s32*)(ptr), 1, __ATOMIC_SEQ_CST)
-        #define AtomicIncrement64(ptr) __atomic_fetch_add((volatile s64*)(ptr), 1, __ATOMIC_SEQ_CST)
+        // NOTE(Sleepster): Increments the value, returns the old pre-incremented value. 
+        #define AtomicIncrement16(ptr) __atomic_fetch_add((volatile s16*)(ptr), 1, __ATOMIC_RELAXED)
+        #define AtomicIncrement32(ptr) __atomic_fetch_add((volatile s32*)(ptr), 1, __ATOMIC_RELAXED)
+        #define AtomicIncrement64(ptr) __atomic_fetch_add((volatile s64*)(ptr), 1, __ATOMIC_RELAXED)
 
         #define AtomicIncrement(ptr) AtomicIncrement32(ptr)
 
     /* =============================================================
        ====================== ATOMIC DECREMENT =====================
        ============================================================= */
-        // NOTE(Sleepster): Decrements the value, returns the newly decremented value. 
-        #define AtomicDecrement16(ptr) __atomic_fetch_sub((volatile s16*)(ptr), 1, __ATOMIC_SEQ_CST)
-        #define AtomicDecrement32(ptr) __atomic_fetch_sub((volatile s32*)(ptr), 1, __ATOMIC_SEQ_CST)
-        #define AtomicDecrement64(ptr) __atomic_fetch_sub((volatile s64*)(ptr), 1, __ATOMIC_SEQ_CST)
+        // NOTE(Sleepster): Decrements the value, returns the old pre-decremented value. 
+        #define AtomicDecrement16(ptr) __atomic_fetch_sub((volatile s16*)(ptr), 1, __ATOMIC_RELAXED)
+        #define AtomicDecrement32(ptr) __atomic_fetch_sub((volatile s32*)(ptr), 1, __ATOMIC_RELAXED)
+        #define AtomicDecrement64(ptr) __atomic_fetch_sub((volatile s64*)(ptr), 1, __ATOMIC_RELAXED)
 
         #define AtomicDecrement(ptr) AtomicDecrement32(ptr)
 
@@ -104,9 +104,9 @@
        ======================== ATOMIC ADD =========================
        ============================================================= */
         // NOTE(Sleepster): Adds the value, returns the new sum of the values. 
-        #define AtomicAdd16(ptr, value) __atomic_add_fetch((volatile s16*)(ptr), (s16)value, __ATOMIC_SEQ_CST)
-        #define AtomicAdd32(ptr, value) __atomic_add_fetch((volatile s32*)(ptr), (s32)value, __ATOMIC_SEQ_CST)
-        #define AtomicAdd64(ptr, value) __atomic_add_fetch((volatile s64*)(ptr), (s64)value, __ATOMIC_SEQ_CST)
+        #define AtomicAdd16(ptr, value) __atomic_add_fetch((volatile s16*)(ptr), (s16)value, __ATOMIC_ACQ_REL)
+        #define AtomicAdd32(ptr, value) __atomic_add_fetch((volatile s32*)(ptr), (s32)value, __ATOMIC_ACQ_REL)
+        #define AtomicAdd64(ptr, value) __atomic_add_fetch((volatile s64*)(ptr), (s64)value, __ATOMIC_ACQ_REL)
 
         #define AtomicAdd(ptr, value) AtomicAdd32(ptr, value)
 
@@ -118,7 +118,7 @@
         #define AtomicExchangeAdd32(ptr, value) __atomic_fetch_add((volatile s32*)(ptr), (s32)value, __ATOMIC_SEQ_CST)
         #define AtomicExchangeAdd64(ptr, value) __atomic_fetch_add((volatile s64*)(ptr), (s64)value, __ATOMIC_SEQ_CST)
 
-        #define AtomicExchangeAdd(ptr, value) AtomicAdd32(ptr, value)
+        #define AtomicExchangeAdd(ptr, value) AtomicExchangeAdd32(ptr, value)
 
         // NOTE(Sleepster): Technically not a real intrinsic but convienence is king.
     /* =============================================================
@@ -126,11 +126,11 @@
        ============================================================= */
 
         // NOTE(Sleepster): Subtracts the value, returns the new difference of the values. 
-        #define AtomicSubtract16(ptr, value) __atomic_add_fetch((volatile s16*)(ptr), (s16)-value, __ATOMIC_SEQ_CST)
-        #define AtomicSubtract32(ptr, value) __atomic_add_fetch((volatile s32*)(ptr), (s32)-value, __ATOMIC_SEQ_CST)
-        #define AtomicSubtract64(ptr, value) __atomic_add_fetch((volatile s64*)(ptr), (s64)-value, __ATOMIC_SEQ_CST)
+        #define AtomicSubtract16(ptr, value) __atomic_sub_fetch((volatile s16*)(ptr), (s16)value, __ATOMIC_RELEASE)
+        #define AtomicSubtract32(ptr, value) __atomic_sub_fetch((volatile s32*)(ptr), (s32)value, __ATOMIC_RELEASE)
+        #define AtomicSubtract64(ptr, value) __atomic_sub_fetch((volatile s64*)(ptr), (s64)value, __ATOMIC_RELEASE)
 
-        #define AtomicSubtract(ptr, value) AtomicSubtract32(ptr, val) 
+        #define AtomicSubtract(ptr, value) AtomicSubtract32(ptr, value) 
 
     /* =============================================================
        ================= ATOMIC EXCHANGE SUBTRACT ==================
@@ -140,7 +140,7 @@
         #define AtomicExchangeSubtract32(ptr, value) __atomic_fetch_add((volatile s32*)(ptr), (s32)-value, __ATOMIC_SEQ_CST)
         #define AtomicExchangeSubtract64(ptr, value) __atomic_fetch_add((volatile s64*)(ptr), (s64)-value, __ATOMIC_SEQ_CST)
 
-        #define AtomicExchangeSubtract(ptr, value) AtomicExchangeSubtract32(ptr, val) 
+        #define AtomicExchangeSubtract(ptr, value) AtomicExchangeSubtract32(ptr, value) 
 
     /* =============================================================
        ====================== ATOMIC EXCHANGE ======================
