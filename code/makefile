@@ -294,6 +294,10 @@ C_INCLUDES := $(foreach f,$(notdir $(C_FILES)),#include "$f"$(newline))
 SANDBOX_SRCS := $(wildcard $(CODE_DIR)/sandbox/*.cpp)
 SANDBOX_EXES := $(patsubst $(CODE_DIR)/sandbox/%.cpp, $(BUILD_DIR)/sandbox_%$(EXE_EXT), $(SANDBOX_SRCS))
 
+# Test targets: every top-level .cpp in code/tests/ becomes its own executable.
+TEST_SRCS := $(wildcard $(CODE_DIR)/tests/*.cpp)
+TEST_EXES := $(patsubst $(CODE_DIR)/tests/%.cpp, $(BUILD_DIR)/%$(EXE_EXT), $(TEST_SRCS))
+
 SHADERS   := $(shell find $(CODE_DIR)/shaders -type f)
 RES_FILES := $(filter-out $(RUN_TREE)/res/asset_stamp, $(shell find $(RUN_TREE)/res -type f))
 
@@ -315,7 +319,7 @@ game_dll:  $(BUILD_DIR)/game_DLL$(DLL_EXT)
 shaders:   $(BUILD_DIR)/shader_stamp
 assets:    $(RUN_TREE)/res/asset_stamp
 sandboxes: $(SANDBOX_EXES)
-tests:     $(BUILD_DIR)/test_manager$(EXE_EXT)
+tests:     $(TEST_EXES)
 
 $(info [Building for OS: $(PLATFORM) From: $(HOST_PLATFORM) Using Compiler: $(COMPILER)])
 
@@ -335,9 +339,16 @@ $(RTTI_HEADER): $(BUILD_DIR)/athena$(HOST_EXE_EXT) $(wildcard $(CODE_DIR)/*.cpp 
 	@echo "[RUNNING ATHENA]"
 	$(SILENT) $< --directory=$(abspath $(CODE_DIR)) --output_file=$(RTTI_HEADER)
 
-$(BUILD_DIR)/test_manager$(EXE_EXT): $(CODE_DIR)/tests/test_manager.cpp $(wildcard $(CODE_DIR)/tests/*) $(C_FILES) | $(BUILD_DIR)
-	@echo "[BUILDING TEST MANAGER]"
-	$(SILENT)$(CXX) $(CXX_TARGET_FLAGS) $(COMMON_INCLUDE_PATHS) $(CODE_DIR)/tests/test_manager.cpp $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(GAME_LINKER_FLAGS) -flto -o $@
+# ------------------------------------------------------------------------------
+# Test Unity Builds (independent — parallelize freely under `make -j`)
+# ------------------------------------------------------------------------------
+# Static pattern rule, scoped to exactly $(TEST_EXES) — this is deliberate
+# rather than a bare $(BUILD_DIR)/%$(EXE_EXT) pattern rule, which would also
+# match (and collide with) game_DEBUG, sandbox_*, athena, etc. living in the
+# same build dir.
+$(TEST_EXES): $(BUILD_DIR)/%$(EXE_EXT): $(CODE_DIR)/tests/%.cpp $(wildcard $(CODE_DIR)/tests/*) $(C_FILES) | $(BUILD_DIR)
+	@echo "[TEST EXECUTABLE: $*]"
+	$(SILENT)$(CXX) $(CXX_TARGET_FLAGS) $(COMMON_INCLUDE_PATHS) $< $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(GAME_LINKER_FLAGS) -flto -o $@
 
 $(BUILD_DIR)/shader_reflector$(HOST_EXE_EXT): $(CODE_DIR)/code_generator/slang_reflector.cpp | $(BUILD_DIR)
 	@echo "[BUILDING SHADER REFLECTOR]"

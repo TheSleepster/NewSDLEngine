@@ -191,16 +191,30 @@
             "terminal": "integrated",
         },
         {
-            "name": "run tests",
+            "name": "metaprogram test",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test_manager",
+            "program": "${workspaceFolder}/build/test_new_metaprogram",
             //"initCommands": ["settings set target.process.follow-fork-mode child"],
             "cwd": "${workspaceFolder}/code",
             "args": [],
             "stopOnEntry": false,
             "terminal": "integrated",
         },
+        {
+            "name": "malloc test",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_new_malloc",
+            "cwd": "${workspaceFolder}/code",
+            "args": [],
+            "stopOnEntry": false,
+            "terminal": "integrated",
+
+            "preRunCommands": [
+                "settings set target.process.follow-fork-mode child"
+            ]
+        }
     ],
     "compounds": [
         {

@@ -1,11 +1,13 @@
+#if !defined(TEST_MANAGER_H)
 /* ========================================================================
-   $File: test_manager.cpp $
-   $Date: April 24 2026 03:17 pm $
+   $File: test_manager.h $
+   $Date: September 05 2026 10:12 am $
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
 #define PROGRAM_FLAG_HANDLER_IMPLEMENTATION 
 #define DYNARRAY_IMPLEMENTATION
+#ifdef OS_LINUX
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,20 +20,22 @@
 #include <p_platform_data.h>
 #include <p_platform_data.cpp>
 
-#include <c_string.cpp>
-#include <c_global_context.cpp>
-#include <c_memory_arena.cpp>
-#include <c_file_api.cpp>
-#include <c_file_watcher.cpp>
-#include <c_zone_allocator.cpp>
+#define TEST_API static
 
-#if OS_LINUX
-
+#define TEST_MANAGER_H
 #define TEST_SECTION __attribute__((used, section("test_table")))
 #define TEST(name)                                                   \
     static void name(void);                                          \
     static test_entry_t _reg_##name TEST_SECTION = { name, #name, __FILE__ }; \
     static void name(void)
+
+#define TEST_FAILURE(cond, msg, ...) \
+if(!(cond)) {                   \
+    log_fatal(msg, __VA_ARGS__) \
+    return(-1)                  \
+}                               \
+
+#define SUBCASE(msg, ...)
 
 typedef void test_func_t(void);
 struct test_entry_t
@@ -40,14 +44,6 @@ struct test_entry_t
     const char  *function_name;
     const char  *filename;
 };
-
-//
-// TEST FILES ARE DECLARED HERE 
-
-#include "test_new_metaprogram.cpp"
-
-// TEST FILES ARE DECLARED HERE 
-//
 
 extern test_entry_t __start_test_table[];
 extern test_entry_t __stop_test_table[];
@@ -65,7 +61,7 @@ struct test_manager_t
     u32           entry_count;
 };
 
-bool8
+TEST_API bool8
 test_manager_run_test(test_entry_t *entry)
 {
     bool8 result = false;
@@ -85,14 +81,12 @@ test_manager_run_test(test_entry_t *entry)
         {
             result = (WEXITSTATUS(exit_status) == 0);
         }
-
-        return(result);
     }
 
     return(result);
 }
 
-test_results_t
+TEST_API test_results_t
 test_manager_run_tests(test_manager_t *manager)
 {
     test_results_t result = {};
@@ -123,7 +117,7 @@ test_manager_run_tests(test_manager_t *manager)
     return(result);
 }
 
-void
+TEST_API void
 test_manager_init(test_manager_t *manager)
 {
     manager->entries     = __start_test_table;
@@ -131,19 +125,5 @@ test_manager_init(test_manager_t *manager)
 }
 #endif
 
-int
-main(void)
-{
-    c_global_context_init();
+#endif // TEST_MANAGER_H
 
-#if OS_LINUX
-    test_manager_t manager = {};
-    test_manager_init(&manager);
-
-    // NOTE(Sleepster): Should just call "test_manager_add_test" on each of the tests in the test table X-macro and then execute them.
-    log_info("Running '%u' test(s)...\n", manager.entry_count);
-    test_results_t results = test_manager_run_tests(&manager);
-    log_info("Tests finished running...\n\nTotal tests: '%u'\nTests Passed: '%u'\nTests Failed: '%u'\n", 
-             results.tests_total, results.tests_passed, results.tests_failed);
-#endif
-}
