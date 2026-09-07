@@ -4,14 +4,7 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-#include <c_string.cpp>
-#include <p_platform_data.cpp>
-#include <c_memory_arena.cpp>
-#include <c_file_watcher.cpp>
-#include <c_file_api.cpp>
-#include <c_zone_allocator.cpp>
-#include <c_global_context.cpp>
-
+#if OS_LINUX 
 #include "test_manager.h"
 
 TEST(basic_macros)
@@ -125,16 +118,18 @@ TEST(anon_internal_unions)
     void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/nested_anon_unions.cpp"));
     Assert(sys_wait_for_process(process));
 }
+#endif
 
 int
 main(void)
 {
     c_global_context_init();
 
+#if OS_LINUX 
     test_manager_t test_manager = {};
-    printf("DIRECT: basic_macros = %p\n", (void *)basic_macros);
     test_manager_init(&test_manager);
     test_manager_run_tests(&test_manager);
+#endif
 
     return(0);
 }

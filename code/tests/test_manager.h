@@ -16,9 +16,6 @@
 #include <c_program_flag_handler.h>
 #include <c_dynarray.h>
 
-#include <sys/types.h>
-#include <sys/wait.h>
-
 #define TEST_API static
 
 #define TEST_MANAGER_H

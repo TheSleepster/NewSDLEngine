@@ -5,11 +5,8 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <stdio.h>
+#if OS_LINUX
 #include "test_manager.h"
-
-#include <c_string.cpp>
-#include <c_memory_arena.cpp>
-#include <p_platform_data.cpp>
 
 #define MAIN
 #include <sandbox/new_malloc.cpp>
@@ -127,14 +124,18 @@ TEST(ReallocateLargerPages)
     }
 }
 
+#endif
+
 int
 main(void)
 {
-    memory_allocator_init(null, GB(12));
 
+#if OS_LINUX
+    memory_allocator_init(null, GB(12));
     test_manager_t test_manager = {};
     test_manager_init(&test_manager);
 
     test_manager_run_tests(&test_manager);
+#endif
     return(0);
 }

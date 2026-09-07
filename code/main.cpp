@@ -1060,7 +1060,7 @@ game_main(global_context_t *_global_context)
                           &render_state->vertex_buffer, 
                           asset_manager, 
                           &basic_font, 
-                          STR("Whatever MDASND HHTGSD."), 
+                          STR("GCC is bugged??."), 
                           vec3(-300, 150, 0.0f), 
                           vec4(1.0f, 1.0f, 1.0f, 1.0f), 
                           0.0f, 

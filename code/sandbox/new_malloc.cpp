@@ -4,6 +4,7 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#include <SDL3/SDL.h>
 #include <stdio.h>
 
 #include <c_base.h>
@@ -58,7 +59,6 @@ struct memory_page_t
     memory_section_t  first_section;
     memory_section_t *cursor;
     byte             *page_base;
-
     union {
         u64 allocation_stats[TAG_COUNT];
         struct {
@@ -72,8 +72,6 @@ struct memory_page_t
     // NOTE(Sleepster): The central allocator ignores the prev_page! 
     memory_page_t    *next_page;
     memory_page_t    *prev_page;
-
-    bool32            in_use;
 };
 
 struct tag_section_array_t 
@@ -165,13 +163,14 @@ print_allocator_info(void)
             current_section = current_section->next_section;
         }while(current_section != &current_page->first_section);
 
+        u64 total_bytes_used = (u64)(current_page->total_free + current_page->total_cached + current_page->total_temp + current_page->total_static);
         log_info("\tPage Info:\n");
         log_info("\t\tTotal size free: '%llu'...\n", current_page->total_free);
         log_info("\t\tTotal size cached: '%llu'...\n", current_page->total_cached);
         log_info("\t\tTotal size temp: '%llu'...\n", current_page->total_temp);
         log_info("\t\tTotal size static: '%llu'...\n", current_page->total_static);
+        log_info("\tDifference betwen total used and page_size is: '%llu'...\n", current_page->page_size - total_bytes_used);
 
-        u64 total_bytes_used = (u64)(current_page->total_free + current_page->total_cached + current_page->total_temp + current_page->total_static);
         Assert(total_bytes_used == current_page->page_size);
 
         current_page = current_page->next_page;
@@ -185,7 +184,6 @@ print_allocator_info(void)
     log_info("\n");
     log_info("\tAllocator size is: '%llu'...\n", allocator.max_capacity);
     log_info("\tTotal size used by zones: '%llu'...\n", total_zone_usage_size);
-
     u64 total_size = total_zone_usage_size + (section_count * sizeof(memory_section_t));
     log_info("\tTotal size used (with sizeof(memory_section_t)): '%llu'...\n", total_size);
     if(total_size > allocator.max_capacity)
@@ -279,7 +277,7 @@ thread_get_next_page(u64 new_page_size)
         result->next_page = null;
         result->prev_page = null;
 
-        result->page_size = new_page_size;
+        result->page_size = new_page_size - sizeof(memory_page_t);
         result->ID        = DEBUG_PAGE_ID;
     }
 
@@ -441,33 +439,103 @@ alloc_impl(u64 size, s32 tag)
         {
             Assert(free_list->count == 0);
             //log_error("Failure to find a block of size: '%llu' for this allocation...\n", total_allocation_size);
+
+            // NOTE(Sleepster): If we don't have any more pages on our thread, we need to do some work... 
             if(!context->current_page->next_page)
             {
                 // We need a new page... Or some more memory so what can we do?:
                 //
-                // - Search the current pages we have to see if the allocation can fit in that page
-                // - Combine pages that are empty (nothing but cached and freed) until the allocation CAN fit
-                // - If we combined all adjacent pages and we still can't fit the allocation, THEN we get a new page.
+                // - [X] Search the current pages we have to see if the allocation can fit in that page
+                // - [X] Combine pages that are empty (nothing but cached and freed) until the allocation CAN fit
+                // - [ ] If we combined all adjacent pages and we still can't fit the allocation, THEN we get a new page.
+                memory_page_t *valid_page = null;
 
-                memory_page_t *old_current_page = context->current_page;
-                memory_page_t *new_page         = thread_get_next_page(total_allocation_size);
-                if(new_page)
+                // NOTE(Sleepster): Search to see if the pages we already have can fit this elsewhere...  
+                for(memory_page_t *current_page = context->first_page;
+                    current_page;
+                    current_page = current_page->next_page)
                 {
-                    context->current_page = new_page;
-                    context->current_page->first_section.owner_page = context->current_page;
-                    context->current_page->prev_page = old_current_page;
+                    // NOTE(Sleepster): In the event that this page is completely empty, check if the next page is the same
+                    // If it is, combine them both
+                    if(current_page->total_free == current_page->page_size)
+                    {
+                        if(current_page->next_page->total_free == current_page->next_page->page_size)
+                        {
+                            // NOTE(Sleepster): Combine the pages 
+                            current_page->page_size += current_page->next_page->page_size;
+                            memory_section_t *last_section = null;
+                            for(memory_section_t *current_section = &current_page->first_section;
+                                current_section;
+                                current_section = current_section->next_section)
+                            {
+                                last_section = current_section;
+                            }
 
-                    tag_section_array_t *array = (context->tag_array + TAG_CLEAR);
-                    array->array[array->count++] = &context->current_page->first_section;
+                            last_section->next_section = &current_page->next_page->first_section;
+                            current_page->next_page = current_page->next_page->next_page;
+                            current_page->next_page->prev_page = current_page;
+                        }
+                    }
+
+                    memory_section_t *largest_free_section = null;
+                    memory_section_t *current_section = &current_page->first_section;
+                    do {
+                        if(current_section->memory_tag == TAG_CLEAR)
+                        {
+                            if(largest_free_section) 
+                            {
+                                if(largest_free_section->section_size < current_section->section_size)
+                                {
+                                    largest_free_section = current_section;
+                                }
+                            }
+                            else
+                            {
+                                largest_free_section = current_section;
+                            }
+                        }
+
+                        current_section = current_section->next_section;
+                    }while(current_section != &current_page->first_section);
+
+                    if(largest_free_section->section_size >= total_allocation_size)
+                    {
+                        valid_page = largest_free_section->owner_page;
+                        break;
+                    }
+                }
+
+                // NOTE(Sleepster): If no valid page is found, then we must get a new page... 
+                if(!valid_page)
+                {
+                    memory_page_t *old_current_page = context->current_page;
+                    memory_page_t *new_page         = thread_get_next_page(total_allocation_size);
+                    if(new_page)
+                    {
+                        context->current_page = new_page;
+                        context->current_page->first_section.owner_page = context->current_page;
+                        context->current_page->prev_page = old_current_page;
+
+                        old_current_page->next_page = new_page;
+
+                        tag_section_array_t *array = (context->tag_array + TAG_CLEAR);
+                        array->array[array->count++] = &context->current_page->first_section;
+                    }
+                    else
+                    {
+                        print_allocator_info();
+                        Expect(false, "Allocator has run out of page space...\n");
+                    }
                 }
                 else
                 {
-                    print_allocator_info();
-                    Expect(false, "Allocator has run out of page space...\n");
+                    // NOTE(Sleepster): This is our new "base page" 
+                    context->current_page = valid_page;
                 }
             }
             else
             {
+                // NOTE(Sleepster): Go to the next page 
                 context->current_page = context->current_page->next_page;
             }
         }
@@ -673,7 +741,8 @@ main(void)
         index < 500;
         ++index)
     {
-        malloc(MB(1));
+        void *result = malloc(MB(1));
+        (void)result;
     }
     u64 this_tick = SDL_GetTicks();
     u64 delta_ticks = this_tick - last_tick;
