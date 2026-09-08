@@ -1071,3 +1071,62 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
     c_file_watcher_emit_changes(watcher);
 }
 
+
+// @copypasta from Linux...
+/*===========================================
+  =============== PROCESSSES ================
+  ===========================================*/
+
+// TODO(Sleepster): Replace these with "CreateProcessEx()"
+
+void*
+sys_create_process(string_t program_path, string_t argument_string)
+{
+    const char **arguments = c_arena_push_array(&gc->transient_arena, const char *, 100);
+    arguments[0] = C_STR(program_path);
+
+    u32 argument_index = 1;
+    while(argument_string.count > 0)
+    {
+        // NOTE(Sleepster): This seems silly... but there's not really a winner for what character should split the arguments... 
+        s32 space_index = c_string_find_first_char_from_left(argument_string, ' ');
+        if(space_index != -1)
+        {
+            string_t copy = c_string_make_copy(&gc->transient_arena, argument_string);
+            copy.count = space_index;
+            copy.data[copy.count] = '\0';
+
+            arguments[argument_index++] = C_STR(copy);
+            c_string_advance_by(&argument_string, space_index + 1);
+        }
+        else
+        {
+            arguments[argument_index++] = C_STR(argument_string);
+            argument_string.count = 0;
+        }
+    }
+
+    arguments[argument_index] = null;
+    SDL_Process *process = SDL_CreateProcess(arguments, false); 
+    if(process == null) 
+    {
+        log_error("SDL_Error: '%s'...\n", SDL_GetError());
+    }
+
+    return(process);
+}
+
+bool8
+sys_wait_for_process(void *process)
+{
+    bool8 result = false;
+
+    int return_code = 0;
+    bool8 exited = SDL_WaitProcess((SDL_Process*)process, true, &return_code);
+    Expect(exited == true, "Process failed to exit...\n");
+
+    result = (return_code == 0);
+    return(result);
+}
+
+

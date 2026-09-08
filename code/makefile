@@ -14,28 +14,37 @@
 #
 # Layout of this file:
 #   1. Settings
-#   2. Host platform detection (never overridden)
-#   3. Target platform selection (COMPILER=llvm-mingw implies PLATFORM=WINDOWS)
-#   4. Per-platform settings (defines, extensions, libs, clean/mkdir commands)
-#   5. Per-compiler toolchain + flags (incl. llvm-mingw PDB/CodeView setup)
-#   6. Paths & dynamic file discovery
-#   7. Release/debug configuration (incl. the hot-reload export/import-lib setup)
-#   8. Library path resolution + linker flags (shared by target and host tools)
-#   9. Host tool toolchain (athena, shader_reflector, asset packer all run on HOST)
-#  10. Dependency-tracking flags (-MMD/-MP wiring)
-#  11. Discovery of sources (unity C files, sandboxes, shaders, assets)
-#  12. Targets
+#   2. Paths (defined early -- needed by the per-compiler flag setup below)
+#   3. Host platform detection (never overridden)
+#   4. Target platform selection (COMPILER=llvm-mingw implies PLATFORM=WINDOWS)
+#   5. Per-platform settings (defines, extensions, libs, clean/mkdir commands)
+#   6. Per-compiler toolchain + flags (incl. llvm-mingw PDB/CodeView setup)
+#   7. Dynamic file discovery
+#   8. Release/debug configuration (incl. the hot-reload export/import-lib setup)
+#   9. Library path resolution + linker flags (shared by target and host tools)
+#  10. Host tool toolchain (athena, shader_reflector, asset packer all run on HOST)
+#  11. Dependency-tracking flags (-MMD/-MP wiring)
+#  12. Discovery of sources (unity C files, sandboxes, shaders, assets)
+#  13. Targets
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
 # 1. Settings
 # ------------------------------------------------------------------------------
-SILENT   ?=
-RELEASE  ?=
-COMPILER ?= clang++
+SILENT            ?=
+RELEASE           ?=
+COMPILER          ?= clang++
+PDB_SOURCE_PREFIX ?= Z:/NewSDLEngine
 
 # ------------------------------------------------------------------------------
-# 2. Host Platform Detection (this is a fact about the machine; never overridden)
+# 2. Paths (defined early -- needed by the per-compiler flag setup in Section 6)
+# ------------------------------------------------------------------------------
+BUILD_DIR := ../build
+CODE_DIR  := ../code
+RUN_TREE  := ../run_tree
+
+# ------------------------------------------------------------------------------
+# 3. Host Platform Detection (this is a fact about the machine; never overridden)
 # ------------------------------------------------------------------------------
 UNAME_S := $(shell uname -s)
 
@@ -50,7 +59,7 @@ else
 endif
 
 # ------------------------------------------------------------------------------
-# 3. Target Platform Selection
+# 4. Target Platform Selection
 # ------------------------------------------------------------------------------
 ifeq ($(COMPILER),llvm-mingw)
     PLATFORM ?= WINDOWS
@@ -59,7 +68,7 @@ else
 endif
 
 # ------------------------------------------------------------------------------
-# 4. Per-Platform Settings
+# 5. Per-Platform Settings
 # ------------------------------------------------------------------------------
 ifeq ($(PLATFORM),WINDOWS)
     OS_DEFINE     := -DOS_WINDOWS=1
@@ -102,22 +111,54 @@ else
 endif
 
 # ------------------------------------------------------------------------------
-# 5. Compiler / Toolchain Selection
+# 6. Compiler / Toolchain Selection
 # ------------------------------------------------------------------------------
 
-# --- clang++ : shared warning/flag base, debug and release only differ by a
-#     handful of flags on top, so we factor it instead of hand-duplicating.
+# --- clang++ : shared warning/flag base
 CLANG_WARN_BASE    := -std=c++11 -Wno-unknown-attributes -Wformat -Wnullability-completeness -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-unused-template
 CLANG_DEBUG_ONLY   := -g -O0 -fno-inline-functions
 CLANG_RELEASE_ONLY := -O3 -Wno-unused-parameter -Wno-incompatible-pointer-types -Wno-pointer-integer-compare -Wno-vla-cxx-extension -Wno-reorder-init-list
 
-# --- g++ : same idea.
+# --- g++
 GPP_WARN_BASE     := -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder -Wno-pointer-arith -Wno-write-strings -Wno-class-memaccess -Wno-sfinae-incomplete -Wno-format-truncation -Wno-implicit-fallthrough -Wno-attributes
 GPP_DEBUG_ONLY    := -g -O0 -fno-inline-functions -Wno-null-pointer-subtraction
 GPP_RELEASE_ONLY  := -O3
 
-LLVM_MINGW_DEBUG_ONLY   := $(CLANG_DEBUG_ONLY) -gcodeview 
+LLVM_MINGW_DEBUG_ONLY   := $(CLANG_DEBUG_ONLY) -gcodeview
 LLVM_MINGW_RELEASE_ONLY := $(CLANG_RELEASE_ONLY) -Wno-unused-template
+
+# --- Source path remapping for PDBs (llvm-mingw only) ------------------------
+ifeq ($(COMPILER),llvm-mingw)
+    # 1. Convert backslashes to forward slashes for target prefix.
+    PDB_MAP_TO := $(subst \,/,$(PDB_SOURCE_PREFIX))
+
+    # 2. Derive repository root (/home/.../NewSDLEngine) covering code/ and build/.
+    ROOT_DIR_ABS  := $(abspath $(CODE_DIR)/..)
+    ROOT_DIR_REAL := $(realpath $(CODE_DIR)/..)
+
+    # 3. Map relative path traversals, absolute paths, and override compilation directory.
+    DEBUG_PREFIX_MAP_FLAG := \
+        -ffile-compilation-dir=$(PDB_MAP_TO)/code \
+        -fdebug-compilation-dir=$(PDB_MAP_TO)/code \
+        -ffile-prefix-map=../code/=$(PDB_MAP_TO)/code/ \
+        -ffile-prefix-map=../code=$(PDB_MAP_TO)/code \
+        -ffile-prefix-map=../build/=$(PDB_MAP_TO)/build/ \
+        -ffile-prefix-map=../build=$(PDB_MAP_TO)/build \
+        -ffile-prefix-map=../run_tree/=$(PDB_MAP_TO)/run_tree/ \
+        -ffile-prefix-map=../run_tree=$(PDB_MAP_TO)/run_tree \
+        -ffile-prefix-map=..=$(PDB_MAP_TO) \
+        -ffile-prefix-map=$(ROOT_DIR_ABS)/code/../code=$(PDB_MAP_TO)/code \
+        -ffile-prefix-map=$(ROOT_DIR_ABS)/code/../build=$(PDB_MAP_TO)/build \
+        -ffile-prefix-map=$(ROOT_DIR_ABS)=$(PDB_MAP_TO)
+    ifneq ($(ROOT_DIR_ABS),$(ROOT_DIR_REAL))
+        DEBUG_PREFIX_MAP_FLAG += \
+            -ffile-prefix-map=$(ROOT_DIR_REAL)/code/../code=$(PDB_MAP_TO)/code \
+            -ffile-prefix-map=$(ROOT_DIR_REAL)/code/../build=$(PDB_MAP_TO)/build \
+            -ffile-prefix-map=$(ROOT_DIR_REAL)=$(PDB_MAP_TO)
+    endif
+else
+    DEBUG_PREFIX_MAP_FLAG :=
+endif
 
 ifeq ($(COMPILER),clang++)
     CXX := clang++
@@ -141,8 +182,8 @@ else ifeq ($(COMPILER),g++)
 else ifeq ($(COMPILER),llvm-mingw)
     CXX := x86_64-w64-mingw32-clang++
     CXX_TARGET_FLAGS :=
-    COMMON_COMPILE_FLAGS := $(LLVM_MINGW_DEBUG_ONLY) $(CLANG_WARN_BASE)
-    COMMON_RELEASE_FLAGS := $(LLVM_MINGW_RELEASE_ONLY) $(CLANG_WARN_BASE)
+    COMMON_COMPILE_FLAGS := $(LLVM_MINGW_DEBUG_ONLY) $(CLANG_WARN_BASE) $(DEBUG_PREFIX_MAP_FLAG)
+    COMMON_RELEASE_FLAGS := $(LLVM_MINGW_RELEASE_ONLY) $(CLANG_WARN_BASE) $(DEBUG_PREFIX_MAP_FLAG)
     EXTRA_LIB_PATHS := -L../run_tree/deps/vulkan/slang/lib
 
 else ifeq ($(COMPILER),msvc)
@@ -157,41 +198,24 @@ else
 endif
 
 # --- PDB / CodeView linking (llvm-mingw only) --------------------------------
-# LLD's COFF driver writes the PDB wherever --pdb= points, independent of the
-# -o output path. We route it through a .tmp.pdb name and rename it into place
-# in the same recipe step that renames the .tmp exe/dll, for the same reason:
-# a debugger attached to a running process can hold the PDB open much like it
-# holds the image itself, and Windows permits renaming over a locked/loaded
-# file but not overwriting it in place. PDB_TMP_PATH/PDB_FINAL_PATH are
-# recursively-expanded ('=') since $@ only resolves inside a recipe.
-# GCC-based mingw, native Linux/Mac clang++, and g++ all produce ELF (or
-# non-PE) output where --pdb is meaningless, and msvc's cl.exe has its own
-# unrelated /Fd mechanism -- so, like the -gcodeview flags above, this is
-# deliberately scoped to COMPILER=llvm-mingw rather than PLATFORM=WINDOWS.
 ifeq ($(COMPILER),llvm-mingw)
-    PDB_TMP_PATH   = $(basename $@).tmp.pdb
-    PDB_FINAL_PATH = $(basename $@).pdb
-    PDB_LINK_FLAG           = -Wl,--pdb=$(basename $@).pdb
-    # Hot-reload-safe: engine exe/DLL route through .tmp.pdb and get renamed
-    # into place alongside the .exe/.dll (see those two rules below) -- a
-    # debugger attached to the long-running engine can hold its PDB open
-    # much like it holds the image itself.
+    PDB_LINK_FLAG = -Wl,--pdb=$(basename $@).pdb -Wl,-Xlink=-PDBALTPATH:$(notdir $(basename $@).pdb)
     PDB_TMP_PATH            = $(basename $@).tmp.pdb
     PDB_FINAL_PATH          = $(basename $@).pdb
-    PDB_LINK_FLAG_HOTRELOAD = -Wl,--pdb=$(PDB_TMP_PATH)
+    PDB_LINK_FLAG_HOTRELOAD = -Wl,--pdb=$(PDB_TMP_PATH) -Wl,-Xlink=-PDBALTPATH:$(notdir $(PDB_FINAL_PATH))
+    LLVM_MINGW_RUNTIME_LINK := -fuse-ld=lld -static-libstdc++ -static-libgcc
 else
-    PDB_LINK_FLAG :=
+    PDB_LINK_FLAG           :=
+    PDB_LINK_FLAG_HOTRELOAD :=
+    LLVM_MINGW_RUNTIME_LINK :=
 endif
 
 # ------------------------------------------------------------------------------
-# 6. Paths & Dynamic File Discovery
+# 7. Dynamic File Discovery
 # ------------------------------------------------------------------------------
-BUILD_DIR := ../build
-CODE_DIR  := ../code
-RUN_TREE  := ../run_tree
 
 # ------------------------------------------------------------------------------
-# 7. Release Configuration Logic
+# 8. Release Configuration Logic
 # ------------------------------------------------------------------------------
 ifdef RELEASE
     ACTIVE_CXX_FLAGS    := $(COMMON_RELEASE_FLAGS) -DNDEBUG
@@ -202,9 +226,6 @@ ifdef RELEASE
 else
     ACTIVE_CXX_FLAGS := $(COMMON_COMPILE_FLAGS)
     ENGINE_MACROS    := -DENGINE_BUILD=1
-    # The host exe exports its symbols (and, on Windows, produces an import lib)
-    # so the hot-reloadable DLL can resolve back into it. See the game_DEBUG
-    # rule below for the reload fix itself (atomic replace of the exe file).
     ifeq ($(PLATFORM),WINDOWS)
         HOST_EXPORT_FLAGS   := -Wl,--export-all-symbols -Wl,--out-implib=$(BUILD_DIR)/libgame_DEBUG.a
         GAME_DLL_EXTRA_LINK := -L$(BUILD_DIR) -lgame_DEBUG
@@ -227,7 +248,7 @@ else
 endif
 
 # ------------------------------------------------------------------------------
-# 8. Library Paths & Linker Flags
+# 9. Library Paths & Linker Flags
 # ------------------------------------------------------------------------------
 COMMON_INCLUDE_PATHS := \
     -I../code/ \
@@ -236,12 +257,6 @@ COMMON_INCLUDE_PATHS := \
     -I../run_tree/deps/SDL3/include/ \
     -I../run_tree/deps/Freetype/include/
 
-# $(call sdl_lib_path,PLATFORM,COMPILER) / $(call freetype_lib_path,PLATFORM,COMPILER)
-# Used for BOTH the compile target and the host tools, so host tools link
-# correctly regardless of what HOST_PLATFORM actually is (previously hardcoded
-# to Linux paths unconditionally). llvm-mingw needs no special case here: it
-# consumes the same GNU-format .a import libraries as GCC mingw, so it falls
-# through to the existing Win32/MinGW lib directories correctly.
 sdl_lib_path = $(strip \
     $(if $(filter LINUX,$1),../run_tree/deps/SDL3/lib/Linux, \
     $(if $(filter MAC,$1),../run_tree/deps/SDL3/lib/mac, \
@@ -259,15 +274,14 @@ FREETYPE_LIB_PATH := $(call freetype_lib_path,$(PLATFORM),$(COMPILER))
 
 BASE_LINKER_LIBS := -lSDL3-Static -lfreetype -lvulkan -lslang -lslang-compiler
 
-# $(call link_flags,SDL_PATH,FREETYPE_PATH)
 link_flags = -L../run_tree/deps/vulkan -L../run_tree/deps -L$1 -L$2 $(EXTRA_LIB_PATHS) $(BASE_LINKER_LIBS)
 
-GAME_LINKER_FLAGS      := $(call link_flags,$(SDL_LIB_PATH),$(FREETYPE_LIB_PATH)) $(PLATFORM_LIBS)
+GAME_LINKER_FLAGS      := $(call link_flags,$(SDL_LIB_PATH),$(FREETYPE_LIB_PATH)) $(PLATFORM_LIBS) $(LLVM_MINGW_RUNTIME_LINK)
 PLATFORM_LINKER_FLAGS  := $(PLATFORM_EXPORT_FLAGS) $(GAME_LINKER_FLAGS)
 GAME_DLL_COMPILE_FLAGS := $(ACTIVE_CXX_FLAGS)
 
 # ------------------------------------------------------------------------------
-# 9. Host Tools (athena, shader_reflector, asset packer always run on HOST)
+# 10. Host Tools (athena, shader_reflector, asset packer always run on HOST)
 # ------------------------------------------------------------------------------
 ifeq ($(HOST_PLATFORM),WINDOWS)
     HOST_EXE_EXT  := .exe
@@ -286,9 +300,6 @@ else ifeq ($(HOST_PLATFORM),MAC)
     GAME_DLL_DEPS :=
 endif
 
-# When cross-compiling with llvm-mingw, $(CXX) targets Windows -- host tools
-# (athena, shader_reflector, the asset packer) still need to run locally
-# during the build, so they fall back to a native, non-cross compiler.
 ifeq ($(COMPILER),llvm-mingw)
     HOST_CXX := clang++
 else
@@ -301,34 +312,24 @@ HOST_LINKER_FLAGS      := $(call link_flags,$(HOST_SDL_LIB_PATH),$(HOST_FREETYPE
 HOST_CXX_FLAGS         := $(ACTIVE_CXX_FLAGS) $(HOST_OS_FLAGS)
 
 # ------------------------------------------------------------------------------
-# 10. Dependency Tracking
+# 11. Dependency Tracking
 # ------------------------------------------------------------------------------
-# Every compiled translation unit gets real -MMD/-MP dependency generation, so
-# make only rebuilds a target when a file it actually #includes has changed
-# (rather than relying on hand-picked proxies like build.cpp's own mtime).
-# $@ is resolved lazily at recipe time, so this is safe to reuse everywhere.
-# MSVC's dependency mechanism differs (/showIncludes) and isn't wired up since
-# MSVC support is a placeholder for now.
 DEP_ARGS = $(if $(filter msvc,$(COMPILER)),,-MMD -MP -MF$@.d -MT$@)
 
 # ------------------------------------------------------------------------------
-# 11. Source Discovery
+# 12. Source Discovery
 # ------------------------------------------------------------------------------
 define newline
 
 
 endef
 
-# All c_*.cpp files inside code/, folded into the unity build.
 C_FILES    := $(wildcard $(CODE_DIR)/c_*.cpp)
 C_INCLUDES := $(foreach f,$(notdir $(C_FILES)),#include "$f"$(newline))
 
-# Sandbox targets: each one is its own independent unity TU and executable, so
-# these build fully in parallel under `make -j` with no shared intermediate state.
 SANDBOX_SRCS := $(wildcard $(CODE_DIR)/sandbox/*.cpp)
 SANDBOX_EXES := $(patsubst $(CODE_DIR)/sandbox/%.cpp, $(BUILD_DIR)/sandbox_%$(EXE_EXT), $(SANDBOX_SRCS))
 
-# Test targets: every top-level .cpp in code/tests/ becomes its own executable.
 TEST_SRCS := $(wildcard $(CODE_DIR)/tests/*.cpp)
 TEST_EXES := $(patsubst $(CODE_DIR)/tests/%.cpp, $(BUILD_DIR)/%$(EXE_EXT), $(TEST_SRCS))
 
@@ -338,7 +339,7 @@ RES_FILES := $(filter-out $(RUN_TREE)/res/asset_stamp, $(shell find $(RUN_TREE)/
 RTTI_HEADER := $(CODE_DIR)/meta/ATHENA_GENERATED_RTTI.h
 
 # ==============================================================================
-# 12. Targets
+# 13. Targets
 # ==============================================================================
 .PHONY: all clean assets shaders engine sandboxes tests game_dll print_info
 
@@ -357,8 +358,6 @@ tests:     $(TEST_EXES)
 
 $(info [Building for OS: $(PLATFORM) From: $(HOST_PLATFORM) Using Compiler: $(COMPILER)])
 
-# Make de-duplicates a target's recipe across parallel jobs, so every rule
-# below that lists `| $(BUILD_DIR)` is safe under `make -j` without a race.
 $(BUILD_DIR):
 	@$(call MKDIR_P,$(BUILD_DIR))
 
@@ -374,12 +373,8 @@ $(RTTI_HEADER): $(BUILD_DIR)/athena$(HOST_EXE_EXT) $(wildcard $(CODE_DIR)/*.cpp 
 	$(SILENT) $< --directory=$(abspath $(CODE_DIR)) --output_file=$(RTTI_HEADER)
 
 # ------------------------------------------------------------------------------
-# Test Unity Builds (independent — parallelize freely under `make -j`)
+# Test Unity Builds
 # ------------------------------------------------------------------------------
-# Static pattern rule, scoped to exactly $(TEST_EXES) — this is deliberate
-# rather than a bare $(BUILD_DIR)/%$(EXE_EXT) pattern rule, which would also
-# match (and collide with) game_DEBUG, sandbox_*, athena, etc. living in the
-# same build dir.
 define TEST_UNITY_FILE_CONTENT
 // AUTO-GENERATED UNITY FILE
 #define UNITY_BUILD
@@ -419,7 +414,7 @@ $(RUN_TREE)/res/asset_stamp: $(BUILD_DIR)/jfd_asset_file_packer$(HOST_EXE_EXT) $
 	@touch $@
 
 # ------------------------------------------------------------------------------
-# Sandbox Unity Builds (independent — parallelize freely under `make -j`)
+# Sandbox Unity Builds
 # ------------------------------------------------------------------------------
 define UNITY_FILE_CONTENT
 // AUTO-GENERATED UNITY FILE
@@ -442,15 +437,6 @@ $(BUILD_DIR)/sandbox_%$(EXE_EXT): $(CODE_DIR)/sandbox/%.cpp $(C_FILES) | $(BUILD
 # ------------------------------------------------------------------------------
 # Engine / Game Build
 # ------------------------------------------------------------------------------
-# HOT-RELOAD FIX: this exe stays running during a reload session, and on
-# Windows the OS won't let you overwrite a loaded image's file in place. We
-# link to a temp file and rename it into place instead -- renaming over a
-# locked/loaded file is permitted on Windows (this is the same trick the
-# game_DLL rule below already used for the DLL itself; it just hadn't been
-# applied here too, which is what made MinGW reload spotty). This also makes
-# a relink completely harmless to an already-running process on every OS.
-# On llvm-mingw builds, the .pdb goes through the identical .tmp-then-rename
-# dance right below the exe/dll rename, for the same locked-file reason.
 $(BUILD_DIR)/game_DEBUG$(EXE_EXT): $(CODE_DIR)/build.cpp $(RTTI_HEADER) | $(BUILD_DIR)
 	@echo "[BUILDING GAME ENGINE]"
 	$(SILENT) $(CXX) -fuse-ld=lld $(CXX_TARGET_FLAGS) $(ENGINE_MACROS) $(COMMON_INCLUDE_PATHS) $< $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(HOST_EXPORT_FLAGS) $(PDB_LINK_FLAG_HOTRELOAD) -o $@.tmp

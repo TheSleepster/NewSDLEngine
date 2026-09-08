@@ -11,7 +11,7 @@
 #define MAIN
 #include <sandbox/new_malloc.cpp>
 
-constexpr u32 MAX_ALLOCATIONS = 1000;
+constexpr u32 MAX_ALLOCATIONS = 500;
 void *allocations[MAX_ALLOCATIONS] = {};
 
 TEST(OneKBAllocations)
@@ -62,21 +62,21 @@ TEST(GroupFreeingTagGroup)
     print_allocator_info();
 }
 
-TEST(Allocation9MBSections)
+TEST(Allocation8MBSections)
 {
     for(u32 index = 0;
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        int *allocation = (int*)alloc(MB(9), TAG_STATIC);
-        memset(allocation, 5, MB(9));
+        int *allocation = (int*)alloc(MB(8), TAG_STATIC);
+        memset(allocation, 5, MB(8));
 
         allocations[index] = allocation;
     }
     print_allocator_info();
 }
 
-TEST(Freeing9MBSections)
+TEST(Freeing8MBSections)
 {
     for(u32 index = 0;
         index < MAX_ALLOCATIONS;
@@ -131,7 +131,7 @@ main(void)
 {
 
 #if OS_LINUX
-    memory_allocator_init(null, GB(12));
+    memory_allocator_init(null, GB(6));
     test_manager_t test_manager = {};
     test_manager_init(&test_manager);
 

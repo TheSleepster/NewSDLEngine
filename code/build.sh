@@ -1,3 +1,3 @@
 #!/bin/bash
 
-bear -o ../misc/compile_commands.json -- make -j12 -k COMPILER=g++ SILENT=@
+make -j12 -k COMPILER=llvm-mingw SILENT=@

@@ -454,7 +454,7 @@ alloc_impl(u64 size, s32 tag)
                 for(memory_page_t *current_page = context->first_page;
                     current_page;
                     current_page = current_page->next_page)
-                {
+                {                            
                     // NOTE(Sleepster): In the event that this page is completely empty, check if the next page is the same
                     // If it is, combine them both
                     if(current_page->total_free == current_page->page_size)
