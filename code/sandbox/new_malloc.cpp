@@ -304,6 +304,56 @@ register_thread_for_allocator(void)
     context->current_page->first_section.owner_page = context->current_page;
 }
 
+static memory_section_t* 
+get_last_page_section(memory_page_t *current_page)
+{
+    memory_section_t *last_section = &current_page->first_section;
+    do {
+        last_section = last_section->next_section;
+    }while(last_section != &current_page->first_section);
+
+    return(last_section);
+}
+
+static void
+merge_pages(memory_page_t *current_page)
+{
+    current_page->page_size += (current_page->next_page->page_size + sizeof(memory_page_t));
+    memory_section_t *last_section = get_last_page_section(current_page);
+
+    // NOTE(Sleepster): We don't handle the next_section ptr here, so there's a chance
+    // that this next_page->first_section here wraps onto itself. 
+    memory_section_t *next_first = &current_page->next_page->first_section;
+
+    // NOTE(Sleepster): Loop through the next page's sections to find it's last section. Really, this should
+    // probably just be a recursive operation
+#if DEBUG
+    last_section->section_size += ((next_first->section_size + sizeof(memory_section_t)) + allocator.os_page_size);
+#else
+    static_assert(false);
+#endif
+    last_section->next_section  = next_first;
+    if(next_first->next_section == next_first)
+    {
+        next_first->next_section = &current_page->first_section;
+    }
+    else
+    {
+        memory_section_t *this_current = next_first;
+        do {
+            this_current = next_first->next_section;
+        }while(this_current != next_first);
+
+        this_current->next_section = &current_page->first_section;
+    }
+
+    current_page->next_page = current_page->next_page->next_page;
+    if(current_page->next_page != null)
+    {
+        current_page->next_page->prev_page = current_page;
+    }
+}
+
 /*
 ==============================================
 alloc_impl
@@ -446,7 +496,8 @@ alloc_impl(u64 size, s32 tag)
                 //
                 // - [X] Search the current pages we have to see if the allocation can fit in that page
                 // - [X] Combine pages that are empty (nothing but cached and freed) until the allocation CAN fit
-                // - [ ] If we combined all adjacent pages and we still can't fit the allocation, THEN we get a new page.
+ 
+                // - If we combined all adjacent pages and we still can't fit the allocation, THEN we get a new page.
                 memory_page_t *valid_page = null;
 
                 // NOTE(Sleepster): Search to see if the pages we already have can fit this elsewhere...  
@@ -461,20 +512,7 @@ alloc_impl(u64 size, s32 tag)
                         if((current_page->next_page->total_free == current_page->next_page->page_size) &&
                           ((current_page->page_base + current_page->page_size) == (current_page->next_page->page_base - sizeof(memory_page_t))))
                         {
-                            // NOTE(Sleepster): Combine the pages 
-                            current_page->page_size += current_page->next_page->page_size;
-                            memory_section_t *last_section = &current_page->first_section;
-                            do {
-                                last_section = last_section->next_section;
-                            }while(last_section != &current_page->first_section);
-
-                            // NOTE(Sleepster): We don't handle the next_section ptr here, so there's a chance
-                            // that this next_page->first_section here wraps onto itself and makes the below loop
-                            // spin lock
-                            last_section->next_section = &current_page->next_page->first_section;
-
-                            current_page->next_page = current_page->next_page->next_page;
-                            current_page->next_page->prev_page = current_page;
+                            merge_pages(current_page;
                         }
                     }
 

@@ -144,7 +144,6 @@ TEST(ReallocateLargerPages)
 int
 main(void)
 {
-    printf("Hello, World!\n");
     memory_allocator_init(null, GB(3));
     test_manager_run_tests();
 

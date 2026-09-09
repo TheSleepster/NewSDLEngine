@@ -2,30 +2,15 @@
 # Build System
 # ==============================================================================
 # Common invocations:
-#   make                        debug build, host compiler, host platform
-#   make RELEASE=1              release build (no DLL hot-reload artifact)
+#   make                         debug build, host compiler, host platform
+#   make RELEASE=1               release build (no DLL hot-reload artifact)
 #   make COMPILER=llvm-mingw    Linux -> Windows cross build via llvm-mingw
-#                               (clang+lld; emits real CodeView/PDB debug info)
+#                                (clang+lld; emits real CodeView/PDB debug info)
 #   make COMPILER=clang++ PLATFORM=WINDOWS   Linux -> Windows via clang cross target
-#   make game_dll               rebuild ONLY the hot-reload DLL (engine keeps running)
-#   make -j$(nproc)             parallelize independent targets (sandboxes, shaders,
-#                               assets, tests all build concurrently with the engine)
+#   make game_dll                rebuild ONLY the hot-reload DLL (engine keeps running)
+#   make -j$(nproc)              parallelize independent targets (sandboxes, shaders,
+#                                assets, tests all build concurrently with the engine)
 #   make clean
-#
-# Layout of this file:
-#   1. Settings
-#   2. Paths (defined early -- needed by the per-compiler flag setup below)
-#   3. Host platform detection (never overridden)
-#   4. Target platform selection (COMPILER=llvm-mingw implies PLATFORM=WINDOWS)
-#   5. Per-platform settings (defines, extensions, libs, clean/mkdir commands)
-#   6. Per-compiler toolchain + flags (incl. llvm-mingw PDB/CodeView setup)
-#   7. Dynamic file discovery
-#   8. Release/debug configuration (incl. the hot-reload export/import-lib setup)
-#   9. Library path resolution + linker flags (shared by target and host tools)
-#  10. Host tool toolchain (athena, shader_reflector, asset packer all run on HOST)
-#  11. Dependency-tracking flags (-MMD/-MP wiring)
-#  12. Discovery of sources (unity C files, sandboxes, shaders, assets)
-#  13. Targets
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
@@ -37,14 +22,14 @@ COMPILER          ?= clang++
 PDB_SOURCE_PREFIX ?= Z:/NewSDLEngine
 
 # ------------------------------------------------------------------------------
-# 2. Paths (defined early -- needed by the per-compiler flag setup in Section 6)
+# 2. Paths
 # ------------------------------------------------------------------------------
 BUILD_DIR := ../build
 CODE_DIR  := ../code
 RUN_TREE  := ../run_tree
 
 # ------------------------------------------------------------------------------
-# 3. Host Platform Detection (this is a fact about the machine; never overridden)
+# 3. Host Platform Detection
 # ------------------------------------------------------------------------------
 UNAME_S := $(shell uname -s)
 
@@ -100,7 +85,6 @@ else
     $(error Unknown PLATFORM '$(PLATFORM)'. Valid options are: WINDOWS, LINUX, MAC)
 endif
 
-# clean / mkdir depend on the HOST shell (cmd.exe vs POSIX sh), not the target.
 ifeq ($(HOST_PLATFORM),WINDOWS)
     RM_CMD := if exist $(subst /,\,$(BUILD_DIR)) rmdir /s /q $(subst /,\,$(BUILD_DIR)) & \
               if exist $(subst /,\,../run_tree/res/asset_stamp) del /q $(subst /,\,../run_tree/res/asset_stamp)
@@ -114,50 +98,29 @@ endif
 # 6. Compiler / Toolchain Selection
 # ------------------------------------------------------------------------------
 
-# --- clang++ : shared warning/flag base
 CLANG_WARN_BASE    := -std=c++11 -Wno-unknown-attributes -Wformat -Wnullability-completeness -fno-rtti -mfma -Wno-c++14-extensions -Wall -Wextra -Wno-unused-function -Wno-missing-braces -Wno-pointer-sign -Wno-incompatible-pointer-types-discards-qualifiers -Wno-null-dereference -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-null-pointer-subtraction -Wno-typedef-redefinition -Wno-writable-strings -Wno-deprecated -Wno-c99-designator -Wno-unused-template
 CLANG_DEBUG_ONLY   := -g -O0 -fno-inline-functions
 CLANG_RELEASE_ONLY := -O3 -Wno-unused-parameter -Wno-incompatible-pointer-types -Wno-pointer-integer-compare -Wno-vla-cxx-extension -Wno-reorder-init-list
 
-# --- g++
-GPP_WARN_BASE     := -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder -Wno-pointer-arith -Wno-write-strings -Wno-class-memaccess -Wno-sfinae-incomplete -Wno-format-truncation -Wno-implicit-fallthrough -Wno-attributes
-GPP_DEBUG_ONLY    := -g -O0 -fno-inline-functions -Wno-null-pointer-subtraction
-GPP_RELEASE_ONLY  := -O3
+GPP_WARN_BASE      := -std=c++11 -Wformat -fno-rtti -mfma -Wall -Wextra -Wno-unused-function -Wno-missing-field-initializers -Wno-switch -Wno-deprecated-declarations -Wno-reorder -Wno-pointer-arith -Wno-write-strings -Wno-class-memaccess -Wno-sfinae-incomplete -Wno-format-truncation -Wno-implicit-fallthrough -Wno-attributes
+GPP_DEBUG_ONLY     := -g -O0 -fno-inline-functions -Wno-null-pointer-subtraction
+GPP_RELEASE_ONLY   := -O3
 
-LLVM_MINGW_DEBUG_ONLY   := $(CLANG_DEBUG_ONLY) -gcodeview
+LLVM_MINGW_DEBUG_ONLY := $(CLANG_DEBUG_ONLY) -gcodeview
 LLVM_MINGW_RELEASE_ONLY := $(CLANG_RELEASE_ONLY) -Wno-unused-template
 
-# --- Source path remapping for PDBs (llvm-mingw only) ------------------------
 ifeq ($(COMPILER),llvm-mingw)
-    # 1. Convert backslashes to forward slashes for target prefix.
-    PDB_MAP_TO := $(subst \,/,$(PDB_SOURCE_PREFIX))
-
-    # 2. Derive repository root (/home/.../NewSDLEngine) covering code/ and build/.
-    ROOT_DIR_ABS  := $(abspath $(CODE_DIR)/..)
-    ROOT_DIR_REAL := $(realpath $(CODE_DIR)/..)
-
-    # 3. Map relative path traversals, absolute paths, and override compilation directory.
+    PDB_MAP_TO    := $(subst \,/,$(PDB_SOURCE_PREFIX))
+    ROOT_DIR_ABS  := $(abspath .)
+    BUILD_DIR_ABS := $(abspath $(BUILD_DIR))
+    
     DEBUG_PREFIX_MAP_FLAG := \
-        -ffile-compilation-dir=$(PDB_MAP_TO)/code \
-        -fdebug-compilation-dir=$(PDB_MAP_TO)/code \
-        -ffile-prefix-map=../code/=$(PDB_MAP_TO)/code/ \
-        -ffile-prefix-map=../code=$(PDB_MAP_TO)/code \
-        -ffile-prefix-map=../build/=$(PDB_MAP_TO)/build/ \
-        -ffile-prefix-map=../build=$(PDB_MAP_TO)/build \
-        -ffile-prefix-map=../run_tree/=$(PDB_MAP_TO)/run_tree/ \
-        -ffile-prefix-map=../run_tree=$(PDB_MAP_TO)/run_tree \
+        -ffile-compilation-dir=$(PDB_MAP_TO) \
+        -fdebug-compilation-dir=$(PDB_MAP_TO) \
+        -ffile-prefix-map=$(ROOT_DIR_ABS)=$(PDB_MAP_TO) \
+        -ffile-prefix-map=$(BUILD_DIR_ABS)=$(PDB_MAP_TO)/build \
         -ffile-prefix-map=..=$(PDB_MAP_TO) \
-        -ffile-prefix-map=$(ROOT_DIR_ABS)/code/../code=$(PDB_MAP_TO)/code \
-        -ffile-prefix-map=$(ROOT_DIR_ABS)/code/../build=$(PDB_MAP_TO)/build \
-        -ffile-prefix-map=$(ROOT_DIR_ABS)=$(PDB_MAP_TO)
-    ifneq ($(ROOT_DIR_ABS),$(ROOT_DIR_REAL))
-        DEBUG_PREFIX_MAP_FLAG += \
-            -ffile-prefix-map=$(ROOT_DIR_REAL)/code/../code=$(PDB_MAP_TO)/code \
-            -ffile-prefix-map=$(ROOT_DIR_REAL)/code/../build=$(PDB_MAP_TO)/build \
-            -ffile-prefix-map=$(ROOT_DIR_REAL)=$(PDB_MAP_TO)
-    endif
-else
-    DEBUG_PREFIX_MAP_FLAG :=
+        -ffile-prefix-map=/tmp=$(PDB_MAP_TO)/build
 endif
 
 ifeq ($(COMPILER),clang++)
@@ -197,16 +160,14 @@ else
     $(error Unknown COMPILER '$(COMPILER)'. Valid options are: clang++, g++, llvm-mingw, msvc)
 endif
 
-# --- PDB / CodeView linking (llvm-mingw only) --------------------------------
+# --- Clean PDB setup + Non-reproducible GUID generation for llvm-mingw -----
 ifeq ($(COMPILER),llvm-mingw)
-    PDB_LINK_FLAG = -Wl,--pdb=$(basename $@).pdb -Wl,-Xlink=-PDBALTPATH:$(notdir $(basename $@).pdb)
-    PDB_TMP_PATH            = $(basename $@).tmp.pdb
-    PDB_FINAL_PATH          = $(basename $@).pdb
-    PDB_LINK_FLAG_HOTRELOAD = -Wl,--pdb=$(PDB_TMP_PATH) -Wl,-Xlink=-PDBALTPATH:$(notdir $(PDB_FINAL_PATH))
+    get_pdb_flags = -Wl,--pdb=$(basename $1).pdb.tmp -Wl,-Xlink=-PDBALTPATH:$(notdir $(basename $1).pdb)
+    move_pdb      = mv -f $(basename $1).pdb.tmp $(basename $1).pdb
     LLVM_MINGW_RUNTIME_LINK := -fuse-ld=lld -static-libstdc++ -static-libgcc
 else
-    PDB_LINK_FLAG           :=
-    PDB_LINK_FLAG_HOTRELOAD :=
+    get_pdb_flags =
+    move_pdb      =
     LLVM_MINGW_RUNTIME_LINK :=
 endif
 
@@ -391,7 +352,8 @@ endef
 $(TEST_EXES): $(BUILD_DIR)/%$(EXE_EXT): $(CODE_DIR)/tests/%.cpp $(wildcard $(CODE_DIR)/tests/*) $(C_FILES) | $(BUILD_DIR)
 	$(file > $(BUILD_DIR)/unity_test_$*.cpp,$(call TEST_UNITY_FILE_CONTENT,$<))
 	@echo "[TEST EXECUTABLE: $*]"
-	$(SILENT)$(CXX) $(OS_DEFINE) $(CXX_TARGET_FLAGS) $(COMMON_INCLUDE_PATHS) $(BUILD_DIR)/unity_test_$*.cpp $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(GAME_LINKER_FLAGS) $(PDB_LINK_FLAG) -o $@
+	$(SILENT)$(CXX) $(OS_DEFINE) $(CXX_TARGET_FLAGS) $(COMMON_INCLUDE_PATHS) $(BUILD_DIR)/unity_test_$*.cpp $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(GAME_LINKER_FLAGS) $(call get_pdb_flags,$@) -o $@
+	$(SILENT) $(call move_pdb,$@)
 
 $(BUILD_DIR)/shader_reflector$(HOST_EXE_EXT): $(CODE_DIR)/code_generator/slang_reflector.cpp | $(BUILD_DIR)
 	@echo "[BUILDING SHADER REFLECTOR]"
@@ -432,31 +394,28 @@ endef
 $(BUILD_DIR)/sandbox_%$(EXE_EXT): $(CODE_DIR)/sandbox/%.cpp $(C_FILES) | $(BUILD_DIR)
 	$(file > $(BUILD_DIR)/unity_$*.cpp,$(call UNITY_FILE_CONTENT,$<))
 	@echo "[SANDBOX EXECUTABLE: $*]"
-	$(SILENT) $(CXX) $(OS_DEFINE) $(CXX_TARGET_FLAGS) $(COMMON_INCLUDE_PATHS) $(BUILD_DIR)/unity_$*.cpp $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(GAME_LINKER_FLAGS) $(DYNAMIC_EXPORT_FLAGS) $(PDB_LINK_FLAG) -o $@
+	$(SILENT) $(CXX) $(OS_DEFINE) $(CXX_TARGET_FLAGS) $(COMMON_INCLUDE_PATHS) $(BUILD_DIR)/unity_$*.cpp $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(GAME_LINKER_FLAGS) $(DYNAMIC_EXPORT_FLAGS) $(call get_pdb_flags,$@) -o $@
+	$(SILENT) $(call move_pdb,$@)
 
 # ------------------------------------------------------------------------------
 # Engine / Game Build
 # ------------------------------------------------------------------------------
 $(BUILD_DIR)/game_DEBUG$(EXE_EXT): $(CODE_DIR)/build.cpp $(RTTI_HEADER) | $(BUILD_DIR)
 	@echo "[BUILDING GAME ENGINE]"
-	$(SILENT) $(CXX) -fuse-ld=lld $(CXX_TARGET_FLAGS) $(ENGINE_MACROS) $(COMMON_INCLUDE_PATHS) $< $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(HOST_EXPORT_FLAGS) $(PDB_LINK_FLAG_HOTRELOAD) -o $@.tmp
+	$(SILENT) $(CXX) -fuse-ld=lld $(CXX_TARGET_FLAGS) $(ENGINE_MACROS) $(COMMON_INCLUDE_PATHS) $< $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(HOST_EXPORT_FLAGS) $(call get_pdb_flags,$@) -o $@.tmp
 	$(SILENT) mv -f $@.tmp $@
-ifeq ($(COMPILER),llvm-mingw)
-	$(SILENT) mv -f $(PDB_TMP_PATH) $(PDB_FINAL_PATH)
-endif
+	$(SILENT) $(call move_pdb,$@)
 
 $(BUILD_DIR)/game_DLL$(DLL_EXT): $(CODE_DIR)/build.cpp $(RTTI_HEADER) $(GAME_DLL_DEPS) | $(BUILD_DIR)
 	@echo "[BUILDING GAME DLL]"
-	$(SILENT) $(CXX) -fuse-ld=lld $(CXX_TARGET_FLAGS) -DGAME_DLL_BUILD=1 -fPIC -shared $(COMMON_INCLUDE_PATHS) $< $(GAME_DLL_COMPILE_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(GAME_DLL_EXTRA_LINK) $(PDB_LINK_FLAG_HOTRELOAD) -o $@.tmp
+	$(SILENT) $(CXX) -fuse-ld=lld $(CXX_TARGET_FLAGS) -DGAME_DLL_BUILD=1 -fPIC -shared $(COMMON_INCLUDE_PATHS) $< $(GAME_DLL_COMPILE_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(GAME_DLL_EXTRA_LINK) $(call get_pdb_flags,$@) -o $@.tmp
 	$(SILENT) mv -f $@.tmp $@
-ifeq ($(COMPILER),llvm-mingw)
-	$(SILENT) mv -f $(PDB_TMP_PATH) $(PDB_FINAL_PATH)
-endif
+	$(SILENT) $(call move_pdb,$@)
 
 clean:
 	@$(RM_CMD)
 
 # ------------------------------------------------------------------------------
-# Pull in real header/source dependencies generated by -MMD/-MP above.
+# Dependency Tracking Inclusion
 # ------------------------------------------------------------------------------
 -include $(wildcard $(BUILD_DIR)/*.d)
