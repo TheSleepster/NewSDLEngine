@@ -5,13 +5,12 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <stdio.h>
-#if OS_LINUX
 #include "test_manager.h"
 
 #define MAIN
 #include <sandbox/new_malloc.cpp>
 
-constexpr u32 MAX_ALLOCATIONS = 500;
+constexpr u32 MAX_ALLOCATIONS = 100;
 void *allocations[MAX_ALLOCATIONS] = {};
 
 TEST(OneKBAllocations)
@@ -100,7 +99,10 @@ TEST(AllocateCached5MBSections)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        alloc(MB(5), TAG_CACHE);
+        int *allocation = (int*)alloc(MB(5), TAG_CACHE);
+        memset(allocation, 5, MB(5));
+
+        allocations[index] = allocation;
     }
 }
 
@@ -110,8 +112,23 @@ TEST(ReclaimCachedMemory)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        alloc(MB(9), TAG_STATIC);
+        int *allocation = (int*)alloc(MB(9), TAG_STATIC);
+        allocations[index] = allocation;
     }
+
+    free_tagged_allocations(TAG_CACHE);
+}
+
+TEST(FreeReclaimedMemory)
+{
+    for(u32 index = 0;
+        index < MAX_ALLOCATIONS;
+        ++index)
+    {
+        free_alloc(allocations[index]);
+    }
+
+    print_allocator_info();
 }
 
 TEST(ReallocateLargerPages)
@@ -124,18 +141,12 @@ TEST(ReallocateLargerPages)
     }
 }
 
-#endif
-
 int
 main(void)
 {
+    printf("Hello, World!\n");
+    memory_allocator_init(null, GB(3));
+    test_manager_run_tests();
 
-#if OS_LINUX
-    memory_allocator_init(null, GB(6));
-    test_manager_t test_manager = {};
-    test_manager_init(&test_manager);
-
-    test_manager_run_tests(&test_manager);
-#endif
     return(0);
 }

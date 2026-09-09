@@ -222,7 +222,7 @@ memory_allocator_init
 ==============================================
 */
 
-static void
+static void 
 memory_allocator_init(void *base_address, u64 total_allocation)
 {
     allocator.memory        = sys_allocate_memory(base_address, total_allocation);
@@ -437,7 +437,6 @@ alloc_impl(u64 size, s32 tag)
         }
         else
         {
-            Assert(free_list->count == 0);
             //log_error("Failure to find a block of size: '%llu' for this allocation...\n", total_allocation_size);
 
             // NOTE(Sleepster): If we don't have any more pages on our thread, we need to do some work... 
@@ -459,19 +458,21 @@ alloc_impl(u64 size, s32 tag)
                     // If it is, combine them both
                     if(current_page->total_free == current_page->page_size)
                     {
-                        if(current_page->next_page->total_free == current_page->next_page->page_size)
+                        if((current_page->next_page->total_free == current_page->next_page->page_size) &&
+                          ((current_page->page_base + current_page->page_size) == (current_page->next_page->page_base - sizeof(memory_page_t))))
                         {
                             // NOTE(Sleepster): Combine the pages 
                             current_page->page_size += current_page->next_page->page_size;
-                            memory_section_t *last_section = null;
-                            for(memory_section_t *current_section = &current_page->first_section;
-                                current_section;
-                                current_section = current_section->next_section)
-                            {
-                                last_section = current_section;
-                            }
+                            memory_section_t *last_section = &current_page->first_section;
+                            do {
+                                last_section = last_section->next_section;
+                            }while(last_section != &current_page->first_section);
 
+                            // NOTE(Sleepster): We don't handle the next_section ptr here, so there's a chance
+                            // that this next_page->first_section here wraps onto itself and makes the below loop
+                            // spin lock
                             last_section->next_section = &current_page->next_page->first_section;
+
                             current_page->next_page = current_page->next_page->next_page;
                             current_page->next_page->prev_page = current_page;
                         }

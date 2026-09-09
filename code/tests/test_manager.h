@@ -5,6 +5,8 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#define TEST_MANAGER_H
+
 #define PROGRAM_FLAG_HANDLER_IMPLEMENTATION 
 #define DYNARRAY_IMPLEMENTATION
 
@@ -16,13 +18,25 @@
 #include <c_program_flag_handler.h>
 #include <c_dynarray.h>
 
-#define TEST_API static
+#if defined(COMPILER_CLANG) || defined(COMPILER_GCC)
+# if OS_WINDOWS
+#   define TEST_SECTION_BEGIN __attribute__((used, section("test_table$A")))
+#   define TEST_SECTION       __attribute__((used, section("test_table$M")))
+#   define TEST_SECTION_END   __attribute__((used, section("test_table$Z")))
+# else
+#   define TEST_SECTION       __attribute__((used, section("test_table")))
+# endif // OS_WINDOWS
+#else 
+# define TEST_SECTION
+# define TEST_SECTION_BEGIN
+# define TEST_SECTION_END
+#endif // COMPILER_CLANG || COMPILER_GCC
 
-#define TEST_MANAGER_H
-#define TEST_SECTION __attribute__((used, section("test_table")))
-#define TEST(name)                                                   \
-    static void name(void);                                          \
-    static test_entry_t _reg_##name TEST_SECTION = { name, #name, __FILE__ }; \
+#define TEST(name)                                                        \
+    static void name(void);                                               \
+    static const test_entry_t _reg_##name TEST_SECTION = {                \
+        name, #name, __FILE__                                             \
+    };                                                                    \
     static void name(void)
 
 #define TEST_FAILURE(cond, msg, ...) \
@@ -41,9 +55,6 @@ struct test_entry_t
     const char  *filename;
 };
 
-extern test_entry_t __start_test_table[];
-extern test_entry_t __stop_test_table[];
-
 struct test_results_t
 {
     u32 tests_total;
@@ -57,8 +68,27 @@ struct test_manager_t
     u32           entry_count;
 };
 
+#if OS_WINDOWS
+
+TEST_SECTION_BEGIN const test_entry_t test_table_begin = { (test_func_t*)1, "sentinel_begin", "" };
+TEST_SECTION_END   const test_entry_t test_table_end   = { (test_func_t*)1, "sentinel_end", "" };
+
+#define TEST_TABLE_BEGIN (&test_table_begin + 1)
+#define TEST_TABLE_END   (&test_table_end)
+
+#else
+
+extern const test_entry_t __start_test_table[];
+extern const test_entry_t __stop_test_table[];
+
+#define TEST_TABLE_BEGIN __start_test_table
+#define TEST_TABLE_END   __stop_test_table
+#endif // OS_WINDOWS
+
+#define TEST_API static
+
 TEST_API bool8
-test_manager_run_test(test_entry_t *entry)
+test_manager_run_test(const test_entry_t *entry)
 {
     bool8 result = false;
 
@@ -94,18 +124,15 @@ test_manager_run_test(test_entry_t *entry)
 }
 
 TEST_API test_results_t
-test_manager_run_tests(test_manager_t *manager)
+test_manager_run_tests(void)
 {
     test_results_t result = {};
 
-    u32 test_count = manager->entry_count;
-    result.tests_total = test_count;
-
-    for(u32 test_index = 0;
-        test_index < test_count;
-        ++test_index)
+    u32 test_count = 0;
+    for(const test_entry_t *entry = TEST_TABLE_BEGIN;
+        entry < TEST_TABLE_END;
+        ++entry)
     {
-        test_entry_t *entry = manager->entries + test_index;
         log_debug("\n[RUNNING]: '%s'...\n", entry->function_name);
 
         bool8 success = test_manager_run_test(entry);
@@ -119,16 +146,12 @@ test_manager_run_tests(test_manager_t *manager)
             log_warning("\n[ FAILURE ]\n");
             ++result.tests_failed;
         }
+
+        ++test_count;
     }
 
+    result.tests_total = test_count;
     return(result);
-}
-
-TEST_API void
-test_manager_init(test_manager_t *manager)
-{
-    manager->entries     = __start_test_table;
-    manager->entry_count = (u32)(__stop_test_table - __start_test_table);
 }
 
 #endif // TEST_MANAGER_H
