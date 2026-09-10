@@ -776,7 +776,7 @@ s32
 sys_thread_wait(sys_thread_t *thread)
 {
     DWORD result = 0;
-    result = WaitForSingleObject(thread->handle, WAIT_OBJECT_0);
+    result = WaitForSingleObject(thread->handle, INFINITE);
     return((s32)result);
 }
 

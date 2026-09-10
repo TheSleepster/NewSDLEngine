@@ -492,20 +492,26 @@ alloc_impl(u64 size, s32 tag)
 
             // NOTE(Sleepster): The start of the guard page 
             s64 section_offset = valid_section->section_size - total_allocation_size;
+            memory_section_t *allocation = valid_section;
+            if(section_offset != 0)
+            {
+                allocation = (memory_section_t*)(valid_section->section_base + section_offset);
 
-            memory_section_t *allocation = (memory_section_t*)(valid_section->section_base + section_offset);
-            valid_section->section_size -= total_allocation_size;
+                allocation->next_section = valid_section->next_section;
+                allocation->prev_section = valid_section;
+
+                valid_section->section_size -= total_allocation_size;
+
+                valid_section->next_section->prev_section = allocation;
+                valid_section->next_section = allocation;
+            }
 
             allocation->ID = DEBUG_SECTION_ID;
             allocation->memory_tag   = tag;
             allocation->section_size = total_allocation_size;
             allocation->section_base = (byte*)allocation;
 
-            allocation->next_section = valid_section->next_section;
-            allocation->prev_section = valid_section;
             allocation->owner_page   = valid_section->owner_page;
-            valid_section->next_section->prev_section = allocation;
-            valid_section->next_section = allocation;
 
             valid_section->owner_page->allocation_stats[tag]       += total_allocation_size;
             valid_section->owner_page->allocation_stats[TAG_CLEAR] -= total_allocation_size;
@@ -518,7 +524,6 @@ alloc_impl(u64 size, s32 tag)
                 tag_section_array_t *array = context->tag_array + tag;
                 array->array[array->count++] = allocation;
             }
-
 #if DEBUG 
             // NOTE(Sleepster): Start of the guard page. 
             void *protected_address = (byte*)allocation + user_allocation_size;
@@ -558,6 +563,7 @@ alloc_impl(u64 size, s32 tag)
                     memory_section_t *largest_free_section = null;
                     memory_section_t *current_section = &current_page->first_section;
                     do {
+                        Assert(current_section->next_section);
                         if(current_section->memory_tag == TAG_CLEAR)
                         {
                             if(largest_free_section) 
