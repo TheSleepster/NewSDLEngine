@@ -769,7 +769,7 @@ s32
 sys_thread_wait(sys_thread_t *handle)
 {
     s32 result = 0;
-    result = SDL_WaitThread(result.handle);
+    SDL_WaitThread(handle->handle, &result);
 
     return(result);
 }

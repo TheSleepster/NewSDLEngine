@@ -50,7 +50,6 @@
 #include <c_types.h>
 #include <SDL3/SDL.h>
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -100,21 +99,19 @@
 #include "sandbox/new_malloc.cpp"
 
 // ============================================================================
-// Timing
+// Timing (SDL performance counters -- works on Linux + Windows)
 // ============================================================================
 
 static u64
 timer_now(void)
 {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return((u64)ts.tv_sec * 1000000000ULL + (u64)ts.tv_nsec);
+    return(SDL_GetPerformanceCounter());
 }
 
 static double
-timer_elapsed_ms(u64 start_ns, u64 end_ns)
+timer_elapsed_ms(u64 start, u64 end)
 {
-    return((double)(end_ns - start_ns) / 1000000.0);
+    return((double)(end - start) * 1000.0 / (double)SDL_GetPerformanceFrequency());
 }
 
 // ============================================================================
