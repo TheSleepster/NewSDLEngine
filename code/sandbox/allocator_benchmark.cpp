@@ -761,7 +761,7 @@ mt_pool_shutdown(void)
     mt_pool_stop = true;
     sys_semaphore_release(&mt_start_sem, mt_thread_count);
     for(s32 t = 0; t < mt_thread_count; t++)
-        SDL_WaitThread(mt_handles[t].handle, NULL);
+        sys_thread_wait(&mt_handles[t]);
     sys_semaphore_close(&mt_start_sem);
     sys_semaphore_close(&mt_done_sem);
     mt_thread_count = 0;

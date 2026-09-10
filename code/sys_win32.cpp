@@ -772,6 +772,14 @@ sys_thread_close_handle(sys_thread_t *thread_data)
     return(result);
 }
 
+s32
+sys_thread_wait(sys_thread_t *thread)
+{
+    DWORD result = 0;
+    result = WaitForSingleObject(thread->handle, WAIT_OBJECT_0);
+    return((s32)result);
+}
+
 sys_mutex_t
 sys_mutex_create()
 {

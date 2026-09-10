@@ -765,6 +765,15 @@ sys_thread_close_handle(sys_thread_t *thread_data)
     return(true);
 }
 
+s32
+sys_thread_wait(sys_thread_t *handle)
+{
+    s32 result = 0;
+    result = SDL_WaitThread(result.handle);
+
+    return(result);
+}
+
 sys_mutex_t
 sys_mutex_create()
 {

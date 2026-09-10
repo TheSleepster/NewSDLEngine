@@ -4,7 +4,6 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
-#if OS_LINUX 
 #include "test_manager.h"
 
 TEST(basic_macros)
@@ -118,7 +117,6 @@ TEST(anon_internal_unions)
     void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/nested_anon_unions.cpp"));
     Assert(sys_wait_for_process(process));
 }
-#endif
 
 int
 main(void)
