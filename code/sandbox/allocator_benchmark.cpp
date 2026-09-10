@@ -185,9 +185,9 @@ bench_record(bench_section_e section, const char *label,
 static void
 print_header(const char *title)
 {
-    log_info("\n----------------------------------------------------------------\n");
-    log_info("  %s\n", title);
-    log_info("----------------------------------------------------------------\n");
+    printf("\n----------------------------------------------------------------\n");
+    printf("  %s\n", title);
+    printf("----------------------------------------------------------------\n");
 }
 
 static void
@@ -198,8 +198,8 @@ print_row_result(const char *label, double custom_ms, double glibc_ms, s64 ops, 
     double custom_mbs = (double)bytes / (custom_ms / 1000.0) / 1000000.0;
     double glibc_mbs  = (double)bytes / (glibc_ms / 1000.0) / 1000000.0;
     double ratio      = glibc_ms / custom_ms;
-    log_info("  %-40s custom %9.2f ms  glibc %9.2f ms  ratio %.2fx  (%7.1fM ops/s | %7.1f MB/s)\n",
-             label, custom_ms, glibc_ms, ratio, custom_ops / 1000000.0, custom_mbs);
+    printf("  %-52s custom %10.2f ms  glibc %10.2f ms  ratio %7.2fx  (%13.1fM ops/s | %14.1f MB/s)\n",
+           label, custom_ms, glibc_ms, ratio, custom_ops / 1000000.0, custom_mbs);
     (void)custom_ops; (void)glibc_ops; (void)glibc_mbs;
 }
 
@@ -1315,8 +1315,8 @@ bench_st_throughput_sweep(bench_section_e section)
         bench_record(section, label, custom_ms, glibc_ms, count, (u64)count * alloc_size);
 
         double ratio = glibc_ms / custom_ms;
-        log_info("  %-12s  %7.2f ms     %7.2f ms     %5.2fx\n",
-                 sizes[s].label, custom_ms, glibc_ms, ratio);
+        printf("  %-12s  %10.2f ms  %10.2f ms  %7.2fx\n",
+               sizes[s].label, custom_ms, glibc_ms, ratio);
     }
 }
 
@@ -1325,10 +1325,10 @@ print_pool_usage(void)
 {
     // new_malloc.cpp is included above, so `allocator` is visible here.
     u64 reserved = allocator.next_page_offset;
-    log_info("  Custom allocator pool usage so far: %llu MB / %llu MB (%.1f%%)\n",
-             (unsigned long long)(reserved / MB(1)),
-             (unsigned long long)(allocator.max_capacity / MB(1)),
-             100.0 * (double)reserved / (double)allocator.max_capacity);
+    printf("  Custom allocator pool usage so far: %llu MB / %llu MB (%.1f%%)\n",
+           (unsigned long long)(reserved / MB(1)),
+           (unsigned long long)(allocator.max_capacity / MB(1)),
+           100.0 * (double)reserved / (double)allocator.max_capacity);
 }
 
 // ============================================================================
@@ -1338,13 +1338,14 @@ print_pool_usage(void)
 static void
 print_section_summary(bench_section_e section)
 {
-    log_info("\n================================================================\n");
-    log_info("  SUMMARY: %s\n", bench_section_names[section]);
-    log_info("================================================================\n");
-    log_info("  %-40s %10s %10s %9s %9s %9s %9s %6s  %s\n",
-             "Test", "Custom ms", "Glibc ms", "Custom ops/s", "Glibc ops/s", "Custom MB/s", "Glibc MB/s", "Ratio", "Faster");
-    log_info("  %-40s %10s %10s %9s %9s %9s %9s %6s  %s\n",
-             "----------------------------------------", "----------", "----------", "---------", "---------", "---------", "---------", "------", "------");
+    printf("\n================================================================\n");
+    printf("  SUMMARY: %s\n", bench_section_names[section]);
+    printf("================================================================\n");
+    printf("  %-52s %10s %10s %12s %12s %14s %14s %7s  %s\n",
+           "Test", "Custom ms", "Glibc ms", "Custom ops/s", "Glibc ops/s", "Custom MB/s", "Glibc MB/s", "Ratio", "Faster");
+    printf("  %-52s %10s %10s %12s %12s %14s %14s %7s  %s\n",
+           "----------------------------------------------------", "----------", "----------",
+           "------------", "------------", "--------------", "--------------", "-------", "------");
 
     double custom_total = 0.0, glibc_total = 0.0;
     u64 bytes_total = 0;
@@ -1371,19 +1372,18 @@ print_section_summary(bench_section_e section)
         bytes_total  += rec->bytes;
         ops_total    += rec->ops;
 
-        log_info("  %-40s %10.2f %10.2f %9.1f %9.1f %9.1f %9.1f %6.2f  %s\n",
-                 rec->label, rec->custom_ms, rec->glibc_ms,
-                 custom_ops / 1000000.0, glibc_ops / 1000000.0, custom_mbs, glibc_mbs, ratio, faster);
+        printf("  %-52s %10.2f %10.2f %12.1f %12.1f %14.1f %14.1f %7.2f  %s\n",
+               rec->label, rec->custom_ms, rec->glibc_ms,
+               custom_ops / 1000000.0, glibc_ops / 1000000.0, custom_mbs, glibc_mbs, ratio, faster);
     }
 
     double total_ratio = glibc_total / custom_total;
-    log_info("  %-40s %10.2f %10.2f %9s %9s\n",
-             "TOTAL", custom_total, glibc_total, "", "");
-    log_info("  Total ops: %lld   Total bytes: %llu (%.2f GB)\n",
-             (long long)ops_total, (unsigned long long)bytes_total,
-             (double)bytes_total / GB(1));
-    log_info("  Section ratio (glibc/custom): %.2fx  |  custom won %d / %d tests\n",
-             total_ratio, custom_wins, custom_wins + glibc_wins);
+    printf("  %-52s %10.2f %10.2f\n", "TOTAL", custom_total, glibc_total);
+    printf("  Total ops: %lld   Total bytes: %llu (%.2f GB)\n",
+           (long long)ops_total, (unsigned long long)bytes_total,
+           (double)bytes_total / GB(1));
+    printf("  Section ratio (glibc/custom): %.2fx  |  custom won %d / %d tests\n",
+           total_ratio, custom_wins, custom_wins + glibc_wins);
 }
 
 static void
@@ -1409,17 +1409,17 @@ print_all_summaries(void)
         else if(rec->glibc_ms < rec->custom_ms) glibc_wins++;
     }
 
-    log_info("\n================================================================\n");
-    log_info("  GRAND TOTAL (all %d tests)\n", g_record_count);
-    log_info("================================================================\n");
-    log_info("  Custom allocator: %12.2f ms total\n", custom_grand);
-    log_info("  Glibc malloc    : %12.2f ms total\n", glibc_grand);
-    log_info("  Overall ratio   : %6.2fx (glibc/custom; >1 means custom faster)\n",
-             glibc_grand / custom_grand);
-    log_info("  Total ops       : %lld\n", (long long)ops_grand);
-    log_info("  Total bytes     : %llu (%.2f GB)\n", (unsigned long long)bytes_grand,
-             (double)bytes_grand / GB(1));
-    log_info("  Custom wins     : %d / %d tests\n", custom_wins, custom_wins + glibc_wins);
+    printf("\n================================================================\n");
+    printf("  GRAND TOTAL (all %d tests)\n", g_record_count);
+    printf("================================================================\n");
+    printf("  Custom allocator: %12.2f ms total\n", custom_grand);
+    printf("  Glibc malloc    : %12.2f ms total\n", glibc_grand);
+    printf("  Overall ratio   : %6.2fx (glibc/custom; >1 means custom faster)\n",
+           glibc_grand / custom_grand);
+    printf("  Total ops       : %lld\n", (long long)ops_grand);
+    printf("  Total bytes     : %llu (%.2f GB)\n", (unsigned long long)bytes_grand,
+           (double)bytes_grand / GB(1));
+    printf("  Custom wins     : %d / %d tests\n", custom_wins, custom_wins + glibc_wins);
 }
 
 // ============================================================================
@@ -1439,21 +1439,21 @@ int main(void)
     s32 mt_threads  = cpu_threads;
     if(mt_threads > (MAX_THREAD_COUNT - 1)) mt_threads = MAX_THREAD_COUNT - 1; // leave room for main thread
 
-    log_info("\n");
-    log_info("================================================================\n");
-    log_info("  Allocator Benchmark: Custom Allocator vs Glibc malloc\n");
-    log_info("================================================================\n");
-    log_info("  CPU logical cores : %d\n", cpu_threads);
-    log_info("  MT pool threads   : %d (persistent, reused by all MT tests)\n", mt_threads);
-    log_info("  Alloc DEBUG mode  : %s\n", ALLOC_BENCH_DEBUG ? "ON (guard pages)" : "OFF (release)");
-    log_info("  Timing iterations : %d (best-of, after identical warmup round)\n", BENCH_ITERATIONS);
-    log_info("  Allocator pool    : %llu MB at %p\n", (unsigned long long)(capacity / MB(1)), base_address);
-    log_info("\n");
+    printf("\n");
+    printf("================================================================\n");
+    printf("  Allocator Benchmark: Custom Allocator vs Glibc malloc\n");
+    printf("================================================================\n");
+    printf("  CPU logical cores : %d\n", cpu_threads);
+    printf("  MT pool threads   : %d (persistent, reused by all MT tests)\n", mt_threads);
+    printf("  Alloc DEBUG mode  : %s\n", ALLOC_BENCH_DEBUG ? "ON (guard pages)" : "OFF (release)");
+    printf("  Timing iterations : %d (best-of, after identical warmup round)\n", BENCH_ITERATIONS);
+    printf("  Allocator pool    : %llu MB at %p\n", (unsigned long long)(capacity / MB(1)), base_address);
+    printf("\n");
 
     // ====================================================================
     //  Single-threaded benchmarks (small/medium)
     // ====================================================================
-    log_info(">>> SINGLE-THREADED BENCHMARKS (small/medium) <<<\n");
+    printf(">>> SINGLE-THREADED BENCHMARKS (small/medium) <<<\n");
 
     bench_st_bulk_alloc_free(64,         BENCH_COUNT(500), BENCH_SEC_ST);
     bench_st_bulk_alloc_free(KB(4),      BENCH_COUNT(500), BENCH_SEC_ST);
@@ -1483,7 +1483,7 @@ int main(void)
     //  Single-threaded LARGE allocation benchmarks (MB-GB sizes)
     //  NOTE: peak live memory per test stays well under the 4 GB pool.
     // ====================================================================
-    log_info("\n>>> SINGLE-THREADED LARGE BENCHMARKS (MB-GB) <<<\n");
+    printf("\n>>> SINGLE-THREADED LARGE BENCHMARKS (MB-GB) <<<\n");
 
     // bulk: alloc all (peak live = count * size), then free all.
     // ORDERED LARGEST-FIRST so freed sections from a big test are reused by
@@ -1512,7 +1512,7 @@ int main(void)
     //  Multi-threaded benchmarks (single persistent thread pool)
     // ====================================================================
     mt_pool_init(mt_threads);
-    log_info("\n>>> MULTI-THREADED BENCHMARKS (%d threads) <<<\n", mt_threads);
+    printf("\n>>> MULTI-THREADED BENCHMARKS (%d threads) <<<\n", mt_threads);
 
     bench_mt_bulk(64,           BENCH_COUNT(500), BENCH_SEC_MT);
     bench_mt_bulk(KB(4),        BENCH_COUNT(500), BENCH_SEC_MT);
@@ -1534,7 +1534,7 @@ int main(void)
     //  total reservation across all 8 pool threads + main stays under the
     //  4 GB shared pool. Largest-first for reuse.
     // ====================================================================
-    log_info("\n>>> MULTI-THREADED LARGE BENCHMARKS (MB-GB) <<<\n");
+    printf("\n>>> MULTI-THREADED LARGE BENCHMARKS (MB-GB) <<<\n");
 
     bench_mt_bulk(MB(64),         2, BENCH_SEC_MT_LARGE); // 8 * 2 * 64 MB = 1.0 GB live
     bench_mt_bulk(MB(16),         8, BENCH_SEC_MT_LARGE); // 8 * 8 * 16 MB = 1.0 GB
@@ -1552,20 +1552,20 @@ int main(void)
     // ====================================================================
     //  Realistic workload
     // ====================================================================
-    log_info("\n>>> REALISTIC WORKLOAD <<<\n");
+    printf("\n>>> REALISTIC WORKLOAD <<<\n");
 
     bench_realistic_frame(BENCH_SEC_REALISTIC);
 
     // ====================================================================
     //  Detailed per-section overview
     // ====================================================================
-    log_info("\n================================================================\n");
-    log_info("  DETAILED OVERVIEW\n");
-    log_info("================================================================\n");
+    printf("\n================================================================\n");
+    printf("  DETAILED OVERVIEW\n");
+    printf("================================================================\n");
 
     print_all_summaries();
 
-    log_info("\n");
+    printf("\n");
     SDL_Quit();
     return(0);
 }
