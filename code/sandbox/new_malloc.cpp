@@ -89,12 +89,12 @@ struct allocator_thread_context_t
 
 struct memory_allocator_t
 {
-    void             *memory;
-    s64               os_page_size;
-    volatile u64      max_capacity;
-    volatile s32      thread_count;
+    void        *memory;
+    s64          os_page_size;
+    volatile u64 max_capacity;
+    volatile u64 next_page_offset;
 
-    volatile  u64     next_page_offset;
+    volatile s32               thread_count;
     allocator_thread_context_t thread_contexts[MAX_THREAD_COUNT];
 };
 
@@ -316,38 +316,46 @@ get_last_page_section(memory_page_t *current_page)
 }
 
 static void
+remove_section_from_tag_array(memory_section_t *section)
+{
+    allocator_thread_context_t *context = allocator.thread_contexts + this_thread_index;
+
+    tag_section_array_t *tag_array = context->tag_array + section->memory_tag;
+    array_view_t<memory_section_t*> view = tag_array->array;
+    s32 index = c_array_find(view, &section);
+    if(index != -1)
+    {
+        c_array_remove(view, index, tag_array->count);
+        --tag_array->count;
+        Assert(tag_array->count >= 0);
+    }
+
+}
+
+static void
 merge_pages(memory_page_t *current_page)
 {
-    current_page->page_size += (current_page->next_page->page_size + sizeof(memory_page_t));
+    memory_page_t *next_page = current_page->next_page;
+
+    Assert(current_page->total_free == current_page->page_size);
+    Assert(next_page->total_free    == next_page->page_size);
+
     memory_section_t *last_section = get_last_page_section(current_page);
+    memory_section_t *next_first   = &next_page->first_section;
 
-    // NOTE(Sleepster): We don't handle the next_section ptr here, so there's a chance
-    // that this next_page->first_section here wraps onto itself. 
-    memory_section_t *next_first = &current_page->next_page->first_section;
+    u64 new_complete_size = next_page->page_size + sizeof(memory_page_t);
 
-    // NOTE(Sleepster): Loop through the next page's sections to find it's last section. Really, this should
-    // probably just be a recursive operation
-#if DEBUG
-    last_section->section_size += ((next_first->section_size + sizeof(memory_section_t)) + allocator.os_page_size);
-#else
-    static_assert(false);
-#endif
-    last_section->next_section  = next_first;
-    if(next_first->next_section == next_first)
-    {
-        next_first->next_section = &current_page->first_section;
-    }
-    else
-    {
-        memory_section_t *this_current = next_first;
-        do {
-            this_current = next_first->next_section;
-        }while(this_current != next_first);
+    current_page->page_size    += new_complete_size;
+    last_section->section_size += new_complete_size;
 
-        this_current->next_section = &current_page->first_section;
-    }
+    last_section->next_section = &current_page->first_section;
+    current_page->first_section.prev_section = last_section;
+    remove_section_from_tag_array(next_first);
 
-    current_page->next_page = current_page->next_page->next_page;
+    current_page->total_free += new_complete_size;
+    current_page->cursor      = last_section;
+
+    current_page->next_page = next_page->next_page;
     if(current_page->next_page != null)
     {
         current_page->next_page->prev_page = current_page;
@@ -459,7 +467,7 @@ alloc_impl(u64 size, s32 tag)
             allocation->ID = DEBUG_SECTION_ID;
             allocation->memory_tag   = tag;
             allocation->section_size = total_allocation_size;
-            allocation->section_base = ((byte*)allocation + sizeof(memory_section_t)); // offset by sizeof(memory_section_t) for the user storage
+            allocation->section_base = (byte*)allocation;
 
             allocation->next_section = valid_section->next_section;
             allocation->prev_section = valid_section;
@@ -472,7 +480,7 @@ alloc_impl(u64 size, s32 tag)
 #if DEBUG
             allocation->user_allocation_size = user_allocation_size;
 #endif
-            result = (void*)allocation->section_base;
+            result = (void*)((byte*)allocation->section_base + sizeof(memory_section_t));
             if(tag != TAG_CLEAR)
             {
                 tag_section_array_t *array = context->tag_array + tag;
@@ -507,13 +515,12 @@ alloc_impl(u64 size, s32 tag)
                 {                            
                     // NOTE(Sleepster): In the event that this page is completely empty, check if the next page is the same
                     // If it is, combine them both
-                    if(current_page->total_free == current_page->page_size)
+                    while((current_page->total_free == current_page->page_size) &&
+                           current_page->next_page &&
+                          (current_page->next_page->total_free == current_page->next_page->page_size) &&
+                          (current_page->page_base + current_page->page_size) == (current_page->next_page->page_base - sizeof(memory_page_t)))
                     {
-                        if((current_page->next_page->total_free == current_page->next_page->page_size) &&
-                          ((current_page->page_base + current_page->page_size) == (current_page->next_page->page_base - sizeof(memory_page_t))))
-                        {
-                            merge_pages(current_page;
-                        }
+                        merge_pages(current_page);
                     }
 
                     memory_section_t *largest_free_section = null;
@@ -623,36 +630,21 @@ free_alloc(void *memory)
     u32 section_tag       = section->memory_tag;
     u64 old_sections_size = section->section_size;
 
-    tag_section_array_t *array = context->tag_array + section->memory_tag;
     // NOTE(Sleepster): Remove the allocation 
-    s32 index = c_array_find(array->array, &section);
-    if(index != -1)
-    {
-        c_array_remove(array->array, index, array->count);
-        --array->count;
-        Assert(array->count >= 0);
-    }
+    remove_section_from_tag_array(section);
 
     // NOTE(Sleepster): We have to set the section base to that of the actual allocation of the section since the
     // current section->section_base points to section_base + sizeof(memory_section_t), making us go over by one header.
     section->memory_tag   = TAG_CLEAR;
     section->section_base = (byte*)section;
 
-    tag_section_array_t *free_list = context->tag_array + section->memory_tag;
-    array_view_t<memory_section_t*> view = free_list->array;
-
     memory_section_t *cursor = section;
     if(section->next_section != section && 
        section->next_section->memory_tag == TAG_CLEAR &&
-      (section->section_base + section->section_size) == section->next_section->section_base)
+       (section->section_base + section->section_size) == section->next_section->section_base)
     {
         memory_section_t *next_section = section->next_section;
-        s32 index = c_array_find(view, &next_section);
-        if(index != -1)
-        {
-            c_array_remove(view, index, free_list->count);
-            --free_list->count;
-        }
+        remove_section_from_tag_array(next_section);
 
         section->section_size += next_section->section_size;
         section->next_section  = next_section->next_section;
@@ -662,15 +654,10 @@ free_alloc(void *memory)
 
     if(section->prev_section != section && 
        section->prev_section->memory_tag == TAG_CLEAR &&
-       section->prev_section->section_base + section->prev_section->section_size == section->section_base)
+      (section->prev_section->section_base + section->prev_section->section_size) == section->section_base)
     {
         memory_section_t *previous_section = section->prev_section;
-        s32 index = c_array_find(view, &previous_section);
-        if(index != -1)
-        {
-            c_array_remove(view, index, free_list->count);
-            --free_list->count;
-        }
+        remove_section_from_tag_array(previous_section);
 
         previous_section->section_size += section->section_size;
         previous_section->next_section  = section->next_section;
@@ -680,6 +667,7 @@ free_alloc(void *memory)
     }
 
     // NOTE(Sleepster): Add to the free list 
+    tag_section_array_t *free_list = context->tag_array + section->memory_tag;
     free_list->array[free_list->count++] = cursor;
 
     section->owner_page->allocation_stats[section_tag] -= old_sections_size;
@@ -707,7 +695,7 @@ free_tagged_allocations(s32 tag)
     memory_section_t *section = array->array[0];
     while(section)
     {
-        void *address = section->section_base;
+        void *address = section->section_base + sizeof(memory_section_t);
         free_alloc(address);
 
         section = array->array[0];

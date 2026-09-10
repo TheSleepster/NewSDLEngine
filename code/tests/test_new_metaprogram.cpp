@@ -124,12 +124,7 @@ int
 main(void)
 {
     c_global_context_init();
-
-#if OS_LINUX 
-    test_manager_t test_manager = {};
-    test_manager_init(&test_manager);
-    test_manager_run_tests(&test_manager);
-#endif
+    test_manager_run_tests();
 
     return(0);
 }
