@@ -14,7 +14,9 @@
 #define DEBUG_SECTION_ID (0xF0C0FFUL)
 #define DEBUG_PAGE_ID    (0x000FF0CC)
 
+#ifndef MAX_MEMORY_SECTIONS
 constexpr u32     MAX_MEMORY_SECTIONS = 1024;
+#endif
 constexpr float32 PROTECTED_ALLOCATION_SIZE_FACTOR = 0.05;
 
 constexpr u64     ALLOCATOR_DEFAULT_PAGE_SECTION_SIZE = MB(10);
@@ -22,7 +24,9 @@ constexpr u64     ALLOCATOR_MIN_UNIQUE_PAGE_SIZE      = MB(10);
 
 struct memory_page_t;
 
-#define DEBUG 1 
+#ifndef DEBUG
+#define DEBUG 1
+#endif
 
 thread_local s32 this_thread_index = -1;
 
@@ -40,7 +44,7 @@ struct memory_section_t
     s32   ID;
     s32   memory_tag;
     u64   section_size;
-#ifdef DEBUG
+#if DEBUG
     // NOTE(Sleepster): Here because in DEBUG mode we must
     // know the offset to the OS protected memory page.
     s64   user_allocation_size;
@@ -315,19 +319,50 @@ get_last_page_section(memory_page_t *current_page)
     return(last_section);
 }
 
+static s32
+tag_array_find(tag_section_array_t *tag_array, memory_section_t *section)
+{
+    s32 result = -1;
+    for(s32 index = 0;
+        index < tag_array->count;
+        ++index)
+    {
+        if(tag_array->array.items[index] == section)
+        {
+            result = index;
+            break;
+        }
+    }
+
+    return(result);
+}
+
+static void
+tag_array_remove_at(tag_section_array_t *tag_array, s32 index)
+{
+    s32 last = tag_array->count - 1;
+    Assert(index >= 0 && index <= last);
+
+    for(s32 this_index = index;
+        this_index < last;
+        ++this_index)
+    {
+        tag_array->array.items[this_index] = tag_array->array.items[this_index + 1];
+    }
+    tag_array->array.items[last] = null;
+    --tag_array->count;
+}
+
 static void
 remove_section_from_tag_array(memory_section_t *section)
 {
     allocator_thread_context_t *context = allocator.thread_contexts + this_thread_index;
 
     tag_section_array_t *tag_array = context->tag_array + section->memory_tag;
-    array_view_t<memory_section_t*> view = tag_array->array;
-    s32 index = c_array_find(view, &section);
+    s32 index = tag_array_find(tag_array, section);
     if(index != -1)
     {
-        c_array_remove(view, index, tag_array->count);
-        --tag_array->count;
-        Assert(tag_array->count >= 0);
+        tag_array_remove_at(tag_array, index);
     }
 
 }
@@ -386,7 +421,7 @@ alloc_impl(u64 size, s32 tag)
     u64 user_allocation_size  = Align((size + sizeof(memory_section_t)), allocator.os_page_size);
     u64 total_allocation_size = user_allocation_size + allocator.os_page_size; 
 #else
-    u64 total_allocation_size = size;
+    u64 total_allocation_size = Align((size + sizeof(memory_section_t)), 16);
 #endif
 
     while(!result) 
@@ -449,13 +484,10 @@ alloc_impl(u64 size, s32 tag)
 
             // NOTE(Sleepster): Remove the item from the free list 
             tag_section_array_t *tag_array = context->tag_array + TAG_CLEAR;
-            array_view_t<memory_section_t*> view = tag_array->array;
-            s32 index = c_array_find(view, &valid_section);
+            s32 index = tag_array_find(tag_array, valid_section);
             if(index != -1)
             {
-                c_array_remove(view, index, tag_array->count);
-                --tag_array->count;
-                Assert(tag_array->count >= 0);
+                tag_array_remove_at(tag_array, index);
             }
 
             // NOTE(Sleepster): The start of the guard page 
