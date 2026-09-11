@@ -323,6 +323,8 @@ get_last_page_section(memory_page_t *current_page)
 // I need to have two arrays for the tags, one sorted by the address position, the other by section size
 //    - Easily be able to just get our next section and coalesce by memory address
 //    - Easily search by the size of memory section
+//
+// We should also sort pages by their address so that it's easier to coalesce pages
 static s32
 tag_array_find(tag_section_array_t *tag_array, memory_section_t *section)
 {
@@ -466,7 +468,10 @@ alloc_impl(u64 size, s32 tag)
 
                 memory_section_t *this_section = current_section;
                 current_section = this_section->prev_section;
-                free_alloc(this_section->section_base);
+
+                // NOTE(Sleepster): We have to do this funky thing here with the offset because if we don't, 
+                // the pointer passed to free is invalid...
+                free_alloc((void*)((byte*)this_section + sizeof(memory_section_t)));
             }
             else
             {
