@@ -319,6 +319,10 @@ get_last_page_section(memory_page_t *current_page)
     return(last_section);
 }
 
+// NOTE(Sleepster): 
+// I need to have two arrays for the tags, one sorted by the address position, the other by section size
+//    - Easily be able to just get our next section and coalesce by memory address
+//    - Easily search by the size of memory section
 static s32
 tag_array_find(tag_section_array_t *tag_array, memory_section_t *section)
 {
@@ -343,12 +347,17 @@ tag_array_remove_at(tag_section_array_t *tag_array, s32 index)
     s32 last = tag_array->count - 1;
     Assert(index >= 0 && index <= last);
 
+#if 0
     for(s32 this_index = index;
         this_index < last;
         ++this_index)
     {
         tag_array->array.items[this_index] = tag_array->array.items[this_index + 1];
     }
+#else
+    memmove(&tag_array->array.items[index], &tag_array->array.items[index + 1], sizeof(memory_section_t) * (last - index));
+#endif
+
     tag_array->array.items[last] = null;
     --tag_array->count;
 }

@@ -1412,9 +1412,9 @@ print_all_summaries(void)
     printf("\n================================================================\n");
     printf("  GRAND TOTAL (all %d tests)\n", g_record_count);
     printf("================================================================\n");
-    printf("  Custom allocator: %12.2f ms total\n", custom_grand);
-    printf("  Glibc malloc    : %12.2f ms total\n", glibc_grand);
-    printf("  Overall ratio   : %6.2fx (glibc/custom; >1 means custom faster)\n",
+    printf("  Custom allocator: %0.2f ms total\n", custom_grand);
+    printf("  Glibc malloc    : %0.2f ms total\n", glibc_grand);
+    printf("  Overall ratio   : %0.2fx (glibc/custom; >1 means custom faster)\n",
            glibc_grand / custom_grand);
     printf("  Total ops       : %lld\n", (long long)ops_grand);
     printf("  Total bytes     : %llu (%.2f GB)\n", (unsigned long long)bytes_grand,
