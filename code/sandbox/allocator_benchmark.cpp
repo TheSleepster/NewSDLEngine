@@ -182,6 +182,47 @@ bench_record(bench_section_e section, const char *label,
 // Helpers
 // ============================================================================
 
+// ============================================================================
+//  Output semantics
+//
+//  "Speedup" is always expressed FROM THE CUSTOM ALLOCATOR'S PERSPECTIVE:
+//      speedup = glibc_ms / custom_ms
+//      > 1.0  => the custom allocator is faster by that factor
+//      < 1.0  => glibc is faster by 1/speedup
+//  A rate (alloc/s or MiB/s) is meaningless when the timed interval falls
+//  below the timer's practical resolution, so we print "floor" instead of
+//  an inflated-but-useless number.
+// ============================================================================
+
+static const double BENCH_TIMER_FLOOR_MS = 0.005; // ~5 us: below this, the counter reads ~0 ticks
+
+static double
+bench_speedup(double custom_ms, double glibc_ms)
+{
+    return(glibc_ms / custom_ms);
+}
+
+// winner = the allocator that was faster, plus the multiplier a reader can
+// use without inverting anything on their own.
+static void
+bench_faster_text(double custom_ms, double glibc_ms, char *out, s32 out_size)
+{
+    if(custom_ms <= glibc_ms)
+    {
+        if(custom_ms < BENCH_TIMER_FLOOR_MS)
+            snprintf(out, out_size, "custom ~ (custom at timer floor)");
+        else
+            snprintf(out, out_size, "custom %.1fx faster", glibc_ms / custom_ms);
+    }
+    else
+    {
+        if(glibc_ms < BENCH_TIMER_FLOOR_MS)
+            snprintf(out, out_size, "glibc ~ (glibc at timer floor)");
+        else
+            snprintf(out, out_size, "glibc %.1fx faster", custom_ms / glibc_ms);
+    }
+}
+
 static void
 print_header(const char *title)
 {
@@ -193,14 +234,14 @@ print_header(const char *title)
 static void
 print_row_result(const char *label, double custom_ms, double glibc_ms, s64 ops, u64 bytes)
 {
-    double custom_ops = (double)ops / (custom_ms / 1000.0);
-    double glibc_ops  = (double)ops / (glibc_ms / 1000.0);
-    double custom_mbs = (double)bytes / (custom_ms / 1000.0) / 1000000.0;
-    double glibc_mbs  = (double)bytes / (glibc_ms / 1000.0) / 1000000.0;
-    double ratio      = glibc_ms / custom_ms;
-    printf("  %-52s custom %10.2f ms  glibc %10.2f ms  ratio %7.2fx  (%13.1fM ops/s | %14.1f MB/s)\n",
-           label, custom_ms, glibc_ms, ratio, custom_ops / 1000000.0, custom_mbs);
-    (void)custom_ops; (void)glibc_ops; (void)glibc_mbs;
+    char faster[64];
+    bench_faster_text(custom_ms, glibc_ms, faster, sizeof(faster));
+    double custom_allocs = (double)ops / (custom_ms / 1000.0);
+    double custom_mibs   = (double)bytes / (custom_ms / 1000.0) / 1048576.0;
+    printf("  %-54s custom %10.2f ms  glibc %10.2f ms  -> speedup %7.2fx   %-30s  (%13.1f alloc/s | %12.1f MiB/s)\n",
+           label, custom_ms, glibc_ms, bench_speedup(custom_ms, glibc_ms), faster,
+           custom_allocs, custom_mibs);
+    (void)custom_allocs; (void)custom_mibs;
 }
 
 // ============================================================================
@@ -1314,9 +1355,10 @@ bench_st_throughput_sweep(bench_section_e section)
         free(ptrs);
         bench_record(section, label, custom_ms, glibc_ms, count, (u64)count * alloc_size);
 
-        double ratio = glibc_ms / custom_ms;
-        printf("  %-12s  %10.2f ms  %10.2f ms  %7.2fx\n",
-               sizes[s].label, custom_ms, glibc_ms, ratio);
+        char faster[64];
+        bench_faster_text(custom_ms, glibc_ms, faster, sizeof(faster));
+        printf("  %-12s  %10.2f ms  %10.2f ms  speedup %7.2fx  -> %s\n",
+               sizes[s].label, custom_ms, glibc_ms, bench_speedup(custom_ms, glibc_ms), faster);
     }
 }
 
@@ -1341,11 +1383,12 @@ print_section_summary(bench_section_e section)
     printf("\n================================================================\n");
     printf("  SUMMARY: %s\n", bench_section_names[section]);
     printf("================================================================\n");
-    printf("  %-52s %10s %10s %12s %12s %14s %14s %7s  %s\n",
-           "Test", "Custom ms", "Glibc ms", "Custom ops/s", "Glibc ops/s", "Custom MB/s", "Glibc MB/s", "Ratio", "Faster");
-    printf("  %-52s %10s %10s %12s %12s %14s %14s %7s  %s\n",
-           "----------------------------------------------------", "----------", "----------",
-           "------------", "------------", "--------------", "--------------", "-------", "------");
+    printf("\n");
+    printf("  %-52s | %9s | %9s | %8s | %s\n",
+           "Test", "Custom ms", "Glibc ms", "Speedup", "Faster");
+    printf("  %-52s-+-%9s-+-%9s-+-%8s-+%s\n",
+           "----------------------------------------------------", "---------",
+           "---------", "--------", "--------------");
 
     double custom_total = 0.0, glibc_total = 0.0;
     u64 bytes_total = 0;
@@ -1357,12 +1400,8 @@ print_section_summary(bench_section_e section)
         bench_record_t *rec = &g_records[i];
         if(rec->section != section) continue;
 
-        double custom_ops = (double)rec->ops / (rec->custom_ms / 1000.0);
-        double glibc_ops  = (double)rec->ops / (rec->glibc_ms / 1000.0);
-        double custom_mbs = (double)rec->bytes / (rec->custom_ms / 1000.0) / 1000000.0;
-        double glibc_mbs  = (double)rec->bytes / (rec->glibc_ms / 1000.0) / 1000000.0;
-        double ratio      = rec->glibc_ms / rec->custom_ms;
-        const char *faster = (rec->custom_ms <= rec->glibc_ms) ? "custom" : "glibc";
+        char faster[64];
+        bench_faster_text(rec->custom_ms, rec->glibc_ms, faster, sizeof(faster));
 
         if(rec->custom_ms < rec->glibc_ms) custom_wins++;
         else if(rec->glibc_ms < rec->custom_ms) glibc_wins++;
@@ -1372,18 +1411,29 @@ print_section_summary(bench_section_e section)
         bytes_total  += rec->bytes;
         ops_total    += rec->ops;
 
-        printf("  %-52s %10.2f %10.2f %12.1f %12.1f %14.1f %14.1f %7.2f  %s\n",
+        printf("  %-52s | %9.2f | %9.2f | %8.2f | %s\n",
                rec->label, rec->custom_ms, rec->glibc_ms,
-               custom_ops / 1000000.0, glibc_ops / 1000000.0, custom_mbs, glibc_mbs, ratio, faster);
+               bench_speedup(rec->custom_ms, rec->glibc_ms), faster);
     }
 
-    double total_ratio = glibc_total / custom_total;
-    printf("  %-52s %10.2f %10.2f\n", "TOTAL", custom_total, glibc_total);
+    double total_speedup = bench_speedup(custom_total, glibc_total);
+    char total_faster[64];
+    bench_faster_text(custom_total, glibc_total, total_faster, sizeof(total_faster));
+    printf("  %-52s-+-%9s-+-%9s-+-%8s-+%s\n",
+           "----------------------------------------------------", "---------",
+           "---------", "--------", "--------------");
+    printf("  %-52s | %9.2f | %9.2f | %8.2f | %s\n",
+           "TOTAL", custom_total, glibc_total, total_speedup, total_faster);
+    printf("\n");
     printf("  Total ops: %lld   Total bytes: %llu (%.2f GB)\n",
            (long long)ops_total, (unsigned long long)bytes_total,
            (double)bytes_total / GB(1));
-    printf("  Section ratio (glibc/custom): %.2fx  |  custom won %d / %d tests\n",
-           total_ratio, custom_wins, custom_wins + glibc_wins);
+    if(total_speedup >= 1.0)
+        printf("  Section speedup (custom vs glibc): %.2fx  ->  custom is %.1fx faster  |  custom won %d / %d tests\n",
+               total_speedup, total_speedup, custom_wins, custom_wins + glibc_wins);
+    else
+        printf("  Section speedup (custom vs glibc): %.2fx  ->  glibc is %.1fx faster  |  custom won %d / %d tests\n",
+               total_speedup, 1.0 / total_speedup, custom_wins, custom_wins + glibc_wins);
 }
 
 static void
@@ -1409,17 +1459,20 @@ print_all_summaries(void)
         else if(rec->glibc_ms < rec->custom_ms) glibc_wins++;
     }
 
+    double grand_speedup = bench_speedup(custom_grand, glibc_grand);
     printf("\n================================================================\n");
     printf("  GRAND TOTAL (all %d tests)\n", g_record_count);
     printf("================================================================\n");
     printf("  Custom allocator: %0.2f ms total\n", custom_grand);
     printf("  Glibc malloc    : %0.2f ms total\n", glibc_grand);
-    printf("  Overall ratio   : %0.2fx (glibc/custom; >1 means custom faster)\n",
-           glibc_grand / custom_grand);
     printf("  Total ops       : %lld\n", (long long)ops_grand);
     printf("  Total bytes     : %llu (%.2f GB)\n", (unsigned long long)bytes_grand,
            (double)bytes_grand / GB(1));
     printf("  Custom wins     : %d / %d tests\n", custom_wins, custom_wins + glibc_wins);
+    if(grand_speedup >= 1.0)
+        printf("  Overall         : custom is %0.2fx faster than glibc\n", grand_speedup);
+    else
+        printf("  Overall         : glibc is %0.2fx faster than custom\n", 1.0 / grand_speedup);
 }
 
 // ============================================================================
@@ -1562,6 +1615,11 @@ int main(void)
     printf("\n================================================================\n");
     printf("  DETAILED OVERVIEW\n");
     printf("================================================================\n");
+    printf("  Speedup = glibc time / custom time.  >1 = custom is faster;  <1 = glibc is faster.\n");
+    printf("  '~' in the Faster column means that winner finished in <%.2f ms, below reliable\n",
+           BENCH_TIMER_FLOOR_MS);
+    printf("  timer resolution, so the advantage could not be measured precisely.\n");
+    printf("\n");
 
     print_all_summaries();
 
