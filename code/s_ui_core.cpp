@@ -90,9 +90,9 @@ ui_state_init(ui_state_t       *ui_state,
     ZeroStruct(*ui_state);
 
     ui_state->ui_events.count = MAX_INPUT_EVENTS;
-    ui_state->widget_arena    = c_arena_create(MB(10));
-    ui_state->polling_arena   = c_arena_create(MB(50));
-    ui_state->persistent_data_arena = c_arena_create(MB(100));
+    ui_state->widget_arena    = c_arena_create(MB(10), ALLOCATOR_TAG_UI);
+    ui_state->polling_arena   = c_arena_create(MB(50), ALLOCATOR_TAG_UI);
+    ui_state->persistent_data_arena = c_arena_create(MB(100), ALLOCATOR_TAG_UI);
     ui_state->widget_states = c_hash_table_create<widget_state_t>(2096, 
                                                                  &ui_state->persistent_data_arena, 
                                                                   widget_hash_table_allocate_impl,

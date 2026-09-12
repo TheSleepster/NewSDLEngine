@@ -16,6 +16,7 @@
 #include <c_dynarray.h>
 #include <c_program_flag_handler.h>
 
+#include <c_heap_allocator.cpp>
 #include <c_global_context.cpp>
 #include <c_file_api.cpp>
 #include <p_platform_data.cpp>
@@ -117,7 +118,7 @@ VISIT_FILES(shader_file_callback)
         c_threadpool_push_work_order(&gc->main_threadpool, [file_manager, filename, fullname]() {
             if(thread_arena.is_initialized == false)
             {
-                thread_arena = c_arena_create(MB(20));
+                thread_arena = c_arena_create(MB(20), ALLOCATOR_TAG_TEMP);
             }
 
             string_t *file_data = c_hash_table_get_element_ptr(&file_manager->loaded_files, filename);
@@ -126,7 +127,7 @@ VISIT_FILES(shader_file_callback)
                 *file_data = c_file_read_entirety(fullname);
             }
 
-            slang_reflector_module_t *module = c_arena_bootstrap_allocate_struct(slang_reflector_module_t, file_arena, MB(1));
+            slang_reflector_module_t *module = c_arena_bootstrap_allocate_struct(slang_reflector_module_t, file_arena, MB(1), ALLOCATOR_TAG_TEMP);
             module->tokenizer   = tokenizer_t{*file_data};
             module->source_file = *file_data;
             module->included_file_IDs = c_arena_push_array(&module->file_arena, u64, MAX_INCLUDED_FILES);
@@ -230,7 +231,7 @@ VISIT_FILES(shader_file_callback)
         c_threadpool_push_work_order(&gc->main_threadpool, [file_manager, filename, fullname]() {
             if(thread_arena.is_initialized == false)
             {
-                thread_arena = c_arena_create(MB(20));
+                thread_arena = c_arena_create(MB(20), ALLOCATOR_TAG_TEMP);
             }
 
             string_t *file_data = c_hash_table_get_element_ptr(&file_manager->loaded_files, filename);

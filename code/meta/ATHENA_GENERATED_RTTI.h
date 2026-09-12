@@ -568,8 +568,8 @@
 	X(TYPE_sys_semaphore_destroy) \
 	X(TYPE_thread_proc_t) \
 	X(TYPE_sys_thread_create) \
-	X(TYPE_sys_thread_wait) \
 	X(TYPE_sys_thread_close_handle) \
+	X(TYPE_sys_thread_wait) \
 	X(TYPE_sys_mutex_create) \
 	X(TYPE_sys_mutex_free) \
 	X(TYPE_sys_mutex_lock) \
@@ -2303,9 +2303,10 @@ struct type_info_procedure_c_arena_create {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[1];
+		type_info_member_t argument_array[2];
 		struct {
 			const type_info_member_t block_size;
+			const type_info_member_t memory_tag;
 		}arguments;
 	};
 };
@@ -2343,11 +2344,12 @@ struct type_info_procedure_c_arena_bootstrap_allocate_struct_ {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[3];
+		type_info_member_t argument_array[4];
 		struct {
 			const type_info_member_t structure_size;
 			const type_info_member_t offset_to_arena;
 			const type_info_member_t block_size;
+			const type_info_member_t memory_tag;
 		}arguments;
 	};
 };
@@ -4210,20 +4212,6 @@ struct type_info_procedure_sys_thread_create {
 	};
 };
 
-struct type_info_procedure_sys_thread_wait {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t semaphore;
-			const type_info_member_t wait_duration_ms;
-		}arguments;
-	};
-};
-
 struct type_info_procedure_sys_thread_close_handle {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -4233,6 +4221,19 @@ struct type_info_procedure_sys_thread_close_handle {
 		type_info_member_t argument_array[1];
 		struct {
 			const type_info_member_t thread_data;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_sys_thread_wait {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t handle;
 		}arguments;
 	};
 };
@@ -9642,8 +9643,8 @@ extern const type_info_procedure_sys_semaphore_release DEFAULT_typedata_procedur
 extern const type_info_procedure_sys_semaphore_destroy DEFAULT_typedata_procedure_sys_semaphore_destroy;
 extern const type_info_t DEFAULT_typedata_thread_proc_t;
 extern const type_info_procedure_sys_thread_create DEFAULT_typedata_procedure_sys_thread_create;
-extern const type_info_procedure_sys_thread_wait DEFAULT_typedata_procedure_sys_thread_wait;
 extern const type_info_procedure_sys_thread_close_handle DEFAULT_typedata_procedure_sys_thread_close_handle;
+extern const type_info_procedure_sys_thread_wait DEFAULT_typedata_procedure_sys_thread_wait;
 extern const type_info_procedure_sys_mutex_create DEFAULT_typedata_procedure_sys_mutex_create;
 extern const type_info_procedure_sys_mutex_free DEFAULT_typedata_procedure_sys_mutex_free;
 extern const type_info_procedure_sys_mutex_lock DEFAULT_typedata_procedure_sys_mutex_lock;
@@ -14079,13 +14080,20 @@ constexpr type_info_procedure_c_arena_create DEFAULT_typedata_procedure_c_arena_
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_c_arena_create,
 	},
-	.argument_count = 1,
+	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_structure_memory_arena_t.type_info,
 	.argument_pointer = DEFAULT_typedata_procedure_c_arena_create.argument_array,
 	.arguments = {
 		.block_size = {
 			.type_info     = &DEFAULT_typedata_u64,
 			.member_name   = "block_size",
+			.parent        = &DEFAULT_typedata_procedure_c_arena_create.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.memory_tag = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "memory_tag",
 			.parent        = &DEFAULT_typedata_procedure_c_arena_create.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
@@ -14143,7 +14151,7 @@ constexpr type_info_procedure_c_arena_bootstrap_allocate_struct_ DEFAULT_typedat
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_c_arena_bootstrap_allocate_struct_,
 	},
-	.argument_count = 3,
+	.argument_count = 4,
 	.return_type    = &DEFAULT_typedata_byte,
 	.argument_pointer = DEFAULT_typedata_procedure_c_arena_bootstrap_allocate_struct_.argument_array,
 	.arguments = {
@@ -14164,6 +14172,13 @@ constexpr type_info_procedure_c_arena_bootstrap_allocate_struct_ DEFAULT_typedat
 		.block_size = {
 			.type_info     = &DEFAULT_typedata_u64,
 			.member_name   = "block_size",
+			.parent        = &DEFAULT_typedata_procedure_c_arena_bootstrap_allocate_struct_.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.memory_tag = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "memory_tag",
 			.parent        = &DEFAULT_typedata_procedure_c_arena_bootstrap_allocate_struct_.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
@@ -18067,32 +18082,6 @@ constexpr type_info_procedure_sys_thread_create DEFAULT_typedata_procedure_sys_t
 		},
 	},
 };
-constexpr type_info_procedure_sys_thread_wait DEFAULT_typedata_procedure_sys_thread_wait = {
-	.type_info = {
-		.type_name = "sys_thread_wait",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_sys_thread_wait,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_sys_thread_wait.argument_array,
-	.arguments = {
-		.semaphore = {
-			.type_info     = &DEFAULT_typedata_structure_sys_semaphore_t.type_info,
-			.member_name   = "semaphore",
-			.parent        = &DEFAULT_typedata_procedure_sys_thread_wait.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.wait_duration_ms = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "wait_duration_ms",
-			.parent        = &DEFAULT_typedata_procedure_sys_thread_wait.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
 constexpr type_info_procedure_sys_thread_close_handle DEFAULT_typedata_procedure_sys_thread_close_handle = {
 	.type_info = {
 		.type_name = "sys_thread_close_handle",
@@ -18107,6 +18096,25 @@ constexpr type_info_procedure_sys_thread_close_handle DEFAULT_typedata_procedure
 			.type_info     = &DEFAULT_typedata_structure_sys_thread_t.type_info,
 			.member_name   = "thread_data",
 			.parent        = &DEFAULT_typedata_procedure_sys_thread_close_handle.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_sys_thread_wait DEFAULT_typedata_procedure_sys_thread_wait = {
+	.type_info = {
+		.type_name = "sys_thread_wait",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_sys_thread_wait,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_s32,
+	.argument_pointer = DEFAULT_typedata_procedure_sys_thread_wait.argument_array,
+	.arguments = {
+		.handle = {
+			.type_info     = &DEFAULT_typedata_structure_sys_thread_t.type_info,
+			.member_name   = "handle",
+			.parent        = &DEFAULT_typedata_procedure_sys_thread_wait.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
@@ -33543,8 +33551,8 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_sys_semaphore_release.type_info,
 	&DEFAULT_typedata_procedure_sys_semaphore_destroy.type_info,
 	&DEFAULT_typedata_procedure_sys_thread_create.type_info,
-	&DEFAULT_typedata_procedure_sys_thread_wait.type_info,
 	&DEFAULT_typedata_procedure_sys_thread_close_handle.type_info,
+	&DEFAULT_typedata_procedure_sys_thread_wait.type_info,
 	&DEFAULT_typedata_procedure_sys_mutex_create.type_info,
 	&DEFAULT_typedata_procedure_sys_mutex_free.type_info,
 	&DEFAULT_typedata_procedure_sys_mutex_lock.type_info,
@@ -35601,6 +35609,7 @@ enum class _log {
 }; // _log
 enum class c_arena_create {
 	block_size,
+	memory_tag,
 }; // c_arena_create
 enum class c_arena_destroy {
 	arena,
@@ -35613,6 +35622,7 @@ enum class c_arena_bootstrap_allocate_struct_ {
 	structure_size,
 	offset_to_arena,
 	block_size,
+	memory_tag,
 }; // c_arena_bootstrap_allocate_struct_
 enum class c_arena_clear_block {
 	arena,
@@ -36045,13 +36055,12 @@ enum class sys_thread_create {
 	user_data,
 	close_handle,
 }; // sys_thread_create
-enum class sys_thread_wait {
-	semaphore,
-	wait_duration_ms,
-}; // sys_thread_wait
 enum class sys_thread_close_handle {
 	thread_data,
 }; // sys_thread_close_handle
+enum class sys_thread_wait {
+	handle,
+}; // sys_thread_wait
 enum class sys_mutex_free {
 	mutex,
 }; // sys_mutex_free

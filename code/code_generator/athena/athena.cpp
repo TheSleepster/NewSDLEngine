@@ -21,6 +21,7 @@
 
 #include <p_platform_data.h>
 
+#include <c_heap_allocator.cpp>
 #include <p_platform_data.cpp>
 #include <c_memory_arena.cpp>
 #include <c_zone_allocator.cpp>
@@ -2756,8 +2757,8 @@ main(int argc, char **argv)
     c_global_context_init();
 
     // NOTE(Sleepster): Thread init 
-    permanent_arena = c_arena_create(MB(10));
-    transient_arena = c_arena_create(MB(10));
+    permanent_arena = c_arena_create(MB(10), ALLOCATOR_TAG_STATIC);
+    transient_arena = c_arena_create(MB(10), ALLOCATOR_TAG_STATIC);
 
     c_dynarray_reserve(&state.filenames,    100);
     c_dynarray_reserve(&state.parser_table, 100);

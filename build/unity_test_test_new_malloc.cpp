@@ -17,4 +17,4 @@
  #include "c_zone_allocator.cpp"
 
 #include "sys_linux.cpp"
-#include "sandbox/arg_parser.cpp"
+#include "tests/test_new_malloc.cpp"

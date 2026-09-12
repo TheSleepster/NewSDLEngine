@@ -13,6 +13,7 @@
 #include <c_base.h>
 #include <c_types.h>
 #include <c_global_context.h>
+#include <c_heap_allocator.h>
 #include <c_intrinsics.h>
 #include <p_platform_data.h>
 #include <c_log.h>
@@ -52,6 +53,7 @@
 #if defined(ENGINE_BUILD)
 // NOTE(Sleepster): Engine 
 #include <c_global_context.cpp>
+#include <c_heap_allocator.cpp>
 #include <c_memory_arena.cpp>
 #include <c_string.cpp>
 #include <c_tokenizer.cpp>

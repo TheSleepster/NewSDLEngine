@@ -51,7 +51,7 @@ void
 string_builder_init(new_string_builder_t *builder, s64 buffer_size)
 {
     Assert(builder->is_initialized == false);
-    builder->arena                     = c_arena_create(MB(10));
+    builder->arena                     = c_arena_create(MB(10), ALLOCATOR_TAG_TEMP);
     builder->builder_buffer_block_size = buffer_size;
     builder->is_initialized            = true;
 
@@ -152,7 +152,7 @@ main(void)
     string_t string = c_file_read_entirety(STR("../code/vk_backend_core.h"));
     string_builder_append_data(&builder, string);
 
-    memory_arena_t arena = c_arena_create(MB(builder.bytes_used));
+    memory_arena_t arena = c_arena_create(MB(builder.bytes_used), ALLOCATOR_TAG_STATIC);
     string_t builder_string = {
         .data  = c_arena_push_array(&arena, byte, builder.bytes_used),
         .count = builder.bytes_used 

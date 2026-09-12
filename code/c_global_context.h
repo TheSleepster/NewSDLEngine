@@ -13,6 +13,7 @@
 #include <c_threadpool.h>
 #include <c_file_watcher.h>
 #include <c_file_api.h>
+#include <c_heap_allocator.h>
 
 typedef struct vec2 vec2_t;
 

@@ -1,0 +1,232 @@
+
+================================================================
+  Allocator Benchmark: Custom Allocator vs Glibc malloc
+================================================================
+  CPU logical cores : 12
+  MT pool threads   : 12 (persistent, reused by all MT tests)
+  Alloc DEBUG mode  : ON (guard pages)
+  Timing iterations : 7 (best-of, after identical warmup round)
+  Allocator pool    : 4096 MB at 0x20000000000
+
+>>> SINGLE-THREADED BENCHMARKS (small/medium) <<<
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (64 B x 500)
+----------------------------------------------------------------
+  Bulk 64 B x 500                                        custom       3.26 ms  glibc       0.01 ms  -> speedup    0.00x   glibc 278.7x faster             (     153461.4 alloc/s |          9.4 MiB/s)
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (4 KB x 500)
+----------------------------------------------------------------
+  Bulk 4 KB x 500                                        custom       3.31 ms  glibc       0.90 ms  -> speedup    0.27x   glibc 3.7x faster               (     151276.0 alloc/s |        590.9 MiB/s)
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (64 KB x 200)
+----------------------------------------------------------------
+  Bulk 64 KB x 200                                       custom       1.24 ms  glibc       0.44 ms  -> speedup    0.36x   glibc 2.8x faster               (     161451.5 alloc/s |      10090.7 MiB/s)
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (1 MB x 100)
+----------------------------------------------------------------
+  Bulk 1 MB x 100                                        custom       0.63 ms  glibc       0.36 ms  -> speedup    0.57x   glibc 1.7x faster               (     159274.5 alloc/s |     159274.5 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Alloc/Free  (size=64 B, count=5000)
+----------------------------------------------------------------
+  Interleaved 64 B x 5000                                custom      23.70 ms  glibc       0.03 ms  -> speedup    0.00x   glibc 694.2x faster             (     211011.3 alloc/s |         12.9 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Alloc/Free  (size=4096 B, count=2000)
+----------------------------------------------------------------
+  Interleaved 4096 B x 2000                              custom       9.53 ms  glibc       0.05 ms  -> speedup    0.00x   glibc 209.9x faster             (     209807.4 alloc/s |        819.6 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Alloc/Free  (size=65536 B, count=500)
+----------------------------------------------------------------
+  Interleaved 65536 B x 500                              custom       2.34 ms  glibc       0.01 ms  -> speedup    0.00x   glibc 202.3x faster             (     214097.1 alloc/s |      13381.1 MiB/s)
+
+----------------------------------------------------------------
+  ST Random Mixed Sizes  (64-4096 B, count=500)
+----------------------------------------------------------------
+  Random 64-4096 B x 500                                 custom       3.27 ms  glibc       0.02 ms  -> speedup    0.01x   glibc 175.1x faster             (     152692.8 alloc/s |        289.2 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Random Sizes  (64-65536 B, count=10000)
+----------------------------------------------------------------
+  Random interleaved 64-65536 B x 10000                  custom      47.68 ms  glibc       0.54 ms  -> speedup    0.01x   glibc 88.2x faster              (     209746.0 alloc/s |       3289.3 MiB/s)
+
+----------------------------------------------------------------
+  ST Alloc-only  (size=64 B, count=500)
+----------------------------------------------------------------
+  Alloc-only 64 B x 500                                  custom       1
+================================================================
+  Allocator Benchmark: Custom Allocator vs Glibc malloc
+================================================================
+  CPU logical cores : 12
+  MT pool threads   : 12 (persistent, reused by all MT tests)
+  Alloc DEBUG mode  : ON (guard pages)
+  Timing iterations : 7 (best-of, after identical warmup round)
+  Allocator pool    : 4096 MB at 0x20000000000
+
+>>> SINGLE-THREADED BENCHMARKS (small/medium) <<<
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (64 B x 500)
+----------------------------------------------------------------
+  Bulk 64 B x 500                                        custom       3.71 ms  glibc       0.01 ms  -> speedup    0.00x   glibc 317.2x faster             (     134919.7 alloc/s |          8.2 MiB/s)
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (4 KB x 500)
+----------------------------------------------------------------
+  Bulk 4 KB x 500                                        custom       3.86 ms  glibc       0.90 ms  -> speedup    0.23x   glibc 4.3x faster               (     129406.5 alloc/s |        505.5 MiB/s)
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (64 KB x 200)
+----------------------------------------------------------------
+  Bulk 64 KB x 200                                       custom       1.38 ms  glibc       0.46 ms  -> speedup    0.33x   glibc 3.0x faster               (     144676.8 alloc/s |       9042.3 MiB/s)
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (1 MB x 100)
+----------------------------------------------------------------
+  Bulk 1 MB x 100                                        custom       0.71 ms  glibc       0.35 ms  -> speedup    0.50x   glibc 2.0x faster               (     140670.1 alloc/s |     140670.1 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Alloc/Free  (size=64 B, count=5000)
+----------------------------------------------------------------
+  Interleaved 64 B x 5000                                custom      24.93 ms  glibc       0.03 ms  -> speedup    0.00x   glibc 731.7x faster             (     200548.5 alloc/s |         12.2 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Alloc/Free  (size=4096 B, count=2000)
+----------------------------------------------------------------
+  Interleaved 4096 B x 2000                              custom       9.79 ms  glibc       0.05 ms  -> speedup    0.00x   glibc 205.8x faster             (     204341.4 alloc/s |        798.2 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Alloc/Free  (size=65536 B, count=500)
+----------------------------------------------------------------
+  Interleaved 65536 B x 500                              custom       2.42 ms  glibc       0.01 ms  -> speedup    0.00x   glibc 209.8x faster             (     206521.1 alloc/s |      12907.6 MiB/s)
+
+----------------------------------------------------------------
+  ST Random Mixed Sizes  (64-4096 B, count=500)
+----------------------------------------------------------------
+  Random 64-4096 B x 500                                 custom       3.57 ms  glibc       0.02 ms  -> speedup    0.01x   glibc 183.0x faster             (     140126.7 alloc/s |        265.4 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Random Sizes  (64-65536 B, count=10000)
+----------------------------------------------------------------
+  Random interleaved 64-65536 B x 10000                  custom      49.95 ms  glibc       0.54 ms  -> speedup    0.01x   glibc 92.9x faster              (     200203.2 alloc/s |       3139.7 MiB/s)
+
+----------------------------------------------------------------
+  ST Alloc-only  (size=64 B, count=500)
+----------------------------------------------------------------
+  Alloc-only 64 B x 500                                  custom       2.03 ms  glibc       0.01 ms  -> speedup    0.00x   glibc 331.0x faster             (     245961.2 alloc/s |         15.0 MiB/s)
+
+----------------------------------------------------------------
+  ST Alloc-only  (size=4 KB, count=500)
+----------------------------------------------------------------
+  Alloc-only 4 KB x 500                                  custom       2.03 ms  glibc       0.01 ms  -> speedup    0.00x   glibc 246.7x faster             (     246700.4 alloc/s |        963.7 MiB/s)
+
+----------------------------------------------------------------
+  ST Alloc-only  (size=64 KB, count=200)
+----------------------------------------------------------------
+  Alloc-only 64 KB x 200                                 custom       0.75 ms  glibc       0.37 ms  -> speedup    0.50x   glibc 2.0x faster               (     265254.5 alloc/s |      16578.4 MiB/s)
+
+----------------------------------------------------------------
+  ST Bucketed Free  (size=64 B, bucket=100, total=20000)
+----------------------------------------------------------------
+  Bucketed 64 B (bucket 100) x 20000                     custom     143.61 ms  glibc       0.45 ms  -> speedup    0.00x   glibc 316.7x faster             (     139264.1 alloc/s |          8.5 MiB/s)
+
+----------------------------------------------------------------
+  ST Tagged Bulk Free  (500 x 3 tags, free by tag)
+----------------------------------------------------------------
+  Tagged bulk free (500 x 3 tags)                        custom      10.98 ms  glibc       0.04 ms  -> speedup    0.00x   glibc 313.5x faster             (     136668.2 alloc/s |          8.3 MiB/s)
+
+----------------------------------------------------------------
+  ST Throughput Sweep (alloc + free, 500 iterations)
+----------------------------------------------------------------
+  16 B                3.63 ms        0.01 ms  speedup    0.00x  -> glibc 321.1x faster
+  64 B                3.68 ms        0.01 ms  speedup    0.00x  -> glibc 312.6x faster
+  256 B               3.90 ms        0.01 ms  speedup    0.00x  -> glibc 303.4x faster
+  1 KB                3.90 ms        0.02 ms  speedup    0.01x  -> glibc 190.6x faster
+  4 KB                3.91 ms        0.02 ms  speedup    0.00x  -> glibc 250.4x faster
+  16 KB               3.91 ms        0.98 ms  speedup    0.25x  -> glibc 4.0x faster
+  64 KB               3.78 ms        1.12 ms  speedup    0.30x  -> glibc 3.4x faster
+  256 KB              3.85 ms        1.61 ms  speedup    0.42x  -> glibc 2.4x faster
+  1 MB                3.87 ms        1.93 ms  speedup    0.50x  -> glibc 2.0x faster
+  Custom allocator pool usage so far: 560 MB / 4096 MB (13.7%)
+
+>>> SINGLE-THREADED LARGE BENCHMARKS (MB-GB) <<<
+
+----------------------------------------------------------------
+  ST Interleaved Alloc/Free  (size=16777216 B, count=500)
+----------------------------------------------------------------
+  Interleaved 16777216 B x 500                           custom       2.24 ms  glibc       0.01 ms  -> speedup    0.01x   glibc 176.3x faster             (     222909.3 alloc/s |    3566548.5 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Alloc/Free  (size=67108864 B, count=200)
+----------------------------------------------------------------
+  Interleaved 67108864 B x 200                           custom       0.88 ms  glibc       1.48 ms  -> speedup    1.68x   custom 1.7x faster              (     226499.0 alloc/s |   14495937.7 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Alloc/Free  (size=268435456 B, count=100)
+----------------------------------------------------------------
+  Interleaved 268435456 B x 100                          custom       0.45 ms  glibc       0.80 ms  -> speedup    1.77x   custom 1.8x faster              (     222477.8 alloc/s |   56954323.1 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Alloc/Free  (size=1073741824 B, count=5)
+----------------------------------------------------------------
+  Interleaved 1073741824 B x 5                           custom       0.02 ms  glibc       0.05 ms  -> speedup    2.31x   custom 2.3x faster              (     230840.3 alloc/s |  236380424.7 MiB/s)
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (256 MB x 4)
+----------------------------------------------------------------
+  Bulk 256 MB x 4                                        custom       0.02 ms  glibc       0.03 ms  -> speedup    1.49x   custom 1.5x faster              (     182556.7 alloc/s |   46734516.9 MiB/s)
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (64 MB x 16)
+----------------------------------------------------------------
+  Bulk 64 MB x 16                                        custom       0.10 ms  glibc       0.13 ms  -> speedup    1.28x   custom 1.3x faster              (     156079.3 alloc/s |    9989074.4 MiB/s)
+
+----------------------------------------------------------------
+  ST Bulk Alloc+Free  (16 MB x 64)
+----------------------------------------------------------------
+  Bulk 16 MB x 64                                        custom       0.43 ms  glibc       0.27 ms  -> speedup    0.62x   glibc 1.6x faster               (     147182.3 alloc/s |    2354916.2 MiB/s)
+
+----------------------------------------------------------------
+  ST Interleaved Random Sizes  (1048576-67108864 B, count=20)
+----------------------------------------------------------------
+  Random interleaved 1048576-67108864 B x 20             custom       0.10 ms  glibc       0.00 ms  -> speedup    0.01x   glibc ~ (glibc at timer floor)  (     204511.5 alloc/s |     207256.9 MiB/s)
+  Custom allocator pool usage so far: 1584 MB / 4096 MB (38.7%)
+
+>>> MULTI-THREADED BENCHMARKS (12 threads) <<<
+
+----------------------------------------------------------------
+  MT Bulk Alloc+Free  (64 B, 12 threads x 500)
+----------------------------------------------------------------
+  MT Bulk 64 B x 500/thr                                 custom      72.34 ms  glibc       0.06 ms  -> speedup    0.00x   glibc 1214.9x faster            (      82941.1 alloc/s |          5.1 MiB/s)
+
+----------------------------------------------------------------
+  MT Bulk Alloc+Free  (4 KB, 12 threads x 500)
+----------------------------------------------------------------
+  MT Bulk 4 KB x 500/thr                                 custom      72.31 ms  glibc       0.05 ms  -> speedup    0.00x   glibc 1594.0x faster            (      82975.3 alloc/s |        324.1 MiB/s)
+
+----------------------------------------------------------------
+  MT Bulk Alloc+Free  (64 KB, 12 threads x 200)
+----------------------------------------------------------------
+  MT Bulk 64 KB x 200/thr                                custom      28.14 ms  glibc       0.03 ms  -> speedup    0.00x   glibc 925.4x faster             (      85291.7 alloc/s |       5330.7 MiB/s)
+
+----------------------------------------------------------------
+  MT Interleaved Alloc/Free  (64 B, 12 threads x 5000)
+----------------------------------------------------------------
+  MT Interleaved 64 B x 5000/thr                         custom     603.10 ms  glibc       0.10 ms  -> speedup    0.00x   glibc 6143.2x faster            (      99486.1 alloc/s |          6.1 MiB/s)
+
+----------------------------------------------------------------
+  MT Interleaved Alloc/Free  (4096 B, 12 threads x 2000)
+----------------------------------------------------------------
+  MT Interleaved 4096 B x 2000/thr                       custom     243.30 ms  glibc       0.19 ms  -> speedup    0.00x   glibc 1257.5x faster            (      98643.0 alloc/s |        385.3 MiB/s)
+
+----------------------------------------------------------------
+  MT Interleaved Alloc/Free  (65536 B, 12 threads x 500)
+----------------------------------------------------------------
+  MT Interleaved 65536 B x 500/thr                       custom      58.81 ms  glibc       0.04 ms  -> speedup    0.00x   glibc 1402.0x faster            (     102019.4 alloc/s |       6376.2 MiB/s)
+
+---------------------------------------

@@ -140,8 +140,8 @@ parser_create(string_t filename, string_t file_data)
     u32 parser_index = AtomicIncrement32(&g_symbol_table.next_parser_index);
     parser_t *parser = g_symbol_table.file_parsers + parser_index;
 
-    parser->arena          = c_arena_create(MB(1));
-    parser->temp_allocator = c_arena_create(MB(2));
+    parser->arena          = c_arena_create(MB(1), ALLOCATOR_TAG_STATIC);
+    parser->temp_allocator = c_arena_create(MB(2), ALLOCATOR_TAG_STATIC);
     parser->filename       = c_string_make_copy(&permanent_arena, filename);
     parser->should_parse   = true;
     

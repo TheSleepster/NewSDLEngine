@@ -5,6 +5,7 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <SDL3/SDL.h>
+#include <c_heap_allocator.h>
 #include <c_file_watcher.h>
 
 file_watcher_t 
@@ -21,7 +22,7 @@ c_file_watcher_create(file_watcher_change_event_t  events_to_monitor,
     result.events_to_monitor = events_to_monitor;
     result.user_data         = user_data;
     result.watch_recursively = recursive;
-    result.watcher_arena     = c_arena_create(MB(10));
+    result.watcher_arena     = c_arena_create(MB(10), ALLOCATOR_TAG_ENGINE);
     result.is_valid          = true;
     sys_file_watcher_init_watch_data(&result.watcher_arena, &result.sys_watch_data);
 

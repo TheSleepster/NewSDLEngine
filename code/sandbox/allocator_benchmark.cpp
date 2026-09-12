@@ -89,14 +89,8 @@
 // Pull in the allocator (release mode, no main)
 // ============================================================================
 
-#if ALLOC_BENCH_DEBUG
-#define DEBUG 1
-#else
-#define DEBUG 0
-#endif
 #define MAIN
 #define MAX_MEMORY_SECTIONS 8192
-#include "sandbox/new_malloc.cpp"
 
 // ============================================================================
 // Timing (SDL performance counters -- works on Linux + Windows)
@@ -254,8 +248,8 @@ print_row_result(const char *label, double custom_ms, double glibc_ms, s64 ops, 
 static void
 st_bulk_work_custom(u64 alloc_size, s64 count, void **ptrs)
 {
-    for(s64 i = 0; i < count; i++) { ptrs[i] = alloc(alloc_size, TAG_STATIC); }
-    for(s64 i = 0; i < count; i++) { free_alloc(ptrs[i]); }
+    for(s64 i = 0; i < count; i++) { ptrs[i] = c_alloc(alloc_size, ALLOCATOR_TAG_STATIC); }
+    for(s64 i = 0; i < count; i++) { c_free_alloc(ptrs[i]); }
 }
 
 static void
@@ -331,8 +325,8 @@ st_interleaved_work_custom(u64 alloc_size, s64 count)
 {
     for(s64 i = 0; i < count; i++)
     {
-        void *p = alloc(alloc_size, TAG_STATIC);
-        free_alloc(p);
+        void *p = c_alloc(alloc_size, ALLOCATOR_TAG_STATIC);
+        c_free_alloc(p);
     }
 }
 
@@ -416,8 +410,8 @@ bench_st_random_mixed(u64 size_min, u64 size_max, s64 count, bench_section_e sec
 
     // untimed warmup: identical workload for both allocators
     {
-        for(s64 i = 0; i < count; i++) { ptrs[i] = alloc(sizes[i], TAG_STATIC); }
-        for(s64 i = 0; i < count; i++) { free_alloc(ptrs[i]); }
+        for(s64 i = 0; i < count; i++) { ptrs[i] = c_alloc(sizes[i], ALLOCATOR_TAG_STATIC); }
+        for(s64 i = 0; i < count; i++) { c_free_alloc(ptrs[i]); }
     }
     {
         for(s64 i = 0; i < count; i++) { ptrs[i] = malloc(sizes[i]); }
@@ -428,8 +422,8 @@ bench_st_random_mixed(u64 size_min, u64 size_max, s64 count, bench_section_e sec
     for(s32 iter = 0; iter < BENCH_ITERATIONS; iter++)
     {
         u64 t0 = timer_now();
-        for(s64 i = 0; i < count; i++) { ptrs[i] = alloc(sizes[i], TAG_STATIC); }
-        for(s64 i = 0; i < count; i++) { free_alloc(ptrs[i]); }
+        for(s64 i = 0; i < count; i++) { ptrs[i] = c_alloc(sizes[i], ALLOCATOR_TAG_STATIC); }
+        for(s64 i = 0; i < count; i++) { c_free_alloc(ptrs[i]); }
         u64 t1 = timer_now();
         double ms = timer_elapsed_ms(t0, t1);
         if(ms < best_custom) best_custom = ms;
@@ -482,8 +476,8 @@ bench_st_random_interleaved(u64 size_min, u64 size_max, s64 count, bench_section
     // untimed warmup
     for(s64 i = 0; i < count; i++)
     {
-        void *p = alloc(sizes[i], TAG_STATIC);
-        free_alloc(p);
+        void *p = c_alloc(sizes[i], ALLOCATOR_TAG_STATIC);
+        c_free_alloc(p);
     }
     for(s64 i = 0; i < count; i++)
     {
@@ -497,8 +491,8 @@ bench_st_random_interleaved(u64 size_min, u64 size_max, s64 count, bench_section
         u64 t0 = timer_now();
         for(s64 i = 0; i < count; i++)
         {
-            void *p = alloc(sizes[i], TAG_STATIC);
-            free_alloc(p);
+            void *p = c_alloc(sizes[i], ALLOCATOR_TAG_STATIC);
+            c_free_alloc(p);
         }
         u64 t1 = timer_now();
         double ms = timer_elapsed_ms(t0, t1);
@@ -554,8 +548,8 @@ bench_st_alloc_only(u64 alloc_size, s64 count, bench_section_e section)
     void **ptrs = (void**)malloc(count * sizeof(void*));
 
     // warmup
-    for(s64 i = 0; i < count; i++) { ptrs[i] = alloc(alloc_size, TAG_STATIC); }
-    for(s64 i = 0; i < count; i++) { free_alloc(ptrs[i]); }
+    for(s64 i = 0; i < count; i++) { ptrs[i] = c_alloc(alloc_size, ALLOCATOR_TAG_STATIC); }
+    for(s64 i = 0; i < count; i++) { c_free_alloc(ptrs[i]); }
     for(s64 i = 0; i < count; i++) { ptrs[i] = malloc(alloc_size); }
     for(s64 i = 0; i < count; i++) { free(ptrs[i]); }
 
@@ -563,9 +557,9 @@ bench_st_alloc_only(u64 alloc_size, s64 count, bench_section_e section)
     for(s32 iter = 0; iter < BENCH_ITERATIONS; iter++)
     {
         u64 t0 = timer_now();
-        for(s64 i = 0; i < count; i++) { ptrs[i] = alloc(alloc_size, TAG_STATIC); }
+        for(s64 i = 0; i < count; i++) { ptrs[i] = c_alloc(alloc_size, ALLOCATOR_TAG_STATIC); }
         u64 t1 = timer_now();
-        for(s64 i = 0; i < count; i++) { free_alloc(ptrs[i]); }
+        for(s64 i = 0; i < count; i++) { c_free_alloc(ptrs[i]); }
         double ms = timer_elapsed_ms(t0, t1);
         if(ms < best_custom) best_custom = ms;
     }
@@ -614,8 +608,8 @@ bench_st_bucketed_free(u64 alloc_size, s64 total_count, s64 bucket_size, bench_s
         {
             s64 this_batch = bucket_size;
             if(allocated + this_batch > total_count) this_batch = total_count - allocated;
-            for(s64 i = 0; i < this_batch; i++) ptrs[i] = alloc(alloc_size, TAG_STATIC);
-            for(s64 i = 0; i < this_batch; i++) free_alloc(ptrs[i]);
+            for(s64 i = 0; i < this_batch; i++) ptrs[i] = c_alloc(alloc_size, ALLOCATOR_TAG_STATIC);
+            for(s64 i = 0; i < this_batch; i++) c_free_alloc(ptrs[i]);
             allocated += this_batch;
         }
     }
@@ -640,8 +634,8 @@ bench_st_bucketed_free(u64 alloc_size, s64 total_count, s64 bucket_size, bench_s
         {
             s64 this_batch = bucket_size;
             if(allocated + this_batch > total_count) this_batch = total_count - allocated;
-            for(s64 i = 0; i < this_batch; i++) ptrs[i] = alloc(alloc_size, TAG_STATIC);
-            for(s64 i = 0; i < this_batch; i++) free_alloc(ptrs[i]);
+            for(s64 i = 0; i < this_batch; i++) ptrs[i] = c_alloc(alloc_size, ALLOCATOR_TAG_STATIC);
+            for(s64 i = 0; i < this_batch; i++) c_free_alloc(ptrs[i]);
             allocated += this_batch;
         }
         u64 t1 = timer_now();
@@ -696,9 +690,9 @@ bench_st_tagged_free(bench_section_e section)
     // warmup
     {
         for(s32 tag = 1; tag < TAG_COUNT; tag++)
-            for(s32 i = 0; i < objects_per_tag; i++) alloc(64, (s32)tag);
+            for(s32 i = 0; i < objects_per_tag; i++) c_alloc(64, (s32)tag);
         for(s32 tag = 1; tag < TAG_COUNT; tag++)
-            free_tagged_allocations((s32)tag);
+            c_free_tagged_allocations((s32)tag);
     }
 
     double best_custom = 1e18;
@@ -706,9 +700,9 @@ bench_st_tagged_free(bench_section_e section)
     {
         u64 t0 = timer_now();
         for(s32 tag = 1; tag < TAG_COUNT; tag++)
-            for(s32 i = 0; i < objects_per_tag; i++) alloc(64, (s32)tag);
+            for(s32 i = 0; i < objects_per_tag; i++) c_alloc(64, (s32)tag);
         for(s32 tag = 1; tag < TAG_COUNT; tag++)
-            free_tagged_allocations((s32)tag);
+            c_free_tagged_allocations((s32)tag);
         u64 t1 = timer_now();
         double ms = timer_elapsed_ms(t0, t1);
         if(ms < best_custom) best_custom = ms;
@@ -872,8 +866,8 @@ mt_bulk_job_fn(void *data)
     mt_bulk_job_t *j = (mt_bulk_job_t*)data;
     if(j->common.use_custom)
     {
-        for(s64 i = 0; i < j->alloc_count; i++) j->ptrs[i] = alloc(j->alloc_size, TAG_STATIC);
-        for(s64 i = 0; i < j->alloc_count; i++) free_alloc(j->ptrs[i]);
+        for(s64 i = 0; i < j->alloc_count; i++) j->ptrs[i] = c_alloc(j->alloc_size, ALLOCATOR_TAG_STATIC);
+        for(s64 i = 0; i < j->alloc_count; i++) c_free_alloc(j->ptrs[i]);
     }
     else
     {
@@ -939,8 +933,8 @@ mt_interleaved_job_fn(void *data)
     {
         for(s64 i = 0; i < j->alloc_count; i++)
         {
-            void *p = alloc(j->alloc_size, TAG_STATIC);
-            free_alloc(p);
+            void *p = c_alloc(j->alloc_size, ALLOCATOR_TAG_STATIC);
+            c_free_alloc(p);
         }
     }
     else
@@ -997,8 +991,8 @@ mt_random_job_fn(void *data)
     mt_random_job_t *j = (mt_random_job_t*)data;
     if(j->common.use_custom)
     {
-        for(s64 i = 0; i < j->alloc_count; i++) j->ptrs[i] = alloc(j->sizes[i], TAG_STATIC);
-        for(s64 i = 0; i < j->alloc_count; i++) free_alloc(j->ptrs[i]);
+        for(s64 i = 0; i < j->alloc_count; i++) j->ptrs[i] = c_alloc(j->sizes[i], ALLOCATOR_TAG_STATIC);
+        for(s64 i = 0; i < j->alloc_count; i++) c_free_alloc(j->ptrs[i]);
     }
     else
     {
@@ -1070,8 +1064,8 @@ mt_random_interleaved_job_fn(void *data)
     {
         for(s64 i = 0; i < j->alloc_count; i++)
         {
-            void *p = alloc(j->sizes[i], TAG_STATIC);
-            free_alloc(p);
+            void *p = c_alloc(j->sizes[i], ALLOCATOR_TAG_STATIC);
+            c_free_alloc(p);
         }
     }
     else
@@ -1151,24 +1145,24 @@ st_realistic_work_custom(s32 frame_iterations)
     for(s32 it = 0; it < frame_iterations; it++)
     {
         void *ent_buf[num_entities];
-        for(s32 i = 0; i < num_entities; i++) ent_buf[i] = alloc(128, TAG_STATIC);
+        for(s32 i = 0; i < num_entities; i++) ent_buf[i] = c_alloc(128, ALLOCATOR_TAG_STATIC);
 
         void *comp_buf[num_components];
-        for(s32 i = 0; i < num_components; i++) comp_buf[i] = alloc(48, TAG_STATIC);
+        for(s32 i = 0; i < num_components; i++) comp_buf[i] = c_alloc(48, ALLOCATOR_TAG_STATIC);
 
-        for(s32 i = 0; i < num_free_some; i++) free_alloc(ent_buf[i]);
+        for(s32 i = 0; i < num_free_some; i++) c_free_alloc(ent_buf[i]);
 
         void *more_buf[num_more_entities];
-        for(s32 i = 0; i < num_more_entities; i++) more_buf[i] = alloc(128, TAG_STATIC);
+        for(s32 i = 0; i < num_more_entities; i++) more_buf[i] = c_alloc(128, ALLOCATOR_TAG_STATIC);
 
         void *str_buf[num_strings];
-        for(s32 i = 0; i < num_strings; i++) str_buf[i] = alloc(32 + (i % 96), TAG_TEMP);
+        for(s32 i = 0; i < num_strings; i++) str_buf[i] = c_alloc(32 + (i % 96), ALLOCATOR_TAG_TEMP);
 
-        for(s32 i = 0; i < num_strings; i++) free_alloc(str_buf[i]);
+        for(s32 i = 0; i < num_strings; i++) c_free_alloc(str_buf[i]);
 
-        for(s32 i = num_free_some; i < num_entities; i++) free_alloc(ent_buf[i]);
-        for(s32 i = 0; i < num_components; i++) free_alloc(comp_buf[i]);
-        for(s32 i = 0; i < num_more_entities; i++) free_alloc(more_buf[i]);
+        for(s32 i = num_free_some; i < num_entities; i++) c_free_alloc(ent_buf[i]);
+        for(s32 i = 0; i < num_components; i++) c_free_alloc(comp_buf[i]);
+        for(s32 i = 0; i < num_more_entities; i++) c_free_alloc(more_buf[i]);
     }
     return(frame_iterations);
 }
@@ -1486,7 +1480,7 @@ int main(void)
     // --- Initialize the custom allocator ---
     void *base_address = (void*)TB(2);
     u64   capacity     = GB(4);
-    memory_allocator_init(base_address, capacity);
+    c_memory_allocator_init(base_address, capacity);
 
     s32 cpu_threads = sys_get_thread_count();
     s32 mt_threads  = cpu_threads;

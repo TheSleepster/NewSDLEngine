@@ -835,11 +835,11 @@ game_main(global_context_t *_global_context)
         gc->game_state->main_ui = c_arena_push_struct(&gc->persistent_arena, ui_state_t);
     }
 
-    game_state_t     *game_state    =  gc->game_state;
-    input_manager_t  *input_manager =  gc->input_manager;
-    asset_manager_t  *asset_manager =  gc->asset_manager;
-    render_state_t   *render_state  = &game_state->render_state;
-    ui_state_t       *main_ui       =  game_state->main_ui;
+    game_state_t    *game_state    =  gc->game_state;
+    input_manager_t *input_manager =  gc->input_manager;
+    asset_manager_t *asset_manager =  gc->asset_manager;
+    render_state_t  *render_state  = &game_state->render_state;
+    ui_state_t      *main_ui       =  game_state->main_ui;
     if(!game_state->is_initialized)
     {
         srand(rdtsc());

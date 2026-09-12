@@ -26,6 +26,7 @@
 
 #include <s_asset_manager.h>
 
+#include <c_heap_allocator.cpp>
 #include <c_global_context.cpp>
 #include <c_zone_allocator.cpp>
 #include <c_memory_arena.cpp>
@@ -153,8 +154,8 @@ main(int arg_count, char **args)
     ZeroStruct(packer_state);
     c_global_context_init();
 
-    packer_state.builder_arena  = c_arena_create(GB(1));
-    packer_state.packages_arena = c_arena_create(GB(6));
+    packer_state.builder_arena  = c_arena_create(GB(1), ALLOCATOR_TAG_STATIC);
+    packer_state.packages_arena = c_arena_create(GB(6), ALLOCATOR_TAG_STATIC);
     c_string_builder_init(&packer_state.builder, MB(500));
     c_string_builder_init(&packer_state.header_builder, GB(6));
 

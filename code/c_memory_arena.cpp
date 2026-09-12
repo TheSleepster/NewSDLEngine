@@ -7,15 +7,20 @@
 #include <c_base.h>
 
 #include <c_memory_arena.h>
+#include <c_heap_allocator.h>
 #include <p_platform_data.h>
 
 memory_arena_t
-c_arena_create(u64 block_size) 
+c_arena_create(u64 block_size, u32 memory_tag) 
 {
     memory_arena_t result = {};
-
-    block_size            = block_size - sizeof(memory_arena_footer_t);
+    block_size = block_size - sizeof(memory_arena_footer_t);
+#if 0
+    (void)memory_tag;
     result.base           = (byte*)sys_allocate_memory(null, block_size);
+#else
+    result.base = (byte*)c_alloc(block_size, memory_tag);
+#endif
     result.used           = 0;
     result.block_size     = block_size;
     result.block_counter += 1;
@@ -29,7 +34,11 @@ void
 c_arena_destroy(memory_arena_t *arena)
 {
     c_arena_reset(arena);
+#if 0
     sys_free_memory(arena->base, arena->block_size + sizeof(memory_arena_footer_t));
+#else
+    c_free_alloc(arena->base);
+#endif
 
     ZeroStruct(*arena);
 }
@@ -69,7 +78,14 @@ c_arena_push_size(memory_arena_t *arena, u64 size_init)
         u64 new_block_size = size > (arena->block_size + sizeof(memory_arena_footer_t)) ? size : arena->block_size;
 
         arena->block_size = new_block_size - sizeof(memory_arena_footer_t);
-        arena->base       = (byte *)sys_allocate_memory(null, new_block_size);
+#if 0
+        arena->base = (byte *)sys_allocate_memory(null, new_block_size);
+#else
+        memory_section_t *section = (memory_section_t*)(arena->base - sizeof(memory_section_t));
+        Assert(section->ID == DEBUG_SECTION_ID);
+
+        arena->base = (byte*)c_alloc(new_block_size, section->memory_tag);
+#endif
         arena->used       = 0;
         arena->block_counter += 1;
 
@@ -87,13 +103,13 @@ c_arena_push_size(memory_arena_t *arena, u64 size_init)
 }
 
 byte*
-c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 block_size)
+c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 block_size, u32 memory_tag)
 {
     Assert(structure_size < block_size);
     byte *result = null;
 
     structure_size = Align16(structure_size);
-    memory_arena_t bootstrap = c_arena_create(block_size);
+    memory_arena_t bootstrap = c_arena_create(block_size, memory_tag);
     result                   = (byte*)c_arena_push_size(&bootstrap, structure_size);
     Assert(result);
 

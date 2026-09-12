@@ -24,7 +24,7 @@ struct really_big_thing_t
 int
 main(void)
 {
-    memory_arena_t arena = c_arena_create(MB(500));
+    memory_arena_t arena = c_arena_create(MB(500), ALLOCATOR_TAG_STATIC);
 
     for(u32 index = 0;
         index < 1000;
@@ -38,7 +38,7 @@ main(void)
         c_arena_end_temporary_memory(&scratch);
     }
 
-    really_big_thing_t *big_thing = c_arena_bootstrap_allocate_struct(really_big_thing_t, thing_arena, MB(800));
+    really_big_thing_t *big_thing = c_arena_bootstrap_allocate_struct(really_big_thing_t, thing_arena, MB(800), ALLOCATOR_TAG_STATIC);
     (void)big_thing;
 
     return(0);

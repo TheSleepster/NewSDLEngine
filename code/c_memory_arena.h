@@ -42,14 +42,14 @@ struct scratch_arena_t
 /*===========================================
   ============ STANDARD ARENAS  =============
   ===========================================*/
-#define c_arena_push_struct(arena, type)                                 (type*)(c_arena_push_size(arena, sizeof(type)))
-#define c_arena_push_array(arena, type, count)                           (type*)(c_arena_push_size(arena, sizeof(type) * count))
-#define c_arena_bootstrap_allocate_struct(type, member, allocation_size) (type*)(c_arena_bootstrap_allocate_struct_(sizeof(type), OffsetOf(type, member), allocation_size))
+#define c_arena_push_struct(arena, type)                                              (type*)(c_arena_push_size(arena, sizeof(type)))
+#define c_arena_push_array(arena, type, count)                                        (type*)(c_arena_push_size(arena, sizeof(type) * count))
+#define c_arena_bootstrap_allocate_struct(type, member, allocation_size, memory_tag ) (type*)(c_arena_bootstrap_allocate_struct_(sizeof(type), OffsetOf(type, member), allocation_size, memory_tag))
 
-memory_arena_t c_arena_create(u64 block_size);
+memory_arena_t c_arena_create(u64 block_size, u32 memory_tag);
 void           c_arena_destroy(memory_arena_t *arena);
 byte*          c_arena_push_size(memory_arena_t *arena, u64 push_size);
-byte*          c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 block_size);
+byte*          c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 block_size, u32 memory_tag);
 void           c_arena_clear_block(memory_arena_t *arena);
 void           c_arena_free_last_block(memory_arena_t *arena);
 

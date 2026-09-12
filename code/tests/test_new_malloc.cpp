@@ -19,7 +19,7 @@ TEST(OneKBAllocations)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        int *allocation = (int*)alloc(KB(1), TAG_STATIC);
+        int *allocation = (int*)c_alloc(KB(1), ALLOCATOR_TAG_STATIC);
         memset(allocation, 5, KB(1));
 
         allocations[index] = allocation;
@@ -33,7 +33,7 @@ TEST(FreeingOneKBAllocations)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        free_alloc(allocations[index]);
+        c_free_alloc(allocations[index]);
     }
     print_allocator_info();
 }
@@ -41,7 +41,7 @@ TEST(FreeingOneKBAllocations)
 TEST(EnsureTagArrayIsEmpty)
 {
     allocator_thread_context_t *context = &allocator.thread_contexts[0];
-    tag_section_array_t static_tag_array = context->tag_array[TAG_STATIC];
+    tag_section_array_t static_tag_array = context->tag_array[ALLOCATOR_TAG_STATIC];
     Assert(static_tag_array.count == 0);
 }
 
@@ -51,13 +51,13 @@ TEST(GroupFreeingTagGroup)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        int *allocation = (int*)alloc(KB(1), TAG_STATIC);
+        int *allocation = (int*)c_alloc(KB(1), ALLOCATOR_TAG_STATIC);
         memset(allocation, 5, KB(1));
     }
     print_allocator_info();
 
     log_trace("Freeing Tags...\n");
-    free_tagged_allocations(TAG_STATIC);
+    c_free_tagged_allocations(ALLOCATOR_TAG_STATIC);
     print_allocator_info();
 }
 
@@ -67,7 +67,7 @@ TEST(Allocation8MBSections)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        int *allocation = (int*)alloc(MB(8), TAG_STATIC);
+        int *allocation = (int*)c_alloc(MB(8), ALLOCATOR_TAG_STATIC);
         memset(allocation, 5, MB(8));
 
         allocations[index] = allocation;
@@ -81,7 +81,7 @@ TEST(Freeing8MBSections)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        free_alloc(allocations[index]);
+        c_free_alloc(allocations[index]);
     }
     print_allocator_info();
 }
@@ -89,7 +89,7 @@ TEST(Freeing8MBSections)
 TEST(EnsureTagArrayIsEmpty2)
 {
     allocator_thread_context_t *context = &allocator.thread_contexts[0];
-    tag_section_array_t static_tag_array = context->tag_array[TAG_STATIC];
+    tag_section_array_t static_tag_array = context->tag_array[ALLOCATOR_TAG_STATIC];
     Assert(static_tag_array.count == 0);
 }
 
@@ -99,7 +99,7 @@ TEST(AllocateCached5MBSections)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        int *allocation = (int*)alloc(MB(5), TAG_CACHE);
+        int *allocation = (int*)c_alloc(MB(5), ALLOCATOR_TAG_CACHE);
         memset(allocation, 5, MB(5));
 
         allocations[index] = allocation;
@@ -112,11 +112,11 @@ TEST(ReclaimCachedMemory)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        int *allocation = (int*)alloc(MB(9), TAG_STATIC);
+        int *allocation = (int*)c_alloc(MB(9), ALLOCATOR_TAG_STATIC);
         allocations[index] = allocation;
     }
 
-    free_tagged_allocations(TAG_CACHE);
+    c_free_tagged_allocations(ALLOCATOR_TAG_CACHE);
 }
 
 TEST(FreeReclaimedMemory)
@@ -125,7 +125,7 @@ TEST(FreeReclaimedMemory)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        free_alloc(allocations[index]);
+        c_free_alloc(allocations[index]);
     }
 
     print_allocator_info();
@@ -137,14 +137,14 @@ TEST(ReallocateLargerPages)
         index < MAX_ALLOCATIONS;
         ++index)
     {
-        alloc(MB(20), TAG_STATIC);
+        c_alloc(MB(20), ALLOCATOR_TAG_STATIC);
     }
 }
 
 int
 main(void)
 {
-    memory_allocator_init(null, GB(3));
+    c_memory_allocator_init(null, GB(3));
     test_manager_run_tests();
 
     return(0);
