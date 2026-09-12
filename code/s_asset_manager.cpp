@@ -534,7 +534,7 @@ s_asset_font_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name
                           0, 
                          &result.font_face))
     {
-        result.font_arena = c_arena_create(MB(100));
+        result.font_arena = c_arena_create(MB(100), ALLOCATOR_TAG_ASSET);
     }
     else
     { 
@@ -919,7 +919,7 @@ s_asset_manager_init(asset_manager_t *asset_manager)
     FT_Init_FreeType(&asset_manager->freetype_handle);
     Expect(asset_manager->freetype_handle != null, "Failure to initialize freetype...\n");
 
-    asset_manager->manager_arena   = c_arena_create(MB(100));
+    asset_manager->manager_arena   = c_arena_create(MB(100), ALLOCATOR_TAG_ASSET);
     asset_manager->asset_allocator = c_za_create(GB(1));
 
     asset_manager->asset_name_to_file = c_hash_table_create<s32>(ASSET_CATALOG_MAX_LOOKUPS, 
@@ -1177,7 +1177,7 @@ initialize_asset_file_contents(asset_manager_t *asset_manager, asset_file_data_t
 
         if(asset_file->init_arena.is_initialized == false)
         {
-            asset_file->init_arena = c_arena_create(MB(500));
+            asset_file->init_arena = c_arena_create(MB(500), ALLOCATOR_TAG_ASSET);
         }
 
         asset_file->is_initialized = true;

@@ -17,6 +17,7 @@ struct input_device_t;
 // NOTE(Sleepster): Game Actions 
 constexpr s32 MAX_GAME_ACTION_BINDINGS = 4;
 constexpr s32 MAX_GAME_ACTION_MAPPINGS = 4;
+constexpr s32 MAX_GAME_ACTIONS         = 24;
 
 enum game_action_mapping_type_t
 {
@@ -233,8 +234,9 @@ struct input_manager_t
     s32                       event_count;
     s32                       connected_device_count;
     s32                       active_device_index;
-    dynarray_t<game_action_t> game_actions;
+    s32                       game_action_count;
 
+    array_t<game_action_t, MAX_GAME_ACTIONS>                 game_actions;
     array_t<input_event_t,  MAX_INPUT_EVENTS>                events;
     array_t<input_device_t, MAX_PHYSICAL_DEVICE_CONNECTIONS> devices;
 };

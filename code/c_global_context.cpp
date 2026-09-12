@@ -18,10 +18,10 @@ c_global_context_init()
     Assert(!gc);
 
     void *DEBUG_base_address = (void*)TB(2);
-    c_memory_allocator_init(DEBUG_base_address, GB(8));
+    c_memory_allocator_init(DEBUG_base_address, GB(16));
 
-    gc = c_arena_bootstrap_allocate_struct(global_context_t, persistent_arena, MB(100), ALLOCATOR_TAG_ENGINE);
-    gc->transient_arena  = c_arena_create(MB(200), ALLOCATOR_TAG_ENGINE);
+    gc = c_arena_bootstrap_allocate_struct(global_context_t, persistent_arena, MB(100), ALLOCATOR_TAG_STATIC);
+    gc->transient_arena  = c_arena_create(MB(200), ALLOCATOR_TAG_STATIC);
     gc->simulation_arena = c_arena_create(MB(200), ALLOCATOR_TAG_ENGINE);
     Assert(gc != null);
 

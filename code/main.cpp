@@ -831,7 +831,7 @@ game_main(global_context_t *_global_context)
     Assert(gc);
     if(!gc->game_state)
     {
-        gc->game_state = c_arena_push_struct(&gc->persistent_arena, game_state_t);
+        gc->game_state          = c_arena_push_struct(&gc->persistent_arena, game_state_t);
         gc->game_state->main_ui = c_arena_push_struct(&gc->persistent_arena, ui_state_t);
     }
 
@@ -846,7 +846,7 @@ game_main(global_context_t *_global_context)
 
         //game_state->controller     = s_im_get_controller_from_active_device(input_manager, game_state->controller);
         game_state->entity_manager = c_arena_push_struct(&gc->persistent_arena, entity_manager_t);
-        game_state->entity_manager->transient_storage = c_arena_create(MB(100));
+        game_state->entity_manager->transient_storage = c_arena_create(MB(100), ALLOCATOR_TAG_GAME);
 
         game_state->gravity = -9.8f;
 
@@ -932,11 +932,25 @@ game_main(global_context_t *_global_context)
                     if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_L))
                     {
                         gc->recording_input = !gc->recording_input;
+                        if(gc->recording_input == false)
+                        {
+                            gc->playing_back_input = true;
+                        }
+                        else
+                        {
+                            gc->playing_back_input = false;
+                        }
                     }
 
                     if(gc->recording_input)
                     {
-                        // ???
+                        c_file_write(gc->input_manager_playback_file, input_manager, sizeof(input_manager));
+                    }
+
+                    if(gc->playing_back_input)
+                    {
+                        // NOTE(Sleepster): Provide a buffer...
+                        //input_manager = c_file_read(gc->input_manager_playback_file, );
                     }
                 }
 

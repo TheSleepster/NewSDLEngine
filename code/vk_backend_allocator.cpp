@@ -101,7 +101,7 @@ vk_allocator_create(vulkan_context_t *vulkan_context, u64 default_block_size)
 {
     vulkan_allocator_t result = {};
     result.default_block_size       =  default_block_size;
-    result.block_allocator          =  c_arena_create(MB(20));
+    result.block_allocator          =  c_arena_create(MB(20), ALLOCATOR_TAG_BACKEND_RENDERER);
     result.device                   =  vulkan_context->device;
     result.cpu_allocation_callbacks =  vulkan_context->cpu_allocation_callbacks;
     result.gpu_info                 = &vulkan_context->gpu;

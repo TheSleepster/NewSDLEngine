@@ -306,10 +306,10 @@ vk_backend_create_instance
 void
 vk_backend_create_instance(vulkan_context_t *vulkan_context)
 {
-    vulkan_context->initialization_arena = c_arena_create(MB(10));
-    vulkan_context->swapchain_arena      = c_arena_create(MB(10));
-    vulkan_context->permanent_arena      = c_arena_create(MB(10));
-    vulkan_context->frame_arena          = c_arena_create(MB(100));
+    vulkan_context->initialization_arena = c_arena_create(MB(10),  ALLOCATOR_TAG_BACKEND_RENDERER);
+    vulkan_context->swapchain_arena      = c_arena_create(MB(10),  ALLOCATOR_TAG_BACKEND_RENDERER);
+    vulkan_context->permanent_arena      = c_arena_create(MB(10),  ALLOCATOR_TAG_BACKEND_RENDERER);
+    vulkan_context->frame_arena          = c_arena_create(MB(100), ALLOCATOR_TAG_BACKEND_RENDERER);
 
 	VkApplicationInfo app_info  = {};
 	app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;

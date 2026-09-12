@@ -722,7 +722,7 @@ vulkan_shader_t
 vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_t shader_source)
 {
     vulkan_shader_t result = {};
-    result.shader_arena = c_arena_create(MB(10));
+    result.shader_arena = c_arena_create(MB(10), ALLOCATOR_TAG_BACKEND_RENDERER);
 
     // NOTE(Sleepster): Create global session if it's invalid 
     if(global_session == nullptr)

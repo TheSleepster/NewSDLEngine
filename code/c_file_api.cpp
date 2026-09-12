@@ -48,7 +48,7 @@ c_file_allocate_file_data(memory_arena_t *arena, zone_allocator_t *zone, za_allo
     void *result = null;
     if(arena  != null) result = c_arena_push_size(arena, allocation_size);
     if(zone   != null) result = c_za_alloc(zone, allocation_size, tag);
-    if(result == null) result = AllocSize(allocation_size);
+    if(result == null) result = c_alloc(allocation_size, ALLOCATOR_TAG_TEMP);
     Assert(result != null);
 
     return(result);

@@ -27,8 +27,8 @@ s_RHI_context_init
 void
 RHI_context_init(RHI_context_t *RHI_context, backend_render_context_t *render_context)
 {
-    RHI_context->RHI_arena       = c_arena_create(MB(100));
-    RHI_context->transient_arena = c_arena_create(MB(100));
+    RHI_context->RHI_arena       = c_arena_create(MB(100), ALLOCATOR_TAG_RHI);
+    RHI_context->transient_arena = c_arena_create(MB(100), ALLOCATOR_TAG_RHI);
 
     RHI_context->command_lists   = c_arena_push_array(&RHI_context->RHI_arena, RHI_command_list_t, RHI_MAX_COMMAND_LISTS);
     RHI_context->constant_buffer_hash = c_hash_table_create<RHI_uniform_constant_buffer_t>(RHI_MAX_CONSTANT_BUFFERS);
@@ -434,8 +434,8 @@ RHI_command_list_init(RHI_command_list_t *list)
 {
     if(list->is_initialized == false)
     {
-        list->transient_arena = c_arena_create(MB(10));
-        list->command_arena   = c_arena_create(MB(30));
+        list->transient_arena = c_arena_create(MB(10), ALLOCATOR_TAG_RHI);
+        list->command_arena   = c_arena_create(MB(30), ALLOCATOR_TAG_RHI);
 
         //list->active_vertex_buffers = c_dynarray_create(render_buffer_t *);
     }

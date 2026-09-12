@@ -638,7 +638,7 @@ c_string_builder_init(string_builder_t *builder, u64 buffer_block_size)
     const u64 padding_bytes = 128;
     const u64 arena_block_size = Align16(buffer_block_size + ((sizeof(string_builder_buffer_t) * 2) + padding_bytes));
 
-    builder->arena                     =  c_arena_create(arena_block_size, ALLOCATOR_TAG_STATIC);
+    builder->arena                     =  c_arena_create(arena_block_size, ALLOCATOR_TAG_TEMP);
     builder->default_buffer_block_size =  buffer_block_size;
     builder->first_buffer              =  c_string_builder_create_and_attach_buffer(builder, buffer_block_size);
     builder->current_buffer            =  builder->first_buffer;

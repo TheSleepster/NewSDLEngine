@@ -52,6 +52,7 @@ typedef struct global_context
 
     file_t            input_manager_playback_file;
     bool8             recording_input;
+    bool8             playing_back_input;
 }global_context_t;
 
 void c_global_context_init();

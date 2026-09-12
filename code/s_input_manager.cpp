@@ -566,8 +566,11 @@ s_im_game_action_create(input_manager_t           *input_manager,
         .action_binding_type = mapping_type,
         .name                = action_name
     };
-    c_dynarray_add(&input_manager->game_actions, &new_action);
-    result = &input_manager->game_actions[input_manager->game_actions.used - 1];
+
+    input_manager->game_actions[input_manager->game_action_count] = new_action;
+
+    result = &input_manager->game_actions[input_manager->game_action_count];
+    ++input_manager->game_action_count;
 
     return(result);
 }
