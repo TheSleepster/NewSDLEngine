@@ -29,10 +29,6 @@ constexpr u64     ALLOCATOR_MIN_UNIQUE_PAGE_SIZE      = MB(10);
 
 struct memory_page_t;
 
-#ifndef DEBUG
-#define DEBUG 1
-#endif
-
 thread_local s32 this_thread_index = -1;
 
 #define MEMORY_ALLOCATOR_TAG_LIST(X) \
@@ -60,7 +56,7 @@ struct memory_section_t
     s32   ID;
     s32   memory_tag;
     u64   section_size;
-#if DEBUG
+#ifndef RELEASE 
     // NOTE(Sleepster): Here because in DEBUG mode we must
     // know the offset to the OS protected memory page.
     s64   user_allocation_size;
@@ -70,6 +66,7 @@ struct memory_section_t
 
     memory_section_t *next_section;
     memory_section_t *prev_section;
+    void             *__Padding;
 };
 
 struct memory_page_t
@@ -118,6 +115,9 @@ struct memory_allocator_t
 
     bool8                      is_initialized;
 };
+
+StaticAssert(sizeof(memory_section_t) % 16 == 0, "Because we use the heading of the allocation as storage for the memory section, it must be 16byte aligned to prevent SSE2 instructions (which require 16byte alignment) from blowing up");
+StaticAssert(sizeof(memory_page_t) % 16 == 0, "Because we use the heading of the allocation as storage for the page section, it must be 16byte aligned to prevent SSE2 instructions (which require 16byte alignment) from blowing up");
 
 void  c_memory_allocator_init(void *base_address, u64 total_allocation);
 

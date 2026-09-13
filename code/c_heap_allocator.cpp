@@ -329,7 +329,7 @@ alloc_impl(u64 size, s32 tag)
     
     allocator_thread_context_t *context = allocator.thread_contexts + this_thread_index;
 
-#if DEBUG
+#ifndef RELEASE
     u64 user_allocation_size  = Align((size + sizeof(memory_section_t)), allocator.os_page_size);
     u64 total_allocation_size = user_allocation_size + allocator.os_page_size; 
 #else
@@ -406,7 +406,7 @@ alloc_impl(u64 size, s32 tag)
             }
 
             // NOTE(Sleepster): The start of the guard page 
-            s64 section_offset = valid_section->section_size - total_allocation_size;
+            s64 section_offset = Align16(valid_section->section_size - total_allocation_size);
             memory_section_t *allocation = valid_section;
             if(section_offset != 0)
             {
@@ -430,7 +430,7 @@ alloc_impl(u64 size, s32 tag)
 
             valid_section->owner_page->allocation_stats[tag]       += total_allocation_size;
             valid_section->owner_page->allocation_stats[ALLOCATOR_TAG_FREE] -= total_allocation_size;
-#if DEBUG
+#ifndef RELEASE
             allocation->user_allocation_size = user_allocation_size;
 #endif
             result = (void*)((byte*)allocation->section_base + sizeof(memory_section_t));
@@ -439,7 +439,7 @@ alloc_impl(u64 size, s32 tag)
                 tag_section_array_t *array = context->tag_array + tag;
                 array->array[array->count++] = allocation;
             }
-#if DEBUG 
+#ifndef RELEASE
             // NOTE(Sleepster): Start of the guard page. 
             void *protected_address = (byte*)allocation + user_allocation_size;
             Assert(sys_set_memory_access_flags(protected_address, allocator.os_page_size, OS_MEMORY_ACCESS_FLAG_NONE));
@@ -571,7 +571,7 @@ c_free_alloc(void *memory)
     Assert(section->ID == DEBUG_SECTION_ID);
     Assert(section->memory_tag != ALLOCATOR_TAG_FREE);
 
-#if DEBUG 
+#ifndef RELEASE
     void *protected_address = (byte*)section + section->user_allocation_size;
     Assert(sys_set_memory_access_flags(protected_address, allocator.os_page_size, OS_MEMORY_ACCESS_FLAG_READ|OS_MEMORY_ACCESS_FLAG_WRITE));
 #endif
