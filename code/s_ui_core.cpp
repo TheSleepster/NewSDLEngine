@@ -1420,7 +1420,7 @@ ui_widget_float_slider_bar(ui_state_t *ui_state, string_t widget_name, u32 bar_w
         ui_widget_seed(ui_state, widget->ID);
         vec2_t slider_box_size = vec2((float32)bar_width * 0.1f, (float32)bar_height * button_scale_factor);
 
-        string_t box_name = c_string_concat(&gc->transient_arena, STR("SLIDER_BOX_"), widget_name);
+        string_t box_name = c_string_concat(&gc->temp_arena, STR("SLIDER_BOX_"), widget_name);
         ui_signal_t slider_button = ui_widget_sized_button(ui_state, 
                                                            box_name, 
                                                            slider_box_size, 
@@ -1577,7 +1577,7 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
         {
             ui_widget_seed(ui_state, widget->ID);
 
-            string_t name = c_string_concat(&gc->transient_arena, STR("TEXT_BOX_CURSOR_"), widget_name);
+            string_t name = c_string_concat(&gc->temp_arena, STR("TEXT_BOX_CURSOR_"), widget_name);
             ui_signal_t signal = ui_widget_rectangle(ui_state, name, vec2(12, size.y), {UI_WIDGET_SIZE_KIND_PIXELS, UI_WIDGET_SIZE_KIND_PIXELS});
 
             widget_t *rect = signal.widget;

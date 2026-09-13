@@ -2497,8 +2497,8 @@ vk_backend_perform_image_blit(vulkan_context_t *vulkan_context,
 internal_api void
 vk_backend_bind_command_list_vertex_buffers(VkCommandBuffer *render_command_buffer, RHI_command_list_t *command_list)
 {
-    VkBuffer *handles     = c_arena_push_array(&gc->transient_arena, VkBuffer,     command_list->vertex_buffer_count);
-    VkDeviceSize *offsets = c_arena_push_array(&gc->transient_arena, VkDeviceSize, command_list->vertex_buffer_count);
+    VkBuffer *handles     = c_arena_push_array(&gc->temp_arena, VkBuffer,     command_list->vertex_buffer_count);
+    VkDeviceSize *offsets = c_arena_push_array(&gc->temp_arena, VkDeviceSize, command_list->vertex_buffer_count);
     for(s32 buffer_index = 0;
         buffer_index < command_list->active_vertex_buffers.used;
         ++buffer_index)

@@ -934,10 +934,13 @@ game_main(global_context_t *_global_context)
                         gc->recording_input = !gc->recording_input;
                         if(gc->recording_input == false)
                         {
+                            c_file_read(&gc->input_manager_playback_file, gc->persistent_arena.base, gc->saved_arena_size); 
                             gc->playing_back_input = true;
                         }
                         else
                         {
+                            gc->saved_arena_size = gc->persistent_arena.used;
+                            c_file_write(&gc->input_manager_playback_file, (byte*)gc->persistent_arena.base, gc->saved_arena_size);
                             gc->playing_back_input = false;
                         }
                     }
@@ -949,11 +952,14 @@ game_main(global_context_t *_global_context)
 
                     if(gc->playing_back_input)
                     {
-                        // NOTE(Sleepster): Provide a buffer...
-                        //input_manager = c_file_read(gc->input_manager_playback_file, );
                         if(!c_file_read(&gc->input_manager_playback_file, (byte*)input_manager, sizeof(input_manager_t)))
                         {
                             gc->input_manager_playback_file.current_read_offset = 0;
+                            c_file_close(&gc->input_manager_playback_file);
+
+                            gc->input_manager_playback_file = c_file_open(STR("../input_manager_playback_file.inpdat"), false);
+                            c_file_read(&gc->input_manager_playback_file, gc->persistent_arena.base, gc->saved_arena_size); 
+                            c_file_read(&gc->input_manager_playback_file, (byte*)input_manager, sizeof(input_manager_t));
                         }
                     }
                 }
@@ -1101,7 +1107,7 @@ game_main(global_context_t *_global_context)
         RHI_buffer_reset(render_state->RHI_context, &render_state->index_buffer);
 
         s_asset_manager_update(asset_manager);
-        c_global_context_reset_transient_arena();
+        c_global_context_reset_temp_arena();
         c_arena_reset(&game_state->entity_manager->transient_storage);
 
 #ifndef RELEASE

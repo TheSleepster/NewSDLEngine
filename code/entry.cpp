@@ -174,9 +174,9 @@ main(void)
             SDL_VERSIONNUM_MICRO(linked));
 
     c_global_context_init();
-    gc->RHI_context    = c_arena_push_struct(&gc->persistent_arena, RHI_context_t);
-    gc->asset_manager  = c_arena_push_struct(&gc->persistent_arena, asset_manager_t);
-    gc->input_manager  = c_arena_push_struct(&gc->persistent_arena, input_manager_t);
+    gc->RHI_context    = c_arena_push_struct(&gc->transient_arena, RHI_context_t);
+    gc->asset_manager  = c_arena_push_struct(&gc->transient_arena, asset_manager_t);
+    gc->input_manager  = c_arena_push_struct(&gc->transient_arena, input_manager_t);
     if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMEPAD))
     {
         s32            display_count = 0;

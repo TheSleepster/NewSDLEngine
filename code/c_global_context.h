@@ -38,12 +38,16 @@ typedef struct global_context
     // NOTE(Sleepster): Persistent allocations... Use sparingly... 
     memory_arena_t    persistent_arena;
     // NOTE(Sleepster): Resets with each call to gc_reset_temporary_data() 
+    memory_arena_t    temp_arena;
+    // NOTE(Sleepster): Resets with every program run 
     memory_arena_t    transient_arena;
     // NOTE(Sleepster): Another arena you can reset whenever... Typically for simulation ticks
     memory_arena_t    simulation_arena;
 
     float64           tick_rate;
     float64           tick_rate_ms;
+
+    s64               saved_arena_size;
 
     // TODO(Sleepster): These should be disabled in release mode... but Athena is causing issues so whatever 
     void             *game_library;
@@ -55,10 +59,11 @@ typedef struct global_context
     bool8             playing_back_input;
 }global_context_t;
 
-void c_global_context_init();
-void c_global_context_reset_transient_arena();
-void c_global_context_reset_persistent_arena();
-void c_global_context_reset_simulation_arena();
+void c_global_context_init(void);
+void c_global_context_reset_transient_arena(void);
+void c_global_context_reset_temp_arena(void);
+void c_global_context_reset_persistent_arena(void);
+void c_global_context_reset_simulation_arena(void);
 
 static global_context_t *gc;
 

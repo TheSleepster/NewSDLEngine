@@ -14,7 +14,8 @@
 file_t
 c_file_open(string_t filepath, bool8 create)
 {
-    file_t result = sys_file_open(filepath, create, false, false);
+    file_t result = sys_file_open(filepath, create, true, false);
+
     result.file_size            = c_file_get_size(&result);
     result.current_read_offset  = 0;
     result.current_write_offset = 0;
@@ -147,6 +148,8 @@ c_file_read(file_t *file, byte *buffer, s32 bytes_to_read)
     Assert(buffer);
     bool8 result = false;
 
+    s64 file_size = sys_file_get_size(file);
+    (void)file_size;
     result = sys_file_read(file, buffer, bytes_to_read, file->current_read_offset);
     if(result)
     {

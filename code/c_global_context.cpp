@@ -13,7 +13,7 @@ vec2_t g_window_size = {};
 bool8 g_running      = false;
 
 void
-c_global_context_init()
+c_global_context_init(void)
 {
     Assert(!gc);
 
@@ -21,6 +21,7 @@ c_global_context_init()
     c_memory_allocator_init(DEBUG_base_address, GB(16));
 
     gc = c_arena_bootstrap_allocate_struct(global_context_t, persistent_arena, MB(100), ALLOCATOR_TAG_STATIC);
+    gc->temp_arena       = c_arena_create(MB(50),  ALLOCATOR_TAG_STATIC);
     gc->transient_arena  = c_arena_create(MB(200), ALLOCATOR_TAG_STATIC);
     gc->simulation_arena = c_arena_create(MB(200), ALLOCATOR_TAG_ENGINE);
     Assert(gc != null);
@@ -33,19 +34,25 @@ c_global_context_init()
 }
 
 void
-c_global_context_reset_transient_arena()
+c_global_context_reset_transient_arena(void)
 {
     c_arena_reset(&gc->transient_arena);
 }
 
 void
-c_global_context_reset_persistent_arena()
+c_global_context_reset_temp_arena(void)
+{
+    c_arena_reset(&gc->temp_arena);
+}
+
+void
+c_global_context_reset_persistent_arena(void)
 {
     c_arena_reset(&gc->persistent_arena);
 }
 
 void
-c_global_context_reset_simulation_arena()
+c_global_context_reset_simulation_arena(void)
 {
     c_arena_reset(&gc->simulation_arena);
 }

@@ -240,7 +240,7 @@ sys_file_get_size(file_t *file_data)
 }
 
 bool8 
-sys_file_read(file_t *file_data, void *memory, u32 bytes_to_read, u32 file_offset)
+sys_file_read(file_t *file_data, void *memory, s64 bytes_to_read, s64 file_offset)
 {
     bool8 result = true;
     
@@ -259,7 +259,7 @@ sys_file_read(file_t *file_data, void *memory, u32 bytes_to_read, u32 file_offse
 
 // NOTE(Sleepster): This is blocking... It will block until the buffer has written everything 
 bool8 
-sys_file_write(file_t *file_data, void *memory, usize bytes_to_write)
+sys_file_write(file_t *file_data, void *memory, s64 bytes_to_write)
 {
     bool8 result = true;
     
@@ -542,9 +542,9 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
         while(true)
         {
             char *name = find_data.cFileName;
-            visit_file_data->filename  = c_string_make_heap(&gc->transient_arena, STR(name));
-            string_t temp_name         = c_string_concat(&gc->transient_arena, directory_name, STR("/"));
-            visit_file_data->fullname  = c_string_concat(&gc->transient_arena, temp_name, visit_file_data->filename);
+            visit_file_data->filename  = c_string_make_heap(&gc->temp_arena, STR(name));
+            string_t temp_name         = c_string_concat(&gc->temp_arena, directory_name, STR("/"));
+            visit_file_data->fullname  = c_string_concat(&gc->temp_arena, temp_name, visit_file_data->filename);
  
             bool8 is_directory = (find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
             if(is_directory)
@@ -554,7 +554,7 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
                     visit_file_data->is_directory = true;
                     if(visit_file_data->recursive)
                     {
-                        byte *data = (byte*)c_arena_push_array(&gc->transient_arena, byte, visit_file_data->fullname.count);
+                        byte *data = (byte*)c_arena_push_array(&gc->temp_arena, byte, visit_file_data->fullname.count);
                         memcpy(data, visit_file_data->fullname.data, visit_file_data->fullname.count);
                         data[visit_file_data->fullname.count] = '\0';
 
@@ -587,16 +587,16 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 {
     Assert(visit_file_data);
 
-    const char *c_string = c_string_null_terminated(&gc->transient_arena, filepath);
+    const char *c_string = c_string_null_terminated(&gc->temp_arena, filepath);
 
     WIN32_FIND_DATA find_data;
     HANDLE file_handle = FindFirstFileEx(c_string, FindExInfoBasic, &find_data, FindExSearchNameMatch, null, FindExSearchNameMatch);
     while(file_handle)
     {
         char *filename = find_data.cFileName;
-        string_t fullpath = c_string_concat(&gc->transient_arena, filepath, STR(filename));
+        string_t fullpath = c_string_concat(&gc->temp_arena, filepath, STR(filename));
 
-        visit_file_data->filename = c_string_make_copy(&gc->transient_arena, STR(filename));
+        visit_file_data->filename = c_string_make_copy(&gc->temp_arena, STR(filename));
         visit_file_data->fullname = fullpath;
 
         bool8 is_directory = ((find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0);
@@ -861,7 +861,7 @@ c_string_utf8_to_wide(string_t input)
     string_t result;
 
     u32 needed = MultiByteToWideChar(CP_UTF8, 0, (char*)input.data, input.count, null, 0);
-    byte *buffer = (byte*)c_arena_push_size(&gc->transient_arena, sizeof(u16) * needed);
+    byte *buffer = (byte*)c_arena_push_size(&gc->temp_arena, sizeof(u16) * needed);
     u32 count = MultiByteToWideChar(CP_UTF8, 0, (char*)input.data, input.count, (LPWSTR)buffer, needed);
 
     result.data  = buffer;
@@ -1016,7 +1016,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                     filename[filename_count] = '\0';
 
                     string_t filename_str = STR(filename);
-                    filename_str = c_string_concat(&gc->transient_arena, watch_data->filename, filename_str);
+                    filename_str = c_string_concat(&gc->temp_arena, watch_data->filename, filename_str);
                     c_string_override_file_separators(&filename_str);
 
                     u32 change_events = 0;
@@ -1042,7 +1042,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                         case FILE_ACTION_RENAMED_OLD_NAME:
                         {
                             change_events |= FWC_EVENT_MOVED|FWC_EVENT_RENAMED;
-                            watch_data->old_filename = c_string_make_copy(&gc->transient_arena, filename_str);
+                            watch_data->old_filename = c_string_make_copy(&gc->temp_arena, filename_str);
                         }break;
                         case FILE_ACTION_RENAMED_NEW_NAME:
                         {
@@ -1090,7 +1090,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
 void*
 sys_create_process(string_t program_path, string_t argument_string)
 {
-    const char **arguments = c_arena_push_array(&gc->transient_arena, const char *, 100);
+    const char **arguments = c_arena_push_array(&gc->temp_arena, const char *, 100);
     arguments[0] = C_STR(program_path);
 
     u32 argument_index = 1;
@@ -1100,7 +1100,7 @@ sys_create_process(string_t program_path, string_t argument_string)
         s32 space_index = c_string_find_first_char_from_left(argument_string, ' ');
         if(space_index != -1)
         {
-            string_t copy = c_string_make_copy(&gc->transient_arena, argument_string);
+            string_t copy = c_string_make_copy(&gc->temp_arena, argument_string);
             copy.count = space_index;
             copy.data[copy.count] = '\0';
 

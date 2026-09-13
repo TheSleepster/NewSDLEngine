@@ -375,11 +375,11 @@ sys_file_get_size(file_t *file_data)
 }
 
 bool8
-sys_file_read(file_t *file_data, void *memory, u32 bytes_to_read, u32 file_offset)
+sys_file_read(file_t *file_data, void *memory, s64 bytes_to_read, s64 file_offset)
 {
     bool8 result = false;
 
-    usize total_bytes_read = 0; 
+    s64 total_bytes_read = 0; 
     if(lseek(file_data->handle, file_offset, SEEK_SET) == -1)
     {
         log_error("Failure to set the file pointer...\n");
@@ -387,9 +387,8 @@ sys_file_read(file_t *file_data, void *memory, u32 bytes_to_read, u32 file_offse
 
     while(total_bytes_read < bytes_to_read)
     {
-        int current_bytes_read = read(file_data->handle, memory, bytes_to_read - total_bytes_read);
-
-        total_bytes_read += (usize)current_bytes_read;
+        int current_bytes_read = read(file_data->handle, (byte*)memory + total_bytes_read, bytes_to_read - total_bytes_read);
+        total_bytes_read += (s64)current_bytes_read;
         if(total_bytes_read == bytes_to_read)
         {
             result = true;
@@ -415,7 +414,7 @@ sys_file_read(file_t *file_data, void *memory, u32 bytes_to_read, u32 file_offse
 }
 
 bool8
-sys_file_write(file_t *file_data, void *memory, usize bytes_to_write)
+sys_file_write(file_t *file_data, void *memory, s64 bytes_to_write)
 {
     bool8 result = false;
     if(lseek(file_data->handle, file_data->current_write_offset, SEEK_SET) == -1)
@@ -423,7 +422,8 @@ sys_file_write(file_t *file_data, void *memory, usize bytes_to_write)
         log_error("Failure to set the file pointer...\n");
     }
     
-    usize bytes_written = write(file_data->handle, memory, bytes_to_write);
+    // TODO(Sleepster): Only 32bit writes allowed, do this in a loop 
+    s64 bytes_written = write(file_data->handle, memory, bytes_to_write);
     if(bytes_written == bytes_to_write)
     {
         result = true;
@@ -500,7 +500,7 @@ sys_file_get_modtime_and_size(string_t filepath)
     file_data_t result = {};
     struct stat file_stats;
 
-    const char *c_filepath = c_string_null_terminated(&gc->transient_arena, filepath);
+    const char *c_filepath = c_string_null_terminated(&gc->temp_arena, filepath);
     if(stat(c_filepath, &file_stats) == 0)
     {
         result.file_size    = file_stats.st_size;
@@ -633,13 +633,13 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
                 continue;
             }
 
-            visit_file_data->filename = c_string_make_heap(&gc->transient_arena, STR(entry->d_name));
+            visit_file_data->filename = c_string_make_heap(&gc->temp_arena, STR(entry->d_name));
             Assert(visit_file_data->filename.data != null);
 
-            string_t temp_name              = c_string_concat(&gc->transient_arena, filepath, STR("/"));
-            temp_name                       = c_string_concat(&gc->transient_arena, temp_name, visit_file_data->filename);
-            visit_file_data->fullname       = c_string_make_copy(&gc->persistent_arena, temp_name);
-            visit_file_data->directory_name = c_string_make_copy(&gc->transient_arena, STR(entry->d_name));
+            string_t temp_name              = c_string_concat(&gc->temp_arena, filepath, STR("/"));
+            temp_name                       = c_string_concat(&gc->temp_arena, temp_name, visit_file_data->filename);
+            visit_file_data->fullname       = c_string_make_copy(&gc->temp_arena, temp_name);
+            visit_file_data->directory_name = c_string_make_copy(&gc->temp_arena, STR(entry->d_name));
 
             bool8 is_directory            = (entry->d_type == DT_DIR);
             visit_file_data->is_directory = is_directory;
@@ -979,7 +979,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                     if(event->mask & IN_DELETE) change_events |= FWC_EVENT_DELETED;
                     if(event->mask & IN_MOVED_FROM)
                     {
-                        directory->old_filename = c_string_make_copy(&gc->transient_arena, fullpath);
+                        directory->old_filename = c_string_make_copy(&gc->temp_arena, fullpath);
                         directory->last_move_cookie = event->cookie;
                     }
                     if(event->mask & IN_MOVED_TO)
@@ -988,8 +988,8 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                         {
                             change_events |= (FWC_EVENT_MOVED | FWC_EVENT_RENAMED);
 
-                            string_t copy_old_fullname = c_string_make_copy(&gc->transient_arena, directory->old_filename);
-                            string_t copy_new_fullname = c_string_make_copy(&gc->transient_arena, filename);
+                            string_t copy_old_fullname = c_string_make_copy(&gc->temp_arena, directory->old_filename);
+                            string_t copy_new_fullname = c_string_make_copy(&gc->temp_arena, filename);
                             c_file_watcher_add_change_event(watcher, copy_new_fullname, copy_old_fullname, change_events);
 
                             directory->last_move_cookie = 0;
@@ -997,7 +997,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                         else
                         {
                             change_events |= FWC_EVENT_ADDED;
-                            string_t copy_new_fullname = c_string_make_copy(&gc->transient_arena, directory->filename);
+                            string_t copy_new_fullname = c_string_make_copy(&gc->temp_arena, directory->filename);
                             c_file_watcher_add_change_event(watcher, copy_new_fullname, STR(""), change_events);
                         }
                     }
@@ -1018,14 +1018,14 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
                         {
                             if(directory->old_filename.data)
                             {
-                                string_t copy_old_fullname = c_string_make_copy(&gc->transient_arena, directory->old_filename);
-                                string_t copy_new_fullname = c_string_make_copy(&gc->transient_arena, filename);
+                                string_t copy_old_fullname = c_string_make_copy(&gc->temp_arena, directory->old_filename);
+                                string_t copy_new_fullname = c_string_make_copy(&gc->temp_arena, filename);
 
                                 c_file_watcher_add_change_event(watcher, copy_new_fullname, copy_old_fullname, change_events);
                             }
                             else
                             {
-                                string_t copy_new_fullname = c_string_make_copy(&gc->transient_arena, filename);
+                                string_t copy_new_fullname = c_string_make_copy(&gc->temp_arena, filename);
                                 c_file_watcher_add_change_event(watcher, copy_new_fullname, STR(""), change_events);
                             }
                         }
@@ -1099,7 +1099,7 @@ sys_get_proc_address(void *library, string_t procedure)
 void*
 sys_create_process(string_t program_path, string_t argument_string)
 {
-    const char **arguments = c_arena_push_array(&gc->transient_arena, const char *, 100);
+    const char **arguments = c_arena_push_array(&gc->temp_arena, const char *, 100);
     arguments[0] = C_STR(program_path);
 
     u32 argument_index = 1;
@@ -1109,7 +1109,7 @@ sys_create_process(string_t program_path, string_t argument_string)
         s32 space_index = c_string_find_first_char_from_left(argument_string, ' ');
         if(space_index != -1)
         {
-            string_t copy = c_string_make_copy(&gc->transient_arena, argument_string);
+            string_t copy = c_string_make_copy(&gc->temp_arena, argument_string);
             copy.count = space_index;
             copy.data[copy.count] = '\0';
 

@@ -205,7 +205,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
             new_device.gamepad_data.stick_deadzone = INPUT_MANAGER_GAMEPAD_DEFAULT_DEADZONE;
 
             input_manager->devices[input_manager->connected_device_count++] = new_device;
-            log_info("Controller '%s' connected...\n", SDL_GetGamepadName(new_device.gamepad_data.handle));
+            log_info("Controll er '%s' connected...\n", SDL_GetGamepadName(new_device.gamepad_data.handle));
         }break;
         case SDL_EVENT_GAMEPAD_REMOVED:
         {

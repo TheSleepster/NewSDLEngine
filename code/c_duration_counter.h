@@ -26,4 +26,3 @@ bool8 c_duration_counter_advance(duration_counter_t *counter, u64 advance_ms);
 void  c_duration_counter_reset(duration_counter_t *counter);
 
 #endif // C_DURATION_COUNTER_H
-
