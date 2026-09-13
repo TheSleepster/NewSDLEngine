@@ -276,12 +276,11 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
 
     slot->ID  = name_hash;
     archetype.ID = name_hash;
-    slot->package_entry->asset_data = c_file_read_from_offset(&slot->owner_asset_file, 
-                                                              slot->package_entry->asset_data.count,
-                                                              slot->package_entry->data_offset, 
-                                                              null, 
-                                                              asset_manager->asset_allocator, 
-                                                              ZA_TAG_STATIC);
+
+    byte *buffer = c_za_alloc(asset_manager->asset_allocator, slot->package_entry->asset_data.count, ZA_TAG_STATIC);
+    slot->package_entry->asset_data.data = buffer;
+
+    c_file_read_from_offset(&slot->owner_asset_file, slot->package_entry->data_offset, buffer, slot->package_entry->asset_data.count);
     string_t material_data = slot->package_entry->asset_data;
 
     tokenizer_t tokenizer = {};
@@ -802,19 +801,17 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_slot_t *sl
     Assert(slot->slot_state == ASLS_LoadQueued);
     string_t asset_data = {};
     
-
     // TODO(Sleepster): Only load from the asset packages in release 
     asset_file_data_t *asset_file = asset_manager->asset_files + slot->owner_asset_file_index;
     file_data_t package_file_info = c_file_get_file_system_info(asset_file->file_info.filepath);
     file_data_t asset_file_info   = c_file_get_file_system_info(slot->package_entry->fullpath);
     if(package_file_info.last_modtime > asset_file_info.last_modtime)
     {
-        asset_data = c_file_read_from_offset(&slot->owner_asset_file, 
-                                             slot->package_entry->asset_data.count,
-                                             slot->package_entry->data_offset, 
-                                             null, 
-                                             asset_manager->asset_allocator, 
-                                             ZA_TAG_STATIC);
+        byte *buffer = c_za_alloc(asset_manager->asset_allocator, slot->package_entry->asset_data.count, ZA_TAG_STATIC);
+        asset_data.data  = buffer;
+        asset_data.count = slot->package_entry->asset_data.count;
+
+        c_file_read_from_offset(&slot->owner_asset_file, slot->package_entry->data_offset, buffer, slot->package_entry->asset_data.count);
         log_info("Asset data for asset '%.*s' loaded from the asset package file...\n", fprint_string(slot->package_entry->filename));
 
         asset_file_data_t *source_asset_file = asset_manager->asset_files + slot->owner_asset_file_index;
@@ -822,15 +819,23 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_slot_t *sl
     }
     else
     {
-        asset_data = c_file_read_entirety(slot->package_entry->fullpath, 
-                                          null, 
-                                          asset_manager->asset_allocator, 
-                                          ZA_TAG_STATIC);
+        file_t file = c_file_open(slot->package_entry->fullpath, false);
+        defer(c_file_close(&file));
+
+        byte *buffer = c_za_alloc(asset_manager->asset_allocator, slot->package_entry->asset_data.count, ZA_TAG_STATIC);
+        asset_data = {
+            .data  = buffer,
+            .count = slot->package_entry->asset_data.count 
+        };
+
+        c_file_read_entirety(&file, 
+                             buffer, 
+                             slot->package_entry->asset_data.count);
         log_info("Asset data for asset '%.*s' loaded from it's local filepath...\n", fprint_string(slot->package_entry->filename));
     }
 
     Assert(asset_data.data != null && asset_data.count > 0);
-     slot->package_entry->asset_data = asset_data;
+    slot->package_entry->asset_data = asset_data;
     switch(slot->type)
     {
         case AT_Bitmap:
@@ -1119,19 +1124,34 @@ asset_file_load_packages(asset_manager_t *asset_manager, asset_file_data_t *asse
     {
         u64 data_offset = current_file_offset + sizeof(jfd_package_chunk_header_t);
         jfd_package_entry_t *entry = asset_file->package_entries + entry_index;
-        entry->entry_header = (jfd_package_chunk_header_t*)(c_file_read_from_offset(file_handle, 
-                                                                                    sizeof(jfd_package_chunk_header_t), 
-                                                                                    current_file_offset, 
-                                                                                    &asset_file->init_arena).data);
+
+        entry->entry_header = c_arena_push_struct(&asset_file->init_arena, jfd_package_chunk_header_t);
+        c_file_read_from_offset(file_handle, 
+                                current_file_offset, 
+                                (byte*)entry->entry_header,
+                                sizeof(jfd_package_chunk_header_t));
+
         Assert(entry->entry_header->magic_value == ASSET_FILE_CHUNK_MAGIC);
-        entry->filename = c_file_read_from_offset(file_handle, 
-                                                  entry->entry_header->filename_size, 
-                                                  data_offset, 
-                                                  &asset_file->init_arena);
-        entry->fullpath = c_file_read_from_offset(file_handle,
-                                                  entry->entry_header->fullpath_size,
-                                                  data_offset + entry->filename.count,
-                                                  &asset_file->init_arena);
+        byte *filename_buffer = c_arena_push_array(&asset_file->init_arena, byte, entry->entry_header->filename_size);
+        byte *fullpath_buffer = c_arena_push_array(&asset_file->init_arena, byte, entry->entry_header->fullpath_size);
+
+        c_file_read_from_offset(file_handle, 
+                                data_offset, 
+                                filename_buffer, 
+                                entry->entry_header->filename_size);
+        entry->filename = {
+            .data = filename_buffer,
+            .count = entry->entry_header->filename_size
+        };
+
+        c_file_read_from_offset(file_handle,
+                                data_offset + entry->filename.count,
+                                fullpath_buffer,
+                                entry->entry_header->fullpath_size);
+        entry->fullpath = {
+            .data  = fullpath_buffer,
+            .count = entry->entry_header->fullpath_size
+        };
 
         entry->asset_data.count = entry->entry_header->entry_data_size;
         entry->data_offset      = data_offset + (entry->filename.count + entry->fullpath.count);
@@ -1183,7 +1203,8 @@ initialize_asset_file_contents(asset_manager_t *asset_manager, asset_file_data_t
         asset_file->is_initialized = true;
         asset_file->ID             = asset_manager->loaded_file_count;
 
-        jfd_file_header_t *header = (jfd_file_header_t*)(c_file_read(file_handle, sizeof(jfd_file_header_t), &asset_file->init_arena).data);
+        jfd_file_header_t *header = c_arena_push_struct(&asset_file->init_arena, jfd_file_header_t);
+        c_file_read(file_handle, (byte*)header, sizeof(jfd_file_header_t));
         Assert(header->magic_value == ASSET_FILE_HEADER_MAGIC);
 
         asset_file->header          = header;

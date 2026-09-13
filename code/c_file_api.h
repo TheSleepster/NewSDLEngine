@@ -61,15 +61,15 @@ typedef enum file_extension {
 typedef struct file
 {
     sys_handle_t handle;
-    string_t    file_name;
-    string_t    filepath;
+    string_t     file_name;
+    string_t     filepath;
 
-    u64         file_size;
-    u64         current_read_offset;
-    u64         current_write_offset;
+    u64          file_size;
+    u64          current_read_offset;
+    u64          current_write_offset;
 
-    bool8       overlapping;
-    bool8       for_writing;
+    bool8        overlapping;
+    bool8        for_writing;
 }file_t;
 
 typedef struct mapped_file
@@ -136,10 +136,17 @@ bool8             c_file_close(file_t *file);
 bool8             c_file_copy(string_t old_path, string_t new_path);
 
 
+#if 0
 string_t          c_file_read(file_t *file_data, u32 bytes_to_read, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
 string_t          c_file_read_entirety(string_t filepath, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
 string_t          c_file_read_from_offset(file_t *file_data, u32 bytes_to_read, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
 string_t          c_file_read_to_end(file_t *file_data, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
+#else
+bool8 c_file_read(file_t *file, byte *buffer, s32 bytes_to_read);
+bool8 c_file_read_from_offset(file_t *file, s32 file_offset, byte *buffer, s32 bytes_to_read);
+bool8 c_file_read_to_end(file_t *file, s32 offset, byte *buffer, s32 bytes_to_read);
+bool8 c_file_read_entirety(file_t *file, byte *buffer, s32 buffer_size);
+#endif
 
 
 bool8             c_file_open_and_write(string_t filepath, void *data, s64 bytes_to_write, bool8 overwrite);

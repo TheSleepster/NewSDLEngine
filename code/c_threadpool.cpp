@@ -45,11 +45,7 @@ c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocato
         ZeroStruct(*thread);
 
         thread_allocator_t *allocator = &thread->allocator;
-#if 0
         allocator->buffer  = (byte*)sys_allocate_memory(null, thread_allocator_size);
-#else
-        allocator->buffer  = (byte*)c_alloc(thread_allocator_size, ALLOCATOR_TAG_STATIC);
-#endif
         allocator->size    = thread_allocator_size;
 
         thread->is_started = false;
@@ -144,11 +140,10 @@ thread_pop_work_order(worker_thread_t *thread)
 
     u32 current_head = AtomicLoad(&thread->work_avaliable.head);
     u32 current_tail = AtomicLoad(&thread->work_avaliable.tail);
-
-    if(current_head != current_tail)
+    if(current_tail != current_head )
     {
         u32 last_head = (current_head - 1) % MAX_WORK_ORDERS;
-        u32 next_entry_todo = AtomicCompareExchange32(&thread->work_avaliable.head,
+        u32 next_entry_todo = AtomicCompareExchange32(&thread->work_avaliable.tail,
                                                       last_head,
                                                       current_head);
         if(next_entry_todo == current_head)

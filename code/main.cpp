@@ -906,7 +906,7 @@ game_main(global_context_t *_global_context)
             handle_debug_ui_menu(main_ui, render_state->RHI_context, &player_sprite);
         }
 
-        // NOTE(Sleepster): Simulate loop 
+        // NOTE(Sleepster):} Simulate loop 
         if(delta_time >= (gc->tick_rate * 2.0f))
         {
             delta_time = gc->tick_rate * 2.0f;
@@ -944,13 +944,17 @@ game_main(global_context_t *_global_context)
 
                     if(gc->recording_input)
                     {
-                        c_file_write(gc->input_manager_playback_file, input_manager, sizeof(input_manager));
+                        c_file_write(&gc->input_manager_playback_file, (byte*)input_manager, sizeof(input_manager_t));
                     }
 
                     if(gc->playing_back_input)
                     {
                         // NOTE(Sleepster): Provide a buffer...
                         //input_manager = c_file_read(gc->input_manager_playback_file, );
+                        if(!c_file_read(&gc->input_manager_playback_file, (byte*)input_manager, sizeof(input_manager_t)))
+                        {
+                            gc->input_manager_playback_file.current_read_offset = 0;
+                        }
                     }
                 }
 

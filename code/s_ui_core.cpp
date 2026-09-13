@@ -175,6 +175,8 @@ ui_state_poll_input_events(ui_state_t *ui_state)
 {
     if(ui_state->frame_begun)
     {
+        ui_state->ui_controller = s_im_get_controller_from_active_device(ui_state->input_manager, ui_state->ui_controller);
+
         input_controller_t *controller = ui_state->ui_controller;
         if(controller)
         {

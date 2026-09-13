@@ -1210,17 +1210,35 @@ consolidate_AST_types(void)
 internal_api void
 parse_single_file(string_t filename)
 {
-    string_t file_data = c_file_read_entirety(filename);
-    parser_t *parser   = parser_create(filename, file_data); 
+    file_t file_handle = c_file_open(filename, false);
+    defer(c_file_close(&file_handle));
+    
+    s32   file_size = c_file_get_size(&file_handle);
+    byte *buffer    = (byte*)c_alloc(file_size, ALLOCATOR_TAG_TEMP);
 
-    record_file_macros(parser);
-    record_file_constants(parser);
-    consolidate_macro_tables();
+    bool8 success = c_file_read_entirety(&file_handle, buffer, file_size);
+    if(success)
+    {
+        string_t string_file_data = {
+            .data = buffer,
+            .count = file_size,
+        };
 
-    build_file_AST(parser);
-    consolidate_AST_nodes();
-    deduce_AST_node_type_data();
-    consolidate_AST_types();
+        parser_t *parser = parser_create(filename, string_file_data); 
+
+        record_file_macros(parser);
+        record_file_constants(parser);
+        consolidate_macro_tables();
+
+        build_file_AST(parser);
+        consolidate_AST_nodes();
+        deduce_AST_node_type_data();
+        consolidate_AST_types();
+    }
+    else
+    {
+        log_error("Failure to begin parsing of file '%.*s'...\n", fprint_string(filename));
+    }
 }
 
 VISIT_FILES(gather_files_in_directory)
@@ -1257,7 +1275,18 @@ parse_directory_type_data(void)
         ++iterator)
     {
         string_t filename = state.filenames[iterator];
-        string_t filedata = c_file_read_entirety(filename);
+
+        file_t file = c_file_open(filename, false);
+        Assert(file.handle);
+
+        defer(c_file_close(&file));
+        s32 file_size = c_file_get_size(&file); 
+        byte *buffer  = (byte*)c_alloc(file_size, ALLOCATOR_TAG_STATIC);
+        string_t filedata = {
+            .data  = buffer,
+            .count = file_size
+        };
+        c_file_read_entirety(&file, buffer, file_size);
 
         parser_t *parser = parser_create(filename, filedata);
         c_dynarray_add(&state.parser_table, &parser);

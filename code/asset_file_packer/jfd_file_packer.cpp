@@ -131,10 +131,20 @@ VISIT_FILES(gather_all_asset_file_entries)
         ZeroStruct(*entry);
 
         file_data_t file_info = c_file_get_file_system_info(filepath);
+        file_t file = c_file_open(filepath, false);
+        defer(c_file_close(&file));
+
+        s32 file_size = c_file_get_size(&file);
+        byte *buffer  = c_arena_push_size(&packer_state.packages_arena, file_size);
+        entry->asset_data = {
+            .data  = buffer,
+            .count = file_size
+        };
+
+        c_file_read_entirety(&file, buffer, file_size);
 
         entry->filename   = c_string_make_copy(&packer_state.packages_arena, filename_no_ext);
         entry->fullpath   = c_string_make_copy(&packer_state.packages_arena, filepath);
-        entry->asset_data = c_file_read_entirety(filepath, &packer_state.packages_arena);
         entry->type       = type;
         entry->timestamp  = file_info.last_modtime;
         if(entry->asset_data.data == null)

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make -j12 COMPILER=clang++ SILENT=@
+make -j12 COMPILER=clang++ -B SILENT=@

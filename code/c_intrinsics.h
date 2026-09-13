@@ -21,10 +21,9 @@
     #define restrict __restrict
 
     #if ARCH_X64
-        #include <emmintrin.h>
-        #include <xmmintrin.h>
-        #include <immintrin.h>
-        #include <x86intrin.h>
+// SIMD
+#include <emmintrin.h>
+// SIMD
 
         // NOTE(Sleepster): For both Windows and GCC their true inline variants make us explode...
         // when trying to use DLL hot-reloading

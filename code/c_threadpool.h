@@ -144,6 +144,7 @@ c_threadpool_push_work_order(worker_thread_t *thread, LambdaType lambda, work_co
 
     Assert(data != null);
     memcpy(data, &lambda, sizeof(LambdaType));
+    Assert(thread->work_avaliable.work_orders);
 
     new_work_order.data     = data;
     new_work_order.function = invoke<LambdaType>;

@@ -41,13 +41,13 @@ typedef struct jfd_file_header
 
 typedef struct jfd_package_chunk_header
 {
-    u32      magic_value;
-    u32      total_entry_size;
-    u32      asset_type; 
-    u32      filename_size;
-    u32      fullpath_size;
-    u32      entry_data_size;
-    u64      modtime;
+    u32 magic_value;
+    u32 total_entry_size;
+    u32 asset_type; 
+    u32 filename_size;
+    u32 fullpath_size;
+    u32 entry_data_size;
+    u64 modtime;
 }jfd_package_chunk_header_t;
 
 typedef struct jfd_chunk_data

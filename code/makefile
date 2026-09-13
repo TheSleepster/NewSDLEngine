@@ -357,7 +357,7 @@ $(TEST_EXES): $(BUILD_DIR)/%$(EXE_EXT): $(CODE_DIR)/tests/%.cpp $(wildcard $(COD
 
 $(BUILD_DIR)/shader_reflector$(HOST_EXE_EXT): $(CODE_DIR)/code_generator/slang_reflector.cpp | $(BUILD_DIR)
 	@echo "[BUILDING SHADER REFLECTOR]"
-	$(SILENT)$(HOST_CXX) $(COMMON_INCLUDE_PATHS) $< -O3 $(HOST_CXX_FLAGS) $(DEP_ARGS) $(HOST_LINKER_FLAGS) -o $@
+	$(SILENT)$(HOST_CXX) $(COMMON_INCLUDE_PATHS) $< -g -O0 $(HOST_CXX_FLAGS) $(DEP_ARGS) $(HOST_LINKER_FLAGS) -o $@
 
 $(BUILD_DIR)/shader_stamp: $(BUILD_DIR)/shader_reflector$(HOST_EXE_EXT) $(SHADERS)
 	@echo "[RUNNING SHADER REFLECTOR]"
@@ -402,13 +402,13 @@ $(BUILD_DIR)/sandbox_%$(EXE_EXT): $(CODE_DIR)/sandbox/%.cpp $(C_FILES) | $(BUILD
 # ------------------------------------------------------------------------------
 $(BUILD_DIR)/game_DEBUG$(EXE_EXT): $(CODE_DIR)/build.cpp $(RTTI_HEADER) | $(BUILD_DIR)
 	@echo "[BUILDING GAME ENGINE]"
-	$(SILENT) $(CXX) -fuse-ld=lld $(CXX_TARGET_FLAGS) $(ENGINE_MACROS) $(COMMON_INCLUDE_PATHS) $< $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(HOST_EXPORT_FLAGS) $(call get_pdb_flags,$@) -o $@.tmp
+	$(SILENT) $(CXX) $(CXX_TARGET_FLAGS) $(ENGINE_MACROS) $(COMMON_INCLUDE_PATHS) $< $(ACTIVE_CXX_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(HOST_EXPORT_FLAGS) $(call get_pdb_flags,$@) -o $@.tmp
 	$(SILENT) mv -f $@.tmp $@
 	$(SILENT) $(call move_pdb,$@)
 
 $(BUILD_DIR)/game_DLL$(DLL_EXT): $(CODE_DIR)/build.cpp $(RTTI_HEADER) $(GAME_DLL_DEPS) | $(BUILD_DIR)
 	@echo "[BUILDING GAME DLL]"
-	$(SILENT) $(CXX) -fuse-ld=lld $(CXX_TARGET_FLAGS) -DGAME_DLL_BUILD=1 -fPIC -shared $(COMMON_INCLUDE_PATHS) $< $(GAME_DLL_COMPILE_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(GAME_DLL_EXTRA_LINK) $(call get_pdb_flags,$@) -o $@.tmp
+	$(SILENT) $(CXX) $(CXX_TARGET_FLAGS) -DGAME_DLL_BUILD=1 -fPIC -shared $(COMMON_INCLUDE_PATHS) $< $(GAME_DLL_COMPILE_FLAGS) $(DEP_ARGS) $(PLATFORM_LINKER_FLAGS) $(GAME_DLL_EXTRA_LINK) $(call get_pdb_flags,$@) -o $@.tmp
 	$(SILENT) mv -f $@.tmp $@
 	$(SILENT) $(call move_pdb,$@)
 

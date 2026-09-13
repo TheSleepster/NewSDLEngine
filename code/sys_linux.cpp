@@ -379,24 +379,36 @@ sys_file_read(file_t *file_data, void *memory, u32 bytes_to_read, u32 file_offse
 {
     bool8 result = false;
 
-    usize bytes_read = 0; 
-    if(file_offset != 0)
+    usize total_bytes_read = 0; 
+    if(lseek(file_data->handle, file_offset, SEEK_SET) == -1)
     {
-        if(lseek(file_data->handle, file_offset, SEEK_SET) == -1)
+        log_error("Failure to set the file pointer...\n");
+    }
+
+    while(total_bytes_read < bytes_to_read)
+    {
+        int current_bytes_read = read(file_data->handle, memory, bytes_to_read - total_bytes_read);
+
+        total_bytes_read += (usize)current_bytes_read;
+        if(total_bytes_read == bytes_to_read)
         {
-            log_error("Failure to set the file pointer...\n");
+            result = true;
+            break;
         }
-    }
 
-    bytes_read = read(file_data->handle, memory, bytes_to_read);
-    if(bytes_read  == bytes_to_read)
-    {
-        result = true;
-    }
-
-    if(bytes_read == 0)
-    {
-        log_error("Failure to read file '%s', error: '%s'...\n", C_STR(file_data->filepath), strerror(errno));
+        // NOTE(Sleepster): EOF 
+        if(current_bytes_read == 0)
+        {
+            break;
+        }
+        else if(current_bytes_read == -1) 
+        {
+            int error = errno;
+            if(error != EWOULDBLOCK)
+            {
+                log_error("Failure to read file '%s', error: '%s'...\n", C_STR(file_data->filepath), strerror(errno));
+            }
+        }
     }
 
     return(result);
@@ -406,6 +418,10 @@ bool8
 sys_file_write(file_t *file_data, void *memory, usize bytes_to_write)
 {
     bool8 result = false;
+    if(lseek(file_data->handle, file_data->current_write_offset, SEEK_SET) == -1)
+    {
+        log_error("Failure to set the file pointer...\n");
+    }
     
     usize bytes_written = write(file_data->handle, memory, bytes_to_write);
     if(bytes_written == bytes_to_write)

@@ -42,6 +42,7 @@ c_file_copy(string_t old_path, string_t new_path)
     return(result);
 }
 
+#if 0
 internal_api void*
 c_file_allocate_file_data(memory_arena_t *arena, zone_allocator_t *zone, za_allocation_tag_t tag, u32 allocation_size)
 {
@@ -118,7 +119,6 @@ c_file_read_to_end(file_t             *file_data,
     return(result);
 }
 
-
 string_t
 c_file_read_entirety(string_t            filepath, 
                      memory_arena_t     *arena, 
@@ -136,6 +136,58 @@ c_file_read_entirety(string_t            filepath,
         log_error("Failure to read file: '%s'...\n", C_STR(filepath));
     }
     c_file_close(&file_data);
+
+    return(result);
+}
+#endif
+
+bool8
+c_file_read(file_t *file, byte *buffer, s32 bytes_to_read)
+{
+    Assert(buffer);
+    bool8 result = false;
+
+    result = sys_file_read(file, buffer, bytes_to_read, file->current_read_offset);
+    if(result)
+    {
+        file->current_read_offset += bytes_to_read;
+    }
+
+    return(result);
+}
+
+bool8
+c_file_read_from_offset(file_t *file, s32 file_offset, byte *buffer, s32 bytes_to_read)
+{
+    bool8 result = false;
+    result = sys_file_read(file, buffer, bytes_to_read, file_offset);
+
+    return(result);
+}
+
+bool8
+c_file_read_to_end(file_t *file, s32 offset, byte *buffer, s32 bytes_to_read)
+{
+    bool8 result = false;
+    result = sys_file_read(file, buffer, bytes_to_read, offset);
+
+    return(result);
+}
+
+bool8
+c_file_read_entirety(file_t *file, byte *buffer, s32 buffer_size)
+{
+    bool8 result = false;
+    
+    s32 file_size = c_file_get_size(file);
+    if(buffer_size >= file_size)
+    {
+        result = c_file_read(file, buffer, buffer_size);
+    }
+    else
+    {
+        log_warning("Buffer passed to '%s()' is too small for the entire file's contents...\n", __FUNCTION__);
+    }
 
     return(result);
 }
@@ -182,7 +234,7 @@ c_file_get_size(file_t *file_data)
     Assert(file_data->handle != INVALID_FILE_HANDLE);
     s64 result = 0;
 
-    result = sys_file_get_size(file_data);
+result = sys_file_get_size(file_data);
     return(result);
 }
 

@@ -149,7 +149,17 @@ main(void)
 {
     new_string_builder_t builder = {};
 
-    string_t string = c_file_read_entirety(STR("../code/vk_backend_core.h"));
+    file_t file = c_file_open(STR("../code/vk_backend_core.h"), false);
+    defer(c_file_close(&file));
+
+    s64 file_size = c_file_get_size(&file);
+    byte *buffer  = (byte*)c_alloc(file_size, ALLOCATOR_TAG_STATIC);
+    c_file_read_entirety(&file, buffer, file_size);
+    
+    string_t string = {
+        .data = buffer,
+        .count = file_size
+    };
     string_builder_append_data(&builder, string);
 
     memory_arena_t arena = c_arena_create(MB(builder.bytes_used), ALLOCATOR_TAG_STATIC);
