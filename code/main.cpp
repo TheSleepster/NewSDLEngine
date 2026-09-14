@@ -92,6 +92,7 @@ struct game_state_t
     entity_manager_t   *entity_manager;
     float64             render_alpha;
     bool32              open_debug_menu;
+    bool32              editor_opened;
 
     float32             gravity;
 
@@ -133,7 +134,6 @@ internal_api void
 handle_debug_ui_menu(ui_state_t *main_ui, RHI_context_t *RHI_context, asset_handle_t *player_sprite)
 {
     // NOTE(Sleepster): DEBUG UI 
-    ui_state_begin_frame(main_ui);
     ui_signal_t main_panel = ui_widget_draggable_panel(main_ui, 
                                                        STR("Test panel..."), 
                                                        vec2(20, 20), 
@@ -319,7 +319,7 @@ entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager)
 
     result->friction         = vec2_create(100);
     result->max_acceleration = vec2_create(100);
-    result->max_velocity     = vec2(3, 5);
+    result->max_velocity     = vec2(3, 15);
 
     // idle
     local_persist duration_counter_t idle_counter = {
@@ -746,7 +746,7 @@ game_state_simulate(game_state_t *game_state)
     for(entity_t *entity: gravity_query)
     {
         //f32_approach(&entity->acceleration.y, entity->max_acceleration.y, game_state->gravity, gc->tick_rate);
-        entity->acceleration.y += (game_state->gravity * (gc->tick_rate * 6));
+        entity->acceleration.y += (game_state->gravity * (gc->tick_rate * 1));
         if(entity->flags & ENTITY_FLAG_GROUNDED)
         {
             entity->acceleration.y = 0;
@@ -770,15 +770,31 @@ game_state_simulate(game_state_t *game_state)
                 {
                     if(collision.x.hit)
                     {
+                        // NOTE(Sleepster): Find our time of impact, with a bit of offset (an Epsilon)
+                        // to prevent the object from being stuck inside another object.
+                        //
+                        // We then use this time of impact and predict the change in velocity for this frame by saying
+                        //
+                        // V1 = V0 * T
+                        //
+                        // Where T is the Time of Impact we recorded ranging between 0.0f - 1.0f.
+                        //
+                        // 0.0f meaning we either never hit, or is immediate
+                        // 1.0f meaning at the end of the timestep (which is 16.667ms)
+                        //
+                        // Essentially, TOI is just a value that is meant to tell us when between right now (0.0f) and 
+                        // the end of the timestep (1.0f) we will hit the object.
                         float32 our_TOI = Max(0.0f, collision.x.toi - 0.0001f);
                         float32 displacement = target_velocity_x.x * our_TOI;
 
+                        // NOTE(Sleepster): A little bit of bias to the velocity to prevent getting stuck 
                         float32 Vbias = ((0.1f * our_TOI) * Max(0.0f, collision.depth - 0.0001f)) * collision.x.normal.x;
                         target_velocity.x = displacement + Vbias;
                     }
 
                     if(collision.y.hit)
                     {
+                        // NOTE(Sleepster): Do the same as above for our Y axis 
                         float32 our_TOI = Max(0.0f, collision.y.toi - 0.0001f);
                         float32 displacement = target_velocity_y.y * our_TOI;
 
@@ -871,6 +887,78 @@ DEBUG_update_state_recording_and_playback(void)
     }
 }
 
+internal_api void
+handle_editor_ui(ui_state_t *main_ui, RHI_context_t *RHI_context)
+{
+    ui_signal_t main_panel = ui_widget_panel(main_ui, 
+                                             STR("Editor Panel"), 
+                                             vec2_multiply(RHI_context->window_size, vec2(-0.5, 0.5)), 
+                                             vec2(20, 20), 
+                                             vec2(10.0f, 0.0f), 
+                                             vec4(10, 10, 10, 10), 
+                                             vec4(0.4, 0.4, 0.4, 0.2),
+                                             0);
+    if(rect2_point_in_rect(main_panel.widget->state->widget_rect, main_ui->mouse_position))
+    {
+        main_ui->input_focused = true;
+    }
+    else
+    {
+        main_ui->input_focused = false;
+    }
+
+    ui_column(main_ui, main_panel.widget)
+    {
+        ui_widget_set_default_font_size(main_ui, 40);
+        ui_signal_t title_bar = ui_widget_panel(main_ui, 
+                                                STR("Editor Title bar"), 
+                                                vec2(0, 0), 
+                                                vec2(20, 20),
+                                                vec2(10.0f, 10.0f), 
+                                                vec4(10, 10, 15, 10), 
+                                                vec4(0.0, 0.0, 0.0, 0.2),
+                                                0);
+        ui_state_set_active_padding(main_ui, vec4(10, 10, 4, 4));
+        ui_signal_t open_menu_button = {};
+        ui_row(main_ui, title_bar.widget)
+        {
+            open_menu_button = ui_widget_sized_button(main_ui, 
+                                                      STR("Open Editor Menu"), 
+                                                      vec2(20, 20), 0);
+            ui_widget_text(main_ui, STR("[Editor Panel]"));
+        }
+
+        if(ui_pressed(open_menu_button))
+        {
+            main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
+        }
+
+        if(main_panel.widget->toggled)
+        {
+            ui_widget_divider(main_ui, 
+                              STR("editor panel divider"), 
+                              vec2(0.9, 5.0f), 
+                              {UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, UI_WIDGET_SIZE_KIND_PIXELS});
+            ui_widget_set_default_font_size(main_ui, 20);
+            ui_signal_t sub_panel = ui_widget_panel(main_ui, 
+                                                    STR("Editor Subpanel"), 
+                                                    vec2(0, 0), 
+                                                    vec2(20, 20),
+                                                    vec2(10.0f, 10.0f), 
+                                                    vec4(10, 10, 10, 0), 
+                                                    vec4_zero(),
+                                                    0);
+            ui_column(main_ui, sub_panel.widget)
+            {
+                // NOTE(Sleepster): Editor stuff 
+                {
+                    ui_signal_t show_atlas = ui_widget_labeled_button(main_ui, STR("Show Atlas"));
+                }
+            }
+        }
+    }
+}
+
 external int
 game_main(global_context_t *_global_context)
 {
@@ -947,10 +1035,19 @@ game_main(global_context_t *_global_context)
         c_file_watcher_process_changes(&gc->file_watcher);
 #endif
         game_state->controller = s_im_get_controller_from_active_device(input_manager, game_state->controller);
-        if(game_state->open_debug_menu)
+        if(game_state->open_debug_menu || game_state->editor_opened)
         {
             ui_state_get_input_events(main_ui);
-            handle_debug_ui_menu(main_ui, render_state->RHI_context, &player_sprite);
+            ui_state_begin_frame(main_ui);
+            if(game_state->open_debug_menu)
+            {
+                handle_debug_ui_menu(main_ui, render_state->RHI_context, &player_sprite);
+            }
+
+            if(game_state->editor_opened)
+            {
+                handle_editor_ui(main_ui, render_state->RHI_context);
+            }
         }
 
         // NOTE(Sleepster):} Simulate loop 
@@ -968,26 +1065,28 @@ game_main(global_context_t *_global_context)
                 // NOTE(Sleepster): Apply events. 
                 s_im_apply_events_to_controller(game_state->controller, game_state->controller->device->events, true);
 
-                // NOTE(Sleepster): Debug menu 
                 if(game_state->controller->type == INPUT_DEVICE_TYPE_KEYBOARD)
                 {
+                    // NOTE(Sleepster): Debug menu 
                     if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_SEMICOLON))
                     {
                         game_state->open_debug_menu = !game_state->open_debug_menu;
                     }
 
+                    // NOTE(Sleepster): Input and state recording 
                     if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_R))
                     {
                         DEBUG_toggle_state_recording();
                     }
 
+                    // NOTE(Sleepster): Input and state looping 
                     if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_L))
                     {
                         DEBUG_toggle_state_playback();
                     }
-
                     DEBUG_update_state_recording_and_playback();
 
+                    // NOTE(Sleepster): Respawn the player 
                     if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_P))
                     {
                         entity_query_t player_query = s_entity_query_archetype(game_state->entity_manager, ENTITY_ARCHETYPE_PLAYER);
@@ -996,6 +1095,12 @@ game_main(global_context_t *_global_context)
                         s_entity_destroy(game_state->entity_manager, player);
 
                         entity_player_create(game_state, asset_manager);
+                    }
+
+
+                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_E))
+                    {
+                        game_state->editor_opened = !game_state->editor_opened;
                     }
                 }
 
@@ -1130,7 +1235,7 @@ game_main(global_context_t *_global_context)
             RHI_cmd_draw_indexed(command_list, (render_state->vertex_buffer.vertex_count * 0.25f) * 6, 0, 1, 0);
 
             // NOTE(Sleepster): Draw UI 
-            if(game_state->open_debug_menu && main_ui->frame_begun)
+            if((game_state->open_debug_menu || game_state->editor_opened) && main_ui->frame_begun)
             {
                 ui_state_end_frame(main_ui, command_list);
             }

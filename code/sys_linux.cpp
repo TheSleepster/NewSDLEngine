@@ -199,7 +199,7 @@ sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overl
         ZeroStruct(result);
         result.handle = -1;
     }
-
+    result.file_size = sys_file_get_size(&result);
     return(result);
 }
 

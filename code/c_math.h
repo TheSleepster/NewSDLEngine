@@ -2086,7 +2086,7 @@ mat4_make_rotation(vec3_t axis, float32 rotation)
     axis = vec3_normalize(axis);
 
     float32 sin_theta = sinf(-rotation);
-    float32 cos_theta = sinf(-rotation);
+    float32 cos_theta = cosf(-rotation);
     float32 cos_value = 1.0f - cos_theta;
 
     result.elements[0][0] = (axis.x * axis.x * cos_value) + cos_theta;

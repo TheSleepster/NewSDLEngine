@@ -127,13 +127,13 @@ entity_sweep_test(rectangle2_t *A, rectangle2_t *B, vec2_t velocity)
 {
     sweep_result_t result = {};
 
-    // note(sleepster): minkowski rectangle 
+    // NOTE(Sleepster): minkowski rectangle 
     float32 left   = A->min.x - B->half_size.x;
     float32 right  = A->max.x + B->half_size.x;
     float32 bottom = A->min.y - B->half_size.y;
     float32 top    = A->max.y + B->half_size.y;
 
-    // note(sleepster): sweep test 
+    // NOTE(Sleepster): sweep test 
     {
         vec2_t initial_position = B->center;
         vec2_t displacement     = velocity;
@@ -150,10 +150,10 @@ entity_sweep_test(rectangle2_t *A, rectangle2_t *B, vec2_t velocity)
             s32 index = axis * 2;
             if(displacement.elements[axis] != 0.0f)
             {
-                float32 delta = 1.0f / displacement.elements[axis];
+                float32 inverse_displacement = 1.0f / displacement.elements[axis];
 
-                float32 time1 = (points[index]     - initial_position.elements[axis]) * delta;
-                float32 time2 = (points[index + 1] - initial_position.elements[axis]) * delta;
+                float32 time1 = (points[index]     - initial_position.elements[axis]) * inverse_displacement;
+                float32 time2 = (points[index + 1] - initial_position.elements[axis]) * inverse_displacement;
 
                 float32 t_near = Min(time1, time2);
                 float32 t_far  = Max(time1, time2);
