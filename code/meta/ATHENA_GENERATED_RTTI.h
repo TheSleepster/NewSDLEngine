@@ -3067,9 +3067,10 @@ struct type_info_procedure_c_file_open {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[2];
+		type_info_member_t argument_array[3];
 		struct {
 			const type_info_member_t filepath;
+			const type_info_member_t for_writing;
 			const type_info_member_t create;
 		}arguments;
 	};
@@ -4791,7 +4792,7 @@ struct type_info_struct_entity_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[19];
+		const type_info_member_t member_array[20];
 		struct {
 			const type_info_member_t ID;
 			const type_info_member_t archetype;
@@ -4800,6 +4801,7 @@ struct type_info_struct_entity_t {
 			const type_info_member_t render_position;
 			const type_info_member_t position;
 			const type_info_member_t velocity;
+			const type_info_member_t max_velocity;
 			const type_info_member_t acceleration;
 			const type_info_member_t max_acceleration;
 			const type_info_member_t friction;
@@ -16913,13 +16915,20 @@ constexpr type_info_procedure_c_file_open DEFAULT_typedata_procedure_c_file_open
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_c_file_open,
 	},
-	.argument_count = 2,
+	.argument_count = 3,
 	.return_type    = &DEFAULT_typedata_structure_file_t.type_info,
 	.argument_pointer = DEFAULT_typedata_procedure_c_file_open.argument_array,
 	.arguments = {
 		.filepath = {
 			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
 			.member_name   = "filepath",
+			.parent        = &DEFAULT_typedata_procedure_c_file_open.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.for_writing = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "for_writing",
 			.parent        = &DEFAULT_typedata_procedure_c_file_open.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
@@ -21064,7 +21073,7 @@ constexpr type_info_struct_entity_t DEFAULT_typedata_structure_entity_t = {
 		.type_id = TYPE_entity_t,
 		.size = athena_internal::safe_sizeof<entity_t>(),
 	},
-	.member_count   = 19,
+	.member_count   = 20,
 	.member_pointer = DEFAULT_typedata_structure_entity_t.member_array,
 	.members = {
 		.ID = {
@@ -21120,6 +21129,14 @@ constexpr type_info_struct_entity_t DEFAULT_typedata_structure_entity_t = {
 			.member_name   = "velocity",
 			.parent        = &DEFAULT_typedata_structure_entity_t.type_info,
 			.offset        = offsetof(entity_t, velocity),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.max_velocity = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "max_velocity",
+			.parent        = &DEFAULT_typedata_structure_entity_t.type_info,
+			.offset        = offsetof(entity_t, max_velocity),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -34379,6 +34396,7 @@ enum class entity_t {
 	render_position,
 	position,
 	velocity,
+	max_velocity,
 	acceleration,
 	max_acceleration,
 	friction,
@@ -35379,6 +35397,7 @@ enum class visit_files_pfn_t {
 }; // visit_files_pfn_t
 enum class c_file_open {
 	filepath,
+	for_writing,
 	create,
 }; // c_file_open
 enum class c_file_close {

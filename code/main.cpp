@@ -319,6 +319,7 @@ entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager)
 
     result->friction         = vec2_create(100);
     result->max_acceleration = vec2_create(100);
+    result->max_velocity     = vec2(3, 5);
 
     // idle
     local_persist duration_counter_t idle_counter = {
@@ -719,6 +720,7 @@ game_state_simulate(game_state_t *game_state)
         // NOTE(Sleepster): X Movement 
         entity->acceleration.x += movement_axis_value.x * 100;
         entity->acceleration.x  = Clamp(entity->acceleration.x, -entity->max_acceleration.x, entity->max_acceleration.x);
+        entity->acceleration.y  = Clamp(entity->acceleration.y, -entity->max_acceleration.y, entity->max_acceleration.y);
         if(movement_axis_value.x == 0.0f)
         {
             entity->acceleration.x = 0.0f;
@@ -727,13 +729,15 @@ game_state_simulate(game_state_t *game_state)
         // NOTE(Sleepster): Y Movement
         if(jumped && (entity->flags & ENTITY_FLAG_GROUNDED))
         {
-            entity->acceleration.y = entity->max_acceleration.y * 0.5f;
+            entity->acceleration.y = entity->max_acceleration.y * 1.0f;
             entity->flags &= ~ENTITY_FLAG_GROUNDED;
         }
 
-        entity->velocity.x = entity->velocity.x + ((entity->acceleration.x) * gc->tick_rate);
+        entity->velocity.x = entity->velocity.x + ((entity->acceleration.x * 100) * gc->tick_rate);
         entity->velocity.y = entity->velocity.y + ((entity->acceleration.y) * gc->tick_rate);
 
+        entity->velocity.x = Clamp(entity->velocity.x, -entity->max_velocity.x, entity->max_velocity.x);
+        entity->velocity.y = Clamp(entity->velocity.y, -entity->max_velocity.y, entity->max_velocity.y);
         if(entity->acceleration.x != 0) entity_transition_animation(entity, PLAYER_ANIMATION_STATE_RUNNING);
         else                            entity_transition_animation(entity, PLAYER_ANIMATION_STATE_IDLE);
     }
@@ -742,7 +746,7 @@ game_state_simulate(game_state_t *game_state)
     for(entity_t *entity: gravity_query)
     {
         //f32_approach(&entity->acceleration.y, entity->max_acceleration.y, game_state->gravity, gc->tick_rate);
-        entity->acceleration.y += (game_state->gravity * gc->tick_rate);
+        entity->acceleration.y += (game_state->gravity * (gc->tick_rate * 6));
         if(entity->flags & ENTITY_FLAG_GROUNDED)
         {
             entity->acceleration.y = 0;
@@ -753,50 +757,42 @@ game_state_simulate(game_state_t *game_state)
     entity_query_t actor_query     = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_ACTOR|ENTITY_FLAG_HAS_COLLIDER);
     for(entity_t *entity: actor_query)
     {
-        for(entity_t *test_entity: collision_query)
+        for(entity_t *collider: collision_query)
         {
-            if(test_entity != entity)
+            vec2_t target_velocity = entity->velocity;
+
+            vec2_t target_velocity_x = vec2(target_velocity.x, 0.0f);
+            vec2_t target_velocity_y = vec2(0.0f, target_velocity.y);
+            if(collider != entity)
             {
-                vec2_t current_velocity = entity->velocity;
-                // NOTE(Sleepster): Sweep Response
+                collision_query_result_t collision = s_entity_test_collisions(entity, collider);
+                if(collision.hit)
                 {
-                    raytest_t sweep = rect2_sweep_test(entity->bounding_box, current_velocity, test_entity->bounding_box);
-                    if(sweep.hit)
+                    if(collision.x.hit)
                     {
-                        if(sweep.normal.x != 0.0f) 
-                        {
-                            current_velocity.x = current_velocity.x * sweep.time;
-                        }
-                        if(sweep.normal.y != 0.0f) 
-                        {
-                            current_velocity.y = current_velocity.y * sweep.time;
-                        }
+                        float32 our_TOI = Max(0.0f, collision.x.toi - 0.0001f);
+                        float32 displacement = target_velocity_x.x * our_TOI;
 
-                        if(test_entity->flags & ENTITY_FLAG_IS_GROUND)
-                        {
-                            entity->flags |= ENTITY_FLAG_GROUNDED;
-                        }
+                        float32 Vbias = ((0.1f * our_TOI) * Max(0.0f, collision.depth - 0.0001f)) * collision.x.normal.x;
+                        target_velocity.x = displacement + Vbias;
+                    }
+
+                    if(collision.y.hit)
+                    {
+                        float32 our_TOI = Max(0.0f, collision.y.toi - 0.0001f);
+                        float32 displacement = target_velocity_y.y * our_TOI;
+
+                        float32 Vbias = ((0.1f * our_TOI) * Max(0.0f, collision.depth - 0.0001f)) * collision.y.normal.y;
+                        target_velocity.y = displacement + Vbias;
+                    }
+
+                    if(collider->flags & ENTITY_FLAG_IS_GROUND)
+                    {
+                        entity->flags |= ENTITY_FLAG_GROUNDED;
                     }
                 }
-
-#if 0
-                // NOTE(Sleepster): Stationary Response
-                {
-                    rectangle2_t predicted_hitbox = entity->bounding_box;
-                    rect2_shift_by(&predicted_hitbox, vec2_multiply(current_velocity, vec2_create(gc->tick_rate)));
-
-                    // TODO(Sleepster): Epsilon 
-                    rectangle2_t minkowski = rect2_minkowski_difference(predicted_hitbox, test_entity->bounding_box);
-                    if(minkowski.min.x <= 0 && minkowski.max.x >= 0 && 
-                       minkowski.min.y <= 0 && minkowski.max.y >= 0)
-                    {
-                        vec2_t overlap_vector = rect2_get_vector_depth(minkowski);
-                        current_velocity      = vec2_add(current_velocity, overlap_vector);
-                    }
-                }
-#endif
-                entity->velocity = current_velocity;
             }
+            entity->velocity = target_velocity;
         }
     }
 
@@ -820,6 +816,57 @@ game_state_simulate(game_state_t *game_state)
         if(c_duration_counter_advance(&animation->frame_timer, gc->tick_rate_ms))
         {
             animation->current_frame = (animation->current_frame + 1) % animation->animation_info.frame_count;
+        }
+    }
+}
+
+internal_api void
+DEBUG_toggle_state_recording(void)
+{
+    gc->recording_input = !gc->recording_input;
+    if(gc->recording_input)
+    {
+        gc->saved_arena_size = gc->persistent_arena.used;
+        
+        c_file_close(&gc->input_manager_playback_file);
+        gc->input_manager_playback_file = c_file_open(gc->input_manager_playback_file.filepath, true, true);
+
+        c_file_write(&gc->input_manager_playback_file, (byte*)gc->persistent_arena.base, gc->saved_arena_size);
+        gc->playing_back_input = false;
+    }
+}
+
+internal_api void
+DEBUG_toggle_state_playback(void)
+{
+    gc->playing_back_input = !gc->playing_back_input;
+    if(gc->playing_back_input)
+    {
+        gc->input_manager_playback_file.current_read_offset = 0;
+        c_file_read(&gc->input_manager_playback_file, gc->persistent_arena.base, gc->saved_arena_size); 
+    }
+}
+
+internal_api void
+DEBUG_update_state_recording_and_playback(void)
+{
+    if(gc->recording_input)
+    {
+        c_file_write(&gc->input_manager_playback_file, (byte*)gc->input_manager, sizeof(input_manager_t));
+    }
+
+    if(gc->recording_input)
+    {
+        Assert(!gc->playing_back_input)
+    }
+
+    if(gc->playing_back_input)
+    {
+        if(!c_file_read(&gc->input_manager_playback_file, (byte*)gc->input_manager, sizeof(input_manager_t)))
+        {
+            gc->input_manager_playback_file.current_read_offset = 0;
+            c_file_read(&gc->input_manager_playback_file, gc->persistent_arena.base, gc->saved_arena_size); 
+            c_file_read(&gc->input_manager_playback_file, (byte*)gc->input_manager, sizeof(input_manager_t));
         }
     }
 }
@@ -848,7 +895,7 @@ game_main(global_context_t *_global_context)
         game_state->entity_manager = c_arena_push_struct(&gc->persistent_arena, entity_manager_t);
         game_state->entity_manager->transient_storage = c_arena_create(MB(100), ALLOCATOR_TAG_GAME);
 
-        game_state->gravity = -9.8f;
+        game_state->gravity = -120.0f;
 
         render_state->RHI_context = gc->RHI_context;
         r_init_render_state(render_state);
@@ -929,38 +976,26 @@ game_main(global_context_t *_global_context)
                         game_state->open_debug_menu = !game_state->open_debug_menu;
                     }
 
+                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_R))
+                    {
+                        DEBUG_toggle_state_recording();
+                    }
+
                     if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_L))
                     {
-                        gc->recording_input = !gc->recording_input;
-                        if(gc->recording_input == false)
-                        {
-                            c_file_read(&gc->input_manager_playback_file, gc->persistent_arena.base, gc->saved_arena_size); 
-                            gc->playing_back_input = true;
-                        }
-                        else
-                        {
-                            gc->saved_arena_size = gc->persistent_arena.used;
-                            c_file_write(&gc->input_manager_playback_file, (byte*)gc->persistent_arena.base, gc->saved_arena_size);
-                            gc->playing_back_input = false;
-                        }
+                        DEBUG_toggle_state_playback();
                     }
 
-                    if(gc->recording_input)
-                    {
-                        c_file_write(&gc->input_manager_playback_file, (byte*)input_manager, sizeof(input_manager_t));
-                    }
+                    DEBUG_update_state_recording_and_playback();
 
-                    if(gc->playing_back_input)
+                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_P))
                     {
-                        if(!c_file_read(&gc->input_manager_playback_file, (byte*)input_manager, sizeof(input_manager_t)))
-                        {
-                            gc->input_manager_playback_file.current_read_offset = 0;
-                            c_file_close(&gc->input_manager_playback_file);
+                        entity_query_t player_query = s_entity_query_archetype(game_state->entity_manager, ENTITY_ARCHETYPE_PLAYER);
+                        entity_t *player = player_query.entities[0];
+                        ZeroStruct(*player);
+                        s_entity_destroy(game_state->entity_manager, player);
 
-                            gc->input_manager_playback_file = c_file_open(STR("../input_manager_playback_file.inpdat"), false);
-                            c_file_read(&gc->input_manager_playback_file, gc->persistent_arena.base, gc->saved_arena_size); 
-                            c_file_read(&gc->input_manager_playback_file, (byte*)input_manager, sizeof(input_manager_t));
-                        }
+                        entity_player_create(game_state, asset_manager);
                     }
                 }
 
@@ -986,10 +1021,11 @@ game_main(global_context_t *_global_context)
                     ++entity_index)
                 {
                     entity_t *entity = game_state->entity_manager->entities + entity_index;
-                    Assert(entity->flags & ENTITY_FLAG_IS_VALID);
-
-                    entity->render_position = vec2_lerp(entity->last_position, entity->position, game_state->render_alpha);
-                    entity_render(render_state, command_list, entity);
+                    if(entity->flags & ENTITY_FLAG_IS_VALID)
+                    {
+                        entity->render_position = vec2_lerp(entity->last_position, entity->position, game_state->render_alpha);
+                        entity_render(render_state, command_list, entity);
+                    }
                 }
 
                 RHI_cmd_update_buffer_contents(command_list, &render_state->vertex_buffer);
@@ -1084,7 +1120,7 @@ game_main(global_context_t *_global_context)
                           &render_state->vertex_buffer, 
                           asset_manager, 
                           &basic_font, 
-                          STR("GCC is bugged??."), 
+                          STR("I love test font!"), 
                           vec3(-300, 150, 0.0f), 
                           vec4(1.0f, 1.0f, 1.0f, 1.0f), 
                           0.0f, 

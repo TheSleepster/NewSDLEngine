@@ -1210,7 +1210,7 @@ consolidate_AST_types(void)
 internal_api void
 parse_single_file(string_t filename)
 {
-    file_t file_handle = c_file_open(filename, false);
+    file_t file_handle = c_file_open(filename, false, false);
     defer(c_file_close(&file_handle));
     
     s32   file_size = c_file_get_size(&file_handle);
@@ -1276,7 +1276,7 @@ parse_directory_type_data(void)
     {
         string_t filename = state.filenames[iterator];
 
-        file_t file = c_file_open(filename, false);
+        file_t file = c_file_open(filename, false, false);
         Assert(file.handle);
 
         defer(c_file_close(&file));
@@ -2772,7 +2772,7 @@ get_attribute_list(char *name)
     if(output_path != null)
     {
         string_t output_filepath = STR(output_path);
-        file_t new_file = c_file_open(output_filepath, true);
+        file_t new_file = c_file_open(output_filepath, true, true);
         Assert(new_file.handle)
 
         c_file_write_string(&new_file, string);

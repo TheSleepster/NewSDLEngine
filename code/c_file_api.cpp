@@ -12,9 +12,9 @@
 
 // NOTE(Sleepster): Errors from these calls are handled internally 
 file_t
-c_file_open(string_t filepath, bool8 create)
+c_file_open(string_t filepath, bool8 for_writing, bool8 create)
 {
-    file_t result = sys_file_open(filepath, create, true, false);
+    file_t result = sys_file_open(filepath, for_writing, create, false);
 
     result.file_size            = c_file_get_size(&result);
     result.current_read_offset  = 0;
@@ -237,7 +237,7 @@ c_file_get_size(file_t *file_data)
     Assert(file_data->handle != INVALID_FILE_HANDLE);
     s64 result = 0;
 
-result = sys_file_get_size(file_data);
+    result = sys_file_get_size(file_data);
     return(result);
 }
 

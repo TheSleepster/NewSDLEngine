@@ -131,7 +131,7 @@ typedef struct visit_file_data
   =============== GENERAL API ===============
   ===========================================*/
 
-file_t            c_file_open(string_t filepath, bool8 create);
+file_t            c_file_open(string_t filepath, bool8 for_writing, bool8 create);
 bool8             c_file_close(file_t *file);
 bool8             c_file_copy(string_t old_path, string_t new_path);
 

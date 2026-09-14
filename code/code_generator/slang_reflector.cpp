@@ -123,7 +123,7 @@ VISIT_FILES(shader_file_callback)
         string_t *file_data = c_hash_table_get_element_ptr(&file_manager->loaded_files, filename);
         if(file_data->count == 0)
         {
-            file_t file = c_file_open(fullname, false);
+            file_t file = c_file_open(fullname, false, false);
             file_data->count = c_file_get_size(&file);
             file_data->data  = (byte*)c_alloc(file_data->count, ALLOCATOR_TAG_TEMP);
 
@@ -178,7 +178,7 @@ VISIT_FILES(shader_file_callback)
                             string_t working_filedata = *included_file;
                             if(included_file->count == 0)
                             {
-                                file_t file = c_file_open(included_filename, false);
+                                file_t file = c_file_open(included_filename, false, false);
 
                                 s32 file_size = c_file_get_size(&file);
                                 byte *buffer  = c_arena_push_size(&thread_arena, file_size);
@@ -240,7 +240,7 @@ VISIT_FILES(shader_file_callback)
 
         c_ticket_mutex_advance_ticket(&file_manager->mutex);
 
-        file_t new_file = c_file_open(output_file, true);
+        file_t new_file = c_file_open(output_file, true, true);
         c_string_builder_dump_to_file(&new_file, &module->new_file_builder);
 
         log_info("Wrote file: '%.*s' out...\n", output_file.count, C_STR(output_file));
@@ -256,7 +256,7 @@ VISIT_FILES(shader_file_callback)
         string_t *file_data = c_hash_table_get_element_ptr(&file_manager->loaded_files, filename);
         if(file_data->count == 0)
         {
-            file_t file = c_file_open(fullname, false);
+            file_t file = c_file_open(fullname, false, false);
             defer(c_file_close(&file));
 
             s64 file_size = c_file_get_size(&file);
@@ -505,7 +505,7 @@ typedef u32    uint;
 
         c_ticket_mutex_advance_ticket(&file_manager->mutex);
 
-        file_t new_meta_file = c_file_open(output_file, true);
+        file_t new_meta_file = c_file_open(output_file, true, true);
         c_string_builder_dump_to_file(&new_meta_file, &header_builder);
         log_info("Generated C header file: '%.*s' for .slh file: '%.*s'...\n",
                  output_file.count, C_STR(output_file),

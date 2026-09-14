@@ -218,7 +218,7 @@ main(void)
         c_file_watcher_add_path(&gc->file_watcher, STR("../res/"));
         c_file_watcher_issue_check_over_all_paths(&gc->file_watcher);
 
-        gc->input_manager_playback_file = c_file_open(STR("../input_manager_playback_file.inpdat"), true);
+        gc->input_manager_playback_file = c_file_open(STR("../input_manager_playback_file.inpdat"), true, true);
 
         // NOTE(Sleepster): Load the game code 
         gc->game_library  = sys_load_library(game_dll_name);

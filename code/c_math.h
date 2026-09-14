@@ -2315,15 +2315,15 @@ rect2_get_position(rectangle2_t rect)
 MATH_API bool8
 rect2_point_in_rect(rectangle2_t rect, vec2_t point)
 {
-    return (point.x >= rect.min.x && point.x <= rect.max.x && 
-            point.y >= rect.min.y && point.y <= rect.max.y);
+    return(point.x >= rect.min.x && point.x <= rect.max.x && 
+           point.y >= rect.min.y && point.y <= rect.max.y);
 }
 
 MATH_API bool8
 rect2_AABB_SAT(rectangle2_t A, rectangle2_t B)
 {
-    return (A.min.x <= B.max.x && A.max.x >= B.min.x &&
-            A.min.y <= B.max.y && A.max.y >= B.min.y);
+    return(A.min.x <= B.max.x && A.max.x >= B.min.x &&
+           A.min.y <= B.max.y && A.max.y >= B.min.y);
 }
 
 MATH_API rectangle2_t 

@@ -168,11 +168,11 @@ sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overl
         result.for_writing = true;
         if(overwrite)
         {
-            flags = O_RDWR|O_CREAT;
+            flags = O_RDWR|O_CREAT|O_TRUNC;
         }
         else
         {
-            flags = O_RDWR|O_CREAT|O_TRUNC;
+            flags = O_RDWR|O_CREAT;
         }
     }
     else

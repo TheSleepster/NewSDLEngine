@@ -819,7 +819,7 @@ s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_slot_t *sl
     }
     else
     {
-        file_t file = c_file_open(slot->package_entry->fullpath, false);
+        file_t file = c_file_open(slot->package_entry->fullpath, false, false);
         defer(c_file_close(&file));
 
         byte *buffer = c_za_alloc(asset_manager->asset_allocator, slot->package_entry->asset_data.count, ZA_TAG_STATIC);
@@ -1190,7 +1190,7 @@ initialize_asset_file_contents(asset_manager_t *asset_manager, asset_file_data_t
 {
     bool8 result = true;
 
-    asset_file->file_info = c_file_open(filepath, false);
+    asset_file->file_info = c_file_open(filepath, false, false);
     if(asset_file->file_info.handle != INVALID_FILE_HANDLE)
     {
         file_t *file_handle = &asset_file->file_info;

@@ -131,7 +131,7 @@ VISIT_FILES(gather_all_asset_file_entries)
         ZeroStruct(*entry);
 
         file_data_t file_info = c_file_get_file_system_info(filepath);
-        file_t file = c_file_open(filepath, false);
+        file_t file = c_file_open(filepath, false, false);
         defer(c_file_close(&file));
 
         s32 file_size = c_file_get_size(&file);
@@ -190,7 +190,7 @@ main(int arg_count, char **args)
     string_t output_fullpath = c_string_concat(&packer_state.builder_arena, packer_state.output_dir, STR("/"));
     output_fullpath = c_string_concat(&packer_state.builder_arena, output_fullpath, packer_state.output_filename);
 
-    packer_state.output_file = c_file_open(output_fullpath, true);
+    packer_state.output_file = c_file_open(output_fullpath, true, true);
     if(packer_state.output_file.handle == INVALID_FILE_HANDLE)
     {
         log_fatal("Could not create file: '%s'... Exiting...\n", packer_state.output_filename);

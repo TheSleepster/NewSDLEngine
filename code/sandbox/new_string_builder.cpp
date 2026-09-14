@@ -149,7 +149,7 @@ main(void)
 {
     new_string_builder_t builder = {};
 
-    file_t file = c_file_open(STR("../code/vk_backend_core.h"), false);
+    file_t file = c_file_open(STR("../code/vk_backend_core.h"), false, false);
     defer(c_file_close(&file));
 
     s64 file_size = c_file_get_size(&file);

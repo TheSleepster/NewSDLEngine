@@ -109,3 +109,145 @@ s_entity_query_archetype(entity_manager_t *entity_manager, entity_archetype_t ar
     result.entity_count = found_entity_count;
     return(result);
 }
+
+/* =======================================
+ * COLLISIONS
+ * =======================================
+ */
+
+struct sweep_result_t
+{
+    bool32  hit;
+    float32 toi;
+    vec2_t  normal;
+};
+
+sweep_result_t
+entity_sweep_test(rectangle2_t *A, rectangle2_t *B, vec2_t velocity)
+{
+    sweep_result_t result = {};
+
+    // note(sleepster): minkowski rectangle 
+    float32 left   = A->min.x - B->half_size.x;
+    float32 right  = A->max.x + B->half_size.x;
+    float32 bottom = A->min.y - B->half_size.y;
+    float32 top    = A->max.y + B->half_size.y;
+
+    // note(sleepster): sweep test 
+    {
+        vec2_t initial_position = B->center;
+        vec2_t displacement     = velocity;
+
+        float32 points[4] = {left, right, bottom, top};
+        vec2_t collision_normal = vec2_zero();
+
+        float32 t_enter = -INFINITY;
+        float32 t_exit  =  INFINITY;
+        for(s32 axis = 0;
+            axis < 2;
+            ++axis)
+        {
+            s32 index = axis * 2;
+            if(displacement.elements[axis] != 0.0f)
+            {
+                float32 delta = 1.0f / displacement.elements[axis];
+
+                float32 time1 = (points[index]     - initial_position.elements[axis]) * delta;
+                float32 time2 = (points[index + 1] - initial_position.elements[axis]) * delta;
+
+                float32 t_near = Min(time1, time2);
+                float32 t_far  = Max(time1, time2);
+                if(t_near > t_enter)
+                {
+                    t_enter = t_near;
+                    collision_normal = vec2_zero(); 
+                    collision_normal.elements[axis] = (displacement.elements[axis] > 0.0f) ? -1.0f : 1.0f;
+                }
+
+                t_exit = Min(t_exit, t_far);
+                if(t_enter > t_exit)
+                {
+                    return(result);
+                }
+            }
+            else
+            {
+                if(initial_position.elements[axis] < points[index] ||
+                   initial_position.elements[axis] > points[index + 1])
+
+                {
+                    return(result);
+                }
+            }
+        }
+
+        if(t_enter <= t_exit && t_exit >= 0.0f && t_enter <= 1.0f)
+        {    
+            result.hit    = true;
+            result.toi    = t_enter;
+            result.normal = collision_normal;
+        }
+    }
+
+    return(result);
+}
+
+struct collision_info_t
+{
+    bool32  hit;
+    float32 toi;
+    vec2_t  normal;
+};
+
+struct collision_query_result_t 
+{
+    bool32  hit;
+    float32 depth;
+    union {
+        collision_info_t axis[2];
+        struct {
+            collision_info_t x;
+            collision_info_t y;
+        };
+    };
+};
+
+collision_query_result_t
+s_entity_test_collisions(entity_t *entity, entity_t *collider)
+{
+    collision_query_result_t result = {};
+
+    vec2_t target_velocity = entity->velocity;
+    rectangle2_t *collider_rect = &collider->bounding_box;
+
+    vec2_t target_velocity_x = vec2(target_velocity.x, 0.0f);
+    vec2_t target_velocity_y = vec2(0.0f, target_velocity.y);
+    sweep_result_t result_x = entity_sweep_test(collider_rect, &entity->bounding_box, target_velocity_x);
+    sweep_result_t result_y = entity_sweep_test(collider_rect, &entity->bounding_box, target_velocity_y);
+
+    vec2_t center_difference = vec2_subtract(entity->bounding_box.center, collider_rect->center);
+    vec2_t overlap = {
+        (entity->bounding_box.half_size.x + collider_rect->half_size.x) - fabs(center_difference.x),
+        (entity->bounding_box.half_size.y + collider_rect->half_size.y) - fabs(center_difference.y)
+    };
+
+    float32 depth = Min(overlap.x, overlap.y);
+
+    result.depth = depth;
+    result.hit   = (result_x.hit || result_y.hit);
+    if(result_x.hit)
+    {
+        result.x.hit    = true;
+        result.x.toi    = result_x.toi;
+        result.x.normal = result_x.normal;
+    }
+
+    if(result_y.hit)
+    {
+        result.y.hit    = true;
+        result.y.toi    = result_y.toi;
+        result.y.normal = result_y.normal;
+    }
+
+    return(result);
+}
