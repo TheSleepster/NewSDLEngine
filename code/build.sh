@@ -1,3 +1,10 @@
 #!/bin/bash
 
-make -j12 COMPILER=clang++ SILENT=@
+mkdir -p ../build/
+if [ ! -d ../build/Makefile ]; then
+    premake5 gmake --toolchain=clang
+fi
+
+pushd ../build/
+make config=debug SILENT=@
+popd

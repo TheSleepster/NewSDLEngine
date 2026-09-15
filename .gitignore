@@ -21,3 +21,5 @@ misc/.cache/
 misc/.cache/clangd/
 .garry
 .claude
+.idea
+build/

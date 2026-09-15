@@ -4,6 +4,7 @@
    $Revision: $
    $Creator: Justin Lewis $
    ======================================================================== */
+#include <SDL3/SDL.h>
 #include <p_platform_data.h>
 #include <sys_win32.h>
 

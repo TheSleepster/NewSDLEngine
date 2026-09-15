@@ -60,6 +60,8 @@ struct memory_section_t
     // NOTE(Sleepster): Here because in DEBUG mode we must
     // know the offset to the OS protected memory page.
     s64   user_allocation_size;
+#else 
+    void          *__Padding2;
 #endif
     byte          *section_base;
     memory_page_t *owner_page;
