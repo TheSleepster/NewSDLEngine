@@ -23,3 +23,5 @@ misc/.cache/clangd/
 .claude
 .idea
 build/
+.xmake
+.ninja

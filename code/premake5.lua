@@ -235,6 +235,54 @@ build_host_tool("athena", "code_generator/athena/athena.cpp")
 build_host_tool("shader_reflector", "code_generator/slang_reflector.cpp")
 build_host_tool("jfd_asset_file_packer", "asset_file_packer/jfd_file_packer.cpp")
 
+local function athena_generate()
+    dependson { "athena" }
+
+    local athena_file = "../code/meta/ATHENA_GENERATED_RTTI.h"
+    local path   = path.getabsolute(".");
+    local c_headers = os.matchfiles("../code/*.h")
+
+    buildinputs(c_headers)
+    buildoutputs(athena_file)
+
+    prebuildcommands {
+        '{ECHO} [RUNNING ATHENA]',
+        '%{cfg.buildcfg}/athena' ..
+        ' --directory=' .. path ..
+        ' --output_file=' .. athena_file
+    }
+end
+
+local function generate_slang_headers()
+    dependson { "shader_reflector" }
+    buildinputs {
+        "../run_tree/res/asset_stamp"
+    }
+
+    buildoutputs {
+        "../run_tree/res/asset_stamp"
+    }
+
+    postbuildmessage "Generating slang shader files..."
+    buildcommands {
+        '{ECHO} [RUNNING SHADER REFLECTOR]',
+        '%{cfg.buildcfg}/shader_reflector' ..
+        ' --shader_input_path=../code/shaders/' ..
+        ' --shader_output_dir=../run_tree/res/shader_binaries/' ..
+        ' --metagen_c_header_output_dir=../../code/meta/'
+    }
+end
+
+local function generate_packed_assets()
+    dependson { "jfd_asset_file_packer" }
+
+    postbuildmessage "Generating asset package files..."
+    postbuildcommands {
+        '{ECHO} [RUNNING JFD ASSET FILE PACKER]',
+        '(cd ../run_tree/res/ && ./../../build/%{cfg.buildcfg}/jfd_asset_file_packer)'
+    }
+end
+
 -- ------------------------------------------------------------------------------
 -- Much more reasonable unity file generation for the tests and sandbox files
 -- ------------------------------------------------------------------------------
@@ -298,58 +346,18 @@ make_unity_target("test",    "../code/tests",   "tests")
 -- ------------------------------------------------------------------------------
 -- Engine & DLL 
 -- ------------------------------------------------------------------------------
-project "AthenaGenerate"
-    kind "Utility"
-    targetdir "meta/"
-    dependson { "athena" }
-
-    local athena_file = "ATHENA_GENERATED_RTTI.h"
-    local source_path      = path.getabsolute(".");
-    local destination_path = path.getabsolute("meta");
-
-    buildinputs(c_headers)
-    buildoutputs(athena_file)
-    prebuildcommands {
-        '{ECHO} [RUNNING ATHENA]',
-        './%{cfg.buildcfg}/athena' ..
-        ' --directory=' .. source_path ..
-        ' --output_file=' .. destination_path .. athena_file
-    }
-
-project "GenerateShaderFiles"
-    kind "Utility"
-    dependson { "jfd_asset_file_packer" }
-
-    postbuildmessage "Generating asset package files..."
-    postbuildcommands {
-        '{ECHO} [RUNNING JFD ASSET FILE PACKER]',
-        '(cd ../run_tree/res/ && ./../../build/%{cfg.buildcfg}/jfd_asset_file_packer)'
-    }
-
-project "GenerateAssetPackages"
-    kind "Utility"
-    dependson { "GenerateShaderFiles", "asset_file_packer" }
-    buildoutputs {
-        "../run_tree/res/asset_stamp"
-    }
-
-    postbuildmessage "Generating slang shader files..."
-    prebuildcommands {
-        '{ECHO} [RUNNING SHADER REFLECTOR]',
-        '%{cfg.buildcfg}/shader_reflector' ..
-        ' --shader_input_path=../code/shaders/' ..
-        ' --shader_output_dir=../run_tree/res/shader_binaries/' ..
-        ' --metagen_c_header_output_dir=../../code/meta/'
-    }
-
 
 project "GameExecutable"
     kind "ConsoleApp"
     targetname "game_DEBUG"
     defines { "ENGINE_BUILD=1" }
-    dependson { "AthenaGenerate", "GenerateShaderFiles" }
+    dependson { "athena" }
 
-    files { "build.cpp", "meta/ATHENA_GENERATED_RTTI.h" }
+    athena_generate()
+    generate_slang_headers()
+    generate_packed_assets()
+
+    files { "build.cpp", "meta/ATHENA_GENERATED_RTTI.h"}
 
     set_toolchain_configuration()
     set_target_platform_configuration()
@@ -372,13 +380,20 @@ project "GameDLL"
     targetprefix ""
     files { "build.cpp", "meta/ATHENA_GENERATED_RTTI.h" }
     defines { "GAME_DLL_BUILD=1" }
+    dependson { "athena" }
     filter "configurations:Debug"
-        dependson { "GameExecutable", "AthenaGenerate", "GenerateShaderFiles" }
+        dependson { "athena", "GameExecutable"}
         pic "On"
+
+        filter { "system:windows" }
+            dependson { "GameExecutable" }
+        filter {}
 
         set_toolchain_configuration()
         set_target_platform_configuration()
         set_ninja_dependency_flags()
+
+        dependson { "GameExecutable" } 
         filter { "system:linux or system:macosx" }
             linkoptions { "-Wl,--allow-shlib-undefined" }
 
