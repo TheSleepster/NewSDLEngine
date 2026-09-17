@@ -6,6 +6,16 @@
 -- ==============================================================================
 
 -- ------------------------------------------------------------------------------
+-- Options
+-- ------------------------------------------------------------------------------
+option("toolchain")
+    set_default("clang")
+    set_showmenu(true)
+    set_values("clang", "gcc", "llvm-mingw", "msvc")
+    set_description("Select which toolchain to build with...")
+option_end()
+
+-- ------------------------------------------------------------------------------
 -- Initialization 
 -- ------------------------------------------------------------------------------
 local BUILD_CONFIG = get_config("mode") or "debug"
@@ -49,6 +59,9 @@ local CROSS_BUILD = (SELECTED_TOOLCHAIN == "mingw[clang]@llvm-mingw")
 -- ------------------------------------------------------------------------------
 -- LLVM-MINGW Toolchain 
 -- ------------------------------------------------------------------------------
+
+-- NOTE(Sleepster): This is just here so we can use our "custom" llvm-mingw implementation without xmake crying
+-- that it doesn't actually exist.
 toolchain("llvm-mingw")
     set_kind("cross")
 toolchain_end()
@@ -197,13 +210,14 @@ rule("platform_config")
     end)
 rule_end()
 
+add_rules("platform_config")
+
 -- ------------------------------------------------------------------------------
 -- Build the Tools (athena, shader_reflector, asset_file_packer)
 -- ------------------------------------------------------------------------------
 
 local function build_host_utility(toolname, source_file)
     target(toolname)
-        add_rules("platform_config")
         set_kind("binary")
         add_files(source_file)
 end
@@ -230,8 +244,7 @@ local function any_file_newer(files, output)
     return false
 end
 
-target("AthenaGenerate")
-    add_rules("platform_config")
+target("AthenaGenerate", function()
     set_kind("phony")
     add_deps("athena")
     on_build(function(target)
@@ -247,9 +260,9 @@ target("AthenaGenerate")
             })
         end
     end)
+end)
 
-target("GenerateShaderModules")
-    add_rules("platform_config")
+target("GenerateShaderModules", function()
     set_kind("phony")
     add_deps("shader_reflector")
     on_build(function(target)
@@ -266,9 +279,9 @@ target("GenerateShaderModules")
             io.writefile(path.join(RESOURCE_DIR, "shader_stamp.stamp"))
         end
     end)
+end)
 
-target("GenerateAssetPackages")
-    add_rules("platform_config")
+target("GenerateAssetPackages", function()
     set_kind("phony")
     add_deps("jfd_asset_file_packer", "shader_reflector")
     on_build(function(target)
@@ -288,6 +301,7 @@ target("GenerateAssetPackages")
             io.writefile(path.join(RESOURCE_DIR, "asset_stamp.stamp"))
         end
     end)
+end)
 
 -- ------------------------------------------------------------------------------
 -- Sandbox & Tests unity build generator 
@@ -327,8 +341,7 @@ local function make_unity_target(group, source_path, relative_dir)
 
         table.insert(includes, '#include "' .. source .. '"')
 
-        target(unity_taskname)
-            add_rules("platform_config")
+        target(unity_taskname, function()
             set_kind("binary")
             set_targetdir(TARGET_DIR)
 
@@ -355,7 +368,8 @@ local function make_unity_target(group, source_path, relative_dir)
                 io.writefile(platform_stamp_path, TARGET_PLATFORM)
             end)
             add_files(unity_file_path)
-        end
+        end)
+    end
 end
 
 make_unity_target("sandbox", path.join(SOURCE_DIR, "sandbox"), "sandbox")
@@ -366,7 +380,6 @@ make_unity_target("test",    path.join(SOURCE_DIR, "tests"),   "tests")
 -- ------------------------------------------------------------------------------
 target("game_executable", function()
     add_deps("AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
-    add_rules("platform_config")
 
     local GAME_BASENAME = "game"
     if BUILD_CONFIG == "debug" then
@@ -388,6 +401,7 @@ target("game_executable", function()
     set_targetdir(TARGET_DIR)
     set_basename(GAME_BASENAME)
     add_defines("ENGINE_BUILD=1")
+    set_rundir(RESOURCE_DIR)
 
     add_files(path.join(SOURCE_DIR, "build.cpp"))
 end)
@@ -400,7 +414,7 @@ if BUILD_CONFIG == "debug" then
         set_basename("game_DLL")
         set_prefixname("")
         add_defines("GAME_DLL_BUILD=1", "RELEASE=1")
-        add_rules("platform_config")
+        set_rundir(RESOURCE_DIR)
 
         add_files(path.join(SOURCE_DIR, "build.cpp"))
 
