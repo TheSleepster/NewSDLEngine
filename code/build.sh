@@ -1,10 +1,6 @@
 #!/bin/bash
 
 mkdir -p ../build/
-if [ ! -d ../build/build.ninja ]; then
-    premake5 ninja --toolchain=clang
-fi
-
-pushd ../build/
-ninja Debug
+pushd ../ 
+xmake f -m debug --toolchain=clang --ccache=n && xmake -j$(nproc) 
 popd

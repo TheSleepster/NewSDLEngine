@@ -9,16 +9,22 @@
 -- Initialization 
 -- ------------------------------------------------------------------------------
 local BUILD_CONFIG = get_config("mode") or "debug"
-local SELECTED_TOOLCHAIN = get_config("toolchain") or "clang"
-
-local HOST_PLATFORM = (function()
+local SELECTED_TOOLCHAIN = (function()
+    local toolchain = get_config("toolchain") or "clang"
+    if toolchain == "llvm-mingw" then
+        toolchain = "mingw[clang]@llvm-mingw"
+    end
+    return toolchain
+end)()
+local TARGET_PLATFORM = (function()
     local host_platform = os.host()
-    if SELECTED_TOOLCHAIN == "llvm-mingw" then
+    if SELECTED_TOOLCHAIN == "mingw[clang]@llvm-mingw" then
         host_platform = "windows"
     end
-
-    return(host_platform)
+    return host_platform
 end)()
+
+local CROSS_BUILD = (SELECTED_TOOLCHAIN == "mingw[clang]@llvm-mingw")
 
 local ROOT_DIR        = os.projectdir()
 local OUTPUT_DIR      = path.normalize(path.join(ROOT_DIR, "build"))
@@ -32,16 +38,29 @@ local BUILD_CONFIG_OUTPUT_TARGET = (function()
     if BUILD_CONFIG == "release" then 
         output_target = "Release"
     end
+
     return output_target
 end)()
 local TARGET_DIR = path.join(OUTPUT_DIR, BUILD_CONFIG_OUTPUT_TARGET)
 local UNITY_OUTPUT_DIR = path.join(OUTPUT_DIR, "unity_sources")
 
+local CROSS_BUILD = (SELECTED_TOOLCHAIN == "mingw[clang]@llvm-mingw")
+
+-- ------------------------------------------------------------------------------
+-- LLVM-MINGW Toolchain 
+-- ------------------------------------------------------------------------------
+toolchain("llvm-mingw")
+    set_kind("cross")
+toolchain_end()
+
+-- ------------------------------------------------------------------------------
+-- Settings 
+-- ------------------------------------------------------------------------------
+
 set_languages("c++11")
 set_toolchains(SELECTED_TOOLCHAIN)
 set_targetdir(TARGET_DIR)
 set_config("builddir", OUTPUT_DIR)
-add_rules("plugin.vsxmake.autoupdate")
 
 -- ------------------------------------------------------------------------------
 -- Compiler Flags 
@@ -92,6 +111,64 @@ local COMMON_INCLUDES = {
 -- ------------------------------------------------------------------------------
 -- Compiler and toolchain setting functions 
 -- ------------------------------------------------------------------------------
+
+local function set_toolchain_configuration(target, toolchain, build_config)
+    if toolchain == "clang" then
+        if build_config == "debug" then
+            target:add("cxxflags", table.join(CLANG_WARN_BASE, CLANG_DEBUG_ONLY))
+        else
+            target:add("cxxflags", table.join(CLANG_WARN_BASE, CLANG_RELEASE_ONLY))
+        end
+    elseif toolchain == "gcc" then
+        if build_config == "debug" then
+            target:add("cxxflags", table.join(GPP_WARN_BASE, GPP_DEBUG_ONLY))
+        else
+            target:add("cxxflags", table.join(GPP_WARN_BASE, GPP_RELEASE_ONLY))
+        end
+    elseif toolchain == "mingw[clang]@llvm-mingw" then
+        if build_config == "debug" then
+            target:add("ldflags", { "--target=x86_64-w64-windows-gnu", "-fuse-ld=lld", "-static-libstdc++", "-static-libgcc" })
+            target:add("cxxflags", table.join(CLANG_WARN_BASE, CLANG_DEBUG_ONLY, LLVM_MINGW_EXTRA_DEBUG, "--target=x86_64-w64-windows-gnu"))
+            target:add("rules", "llvmmingw.debug_pdb")
+            target:add("shflags", { "--target=x86_64-w64-windows-gnu", "-fuse-ld=lld", "-static-libstdc++", "-static-libgcc" })
+        else
+            target:add("cxxflags", table.join(CLANG_WARN_BASE, CLANG_RELEASE_ONLY, LLVM_MINGW_EXTRA_RELEASE))
+        end
+    elseif toolchain == "MSVC" then
+    end
+end
+
+local function set_host_configuration(target, target_platform, cross_build)
+    target:add("links", { "SDL3-Static", "freetype", "vulkan", "slang", "slang-compiler" })
+    target:add("linkdirs", path.join(DEPS_DIR, "vulkan"))
+
+    if target_platform == "windows" then
+        target:add("defines", "OS_WINDOWS=1")
+        target:add("links", { "opengl32","user32","gdi32","winmm","shell32","ole32","uuid",
+                    "version","advapi32","setupapi","cfgmgr32","oleaut32","ws2_32","imm32" })
+        target:add("linkdirs", {
+            path.join(DEPS_DIR, "SDL3", "lib", (cross_build and "Win32/MinGW" or "Win32/MSVC")),
+            path.join(DEPS_DIR, "Freetype", "lib", (cross_build and "Win32/MinGW" or "Win32/MSVC")),
+        })
+        if cross_build then
+            target:add("linkdirs", path.join(DEPS_DIR, "vulkan", "slang", "lib"))
+        end
+    elseif target_platform == "linux" then
+        target:add("defines", "OS_LINUX=1")
+        target:add("links", { "m", "dl", "pthread" })
+        target:add("linkdirs", {
+            path.join(DEPS_DIR, "SDL3", "lib", "Linux"),
+            path.join(DEPS_DIR, "Freetype", "lib", "Linux"),
+        })
+    elseif target_platform == "macosx" then
+        os.raise("MacOS is not supported...")
+    else
+        os.raise("Unsupported Platform...")
+    end
+
+    target:add("includedirs", COMMON_INCLUDES)
+end
+
 rule("llvmmingw.debug_pdb")
     on_load(function(target)
         local targetdir = target:targetdir()
@@ -99,7 +176,7 @@ rule("llvmmingw.debug_pdb")
         target:add("ldflags", {
             "-Wl,--pdb=" .. path.join(targetdir, basename .. ".pdb.tmp"),
             "-Wl,-Xlink=-PDBALTPATH:" .. basename .. ".pdb"
-        })
+        }, { force = true })
     end)
     after_build(function(target)
         local targetdir = target:targetdir()
@@ -112,76 +189,13 @@ rule("llvmmingw.debug_pdb")
     end)
 rule_end()
 
-local function set_toolchain_configuration()
-    local CC = SELECTED_TOOLCHAIN
-    if CC == "clang" then
-        if BUILD_CONFIG == "debug" then
-            add_cxxflags(table.join(CLANG_WARN_BASE, CLANG_DEBUG_ONLY))
-        else
-            add_cxxflags(table.join(CLANG_WARN_BASE, CLANG_RELEASE_ONLY))
-        end
-    elseif CC == "gcc" then
-        if BUILD_CONFIG == "debug" then
-            add_cxxflags(table.join(GPP_WARN_BASE, GPP_DEBUG_ONLY))
-        else
-            add_cxxflags(table.join(GPP_WARN_BASE, GPP_RELEASE_ONLY))
-        end
-    elseif CC == "llvm-mingw" then
-        if BUILD_CONFIG == "debug" then
-            add_ldflags({ "--target=x86_64-w64-windows-gnu", "-fuse-ld=lld", "-static-libstdc++", "-static-libgcc" })
-            add_cxxflags(table.join(CLANG_WARN_BASE, CLANG_DEBUG_ONLY, LLVM_MINGW_EXTRA_DEBUG, "--target=x86_64-w64-windows-gnu"))
-            add_rules("llvmmingw.debug_pdb")
-        else
-            add_cxxflags(table.join(CLANG_WARN_BASE, CLANG_RELEASE_ONLY, LLVM_MINGW_EXTRA_RELEASE))
-        end
-    elseif CC == "MSVC" then
-        if BUILD_CONFIG == "debug" then
-        else
-        end
-    else
-    end
-end
 
-local function set_host_configuration()
-    add_links({ "SDL3-Static", "freetype", "vulkan", "slang", "slang-compiler" })
-    add_linkdirs({
-        path.join(DEPS_DIR, "vulkan")
-    })
-
-    if HOST_PLATFORM == "windows" then
-        local cross_build = (SELECTED_TOOLCHAIN == "llvm-mingw")
-
-        add_defines("OS_WINDOWS=1")
-        add_links({ "opengl32","user32","gdi32","winmm","shell32","ole32","uuid",
-                    "version","advapi32","setupapi","cfgmgr32","oleaut32","ws2_32","imm32" })
-
-        add_linkdirs({
-            path.join(DEPS_DIR, "SDL3", "lib", (cross_build and "Win32/MinGW" or "Win32/MSVC")),
-            path.join(DEPS_DIR, "Freetype", "lib", (cross_build and "Win32/MinGW" or "Win32/MSVC")),
-        })
-
-        if cross_build then
-            add_link_dirs(path.join(DEPS_DIR, "vulkan", "slang", "lib"))
-        end
-    elseif HOST_PLATFORM == "linux" then
-        add_defines("OS_LINUX=1")
-        add_links({ "m", "dl", "pthread" })
-        add_linkdirs({
-            path.join(DEPS_DIR, "SDL3", "lib", "Linux"),
-            path.join(DEPS_DIR, "Freetype", "lib", "Linux"),
-        })
-    elseif HOST_PLATFORM == "macosx" then
-        add_defines("OS_MAC=1")
-        os.raise("MacOS is not supported...")
-    else
-        os.raise("Unsupported Platform...")
-    end
-
-    add_includedirs(COMMON_INCLUDES)
-end
-
-set_toolchain_configuration()
-set_host_configuration()
+rule("platform_config")
+    on_load(function(target)
+        set_toolchain_configuration(target, SELECTED_TOOLCHAIN, BUILD_CONFIG)
+        set_host_configuration(target, TARGET_PLATFORM, CROSS_BUILD)
+    end)
+rule_end()
 
 -- ------------------------------------------------------------------------------
 -- Build the Tools (athena, shader_reflector, asset_file_packer)
@@ -189,6 +203,7 @@ set_host_configuration()
 
 local function build_host_utility(toolname, source_file)
     target(toolname)
+        add_rules("platform_config")
         set_kind("binary")
         add_files(source_file)
 end
@@ -216,6 +231,7 @@ local function any_file_newer(files, output)
 end
 
 target("AthenaGenerate")
+    add_rules("platform_config")
     set_kind("phony")
     add_deps("athena")
     on_build(function(target)
@@ -233,6 +249,7 @@ target("AthenaGenerate")
     end)
 
 target("GenerateShaderModules")
+    add_rules("platform_config")
     set_kind("phony")
     add_deps("shader_reflector")
     on_build(function(target)
@@ -251,6 +268,7 @@ target("GenerateShaderModules")
     end)
 
 target("GenerateAssetPackages")
+    add_rules("platform_config")
     set_kind("phony")
     add_deps("jfd_asset_file_packer", "shader_reflector")
     on_build(function(target)
@@ -298,9 +316,9 @@ local function make_unity_target(group, source_path, relative_dir)
 
         table.insert(includes, "")
 
-        if HOST_PLATFORM == "linux" and os.isfile(path.join(SOURCE_DIR, "sys_linux.cpp")) then
+        if TARGET_PLATFORM == "linux" and os.isfile(path.join(SOURCE_DIR, "sys_linux.cpp")) then
             table.insert(includes, '#include "sys_linux.cpp"')
-        elseif HOST_PLATFORM == "windows" and os.isfile(SOURCE_DIR, "sys_win32.cpp") then
+        elseif TARGET_PLATFORM == "windows" and os.isfile(path.join(SOURCE_DIR, "sys_win32.cpp")) then
             table.insert(includes, '#include "sys_win32.cpp"')
         end
 
@@ -310,14 +328,31 @@ local function make_unity_target(group, source_path, relative_dir)
         table.insert(includes, '#include "' .. source .. '"')
 
         target(unity_taskname)
+            add_rules("platform_config")
             set_kind("binary")
             set_targetdir(TARGET_DIR)
 
             on_load(function()
                 os.mkdir(UNITY_OUTPUT_DIR)
-                if #os.files(unity_file_path) == 0 then
+                local platform_stamp_path = unity_file_path .. ".platform"
+
+                local regenerate
+                if not os.isfile(unity_file_path) then
+                    regenerate = true
+                elseif not os.isfile(platform_stamp_path) then
+                    regenerate = true
+                else
+                    local generated_platform = io.readfile(platform_stamp_path)
+                    if generated_platform ~= TARGET_PLATFORM then
+                        regenerate = true
+                    end
+                end
+
+                if regenerate then
                     io.writefile(unity_file_path, table.concat(includes, "\n"))
                 end
+
+                io.writefile(platform_stamp_path, TARGET_PLATFORM)
             end)
             add_files(unity_file_path)
         end
@@ -330,19 +365,23 @@ make_unity_target("test",    path.join(SOURCE_DIR, "tests"),   "tests")
 -- Engine & DLL 
 -- ------------------------------------------------------------------------------
 target("game_executable", function()
+    add_deps("AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
+    add_rules("platform_config")
+
     local GAME_BASENAME = "game"
     if BUILD_CONFIG == "debug" then
-        if (HOST_PLATFORM == "linux" or HOST_PLATFORM == "macosx") then
+        if (TARGET_PLATFORM == "linux" or TARGET_PLATFORM == "macosx") then
             add_ldflags("-rdynamic")
         else
             add_ldflags({
                 "-Wl,--export-all-symbols", 
-                "-Wl,--out-implib=" .. path.join(TARGET_DIR .. "game_DEBUG." .. (SELECTED_TOOLCHAIN == "msvc" and ".lib" or ".a"))
+                "-L" .. TARGET_DIR, 
+                "-Wl,--out-implib=" .. path.join(TARGET_DIR .. (SELECTED_TOOLCHAIN == "msvc" and "" or "/lib") .. "game_DEBUG." .. (SELECTED_TOOLCHAIN == "msvc" and "lib" or "a"))
             })
         end
         GAME_BASENAME = GAME_BASENAME .. "_DEBUG"
     else
-        add_defines("GAME_DLL_BUILD=1")
+        add_defines("GAME_DLL_BUILD=1", "RELEASE=1")
     end
 
     set_kind("binary")
@@ -350,29 +389,31 @@ target("game_executable", function()
     set_basename(GAME_BASENAME)
     add_defines("ENGINE_BUILD=1")
 
-    add_deps("AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
     add_files(path.join(SOURCE_DIR, "build.cpp"))
 end)
 
 if BUILD_CONFIG == "debug" then
     target("game_DLL", function()
+        add_deps("AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
         set_kind("shared")
         set_targetdir(TARGET_DIR)
         set_basename("game_DLL")
         set_prefixname("")
-        add_defines("GAME_DLL_BUILD=1")
+        add_defines("GAME_DLL_BUILD=1", "RELEASE=1")
+        add_rules("platform_config")
 
-        add_deps("AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
         add_files(path.join(SOURCE_DIR, "build.cpp"))
 
-        if HOST_PLATFORM == "linux" or HOST_PLATFORM == "macosx" then
+        if TARGET_PLATFORM == "linux" or TARGET_PLATFORM == "macosx" then
             add_ldflags("-Wl,--allow-shlib-undefined")
+            set_extension(".so")
         else
+            set_extension(".dll")
             add_linkdirs(TARGET_DIR)
-            ldflags({
+            add_shflags({
                 "-L" .. TARGET_DIR,
                 "-lgame_DEBUG"
-            })
+            }, {force = true})
         end
     end)
 end
