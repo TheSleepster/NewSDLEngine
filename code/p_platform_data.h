@@ -11,10 +11,10 @@
 
 #if OS_WINDOWS
     #include <sys_win32.h>
-    string_t game_dll_name = STR("../../build/game_DLL.dll");
+    string_t game_dll_name = STR("../../build/Win32/Debug/game_DLL.dll");
 #elif OS_LINUX
     #include <sys_linux.h>
-    string_t game_dll_name = STR("../../build/game_DLL.so");
+    string_t game_dll_name = STR("../../build/Linux/Debug/game_DLL.so");
 #elif OS_MAC
     #error "lmao really?"
 #endif

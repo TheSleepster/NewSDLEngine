@@ -158,8 +158,11 @@ process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager
 }
 
 int
-main(void)
+main(int argc, char **argv)
 {
+    (void)argc;
+    (void)argv;
+
     const int linked   = SDL_GetVersion();
     const int compiled = SDL_VERSION;
 
@@ -245,11 +248,12 @@ main(void)
             // NOTE(Sleepster): Reload the game code 
             if(gc->should_reload)
             {
-                SDL_Delay(5);
                 sys_free_library(gc->game_library);
-
-                gc->game_library  = sys_load_library(gc->game_dll_path);
-                Assert(gc->game_library);
+                gc->game_library = null;
+                while(!gc->game_library)
+                {
+                    gc->game_library  = sys_load_library(gc->game_dll_path);
+                }
 
                 game_main = (game_main_t*)sys_get_proc_address(gc->game_library, STR("game_main"));
                 Assert(game_main);

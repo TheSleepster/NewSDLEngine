@@ -51,7 +51,24 @@ local BUILD_CONFIG_OUTPUT_TARGET = (function()
 
     return output_target
 end)()
-local TARGET_DIR = path.join(OUTPUT_DIR, BUILD_CONFIG_OUTPUT_TARGET)
+
+local TARGET_DIR = (function()
+    local os_dir = (function()
+        local result;
+        
+        if TARGET_PLATFORM == "windows" then
+            result = "Win32"
+        elseif TARGET_PLATFORM == "linux" then
+            result = "Linux"
+        else
+            print("Unsupported Platform...")
+        end
+
+        return result
+    end)()
+
+    return path.join(OUTPUT_DIR, os_dir, BUILD_CONFIG_OUTPUT_TARGET)
+end)()
 local UNITY_OUTPUT_DIR = path.join(OUTPUT_DIR, "unity_sources")
 
 local CROSS_BUILD = (SELECTED_TOOLCHAIN == "mingw[clang]@llvm-mingw")
@@ -60,8 +77,8 @@ local CROSS_BUILD = (SELECTED_TOOLCHAIN == "mingw[clang]@llvm-mingw")
 -- LLVM-MINGW Toolchain 
 -- ------------------------------------------------------------------------------
 
--- NOTE(Sleepster): This is just here so we can use our "custom" llvm-mingw implementation without xmake crying
--- that it doesn't actually exist.
+-- NOTE(Sleepster): This is just here so we can use our "custom" llvm-mingw
+-- without xmake crying about it
 toolchain("llvm-mingw")
     set_kind("cross")
 toolchain_end()
@@ -70,7 +87,10 @@ toolchain_end()
 -- Settings 
 -- ------------------------------------------------------------------------------
 
-set_languages("c++11")
+-- Microsoft hates happiness
+local standard = (SELECTED_TOOLCHAIN == "msvc" and "c++14" or "c++11")
+set_languages(standard)
+
 set_toolchains(SELECTED_TOOLCHAIN)
 set_targetdir(TARGET_DIR)
 set_config("builddir", OUTPUT_DIR)
@@ -107,11 +127,10 @@ local LLVM_MINGW_EXTRA_DEBUG = {
     "-gcodeview",
     "-ffile-compilation-dir=" .. MINGW_DEBUG_DIR,
     "-fdebug-compilation-dir=" .. MINGW_DEBUG_DIR,
-    "-ffile-prefix-map=%{wks.location}/..=" .. MINGW_DEBUG_DIR,
-    "-ffile-prefix-map=%{wks.location}=" .. MINGW_DEBUG_DIR .. "/build",
-    "-ffile-prefix-map=..=" .. MINGW_DEBUG_DIR,
+    "-ffile-prefix-map=" .. ROOT_DIR .. "=" .. MINGW_DEBUG_DIR,
     "-ffile-prefix-map=/tmp=" .. MINGW_DEBUG_DIR .. "/build",
 }
+
 local LLVM_MINGW_EXTRA_RELEASE = { "-Wno-unused-template" }
 local COMMON_INCLUDES = {
     SOURCE_DIR,
@@ -381,7 +400,8 @@ make_unity_target("test",    path.join(SOURCE_DIR, "tests"),   "tests")
 target("game_executable", function()
     add_deps("AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
 
-    local GAME_BASENAME = "game"
+    -- NOTE(Sleepster): Call it game debug no matter what 
+    local GAME_BASENAME = "game_DEBUG"
     if BUILD_CONFIG == "debug" then
         if (TARGET_PLATFORM == "linux" or TARGET_PLATFORM == "macosx") then
             add_ldflags("-rdynamic")
@@ -392,7 +412,6 @@ target("game_executable", function()
                 "-Wl,--out-implib=" .. path.join(TARGET_DIR .. (SELECTED_TOOLCHAIN == "msvc" and "" or "/lib") .. "game_DEBUG." .. (SELECTED_TOOLCHAIN == "msvc" and "lib" or "a"))
             })
         end
-        GAME_BASENAME = GAME_BASENAME .. "_DEBUG"
     else
         add_defines("GAME_DLL_BUILD=1", "RELEASE=1")
     end
@@ -408,12 +427,12 @@ end)
 
 if BUILD_CONFIG == "debug" then
     target("game_DLL", function()
-        add_deps("AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
+        add_deps("game_executable", "AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
         set_kind("shared")
         set_targetdir(TARGET_DIR)
         set_basename("game_DLL")
         set_prefixname("")
-        add_defines("GAME_DLL_BUILD=1", "RELEASE=1")
+        add_defines("GAME_DLL_BUILD=1")
         set_rundir(RESOURCE_DIR)
 
         add_files(path.join(SOURCE_DIR, "build.cpp"))

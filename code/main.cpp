@@ -1225,7 +1225,7 @@ game_main(global_context_t *_global_context)
                           &render_state->vertex_buffer, 
                           asset_manager, 
                           &basic_font, 
-                          STR("I love test font!"), 
+                          STR("Xmake is weird about how it writes out ELF files!"), 
                           vec3(-300, 150, 0.0f), 
                           vec4(1.0f, 1.0f, 1.0f, 1.0f), 
                           0.0f, 
