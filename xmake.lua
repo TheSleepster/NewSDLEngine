@@ -159,10 +159,17 @@ local function set_toolchain_configuration(target, toolchain, build_config)
         end
     elseif toolchain == "mingw[clang]@llvm-mingw" then
         if build_config == "debug" then
-            target:add("ldflags", { "--target=x86_64-w64-windows-gnu", "-fuse-ld=lld", "-static-libstdc++", "-static-libgcc" })
+            target:add("ldflags", { "-fuse-ld=lld", "--target=x86_64-w64-windows-gnu", "-static-libstdc++", "-static-libgcc" })
             target:add("cxxflags", table.join(CLANG_WARN_BASE, CLANG_DEBUG_ONLY, LLVM_MINGW_EXTRA_DEBUG, "--target=x86_64-w64-windows-gnu"))
             target:add("rules", "llvmmingw.debug_pdb")
             target:add("shflags", { "--target=x86_64-w64-windows-gnu", "-fuse-ld=lld", "-static-libstdc++", "-static-libgcc" })
+
+            local targetdir = target:targetdir()
+            local basename  = target:basename()
+            target:add("ldflags", {
+                "-Wl,--pdb=" .. path.join(targetdir, basename .. ".pdb.tmp"),
+                "-Wl,-Xlink=-PDBALTPATH:" .. basename .. ".pdb"
+            })
         else
             target:add("cxxflags", table.join(CLANG_WARN_BASE, CLANG_RELEASE_ONLY, LLVM_MINGW_EXTRA_RELEASE))
         end
@@ -202,14 +209,6 @@ local function set_host_configuration(target, target_platform, cross_build)
 end
 
 rule("llvmmingw.debug_pdb")
-    on_load(function(target)
-        local targetdir = target:targetdir()
-        local basename  = target:basename()
-        target:add("ldflags", {
-            "-Wl,--pdb=" .. path.join(targetdir, basename .. ".pdb.tmp"),
-            "-Wl,-Xlink=-PDBALTPATH:" .. basename .. ".pdb"
-        }, { force = true })
-    end)
     after_build(function(target)
         local targetdir = target:targetdir()
         local basename  = target:basename()
