@@ -121,6 +121,7 @@ bool8             vk_is_depth_format(u32 format);
 VkImageLayout     vk_get_image_initial_layout_from_usage(u32 usage);
 VkImageLayout     vk_get_image_final_layout_from_usage(u32 usage);
 VkSampler         vk_backend_get_sampler(vulkan_context_t *vulkan_context, vulkan_sampler_info_t *sampler_info);
+void              vk_backend_image_clear_contents(VkCommandBuffer command_buffer, vulkan_image_t *image, VkClearValue clear_value);
      
 #endif // VK_BACKEND_IMAGE_H
 

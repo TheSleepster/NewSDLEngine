@@ -11,7 +11,7 @@
 option("toolchain")
     set_default("clang")
     set_showmenu(true)
-    set_values("clang", "gcc", "llvm-mingw", "msvc")
+    set_values("clang", "gcc", "llvm-mingw", "msvc", "clang-cl")
     set_description("Select which toolchain to build with...")
 option_end()
 
@@ -88,7 +88,15 @@ toolchain_end()
 -- ------------------------------------------------------------------------------
 
 -- Microsoft hates happiness
-local standard = (SELECTED_TOOLCHAIN == "msvc" and "c++14" or "c++11")
+local microsoft_stupid = (function()
+    if SELECTED_TOOLCHAIN == "msvc" or SELECTED_TOOLCHAIN == "clang-cl" then
+        return true 
+    end
+
+    return false
+end)()
+
+local standard = (microsoft_stupid and "c++14" or "c++11")
 set_languages(standard)
 
 set_toolchains(SELECTED_TOOLCHAIN)
@@ -131,6 +139,17 @@ local LLVM_MINGW_EXTRA_DEBUG = {
     "-ffile-prefix-map=/tmp=" .. MINGW_DEBUG_DIR .. "/build",
 }
 
+local MSVC_WARN_BASE = {
+    "-Wno-write-strings", "-Wno-c++11-narrowing", 
+}
+
+local MSVC_DEBUG_ONLY = {
+    "-MT"
+}
+
+local MSVC_RELEASE_ONLY = {
+}
+
 local LLVM_MINGW_EXTRA_RELEASE = { "-Wno-unused-template" }
 local COMMON_INCLUDES = {
     SOURCE_DIR,
@@ -159,21 +178,19 @@ local function set_toolchain_configuration(target, toolchain, build_config)
         end
     elseif toolchain == "mingw[clang]@llvm-mingw" then
         if build_config == "debug" then
-            target:add("ldflags", { "-fuse-ld=lld", "--target=x86_64-w64-windows-gnu", "-static-libstdc++", "-static-libgcc" })
+            target:add("ldflags", { "--target=x86_64-w64-windows-gnu", "-fuse-ld=lld", "-static-libstdc++", "-static-libgcc" })
             target:add("cxxflags", table.join(CLANG_WARN_BASE, CLANG_DEBUG_ONLY, LLVM_MINGW_EXTRA_DEBUG, "--target=x86_64-w64-windows-gnu"))
             target:add("rules", "llvmmingw.debug_pdb")
             target:add("shflags", { "--target=x86_64-w64-windows-gnu", "-fuse-ld=lld", "-static-libstdc++", "-static-libgcc" })
-
-            local targetdir = target:targetdir()
-            local basename  = target:basename()
-            target:add("ldflags", {
-                "-Wl,--pdb=" .. path.join(targetdir, basename .. ".pdb.tmp"),
-                "-Wl,-Xlink=-PDBALTPATH:" .. basename .. ".pdb"
-            })
         else
             target:add("cxxflags", table.join(CLANG_WARN_BASE, CLANG_RELEASE_ONLY, LLVM_MINGW_EXTRA_RELEASE))
         end
-    elseif toolchain == "MSVC" then
+    elseif toolchain == "msvc" or toolchain == "clang-cl" then
+        if build_config == "debug" then
+            target:add("cxxflags", table.join(MSVC_WARN_BASE, MSVC_DEBUG_ONLY))
+        else
+            target:add("cxxflags", table.join(MSVC_WARN_BASE, MSVC_RELEASE_ONLY))
+        end
     end
 end
 
@@ -188,10 +205,9 @@ local function set_host_configuration(target, target_platform, cross_build)
         target:add("linkdirs", {
             path.join(DEPS_DIR, "SDL3", "lib", (cross_build and "Win32/MinGW" or "Win32/MSVC")),
             path.join(DEPS_DIR, "Freetype", "lib", (cross_build and "Win32/MinGW" or "Win32/MSVC")),
+            path.join(DEPS_DIR, "Freetype", "lib", (cross_build and "Win32/MinGW" or "Win32/MSVC")),
+            path.join(DEPS_DIR, "vulkan", "slang", "lib")
         })
-        if cross_build then
-            target:add("linkdirs", path.join(DEPS_DIR, "vulkan", "slang", "lib"))
-        end
     elseif target_platform == "linux" then
         target:add("defines", "OS_LINUX=1")
         target:add("links", { "m", "dl", "pthread" })
@@ -209,13 +225,25 @@ local function set_host_configuration(target, target_platform, cross_build)
 end
 
 rule("llvmmingw.debug_pdb")
+    on_load(function(target)
+        if SELECTED_TOOLCHAIN == "mingw[clang]@llvm-mingw" then
+            local targetdir = target:targetdir()
+            local basename  = target:basename()
+            target:add("ldflags", {
+                "-Wl,--pdb=" .. path.join(targetdir, basename .. ".pdb.tmp"),
+                "-Wl,-Xlink=-PDBALTPATH:" .. basename .. ".pdb"
+            }, { force = true })
+        end
+    end)
     after_build(function(target)
-        local targetdir = target:targetdir()
-        local basename  = target:basename()
-        local tmp_pdb   = path.join(targetdir, basename .. ".pdb.tmp")
-        local final_pdb = path.join(targetdir, basename .. ".pdb")
-        if os.isfile(tmp_pdb) then
-            os.mv(tmp_pdb, final_pdb)
+        if SELECTED_TOOLCHAIN == "mingw[clang]@llvm-mingw" then
+            local targetdir = target:targetdir()
+            local basename  = target:basename()
+            local tmp_pdb   = path.join(targetdir, basename .. ".pdb.tmp")
+            local final_pdb = path.join(targetdir, basename .. ".pdb")
+            if os.isfile(tmp_pdb) then
+                os.mv(tmp_pdb, final_pdb)
+            end
         end
     end)
 rule_end()
@@ -229,6 +257,7 @@ rule("platform_config")
 rule_end()
 
 add_rules("platform_config")
+add_rules("llvmmingw.debug_pdb")
 
 -- ------------------------------------------------------------------------------
 -- Build the Tools (athena, shader_reflector, asset_file_packer)
@@ -343,7 +372,8 @@ local function make_unity_target(group, source_path, relative_dir)
         }
 
         for _, c_file in ipairs(c_base_files) do
-            table.insert(includes, '#include "' .. c_file .. '"')
+            local filename = path.basename(c_file) .. ".cpp"
+            table.insert(includes, '#include "' .. filename .. '"')
         end
 
         table.insert(includes, "")
@@ -357,7 +387,8 @@ local function make_unity_target(group, source_path, relative_dir)
         local generated_unity_target = "generate" .. "_" .. group .. "_", relative_dir
         local unity_taskname = path.basename(unity_file_path)
 
-        table.insert(includes, '#include "' .. source .. '"')
+        local this_file = path.basename(source) .. ".cpp"
+        table.insert(includes, '#include "' .. relative_dir .. '/' .. this_file .. '"')
 
         target(unity_taskname, function()
             set_kind("binary")
@@ -405,11 +436,26 @@ target("game_executable", function()
         if (TARGET_PLATFORM == "linux" or TARGET_PLATFORM == "macosx") then
             add_ldflags("-rdynamic")
         else
-            add_ldflags({
-                "-Wl,--export-all-symbols", 
-                "-L" .. TARGET_DIR, 
-                "-Wl,--out-implib=" .. path.join(TARGET_DIR .. (SELECTED_TOOLCHAIN == "msvc" and "" or "/lib") .. "game_DEBUG." .. (SELECTED_TOOLCHAIN == "msvc" and "lib" or "a"))
-            })
+            local game_library_target = (function()
+                local target_lib = path.join(TARGET_DIR .. "/lib" .. "game_DEBUG." .. "a")
+                if SELECTED_TOOLCHAIN == "msvc" or SELECTED_TOOLCHAIN == "clang-cl" then
+                    target_lib = path.join(TARGET_DIR .. "/", "game_DEBUG." .. "lib")
+                end
+
+                return target_lib 
+            end)()
+            if SELECTED_TOOLCHAIN == "msvc" or  SELECTED_TOOLCHAIN == "clang-cl" then
+                add_ldflags({
+                    "/LIBPATH:" .. TARGET_DIR, 
+                    "/IMPLIB:" .. game_library_target,
+                })
+            else
+                add_ldflags({
+                    "-Wl,--export-all-symbols", 
+                    "-L" .. TARGET_DIR, 
+                    "-Wl,--out-implib=" .. game_library_target
+                })
+            end
         end
     else
         add_defines("GAME_DLL_BUILD=1", "RELEASE=1")
@@ -429,23 +475,41 @@ if BUILD_CONFIG == "debug" then
         add_deps("game_executable", "AthenaGenerate", "GenerateShaderModules", "GenerateAssetPackages")
         set_kind("shared")
         set_targetdir(TARGET_DIR)
-        set_basename("game_DLL")
+        set_basename("game_DLL.tmp")
         set_prefixname("")
         add_defines("GAME_DLL_BUILD=1")
         set_rundir(RESOURCE_DIR)
 
         add_files(path.join(SOURCE_DIR, "build.cpp"))
 
+        local DLL_EXT = ".so"
         if TARGET_PLATFORM == "linux" or TARGET_PLATFORM == "macosx" then
             add_ldflags("-Wl,--allow-shlib-undefined")
             set_extension(".so")
         else
+            DLL_EXT = ".dll"
             set_extension(".dll")
             add_linkdirs(TARGET_DIR)
-            add_shflags({
-                "-L" .. TARGET_DIR,
-                "-lgame_DEBUG"
-            }, {force = true})
+            if SELECTED_TOOLCHAIN == "msvc" or SELECTED_TOOLCHAIN == "clang-cl" then
+                add_shflags({
+                    "/LIBPATH:" .. TARGET_DIR,
+                    "game_DEBUG.lib",
+                }, { force = true })
+            else
+                add_shflags({
+                    "-L" .. TARGET_DIR,
+                    "-lgame_DEBUG"
+                }, {force = true})
+            end
         end
+
+        -- NOTE(Sleepster): Copy DLL for hotreloading 
+        after_build(function(target)
+            local target_dll = path.join(TARGET_DIR, "game_DLL" .. DLL_EXT)
+            local temp_dll   = path.join(TARGET_DIR, "game_DLL.tmp" .. DLL_EXT)
+            if os.isfile(temp_dll) then
+                os.mv(temp_dll, target_dll)
+            end
+        end)
     end)
 end

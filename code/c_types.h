@@ -36,7 +36,6 @@ typedef float           real32;
 typedef double          real64;
 
 #define null            NULL
-#define external        extern "C"
 
 #endif // C_TYPES_H
 

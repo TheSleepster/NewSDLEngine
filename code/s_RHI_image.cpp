@@ -45,5 +45,3 @@ RHI_image_update_data(RHI_context_t *RHI_context, RHI_image_t *image)
 {
     RHI_context->backend_image_update_contents(image);
 }
-
-

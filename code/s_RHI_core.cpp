@@ -97,11 +97,23 @@ RHI_handle_window_resize(RHI_context_t *RHI_context, vec2_t window_size)
     }
 }
 
+/*
+=============
+RHI_execute_backend_commands
+=============
+*/
+
 void
 RHI_execute_backend_commands(RHI_context_t *RHI_context)
 {
     RHI_context->backend_render_frame();
 }
+
+/*
+=============
+RHI_renderpass_key
+=============
+*/
 
 internal_api void 
 RHI_renderpass_key(RHI_renderpass_key_t *key, RHI_renderpass_t *renderpass, RHI_renderpass_desc_t *renderpass_desc)
@@ -133,6 +145,9 @@ u32
 RHI_build_renderpass(RHI_context_t *RHI_context, RHI_renderpass_desc_t *renderpass_desc)
 {
     u32 result = INVALID_ID;
+
+    // TODO(Sleepster): What if we destroy renderpasses? Suddenly this is a really bad way of getting
+    // a new renderpass!
     RHI_renderpass_t *renderpass = RHI_context->renderpasses + RHI_context->renderpass_count;
     Assert(renderpass);
     
@@ -174,6 +189,25 @@ RHI_resize_renderpass(RHI_context_t *RHI_context, RHI_renderpass_t *renderpass)
 
     renderpass->render_width  = renderpass->create_info.render_width;
     renderpass->render_height = renderpass->create_info.render_height;
+}
+
+
+/////////////////////////
+// RENDER CAMERA 
+/////////////////////////
+
+void
+RHI_render_camera_set_matrices(RHI_render_camera_t *camera)
+{
+    float32 half_width  = (camera->viewport.x * 0.5f) * camera->zoom;
+    float32 half_height = (camera->viewport.y * 0.5f) * camera->zoom;
+
+    camera->matrices.view_matrix       = mat4_make_translation(vec2_expand_vec3(camera->translation, 0.0f));
+    camera->matrices.projection_matrix = mat4_RHDX_ortho(-half_width, 
+                                                          half_width, 
+                                                         -half_height, 
+                                                          half_height, 
+                                                         -1, 1);
 }
 
 /////////////////////////
@@ -547,6 +581,53 @@ RHI_cmd_renderpass_end(RHI_command_list_t *command_list)
     command->data                = end_renderpass;
 
     command_list->active_renderpass = null;
+}
+
+/*
+=============
+RHI_cmd_clear_image
+=============
+*/
+
+void
+RHI_cmd_clear_image(RHI_command_list_t *command_list, RHI_image_t *image, RHI_clear_value_t value)
+{
+    Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+    if(command_list->active_renderpass != null)
+    {
+        log_error("You cannot clear the image inside an active renderpass!\n");
+    }
+
+    RHI_command_t *command = RHI_get_next_command(command_list);
+    RHI_command_clear_image_t *clear = c_arena_push_struct(&command_list->command_arena, 
+                                                            RHI_command_clear_image_t);
+    clear->image       = image;
+    clear->clear_value = value;
+
+    command->header.command_type = RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE;
+    command->data                = clear;
+}
+
+/*
+=============
+RHI_cmd_clear_renderpass_contents
+=============
+*/
+
+void
+RHI_cmd_clear_renderpass_attachments(RHI_command_list_t *command_list, u32 renderpassID)
+{
+    Assert(command_list->active_renderpass != null);
+    Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+
+    RHI_command_t *command = RHI_get_next_command(command_list);
+    RHI_command_clear_renderpass_attachments_t *clear_renderpass = c_arena_push_struct(&command_list->command_arena, 
+                                                                                       RHI_command_clear_renderpass_attachments_t);
+
+    clear_renderpass->ID = renderpassID;
+
+    command->header.command_type = RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS;
+    command->data                = clear_renderpass;
 }
 
 /*

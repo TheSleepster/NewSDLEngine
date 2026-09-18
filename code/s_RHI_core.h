@@ -23,6 +23,22 @@ constexpr u32 RHI_MAX_CONSTANT_BUFFERS    = 1000;
 constexpr u32 RHI_MAX_RENDER_TARGETS      = 100;
 constexpr u32 RHI_MAX_SHADER_IMAGE_PARAMS = 16;
 
+struct RHI_render_camera_t
+{
+    vec2_t  viewport;
+    vec2_t  translation;
+    float32 zoom;
+
+    // NOTE(Sleepster): I have decided that I don't want to deal with Euler angles in 2D. Fuck you. 
+    //float32 rotation;
+    //vec3_t  axis;
+
+    struct {
+        mat4_t projection_matrix;
+        mat4_t view_matrix;
+    }matrices;
+};
+
 // TODO(Sleepster): Remove this...
 struct camera_matrices_t
 {
@@ -107,6 +123,18 @@ struct RHI_index_buffer_t
 ////////////////////
 // RENDER COMMAND STUFF
 ////////////////////
+
+union RHI_clear_value_t
+{
+    vec4_t  float_color;
+    ivec4_t int_color;
+    u32     uint_color[4];
+    struct {
+        float32 depth;
+        u32     stencil;
+    };
+};
+
 struct RHI_renderpass_t;
 
 // NOTE(Sleepster): The memory for each of these is transient, don't rely 
@@ -146,6 +174,8 @@ enum RHI_command_type_t
 {
     RHI_RENDER_COMMAND_TYPE_INVALID,
     RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET,
+    RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS,
+    RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE,
     RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS,
     RHI_RENDER_COMMAND_TYPE_END_RENDERPASS,
     RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER,
@@ -182,6 +212,17 @@ struct RHI_command_begin_renderpass_t
 struct RHI_command_end_renderpass_t
 {
     u32 ID;
+};
+
+struct RHI_command_clear_renderpass_attachments_t 
+{
+    u32 ID;
+};
+
+struct RHI_command_clear_image_t
+{
+    RHI_image_t      *image;
+    RHI_clear_value_t clear_value;
 };
 
 struct RHI_command_bind_vertex_buffer_t
@@ -367,19 +408,6 @@ struct RHI_command_list_t
 // RENDER TARGETS 
 ////////////////////
 
-union RHI_clear_value_t
-{
-    union {
-        vec4_t  float_color;
-        ivec4_t int_color;
-        u32     uint_color[4];
-        struct {
-            float32 depth;
-            u32     stencil;
-        };
-    };
-};
-
 enum RHI_renderpass_attachment_access_t
 {
     RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID     = BIT(0),
@@ -441,6 +469,8 @@ struct RHI_renderpass_t
     backend_renderpass_handle_t  renderpass_handle;
     backend_framebuffer_handle_t framebuffer_handle;
 
+    // TODO(Sleepster): Work these two together for easy interation? Perhaps just slap the depth_stencil
+    // at the end of the array?
     RHI_renderpass_attachment_t  depth_stencil_attachment;
     RHI_renderpass_attachment_t  color_attachments[RHI_MAX_RENDER_TARGET_ATTACHMENTS];
     u32                          color_attachment_count;
@@ -519,6 +549,7 @@ void             RHI_handle_window_resize(RHI_context_t *RHI_context, vec2_t win
 void             RHI_resize_render_targets(RHI_context_t *RHI_context, vec2_t window_size);
 u32              RHI_build_renderpass(RHI_context_t *RHI_context, RHI_renderpass_desc_t *renderpass_desc);
 true_inline void RHI_resize_renderpass(RHI_context_t *RHI_context, RHI_renderpass_t *renderpass);
+void             RHI_render_camera_set_matrices(RHI_render_camera_t *camera);
 
 RHI_uniform_constant_buffer_t* RHI_get_constant_buffer(RHI_context_t *RHI_context, string_t uniform_name);
 
@@ -544,8 +575,8 @@ void                   RHI_set_texture_filter_mode(RHI_context_t *render_state, 
 // NOTE(Sleepster): RHI commands 
 void RHI_cmd_renderpass_begin(RHI_command_list_t *command_list, u32 renderpassID);
 void RHI_cmd_renderpass_end(RHI_command_list_t *command_list);
-void RHI_cmd_begin_render_group(RHI_command_list_t *command_list);
-void RHI_cmd_end_render_group(RHI_command_list_t *command_list);
+void RHI_cmd_clear_renderpass_attachments(RHI_command_list_t *command_list, u32 renderpassID);
+void RHI_cmd_renderpass_begin(RHI_command_list_t *command_list, u32 renderpassID);
 void RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_render_buffer_t *buffer);
 void RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer);
 void RHI_cmd_bind_index_buffer(RHI_command_list_t *command_list, RHI_render_buffer_t *buffer);

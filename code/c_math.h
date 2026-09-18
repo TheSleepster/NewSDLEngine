@@ -562,6 +562,15 @@ MATH_API float32 mat3_inverse_determinant(mat3_t A);
   =========== MATRIX 4 FUNCTIONS ============
   ===========================================*/
 
+// TODO(Sleepster): Maybe make at least a FEW of these take a pointer? I mean damn.
+// If you have to translate -> rotate -> scale then this just is slower than it needs to be
+//
+// mat4 identity = mat4_identity()
+// identity      = mat4_translate(...)
+// identity      = mat4_rotate()
+// identity      = mat4_scale()
+//
+// when it could just be a pass-by-reference operation
 MATH_API mat4_t  mat4_identity(void);
 MATH_API mat4_t  mat4_set_identity(float32 value);
 MATH_API mat4_t  mat4_add(mat4_t A, mat4_t B);

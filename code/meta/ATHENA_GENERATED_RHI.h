@@ -195,6 +195,7 @@
 	X(VkImageSubresourceRange, &DEFAULT_typedata_VkImageSubresourceRange) \
 	X(VkImageUsageFlags, &DEFAULT_typedata_VkImageUsageFlags) \
 	X(VkFilter, &DEFAULT_typedata_VkFilter) \
+	X(VkClearValue, &DEFAULT_typedata_VkClearValue) \
 	X(VkImageAspectFlags, &DEFAULT_typedata_VkImageAspectFlags) \
 	X(entity_archetype_t, &DEFAULT_typedata_structure_entity_archetype_t.type_info) \
 	X(entity_flags_t, &DEFAULT_typedata_structure_entity_flags_t.type_info) \
@@ -227,15 +228,19 @@
 	X(game_state_t, &DEFAULT_typedata_game_state_t) \
 	X(memory_arena_footer_t, &DEFAULT_typedata_structure_memory_arena_footer_t.type_info) \
 	X(scratch_arena_t, &DEFAULT_typedata_structure_scratch_arena_t.type_info) \
+	X(RHI_render_camera_t, &DEFAULT_typedata_structure_RHI_render_camera_t.type_info) \
 	X(RHI_render_buffer_type_t, &DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info) \
 	X(RHI_render_buffer_advance_rate_t, &DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info) \
 	X(RHI_render_buffer_memory_type_t, &DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info) \
 	X(RHI_render_buffer_desc_t, &DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info) \
 	X(RHI_render_buffer_t, &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info) \
+	X(RHI_clear_value_t, &DEFAULT_typedata_structure_RHI_clear_value_t.type_info) \
 	X(RHI_command_type_t, &DEFAULT_typedata_structure_RHI_command_type_t.type_info) \
 	X(RHI_command_header_t, &DEFAULT_typedata_structure_RHI_command_header_t.type_info) \
 	X(RHI_command_begin_renderpass_t, &DEFAULT_typedata_structure_RHI_command_begin_renderpass_t.type_info) \
 	X(RHI_command_end_renderpass_t, &DEFAULT_typedata_structure_RHI_command_end_renderpass_t.type_info) \
+	X(RHI_command_clear_renderpass_attachments_t, &DEFAULT_typedata_structure_RHI_command_clear_renderpass_attachments_t.type_info) \
+	X(RHI_command_clear_image_t, &DEFAULT_typedata_structure_RHI_command_clear_image_t.type_info) \
 	X(RHI_command_bind_vertex_buffer_t, &DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.type_info) \
 	X(RHI_command_bind_index_buffer_t, &DEFAULT_typedata_structure_RHI_command_bind_index_buffer_t.type_info) \
 	X(RHI_command_update_texture_t, &DEFAULT_typedata_structure_RHI_command_update_texture_t.type_info) \
@@ -255,7 +260,6 @@
 	X(RHI_command_present_frame_t, &DEFAULT_typedata_structure_RHI_command_present_frame_t.type_info) \
 	X(RHI_command_t, &DEFAULT_typedata_structure_RHI_command_t.type_info) \
 	X(RHI_command_list_type_t, &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info) \
-	X(RHI_clear_value_t, &DEFAULT_typedata_structure_RHI_clear_value_t.type_info) \
 	X(RHI_renderpass_attachment_access_t, &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info) \
 	X(RHI_renderpass_attachment_load_operation_t, &DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info) \
 	X(RHI_renderpass_attachment_store_operation_t, &DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info) \
@@ -656,6 +660,8 @@
 	X(TYPE_vk_get_image_initial_layout_from_usage) \
 	X(TYPE_vk_get_image_final_layout_from_usage) \
 	X(TYPE_vk_backend_get_sampler) \
+	X(TYPE_VkClearValue) \
+	X(TYPE_vk_backend_image_clear_contents) \
 	X(TYPE_VkImageAspectFlags) \
 	X(TYPE_entity_archetype_t) \
 	X(TYPE_entity_flags_t) \
@@ -744,15 +750,19 @@
 	X(TYPE_c_arena_reset) \
 	X(TYPE_c_arena_begin_temporary_memory) \
 	X(TYPE_c_arena_end_temporary_memory) \
+	X(TYPE_RHI_render_camera_t) \
 	X(TYPE_RHI_render_buffer_type_t) \
 	X(TYPE_RHI_render_buffer_advance_rate_t) \
 	X(TYPE_RHI_render_buffer_memory_type_t) \
 	X(TYPE_RHI_render_buffer_desc_t) \
 	X(TYPE_RHI_render_buffer_t) \
+	X(TYPE_RHI_clear_value_t) \
 	X(TYPE_RHI_command_type_t) \
 	X(TYPE_RHI_command_header_t) \
 	X(TYPE_RHI_command_begin_renderpass_t) \
 	X(TYPE_RHI_command_end_renderpass_t) \
+	X(TYPE_RHI_command_clear_renderpass_attachments_t) \
+	X(TYPE_RHI_command_clear_image_t) \
 	X(TYPE_RHI_command_bind_vertex_buffer_t) \
 	X(TYPE_RHI_command_bind_index_buffer_t) \
 	X(TYPE_RHI_command_update_texture_t) \
@@ -772,7 +782,6 @@
 	X(TYPE_RHI_command_present_frame_t) \
 	X(TYPE_RHI_command_t) \
 	X(TYPE_RHI_command_list_type_t) \
-	X(TYPE_RHI_clear_value_t) \
 	X(TYPE_RHI_renderpass_attachment_access_t) \
 	X(TYPE_RHI_renderpass_attachment_load_operation_t) \
 	X(TYPE_RHI_renderpass_attachment_store_operation_t) \
@@ -783,6 +792,7 @@
 	X(TYPE_RHI_resize_render_targets) \
 	X(TYPE_RHI_build_renderpass) \
 	X(TYPE_RHI_resize_renderpass) \
+	X(TYPE_RHI_render_camera_set_matrices) \
 	X(TYPE_RHI_get_constant_buffer) \
 	X(TYPE_RHI_render_buffer_create) \
 	X(TYPE_RHI_vertex_buffer_create) \
@@ -797,8 +807,7 @@
 	X(TYPE_RHI_set_texture_filter_mode) \
 	X(TYPE_RHI_cmd_renderpass_begin) \
 	X(TYPE_RHI_cmd_renderpass_end) \
-	X(TYPE_RHI_cmd_begin_render_group) \
-	X(TYPE_RHI_cmd_end_render_group) \
+	X(TYPE_RHI_cmd_clear_renderpass_attachments) \
 	X(TYPE_RHI_cmd_bind_vertex_buffer) \
 	X(TYPE_RHI_cmd_bind_index_buffer) \
 	X(TYPE_RHI_cmd_set_scissor) \
@@ -818,6 +827,7 @@
 	X(TYPE_RHI_cmd_blit_renderpass) \
 	X(TYPE_RHI_cmd_present) \
 	X(TYPE_RHI_execute_backend_commands) \
+	X(TYPE_matrices) \
 	X(TYPE_ivec4_t) \
 	X(TYPE_bitmap_format_t) \
 	X(TYPE_backend_initialize) \
@@ -4749,6 +4759,21 @@ struct type_info_procedure_vk_backend_get_sampler {
 	};
 };
 
+struct type_info_procedure_vk_backend_image_clear_contents {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[3];
+		struct {
+			const type_info_member_t command_buffer;
+			const type_info_member_t image;
+			const type_info_member_t clear_value;
+		}arguments;
+	};
+};
+
 struct type_info_struct_entity_archetype_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -6064,6 +6089,21 @@ struct type_info_procedure_c_arena_end_temporary_memory {
 	};
 };
 
+struct type_info_struct_RHI_render_camera_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[4];
+		struct {
+			const type_info_member_t viewport;
+			const type_info_member_t translation;
+			const type_info_member_t zoom;
+			const type_info_member_t matrices;
+		}members;
+	};
+};
+
 struct type_info_struct_RHI_render_buffer_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -6142,15 +6182,33 @@ struct type_info_struct_RHI_render_buffer_t {
 	};
 };
 
+struct type_info_struct_RHI_clear_value_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[5];
+		struct {
+			const type_info_member_t float_color;
+			const type_info_member_t int_color;
+			const type_info_member_t uint_color;
+			const type_info_member_t depth;
+			const type_info_member_t stencil;
+		}members;
+	};
+};
+
 struct type_info_struct_RHI_command_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[23];
+		const type_info_member_t member_array[25];
 		struct {
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_INVALID;
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE;
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS;
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_END_RENDERPASS;
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER;
@@ -6208,6 +6266,31 @@ struct type_info_struct_RHI_command_end_renderpass_t {
 		const type_info_member_t member_array[1];
 		struct {
 			const type_info_member_t ID;
+		}members;
+	};
+};
+
+struct type_info_struct_RHI_command_clear_renderpass_attachments_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[1];
+		struct {
+			const type_info_member_t ID;
+		}members;
+	};
+};
+
+struct type_info_struct_RHI_command_clear_image_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[2];
+		struct {
+			const type_info_member_t image;
+			const type_info_member_t clear_value;
 		}members;
 	};
 };
@@ -6471,22 +6554,6 @@ struct type_info_struct_RHI_command_list_type_t {
 	};
 };
 
-struct type_info_struct_RHI_clear_value_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[5];
-		struct {
-			const type_info_member_t float_color;
-			const type_info_member_t int_color;
-			const type_info_member_t uint_color;
-			const type_info_member_t depth;
-			const type_info_member_t stencil;
-		}members;
-	};
-};
-
 struct type_info_struct_RHI_renderpass_attachment_access_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -6624,6 +6691,19 @@ struct type_info_procedure_RHI_resize_renderpass {
 		struct {
 			const type_info_member_t RHI_context;
 			const type_info_member_t renderpass;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_RHI_render_camera_set_matrices {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t camera;
 		}arguments;
 	};
 };
@@ -6833,28 +6913,16 @@ struct type_info_procedure_RHI_cmd_renderpass_end {
 	};
 };
 
-struct type_info_procedure_RHI_cmd_begin_render_group {
+struct type_info_procedure_RHI_cmd_clear_renderpass_attachments {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[1];
+		type_info_member_t argument_array[2];
 		struct {
 			const type_info_member_t command_list;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_RHI_cmd_end_render_group {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t command_list;
+			const type_info_member_t renderpassID;
 		}arguments;
 	};
 };
@@ -9671,6 +9739,8 @@ extern const type_info_procedure_vk_is_depth_format DEFAULT_typedata_procedure_v
 extern const type_info_procedure_vk_get_image_initial_layout_from_usage DEFAULT_typedata_procedure_vk_get_image_initial_layout_from_usage;
 extern const type_info_procedure_vk_get_image_final_layout_from_usage DEFAULT_typedata_procedure_vk_get_image_final_layout_from_usage;
 extern const type_info_procedure_vk_backend_get_sampler DEFAULT_typedata_procedure_vk_backend_get_sampler;
+extern const type_info_t DEFAULT_typedata_VkClearValue;
+extern const type_info_procedure_vk_backend_image_clear_contents DEFAULT_typedata_procedure_vk_backend_image_clear_contents;
 extern const type_info_t DEFAULT_typedata_VkImageAspectFlags;
 extern const type_info_struct_entity_archetype_t DEFAULT_typedata_structure_entity_archetype_t;
 extern const type_info_struct_entity_flags_t DEFAULT_typedata_structure_entity_flags_t;
@@ -9759,15 +9829,19 @@ extern const type_info_procedure_c_arena_free_last_block DEFAULT_typedata_proced
 extern const type_info_procedure_c_arena_reset DEFAULT_typedata_procedure_c_arena_reset;
 extern const type_info_procedure_c_arena_begin_temporary_memory DEFAULT_typedata_procedure_c_arena_begin_temporary_memory;
 extern const type_info_procedure_c_arena_end_temporary_memory DEFAULT_typedata_procedure_c_arena_end_temporary_memory;
+extern const type_info_struct_RHI_render_camera_t DEFAULT_typedata_structure_RHI_render_camera_t;
 extern const type_info_struct_RHI_render_buffer_type_t DEFAULT_typedata_structure_RHI_render_buffer_type_t;
 extern const type_info_struct_RHI_render_buffer_advance_rate_t DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t;
 extern const type_info_struct_RHI_render_buffer_memory_type_t DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t;
 extern const type_info_struct_RHI_render_buffer_desc_t DEFAULT_typedata_structure_RHI_render_buffer_desc_t;
 extern const type_info_struct_RHI_render_buffer_t DEFAULT_typedata_structure_RHI_render_buffer_t;
+extern const type_info_struct_RHI_clear_value_t DEFAULT_typedata_structure_RHI_clear_value_t;
 extern const type_info_struct_RHI_command_type_t DEFAULT_typedata_structure_RHI_command_type_t;
 extern const type_info_struct_RHI_command_header_t DEFAULT_typedata_structure_RHI_command_header_t;
 extern const type_info_struct_RHI_command_begin_renderpass_t DEFAULT_typedata_structure_RHI_command_begin_renderpass_t;
 extern const type_info_struct_RHI_command_end_renderpass_t DEFAULT_typedata_structure_RHI_command_end_renderpass_t;
+extern const type_info_struct_RHI_command_clear_renderpass_attachments_t DEFAULT_typedata_structure_RHI_command_clear_renderpass_attachments_t;
+extern const type_info_struct_RHI_command_clear_image_t DEFAULT_typedata_structure_RHI_command_clear_image_t;
 extern const type_info_struct_RHI_command_bind_vertex_buffer_t DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t;
 extern const type_info_struct_RHI_command_bind_index_buffer_t DEFAULT_typedata_structure_RHI_command_bind_index_buffer_t;
 extern const type_info_struct_RHI_command_update_texture_t DEFAULT_typedata_structure_RHI_command_update_texture_t;
@@ -9787,7 +9861,6 @@ extern const type_info_struct_RHI_command_blit_renderpass_t DEFAULT_typedata_str
 extern const type_info_struct_RHI_command_present_frame_t DEFAULT_typedata_structure_RHI_command_present_frame_t;
 extern const type_info_struct_RHI_command_t DEFAULT_typedata_structure_RHI_command_t;
 extern const type_info_struct_RHI_command_list_type_t DEFAULT_typedata_structure_RHI_command_list_type_t;
-extern const type_info_struct_RHI_clear_value_t DEFAULT_typedata_structure_RHI_clear_value_t;
 extern const type_info_struct_RHI_renderpass_attachment_access_t DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t;
 extern const type_info_struct_RHI_renderpass_attachment_load_operation_t DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t;
 extern const type_info_struct_RHI_renderpass_attachment_store_operation_t DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t;
@@ -9798,6 +9871,7 @@ extern const type_info_procedure_RHI_handle_window_resize DEFAULT_typedata_proce
 extern const type_info_procedure_RHI_resize_render_targets DEFAULT_typedata_procedure_RHI_resize_render_targets;
 extern const type_info_procedure_RHI_build_renderpass DEFAULT_typedata_procedure_RHI_build_renderpass;
 extern const type_info_procedure_RHI_resize_renderpass DEFAULT_typedata_procedure_RHI_resize_renderpass;
+extern const type_info_procedure_RHI_render_camera_set_matrices DEFAULT_typedata_procedure_RHI_render_camera_set_matrices;
 extern const type_info_procedure_RHI_get_constant_buffer DEFAULT_typedata_procedure_RHI_get_constant_buffer;
 extern const type_info_procedure_RHI_render_buffer_create DEFAULT_typedata_procedure_RHI_render_buffer_create;
 extern const type_info_procedure_RHI_vertex_buffer_create DEFAULT_typedata_procedure_RHI_vertex_buffer_create;
@@ -9811,8 +9885,7 @@ extern const type_info_procedure_RHI_is_texture_bound DEFAULT_typedata_procedure
 extern const type_info_procedure_RHI_set_texture_filter_mode DEFAULT_typedata_procedure_RHI_set_texture_filter_mode;
 extern const type_info_procedure_RHI_cmd_renderpass_begin DEFAULT_typedata_procedure_RHI_cmd_renderpass_begin;
 extern const type_info_procedure_RHI_cmd_renderpass_end DEFAULT_typedata_procedure_RHI_cmd_renderpass_end;
-extern const type_info_procedure_RHI_cmd_begin_render_group DEFAULT_typedata_procedure_RHI_cmd_begin_render_group;
-extern const type_info_procedure_RHI_cmd_end_render_group DEFAULT_typedata_procedure_RHI_cmd_end_render_group;
+extern const type_info_procedure_RHI_cmd_clear_renderpass_attachments DEFAULT_typedata_procedure_RHI_cmd_clear_renderpass_attachments;
 extern const type_info_procedure_RHI_cmd_set_scissor DEFAULT_typedata_procedure_RHI_cmd_set_scissor;
 extern const type_info_procedure_RHI_cmd_set_viewport DEFAULT_typedata_procedure_RHI_cmd_set_viewport;
 extern const type_info_procedure_RHI_cmd_update_push_constants DEFAULT_typedata_procedure_RHI_cmd_update_push_constants;
@@ -20859,6 +20932,44 @@ constexpr type_info_procedure_vk_backend_get_sampler DEFAULT_typedata_procedure_
 		},
 	},
 };
+constexpr type_info_t DEFAULT_typedata_VkClearValue = {
+	.type_name = "VkClearValue",
+	.type_id = TYPE_VkClearValue,
+	.size = athena_internal::safe_sizeof<VkClearValue>(),
+};
+constexpr type_info_procedure_vk_backend_image_clear_contents DEFAULT_typedata_procedure_vk_backend_image_clear_contents = {
+	.type_info = {
+		.type_name = "vk_backend_image_clear_contents",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_vk_backend_image_clear_contents,
+	},
+	.argument_count = 3,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_image_clear_contents.argument_array,
+	.arguments = {
+		.command_buffer = {
+			.type_info     = &DEFAULT_typedata_VkCommandBuffer,
+			.member_name   = "command_buffer",
+			.parent        = &DEFAULT_typedata_procedure_vk_backend_image_clear_contents.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.image = {
+			.type_info     = &DEFAULT_typedata_structure_vulkan_image_t.type_info,
+			.member_name   = "image",
+			.parent        = &DEFAULT_typedata_procedure_vk_backend_image_clear_contents.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.clear_value = {
+			.type_info     = &DEFAULT_typedata_VkClearValue,
+			.member_name   = "clear_value",
+			.parent        = &DEFAULT_typedata_procedure_vk_backend_image_clear_contents.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
 constexpr type_info_t DEFAULT_typedata_VkImageAspectFlags = {
 	.type_name = "VkImageAspectFlags",
 	.type_id = TYPE_VkImageAspectFlags,
@@ -25190,6 +25301,43 @@ constexpr type_info_procedure_c_arena_end_temporary_memory DEFAULT_typedata_proc
 		},
 	},
 };
+constexpr type_info_struct_RHI_render_camera_t DEFAULT_typedata_structure_RHI_render_camera_t = {
+	.type_info = {
+		.type_name = "RHI_render_camera_t",
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.type_id = TYPE_RHI_render_camera_t,
+		.size = athena_internal::safe_sizeof<RHI_render_camera_t>(),
+	},
+	.member_count   = 4,
+	.member_pointer = DEFAULT_typedata_structure_RHI_render_camera_t.member_array,
+	.members = {
+		.viewport = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "viewport",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_camera_t.type_info,
+			.offset        = offsetof(RHI_render_camera_t, viewport),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.translation = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "translation",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_camera_t.type_info,
+			.offset        = offsetof(RHI_render_camera_t, translation),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.zoom = {
+			.type_info     = &DEFAULT_typedata_float32,
+			.member_name   = "zoom",
+			.parent        = &DEFAULT_typedata_structure_RHI_render_camera_t.type_info,
+			.offset        = offsetof(RHI_render_camera_t, zoom),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
 constexpr type_info_struct_RHI_render_buffer_type_t DEFAULT_typedata_structure_RHI_render_buffer_type_t = {
 	.type_info = {
 		.type_name = "RHI_render_buffer_type_t",
@@ -25460,6 +25608,59 @@ constexpr type_info_struct_RHI_render_buffer_t DEFAULT_typedata_structure_RHI_re
 	},
 };
 
+constexpr type_info_struct_RHI_clear_value_t DEFAULT_typedata_structure_RHI_clear_value_t = {
+	.type_info = {
+		.type_name = "RHI_clear_value_t",
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.type_id = TYPE_RHI_clear_value_t,
+		.size = athena_internal::safe_sizeof<RHI_clear_value_t>(),
+	},
+	.member_count   = 5,
+	.member_pointer = DEFAULT_typedata_structure_RHI_clear_value_t.member_array,
+	.members = {
+		.float_color = {
+			.type_info     = &DEFAULT_typedata_vec4_t,
+			.member_name   = "float_color",
+			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.offset        = offsetof(RHI_clear_value_t, float_color),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.int_color = {
+			.type_info     = &DEFAULT_typedata_ivec4_t,
+			.member_name   = "int_color",
+			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.offset        = offsetof(RHI_clear_value_t, int_color),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.uint_color = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "uint_color",
+			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.offset        = offsetof(RHI_clear_value_t, uint_color),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.depth = {
+			.type_info     = &DEFAULT_typedata_float32,
+			.member_name   = "depth",
+			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.offset        = offsetof(RHI_clear_value_t, depth),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.stencil = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "stencil",
+			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.offset        = offsetof(RHI_clear_value_t, stencil),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
 constexpr type_info_struct_RHI_command_type_t DEFAULT_typedata_structure_RHI_command_type_t = {
 	.type_info = {
 		.type_name = "RHI_command_type_t",
@@ -25467,7 +25668,7 @@ constexpr type_info_struct_RHI_command_type_t DEFAULT_typedata_structure_RHI_com
 		.type_id = TYPE_RHI_command_type_t,
 		.size = athena_internal::safe_sizeof<RHI_command_type_t>(),
 	},
-	.member_count   = 23,
+	.member_count   = 25,
 	.member_pointer = DEFAULT_typedata_structure_RHI_command_type_t.member_array,
 	.members = {
 		.RHI_RENDER_COMMAND_TYPE_INVALID = {
@@ -25490,6 +25691,28 @@ constexpr type_info_struct_RHI_command_type_t DEFAULT_typedata_structure_RHI_com
 			.value = {
 				.type  = 2,
 				.int64 = RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE,
 			},
 		},
 		.RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS = {
@@ -25783,6 +26006,56 @@ constexpr type_info_struct_RHI_command_end_renderpass_t DEFAULT_typedata_structu
 			.member_name   = "ID",
 			.parent        = &DEFAULT_typedata_structure_RHI_command_end_renderpass_t.type_info,
 			.offset        = offsetof(RHI_command_end_renderpass_t, ID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_clear_renderpass_attachments_t DEFAULT_typedata_structure_RHI_command_clear_renderpass_attachments_t = {
+	.type_info = {
+		.type_name = "RHI_command_clear_renderpass_attachments_t",
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.type_id = TYPE_RHI_command_clear_renderpass_attachments_t,
+		.size = athena_internal::safe_sizeof<RHI_command_clear_renderpass_attachments_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_clear_renderpass_attachments_t.member_array,
+	.members = {
+		.ID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "ID",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_clear_renderpass_attachments_t.type_info,
+			.offset        = offsetof(RHI_command_clear_renderpass_attachments_t, ID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_clear_image_t DEFAULT_typedata_structure_RHI_command_clear_image_t = {
+	.type_info = {
+		.type_name = "RHI_command_clear_image_t",
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.type_id = TYPE_RHI_command_clear_image_t,
+		.size = athena_internal::safe_sizeof<RHI_command_clear_image_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_clear_image_t.member_array,
+	.members = {
+		.image = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.member_name   = "image",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_clear_image_t.type_info,
+			.offset        = offsetof(RHI_command_clear_image_t, image),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.clear_value = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
+			.member_name   = "clear_value",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_clear_image_t.type_info,
+			.offset        = offsetof(RHI_command_clear_image_t, clear_value),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -26442,59 +26715,6 @@ constexpr type_info_struct_RHI_command_list_type_t DEFAULT_typedata_structure_RH
 	},
 };
 
-constexpr type_info_struct_RHI_clear_value_t DEFAULT_typedata_structure_RHI_clear_value_t = {
-	.type_info = {
-		.type_name = "RHI_clear_value_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.type_id = TYPE_RHI_clear_value_t,
-		.size = athena_internal::safe_sizeof<RHI_clear_value_t>(),
-	},
-	.member_count   = 5,
-	.member_pointer = DEFAULT_typedata_structure_RHI_clear_value_t.member_array,
-	.members = {
-		.float_color = {
-			.type_info     = &DEFAULT_typedata_vec4_t,
-			.member_name   = "float_color",
-			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
-			.offset        = offsetof(RHI_clear_value_t, float_color),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.int_color = {
-			.type_info     = &DEFAULT_typedata_ivec4_t,
-			.member_name   = "int_color",
-			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
-			.offset        = offsetof(RHI_clear_value_t, int_color),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.uint_color = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "uint_color",
-			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
-			.offset        = offsetof(RHI_clear_value_t, uint_color),
-			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.depth = {
-			.type_info     = &DEFAULT_typedata_float32,
-			.member_name   = "depth",
-			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
-			.offset        = offsetof(RHI_clear_value_t, depth),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.stencil = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "stencil",
-			.parent        = &DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
-			.offset        = offsetof(RHI_clear_value_t, stencil),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
 constexpr type_info_struct_RHI_renderpass_attachment_access_t DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t = {
 	.type_info = {
 		.type_name = "RHI_renderpass_attachment_access_t",
@@ -26843,6 +27063,25 @@ constexpr type_info_procedure_RHI_resize_renderpass DEFAULT_typedata_procedure_R
 			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
 			.member_name   = "renderpass",
 			.parent        = &DEFAULT_typedata_procedure_RHI_resize_renderpass.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_render_camera_set_matrices DEFAULT_typedata_procedure_RHI_render_camera_set_matrices = {
+	.type_info = {
+		.type_name = "RHI_render_camera_set_matrices",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_RHI_render_camera_set_matrices,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_render_camera_set_matrices.argument_array,
+	.arguments = {
+		.camera = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_camera_t.type_info,
+			.member_name   = "camera",
+			.parent        = &DEFAULT_typedata_procedure_RHI_render_camera_set_matrices.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
@@ -27260,41 +27499,29 @@ constexpr type_info_procedure_RHI_cmd_renderpass_end DEFAULT_typedata_procedure_
 		},
 	},
 };
-constexpr type_info_procedure_RHI_cmd_begin_render_group DEFAULT_typedata_procedure_RHI_cmd_begin_render_group = {
+constexpr type_info_procedure_RHI_cmd_clear_renderpass_attachments DEFAULT_typedata_procedure_RHI_cmd_clear_renderpass_attachments = {
 	.type_info = {
-		.type_name = "RHI_cmd_begin_render_group",
+		.type_name = "RHI_cmd_clear_renderpass_attachments",
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_RHI_cmd_begin_render_group,
+		.type_id = TYPE_RHI_cmd_clear_renderpass_attachments,
 	},
-	.argument_count = 1,
+	.argument_count = 2,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_begin_render_group.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_clear_renderpass_attachments.argument_array,
 	.arguments = {
 		.command_list = {
 			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_begin_render_group.type_info,
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_clear_renderpass_attachments.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-	},
-};
-constexpr type_info_procedure_RHI_cmd_end_render_group DEFAULT_typedata_procedure_RHI_cmd_end_render_group = {
-	.type_info = {
-		.type_name = "RHI_cmd_end_render_group",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_RHI_cmd_end_render_group,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_end_render_group.argument_array,
-	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_end_render_group.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
+		.renderpassID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "renderpassID",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_clear_renderpass_attachments.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 	},
 };
@@ -33334,6 +33561,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_vk_get_image_initial_layout_from_usage.type_info,
 	&DEFAULT_typedata_procedure_vk_get_image_final_layout_from_usage.type_info,
 	&DEFAULT_typedata_procedure_vk_backend_get_sampler.type_info,
+	&DEFAULT_typedata_procedure_vk_backend_image_clear_contents.type_info,
 	&DEFAULT_typedata_structure_entity_archetype_t.type_info,
 	&DEFAULT_typedata_structure_entity_flags_t.type_info,
 	&DEFAULT_typedata_structure_entity_t.type_info,
@@ -33414,15 +33642,19 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_arena_reset.type_info,
 	&DEFAULT_typedata_procedure_c_arena_begin_temporary_memory.type_info,
 	&DEFAULT_typedata_procedure_c_arena_end_temporary_memory.type_info,
+	&DEFAULT_typedata_structure_RHI_render_camera_t.type_info,
 	&DEFAULT_typedata_structure_RHI_render_buffer_type_t.type_info,
 	&DEFAULT_typedata_structure_RHI_render_buffer_advance_rate_t.type_info,
 	&DEFAULT_typedata_structure_RHI_render_buffer_memory_type_t.type_info,
 	&DEFAULT_typedata_structure_RHI_render_buffer_desc_t.type_info,
 	&DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+	&DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_type_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_header_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_begin_renderpass_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_end_renderpass_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_clear_renderpass_attachments_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_clear_image_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_bind_index_buffer_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_update_texture_t.type_info,
@@ -33442,7 +33674,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_RHI_command_present_frame_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
-	&DEFAULT_typedata_structure_RHI_clear_value_t.type_info,
 	&DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
 	&DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info,
 	&DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info,
@@ -33453,6 +33684,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_RHI_resize_render_targets.type_info,
 	&DEFAULT_typedata_procedure_RHI_build_renderpass.type_info,
 	&DEFAULT_typedata_procedure_RHI_resize_renderpass.type_info,
+	&DEFAULT_typedata_procedure_RHI_render_camera_set_matrices.type_info,
 	&DEFAULT_typedata_procedure_RHI_get_constant_buffer.type_info,
 	&DEFAULT_typedata_procedure_RHI_render_buffer_create.type_info,
 	&DEFAULT_typedata_procedure_RHI_vertex_buffer_create.type_info,
@@ -33466,8 +33698,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_RHI_set_texture_filter_mode.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_renderpass_begin.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_renderpass_end.type_info,
-	&DEFAULT_typedata_procedure_RHI_cmd_begin_render_group.type_info,
-	&DEFAULT_typedata_procedure_RHI_cmd_end_render_group.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_clear_renderpass_attachments.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_set_scissor.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_set_viewport.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_update_push_constants.type_info,
@@ -34706,6 +34937,12 @@ enum class scratch_arena_t {
 	base,
 	used,
 }; // scratch_arena_t
+enum class RHI_render_camera_t {
+	viewport,
+	translation,
+	zoom,
+	matrices,
+}; // RHI_render_camera_t
 enum class RHI_render_buffer_type_t {
 	RHI_RENDER_BUFFER_TYPE_INVALID,
 	RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER,
@@ -34739,9 +34976,18 @@ enum class RHI_render_buffer_t {
 	mapped_data,
 	buffer_info,
 }; // RHI_render_buffer_t
+enum class RHI_clear_value_t {
+	float_color,
+	int_color,
+	uint_color,
+	depth,
+	stencil,
+}; // RHI_clear_value_t
 enum class RHI_command_type_t {
 	RHI_RENDER_COMMAND_TYPE_INVALID,
 	RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET,
+	RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS,
+	RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE,
 	RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS,
 	RHI_RENDER_COMMAND_TYPE_END_RENDERPASS,
 	RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER,
@@ -34773,6 +35019,13 @@ enum class RHI_command_begin_renderpass_t {
 enum class RHI_command_end_renderpass_t {
 	ID,
 }; // RHI_command_end_renderpass_t
+enum class RHI_command_clear_renderpass_attachments_t {
+	ID,
+}; // RHI_command_clear_renderpass_attachments_t
+enum class RHI_command_clear_image_t {
+	image,
+	clear_value,
+}; // RHI_command_clear_image_t
 enum class RHI_command_bind_vertex_buffer_t {
 	vertex_buffer,
 }; // RHI_command_bind_vertex_buffer_t
@@ -34861,13 +35114,6 @@ enum class RHI_command_list_type_t {
 	RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS,
 	RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE,
 }; // RHI_command_list_type_t
-enum class RHI_clear_value_t {
-	float_color,
-	int_color,
-	uint_color,
-	depth,
-	stencil,
-}; // RHI_clear_value_t
 enum class RHI_renderpass_attachment_access_t {
 	RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID,
 	RHI_RENDERPASS_ATTACHMENT_ACCESS_READ,
@@ -35796,6 +36042,11 @@ enum class vk_backend_get_sampler {
 	vulkan_context,
 	sampler_info,
 }; // vk_backend_get_sampler
+enum class vk_backend_image_clear_contents {
+	command_buffer,
+	image,
+	clear_value,
+}; // vk_backend_image_clear_contents
 enum class s_entity_create {
 	entity_manager,
 	archetype,
@@ -36038,6 +36289,9 @@ enum class RHI_resize_renderpass {
 	RHI_context,
 	renderpass,
 }; // RHI_resize_renderpass
+enum class RHI_render_camera_set_matrices {
+	camera,
+}; // RHI_render_camera_set_matrices
 enum class RHI_get_constant_buffer {
 	RHI_context,
 	uniform_name,
@@ -36095,12 +36349,10 @@ enum class RHI_cmd_renderpass_begin {
 enum class RHI_cmd_renderpass_end {
 	command_list,
 }; // RHI_cmd_renderpass_end
-enum class RHI_cmd_begin_render_group {
+enum class RHI_cmd_clear_renderpass_attachments {
 	command_list,
-}; // RHI_cmd_begin_render_group
-enum class RHI_cmd_end_render_group {
-	command_list,
-}; // RHI_cmd_end_render_group
+	renderpassID,
+}; // RHI_cmd_clear_renderpass_attachments
 enum class RHI_cmd_set_scissor {
 	command_list,
 	offset,

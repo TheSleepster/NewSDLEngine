@@ -2709,6 +2709,85 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
 
                     command_list->active_renderpass = null;
                 }break;
+                case RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS:
+                {
+                    RHI_command_clear_renderpass_attachments_t *cmd = (RHI_command_clear_renderpass_attachments_t*)command->data;
+                    RHI_renderpass_t *renderpass = RHI_context->renderpasses + cmd->ID;
+                    
+                    VkClearRect clear_rect = {};
+                    clear_rect.baseArrayLayer = 0;
+                    clear_rect.layerCount     = 1;
+                    clear_rect.rect = {
+                        .offset = {
+                            .x = 0,
+                            .y = 0
+                        },
+                        .extent = {
+                            .width  = renderpass->render_width,
+                            .height = renderpass->render_height 
+                        }
+                    };
+                    Expect(clear_rect.rect.extent.width > 0 && clear_rect.rect.extent.height > 0, 
+                           "clear_rect's width and height parameter MUST be non-zero: https://docs.vulkan.org/refpages/latest/refpages/source/vkCmdClearAttachments.html");
+
+                    VkClearAttachment *vk_clear_attachments = c_arena_push_array(&gc->temp_arena, VkClearAttachment, renderpass->total_attachment_count);
+
+                    s32 next_vk_attachment = 0;
+                    for(u32 color_attachment_index = 0;
+                        color_attachment_index < renderpass->color_attachment_count;
+                        ++color_attachment_index)
+                    {
+                        RHI_clear_value_t *clear_value   = renderpass->attachment_clear_values + color_attachment_index;
+                        VkClearAttachment *vk_attachment = vk_clear_attachments + next_vk_attachment++;
+
+                        VkClearValue value = {};
+                        memcpy(&value.color.float32, &clear_value->uint_color, sizeof(float32) * 4);
+
+                        vk_attachment->aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+                        vk_attachment->colorAttachment = color_attachment_index;
+                        vk_attachment->clearValue      = value;
+                    }
+
+                    if(renderpass->has_depth_stencil_attachment)
+                    {
+                        VkClearAttachment *vk_attachment = vk_clear_attachments + next_vk_attachment;
+                        RHI_clear_value_t *clear_value   = renderpass->attachment_clear_values + next_vk_attachment;
+                        VkClearValue value = {
+                            .depthStencil = {
+                                .depth   = clear_value->depth,
+                                .stencil = clear_value->stencil
+                            }
+                        };
+
+                        vk_attachment->aspectMask      = VK_IMAGE_ASPECT_DEPTH_BIT;
+                        vk_attachment->colorAttachment = 0;
+                        vk_attachment->clearValue      = value;
+                    }
+
+
+                    vkCmdClearAttachments(render_command_buffer, 
+                                          renderpass->total_attachment_count, 
+                                          vk_clear_attachments, 
+                                          1, 
+                                         &clear_rect);
+                }break;
+                case RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE:
+                {
+                    RHI_command_clear_image_t *cmd = (RHI_command_clear_image_t*)command->data;
+
+                    VkClearValue clear_value = {};
+                    VkClearColorValue clear_color;
+                    VkClearDepthStencilValue depth_stencil_value;
+
+                    memcpy(&clear_color.float32, cmd->clear_value.uint_color, sizeof(float32) * 4);
+                    depth_stencil_value.depth   = cmd->clear_value.depth;
+                    depth_stencil_value.stencil = cmd->clear_value.stencil;
+
+                    clear_value.color        = clear_color;
+                    clear_value.depthStencil = depth_stencil_value;
+
+                    vk_backend_image_clear_contents(render_command_buffer, &cmd->image->backend_image, clear_value);
+                }break;
                 case RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS:
                 {
                     RHI_command_blit_renderpass_t *cmd = (RHI_command_blit_renderpass_t*)command->data;

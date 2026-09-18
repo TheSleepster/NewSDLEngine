@@ -813,3 +813,72 @@ vk_backend_image_ensure_shader_readonly_optimal(vulkan_context_t *vulkan_context
         vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
     }
 }
+
+
+/*
+=============
+vk_backend_image_clear_contents
+=============
+*/
+
+// TODO(Sleepster): Does not support compute shaders!!!!
+void
+vk_backend_image_clear_contents(VkCommandBuffer command_buffer, vulkan_image_t *image, VkClearValue clear_value)
+{
+    bool8 is_color_image     = vk_backend_is_image_format_depth_format(image);
+    bool8 is_stencil_format  = vk_backend_is_image_format_stencil_format(image);
+    VkImageLayout old_layout = image->layout;
+
+    VkImageAspectFlags   aspect_flags = is_color_image ? VK_IMAGE_ASPECT_COLOR_BIT : VK_IMAGE_ASPECT_DEPTH_BIT;
+    VkPipelineStageFlags stage_flags  = is_color_image ? 
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT : 
+        (VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT);
+
+    VkAccessFlags        access_flags = is_color_image ? 
+        (VK_ACCESS_COLOR_ATTACHMENT_READ_BIT|VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT) : 
+        (VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT|VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
+
+    if(is_stencil_format)
+    {
+        aspect_flags |= VK_IMAGE_ASPECT_STENCIL_BIT;
+    }
+
+    VkImageSubresourceRange range = {
+        .aspectMask     = aspect_flags,
+        .baseMipLevel   = 0,
+        .levelCount     = 1,
+        .baseArrayLayer = 0,
+        .layerCount     = 1,
+    };
+
+    vk_backend_image_change_layout(command_buffer, 
+                                   image->handle, 
+                                   old_layout, 
+                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                   stage_flags,
+                                   VK_ACCESS_TRANSFER_WRITE_BIT,
+                                   access_flags,
+                                   range);
+
+    if(is_color_image) 
+    {
+        VkClearColorValue vk_clear_value = clear_value.color;
+        vkCmdClearColorImage(command_buffer, image->handle, image->layout, &vk_clear_value, 1, &range);
+    }
+    else
+    {
+        VkClearDepthStencilValue vk_clear_value = clear_value.depthStencil;
+        vkCmdClearDepthStencilImage(command_buffer, image->handle, image->layout, &vk_clear_value, 1, &range);
+    }
+
+    vk_backend_image_change_layout(command_buffer, 
+                                   image->handle, 
+                                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
+                                   old_layout, 
+                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                   stage_flags,
+                                   VK_ACCESS_TRANSFER_WRITE_BIT,
+                                   access_flags,
+                                   range);
+}
