@@ -405,9 +405,12 @@ ui_state_render_widgets(ui_state_t *ui_state, RHI_command_list_t *command_list)
             RHI_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
             RHI_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
 
-            RHI_cmd_draw_indexed(command_list, ui_state->widget_item_count * 6, 0, 1, 0);
-            RHI_buffer_reset(ui_state->RHI_context, &ui_state->vertex_buffer);
-            RHI_buffer_reset(ui_state->RHI_context, &ui_state->index_buffer);
+            RHI_cmd_draw_indexed(command_list, ui_state->widget_item_count * 6, 0, 0, 1, 0);
+
+            RHI_vertex_buffer_reset_offsets(ui_state->RHI_context, &ui_state->vertex_buffer);
+            RHI_vertex_buffer_reset_count(&ui_state->vertex_buffer);
+
+            RHI_vertex_buffer_reset_offsets(ui_state->RHI_context, &ui_state->index_buffer);
             ui_state->widget_instance_count = 0;
         }
     }
@@ -443,16 +446,16 @@ render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, 
             current_widget->widget_instance_data->iRadius          = current_widget->radius;
             current_widget->widget_instance_data->iSDFSmoothness   = current_widget->smoothness;
 
-            immediate_rect(command_list,
-                          &ui_state->vertex_buffer,
-                           current_widget->state->position, 
-                           current_widget->state->render_size,
-                           current_widget->state->render_color,
-                           vec2_negate(half_size),
-                           half_size,
-                           vec2(0, ui_state->widget_instance_count),
-                           vec2_zero(),
-                           vec2_zero());
+            immediate_rect_ex(command_list,
+                             &ui_state->vertex_buffer,
+                              current_widget->state->position, 
+                              current_widget->state->render_size,
+                              current_widget->state->render_color,
+                              vec2_negate(half_size),
+                              half_size,
+                              vec2(0, ui_state->widget_instance_count),
+                              vec2_zero(),
+                              vec2_zero());
 
             ++ui_state->widget_item_count;
             ++ui_state->widget_instance_count;
@@ -460,16 +463,16 @@ render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, 
 
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
         {
-            immediate_rect(command_list,
-                          &ui_state->vertex_buffer,
-                           current_widget->state->position, 
-                           current_widget->state->render_size,
-                           current_widget->state->render_color,
-                           current_widget->state->position.xy,
-                           vec2_add(current_widget->state->position.xy, current_widget->state->render_size),
-                           vec2(0, 0),
-                           vec2_zero(),
-                           vec2_zero());
+            immediate_rect_ex(command_list,
+                             &ui_state->vertex_buffer,
+                              current_widget->state->position, 
+                              current_widget->state->render_size,
+                              current_widget->state->render_color,
+                              current_widget->state->position.xy,
+                              vec2_add(current_widget->state->position.xy, current_widget->state->render_size),
+                              vec2(0, 0),
+                              vec2_zero(),
+                              vec2_zero());
 
             ++ui_state->widget_item_count;
         }

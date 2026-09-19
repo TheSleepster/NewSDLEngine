@@ -78,6 +78,7 @@
 	X(render_pipeline_blending_equation_t, &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info) \
 	X(render_pipeline_depth_function_t, &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info) \
 	X(render_pipeline_polygon_mode_t, &DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info) \
+	X(render_pipeline_primitive_type_t, &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info) \
 	X(RHI_pipeline_state_t, &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info) \
 	X(gpu_info_t, &DEFAULT_typedata_structure_gpu_info_t.type_info) \
 	X(swapchain_info_t, &DEFAULT_typedata_structure_swapchain_info_t.type_info) \
@@ -97,6 +98,7 @@
 	X(VkPipelineDepthStencilStateCreateInfo, &DEFAULT_typedata_VkPipelineDepthStencilStateCreateInfo) \
 	X(VkPipelineColorBlendAttachmentState, &DEFAULT_typedata_VkPipelineColorBlendAttachmentState) \
 	X(VkPipelineVertexInputStateCreateInfo, &DEFAULT_typedata_VkPipelineVertexInputStateCreateInfo) \
+	X(VkPrimitiveTopology, &DEFAULT_typedata_VkPrimitiveTopology) \
 	X(VkFramebuffer, &DEFAULT_typedata_VkFramebuffer) \
 	X(RHI_renderpass_desc_t, &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info) \
 	X(RHI_renderpass_t, &DEFAULT_typedata_structure_RHI_renderpass_t.type_info) \
@@ -248,6 +250,7 @@
 	X(RHI_command_bind_shader_t, &DEFAULT_typedata_structure_RHI_command_bind_shader_t.type_info) \
 	X(RHI_command_set_viewport_t, &DEFAULT_typedata_structure_RHI_command_set_viewport_t.type_info) \
 	X(RHI_command_set_scissor_t, &DEFAULT_typedata_structure_RHI_command_set_scissor_t.type_info) \
+	X(RHI_command_set_line_width_t, &DEFAULT_typedata_structure_RHI_command_set_line_width_t.type_info) \
 	X(RHI_command_update_push_constant_t, &DEFAULT_typedata_structure_RHI_command_update_push_constant_t.type_info) \
 	X(RHI_command_update_uniform_constant_buffer_t, &DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t.type_info) \
 	X(RHI_command_update_render_buffer_contents_t, &DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t.type_info) \
@@ -415,6 +418,7 @@
 	X(TYPE_render_pipeline_blending_equation_t) \
 	X(TYPE_render_pipeline_depth_function_t) \
 	X(TYPE_render_pipeline_polygon_mode_t) \
+	X(TYPE_render_pipeline_primitive_type_t) \
 	X(TYPE_RHI_pipeline_state_t) \
 	X(TYPE_gpu_info_t) \
 	X(TYPE_swapchain_info_t) \
@@ -438,6 +442,7 @@
 	X(TYPE_VkPipelineDepthStencilStateCreateInfo) \
 	X(TYPE_VkPipelineColorBlendAttachmentState) \
 	X(TYPE_VkPipelineVertexInputStateCreateInfo) \
+	X(TYPE_VkPrimitiveTopology) \
 	X(TYPE_vk_backend_create_render_pipeline) \
 	X(TYPE_vk_backend_renderpass_destroy) \
 	X(TYPE_VkFramebuffer) \
@@ -770,6 +775,7 @@
 	X(TYPE_RHI_command_bind_shader_t) \
 	X(TYPE_RHI_command_set_viewport_t) \
 	X(TYPE_RHI_command_set_scissor_t) \
+	X(TYPE_RHI_command_set_line_width_t) \
 	X(TYPE_RHI_command_update_push_constant_t) \
 	X(TYPE_RHI_command_update_uniform_constant_buffer_t) \
 	X(TYPE_RHI_command_update_render_buffer_contents_t) \
@@ -798,7 +804,10 @@
 	X(TYPE_RHI_vertex_buffer_create) \
 	X(TYPE_RHI_index_buffer_create) \
 	X(TYPE_RHI_render_buffer_copy_data) \
-	X(TYPE_RHI_buffer_reset) \
+	X(TYPE_RHI_buffer_reset_offsets) \
+	X(TYPE_RHI_vertex_buffer_reset_offsets) \
+	X(TYPE_RHI_vertex_buffer_reset_count) \
+	X(TYPE_RHI_index_buffer_reset_count) \
 	X(TYPE_RHI_get_command_list) \
 	X(TYPE_RHI_find_texture_index) \
 	X(TYPE_RHI_reset_command_list) \
@@ -812,6 +821,7 @@
 	X(TYPE_RHI_cmd_bind_index_buffer) \
 	X(TYPE_RHI_cmd_set_scissor) \
 	X(TYPE_RHI_cmd_set_viewport) \
+	X(TYPE_RHI_cmd_set_line_width) \
 	X(TYPE_RHI_cmd_update_push_constants) \
 	X(TYPE_RHI_cmd_update_buffer_contents) \
 	X(TYPE_RHI_cmd_use_shader_program) \
@@ -898,10 +908,12 @@
 	X(TYPE_c_string_builder_flush_to_file) \
 	X(TYPE_string_builder_buffer) \
 	X(TYPE_immediate_vertex_t) \
+	X(TYPE_immediate_put_data) \
 	X(TYPE_immediate_quad_ex) \
+	X(TYPE_immediate_rect_ex) \
 	X(TYPE_immediate_rect) \
 	X(TYPE_immediate_text) \
-	X(TYPE_immediate_put_data) \
+	X(TYPE_immediate_line) \
 	X(TYPE_duration_counter_t) \
 	X(TYPE_c_duration_counter_init) \
 	X(TYPE_c_duration_counter_advance) \
@@ -1243,7 +1255,7 @@ struct type_info_struct_input_event_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[9];
+		const type_info_member_t member_array[10];
 		struct {
 			const type_info_member_t type;
 			const type_info_member_t input_type;
@@ -1254,6 +1266,7 @@ struct type_info_struct_input_event_t {
 			const type_info_member_t timestampMS;
 			const type_info_member_t input_stream;
 			const type_info_member_t axis_value;
+			const type_info_member_t relative_axis_value;
 		}members;
 	};
 };
@@ -2130,10 +2143,33 @@ struct type_info_struct_render_pipeline_polygon_mode_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[2];
+		const type_info_member_t member_array[3];
 		struct {
 			const type_info_member_t RENDER_PIPELINE_POLYGON_MODE_FILL;
 			const type_info_member_t RENDER_PIPELINE_POLYGON_MODE_LINE;
+			const type_info_member_t RENDER_PIPELINE_POLYGON_MODE_POINT;
+		}members;
+	};
+};
+
+struct type_info_struct_render_pipeline_primitive_type_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[11];
+		struct {
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_POINT_LIST;
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST;
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP;
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN;
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY;
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY;
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY;
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY;
+			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_PATCH_LIST;
 		}members;
 	};
 };
@@ -2143,7 +2179,7 @@ struct type_info_struct_RHI_pipeline_state_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[14];
+		const type_info_member_t member_array[15];
 		struct {
 			const type_info_member_t blend_enabled;
 			const type_info_member_t src_color_blend_mode;
@@ -2159,6 +2195,7 @@ struct type_info_struct_RHI_pipeline_state_t {
 			const type_info_member_t stencil_state;
 			const type_info_member_t stencil_keep;
 			const type_info_member_t polygon_mode;
+			const type_info_member_t primitive_type;
 		}members;
 	};
 };
@@ -2386,7 +2423,7 @@ struct type_info_procedure_vk_backend_create_render_pipeline {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[7];
+		type_info_member_t argument_array[8];
 		struct {
 			const type_info_member_t vulkan_context;
 			const type_info_member_t shader;
@@ -2395,6 +2432,7 @@ struct type_info_procedure_vk_backend_create_render_pipeline {
 			const type_info_member_t depth_stencil_state;
 			const type_info_member_t blend_settings;
 			const type_info_member_t pipeline_vertex_input_state;
+			const type_info_member_t topology;
 		}arguments;
 	};
 };
@@ -5829,13 +5867,15 @@ struct type_info_struct_RHI_vertex_buffer_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[5];
+		const type_info_member_t member_array[7];
 		struct {
 			const type_info_member_t buffer_data;
 			const type_info_member_t vertex_data;
 			const type_info_member_t max_vertices;
 			const type_info_member_t vertex_count;
 			const type_info_member_t advance_rate;
+			const type_info_member_t vertex_offset;
+			const type_info_member_t instance_offset;
 		}members;
 	};
 };
@@ -5845,13 +5885,14 @@ struct type_info_struct_RHI_index_buffer_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[5];
+		const type_info_member_t member_array[6];
 		struct {
 			const type_info_member_t buffer_data;
 			const type_info_member_t index_data;
 			const type_info_member_t max_indices;
 			const type_info_member_t index_count;
 			const type_info_member_t index_offset;
+			const type_info_member_t instance_offset;
 		}members;
 	};
 };
@@ -6203,7 +6244,7 @@ struct type_info_struct_RHI_command_type_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[25];
+		const type_info_member_t member_array[26];
 		struct {
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_INVALID;
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_CLEAR_RENDER_TARGET;
@@ -6222,6 +6263,7 @@ struct type_info_struct_RHI_command_type_t {
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT;
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_SET_SCISSOR;
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE;
+			const type_info_member_t RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH;
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE;
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE;
 			const type_info_member_t RHI_RENDER_COMMAND_TYPE_DRAW;
@@ -6380,6 +6422,18 @@ struct type_info_struct_RHI_command_set_scissor_t {
 		struct {
 			const type_info_member_t offset;
 			const type_info_member_t size;
+		}members;
+	};
+};
+
+struct type_info_struct_RHI_command_set_line_width_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[1];
+		struct {
+			const type_info_member_t width;
 		}members;
 	};
 };
@@ -6788,7 +6842,7 @@ struct type_info_procedure_RHI_render_buffer_copy_data {
 	};
 };
 
-struct type_info_procedure_RHI_buffer_reset {
+struct type_info_procedure_RHI_buffer_reset_offsets {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -6797,6 +6851,46 @@ struct type_info_procedure_RHI_buffer_reset {
 		type_info_member_t argument_array[2];
 		struct {
 			const type_info_member_t RHI_context;
+			const type_info_member_t buffer;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_RHI_vertex_buffer_reset_offsets {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t RHI_context;
+			const type_info_member_t buffer;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_RHI_vertex_buffer_reset_count {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
+			const type_info_member_t buffer;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_RHI_index_buffer_reset_count {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[1];
+		struct {
 			const type_info_member_t buffer;
 		}arguments;
 	};
@@ -6985,6 +7079,20 @@ struct type_info_procedure_RHI_cmd_set_viewport {
 	};
 };
 
+struct type_info_procedure_RHI_cmd_set_line_width {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t command_list;
+			const type_info_member_t line_width;
+		}arguments;
+	};
+};
+
 struct type_info_procedure_RHI_cmd_update_push_constants {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -7125,11 +7233,12 @@ struct type_info_procedure_RHI_cmd_draw_indexed {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[5];
+		type_info_member_t argument_array[6];
 		struct {
 			const type_info_member_t command_list;
 			const type_info_member_t index_count;
 			const type_info_member_t index_offset;
+			const type_info_member_t vertex_offset;
 			const type_info_member_t instance_count;
 			const type_info_member_t first_instance;
 		}arguments;
@@ -8139,6 +8248,22 @@ struct type_info_procedure_c_string_builder_flush_to_file {
 	};
 };
 
+struct type_info_procedure_immediate_put_data {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[4];
+		struct {
+			const type_info_member_t buffer;
+			const type_info_member_t data;
+			const type_info_member_t element_size;
+			const type_info_member_t element_count;
+		}arguments;
+	};
+};
+
 struct type_info_procedure_immediate_quad_ex {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -8162,7 +8287,7 @@ struct type_info_procedure_immediate_quad_ex {
 	};
 };
 
-struct type_info_procedure_immediate_rect {
+struct type_info_procedure_immediate_rect_ex {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
@@ -8180,6 +8305,23 @@ struct type_info_procedure_immediate_rect {
 			const type_info_member_t padding;
 			const type_info_member_t sdf_info;
 			const type_info_member_t padding0;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_immediate_rect {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[5];
+		struct {
+			const type_info_member_t command_list;
+			const type_info_member_t vertex_buffer;
+			const type_info_member_t position;
+			const type_info_member_t render_size;
+			const type_info_member_t render_color;
 		}arguments;
 	};
 };
@@ -8205,18 +8347,20 @@ struct type_info_procedure_immediate_text {
 	};
 };
 
-struct type_info_procedure_immediate_put_data {
+struct type_info_procedure_immediate_line {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[4];
+		type_info_member_t argument_array[6];
 		struct {
-			const type_info_member_t buffer;
-			const type_info_member_t data;
-			const type_info_member_t element_size;
-			const type_info_member_t element_count;
+			const type_info_member_t command_list;
+			const type_info_member_t vertex_buffer;
+			const type_info_member_t start;
+			const type_info_member_t end;
+			const type_info_member_t depth;
+			const type_info_member_t render_color;
 		}arguments;
 	};
 };
@@ -9487,6 +9631,7 @@ extern const type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_s
 extern const type_info_struct_render_pipeline_blending_equation_t DEFAULT_typedata_structure_render_pipeline_blending_equation_t;
 extern const type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_structure_render_pipeline_depth_function_t;
 extern const type_info_struct_render_pipeline_polygon_mode_t DEFAULT_typedata_structure_render_pipeline_polygon_mode_t;
+extern const type_info_struct_render_pipeline_primitive_type_t DEFAULT_typedata_structure_render_pipeline_primitive_type_t;
 extern const type_info_struct_RHI_pipeline_state_t DEFAULT_typedata_structure_RHI_pipeline_state_t;
 extern const type_info_struct_gpu_info_t DEFAULT_typedata_structure_gpu_info_t;
 extern const type_info_struct_swapchain_info_t DEFAULT_typedata_structure_swapchain_info_t;
@@ -9511,6 +9656,7 @@ extern const type_info_t DEFAULT_typedata_VkPipelineRasterizationStateCreateInfo
 extern const type_info_t DEFAULT_typedata_VkPipelineDepthStencilStateCreateInfo;
 extern const type_info_t DEFAULT_typedata_VkPipelineColorBlendAttachmentState;
 extern const type_info_t DEFAULT_typedata_VkPipelineVertexInputStateCreateInfo;
+extern const type_info_t DEFAULT_typedata_VkPrimitiveTopology;
 extern const type_info_procedure_vk_backend_create_render_pipeline DEFAULT_typedata_procedure_vk_backend_create_render_pipeline;
 extern const type_info_procedure_vk_backend_renderpass_destroy DEFAULT_typedata_procedure_vk_backend_renderpass_destroy;
 extern const type_info_t DEFAULT_typedata_VkFramebuffer;
@@ -9849,6 +9995,7 @@ extern const type_info_struct_RHI_command_bind_material_t DEFAULT_typedata_struc
 extern const type_info_struct_RHI_command_bind_shader_t DEFAULT_typedata_structure_RHI_command_bind_shader_t;
 extern const type_info_struct_RHI_command_set_viewport_t DEFAULT_typedata_structure_RHI_command_set_viewport_t;
 extern const type_info_struct_RHI_command_set_scissor_t DEFAULT_typedata_structure_RHI_command_set_scissor_t;
+extern const type_info_struct_RHI_command_set_line_width_t DEFAULT_typedata_structure_RHI_command_set_line_width_t;
 extern const type_info_struct_RHI_command_update_push_constant_t DEFAULT_typedata_structure_RHI_command_update_push_constant_t;
 extern const type_info_struct_RHI_command_update_uniform_constant_buffer_t DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t;
 extern const type_info_struct_RHI_command_update_render_buffer_contents_t DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t;
@@ -9877,6 +10024,9 @@ extern const type_info_procedure_RHI_render_buffer_create DEFAULT_typedata_proce
 extern const type_info_procedure_RHI_vertex_buffer_create DEFAULT_typedata_procedure_RHI_vertex_buffer_create;
 extern const type_info_procedure_RHI_index_buffer_create DEFAULT_typedata_procedure_RHI_index_buffer_create;
 extern const type_info_procedure_RHI_render_buffer_copy_data DEFAULT_typedata_procedure_RHI_render_buffer_copy_data;
+extern const type_info_procedure_RHI_buffer_reset_offsets DEFAULT_typedata_procedure_RHI_buffer_reset_offsets;
+extern const type_info_procedure_RHI_vertex_buffer_reset_count DEFAULT_typedata_procedure_RHI_vertex_buffer_reset_count;
+extern const type_info_procedure_RHI_index_buffer_reset_count DEFAULT_typedata_procedure_RHI_index_buffer_reset_count;
 extern const type_info_procedure_RHI_get_command_list DEFAULT_typedata_procedure_RHI_get_command_list;
 extern const type_info_procedure_RHI_find_texture_index DEFAULT_typedata_procedure_RHI_find_texture_index;
 extern const type_info_procedure_RHI_reset_command_list DEFAULT_typedata_procedure_RHI_reset_command_list;
@@ -9888,6 +10038,7 @@ extern const type_info_procedure_RHI_cmd_renderpass_end DEFAULT_typedata_procedu
 extern const type_info_procedure_RHI_cmd_clear_renderpass_attachments DEFAULT_typedata_procedure_RHI_cmd_clear_renderpass_attachments;
 extern const type_info_procedure_RHI_cmd_set_scissor DEFAULT_typedata_procedure_RHI_cmd_set_scissor;
 extern const type_info_procedure_RHI_cmd_set_viewport DEFAULT_typedata_procedure_RHI_cmd_set_viewport;
+extern const type_info_procedure_RHI_cmd_set_line_width DEFAULT_typedata_procedure_RHI_cmd_set_line_width;
 extern const type_info_procedure_RHI_cmd_update_push_constants DEFAULT_typedata_procedure_RHI_cmd_update_push_constants;
 extern const type_info_procedure_RHI_cmd_update_buffer_contents DEFAULT_typedata_procedure_RHI_cmd_update_buffer_contents;
 extern const type_info_procedure_RHI_cmd_use_shader_program DEFAULT_typedata_procedure_RHI_cmd_use_shader_program;
@@ -9973,10 +10124,12 @@ extern const type_info_procedure_c_string_builder_dump_to_file DEFAULT_typedata_
 extern const type_info_procedure_c_string_builder_flush_to_file DEFAULT_typedata_procedure_c_string_builder_flush_to_file;
 extern const type_info_t DEFAULT_typedata_string_builder_buffer;
 extern const type_info_t DEFAULT_typedata_immediate_vertex_t;
+extern const type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data;
 extern const type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immediate_quad_ex;
+extern const type_info_procedure_immediate_rect_ex DEFAULT_typedata_procedure_immediate_rect_ex;
 extern const type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediate_rect;
 extern const type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediate_text;
-extern const type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data;
+extern const type_info_procedure_immediate_line DEFAULT_typedata_procedure_immediate_line;
 extern const type_info_struct_duration_counter_t DEFAULT_typedata_structure_duration_counter_t;
 extern const type_info_procedure_c_duration_counter_init DEFAULT_typedata_procedure_c_duration_counter_init;
 extern const type_info_procedure_c_duration_counter_advance DEFAULT_typedata_procedure_c_duration_counter_advance;
@@ -11034,7 +11187,7 @@ constexpr type_info_struct_input_event_t DEFAULT_typedata_structure_input_event_
 		.type_id = TYPE_input_event_t,
 		.size = athena_internal::safe_sizeof<input_event_t>(),
 	},
-	.member_count   = 9,
+	.member_count   = 10,
 	.member_pointer = DEFAULT_typedata_structure_input_event_t.member_array,
 	.members = {
 		.type = {
@@ -11106,6 +11259,14 @@ constexpr type_info_struct_input_event_t DEFAULT_typedata_structure_input_event_
 			.member_name   = "axis_value",
 			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
 			.offset        = offsetof(input_event_t, axis_value),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.relative_axis_value = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "relative_axis_value",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, relative_axis_value),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -13615,7 +13776,7 @@ constexpr type_info_struct_render_pipeline_polygon_mode_t DEFAULT_typedata_struc
 		.type_id = TYPE_render_pipeline_polygon_mode_t,
 		.size = athena_internal::safe_sizeof<render_pipeline_polygon_mode_t>(),
 	},
-	.member_count   = 2,
+	.member_count   = 3,
 	.member_pointer = DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.member_array,
 	.members = {
 		.RENDER_PIPELINE_POLYGON_MODE_FILL = {
@@ -13625,8 +13786,8 @@ constexpr type_info_struct_render_pipeline_polygon_mode_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 2,
-				.int64 = RENDER_PIPELINE_POLYGON_MODE_FILL,
+				.type = 3,
+				.u64 = 0,
 			},
 		},
 		.RENDER_PIPELINE_POLYGON_MODE_LINE = {
@@ -13636,8 +13797,153 @@ constexpr type_info_struct_render_pipeline_polygon_mode_t DEFAULT_typedata_struc
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type  = 2,
-				.int64 = RENDER_PIPELINE_POLYGON_MODE_LINE,
+				.type = 3,
+				.u64 = 1,
+			},
+		},
+		.RENDER_PIPELINE_POLYGON_MODE_POINT = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info,
+			.member_name   = "RENDER_PIPELINE_POLYGON_MODE_POINT",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 2,
+			},
+		},
+	},
+};
+
+constexpr type_info_struct_render_pipeline_primitive_type_t DEFAULT_typedata_structure_render_pipeline_primitive_type_t = {
+	.type_info = {
+		.type_name = "render_pipeline_primitive_type_t",
+		.metatype  = ATHENA_METATYPE_ENUM,
+		.type_id = TYPE_render_pipeline_primitive_type_t,
+		.size = athena_internal::safe_sizeof<render_pipeline_primitive_type_t>(),
+	},
+	.member_count   = 11,
+	.member_pointer = DEFAULT_typedata_structure_render_pipeline_primitive_type_t.member_array,
+	.members = {
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_POINT_LIST = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_POINT_LIST",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 0,
+			},
+		},
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 1,
+			},
+		},
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 2,
+			},
+		},
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 3,
+			},
+		},
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 4,
+			},
+		},
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 5,
+			},
+		},
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 6,
+			},
+		},
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 7,
+			},
+		},
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 8,
+			},
+		},
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 9,
+			},
+		},
+		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_PATCH_LIST = {
+			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_PATCH_LIST",
+			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 3,
+				.u64 = 10,
 			},
 		},
 	},
@@ -13650,7 +13956,7 @@ constexpr type_info_struct_RHI_pipeline_state_t DEFAULT_typedata_structure_RHI_p
 		.type_id = TYPE_RHI_pipeline_state_t,
 		.size = athena_internal::safe_sizeof<RHI_pipeline_state_t>(),
 	},
-	.member_count   = 14,
+	.member_count   = 15,
 	.member_pointer = DEFAULT_typedata_structure_RHI_pipeline_state_t.member_array,
 	.members = {
 		.blend_enabled = {
@@ -13817,8 +14123,20 @@ constexpr type_info_struct_RHI_pipeline_state_t DEFAULT_typedata_structure_RHI_p
 			.flags         = 0,
 			.pointer_depth = 0,
 			.value = {
-				.type = 3,
-				.u64 = 0,
+				.type = 7,
+				.string = "RENDER_PIPELINE_POLYGON_MODE_FILL",
+			},
+		},
+		.primitive_type = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "primitive_type",
+			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.offset        = offsetof(RHI_pipeline_state_t, primitive_type),
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type = 7,
+				.string = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST",
 			},
 		},
 	},
@@ -14846,13 +15164,18 @@ constexpr type_info_t DEFAULT_typedata_VkPipelineVertexInputStateCreateInfo = {
 	.type_id = TYPE_VkPipelineVertexInputStateCreateInfo,
 	.size = athena_internal::safe_sizeof<VkPipelineVertexInputStateCreateInfo>(),
 };
+constexpr type_info_t DEFAULT_typedata_VkPrimitiveTopology = {
+	.type_name = "VkPrimitiveTopology",
+	.type_id = TYPE_VkPrimitiveTopology,
+	.size = athena_internal::safe_sizeof<VkPrimitiveTopology>(),
+};
 constexpr type_info_procedure_vk_backend_create_render_pipeline DEFAULT_typedata_procedure_vk_backend_create_render_pipeline = {
 	.type_info = {
 		.type_name = "vk_backend_create_render_pipeline",
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_vk_backend_create_render_pipeline,
 	},
-	.argument_count = 7,
+	.argument_count = 8,
 	.return_type    = &DEFAULT_typedata_VkPipeline,
 	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_create_render_pipeline.argument_array,
 	.arguments = {
@@ -14904,6 +15227,13 @@ constexpr type_info_procedure_vk_backend_create_render_pipeline DEFAULT_typedata
 			.parent        = &DEFAULT_typedata_procedure_vk_backend_create_render_pipeline.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
+		},
+		.topology = {
+			.type_info     = &DEFAULT_typedata_VkPrimitiveTopology,
+			.member_name   = "topology",
+			.parent        = &DEFAULT_typedata_procedure_vk_backend_create_render_pipeline.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 	},
 };
@@ -24638,7 +24968,7 @@ constexpr type_info_struct_RHI_vertex_buffer_t DEFAULT_typedata_structure_RHI_ve
 		.type_id = TYPE_RHI_vertex_buffer_t,
 		.size = athena_internal::safe_sizeof<RHI_vertex_buffer_t>(),
 	},
-	.member_count   = 5,
+	.member_count   = 7,
 	.member_pointer = DEFAULT_typedata_structure_RHI_vertex_buffer_t.member_array,
 	.members = {
 		.buffer_data = {
@@ -24681,6 +25011,22 @@ constexpr type_info_struct_RHI_vertex_buffer_t DEFAULT_typedata_structure_RHI_ve
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.vertex_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.offset        = offsetof(RHI_vertex_buffer_t, vertex_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.instance_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "instance_offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.offset        = offsetof(RHI_vertex_buffer_t, instance_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 	},
 };
 
@@ -24691,7 +25037,7 @@ constexpr type_info_struct_RHI_index_buffer_t DEFAULT_typedata_structure_RHI_ind
 		.type_id = TYPE_RHI_index_buffer_t,
 		.size = athena_internal::safe_sizeof<RHI_index_buffer_t>(),
 	},
-	.member_count   = 5,
+	.member_count   = 6,
 	.member_pointer = DEFAULT_typedata_structure_RHI_index_buffer_t.member_array,
 	.members = {
 		.buffer_data = {
@@ -24731,6 +25077,14 @@ constexpr type_info_struct_RHI_index_buffer_t DEFAULT_typedata_structure_RHI_ind
 			.member_name   = "index_offset",
 			.parent        = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
 			.offset        = offsetof(RHI_index_buffer_t, index_offset),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.instance_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "instance_offset",
+			.parent        = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+			.offset        = offsetof(RHI_index_buffer_t, instance_offset),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -25668,7 +26022,7 @@ constexpr type_info_struct_RHI_command_type_t DEFAULT_typedata_structure_RHI_com
 		.type_id = TYPE_RHI_command_type_t,
 		.size = athena_internal::safe_sizeof<RHI_command_type_t>(),
 	},
-	.member_count   = 25,
+	.member_count   = 26,
 	.member_pointer = DEFAULT_typedata_structure_RHI_command_type_t.member_array,
 	.members = {
 		.RHI_RENDER_COMMAND_TYPE_INVALID = {
@@ -25856,6 +26210,17 @@ constexpr type_info_struct_RHI_command_type_t DEFAULT_typedata_structure_RHI_com
 			.value = {
 				.type  = 2,
 				.int64 = RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE,
+			},
+		},
+		.RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.member_name   = "RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_type_t.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+			.value = {
+				.type  = 2,
+				.int64 = RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH,
 			},
 		},
 		.RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE = {
@@ -26073,7 +26438,7 @@ constexpr type_info_struct_RHI_command_bind_vertex_buffer_t DEFAULT_typedata_str
 	.member_pointer = DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.member_array,
 	.members = {
 		.vertex_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 			.member_name   = "vertex_buffer",
 			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.type_info,
 			.offset        = offsetof(RHI_command_bind_vertex_buffer_t, vertex_buffer),
@@ -26243,6 +26608,27 @@ constexpr type_info_struct_RHI_command_set_scissor_t DEFAULT_typedata_structure_
 			.member_name   = "size",
 			.parent        = &DEFAULT_typedata_structure_RHI_command_set_scissor_t.type_info,
 			.offset        = offsetof(RHI_command_set_scissor_t, size),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_set_line_width_t DEFAULT_typedata_structure_RHI_command_set_line_width_t = {
+	.type_info = {
+		.type_name = "RHI_command_set_line_width_t",
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.type_id = TYPE_RHI_command_set_line_width_t,
+		.size = athena_internal::safe_sizeof<RHI_command_set_line_width_t>(),
+	},
+	.member_count   = 1,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_set_line_width_t.member_array,
+	.members = {
+		.width = {
+			.type_info     = &DEFAULT_typedata_float32,
+			.member_name   = "width",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_set_line_width_t.type_info,
+			.offset        = offsetof(RHI_command_set_line_width_t, width),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -27287,6 +27673,70 @@ constexpr type_info_procedure_RHI_render_buffer_copy_data DEFAULT_typedata_proce
 		},
 	},
 };
+constexpr type_info_procedure_RHI_buffer_reset_offsets DEFAULT_typedata_procedure_RHI_buffer_reset_offsets = {
+	.type_info = {
+		.type_name = "RHI_buffer_reset_offsets",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_RHI_buffer_reset_offsets,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_buffer_reset_offsets.argument_array,
+	.arguments = {
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_procedure_RHI_buffer_reset_offsets.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_render_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_RHI_buffer_reset_offsets.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_vertex_buffer_reset_count DEFAULT_typedata_procedure_RHI_vertex_buffer_reset_count = {
+	.type_info = {
+		.type_name = "RHI_vertex_buffer_reset_count",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_RHI_vertex_buffer_reset_count,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_vertex_buffer_reset_count.argument_array,
+	.arguments = {
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_RHI_vertex_buffer_reset_count.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
+constexpr type_info_procedure_RHI_index_buffer_reset_count DEFAULT_typedata_procedure_RHI_index_buffer_reset_count = {
+	.type_info = {
+		.type_name = "RHI_index_buffer_reset_count",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_RHI_index_buffer_reset_count,
+	},
+	.argument_count = 1,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_index_buffer_reset_count.argument_array,
+	.arguments = {
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_RHI_index_buffer_reset_count.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+	},
+};
 constexpr type_info_procedure_RHI_get_command_list DEFAULT_typedata_procedure_RHI_get_command_list = {
 	.type_info = {
 		.type_name = "RHI_get_command_list",
@@ -27591,6 +28041,32 @@ constexpr type_info_procedure_RHI_cmd_set_viewport DEFAULT_typedata_procedure_RH
 		},
 	},
 };
+constexpr type_info_procedure_RHI_cmd_set_line_width DEFAULT_typedata_procedure_RHI_cmd_set_line_width = {
+	.type_info = {
+		.type_name = "RHI_cmd_set_line_width",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_RHI_cmd_set_line_width,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_set_line_width.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_line_width.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.line_width = {
+			.type_info     = &DEFAULT_typedata_float32,
+			.member_name   = "line_width",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_line_width.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
 constexpr type_info_procedure_RHI_cmd_update_push_constants DEFAULT_typedata_procedure_RHI_cmd_update_push_constants = {
 	.type_info = {
 		.type_name = "RHI_cmd_update_push_constants",
@@ -27887,7 +28363,7 @@ constexpr type_info_procedure_RHI_cmd_draw_indexed DEFAULT_typedata_procedure_RH
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_RHI_cmd_draw_indexed,
 	},
-	.argument_count = 5,
+	.argument_count = 6,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_draw_indexed.argument_array,
 	.arguments = {
@@ -27908,6 +28384,13 @@ constexpr type_info_procedure_RHI_cmd_draw_indexed DEFAULT_typedata_procedure_RH
 		.index_offset = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "index_offset",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw_indexed.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.vertex_offset = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_offset",
 			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_draw_indexed.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
@@ -29909,6 +30392,46 @@ constexpr type_info_t DEFAULT_typedata_immediate_vertex_t = {
 	.type_id = TYPE_immediate_vertex_t,
 	.size = athena_internal::safe_sizeof<immediate_vertex_t>(),
 };
+constexpr type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data = {
+	.type_info = {
+		.type_name = "immediate_put_data",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_immediate_put_data,
+	},
+	.argument_count = 4,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_immediate_put_data.argument_array,
+	.arguments = {
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.data = {
+			.type_info     = &DEFAULT_typedata_byte,
+			.member_name   = "data",
+			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.element_size = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "element_size",
+			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.element_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "element_count",
+			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
 constexpr type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immediate_quad_ex = {
 	.type_info = {
 		.type_name = "immediate_quad_ex",
@@ -29998,13 +30521,95 @@ constexpr type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immed
 		},
 	},
 };
+constexpr type_info_procedure_immediate_rect_ex DEFAULT_typedata_procedure_immediate_rect_ex = {
+	.type_info = {
+		.type_name = "immediate_rect_ex",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_immediate_rect_ex,
+	},
+	.argument_count = 10,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect_ex.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.position = {
+			.type_info     = &DEFAULT_typedata_vec3_t,
+			.member_name   = "position",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.render_size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "render_size",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.render_color = {
+			.type_info     = &DEFAULT_typedata_vec4_t,
+			.member_name   = "render_color",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.uv_min = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "uv_min",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.uv_max = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "uv_max",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.padding = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "padding",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.sdf_info = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "sdf_info",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.padding0 = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "padding0",
+			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
 constexpr type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediate_rect = {
 	.type_info = {
 		.type_name = "immediate_rect",
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_immediate_rect,
 	},
-	.argument_count = 10,
+	.argument_count = 5,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect.argument_array,
 	.arguments = {
@@ -30015,9 +30620,9 @@ constexpr type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediat
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.buffer = {
+		.vertex_buffer = {
 			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
-			.member_name   = "buffer",
+			.member_name   = "vertex_buffer",
 			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
@@ -30039,41 +30644,6 @@ constexpr type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediat
 		.render_color = {
 			.type_info     = &DEFAULT_typedata_vec4_t,
 			.member_name   = "render_color",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.uv_min = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "uv_min",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.uv_max = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "uv_max",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.padding = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "padding",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.sdf_info = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "sdf_info",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.padding0 = {
-			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "padding0",
 			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
@@ -30155,41 +30725,55 @@ constexpr type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediat
 		},
 	},
 };
-constexpr type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data = {
+constexpr type_info_procedure_immediate_line DEFAULT_typedata_procedure_immediate_line = {
 	.type_info = {
-		.type_name = "immediate_put_data",
+		.type_name = "immediate_line",
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_immediate_put_data,
+		.type_id = TYPE_immediate_line,
 	},
-	.argument_count = 4,
+	.argument_count = 6,
 	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_immediate_put_data.argument_array,
+	.argument_pointer = DEFAULT_typedata_procedure_immediate_line.argument_array,
 	.arguments = {
-		.buffer = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_immediate_line.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.vertex_buffer = {
 			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
+			.member_name   = "vertex_buffer",
+			.parent        = &DEFAULT_typedata_procedure_immediate_line.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.data = {
-			.type_info     = &DEFAULT_typedata_byte,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.element_size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "element_size",
-			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
+		.start = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "start",
+			.parent        = &DEFAULT_typedata_procedure_immediate_line.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.element_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "element_count",
-			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
+		.end = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "end",
+			.parent        = &DEFAULT_typedata_procedure_immediate_line.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.depth = {
+			.type_info     = &DEFAULT_typedata_float32,
+			.member_name   = "depth",
+			.parent        = &DEFAULT_typedata_procedure_immediate_line.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.render_color = {
+			.type_info     = &DEFAULT_typedata_vec4_t,
+			.member_name   = "render_color",
+			.parent        = &DEFAULT_typedata_procedure_immediate_line.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -33389,6 +33973,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
 	&DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
 	&DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info,
+	&DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
 	&DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
 	&DEFAULT_typedata_structure_gpu_info_t.type_info,
 	&DEFAULT_typedata_structure_swapchain_info_t.type_info,
@@ -33662,6 +34247,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_RHI_command_bind_shader_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_set_viewport_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_set_scissor_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_set_line_width_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_update_push_constant_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_update_uniform_constant_buffer_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_update_render_buffer_contents_t.type_info,
@@ -33690,6 +34276,9 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_RHI_vertex_buffer_create.type_info,
 	&DEFAULT_typedata_procedure_RHI_index_buffer_create.type_info,
 	&DEFAULT_typedata_procedure_RHI_render_buffer_copy_data.type_info,
+	&DEFAULT_typedata_procedure_RHI_buffer_reset_offsets.type_info,
+	&DEFAULT_typedata_procedure_RHI_vertex_buffer_reset_count.type_info,
+	&DEFAULT_typedata_procedure_RHI_index_buffer_reset_count.type_info,
 	&DEFAULT_typedata_procedure_RHI_get_command_list.type_info,
 	&DEFAULT_typedata_procedure_RHI_find_texture_index.type_info,
 	&DEFAULT_typedata_procedure_RHI_reset_command_list.type_info,
@@ -33701,6 +34290,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_RHI_cmd_clear_renderpass_attachments.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_set_scissor.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_set_viewport.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_set_line_width.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_update_push_constants.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_update_buffer_contents.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_use_shader_program.type_info,
@@ -33783,10 +34373,12 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_string_builder_sprintf.type_info,
 	&DEFAULT_typedata_procedure_c_string_builder_dump_to_file.type_info,
 	&DEFAULT_typedata_procedure_c_string_builder_flush_to_file.type_info,
+	&DEFAULT_typedata_procedure_immediate_put_data.type_info,
 	&DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+	&DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
 	&DEFAULT_typedata_procedure_immediate_rect.type_info,
 	&DEFAULT_typedata_procedure_immediate_text.type_info,
-	&DEFAULT_typedata_procedure_immediate_put_data.type_info,
+	&DEFAULT_typedata_procedure_immediate_line.type_info,
 	&DEFAULT_typedata_structure_duration_counter_t.type_info,
 	&DEFAULT_typedata_procedure_c_duration_counter_init.type_info,
 	&DEFAULT_typedata_procedure_c_duration_counter_advance.type_info,
@@ -33971,6 +34563,7 @@ enum class input_event_t {
 	timestampMS,
 	input_stream,
 	axis_value,
+	relative_axis_value,
 }; // input_event_t
 enum class input_controller_t {
 	type,
@@ -34178,7 +34771,21 @@ enum class render_pipeline_depth_function_t {
 enum class render_pipeline_polygon_mode_t {
 	RENDER_PIPELINE_POLYGON_MODE_FILL,
 	RENDER_PIPELINE_POLYGON_MODE_LINE,
+	RENDER_PIPELINE_POLYGON_MODE_POINT,
 }; // render_pipeline_polygon_mode_t
+enum class render_pipeline_primitive_type_t {
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_POINT_LIST,
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST,
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP,
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN,
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY,
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY,
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY,
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY,
+	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_PATCH_LIST,
+}; // render_pipeline_primitive_type_t
 enum class RHI_pipeline_state_t {
 	blend_enabled,
 	src_color_blend_mode,
@@ -34194,6 +34801,7 @@ enum class RHI_pipeline_state_t {
 	stencil_state,
 	stencil_keep,
 	polygon_mode,
+	primitive_type,
 }; // RHI_pipeline_state_t
 enum class gpu_info_t {
 	device,
@@ -34889,6 +35497,8 @@ enum class RHI_vertex_buffer_t {
 	max_vertices,
 	vertex_count,
 	advance_rate,
+	vertex_offset,
+	instance_offset,
 }; // RHI_vertex_buffer_t
 enum class RHI_index_buffer_t {
 	buffer_data,
@@ -34896,6 +35506,7 @@ enum class RHI_index_buffer_t {
 	max_indices,
 	index_count,
 	index_offset,
+	instance_offset,
 }; // RHI_index_buffer_t
 enum class RHI_uniform_constant_buffer_t {
 	mapped_data,
@@ -35001,6 +35612,7 @@ enum class RHI_command_type_t {
 	RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT,
 	RHI_RENDER_COMMAND_TYPE_SET_SCISSOR,
 	RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE,
+	RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH,
 	RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE,
 	RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE,
 	RHI_RENDER_COMMAND_TYPE_DRAW,
@@ -35052,6 +35664,9 @@ enum class RHI_command_set_scissor_t {
 	offset,
 	size,
 }; // RHI_command_set_scissor_t
+enum class RHI_command_set_line_width_t {
+	width,
+}; // RHI_command_set_line_width_t
 enum class RHI_command_update_push_constant_t {
 	data,
 	size,
@@ -35536,6 +36151,7 @@ enum class vk_backend_create_render_pipeline {
 	depth_stencil_state,
 	blend_settings,
 	pipeline_vertex_input_state,
+	topology,
 }; // vk_backend_create_render_pipeline
 enum class vk_backend_renderpass_destroy {
 	vulkan_context,
@@ -36322,6 +36938,16 @@ enum class RHI_render_buffer_copy_data {
 	size,
 	offset,
 }; // RHI_render_buffer_copy_data
+enum class RHI_buffer_reset_offsets {
+	RHI_context,
+	buffer,
+}; // RHI_buffer_reset_offsets
+enum class RHI_vertex_buffer_reset_count {
+	buffer,
+}; // RHI_vertex_buffer_reset_count
+enum class RHI_index_buffer_reset_count {
+	buffer,
+}; // RHI_index_buffer_reset_count
 enum class RHI_get_command_list {
 	RHI_context,
 	type,
@@ -36363,6 +36989,10 @@ enum class RHI_cmd_set_viewport {
 	offset,
 	size,
 }; // RHI_cmd_set_viewport
+enum class RHI_cmd_set_line_width {
+	command_list,
+	line_width,
+}; // RHI_cmd_set_line_width
 enum class RHI_cmd_update_push_constants {
 	command_list,
 	offset,
@@ -36411,6 +37041,7 @@ enum class RHI_cmd_draw_indexed {
 	command_list,
 	index_count,
 	index_offset,
+	vertex_offset,
 	instance_count,
 	first_instance,
 }; // RHI_cmd_draw_indexed
@@ -36670,6 +37301,12 @@ enum class c_string_builder_flush_to_file {
 	file,
 	builder,
 }; // c_string_builder_flush_to_file
+enum class immediate_put_data {
+	buffer,
+	data,
+	element_size,
+	element_count,
+}; // immediate_put_data
 enum class immediate_quad_ex {
 	command_list,
 	buffer,
@@ -36683,7 +37320,7 @@ enum class immediate_quad_ex {
 	padding0,
 	texture,
 }; // immediate_quad_ex
-enum class immediate_rect {
+enum class immediate_rect_ex {
 	command_list,
 	buffer,
 	position,
@@ -36694,6 +37331,13 @@ enum class immediate_rect {
 	padding,
 	sdf_info,
 	padding0,
+}; // immediate_rect_ex
+enum class immediate_rect {
+	command_list,
+	vertex_buffer,
+	position,
+	render_size,
+	render_color,
 }; // immediate_rect
 enum class immediate_text {
 	command_list,
@@ -36706,12 +37350,14 @@ enum class immediate_text {
 	settings,
 	font_size,
 }; // immediate_text
-enum class immediate_put_data {
-	buffer,
-	data,
-	element_size,
-	element_count,
-}; // immediate_put_data
+enum class immediate_line {
+	command_list,
+	vertex_buffer,
+	start,
+	end,
+	depth,
+	render_color,
+}; // immediate_line
 enum class c_duration_counter_init {
 	counter,
 	duration_ms,

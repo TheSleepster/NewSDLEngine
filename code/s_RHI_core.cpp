@@ -303,12 +303,12 @@ RHI_render_buffer_copy_data(RHI_context_t *RHI_context, RHI_render_buffer_t *buf
 
 /*
 =============
-RHI_buffer_reset
+RHI_buffer_reset_offsets
 =============
 */
 
 true_inline void
-RHI_buffer_reset(RHI_context_t *RHI_context, RHI_render_buffer_t *buffer)
+RHI_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_render_buffer_t *buffer)
 {
     buffer->buffer_elements_used = 0;
     buffer->working_offset       = 0;
@@ -318,28 +318,55 @@ RHI_buffer_reset(RHI_context_t *RHI_context, RHI_render_buffer_t *buffer)
 
 /*
 =============
-RHI_buffer_reset
+RHI_vertex_buffer_reset_offsets
 =============
 */
 
 true_inline void
-RHI_buffer_reset(RHI_context_t *RHI_context, RHI_vertex_buffer_t *buffer)
+RHI_vertex_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_vertex_buffer_t *buffer)
 {
-    buffer->vertex_count = 0;
-    RHI_buffer_reset(RHI_context, &buffer->buffer_data);
+    buffer->vertex_offset   = 0;
+    buffer->instance_offset = 0;
+    RHI_buffer_reset_offsets(RHI_context, &buffer->buffer_data);
 }
 
 /*
 =============
-RHI_buffer_reset
+RHI_index_buffer_reset_offsets
 =============
 */
 
 true_inline void
-RHI_buffer_reset(RHI_context_t *RHI_context, RHI_index_buffer_t *buffer)
+RHI_vertex_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_index_buffer_t *buffer)
 {
-    buffer->index_offset = 0;
-    RHI_buffer_reset(RHI_context, &buffer->buffer_data);
+    buffer->index_offset    = 0;
+    buffer->instance_offset = 0;
+    RHI_buffer_reset_offsets(RHI_context, &buffer->buffer_data);
+}
+
+
+/*
+=============
+RHI_vertex_buffer_reset_count
+=============
+*/
+
+true_inline void
+RHI_vertex_buffer_reset_count(RHI_vertex_buffer_t *buffer)
+{
+    buffer->vertex_count = 0;
+}
+
+/*
+=============
+RHI_index_buffer_reset_count
+=============
+*/
+
+true_inline void
+RHI_index_buffer_reset_count(RHI_index_buffer_t *buffer)
+{
+    buffer->index_count = 0;
 }
 
 /////////////////////////
@@ -733,26 +760,17 @@ RHI_cmd_bind_vertex_buffer
 =============
 */
 
-void
-RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_render_buffer_t *buffer)
-{
-    Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
-
-    RHI_command_t *command = RHI_get_next_command(command_list);
-    RHI_command_bind_vertex_buffer_t *bind_vertex_buffer = c_arena_push_struct(&command_list->command_arena, 
-                                                                                RHI_command_bind_vertex_buffer_t);
-    Assert(buffer->type == RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER);
-    bind_vertex_buffer->vertex_buffer = buffer; 
-
-    command->header.command_type = RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER;
-    command->data = bind_vertex_buffer;
-}
-
 true_inline void 
 RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
-    RHI_cmd_bind_vertex_buffer(command_list, &buffer->buffer_data);
+    RHI_command_t *command = RHI_get_next_command(command_list);
+    RHI_command_bind_vertex_buffer_t *bind_vertex_buffer = c_arena_push_struct(&command_list->command_arena, 
+                                                                                RHI_command_bind_vertex_buffer_t);
+    bind_vertex_buffer->vertex_buffer = buffer; 
+
+    command->header.command_type = RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER;
+    command->data = bind_vertex_buffer;
 }
 
 /*
@@ -817,6 +835,24 @@ RHI_cmd_set_scissor(RHI_command_list_t *command_list, vec2_t offset, vec2_t size
 
     command->header.command_type = RHI_RENDER_COMMAND_TYPE_SET_SCISSOR;
     command->data = set_scissor;
+}
+
+/*
+=============
+RHI_cmd_set_line_width
+=============
+*/
+
+void
+RHI_cmd_set_line_width(RHI_command_list_t *command_list, float32 line_width)
+{
+    RHI_command_t *command  = RHI_get_next_command(command_list);
+    RHI_command_set_line_width_t *line = c_arena_push_struct(&command_list->command_arena,
+                                                              RHI_command_set_line_width_t);
+    line->width = line_width;
+
+    command->header.command_type = RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH;
+    command->data                = line;
 }
 
 /*
@@ -945,7 +981,6 @@ RHI_cmd_set_render_state(RHI_command_list_t *command_list, RHI_pipeline_state_t 
     command->data = set_render_state;
 }
 
-
 /*
 =============
 RHI_cmd_reset_render_state
@@ -998,6 +1033,7 @@ void
 RHI_cmd_draw_indexed(RHI_command_list_t *command_list, 
                      u32                 index_count, 
                      u32                 index_offset, 
+                     u32                 vertex_offset,
                      u32                 instance_count, 
                      u32                 first_instance)
 {
@@ -1010,6 +1046,7 @@ RHI_cmd_draw_indexed(RHI_command_list_t *command_list,
     draw->index_offset     = index_offset;
     draw->instance_count   = instance_count;
     draw->first_instance   = first_instance;
+    draw->vertex_offset    = vertex_offset;
 
     command->header.command_type = RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED;
     command->data = draw;

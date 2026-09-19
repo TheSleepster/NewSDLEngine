@@ -16,6 +16,12 @@ immediate_put_data(RHI_vertex_buffer_t *buffer, byte *data, u32 element_size, u3
     buffer->vertex_count += element_count;
 }
 
+/*
+=============
+QUADS
+=============
+*/
+
 void
 immediate_quad_ex(RHI_command_list_t  *command_list,
                   RHI_vertex_buffer_t *buffer,
@@ -89,16 +95,16 @@ immediate_quad_ex(RHI_command_list_t  *command_list,
 }
 
 void
-immediate_rect(RHI_command_list_t  *command_list,
-               RHI_vertex_buffer_t *buffer,
-               vec3_t               position,
-               vec2_t               render_size,
-               vec4_t               render_color,
-               vec2_t               uv_min,
-               vec2_t               uv_max,
-               vec2_t               padding,
-               vec2_t               sdf_info,
-               vec2_t               padding0)
+immediate_rect_ex(RHI_command_list_t  *command_list,
+                  RHI_vertex_buffer_t *buffer,
+                  vec3_t               position,
+                  vec2_t               render_size,
+                  vec4_t               render_color,
+                  vec2_t               uv_min,
+                  vec2_t               uv_max,
+                  vec2_t               padding,
+                  vec2_t               sdf_info,
+                  vec2_t               padding0)
 {
     immediate_quad_ex(command_list, 
                       buffer,
@@ -110,6 +116,27 @@ immediate_rect(RHI_command_list_t  *command_list,
                       padding,
                       sdf_info,
                       padding0,
+                      null);
+}
+
+void
+immediate_rect(RHI_command_list_t  *command_list,
+               RHI_vertex_buffer_t *buffer,
+               vec3_t               position,
+               vec2_t               render_size,
+               vec4_t               render_color)
+{
+    vec2_t zero = vec2_zero();
+    immediate_quad_ex(command_list, 
+                      buffer,
+                      position, 
+                      render_size, 
+                      render_color,
+                      zero,
+                      zero,
+                      zero,
+                      zero,
+                      zero,
                       null);
 }
 
@@ -184,4 +211,37 @@ immediate_text(RHI_command_list_t    *command_list,
             }
         }
     }
+}
+
+/*
+=============
+LINES
+=============
+*/
+
+void
+immediate_line(RHI_command_list_t    *command_list,
+               RHI_vertex_buffer_t   *vertex_buffer,
+               vec2_t                 start,
+               vec2_t                 end,
+               float32                depth,
+               vec4_t                 render_color)
+{
+    // NOTE(Sleepster): Although we don't use this, it's better to keep it here for
+    // consistency
+    (void)command_list;
+
+    immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)vertex_buffer->vertex_data + vertex_buffer->vertex_count);
+    Expect(vertex_pointer, "The vertex buffer pointer is invalid...");
+
+    immediate_vertex_t *first  = vertex_pointer;
+    immediate_vertex_t *second = vertex_pointer + 1;
+
+    first->vPosition = vec4(start.x, start.y, depth, 1.0f);
+    first->vColor    = render_color;
+
+    second->vPosition = vec4(end.x, end.y, depth, 1.0f);
+    second->vColor    = render_color;
+
+    vertex_buffer->vertex_count += 2;
 }

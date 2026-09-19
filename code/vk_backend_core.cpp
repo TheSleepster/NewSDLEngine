@@ -695,6 +695,12 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
     device_features.fillModeNonSolid  = VK_TRUE;
     device_features.logicOp           = VK_TRUE;
     device_features.samplerAnisotropy = VK_TRUE;
+
+    // TODO(Sleepster): Maybe make these two debug? 
+    device_features.wideLines         = VK_TRUE;
+    device_features.largePoints       = VK_TRUE;
+    device_features.multiDrawIndirect = VK_TRUE;
+
     //device_features.sparseBinding     = VK_TRUE;
 
     VkPhysicalDeviceVulkan11Features device_11_features = {};
@@ -1716,7 +1722,7 @@ vk_backend_create_pipeline_from_render_state(vulkan_context_t     *vulkan_contex
         .sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
         .depthClampEnable        = false,
         .rasterizerDiscardEnable = false,
-        .polygonMode             = VK_POLYGON_MODE_FILL,
+        .polygonMode             = (VkPolygonMode)state->polygon_mode,
         .cullMode                = VK_CULL_MODE_BACK_BIT,
         .frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE,
         .depthBiasEnable         = false,
@@ -1736,7 +1742,7 @@ vk_backend_create_pipeline_from_render_state(vulkan_context_t     *vulkan_contex
     };
 
     const VkPipelineColorBlendAttachmentState blend_settings = {
-        .blendEnable         = true,
+        .blendEnable         = (VkBool32)state->blend_enabled,
         .srcColorBlendFactor = (VkBlendFactor)state->src_color_blend_mode,
         .dstColorBlendFactor = (VkBlendFactor)state->dst_color_blend_mode,
         .colorBlendOp        = (VkBlendOp)state->color_blend_op,
@@ -1752,7 +1758,8 @@ vk_backend_create_pipeline_from_render_state(vulkan_context_t     *vulkan_contex
                                               &rasterization_state, 
                                               &depth_stencil_state,
                                               &blend_settings,
-                                              &shader->pipeline_vertex_input_state);
+                                              &shader->pipeline_vertex_input_state,
+                                             (VkPrimitiveTopology)state->primitive_type);
 
     return(result);
 }
@@ -1779,7 +1786,8 @@ vk_backend_create_render_pipeline(vulkan_context_t                             *
                                   const VkPipelineRasterizationStateCreateInfo *rasterization_state,
                                   const VkPipelineDepthStencilStateCreateInfo  *depth_stencil_state,
                                   const VkPipelineColorBlendAttachmentState    *blend_settings,
-                                  VkPipelineVertexInputStateCreateInfo         *pipeline_vertex_input_state)
+                                  VkPipelineVertexInputStateCreateInfo         *pipeline_vertex_input_state,
+                                  VkPrimitiveTopology                           topology)
 {
     Assert(shader->shader_id > 0);
 
@@ -1810,7 +1818,7 @@ vk_backend_create_render_pipeline(vulkan_context_t                             *
 
     VkPipelineInputAssemblyStateCreateInfo assembly_state = {
         .sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-        .topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+        .topology               = topology,
         .primitiveRestartEnable = false,
     };
 
@@ -2503,9 +2511,18 @@ vk_backend_bind_command_list_vertex_buffers(VkCommandBuffer *render_command_buff
         buffer_index < command_list->active_vertex_buffers.used;
         ++buffer_index)
     {
-        RHI_render_buffer_t *buffer = command_list->active_vertex_buffers[buffer_index];
-        handles[buffer_index] = buffer->buffer_info.handle;
-        offsets[buffer_index] = 000000000; // TODO(Sleepster): maybe allow a "per buffer" offset.
+        RHI_vertex_buffer_t *buffer = command_list->active_vertex_buffers[buffer_index];
+        handles[buffer_index] = buffer->buffer_data.buffer_info.handle;
+
+        // NOTE(Sleepster): THIS IS NOTTTTT VERTEX OFFSET... this is BYTE offset 
+        if(buffer->advance_rate == RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT)
+        {
+            offsets[buffer_index] = buffer->buffer_data.buffer_element_size * buffer->vertex_offset; 
+        }
+        else
+        {
+            offsets[buffer_index] = buffer->buffer_data.buffer_element_size * buffer->instance_offset; 
+        }
     }
 
     vkCmdBindVertexBuffers(*render_command_buffer, 0, command_list->vertex_buffer_count, handles, offsets); 
@@ -2839,7 +2856,6 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                 case RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER:
                 {
                     RHI_command_bind_vertex_buffer_t *cmd = (RHI_command_bind_vertex_buffer_t*)command->data;
-                    Assert(cmd->vertex_buffer->type == RHI_RENDER_BUFFER_TYPE_VERTEX_BUFFER);
 
                     c_dynarray_add(&command_list->active_vertex_buffers, &cmd->vertex_buffer);
                     ++command_list->vertex_buffer_count;
@@ -2958,6 +2974,11 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                     vkCmdSetScissor(render_command_buffer, 0, 1, &scissor);
                     command_list->active_scissor_command = command;
                 }break;
+                case RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH:
+                {
+                    RHI_command_set_line_width_t *cmd = (RHI_command_set_line_width_t*)command->data;
+                    vkCmdSetLineWidth(render_command_buffer, cmd->width);
+                }break;
                 case RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS:
                 {
                     Assert(command_list->active_shader_program);
@@ -3002,11 +3023,21 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                     Assert(command_list->active_shader_program);
                     Assert(command_list->active_viewport_command);
                     Assert(command_list->active_scissor_command);
+                    RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
 
                     vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
                     vk_backend_commit_descriptor_data(vulkan_context, RHI_context, command_list);
-
-                    RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
+                    for(RHI_vertex_buffer_t *buffer: command_list->active_vertex_buffers)
+                    {
+                        if(buffer->advance_rate == RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT)
+                        {
+                            buffer->vertex_offset += cmd->vertices_to_draw;
+                        }
+                        else
+                        {
+                            buffer->instance_offset += cmd->instance_count;
+                        }
+                    }
                     vkCmdDraw(render_command_buffer, 
                               cmd->vertices_to_draw, 
                               cmd->instance_count, 
@@ -3016,11 +3047,12 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                     command_list->image_count = 0;
                     command_list->bound_image_count = 0;
 
-                    c_dynarray_reset(&command_list->active_vertex_buffers);
-
                     // NOTE(Sleepster): Resetting this to prevent garbage images from being pushed to the shader. 
                     // We exlude the first image index due to the fact that this is typically the default texture
                     ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params));
+
+                    c_dynarray_reset(&command_list->active_vertex_buffers);
+                    command_list->vertex_buffer_count = 0;
                 }break;
                 case RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED:
                 {
@@ -3029,18 +3061,28 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                     Assert(command_list->active_shader_program);
                     Assert(command_list->active_viewport_command);
                     Assert(command_list->active_scissor_command);
+                    RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
 
                     vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
                     vk_backend_commit_descriptor_data(vulkan_context, RHI_context, command_list);
+                    for(RHI_vertex_buffer_t *buffer: command_list->active_vertex_buffers)
+                    {
+                        if(buffer->advance_rate == RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT)
+                        {
+                            buffer->vertex_offset += cmd->vertices_to_draw;
+                        }
+                        else
+                        {
+                            buffer->instance_offset += cmd->instance_count;
+                        }
+                    }
 
-                    RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
                     vkCmdDrawIndexed(render_command_buffer, 
                                      cmd->indices_to_draw, 
                                      cmd->instance_count, 
                                      cmd->index_offset + command_list->active_index_buffer->index_offset, 
                                      cmd->vertex_offset, 
                                      cmd->first_instance);
-
 
                     command_list->image_count = 0;
                     command_list->bound_image_count = 0;

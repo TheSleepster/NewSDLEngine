@@ -174,6 +174,7 @@ struct input_event_t
 
     string_t input_stream;
     vec2_t   axis_value;
+    vec2_t   relative_axis_value;
 };
 
 // NOTE(Sleepster): I don't want this here... but the C++ compiler is too stupid to see it in the "Input Controllers" section 

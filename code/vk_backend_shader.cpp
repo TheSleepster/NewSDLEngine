@@ -1120,14 +1120,14 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
     if(result.pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
     {
         result.pipeline_hash = c_hash_table_create<VkPipeline>(MAX_SHADER_PIPELINE_COUNT, 
-                                                               &result.shader_arena,
+                                                              &result.shader_arena,
                                                                shader_arena_allocate,
                                                                null);
     }
     else
     {
         result.pipeline_hash = c_hash_table_create<VkPipeline>(1, 
-                                                               &result.shader_arena,
+                                                              &result.shader_arena,
                                                                shader_arena_allocate,
                                                                null);
     }
@@ -1161,7 +1161,8 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
                                                                                                    &g_pipeline_default_rasterization_state, 
                                                                                                    &g_pipeline_default_depth_stencil_state,
                                                                                                    &g_pipeline_default_blend_settings,
-                                                                                                   &result.pipeline_vertex_input_state);
+                                                                                                   &result.pipeline_vertex_input_state,
+                                                                                                    (VkPrimitiveTopology)g_pipeline_default_state_key.primitive_type);
         result.default_pipeline = (result.pipeline_hash.items[pipeline_state_hash]).item;
     }
     else if(result.pipeline_type == VK_PIPELINE_BIND_POINT_COMPUTE)

@@ -186,6 +186,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
             input_event.inputID       = INPUT_AXIS_MOUSE;
             input_event.timestampMS   = SDL_GetTicks();
             input_event.axis_value    = vec2(event->motion.x, event->motion.y);
+            input_event.relative_axis_value = vec2(event->motion.xrel, event->motion.yrel);
 
             append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
@@ -205,7 +206,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
             new_device.gamepad_data.stick_deadzone = INPUT_MANAGER_GAMEPAD_DEFAULT_DEADZONE;
 
             input_manager->devices[input_manager->connected_device_count++] = new_device;
-            log_info("Controll er '%s' connected...\n", SDL_GetGamepadName(new_device.gamepad_data.handle));
+            log_info("Controller '%s' connected...\n", SDL_GetGamepadName(new_device.gamepad_data.handle));
         }break;
         case SDL_EVENT_GAMEPAD_REMOVED:
         {
@@ -381,7 +382,7 @@ s_im_apply_events_to_controller(input_controller_t         *controller,
                         {
                             controller->device->keyboard_data.last_mouse_pos    = controller->device->keyboard_data.current_mouse_pos;
                             controller->device->keyboard_data.current_mouse_pos = event->axis_value;
-                            controller->device->keyboard_data.mouse_delta       = event->axis_value - controller->device->keyboard_data.last_mouse_pos;
+                            controller->device->keyboard_data.mouse_delta       = event->relative_axis_value;
                         }
                         else if(event->inputID == INPUT_AXIS_MOUSE_WHEEL)
                         {
