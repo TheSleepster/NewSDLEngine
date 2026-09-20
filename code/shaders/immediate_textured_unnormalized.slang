@@ -22,7 +22,7 @@ VSMain(vImmediateVertex_t Input)
 {
     VertexOutput_t result;
     
-    float2 v2DPositionFloored = floor(Input.vPosition.xy);
+    float2 v2DPositionFloored = Input.vPosition.xy;
     float4 vPositionFloored   = float4(v2DPositionFloored, Input.vPosition.zw);
 
     result.vOutPosition = mul(CameraMatrices.ProjectionMatrix, mul(CameraMatrices.ViewMatrix, vPositionFloored));

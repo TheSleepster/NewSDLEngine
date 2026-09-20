@@ -131,39 +131,39 @@ typedef struct visit_file_data
   =============== GENERAL API ===============
   ===========================================*/
 
-file_t            c_file_open(string_t filepath, bool8 for_writing, bool8 create);
-bool8             c_file_close(file_t *file);
-bool8             c_file_copy(string_t old_path, string_t new_path);
+ENGINE_API file_t            c_file_open(string_t filepath, bool8 for_writing, bool8 create);
+ENGINE_API bool8             c_file_close(file_t *file);
+ENGINE_API bool8             c_file_copy(string_t old_path, string_t new_path);
 
 
 #if 0
-string_t          c_file_read(file_t *file_data, u32 bytes_to_read, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
-string_t          c_file_read_entirety(string_t filepath, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
-string_t          c_file_read_from_offset(file_t *file_data, u32 bytes_to_read, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
-string_t          c_file_read_to_end(file_t *file_data, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
+ENGINE_API string_t          c_file_read(file_t *file_data, u32 bytes_to_read, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
+ENGINE_API string_t          c_file_read_entirety(string_t filepath, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
+ENGINE_API string_t          c_file_read_from_offset(file_t *file_data, u32 bytes_to_read, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
+ENGINE_API string_t          c_file_read_to_end(file_t *file_data, u32 offset, memory_arena_t *arena = null, zone_allocator_t *zone = null, za_allocation_tag_t tag = ZA_TAG_STATIC);
 #else
-bool8 c_file_read(file_t *file, byte *buffer, s32 bytes_to_read);
-bool8 c_file_read_from_offset(file_t *file, s32 file_offset, byte *buffer, s32 bytes_to_read);
-bool8 c_file_read_to_end(file_t *file, s32 offset, byte *buffer, s32 bytes_to_read);
-bool8 c_file_read_entirety(file_t *file, byte *buffer, s32 buffer_size);
+ENGINE_API bool8 c_file_read(file_t *file, byte *buffer, s32 bytes_to_read);
+ENGINE_API bool8 c_file_read_from_offset(file_t *file, s32 file_offset, byte *buffer, s32 bytes_to_read);
+ENGINE_API bool8 c_file_read_to_end(file_t *file, s32 offset, byte *buffer, s32 bytes_to_read);
+ENGINE_API bool8 c_file_read_entirety(file_t *file, byte *buffer, s32 buffer_size);
 #endif
 
 
-bool8             c_file_open_and_write(string_t filepath, void *data, s64 bytes_to_write, bool8 overwrite);
-bool8             c_file_write(file_t *file, void *data, s64 bytes_to_write);
-bool8             c_file_write_string(file_t *file, string_t data);
+ENGINE_API bool8             c_file_open_and_write(string_t filepath, void *data, s64 bytes_to_write, bool8 overwrite);
+ENGINE_API bool8             c_file_write(file_t *file, void *data, s64 bytes_to_write);
+ENGINE_API bool8             c_file_write_string(file_t *file, string_t data);
 
-s64               c_file_get_size(file_t *file_data);
-file_data_t       c_file_get_file_system_info(string_t filepath);
-bool8             c_file_replace_or_rename(string_t old_file, string_t new_file);
-mapped_file_t     c_file_map(string_t filepath);
-bool8             c_file_unmap(mapped_file_t *map_data);
-u32               c_file_ext_string_to_enum(string_t file_ext);
+ENGINE_API s64               c_file_get_size(file_t *file_data);
+ENGINE_API file_data_t       c_file_get_file_system_info(string_t filepath);
+ENGINE_API bool8             c_file_replace_or_rename(string_t old_file, string_t new_file);
+ENGINE_API mapped_file_t     c_file_map(string_t filepath);
+ENGINE_API bool8             c_file_unmap(mapped_file_t *map_data);
+ENGINE_API u32               c_file_ext_string_to_enum(string_t file_ext);
 
-bool8             c_directory_exists(string_t filepath);
-visit_file_data_t c_directory_create_visit_data(visit_files_pfn_t *function, bool8 recursive, void *user_data);
-void              c_directory_visit(string_t filepath, visit_file_data_t *visit_file_data);
-s32               c_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 recursive, string_t file_ext);
+ENGINE_API bool8             c_directory_exists(string_t filepath);
+ENGINE_API visit_file_data_t c_directory_create_visit_data(visit_files_pfn_t *function, bool8 recursive, void *user_data);
+ENGINE_API void              c_directory_visit(string_t filepath, visit_file_data_t *visit_file_data);
+ENGINE_API s32               c_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 recursive, string_t file_ext);
 
 #endif // C_FILE_API_H
 

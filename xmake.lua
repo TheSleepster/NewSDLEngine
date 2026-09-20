@@ -107,11 +107,10 @@ set_config("builddir", OUTPUT_DIR)
 -- Compiler Flags 
 -- ------------------------------------------------------------------------------
 local CLANG_WARN_BASE = {
-    "-Wno-unknown-attributes", "-Wformat", "-Wnullability-completeness", "-mfma",
+    "-Wformat", "-Wformat-extra-args", "-Wno-unknown-attributes", "-Wnullability-completeness", "-mfma",
     "-Wno-c++14-extensions", "-Wall", "-Wextra", "-Wno-unused-function",
-    "-Wno-missing-braces", "-Wno-pointer-sign",
-    "-Wno-incompatible-pointer-types-discards-qualifiers", "-Wno-null-dereference",
-    "-Wno-missing-field-initializers", "-Wno-switch", "-Wno-deprecated-declarations",
+    "-Wno-missing-braces", "-Wno-pointer-sign", "-Wno-incompatible-pointer-types-discards-qualifiers", 
+    "-Wno-null-dereference", "-Wno-missing-field-initializers", "-Wno-switch", "-Wno-deprecated-declarations",
     "-Wno-null-pointer-subtraction", "-Wno-typedef-redefinition", "-Wno-writable-strings",
     "-Wno-deprecated", "-Wno-c99-designator", "-Wno-unused-template",
 }
@@ -125,7 +124,7 @@ local GPP_WARN_BASE = {
     "-Wformat", "-mfma", "-Wall", "-Wextra", "-Wno-unused-function",
     "-Wno-missing-field-initializers", "-Wno-switch", "-Wno-deprecated-declarations",
     "-Wno-reorder", "-Wno-pointer-arith", "-Wno-write-strings", "-Wno-class-memaccess",
-    "-Wno-sfinae-incomplete", "-Wno-format-truncation", "-Wno-implicit-fallthrough",
+    "-Wno-sfinae-incomplete", "-Wno-implicit-fallthrough",
     "-Wno-attributes",
 }
 local GPP_DEBUG_ONLY   = { "-g", "-O0", "-fno-inline-functions" }
@@ -140,11 +139,12 @@ local LLVM_MINGW_EXTRA_DEBUG = {
 }
 
 local MSVC_WARN_BASE = {
-    "-Wno-write-strings", "-Wno-c++11-narrowing", 
+    "-Wno-write-strings", "-Wno-c++11-narrowing", "-Wno-switch",
+    "-Wno-c99-designator", "-Wno-unknown-attributes"
 }
 
 local MSVC_DEBUG_ONLY = {
-    "-MT"
+    "-g", "-MT"
 }
 
 local MSVC_RELEASE_ONLY = {
@@ -301,6 +301,7 @@ target("AthenaGenerate", function()
         table.insert(inputs, path.join(TARGET_DIR, "athena"))
 
         if any_file_newer(inputs, output_file) then
+            print("[Running: Athena]")
             os.execv(path.join(TARGET_DIR, "athena"), {
                 "--directory=" .. SOURCE_DIR,
                 "--output_file=" .. path.join(SOURCE_DIR, "meta", "ATHENA_GENERATED_RHI.h")
@@ -313,10 +314,11 @@ target("GenerateShaderModules", function()
     set_kind("phony")
     add_deps("shader_reflector")
     on_build(function(target)
-        local input_files = os.files(path.join(SOURCE_DIR, "shaders"))
+        local input_files = os.files(path.join(SOURCE_DIR, "shaders", "*.slang"))
 
         table.insert(input_files, path.join(TARGET_DIR, "shader_reflector"))
         if any_file_newer(input_files, path.join(RESOURCE_DIR, "shader_stamp.stamp")) then
+            print("[Running: Shader Reflector]")
             os.execv(path.join(TARGET_DIR, "shader_reflector"), {
                 "--shader_input_path=" .. path.join(SOURCE_DIR, "shaders") .. "/",
                 "--shader_output_dir=" .. path.join(RESOURCE_DIR, "shader_binaries") .. "/",
@@ -330,13 +332,10 @@ end)
 
 target("GenerateAssetPackages", function()
     set_kind("phony")
-    add_deps("jfd_asset_file_packer", "shader_reflector")
+    add_deps("jfd_asset_file_packer", "shader_reflector", "GenerateShaderModules")
     on_build(function(target)
         local input_files = os.files(path.join(RESOURCE_DIR, "**"))
         table.insert(input_files, path.join(TARGET_DIR, "jfd_asset_file_packer"))
-        for _, file in ipairs(input_files) do
-            
-        end
 
         if any_file_newer(input_files, path.join(RESOURCE_DIR, "asset_stamp.stamp")) or rebuilt then
             local popd = os.curdir()

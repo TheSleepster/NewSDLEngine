@@ -81,7 +81,7 @@ FILE_WATCHER_CALLBACK(main_file_watcher)
 }
 #endif
 
-void
+ENGINE_API void
 process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager)
 {
     SDL_Event event;

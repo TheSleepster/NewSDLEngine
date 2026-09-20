@@ -34,8 +34,8 @@ struct RHI_render_camera_t
     //vec3_t  axis;
 
     struct {
-        mat4_t projection_matrix;
         mat4_t view_matrix;
+        mat4_t projection_matrix;
     }matrices;
 };
 
@@ -554,69 +554,69 @@ struct RHI_context_t
 
 struct RHI_image_create_info_t;
 
-void             RHI_context_init(RHI_context_t *RHI_context, backend_render_context_t *render_context);
-void             RHI_handle_window_resize(RHI_context_t *RHI_context, vec2_t window_size);
-void             RHI_resize_render_targets(RHI_context_t *RHI_context, vec2_t window_size);
-u32              RHI_build_renderpass(RHI_context_t *RHI_context, RHI_renderpass_desc_t *renderpass_desc);
-true_inline void RHI_resize_renderpass(RHI_context_t *RHI_context, RHI_renderpass_t *renderpass);
-void             RHI_render_camera_set_matrices(RHI_render_camera_t *camera);
+ENGINE_API void             RHI_context_init(RHI_context_t *RHI_context, backend_render_context_t *render_context);
+ENGINE_API void             RHI_handle_window_resize(RHI_context_t *RHI_context, vec2_t window_size);
+ENGINE_API void             RHI_resize_render_targets(RHI_context_t *RHI_context, vec2_t window_size);
+ENGINE_API u32              RHI_build_renderpass(RHI_context_t *RHI_context, RHI_renderpass_desc_t *renderpass_desc);
+ENGINE_API true_inline void RHI_resize_renderpass(RHI_context_t *RHI_context, RHI_renderpass_t *renderpass);
+ENGINE_API void             RHI_render_camera_set_matrices(RHI_render_camera_t *camera);
 
-RHI_uniform_constant_buffer_t* RHI_get_constant_buffer(RHI_context_t *RHI_context, string_t uniform_name);
+ENGINE_API RHI_uniform_constant_buffer_t* RHI_get_constant_buffer(RHI_context_t *RHI_context, string_t uniform_name);
 
-            RHI_render_buffer_t RHI_render_buffer_create(RHI_context_t *RHI_context, RHI_render_buffer_desc_t *buffer_desc);
-true_inline RHI_vertex_buffer_t RHI_vertex_buffer_create(RHI_context_t *RHI_context, RHI_render_buffer_memory_type_t memory_type, RHI_render_buffer_advance_rate_t rate, byte* vertex_buffer_data, u32 vertex_size, u32 max_vertices);
-true_inline RHI_index_buffer_t  RHI_index_buffer_create(RHI_context_t *RHI_context, RHI_render_buffer_memory_type_t memory_type, u32 element_size, void *data, u32 size);
-true_inline void                RHI_render_buffer_copy_data(RHI_context_t *RHI_context, RHI_render_buffer_t *buffer, void *data, u32 size, u32 offset);
+ENGINE_API             RHI_render_buffer_t RHI_render_buffer_create(RHI_context_t *RHI_context, RHI_render_buffer_desc_t *buffer_desc);
+ENGINE_API true_inline RHI_vertex_buffer_t RHI_vertex_buffer_create(RHI_context_t *RHI_context, RHI_render_buffer_memory_type_t memory_type, RHI_render_buffer_advance_rate_t rate, byte* vertex_buffer_data, u32 vertex_size, u32 max_vertices);
+ENGINE_API true_inline RHI_index_buffer_t  RHI_index_buffer_create(RHI_context_t *RHI_context, RHI_render_buffer_memory_type_t memory_type, u32 element_size, void *data, u32 size);
+ENGINE_API true_inline void                RHI_render_buffer_copy_data(RHI_context_t *RHI_context, RHI_render_buffer_t *buffer, void *data, u32 size, u32 offset);
 
-true_inline void RHI_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_render_buffer_t *buffer);
-true_inline void RHI_vertex_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_vertex_buffer_t *buffer);
-true_inline void RHI_vertex_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_index_buffer_t *buffer);
-true_inline void RHI_vertex_buffer_reset_count(RHI_vertex_buffer_t *buffer);
-true_inline void RHI_index_buffer_reset_count(RHI_index_buffer_t *buffer);
+ENGINE_API true_inline void RHI_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_render_buffer_t *buffer);
+ENGINE_API true_inline void RHI_vertex_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_vertex_buffer_t *buffer);
+ENGINE_API true_inline void RHI_vertex_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_index_buffer_t *buffer);
+ENGINE_API true_inline void RHI_vertex_buffer_reset_count(RHI_vertex_buffer_t *buffer);
+ENGINE_API true_inline void RHI_index_buffer_reset_count(RHI_index_buffer_t *buffer);
 
-RHI_image_t            RHI_image_create(RHI_context_t *render_state, RHI_image_create_info_t *image_create_info);
-void                   RHI_image_destroy(RHI_context_t *RHI_context, RHI_image_t *image);
-void                   RHI_image_update_data(void *backend_context, RHI_image_t *image);
-RHI_command_list_t    *RHI_get_command_list(RHI_context_t *RHI_context, RHI_command_list_type_t type);
-s32                    RHI_find_texture_index(RHI_command_list_t *command_list, u64 ID);
-void                   RHI_reset_command_list(RHI_command_list_t *command_list);
+ENGINE_API RHI_image_t            RHI_image_create(RHI_context_t *render_state, RHI_image_create_info_t *image_create_info);
+ENGINE_API void                   RHI_image_destroy(RHI_context_t *RHI_context, RHI_image_t *image);
+ENGINE_API void                   RHI_image_update_data(void *backend_context, RHI_image_t *image);
+ENGINE_API RHI_command_list_t    *RHI_get_command_list(RHI_context_t *RHI_context, RHI_command_list_type_t type);
+ENGINE_API s32                    RHI_find_texture_index(RHI_command_list_t *command_list, u64 ID);
+ENGINE_API void                   RHI_reset_command_list(RHI_command_list_t *command_list);
 
 // TODO(Sleepster): Do we want these here???
-s32                    RHI_is_texture_bound(RHI_command_list_t *command_list, texture2D_t *texture);
-void                   RHI_set_texture_filter_mode(RHI_context_t *render_state, texture2D_t *texture, u32 filter_mode);
+ENGINE_API s32                    RHI_is_texture_bound(RHI_command_list_t *command_list, texture2D_t *texture);
+ENGINE_API void                   RHI_set_texture_filter_mode(RHI_context_t *render_state, texture2D_t *texture, u32 filter_mode);
 
 // NOTE(Sleepster): RHI commands 
-void RHI_cmd_renderpass_begin(RHI_command_list_t *command_list, u32 renderpassID);
-void RHI_cmd_renderpass_end(RHI_command_list_t *command_list);
-void RHI_cmd_clear_renderpass_attachments(RHI_command_list_t *command_list, u32 renderpassID);
-void RHI_cmd_renderpass_begin(RHI_command_list_t *command_list, u32 renderpassID);
-void RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_render_buffer_t *buffer);
-void RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer);
-void RHI_cmd_bind_index_buffer(RHI_command_list_t *command_list, RHI_render_buffer_t *buffer);
-void RHI_cmd_bind_index_buffer(RHI_command_list_t *command_list, RHI_index_buffer_t *buffer);
-void RHI_cmd_set_scissor(RHI_command_list_t *command_list, vec2_t offset, vec2_t size);
-void RHI_cmd_set_viewport(RHI_command_list_t *command_list, vec2_t offset, vec2_t size);
-void RHI_cmd_set_line_width(RHI_command_list_t *command_list, float32 line_width);
-void RHI_cmd_update_push_constants(RHI_command_list_t *command_list, u32 offset, u32 size, void *data);
-void RHI_cmd_update_buffer_contents(RHI_command_list_t *command_list, RHI_render_buffer_t *buffer, void *data, u32 data_size);
-void RHI_cmd_use_shader_program(RHI_command_list_t *command_list, asset_handle_t program);
-void RHI_cmd_update_constant_buffer(RHI_command_list_t *command_list, RHI_uniform_constant_buffer_t *buffer, void *data, u32 data_size);
-void RHI_cmd_bind_texture_image(RHI_command_list_t *command_list, texture2D_t *texture);
-void RHI_cmd_bind_texture_from_handle(RHI_command_list_t *command_list, asset_handle_t *asset_handle);
-void RHI_cmd_reset_render_state(RHI_command_list_t *command_list);
-void RHI_cmd_set_render_state(RHI_command_list_t *command_list, RHI_pipeline_state_t *render_pipeline_state);
-void RHI_cmd_draw(RHI_command_list_t *command_list, u32 vertex_count, u32 vertex_offset, u32 instance_count, u32 first_instance);
-void RHI_cmd_draw_indexed(RHI_command_list_t *command_list, u32 index_count, u32 index_offset, u32 vertex_offset, u32 instance_count, u32 first_instance);
-void RHI_cmd_dispatch_compute(RHI_command_list_t *command_list, u32 invoke_x, u32 invoke_y, u32 invoke_z);
-void RHI_cmd_blit_image(RHI_command_list_t *command_list, RHI_image_t *source_image, RHI_image_t *dest_image, vec2_t source_offset, vec2_t source_blit_size, vec2_t dest_offset, vec2_t dest_blit_size);
-void RHI_cmd_blit_renderpass(RHI_command_list_t *command_list, u32 source_ID, u32 destination_ID);
-void RHI_cmd_present(RHI_command_list_t *command_list, RHI_image_t *presentation_source);
+ENGINE_API void RHI_cmd_renderpass_begin(RHI_command_list_t *command_list, u32 renderpassID);
+ENGINE_API void RHI_cmd_renderpass_end(RHI_command_list_t *command_list);
+ENGINE_API void RHI_cmd_clear_renderpass_attachments(RHI_command_list_t *command_list, u32 renderpassID);
+ENGINE_API void RHI_cmd_renderpass_begin(RHI_command_list_t *command_list, u32 renderpassID);
+ENGINE_API void RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_render_buffer_t *buffer);
+ENGINE_API void RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer);
+ENGINE_API void RHI_cmd_bind_index_buffer(RHI_command_list_t *command_list, RHI_render_buffer_t *buffer);
+ENGINE_API void RHI_cmd_bind_index_buffer(RHI_command_list_t *command_list, RHI_index_buffer_t *buffer);
+ENGINE_API void RHI_cmd_set_scissor(RHI_command_list_t *command_list, vec2_t offset, vec2_t size);
+ENGINE_API void RHI_cmd_set_viewport(RHI_command_list_t *command_list, vec2_t offset, vec2_t size);
+ENGINE_API void RHI_cmd_set_line_width(RHI_command_list_t *command_list, float32 line_width);
+ENGINE_API void RHI_cmd_update_push_constants(RHI_command_list_t *command_list, u32 offset, u32 size, void *data);
+ENGINE_API void RHI_cmd_update_buffer_contents(RHI_command_list_t *command_list, RHI_render_buffer_t *buffer, void *data, u32 data_size);
+ENGINE_API void RHI_cmd_use_shader_program(RHI_command_list_t *command_list, asset_handle_t program);
+ENGINE_API void RHI_cmd_update_constant_buffer(RHI_command_list_t *command_list, RHI_uniform_constant_buffer_t *buffer, void *data, u32 data_size);
+ENGINE_API void RHI_cmd_bind_texture_image(RHI_command_list_t *command_list, texture2D_t *texture);
+ENGINE_API void RHI_cmd_bind_texture_from_handle(RHI_command_list_t *command_list, asset_handle_t *asset_handle);
+ENGINE_API void RHI_cmd_reset_render_state(RHI_command_list_t *command_list);
+ENGINE_API void RHI_cmd_set_render_state(RHI_command_list_t *command_list, RHI_pipeline_state_t *render_pipeline_state);
+ENGINE_API void RHI_cmd_draw(RHI_command_list_t *command_list, u32 vertex_count, u32 vertex_offset, u32 instance_count, u32 first_instance);
+ENGINE_API void RHI_cmd_draw_indexed(RHI_command_list_t *command_list, u32 index_count, u32 index_offset, u32 vertex_offset, u32 instance_count, u32 first_instance);
+ENGINE_API void RHI_cmd_dispatch_compute(RHI_command_list_t *command_list, u32 invoke_x, u32 invoke_y, u32 invoke_z);
+ENGINE_API void RHI_cmd_blit_image(RHI_command_list_t *command_list, RHI_image_t *source_image, RHI_image_t *dest_image, vec2_t source_offset, vec2_t source_blit_size, vec2_t dest_offset, vec2_t dest_blit_size);
+ENGINE_API void RHI_cmd_blit_renderpass(RHI_command_list_t *command_list, u32 source_ID, u32 destination_ID);
+ENGINE_API void RHI_cmd_present(RHI_command_list_t *command_list, RHI_image_t *presentation_source);
 
 // NOTE(Sleepster): Aliases for operator overloading...
-true_inline void RHI_cmd_update_buffer_contents(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer);
-true_inline void RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer);
+ENGINE_API true_inline void RHI_cmd_update_buffer_contents(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer);
+ENGINE_API true_inline void RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer);
 
-void RHI_execute_backend_commands(RHI_context_t *RHI_context);
+ENGINE_API void RHI_execute_backend_commands(RHI_context_t *RHI_context);
 
 #endif // S_RENDERER_H
 

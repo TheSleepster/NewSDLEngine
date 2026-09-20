@@ -12,7 +12,7 @@
 vec2_t g_window_size = {};
 bool8 g_running      = false;
 
-void
+ENGINE_API void
 c_global_context_init(void)
 {
     Assert(!gc);
@@ -34,25 +34,25 @@ c_global_context_init(void)
     gc->tick_rate_ms = gc->tick_rate * 1000;
 }
 
-void
+ENGINE_API void
 c_global_context_reset_transient_arena(void)
 {
     c_arena_reset(&gc->transient_arena);
 }
 
-void
+ENGINE_API void
 c_global_context_reset_temp_arena(void)
 {
     c_arena_reset(&gc->temp_arena);
 }
 
-void
+ENGINE_API void
 c_global_context_reset_persistent_arena(void)
 {
     c_arena_reset(&gc->persistent_arena);
 }
 
-void
+ENGINE_API void
 c_global_context_reset_simulation_arena(void)
 {
     c_arena_reset(&gc->simulation_arena);

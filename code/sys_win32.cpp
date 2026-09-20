@@ -25,7 +25,7 @@ typedef struct multithreading_work_queue_manager multithreading_work_queue_manag
 // MEMORY FUNCTIONS
 /////////////////////
 
-u64 
+ENGINE_API u64 
 sys_get_virtual_memory_page_size(void)
 {    
     SYSTEM_INFO info;
@@ -34,7 +34,7 @@ sys_get_virtual_memory_page_size(void)
     return(info.dwPageSize);
 }
 
-void*
+ENGINE_API void*
 sys_allocate_memory(void *base_address, usize allocation_size)
 {
     void *result = null;
@@ -58,7 +58,7 @@ sys_allocate_memory(void *base_address, usize allocation_size)
     return(result);
 }
 
-void*
+ENGINE_API void*
 sys_reallocate_memory(void *offset, u64 old_size, u64 allocation_size)
 {
     (void)old_size;
@@ -85,14 +85,14 @@ sys_reallocate_memory(void *offset, u64 old_size, u64 allocation_size)
 }
 
 
-void
+ENGINE_API void
 sys_free_memory(void *data, usize free_size)
 {
     (void)free_size;
     VirtualFree(data, 0, MEM_RELEASE);
 }
 
-bool8  
+ENGINE_API bool8  
 sys_set_memory_access_flags(void *memory, u64 memory_size, int access_flags)
 {
     bool8 result = true;
@@ -150,7 +150,7 @@ sys_set_memory_access_flags(void *memory, u64 memory_size, int access_flags)
 ///////////////////////////////////
 
 // TODO(Sleepster): UNICODE CreateFileW 
-file_t
+ENGINE_API file_t
 sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overlapping_io)
 {
     file_t result = {};
@@ -202,7 +202,7 @@ sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overl
     return(result);
 }
 
-bool8 
+ENGINE_API bool8 
 sys_file_close(file_t *file_data)
 {
     bool8 result = CloseHandle(file_data->handle);
@@ -214,7 +214,7 @@ sys_file_close(file_t *file_data)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_copy(string_t old_path, string_t new_path)
 {
     bool8 result = CopyFile(C_STR(old_path), C_STR(new_path), FALSE);
@@ -222,7 +222,7 @@ sys_file_copy(string_t old_path, string_t new_path)
     return(result);
 }
 
-s64
+ENGINE_API s64
 sys_file_get_size(file_t *file_data)
 {
     s64 result = 0;
@@ -240,7 +240,7 @@ sys_file_get_size(file_t *file_data)
     return(result);
 }
 
-bool8 
+ENGINE_API bool8 
 sys_file_read(file_t *file_data, void *memory, s64 bytes_to_read, s64 file_offset)
 {
     bool8 result = true;
@@ -259,7 +259,7 @@ sys_file_read(file_t *file_data, void *memory, s64 bytes_to_read, s64 file_offse
 }
 
 // NOTE(Sleepster): This is blocking... It will block until the buffer has written everything 
-bool8 
+ENGINE_API bool8 
 sys_file_write(file_t *file_data, void *memory, s64 bytes_to_write)
 {
     bool8 result = true;
@@ -280,7 +280,7 @@ sys_file_write(file_t *file_data, void *memory, s64 bytes_to_write)
     return(result);
 }
 
-mapped_file_t
+ENGINE_API mapped_file_t
 sys_file_map(string_t filepath)
 {
     mapped_file_t result = {};
@@ -313,7 +313,7 @@ sys_file_map(string_t filepath)
     return(result);
 }
 
-bool8 
+ENGINE_API bool8 
 sys_file_unmap(mapped_file_t *map_data)
 {
     bool8 result = true;
@@ -344,7 +344,7 @@ sys_file_unmap(mapped_file_t *map_data)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_exists(string_t filepath)
 {
     bool8 result = false;
@@ -353,7 +353,7 @@ sys_file_exists(string_t filepath)
     return(result);
 }
 
-file_data_t
+ENGINE_API file_data_t
 sys_file_get_modtime_and_size(string_t filepath)
 {
     file_data_t result = {};
@@ -391,7 +391,7 @@ sys_file_get_modtime_and_size(string_t filepath)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_replace_or_rename(string_t old_file, string_t new_file)
 {
     bool8 result = true;
@@ -419,7 +419,7 @@ sys_file_replace_or_rename(string_t old_file, string_t new_file)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_directory_get_current_working_dir(byte *buffer, u32 buffer_length)
 {
     bool8 result = false;
@@ -428,7 +428,7 @@ sys_directory_get_current_working_dir(byte *buffer, u32 buffer_length)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_directory_exists(string_t filepath)
 {
     bool8 result = false;
@@ -441,7 +441,7 @@ sys_directory_exists(string_t filepath)
     return(result);
 }
 
-s32
+ENGINE_API s32
 sys_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 recursive, string_t file_ext)
 {
     s32 result = -1;
@@ -506,7 +506,7 @@ sys_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 rec
 }
 
 #if 0
-void
+ENGINE_API void
 sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 {
     Assert(visit_file_data);
@@ -583,7 +583,7 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 }
 #endif
 
-void
+ENGINE_API void
 sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 {
     Assert(visit_file_data);
@@ -639,7 +639,7 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
     FindClose(file_handle);
 }
 
-void*
+ENGINE_API void*
 sys_load_library(string_t filepath)
 {
     void *result = null;
@@ -648,13 +648,13 @@ sys_load_library(string_t filepath)
     return(result);
 }
 
-void
+ENGINE_API void
 sys_free_library(void *library)
 {
     FreeLibrary((HMODULE)library);
 }
 
-void*
+ENGINE_API void*
 sys_get_proc_address(void *library, string_t procedure)
 {
     void *result = null;
@@ -666,7 +666,7 @@ sys_get_proc_address(void *library, string_t procedure)
 /* ===========================================
    ======== MULTITHREADING FUNCTIONS =========
    ===========================================*/
-s32
+ENGINE_API s32
 sys_get_thread_count()
 {
     SYSTEM_INFO system_info;
@@ -675,7 +675,7 @@ sys_get_thread_count()
     return(system_info.dwNumberOfProcessors);
 }
 
-sys_semaphore_t
+ENGINE_API sys_semaphore_t
 sys_semaphore_create(s32 initial_thread_count, s32 max_thread_count)
 {
     Assert(initial_thread_count <= max_thread_count);
@@ -692,14 +692,14 @@ sys_semaphore_create(s32 initial_thread_count, s32 max_thread_count)
     return(result);
 }
 
-void
+ENGINE_API void
 sys_semaphore_close(sys_semaphore_t *semaphore)
 {
     CloseHandle(semaphore->handle);
     semaphore->handle = null;
 }
 
-s32
+ENGINE_API s32
 sys_semaphore_release(sys_semaphore_t *semaphore, s32 threads_to_release)
 {
     Assert(semaphore);
@@ -715,7 +715,7 @@ sys_semaphore_release(sys_semaphore_t *semaphore, s32 threads_to_release)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_semaphore_destroy(sys_semaphore_t *semaphore)
 {
     Assert(semaphore);
@@ -726,7 +726,7 @@ sys_semaphore_destroy(sys_semaphore_t *semaphore)
     return(result);
 }
 
-void
+ENGINE_API void
 sys_semaphore_wait(sys_semaphore_t *semaphore, u64 wait_duration_ms)
 {
     Assert(semaphore);
@@ -737,7 +737,7 @@ sys_semaphore_wait(sys_semaphore_t *semaphore, u64 wait_duration_ms)
     WaitForSingleObjectEx(semaphore->handle, wait_duration_ms, FALSE);
 }
 
-sys_thread_t
+ENGINE_API sys_thread_t
 sys_thread_create(thread_proc_t *proc, void *user_data, bool8 close_handle)
 {
     Assert(proc);
@@ -758,7 +758,7 @@ sys_thread_create(thread_proc_t *proc, void *user_data, bool8 close_handle)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_thread_close_handle(sys_thread_t *thread_data)
 {
     Assert(thread_data);
@@ -773,7 +773,7 @@ sys_thread_close_handle(sys_thread_t *thread_data)
     return(result);
 }
 
-s32
+ENGINE_API s32
 sys_thread_wait(sys_thread_t *thread)
 {
     DWORD result = 0;
@@ -781,7 +781,7 @@ sys_thread_wait(sys_thread_t *thread)
     return((s32)result);
 }
 
-sys_mutex_t
+ENGINE_API sys_mutex_t
 sys_mutex_create()
 {
     sys_mutex_t result;
@@ -794,7 +794,7 @@ sys_mutex_create()
     return(result);
 }
 
-void
+ENGINE_API void
 sys_mutex_free(sys_mutex_t *mutex)
 {
     Assert(mutex);
@@ -803,7 +803,7 @@ sys_mutex_free(sys_mutex_t *mutex)
     mutex->handle = null;
 }
 
-bool8
+ENGINE_API bool8
 sys_mutex_lock(sys_mutex_t *mutex, const bool8 should_block)
 {
     Assert(mutex);
@@ -830,7 +830,7 @@ sys_mutex_lock(sys_mutex_t *mutex, const bool8 should_block)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_mutex_unlock(sys_mutex_t *mutex)
 {
     Assert(mutex);
@@ -849,14 +849,14 @@ sys_mutex_unlock(sys_mutex_t *mutex)
   =============== FILE WATCHER ==============
   ===========================================*/
 
-void
+ENGINE_API void
 sys_file_watcher_init_watch_data(memory_arena_t *arena, file_watcher_sys_watch_data_t *watch_data)
 {
     (void)arena;
     (void) watch_data;
 }
 
-string_t
+ENGINE_API string_t
 c_string_utf8_to_wide(string_t input)
 {
     string_t result;
@@ -874,7 +874,7 @@ c_string_utf8_to_wide(string_t input)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_watcher_add_path(file_watcher_t *watcher, string_t path)
 {
     bool8 result = false;
@@ -915,7 +915,7 @@ sys_file_watcher_add_path(file_watcher_t *watcher, string_t path)
     return(result);
 }
 
-void
+ENGINE_API void
 sys_file_watcher_issue_check(file_watcher_t *watcher, sys_file_check_event_data_t *directory_data)
 {
     Assert(directory_data->file_handle != INVALID_HANDLE_VALUE);
@@ -956,7 +956,7 @@ sys_file_watcher_issue_check(file_watcher_t *watcher, sys_file_check_event_data_
     }
 }
 
-FILE_NOTIFY_INFORMATION*
+internal_api FILE_NOTIFY_INFORMATION*
 sys_file_watcher_move_info_forward(FILE_NOTIFY_INFORMATION *info)
 {
     FILE_NOTIFY_INFORMATION *result = null;
@@ -968,7 +968,7 @@ sys_file_watcher_move_info_forward(FILE_NOTIFY_INFORMATION *info)
     return(result);
 }
 
-void
+ENGINE_API void
 sys_file_watcher_process_changes(file_watcher_t *watcher)
 {
     for(u32 data_index = 0;
@@ -1088,7 +1088,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
 
 // TODO(Sleepster): Replace these with "CreateProcessEx()"
 
-void*
+ENGINE_API void*
 sys_create_process(string_t program_path, string_t argument_string)
 {
     const char **arguments = c_arena_push_array(&gc->temp_arena, const char *, 100);
@@ -1125,7 +1125,7 @@ sys_create_process(string_t program_path, string_t argument_string)
     return(process);
 }
 
-bool8
+ENGINE_API bool8
 sys_wait_for_process(void *process)
 {
     bool8 result = false;

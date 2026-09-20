@@ -124,7 +124,7 @@ c_memory_allocator_init
 ==============================================
 */
 
-void 
+ENGINE_API void 
 c_memory_allocator_init(void *base_address, u64 total_allocation)
 {
     Assert(allocator.is_initialized == false);
@@ -549,7 +549,7 @@ alloc
 ==============================================
 */
 
-void*
+ENGINE_API void*
 c_alloc(u64 size, s32 tag)
 {
     void *result = alloc_impl(size, tag);
@@ -562,7 +562,7 @@ free_alloc
 ==============================================
 */
 
-void
+ENGINE_API void
 c_free_alloc(void *memory)
 {
     allocator_thread_context_t *context = allocator.thread_contexts + this_thread_index;
@@ -635,7 +635,7 @@ free_tagged_allocations
 ==============================================
 */
 
-void
+ENGINE_API void
 c_free_tagged_allocations(s32 tag)
 {
     Assert(tag != ALLOCATOR_TAG_FREE);
@@ -661,7 +661,7 @@ free_tagged_allocation_range
 ==============================================
 */
 
-void
+ENGINE_API void
 c_free_tagged_allocation_range(s32 min_tag, s32 max_tag)
 {
     for(s32 tag = min_tag;

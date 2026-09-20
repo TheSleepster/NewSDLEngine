@@ -745,7 +745,8 @@ vk_backend_shader_create_slang_reflect(vulkan_context_t *vulkan_context, string_
 
     // NOTE(Sleepster): Setup the session's compilation flags and other information 
     slang::SessionDesc session_desc = {};
-    session_desc.targets     = &target_desc;
+    session_desc.targets                 = &target_desc;
+    session_desc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
     session_desc.targetCount = 1;
 
     slang::CompilerOptionEntry options[3] = {};

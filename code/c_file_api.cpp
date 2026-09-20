@@ -11,7 +11,7 @@
 #include <p_platform_data.h>
 
 // NOTE(Sleepster): Errors from these calls are handled internally 
-file_t
+ENGINE_API file_t
 c_file_open(string_t filepath, bool8 for_writing, bool8 create)
 {
     file_t result = sys_file_open(filepath, for_writing, create, false);
@@ -23,7 +23,7 @@ c_file_open(string_t filepath, bool8 for_writing, bool8 create)
     return(result);
 }
 
-bool8 
+ENGINE_API bool8 
 c_file_close(file_t *file)
 {
     bool8 result = sys_file_close(file);
@@ -36,7 +36,7 @@ c_file_close(file_t *file)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 c_file_copy(string_t old_path, string_t new_path)
 {
     bool8 result = sys_file_copy(old_path, new_path);
@@ -56,7 +56,7 @@ c_file_allocate_file_data(memory_arena_t *arena, zone_allocator_t *zone, za_allo
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_file_read(file_t             *file_data, 
             u32                 bytes_to_read, 
             memory_arena_t     *arena, 
@@ -77,7 +77,7 @@ c_file_read(file_t             *file_data,
     return(result);
 }
 
-string_t 
+ENGINE_API string_t 
 c_file_read_from_offset(file_t             *file_data, 
                         u32                 bytes_to_read, 
                         u32                 offset, 
@@ -103,7 +103,7 @@ c_file_read_from_offset(file_t             *file_data,
     return(result);
 }
 
-string_t 
+ENGINE_API string_t 
 c_file_read_to_end(file_t             *file_data, 
                    u32                 offset, 
                    memory_arena_t     *arena, 
@@ -120,7 +120,7 @@ c_file_read_to_end(file_t             *file_data,
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_file_read_entirety(string_t            filepath, 
                      memory_arena_t     *arena, 
                      zone_allocator_t   *zone, 
@@ -142,7 +142,7 @@ c_file_read_entirety(string_t            filepath,
 }
 #endif
 
-bool8
+ENGINE_API bool8
 c_file_read(file_t *file, byte *buffer, s32 bytes_to_read)
 {
     Assert(buffer);
@@ -159,7 +159,7 @@ c_file_read(file_t *file, byte *buffer, s32 bytes_to_read)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 c_file_read_from_offset(file_t *file, s32 file_offset, byte *buffer, s32 bytes_to_read)
 {
     bool8 result = false;
@@ -168,7 +168,7 @@ c_file_read_from_offset(file_t *file, s32 file_offset, byte *buffer, s32 bytes_t
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 c_file_read_to_end(file_t *file, s32 offset, byte *buffer, s32 bytes_to_read)
 {
     bool8 result = false;
@@ -177,7 +177,7 @@ c_file_read_to_end(file_t *file, s32 offset, byte *buffer, s32 bytes_to_read)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 c_file_read_entirety(file_t *file, byte *buffer, s32 buffer_size)
 {
     bool8 result = false;
@@ -195,7 +195,7 @@ c_file_read_entirety(file_t *file, byte *buffer, s32 buffer_size)
     return(result);
 }
 
-bool8 
+ENGINE_API bool8 
 c_file_write(file_t *file, void *data, s64 bytes_to_write)
 {
     Assert(file->for_writing);
@@ -207,7 +207,7 @@ c_file_write(file_t *file, void *data, s64 bytes_to_write)
     return(success);
 }
 
-bool8 
+ENGINE_API bool8 
 c_file_open_and_write(string_t filepath, void *data, s64 bytes_to_write, bool8 overwrite)
 {
     bool8 result = false;
@@ -221,7 +221,7 @@ c_file_open_and_write(string_t filepath, void *data, s64 bytes_to_write, bool8 o
     return(result);
 }
 
-bool8 
+ENGINE_API bool8 
 c_file_write_string(file_t *file, string_t data)
 {
     Assert(file->for_writing);
@@ -231,7 +231,7 @@ c_file_write_string(file_t *file, string_t data)
     return(result);
 }
 
-s64
+ENGINE_API s64
 c_file_get_size(file_t *file_data)
 {
     Assert(file_data->handle != INVALID_FILE_HANDLE);
@@ -241,13 +241,13 @@ c_file_get_size(file_t *file_data)
     return(result);
 }
 
-file_data_t
+ENGINE_API file_data_t
 c_file_get_file_system_info(string_t filepath)
 {
     return(sys_file_get_modtime_and_size(filepath));
 }
 
-bool8
+ENGINE_API bool8
 c_file_replace_or_rename(string_t old_file, string_t new_file)
 {
     bool8 result = false;
@@ -256,19 +256,19 @@ c_file_replace_or_rename(string_t old_file, string_t new_file)
     return(result);
 }
 
-mapped_file_t
+ENGINE_API mapped_file_t
 c_file_map(string_t filepath)
 {
     return(sys_file_map(filepath));
 }
 
-bool8
+ENGINE_API bool8
 c_file_unmap(mapped_file_t *map_data)
 {
     return(sys_file_unmap(map_data));
 }
 
-u32
+ENGINE_API u32
 c_file_ext_string_to_enum(string_t file_extension)
 {
     u32 result = FILE_EXT_INVALID;
@@ -287,7 +287,7 @@ c_file_ext_string_to_enum(string_t file_extension)
 // DIRECTORY
 ////////////////
 
-visit_file_data_t
+ENGINE_API visit_file_data_t
 c_directory_create_visit_data(visit_files_pfn_t *function, bool8 recursive, void *user_data)
 {
     visit_file_data_t result = {};
@@ -299,19 +299,19 @@ c_directory_create_visit_data(visit_files_pfn_t *function, bool8 recursive, void
     return(result);
 }
 
-void
+ENGINE_API void
 c_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 {
     return(sys_directory_visit(filepath, visit_file_data));
 }
 
-bool8
+ENGINE_API bool8
 c_directory_exists(string_t filepath)
 {
     return(sys_directory_exists(filepath));
 }
 
-s32
+ENGINE_API s32
 c_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 recursive, string_t file_ext)
 {
     return(sys_directory_get_file_count(arena, filepath, recursive, file_ext));

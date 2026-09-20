@@ -51,6 +51,7 @@ enum memory_allocator_tag_t
     TAG_COUNT
 };
 
+#pragma pack(push, 1)
 struct memory_section_t 
 {
     s32   ID;
@@ -91,6 +92,7 @@ struct memory_page_t
     memory_page_t    *next_page;
     memory_page_t    *prev_page;
 };
+#pragma pack(pop)
 
 struct tag_section_array_t 
 {
@@ -121,12 +123,12 @@ struct memory_allocator_t
 StaticAssert(sizeof(memory_section_t) % 16 == 0, "Because we use the heading of the allocation as storage for the memory section, it must be 16byte aligned to prevent SSE2 instructions (which require 16byte alignment) from blowing up");
 StaticAssert(sizeof(memory_page_t) % 16 == 0, "Because we use the heading of the allocation as storage for the page section, it must be 16byte aligned to prevent SSE2 instructions (which require 16byte alignment) from blowing up");
 
-void  c_memory_allocator_init(void *base_address, u64 total_allocation);
+ENGINE_API void  c_memory_allocator_init(void *base_address, u64 total_allocation);
 
-void *c_alloc(u64 size, s32 tag);
-void  c_free_alloc(void *memory);
-void  c_free_tagged_allocations(s32 tag);
-void  c_free_tagged_allocation_range(s32 min_tag, s32 max_tag);
+ENGINE_API void *c_alloc(u64 size, s32 tag);
+ENGINE_API void  c_free_alloc(void *memory);
+ENGINE_API void  c_free_tagged_allocations(s32 tag);
+ENGINE_API void  c_free_tagged_allocation_range(s32 min_tag, s32 max_tag);
 
 
 #endif // C_HEAP_ALLOCATOR_H

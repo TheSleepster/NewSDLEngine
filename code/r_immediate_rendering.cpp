@@ -6,7 +6,7 @@
    ======================================================================== */
 #include <r_immediate_rendering.h>
 
-void
+ENGINE_API void
 immediate_put_data(RHI_vertex_buffer_t *buffer, byte *data, u32 element_size, u32 element_count)
 {
     byte *vertex_pointer = buffer->vertex_data + buffer->vertex_count;
@@ -22,7 +22,7 @@ QUADS
 =============
 */
 
-void
+ENGINE_API void
 immediate_quad_ex(RHI_command_list_t  *command_list,
                   RHI_vertex_buffer_t *buffer,
                   vec3_t               position,
@@ -94,7 +94,7 @@ immediate_quad_ex(RHI_command_list_t  *command_list,
     buffer->vertex_count += 4;
 }
 
-void
+ENGINE_API void
 immediate_rect_ex(RHI_command_list_t  *command_list,
                   RHI_vertex_buffer_t *buffer,
                   vec3_t               position,
@@ -119,7 +119,7 @@ immediate_rect_ex(RHI_command_list_t  *command_list,
                       null);
 }
 
-void
+ENGINE_API void
 immediate_rect(RHI_command_list_t  *command_list,
                RHI_vertex_buffer_t *buffer,
                vec3_t               position,
@@ -140,7 +140,7 @@ immediate_rect(RHI_command_list_t  *command_list,
                       null);
 }
 
-void
+ENGINE_API void
 immediate_text(RHI_command_list_t    *command_list, 
                RHI_vertex_buffer_t   *vertex_buffer,
                asset_manager_t       *asset_manager,
@@ -219,7 +219,7 @@ LINES
 =============
 */
 
-void
+ENGINE_API void
 immediate_line(RHI_command_list_t    *command_list,
                RHI_vertex_buffer_t   *vertex_buffer,
                vec2_t                 start,

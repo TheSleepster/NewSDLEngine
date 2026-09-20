@@ -242,41 +242,45 @@ struct input_manager_t
     array_t<input_device_t, MAX_PHYSICAL_DEVICE_CONNECTIONS> devices;
 };
 
+#define ActionButtonDown(button)     ((button)->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN)
+#define ActionButtonPressed(button)  ((button)->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED)
+#define ActionButtonReleased(button) ((button)->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED)
+
 #define GameActionPressed(action)  ((action->button_flags) & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED)
 #define GameActionDown(action)     ((action->button_flags) & INPUT_MANAGER_ACTION_BUTTON_DOWN)
 #define GameActionReleased(action) ((action->button_flags) & INPUT_MANAGER_ACTION_BUTTON_RELEASED)
 
 // INTERFACE
-void s_im_init_input_manager(input_manager_t *input_manager);
-void s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager);
-void s_im_apply_events_to_controller(input_controller_t *controller, array_view_t<input_event_t> events, bool8 auto_consume);
-void s_im_clear_device_events(input_device_t *device);
-void s_im_clear_controller_transient_state(input_controller_t *controller);
+ENGINE_API void s_im_init_input_manager(input_manager_t *input_manager);
+ENGINE_API void s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager);
+ENGINE_API void s_im_apply_events_to_controller(input_controller_t *controller, array_view_t<input_event_t> events, bool8 auto_consume);
+ENGINE_API void s_im_clear_device_events(input_device_t *device);
+ENGINE_API void s_im_clear_controller_transient_state(input_controller_t *controller);
 
-input_device_t* s_im_find_device_by_ID(input_manager_t *input_manager, s32 ID, s32 *index_out);
-input_device_t* s_im_find_first_keyboard_device(input_manager_t *input_manager, s32 *index_out);
-input_device_t* s_im_find_first_gamepad_device(input_manager_t *input_manager, s32 *index_out);
+ENGINE_API input_device_t* s_im_find_device_by_ID(input_manager_t *input_manager, s32 ID, s32 *index_out);
+ENGINE_API input_device_t* s_im_find_first_keyboard_device(input_manager_t *input_manager, s32 *index_out);
+ENGINE_API input_device_t* s_im_find_first_gamepad_device(input_manager_t *input_manager, s32 *index_out);
 
-input_controller_t* s_im_get_controller_from_active_device(input_manager_t *input_manager, input_controller_t *controller);
+ENGINE_API input_controller_t* s_im_get_controller_from_active_device(input_manager_t *input_manager, input_controller_t *controller);
 
-vec2_t              s_im_transform_mouse_data(input_controller_t *controller, vec2_t surface_size, mat4_t view_matrix, mat4_t projection_matrix);
+ENGINE_API vec2_t              s_im_transform_mouse_data(input_controller_t *controller, vec2_t surface_size, mat4_t view_matrix, mat4_t projection_matrix);
 
-input_binding_state_t s_im_get_button_binding_state(input_controller_t *controller, game_action_binding_t *binding);
-float32               s_im_get_axis_value(input_controller_t *controller, game_action_binding_t *binding);
+ENGINE_API input_binding_state_t s_im_get_button_binding_state(input_controller_t *controller, game_action_binding_t *binding);
+ENGINE_API float32               s_im_get_axis_value(input_controller_t *controller, game_action_binding_t *binding);
 
-bool8                 s_im_is_button_pressed(input_controller_t *controller, s32 inputID);
-bool8                 s_im_is_button_down(input_controller_t *controller, s32 inputID);
-bool8                 s_im_is_button_released(input_controller_t *controller, s32 inputID);
+ENGINE_API bool8                 s_im_is_button_pressed(input_controller_t *controller, s32 inputID);
+ENGINE_API bool8                 s_im_is_button_down(input_controller_t *controller, s32 inputID);
+ENGINE_API bool8                 s_im_is_button_released(input_controller_t *controller, s32 inputID);
 
-game_action_t* s_im_game_action_create(input_manager_t *input_manager, string_t action_name, game_action_mapping_type_t mapping_type);
-void           s_im_game_action_add_mapping(game_action_t *action, game_action_mapping_t *mapping);
-void           s_im_game_action_reset_mappings(game_action_t *action);
-void           s_im_game_action_process_button_state(input_controller_t *controller, game_action_t *action);
-void           s_im_game_action_process_axis1D_state(input_controller_t *controller, game_action_t *action);
-void           s_im_game_action_process_axis2D_state(input_controller_t *controller, game_action_t *action);
+ENGINE_API game_action_t* s_im_game_action_create(input_manager_t *input_manager, string_t action_name, game_action_mapping_type_t mapping_type);
+ENGINE_API void           s_im_game_action_add_mapping(game_action_t *action, game_action_mapping_t *mapping);
+ENGINE_API void           s_im_game_action_reset_mappings(game_action_t *action);
+ENGINE_API void           s_im_game_action_process_button_state(input_controller_t *controller, game_action_t *action);
+ENGINE_API void           s_im_game_action_process_axis1D_state(input_controller_t *controller, game_action_t *action);
+ENGINE_API void           s_im_game_action_process_axis2D_state(input_controller_t *controller, game_action_t *action);
 
-void s_im_update_game_action_states(input_manager_t *input_manager, input_controller_t *controller);
-action_button_t* s_im_get_controller_action_button(input_controller_t *controller, s32 inputID);
+ENGINE_API void s_im_update_game_action_states(input_manager_t *input_manager, input_controller_t *controller);
+ENGINE_API action_button_t* s_im_get_controller_action_button(input_controller_t *controller, s32 inputID);
 
 #endif // S_INPUT_MANAGER_H
 

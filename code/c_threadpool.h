@@ -83,10 +83,10 @@ struct threadpool_t
   ============= FUNCATION API ===============
   ===========================================*/
 
-void c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocator_size, bool8 start_instantly, bool8 allow_stealing);
-void c_threadpool_start(threadpool_t *threadpool);
-void c_threadpool_flush_work_orders(threadpool_t *threadpool);
-void c_threadpool_wait_on_fence(threadpool_t *threadpool, work_completion_fence_t *fence);
+ENGINE_API void c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocator_size, bool8 start_instantly, bool8 allow_stealing);
+ENGINE_API void c_threadpool_start(threadpool_t *threadpool);
+ENGINE_API void c_threadpool_flush_work_orders(threadpool_t *threadpool);
+ENGINE_API void c_threadpool_wait_on_fence(threadpool_t *threadpool, work_completion_fence_t *fence);
 
 template <typename LambdaType>
 internal_api void c_threadpool_push_work_order(threadpool_t *threadpool, LambdaType lambda, work_completion_fence_t *fence);

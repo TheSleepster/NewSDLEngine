@@ -24,7 +24,7 @@ s_RHI_context_init
 =============
 */
 
-void
+ENGINE_API void
 RHI_context_init(RHI_context_t *RHI_context, backend_render_context_t *render_context)
 {
     RHI_context->RHI_arena       = c_arena_create(MB(100), ALLOCATOR_TAG_RHI);
@@ -42,7 +42,7 @@ RHI_handle_window_resize
 =============
 */
 
-void
+ENGINE_API void
 RHI_handle_window_resize(RHI_context_t *RHI_context, vec2_t window_size)
 {
     RHI_context->backend_handle_window_resize(window_size);
@@ -103,7 +103,7 @@ RHI_execute_backend_commands
 =============
 */
 
-void
+ENGINE_API void
 RHI_execute_backend_commands(RHI_context_t *RHI_context)
 {
     RHI_context->backend_render_frame();
@@ -141,7 +141,7 @@ RHI_build_renderpass
 =============
 */
 
-u32 
+ENGINE_API u32 
 RHI_build_renderpass(RHI_context_t *RHI_context, RHI_renderpass_desc_t *renderpass_desc)
 {
     u32 result = INVALID_ID;
@@ -182,7 +182,7 @@ RHI_build_renderpass(RHI_context_t *RHI_context, RHI_renderpass_desc_t *renderpa
     return(result);
 }
 
-true_inline void
+ENGINE_API true_inline void
 RHI_resize_renderpass(RHI_context_t *RHI_context, RHI_renderpass_t *renderpass)
 {
     RHI_context->backend_renderpass_initialize(&renderpass->create_info, renderpass);
@@ -196,13 +196,16 @@ RHI_resize_renderpass(RHI_context_t *RHI_context, RHI_renderpass_t *renderpass)
 // RENDER CAMERA 
 /////////////////////////
 
-void
+ENGINE_API void
 RHI_render_camera_set_matrices(RHI_render_camera_t *camera)
 {
-    float32 half_width  = (camera->viewport.x * 0.5f) * camera->zoom;
-    float32 half_height = (camera->viewport.y * 0.5f) * camera->zoom;
+    float32 half_width  = (camera->viewport.x * 0.5f);
+    float32 half_height = (camera->viewport.y * 0.5f);
 
-    camera->matrices.view_matrix       = mat4_make_translation(vec2_expand_vec3(camera->translation, 0.0f));
+    mat4_t translation = mat4_make_translation(vec3(-camera->translation.x, -camera->translation.y, 0.0f));
+    mat4_t scale       = mat4_make_scale(vec3(camera->zoom, camera->zoom, 1.0f));
+
+    camera->matrices.view_matrix = mat4_multiply(translation, scale);
     camera->matrices.projection_matrix = mat4_RHDX_ortho(-half_width, 
                                                           half_width, 
                                                          -half_height, 
@@ -220,7 +223,7 @@ RHI_vertex_buffer_create
 =============
 */
 
-true_inline RHI_vertex_buffer_t
+ENGINE_API true_inline RHI_vertex_buffer_t
 RHI_vertex_buffer_create(RHI_context_t                   *RHI_context, 
                          RHI_render_buffer_memory_type_t  memory_type, 
                          RHI_render_buffer_advance_rate_t rate, 
@@ -252,7 +255,7 @@ RHI_index_buffer_create
 =============
 */
 
-true_inline RHI_index_buffer_t
+ENGINE_API true_inline RHI_index_buffer_t
 RHI_index_buffer_create(RHI_context_t *RHI_context, RHI_render_buffer_memory_type_t memory_type, u32 element_size, void *data, u32 size)
 {
     RHI_index_buffer_t result = {};
@@ -274,7 +277,7 @@ RHI_render_buffer_create
 =============
 */
 
-RHI_render_buffer_t
+ENGINE_API RHI_render_buffer_t
 RHI_render_buffer_create(RHI_context_t            *RHI_context, 
                          RHI_render_buffer_desc_t *buffer_desc)
 {
@@ -294,7 +297,7 @@ RHI_render_buffer_copy_data
 =============
 */
 
-true_inline void
+ENGINE_API true_inline void
 RHI_render_buffer_copy_data(RHI_context_t *RHI_context, RHI_render_buffer_t *buffer, void *data, u32 size, u32 offset)
 {
     RHI_context->backend_buffer_copy_data(buffer, data, size, offset);
@@ -307,7 +310,7 @@ RHI_buffer_reset_offsets
 =============
 */
 
-true_inline void
+ENGINE_API true_inline void
 RHI_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_render_buffer_t *buffer)
 {
     buffer->buffer_elements_used = 0;
@@ -322,7 +325,7 @@ RHI_vertex_buffer_reset_offsets
 =============
 */
 
-true_inline void
+ENGINE_API true_inline void
 RHI_vertex_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_vertex_buffer_t *buffer)
 {
     buffer->vertex_offset   = 0;
@@ -336,7 +339,7 @@ RHI_index_buffer_reset_offsets
 =============
 */
 
-true_inline void
+ENGINE_API true_inline void
 RHI_vertex_buffer_reset_offsets(RHI_context_t *RHI_context, RHI_index_buffer_t *buffer)
 {
     buffer->index_offset    = 0;
@@ -351,7 +354,7 @@ RHI_vertex_buffer_reset_count
 =============
 */
 
-true_inline void
+ENGINE_API true_inline void
 RHI_vertex_buffer_reset_count(RHI_vertex_buffer_t *buffer)
 {
     buffer->vertex_count = 0;
@@ -363,7 +366,7 @@ RHI_index_buffer_reset_count
 =============
 */
 
-true_inline void
+ENGINE_API true_inline void
 RHI_index_buffer_reset_count(RHI_index_buffer_t *buffer)
 {
     buffer->index_count = 0;
@@ -380,7 +383,7 @@ RHI_index_buffer_reset_count(RHI_index_buffer_t *buffer)
 // We could perhaps do what we do for assets and shader parameters where we preload
 // the name of the item into the hash table so that if you ask for a constant buffer that literally
 // doesn't exist and can't exist, it's a reasonable error.
-RHI_uniform_constant_buffer_t*
+ENGINE_API RHI_uniform_constant_buffer_t*
 RHI_get_constant_buffer(RHI_context_t *RHI_context, string_t uniform_name)
 {
     RHI_uniform_constant_buffer_t *result = null;
@@ -409,7 +412,7 @@ RHI_is_texture_bound
 =============
 */
 
-s32
+ENGINE_API s32
 RHI_is_texture_bound(RHI_command_list_t *command_list, texture2D_t *texture)
 {
     s32 result = -1;
@@ -435,7 +438,7 @@ RHI_find_texture_index
 =============
 */
 
-s32
+ENGINE_API s32
 RHI_find_texture_index(RHI_command_list_t *command_list, u64 ID)
 {
     s32 result = -1;
@@ -460,7 +463,7 @@ RHI_set_texture_filter_mode
 =============
 */
 
-void
+ENGINE_API void
 RHI_set_texture_filter_mode(RHI_context_t *render_state, texture2D_t *texture, u32 filter_mode)
 {
     if(texture->gpu_data.create_info.sampler_info.filtering != filter_mode)
@@ -527,7 +530,7 @@ RHI_get_command_list
 =============
 */
 
-RHI_command_list_t*
+ENGINE_API RHI_command_list_t*
 RHI_get_command_list(RHI_context_t *RHI_context, RHI_command_list_type_t type)
 {
     RHI_command_list_t *result = null;
@@ -566,7 +569,7 @@ RHI_cmd_renderpass_begin
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_renderpass_begin(RHI_command_list_t *command_list, u32 renderpassID)
 {
     Assert(command_list->active_renderpass == null);
@@ -593,7 +596,7 @@ RHI_cmd_renderpass_end
 // TODO(Sleepster): 
 // This is probably a problem. Not really sure why we're actually operating on command list here when it could 
 // be accessed from multiple threads
-void
+ENGINE_API void
 RHI_cmd_renderpass_end(RHI_command_list_t *command_list)
 {
     Assert(command_list->active_renderpass != null);
@@ -616,7 +619,7 @@ RHI_cmd_clear_image
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_clear_image(RHI_command_list_t *command_list, RHI_image_t *image, RHI_clear_value_t value)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -641,7 +644,7 @@ RHI_cmd_clear_renderpass_contents
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_clear_renderpass_attachments(RHI_command_list_t *command_list, u32 renderpassID)
 {
     Assert(command_list->active_renderpass != null);
@@ -663,7 +666,7 @@ RHI_cmd_use_shader_program
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_use_shader_program(RHI_command_list_t *command_list, asset_handle_t asset_handle)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -698,7 +701,7 @@ RHI_cmd_bind_texture_image
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_bind_texture_image(RHI_command_list_t *command_list, texture2D_t *texture)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -728,7 +731,7 @@ RHI_cmd_bind_texture_from_handle
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_bind_texture_from_handle(RHI_command_list_t *command_list, asset_handle_t *asset_handle)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -760,7 +763,7 @@ RHI_cmd_bind_vertex_buffer
 =============
 */
 
-true_inline void 
+ENGINE_API true_inline void 
 RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -779,7 +782,7 @@ RHI_cmd_bind_index_buffer
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_bind_index_buffer(RHI_command_list_t *command_list, RHI_index_buffer_t *buffer)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -801,7 +804,7 @@ RHI_cmd_set_viewport
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_set_viewport(RHI_command_list_t *command_list, vec2_t offset, vec2_t size)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -822,7 +825,7 @@ RHI_cmd_set_scissor
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_set_scissor(RHI_command_list_t *command_list, vec2_t offset, vec2_t size)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -843,7 +846,7 @@ RHI_cmd_set_line_width
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_set_line_width(RHI_command_list_t *command_list, float32 line_width)
 {
     RHI_command_t *command  = RHI_get_next_command(command_list);
@@ -861,7 +864,7 @@ RHI_cmd_update_push_constants
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_update_push_constants(RHI_command_list_t *command_list, u32 offset, u32 size, void *data) 
 {
     Assert(size <= 128);
@@ -883,7 +886,7 @@ RHI_cmd_update_constant_buffer
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_update_constant_buffer(RHI_command_list_t *command_list, RHI_uniform_constant_buffer_t *buffer, void *data, u32 data_size)
 {
     RHI_command_t *command  = RHI_get_next_command(command_list);
@@ -912,7 +915,7 @@ RHI_cmd_update_buffer_contents
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_update_buffer_contents(RHI_command_list_t *command_list, RHI_render_buffer_t *buffer, void *data, u32 data_size)
 {
     RHI_command_t *command  = RHI_get_next_command(command_list);
@@ -936,7 +939,7 @@ RHI_cmd_update_buffer_contents
 */
 
 // TODO(Sleepster): I don't feel good about this... this feels like a good way to blow something up and not know
-true_inline void
+ENGINE_API true_inline void
 RHI_cmd_update_buffer_contents(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer)
 {
     RHI_cmd_update_buffer_contents(command_list, 
@@ -952,7 +955,7 @@ RHI_cmd_update_buffer_contents
 */
 
 // TODO(Sleepster): I don't feel good about this... this feels like a good way to blow something up and not know x2
-true_inline void
+ENGINE_API true_inline void
 RHI_cmd_update_buffer_contents(RHI_command_list_t *command_list, RHI_index_buffer_t *buffer)
 {
     RHI_cmd_update_buffer_contents(command_list, 
@@ -967,7 +970,7 @@ RHI_cmd_set_render_state
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_set_render_state(RHI_command_list_t *command_list, RHI_pipeline_state_t *render_pipeline_state)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -987,7 +990,7 @@ RHI_cmd_reset_render_state
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_reset_render_state(RHI_command_list_t *command_list)
 {
     RHI_command_t *command  = RHI_get_next_command(command_list);
@@ -1000,7 +1003,7 @@ RHI_cmd_draw
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_draw(RHI_command_list_t *command_list, 
              u32                 vertex_count, 
              u32                 vertex_offset, 
@@ -1029,7 +1032,7 @@ RHI_cmd_draw_indexed
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_draw_indexed(RHI_command_list_t *command_list, 
                      u32                 index_count, 
                      u32                 index_offset, 
@@ -1060,7 +1063,7 @@ RHI_cmd_blit_image
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_blit_image(RHI_command_list_t *command_list, 
                    RHI_image_t        *source_image, 
                    RHI_image_t        *dest_image, 
@@ -1092,7 +1095,7 @@ RHI_cmd_blit_renderpass
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_blit_renderpass(RHI_command_list_t *command_list, u32 source_ID, u32 destination_ID)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
@@ -1124,7 +1127,7 @@ RHI_cmd_clear_image
 */
 
 // TODO(Sleepster): This function
-void
+ENGINE_API void
 RHI_cmd_clear_image()
 {
     Expect(false, "This function is not implemented...\n");
@@ -1136,7 +1139,7 @@ RHI_cmd_dispatch_compute
 =============
 */
 
-void
+ENGINE_API void
 RHI_cmd_dispatch_compute(RHI_command_list_t *command_list, u32 invoke_x, u32 invoke_y, u32 invoke_z)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE);
@@ -1163,7 +1166,7 @@ RHI_cmd_present
 // which is later presented when appropriate
 //
 // Also, when you call this command any commands after this is called, are an error.
-void
+ENGINE_API void
 RHI_cmd_present(RHI_command_list_t *command_list, RHI_image_t *presentation_source)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);

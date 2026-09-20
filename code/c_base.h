@@ -134,8 +134,10 @@
 
 #if OS_WINDOWS
 # define external extern "C"  __declspec(dllexport)
+# define ENGINE_API __declspec(dllexport)
 #else
-# define external extern "C"
+# define external   extern "C"
+# define ENGINE_API 
 #endif
 
 #if COMPILER_CLANG || COMPILER_GCC

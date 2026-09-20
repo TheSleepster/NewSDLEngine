@@ -7,7 +7,7 @@
 #include <c_duration_counter.h>
 #include <c_intrinsics.h>
 
-void
+ENGINE_API void
 c_duration_counter_init(duration_counter_t *counter, u64 duration_ms, bool8 looped)
 {
     ZeroStruct(*counter);
@@ -15,7 +15,7 @@ c_duration_counter_init(duration_counter_t *counter, u64 duration_ms, bool8 loop
     counter->looped      = looped;
 }
 
-bool8
+ENGINE_API bool8
 c_duration_counter_advance(duration_counter_t *counter, u64 advance_ms)
 {
     bool8 ended = false;
@@ -32,7 +32,7 @@ c_duration_counter_advance(duration_counter_t *counter, u64 advance_ms)
     return(ended);
 }
 
-true_inline void
+ENGINE_API true_inline void
 c_duration_counter_reset(duration_counter_t *counter)
 {
     counter->current_elapsed = 0;

@@ -10,7 +10,7 @@
 #include <c_heap_allocator.h>
 #include <p_platform_data.h>
 
-memory_arena_t
+ENGINE_API memory_arena_t
 c_arena_create(u64 block_size, u32 memory_tag) 
 {
     memory_arena_t result = {};
@@ -30,7 +30,7 @@ c_arena_create(u64 block_size, u32 memory_tag)
     return(result);
 }
 
-void
+ENGINE_API void
 c_arena_destroy(memory_arena_t *arena)
 {
     c_arena_reset(arena);
@@ -52,7 +52,7 @@ c_arena_get_footer(memory_arena_t *arena)
     return(result);
 }
 
-byte*
+ENGINE_API byte*
 c_arena_push_size(memory_arena_t *arena, u64 size_init)
 {
     Assert(arena->is_initialized == true);
@@ -102,7 +102,7 @@ c_arena_push_size(memory_arena_t *arena, u64 size_init)
     return(result);
 }
 
-byte*
+ENGINE_API byte*
 c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 block_size, u32 memory_tag)
 {
     Assert(structure_size < block_size);
@@ -117,14 +117,14 @@ c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 
     return(result);
 }
 
-void
+ENGINE_API void
 c_arena_clear_block(memory_arena_t *arena)
 {
     ZeroMemory(arena->base, arena->used);    
     arena->used = 0;
 }
 
-void
+ENGINE_API void
 c_arena_free_last_block(memory_arena_t *arena)
 {
     u8 *block_to_free  = (u8*)arena->base;
@@ -142,7 +142,7 @@ c_arena_free_last_block(memory_arena_t *arena)
     arena->block_counter -= 1;
 }
 
-void
+ENGINE_API void
 c_arena_reset(memory_arena_t *arena)
 {
     while(arena->block_counter > 1)
@@ -155,7 +155,7 @@ c_arena_reset(memory_arena_t *arena)
     arena->used = 0;
 }
 
-scratch_arena_t
+ENGINE_API scratch_arena_t
 c_arena_begin_temporary_memory(memory_arena_t *arena)
 {
     scratch_arena_t result;
@@ -168,7 +168,7 @@ c_arena_begin_temporary_memory(memory_arena_t *arena)
     return(result);
 }
 
-void
+ENGINE_API void
 c_arena_end_temporary_memory(scratch_arena_t *scratch_arena)
 {
     memory_arena_t *parent = scratch_arena->parent;

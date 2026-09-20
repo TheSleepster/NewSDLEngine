@@ -207,11 +207,11 @@ DEBUG_print_lambda_data(AST_node_t *lambda_AST, u32 indent)
             {
                 case AST_EXPRESSION_VALUE_INT:
                 {
-                    printf("%ld", value.int_value);
+                    printf("%lld", (unsigned long long)value.int_value);
                 }break;
                 case AST_EXPRESSION_VALUE_UNSIGNED:
                 {
-                    printf("%lu", value.unsigned_value);
+                    printf("%llu", (unsigned long long)value.unsigned_value);
                 }break;
                 case AST_EXPRESSION_VALUE_FLOAT:
                 {
@@ -286,11 +286,11 @@ DEBUG_print_structure_members(AST_node_t *structure, u32 indent)
             {
                 case AST_EXPRESSION_VALUE_INT:
                 {
-                    printf("%ld", value.int_value);
+                    printf("%lld", (unsigned long long)value.int_value);
                 }break;
                 case AST_EXPRESSION_VALUE_UNSIGNED:
                 {
-                    printf("%lu", value.unsigned_value);
+                    printf("%llu", (unsigned long long)value.unsigned_value);
                 }break;
                 case AST_EXPRESSION_VALUE_FLOAT:
                 {
@@ -333,11 +333,11 @@ DEBUG_print_enum_data(AST_node_t *enum_AST, u32 indent)
             {
                 case AST_EXPRESSION_VALUE_INT:
                 {
-                    printf("%ld", value.int_value);
+                    printf("%lld", (unsigned long long)value.int_value);
                 } break;
                 case AST_EXPRESSION_VALUE_UNSIGNED:
                 {
-                    printf("%lu", value.unsigned_value);
+                    printf("%llu", (unsigned long long)value.unsigned_value);
                 } break;
                 case AST_EXPRESSION_VALUE_FLOAT:
                 {
@@ -1560,11 +1560,11 @@ output_type_info_member_data(string_builder_t *builder, code_type_t *type, AST_n
             {
                 case AST_EXPRESSION_VALUE_INT:
                 {
-                    c_string_builder_sprintf(builder, "\t\t\t\t.int64 = %ld,\n", current_member->expression.value.int_value);
+                    c_string_builder_sprintf(builder, "\t\t\t\t.int64 = %lld,\n", current_member->expression.value.int_value);
                 }break;
                 case AST_EXPRESSION_VALUE_UNSIGNED:
                 {
-                    c_string_builder_sprintf(builder, "\t\t\t\t.u64 = %lu,\n", current_member->expression.value.unsigned_value);
+                    c_string_builder_sprintf(builder, "\t\t\t\t.u64 = %llu,\n", current_member->expression.value.unsigned_value);
                 }break;
                 case AST_EXPRESSION_VALUE_FLOAT:
                 {
@@ -1641,11 +1641,11 @@ athena_handle_type_info(const char *char_filepath, const char *output_path, bool
                         {
                             case AST_EXPRESSION_VALUE_INT:
                             {
-                                printf("%ld", AST->expression.value.int_value);
+                                printf("%lld", (unsigned long long)AST->expression.value.int_value);
                             }break;
                             case AST_EXPRESSION_VALUE_UNSIGNED:
                             {
-                                printf("%lu", AST->expression.value.unsigned_value);
+                                printf("%llu", (unsigned long long)AST->expression.value.unsigned_value);
                             }break;
                             case AST_EXPRESSION_VALUE_FLOAT:
                             {

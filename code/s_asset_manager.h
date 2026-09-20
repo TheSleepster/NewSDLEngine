@@ -573,35 +573,35 @@ struct asset_manager_t
     RHI_context_t            *RHI_context;
 };
 
-void s_asset_manager_init(asset_manager_t *asset_manager);
-void s_asset_manager_update(asset_manager_t *asset_manager);
-void s_asset_manager_queue_asset_load(asset_manager_t *asset_manager, asset_slot_t *slot);
+ENGINE_API void s_asset_manager_init(asset_manager_t *asset_manager);
+ENGINE_API void s_asset_manager_update(asset_manager_t *asset_manager);
+ENGINE_API void s_asset_manager_queue_asset_load(asset_manager_t *asset_manager, asset_slot_t *slot);
 
 // TODO(Sleepster): Unicode.cpp 
-void s_UTF32_convert_to_UTF8(string_t *buffer, u32 character);
-u32  s_UTF8_convert_UTF32(u8 *character);
+ENGINE_API void s_UTF32_convert_to_UTF8(string_t *buffer, u32 character);
+ENGINE_API u32  s_UTF8_convert_UTF32(u8 *character);
 
-bool8          s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath);
-void           s_asset_manager_signal_asset_file_reload(asset_manager_t *asset_manager, string_t filename);
-asset_handle_t s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name);
+ENGINE_API bool8          s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath);
+ENGINE_API void           s_asset_manager_signal_asset_file_reload(asset_manager_t *asset_manager, string_t filename);
+ENGINE_API asset_handle_t s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name);
 
-texture_atlas_t *s_texture_atlas_create(asset_manager_t *asset_manager, u32 size, u32 channel_count, u32 format, u32 initial_subtexture_count);
-void             s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle);
-void             s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atlas_t *atlas);
+ENGINE_API texture_atlas_t *s_texture_atlas_create(asset_manager_t *asset_manager, u32 size, u32 channel_count, u32 format, u32 initial_subtexture_count);
+ENGINE_API void             s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle);
+ENGINE_API void             s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atlas_t *atlas);
 
-true_inline void           s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot_t *slot);
+ENGINE_API true_inline void           s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot_t *slot);
 internal_api asset_slot_t *s_asset_manager_get_asset_slot(asset_catalog_t *catalog, string_t name);
 
-shader_t*             s_asset_get_shader_from_handle(asset_handle_t *handle);
-texture2D_t*          s_asset_get_texture_from_handle(asset_handle_t *handle);
-material_data_t*      s_asset_get_material_data_from_handle(asset_handle_t *handle);
-material_archetype_t* s_asset_get_material_archetype_from_handle(asset_handle_t *handle);
-material_instance_t*  s_asset_get_material_instance_from_handle(asset_handle_t *handle);
+ENGINE_API shader_t*             s_asset_get_shader_from_handle(asset_handle_t *handle);
+ENGINE_API texture2D_t*          s_asset_get_texture_from_handle(asset_handle_t *handle);
+ENGINE_API material_data_t*      s_asset_get_material_data_from_handle(asset_handle_t *handle);
+ENGINE_API material_archetype_t* s_asset_get_material_archetype_from_handle(asset_handle_t *handle);
+ENGINE_API material_instance_t*  s_asset_get_material_instance_from_handle(asset_handle_t *handle);
 
-vec2_t                         s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, asset_handle_t *font_handle, u32 pixel_size, float32 *max_descender_out);
-dynamic_render_font_varient_t *s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t *font_handle, u32 font_size);
+ENGINE_API vec2_t                         s_asset_font_get_string_size(asset_manager_t *asset_manager, string_t string, asset_handle_t *font_handle, u32 pixel_size, float32 *max_descender_out);
+ENGINE_API dynamic_render_font_varient_t *s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t *font_handle, u32 font_size);
 
-glyph_metric_t*
+ENGINE_API glyph_metric_t*
 s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
                          dynamic_render_font_varient_t *varient,
                          byte                          *codepoint);

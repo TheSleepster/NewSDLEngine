@@ -2198,7 +2198,7 @@ mat4_RHGL_ortho(float32 left,
 
     result.elements[3][0] = (left   + right) / (left - right);
     result.elements[3][1] = (bottom + top)   / (bottom - top);
-    result.elements[3][2] = (near_plane   + far_plane)   / (near_plane - far_plane);
+    result.elements[3][2] = (near_plane + far_plane) / (near_plane - far_plane);
 
     return(result);
 }

@@ -15,7 +15,7 @@
 #include <c_file_api.h>
 #include <c_file_watcher.h>
 
-char *
+ENGINE_API char *
 c_string_null_terminated(memory_arena_t *arena, string_t data)
 {
     char *result = null;
@@ -27,7 +27,7 @@ c_string_null_terminated(memory_arena_t *arena, string_t data)
     return(result);
 }
 
-u32
+ENGINE_API u32
 c_string_length(const char *c_string)
 {
     Assert(c_string);
@@ -42,13 +42,13 @@ c_string_length(const char *c_string)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 c_string_is_valid(string_t string)
 {
     return((string.count != 0) && (string.data != null));
 }
 
-string_t
+ENGINE_API string_t
 c_string_create(const char *c_string)
 {
     string_t result;
@@ -58,7 +58,7 @@ c_string_create(const char *c_string)
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_string_create_with_length(byte *data, u32 length)
 {
     string_t result;
@@ -68,7 +68,7 @@ c_string_create_with_length(byte *data, u32 length)
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_string_make_heap(memory_arena_t *arena, string_t string)
 {
     Assert(string.count > 0);
@@ -81,7 +81,7 @@ c_string_make_heap(memory_arena_t *arena, string_t string)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 c_string_compare(string_t A, string_t B)
 {
     if(A.count != B.count) return(false);
@@ -89,7 +89,7 @@ c_string_compare(string_t A, string_t B)
     return(memcmp(A.data, B.data, A.count) == 0);
 }
 
-bool8
+ENGINE_API bool8
 c_string_ends_with(string_t A, string_t ending)
 {
     bool8 result;
@@ -109,7 +109,7 @@ c_string_ends_with(string_t A, string_t ending)
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_string_concat(memory_arena_t *arena, string_t A, string_t B)
 {
     string_t result;
@@ -125,7 +125,7 @@ c_string_concat(memory_arena_t *arena, string_t A, string_t B)
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_string_make_copy(memory_arena_t *arena, string_t string)
 {
     string_t result;
@@ -148,7 +148,7 @@ c_string_make_copy(memory_arena_t *arena, string_t string)
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_string_sub_from_left(string_t string, u32 index)
 {
     string_t result;
@@ -158,7 +158,7 @@ c_string_sub_from_left(string_t string, u32 index)
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_string_sub_from_right(string_t string, u32 index)
 {
     string_t result;
@@ -168,7 +168,7 @@ c_string_sub_from_right(string_t string, u32 index)
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_string_substring(string_t string, u32 first_index, u32 last_index)
 {
     string_t result;
@@ -179,7 +179,7 @@ c_string_substring(string_t string, u32 first_index, u32 last_index)
 }
 
 // NOTE(Sleepster): Allowed to consume the whole string down to count == 0. 
-void
+ENGINE_API void
 c_string_advance_by(string_t *string, u32 amount)
 {
     Assert(string->data + amount <= string->data + string->count);
@@ -187,7 +187,7 @@ c_string_advance_by(string_t *string, u32 amount)
     string->count -= amount;
 }
 
-s32
+ENGINE_API s32
 c_string_find_first_char_from_left(string_t string, char character)
 {
     s32 result = -1;
@@ -206,7 +206,7 @@ c_string_find_first_char_from_left(string_t string, char character)
     return(result);
 }
 
-s32
+ENGINE_API s32
 c_string_find_first_char_from_right(string_t string, char character)
 {
     s32 result = -1;
@@ -225,7 +225,7 @@ c_string_find_first_char_from_right(string_t string, char character)
     return(result);
 }
 
-s32
+ENGINE_API s32
 c_string_find_first_char_from_left_on_line(string_t string, char character)
 {
     s32 result = -1;
@@ -249,7 +249,7 @@ c_string_find_first_char_from_left_on_line(string_t string, char character)
     return(result);
 }
 
-u32
+ENGINE_API u32
 c_string_find_first_char_from_right_on_line(string_t string, char character, u32 ending_index)
 {
     u32 count = ending_index;
@@ -280,7 +280,7 @@ c_string_find_first_char_from_right_on_line(string_t string, char character, u32
 }
 
 // NOTE(Sleepster): Returns the string you passed as the filename should this not actually be a path and simply the file's name 
-string_t
+ENGINE_API string_t
 c_string_get_filename_from_path(string_t filepath)
 {
     string_t result = filepath;
@@ -293,7 +293,7 @@ c_string_get_filename_from_path(string_t filepath)
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_string_get_file_ext_from_path(string_t filepath)
 {
     string_t result = {};
@@ -306,13 +306,13 @@ c_string_get_file_ext_from_path(string_t filepath)
     return(result);
 }
 
-const char *
+ENGINE_API const char *
 c_string_to_const_array(string_t string)
 {
     return((const char *)string.data);
 }
 
-string_t
+ENGINE_API string_t
 c_string_to_upper(memory_arena_t *arena, string_t string)
 {
     string_t result = c_string_make_copy(arena, string);
@@ -327,7 +327,7 @@ c_string_to_upper(memory_arena_t *arena, string_t string)
     return(result);
 }
 
-void 
+ENGINE_API void 
 c_string_override_file_separators(string_t *string)
 {
     for(u32 string_index = 0;
@@ -342,7 +342,7 @@ c_string_override_file_separators(string_t *string)
     }
 }
 
-string_t
+ENGINE_API string_t
 c_string_get_filename_from_path_and_ext(string_t filepath)
 {
     string_t result;
@@ -355,7 +355,7 @@ c_string_get_filename_from_path_and_ext(string_t filepath)
 }
 
 // NOTE(Sleepster): Get current line, advance the .data pointer 
-string_t 
+ENGINE_API string_t 
 c_string_read_line(string_t *data)
 {
     string_t result;
@@ -378,7 +378,7 @@ c_string_read_line(string_t *data)
     return(result);
 }
 
-s32 
+ENGINE_API s32 
 c_string_read_int(string_t data)
 {
     s32 result = 0;
@@ -397,7 +397,7 @@ c_string_read_int(string_t data)
     return(result);
 }
 
-u32 
+ENGINE_API u32 
 c_string_read_uint(string_t data)
 {
     u32 result = 0;
@@ -416,7 +416,7 @@ c_string_read_uint(string_t data)
     return(result);
 }
 
-float32 
+ENGINE_API float32 
 c_string_read_float32(string_t data)
 {
     float32 result = 0;
@@ -427,7 +427,7 @@ c_string_read_float32(string_t data)
     return(result);
 }
 
-float64
+ENGINE_API float64
 c_string_read_float64(string_t data)
 {
     float64 result = 0;
@@ -438,7 +438,7 @@ c_string_read_float64(string_t data)
     return(result);
 }
 
-string_t 
+ENGINE_API string_t 
 c_string_sprintf(char *buffer, u32 buffer_size, const char *string, ...)
 {
     string_t result;
@@ -456,7 +456,7 @@ c_string_sprintf(char *buffer, u32 buffer_size, const char *string, ...)
     return(result);
 }
 
-bool32
+ENGINE_API bool32
 c_string_is_end_of_line(string_t *current_line)
 {
     bool32 result = false;
@@ -472,7 +472,7 @@ c_string_is_end_of_line(string_t *current_line)
     return(result);
 }
 
-bool32
+ENGINE_API bool32
 c_string_is_whitespace(string_t *current_line)
 {
     Expect(current_line->count > 0, "Attempted to perform this on an empty string...\n");
@@ -493,7 +493,7 @@ c_string_is_whitespace(string_t *current_line)
     return(result);
 }
 
-u32
+ENGINE_API u32
 c_string_eat_whitespace(string_t *current_line)
 {
     u32 result = 0;
@@ -542,7 +542,7 @@ c_string_eat_whitespace(string_t *current_line)
     return(result);
 }
 
-u32
+ENGINE_API u32
 c_string_get_whitespace_size(string_t string)
 {
     u32 result = 0;
@@ -554,7 +554,7 @@ c_string_get_whitespace_size(string_t string)
     return(result);
 }
 
-u32 
+ENGINE_API u32 
 c_string_get_current_line_size(string_t string)
 {
     u32 result = 0;
@@ -565,7 +565,7 @@ c_string_get_current_line_size(string_t string)
     return(result);
 }
 
-u32
+ENGINE_API u32
 c_string_find_all_instances_of(string_t string, u8 character)
 {
     u32 result = 0;
@@ -582,7 +582,7 @@ c_string_find_all_instances_of(string_t string, u8 character)
     return(result);
 }
 
-string_t
+ENGINE_API string_t
 c_string_replace_all_instances_of(memory_arena_t *arena, string_t string, u8 character, u8 replacement)
 {
     string_t result = {};
@@ -631,7 +631,7 @@ c_string_builder_create_and_attach_buffer(string_builder_t *builder, u64 block_s
 }
 
 // NOTE(Sleepster): I trust you won't call this while the builder is actually initialized.... 
-void
+ENGINE_API void
 c_string_builder_init(string_builder_t *builder, u64 buffer_block_size)
 {
     ZeroStruct(*builder);
@@ -645,7 +645,7 @@ c_string_builder_init(string_builder_t *builder, u64 buffer_block_size)
     builder->is_initialized            =  true;
 }
 
-void
+ENGINE_API void
 c_string_builder_deinit(string_builder_t *builder)
 {
     c_arena_destroy(&builder->arena);
@@ -663,7 +663,7 @@ c_string_builder_advance_buffer(string_builder_t *builder)
     builder->current_buffer = next_buffer;
 }
 
-void
+ENGINE_API void
 c_string_builder_append_data(string_builder_t *builder, string_t data)
 {
     Assert(data.count <= builder->default_buffer_block_size);
@@ -683,7 +683,7 @@ c_string_builder_append_data(string_builder_t *builder, string_t data)
     builder->bytes_used += data.count;
 }
 
-void
+ENGINE_API void
 c_string_builder_append_value(string_builder_t *builder, void *value, u32 value_size)
 {
     string_t value_string = {
@@ -694,7 +694,7 @@ c_string_builder_append_value(string_builder_t *builder, void *value, u32 value_
     c_string_builder_append_data(builder, value_string);
 }
 
-string_t
+ENGINE_API string_t
 c_string_builder_get_current_string(string_builder_t *builder)
 {
     string_t result = {};
@@ -709,7 +709,7 @@ c_string_builder_get_current_string(string_builder_t *builder)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 c_string_builder_dump_to_file(file_t *file, string_builder_t *builder)
 {
     bool8 result = false;
@@ -719,7 +719,7 @@ c_string_builder_dump_to_file(file_t *file, string_builder_t *builder)
     return(result);
 }
 
-void 
+ENGINE_API void 
 c_string_builder_reset(string_builder_t *builder)
 {
     c_arena_reset(&builder->arena);
@@ -730,7 +730,7 @@ c_string_builder_reset(string_builder_t *builder)
     builder->current_buffer  = c_string_builder_create_and_attach_buffer(builder, builder->default_buffer_block_size);
 }
 
-bool8 
+ENGINE_API bool8 
 c_string_builder_flush_to_file(file_t *file, string_builder_t *builder)
 {
     bool8 result = c_string_builder_dump_to_file(file, builder);
@@ -740,14 +740,14 @@ c_string_builder_flush_to_file(file_t *file, string_builder_t *builder)
 }
 
 // NOTE(Sleepster): Might wanna flip these. 
-void
+ENGINE_API void
 c_string_builder_append_builder(string_builder_t *A, string_builder_t *B)
 {
     string_t builder_string = c_string_builder_get_current_string(B);
     c_string_builder_append_data(A, builder_string);
 }
 
-void
+ENGINE_API void
 c_string_builder_sprintf(string_builder_t *builder, const char *string, ...)
 {
     char buffer[32000];

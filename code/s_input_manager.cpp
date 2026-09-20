@@ -6,7 +6,7 @@
    ======================================================================== */
 #include <s_input_manager.h>
 
-void
+ENGINE_API void
 s_im_init_input_manager(input_manager_t *input_manager)
 {
     *input_manager = {};
@@ -63,7 +63,7 @@ SDL_axis_to_input_axis(u32 SDL_axis)
     return(result);
 }
 
-void
+ENGINE_API void
 s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
 {
     switch(event->type)
@@ -186,7 +186,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
             input_event.inputID       = INPUT_AXIS_MOUSE;
             input_event.timestampMS   = SDL_GetTicks();
             input_event.axis_value    = vec2(event->motion.x, event->motion.y);
-            input_event.relative_axis_value = vec2(event->motion.xrel, event->motion.yrel);
+            //printf("MOUSE MOVED: %.02f, %.02f...\n", event->motion.x, event->motion.y);
 
             append_input_event(input_manager->events, &input_manager->event_count, &input_event);
         }break;
@@ -264,7 +264,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
     }
 }
 
-void
+ENGINE_API void
 s_im_clear_controller_transient_state(input_controller_t *controller)
 {
     // NOTE(Sleepster): Reset the transient state of the device's controller. 
@@ -302,7 +302,7 @@ s_im_clear_controller_transient_state(input_controller_t *controller)
     controller->action_button_interactions = 0;
 }
 
-void
+ENGINE_API void
 s_im_clear_device_events(input_device_t *device)
 {
     device->event_count = 0;
@@ -315,7 +315,7 @@ s_im_clear_device_events(input_device_t *device)
     }
 }
 
-void
+ENGINE_API void
 s_im_apply_events_to_controller(input_controller_t         *controller, 
                                 array_view_t<input_event_t> events, 
                                 bool8                       auto_consume)
@@ -382,11 +382,11 @@ s_im_apply_events_to_controller(input_controller_t         *controller,
                         {
                             controller->device->keyboard_data.last_mouse_pos    = controller->device->keyboard_data.current_mouse_pos;
                             controller->device->keyboard_data.current_mouse_pos = event->axis_value;
-                            controller->device->keyboard_data.mouse_delta       = event->relative_axis_value;
+                            controller->device->keyboard_data.mouse_delta       = controller->device->keyboard_data.last_mouse_pos - event->axis_value;
                         }
                         else if(event->inputID == INPUT_AXIS_MOUSE_WHEEL)
                         {
-                            controller->device->keyboard_data.mouse_wheel_delta   = event->axis_value - controller->device->keyboard_data.current_mouse_wheel;
+                            controller->device->keyboard_data.mouse_wheel_delta   = controller->device->keyboard_data.current_mouse_wheel - event->axis_value;
                             controller->device->keyboard_data.current_mouse_wheel = event->axis_value;
                         }
                         else
@@ -406,7 +406,7 @@ s_im_apply_events_to_controller(input_controller_t         *controller,
     }
 }
 
-input_controller_t*
+ENGINE_API input_controller_t*
 s_im_get_controller_from_active_device(input_manager_t *input_manager, input_controller_t *controller)
 {
     input_controller_t *result = controller;
@@ -428,7 +428,7 @@ s_im_get_controller_from_active_device(input_manager_t *input_manager, input_con
     return(result);
 }
 
-input_device_t*
+ENGINE_API input_device_t*
 s_im_find_device_by_ID(input_manager_t *input_manager, s32 ID, s32 *index_out)
 {
     input_device_t *result = null;
@@ -449,7 +449,7 @@ s_im_find_device_by_ID(input_manager_t *input_manager, s32 ID, s32 *index_out)
     return(result);
 }
 
-input_device_t*
+ENGINE_API input_device_t*
 s_im_find_first_gamepad_device(input_manager_t *input_manager, s32 *index_out)
 {
     input_device_t *result = null;
@@ -470,7 +470,7 @@ s_im_find_first_gamepad_device(input_manager_t *input_manager, s32 *index_out)
     return(result);
 }
 
-input_device_t*
+ENGINE_API input_device_t*
 s_im_find_first_keyboard_device(input_manager_t *input_manager, s32 *index_out)
 {
     input_device_t *result = null;
@@ -491,7 +491,7 @@ s_im_find_first_keyboard_device(input_manager_t *input_manager, s32 *index_out)
     return(result);
 }
 
-vec2_t
+ENGINE_API vec2_t
 s_im_transform_mouse_data(input_controller_t *controller,
                           vec2_t              surface_size,    
                           mat4_t              view_matrix,
@@ -513,7 +513,7 @@ s_im_transform_mouse_data(input_controller_t *controller,
     return(result);
 }
 
-input_binding_state_t
+ENGINE_API input_binding_state_t
 s_im_get_button_binding_state(input_controller_t *controller, game_action_binding_t *binding)
 {
     input_binding_state_t result = {};
@@ -525,7 +525,7 @@ s_im_get_button_binding_state(input_controller_t *controller, game_action_bindin
     return(result);
 }
 
-float32
+ENGINE_API float32
 s_im_get_axis_value(input_controller_t *controller, game_action_binding_t *binding)
 {
     float32 result = 0;
@@ -556,7 +556,7 @@ s_im_get_axis_value(input_controller_t *controller, game_action_binding_t *bindi
 }
 
 // GAME ACTION API
-game_action_t*
+ENGINE_API game_action_t*
 s_im_game_action_create(input_manager_t           *input_manager, 
                         string_t                   action_name, 
                         game_action_mapping_type_t mapping_type)
@@ -576,21 +576,21 @@ s_im_game_action_create(input_manager_t           *input_manager,
     return(result);
 }
 
-void
+ENGINE_API void
 s_im_game_action_add_mapping(game_action_t *action, game_action_mapping_t *mapping)
 {
     Expect((action->mapping_count + 1) <= MAX_GAME_ACTION_MAPPINGS, "Attempted to add more mappings to a game_action than allowed... the max is 4...\n");
     action->mappings[action->mapping_count++] = *mapping;
 }
 
-void
+ENGINE_API void
 s_im_game_action_reset_mappings(game_action_t *action)
 {
     ZeroMemory(action->mappings, sizeof(game_action_mapping_t) * MAX_GAME_ACTION_MAPPINGS);
     action->mapping_count = 0;
 }
 
-void
+ENGINE_API void
 s_im_game_action_process_button_state(input_controller_t *controller, game_action_t *action)
 {
     game_action_mapping_t *mapping = null;
@@ -613,7 +613,7 @@ s_im_game_action_process_button_state(input_controller_t *controller, game_actio
     }
 }
 
-void
+ENGINE_API void
 s_im_game_action_process_axis1D_state(input_controller_t *controller, game_action_t *action)
 {
     float32 axis_value = action->axis1D_value;
@@ -659,7 +659,7 @@ s_im_game_action_process_axis1D_state(input_controller_t *controller, game_actio
     }
 }
 
-void
+ENGINE_API void
 s_im_game_action_process_axis2D_state(input_controller_t *controller, game_action_t *action)
 {
     vec2_t axis_value = vec2_zero();
@@ -749,7 +749,7 @@ s_im_game_action_process_axis2D_state(input_controller_t *controller, game_actio
     action->axis2D_value = axis_value;
 }
 
-void
+ENGINE_API void
 s_im_update_game_action_states(input_manager_t *input_manager, input_controller_t *controller)
 {
     for(game_action_t &action: input_manager->game_actions)
@@ -773,7 +773,7 @@ s_im_update_game_action_states(input_manager_t *input_manager, input_controller_
     }
 }
 
-action_button_t*
+ENGINE_API action_button_t*
 s_im_get_controller_action_button(input_controller_t *controller, s32 inputID)
 {
     action_button_t *result = null;
@@ -794,7 +794,7 @@ s_im_get_controller_action_button(input_controller_t *controller, s32 inputID)
 
 // IS PRESSED API
 
-bool8
+ENGINE_API bool8
 s_im_is_button_pressed(input_controller_t *controller, s32 inputID)
 {
     bool8 result = false;
@@ -807,7 +807,7 @@ s_im_is_button_pressed(input_controller_t *controller, s32 inputID)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 s_im_is_button_down(input_controller_t *controller, s32 inputID)
 {
     bool8 result = false;
@@ -820,7 +820,7 @@ s_im_is_button_down(input_controller_t *controller, s32 inputID)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 s_im_is_button_released(input_controller_t *controller, s32 inputID)
 {
     bool8 result = false;

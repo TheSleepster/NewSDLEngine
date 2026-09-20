@@ -103,6 +103,10 @@ struct game_state_t
     bool32              show_grid;
     bool32              show_player_viewport;
     float32             editor_zoom;
+    RHI_render_camera_t editor_camera;
+
+    RHI_render_camera_t game_camera;
+    RHI_render_camera_t fullscreen_camera;
 
     float32             gravity;
     s32                 game_mode;
@@ -922,13 +926,13 @@ handle_editor_ui(game_state_t *game_state, ui_state_t *main_ui, RHI_context_t *R
 
     ui_column(main_ui, main_panel.widget)
     {
-        ui_widget_set_default_font_size(main_ui, 40);
+        ui_widget_set_default_font_size(main_ui, 25);
         ui_signal_t title_bar = ui_widget_panel(main_ui, 
                                                 STR("Editor Title bar"), 
                                                 vec2(0, 0), 
                                                 vec2(20, 20),
-                                                vec2(10.0f, 10.0f), 
-                                                vec4(10, 10, 15, 10), 
+                                                vec2(10.0f, 4.0f), 
+                                                vec4(10, 10, 2, 0), 
                                                 vec4(0.0, 0.0, 0.0, 0.5),
                                                 0);
         ui_state_set_active_padding(main_ui, vec4(10, 10, 4, 4));
@@ -952,7 +956,7 @@ handle_editor_ui(game_state_t *game_state, ui_state_t *main_ui, RHI_context_t *R
                               STR("editor panel divider"), 
                               vec2(0.9, 5.0f), 
                               {UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, UI_WIDGET_SIZE_KIND_PIXELS});
-            ui_widget_set_default_font_size(main_ui, 20);
+            ui_widget_set_default_font_size(main_ui, 16);
             ui_signal_t sub_panel = ui_widget_panel(main_ui, 
                                                     STR("Editor Subpanel"), 
                                                     vec2(0, 0), 
@@ -974,6 +978,13 @@ handle_editor_ui(game_state_t *game_state, ui_state_t *main_ui, RHI_context_t *R
                 {
                     game_state->show_player_viewport = !game_state->show_player_viewport;
                 }
+
+                ui_signal_t reset_editor_camera_translation = ui_widget_labeled_button(main_ui, STR("Reset Editor Camera Translation"));
+                if(ui_pressed(reset_editor_camera_translation))
+                {
+                    game_state->editor_camera.translation = vec2_zero();
+                }
+                ui_widget_text(main_ui, STR("Click this if the camera flies away!"));
             }
         }
     }
@@ -1025,7 +1036,7 @@ game_main(global_context_t *_global_context)
         global_test_textbox_string.data  = (byte*)c_alloc(256, ALLOCATOR_TAG_CACHE);
         global_test_textbox_string.count = 0;
 
-        game_state->editor_zoom          = 0.20f;
+        game_state->editor_zoom          = 2.5f;
         game_state->show_grid            = true;
         game_state->show_player_viewport = true;
 
@@ -1054,7 +1065,7 @@ game_main(global_context_t *_global_context)
     s_texture_atlas_add_texture(atlas, &player_sprite);
     s_texture_atlas_add_texture(atlas, &player_sprite_sheet);
 
-    RHI_render_camera_t game_camera = {
+    game_state->game_camera = {
         .viewport = {
             .x = GAME_FRAMEBUFFER_WIDTH,
             .y = GAME_FRAMEBUFFER_HEIGHT
@@ -1063,14 +1074,14 @@ game_main(global_context_t *_global_context)
         .zoom = 1.0f
     };
 
-    RHI_render_camera_t fullscreen_camera = {
+    game_state->fullscreen_camera = {
         .viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
                          Max(render_state->RHI_context->window_size.y, 10)),
         .translation = {0.0f, 0.0f},
         .zoom = 1.0f
     };
 
-    RHI_render_camera_t editor_camera = {
+    game_state->editor_camera = {
         .viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
                          Max(render_state->RHI_context->window_size.y, 10)),
         .translation = {0.0f, 0.0f},
@@ -1108,25 +1119,52 @@ game_main(global_context_t *_global_context)
             }
         }
 
+        game_state->game_camera.viewport = vec2(GAME_FRAMEBUFFER_WIDTH, GAME_FRAMEBUFFER_HEIGHT);
+        game_state->game_camera.zoom = 1.0f;
+
+        game_state->fullscreen_camera.viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
+                                          Max(render_state->RHI_context->window_size.y, 10));
+        game_state->fullscreen_camera.zoom = 1.0f;
+
+        game_state->editor_camera.zoom = game_state->editor_zoom;
+        game_state->editor_camera.viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
+                                                  Max(render_state->RHI_context->window_size.y, 10));
+
+        RHI_render_camera_set_matrices(&game_state->game_camera);
+        RHI_render_camera_set_matrices(&game_state->fullscreen_camera);
+        RHI_render_camera_set_matrices(&game_state->editor_camera);
+
         // NOTE(Sleepster): Editor controls block 
         if(game_state->editor_opened)
         {
             action_button_t *middle_mouse = s_im_get_controller_action_button(game_state->controller, SDL_MIDDLE_MOUSE);
             vec2_t scroll_delta     = game_state->controller->device->keyboard_data.current_mouse_wheel;
             vec2_t mouse_move_delta = game_state->controller->device->keyboard_data.mouse_delta;
-            if(middle_mouse->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN)
-            {
-                float32 pan_speed = 0.1f * (editor_camera.zoom);
-                editor_camera.translation.x -= mouse_move_delta.x * pan_speed;
-                editor_camera.translation.y += mouse_move_delta.y * pan_speed;
 
-                printf("%.02f, %.02f\n", editor_camera.translation.x, editor_camera.translation.y);
+            // NOTE(Sleepster): Panning 
+            if(ActionButtonDown(middle_mouse))
+            {
+                game_state->editor_camera.translation.x -= (mouse_move_delta.x * 3) * game_state->editor_camera.zoom;
+                game_state->editor_camera.translation.y += (mouse_move_delta.y * 3) * game_state->editor_camera.zoom;
             }
 
+            // NOTE(Sleepster): Zoom adjustment 
             if(scroll_delta.y != 0.0f)
             {
-                game_state->editor_zoom -= (scroll_delta.y * 0.1f);
-                game_state->editor_zoom  = Clamp(game_state->editor_zoom, 0.1f, 1.0f);
+                game_state->editor_zoom += (scroll_delta.y * 0.5f);
+                game_state->editor_zoom  = Clamp(game_state->editor_zoom, 2.0f, 5.0f);
+            }
+
+            // NOTE(Sleepster): Tile placing 
+            action_button_t *left_mouse = s_im_get_controller_action_button(game_state->controller, SDL_LEFT_MOUSE);
+            if(ActionButtonDown(left_mouse))
+            {
+                vec2_t mouse_position = s_im_transform_mouse_data(game_state->controller, 
+                                                                  game_state->editor_camera.viewport, 
+                                                                  game_state->editor_camera.matrices.view_matrix, 
+                                                                  game_state->editor_camera.matrices.projection_matrix);
+                vec2_t tile_position = world_to_tile(mouse_position);
+                (void)tile_position;
             }
 
             game_state->controller->device->keyboard_data.mouse_delta = {};
@@ -1134,20 +1172,6 @@ game_main(global_context_t *_global_context)
         }
         // NOTE(Sleepster): Editor controls block 
 
-        game_camera.viewport = vec2(GAME_FRAMEBUFFER_WIDTH, GAME_FRAMEBUFFER_HEIGHT);
-        game_camera.zoom = 1.0f;
-
-        fullscreen_camera.viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
-                                          Max(render_state->RHI_context->window_size.y, 10));
-        fullscreen_camera.zoom = 1.0f;
-
-        editor_camera.zoom = game_state->editor_zoom;
-        editor_camera.viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
-                                      Max(render_state->RHI_context->window_size.y, 10));
-
-        RHI_render_camera_set_matrices(&game_camera);
-        RHI_render_camera_set_matrices(&fullscreen_camera);
-        RHI_render_camera_set_matrices(&editor_camera);
 
         // NOTE(Sleepster):} Simulate loop 
         if(delta_time >= (gc->tick_rate * 2.0f))
@@ -1239,7 +1263,7 @@ game_main(global_context_t *_global_context)
 
             if(game_state->game_mode == GAME_MODE_EDIT_MODE)
             {
-                RHI_render_camera_t *scene_camera = &editor_camera;
+                RHI_render_camera_t *scene_camera = &game_state->editor_camera;
 
                 // NOTE(Sleepster): Tile Grid 
                 if(game_state->show_grid)
@@ -1256,7 +1280,7 @@ game_main(global_context_t *_global_context)
                     vec2_t end   = world_to_tile(vec2(right, top));
 
                     for(s32 tile_x = start.x;
-                        tile_x < end.x;
+                        tile_x <= end.x;
                         ++tile_x)
                     {
                         float32 current_tile_x = tile_x * WORLD_TILE_SIZE;
@@ -1285,13 +1309,13 @@ game_main(global_context_t *_global_context)
                 // NOTE(Sleepster): Viewport box 
                 if(game_state->show_player_viewport)
                 {
-                    float32 half_width  = (game_camera.viewport.x * 0.5f) * game_camera.zoom;
-                    float32 half_height = (game_camera.viewport.y * 0.5f) * game_camera.zoom;
+                    float32 half_width  = (game_state->game_camera.viewport.x * 0.5f) * game_state->game_camera.zoom;
+                    float32 half_height = (game_state->game_camera.viewport.y * 0.5f) * game_state->game_camera.zoom;
 
-                    float32 left   = game_camera.translation.x - half_width;
-                    float32 right  = game_camera.translation.x + half_width;
-                    float32 bottom = game_camera.translation.y - half_height;
-                    float32 top    = game_camera.translation.y + half_height;
+                    float32 left   = game_state->game_camera.translation.x - half_width;
+                    float32 right  = game_state->game_camera.translation.x + half_width;
+                    float32 bottom = game_state->game_camera.translation.y - half_height;
+                    float32 top    = game_state->game_camera.translation.y + half_height;
 
                     immediate_line(command_list,
                                   &render_state->vertex_buffer,
@@ -1372,7 +1396,7 @@ game_main(global_context_t *_global_context)
                 RHI_cmd_bind_index_buffer(command_list,  &render_state->index_buffer);
                 RHI_cmd_use_shader_program(command_list, immediate_textured);
 
-                RHI_render_camera_t *scene_camera = (game_state->game_mode == GAME_MODE_NORMAL) ? &game_camera : &editor_camera;
+                RHI_render_camera_t *scene_camera = (game_state->game_mode == GAME_MODE_NORMAL) ? &game_state->game_camera : &game_state->editor_camera;
                 RHI_cmd_update_constant_buffer(command_list, render_state->camera_matrices_buffer, &scene_camera->matrices, sizeof(mat4_t) * 2);
 
                 if(game_state->game_mode == GAME_MODE_NORMAL)
@@ -1439,7 +1463,7 @@ game_main(global_context_t *_global_context)
             RHI_cmd_bind_vertex_buffer(command_list, &render_state->vertex_buffer);
             RHI_cmd_bind_index_buffer(command_list,  &render_state->index_buffer);
 
-            RHI_render_camera_t *scene_camera = &fullscreen_camera;
+            RHI_render_camera_t *scene_camera = &game_state->fullscreen_camera;
             RHI_cmd_update_constant_buffer(command_list, render_state->camera_matrices_buffer, &scene_camera->matrices, sizeof(mat4_t) * 2);
 
             RHI_pipeline_state_t font_state = {};

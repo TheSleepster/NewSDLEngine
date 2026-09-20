@@ -866,7 +866,6 @@
 	X(TYPE_c_string_compare) \
 	X(TYPE_c_string_ends_with) \
 	X(TYPE_c_string_concat) \
-	X(TYPE_c_string_to_const_array) \
 	X(TYPE_c_string_to_upper) \
 	X(TYPE_c_string_sprintf) \
 	X(TYPE_c_string_make_copy) \
@@ -7695,19 +7694,6 @@ struct type_info_procedure_c_string_concat {
 	};
 };
 
-struct type_info_procedure_c_string_to_const_array {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t string;
-		}arguments;
-	};
-};
-
 struct type_info_procedure_c_string_to_upper {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -10082,7 +10068,6 @@ extern const type_info_procedure_c_string_make_heap DEFAULT_typedata_procedure_c
 extern const type_info_procedure_c_string_compare DEFAULT_typedata_procedure_c_string_compare;
 extern const type_info_procedure_c_string_ends_with DEFAULT_typedata_procedure_c_string_ends_with;
 extern const type_info_procedure_c_string_concat DEFAULT_typedata_procedure_c_string_concat;
-extern const type_info_procedure_c_string_to_const_array DEFAULT_typedata_procedure_c_string_to_const_array;
 extern const type_info_procedure_c_string_to_upper DEFAULT_typedata_procedure_c_string_to_upper;
 extern const type_info_procedure_c_string_sprintf DEFAULT_typedata_procedure_c_string_sprintf;
 extern const type_info_procedure_c_string_make_copy DEFAULT_typedata_procedure_c_string_make_copy;
@@ -29364,25 +29349,6 @@ constexpr type_info_procedure_c_string_concat DEFAULT_typedata_procedure_c_strin
 		},
 	},
 };
-constexpr type_info_procedure_c_string_to_const_array DEFAULT_typedata_procedure_c_string_to_const_array = {
-	.type_info = {
-		.type_name = "c_string_to_const_array",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_c_string_to_const_array,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_char,
-	.argument_pointer = DEFAULT_typedata_procedure_c_string_to_const_array.argument_array,
-	.arguments = {
-		.string = {
-			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
-			.member_name   = "string",
-			.parent        = &DEFAULT_typedata_procedure_c_string_to_const_array.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
 constexpr type_info_procedure_c_string_to_upper DEFAULT_typedata_procedure_c_string_to_upper = {
 	.type_info = {
 		.type_name = "c_string_to_upper",
@@ -34333,7 +34299,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_string_compare.type_info,
 	&DEFAULT_typedata_procedure_c_string_ends_with.type_info,
 	&DEFAULT_typedata_procedure_c_string_concat.type_info,
-	&DEFAULT_typedata_procedure_c_string_to_const_array.type_info,
 	&DEFAULT_typedata_procedure_c_string_to_upper.type_info,
 	&DEFAULT_typedata_procedure_c_string_sprintf.type_info,
 	&DEFAULT_typedata_procedure_c_string_make_copy.type_info,
@@ -37161,9 +37126,6 @@ enum class c_string_concat {
 	A,
 	B,
 }; // c_string_concat
-enum class c_string_to_const_array {
-	string,
-}; // c_string_to_const_array
 enum class c_string_to_upper {
 	arena,
 	string,

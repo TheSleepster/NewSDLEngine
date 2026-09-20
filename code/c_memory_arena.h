@@ -46,21 +46,21 @@ struct scratch_arena_t
 #define c_arena_push_array(arena, type, count)                                        (type*)(c_arena_push_size(arena, sizeof(type) * count))
 #define c_arena_bootstrap_allocate_struct(type, member, allocation_size, memory_tag ) (type*)(c_arena_bootstrap_allocate_struct_(sizeof(type), OffsetOf(type, member), allocation_size, memory_tag))
 
-memory_arena_t c_arena_create(u64 block_size, u32 memory_tag);
-void           c_arena_destroy(memory_arena_t *arena);
-byte*          c_arena_push_size(memory_arena_t *arena, u64 push_size);
-byte*          c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 block_size, u32 memory_tag);
-void           c_arena_clear_block(memory_arena_t *arena);
-void           c_arena_free_last_block(memory_arena_t *arena);
+ENGINE_API memory_arena_t c_arena_create(u64 block_size, u32 memory_tag);
+ENGINE_API void           c_arena_destroy(memory_arena_t *arena);
+ENGINE_API byte*          c_arena_push_size(memory_arena_t *arena, u64 push_size);
+ENGINE_API byte*          c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 block_size, u32 memory_tag);
+ENGINE_API void           c_arena_clear_block(memory_arena_t *arena);
+ENGINE_API void           c_arena_free_last_block(memory_arena_t *arena);
 
 // TODO(Sleepster): We should probably create a way of storing "freed" blocks in a freelist, since this function is likely slow.
-void           c_arena_reset(memory_arena_t *arena);
+ENGINE_API void           c_arena_reset(memory_arena_t *arena);
 
 /*===========================================
   ============= SCRATCH ARENAS  =============
   ===========================================*/
-inline scratch_arena_t c_arena_begin_temporary_memory(memory_arena_t *arena);
-inline void            c_arena_end_temporary_memory(scratch_arena_t *scratch_arena);
+ENGINE_API scratch_arena_t c_arena_begin_temporary_memory(memory_arena_t *arena);
+ENGINE_API void            c_arena_end_temporary_memory(scratch_arena_t *scratch_arena);
 
 #endif // C_MEMORY_ARENA_H
 

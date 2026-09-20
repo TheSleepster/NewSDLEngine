@@ -32,13 +32,13 @@
 #include <poll.h>
 #include <stdlib.h>
 
-u64
+ENGINE_API u64
 sys_get_virtual_memory_page_size(void)
 {
     return(sysconf(_SC_PAGESIZE));
 }
 
-u64 
+ENGINE_API u64 
 sys_align_to_page_size(u64 size)
 {
     u64 result = 0;
@@ -59,7 +59,7 @@ sys_align_to_page_size(u64 size)
 //
 // But, this needs more work.
 
-void*
+ENGINE_API void*
 sys_allocate_memory(void *base_address, usize allocation_size)
 {
     u64 true_allocation = sys_align_to_page_size(allocation_size);
@@ -79,7 +79,7 @@ sys_allocate_memory(void *base_address, usize allocation_size)
 // Again, mmap is weird. You can't just pass the virtual address and say "give me more memory off of this base address" 
 // because... idk unix stuff? Again, this is behavior that Windows actually supports better. As for how to replicate on Unix?
 // idk yet...
-void*
+ENGINE_API void*
 sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
 {
     void *result = null;
@@ -109,7 +109,7 @@ sys_reallocate_memory(void *base, u64 old_size, u64 allocation_size)
     return(result);
 }
 
-void
+ENGINE_API void
 sys_free_memory(void *data, usize free_size)
 {
     if(munmap(data, free_size) == -1)
@@ -119,7 +119,7 @@ sys_free_memory(void *data, usize free_size)
     }
 }
 
-bool8
+ENGINE_API bool8
 sys_set_memory_access_flags(void *memory, u64 memory_size, int access_flags)
 {
     bool8 result = true;
@@ -153,7 +153,7 @@ sys_set_memory_access_flags(void *memory, u64 memory_size, int access_flags)
 /////////////////////
 
 // TODO(Sleepster): find the equivilent to that of OPEN_ALWAYS from win32
-file_t
+ENGINE_API file_t
 sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overlapping_io)
 {
     file_t result = {};
@@ -203,7 +203,7 @@ sys_file_open(string_t filepath, bool8 for_writing, bool8 overwrite, bool8 overl
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_close(file_t *file_data)
 {
     bool8 result = false;
@@ -218,7 +218,7 @@ sys_file_close(file_t *file_data)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_copy(string_t source_path, string_t dest_path)
 {
     bool8 result = false;
@@ -355,7 +355,7 @@ sys_file_copy(string_t source_path, string_t dest_path)
 }
 
 
-s64
+ENGINE_API s64
 sys_file_get_size(file_t *file_data)
 {
     s64 file_size = 0;
@@ -374,7 +374,7 @@ sys_file_get_size(file_t *file_data)
     return(file_size);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_read(file_t *file_data, void *memory, s64 bytes_to_read, s64 file_offset)
 {
     bool8 result = false;
@@ -413,7 +413,7 @@ sys_file_read(file_t *file_data, void *memory, s64 bytes_to_read, s64 file_offse
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_write(file_t *file_data, void *memory, s64 bytes_to_write)
 {
     bool8 result = false;
@@ -436,7 +436,7 @@ sys_file_write(file_t *file_data, void *memory, s64 bytes_to_write)
     return(result);
 }
 
-mapped_file_t
+ENGINE_API mapped_file_t
 sys_file_map(string_t filepath)
 {
     mapped_file_t result = {};
@@ -463,7 +463,7 @@ sys_file_map(string_t filepath)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_unmap(mapped_file_t *map_data)
 {
     bool8 result = false;
@@ -483,7 +483,7 @@ sys_file_unmap(mapped_file_t *map_data)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_exists(string_t filepath)
 {
     bool8 result = false;
@@ -494,7 +494,7 @@ sys_file_exists(string_t filepath)
     return(result);
 }
 
-file_data_t
+ENGINE_API file_data_t
 sys_file_get_modtime_and_size(string_t filepath)
 {
     file_data_t result = {};
@@ -516,7 +516,7 @@ sys_file_get_modtime_and_size(string_t filepath)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_file_replace_or_rename(string_t old_file, string_t new_file)
 {
     bool8 result = false;
@@ -533,7 +533,7 @@ sys_file_replace_or_rename(string_t old_file, string_t new_file)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_directory_get_current_working_dir(byte *buffer, u32 buffer_length)
 {
     bool8 result = false;
@@ -550,7 +550,7 @@ sys_directory_get_current_working_dir(byte *buffer, u32 buffer_length)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_directory_exists(string_t filepath)
 {
     bool8 result = false;
@@ -563,7 +563,7 @@ sys_directory_exists(string_t filepath)
     return(result);
 }
 
-s32
+ENGINE_API s32
 sys_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 recursive, string_t file_ext)
 {
     s32 result = -1;
@@ -619,7 +619,7 @@ sys_directory_get_file_count(memory_arena_t *arena, string_t filepath, bool8 rec
     return(result);
 }
 
-void
+ENGINE_API void
 sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
 {
     DIR *directory = opendir(C_STR(filepath));
@@ -666,7 +666,7 @@ sys_directory_visit(string_t filepath, visit_file_data_t *visit_file_data)
    ===========================================*/
 #include <SDL3/SDL.h>
 
-s32
+ENGINE_API s32
 sys_get_thread_count()
 {
     s32 result = 0;
@@ -675,7 +675,7 @@ sys_get_thread_count()
     return(result);
 }
 
-sys_semaphore_t
+ENGINE_API sys_semaphore_t
 sys_semaphore_create(s32 initial_thread_count, s32 max_thread_count)
 {
     Assert(initial_thread_count < max_thread_count);
@@ -693,7 +693,7 @@ sys_semaphore_create(s32 initial_thread_count, s32 max_thread_count)
     return(result);
 }
 
-void
+ENGINE_API void
 sys_semaphore_close(sys_semaphore_t *semaphore)
 {
     Assert(semaphore         != null);
@@ -704,7 +704,7 @@ sys_semaphore_close(sys_semaphore_t *semaphore)
 }
 
 // TODO(Sleepster): sys_semaphore_signal 
-s32
+ENGINE_API s32
 sys_semaphore_release(sys_semaphore_t *semaphore, s32 threads_to_release)
 {
     Assert(semaphore         != null);
@@ -722,7 +722,7 @@ sys_semaphore_release(sys_semaphore_t *semaphore, s32 threads_to_release)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_semaphore_destroy(sys_semaphore_t *semaphore)
 {
     Assert(semaphore         != null);
@@ -734,7 +734,7 @@ sys_semaphore_destroy(sys_semaphore_t *semaphore)
     return(true);
 }
 
-void
+ENGINE_API void
 sys_semaphore_wait(sys_semaphore_t *semaphore, u64 wait_duration_ms)
 {
     if(wait_duration_ms == 0)
@@ -747,7 +747,7 @@ sys_semaphore_wait(sys_semaphore_t *semaphore, u64 wait_duration_ms)
     }
 }
 
-sys_thread_t
+ENGINE_API sys_thread_t
 sys_thread_create(thread_proc_t *proc, void *user_data, bool8 close_handle)
 {
     sys_thread_t result;
@@ -771,7 +771,7 @@ sys_thread_create(thread_proc_t *proc, void *user_data, bool8 close_handle)
 }
 
 // NOTE(Sleepster): There is no "close handle" like there is on Windows to my knowledge.
-bool8
+ENGINE_API bool8
 sys_thread_close_handle(sys_thread_t *thread_data)
 {
     Assert(thread_data);
@@ -781,7 +781,7 @@ sys_thread_close_handle(sys_thread_t *thread_data)
     return(true);
 }
 
-s32
+ENGINE_API s32
 sys_thread_wait(sys_thread_t *handle)
 {
     s32 result = 0;
@@ -790,7 +790,7 @@ sys_thread_wait(sys_thread_t *handle)
     return(result);
 }
 
-sys_mutex_t
+ENGINE_API sys_mutex_t
 sys_mutex_create()
 {
     sys_mutex_t result;
@@ -802,7 +802,7 @@ sys_mutex_create()
     return(result);
 }
 
-void
+ENGINE_API void
 sys_mutex_free(sys_mutex_t *mutex)
 {
     Assert(mutex);
@@ -812,7 +812,7 @@ sys_mutex_free(sys_mutex_t *mutex)
     mutex->handle = null;
 }
 
-bool8
+ENGINE_API bool8
 sys_mutex_lock(sys_mutex_t *mutex, const bool8 should_block)
 {
     bool8 result = false;
@@ -828,7 +828,7 @@ sys_mutex_lock(sys_mutex_t *mutex, const bool8 should_block)
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 sys_mutex_unlock(sys_mutex_t *mutex)
 {
     SDL_UnlockMutex(mutex->handle);
@@ -839,7 +839,7 @@ sys_mutex_unlock(sys_mutex_t *mutex)
   =============== FILE WATCHER ==============
   ===========================================*/
 
-void
+ENGINE_API void
 sys_file_watcher_init_watch_data(memory_arena_t *arena, file_watcher_sys_watch_data_t *watch_data)
 {
     watch_data->inotify_instance = inotify_init1(IN_NONBLOCK);
@@ -906,7 +906,7 @@ sys_internal_file_watcher_add_path(file_watcher_t *watcher, u32 watch_flags, str
     return(result);
 }
 
-bool8 
+ENGINE_API bool8 
 sys_file_watcher_add_path(file_watcher_t *watcher, string_t filepath)
 {
     bool8 result = false;
@@ -922,14 +922,14 @@ sys_file_watcher_add_path(file_watcher_t *watcher, string_t filepath)
     return(result);
 }
 
-void
+ENGINE_API void
 sys_file_watcher_issue_check(file_watcher_t *watcher, sys_file_check_event_data_t *directory_data)
 {
     (void)watcher;
     (void)directory_data;
 }
 
-void
+ENGINE_API void
 sys_file_watcher_process_changes(file_watcher_t *watcher)
 {
     file_watcher_sys_watch_data_t *watch_data = &watcher->sys_watch_data;
@@ -1060,7 +1060,7 @@ sys_file_watcher_process_changes(file_watcher_t *watcher)
   =============== DLL LOADING ===============
   ===========================================*/
 
-void*
+ENGINE_API void*
 sys_load_library(string_t filepath)
 {
     void *result = dlopen(C_STR(filepath), RTLD_NOW);
@@ -1072,7 +1072,7 @@ sys_load_library(string_t filepath)
     return result;
 }
 
-void
+ENGINE_API void
 sys_free_library(void *library)
 {
     if(library)
@@ -1081,7 +1081,7 @@ sys_free_library(void *library)
     }
 }
 
-void*
+ENGINE_API void*
 sys_get_proc_address(void *library, string_t procedure)
 {
     void *result = null;
@@ -1096,7 +1096,7 @@ sys_get_proc_address(void *library, string_t procedure)
   =============== PROCESSSES ================
   ===========================================*/
 
-void*
+ENGINE_API void*
 sys_create_process(string_t program_path, string_t argument_string)
 {
     const char **arguments = c_arena_push_array(&gc->temp_arena, const char *, 100);
@@ -1133,7 +1133,7 @@ sys_create_process(string_t program_path, string_t argument_string)
     return(process);
 }
 
-bool8
+ENGINE_API bool8
 sys_wait_for_process(void *process)
 {
     bool8 result = false;

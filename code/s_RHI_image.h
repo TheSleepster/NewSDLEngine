@@ -74,10 +74,10 @@ struct RHI_image_t
 typedef struct bitmap bitmap_t;
 struct RHI_context_t;
 
-RHI_image_t RHI_image_create(RHI_context_t *RHI_context, RHI_image_create_info_t *image_create_info);
-RHI_image_t RHI_image_create_from_bitmap(bitmap_t *bitmap);
-void        RHI_image_destroy(RHI_context_t *RHI_context, RHI_image_t *image);
-void        RHI_image_update_data(RHI_context_t *RHI_context, RHI_image_t *image);
+ENGINE_API RHI_image_t RHI_image_create(RHI_context_t *RHI_context, RHI_image_create_info_t *image_create_info);
+ENGINE_API RHI_image_t RHI_image_create_from_bitmap(bitmap_t *bitmap);
+ENGINE_API void        RHI_image_destroy(RHI_context_t *RHI_context, RHI_image_t *image);
+ENGINE_API void        RHI_image_update_data(RHI_context_t *RHI_context, RHI_image_t *image);
 
 #endif // R_RENDER_IMAGE_H
 

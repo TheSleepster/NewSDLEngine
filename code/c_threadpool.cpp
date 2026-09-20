@@ -30,7 +30,7 @@ c_threadpool_init
 =============
 */
 
-void
+ENGINE_API void
 c_threadpool_init(threadpool_t *threadpool, u32 max_threads, u32 thread_allocator_size, bool8 start_instantly, bool8 allow_stealing)
 {
     ZeroStruct(*threadpool);
@@ -71,7 +71,7 @@ c_threadpool_start
 =============
 */
 
-void
+ENGINE_API void
 c_threadpool_start(threadpool_t *threadpool)
 {
     for(s32 thread_index = 0;
@@ -91,7 +91,7 @@ c_threadpool_flush_work_orders
 =============
 */
 
-void
+ENGINE_API void
 c_threadpool_flush_work_orders(threadpool_t *threadpool)
 {
     worker_thread_t this_thread = {};
@@ -112,7 +112,7 @@ c_threadpool_wait_on_fence
 =============
 */
 
-void
+ENGINE_API void
 c_threadpool_wait_on_fence(threadpool_t *threadpool, work_completion_fence_t *fence)
 {
     worker_thread_t this_thread = {};

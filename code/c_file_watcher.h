@@ -83,14 +83,14 @@ typedef struct file_watcher
 /*===========================================
   ============ API DEFINITIONS ==============
   ===========================================*/
-file_watcher_t  c_file_watcher_create(file_watcher_change_event_t events_to_monitor, bool8 recursive, file_watcher_callback_pfn_t *callback, void *user_data, bool8 verbose);
-void            c_file_watcher_add_path(file_watcher_t *watcher, string_t filepath);
-void            c_file_watcher_issue_check_for_single_path(file_watcher_t *watcher, sys_file_check_event_data_t *watch_data);
-void            c_file_watcher_issue_check_over_all_paths(file_watcher_t *watcher);
+ENGINE_API file_watcher_t  c_file_watcher_create(file_watcher_change_event_t events_to_monitor, bool8 recursive, file_watcher_callback_pfn_t *callback, void *user_data, bool8 verbose);
+ENGINE_API void            c_file_watcher_add_path(file_watcher_t *watcher, string_t filepath);
+ENGINE_API void            c_file_watcher_issue_check_for_single_path(file_watcher_t *watcher, sys_file_check_event_data_t *watch_data);
+ENGINE_API void            c_file_watcher_issue_check_over_all_paths(file_watcher_t *watcher);
 
-void            c_file_watcher_add_change_event(file_watcher_t *watcher, string_t fullname, string_t old_filename, u32 changes);
-void            c_file_watcher_emit_changes(file_watcher_t *watcher);
-void            c_file_watcher_process_changes(file_watcher_t *watcher);
+ENGINE_API void            c_file_watcher_add_change_event(file_watcher_t *watcher, string_t fullname, string_t old_filename, u32 changes);
+ENGINE_API void            c_file_watcher_emit_changes(file_watcher_t *watcher);
+ENGINE_API void            c_file_watcher_process_changes(file_watcher_t *watcher);
 
 #endif // C_FILE_WATCHER_H
 

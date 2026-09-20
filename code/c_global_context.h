@@ -59,11 +59,11 @@ typedef struct global_context
     bool8             playing_back_input;
 }global_context_t;
 
-void c_global_context_init(void);
-void c_global_context_reset_transient_arena(void);
-void c_global_context_reset_temp_arena(void);
-void c_global_context_reset_persistent_arena(void);
-void c_global_context_reset_simulation_arena(void);
+ENGINE_API void c_global_context_init(void);
+ENGINE_API void c_global_context_reset_transient_arena(void);
+ENGINE_API void c_global_context_reset_temp_arena(void);
+ENGINE_API void c_global_context_reset_persistent_arena(void);
+ENGINE_API void c_global_context_reset_simulation_arena(void);
 
 static global_context_t *gc;
 

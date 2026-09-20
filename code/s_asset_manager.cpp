@@ -41,7 +41,7 @@ asset_manager_hash_arena_allocate(void *allocator, u32 allocation_size)
   ========== TEXTURES ===========
   =============================== */
 
-bitmap_t
+ENGINE_API bitmap_t
 s_asset_bitmap_create(asset_manager_t *asset_manager, 
                       u32              width,
                       u32              height, 
@@ -64,7 +64,7 @@ s_asset_bitmap_create(asset_manager_t *asset_manager,
     return(result);
 }
 
-bitmap_t
+ENGINE_API bitmap_t
 s_asset_bitmap_init(string_t pixels, s32 width, s32 height, s32 channels, u32 format)
 {
     bitmap_t result = {};
@@ -77,7 +77,7 @@ s_asset_bitmap_init(string_t pixels, s32 width, s32 height, s32 channels, u32 fo
     return(result);
 }
 
-bitmap_t 
+ENGINE_API bitmap_t 
 s_asset_bitmap_create(asset_manager_t *asset_manager, s32 width, s32 height, s32 channels, u32 format)
 {
     bitmap_t result;
@@ -92,7 +92,7 @@ s_asset_bitmap_create(asset_manager_t *asset_manager, s32 width, s32 height, s32
     return(result);
 }
 
-texture2D_t 
+ENGINE_API texture2D_t 
 s_asset_texture_create(asset_slot_t *slot, u64 name_hash)
 {
     texture2D_t result = {};
@@ -123,7 +123,7 @@ s_asset_texture_create(asset_slot_t *slot, u64 name_hash)
   =========================================== */
 
 #if 0
-animation_source2D_t
+ENGINE_API animation_source2D_t
 s_asset_animation_source_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     animation_source2D_t result = {};
@@ -135,7 +135,7 @@ s_asset_animation_source_create(asset_manager_t *asset_manager, asset_slot_t *sl
   =========== SHADERS ===========
   =============================== */
 
-shader_t
+ENGINE_API shader_t
 s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     shader_t result;
@@ -152,7 +152,7 @@ s_asset_shader_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 na
   =============================== */
 
 // NOTE(Sleepster): We need to pass a pointer to the actual structure to actually store the file data
-void
+ENGINE_API void
 material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *tokenizer, const type_info_t *parent_type_data, token_data_t name_token)
 {
     // NOTE(Sleepster): Eating the colon... 
@@ -220,7 +220,7 @@ material_file_parse_item(string_t filename, void *parent_data, tokenizer_t *toke
     }
 }
 
-void 
+ENGINE_API void 
 material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t *tokenizer, const type_info_t *parent_type_data)
 {
     token_data_t token = c_tokenizer_get_next_token(tokenizer);
@@ -268,7 +268,7 @@ material_file_parse_block_data(string_t filename, void *parent_data, tokenizer_t
 // TODO(Sleepster): 
 // For now, we're only worrying about archetypes for the sake of simplicity. Later on we WILL need instances, 
 // but for the moment we can live without them
-material_data_t
+ENGINE_API material_data_t
 s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     material_data_t result = {};
@@ -352,7 +352,7 @@ s_asset_material_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 
 /*===========================================
   ================ FONT DATA  ===============
   ===========================================*/
-u32
+ENGINE_API u32
 s_UTF8_convert_UTF32(u8 *character)
 {
     u32 result = 0;
@@ -375,7 +375,7 @@ s_UTF8_convert_UTF32(u8 *character)
     return(result);
 }
 
-void
+ENGINE_API void
 s_UTF32_convert_to_UTF8(string_t *buffer, u32 character)
 {
     if(buffer->count >= 4)
@@ -428,7 +428,7 @@ s_UTF32_convert_to_UTF8(string_t *buffer, u32 character)
     }
 }
 
-bool8
+ENGINE_API bool8
 s_asset_font_set_unknown_character(dynamic_render_font_varient_t *varient, u32 UTF32_index)
 {
     bool8 result = false;
@@ -443,7 +443,7 @@ s_asset_font_set_unknown_character(dynamic_render_font_varient_t *varient, u32 U
     return(result);
 }
 
-dynamic_render_font_page_t*
+ENGINE_API dynamic_render_font_page_t*
 s_asset_font_create_new_page(asset_manager_t *asset_manager, dynamic_render_font_varient_t *varient, memory_arena_t *arena)
 {
     dynamic_render_font_page_t *new_page = null; 
@@ -460,7 +460,7 @@ s_asset_font_create_new_page(asset_manager_t *asset_manager, dynamic_render_font
     return(new_page);
 }
 
-dynamic_render_font_varient_t*
+ENGINE_API dynamic_render_font_varient_t*
 s_asset_font_create_new_varient(asset_manager_t *asset_manager, dynamic_render_font_t *font, u32 font_size)
 {
     dynamic_render_font_varient_t *result = c_arena_push_struct(&font->font_arena, dynamic_render_font_varient_t);
@@ -522,7 +522,7 @@ s_asset_font_create_new_varient(asset_manager_t *asset_manager, dynamic_render_f
     return(result);
 }
 
-dynamic_render_font_t 
+ENGINE_API dynamic_render_font_t 
 s_asset_font_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     dynamic_render_font_t result = {};
@@ -544,7 +544,7 @@ s_asset_font_create(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name
     return(result);
 }
 
-dynamic_render_font_varient_t*
+ENGINE_API dynamic_render_font_varient_t*
 s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t *font_handle, u32 font_size)
 {
     Assert(font_handle->slot->type == AT_Font);
@@ -573,7 +573,7 @@ s_asset_font_acquire_font_at_size(asset_manager_t *asset_manager, asset_handle_t
 
 // TODO(Sleepster): This will *NOT* correctly handle UTF8 characters as simply advancing by one doesn't work
 // We need to advance by how ever many bytes the UTF character is.
-vec2_t 
+ENGINE_API vec2_t 
 s_asset_font_get_string_size(asset_manager_t *asset_manager, 
                              string_t         string, 
                              asset_handle_t  *font_handle, 
@@ -611,7 +611,7 @@ s_asset_font_get_string_size(asset_manager_t *asset_manager,
     return(result);
 }
 
-glyph_metric_t*
+ENGINE_API glyph_metric_t*
 s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
                          dynamic_render_font_varient_t *varient,
                          byte                          *codepoint)
@@ -725,7 +725,7 @@ s_asset_font_fetch_glyph(asset_manager_t               *asset_manager,
     return(result);
 }
 
-void
+ENGINE_API void
 s_asset_font_load_glyph(dynamic_render_font_varient_t *varient, 
                         dynamic_render_font_page_t    *page, 
                         temporary_glyph_t             *temp_glyph)
@@ -795,7 +795,7 @@ s_asset_font_load_glyph(dynamic_render_font_varient_t *varient,
 // vulkan_shader_data_t *shader = &current_group->material->material->archetype->shader.slot->shader.shader_data;
 //
 // Like what the fuck???
-void
+ENGINE_API void
 s_asset_manager_load_asset_data(asset_manager_t *asset_manager, asset_slot_t *slot, u64 name_hash)
 {
     Assert(slot->slot_state == ASLS_LoadQueued);
@@ -915,7 +915,7 @@ asset_catalog_load_default_asset(asset_catalog_t *catalog)
     return(result);
 }
 
-void
+ENGINE_API void
 s_asset_manager_init(asset_manager_t *asset_manager)
 {
     Assert(asset_manager->is_initialized == false);
@@ -974,7 +974,7 @@ s_asset_manager_init(asset_manager_t *asset_manager)
     asset_manager->is_initialized = true;
 }
 
-void
+ENGINE_API void
 s_asset_manager_update(asset_manager_t *asset_manager)
 {
     // NOTE(Sleepster): Reload asset files 
@@ -1226,7 +1226,7 @@ initialize_asset_file_contents(asset_manager_t *asset_manager, asset_file_data_t
     return(result);
 }
 
-bool8
+ENGINE_API bool8
 s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepath)
 {
     Assert(asset_manager->loaded_file_count + 1 <= ASSET_MANAGER_MAX_ASSET_FILES);
@@ -1252,7 +1252,7 @@ s_asset_manager_load_asset_file(asset_manager_t *asset_manager, string_t filepat
     return(result);
 }
 
-void
+ENGINE_API void
 s_asset_manager_signal_asset_file_reload(asset_manager_t *asset_manager, string_t filename)
 {
     // TODO(Sleepster): Hash table? 
@@ -1306,7 +1306,7 @@ s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot
     }
 }
 
-void
+ENGINE_API void
 s_asset_manager_queue_asset_load(asset_manager_t *asset_manager, asset_slot_t *slot)
 {
     if(slot->slot_state == ASLS_Loaded)
@@ -1361,7 +1361,7 @@ s_asset_manager_queue_asset_load(asset_manager_t *asset_manager, asset_slot_t *s
     }
 }
 
-asset_handle_t
+ENGINE_API asset_handle_t
 s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name)
 {
     asset_handle_t result;
@@ -1412,7 +1412,7 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
 // ======= TEXTURE ATLASES =======
 // ===============================
 
-texture_atlas_t*
+ENGINE_API texture_atlas_t*
 s_texture_atlas_create(asset_manager_t *asset_manager, 
                        u32              size, 
                        u32              channel_count, 
@@ -1451,7 +1451,7 @@ s_texture_atlas_create(asset_manager_t *asset_manager,
     return(atlas);
 }
 
-void
+ENGINE_API void
 s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle)
 {
     Assert(texture_handle);
@@ -1461,7 +1461,7 @@ s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_hand
     atlas->merge_counter += 1;
 }
 
-void
+ENGINE_API void
 s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atlas_t *atlas)
 {
     Assert(atlas->is_valid);
@@ -1568,7 +1568,7 @@ s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atla
     }
 }
 
-shader_t*
+ENGINE_API shader_t*
 s_asset_get_shader_from_handle(asset_handle_t *handle) 
 {
     shader_t *result = null;
@@ -1577,7 +1577,7 @@ s_asset_get_shader_from_handle(asset_handle_t *handle)
     return(result);
 }
 
-texture2D_t*
+ENGINE_API texture2D_t*
 s_asset_get_texture_from_handle(asset_handle_t *handle) 
 {
     texture2D_t *result = null;
@@ -1586,7 +1586,7 @@ s_asset_get_texture_from_handle(asset_handle_t *handle)
     return(result);
 }
 
-material_data_t*
+ENGINE_API material_data_t*
 s_asset_get_material_data_from_handle(asset_handle_t *handle)
 {
     material_data_t *result = null;
@@ -1595,7 +1595,7 @@ s_asset_get_material_data_from_handle(asset_handle_t *handle)
     return(result);
 }
 
-material_archetype_t*
+ENGINE_API material_archetype_t*
 s_asset_get_material_archetype_from_handle(asset_handle_t *handle) 
 {
     Assert(handle->material_info->material_type == SMT_Archetype);
@@ -1606,7 +1606,7 @@ s_asset_get_material_archetype_from_handle(asset_handle_t *handle)
     return(result);
 }
 
-material_instance_t*
+ENGINE_API material_instance_t*
 s_asset_get_material_instance_from_handle(asset_handle_t *handle)
 {
     Assert(handle->material_info->material_type == SMT_Instance);

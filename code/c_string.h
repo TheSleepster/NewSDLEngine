@@ -28,53 +28,53 @@ typedef struct string
 // TODO(Sleepster): - [ ] Any function in here that allocates memory should be reordered like the file API 
 
 //////////// API DEFINITIONS //////////////
-u32         c_string_length(const char *c_string);
-char*       c_string_null_terminated(memory_arena_t *arena, string_t data);
-bool8       c_string_is_valid(string_t string);
-string_t    c_string_create(const char *c_string);
-string_t    c_string_create_with_length(byte *data, u32 length);
-string_t    c_string_make_heap(memory_arena_t *arena, string_t string);
-bool8       c_string_compare(string_t A, string_t B);
-bool8       c_string_ends_with(string_t A, string_t ending);
-string_t    c_string_concat(memory_arena_t *arena, string_t A, string_t B);
-const char *c_string_to_const_array(string_t string);
-string_t    c_string_to_upper(memory_arena_t *arena, string_t string);
+ENGINE_API u32         c_string_length(const char *c_string);
+ENGINE_API char*       c_string_null_terminated(memory_arena_t *arena, string_t data);
+ENGINE_API bool8       c_string_is_valid(string_t string);
+ENGINE_API string_t    c_string_create(const char *c_string);
+ENGINE_API string_t    c_string_create_with_length(byte *data, u32 length);
+ENGINE_API string_t    c_string_make_heap(memory_arena_t *arena, string_t string);
+ENGINE_API bool8       c_string_compare(string_t A, string_t B);
+ENGINE_API bool8       c_string_ends_with(string_t A, string_t ending);
+ENGINE_API string_t    c_string_concat(memory_arena_t *arena, string_t A, string_t B);
+ENGINE_API const char *c_string_to_const_array(string_t string);
+ENGINE_API string_t    c_string_to_upper(memory_arena_t *arena, string_t string);
 
-string_t    c_string_sprintf(char *buffer, u32 buffer_size, const char *string, ...);
-string_t    c_string_make_copy(memory_arena_t *arena, string_t string);
-string_t    c_string_sub_from_left(string_t string, u32 index);
-string_t    c_string_sub_from_right(string_t string, u32 index);
-string_t    c_string_substring(string_t string, u32 first_index, u32 last_index);
-void        c_string_advance_by(string_t *string, u32 advance);
+ENGINE_API string_t    c_string_sprintf(char *buffer, u32 buffer_size, const char *string, ...);
+ENGINE_API string_t    c_string_make_copy(memory_arena_t *arena, string_t string);
+ENGINE_API string_t    c_string_sub_from_left(string_t string, u32 index);
+ENGINE_API string_t    c_string_sub_from_right(string_t string, u32 index);
+ENGINE_API string_t    c_string_substring(string_t string, u32 first_index, u32 last_index);
+ENGINE_API void        c_string_advance_by(string_t *string, u32 advance);
 
-s32         c_string_find_first_char_from_left(string_t string,  char character);
-s32         c_string_find_first_char_from_right(string_t string, char character);
-s32         c_string_find_first_char_from_left_on_line(string_t string,  char character);
+ENGINE_API s32         c_string_find_first_char_from_left(string_t string,  char character);
+ENGINE_API s32         c_string_find_first_char_from_right(string_t string, char character);
+ENGINE_API s32         c_string_find_first_char_from_left_on_line(string_t string,  char character);
 // NOTE(Sleepster): This takes that "ending index" so that you don't have to parse the whole string.
 // if it's 0, we just use the string length
-u32         c_string_find_first_char_from_right_on_line(string_t string, char character, u32 ending_index);
+ENGINE_API u32         c_string_find_first_char_from_right_on_line(string_t string, char character, u32 ending_index);
 
-string_t    c_string_get_filename_from_path(string_t filepath);
-string_t    c_string_get_file_ext_from_path(string_t filepath);
-string_t    c_string_get_filename_from_path_and_ext(string_t filepath);
-void        c_string_override_file_separators(string_t *string);
+ENGINE_API string_t    c_string_get_filename_from_path(string_t filepath);
+ENGINE_API string_t    c_string_get_file_ext_from_path(string_t filepath);
+ENGINE_API string_t    c_string_get_filename_from_path_and_ext(string_t filepath);
+ENGINE_API void        c_string_override_file_separators(string_t *string);
 
-bool32      c_string_is_whitespace(string_t *current_line);
-bool32      c_string_is_end_of_line(string_t *current_line);
+ENGINE_API bool32      c_string_is_whitespace(string_t *current_line);
+ENGINE_API bool32      c_string_is_end_of_line(string_t *current_line);
 // NOTE(Sleepster): Returns the number of new_line characters seen
-u32         c_string_eat_whitespace(string_t *current_line);
-u32         c_string_get_whitespace_size(string_t string);
-u32         c_string_get_current_line_size(string_t string);
+ENGINE_API u32         c_string_eat_whitespace(string_t *current_line);
+ENGINE_API u32         c_string_get_whitespace_size(string_t string);
+ENGINE_API u32         c_string_get_current_line_size(string_t string);
 
-string_t    c_string_read_line(string_t *data);
+ENGINE_API string_t    c_string_read_line(string_t *data);
 
-s32         c_string_read_int(string_t data);
-u32         c_string_read_uint(string_t data);
-float32     c_string_read_float32(string_t data);
-float64     c_string_read_float64(string_t data);
+ENGINE_API s32         c_string_read_int(string_t data);
+ENGINE_API u32         c_string_read_uint(string_t data);
+ENGINE_API float32     c_string_read_float32(string_t data);
+ENGINE_API float64     c_string_read_float64(string_t data);
 
-u32      c_string_find_all_instances_of(string_t string, u8 character);
-string_t c_string_replace_all_instances_of(memory_arena_t *arena, string_t string, u8 character, u8 replacement);
+ENGINE_API u32      c_string_find_all_instances_of(string_t string, u8 character);
+ENGINE_API string_t c_string_replace_all_instances_of(memory_arena_t *arena, string_t string, u8 character, u8 replacement);
 
 // MACROS
 #define C_STR(x)              ((const char *)x.data)
@@ -121,19 +121,19 @@ typedef struct string_builder
     s64                          total_allocated;
 }string_builder_t;
 
-void     c_string_builder_init(string_builder_t *builder, u64 buffer_block_size);
-void     c_string_builder_deinit(string_builder_t *builder);
-void     c_string_builder_append_data(string_builder_t *builder, string_t data);
-void     c_string_builder_append_value(string_builder_t *builder, void *value, u32 value_size);
-string_t c_string_builder_get_current_string(string_builder_t *builder);
-void     c_string_builder_reset(string_builder_t *builder);
-void     c_string_builder_append_builder(string_builder_t *A, string_builder_t *B);
-void     c_string_builder_sprintf(string_builder_t *builder, const char *string, ...);
+ENGINE_API void     c_string_builder_init(string_builder_t *builder, u64 buffer_block_size);
+ENGINE_API void     c_string_builder_deinit(string_builder_t *builder);
+ENGINE_API void     c_string_builder_append_data(string_builder_t *builder, string_t data);
+ENGINE_API void     c_string_builder_append_value(string_builder_t *builder, void *value, u32 value_size);
+ENGINE_API string_t c_string_builder_get_current_string(string_builder_t *builder);
+ENGINE_API void     c_string_builder_reset(string_builder_t *builder);
+ENGINE_API void     c_string_builder_append_builder(string_builder_t *A, string_builder_t *B);
+ENGINE_API void     c_string_builder_sprintf(string_builder_t *builder, const char *string, ...);
 
 // NOTE(Sleepster): DUMP simply writes the data out and keeps the state of the builder the same, 
 //                  FLUSH writes out the data, and completely resets the state of the builder
-bool8 c_string_builder_dump_to_file(file_t *file, string_builder_t *builder);
-bool8 c_string_builder_flush_to_file(file_t *file, string_builder_t *builder);
+ENGINE_API bool8 c_string_builder_dump_to_file(file_t *file, string_builder_t *builder);
+ENGINE_API bool8 c_string_builder_flush_to_file(file_t *file, string_builder_t *builder);
 
 #endif // C_STRING_H
 
