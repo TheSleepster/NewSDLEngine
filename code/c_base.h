@@ -137,7 +137,7 @@
 # define ENGINE_API __declspec(dllexport)
 #else
 # define external   extern "C"
-# define ENGINE_API 
+# define ENGINE_API __attribute__((visibility("default"))) 
 #endif
 
 #if COMPILER_CLANG || COMPILER_GCC

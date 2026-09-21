@@ -22,7 +22,12 @@
 
 struct animation2D_t;
 
-#define MAX_ENTITIES (100000)
+#define MAX_SIM_REGION_ENTITIES (1000)
+
+constexpr u32 MAX_SIM_REGIONS        = 4096;
+constexpr u32 SIM_REGION_WIDTH       = 320;
+constexpr u32 SIM_REGION_HEIGHT      = 180;
+constexpr u32 MAX_ACTIVE_SIM_REGIONS = 50;
 
 enum entity_archetype_t
 {
@@ -87,19 +92,23 @@ struct entity_t
     bool8           collision;
 };
 
+struct world_sim_region_t
+{
+    ivec2_t   world_chunk_hash;
+
+    entity_t entities[MAX_SIM_REGION_ENTITIES];
+    u32      sim_entity_count;
+};
+
 struct entity_manager_t
 {
-    memory_arena_t transient_storage;
-    
-    entity_t       entities[MAX_ENTITIES];
-    u32            active_entities;
+    memory_arena_t                        transient_storage;
 
-    // NOTE(Sleepster): Maybe instead make a hash_table that maps entity->flags to that of an array of entities 
-    // do the same for entity->archetype -> entity array 
-#if 0
-    entity_t      *players[MAX_ENTITIES];
-    entity_t      *colliders[MAX_ENTITIES];
-#endif
+    u8                                    world_sim_region_sparse_matrix[MAX_SIM_REGIONS][MAX_SIM_REGIONS];
+
+    world_sim_region_t                    active_region_hash[MAX_ACTIVE_SIM_REGIONS];
+    array_t<u32, MAX_SIM_REGION_ENTITIES> occupied_region_hash_indices;
+    u32                                   active_region_count;
 };
 
 struct entity_query_t
@@ -111,7 +120,9 @@ struct entity_query_t
     entity_t **end()   { return(entities + entity_count); }
 };
 
-entity_t*      s_entity_create(entity_manager_t *entity_manager, u32 archetype, u32 flags);
+world_sim_region_t* s_entity_manager_get_or_create_sim_region(entity_manager_t *entity_manager, vec2_t world_position);
+
+entity_t      *s_entity_create(entity_manager_t *entity_manager, vec2_t world_position, u32 archetype, u32 flags);
 void           s_entity_destroy(entity_manager_t *entity_manager, entity_t *entity);
 entity_query_t s_entity_query_flags(entity_manager_t *entity_manager, u32 search_mask);
 entity_query_t s_entity_query_flags_exact(entity_manager_t *entity_manager, u32 search_mask);

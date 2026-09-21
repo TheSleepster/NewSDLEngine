@@ -42,7 +42,9 @@ struct scratch_arena_t
 /*===========================================
   ============ STANDARD ARENAS  =============
   ===========================================*/
+#if 0
 #define c_arena_push_struct(arena, type)                                              (type*)(c_arena_push_size(arena, sizeof(type)))
+#endif
 #define c_arena_push_array(arena, type, count)                                        (type*)(c_arena_push_size(arena, sizeof(type) * count))
 #define c_arena_bootstrap_allocate_struct(type, member, allocation_size, memory_tag ) (type*)(c_arena_bootstrap_allocate_struct_(sizeof(type), OffsetOf(type, member), allocation_size, memory_tag))
 
@@ -52,6 +54,22 @@ ENGINE_API byte*          c_arena_push_size(memory_arena_t *arena, u64 push_size
 ENGINE_API byte*          c_arena_bootstrap_allocate_struct_(u32 structure_size, u32 offset_to_arena, u64 block_size, u32 memory_tag);
 ENGINE_API void           c_arena_clear_block(memory_arena_t *arena);
 ENGINE_API void           c_arena_free_last_block(memory_arena_t *arena);
+
+#if 1
+// NOTE(Sleepster): We can't use this because the compiler is stupid and refuses
+// to just call the address of c_arena_push_size on some occasions
+template <typename T>
+T*
+c_arena_push_struct_(memory_arena_t *arena)
+{
+    T *result = (T*)c_arena_push_size(arena, sizeof(T));
+    *result   = {};
+
+    return(result);
+}
+
+#define c_arena_push_struct(arena, type) c_arena_push_struct_<type>(arena)
+#endif
 
 // TODO(Sleepster): We should probably create a way of storing "freed" blocks in a freelist, since this function is likely slow.
 ENGINE_API void           c_arena_reset(memory_arena_t *arena);

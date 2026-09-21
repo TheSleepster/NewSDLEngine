@@ -319,7 +319,7 @@ entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager, v
     entity_t *result = null;
 
     u32 entity_flags = ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_HAS_SPRITE|ENTITY_FLAG_GRAVITIC|ENTITY_FLAG_ACTOR|ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_ANIMATED|ENTITY_FLAG_GRAVITIC;
-    result = s_entity_create(game_state->entity_manager, ENTITY_ARCHETYPE_PLAYER, entity_flags);
+    result = s_entity_create(game_state->entity_manager, initial_position, ENTITY_ARCHETYPE_PLAYER, entity_flags);
     
     asset_handle_t player_sprite = s_asset_manager_acquire_asset_handle(asset_manager, STR("player_sprite_sheet"));
 
@@ -392,7 +392,7 @@ entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager, v
 internal_api entity_t*
 entity_test_collider_create(game_state_t *game_state, vec2_t position, vec2_t size, u32 flags)
 {
-    entity_t *result = s_entity_create(game_state->entity_manager, ENTITY_ARCHETYPE_COLLIDER, ((ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_STATIC) | flags));
+    entity_t *result = s_entity_create(game_state->entity_manager, position, ENTITY_ARCHETYPE_COLLIDER, ((ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_STATIC) | flags));
     result->archetype       = ENTITY_ARCHETYPE_COLLIDER;
     result->position        = position;
     result->editor_position = position;
@@ -650,7 +650,7 @@ r_init_render_state(render_state_t *render_state)
                                                           RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY, 
                                                           sizeof(u32),
                                                           indices, 
-                                                          (sizeof(u32) * (6 * MAX_ENTITIES)));
+                                                          (sizeof(u32) * (6 * MAX_SIM_REGION_ENTITIES)));
 }
 
 internal_api void
@@ -1031,8 +1031,9 @@ game_main(global_context_t *_global_context)
     {
         srand(rdtsc());
 
-        //game_state->controller     = s_im_get_controller_from_active_device(input_manager, game_state->controller);
-        game_state->entity_manager = c_arena_push_struct(&gc->persistent_arena, entity_manager_t);
+        //game_state->controller    = s_im_get_controller_from_active_device(input_manager, game_state->controller);
+        game_state->entity_manager  = c_arena_push_struct(&gc->persistent_arena, entity_manager_t);
+        *game_state->entity_manager = {};
         game_state->entity_manager->transient_storage = c_arena_create(MB(100), ALLOCATOR_TAG_GAME);
 
         game_state->gravity = -120.0f;
@@ -1054,6 +1055,9 @@ game_main(global_context_t *_global_context)
         entity_player_create(game_state, asset_manager, vec2(0, 0));
         create_test_environment(game_state, asset_manager);
         // GAME INIT
+        
+
+        entity_player_create(game_state, asset_manager, vec2(-640, 180));
 
         // NOTE(Sleepster): Init bindings 
         game_state_init_bindings(game_state, gc->input_manager);
@@ -1188,6 +1192,8 @@ game_main(global_context_t *_global_context)
             delta_time = gc->tick_rate * 2.0f;
         }
 
+        world_sim_region_t *active_region = &game_state->entity_manager->active_region_hash[6];
+
         bool8 first_tick = true;
         dt_accumulator  += delta_time;
         while(dt_accumulator >= gc->tick_rate)
@@ -1209,15 +1215,15 @@ game_main(global_context_t *_global_context)
                     if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_E))
                     {
                         game_state->editor_opened = !game_state->editor_opened;
-
                         if(game_state->editor_opened) 
                         {
                             game_state->game_mode = GAME_MODE_EDIT_MODE;
+
                             for(u32 entity_index = 0;
-                                entity_index < game_state->entity_manager->active_entities;
+                                entity_index < active_region->sim_entity_count;
                                 ++entity_index)
                             {
-                                entity_t *entity = game_state->entity_manager->entities + entity_index;
+                                entity_t *entity = active_region->entities + entity_index;
                                 entity->render_position = entity->editor_position;
                             }
                         }
@@ -1225,10 +1231,10 @@ game_main(global_context_t *_global_context)
                         {
                             game_state->game_mode = GAME_MODE_NORMAL;
                             for(u32 entity_index = 0;
-                                entity_index < game_state->entity_manager->active_entities;
+                                entity_index < active_region->sim_entity_count;
                                 ++entity_index)
                             {
-                                entity_t *entity = game_state->entity_manager->entities + entity_index;
+                                entity_t *entity = active_region->entities + entity_index;
                                 entity->render_position = entity->position;
                             }
                         }
@@ -1406,10 +1412,10 @@ game_main(global_context_t *_global_context)
             // NOTE(Sleepster): Draw entities 
             {
                 for(u32 entity_index = 0;
-                    entity_index < game_state->entity_manager->active_entities;
+                    entity_index < active_region->sim_entity_count;
                     ++entity_index)
                 {
-                    entity_t *entity = game_state->entity_manager->entities + entity_index;
+                    entity_t *entity = active_region->entities + entity_index;
                     if((entity->flags & ENTITY_FLAG_IS_VALID) && 
                        (entity->archetype != ENTITY_ARCHETYPE_COLLIDER))
                     {
@@ -1457,10 +1463,10 @@ game_main(global_context_t *_global_context)
             // NOTE(Sleepster): Draw misc 
             {
                 for(u32 entity_index = 0;
-                    entity_index < game_state->entity_manager->active_entities;
+                    entity_index < active_region->sim_entity_count;
                     ++entity_index)
                 {
-                    entity_t *entity = game_state->entity_manager->entities + entity_index;
+                    entity_t *entity = active_region->entities + entity_index;
                     render_collider(game_state, render_state, command_list, entity);
                 }
 

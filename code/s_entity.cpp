@@ -6,26 +6,69 @@
    ======================================================================== */
 #include <s_entity.h>
 
-entity_t*
-s_entity_create(entity_manager_t *entity_manager, u32 archetype, u32 flags)
+/* Min Region:
+ *  vec2(-160, -90)
+ * Max Region:
+ *  vec2( 160,  90)
+ *
+ * Lookup -> vec2(128, -69) -> the above region
+ *
+ *
+ * Min of other region:
+ *  vec2(-320, -180)
+ *
+ * Max of other region:
+ *  vec2( 320,  180)
+ * 
+ */
+
+world_sim_region_t*
+s_entity_manager_get_or_create_sim_region(entity_manager_t *entity_manager, vec2_t world_position)
 {
+    world_sim_region_t *result = null;
+    
+    const u32 matrix_center = (MAX_SIM_REGIONS * 0.5f);
+    u32 chunk_x = floorf(((world_position.x + (SIM_REGION_WIDTH  * 0.5f)) / SIM_REGION_WIDTH)  + (matrix_center));
+    u32 chunk_y = floorf(((world_position.y + (SIM_REGION_HEIGHT * 0.5f)) / SIM_REGION_HEIGHT) + (matrix_center));
+
+    u8 *regionID = &entity_manager->world_sim_region_sparse_matrix[chunk_x][chunk_y];
+    if(*regionID == 0)
+    {
+        // NOTE(Sleepster): Store the x in the upper 32 bits, mask off the x for the y storage and store them in the lower 32 bits. 
+        u64 region_key = (u64)(((u64)chunk_x << 32) | ((u64)chunk_y & 0xFFFFFFFF));
+        u64 region_hash_index = region_key % MAX_ACTIVE_SIM_REGIONS;
+
+        *regionID = region_hash_index;
+        entity_manager->occupied_region_hash_indices[entity_manager->active_region_count++] = region_hash_index;
+    }
+
+    result = entity_manager->active_region_hash + *regionID;
+    result->world_chunk_hash = ivec2(chunk_x, chunk_y);
+
+    return(result);
+}
+
+entity_t*
+s_entity_create(entity_manager_t *entity_manager, vec2_t world_position, u32 archetype, u32 flags)
+{
+    world_sim_region_t *sim_region = s_entity_manager_get_or_create_sim_region(entity_manager, world_position);
+
     entity_t *result = null;
     for(u32 entity_index = 0;
-        entity_index < MAX_ENTITIES;
+        entity_index < MAX_SIM_REGION_ENTITIES;
         ++entity_index)
     {
-        entity_t *found = entity_manager->entities + entity_index;
+        entity_t *found = sim_region->entities + entity_index;
         if(!(found->flags & ENTITY_FLAG_IS_VALID))
         {
             result = found;
             ZeroStruct(*result);
 
             result->flags     = (ENTITY_FLAG_IS_VALID|flags);
-            result->archetype = archetype;
-            result->ID        = entity_index;
+            result->archetype =  archetype;
+            result->ID        =  entity_index;
 
-            ++entity_manager->active_entities;
-
+            ++sim_region->sim_entity_count;
             break;
         }
     }
@@ -36,25 +79,30 @@ s_entity_create(entity_manager_t *entity_manager, u32 archetype, u32 flags)
 void
 s_entity_destroy(entity_manager_t *entity_manager, entity_t *entity)
 {
-    void *entity_array_end = &entity_manager->entities[entity_manager->active_entities];
+    world_sim_region_t *sim_region = s_entity_manager_get_or_create_sim_region(entity_manager, entity->position);
+
+    void *entity_array_end = &sim_region->entities[sim_region->sim_entity_count];
     memcpy(entity_array_end, entity, sizeof(entity_t));
     ZeroMemory(entity_array_end, sizeof(entity_t));
 
-    --entity_manager->active_entities;
+    --sim_region->sim_entity_count;
 }
 
 entity_query_t
 s_entity_query_flags(entity_manager_t *entity_manager, u32 search_mask)
 {
     entity_query_t result = {};
-    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_ENTITIES);
+    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_SIM_REGION_ENTITIES);
+
+    // NOTE(Sleepster): Active sim region 
+    world_sim_region_t *sim_region = s_entity_manager_get_or_create_sim_region(entity_manager, vec2_zero());
 
     s32 found_entity_count = 0;
     for(u32 entity_index = 0;
-        entity_index < entity_manager->active_entities;
+        entity_index < sim_region->sim_entity_count;
         ++entity_index)
     {
-        entity_t *entity = entity_manager->entities + entity_index;
+        entity_t *entity = sim_region->entities + entity_index;
         if((entity->flags & search_mask) != 0)
         {
             result.entities[found_entity_count] = entity;
@@ -70,14 +118,18 @@ entity_query_t
 s_entity_query_flags_exact(entity_manager_t *entity_manager, u32 search_mask)
 {
     entity_query_t result = {};
-    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_ENTITIES);
+
+    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_SIM_REGION_ENTITIES);
+
+    // NOTE(Sleepster): Active sim region 
+    world_sim_region_t *sim_region = s_entity_manager_get_or_create_sim_region(entity_manager, vec2_zero());
 
     s32 found_entity_count = 0;
     for(u32 entity_index = 0;
-        entity_index < entity_manager->active_entities;
+        entity_index < sim_region->sim_entity_count;
         ++entity_index)
     {
-        entity_t *entity = entity_manager->entities + entity_index;
+        entity_t *entity = sim_region->entities + entity_index;
         if((entity->flags & search_mask) == search_mask)
         {
             result.entities[found_entity_count] = entity;
@@ -93,14 +145,18 @@ entity_query_t
 s_entity_query_archetype(entity_manager_t *entity_manager, entity_archetype_t archetype)
 {
     entity_query_t result = {};
-    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_ENTITIES);
+
+    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_SIM_REGION_ENTITIES);
+
+    // NOTE(Sleepster): Active sim region 
+    world_sim_region_t *sim_region = s_entity_manager_get_or_create_sim_region(entity_manager, vec2_zero());
 
     s32 found_entity_count = 0;
     for(u32 entity_index = 0;
-        entity_index < entity_manager->active_entities;
+        entity_index < sim_region->sim_entity_count;
         ++entity_index)
     {
-        entity_t *entity = entity_manager->entities + entity_index;
+        entity_t *entity = sim_region->entities + entity_index;
         if(entity->archetype == archetype)
         {
             result.entities[found_entity_count] = entity;

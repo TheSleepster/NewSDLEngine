@@ -43,7 +43,7 @@ enum os_memory_access_flags
 };
 
 ENGINE_API u64   sys_get_virtual_memory_page_size(void);
-ENGINE_API u32   sys_align_to_page_size(u32 size);
+ENGINE_API u64   sys_align_to_page_size(u64 size);
 
 ENGINE_API void* sys_allocate_memory(void *base_address, usize allocation_size);
 ENGINE_API void  sys_free_memory(void *data, usize free_size);

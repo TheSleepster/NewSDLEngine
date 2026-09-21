@@ -66,8 +66,8 @@ c_dynarray_default_free_impl(void *allocator, void *memory)
 template <typename T>
 struct array_view_t
 {
-    T  *items;
-    s32 count;
+    T        *items;
+    const s32 count;
 
     T &operator[](s32 index);
     T *operator+(s32 index);
@@ -185,8 +185,8 @@ c_array_add_if_unique(array_view_t<T> array, T *element, s32 index_to_emplace)
 template <typename T, s32 capacity>
 struct array_t
 {
-    T    items[capacity];
-    s32  count = capacity;
+    T   items[capacity];
+    s32 count = capacity;
 
     T &operator[](s32 index);
     T *operator+(s32 index);

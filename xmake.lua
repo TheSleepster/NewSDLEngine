@@ -295,7 +295,7 @@ target("AthenaGenerate", function()
     set_kind("phony")
     add_deps("athena")
     on_build(function(target)
-        local output_file = path.join(SOURCE_DIR, "meta", "ATHENA_GENERATED_RHI.h")
+        local output_file = path.join(SOURCE_DIR, "meta", "ATHENA_GENERATED_RTTI.h")
 
         local inputs = os.files(path.join(SOURCE_DIR, "*.h"))
         table.insert(inputs, path.join(TARGET_DIR, "athena"))
@@ -304,7 +304,7 @@ target("AthenaGenerate", function()
             print("[Running: Athena]")
             os.execv(path.join(TARGET_DIR, "athena"), {
                 "--directory=" .. SOURCE_DIR,
-                "--output_file=" .. path.join(SOURCE_DIR, "meta", "ATHENA_GENERATED_RHI.h")
+                "--output_file=" .. path.join(SOURCE_DIR, "meta", "ATHENA_GENERATED_RTTI.h")
             })
         end
     end)
@@ -483,7 +483,7 @@ if BUILD_CONFIG == "debug" then
 
         local DLL_EXT = ".so"
         if TARGET_PLATFORM == "linux" or TARGET_PLATFORM == "macosx" then
-            add_ldflags("-Wl,--allow-shlib-undefined")
+            add_shflags("-Wl,--allow-shlib-undefined", { force = true })
             set_extension(".so")
         else
             DLL_EXT = ".dll"

@@ -130,6 +130,17 @@ ENGINE_API void  c_free_alloc(void *memory);
 ENGINE_API void  c_free_tagged_allocations(s32 tag);
 ENGINE_API void  c_free_tagged_allocation_range(s32 min_tag, s32 max_tag);
 
+template <typename T>
+T*
+c_alloc_type_(s32 tag)
+{
+    T *result = (T*)c_alloc(sizeof(T), tag);
+    *result = {};
+
+    return(result);
+}
+
+#define c_alloc_type(type, tag) c_alloc_type_<type>(tag)
 
 #endif // C_HEAP_ALLOCATOR_H
 
