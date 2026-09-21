@@ -185,8 +185,9 @@ c_array_add_if_unique(array_view_t<T> array, T *element, s32 index_to_emplace)
 template <typename T, s32 capacity>
 struct array_t
 {
+    // NOTE(Sleepster): Cannot resize the same array. This "static constexpr" makes it so that the count will survive any and all memsets
     T   items[capacity];
-    s32 count = capacity;
+    static constexpr s32 count = capacity;
 
     T &operator[](s32 index);
     T *operator+(s32 index);

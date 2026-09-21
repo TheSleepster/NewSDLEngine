@@ -62,9 +62,7 @@ template <typename T>
 T*
 c_arena_push_struct_(memory_arena_t *arena)
 {
-    T *result = (T*)c_arena_push_size(arena, sizeof(T));
-    *result   = {};
-
+    T *result = (T*)c_arena_push_size(arena, sizeof(T)); 
     return(result);
 }
 

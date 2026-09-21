@@ -1033,7 +1033,6 @@ game_main(global_context_t *_global_context)
 
         //game_state->controller    = s_im_get_controller_from_active_device(input_manager, game_state->controller);
         game_state->entity_manager  = c_arena_push_struct(&gc->persistent_arena, entity_manager_t);
-        *game_state->entity_manager = {};
         game_state->entity_manager->transient_storage = c_arena_create(MB(100), ALLOCATOR_TAG_GAME);
 
         game_state->gravity = -120.0f;
