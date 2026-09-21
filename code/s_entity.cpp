@@ -18,6 +18,8 @@ s_entity_create(entity_manager_t *entity_manager, u32 archetype, u32 flags)
         if(!(found->flags & ENTITY_FLAG_IS_VALID))
         {
             result = found;
+            ZeroStruct(*result);
+
             result->flags     = (ENTITY_FLAG_IS_VALID|flags);
             result->archetype = archetype;
             result->ID        = entity_index;

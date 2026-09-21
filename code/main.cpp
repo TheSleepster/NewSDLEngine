@@ -314,7 +314,7 @@ handle_debug_ui_menu(ui_state_t *main_ui, RHI_context_t *RHI_context, asset_hand
 }
 
 internal_api entity_t*
-entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager)
+entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager, vec2_t initial_position)
 {
     entity_t *result = null;
 
@@ -329,6 +329,9 @@ entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager)
     result->position = vec2(0,  40);
     result->size     = vec2(15, 18);
     result->animation_state = PLAYER_ANIMATION_STATE_RUNNING;
+
+    result->editor_position = initial_position;
+    result->position        = initial_position;
 
     result->animations      = c_arena_push_array(&gc->persistent_arena, animation2D_t, PLAYER_ANIMATION_STATE_COUNT);
     result->animation_count = PLAYER_ANIMATION_STATE_COUNT;
@@ -390,9 +393,10 @@ internal_api entity_t*
 entity_test_collider_create(game_state_t *game_state, vec2_t position, vec2_t size, u32 flags)
 {
     entity_t *result = s_entity_create(game_state->entity_manager, ENTITY_ARCHETYPE_COLLIDER, ((ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_STATIC) | flags));
-    result->archetype = ENTITY_ARCHETYPE_COLLIDER;
-    result->position  = position;
-    result->size      = size;
+    result->archetype       = ENTITY_ARCHETYPE_COLLIDER;
+    result->position        = position;
+    result->editor_position = position;
+    result->size            = size;
 
     result->bounding_box = rect2_create(position, size);
 
@@ -400,12 +404,18 @@ entity_test_collider_create(game_state_t *game_state, vec2_t position, vec2_t si
 }
 
 internal_api void
-render_collider(render_state_t *render_state, RHI_command_list_t *command_list, entity_t *entity)
+render_collider(game_state_t *game_state, render_state_t *render_state, RHI_command_list_t *command_list, entity_t *entity)
 {
+    vec2_t render_position = entity->bounding_box.min;
+    if(game_state->game_mode == GAME_MODE_EDIT_MODE)
+    {
+        render_position = entity->render_position;
+    }
+
     vec4_t color = vec4(0.5f, 0.0f, 0.0f, 0.2f);
     immediate_rect_ex(command_list, 
                      &render_state->vertex_buffer,
-                      vec2_expand_vec3(entity->bounding_box.min, 0.6f),
+                      vec2_expand_vec3(render_position, 0.6f),
                       vec2_multiply(entity->bounding_box.half_size, vec2(2, 2)),
                       color,
                       vec2_zero(),
@@ -470,7 +480,7 @@ entity_render(render_state_t *render_state, RHI_command_list_t *command_list, en
     
     immediate_quad_ex(command_list,
                      &render_state->vertex_buffer, 
-                      vec2_expand_vec3(entity->position, 0.8f), 
+                      vec2_expand_vec3(entity->render_position, 0.8f), 
                       entity->size, 
                       vec4(1.0, 1.0, 1.0, 1.0),
                       uv_min,
@@ -1041,7 +1051,7 @@ game_main(global_context_t *_global_context)
         game_state->show_player_viewport = true;
 
         // GAME INIT
-        entity_player_create(game_state, asset_manager);
+        entity_player_create(game_state, asset_manager, vec2(0, 0));
         create_test_environment(game_state, asset_manager);
         // GAME INIT
 
@@ -1172,7 +1182,6 @@ game_main(global_context_t *_global_context)
         }
         // NOTE(Sleepster): Editor controls block 
 
-
         // NOTE(Sleepster):} Simulate loop 
         if(delta_time >= (gc->tick_rate * 2.0f))
         {
@@ -1201,8 +1210,28 @@ game_main(global_context_t *_global_context)
                     {
                         game_state->editor_opened = !game_state->editor_opened;
 
-                        if(game_state->editor_opened) game_state->game_mode = GAME_MODE_EDIT_MODE;
-                        else                          game_state->game_mode = GAME_MODE_NORMAL;
+                        if(game_state->editor_opened) 
+                        {
+                            game_state->game_mode = GAME_MODE_EDIT_MODE;
+                            for(u32 entity_index = 0;
+                                entity_index < game_state->entity_manager->active_entities;
+                                ++entity_index)
+                            {
+                                entity_t *entity = game_state->entity_manager->entities + entity_index;
+                                entity->render_position = entity->editor_position;
+                            }
+                        }
+                        else
+                        {
+                            game_state->game_mode = GAME_MODE_NORMAL;
+                            for(u32 entity_index = 0;
+                                entity_index < game_state->entity_manager->active_entities;
+                                ++entity_index)
+                            {
+                                entity_t *entity = game_state->entity_manager->entities + entity_index;
+                                entity->render_position = entity->position;
+                            }
+                        }
                     }
 
                     // NOTE(Sleepster): Input and state recording 
@@ -1226,7 +1255,7 @@ game_main(global_context_t *_global_context)
                         ZeroStruct(*player);
                         s_entity_destroy(game_state->entity_manager, player);
 
-                        entity_player_create(game_state, asset_manager);
+                        entity_player_create(game_state, asset_manager, vec2(0, 0));
                     }
                 }
 
@@ -1384,7 +1413,12 @@ game_main(global_context_t *_global_context)
                     if((entity->flags & ENTITY_FLAG_IS_VALID) && 
                        (entity->archetype != ENTITY_ARCHETYPE_COLLIDER))
                     {
-                        entity->render_position = vec2_lerp(entity->last_position, entity->position, game_state->render_alpha);
+                        // NOTE(Sleepster): Update the entitie's render position if we are SIMULATING
+                        if(game_state->game_mode == GAME_MODE_NORMAL)
+                        {
+                            entity->render_position = vec2_lerp(entity->last_position, entity->position, game_state->render_alpha);
+                        }
+
                         entity_render(render_state, command_list, entity);
                     }
                 }
@@ -1427,7 +1461,7 @@ game_main(global_context_t *_global_context)
                     ++entity_index)
                 {
                     entity_t *entity = game_state->entity_manager->entities + entity_index;
-                    render_collider(render_state, command_list, entity);
+                    render_collider(game_state, render_state, command_list, entity);
                 }
 
                 immediate_rect(command_list, &render_state->vertex_buffer, vec3(0, 0, 0.4), vec2(8, 8), vec4(0.0, 1.0f, 0.0f, 1.0f));

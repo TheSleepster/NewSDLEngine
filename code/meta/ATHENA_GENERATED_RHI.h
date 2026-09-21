@@ -4854,14 +4854,15 @@ struct type_info_struct_entity_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[20];
+		const type_info_member_t member_array[21];
 		struct {
 			const type_info_member_t ID;
 			const type_info_member_t archetype;
 			const type_info_member_t flags;
+			const type_info_member_t position;
 			const type_info_member_t last_position;
 			const type_info_member_t render_position;
-			const type_info_member_t position;
+			const type_info_member_t editor_position;
 			const type_info_member_t velocity;
 			const type_info_member_t max_velocity;
 			const type_info_member_t acceleration;
@@ -21499,7 +21500,7 @@ constexpr type_info_struct_entity_t DEFAULT_typedata_structure_entity_t = {
 		.type_id = TYPE_entity_t,
 		.size = athena_internal::safe_sizeof<entity_t>(),
 	},
-	.member_count   = 20,
+	.member_count   = 21,
 	.member_pointer = DEFAULT_typedata_structure_entity_t.member_array,
 	.members = {
 		.ID = {
@@ -21526,6 +21527,14 @@ constexpr type_info_struct_entity_t DEFAULT_typedata_structure_entity_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.position = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "position",
+			.parent        = &DEFAULT_typedata_structure_entity_t.type_info,
+			.offset        = offsetof(entity_t, position),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.last_position = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
 			.member_name   = "last_position",
@@ -21542,11 +21551,11 @@ constexpr type_info_struct_entity_t DEFAULT_typedata_structure_entity_t = {
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
-		.position = {
+		.editor_position = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
-			.member_name   = "position",
+			.member_name   = "editor_position",
 			.parent        = &DEFAULT_typedata_structure_entity_t.type_info,
-			.offset        = offsetof(entity_t, position),
+			.offset        = offsetof(entity_t, editor_position),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -35196,9 +35205,10 @@ enum class entity_t {
 	ID,
 	archetype,
 	flags,
+	position,
 	last_position,
 	render_position,
-	position,
+	editor_position,
 	velocity,
 	max_velocity,
 	acceleration,

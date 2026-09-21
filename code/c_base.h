@@ -56,7 +56,7 @@
 #  elif defined(__aarch_64__)
 # define ARCH_ARM64 1
 #else
-# error x86/x64 is the only supported architecture at the moment...
+# error "x86/x64 is the only supported architecture at the moment..."
 #endif
 
 // GNU C

@@ -58,9 +58,12 @@ struct entity_t
     u32             flags;
 
     // NOTE(Sleepster): Transform data 
+    vec2_t          position;
     vec2_t          last_position;
     vec2_t          render_position;
-    vec2_t          position;
+
+    vec2_t          editor_position;
+
     vec2_t          velocity;
     vec2_t          max_velocity;
 
