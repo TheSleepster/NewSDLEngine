@@ -8,7 +8,7 @@
 
 #define VK_BACKEND_BUFFER_H
 
-CODE_GEN_INGORE_FILE
+CODE_GEN_IGNORE_FILE
 
 #include <vulkan/vulkan.h>
 #include <vk_backend_allocator.h>

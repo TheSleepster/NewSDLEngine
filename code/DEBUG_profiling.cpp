@@ -25,13 +25,15 @@ struct DEBUG_timed_block
     ~DEBUG_timed_block();
 };
 
-DEBUG_timed_block::DEBUG_timed_block(u32 timer_index)
+DEBUG_timed_block::
+DEBUG_timed_block(u32 timer_index)
 {
     begin_cycle_count = rdtscp(&core_ID);
     timer_ID          = timer_index;
 }
 
-DEBUG_timed_block::~DEBUG_timed_block()
+DEBUG_timed_block::
+~DEBUG_timed_block()
 {
     end_cycle_count   = rdtsc();
     delta_cycle_count = AtomicSubtract32(&end_cycle_count, begin_cycle_count);

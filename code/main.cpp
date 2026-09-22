@@ -31,6 +31,8 @@
 #include <s_ui_core.h>
 #include <s_entity.h>
 
+constexpr u32 GAME_MAX_INDICES = 600000;
+
 void process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager);
 
 /*===========================================
@@ -622,7 +624,7 @@ r_init_render_state(render_state_t *render_state)
     render_state->game_renderpass_ID       = RHI_build_renderpass(render_state->RHI_context, &game_renderpass_desc);
     render_state->fullscreen_renderpass_ID = RHI_build_renderpass(render_state->RHI_context, &fullscreen_renderpass_desc);
 
-    u32 *indices = c_arena_push_array(&render_state->RHI_context->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
+    u32 *indices = c_arena_push_array(&render_state->RHI_context->transient_arena, u32, GAME_MAX_INDICES);
     u32  index_offset = 0;
     for(u32 index = 0;
         index < 60000;

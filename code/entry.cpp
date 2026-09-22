@@ -22,7 +22,6 @@
 #include <c_tokenizer.h>
 #include <p_platform_data.h>
 
-#include <vk_backend_core.h>
 #include <s_RHI_image.h>
 #include <s_RHI_core.h>
 

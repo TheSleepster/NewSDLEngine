@@ -25,6 +25,13 @@
 #include <c_dynarray.h>
 #include <c_duration_counter.h>
 
+#if RENDERER_VULKAN
+#include <vk_backend_image.h>
+#include <vk_backend_shader.h>
+#elif RENDERER_HEADLESS
+#include <headless_backend_core.h>
+#endif
+
 #include <s_RHI_image.h>
 
 #define ASSET_CATALOG_MAX_LOOKUPS         (4099)

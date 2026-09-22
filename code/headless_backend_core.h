@@ -110,13 +110,24 @@ typedef struct RHI_pipeline_state
     u32    primitive_type        = RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 }RHI_pipeline_state_t;
 
+CODE_GEN_IGNORE_FILE
+
+typedef struct headless_image
+{
+    bool8 is_valid;
+    void *handle;
+}headless_image_t;
+
 typedef s32 backend_render_context_t;
 typedef s32 backend_command_buffer_t;
 typedef s32 backend_renderpass_handle_t;
 typedef s32 backend_framebuffer_handle_t;
-typedef s32 backend_image_t;
 typedef s32 backend_shader_t;
 typedef s32 backend_buffer_t;
+
+typedef headless_image_t backend_image_t;
+
+global_variable constexpr RHI_pipeline_state_t g_pipeline_default_state_key = {};
 
 #endif // HEADLESS_BACKEND_CORE_H
 

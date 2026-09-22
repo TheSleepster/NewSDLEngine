@@ -139,19 +139,6 @@
 	X(RHI_vertex_buffer_t, &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info) \
 	X(RHI_index_buffer_t, &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info) \
 	X(RHI_uniform_constant_buffer_t, &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info) \
-	X(renderer_effect_application_flags_t, &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info) \
-	X(render_pipeline_blending_mode_t, &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info) \
-	X(render_pipeline_blending_equation_t, &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info) \
-	X(render_pipeline_depth_function_t, &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info) \
-	X(render_pipeline_polygon_mode_t, &DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info) \
-	X(render_pipeline_primitive_type_t, &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info) \
-	X(RHI_pipeline_state_t, &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info) \
-	X(backend_render_context_t, &DEFAULT_typedata_backend_render_context_t) \
-	X(backend_command_buffer_t, &DEFAULT_typedata_backend_command_buffer_t) \
-	X(backend_renderpass_handle_t, &DEFAULT_typedata_backend_renderpass_handle_t) \
-	X(backend_framebuffer_handle_t, &DEFAULT_typedata_backend_framebuffer_handle_t) \
-	X(backend_shader_t, &DEFAULT_typedata_backend_shader_t) \
-	X(backend_buffer_t, &DEFAULT_typedata_backend_buffer_t) \
 	X(global_context_t, &DEFAULT_typedata_structure_global_context_t.type_info) \
 	X(game_state_t, &DEFAULT_typedata_game_state_t) \
 	X(memory_arena_footer_t, &DEFAULT_typedata_structure_memory_arena_footer_t.type_info) \
@@ -196,9 +183,15 @@
 	X(RHI_renderpass_desc_t, &DEFAULT_typedata_structure_RHI_renderpass_desc_t.type_info) \
 	X(RHI_renderpass_key_t, &DEFAULT_typedata_structure_RHI_renderpass_key_t.type_info) \
 	X(RHI_renderpass_t, &DEFAULT_typedata_structure_RHI_renderpass_t.type_info) \
+	X(backend_render_context_t, &DEFAULT_typedata_backend_render_context_t) \
 	X(texture2D_t, &DEFAULT_typedata_structure_texture2D_t.type_info) \
+	X(RHI_pipeline_state_t, &DEFAULT_typedata_RHI_pipeline_state_t) \
+	X(backend_buffer_t, &DEFAULT_typedata_backend_buffer_t) \
 	X(ivec4_t, &DEFAULT_typedata_ivec4_t) \
+	X(backend_command_buffer_t, &DEFAULT_typedata_backend_command_buffer_t) \
 	X(bitmap_format_t, &DEFAULT_typedata_structure_bitmap_format_t.type_info) \
+	X(backend_renderpass_handle_t, &DEFAULT_typedata_backend_renderpass_handle_t) \
+	X(backend_framebuffer_handle_t, &DEFAULT_typedata_backend_framebuffer_handle_t) \
 	X(SDL_Window, &DEFAULT_typedata_SDL_Window) \
 	X(RHI_shader_t, &DEFAULT_typedata_structure_RHI_shader_t.type_info) \
 	X(string_builder_buffer_t, &DEFAULT_typedata_structure_string_builder_buffer_t.type_info) \
@@ -206,16 +199,6 @@
 	X(string_builder_buffer, &DEFAULT_typedata_string_builder_buffer) \
 	X(immediate_vertex_t, &DEFAULT_typedata_immediate_vertex_t) \
 	X(duration_counter_t, &DEFAULT_typedata_structure_duration_counter_t.type_info) \
-	X(VkBuffer, &DEFAULT_typedata_VkBuffer) \
-	X(VkBufferUsageFlags, &DEFAULT_typedata_VkBufferUsageFlags) \
-	X(vulkan_allocation_info_t, &DEFAULT_typedata_vulkan_allocation_info_t) \
-	X(vulkan_buffer_t, &DEFAULT_typedata_vulkan_buffer_t) \
-	X(VkCommandBuffer, &DEFAULT_typedata_VkCommandBuffer) \
-	X(vulkan_context_t, &DEFAULT_typedata_vulkan_context_t) \
-	X(vulkan_allocation_usage_type_t, &DEFAULT_typedata_vulkan_allocation_usage_type_t) \
-	X(vulkan_staging_info_t, &DEFAULT_typedata_structure_vulkan_staging_info_t.type_info) \
-	X(vulkan_staging_buffer_t, &DEFAULT_typedata_structure_vulkan_staging_buffer_t.type_info) \
-	X(VkFence, &DEFAULT_typedata_VkFence) \
 	X(asset_type_t, &DEFAULT_typedata_structure_asset_type_t.type_info) \
 	X(asset_slot_load_status_t, &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info) \
 	X(subtexture_data_t, &DEFAULT_typedata_structure_subtexture_data_t.type_info) \
@@ -236,6 +219,7 @@
 	X(font_manager_t, &DEFAULT_typedata_structure_font_manager_t.type_info) \
 	X(texture_atlas_registry_t, &DEFAULT_typedata_structure_texture_atlas_registry_t.type_info) \
 	X(shader_t, &DEFAULT_typedata_shader_t) \
+	X(backend_shader_t, &DEFAULT_typedata_backend_shader_t) \
 	X(FT_Face, &DEFAULT_typedata_FT_Face) \
 	X(jfd_package_entry_t, &DEFAULT_typedata_jfd_package_entry_t) \
 	X(jfd_file_header_t, &DEFAULT_typedata_jfd_file_header_t) \
@@ -544,19 +528,6 @@
 	X(TYPE_RHI_vertex_buffer_t) \
 	X(TYPE_RHI_index_buffer_t) \
 	X(TYPE_RHI_uniform_constant_buffer_t) \
-	X(TYPE_renderer_effect_application_flags_t) \
-	X(TYPE_render_pipeline_blending_mode_t) \
-	X(TYPE_render_pipeline_blending_equation_t) \
-	X(TYPE_render_pipeline_depth_function_t) \
-	X(TYPE_render_pipeline_polygon_mode_t) \
-	X(TYPE_render_pipeline_primitive_type_t) \
-	X(TYPE_RHI_pipeline_state_t) \
-	X(TYPE_backend_render_context_t) \
-	X(TYPE_backend_command_buffer_t) \
-	X(TYPE_backend_renderpass_handle_t) \
-	X(TYPE_backend_framebuffer_handle_t) \
-	X(TYPE_backend_shader_t) \
-	X(TYPE_backend_buffer_t) \
 	X(TYPE_global_context_t) \
 	X(TYPE_c_global_context_init) \
 	X(TYPE_c_global_context_reset_transient_arena) \
@@ -615,6 +586,7 @@
 	X(TYPE_RHI_renderpass_desc_t) \
 	X(TYPE_RHI_renderpass_key_t) \
 	X(TYPE_RHI_renderpass_t) \
+	X(TYPE_backend_render_context_t) \
 	X(TYPE_RHI_context_init) \
 	X(TYPE_RHI_handle_window_resize) \
 	X(TYPE_RHI_resize_render_targets) \
@@ -651,6 +623,7 @@
 	X(TYPE_RHI_cmd_bind_texture_image) \
 	X(TYPE_RHI_cmd_bind_texture_from_handle) \
 	X(TYPE_RHI_cmd_reset_render_state) \
+	X(TYPE_RHI_pipeline_state_t) \
 	X(TYPE_RHI_cmd_set_render_state) \
 	X(TYPE_RHI_cmd_draw) \
 	X(TYPE_RHI_cmd_draw_indexed) \
@@ -660,9 +633,13 @@
 	X(TYPE_RHI_cmd_present) \
 	X(TYPE_RHI_execute_backend_commands) \
 	X(TYPE_matrices) \
+	X(TYPE_backend_buffer_t) \
 	X(TYPE_ivec4_t) \
 	X(TYPE_dynarray_t) \
+	X(TYPE_backend_command_buffer_t) \
 	X(TYPE_bitmap_format_t) \
+	X(TYPE_backend_renderpass_handle_t) \
+	X(TYPE_backend_framebuffer_handle_t) \
 	X(TYPE_SDL_Window) \
 	X(TYPE_backend_initialize) \
 	X(TYPE_backend_handle_window_resize) \
@@ -741,29 +718,6 @@
 	X(TYPE_c_duration_counter_init) \
 	X(TYPE_c_duration_counter_advance) \
 	X(TYPE_c_duration_counter_reset) \
-	X(TYPE_VkBuffer) \
-	X(TYPE_VkBufferUsageFlags) \
-	X(TYPE_vulkan_allocation_info_t) \
-	X(TYPE_vulkan_buffer_t) \
-	X(TYPE_VkCommandBuffer) \
-	X(TYPE_vk_backend_buffer_copy_buffer) \
-	X(TYPE_vulkan_context_t) \
-	X(TYPE_vk_backend_buffer_copy_data) \
-	X(TYPE_vulkan_allocation_usage_type_t) \
-	X(TYPE_vk_backend_buffer_create) \
-	X(TYPE_vk_backend_buffer_destroy) \
-	X(TYPE_vk_backend_buffer_resize) \
-	X(TYPE_vk_backend_buffer_map) \
-	X(TYPE_vk_backend_buffer_unmap) \
-	X(TYPE_vk_backend_buffer_append_data) \
-	X(TYPE_vk_backend_buffer_reset) \
-	X(TYPE_vulkan_staging_info_t) \
-	X(TYPE_vulkan_staging_buffer_t) \
-	X(TYPE_vk_backend_staging_buffer_create) \
-	X(TYPE_vk_backend_buffer_upload_staged_data) \
-	X(TYPE_vk_backend_buffer_flush_staging_buffer) \
-	X(TYPE_vk_backend_buffer_stage_data) \
-	X(TYPE_VkFence) \
 	X(TYPE_asset_type_t) \
 	X(TYPE_asset_slot_load_status_t) \
 	X(TYPE_subtexture_data_t) \
@@ -807,6 +761,7 @@
 	X(TYPE_s_asset_font_get_string_size) \
 	X(TYPE_s_asset_font_acquire_font_at_size) \
 	X(TYPE_s_asset_font_fetch_glyph) \
+	X(TYPE_backend_shader_t) \
 	X(TYPE_FT_Face) \
 	X(TYPE_jfd_package_entry_t) \
 	X(TYPE_jfd_file_header_t) \
@@ -4606,146 +4561,6 @@ struct type_info_struct_RHI_uniform_constant_buffer_t {
 	};
 };
 
-struct type_info_struct_renderer_effect_application_flags_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[6];
-		struct {
-			const type_info_member_t REAF_None;
-			const type_info_member_t REAF_Bloom;
-			const type_info_member_t REAF_Emmision;
-			const type_info_member_t REAF_Vignette;
-			const type_info_member_t REAF_FilmGrain;
-			const type_info_member_t REAF_Count;
-		}members;
-	};
-};
-
-struct type_info_struct_render_pipeline_blending_mode_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[15];
-		struct {
-			const type_info_member_t RBM_Zero;
-			const type_info_member_t RBM_One;
-			const type_info_member_t RBM_SrcColor;
-			const type_info_member_t RBM_OneMinusSrcColor;
-			const type_info_member_t RBM_DstColor;
-			const type_info_member_t RBM_OneMinusDstColor;
-			const type_info_member_t RBM_SrcAlpha;
-			const type_info_member_t RBM_OneMinusSrcAlpha;
-			const type_info_member_t RBM_DstAlpha;
-			const type_info_member_t RBM_OneMinusDstAlpha;
-			const type_info_member_t RBM_ConstantColor;
-			const type_info_member_t RBM_OneMinusConstantColor;
-			const type_info_member_t RBM_ConstantAlpha;
-			const type_info_member_t RBM_OneMinusConstantAlpha;
-			const type_info_member_t RBM_Count;
-		}members;
-	};
-};
-
-struct type_info_struct_render_pipeline_blending_equation_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[5];
-		struct {
-			const type_info_member_t RBE_Add;
-			const type_info_member_t RBE_Subtract;
-			const type_info_member_t RBE_ReverseSubtract;
-			const type_info_member_t RBE_Min;
-			const type_info_member_t RBE_Max;
-		}members;
-	};
-};
-
-struct type_info_struct_render_pipeline_depth_function_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[8];
-		struct {
-			const type_info_member_t RDF_Never;
-			const type_info_member_t RDF_Less;
-			const type_info_member_t RDF_Equal;
-			const type_info_member_t RDF_LessOrEqual;
-			const type_info_member_t RDF_Greater;
-			const type_info_member_t RDF_NotEqual;
-			const type_info_member_t RDF_GreaterOrEqual;
-			const type_info_member_t RDF_Always;
-		}members;
-	};
-};
-
-struct type_info_struct_render_pipeline_polygon_mode_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[3];
-		struct {
-			const type_info_member_t RENDER_PIPELINE_POLYGON_MODE_FILL;
-			const type_info_member_t RENDER_PIPELINE_POLYGON_MODE_LINE;
-			const type_info_member_t RENDER_PIPELINE_POLYGON_MODE_POINT;
-		}members;
-	};
-};
-
-struct type_info_struct_render_pipeline_primitive_type_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[11];
-		struct {
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_POINT_LIST;
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST;
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP;
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN;
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY;
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY;
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY;
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY;
-			const type_info_member_t RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_PATCH_LIST;
-		}members;
-	};
-};
-
-struct type_info_struct_RHI_pipeline_state_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[15];
-		struct {
-			const type_info_member_t blend_enabled;
-			const type_info_member_t src_color_blend_mode;
-			const type_info_member_t dst_color_blend_mode;
-			const type_info_member_t src_alpha_blend_mode;
-			const type_info_member_t dst_alpha_blend_mode;
-			const type_info_member_t color_blend_op;
-			const type_info_member_t alpha_blend_op;
-			const type_info_member_t depth_testing_enabled;
-			const type_info_member_t depth_writing_enabled;
-			const type_info_member_t depth_func;
-			const type_info_member_t stencil_enabled;
-			const type_info_member_t stencil_state;
-			const type_info_member_t stencil_keep;
-			const type_info_member_t polygon_mode;
-			const type_info_member_t primitive_type;
-		}members;
-	};
-};
-
 struct type_info_struct_global_context_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -7284,235 +7099,6 @@ struct type_info_procedure_c_duration_counter_reset {
 	};
 };
 
-struct type_info_procedure_vk_backend_buffer_copy_buffer {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[6];
-		struct {
-			const type_info_member_t source_buffer;
-			const type_info_member_t destination_buffer;
-			const type_info_member_t scratch_buffer;
-			const type_info_member_t source_offset;
-			const type_info_member_t source_copy_size;
-			const type_info_member_t destination_offset;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_copy_data {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[5];
-		struct {
-			const type_info_member_t vulkan_context;
-			const type_info_member_t buffer;
-			const type_info_member_t data;
-			const type_info_member_t copy_size;
-			const type_info_member_t offset;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_create {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[4];
-		struct {
-			const type_info_member_t vulkan_context;
-			const type_info_member_t buffer_size;
-			const type_info_member_t usage_flags;
-			const type_info_member_t usage_type;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_destroy {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t vulkan_context;
-			const type_info_member_t buffer;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_resize {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[4];
-		struct {
-			const type_info_member_t vulkan_context;
-			const type_info_member_t buffer;
-			const type_info_member_t command_buffer;
-			const type_info_member_t new_size;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_map {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[4];
-		struct {
-			const type_info_member_t vulkan_context;
-			const type_info_member_t buffer;
-			const type_info_member_t offset;
-			const type_info_member_t size;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_unmap {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t vulkan_context;
-			const type_info_member_t buffer;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_append_data {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[3];
-		struct {
-			const type_info_member_t buffer;
-			const type_info_member_t data;
-			const type_info_member_t size;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_reset {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[1];
-		struct {
-			const type_info_member_t buffer;
-		}arguments;
-	};
-};
-
-struct type_info_struct_vulkan_staging_info_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[4];
-		struct {
-			const type_info_member_t target_buffer;
-			const type_info_member_t upload_size;
-			const type_info_member_t target_offset;
-			const type_info_member_t staging_buffer_offset;
-		}members;
-	};
-};
-
-struct type_info_struct_vulkan_staging_buffer_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[3];
-		struct {
-			const type_info_member_t buffer;
-			const type_info_member_t submitted;
-			const type_info_member_t upload_complete_fence;
-		}members;
-	};
-};
-
-struct type_info_procedure_vk_backend_staging_buffer_create {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[4];
-		struct {
-			const type_info_member_t vulkan_context;
-			const type_info_member_t size;
-			const type_info_member_t usage_flags;
-			const type_info_member_t memory_type;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_upload_staged_data {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[3];
-		struct {
-			const type_info_member_t vulkan_context;
-			const type_info_member_t command_buffer;
-			const type_info_member_t target_buffer;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_flush_staging_buffer {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[2];
-		struct {
-			const type_info_member_t vulkan_context;
-			const type_info_member_t command_buffer;
-		}arguments;
-	};
-};
-
-struct type_info_procedure_vk_backend_buffer_stage_data {
-	const type_info_t  type_info;
-	const unsigned int argument_count;
-	const type_info_t *return_type;
-	const type_info_member_t *argument_pointer;
-	union {
-		type_info_member_t argument_array[4];
-		struct {
-			const type_info_member_t vulkan_context;
-			const type_info_member_t data;
-			const type_info_member_t data_size;
-			const type_info_member_t target_buffer;
-		}arguments;
-	};
-};
-
 struct type_info_struct_asset_type_t {
 	const type_info_t  type_info;
 	const unsigned int member_count;
@@ -8720,19 +8306,6 @@ extern const type_info_struct_camera_matrices_t DEFAULT_typedata_structure_camer
 extern const type_info_struct_RHI_vertex_buffer_t DEFAULT_typedata_structure_RHI_vertex_buffer_t;
 extern const type_info_struct_RHI_index_buffer_t DEFAULT_typedata_structure_RHI_index_buffer_t;
 extern const type_info_struct_RHI_uniform_constant_buffer_t DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t;
-extern const type_info_struct_renderer_effect_application_flags_t DEFAULT_typedata_structure_renderer_effect_application_flags_t;
-extern const type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_structure_render_pipeline_blending_mode_t;
-extern const type_info_struct_render_pipeline_blending_equation_t DEFAULT_typedata_structure_render_pipeline_blending_equation_t;
-extern const type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_structure_render_pipeline_depth_function_t;
-extern const type_info_struct_render_pipeline_polygon_mode_t DEFAULT_typedata_structure_render_pipeline_polygon_mode_t;
-extern const type_info_struct_render_pipeline_primitive_type_t DEFAULT_typedata_structure_render_pipeline_primitive_type_t;
-extern const type_info_struct_RHI_pipeline_state_t DEFAULT_typedata_structure_RHI_pipeline_state_t;
-extern const type_info_t DEFAULT_typedata_backend_render_context_t;
-extern const type_info_t DEFAULT_typedata_backend_command_buffer_t;
-extern const type_info_t DEFAULT_typedata_backend_renderpass_handle_t;
-extern const type_info_t DEFAULT_typedata_backend_framebuffer_handle_t;
-extern const type_info_t DEFAULT_typedata_backend_shader_t;
-extern const type_info_t DEFAULT_typedata_backend_buffer_t;
 extern const type_info_struct_global_context_t DEFAULT_typedata_structure_global_context_t;
 extern const type_info_procedure_c_global_context_init DEFAULT_typedata_procedure_c_global_context_init;
 extern const type_info_procedure_c_global_context_reset_transient_arena DEFAULT_typedata_procedure_c_global_context_reset_transient_arena;
@@ -8791,6 +8364,7 @@ extern const type_info_struct_RHI_renderpass_attachment_t DEFAULT_typedata_struc
 extern const type_info_struct_RHI_renderpass_desc_t DEFAULT_typedata_structure_RHI_renderpass_desc_t;
 extern const type_info_struct_RHI_renderpass_key_t DEFAULT_typedata_structure_RHI_renderpass_key_t;
 extern const type_info_struct_RHI_renderpass_t DEFAULT_typedata_structure_RHI_renderpass_t;
+extern const type_info_t DEFAULT_typedata_backend_render_context_t;
 extern const type_info_procedure_RHI_context_init DEFAULT_typedata_procedure_RHI_context_init;
 extern const type_info_procedure_RHI_handle_window_resize DEFAULT_typedata_procedure_RHI_handle_window_resize;
 extern const type_info_procedure_RHI_resize_render_targets DEFAULT_typedata_procedure_RHI_resize_render_targets;
@@ -8824,6 +8398,7 @@ extern const type_info_procedure_RHI_cmd_update_constant_buffer DEFAULT_typedata
 extern const type_info_procedure_RHI_cmd_bind_texture_image DEFAULT_typedata_procedure_RHI_cmd_bind_texture_image;
 extern const type_info_procedure_RHI_cmd_bind_texture_from_handle DEFAULT_typedata_procedure_RHI_cmd_bind_texture_from_handle;
 extern const type_info_procedure_RHI_cmd_reset_render_state DEFAULT_typedata_procedure_RHI_cmd_reset_render_state;
+extern const type_info_t DEFAULT_typedata_RHI_pipeline_state_t;
 extern const type_info_procedure_RHI_cmd_set_render_state DEFAULT_typedata_procedure_RHI_cmd_set_render_state;
 extern const type_info_procedure_RHI_cmd_draw DEFAULT_typedata_procedure_RHI_cmd_draw;
 extern const type_info_procedure_RHI_cmd_draw_indexed DEFAULT_typedata_procedure_RHI_cmd_draw_indexed;
@@ -8832,9 +8407,13 @@ extern const type_info_procedure_RHI_cmd_blit_image DEFAULT_typedata_procedure_R
 extern const type_info_procedure_RHI_cmd_blit_renderpass DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass;
 extern const type_info_procedure_RHI_cmd_present DEFAULT_typedata_procedure_RHI_cmd_present;
 extern const type_info_procedure_RHI_execute_backend_commands DEFAULT_typedata_procedure_RHI_execute_backend_commands;
+extern const type_info_t DEFAULT_typedata_backend_buffer_t;
 extern const type_info_t DEFAULT_typedata_ivec4_t;
 extern const type_info_t DEFAULT_typedata_dynarray_t;
+extern const type_info_t DEFAULT_typedata_backend_command_buffer_t;
 extern const type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_format_t;
+extern const type_info_t DEFAULT_typedata_backend_renderpass_handle_t;
+extern const type_info_t DEFAULT_typedata_backend_framebuffer_handle_t;
 extern const type_info_t DEFAULT_typedata_SDL_Window;
 extern const type_info_procedure_backend_initialize DEFAULT_typedata_procedure_backend_initialize;
 extern const type_info_procedure_backend_handle_window_resize DEFAULT_typedata_procedure_backend_handle_window_resize;
@@ -8913,29 +8492,6 @@ extern const type_info_struct_duration_counter_t DEFAULT_typedata_structure_dura
 extern const type_info_procedure_c_duration_counter_init DEFAULT_typedata_procedure_c_duration_counter_init;
 extern const type_info_procedure_c_duration_counter_advance DEFAULT_typedata_procedure_c_duration_counter_advance;
 extern const type_info_procedure_c_duration_counter_reset DEFAULT_typedata_procedure_c_duration_counter_reset;
-extern const type_info_t DEFAULT_typedata_VkBuffer;
-extern const type_info_t DEFAULT_typedata_VkBufferUsageFlags;
-extern const type_info_t DEFAULT_typedata_vulkan_allocation_info_t;
-extern const type_info_t DEFAULT_typedata_vulkan_buffer_t;
-extern const type_info_t DEFAULT_typedata_VkCommandBuffer;
-extern const type_info_procedure_vk_backend_buffer_copy_buffer DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer;
-extern const type_info_t DEFAULT_typedata_vulkan_context_t;
-extern const type_info_procedure_vk_backend_buffer_copy_data DEFAULT_typedata_procedure_vk_backend_buffer_copy_data;
-extern const type_info_t DEFAULT_typedata_vulkan_allocation_usage_type_t;
-extern const type_info_procedure_vk_backend_buffer_create DEFAULT_typedata_procedure_vk_backend_buffer_create;
-extern const type_info_procedure_vk_backend_buffer_destroy DEFAULT_typedata_procedure_vk_backend_buffer_destroy;
-extern const type_info_procedure_vk_backend_buffer_resize DEFAULT_typedata_procedure_vk_backend_buffer_resize;
-extern const type_info_procedure_vk_backend_buffer_map DEFAULT_typedata_procedure_vk_backend_buffer_map;
-extern const type_info_procedure_vk_backend_buffer_unmap DEFAULT_typedata_procedure_vk_backend_buffer_unmap;
-extern const type_info_procedure_vk_backend_buffer_append_data DEFAULT_typedata_procedure_vk_backend_buffer_append_data;
-extern const type_info_procedure_vk_backend_buffer_reset DEFAULT_typedata_procedure_vk_backend_buffer_reset;
-extern const type_info_struct_vulkan_staging_info_t DEFAULT_typedata_structure_vulkan_staging_info_t;
-extern const type_info_struct_vulkan_staging_buffer_t DEFAULT_typedata_structure_vulkan_staging_buffer_t;
-extern const type_info_procedure_vk_backend_staging_buffer_create DEFAULT_typedata_procedure_vk_backend_staging_buffer_create;
-extern const type_info_procedure_vk_backend_buffer_upload_staged_data DEFAULT_typedata_procedure_vk_backend_buffer_upload_staged_data;
-extern const type_info_procedure_vk_backend_buffer_flush_staging_buffer DEFAULT_typedata_procedure_vk_backend_buffer_flush_staging_buffer;
-extern const type_info_procedure_vk_backend_buffer_stage_data DEFAULT_typedata_procedure_vk_backend_buffer_stage_data;
-extern const type_info_t DEFAULT_typedata_VkFence;
 extern const type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t;
 extern const type_info_struct_asset_slot_load_status_t DEFAULT_typedata_structure_asset_slot_load_status_t;
 extern const type_info_struct_subtexture_data_t DEFAULT_typedata_structure_subtexture_data_t;
@@ -8979,6 +8535,7 @@ extern const type_info_procedure_s_asset_get_material_instance_from_handle DEFAU
 extern const type_info_procedure_s_asset_font_get_string_size DEFAULT_typedata_procedure_s_asset_font_get_string_size;
 extern const type_info_procedure_s_asset_font_acquire_font_at_size DEFAULT_typedata_procedure_s_asset_font_acquire_font_at_size;
 extern const type_info_procedure_s_asset_font_fetch_glyph DEFAULT_typedata_procedure_s_asset_font_fetch_glyph;
+extern const type_info_t DEFAULT_typedata_backend_shader_t;
 extern const type_info_t DEFAULT_typedata_FT_Face;
 extern const type_info_t DEFAULT_typedata_jfd_package_entry_t;
 extern const type_info_t DEFAULT_typedata_jfd_file_header_t;
@@ -18428,7 +17985,7 @@ constexpr type_info_struct_RHI_command_list_t DEFAULT_typedata_structure_RHI_com
 			.pointer_depth = 0,
 		},
 		.active_render_state = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.type_info     = &DEFAULT_typedata_RHI_pipeline_state_t,
 			.member_name   = "active_render_state",
 			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 			.offset        = offsetof(RHI_command_list_t, active_render_state),
@@ -19789,835 +19346,6 @@ constexpr type_info_struct_RHI_uniform_constant_buffer_t DEFAULT_typedata_struct
 	},
 };
 
-constexpr type_info_struct_renderer_effect_application_flags_t DEFAULT_typedata_structure_renderer_effect_application_flags_t = {
-	.type_info = {
-		.type_name = "renderer_effect_application_flags_t",
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.type_id = TYPE_renderer_effect_application_flags_t,
-		.size = athena_internal::safe_sizeof<renderer_effect_application_flags_t>(),
-	},
-	.member_count   = 6,
-	.member_pointer = DEFAULT_typedata_structure_renderer_effect_application_flags_t.member_array,
-	.members = {
-		.REAF_None = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.member_name   = "REAF_None",
-			.parent        = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = REAF_None,
-			},
-		},
-		.REAF_Bloom = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.member_name   = "REAF_Bloom",
-			.parent        = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = REAF_Bloom,
-			},
-		},
-		.REAF_Emmision = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.member_name   = "REAF_Emmision",
-			.parent        = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = REAF_Emmision,
-			},
-		},
-		.REAF_Vignette = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.member_name   = "REAF_Vignette",
-			.parent        = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = REAF_Vignette,
-			},
-		},
-		.REAF_FilmGrain = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.member_name   = "REAF_FilmGrain",
-			.parent        = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = REAF_FilmGrain,
-			},
-		},
-		.REAF_Count = {
-			.type_info     = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.member_name   = "REAF_Count",
-			.parent        = &DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = REAF_Count,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_render_pipeline_blending_mode_t DEFAULT_typedata_structure_render_pipeline_blending_mode_t = {
-	.type_info = {
-		.type_name = "render_pipeline_blending_mode_t",
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.type_id = TYPE_render_pipeline_blending_mode_t,
-		.size = athena_internal::safe_sizeof<render_pipeline_blending_mode_t>(),
-	},
-	.member_count   = 15,
-	.member_pointer = DEFAULT_typedata_structure_render_pipeline_blending_mode_t.member_array,
-	.members = {
-		.RBM_Zero = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_Zero",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 0,
-			},
-		},
-		.RBM_One = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_One",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.RBM_SrcColor = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_SrcColor",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 2,
-			},
-		},
-		.RBM_OneMinusSrcColor = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_OneMinusSrcColor",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 3,
-			},
-		},
-		.RBM_DstColor = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_DstColor",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 4,
-			},
-		},
-		.RBM_OneMinusDstColor = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_OneMinusDstColor",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 5,
-			},
-		},
-		.RBM_SrcAlpha = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_SrcAlpha",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 6,
-			},
-		},
-		.RBM_OneMinusSrcAlpha = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_OneMinusSrcAlpha",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 7,
-			},
-		},
-		.RBM_DstAlpha = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_DstAlpha",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 8,
-			},
-		},
-		.RBM_OneMinusDstAlpha = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_OneMinusDstAlpha",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 9,
-			},
-		},
-		.RBM_ConstantColor = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_ConstantColor",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 10,
-			},
-		},
-		.RBM_OneMinusConstantColor = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_OneMinusConstantColor",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 11,
-			},
-		},
-		.RBM_ConstantAlpha = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_ConstantAlpha",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 12,
-			},
-		},
-		.RBM_OneMinusConstantAlpha = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_OneMinusConstantAlpha",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 13,
-			},
-		},
-		.RBM_Count = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.member_name   = "RBM_Count",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type  = 2,
-				.int64 = RBM_Count,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_render_pipeline_blending_equation_t DEFAULT_typedata_structure_render_pipeline_blending_equation_t = {
-	.type_info = {
-		.type_name = "render_pipeline_blending_equation_t",
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.type_id = TYPE_render_pipeline_blending_equation_t,
-		.size = athena_internal::safe_sizeof<render_pipeline_blending_equation_t>(),
-	},
-	.member_count   = 5,
-	.member_pointer = DEFAULT_typedata_structure_render_pipeline_blending_equation_t.member_array,
-	.members = {
-		.RBE_Add = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-			.member_name   = "RBE_Add",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 0,
-			},
-		},
-		.RBE_Subtract = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-			.member_name   = "RBE_Subtract",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.RBE_ReverseSubtract = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-			.member_name   = "RBE_ReverseSubtract",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 2,
-			},
-		},
-		.RBE_Min = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-			.member_name   = "RBE_Min",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 3,
-			},
-		},
-		.RBE_Max = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-			.member_name   = "RBE_Max",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 4,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_render_pipeline_depth_function_t DEFAULT_typedata_structure_render_pipeline_depth_function_t = {
-	.type_info = {
-		.type_name = "render_pipeline_depth_function_t",
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.type_id = TYPE_render_pipeline_depth_function_t,
-		.size = athena_internal::safe_sizeof<render_pipeline_depth_function_t>(),
-	},
-	.member_count   = 8,
-	.member_pointer = DEFAULT_typedata_structure_render_pipeline_depth_function_t.member_array,
-	.members = {
-		.RDF_Never = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.member_name   = "RDF_Never",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 0,
-			},
-		},
-		.RDF_Less = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.member_name   = "RDF_Less",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.RDF_Equal = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.member_name   = "RDF_Equal",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 2,
-			},
-		},
-		.RDF_LessOrEqual = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.member_name   = "RDF_LessOrEqual",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 3,
-			},
-		},
-		.RDF_Greater = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.member_name   = "RDF_Greater",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 4,
-			},
-		},
-		.RDF_NotEqual = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.member_name   = "RDF_NotEqual",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 5,
-			},
-		},
-		.RDF_GreaterOrEqual = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.member_name   = "RDF_GreaterOrEqual",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 6,
-			},
-		},
-		.RDF_Always = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.member_name   = "RDF_Always",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 7,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_render_pipeline_polygon_mode_t DEFAULT_typedata_structure_render_pipeline_polygon_mode_t = {
-	.type_info = {
-		.type_name = "render_pipeline_polygon_mode_t",
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.type_id = TYPE_render_pipeline_polygon_mode_t,
-		.size = athena_internal::safe_sizeof<render_pipeline_polygon_mode_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.member_array,
-	.members = {
-		.RENDER_PIPELINE_POLYGON_MODE_FILL = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info,
-			.member_name   = "RENDER_PIPELINE_POLYGON_MODE_FILL",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 0,
-			},
-		},
-		.RENDER_PIPELINE_POLYGON_MODE_LINE = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info,
-			.member_name   = "RENDER_PIPELINE_POLYGON_MODE_LINE",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.RENDER_PIPELINE_POLYGON_MODE_POINT = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info,
-			.member_name   = "RENDER_PIPELINE_POLYGON_MODE_POINT",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 2,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_render_pipeline_primitive_type_t DEFAULT_typedata_structure_render_pipeline_primitive_type_t = {
-	.type_info = {
-		.type_name = "render_pipeline_primitive_type_t",
-		.metatype  = ATHENA_METATYPE_ENUM,
-		.type_id = TYPE_render_pipeline_primitive_type_t,
-		.size = athena_internal::safe_sizeof<render_pipeline_primitive_type_t>(),
-	},
-	.member_count   = 11,
-	.member_pointer = DEFAULT_typedata_structure_render_pipeline_primitive_type_t.member_array,
-	.members = {
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_POINT_LIST = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_POINT_LIST",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 0,
-			},
-		},
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 2,
-			},
-		},
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 3,
-			},
-		},
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 4,
-			},
-		},
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 5,
-			},
-		},
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 6,
-			},
-		},
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 7,
-			},
-		},
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 8,
-			},
-		},
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 9,
-			},
-		},
-		.RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_PATCH_LIST = {
-			.type_info     = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.member_name   = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_PATCH_LIST",
-			.parent        = &DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 10,
-			},
-		},
-	},
-};
-
-constexpr type_info_struct_RHI_pipeline_state_t DEFAULT_typedata_structure_RHI_pipeline_state_t = {
-	.type_info = {
-		.type_name = "RHI_pipeline_state_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.type_id = TYPE_RHI_pipeline_state_t,
-		.size = athena_internal::safe_sizeof<RHI_pipeline_state_t>(),
-	},
-	.member_count   = 15,
-	.member_pointer = DEFAULT_typedata_structure_RHI_pipeline_state_t.member_array,
-	.members = {
-		.blend_enabled = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "blend_enabled",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, blend_enabled),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.src_color_blend_mode = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "src_color_blend_mode",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, src_color_blend_mode),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 7,
-				.string = "RBM_SrcAlpha",
-			},
-		},
-		.dst_color_blend_mode = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "dst_color_blend_mode",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, dst_color_blend_mode),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 7,
-				.string = "RBM_OneMinusSrcAlpha",
-			},
-		},
-		.src_alpha_blend_mode = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "src_alpha_blend_mode",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, src_alpha_blend_mode),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 7,
-				.string = "RBM_One",
-			},
-		},
-		.dst_alpha_blend_mode = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "dst_alpha_blend_mode",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, dst_alpha_blend_mode),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 7,
-				.string = "RBM_Zero",
-			},
-		},
-		.color_blend_op = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "color_blend_op",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, color_blend_op),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 7,
-				.string = "RBE_Add",
-			},
-		},
-		.alpha_blend_op = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "alpha_blend_op",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, alpha_blend_op),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 7,
-				.string = "RBE_Add",
-			},
-		},
-		.depth_testing_enabled = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "depth_testing_enabled",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, depth_testing_enabled),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.depth_writing_enabled = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "depth_writing_enabled",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, depth_writing_enabled),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 1,
-			},
-		},
-		.depth_func = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "depth_func",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, depth_func),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 7,
-				.string = "RDF_Less",
-			},
-		},
-		.stencil_enabled = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "stencil_enabled",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, stencil_enabled),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 0,
-			},
-		},
-		.stencil_state = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "stencil_state",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, stencil_state),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 0,
-			},
-		},
-		.stencil_keep = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "stencil_keep",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, stencil_keep),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 3,
-				.u64 = 0,
-			},
-		},
-		.polygon_mode = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "polygon_mode",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, polygon_mode),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 7,
-				.string = "RENDER_PIPELINE_POLYGON_MODE_FILL",
-			},
-		},
-		.primitive_type = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "primitive_type",
-			.parent        = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
-			.offset        = offsetof(RHI_pipeline_state_t, primitive_type),
-			.flags         = 0,
-			.pointer_depth = 0,
-			.value = {
-				.type = 7,
-				.string = "RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST",
-			},
-		},
-	},
-};
-
-constexpr type_info_t DEFAULT_typedata_backend_render_context_t = {
-	.type_name = "backend_render_context_t",
-	.type_id = TYPE_backend_render_context_t,
-	.size = athena_internal::safe_sizeof<backend_render_context_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_backend_command_buffer_t = {
-	.type_name = "backend_command_buffer_t",
-	.type_id = TYPE_backend_command_buffer_t,
-	.size = athena_internal::safe_sizeof<backend_command_buffer_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_backend_renderpass_handle_t = {
-	.type_name = "backend_renderpass_handle_t",
-	.type_id = TYPE_backend_renderpass_handle_t,
-	.size = athena_internal::safe_sizeof<backend_renderpass_handle_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_backend_framebuffer_handle_t = {
-	.type_name = "backend_framebuffer_handle_t",
-	.type_id = TYPE_backend_framebuffer_handle_t,
-	.size = athena_internal::safe_sizeof<backend_framebuffer_handle_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_backend_shader_t = {
-	.type_name = "backend_shader_t",
-	.type_id = TYPE_backend_shader_t,
-	.size = athena_internal::safe_sizeof<backend_shader_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_backend_buffer_t = {
-	.type_name = "backend_buffer_t",
-	.type_id = TYPE_backend_buffer_t,
-	.size = athena_internal::safe_sizeof<backend_buffer_t>(),
-};
 constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_context_t = {
 	.type_info = {
 		.type_name = "global_context_t",
@@ -22313,7 +21041,7 @@ constexpr type_info_struct_RHI_command_set_pipeline_state_t DEFAULT_typedata_str
 	.member_pointer = DEFAULT_typedata_structure_RHI_command_set_pipeline_state_t.member_array,
 	.members = {
 		.pipeline_state = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.type_info     = &DEFAULT_typedata_RHI_pipeline_state_t,
 			.member_name   = "pipeline_state",
 			.parent        = &DEFAULT_typedata_structure_RHI_command_set_pipeline_state_t.type_info,
 			.offset        = offsetof(RHI_command_set_pipeline_state_t, pipeline_state),
@@ -22992,6 +21720,11 @@ constexpr type_info_struct_RHI_renderpass_t DEFAULT_typedata_structure_RHI_rende
 	},
 };
 
+constexpr type_info_t DEFAULT_typedata_backend_render_context_t = {
+	.type_name = "backend_render_context_t",
+	.type_id = TYPE_backend_render_context_t,
+	.size = athena_internal::safe_sizeof<backend_render_context_t>(),
+};
 constexpr type_info_procedure_RHI_context_init DEFAULT_typedata_procedure_RHI_context_init = {
 	.type_info = {
 		.type_name = "RHI_context_init",
@@ -23952,6 +22685,11 @@ constexpr type_info_procedure_RHI_cmd_reset_render_state DEFAULT_typedata_proced
 		},
 	},
 };
+constexpr type_info_t DEFAULT_typedata_RHI_pipeline_state_t = {
+	.type_name = "RHI_pipeline_state_t",
+	.type_id = TYPE_RHI_pipeline_state_t,
+	.size = athena_internal::safe_sizeof<RHI_pipeline_state_t>(),
+};
 constexpr type_info_procedure_RHI_cmd_set_render_state DEFAULT_typedata_procedure_RHI_cmd_set_render_state = {
 	.type_info = {
 		.type_name = "RHI_cmd_set_render_state",
@@ -23970,7 +22708,7 @@ constexpr type_info_procedure_RHI_cmd_set_render_state DEFAULT_typedata_procedur
 			.pointer_depth = 1,
 		},
 		.render_pipeline_state = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.type_info     = &DEFAULT_typedata_RHI_pipeline_state_t,
 			.member_name   = "render_pipeline_state",
 			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_set_render_state.type_info,
 			.flags         = 2,
@@ -24258,10 +22996,20 @@ constexpr type_info_procedure_RHI_execute_backend_commands DEFAULT_typedata_proc
 		},
 	},
 };
+constexpr type_info_t DEFAULT_typedata_backend_buffer_t = {
+	.type_name = "backend_buffer_t",
+	.type_id = TYPE_backend_buffer_t,
+	.size = athena_internal::safe_sizeof<backend_buffer_t>(),
+};
 constexpr type_info_t DEFAULT_typedata_ivec4_t = {
 	.type_name = "ivec4_t",
 	.type_id = TYPE_ivec4_t,
 	.size = athena_internal::safe_sizeof<ivec4_t>(),
+};
+constexpr type_info_t DEFAULT_typedata_backend_command_buffer_t = {
+	.type_name = "backend_command_buffer_t",
+	.type_id = TYPE_backend_command_buffer_t,
+	.size = athena_internal::safe_sizeof<backend_command_buffer_t>(),
 };
 constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_format_t = {
 	.type_info = {
@@ -24419,6 +23167,16 @@ constexpr type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_for
 	},
 };
 
+constexpr type_info_t DEFAULT_typedata_backend_renderpass_handle_t = {
+	.type_name = "backend_renderpass_handle_t",
+	.type_id = TYPE_backend_renderpass_handle_t,
+	.size = athena_internal::safe_sizeof<backend_renderpass_handle_t>(),
+};
+constexpr type_info_t DEFAULT_typedata_backend_framebuffer_handle_t = {
+	.type_name = "backend_framebuffer_handle_t",
+	.type_id = TYPE_backend_framebuffer_handle_t,
+	.size = athena_internal::safe_sizeof<backend_framebuffer_handle_t>(),
+};
 constexpr type_info_t DEFAULT_typedata_SDL_Window = {
 	.type_name = "SDL_Window",
 	.type_id = TYPE_SDL_Window,
@@ -26548,592 +25306,6 @@ constexpr type_info_procedure_c_duration_counter_reset DEFAULT_typedata_procedur
 		},
 	},
 };
-constexpr type_info_t DEFAULT_typedata_VkBuffer = {
-	.type_name = "VkBuffer",
-	.type_id = TYPE_VkBuffer,
-	.size = athena_internal::safe_sizeof<VkBuffer>(),
-};
-constexpr type_info_t DEFAULT_typedata_VkBufferUsageFlags = {
-	.type_name = "VkBufferUsageFlags",
-	.type_id = TYPE_VkBufferUsageFlags,
-	.size = athena_internal::safe_sizeof<VkBufferUsageFlags>(),
-};
-constexpr type_info_t DEFAULT_typedata_vulkan_allocation_info_t = {
-	.type_name = "vulkan_allocation_info_t",
-	.type_id = TYPE_vulkan_allocation_info_t,
-	.size = athena_internal::safe_sizeof<vulkan_allocation_info_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_vulkan_buffer_t = {
-	.type_name = "vulkan_buffer_t",
-	.type_id = TYPE_vulkan_buffer_t,
-	.size = athena_internal::safe_sizeof<vulkan_buffer_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_VkCommandBuffer = {
-	.type_name = "VkCommandBuffer",
-	.type_id = TYPE_VkCommandBuffer,
-	.size = athena_internal::safe_sizeof<VkCommandBuffer>(),
-};
-constexpr type_info_procedure_vk_backend_buffer_copy_buffer DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_copy_buffer",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_copy_buffer,
-	},
-	.argument_count = 6,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer.argument_array,
-	.arguments = {
-		.source_buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "source_buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.destination_buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "destination_buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.scratch_buffer = {
-			.type_info     = &DEFAULT_typedata_VkCommandBuffer,
-			.member_name   = "scratch_buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.source_offset = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "source_offset",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.source_copy_size = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "source_copy_size",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.destination_offset = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "destination_offset",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_t DEFAULT_typedata_vulkan_context_t = {
-	.type_name = "vulkan_context_t",
-	.type_id = TYPE_vulkan_context_t,
-	.size = athena_internal::safe_sizeof<vulkan_context_t>(),
-};
-constexpr type_info_procedure_vk_backend_buffer_copy_data DEFAULT_typedata_procedure_vk_backend_buffer_copy_data = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_copy_data",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_copy_data,
-	},
-	.argument_count = 5,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_copy_data.argument_array,
-	.arguments = {
-		.vulkan_context = {
-			.type_info     = &DEFAULT_typedata_vulkan_context_t,
-			.member_name   = "vulkan_context",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.data = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.copy_size = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "copy_size",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_data.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.offset = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_copy_data.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_t DEFAULT_typedata_vulkan_allocation_usage_type_t = {
-	.type_name = "vulkan_allocation_usage_type_t",
-	.type_id = TYPE_vulkan_allocation_usage_type_t,
-	.size = athena_internal::safe_sizeof<vulkan_allocation_usage_type_t>(),
-};
-constexpr type_info_procedure_vk_backend_buffer_create DEFAULT_typedata_procedure_vk_backend_buffer_create = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_create",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_create,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_vulkan_buffer_t,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_create.argument_array,
-	.arguments = {
-		.vulkan_context = {
-			.type_info     = &DEFAULT_typedata_vulkan_context_t,
-			.member_name   = "vulkan_context",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_create.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer_size = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "buffer_size",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_create.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.usage_flags = {
-			.type_info     = &DEFAULT_typedata_VkBufferUsageFlags,
-			.member_name   = "usage_flags",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_create.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.usage_type = {
-			.type_info     = &DEFAULT_typedata_vulkan_allocation_usage_type_t,
-			.member_name   = "usage_type",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_create.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_vk_backend_buffer_destroy DEFAULT_typedata_procedure_vk_backend_buffer_destroy = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_destroy",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_destroy,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_destroy.argument_array,
-	.arguments = {
-		.vulkan_context = {
-			.type_info     = &DEFAULT_typedata_vulkan_context_t,
-			.member_name   = "vulkan_context",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_destroy.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_destroy.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_vk_backend_buffer_resize DEFAULT_typedata_procedure_vk_backend_buffer_resize = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_resize",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_resize,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_resize.argument_array,
-	.arguments = {
-		.vulkan_context = {
-			.type_info     = &DEFAULT_typedata_vulkan_context_t,
-			.member_name   = "vulkan_context",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_resize.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_resize.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.command_buffer = {
-			.type_info     = &DEFAULT_typedata_VkCommandBuffer,
-			.member_name   = "command_buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_resize.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.new_size = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "new_size",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_resize.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_vk_backend_buffer_map DEFAULT_typedata_procedure_vk_backend_buffer_map = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_map",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_map,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_map.argument_array,
-	.arguments = {
-		.vulkan_context = {
-			.type_info     = &DEFAULT_typedata_vulkan_context_t,
-			.member_name   = "vulkan_context",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_map.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_map.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.offset = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "offset",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_map.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_map.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_vk_backend_buffer_unmap DEFAULT_typedata_procedure_vk_backend_buffer_unmap = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_unmap",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_unmap,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_unmap.argument_array,
-	.arguments = {
-		.vulkan_context = {
-			.type_info     = &DEFAULT_typedata_vulkan_context_t,
-			.member_name   = "vulkan_context",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_unmap.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_unmap.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_vk_backend_buffer_append_data DEFAULT_typedata_procedure_vk_backend_buffer_append_data = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_append_data",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_append_data,
-	},
-	.argument_count = 3,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_append_data.argument_array,
-	.arguments = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_append_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.data = {
-			.type_info     = &DEFAULT_typedata_void,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_append_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_append_data.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_vk_backend_buffer_reset DEFAULT_typedata_procedure_vk_backend_buffer_reset = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_reset",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_reset,
-	},
-	.argument_count = 1,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_reset.argument_array,
-	.arguments = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_reset.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_struct_vulkan_staging_info_t DEFAULT_typedata_structure_vulkan_staging_info_t = {
-	.type_info = {
-		.type_name = "vulkan_staging_info_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.type_id = TYPE_vulkan_staging_info_t,
-		.size = athena_internal::safe_sizeof<vulkan_staging_info_t>(),
-	},
-	.member_count   = 4,
-	.member_pointer = DEFAULT_typedata_structure_vulkan_staging_info_t.member_array,
-	.members = {
-		.target_buffer = {
-			.type_info     = &DEFAULT_typedata_VkBuffer,
-			.member_name   = "target_buffer",
-			.parent        = &DEFAULT_typedata_structure_vulkan_staging_info_t.type_info,
-			.offset        = offsetof(vulkan_staging_info_t, target_buffer),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.upload_size = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "upload_size",
-			.parent        = &DEFAULT_typedata_structure_vulkan_staging_info_t.type_info,
-			.offset        = offsetof(vulkan_staging_info_t, upload_size),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.target_offset = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "target_offset",
-			.parent        = &DEFAULT_typedata_structure_vulkan_staging_info_t.type_info,
-			.offset        = offsetof(vulkan_staging_info_t, target_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.staging_buffer_offset = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "staging_buffer_offset",
-			.parent        = &DEFAULT_typedata_structure_vulkan_staging_info_t.type_info,
-			.offset        = offsetof(vulkan_staging_info_t, staging_buffer_offset),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_struct_vulkan_staging_buffer_t DEFAULT_typedata_structure_vulkan_staging_buffer_t = {
-	.type_info = {
-		.type_name = "vulkan_staging_buffer_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.type_id = TYPE_vulkan_staging_buffer_t,
-		.size = athena_internal::safe_sizeof<vulkan_staging_buffer_t>(),
-	},
-	.member_count   = 3,
-	.member_pointer = DEFAULT_typedata_structure_vulkan_staging_buffer_t.member_array,
-	.members = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "buffer",
-			.parent        = &DEFAULT_typedata_structure_vulkan_staging_buffer_t.type_info,
-			.offset        = offsetof(vulkan_staging_buffer_t, buffer),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.submitted = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "submitted",
-			.parent        = &DEFAULT_typedata_structure_vulkan_staging_buffer_t.type_info,
-			.offset        = offsetof(vulkan_staging_buffer_t, submitted),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.upload_complete_fence = {
-			.type_info     = &DEFAULT_typedata_VkFence,
-			.member_name   = "upload_complete_fence",
-			.parent        = &DEFAULT_typedata_structure_vulkan_staging_buffer_t.type_info,
-			.offset        = offsetof(vulkan_staging_buffer_t, upload_complete_fence),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
-constexpr type_info_procedure_vk_backend_staging_buffer_create DEFAULT_typedata_procedure_vk_backend_staging_buffer_create = {
-	.type_info = {
-		.type_name = "vk_backend_staging_buffer_create",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_staging_buffer_create,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_structure_vulkan_staging_buffer_t.type_info,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_staging_buffer_create.argument_array,
-	.arguments = {
-		.vulkan_context = {
-			.type_info     = &DEFAULT_typedata_vulkan_context_t,
-			.member_name   = "vulkan_context",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_staging_buffer_create.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.size = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "size",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_staging_buffer_create.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.usage_flags = {
-			.type_info     = &DEFAULT_typedata_VkBufferUsageFlags,
-			.member_name   = "usage_flags",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_staging_buffer_create.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.memory_type = {
-			.type_info     = &DEFAULT_typedata_vulkan_allocation_usage_type_t,
-			.member_name   = "memory_type",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_staging_buffer_create.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_vk_backend_buffer_upload_staged_data DEFAULT_typedata_procedure_vk_backend_buffer_upload_staged_data = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_upload_staged_data",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_upload_staged_data,
-	},
-	.argument_count = 3,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_upload_staged_data.argument_array,
-	.arguments = {
-		.vulkan_context = {
-			.type_info     = &DEFAULT_typedata_vulkan_context_t,
-			.member_name   = "vulkan_context",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_upload_staged_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.command_buffer = {
-			.type_info     = &DEFAULT_typedata_VkCommandBuffer,
-			.member_name   = "command_buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_upload_staged_data.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.target_buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "target_buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_upload_staged_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_procedure_vk_backend_buffer_flush_staging_buffer DEFAULT_typedata_procedure_vk_backend_buffer_flush_staging_buffer = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_flush_staging_buffer",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_flush_staging_buffer,
-	},
-	.argument_count = 2,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_flush_staging_buffer.argument_array,
-	.arguments = {
-		.vulkan_context = {
-			.type_info     = &DEFAULT_typedata_vulkan_context_t,
-			.member_name   = "vulkan_context",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_flush_staging_buffer.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.command_buffer = {
-			.type_info     = &DEFAULT_typedata_VkCommandBuffer,
-			.member_name   = "command_buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_flush_staging_buffer.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-constexpr type_info_procedure_vk_backend_buffer_stage_data DEFAULT_typedata_procedure_vk_backend_buffer_stage_data = {
-	.type_info = {
-		.type_name = "vk_backend_buffer_stage_data",
-		.metatype  = ATHENA_METATYPE_PROCEDURE,
-		.type_id = TYPE_vk_backend_buffer_stage_data,
-	},
-	.argument_count = 4,
-	.return_type    = &DEFAULT_typedata_void,
-	.argument_pointer = DEFAULT_typedata_procedure_vk_backend_buffer_stage_data.argument_array,
-	.arguments = {
-		.vulkan_context = {
-			.type_info     = &DEFAULT_typedata_vulkan_context_t,
-			.member_name   = "vulkan_context",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_stage_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.data = {
-			.type_info     = &DEFAULT_typedata_byte,
-			.member_name   = "data",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_stage_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.data_size = {
-			.type_info     = &DEFAULT_typedata_u64,
-			.member_name   = "data_size",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_stage_data.type_info,
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.target_buffer = {
-			.type_info     = &DEFAULT_typedata_vulkan_buffer_t,
-			.member_name   = "target_buffer",
-			.parent        = &DEFAULT_typedata_procedure_vk_backend_buffer_stage_data.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-	},
-};
-constexpr type_info_t DEFAULT_typedata_VkFence = {
-	.type_name = "VkFence",
-	.type_id = TYPE_VkFence,
-	.size = athena_internal::safe_sizeof<VkFence>(),
-};
 constexpr type_info_struct_asset_type_t DEFAULT_typedata_structure_asset_type_t = {
 	.type_info = {
 		.type_name = "asset_type_t",
@@ -27535,7 +25707,7 @@ constexpr type_info_struct_material_instance_t DEFAULT_typedata_structure_materi
 			.pointer_depth = 0,
 		},
 		.pipeline_state = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
+			.type_info     = &DEFAULT_typedata_RHI_pipeline_state_t,
 			.member_name   = "pipeline_state",
 			.parent        = &DEFAULT_typedata_structure_material_instance_t.type_info,
 			.offset        = offsetof(material_instance_t, pipeline_state),
@@ -29085,6 +27257,11 @@ constexpr type_info_procedure_s_asset_font_fetch_glyph DEFAULT_typedata_procedur
 		},
 	},
 };
+constexpr type_info_t DEFAULT_typedata_backend_shader_t = {
+	.type_name = "backend_shader_t",
+	.type_id = TYPE_backend_shader_t,
+	.size = athena_internal::safe_sizeof<backend_shader_t>(),
+};
 constexpr type_info_t DEFAULT_typedata_FT_Face = {
 	.type_name = "FT_Face",
 	.type_id = TYPE_FT_Face,
@@ -29926,13 +28103,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 	&DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
 	&DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info,
-	&DEFAULT_typedata_structure_renderer_effect_application_flags_t.type_info,
-	&DEFAULT_typedata_structure_render_pipeline_blending_mode_t.type_info,
-	&DEFAULT_typedata_structure_render_pipeline_blending_equation_t.type_info,
-	&DEFAULT_typedata_structure_render_pipeline_depth_function_t.type_info,
-	&DEFAULT_typedata_structure_render_pipeline_polygon_mode_t.type_info,
-	&DEFAULT_typedata_structure_render_pipeline_primitive_type_t.type_info,
-	&DEFAULT_typedata_structure_RHI_pipeline_state_t.type_info,
 	&DEFAULT_typedata_structure_global_context_t.type_info,
 	&DEFAULT_typedata_procedure_c_global_context_init.type_info,
 	&DEFAULT_typedata_procedure_c_global_context_reset_transient_arena.type_info,
@@ -30107,21 +28277,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_duration_counter_init.type_info,
 	&DEFAULT_typedata_procedure_c_duration_counter_advance.type_info,
 	&DEFAULT_typedata_procedure_c_duration_counter_reset.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_copy_buffer.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_copy_data.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_create.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_destroy.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_resize.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_map.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_unmap.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_append_data.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_reset.type_info,
-	&DEFAULT_typedata_structure_vulkan_staging_info_t.type_info,
-	&DEFAULT_typedata_structure_vulkan_staging_buffer_t.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_staging_buffer_create.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_upload_staged_data.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_flush_staging_buffer.type_info,
-	&DEFAULT_typedata_procedure_vk_backend_buffer_stage_data.type_info,
 	&DEFAULT_typedata_structure_asset_type_t.type_info,
 	&DEFAULT_typedata_structure_asset_slot_load_status_t.type_info,
 	&DEFAULT_typedata_structure_subtexture_data_t.type_info,
@@ -30939,83 +29094,6 @@ enum class RHI_uniform_constant_buffer_t {
 	offset,
 	uniform_hash_index,
 }; // RHI_uniform_constant_buffer_t
-enum class renderer_effect_application_flags_t {
-	REAF_None,
-	REAF_Bloom,
-	REAF_Emmision,
-	REAF_Vignette,
-	REAF_FilmGrain,
-	REAF_Count,
-}; // renderer_effect_application_flags_t
-enum class render_pipeline_blending_mode_t {
-	RBM_Zero,
-	RBM_One,
-	RBM_SrcColor,
-	RBM_OneMinusSrcColor,
-	RBM_DstColor,
-	RBM_OneMinusDstColor,
-	RBM_SrcAlpha,
-	RBM_OneMinusSrcAlpha,
-	RBM_DstAlpha,
-	RBM_OneMinusDstAlpha,
-	RBM_ConstantColor,
-	RBM_OneMinusConstantColor,
-	RBM_ConstantAlpha,
-	RBM_OneMinusConstantAlpha,
-	RBM_Count,
-}; // render_pipeline_blending_mode_t
-enum class render_pipeline_blending_equation_t {
-	RBE_Add,
-	RBE_Subtract,
-	RBE_ReverseSubtract,
-	RBE_Min,
-	RBE_Max,
-}; // render_pipeline_blending_equation_t
-enum class render_pipeline_depth_function_t {
-	RDF_Never,
-	RDF_Less,
-	RDF_Equal,
-	RDF_LessOrEqual,
-	RDF_Greater,
-	RDF_NotEqual,
-	RDF_GreaterOrEqual,
-	RDF_Always,
-}; // render_pipeline_depth_function_t
-enum class render_pipeline_polygon_mode_t {
-	RENDER_PIPELINE_POLYGON_MODE_FILL,
-	RENDER_PIPELINE_POLYGON_MODE_LINE,
-	RENDER_PIPELINE_POLYGON_MODE_POINT,
-}; // render_pipeline_polygon_mode_t
-enum class render_pipeline_primitive_type_t {
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_POINT_LIST,
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST,
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP,
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN,
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY,
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY,
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY,
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY,
-	RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_PATCH_LIST,
-}; // render_pipeline_primitive_type_t
-enum class RHI_pipeline_state_t {
-	blend_enabled,
-	src_color_blend_mode,
-	dst_color_blend_mode,
-	src_alpha_blend_mode,
-	dst_alpha_blend_mode,
-	color_blend_op,
-	alpha_blend_op,
-	depth_testing_enabled,
-	depth_writing_enabled,
-	depth_func,
-	stencil_enabled,
-	stencil_state,
-	stencil_keep,
-	polygon_mode,
-	primitive_type,
-}; // RHI_pipeline_state_t
 enum class global_context_t {
 	is_initialized,
 	running,
@@ -31325,17 +29403,6 @@ enum class duration_counter_t {
 	current_elapsed,
 	looped,
 }; // duration_counter_t
-enum class vulkan_staging_info_t {
-	target_buffer,
-	upload_size,
-	target_offset,
-	staging_buffer_offset,
-}; // vulkan_staging_info_t
-enum class vulkan_staging_buffer_t {
-	buffer,
-	submitted,
-	upload_complete_fence,
-}; // vulkan_staging_buffer_t
 enum class asset_type_t {
 	AT_Invalid,
 	AT_Bitmap,
@@ -32707,76 +30774,6 @@ enum class c_duration_counter_advance {
 enum class c_duration_counter_reset {
 	counter,
 }; // c_duration_counter_reset
-enum class vk_backend_buffer_copy_buffer {
-	source_buffer,
-	destination_buffer,
-	scratch_buffer,
-	source_offset,
-	source_copy_size,
-	destination_offset,
-}; // vk_backend_buffer_copy_buffer
-enum class vk_backend_buffer_copy_data {
-	vulkan_context,
-	buffer,
-	data,
-	copy_size,
-	offset,
-}; // vk_backend_buffer_copy_data
-enum class vk_backend_buffer_create {
-	vulkan_context,
-	buffer_size,
-	usage_flags,
-	usage_type,
-}; // vk_backend_buffer_create
-enum class vk_backend_buffer_destroy {
-	vulkan_context,
-	buffer,
-}; // vk_backend_buffer_destroy
-enum class vk_backend_buffer_resize {
-	vulkan_context,
-	buffer,
-	command_buffer,
-	new_size,
-}; // vk_backend_buffer_resize
-enum class vk_backend_buffer_map {
-	vulkan_context,
-	buffer,
-	offset,
-	size,
-}; // vk_backend_buffer_map
-enum class vk_backend_buffer_unmap {
-	vulkan_context,
-	buffer,
-}; // vk_backend_buffer_unmap
-enum class vk_backend_buffer_append_data {
-	buffer,
-	data,
-	size,
-}; // vk_backend_buffer_append_data
-enum class vk_backend_buffer_reset {
-	buffer,
-}; // vk_backend_buffer_reset
-enum class vk_backend_staging_buffer_create {
-	vulkan_context,
-	size,
-	usage_flags,
-	memory_type,
-}; // vk_backend_staging_buffer_create
-enum class vk_backend_buffer_upload_staged_data {
-	vulkan_context,
-	command_buffer,
-	target_buffer,
-}; // vk_backend_buffer_upload_staged_data
-enum class vk_backend_buffer_flush_staging_buffer {
-	vulkan_context,
-	command_buffer,
-}; // vk_backend_buffer_flush_staging_buffer
-enum class vk_backend_buffer_stage_data {
-	vulkan_context,
-	data,
-	data_size,
-	target_buffer,
-}; // vk_backend_buffer_stage_data
 enum class FT_ROUND {
 	X,
 }; // FT_ROUND

@@ -1243,10 +1243,19 @@ parse_single_file(string_t filename)
 
 VISIT_FILES(gather_files_in_directory)
 {
-    (void)user_data;
-
     string_t filename = visit_file_data->fullname;
     string_t file_ext = c_string_get_file_ext_from_path(filename);
+
+    string_t excluded_prefix_string = (string_t)(*(string_t*)user_data);
+    if(excluded_prefix_string.data && excluded_prefix_string.count > 0)
+    {
+        string_t bare_filename = c_string_sub_from_left(filename, (u32)excluded_prefix_string.count);
+        if(c_string_compare(bare_filename, excluded_prefix_string))
+        {
+            return;
+        }
+    }
+
     if(!c_string_compare(file_ext, STR(".h")))
     {
         return;
@@ -1594,7 +1603,7 @@ output_type_info_member_data(string_builder_t *builder, code_type_t *type, AST_n
 }
 
 void
-athena_handle_type_info(const char *char_filepath, const char *output_path, bool32 directory, bool32 recursive)
+athena_handle_type_info(const char *char_filepath, const char *output_path, bool32 directory, string_t excluded_prefix, bool32 recursive)
 {
     string_t filepath = STR(char_filepath);
     if(!directory)
@@ -1604,7 +1613,7 @@ athena_handle_type_info(const char *char_filepath, const char *output_path, bool
     }
     else
     {
-        visit_file_data_t visit_info = c_directory_create_visit_data(gather_files_in_directory, recursive, null);
+        visit_file_data_t visit_info = c_directory_create_visit_data(gather_files_in_directory, recursive, &excluded_prefix);
         symbol_table_init(filepath, recursive);
 
         c_directory_visit(filepath, &visit_info);
@@ -2802,6 +2811,7 @@ main(int argc, char **argv)
     char   **requested_directory = c_program_flag_add_string("-directory", null, "Points to the directory you wish to parse...\n");
     char   **output_file         = c_program_flag_add_string("-output_file", null, "Output path for the generated file...\n");
     bool32 *recursive            = c_program_flag_add_bool32("-recursive", false, "Denotes recursive parsing over the passed directory...\n");
+    char   **excluded_prefix     = c_program_flag_add_string("-excluded_prefix", null, "excludes a specific file prefix (like vk_)...\n");
 
     c_program_flag_parse_args(argc, argv);
 
@@ -2822,7 +2832,13 @@ main(int argc, char **argv)
     {
         filepath = *requested_filename;
     }
+
+    string_t excluded_prefix_string = {};
+    if(*excluded_prefix)
+    {
+        excluded_prefix_string = STR(*excluded_prefix);
+    }
    
-    athena_handle_type_info(filepath, *output_file, directory, *recursive);
+    athena_handle_type_info(filepath, *output_file, directory, excluded_prefix_string, *recursive);
     return(0);
 }

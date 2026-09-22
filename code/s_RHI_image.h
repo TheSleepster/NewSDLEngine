@@ -10,6 +10,7 @@
 #include <c_string.h>
 
 #if RENDERER_VULKAN
+#include <vk_backend_core.h>
 #include <vk_backend_image.h>
 #elif RENDERER_HEADLESS
 #include <headless_backend_core.h>

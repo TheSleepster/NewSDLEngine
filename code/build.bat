@@ -6,6 +6,5 @@ IF NOT EXIST "..\build" (
 )
 
 pushd ..\
-xmake project -k compile_commands --lsp=clangd
-xmake f -m debug --toolchain=clang-cl --ccache=n && xmake -j %NUMBER_OF_PROCESSORS%
+xmake -v f -m debug --toolchain=clang-cl --ccache=n && xmake -j %NUMBER_OF_PROCESSORS%
 popd

@@ -7,6 +7,8 @@
 #include <s_ui_core.h>
 #include <r_immediate_rendering.h>
 
+constexpr u32 UI_MAX_INDICES = 600000;
+
 internal_api void* widget_hash_table_allocate_impl(void *allocator, u32 allocation_size);
 void ui_state_update_widget_state(ui_state_t *ui_state);
 
@@ -120,7 +122,8 @@ ui_state_init(ui_state_t       *ui_state,
     ui_state->input_manager = input_manager;
     ui_state->widget_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_widget"));
 
-    u32 *indices = c_arena_push_array(&RHI_context->transient_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
+
+    u32 *indices = c_arena_push_array(&RHI_context->transient_arena, u32, UI_MAX_INDICES);
     u32  index_offset = 0;
     for(u32 index = 0;
         index < 60000;

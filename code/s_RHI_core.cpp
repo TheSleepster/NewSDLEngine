@@ -720,7 +720,9 @@ RHI_cmd_bind_texture_image(RHI_command_list_t *command_list, texture2D_t *textur
     }
     else
     {
+#ifndef RENDERER_HEADLESS
         log_warning("Attempting to bind a texture where it's ID == 0. This may be intentional...\n");
+#endif
     }
 }
 
@@ -925,8 +927,8 @@ RHI_cmd_update_buffer_contents(RHI_command_list_t *command_list, RHI_render_buff
     update_buffer_contents->buffer    = buffer;
 
     buffer->buffer_elements_used += (data_size / buffer->buffer_element_size);
-    command_list->RHI_context->backend_buffer_append_data(buffer, data, data_size);
 
+    command_list->RHI_context->backend_buffer_append_data(buffer, data, data_size);
     command->data = update_buffer_contents; 
     command->header.command_type = RHI_RENDER_COMMAND_TYPE_UPDATE_BUFFER_CONTENTS;
 }

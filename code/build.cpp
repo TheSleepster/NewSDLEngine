@@ -30,21 +30,12 @@
 #include <c_threadpool.h>
 #include <c_duration_counter.h>
 #include <c_tokenizer.h>
-#include <r_immediate_rendering.h>
+
 #include <s_input_manager.h>
 #include <s_nt_networking.h>
 
-#if RENDERER_VULKAN
-#include <vk_backend_allocator.h>
-#include <vk_backend_buffer.h>
-#include <vk_backend_core.h>
-#include <vk_backend_image.h>
-#include <vk_backend_shader.h>
-#elif RENDERER_HEADLESS
-#include <headless_backend_core.h>
-#endif
-
-#include <s_asset_manager.h>
+#include <s_RHI_image.h>
+#include <r_immediate_rendering.h>
 
 #include <s_ui_core.h>
 #include <s_entity.h>
@@ -55,13 +46,23 @@
 
 // NOTE(Sleepster): Game 
 #if defined(GAME_DLL_BUILD) || defined(RELEASE)
-
 #include <s_ui_core.cpp>
 #include <s_entity.cpp>
 #include <main.cpp>
 #endif
 
 #if defined(ENGINE_BUILD)
+
+#if RENDERER_VULKAN
+#include <vk_backend_allocator.h>
+#include <vk_backend_core.h>
+#include <vk_backend_buffer.h>
+#include <vk_backend_image.h>
+#include <vk_backend_shader.h>
+#elif RENDERER_HEADLESS
+#include <headless_backend_core.h>
+#endif
+
 // NOTE(Sleepster): Engine 
 #include <c_global_context.cpp>
 #include <c_heap_allocator.cpp>
@@ -71,9 +72,7 @@
 #include <c_zone_allocator.cpp>
 #include <c_duration_counter.cpp>
 #include <DEBUG_profiling.cpp>
-#include <r_immediate_rendering.cpp>
 #include <s_input_manager.cpp>
-#include <s_RHI_core.cpp>
 
 #include <p_platform_data.h>
 
@@ -82,7 +81,6 @@
 #include <c_file_watcher.cpp>
 #include <p_platform_data.cpp>
 #include <s_nt_networking.cpp>
-#include <s_RHI_image.cpp>
 
 #if RENDERER_VULKAN
 #include <vk_backend_allocator.cpp>
@@ -90,10 +88,17 @@
 #include <vk_backend_core.cpp>
 #include <vk_backend_image.cpp>
 #include <vk_backend_shader.cpp>
-#include <s_asset_manager.cpp>
 #elif RENDERER_HEADLESS
 #include <headless_backend_core.cpp>
 #endif
+
+#include <s_RHI_core.cpp>
+#include <s_RHI_image.cpp>
+
+#include <r_immediate_rendering.cpp>
+
+#include <s_asset_manager.h>
+#include <s_asset_manager.cpp>
 
 #include <p_platform_data.cpp>
 #include <entry.cpp>
