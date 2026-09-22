@@ -4,11 +4,10 @@
 -- What? What do you mean that when it's lua and not a makefile you can actually write it
 -- yourself?? That's weird man.
 -- ==============================================================================
-
 -- ------------------------------------------------------------------------------
 -- Options
 -- ------------------------------------------------------------------------------
-option("toolchain")
+option("compiler")
     set_default("clang")
     set_showmenu(true)
     set_values("clang", "gcc", "llvm-mingw", "msvc", "clang-cl")
@@ -29,7 +28,7 @@ local BUILD_CONFIG = get_config("mode") or "debug"
 local SELECTED_RENDERING_BACKEND = get_config("renderer_backend") or "vulkan" 
 
 local SELECTED_TOOLCHAIN = (function()
-    local toolchain = get_config("toolchain") or "clang"
+    local toolchain = get_config("compiler") or "clang"
     if toolchain == "llvm-mingw" then
         toolchain = "mingw[clang]@llvm-mingw"
     end
@@ -79,9 +78,10 @@ local TARGET_DIR = (function()
 
     return path.join(OUTPUT_DIR, os_dir, BUILD_CONFIG_OUTPUT_TARGET)
 end)()
-local UNITY_OUTPUT_DIR = path.join(OUTPUT_DIR, "unity_sources")
 
 local CROSS_BUILD = (SELECTED_TOOLCHAIN == "mingw[clang]@llvm-mingw")
+
+local UNITY_OUTPUT_DIR = path.join(OUTPUT_DIR, "unity_sources")
 
 -- ------------------------------------------------------------------------------
 -- LLVM-MINGW Toolchain 
@@ -131,7 +131,7 @@ local CLANG_RELEASE_ONLY = {
 }
 
 local GPP_WARN_BASE = {
-    "-Wformat", "-mfma", "-Wall", "-Wextra", "-Wno-unused-function",
+    "-Wno-format-truncation", "-Wformat", "-mfma", "-Wall", "-Wextra", "-Wno-unused-function",
     "-Wno-missing-field-initializers", "-Wno-switch", "-Wno-deprecated-declarations",
     "-Wno-reorder", "-Wno-pointer-arith", "-Wno-write-strings", "-Wno-class-memaccess",
     "-Wno-sfinae-incomplete", "-Wno-implicit-fallthrough",
