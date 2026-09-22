@@ -201,11 +201,11 @@ main(int argc, char **argv)
 
         SDL_StartTextInput(gc->RHI_context->window);
 
-        gc->RHI_context->backend_render_context = c_arena_push_struct(&gc->persistent_arena, vulkan_context_t);
-        gc->asset_manager->RHI_context          = gc->RHI_context; 
-        vulkan_context_t *vulkan_context        = (vulkan_context_t*)gc->RHI_context->backend_render_context;
 
         gc->RHI_context->backend_initialize(gc->RHI_context->window);
+        gc->asset_manager->RHI_context = gc->RHI_context; 
+
+        backend_render_context_t *render_context = (backend_render_context_t*)gc->RHI_context->backend_render_context;
 
         // TODO(Sleepster): The count will need to be adjusted in the future. But this is fine for now 
         u32 thread_count = sys_get_thread_count() - 4;
@@ -214,7 +214,7 @@ main(int argc, char **argv)
         s_asset_manager_init(gc->asset_manager);
 
         s_im_init_input_manager(gc->input_manager);
-        RHI_context_init(gc->RHI_context, vulkan_context);
+        RHI_context_init(gc->RHI_context, render_context);
 
 #ifndef RELEASE
         gc->file_watcher = c_file_watcher_create(FWC_EVENT_ALL, true, main_file_watcher, null, false);

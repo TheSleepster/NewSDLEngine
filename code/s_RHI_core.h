@@ -12,7 +12,6 @@
 #include <c_types.h>
 #include <c_math.h>
 
-#include <vk_backend_core.h>
 #include <s_asset_manager.h>
 
 constexpr u32 RHI_MAX_RENDER_TARGET_ATTACHMENTS = 10;

@@ -26,8 +26,6 @@
 #include <c_duration_counter.h>
 
 #include <s_RHI_image.h>
-#include <vk_backend_image.h>
-#include <vk_backend_shader.h>
 
 #define ASSET_CATALOG_MAX_LOOKUPS         (4099)
 #define ASSET_MANAGER_MAX_TEXTURE_ATLASES (128)
@@ -284,7 +282,9 @@ typedef struct material_archetype
     string_t            shader_binary_name;
     asset_handle_t      shader_handle;
 
+#if 0
     VkDescriptorSet     descriptors[MAX_DESCRIPTOR_SET_BINDINGS];
+#endif
     material_instance_t base_instance;
 }material_archetype_t;
 

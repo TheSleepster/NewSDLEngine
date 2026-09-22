@@ -7,6 +7,7 @@
    ======================================================================== */
 
 #define VK_BACKEND_ALLOCATOR_H
+CODE_GEN_IGNORE_FILE
 #include <vulkan/vulkan.h>
 
 #include <c_types.h>

@@ -7,6 +7,7 @@
    ======================================================================== */
 
 #define VK_BACKEND_CORE_H
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 #include <vulkan/vulkan.h>
@@ -138,6 +139,8 @@ typedef struct RHI_pipeline_state
 
 // BACKEND RHI DEFINITIONS
 
+CODE_GEN_IGNORE_FILE
+
 struct gpu_info_t 
 {
 	VkPhysicalDevice                    device;
@@ -153,6 +156,7 @@ struct gpu_info_t
     dynarray_t<VkExtensionProperties>   extension_properties;
 };
 
+CODE_GEN_IGNORE_DECL
 struct swapchain_info_t 
 {
     VkSwapchainKHR     handle;
@@ -166,6 +170,7 @@ struct swapchain_info_t
     VkImageLayout      *image_layouts;
 };
 
+CODE_GEN_IGNORE_DECL
 struct vulkan_context_t 
 {
     memory_arena_t                      initialization_arena;

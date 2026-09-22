@@ -8,7 +8,12 @@
 
 #define R_RENDER_IMAGE_H
 #include <c_string.h>
-#include <vk_backend_core.h>
+
+#if RENDERER_VULKAN
+#include <vk_backend_image.h>
+#elif RENDERER_HEADLESS
+#include <headless_backend_core.h>
+#endif
 
 // NOTE(Sleepster): 
 // The invalid states are meant to help us know if the create_info is 

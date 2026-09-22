@@ -7,6 +7,7 @@
    ======================================================================== */
 
 #define VK_BACKEND_SHADER_H
+CODE_GEN_IGNORE_FILE
 #include <vk_backend_core.h>
 
 struct uniform_constant_buffer_t;

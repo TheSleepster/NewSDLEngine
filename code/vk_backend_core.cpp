@@ -3257,6 +3257,7 @@ renderer_state_t::backend_initialize
 void RHI_context_t::
 backend_initialize(SDL_Window *window)
 {
+    gc->RHI_context->backend_render_context  = c_arena_push_struct(&gc->persistent_arena, vulkan_context_t);
     vk_backend_init(this->backend_render_context, window);
 }
 

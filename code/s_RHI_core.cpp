@@ -13,7 +13,6 @@
 #include <c_hash_table.h>
 #include <c_log.h>
 
-#include <vk_backend_core.h>
 #include <s_asset_manager.h>
 #include <s_RHI_image.h>
 #include <s_RHI_core.h>

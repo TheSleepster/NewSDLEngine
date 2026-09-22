@@ -15,10 +15,19 @@ option("toolchain")
     set_description("Select which toolchain to build with...")
 option_end()
 
+option("renderer_backend")
+    set_default("vulkan")
+    set_showmenu(true)
+    set_values("vulkan", "headless")
+    set_description("Select which rendering backend to build with...");
+option_end()
+
 -- ------------------------------------------------------------------------------
 -- Initialization 
 -- ------------------------------------------------------------------------------
 local BUILD_CONFIG = get_config("mode") or "debug"
+local SELECTED_RENDERING_BACKEND = get_config("renderer_backend") or "vulkan" 
+
 local SELECTED_TOOLCHAIN = (function()
     local toolchain = get_config("toolchain") or "clang"
     if toolchain == "llvm-mingw" then
@@ -26,6 +35,7 @@ local SELECTED_TOOLCHAIN = (function()
     end
     return toolchain
 end)()
+
 local TARGET_PLATFORM = (function()
     local host_platform = os.host()
     if SELECTED_TOOLCHAIN == "mingw[clang]@llvm-mingw" then
@@ -195,8 +205,15 @@ local function set_toolchain_configuration(target, toolchain, build_config)
 end
 
 local function set_host_configuration(target, target_platform, cross_build)
-    target:add("links", { "SDL3-Static", "freetype", "vulkan", "slang", "slang-compiler" })
-    target:add("linkdirs", path.join(DEPS_DIR, "vulkan"))
+    target:add("links", { "SDL3-Static", "freetype", "slang", "slang-compiler" })
+
+    if SELECTED_RENDERING_BACKEND == "vulkan" then
+        target:add("defines", "RENDERER_VULKAN=1")
+        target:add("links", "vulkan")
+        target:add("linkdirs", path.join(DEPS_DIR, "vulkan"))
+    elseif SELECTED_RENDERING_BACKEND == "headless" then
+        target:add("defines", "RENDERER_HEADLESS=1")
+    end
 
     if target_platform == "windows" then
         target:add("defines", "OS_WINDOWS=1")

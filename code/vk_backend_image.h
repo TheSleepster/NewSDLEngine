@@ -7,6 +7,8 @@
    ======================================================================== */
 
 #define VK_BACKEND_IMAGE_H
+CODE_GEN_IGNORE_FILE
+
 #include <vulkan/vulkan.h>
 #include <c_types.h>
 #include <c_string.h>
