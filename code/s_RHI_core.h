@@ -523,7 +523,7 @@ struct RHI_context_t
     u32                                         current_window_size_generation;
     u32                                         last_window_size_generation;
 
-    array_t<RHI_renderpass_t, 100>              renderpasses;
+    fixed_array_t<RHI_renderpass_t, 100>        renderpasses;
     u32                                         renderpass_count;
 
     RHI_command_present_frame_t                *present_command;

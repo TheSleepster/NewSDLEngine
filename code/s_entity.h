@@ -93,23 +93,25 @@ struct entity_t
     bool8           collision;
 };
 
+using sim_region_entity_array_t = fixed_array_t<entity_t, MAX_SIM_REGION_ENTITIES>;
 struct world_sim_region_t
 {
     ivec2_t   world_chunk_hash;
 
-    array_t<entity_t, MAX_SIM_REGION_ENTITIES> entities;
-    u32                                        sim_entity_count;
+    sim_region_entity_array_t entities;
+    u32                       sim_entity_count;
 };
 
 // NOTE(Sleepster): This isn't a real solution for the world sim storage... 
+using world_sim_region_array_t = fixed_array_t<world_sim_region_t, MAX_ACTIVE_SIM_REGIONS>;
 struct entity_manager_t
 {
     memory_arena_t transient_storage;
     u8             world_sim_region_sparse_matrix[MAX_SIM_REGIONS][MAX_SIM_REGIONS];
 
     // NOTE(Sleepster): index 0 is always invalid 
-    array_t<world_sim_region_t, MAX_ACTIVE_SIM_REGIONS> active_sim_regions;
-    u32                                                 active_region_count;
+    world_sim_region_array_t active_sim_regions;
+    u32                      active_region_count;
 };
 
 struct entity_query_t

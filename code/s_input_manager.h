@@ -138,9 +138,9 @@ enum input_device_type_t
 };
 
 // NOTE(Sleepster): Using is dumb. I hate C++ but templates don't support typedef... 
-using input_event_array_t      = array_t<input_event_t, DEVICE_MAX_INPUT_EVENT_COUNT>;
-using transient_button_array_t = array_t<input_state_t*, MAX_TRACKED_TRANSIENT_BUTTONS>;
-using input_state_array_t      = array_t<input_state_t, MAX_INPUT_ARRAY_SIZE>;
+using input_event_array_t      = fixed_array_t<input_event_t, DEVICE_MAX_INPUT_EVENT_COUNT>;
+using transient_button_array_t = fixed_array_t<input_state_t*, MAX_TRACKED_TRANSIENT_BUTTONS>;
+using input_state_array_t      = fixed_array_t<input_state_t, MAX_INPUT_ARRAY_SIZE>;
 
 struct input_controller_t
 {
@@ -161,7 +161,7 @@ struct input_controller_t
     }transient_data;
 };
 
-using device_input_axis_array_t = array_t<input_state_t, INPUT_ARRAY_INPUT_AXIS_COUNT>;
+using device_input_axis_array_t = fixed_array_t<input_state_t, INPUT_ARRAY_INPUT_AXIS_COUNT>;
 struct input_device_t
 {
     s32 deviceID;
@@ -202,7 +202,7 @@ struct input_action_binding_t
     u32 required_modifiers;
 };
 
-using input_action_binding_array_t = array_t<input_action_binding_t, 10>;
+using input_action_binding_array_t = fixed_array_t<input_action_binding_t, 10>;
 struct input_action_mapping_t
 {
     s32                          device_type;
@@ -210,7 +210,7 @@ struct input_action_mapping_t
     input_action_binding_array_t bindings;
 };
 
-using input_action_mapping_array_t = array_t<input_action_mapping_t, 2>;
+using input_action_mapping_array_t = fixed_array_t<input_action_mapping_t, 2>;
 struct input_action_t
 {
     s32     type;
@@ -240,9 +240,9 @@ INPUT MANAGER
 constexpr s32 MAX_INPUT_ACTIONS     = 10;
 constexpr s32 MAX_INPUT_CONTROLLERS = 20;
 
-using input_device_array_t     = array_t<input_device_t, MAX_INPUT_DEVICES>;
-using input_action_array_t     = array_t<input_action_t, MAX_INPUT_ACTIONS>;
-using input_controller_array_t = array_t<input_controller_t, MAX_INPUT_CONTROLLERS>;
+using input_device_array_t     = fixed_array_t<input_device_t, MAX_INPUT_DEVICES>;
+using input_action_array_t     = fixed_array_t<input_action_t, MAX_INPUT_ACTIONS>;
+using input_controller_array_t = fixed_array_t<input_controller_t, MAX_INPUT_CONTROLLERS>;
 
 struct input_manager_t 
 {

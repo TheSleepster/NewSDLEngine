@@ -229,7 +229,7 @@ struct ui_state_t
     input_state_t                    *left_mouse;
     input_state_t                    *right_mouse;
 
-    array_t<input_event_t, 100>       ui_events;
+    fixed_array_t<input_event_t, 100> ui_events;
     u32                               ui_event_count;
 
     vec2_t                            mouse_position;

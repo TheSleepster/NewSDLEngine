@@ -96,7 +96,7 @@ struct memory_page_t
 
 struct tag_section_array_t 
 {
-    array_t<memory_section_t*, MAX_MEMORY_SECTIONS> array;
+    fixed_array_t<memory_section_t*, MAX_MEMORY_SECTIONS> array;
     s32 count;
 };
 

@@ -183,7 +183,7 @@ c_array_add_if_unique(array_view_t<T> array, T *element, s32 index_to_emplace)
 /////////////////////////
 
 template <typename T, s32 capacity>
-struct array_t
+struct fixed_array_t
 {
     // NOTE(Sleepster): Cannot resize the same array. This "static constexpr" makes it so that the count will survive any and all memsets
     static constexpr s32 count = capacity;
@@ -206,7 +206,7 @@ struct array_t
 
 template <typename T, s32 count>
 T&
-array_t<T, count>::operator[](s32 index)
+fixed_array_t<T, count>::operator[](s32 index)
 {
     Expect(index < this->count, "Array bounds check failed... index was: '%d' while count is: '%d'...\n", index, this->count);
     Expect(index >= 0, "Array bounds check failed... index was: '%d' which is less than 0...\n", index);
@@ -216,7 +216,7 @@ array_t<T, count>::operator[](s32 index)
 
 template <typename T, s32 count>
 T*
-array_t<T, count>::operator+(s32 index)
+fixed_array_t<T, count>::operator+(s32 index)
 {
     Expect(index < this->count, "Array bounds check failed... index was: '%d' while count is: '%d'...\n", index, this->count);
     Expect(index >= 0, "Array bounds check failed... index was: '%d' which is less than 0...\n", index);
@@ -227,14 +227,14 @@ array_t<T, count>::operator+(s32 index)
 // NOTE(Sleepster): These all call their "array_view_t" variants... 
 template <typename T, s32 count>
 void
-c_array_clear(array_t<T, count> &array)
+c_array_clear(fixed_array_t<T, count> &array)
 {
     c_array_clear(static_cast<array_view_t<T>>(array));
 }
 
 template <typename T, s32 count>
 s32
-c_array_find(array_t<T, count> &array, T *element)
+c_array_find(fixed_array_t<T, count> &array, T *element)
 {
     s32 result = c_array_find(static_cast<array_view_t<T>>(array), element);
     return(result);
@@ -242,14 +242,14 @@ c_array_find(array_t<T, count> &array, T *element)
 
 template <typename T, s32 count>
 void
-c_array_remove(array_t<T, count> &array, s32 index, s32 max_index)
+c_array_remove(fixed_array_t<T, count> &array, s32 index, s32 max_index)
 {
     c_array_remove(static_cast<array_view_t<T>>(array), index, max_index);
 }
 
 template <typename T, s32 count>
 s32
-c_array_add_if_unique(array_t<T, count> &array, T *element, s32 index_to_emplace)
+c_array_add_if_unique(fixed_array_t<T, count> &array, T *element, s32 index_to_emplace)
 {
     s32 result = c_array_add_if_unique(static_cast<array_view_t<T>>(array), element, index_to_emplace);
     return(result);

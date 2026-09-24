@@ -474,7 +474,7 @@
 	X(TYPE_animation2D_t) \
 	X(TYPE_rectangle2_t) \
 	X(TYPE_ivec2_t) \
-	X(TYPE_array_t) \
+	X(TYPE_fixed_array_t) \
 	X(TYPE_begin) \
 	X(TYPE_end) \
 	X(TYPE_widget_state_t) \
@@ -8088,7 +8088,7 @@ extern const type_info_struct_asset_handle_t DEFAULT_typedata_structure_asset_ha
 extern const type_info_t DEFAULT_typedata_animation2D_t;
 extern const type_info_t DEFAULT_typedata_rectangle2_t;
 extern const type_info_t DEFAULT_typedata_ivec2_t;
-extern const type_info_t DEFAULT_typedata_array_t;
+extern const type_info_t DEFAULT_typedata_fixed_array_t;
 extern const type_info_procedure_begin DEFAULT_typedata_procedure_begin;
 extern const type_info_procedure_end DEFAULT_typedata_procedure_end;
 extern const type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_state_t;
