@@ -6,7 +6,7 @@
    ======================================================================== */
 #include <c_heap_allocator.h>
 
-global_variable memory_allocator_t allocator = {};
+global memory_allocator_t allocator = {};
 
 /*
 ==============================================

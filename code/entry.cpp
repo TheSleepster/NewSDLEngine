@@ -33,7 +33,7 @@
 
 #ifndef RELEASE 
 typedef int game_main_t(global_context_t *_global_context);
-global_variable game_main_t *game_main;
+global game_main_t *game_main;
 #else
 int game_main(global_context_t *_global_context);
 #endif
@@ -83,6 +83,14 @@ FILE_WATCHER_CALLBACK(main_file_watcher)
 ENGINE_API void
 process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager)
 {
+    for(input_device_t &device: input_manager->devices)
+    {
+        for(input_state_t &axis_state: device.input_axis_info_array)
+        {
+            axis_state.delta_value = vec2_zero();
+        }
+    }
+
     SDL_Event event;
     while(SDL_PollEvent(&event))
     {
@@ -103,57 +111,6 @@ process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager
             }break;
         }
     }
-
-    // NOTE(Sleepster): Consume redundant events
-    u32 redundant_events[MAX_INPUT_EVENTS] = {};
-    u32 events_to_remove = 0;
-
-    for(s32 event_index = 0;
-        event_index < input_manager->event_count - 1;
-        ++event_index)
-    {
-        input_event_t *event      = input_manager->events + (event_index);
-        input_event_t *next_event = input_manager->events + (event_index + 1);
-        if(is_same_event(event, next_event))
-        {
-            redundant_events[events_to_remove++] = (event_index + 1);
-            if(event->input_stream.data == null && next_event->input_stream.data != null)
-            {
-                event->input_stream = next_event->input_stream;
-            }
-        }
-    }
-
-    for(u32 removal_index = 0;
-        removal_index < events_to_remove;
-        ++removal_index)
-    {
-        u32 index = (redundant_events[removal_index] - removal_index);
-        c_array_remove(input_manager->events, index, input_manager->event_count - removal_index);
-    }
-
-    input_manager->event_count -= events_to_remove;
-
-    // NOTE(Sleepster): Dispatch to the according device 
-    u64 most_recent_timestamp = 0;
-    for(s32 event_index = 0;
-        event_index < input_manager->event_count;
-        ++event_index)
-    {
-        input_event_t *event = input_manager->events + event_index;
-        input_device_t *device = null;
-        if(event->input_type == INPUT_DEVICE_TYPE_KEYBOARD) device = s_im_find_first_keyboard_device(input_manager, null);
-        else                                                device = s_im_find_first_gamepad_device(input_manager, null);
-
-        Assert(device);
-        append_input_event(device->events, &device->event_count, event);
-        if(event->timestampMS >= most_recent_timestamp)
-        {
-            input_manager->active_device_index = device->device_index;
-            most_recent_timestamp = event->timestampMS;
-        }
-    }
-    input_manager->event_count = 0;
 }
 
 int
@@ -211,8 +168,6 @@ main(int argc, char **argv)
         c_threadpool_init(&gc->main_threadpool, thread_count, MB(10), true, false);
 
         s_asset_manager_init(gc->asset_manager);
-
-        s_im_init_input_manager(gc->input_manager);
         RHI_context_init(gc->RHI_context, render_context);
 
 #ifndef RELEASE

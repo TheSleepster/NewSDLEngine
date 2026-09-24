@@ -32,7 +32,7 @@
             ]
         },
         {
-            "id": "Set Working Directory",
+            "id": "SetWorkingDirectory",
             "type": "pickString",
             "description": "Working directory",
             "options": ["${workspaceFolder}/code", "${workspaceFolder}/run_tree/res"],
@@ -112,7 +112,7 @@
             "linux": {                                     
                 "program": "${workspaceFolder}/build/Linux/${input:buildConfig}/${input:Sandboxes}"
             },
-            "cwd": "${input:SandboxCwd}",
+            "cwd": "${input:SetWorkingDirectory}",
             "stopOnEntry": false,
             "terminal": "integrated"
         },
@@ -126,7 +126,7 @@
             "linux": {                                     
                 "program": "${workspaceFolder}/build/Linux/${input:buildConfig}/${input:Tests}"
             },
-            "cwd": "${input:SandboxCwd}",
+            "cwd": "${input:SetWorkingDirectory}",
             "stopOnEntry": false,
             "terminal": "integrated"
         }

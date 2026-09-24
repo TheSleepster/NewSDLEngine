@@ -92,11 +92,10 @@ enum game_mode_t
 struct game_state_t
 {
     bool8               is_initialized;
-
-    render_state_t      render_state;
     ui_state_t         *main_ui;
 
-    input_controller_t *controller;
+    input_controller_t *game_controller;
+
     entity_manager_t   *entity_manager;
     float64             render_alpha;
     bool32              open_debug_menu;
@@ -106,6 +105,7 @@ struct game_state_t
     bool32              show_player_viewport;
     float32             editor_zoom;
     RHI_render_camera_t editor_camera;
+    input_controller_t *editor_controller;
 
     RHI_render_camera_t game_camera;
     RHI_render_camera_t fullscreen_camera;
@@ -114,9 +114,9 @@ struct game_state_t
     s32                 game_mode;
 
     struct {
-        game_action_t *move;
-        game_action_t *jump;
-        game_action_t *dash;
+        input_action_t *move;
+        input_action_t *jump;
+        input_action_t *dash;
     }mappings;
 
     struct {
@@ -145,7 +145,7 @@ constexpr float32 MAX_ENTITY_ACCELERATION = 100;
 constexpr s32     WORLD_TILE_SIZE = 8;
 
 // TODO(Sleepster): DEBUG CODE 
-global_variable string_t global_test_textbox_string = {}; 
+global string_t global_test_textbox_string = {}; 
 // TODO(Sleepster): DEBUG CODE 
 
 // NOTE(Sleepster): DEBUG CODE
@@ -405,6 +405,23 @@ entity_test_collider_create(game_state_t *game_state, vec2_t position, vec2_t si
     return(result);
 }
 
+internal_api entity_t*
+entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags)
+{
+    entity_t *result = s_entity_create(game_state->entity_manager, 
+                                       position, 
+                                       ENTITY_ARCHETYPE_TILE, 
+                                      (ENTITY_FLAG_STATIC|ENTITY_FLAG_IS_GROUND|flags));
+    result->archetype       = ENTITY_ARCHETYPE_TILE;
+    result->position        = position;
+    result->render_position = position;
+    result->editor_position = position;
+    result->size            = vec2(WORLD_TILE_SIZE, WORLD_TILE_SIZE);
+    result->bounding_box    = rect2_create(position, result->size);
+
+    return(result);
+}
+
 internal_api void
 render_collider(game_state_t *game_state, render_state_t *render_state, RHI_command_list_t *command_list, entity_t *entity)
 {
@@ -658,59 +675,61 @@ r_init_render_state(render_state_t *render_state)
 internal_api void
 game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manager)
 {
+    game_state->game_controller   = s_im_init_input_controller(input_manager);
+    game_state->editor_controller = s_im_init_input_controller(input_manager);
+
     // NOTE(Sleepster): Movement 
-    game_action_t *movement_action = s_im_game_action_create(input_manager, STR("character move"), INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_AXIS2D);
+    input_action_t *movement_action = s_im_input_action_create(input_manager, INPUT_ACTION_TYPE_AXIS2D);
 
-    game_action_mapping_t keyboard_movement_mapping = (game_action_mapping_t) {
-        .bindings = {{SDL_SCANCODE_W}, {SDL_SCANCODE_S}, {SDL_SCANCODE_A}, {SDL_SCANCODE_D}},
+    input_action_mapping_t keyboard_movement_mapping = (input_action_mapping_t) {
+        .bindings = {{{SDL_SCANCODE_W}, {SDL_SCANCODE_S}, {SDL_SCANCODE_A}, {SDL_SCANCODE_D}}},
         .binding_count = 4,
-        .controller_type = INPUT_DEVICE_TYPE_KEYBOARD
+        .device_type = INPUT_DEVICE_TYPE_KEYBOARD
     };
-    s_im_game_action_add_mapping(movement_action, &keyboard_movement_mapping);
+    s_im_input_action_add_mapping(movement_action, &keyboard_movement_mapping);
 
-    game_action_mapping_t controller_movement_mapping = (game_action_mapping_t) {
+    input_action_mapping_t controller_movement_mapping = (input_action_mapping_t) {
         .bindings = {
-            {SDL_GAMEPAD_AXIS_LEFTY, INPUT_MANAGER_BINDING_TYPE_JOYSTICK}, 
-            {SDL_GAMEPAD_AXIS_LEFTX, INPUT_MANAGER_BINDING_TYPE_JOYSTICK}
+            {{SDL_GAMEPAD_AXIS_LEFTY}, {SDL_GAMEPAD_AXIS_LEFTX}}
         },
         .binding_count   = 2,
-        .controller_type = INPUT_DEVICE_TYPE_GAMEPAD 
+        .device_type = INPUT_DEVICE_TYPE_GAMEPAD 
     };
-    s_im_game_action_add_mapping(movement_action, &controller_movement_mapping);
+    s_im_input_action_add_mapping(movement_action, &controller_movement_mapping);
     game_state->mappings.move = movement_action;
 
     // NOTE(Sleepster): Jump
-    game_action_t *jump_action = s_im_game_action_create(input_manager, STR("Jump"), INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON);
-    game_action_mapping_t keyboard_jump_mapping = (game_action_mapping_t) {
+    input_action_t *jump_action = s_im_input_action_create(input_manager, INPUT_ACTION_TYPE_BUTTON);
+    input_action_mapping_t keyboard_jump_mapping = (input_action_mapping_t) {
         .bindings = {{SDL_SCANCODE_SPACE}},
         .binding_count = 1,
-        .controller_type = INPUT_DEVICE_TYPE_KEYBOARD
+        .device_type = INPUT_DEVICE_TYPE_KEYBOARD
     };
-    s_im_game_action_add_mapping(jump_action, &keyboard_jump_mapping);
+    s_im_input_action_add_mapping(jump_action, &keyboard_jump_mapping);
 
-    game_action_mapping_t gamepad_jump_mapping = (game_action_mapping_t) {
+    input_action_mapping_t gamepad_jump_mapping = (input_action_mapping_t) {
         .bindings = {{SDL_GAMEPAD_BUTTON_SOUTH}},
         .binding_count = 1,
-        .controller_type = INPUT_DEVICE_TYPE_GAMEPAD
+        .device_type = INPUT_DEVICE_TYPE_GAMEPAD
     };
-    s_im_game_action_add_mapping(jump_action, &gamepad_jump_mapping);
+    s_im_input_action_add_mapping(jump_action, &gamepad_jump_mapping);
     game_state->mappings.jump = jump_action;
 
     // NOTE(Sleepster): Dash 
-    game_action_t *dash_action = s_im_game_action_create(input_manager, STR("Dash"), INPUT_MANAGER_GAME_ACTION_MAPPING_TYPE_BUTTON);
-    game_action_mapping_t keyboard_dash_mapping = (game_action_mapping_t) {
+    input_action_t *dash_action = s_im_input_action_create(input_manager, INPUT_ACTION_TYPE_BUTTON);
+    input_action_mapping_t keyboard_dash_mapping = (input_action_mapping_t) {
         .bindings = {{SDL_SCANCODE_LSHIFT}},
         .binding_count = 1,
-        .controller_type = INPUT_DEVICE_TYPE_KEYBOARD 
+        .device_type = INPUT_DEVICE_TYPE_KEYBOARD 
     };
-    s_im_game_action_add_mapping(dash_action, &keyboard_dash_mapping);
+    s_im_input_action_add_mapping(dash_action, &keyboard_dash_mapping);
 
-    game_action_mapping_t gamepad_dash_mapping = (game_action_mapping_t) {
+    input_action_mapping_t gamepad_dash_mapping = (input_action_mapping_t) {
         .bindings = {{SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1}},
         .binding_count = 1,
-        .controller_type = INPUT_DEVICE_TYPE_GAMEPAD
+        .device_type = INPUT_DEVICE_TYPE_GAMEPAD
     };
-    s_im_game_action_add_mapping(dash_action, &gamepad_dash_mapping);
+    s_im_input_action_add_mapping(dash_action, &gamepad_dash_mapping);
     game_state->mappings.dash = dash_action;
 }
 
@@ -718,8 +737,8 @@ internal_api void
 poll_player_input(game_state_t *game_state)
 {
     game_state->input_info.movement_axis = game_state->mappings.move->axis2D_value;
-    game_state->input_info.jumped        = GameActionPressed(game_state->mappings.jump);
-    game_state->input_info.dashed        = GameActionPressed(game_state->mappings.dash);
+    game_state->input_info.jumped        = InputActionPressed(game_state->mappings.jump);
+    game_state->input_info.dashed        = InputActionPressed(game_state->mappings.dash);
 }
 
 internal_api void
@@ -782,7 +801,7 @@ game_state_simulate(game_state_t *game_state)
         }
     }
 
-    entity_query_t collision_query = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_HAS_COLLIDER);
+    entity_query_t collision_query = s_entity_query_flags(game_state->entity_manager, ENTITY_FLAG_HAS_COLLIDER);
     entity_query_t actor_query     = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_ACTOR|ENTITY_FLAG_HAS_COLLIDER);
     for(entity_t *entity: actor_query)
     {
@@ -1021,13 +1040,14 @@ game_main(global_context_t *_global_context)
     if(!gc->game_state)
     {
         gc->game_state          = c_arena_push_struct(&gc->persistent_arena, game_state_t);
+        gc->render_state        = c_arena_push_struct(&gc->transient_arena, render_state_t);
         gc->game_state->main_ui = c_arena_push_struct(&gc->persistent_arena, ui_state_t);
     }
 
     game_state_t    *game_state    =  gc->game_state;
     input_manager_t *input_manager =  gc->input_manager;
     asset_manager_t *asset_manager =  gc->asset_manager;
-    render_state_t  *render_state  = &game_state->render_state;
+    render_state_t  *render_state  =  gc->render_state;
     ui_state_t      *main_ui       =  game_state->main_ui;
     if(!game_state->is_initialized)
     {
@@ -1118,7 +1138,6 @@ game_main(global_context_t *_global_context)
 #ifndef RELEASE
         c_file_watcher_process_changes(&gc->file_watcher);
 #endif
-        game_state->controller = s_im_get_controller_from_active_device(input_manager, game_state->controller);
         if(game_state->open_debug_menu || game_state->editor_opened)
         {
             ui_state_get_input_events(main_ui);
@@ -1138,7 +1157,7 @@ game_main(global_context_t *_global_context)
         game_state->game_camera.zoom = 1.0f;
 
         game_state->fullscreen_camera.viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
-                                          Max(render_state->RHI_context->window_size.y, 10));
+                                                      Max(render_state->RHI_context->window_size.y, 10));
         game_state->fullscreen_camera.zoom = 1.0f;
 
         game_state->editor_camera.zoom = game_state->editor_zoom;
@@ -1152,38 +1171,60 @@ game_main(global_context_t *_global_context)
         // NOTE(Sleepster): Editor controls block 
         if(game_state->editor_opened)
         {
-            action_button_t *middle_mouse = s_im_get_controller_action_button(game_state->controller, SDL_MIDDLE_MOUSE);
-            vec2_t scroll_delta     = game_state->controller->device->keyboard_data.current_mouse_wheel;
-            vec2_t mouse_move_delta = game_state->controller->device->keyboard_data.mouse_delta;
+            s_im_controller_update_state(input_manager, game_state->editor_controller, false);
+
+            input_state_t *middle_mouse   = s_im_controller_get_input_state(game_state->editor_controller, SDL_SCANCODE_MIDDLE_MOUSE);
+            input_state_t *mouse_movement = s_im_controller_get_input_state(game_state->editor_controller, INPUT_ARRAY_INPUT_AXIS_MOUSE_MOVEMENT);
+            input_state_t *mouse_scroll   = s_im_controller_get_input_state(game_state->editor_controller, INPUT_ARRAY_INPUT_AXIS_MOUSE_WHEEL);
+
+            vec2_t scroll_delta     = mouse_scroll->delta_value; 
+            vec2_t mouse_move_delta = mouse_movement->delta_value;
 
             // NOTE(Sleepster): Panning 
-            if(ActionButtonDown(middle_mouse))
+            if(InputStateDown(middle_mouse->flags))
             {
-                game_state->editor_camera.translation.x -= (mouse_move_delta.x * 3) * game_state->editor_camera.zoom;
-                game_state->editor_camera.translation.y += (mouse_move_delta.y * 3) * game_state->editor_camera.zoom;
+                game_state->editor_camera.translation.x += mouse_move_delta.x;
+                game_state->editor_camera.translation.y -= mouse_move_delta.y;
             }
 
             // NOTE(Sleepster): Zoom adjustment 
             if(scroll_delta.y != 0.0f)
             {
-                game_state->editor_zoom += (scroll_delta.y * 0.5f);
-                game_state->editor_zoom  = Clamp(game_state->editor_zoom, 2.0f, 5.0f);
+                game_state->editor_zoom += (scroll_delta.y);
+                game_state->editor_zoom  = Clamp(game_state->editor_zoom, 1.0f, 10.0f);
             }
 
             // NOTE(Sleepster): Tile placing 
-            action_button_t *left_mouse = s_im_get_controller_action_button(game_state->controller, SDL_LEFT_MOUSE);
-            if(ActionButtonDown(left_mouse))
+            input_state_t *left_mouse = s_im_controller_get_input_state(game_state->editor_controller, SDL_SCANCODE_LEFT_MOUSE);
+            if(InputStateDown(left_mouse->flags))
             {
-                vec2_t mouse_position = s_im_transform_mouse_data(game_state->controller, 
+                vec2_t mouse_position = s_im_transform_mouse_data(game_state->editor_controller, 
                                                                   game_state->editor_camera.viewport, 
                                                                   game_state->editor_camera.matrices.view_matrix, 
                                                                   game_state->editor_camera.matrices.projection_matrix);
-                vec2_t tile_position = world_to_tile(mouse_position);
-                (void)tile_position;
-            }
 
-            game_state->controller->device->keyboard_data.mouse_delta = {};
-            game_state->controller->device->keyboard_data.current_mouse_wheel = {};
+                world_sim_region_t *region = s_entity_manager_get_sim_region(game_state->entity_manager, mouse_position);
+                // TODO(Sleepster): This is just to fix some stupid bugs with the cursor clicking outside of the main area for now
+                // this WILL go away
+                if(region)
+                {
+                    bool8 occupied = false;
+                    for(const entity_t &entity: region->entities)
+                    {
+                        if(rect2_point_in_rect(entity.bounding_box, mouse_position))
+                        {
+                            occupied = true;
+                            break;
+                        }
+                    }
+
+                    if(!occupied)
+                    {
+                        vec2_t tile_position = vec2_scale(world_to_tile(mouse_position), WORLD_TILE_SIZE);
+                        entity_tile_create(game_state, tile_position, 0);
+                    }
+                }
+            }
         }
         // NOTE(Sleepster): Editor controls block 
 
@@ -1193,7 +1234,7 @@ game_main(global_context_t *_global_context)
             delta_time = gc->tick_rate * 2.0f;
         }
 
-        world_sim_region_t *active_region = &game_state->entity_manager->active_region_hash[6];
+        world_sim_region_t *active_region = &game_state->entity_manager->active_sim_regions[1];
 
         bool8 first_tick = true;
         dt_accumulator  += delta_time;
@@ -1201,19 +1242,19 @@ game_main(global_context_t *_global_context)
         {
             if(first_tick)
             {
-                // NOTE(Sleepster): Apply events. 
-                s_im_apply_events_to_controller(game_state->controller, game_state->controller->device->events, true);
+                s_im_controller_update_state(input_manager, game_state->game_controller, false);
+                s_im_input_action_update_state(input_manager, game_state->game_controller);
 
-                if(game_state->controller->type == INPUT_DEVICE_TYPE_KEYBOARD)
+                if(game_state->game_controller->owner_device && game_state->game_controller->owner_device->type == INPUT_DEVICE_TYPE_KEYBOARD)
                 {
                     // NOTE(Sleepster): Debug menu 
-                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_SEMICOLON))
+                    if(s_im_is_input_button_pressed(game_state->game_controller, SDL_SCANCODE_SEMICOLON))
                     {
                         game_state->open_debug_menu = !game_state->open_debug_menu;
                     }
 
                     // NOTE(Sleepster): Edit mode 
-                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_E))
+                    if(s_im_is_input_button_pressed(game_state->game_controller, SDL_SCANCODE_E))
                     {
                         game_state->editor_opened = !game_state->editor_opened;
                         if(game_state->editor_opened) 
@@ -1242,20 +1283,20 @@ game_main(global_context_t *_global_context)
                     }
 
                     // NOTE(Sleepster): Input and state recording 
-                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_R))
+                    if(s_im_is_input_button_pressed(game_state->game_controller, SDL_SCANCODE_R))
                     {
                         DEBUG_toggle_state_recording();
                     }
 
                     // NOTE(Sleepster): Input and state looping 
-                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_L))
+                    if(s_im_is_input_button_pressed(game_state->game_controller, SDL_SCANCODE_L))
                     {
                         DEBUG_toggle_state_playback();
                     }
                     DEBUG_update_state_recording_and_playback();
 
                     // NOTE(Sleepster): Respawn the player 
-                    if(s_im_is_button_pressed(game_state->controller, SDL_SCANCODE_P))
+                    if(s_im_is_input_button_pressed(game_state->game_controller, SDL_SCANCODE_P))
                     {
                         entity_query_t player_query = s_entity_query_archetype(game_state->entity_manager, ENTITY_ARCHETYPE_PLAYER);
                         entity_t *player = player_query.entities[0];
@@ -1265,9 +1306,6 @@ game_main(global_context_t *_global_context)
                         entity_player_create(game_state, asset_manager, vec2(0, 0));
                     }
                 }
-
-                s_im_update_game_action_states(input_manager, game_state->controller);
-                s_im_clear_device_events(game_state->controller->device);
 
                 first_tick = false;
                 c_global_context_reset_simulation_arena();

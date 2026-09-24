@@ -75,7 +75,7 @@ typedef struct file_packer_state
     u32                asset_next_entry_to_write;
 }file_packer_state_t;
 
-global_variable file_packer_state_t packer_state;
+global file_packer_state_t packer_state;
 
 internal_api void
 parse_arguments(s32 arg_count, char **args)

@@ -21,6 +21,7 @@ struct RHI_context_t;
 struct asset_manager_t;
 struct input_manager_t;
 struct game_state_t;
+struct render_state_t;
 
 typedef struct global_context
 {
@@ -30,6 +31,7 @@ typedef struct global_context
 
     threadpool_t      main_threadpool;
     game_state_t     *game_state;
+    render_state_t   *render_state;
     RHI_context_t    *RHI_context;
     asset_manager_t  *asset_manager;
     input_manager_t  *input_manager;

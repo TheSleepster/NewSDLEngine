@@ -206,6 +206,8 @@ enum RHI_command_type_t
 struct RHI_command_header_t
 {
     RHI_command_type_t command_type;
+    s32                  line_number;
+    const char          *filename;
 };
 
 struct RHI_command_begin_renderpass_t
@@ -521,7 +523,7 @@ struct RHI_context_t
     u32                                         current_window_size_generation;
     u32                                         last_window_size_generation;
 
-    RHI_renderpass_t                            renderpasses[100];
+    array_t<RHI_renderpass_t, 100>              renderpasses;
     u32                                         renderpass_count;
 
     RHI_command_present_frame_t                *present_command;
@@ -585,6 +587,9 @@ ENGINE_API s32                    RHI_is_texture_bound(RHI_command_list_t *comma
 ENGINE_API void                   RHI_set_texture_filter_mode(RHI_context_t *render_state, texture2D_t *texture, u32 filter_mode);
 
 // NOTE(Sleepster): RHI commands 
+//
+// TODO(Sleepster): Figure out if the addition of the line number and the filename to the RHI command causes
+// too much overhead. I can't see it actually causing a problem, but who knows right?
 ENGINE_API void RHI_cmd_renderpass_begin(RHI_command_list_t *command_list, u32 renderpassID);
 ENGINE_API void RHI_cmd_renderpass_end(RHI_command_list_t *command_list);
 ENGINE_API void RHI_cmd_clear_renderpass_attachments(RHI_command_list_t *command_list, u32 renderpassID);
@@ -616,6 +621,10 @@ ENGINE_API true_inline void RHI_cmd_update_buffer_contents(RHI_command_list_t *c
 ENGINE_API true_inline void RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer);
 
 ENGINE_API void RHI_execute_backend_commands(RHI_context_t *RHI_context);
+
+#ifndef RELEASE
+#else
+#endif
 
 #endif // S_RENDERER_H
 

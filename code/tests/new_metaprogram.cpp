@@ -118,6 +118,12 @@ TEST(anon_internal_unions)
     Assert(sys_wait_for_process(process));
 }
 
+TEST(array_using)
+{
+    void *process = sys_create_process(STR("../build/athena"), STR("--filename=tests/metaprogram_tests/using.cpp"));
+    Assert(sys_wait_for_process(process));
+}
+
 int
 main(void)
 {

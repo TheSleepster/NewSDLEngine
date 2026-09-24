@@ -186,8 +186,8 @@ template <typename T, s32 capacity>
 struct array_t
 {
     // NOTE(Sleepster): Cannot resize the same array. This "static constexpr" makes it so that the count will survive any and all memsets
-    T   items[capacity];
     static constexpr s32 count = capacity;
+    T items[capacity];
 
     T &operator[](s32 index);
     T *operator+(s32 index);

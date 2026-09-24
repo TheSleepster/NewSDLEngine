@@ -27,13 +27,14 @@ struct animation2D_t;
 constexpr u32 MAX_SIM_REGIONS        = 4096;
 constexpr u32 SIM_REGION_WIDTH       = 320;
 constexpr u32 SIM_REGION_HEIGHT      = 180;
-constexpr u32 MAX_ACTIVE_SIM_REGIONS = 50;
+constexpr u32 MAX_ACTIVE_SIM_REGIONS = 51;
 
 enum entity_archetype_t
 {
     ENTITY_ARCHETYPE_INVALID,
     ENTITY_ARCHETYPE_PLAYER,
     ENTITY_ARCHETYPE_COLLIDER,
+    ENTITY_ARCHETYPE_TILE,
     ENTITY_ARCHETYPE_COUNT
 };
 
@@ -96,19 +97,19 @@ struct world_sim_region_t
 {
     ivec2_t   world_chunk_hash;
 
-    entity_t entities[MAX_SIM_REGION_ENTITIES];
-    u32      sim_entity_count;
+    array_t<entity_t, MAX_SIM_REGION_ENTITIES> entities;
+    u32                                        sim_entity_count;
 };
 
+// NOTE(Sleepster): This isn't a real solution for the world sim storage... 
 struct entity_manager_t
 {
-    memory_arena_t                        transient_storage;
+    memory_arena_t transient_storage;
+    u8             world_sim_region_sparse_matrix[MAX_SIM_REGIONS][MAX_SIM_REGIONS];
 
-    u8                                    world_sim_region_sparse_matrix[MAX_SIM_REGIONS][MAX_SIM_REGIONS];
-
-    world_sim_region_t                    active_region_hash[MAX_ACTIVE_SIM_REGIONS];
-    array_t<u32, MAX_SIM_REGION_ENTITIES> occupied_region_hash_indices;
-    u32                                   active_region_count;
+    // NOTE(Sleepster): index 0 is always invalid 
+    array_t<world_sim_region_t, MAX_ACTIVE_SIM_REGIONS> active_sim_regions;
+    u32                                                 active_region_count;
 };
 
 struct entity_query_t
@@ -120,6 +121,7 @@ struct entity_query_t
     entity_t **end()   { return(entities + entity_count); }
 };
 
+world_sim_region_t* s_entity_manager_get_sim_region(entity_manager_t *entity_manager, vec2_t world_position);
 world_sim_region_t* s_entity_manager_get_or_create_sim_region(entity_manager_t *entity_manager, vec2_t world_position);
 
 entity_t      *s_entity_create(entity_manager_t *entity_manager, vec2_t world_position, u32 archetype, u32 flags);

@@ -213,8 +213,8 @@ struct symbol_table_t
 };
 
 
-global_variable language_info_t g_language_info;
-global_variable symbol_table_t  g_symbol_table;
+global language_info_t g_language_info;
+global symbol_table_t  g_symbol_table;
 
 internal_api language_keyword_t *get_keyword_from_identifier(string_t identifier);
 internal_api void                symbol_table_init(string_t filepath, bool8 recursive);

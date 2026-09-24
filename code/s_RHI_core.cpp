@@ -145,8 +145,6 @@ RHI_build_renderpass(RHI_context_t *RHI_context, RHI_renderpass_desc_t *renderpa
 {
     u32 result = INVALID_ID;
 
-    // TODO(Sleepster): What if we destroy renderpasses? Suddenly this is a really bad way of getting
-    // a new renderpass!
     RHI_renderpass_t *renderpass = RHI_context->renderpasses + RHI_context->renderpass_count;
     Assert(renderpass);
     
@@ -576,7 +574,7 @@ RHI_cmd_renderpass_begin(RHI_command_list_t *command_list, u32 renderpassID)
 
     RHI_command_t *command = RHI_get_next_command(command_list);
     RHI_command_begin_renderpass_t *begin_renderpass = c_arena_push_struct(&command_list->command_arena, 
-                                                                                  RHI_command_begin_renderpass_t);
+                                                                           RHI_command_begin_renderpass_t);
     begin_renderpass->ID = renderpassID;
 
     command->header.command_type = RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS;
@@ -603,7 +601,7 @@ RHI_cmd_renderpass_end(RHI_command_list_t *command_list)
 
     RHI_command_t *command = RHI_get_next_command(command_list);
     RHI_command_end_renderpass_t *end_renderpass = c_arena_push_struct(&command_list->command_arena, 
-                                                                           RHI_command_end_renderpass_t);
+                                                                       RHI_command_end_renderpass_t);
     end_renderpass->ID = command_list->active_renderpass->ID;
 
     command->header.command_type = RHI_RENDER_COMMAND_TYPE_END_RENDERPASS;

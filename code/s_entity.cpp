@@ -22,28 +22,51 @@
  * 
  */
 
+internal_api ivec2_t
+get_sim_chunk_position(vec2_t world_position)
+{
+    ivec2_t result;
+
+    const u32 matrix_center = (MAX_SIM_REGIONS * 0.5f);
+    u32 chunk_x = floorf(((world_position.x + (SIM_REGION_WIDTH  * 0.5f)) / SIM_REGION_WIDTH)  + (matrix_center));
+    u32 chunk_y = floorf(((world_position.y + (SIM_REGION_HEIGHT * 0.5f)) / SIM_REGION_HEIGHT) + (matrix_center));
+
+    result.x = chunk_x;
+    result.y = chunk_y;
+
+    return(result);
+}
+
+world_sim_region_t*
+s_entity_manager_get_sim_region(entity_manager_t *entity_manager, vec2_t world_position)
+{    
+    world_sim_region_t *result = null;
+
+    ivec2_t chunk_position = get_sim_chunk_position(world_position); 
+
+    u8 *active_region_index = &entity_manager->world_sim_region_sparse_matrix[chunk_position.x][chunk_position.y];
+    if(*active_region_index != 0)
+    {
+        result = &entity_manager->active_sim_regions[*active_region_index];
+    }
+
+    return(result);
+}
+
 world_sim_region_t*
 s_entity_manager_get_or_create_sim_region(entity_manager_t *entity_manager, vec2_t world_position)
 {
     world_sim_region_t *result = null;
     
-    const u32 matrix_center = (MAX_SIM_REGIONS * 0.5f);
-    u32 chunk_x = floorf(((world_position.x + (SIM_REGION_WIDTH  * 0.5f)) / SIM_REGION_WIDTH)  + (matrix_center));
-    u32 chunk_y = floorf(((world_position.y + (SIM_REGION_HEIGHT * 0.5f)) / SIM_REGION_HEIGHT) + (matrix_center));
-
-    u8 *regionID = &entity_manager->world_sim_region_sparse_matrix[chunk_x][chunk_y];
-    if(*regionID == 0)
+    ivec2_t chunk_position = get_sim_chunk_position(world_position); 
+    u8 *active_region_index = &entity_manager->world_sim_region_sparse_matrix[chunk_position.x][chunk_position.y];
+    if(*active_region_index == 0)
     {
-        // NOTE(Sleepster): Store the x in the upper 32 bits, mask off the x for the y storage and store them in the lower 32 bits. 
-        u64 region_key = (u64)(((u64)chunk_x << 32) | ((u64)chunk_y & 0xFFFFFFFF));
-        u64 region_hash_index = region_key % MAX_ACTIVE_SIM_REGIONS;
-
-        *regionID = region_hash_index;
-        entity_manager->occupied_region_hash_indices[entity_manager->active_region_count++] = region_hash_index;
+        *active_region_index = entity_manager->active_region_count + 1;
     }
 
-    result = entity_manager->active_region_hash + *regionID;
-    result->world_chunk_hash = ivec2(chunk_x, chunk_y);
+    result = entity_manager->active_sim_regions + *active_region_index;
+    result->world_chunk_hash = ivec2(chunk_position.x, chunk_position.y);
 
     return(result);
 }

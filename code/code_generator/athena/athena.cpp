@@ -98,7 +98,7 @@ struct athena_state_t
     dynarray_t<parser_t*> parser_table; 
 };
 
-global_variable athena_state_t state;
+global athena_state_t state;
 
 thread_static memory_arena_t permanent_arena;
 thread_static memory_arena_t transient_arena;
@@ -108,7 +108,7 @@ struct AST_node_t;
 internal_api inline u64   type_id_from_identifier(string_t string);
 internal_api code_type_t* symbol_table_register_typename(string_t type_name, u32 expected_metatype, u64 alias_id = INVALID_ID);
 
-static ticket_mutex_t error_mutex;
+global ticket_mutex_t error_mutex;
 
 internal_api void
 report_error(parser_t *parser, char *message, ...)
@@ -853,6 +853,28 @@ build_file_AST(parser_t *parser)
             }break;
             case TOKEN_TYPE_CONSTEXPR:
             {
+            }break;
+            case TOKEN_TYPE_USING:
+            {
+                // TODO(Sleepster): We're doing this in place for now, it's really bad and doesn't handle real stuff
+                // but I'm too lazy to make a real solution right now so I hope it's good enough 
+                lexer_token_t type_name = parser_get_next_lexer_token(parser);
+                lexer_token_t equals_token = parser_get_next_lexer_token(parser);
+                if(type_name.token_type == TOKEN_TYPE_IDENT)
+                {
+                    if(equals_token.token_type == TOKEN_TYPE_EQUALS)
+                    {
+                        parser_register_code_type(parser, type_name.data);
+                    }
+                    else
+                    {
+                    }
+                }
+                else
+                {
+                    report_error(parser, "Expected an identifier following the found 'using' statement... Instead we found token: '%.*s'...\n",
+                                 fprint_token(type_name));
+                }
             }break;
             case TOKEN_TYPE_OPEN_BRACKET:
             {

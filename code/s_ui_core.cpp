@@ -93,6 +93,7 @@ ui_state_init(ui_state_t       *ui_state,
 
     ui_state->widget_arena    = c_arena_create(MB(10), ALLOCATOR_TAG_UI);
     ui_state->polling_arena   = c_arena_create(MB(50), ALLOCATOR_TAG_UI);
+    ui_state->ui_controller   = s_im_init_input_controller(input_manager);
     ui_state->persistent_data_arena = c_arena_create(MB(100), ALLOCATOR_TAG_UI);
     ui_state->widget_states = c_hash_table_create<widget_state_t>(2096, 
                                                                  &ui_state->persistent_data_arena, 
@@ -177,105 +178,83 @@ ui_state_poll_input_events(ui_state_t *ui_state)
 {
     if(ui_state->frame_begun)
     {
-        ui_state->ui_controller = s_im_get_controller_from_active_device(ui_state->input_manager, ui_state->ui_controller);
+        s_im_controller_update_state(ui_state->input_manager, ui_state->ui_controller, ui_state->input_focused);
+    }
 
-        input_controller_t *controller = ui_state->ui_controller;
-        if(controller)
+    ui_state->keyboard_flags = 0;
+
+    input_state_t *left_mouse  = s_im_controller_get_input_state(ui_state->ui_controller, SDL_SCANCODE_LEFT_MOUSE);
+    input_state_t *right_mouse = s_im_controller_get_input_state(ui_state->ui_controller, SDL_SCANCODE_RIGHT_MOUSE);
+    input_state_t *lctrl       = s_im_controller_get_input_state(ui_state->ui_controller, SDL_SCANCODE_LCTRL);
+    if(InputStateDown(lctrl->flags))
+    {
+        ui_state->keyboard_flags |= UI_KEYBOARD_FLAG_LCTRL; 
+    }
+
+    ui_state->left_mouse  = left_mouse;
+    ui_state->right_mouse = right_mouse;
+
+    if(ui_state->first_widget != null)
+    {
+        vec2_t current_mouse_position = ui_state->mouse_position;
+
+        // NOTE(Sleepster): Determine top most widget for the hierarchy 
+        widget_t *current_widget = ui_state->first_widget;
+        if(ui_state->hot_widget)
         {
-            s_im_apply_events_to_controller(ui_state->ui_controller, ui_state->ui_events, false);
+            widget_state_t *state = &(ui_state->widget_states.items[ui_state->hot_widget->ID]).item;
+            bool8 within_bounds = rect2_point_in_rect(state->widget_rect, current_mouse_position);
+            if(!within_bounds)
+            {
+                ui_state->last_hot_ID = ui_state->hot_widget->ID;
+                ui_state->hot_widget = null;
+            }
+        }
+
+        bool8 is_held           = InputStateDown(left_mouse->flags);
+        bool8 just_released     = InputStateReleased(left_mouse->flags);
+        bool8 just_clicked      = InputStatePressed(left_mouse->flags);
+        bool8 is_right_clicked  = InputStatePressed(right_mouse->flags);
+        bool8 is_right_held     = InputStateDown(right_mouse->flags);
+        bool8 is_double_clicked = left_mouse->half_transition_count >= 2;
+
+        ui_state->left_mouse_clicked_this_frame = just_clicked;
+        widget_t *top_most_widget = find_top_level_in_bounds_widget(ui_state,
+                                                                    current_widget, 
+                                                                    current_mouse_position);
+        if(ui_state->hot_widget)
+        {
+            ui_state->last_hot_ID = ui_state->hot_widget->ID;
+            ui_state->hot_widget  = top_most_widget;
         }
         else
         {
-            log_warning("NO valid UI_controller...\n");
-        }
-    }
-
-    if(ui_state->ui_controller)
-    {
-        ui_state->keyboard_flags = 0;
-
-        action_button_t *left_mouse  = s_im_get_controller_action_button(ui_state->ui_controller, SDL_LEFT_MOUSE);
-        action_button_t *right_mouse = s_im_get_controller_action_button(ui_state->ui_controller, SDL_RIGHT_MOUSE);
-        action_button_t *lctrl       = s_im_get_controller_action_button(ui_state->ui_controller, SDL_SCANCODE_LCTRL);
-        if(lctrl->flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN)
-        {
-            ui_state->keyboard_flags |= UI_KEYBOARD_FLAG_LCTRL; 
+            ui_state->hot_widget  = top_most_widget;
         }
 
-        ui_state->left_mouse = {
-            .flags = left_mouse->flags,
-            .half_transition_count = left_mouse->half_transition_count,
-            .ID = SDL_LEFT_MOUSE
-        };
-
-        ui_state->right_mouse = {
-            .flags = right_mouse->flags,
-            .half_transition_count = right_mouse->half_transition_count,
-            .ID = SDL_RIGHT_MOUSE
-        };
-
-        if(ui_state->first_widget != null)
+        if(just_clicked || is_right_clicked)
         {
-            vec2_t current_mouse_position = ui_state->mouse_position;
-
-            // NOTE(Sleepster): Determine top most widget for the hierarchy 
-            widget_t *current_widget = ui_state->first_widget;
-            if(ui_state->hot_widget)
+            if(ui_state->active_widget)
             {
-                widget_state_t *state = &(ui_state->widget_states.items[ui_state->hot_widget->ID]).item;
-                bool8 within_bounds = rect2_point_in_rect(state->widget_rect, current_mouse_position);
-                if(!within_bounds)
-                {
-                    ui_state->last_hot_ID = ui_state->hot_widget->ID;
-                    ui_state->hot_widget = null;
-                }
-            }
-
-            bool8 is_held           = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
-            bool8 just_released     = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_RELEASED);
-            bool8 just_clicked      = (ui_state->left_mouse.flags  & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
-            bool8 is_right_clicked  = (ui_state->right_mouse.flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_PRESSED);
-            bool8 is_right_held     = (ui_state->right_mouse.flags & INPUT_MANAGER_ACTION_BUTTON_FLAG_DOWN);
-            bool8 is_double_clicked = ui_state->left_mouse.half_transition_count >= 2;
-
-            ui_state->left_mouse_clicked_this_frame = just_clicked;
-            widget_t *top_most_widget = find_top_level_in_bounds_widget(ui_state,
-                                                                        current_widget, 
-                                                                        current_mouse_position);
-            if(ui_state->hot_widget)
-            {
-                ui_state->last_hot_ID = ui_state->hot_widget->ID;
-                ui_state->hot_widget  = top_most_widget;
+                ui_state->last_active_ID = ui_state->active_widget->ID;
+                ui_state->active_widget  = top_most_widget;
             }
             else
             {
-                ui_state->hot_widget  = top_most_widget;
+                ui_state->active_widget  = top_most_widget;
             }
+        }
 
-            if(just_clicked || is_right_clicked)
-            {
-                if(ui_state->active_widget)
-                {
-                    ui_state->last_active_ID = ui_state->active_widget->ID;
-                    ui_state->active_widget  = top_most_widget;
-                }
-                else
-                {
-                    ui_state->active_widget  = top_most_widget;
-                }
-            }
+        if(ui_state->active_widget)
+        {
+            widget_state_t *state = &(ui_state->widget_states.items[ui_state->active_widget->ID]).item;
 
-            if(ui_state->active_widget)
-            {
-                widget_state_t *state = &(ui_state->widget_states.items[ui_state->active_widget->ID]).item;
-
-                state->is_held = is_held;
-                state->just_released = just_released;
-                state->just_clicked = just_clicked;
-                state->is_double_clicked = is_double_clicked;
-                state->is_right_clicked = is_right_clicked;
-                state->is_right_held = is_right_held;
-            }
+            state->is_held = is_held;
+            state->just_released = just_released;
+            state->just_clicked = just_clicked;
+            state->is_double_clicked = is_double_clicked;
+            state->is_right_clicked = is_right_clicked;
+            state->is_right_held = is_right_held;
         }
     }
 }
@@ -295,6 +274,8 @@ from that of it's ui_controller.
 void
 ui_state_get_input_events(ui_state_t *ui_state)
 {
+    (void)ui_state;
+#if 0
     if(ui_state->ui_controller && ui_state->input_focused)
     {
         c_arena_reset(&ui_state->polling_arena);
@@ -318,6 +299,7 @@ ui_state_get_input_events(ui_state_t *ui_state)
             ++ui_state->ui_event_count;
         }
     }
+#endif
 }
 
 /*
@@ -330,7 +312,6 @@ void
 ui_state_update_widget_state(ui_state_t *ui_state)
 {
     RHI_renderpass_t *renderpass = ui_state->RHI_context->renderpasses + ui_state->interface_framebuffer;
-    ui_state->ui_controller = s_im_get_controller_from_active_device(ui_state->input_manager, ui_state->ui_controller);
     
     float32 half_width  = renderpass->render_width  * 0.5f;
     float32 half_height = renderpass->render_height * 0.5f;
@@ -594,10 +575,6 @@ ui_state_end_frame(ui_state_t *ui_state, RHI_command_list_t *command_list)
     ui_state_render_widgets(ui_state, command_list);
     ui_state->frame_ended = true;
     ui_state->frame_begun = false;
-    if(ui_state->input_focused)
-    {
-        s_im_clear_device_events(ui_state->ui_controller->device);
-    }
 
     ++ui_state->frame_count;
 }
@@ -1483,6 +1460,8 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
     if(widget_state->toggled && ui_state->input_focused)
     {
         bool8 backspaced = false;
+        (void)backspaced;
+#if 0
         for(u32 event_index = 0;
             event_index < ui_state->ui_event_count;
             ++event_index)
@@ -1530,6 +1509,7 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
                 }
             }
         }
+#endif
 
         widget_state->widget_text_render_start_offset = 0;
         widget_state->widget_text_render_end_offset   = widget->widget_text_buffer->count;

@@ -226,8 +226,8 @@ struct ui_state_t
     widget_t                         *active_widget;
     widget_t                         *last_clicked_widget;
 
-    input_binding_state_t             left_mouse;
-    input_binding_state_t             right_mouse;
+    input_state_t                    *left_mouse;
+    input_state_t                    *right_mouse;
 
     array_t<input_event_t, 100>       ui_events;
     u32                               ui_event_count;

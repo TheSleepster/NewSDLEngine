@@ -291,13 +291,13 @@ typedef vulkan_buffer_t  backend_buffer_t;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
 
-global_variable const char *g_device_extensions[] = {
+global const char *g_device_extensions[] = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
 #pragma GCC diagnostic pop
 
-global_variable const VkDynamicState g_pipeline_dynamic_states[] = {
+global const VkDynamicState g_pipeline_dynamic_states[] = {
     VK_DYNAMIC_STATE_VIEWPORT,
     VK_DYNAMIC_STATE_SCISSOR,
     VK_DYNAMIC_STATE_LINE_WIDTH,
@@ -309,7 +309,7 @@ global_variable const VkDynamicState g_pipeline_dynamic_states[] = {
 //
 // The idea is that if it's a shader that's never been loaded, we have no idea what the state of the pipeline should be.
 // So, we just use these defaults instead.
-global_variable constexpr VkPipelineRasterizationStateCreateInfo g_pipeline_default_rasterization_state = {
+global constexpr VkPipelineRasterizationStateCreateInfo g_pipeline_default_rasterization_state = {
         .sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
         .depthClampEnable        = false,
         .rasterizerDiscardEnable = false,
@@ -323,7 +323,7 @@ global_variable constexpr VkPipelineRasterizationStateCreateInfo g_pipeline_defa
         .lineWidth               = 1.0f,
 };
 
-global_variable constexpr VkPipelineDepthStencilStateCreateInfo g_pipeline_default_depth_stencil_state = {
+global constexpr VkPipelineDepthStencilStateCreateInfo g_pipeline_default_depth_stencil_state = {
     .sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
     .depthTestEnable       = true,
     .depthWriteEnable      = true,
@@ -332,7 +332,7 @@ global_variable constexpr VkPipelineDepthStencilStateCreateInfo g_pipeline_defau
     .stencilTestEnable     = false,
 };
 
-global_variable constexpr VkPipelineColorBlendAttachmentState g_pipeline_default_blend_settings = {
+global constexpr VkPipelineColorBlendAttachmentState g_pipeline_default_blend_settings = {
     .blendEnable         = true,
     .srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
     .dstColorBlendFactor = VK_BLEND_FACTOR_ONE,
@@ -343,7 +343,7 @@ global_variable constexpr VkPipelineColorBlendAttachmentState g_pipeline_default
     .colorWriteMask      = VK_COLOR_COMPONENT_R_BIT|VK_COLOR_COMPONENT_G_BIT|VK_COLOR_COMPONENT_B_BIT|VK_COLOR_COMPONENT_A_BIT
 };
 
-global_variable constexpr RHI_pipeline_state g_pipeline_default_state_key = {};
+global constexpr RHI_pipeline_state g_pipeline_default_state_key = {};
 
 #define vkAssert(result) ({                                                \
     if(!vk_backend_result_is_success(result))                              \

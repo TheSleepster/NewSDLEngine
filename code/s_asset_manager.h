@@ -318,7 +318,7 @@ typedef struct material_data
 
 constexpr u32 MAX_CACHED_TEMPORARY_FONT_GLYPHS = 1000;
 
-const global_variable u8 UTF8_trailing_bytes[] = {
+const global u8 UTF8_trailing_bytes[] = {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -329,10 +329,10 @@ const global_variable u8 UTF8_trailing_bytes[] = {
 	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, 3,3,3,3,3,3,3,3,4,4,4,4,5,5,5,5
 };
 
-const global_variable u8 UTF8_initial_bytemask[] = {0x7f, 0x1f, 0x0f, 0x07, 0x03, 0x01};
-const global_variable u8 UTF8_first_byte_mark[]  = {0x00, 0x00, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
+const global u8 UTF8_initial_bytemask[] = {0x7f, 0x1f, 0x0f, 0x07, 0x03, 0x01};
+const global u8 UTF8_first_byte_mark[]  = {0x00, 0x00, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
 
-const global_variable u32 UTF8_offsets[] = {
+const global u32 UTF8_offsets[] = {
     0x00000000, 0x00003080, 0x000e2080, 
     0x03c82080, 0xfa082080, 0x82082080
 };

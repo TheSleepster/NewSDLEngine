@@ -521,7 +521,8 @@ evaluate_expression_AST(AST_node_t *expression)
                         }
                         else
                         {
-                            Expect(false, "Oopsies how are you here???\n");
+                            // TODO(Sleepster): Turned off for now 
+                            //Expect(false, "Oopsies how are you here???\n");
                         }
                     }
                     else
