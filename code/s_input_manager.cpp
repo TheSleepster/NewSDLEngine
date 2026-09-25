@@ -457,6 +457,8 @@ ENGINE_API u32
 s_im_observe_current_device_events(input_controller_t *controller, array_view_t<input_event_t> event_array)
 {
     u32 result = 0;
+
+    u64 current_time = SDL_GetTicks();
     if(controller->owner_device && controller->owner_device->deviceID != (s32)INVALID_ID)
     {
         s32 events_read   = 0;
@@ -470,15 +472,15 @@ s_im_observe_current_device_events(input_controller_t *controller, array_view_t<
             input_event_t *event = controller->owner_device->input_events + source_index;
             Assert(event->type != INPUT_EVENT_TYPE_NONE);
 
-            u64 delta_ticks = controller->last_polled_timestamp - event->timestamp;
+            u64 delta_ticks = current_time - event->timestamp;
             if(delta_ticks <= 17 && !event->consumed)
             {
-                ++events_stored;
                 if(event_array.items)
                 {
-                    input_event_t *store_event = event_array + events_read;
+                    input_event_t *store_event = event_array + events_stored;
                     *store_event = *event;
                 }
+                ++events_stored;
             }
 
             ++events_read;
