@@ -111,17 +111,18 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
                 input_device_t *device = get_or_create_input_device(input_manager, ID, INPUT_DEVICE_TYPE_KEYBOARD); 
                 if(device)
                 {
+                    // TODO(Sleepster): See if this is okay                     
                     // NOTE(Sleepster): Only register the PRESSED event
-                    if(!event->key.repeat)
-                    {
-                        input_event_t new_event = {};
-                        new_event.type      = INPUT_EVENT_TYPE_KEY_DOWN;
-                        new_event.timestamp = SDL_GetTicks();
-                        new_event.inputID   = event->key.scancode;
-                        new_event.vkcode    = event->key.key;
+                    //if(!event->key.repeat)
+                    //{
+                    input_event_t new_event = {};
+                    new_event.type      = INPUT_EVENT_TYPE_KEY_DOWN;
+                    new_event.timestamp = SDL_GetTicks();
+                    new_event.inputID   = event->key.scancode;
+                    new_event.vkcode    = event->key.key;
 
-                        append_event_to_device(device, &new_event);
-                    }
+                    append_event_to_device(device, &new_event);
+                    //}
                 }
             }
         }break;

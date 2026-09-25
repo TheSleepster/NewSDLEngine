@@ -144,12 +144,30 @@ c_array_remove(array_view_t<T> array, s32 index, s32 max_index)
         max_index = array.count;
     }
 
-    // TODO(Sleepster): @speed Speed this up! 
+    // TODO(Sleepster): @speed
     for(s32 this_index = index;
         this_index < max_index;
         ++this_index)
     {
         array.items[this_index] = array.items[this_index + 1];
+    }
+}
+
+
+template <typename T>
+void
+c_array_unordered_remove(array_view_t<T> array, s32 index, s32 max_index)
+{
+    Assert(index <= array.count);
+    if(max_index == -1)
+    {
+        max_index = array.count;
+    }
+
+    --max_index;
+    if(index != max_index)
+    {
+        array.items[index] = array.items[max_index];
     }
 }
 
@@ -257,6 +275,13 @@ c_array_remove(fixed_array_t<T, count> &array, s32 index, s32 max_index)
 }
 
 template <typename T, s32 count>
+void
+c_array_unordered_remove(fixed_array_t<T, count> &array, s32 index, s32 max_index)
+{
+    c_array_unordered_remove(static_cast<array_view_t<T>>(array), index, max_index);
+}
+
+template <typename T, s32 count>
 s32
 c_array_add_if_unique(fixed_array_t<T, count> &array, T *element, s32 index_to_emplace)
 {
@@ -274,6 +299,9 @@ given to it rather than allocated. YOU must provide the memory.
 It basically is just a safer runtime C array. Again, it is different
 from that of a dynamic array in the sense that it will NOT resize on it's
 own. If you need the behavior of dynamic resizing, use a dynamic array.
+How is this different from an array_view_t? honestly, probably just semantics.
+In this case it's more clear that memory is OWNED by this array rather than just
+a view into it.
 ==================================================== 
 */
 
@@ -336,6 +364,13 @@ void
 c_array_remove(array_t<T> &array, s32 index, s32 max_index)
 {
     c_array_remove(static_cast<array_view_t<T>>(array), index, max_index);
+}
+
+template <typename T>
+void
+c_array_unordered_remove(array_t<T> &array, s32 index, s32 max_index)
+{
+    c_array_unordered_remove(static_cast<array_view_t<T>>(array), index, max_index);
 }
 
 template <typename T>
@@ -446,7 +481,6 @@ void
 c_dynarray_remove(dynarray_t<T> *array, s32 index)
 {
     Assert(index <= array->count);
-
     for(s32 this_index = index;
         this_index < (array->used - 1);
         ++this_index)
@@ -455,6 +489,20 @@ c_dynarray_remove(dynarray_t<T> *array, s32 index)
     }
 
     --array->used;
+}
+
+
+template <typename T>
+void
+c_dynarray_unordered_remove(dynarray_t<T> *array, s32 index)
+{
+    Assert(index < array->count);
+
+    --array->used;
+    if(index != array->used)
+    {
+        array->items[index] = array->items[array->used];
+    }
 }
 
 template <typename T>

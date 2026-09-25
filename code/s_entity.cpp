@@ -27,9 +27,9 @@ get_sim_chunk_position(vec2_t world_position)
 {
     ivec2_t result;
 
-    const u32 matrix_center = (MAX_SIM_REGIONS * 0.5f);
-    u32 chunk_x = floorf(((world_position.x + (SIM_REGION_WIDTH  * 0.5f)) / SIM_REGION_WIDTH)  + (matrix_center));
-    u32 chunk_y = floorf(((world_position.y + (SIM_REGION_HEIGHT * 0.5f)) / SIM_REGION_HEIGHT) + (matrix_center));
+    const u32 matrix_center = (MAX_CHUNKS * 0.5f);
+    u32 chunk_x = floorf(((world_position.x + (CHUNK_WIDTH  * 0.5f)) / CHUNK_WIDTH)  + (matrix_center));
+    u32 chunk_y = floorf(((world_position.y + (CHUNK_HEIGHT * 0.5f)) / CHUNK_HEIGHT) + (matrix_center));
 
     result.x = chunk_x;
     result.y = chunk_y;
@@ -37,35 +37,39 @@ get_sim_chunk_position(vec2_t world_position)
     return(result);
 }
 
-world_sim_region_t*
-s_entity_manager_get_sim_region(entity_manager_t *entity_manager, vec2_t world_position)
+world_chunk_t*
+s_entity_manager_get_chunk(entity_manager_t *entity_manager, vec2_t world_position)
 {    
-    world_sim_region_t *result = null;
+    world_chunk_t *result = null;
 
     ivec2_t chunk_position = get_sim_chunk_position(world_position); 
 
-    u8 *active_region_index = &entity_manager->world_sim_region_sparse_matrix[chunk_position.x][chunk_position.y];
-    if(*active_region_index != 0)
+    u8 *active_chunk_index = &entity_manager->world_chunk_sparse_matrix[chunk_position.x][chunk_position.y];
+    if(*active_chunk_index != 0)
     {
-        result = &entity_manager->active_sim_regions[*active_region_index];
+        result = &entity_manager->active_chunks[*active_chunk_index];
     }
 
     return(result);
 }
 
-world_sim_region_t*
-s_entity_manager_get_or_create_sim_region(entity_manager_t *entity_manager, vec2_t world_position)
+world_chunk_t*
+s_entity_manager_get_or_create_chunk(entity_manager_t *entity_manager, vec2_t world_position)
 {
-    world_sim_region_t *result = null;
+    world_chunk_t *result = null;
     
     ivec2_t chunk_position = get_sim_chunk_position(world_position); 
-    u8 *active_region_index = &entity_manager->world_sim_region_sparse_matrix[chunk_position.x][chunk_position.y];
-    if(*active_region_index == 0)
+    Assert((u32)chunk_position.x < MAX_CHUNKS && (u32)chunk_position.y < MAX_CHUNKS);
+
+    u8 *active_chunk_index = &entity_manager->world_chunk_sparse_matrix[chunk_position.x][chunk_position.y];
+    if(*active_chunk_index == 0)
     {
-        *active_region_index = entity_manager->active_region_count + 1;
+        // NOTE(Sleepster): "Create" chunk
+        *active_chunk_index = entity_manager->active_chunk_count + 1;
+        ++entity_manager->active_chunk_count;
     }
 
-    result = entity_manager->active_sim_regions + *active_region_index;
+    result = entity_manager->active_chunks + *active_chunk_index;
     result->world_chunk_hash = ivec2(chunk_position.x, chunk_position.y);
 
     return(result);
@@ -74,14 +78,14 @@ s_entity_manager_get_or_create_sim_region(entity_manager_t *entity_manager, vec2
 entity_t*
 s_entity_create(entity_manager_t *entity_manager, vec2_t world_position, u32 archetype, u32 flags)
 {
-    world_sim_region_t *sim_region = s_entity_manager_get_or_create_sim_region(entity_manager, world_position);
+    world_chunk_t *chunk = s_entity_manager_get_or_create_chunk(entity_manager, world_position);
 
     entity_t *result = null;
     for(u32 entity_index = 0;
-        entity_index < MAX_SIM_REGION_ENTITIES;
+        entity_index < MAX_CHUNK_ENTITIES;
         ++entity_index)
     {
-        entity_t *found = sim_region->entities + entity_index;
+        entity_t *found = chunk->entities + entity_index;
         if(!(found->flags & ENTITY_FLAG_IS_VALID))
         {
             result = found;
@@ -91,7 +95,7 @@ s_entity_create(entity_manager_t *entity_manager, vec2_t world_position, u32 arc
             result->archetype =  archetype;
             result->ID        =  entity_index;
 
-            ++sim_region->sim_entity_count;
+            ++chunk->chunk_entity_count;
             break;
         }
     }
@@ -102,34 +106,34 @@ s_entity_create(entity_manager_t *entity_manager, vec2_t world_position, u32 arc
 void
 s_entity_destroy(entity_manager_t *entity_manager, entity_t *entity)
 {
-    world_sim_region_t *sim_region = s_entity_manager_get_or_create_sim_region(entity_manager, entity->position);
+    world_chunk_t *chunk = s_entity_manager_get_or_create_chunk(entity_manager, entity->position);
+    c_array_remove(chunk->entities, entity->ID, chunk->chunk_entity_count);
 
-    void *entity_array_end = &sim_region->entities[sim_region->sim_entity_count];
-    memcpy(entity_array_end, entity, sizeof(entity_t));
-    ZeroMemory(entity_array_end, sizeof(entity_t));
-
-    --sim_region->sim_entity_count;
+    --chunk->chunk_entity_count;
 }
 
 entity_query_t
 s_entity_query_flags(entity_manager_t *entity_manager, u32 search_mask)
 {
     entity_query_t result = {};
-    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_SIM_REGION_ENTITIES);
-
-    // NOTE(Sleepster): Active sim region 
-    world_sim_region_t *sim_region = s_entity_manager_get_or_create_sim_region(entity_manager, vec2_zero());
+    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_CHUNK_ENTITIES);
 
     s32 found_entity_count = 0;
-    for(u32 entity_index = 0;
-        entity_index < sim_region->sim_entity_count;
-        ++entity_index)
+    for(u32 chunk_index = 1;
+        chunk_index <= entity_manager->active_chunk_count;
+        ++chunk_index)
     {
-        entity_t *entity = sim_region->entities + entity_index;
-        if((entity->flags & search_mask) != 0)
+        world_chunk_t *chunk = entity_manager->active_chunks + chunk_index;
+        for(u32 entity_index = 0;
+            entity_index < chunk->chunk_entity_count;
+            ++entity_index)
         {
-            result.entities[found_entity_count] = entity;
-            ++found_entity_count;
+            entity_t *entity = chunk->entities + entity_index;
+            if((entity->flags & search_mask) != 0)
+            {
+                result.entities[found_entity_count] = entity;
+                ++found_entity_count;
+            }
         }
     }
 
@@ -142,21 +146,25 @@ s_entity_query_flags_exact(entity_manager_t *entity_manager, u32 search_mask)
 {
     entity_query_t result = {};
 
-    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_SIM_REGION_ENTITIES);
+    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_CHUNK_ENTITIES);
 
     // NOTE(Sleepster): Active sim region 
-    world_sim_region_t *sim_region = s_entity_manager_get_or_create_sim_region(entity_manager, vec2_zero());
-
     s32 found_entity_count = 0;
-    for(u32 entity_index = 0;
-        entity_index < sim_region->sim_entity_count;
-        ++entity_index)
+    for(u32 chunk_index = 1;
+        chunk_index <= entity_manager->active_chunk_count;
+        ++chunk_index)
     {
-        entity_t *entity = sim_region->entities + entity_index;
-        if((entity->flags & search_mask) == search_mask)
+        world_chunk_t *chunk = entity_manager->active_chunks + chunk_index;
+        for(u32 entity_index = 0;
+            entity_index < chunk->chunk_entity_count;
+            ++entity_index)
         {
-            result.entities[found_entity_count] = entity;
-            ++found_entity_count;
+            entity_t *entity = chunk->entities + entity_index;
+            if((entity->flags & search_mask) == search_mask)
+            {
+                result.entities[found_entity_count] = entity;
+                ++found_entity_count;
+            }
         }
     }
 
@@ -169,21 +177,25 @@ s_entity_query_archetype(entity_manager_t *entity_manager, entity_archetype_t ar
 {
     entity_query_t result = {};
 
-    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_SIM_REGION_ENTITIES);
+    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_CHUNK_ENTITIES);
 
-    // NOTE(Sleepster): Active sim region 
-    world_sim_region_t *sim_region = s_entity_manager_get_or_create_sim_region(entity_manager, vec2_zero());
-
+    // NOTE(Sleepster): Active chunk 
     s32 found_entity_count = 0;
-    for(u32 entity_index = 0;
-        entity_index < sim_region->sim_entity_count;
-        ++entity_index)
+    for(u32 chunk_index = 1;
+        chunk_index <= entity_manager->active_chunk_count;
+        ++chunk_index)
     {
-        entity_t *entity = sim_region->entities + entity_index;
-        if(entity->archetype == archetype)
+        world_chunk_t *chunk = entity_manager->active_chunks + chunk_index;
+        for(u32 entity_index = 0;
+            entity_index < chunk->chunk_entity_count;
+            ++entity_index)
         {
-            result.entities[found_entity_count] = entity;
-            ++found_entity_count;
+            entity_t *entity = chunk->entities + entity_index;
+            if(entity->archetype == archetype)
+            {
+                result.entities[found_entity_count] = entity;
+                ++found_entity_count;
+            }
         }
     }
 

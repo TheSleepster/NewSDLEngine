@@ -593,11 +593,12 @@ ENGINE_API void           s_asset_manager_signal_asset_file_reload(asset_manager
 ENGINE_API asset_handle_t s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t name);
 
 ENGINE_API texture_atlas_t *s_texture_atlas_create(asset_manager_t *asset_manager, u32 size, u32 channel_count, u32 format, u32 initial_subtexture_count);
-ENGINE_API void             s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle);
+ENGINE_API void             s_texture_atlas_add_texture(texture_atlas_t *texture_atlas, asset_handle_t *texture_handle);
+ENGINE_API void             s_asset_manager_insert_image_into_atlas(asset_manager_t *asset_manager, asset_handle_t *texture_handle);
 ENGINE_API void             s_texture_atlas_pack_added_textures(asset_manager_t *asset_manager, texture_atlas_t *atlas);
 
-ENGINE_API true_inline void           s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot_t *slot);
-internal_api asset_slot_t *s_asset_manager_get_asset_slot(asset_catalog_t *catalog, string_t name);
+ENGINE_API true_inline void s_asset_manager_set_handle_asset_data_pointer(asset_handle_t *handle, asset_slot_t *slot);
+internal_api asset_slot_t  *s_asset_manager_get_asset_slot(asset_catalog_t *catalog, string_t name);
 
 ENGINE_API shader_t*             s_asset_get_shader_from_handle(asset_handle_t *handle);
 ENGINE_API texture2D_t*          s_asset_get_texture_from_handle(asset_handle_t *handle);

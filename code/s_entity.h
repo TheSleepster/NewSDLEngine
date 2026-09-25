@@ -22,12 +22,12 @@
 
 struct animation2D_t;
 
-#define MAX_SIM_REGION_ENTITIES (1000)
+#define MAX_CHUNK_ENTITIES (1000)
 
-constexpr u32 MAX_SIM_REGIONS        = 4096;
-constexpr u32 SIM_REGION_WIDTH       = 320;
-constexpr u32 SIM_REGION_HEIGHT      = 180;
-constexpr u32 MAX_ACTIVE_SIM_REGIONS = 51;
+constexpr u32 MAX_CHUNKS        = 4096;
+constexpr u32 CHUNK_WIDTH       = 320;
+constexpr u32 CHUNK_HEIGHT      = 180;
+constexpr u32 MAX_ACTIVE_CHUNKS = 51;
 
 enum entity_archetype_t
 {
@@ -93,25 +93,30 @@ struct entity_t
     bool8           collision;
 };
 
-using sim_region_entity_array_t = fixed_array_t<entity_t, MAX_SIM_REGION_ENTITIES>;
-struct world_sim_region_t
+using chunk_entity_array_t = fixed_array_t<entity_t, MAX_CHUNK_ENTITIES>;
+struct world_chunk_t
 {
     ivec2_t   world_chunk_hash;
 
-    sim_region_entity_array_t entities;
-    u32                       sim_entity_count;
+    chunk_entity_array_t entities;
+    u32                  chunk_entity_count;
 };
 
 // NOTE(Sleepster): This isn't a real solution for the world sim storage... 
-using world_sim_region_array_t = fixed_array_t<world_sim_region_t, MAX_ACTIVE_SIM_REGIONS>;
+using world_chunk_array_t = fixed_array_t<world_chunk_t, MAX_ACTIVE_CHUNKS>;
 struct entity_manager_t
 {
-    memory_arena_t transient_storage;
-    u8             world_sim_region_sparse_matrix[MAX_SIM_REGIONS][MAX_SIM_REGIONS];
+    memory_arena_t      transient_storage;
+    // NOTE(Sleepster): If the value at the pair of indices is 0, the chunk has not been created.
+    // If the value is NONZERO then the chunk exists.
+    u8                  world_chunk_sparse_matrix[MAX_CHUNKS][MAX_CHUNKS];
 
     // NOTE(Sleepster): index 0 is always invalid 
-    world_sim_region_array_t active_sim_regions;
-    u32                      active_region_count;
+    world_chunk_array_t inactive_chunks;
+    u32                 inactive_chunk_count;
+
+    u32                 active_chunk_count;
+    world_chunk_array_t active_chunks;
 };
 
 struct entity_query_t
@@ -123,8 +128,8 @@ struct entity_query_t
     entity_t **end()   { return(entities + entity_count); }
 };
 
-world_sim_region_t* s_entity_manager_get_sim_region(entity_manager_t *entity_manager, vec2_t world_position);
-world_sim_region_t* s_entity_manager_get_or_create_sim_region(entity_manager_t *entity_manager, vec2_t world_position);
+world_chunk_t* s_entity_manager_get_chunk(entity_manager_t *entity_manager, vec2_t world_position);
+world_chunk_t* s_entity_manager_get_or_create_chunk(entity_manager_t *entity_manager, vec2_t world_position);
 
 entity_t      *s_entity_create(entity_manager_t *entity_manager, vec2_t world_position, u32 archetype, u32 flags);
 void           s_entity_destroy(entity_manager_t *entity_manager, entity_t *entity);

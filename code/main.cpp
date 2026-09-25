@@ -31,9 +31,13 @@
 #include <s_ui_core.h>
 #include <s_entity.h>
 
-constexpr u32 GAME_MAX_INDICES = 600000;
+constexpr u32 MAX_RENDER_QUADS    = 100000;
+constexpr u32 MAX_RENDER_VERTICES = MAX_RENDER_QUADS * 4;
+constexpr u32 MAX_RENDER_INDICES  = MAX_RENDER_QUADS * 6;
 
 void process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager);
+
+struct map_editor_t;
 
 /*===========================================
   =============== ANIMATION2D ===============
@@ -101,11 +105,7 @@ struct game_state_t
     bool32              open_debug_menu;
 
     bool32              editor_opened;
-    bool32              show_grid;
-    bool32              show_player_viewport;
-    float32             editor_zoom;
-    RHI_render_camera_t editor_camera;
-    input_controller_t *editor_controller;
+    map_editor_t       *editor;
 
     RHI_render_camera_t game_camera;
     RHI_render_camera_t fullscreen_camera;
@@ -141,12 +141,18 @@ constexpr u32 GAME_FRAMEBUFFER_HEIGHT = 180;
 
 constexpr float32 COLLISION_EPSILON       = 0.01f;
 constexpr float32 MAX_ENTITY_ACCELERATION = 100;
-
 constexpr s32     WORLD_TILE_SIZE = 8;
 
 // TODO(Sleepster): DEBUG CODE 
 global string_t global_test_textbox_string = {}; 
 // TODO(Sleepster): DEBUG CODE 
+
+internal_api vec2_t    world_to_tile(vec2_t world_position);
+internal_api entity_t* entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags);
+
+#include <s_ui_core.cpp>
+#include <s_entity.cpp>
+#include <s_map_editor.cpp>
 
 // NOTE(Sleepster): DEBUG CODE
 internal_api void
@@ -641,7 +647,7 @@ r_init_render_state(render_state_t *render_state)
     render_state->game_renderpass_ID       = RHI_build_renderpass(render_state->RHI_context, &game_renderpass_desc);
     render_state->fullscreen_renderpass_ID = RHI_build_renderpass(render_state->RHI_context, &fullscreen_renderpass_desc);
 
-    u32 *indices = c_arena_push_array(&render_state->RHI_context->transient_arena, u32, GAME_MAX_INDICES);
+    u32 *indices = c_arena_push_array(&render_state->RHI_context->transient_arena, u32, 6 * MAX_CHUNK_ENTITIES);
     u32  index_offset = 0;
     for(u32 index = 0;
         index < 60000;
@@ -657,26 +663,24 @@ r_init_render_state(render_state_t *render_state)
         index_offset += 4;
     }
 
-    const u32 VERTEX_BUFFER_SIZE = 4 * 10000;
-    immediate_vertex_t *vertices = c_arena_push_array(&render_state->RHI_context->RHI_arena, immediate_vertex_t, VERTEX_BUFFER_SIZE);
+    immediate_vertex_t *vertices = c_arena_push_array(&render_state->RHI_context->RHI_arena, immediate_vertex_t, MAX_RENDER_VERTICES);
     render_state->vertex_buffer = RHI_vertex_buffer_create(render_state->RHI_context, 
                                                            RHI_RENDER_BUFFER_ALLOCATION_TYPE_MAPPED, 
                                                            RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT, 
                                                            (byte*)vertices, 
                                                            sizeof(immediate_vertex_t), 
-                                                           VERTEX_BUFFER_SIZE);
-    render_state->index_buffer  = RHI_index_buffer_create(render_state->RHI_context,  
-                                                          RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY, 
-                                                          sizeof(u32),
-                                                          indices, 
-                                                          (sizeof(u32) * (6 * MAX_SIM_REGION_ENTITIES)));
+                                                           MAX_RENDER_VERTICES);
+    render_state->index_buffer = RHI_index_buffer_create(render_state->RHI_context,  
+                                                         RHI_RENDER_BUFFER_ALLOCATION_TYPE_GPU_ONLY, 
+                                                         sizeof(u32),
+                                                         indices, 
+                                                         (sizeof(u32) * MAX_RENDER_INDICES));
 }
 
 internal_api void
 game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manager)
 {
-    game_state->game_controller   = s_im_init_input_controller(input_manager);
-    game_state->editor_controller = s_im_init_input_controller(input_manager);
+    game_state->game_controller          = s_im_init_input_controller(input_manager);
 
     // NOTE(Sleepster): Movement 
     input_action_t *movement_action = s_im_input_action_create(input_manager, INPUT_ACTION_TYPE_AXIS2D);
@@ -937,92 +941,6 @@ DEBUG_update_state_recording_and_playback(void)
     }
 }
 
-internal_api void
-handle_editor_ui(game_state_t *game_state, ui_state_t *main_ui, RHI_context_t *RHI_context)
-{
-    ui_signal_t main_panel = ui_widget_panel(main_ui, 
-                                             STR("Editor Panel"), 
-                                             vec2_multiply(RHI_context->window_size, vec2(-0.5, 0.5)), 
-                                             vec2(20, 20), 
-                                             vec2(10.0f, 0.0f), 
-                                             vec4(10, 10, 10, 10), 
-                                             vec4(0.4, 0.4, 0.4, 0.6),
-                                             0);
-    if(rect2_point_in_rect(main_panel.widget->state->widget_rect, main_ui->mouse_position))
-    {
-        main_ui->input_focused = true;
-    }
-    else
-    {
-        main_ui->input_focused = false;
-    }
-
-    ui_column(main_ui, main_panel.widget)
-    {
-        ui_widget_set_default_font_size(main_ui, 25);
-        ui_signal_t title_bar = ui_widget_panel(main_ui, 
-                                                STR("Editor Title bar"), 
-                                                vec2(0, 0), 
-                                                vec2(20, 20),
-                                                vec2(10.0f, 4.0f), 
-                                                vec4(10, 10, 2, 0), 
-                                                vec4(0.0, 0.0, 0.0, 0.5),
-                                                0);
-        ui_state_set_active_padding(main_ui, vec4(10, 10, 4, 4));
-        ui_signal_t open_menu_button = {};
-        ui_row(main_ui, title_bar.widget)
-        {
-            open_menu_button = ui_widget_sized_button(main_ui, 
-                                                      STR("Open Editor Menu"), 
-                                                      vec2(20, 20), 0);
-            ui_widget_text(main_ui, STR("[Editor Panel]"));
-        }
-
-        if(ui_pressed(open_menu_button))
-        {
-            main_panel.widget->state->toggled = !main_panel.widget->state->toggled;
-        }
-
-        if(main_panel.widget->toggled)
-        {
-            ui_widget_divider(main_ui, 
-                              STR("editor panel divider"), 
-                              vec2(0.9, 5.0f), 
-                              {UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, UI_WIDGET_SIZE_KIND_PIXELS});
-            ui_widget_set_default_font_size(main_ui, 16);
-            ui_signal_t sub_panel = ui_widget_panel(main_ui, 
-                                                    STR("Editor Subpanel"), 
-                                                    vec2(0, 0), 
-                                                    vec2(20, 20),
-                                                    vec2(10.0f, 10.0f), 
-                                                    vec4(10, 10, 10, 0), 
-                                                    vec4_zero(),
-                                                    0);
-            ui_column(main_ui, sub_panel.widget)
-            {
-                ui_signal_t tile_grid = ui_widget_labeled_button(main_ui, STR("Toggle Editor Tile Grid"));
-                if(ui_pressed(tile_grid))
-                {
-                    game_state->show_grid = !game_state->show_grid;
-                }
-
-                ui_signal_t show_viewport = ui_widget_labeled_button(main_ui, STR("Toggle Editor Player Viewport"));
-                if(ui_pressed(show_viewport))
-                {
-                    game_state->show_player_viewport = !game_state->show_player_viewport;
-                }
-
-                ui_signal_t reset_editor_camera_translation = ui_widget_labeled_button(main_ui, STR("Reset Editor Camera Translation"));
-                if(ui_pressed(reset_editor_camera_translation))
-                {
-                    game_state->editor_camera.translation = vec2_zero();
-                }
-                ui_widget_text(main_ui, STR("Click this if the camera flies away!"));
-            }
-        }
-    }
-}
-
 internal_api vec2_t
 world_to_tile(vec2_t world_position)
 {
@@ -1070,18 +988,13 @@ game_main(global_context_t *_global_context)
         global_test_textbox_string.data  = (byte*)c_alloc(256, ALLOCATOR_TAG_CACHE);
         global_test_textbox_string.count = 0;
 
-        game_state->editor_zoom          = 2.5f;
-        game_state->show_grid            = true;
-        game_state->show_player_viewport = true;
+        game_state->editor = s_map_editor_create(input_manager, asset_manager, render_state);
 
         // GAME INIT
         entity_player_create(game_state, asset_manager, vec2(0, 0));
         create_test_environment(game_state, asset_manager);
         // GAME INIT
         
-
-        entity_player_create(game_state, asset_manager, vec2(-640, 180));
-
         // NOTE(Sleepster): Init bindings 
         game_state_init_bindings(game_state, gc->input_manager);
         // NOTE(Sleepster): Init bindings 
@@ -1098,9 +1011,8 @@ game_main(global_context_t *_global_context)
     asset_handle_t basic_font          = s_asset_manager_acquire_asset_handle(asset_manager, STR("LiberationMono_Regular"));
     asset_handle_t player_sprite_sheet = s_asset_manager_acquire_asset_handle(asset_manager, STR("player_sprite_sheet"));
 
-    texture_atlas_t *atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32_SRGB, 32);
-    s_texture_atlas_add_texture(atlas, &player_sprite);
-    s_texture_atlas_add_texture(atlas, &player_sprite_sheet);
+    s_asset_manager_insert_image_into_atlas(asset_manager, &player_sprite);
+    s_asset_manager_insert_image_into_atlas(asset_manager, &player_sprite_sheet);
 
     game_state->game_camera = {
         .viewport = {
@@ -1116,13 +1028,6 @@ game_main(global_context_t *_global_context)
                          Max(render_state->RHI_context->window_size.y, 10)),
         .translation = {0.0f, 0.0f},
         .zoom = 1.0f
-    };
-
-    game_state->editor_camera = {
-        .viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
-                         Max(render_state->RHI_context->window_size.y, 10)),
-        .translation = {0.0f, 0.0f},
-        .zoom = game_state->editor_zoom 
     };
 
     u64 perf_count_freq = SDL_GetPerformanceFrequency();
@@ -1150,7 +1055,7 @@ game_main(global_context_t *_global_context)
 
             if(game_state->editor_opened)
             {
-                handle_editor_ui(game_state, main_ui, render_state->RHI_context);
+                s_map_editor_handle_ui(game_state, main_ui, render_state->RHI_context);
             }
         }
 
@@ -1161,87 +1066,20 @@ game_main(global_context_t *_global_context)
                                                       Max(render_state->RHI_context->window_size.y, 10));
         game_state->fullscreen_camera.zoom = 1.0f;
 
-        game_state->editor_camera.zoom = game_state->editor_zoom;
-        game_state->editor_camera.viewport = vec2(Max(render_state->RHI_context->window_size.x, 10),
-                                                  Max(render_state->RHI_context->window_size.y, 10));
-
         RHI_render_camera_set_matrices(&game_state->game_camera);
         RHI_render_camera_set_matrices(&game_state->fullscreen_camera);
-        RHI_render_camera_set_matrices(&game_state->editor_camera);
 
         // NOTE(Sleepster): Editor controls block 
         if(game_state->editor_opened)
         {
-            s_im_controller_update_state(input_manager, game_state->editor_controller, false);
-            vec2_t mouse_position = s_im_transform_mouse_data(game_state->editor_controller, 
-                                                              game_state->editor_camera.viewport, 
-                                                              game_state->editor_camera.matrices.view_matrix, 
-                                                              game_state->editor_camera.matrices.projection_matrix);
-
-            input_state_t *middle_mouse   = s_im_controller_get_input_state(game_state->editor_controller, SDL_SCANCODE_MIDDLE_MOUSE);
-            input_state_t *mouse_movement = s_im_controller_get_input_state(game_state->editor_controller, INPUT_ARRAY_INPUT_AXIS_MOUSE_MOVEMENT);
-            input_state_t *mouse_scroll   = s_im_controller_get_input_state(game_state->editor_controller, INPUT_ARRAY_INPUT_AXIS_MOUSE_WHEEL);
-
-            vec2_t scroll_delta     = mouse_scroll->delta_value; 
-            vec2_t mouse_move_delta = mouse_movement->delta_value;
-
-            // NOTE(Sleepster): Panning 
-            if(InputStateDown(middle_mouse->flags))
-            {
-                game_state->editor_camera.translation.x += mouse_move_delta.x;
-                game_state->editor_camera.translation.y -= mouse_move_delta.y;
-            }
-
-            // NOTE(Sleepster): Zoom adjustment 
-            if(scroll_delta.y != 0.0f)
-            {
-                float32 previous_zoom = game_state->editor_zoom;
-
-                // NOTE(Sleepster): Taken from this raylib example:
-                // https://github.com/raysan5/raylib/blob/master/examples/core/core_2d_camera_mouse_zoom.c
-                float scale = 0.2f * scroll_delta.y;
-                game_state->editor_zoom = Clamp(expf(logf(previous_zoom) + scale), 1.0f, 10.0f);
-
-                vec2_t new_mouse_offset_scaling = vec2_scale(mouse_position, game_state->editor_zoom - previous_zoom);
-                game_state->editor_camera.translation = vec2_add(game_state->editor_camera.translation, new_mouse_offset_scaling);
-            }
-
-            // NOTE(Sleepster): Tile placing 
-            input_state_t *left_mouse = s_im_controller_get_input_state(game_state->editor_controller, SDL_SCANCODE_LEFT_MOUSE);
-            if(InputStateDown(left_mouse->flags))
-            {
-                world_sim_region_t *region = s_entity_manager_get_sim_region(game_state->entity_manager, mouse_position);
-                // TODO(Sleepster): This is just to fix some stupid bugs with the cursor clicking outside of the main area for now
-                // this WILL go away
-                if(region)
-                {
-                    bool8 occupied = false;
-                    for(const entity_t &entity: region->entities)
-                    {
-                        if(rect2_point_in_rect(entity.bounding_box, mouse_position))
-                        {
-                            occupied = true;
-                            break;
-                        }
-                    }
-
-                    if(!occupied)
-                    {
-                        vec2_t tile_position = vec2_scale(world_to_tile(mouse_position), WORLD_TILE_SIZE);
-                        entity_tile_create(game_state, tile_position, 0);
-                    }
-                }
-            }
+            s_editor_update_state(game_state, render_state, input_manager);
         }
-        // NOTE(Sleepster): Editor controls block 
 
         // NOTE(Sleepster):} Simulate loop 
         if(delta_time >= (gc->tick_rate * 2.0f))
         {
             delta_time = gc->tick_rate * 2.0f;
         }
-
-        world_sim_region_t *active_region = &game_state->entity_manager->active_sim_regions[1];
 
         bool8 first_tick = true;
         dt_accumulator  += delta_time;
@@ -1267,24 +1105,35 @@ game_main(global_context_t *_global_context)
                         if(game_state->editor_opened) 
                         {
                             game_state->game_mode = GAME_MODE_EDIT_MODE;
-
-                            for(u32 entity_index = 0;
-                                entity_index < active_region->sim_entity_count;
-                                ++entity_index)
+                            for(u32 chunk_index = 1;
+                                chunk_index <= game_state->entity_manager->active_chunk_count;
+                                ++chunk_index)
                             {
-                                entity_t *entity = active_region->entities + entity_index;
-                                entity->render_position = entity->editor_position;
+                                world_chunk_t *active_chunk = game_state->entity_manager->active_chunks + chunk_index;
+                                for(u32 entity_index = 0;
+                                    entity_index < active_chunk->chunk_entity_count;
+                                    ++entity_index)
+                                {
+                                    entity_t *entity = active_chunk->entities + entity_index;
+                                    entity->render_position = entity->editor_position;
+                                }
                             }
                         }
                         else
                         {
                             game_state->game_mode = GAME_MODE_NORMAL;
-                            for(u32 entity_index = 0;
-                                entity_index < active_region->sim_entity_count;
-                                ++entity_index)
+                            for(u32 chunk_index = 1;
+                                chunk_index <= game_state->entity_manager->active_chunk_count;
+                                ++chunk_index)
                             {
-                                entity_t *entity = active_region->entities + entity_index;
-                                entity->render_position = entity->position;
+                                world_chunk_t *active_chunk = game_state->entity_manager->active_chunks + chunk_index;
+                                for(u32 entity_index = 0;
+                                    entity_index < active_chunk->chunk_entity_count;
+                                    ++entity_index)
+                                {
+                                    entity_t *entity = active_chunk->entities + entity_index;
+                                    entity->render_position = entity->position;
+                                }
                             }
                         }
                     }
@@ -1339,15 +1188,18 @@ game_main(global_context_t *_global_context)
             RHI_cmd_renderpass_begin(command_list, renderpassID);
             if(game_state->game_mode == GAME_MODE_EDIT_MODE)
             {
+                // NOTE(Sleepster): We explicitly do this here because the blit from before doesn't make any sense.
+                // The problem as well is that the fullscreen renderpass uses a LOAD instead of a CLEAR. So we must
+                // MANUALLY clear it.
                 RHI_cmd_clear_renderpass_attachments(command_list, render_state->fullscreen_renderpass_ID);
             }
 
             if(game_state->game_mode == GAME_MODE_EDIT_MODE)
             {
-                RHI_render_camera_t *scene_camera = &game_state->editor_camera;
+                RHI_render_camera_t *scene_camera = &game_state->editor->camera;
 
                 // NOTE(Sleepster): Tile Grid 
-                if(game_state->show_grid)
+                if(game_state->editor->show_grid)
                 {
                     float32 half_width  = (scene_camera->viewport.x * 0.5f) * scene_camera->zoom;
                     float32 half_height = (scene_camera->viewport.y * 0.5f) * scene_camera->zoom;
@@ -1388,7 +1240,7 @@ game_main(global_context_t *_global_context)
                 }
 
                 // NOTE(Sleepster): Viewport box 
-                if(game_state->show_player_viewport)
+                if(game_state->editor->show_player_viewport)
                 {
                     float32 half_width  = (game_state->game_camera.viewport.x * 0.5f) * game_state->game_camera.zoom;
                     float32 half_height = (game_state->game_camera.viewport.y * 0.5f) * game_state->game_camera.zoom;
@@ -1427,11 +1279,7 @@ game_main(global_context_t *_global_context)
                                    vec4(1.0f, 1.0, 1.0f, 1.0f));
                 }
 
-                // NOTE(Sleepster): We explicitly do this here because the blit from before doesn't make any sense.
-                // The problem as well is that the fullscreen renderpass uses a LOAD instead of a CLEAR. So we must
-                // MANUALLY clear it.
                 RHI_cmd_update_buffer_contents(command_list, &render_state->vertex_buffer);
-
                 RHI_cmd_bind_vertex_buffer(command_list, &render_state->vertex_buffer);
 
                 s32 window_width  = Max(render_state->RHI_context->window_size.x, 10);
@@ -1452,26 +1300,32 @@ game_main(global_context_t *_global_context)
                 RHI_cmd_use_shader_program(command_list, immediate_rectangle);
 
                 RHI_cmd_draw(command_list, render_state->vertex_buffer.vertex_count, 0, 1, 0);
-                render_state->vertex_buffer.vertex_count = 0;
+                RHI_vertex_buffer_reset_count(&render_state->vertex_buffer);
             }
 
             // NOTE(Sleepster): Draw entities 
             {
-                for(u32 entity_index = 0;
-                    entity_index < active_region->sim_entity_count;
-                    ++entity_index)
+                for(u32 chunk_index = 1;
+                    chunk_index <= game_state->entity_manager->active_chunk_count;
+                    ++chunk_index)
                 {
-                    entity_t *entity = active_region->entities + entity_index;
-                    if((entity->flags & ENTITY_FLAG_IS_VALID) && 
-                       (entity->archetype != ENTITY_ARCHETYPE_COLLIDER))
+                    world_chunk_t *active_chunk = game_state->entity_manager->active_chunks + chunk_index;
+                    for(u32 entity_index = 0;
+                        entity_index < active_chunk->chunk_entity_count;
+                        ++entity_index)
                     {
-                        // NOTE(Sleepster): Update the entitie's render position if we are SIMULATING
-                        if(game_state->game_mode == GAME_MODE_NORMAL)
+                        entity_t *entity = active_chunk->entities + entity_index;
+                        if((entity->flags & ENTITY_FLAG_IS_VALID) && 
+                           (entity->archetype != ENTITY_ARCHETYPE_COLLIDER))
                         {
-                            entity->render_position = vec2_lerp(entity->last_position, entity->position, game_state->render_alpha);
-                        }
+                            // NOTE(Sleepster): Update the entitie's render position if we are SIMULATING
+                            if(game_state->game_mode == GAME_MODE_NORMAL)
+                            {
+                                entity->render_position = vec2_lerp(entity->last_position, entity->position, game_state->render_alpha);
+                            }
 
-                        entity_render(render_state, command_list, entity);
+                            entity_render(render_state, command_list, entity);
+                        }
                     }
                 }
 
@@ -1482,7 +1336,7 @@ game_main(global_context_t *_global_context)
                 RHI_cmd_bind_index_buffer(command_list,  &render_state->index_buffer);
                 RHI_cmd_use_shader_program(command_list, immediate_textured);
 
-                RHI_render_camera_t *scene_camera = (game_state->game_mode == GAME_MODE_NORMAL) ? &game_state->game_camera : &game_state->editor_camera;
+                RHI_render_camera_t *scene_camera = (game_state->game_mode == GAME_MODE_NORMAL) ? &game_state->game_camera : &game_state->editor->camera;
                 RHI_cmd_update_constant_buffer(command_list, render_state->camera_matrices_buffer, &scene_camera->matrices, sizeof(mat4_t) * 2);
 
                 if(game_state->game_mode == GAME_MODE_NORMAL)
@@ -1508,12 +1362,18 @@ game_main(global_context_t *_global_context)
 
             // NOTE(Sleepster): Draw misc 
             {
-                for(u32 entity_index = 0;
-                    entity_index < active_region->sim_entity_count;
-                    ++entity_index)
+                for(u32 chunk_index = 1;
+                    chunk_index <= game_state->entity_manager->active_chunk_count;
+                    ++chunk_index)
                 {
-                    entity_t *entity = active_region->entities + entity_index;
-                    render_collider(game_state, render_state, command_list, entity);
+                    world_chunk_t *active_chunk = game_state->entity_manager->active_chunks + chunk_index;
+                    for(u32 entity_index = 0;
+                        entity_index < active_chunk->chunk_entity_count;
+                        ++entity_index)
+                    {
+                        entity_t *entity = active_chunk->entities + entity_index;
+                        render_collider(game_state, render_state, command_list, entity);
+                    }
                 }
 
                 immediate_rect(command_list, &render_state->vertex_buffer, vec3(0, 0, 0.4), vec2(8, 8), vec4(0.0, 1.0f, 0.0f, 1.0f));

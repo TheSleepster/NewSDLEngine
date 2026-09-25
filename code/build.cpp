@@ -46,8 +46,6 @@
 
 // NOTE(Sleepster): Game 
 #if defined(GAME_DLL_BUILD) || defined(RELEASE)
-#include <s_ui_core.cpp>
-#include <s_entity.cpp>
 #include <main.cpp>
 #endif
 
@@ -94,12 +92,9 @@
 
 #include <s_RHI_core.cpp>
 #include <s_RHI_image.cpp>
-
 #include <r_immediate_rendering.cpp>
-
 #include <s_asset_manager.h>
 #include <s_asset_manager.cpp>
-
 #include <p_platform_data.cpp>
 #include <entry.cpp>
 #endif

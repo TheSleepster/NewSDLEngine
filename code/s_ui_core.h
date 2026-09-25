@@ -320,6 +320,7 @@ ui_signal_t ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2
 void        ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size, ivec2_t size_kind);
 ui_signal_t ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_text_content, vec2_t size);
 ui_signal_t ui_widget_texture(ui_state_t *ui_state, string_t widget_name, vec2_t size, asset_handle_t *texture, vec2_t uv_min, vec2_t uv_max, ivec2_t size_kind, u32 additional_flags);
+ui_signal_t ui_widget_textured_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, vec2_t additional_offset, asset_handle_t *texture, vec2_t uv_min, vec2_t uv_max, u32 widget_flags);
 
 true_inline void ui_state_begin_row(ui_state_t *ui_state, widget_t *parent);
 true_inline void ui_state_end_row(ui_state_t *ui_state);

@@ -1278,6 +1278,39 @@ ui_widget_sized_button(ui_state_t *ui_state,
 }
 
 ui_signal_t
+ui_widget_textured_button(ui_state_t     *ui_state, 
+                          string_t        widget_name, 
+                          vec2_t          minimum_size,
+                          vec2_t          additional_offset,
+                          asset_handle_t *texture,
+                          vec2_t          uv_min,
+                          vec2_t          uv_max,
+                          u32             widget_flags)
+{
+    ui_signal_t result = ui_widget_sized_button(ui_state, widget_name, minimum_size, widget_flags);
+    ui_parent(ui_state, result.widget)
+    {
+        ui_widget_seed(ui_state, result.widget->ID);
+        ui_signal_t texture_widget = ui_widget_texture(ui_state, 
+                                                       widget_name, 
+                                                       vec2(1, 1), 
+                                                       texture, 
+                                                       uv_min, 
+                                                       uv_max, 
+                                                       ivec2(UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT, UI_WIDGET_SIZE_KIND_PERCENT_OF_PARENT), 
+                                                       widget_flags);
+        widget_t *widget = texture_widget.widget;
+        widget->state->offset.x = minimum_size.x * -0.5f;
+        widget->state->offset.y = minimum_size.y *  0.5f;
+
+        widget->state->offset.x += additional_offset.x;
+        widget->state->offset.y += additional_offset.y;
+    }
+
+    return(result);
+}
+
+ui_signal_t
 ui_widget_text(ui_state_t *ui_state, string_t widget_text)
 {
     widget_t *widget  = ui_widget_create(ui_state, widget_text, UI_WIDGET_FLAG_DRAW_TEXT|UI_WIDGET_FLAG_IDLE_COLOR);
@@ -1465,29 +1498,22 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
 
         // NOTE(Sleepster): Backspace 
         input_state_t *input = s_im_controller_get_input_state(ui_state->ui_controller, SDL_SCANCODE_BACKSPACE);
-        if(InputStateDown(input->flags))
+        if(InputStatePressed(input->flags))
         {
             // NOTE(Sleepster): This is actually really stupid but we don't send or generate key repeat events so oh well,
             // we're just gonna this it's mainly for debug code anyway so I don't realllyyyyyyyy care. (only kinda)
-            u64 current_time   = SDL_GetTicks();
-            u64 last_backspace = current_time - widget_state->backspace_time;
-            if(last_backspace > (gc->tick_rate_ms * 5))
+            s32 backspace_amount = 1;
+            if(ui_state->keyboard_flags & UI_KEYBOARD_FLAG_LCTRL)
             {
-                widget_state->backspace_time = current_time;
+                backspace_amount = 4;
+            }
 
-                s32 backspace_amount = 1;
-                if(ui_state->keyboard_flags & UI_KEYBOARD_FLAG_LCTRL)
-                {
-                    backspace_amount = 4;
-                }
-
-                for(s32 backspace_index = 0;
-                    backspace_index < backspace_amount;
-                    ++backspace_index)
-                {
-                    widget->widget_text_buffer->data[widget->widget_text_buffer->count] = '\0';
-                    widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 1, 0);
-                }
+            for(s32 backspace_index = 0;
+                backspace_index < backspace_amount;
+                ++backspace_index)
+            {
+                widget->widget_text_buffer->data[widget->widget_text_buffer->count] = '\0';
+                widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 1, 0);
             }
         }
 
@@ -1566,7 +1592,6 @@ ui_widget_texture(ui_state_t     *ui_state,
                   ivec2_t         size_kind,
                   u32             additional_flags)
 {
-    ui_signal_t result = {};
 
     widget_t *widget = ui_widget_create(ui_state, widget_name, (UI_WIDGET_FLAG_DISPLAY_TEXTURE|additional_flags));
     widget->minimum_render_size   = size;
@@ -1575,6 +1600,8 @@ ui_widget_texture(ui_state_t     *ui_state,
     widget->display_texture_uvmin = uv_min;
     widget->display_texture_uvmax = uv_max;
     widget->state->render_color   = vec4(1.0, 1.0, 1.0, 1.0);
+
+    ui_signal_t result = ui_widget_get_signals(ui_state, widget);
 
     return(result);
 }

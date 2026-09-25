@@ -1016,32 +1016,6 @@ s_asset_manager_update(asset_manager_t *asset_manager)
         }
     }
 
-    // NOTE(Sleepster): Update texture atlases 
-    for(u32 atlas_index = 0;
-        atlas_index < asset_manager->atlas_registry.current_atlas_count;
-        ++atlas_index)
-    {
-        texture_atlas_t *atlas = asset_manager->atlas_registry.atlases + atlas_index;
-        for(u32 texture_index = 0;
-            texture_index < atlas->packed_subtexture_count;
-            ++texture_index)
-        {
-            subtexture_data_t *data = atlas->packed_subtextures + texture_index;
-
-            volatile u32 recorded_package_version = AtomicLoad32(&data->packed_asset.slot->package_generation);
-            volatile u32 atlased_generation       = AtomicLoad32(&data->atlased_generation);
-            if(recorded_package_version != atlased_generation)
-            {
-                s_texture_atlas_add_texture(atlas, &data->packed_asset);
-            }
-        }
-
-        if(atlas->merge_counter > 0)
-        {
-            s_texture_atlas_pack_added_textures(asset_manager, atlas);
-        }
-    }
-
     // NOTE(Sleepster): Process items in the load queue 
     // TODO(Sleepster): Unload queue...
     for(u32 queued_load_index = 0;
@@ -1111,6 +1085,32 @@ s_asset_manager_update(asset_manager_t *asset_manager)
         }
     }
     font_manager->pages_queued = 0;
+
+    // NOTE(Sleepster): Update texture atlases 
+    for(u32 atlas_index = 0;
+        atlas_index < asset_manager->atlas_registry.current_atlas_count;
+        ++atlas_index)
+    {
+        texture_atlas_t *atlas = asset_manager->atlas_registry.atlases + atlas_index;
+        for(u32 texture_index = 0;
+            texture_index < atlas->packed_subtexture_count;
+            ++texture_index)
+        {
+            subtexture_data_t *data = atlas->packed_subtextures + texture_index;
+
+            volatile u32 recorded_package_version = AtomicLoad32(&data->packed_asset.slot->package_generation);
+            volatile u32 atlased_generation       = AtomicLoad32(&data->atlased_generation);
+            if(recorded_package_version != atlased_generation)
+            {
+                s_texture_atlas_add_texture(atlas, &data->packed_asset);
+            }
+        }
+
+        if(atlas->merge_counter > 0)
+        {
+            s_texture_atlas_pack_added_textures(asset_manager, atlas);
+        }
+    }
 }
 
 internal_api void
@@ -1452,13 +1452,43 @@ s_texture_atlas_create(asset_manager_t *asset_manager,
 }
 
 ENGINE_API void
-s_texture_atlas_add_texture(texture_atlas_t *atlas, asset_handle_t *texture_handle)
+s_asset_manager_insert_image_into_atlas(asset_manager_t *asset_manager, asset_handle_t *texture_handle)
 {
     Assert(texture_handle);
     Assert(texture_handle->slot->type == AT_Bitmap);
 
+    texture_atlas_registry_t *registry = &asset_manager->atlas_registry;
+
+    texture_atlas_t *atlas = null;
+    for(u32 atlas_index = 0;
+        atlas_index < registry->current_atlas_count;
+        ++atlas_index)
+    {
+        texture_atlas_t *found = registry->atlases + atlas_index;
+        if(found->is_valid == true)
+        {
+            atlas = found;
+            break;
+        }
+    }
+
+    if(!atlas)
+    {
+        atlas = s_texture_atlas_create(asset_manager, 1024, 4, BMF_RGBA32_SRGB, 32);
+    }
+        
     c_dynarray_add(&atlas->textures_to_merge, &texture_handle);
     atlas->merge_counter += 1;
+}
+
+ENGINE_API void
+s_texture_atlas_add_texture(texture_atlas_t *texture_atlas, asset_handle_t *texture_handle)
+{
+    Assert(texture_handle);
+    Assert(texture_handle->slot->type == AT_Bitmap);
+
+    c_dynarray_add(&texture_atlas->textures_to_merge, &texture_handle);
+    texture_atlas->merge_counter += 1;
 }
 
 ENGINE_API void
