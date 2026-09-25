@@ -118,6 +118,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
                         new_event.type      = INPUT_EVENT_TYPE_KEY_DOWN;
                         new_event.timestamp = SDL_GetTicks();
                         new_event.inputID   = event->key.scancode;
+                        new_event.vkcode    = event->key.key;
 
                         append_event_to_device(device, &new_event);
                     }
@@ -149,7 +150,7 @@ s_im_handle_window_inputs(SDL_Event *event, input_manager_t *input_manager)
                 input_event_t new_event = {};
                 new_event.type      = INPUT_EVENT_TYPE_TEXT_INPUT;
                 new_event.timestamp = SDL_GetTicks();
-                new_event.text      = c_string_make_copy(&gc->simulation_arena, STR(event->text.text));
+                new_event.text      = c_string_make_copy(&gc->temp_arena, STR(event->text.text));
 
                 append_event_to_device(device, &new_event);
             }
@@ -358,12 +359,13 @@ s_im_controller_update_state(input_manager_t *input_manager, input_controller_t 
         s32 events_read = 0;
         for(s32 event_index = controller->next_device_event_to_read;
             event_index != device->next_event_to_write;
-            ++event_index)
+            event_index = (event_index + 1) % device->input_events.count)
         {
             s32 source_index = (controller->next_device_event_to_read + events_read) % device->input_events.count;
 
             input_event_t *source      = device->input_events + source_index;
             input_event_t *destination = controller->input_events + controller->next_controller_event_to_write;
+            Assert(source->type != INPUT_EVENT_TYPE_NONE);
 
             u64 delta_ticks = controller->last_polled_timestamp - source->timestamp;
             if(!source->consumed && (delta_ticks <= 17))
@@ -416,6 +418,7 @@ s_im_controller_update_state(input_manager_t *input_manager, input_controller_t 
                     input_state_t *button = controller->inputs + event->inputID;
                     button->flags  |= (INPUT_MANAGER_INPUT_STATE_FLAG_DOWN|INPUT_MANAGER_INPUT_STATE_FLAG_PRESSED);
                     button->inputID = event->inputID;
+                    button->vkcode  = event->vkcode;
 
                     ++button->half_transition_count;
                     controller->transient_data.buttons_pressed[controller->transient_data.pressed_button_count++] = button;
@@ -448,6 +451,43 @@ s_im_controller_update_state(input_manager_t *input_manager, input_controller_t 
 
         memcpy(controller_destination, device_source, sizeof(input_state_t) * device->input_axis_info_array.count);
     }
+}
+
+ENGINE_API u32
+s_im_observe_current_device_events(input_controller_t *controller, array_view_t<input_event_t> event_array)
+{
+    u32 result = 0;
+    if(controller->owner_device && controller->owner_device->deviceID != (s32)INVALID_ID)
+    {
+        s32 events_read   = 0;
+        s32 events_stored = 0;
+        for(s32 event_index = controller->next_device_event_to_read;
+            event_index != controller->owner_device->next_event_to_write;
+            event_index = (event_index + 1) % controller->owner_device->input_events.count)
+        {
+            s32 source_index = (controller->next_device_event_to_read + events_read) % controller->owner_device->input_events.count;
+
+            input_event_t *event = controller->owner_device->input_events + source_index;
+            Assert(event->type != INPUT_EVENT_TYPE_NONE);
+
+            u64 delta_ticks = controller->last_polled_timestamp - event->timestamp;
+            if(delta_ticks <= 17 && !event->consumed)
+            {
+                ++events_stored;
+                if(event_array.items)
+                {
+                    input_event_t *store_event = event_array + events_read;
+                    *store_event = *event;
+                }
+            }
+
+            ++events_read;
+        }
+
+        result = events_stored;
+    }
+
+    return(result);
 }
 
 ENGINE_API u32

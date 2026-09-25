@@ -1480,12 +1480,14 @@ output_basic_type_info(string_builder_t *builder, code_type_t *type, u32 indent_
     }
 }
 
+// TODO(Sleepster): Bad. I know. Don't care for now.
 internal_api bool8
 athena_excluded_type(string_t type_name)
 {
     bool8 result = false;
     if(c_string_compare(type_name, STR("dynarray_t")) ||
        c_string_compare(type_name, STR("hash_table_t")) ||
+       c_string_compare(type_name, STR("array_t")) ||
        c_string_compare(type_name, STR("fixed_array_t")) ||
        c_string_compare(type_name, STR("array_view_t")))
     {

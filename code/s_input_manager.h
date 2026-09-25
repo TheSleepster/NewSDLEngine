@@ -36,6 +36,7 @@ struct input_event_t
     u32      type;
     bool8    consumed;
     u16      inputID; 
+    u32      vkcode; 
     u64      timestamp;
     vec2_t   axis_value;
     string_t text;
@@ -97,6 +98,7 @@ enum keyboard_modifier_flags_t
 struct input_state_t
 {
     u32    inputID;
+    u32    vkcode; 
     u32    flags;
     u16    half_transition_count;
 
@@ -264,6 +266,7 @@ ENGINE_API input_device_t     *s_im_find_first_device_of_type(input_manager_t *i
 ENGINE_API input_controller_t *s_im_init_input_controller(input_manager_t *input_manager);
 ENGINE_API input_event_t      *s_im_read_next_event_from_controller(input_controller_t *controller);
 ENGINE_API void                s_im_controller_update_state(input_manager_t *input_manager, input_controller_t *controller, bool8 consume);
+ENGINE_API u32                 s_im_observe_current_device_events(input_controller_t *controller, array_view_t<input_event_t> event_array);
 
 
 ENGINE_API vec2_t

@@ -411,7 +411,7 @@ entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags)
     entity_t *result = s_entity_create(game_state->entity_manager, 
                                        position, 
                                        ENTITY_ARCHETYPE_TILE, 
-                                      (ENTITY_FLAG_STATIC|ENTITY_FLAG_IS_GROUND|flags));
+                                      (ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_STATIC|ENTITY_FLAG_IS_GROUND|flags));
     result->archetype       = ENTITY_ARCHETYPE_TILE;
     result->position        = position;
     result->render_position = position;
@@ -682,18 +682,18 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
     input_action_t *movement_action = s_im_input_action_create(input_manager, INPUT_ACTION_TYPE_AXIS2D);
 
     input_action_mapping_t keyboard_movement_mapping = (input_action_mapping_t) {
-        .bindings = {{{SDL_SCANCODE_W}, {SDL_SCANCODE_S}, {SDL_SCANCODE_A}, {SDL_SCANCODE_D}}},
+        .device_type   = INPUT_DEVICE_TYPE_KEYBOARD,
         .binding_count = 4,
-        .device_type = INPUT_DEVICE_TYPE_KEYBOARD
+        .bindings = {{{SDL_SCANCODE_W}, {SDL_SCANCODE_S}, {SDL_SCANCODE_A}, {SDL_SCANCODE_D}}},
     };
     s_im_input_action_add_mapping(movement_action, &keyboard_movement_mapping);
 
     input_action_mapping_t controller_movement_mapping = (input_action_mapping_t) {
+        .device_type   = INPUT_DEVICE_TYPE_GAMEPAD,
+        .binding_count = 2,
         .bindings = {
             {{SDL_GAMEPAD_AXIS_LEFTY}, {SDL_GAMEPAD_AXIS_LEFTX}}
         },
-        .binding_count   = 2,
-        .device_type = INPUT_DEVICE_TYPE_GAMEPAD 
     };
     s_im_input_action_add_mapping(movement_action, &controller_movement_mapping);
     game_state->mappings.move = movement_action;
@@ -701,16 +701,16 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
     // NOTE(Sleepster): Jump
     input_action_t *jump_action = s_im_input_action_create(input_manager, INPUT_ACTION_TYPE_BUTTON);
     input_action_mapping_t keyboard_jump_mapping = (input_action_mapping_t) {
-        .bindings = {{SDL_SCANCODE_SPACE}},
+        .device_type   = INPUT_DEVICE_TYPE_KEYBOARD,
         .binding_count = 1,
-        .device_type = INPUT_DEVICE_TYPE_KEYBOARD
+        .bindings = {{SDL_SCANCODE_SPACE}},
     };
     s_im_input_action_add_mapping(jump_action, &keyboard_jump_mapping);
 
     input_action_mapping_t gamepad_jump_mapping = (input_action_mapping_t) {
-        .bindings = {{SDL_GAMEPAD_BUTTON_SOUTH}},
+        .device_type   = INPUT_DEVICE_TYPE_GAMEPAD,
         .binding_count = 1,
-        .device_type = INPUT_DEVICE_TYPE_GAMEPAD
+        .bindings = {{SDL_GAMEPAD_BUTTON_SOUTH}},
     };
     s_im_input_action_add_mapping(jump_action, &gamepad_jump_mapping);
     game_state->mappings.jump = jump_action;
@@ -718,16 +718,16 @@ game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manage
     // NOTE(Sleepster): Dash 
     input_action_t *dash_action = s_im_input_action_create(input_manager, INPUT_ACTION_TYPE_BUTTON);
     input_action_mapping_t keyboard_dash_mapping = (input_action_mapping_t) {
-        .bindings = {{SDL_SCANCODE_LSHIFT}},
+        .device_type = INPUT_DEVICE_TYPE_KEYBOARD,
         .binding_count = 1,
-        .device_type = INPUT_DEVICE_TYPE_KEYBOARD 
+        .bindings = {{SDL_SCANCODE_LSHIFT}},
     };
     s_im_input_action_add_mapping(dash_action, &keyboard_dash_mapping);
 
     input_action_mapping_t gamepad_dash_mapping = (input_action_mapping_t) {
-        .bindings = {{SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1}},
+        .device_type   = INPUT_DEVICE_TYPE_GAMEPAD,
         .binding_count = 1,
-        .device_type = INPUT_DEVICE_TYPE_GAMEPAD
+        .bindings = {{SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1}},
     };
     s_im_input_action_add_mapping(dash_action, &gamepad_dash_mapping);
     game_state->mappings.dash = dash_action;
@@ -805,6 +805,7 @@ game_state_simulate(game_state_t *game_state)
     entity_query_t actor_query     = s_entity_query_flags_exact(game_state->entity_manager, ENTITY_FLAG_ACTOR|ENTITY_FLAG_HAS_COLLIDER);
     for(entity_t *entity: actor_query)
     {
+        entity->flags &= ~ENTITY_FLAG_GROUNDED;
         for(entity_t *collider: collision_query)
         {
             vec2_t target_velocity = entity->velocity;
@@ -850,7 +851,8 @@ game_state_simulate(game_state_t *game_state)
                         target_velocity.y = displacement + Vbias;
                     }
 
-                    if(collider->flags & ENTITY_FLAG_IS_GROUND)
+                    if(collider->flags & ENTITY_FLAG_IS_GROUND &&
+                       collision.y.normal.y >= 0.0f)
                     {
                         entity->flags |= ENTITY_FLAG_GROUNDED;
                     }
@@ -888,7 +890,7 @@ internal_api void
 DEBUG_toggle_state_recording(void)
 {
     gc->recording_input = !gc->recording_input;
-    if(gc->recording_input)
+    if(gc->recording_input && !gc->playing_back_input)
     {
         gc->saved_arena_size = gc->persistent_arena.used;
         
@@ -904,7 +906,7 @@ internal_api void
 DEBUG_toggle_state_playback(void)
 {
     gc->playing_back_input = !gc->playing_back_input;
-    if(gc->playing_back_input)
+    if(gc->playing_back_input && !gc->recording_input)
     {
         gc->input_manager_playback_file.current_read_offset = 0;
         c_file_read(&gc->input_manager_playback_file, gc->persistent_arena.base, gc->saved_arena_size); 
@@ -1172,6 +1174,10 @@ game_main(global_context_t *_global_context)
         if(game_state->editor_opened)
         {
             s_im_controller_update_state(input_manager, game_state->editor_controller, false);
+            vec2_t mouse_position = s_im_transform_mouse_data(game_state->editor_controller, 
+                                                              game_state->editor_camera.viewport, 
+                                                              game_state->editor_camera.matrices.view_matrix, 
+                                                              game_state->editor_camera.matrices.projection_matrix);
 
             input_state_t *middle_mouse   = s_im_controller_get_input_state(game_state->editor_controller, SDL_SCANCODE_MIDDLE_MOUSE);
             input_state_t *mouse_movement = s_im_controller_get_input_state(game_state->editor_controller, INPUT_ARRAY_INPUT_AXIS_MOUSE_MOVEMENT);
@@ -1190,19 +1196,21 @@ game_main(global_context_t *_global_context)
             // NOTE(Sleepster): Zoom adjustment 
             if(scroll_delta.y != 0.0f)
             {
-                game_state->editor_zoom += (scroll_delta.y);
-                game_state->editor_zoom  = Clamp(game_state->editor_zoom, 1.0f, 10.0f);
+                float32 previous_zoom = game_state->editor_zoom;
+
+                // NOTE(Sleepster): Taken from this raylib example:
+                // https://github.com/raysan5/raylib/blob/master/examples/core/core_2d_camera_mouse_zoom.c
+                float scale = 0.2f * scroll_delta.y;
+                game_state->editor_zoom = Clamp(expf(logf(previous_zoom) + scale), 1.0f, 10.0f);
+
+                vec2_t new_mouse_offset_scaling = vec2_scale(mouse_position, game_state->editor_zoom - previous_zoom);
+                game_state->editor_camera.translation = vec2_add(game_state->editor_camera.translation, new_mouse_offset_scaling);
             }
 
             // NOTE(Sleepster): Tile placing 
             input_state_t *left_mouse = s_im_controller_get_input_state(game_state->editor_controller, SDL_SCANCODE_LEFT_MOUSE);
             if(InputStateDown(left_mouse->flags))
             {
-                vec2_t mouse_position = s_im_transform_mouse_data(game_state->editor_controller, 
-                                                                  game_state->editor_camera.viewport, 
-                                                                  game_state->editor_camera.matrices.view_matrix, 
-                                                                  game_state->editor_camera.matrices.projection_matrix);
-
                 world_sim_region_t *region = s_entity_manager_get_sim_region(game_state->entity_manager, mouse_position);
                 // TODO(Sleepster): This is just to fix some stupid bugs with the cursor clicking outside of the main area for now
                 // this WILL go away

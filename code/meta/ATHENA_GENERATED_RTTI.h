@@ -119,7 +119,9 @@
 	X(entity_archetype_t, &DEFAULT_typedata_structure_entity_archetype_t.type_info) \
 	X(entity_flags_t, &DEFAULT_typedata_structure_entity_flags_t.type_info) \
 	X(entity_t, &DEFAULT_typedata_structure_entity_t.type_info) \
+	X(sim_region_entity_array_t, &DEFAULT_typedata_sim_region_entity_array_t) \
 	X(world_sim_region_t, &DEFAULT_typedata_structure_world_sim_region_t.type_info) \
+	X(world_sim_region_array_t, &DEFAULT_typedata_world_sim_region_array_t) \
 	X(entity_manager_t, &DEFAULT_typedata_structure_entity_manager_t.type_info) \
 	X(entity_query_t, &DEFAULT_typedata_structure_entity_query_t.type_info) \
 	X(asset_handle_t, &DEFAULT_typedata_structure_asset_handle_t.type_info) \
@@ -296,6 +298,8 @@
 	X(TYPE_s_im_find_first_device_of_type) \
 	X(TYPE_s_im_init_input_controller) \
 	X(TYPE_s_im_controller_update_state) \
+	X(TYPE_array_view_t) \
+	X(TYPE_s_im_observe_current_device_events) \
 	X(TYPE_vec2_t) \
 	X(TYPE_mat4_t) \
 	X(TYPE_s_im_transform_mouse_data) \
@@ -460,7 +464,9 @@
 	X(TYPE_entity_archetype_t) \
 	X(TYPE_entity_flags_t) \
 	X(TYPE_entity_t) \
+	X(TYPE_sim_region_entity_array_t) \
 	X(TYPE_world_sim_region_t) \
+	X(TYPE_world_sim_region_array_t) \
 	X(TYPE_entity_manager_t) \
 	X(TYPE_entity_query_t) \
 	X(TYPE_s_entity_manager_get_sim_region) \
@@ -474,7 +480,6 @@
 	X(TYPE_animation2D_t) \
 	X(TYPE_rectangle2_t) \
 	X(TYPE_ivec2_t) \
-	X(TYPE_fixed_array_t) \
 	X(TYPE_begin) \
 	X(TYPE_end) \
 	X(TYPE_widget_state_t) \
@@ -526,6 +531,7 @@
 	X(TYPE_ui_state_end_column) \
 	X(TYPE_vec3_t) \
 	X(TYPE_immediate_widget_data_t) \
+	X(TYPE_array_t) \
 	X(TYPE_hash_table_t) \
 	X(TYPE_camera_matrices_t) \
 	X(TYPE_RHI_vertex_buffer_t) \
@@ -645,6 +651,7 @@
 	X(TYPE_backend_renderpass_handle_t) \
 	X(TYPE_backend_framebuffer_handle_t) \
 	X(TYPE_SDL_Window) \
+	X(TYPE_fixed_array_t) \
 	X(TYPE_backend_initialize) \
 	X(TYPE_backend_handle_window_resize) \
 	X(TYPE_backend_render_frame) \
@@ -834,11 +841,12 @@ struct type_info_struct_input_event_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[6];
+		const type_info_member_t member_array[7];
 		struct {
 			const type_info_member_t type;
 			const type_info_member_t consumed;
 			const type_info_member_t inputID;
+			const type_info_member_t vkcode;
 			const type_info_member_t timestamp;
 			const type_info_member_t axis_value;
 			const type_info_member_t text;
@@ -955,9 +963,10 @@ struct type_info_struct_input_state_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[6];
+		const type_info_member_t member_array[7];
 		struct {
 			const type_info_member_t inputID;
+			const type_info_member_t vkcode;
 			const type_info_member_t flags;
 			const type_info_member_t half_transition_count;
 			const type_info_member_t last_value;
@@ -1241,6 +1250,20 @@ struct type_info_procedure_s_im_controller_update_state {
 			const type_info_member_t input_manager;
 			const type_info_member_t controller;
 			const type_info_member_t consume;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_s_im_observe_current_device_events {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t controller;
+			const type_info_member_t event_array;
 		}arguments;
 	};
 };
@@ -3694,7 +3717,7 @@ struct type_info_struct_ui_state_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[52];
+		const type_info_member_t member_array[51];
 		struct {
 			const type_info_member_t widget_arena;
 			const type_info_member_t polling_arena;
@@ -3712,7 +3735,6 @@ struct type_info_struct_ui_state_t {
 			const type_info_member_t left_mouse;
 			const type_info_member_t right_mouse;
 			const type_info_member_t ui_events;
-			const type_info_member_t ui_event_count;
 			const type_info_member_t mouse_position;
 			const type_info_member_t mouse_delta;
 			const type_info_member_t persistent_data_arena;
@@ -7907,6 +7929,8 @@ extern const type_info_procedure_s_im_handle_window_inputs DEFAULT_typedata_proc
 extern const type_info_procedure_s_im_find_first_device_of_type DEFAULT_typedata_procedure_s_im_find_first_device_of_type;
 extern const type_info_procedure_s_im_init_input_controller DEFAULT_typedata_procedure_s_im_init_input_controller;
 extern const type_info_procedure_s_im_controller_update_state DEFAULT_typedata_procedure_s_im_controller_update_state;
+extern const type_info_t DEFAULT_typedata_array_view_t;
+extern const type_info_procedure_s_im_observe_current_device_events DEFAULT_typedata_procedure_s_im_observe_current_device_events;
 extern const type_info_t DEFAULT_typedata_vec2_t;
 extern const type_info_t DEFAULT_typedata_mat4_t;
 extern const type_info_procedure_s_im_transform_mouse_data DEFAULT_typedata_procedure_s_im_transform_mouse_data;
@@ -8074,7 +8098,9 @@ extern const type_info_procedure_sys_wait_for_process DEFAULT_typedata_procedure
 extern const type_info_struct_entity_archetype_t DEFAULT_typedata_structure_entity_archetype_t;
 extern const type_info_struct_entity_flags_t DEFAULT_typedata_structure_entity_flags_t;
 extern const type_info_struct_entity_t DEFAULT_typedata_structure_entity_t;
+extern const type_info_t DEFAULT_typedata_sim_region_entity_array_t;
 extern const type_info_struct_world_sim_region_t DEFAULT_typedata_structure_world_sim_region_t;
+extern const type_info_t DEFAULT_typedata_world_sim_region_array_t;
 extern const type_info_struct_entity_manager_t DEFAULT_typedata_structure_entity_manager_t;
 extern const type_info_struct_entity_query_t DEFAULT_typedata_structure_entity_query_t;
 extern const type_info_procedure_s_entity_manager_get_sim_region DEFAULT_typedata_procedure_s_entity_manager_get_sim_region;
@@ -8088,7 +8114,6 @@ extern const type_info_struct_asset_handle_t DEFAULT_typedata_structure_asset_ha
 extern const type_info_t DEFAULT_typedata_animation2D_t;
 extern const type_info_t DEFAULT_typedata_rectangle2_t;
 extern const type_info_t DEFAULT_typedata_ivec2_t;
-extern const type_info_t DEFAULT_typedata_fixed_array_t;
 extern const type_info_procedure_begin DEFAULT_typedata_procedure_begin;
 extern const type_info_procedure_end DEFAULT_typedata_procedure_end;
 extern const type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_state_t;
@@ -8140,6 +8165,7 @@ extern const type_info_procedure_ui_state_begin_column DEFAULT_typedata_procedur
 extern const type_info_procedure_ui_state_end_column DEFAULT_typedata_procedure_ui_state_end_column;
 extern const type_info_t DEFAULT_typedata_vec3_t;
 extern const type_info_t DEFAULT_typedata_immediate_widget_data_t;
+extern const type_info_t DEFAULT_typedata_array_t;
 extern const type_info_t DEFAULT_typedata_hash_table_t;
 extern const type_info_struct_camera_matrices_t DEFAULT_typedata_structure_camera_matrices_t;
 extern const type_info_struct_RHI_vertex_buffer_t DEFAULT_typedata_structure_RHI_vertex_buffer_t;
@@ -8255,6 +8281,7 @@ extern const type_info_struct_bitmap_format_t DEFAULT_typedata_structure_bitmap_
 extern const type_info_t DEFAULT_typedata_backend_renderpass_handle_t;
 extern const type_info_t DEFAULT_typedata_backend_framebuffer_handle_t;
 extern const type_info_t DEFAULT_typedata_SDL_Window;
+extern const type_info_t DEFAULT_typedata_fixed_array_t;
 extern const type_info_procedure_backend_initialize DEFAULT_typedata_procedure_backend_initialize;
 extern const type_info_procedure_backend_handle_window_resize DEFAULT_typedata_procedure_backend_handle_window_resize;
 extern const type_info_procedure_backend_render_frame DEFAULT_typedata_procedure_backend_render_frame;
@@ -8628,7 +8655,7 @@ constexpr type_info_struct_input_event_t DEFAULT_typedata_structure_input_event_
 		.type_id = TYPE_input_event_t,
 		.size = athena_internal::safe_sizeof<input_event_t>(),
 	},
-	.member_count   = 6,
+	.member_count   = 7,
 	.member_pointer = DEFAULT_typedata_structure_input_event_t.member_array,
 	.members = {
 		.type = {
@@ -8652,6 +8679,14 @@ constexpr type_info_struct_input_event_t DEFAULT_typedata_structure_input_event_
 			.member_name   = "inputID",
 			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
 			.offset        = offsetof(input_event_t, inputID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.vkcode = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vkcode",
+			.parent        = &DEFAULT_typedata_structure_input_event_t.type_info,
+			.offset        = offsetof(input_event_t, vkcode),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -9137,7 +9172,7 @@ constexpr type_info_struct_input_state_t DEFAULT_typedata_structure_input_state_
 		.type_id = TYPE_input_state_t,
 		.size = athena_internal::safe_sizeof<input_state_t>(),
 	},
-	.member_count   = 6,
+	.member_count   = 7,
 	.member_pointer = DEFAULT_typedata_structure_input_state_t.member_array,
 	.members = {
 		.inputID = {
@@ -9145,6 +9180,14 @@ constexpr type_info_struct_input_state_t DEFAULT_typedata_structure_input_state_
 			.member_name   = "inputID",
 			.parent        = &DEFAULT_typedata_structure_input_state_t.type_info,
 			.offset        = offsetof(input_state_t, inputID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.vkcode = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vkcode",
+			.parent        = &DEFAULT_typedata_structure_input_state_t.type_info,
+			.offset        = offsetof(input_state_t, vkcode),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -9925,6 +9968,25 @@ constexpr type_info_procedure_s_im_controller_update_state DEFAULT_typedata_proc
 			.parent        = &DEFAULT_typedata_procedure_s_im_controller_update_state.type_info,
 			.flags         = 0,
 			.pointer_depth = 0,
+		},
+	},
+};
+constexpr type_info_procedure_s_im_observe_current_device_events DEFAULT_typedata_procedure_s_im_observe_current_device_events = {
+	.type_info = {
+		.type_name = "s_im_observe_current_device_events",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_s_im_observe_current_device_events,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_u32,
+	.argument_pointer = DEFAULT_typedata_procedure_s_im_observe_current_device_events.argument_array,
+	.arguments = {
+		.controller = {
+			.type_info     = &DEFAULT_typedata_structure_input_controller_t.type_info,
+			.member_name   = "controller",
+			.parent        = &DEFAULT_typedata_procedure_s_im_observe_current_device_events.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
 	},
 };
@@ -15397,6 +15459,11 @@ constexpr type_info_struct_entity_t DEFAULT_typedata_structure_entity_t = {
 	},
 };
 
+constexpr type_info_t DEFAULT_typedata_sim_region_entity_array_t = {
+	.type_name = "sim_region_entity_array_t",
+	.type_id = TYPE_sim_region_entity_array_t,
+	.size = athena_internal::safe_sizeof<sim_region_entity_array_t>(),
+};
 constexpr type_info_struct_world_sim_region_t DEFAULT_typedata_structure_world_sim_region_t = {
 	.type_info = {
 		.type_name = "world_sim_region_t",
@@ -15415,6 +15482,14 @@ constexpr type_info_struct_world_sim_region_t DEFAULT_typedata_structure_world_s
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+		.entities = {
+			.type_info     = &DEFAULT_typedata_sim_region_entity_array_t,
+			.member_name   = "entities",
+			.parent        = &DEFAULT_typedata_structure_world_sim_region_t.type_info,
+			.offset        = offsetof(world_sim_region_t, entities),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.sim_entity_count = {
 			.type_info     = &DEFAULT_typedata_u32,
 			.member_name   = "sim_entity_count",
@@ -15426,6 +15501,11 @@ constexpr type_info_struct_world_sim_region_t DEFAULT_typedata_structure_world_s
 	},
 };
 
+constexpr type_info_t DEFAULT_typedata_world_sim_region_array_t = {
+	.type_name = "world_sim_region_array_t",
+	.type_id = TYPE_world_sim_region_array_t,
+	.size = athena_internal::safe_sizeof<world_sim_region_array_t>(),
+};
 constexpr type_info_struct_entity_manager_t DEFAULT_typedata_structure_entity_manager_t = {
 	.type_info = {
 		.type_name = "entity_manager_t",
@@ -15450,6 +15530,14 @@ constexpr type_info_struct_entity_manager_t DEFAULT_typedata_structure_entity_ma
 			.parent        = &DEFAULT_typedata_structure_entity_manager_t.type_info,
 			.offset        = offsetof(entity_manager_t, world_sim_region_sparse_matrix),
 			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.active_sim_regions = {
+			.type_info     = &DEFAULT_typedata_world_sim_region_array_t,
+			.member_name   = "active_sim_regions",
+			.parent        = &DEFAULT_typedata_structure_entity_manager_t.type_info,
+			.offset        = offsetof(entity_manager_t, active_sim_regions),
+			.flags         = 0,
 			.pointer_depth = 0,
 		},
 		.active_region_count = {
@@ -16833,7 +16921,7 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 		.type_id = TYPE_ui_state_t,
 		.size = athena_internal::safe_sizeof<ui_state_t>(),
 	},
-	.member_count   = 52,
+	.member_count   = 51,
 	.member_pointer = DEFAULT_typedata_structure_ui_state_t.member_array,
 	.members = {
 		.widget_arena = {
@@ -16955,14 +17043,6 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.offset        = offsetof(ui_state_t, right_mouse),
 			.flags         = 2,
 			.pointer_depth = 1,
-		},
-		.ui_event_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "ui_event_count",
-			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
-			.offset        = offsetof(ui_state_t, ui_event_count),
-			.flags         = 0,
-			.pointer_depth = 0,
 		},
 		.mouse_position = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
@@ -27511,6 +27591,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_s_im_find_first_device_of_type.type_info,
 	&DEFAULT_typedata_procedure_s_im_init_input_controller.type_info,
 	&DEFAULT_typedata_procedure_s_im_controller_update_state.type_info,
+	&DEFAULT_typedata_procedure_s_im_observe_current_device_events.type_info,
 	&DEFAULT_typedata_procedure_s_im_transform_mouse_data.type_info,
 	&DEFAULT_typedata_structure_string_t.type_info,
 	&DEFAULT_typedata_structure_RHI_image_filter_type_t.type_info,
@@ -27965,6 +28046,7 @@ enum class input_event_t {
 	type,
 	consumed,
 	inputID,
+	vkcode,
 	timestamp,
 	axis_value,
 	text,
@@ -28017,6 +28099,7 @@ enum class keyboard_modifier_flags_t {
 }; // keyboard_modifier_flags_t
 enum class input_state_t {
 	inputID,
+	vkcode,
 	flags,
 	half_transition_count,
 	last_value,
@@ -28577,7 +28660,6 @@ enum class ui_state_t {
 	left_mouse,
 	right_mouse,
 	ui_events,
-	ui_event_count,
 	mouse_position,
 	mouse_delta,
 	persistent_data_arena,
@@ -29253,6 +29335,10 @@ enum class s_im_controller_update_state {
 	controller,
 	consume,
 }; // s_im_controller_update_state
+enum class s_im_observe_current_device_events {
+	controller,
+	event_array,
+}; // s_im_observe_current_device_events
 enum class s_im_transform_mouse_data {
 	controller,
 	surface_size,

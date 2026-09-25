@@ -57,17 +57,22 @@ c_dynarray_default_free_impl(void *allocator, void *memory)
 #endif
 // TODO(Sleepster): Custom allocator overriding 
 
-/////////////////////////
-// ARRAY VIEW
-//
-// This essentially acts as std::span for arrays.
-/////////////////////////
+/* 
+====================================================
+ARRAY VIEW
+
+This is just a way to look into the data of either a 'fixed_array_t'
+or a standard 'array_t' without having to pass the arrays around as 
+pointers. anything modified here will NOT effect the data of the
+original array. This is essentially "read only".
+==================================================== 
+*/
 
 template <typename T>
 struct array_view_t
 {
-    T        *items;
-    const s32 count;
+    T  *items;
+    s32 count;
 
     T &operator[](s32 index);
     T *operator+(s32 index);
@@ -178,9 +183,13 @@ c_array_add_if_unique(array_view_t<T> array, T *element, s32 index_to_emplace)
     return(result);
 }
 
-/////////////////////////
-// STATIC ARRAY
-/////////////////////////
+/* 
+====================================================
+FIXED COMPILE TIME ARRAY
+
+No matter what happens, this array can NEVER resize.
+==================================================== 
+*/
 
 template <typename T, s32 capacity>
 struct fixed_array_t
@@ -255,9 +264,109 @@ c_array_add_if_unique(fixed_array_t<T, count> &array, T *element, s32 index_to_e
     return(result);
 }
 
-/////////////////////////
-// DYNAMIC ARRAY
-/////////////////////////
+/* 
+====================================================
+HEAP ARRAY
+
+Different from both the fixed_array_t and the dynamic array.
+Unlike the fixed array, this CAN be resized and it's memory is
+given to it rather than allocated. YOU must provide the memory.
+It basically is just a safer runtime C array. Again, it is different
+from that of a dynamic array in the sense that it will NOT resize on it's
+own. If you need the behavior of dynamic resizing, use a dynamic array.
+==================================================== 
+*/
+
+template <typename T>
+struct array_t
+{
+    T  *items;
+    s32 count;
+
+    T &operator[](s32 index);
+    T *operator+(s32 index);
+
+    operator array_view_t<T>() { return((array_view_t<T>){items, count}); }
+
+    // NOTE(Sleepster): Stupid C++ crap 
+    T *begin() { return items; }
+    T *end()   { return items + count; }
+
+    const T *begin() const { return items; }
+    const T *end()   const { return items + count; }
+};
+
+template <typename T>
+T&
+array_t<T>::operator[](s32 index)
+{
+    Expect(index < this->count, "Array bounds check failed... index was: '%d' while count is: '%d'...\n", index, this->count);
+    Expect(index >= 0, "Array bounds check failed... index was: '%d' which is less than 0...\n", index);
+
+    return(this->items[index]);
+}
+
+template <typename T>
+T*
+array_t<T>::operator+(s32 index)
+{
+    Expect(index < this->count, "Array bounds check failed... index was: '%d' while count is: '%d'...\n", index, this->count);
+    Expect(index >= 0, "Array bounds check failed... index was: '%d' which is less than 0...\n", index);
+
+    return(this->items + index);
+}
+
+template <typename T>
+void
+c_array_clear(array_t<T> &array)
+{
+    c_array_clear(static_cast<array_view_t<T>>(array));
+}
+
+template <typename T>
+s32
+c_array_find(array_t<T> &array, T *element)
+{
+    s32 result = c_array_find(static_cast<array_view_t<T>>(array), element);
+    return(result);
+}
+
+template <typename T>
+void
+c_array_remove(array_t<T> &array, s32 index, s32 max_index)
+{
+    c_array_remove(static_cast<array_view_t<T>>(array), index, max_index);
+}
+
+template <typename T>
+s32
+c_array_add_if_unique(array_t<T> &array, T *element, s32 index_to_emplace)
+{
+    s32 result = c_array_add_if_unique(static_cast<array_view_t<T>>(array), element, index_to_emplace);
+    return(result);
+}
+
+template<typename T>
+array_t<T>
+c_array_create(u32 count, T *memory)
+{
+    array_t<T> result = {};
+
+    result.items = memory;
+    result.count = count;
+
+    return(result);
+}
+
+/* 
+====================================================
+DYNAMIC ARRAY
+
+This stores it's memory on the heap and will resize when
+appropriate. Iteration instead uses the 'used' member rather 
+than count.
+==================================================== 
+*/
 
 template <typename T>
 struct dynarray_t

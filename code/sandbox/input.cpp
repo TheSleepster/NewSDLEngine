@@ -704,19 +704,19 @@ main(void)
 
     input_action_t *movement_action = s_im_input_action_create(input_manager, INPUT_ACTION_TYPE_AXIS2D);
     input_action_mapping_t keyboard_movement_mapping = {
+        .device_type   = INPUT_DEVICE_TYPE_KEYBOARD,
+        .binding_count = 4,
         .bindings = {
             {{SDL_SCANCODE_W}, {SDL_SCANCODE_S}, {SDL_SCANCODE_A}, {SDL_SCANCODE_D}}
         },
-        .binding_count = 4,
-        .device_type   = INPUT_DEVICE_TYPE_KEYBOARD
     };
 
     input_action_mapping_t gamepad_movement_mapping = {
+        .device_type   = INPUT_DEVICE_TYPE_GAMEPAD,
+        .binding_count = 2,
         .bindings = {
             {{INPUT_ARRAY_INPUT_AXIS_GAMEPAD_LEFTX}, {INPUT_ARRAY_INPUT_AXIS_GAMEPAD_LEFTY}}
         },
-        .binding_count = 2,
-        .device_type   = INPUT_DEVICE_TYPE_GAMEPAD
     };
 
     s_im_input_action_add_mapping(movement_action, &keyboard_movement_mapping);
@@ -724,19 +724,19 @@ main(void)
 
     input_action_t *jump_action = s_im_input_action_create(input_manager, INPUT_ACTION_TYPE_BUTTON);
     input_action_mapping_t keyboard_jump_mapping = {
+        .device_type = INPUT_DEVICE_TYPE_KEYBOARD,
+        .binding_count = 1,
         .bindings = {
             {{SDL_SCANCODE_SPACE}}
         },
-        .binding_count = 1,
-        .device_type   = INPUT_DEVICE_TYPE_KEYBOARD
     };
 
     input_action_mapping_t gamepad_jump_mapping = {
+        .device_type = INPUT_DEVICE_TYPE_GAMEPAD,
+        .binding_count = 1,
         .bindings = {
             {{SDL_GAMEPAD_BUTTON_SOUTH}}
         },
-        .binding_count = 1,
-        .device_type   = INPUT_DEVICE_TYPE_GAMEPAD
     };
 
     s_im_input_action_add_mapping(jump_action, &keyboard_jump_mapping);

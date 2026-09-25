@@ -178,6 +178,30 @@ ui_state_poll_input_events(ui_state_t *ui_state)
 {
     if(ui_state->frame_begun)
     {
+        c_arena_reset(&ui_state->polling_arena);
+
+        ui_state->ui_events.count = 0;
+        ui_state->ui_events.items = null;
+
+        ui_state->ui_events.count = s_im_observe_current_device_events(ui_state->ui_controller, ui_state->ui_events);
+        if(ui_state->ui_events.count > 0)
+        {
+            ui_state->ui_events.items = c_arena_push_array(&ui_state->polling_arena, input_event_t, ui_state->ui_events.count);
+        }
+
+        s_im_observe_current_device_events(ui_state->ui_controller, ui_state->ui_events);
+        if(ui_state->ui_events.items)
+        {
+            for(input_event_t &event: ui_state->ui_events)
+            {
+                if(event.type == INPUT_EVENT_TYPE_TEXT_INPUT)
+                {
+                    // NOTE(Sleepster): Copy the string again since the text for the event could expire whenever. 
+                    event.text = c_string_make_copy(&ui_state->polling_arena, event.text);
+                }
+            }
+        }
+
         s_im_controller_update_state(ui_state->input_manager, ui_state->ui_controller, ui_state->input_focused);
     }
 
@@ -1460,56 +1484,50 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
     if(widget_state->toggled && ui_state->input_focused)
     {
         bool8 backspaced = false;
-        (void)backspaced;
-#if 0
-        for(u32 event_index = 0;
-            event_index < ui_state->ui_event_count;
+        for(s32 event_index = 0;
+            event_index < ui_state->ui_events.count;
             ++event_index)
         {
             input_event_t *event = ui_state->ui_events + event_index;
-            if(!event->consumed)
+            Assert(event->type != INPUT_EVENT_TYPE_NONE);
+            if(event->text.count > 0)
             {
-                event->consumed = true;
-                if(event->input_stream.count > 0)
+                for(s32 stream_index = 0;
+                    stream_index < event->text.count;
+                    ++stream_index)
                 {
-                    for(s32 stream_index = 0;
-                        stream_index < event->input_stream.count;
-                        ++stream_index)
+                    s32 index = widget->widget_text_buffer->count + stream_index;
+                    widget->widget_text_buffer->data[index] = event->text.data[stream_index];
+                }
+
+                widget->widget_text_buffer->count += event->text.count;
+            }
+            else
+            {
+                input_state_t *input = s_im_controller_get_input_state(ui_state->ui_controller, event->inputID);
+                // NOTE(Sleepster): Backspace 
+                if(input->vkcode == 0x08 && 
+                   (event->type == INPUT_EVENT_TYPE_KEY_DOWN) && 
+                   !backspaced)
+                {
+                    backspaced = true;
+
+                    s32 backspace_amount = 1;
+                    if(ui_state->keyboard_flags & UI_KEYBOARD_FLAG_LCTRL)
                     {
-                        s32 index = widget->widget_text_buffer->count + stream_index;
-                        widget->widget_text_buffer->data[index] = event->input_stream.data[stream_index];
+                        backspace_amount = 4;
                     }
 
-                    widget->widget_text_buffer->count += event->input_stream.count;
-                }
-                else
-                {
-                    action_button_t *input = s_im_get_controller_action_button(ui_state->ui_controller, event->inputID);
-                    // NOTE(Sleepster): Backspace 
-                    if(input->keycode == 0x08 && 
-                       ((event->type == INPUT_EVENT_TYPE_DOWN) || event->type == INPUT_EVENT_TYPE_PRESSED) && 
-                       !backspaced)
+                    for(s32 backspace_index = 0;
+                        backspace_index < backspace_amount;
+                        ++backspace_index)
                     {
-                        backspaced = true;
-
-                        s32 backspace_amount = 1;
-                        if(ui_state->keyboard_flags & UI_KEYBOARD_FLAG_LCTRL)
-                        {
-                            backspace_amount = 4;
-                        }
-
-                        for(s32 backspace_index = 0;
-                            backspace_index < backspace_amount;
-                            ++backspace_index)
-                        {
-                            widget->widget_text_buffer->data[widget->widget_text_buffer->count] = '\0';
-                            widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 1, 0);
-                        }
+                        widget->widget_text_buffer->data[widget->widget_text_buffer->count] = '\0';
+                        widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 1, 0);
                     }
                 }
             }
         }
-#endif
 
         widget_state->widget_text_render_start_offset = 0;
         widget_state->widget_text_render_end_offset   = widget->widget_text_buffer->count;
