@@ -285,49 +285,6 @@ ui_state_poll_input_events(ui_state_t *ui_state)
 
 /*
 =============
-ui_state_get_input_events
-
-This function is what actually GATHERS the input
-events that you can then poll for. The reason this
-API is seperate is because the ui_state itself stores
-input events in case it is updated at a different rate
-from that of it's ui_controller.
-=============
-*/
-
-void
-ui_state_get_input_events(ui_state_t *ui_state)
-{
-    (void)ui_state;
-#if 0
-    if(ui_state->ui_controller && ui_state->input_focused)
-    {
-        c_arena_reset(&ui_state->polling_arena);
-
-        input_device_t *device = ui_state->ui_controller->device;
-        ui_state->ui_event_count = 0;
-        for(s32 event_index = 0;
-            event_index < device->events.count;
-            ++event_index)
-        {
-            input_event_t *event = device->events + event_index;
-            ui_state->ui_events[ui_state->ui_event_count] = *event;
-
-            ZeroStruct(*event);
-            if(event->input_stream.count > 0)
-            {
-                input_event_t *text_event = &ui_state->ui_events[ui_state->ui_event_count];
-                text_event->input_stream = c_string_make_copy(&ui_state->polling_arena, text_event->input_stream);
-            }
-
-            ++ui_state->ui_event_count;
-        }
-    }
-#endif
-}
-
-/*
-=============
 ui_state_update_widget_state
 =============
 */
@@ -1483,7 +1440,6 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
 
     if(widget_state->toggled && ui_state->input_focused)
     {
-        bool8 backspaced = false;
         for(s32 event_index = 0;
             event_index < ui_state->ui_events.count;
             ++event_index)
@@ -1504,27 +1460,33 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
             }
             else
             {
-                input_state_t *input = s_im_controller_get_input_state(ui_state->ui_controller, event->inputID);
-                // NOTE(Sleepster): Backspace 
-                if(input->vkcode == 0x08 && 
-                   (event->type == INPUT_EVENT_TYPE_KEY_DOWN) && 
-                   !backspaced)
+            }
+        }
+
+        // NOTE(Sleepster): Backspace 
+        input_state_t *input = s_im_controller_get_input_state(ui_state->ui_controller, SDL_SCANCODE_BACKSPACE);
+        if(InputStateDown(input->flags))
+        {
+            // NOTE(Sleepster): This is actually really stupid but we don't send or generate key repeat events so oh well,
+            // we're just gonna this it's mainly for debug code anyway so I don't realllyyyyyyyy care. (only kinda)
+            u64 current_time   = SDL_GetTicks();
+            u64 last_backspace = current_time - widget_state->backspace_time;
+            if(last_backspace > (gc->tick_rate_ms * 5))
+            {
+                widget_state->backspace_time = current_time;
+
+                s32 backspace_amount = 1;
+                if(ui_state->keyboard_flags & UI_KEYBOARD_FLAG_LCTRL)
                 {
-                    backspaced = true;
+                    backspace_amount = 4;
+                }
 
-                    s32 backspace_amount = 1;
-                    if(ui_state->keyboard_flags & UI_KEYBOARD_FLAG_LCTRL)
-                    {
-                        backspace_amount = 4;
-                    }
-
-                    for(s32 backspace_index = 0;
-                        backspace_index < backspace_amount;
-                        ++backspace_index)
-                    {
-                        widget->widget_text_buffer->data[widget->widget_text_buffer->count] = '\0';
-                        widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 1, 0);
-                    }
+                for(s32 backspace_index = 0;
+                    backspace_index < backspace_amount;
+                    ++backspace_index)
+                {
+                    widget->widget_text_buffer->data[widget->widget_text_buffer->count] = '\0';
+                    widget->widget_text_buffer->count = Max(widget->widget_text_buffer->count - 1, 0);
                 }
             }
         }

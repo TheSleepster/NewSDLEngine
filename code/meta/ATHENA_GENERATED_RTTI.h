@@ -3529,7 +3529,7 @@ struct type_info_struct_widget_state_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[21];
+		const type_info_member_t member_array[22];
 		struct {
 			const type_info_member_t last_interacted_frame;
 			const type_info_member_t toggled;
@@ -3552,6 +3552,7 @@ struct type_info_struct_widget_state_t {
 			const type_info_member_t resize_amount;
 			const type_info_member_t render_color;
 			const type_info_member_t widget_rect;
+			const type_info_member_t backspace_time;
 		}members;
 	};
 };
@@ -15891,7 +15892,7 @@ constexpr type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_stat
 		.type_id = TYPE_widget_state_t,
 		.size = athena_internal::safe_sizeof<widget_state_t>(),
 	},
-	.member_count   = 21,
+	.member_count   = 22,
 	.member_pointer = DEFAULT_typedata_structure_widget_state_t.member_array,
 	.members = {
 		.last_interacted_frame = {
@@ -16059,6 +16060,14 @@ constexpr type_info_struct_widget_state_t DEFAULT_typedata_structure_widget_stat
 			.member_name   = "widget_rect",
 			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
 			.offset        = offsetof(widget_state_t, widget_rect),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.backspace_time = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "backspace_time",
+			.parent        = &DEFAULT_typedata_structure_widget_state_t.type_info,
+			.offset        = offsetof(widget_state_t, backspace_time),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -28549,6 +28558,7 @@ enum class widget_state_t {
 	resize_amount,
 	render_color,
 	widget_rect,
+	backspace_time,
 }; // widget_state_t
 enum class ui_signal_flags_t {
 	UI_SIGNAL_FLAG_INVALID,

@@ -368,7 +368,7 @@ s_im_controller_update_state(input_manager_t *input_manager, input_controller_t 
             Assert(source->type != INPUT_EVENT_TYPE_NONE);
 
             u64 delta_ticks = controller->last_polled_timestamp - source->timestamp;
-            if(!source->consumed && (delta_ticks <= 17))
+            if(!source->consumed && (delta_ticks <= gc->tick_rate_ms))
             {
                 *destination = *source;
                 if(consume) source->consumed = true;
@@ -473,7 +473,7 @@ s_im_observe_current_device_events(input_controller_t *controller, array_view_t<
             Assert(event->type != INPUT_EVENT_TYPE_NONE);
 
             u64 delta_ticks = current_time - event->timestamp;
-            if(delta_ticks <= 17 && !event->consumed)
+            if(delta_ticks <= gc->tick_rate_ms && !event->consumed)
             {
                 if(event_array.items)
                 {

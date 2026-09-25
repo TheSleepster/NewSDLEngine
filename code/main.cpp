@@ -1142,7 +1142,6 @@ game_main(global_context_t *_global_context)
 #endif
         if(game_state->open_debug_menu || game_state->editor_opened)
         {
-            ui_state_get_input_events(main_ui);
             ui_state_begin_frame(main_ui);
             if(game_state->open_debug_menu)
             {

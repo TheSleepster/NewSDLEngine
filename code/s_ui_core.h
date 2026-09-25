@@ -28,6 +28,7 @@ struct widget_state_t
     u32          last_interacted_frame;
     bool8        toggled;
 
+    // TODO(Sleepster): Make this a set of flags 
     bool8        dragging;
     bool8        input_begin_within_bounds;
     bool8        is_held;
@@ -36,6 +37,7 @@ struct widget_state_t
     bool8        is_double_clicked;
     bool8        is_right_clicked;
     bool8        is_right_held;
+    // TODO(Sleepster): Make this a set of flags 
 
     // NOTE(Sleepster): For rendering SECTIONS of a string 
     s32          widget_text_render_start_offset;
@@ -59,6 +61,7 @@ struct widget_state_t
     vec4_t       render_color;
 
     rectangle2_t widget_rect;
+    u64          backspace_time;
 };
 
 enum ui_signal_flags_t
