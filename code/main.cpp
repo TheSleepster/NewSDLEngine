@@ -852,7 +852,7 @@ game_state_simulate(game_state_t *game_state)
                     }
 
                     if(collider->flags & ENTITY_FLAG_IS_GROUND &&
-                       collision.y.normal.y >= 0.0f)
+                       collision.y.normal.y >= 0.0f && collision.x.normal.x == 0.0f)
                     {
                         entity->flags |= ENTITY_FLAG_GROUNDED;
                     }
