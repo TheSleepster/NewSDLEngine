@@ -212,7 +212,8 @@ No matter what happens, this array can NEVER resize.
 template <typename T, s32 capacity>
 struct fixed_array_t
 {
-    // NOTE(Sleepster): Cannot resize the same array. This "static constexpr" makes it so that the count will survive any and all memsets
+    // NOTE(Sleepster): Cannot resize the same array. This "static constexpr" makes it so that the count will survive any 
+    // and all memsets as it is PURELY compile time
     static constexpr s32 count = capacity;
     T items[capacity];
 

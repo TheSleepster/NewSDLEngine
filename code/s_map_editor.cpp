@@ -42,19 +42,22 @@ struct editor_action_buffer_t
 
 struct map_editor_t
 {
-    memory_arena_t         editor_arena;
+    memory_arena_t                 editor_arena;
 
-    bool32                 show_grid;
-    bool32                 show_player_viewport;
-    float32                zoom;
-    RHI_render_camera_t    camera;
-    input_controller_t    *controller;
+    bool32                         show_grid;
+    bool32                         show_player_viewport;
+    float32                        zoom;
+    RHI_render_camera_t            camera;
+    input_controller_t            *controller;
 
-    asset_handle_t         gizmo_image;
-    asset_handle_t         mouse_cursor_image;
+    asset_handle_t                 gizmo_image;
+    asset_handle_t                 mouse_cursor_image;
 
-    editor_action_buffer_t first_undo_buffer;
-    editor_action_buffer_t first_redo_buffer;
+    editor_action_buffer_t         first_undo_buffer;
+    editor_action_buffer_t         first_redo_buffer;
+
+    editor_selected_entity_array_t selected_entities;
+    s32                            selected_entity_count;
 };
 
 internal_api map_editor_t*
@@ -248,6 +251,36 @@ s_editor_append_action(map_editor_t *editor, editor_action_t *action)
     chosen_buffer->actions[chosen_buffer->current_action_count++] = *action;
 }
 
+/* 
+=========================================================
+EDITOR CONTROLS:
+ LSHIFT + S = "Switch Mode"
+ 
+ BOTH MODES:
+     ESCAPE       = "Open Editor UI Panel"
+     CTRL + E     = "Open Entity Panel"
+     CTRL + Z     = "Undo"
+     CTRL + Y     = "Redo"
+     MIDDLE MOUSE = "Camera Pan"
+     WASD         = "Camera Pan"
+     MOUSE SCROLL = "Camera Zoom"
+ 
+ MANIPULATE MODE:
+     LEFT MOUSE (Clicked) = "Select Hovered Entity"
+     LEFT MOUSE (Held)    = "Box Select"
+     CTRL + LEFT MOUSE    = "Deselect Selected Entity"
+     ALT  + LEFT MOUSE    = "Drag Group"
+     CTRL + C             = "Copy Item"
+     CTRL + V             = "Paste Item"
+ 
+ PAINT MODE:
+     LEFT MOUSE         = "Paint Tiles"
+     CTRL + LEFT MOUSE  = "Paint Tiles Within Area"
+     RIGHT MOUSE        = "Remove Painted Tile"
+     CTRL + RIGHT MOUSE = "Remove Tiles Within Area"
+=========================================================
+*/
+
 internal_api void
 s_editor_update_state(game_state_t *game_state, render_state_t *render_state, input_manager_t *input_manager)
 {
@@ -359,24 +392,63 @@ s_editor_update_state(game_state_t *game_state, render_state_t *render_state, in
         editor->camera.translation = vec2_add(editor->camera.translation, new_mouse_offset_scaling);
     }
 
-    // NOTE(Sleepster): Tile placing 
-    input_state_t *left_mouse = s_im_controller_get_input_state(editor->controller, SDL_SCANCODE_LEFT_MOUSE);
-    if(InputStateDown(left_mouse->flags))
+
+    // NOTE(Sleepster): Entity selection
+    if(InputStatePressed(lclick->flags) && InputStateDown(lalt->flags))
     {
         world_chunk_t *chunk = s_entity_manager_get_or_create_chunk(game_state->entity_manager, mouse_position);
         if(chunk)
         {
-            bool8 occupied = false;
+            entity_t *selected_entity = null;
+            for(u32 entity_index = 0;
+                entity_index < chunk->chunk_entity_count;
+                ++entity_index)
+            {
+                entity_t *entity = chunk->entities + entity_index;
+                rectangle2_t editor_collider_rect = rect2_create(entity->editor_position, entity->size);
+                if(rect2_point_in_rect(editor_collider_rect, mouse_position))
+                {
+                    selected_entity = entity;
+                    break;
+                }
+                else
+                {
+                    s32 index = c_array_find(editor->selected_entities, &entity);
+                    if(index != -1)
+                    {
+                        c_array_remove(editor->selected_entities, index, editor->selected_entity_count);
+                        --editor->selected_entity_count;
+                    }
+                }
+            }
+
+            if(selected_entity)
+            {
+                s32 result = c_array_add_if_unique(editor->selected_entities, &selected_entity, editor->selected_entity_count);
+                if(result == -1)
+                {
+                    ++editor->selected_entity_count;
+                }
+            }
+        }
+    }
+    else if(InputStateDown(lclick->flags) && !InputStateDown(lalt->flags))
+    {
+        // NOTE(Sleepster): Tile placing 
+        world_chunk_t *chunk = s_entity_manager_get_or_create_chunk(game_state->entity_manager, mouse_position);
+        if(chunk)
+        {
+            bool8 cell_occupied = false;
             for(const entity_t &entity: chunk->entities)
             {
                 if(rect2_point_in_rect(entity.bounding_box, mouse_position))
                 {
-                    occupied = true;
+                    cell_occupied = true;
                     break;
                 }
             }
 
-            if(!occupied)
+            if(!cell_occupied)
             {
                 vec2_t tile_position = vec2_scale(world_to_tile(mouse_position), WORLD_TILE_SIZE);
                 entity_t *tile = entity_tile_create(game_state, tile_position, 0);

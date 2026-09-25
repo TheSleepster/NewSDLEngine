@@ -1376,6 +1376,14 @@ game_main(global_context_t *_global_context)
                     }
                 }
 
+                for(s32 entity_index = 0;
+                    entity_index < game_state->editor->selected_entity_count;
+                    ++entity_index)
+                {
+                    entity_t *entity = game_state->editor->selected_entities[entity_index];
+                    immediate_rect(command_list, &render_state->vertex_buffer, vec2_expand_vec3(entity->editor_position, 0.2), entity->size, vec4(0.0, 1.0, 0.0, 0.2));
+                }
+
                 immediate_rect(command_list, &render_state->vertex_buffer, vec3(0, 0, 0.4), vec2(8, 8), vec4(0.0, 1.0f, 0.0f, 1.0f));
 
                 RHI_cmd_update_buffer_contents(command_list, &render_state->vertex_buffer);
