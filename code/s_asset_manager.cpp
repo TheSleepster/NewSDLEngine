@@ -1366,8 +1366,6 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
 {
     asset_handle_t result;
 
-    u64 hash_value = c_hash_table_value_from_key(&asset_manager->asset_name_to_file, name);
-    log_info("hash index for: '%.*s' is '%llu'...\n", fprint_string(name), hash_value);
     s32 file_index = c_hash_table_get_element(&asset_manager->asset_name_to_file, name);
     if(file_index != -1)
     {
@@ -1385,13 +1383,16 @@ s_asset_manager_acquire_asset_handle(asset_manager_t *asset_manager, string_t na
         Assert(catalog);
 
         asset_slot_t *slot = s_asset_manager_get_asset_slot(catalog, name);
-
         result.is_valid = &slot->is_valid_for_handles;
         result.slot     = slot;
-        result.slot->ID = hash_value;
-        result.slot->catalog = asset_manager->asset_catalogs + result.slot->type;
         if(result.slot->slot_state == ASLS_Unloaded)
         {
+            u64 hash_value = c_hash_table_value_from_key(&asset_manager->asset_name_to_file, name);
+            log_info("hash index for: '%.*s' is '%llu'...\n", fprint_string(name), hash_value);
+
+            result.slot->ID = hash_value;
+            result.slot->catalog = asset_manager->asset_catalogs + result.slot->type;
+
             // NOTE(Sleepster): Otherwise, load it. 
             s_asset_manager_queue_asset_load(asset_manager, slot);
             slot->owner_asset_file_index = file_index;

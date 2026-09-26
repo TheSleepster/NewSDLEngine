@@ -84,6 +84,7 @@ vk_backend_buffer_append_data(vulkan_buffer_t *buffer, void *data, u32 size)
     }
     void *result = buffer->allocation.mapped_data + buffer->used;
 
+    Assert(buffer->used + size < buffer->size);
     memcpy(result, data, size);
     buffer->used += size;
 

@@ -87,9 +87,8 @@ s_map_editor_create(input_manager_t *input_manager, asset_manager_t *asset_manag
 }
 
 internal_api void 
-s_map_editor_handle_ui(game_state_t *game_state, ui_state_t *main_ui, RHI_context_t *RHI_context)
+s_map_editor_handle_ui(map_editor_t *editor, ui_state_t *main_ui, RHI_context_t *RHI_context)
 {
-    map_editor_t *editor = game_state->editor;
     ui_signal_t main_panel = ui_widget_panel(main_ui, 
                                              STR("Editor Panel"), 
                                              vec2_multiply(RHI_context->window_size, vec2(-0.5, 0.5)), 
@@ -153,13 +152,13 @@ s_map_editor_handle_ui(game_state_t *game_state, ui_state_t *main_ui, RHI_contex
                 ui_signal_t tile_grid = ui_widget_labeled_button(main_ui, STR("Toggle Editor Tile Grid"));
                 if(ui_pressed(tile_grid))
                 {
-                    game_state->editor->show_grid = !game_state->editor->show_grid;
+                    editor->show_grid = !editor->show_grid;
                 }
 
                 ui_signal_t show_viewport = ui_widget_labeled_button(main_ui, STR("Toggle Editor Player Viewport"));
                 if(ui_pressed(show_viewport))
                 {
-                    game_state->editor->show_player_viewport = !game_state->editor->show_player_viewport;
+                    editor->show_player_viewport = !editor->show_player_viewport;
                 }
 
                 ui_signal_t editor_selection_button_panel = ui_widget_panel(main_ui, 
@@ -184,7 +183,7 @@ s_map_editor_handle_ui(game_state_t *game_state, ui_state_t *main_ui, RHI_contex
                                                                   0);
                     if(ui_pressed(gizmo))
                     {
-                        game_state->editor->show_player_viewport = !game_state->editor->show_player_viewport;
+                        editor->show_player_viewport = !editor->show_player_viewport;
                     }
 
                     ui_signal_t selection = ui_widget_textured_button(main_ui, 
@@ -197,7 +196,7 @@ s_map_editor_handle_ui(game_state_t *game_state, ui_state_t *main_ui, RHI_contex
                                                                   0);
                     if(ui_pressed(selection))
                     {
-                        game_state->editor->show_player_viewport = !game_state->editor->show_player_viewport;
+                        editor->show_player_viewport = !editor->show_player_viewport;
                     }
                 }
             }
@@ -282,16 +281,15 @@ EDITOR CONTROLS:
 */
 
 internal_api void
-s_editor_update_state(game_state_t *game_state, render_state_t *render_state, input_manager_t *input_manager)
+s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_state_t *render_state, input_manager_t *input_manager)
 {
-    map_editor_t *editor = game_state->editor;
-
     input_state_t *undo   = s_im_controller_get_input_state(editor->controller, SDL_SCANCODE_Z);
     input_state_t *redo   = s_im_controller_get_input_state(editor->controller, SDL_SCANCODE_Y);
     input_state_t *lctrl  = s_im_controller_get_input_state(editor->controller, SDL_SCANCODE_LCTRL);
     input_state_t *lshift = s_im_controller_get_input_state(editor->controller, SDL_SCANCODE_LSHIFT);
     input_state_t *lalt   = s_im_controller_get_input_state(editor->controller, SDL_SCANCODE_LALT);
     input_state_t *lclick = s_im_controller_get_input_state(editor->controller, SDL_SCANCODE_LEFT_MOUSE);
+    (void)lshift;
 
     // NOTE(Sleepster): Undo  
     if(InputStatePressed(undo->flags) && InputStateDown(lctrl->flags))
@@ -462,4 +460,155 @@ s_editor_update_state(game_state_t *game_state, render_state_t *render_state, in
             }
         }
     }
+}
+
+#if 0
+internal_api void
+s_editor_render_to_output(map_editor_t *editor, asset_manager_t *asset_manager, render_state_t *render_state)
+{
+    asset_handle_t shader  = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_rectangle"));
+    asset_handle_t player  = s_asset_manager_acquire_asset_handle(asset_manager, STR("player_sprite")); 
+
+    u32 renderpassID = render_state->fullscreen_renderpassID;
+    immediate_render_group_t *current_render_group = immediate_render_group_begin(render_state, renderpassID);
+    immediate_render_group_apply_shader(current_render_group, shader);
+
+    s32 player_texture_index      = immediate_render_group_append_texture(current_action_group, player);
+    RHI_constant_buffer_t *buffer = RHI_get_constant_buffer(render_state->RHI_context, STR("CameraMatrices"));
+
+    immediate_render_group_use_constant_buffer(current_render_group, buffer, &stock_camera.matrices, sizeof(stock_camera.matrices));
+
+    immediate_quad(current_render_group, vec2(100, 100), vec2(20,  20),  vec4(1.0, 0.0, 0.0, 1.0), player_texture_index);
+    immediate_line(current_render_group, vec2(100, 100), vec2(120, 100), vec4(1.0, 1.0, 1.0, 1.0));
+
+    immediate_render_group_end(current_render_group, &render_state->primary_vertex_buffer);
+}
+#endif
+
+internal_api void
+s_editor_render_to_output(map_editor_t *editor, asset_manager_t *asset_manager, render_state_t *render_state)
+{
+    (void)editor;
+    (void)asset_manager;
+    (void)render_state;
+#if 0 
+    asset_handle_t shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_rectangle"));
+    asset_handle_t player = s_asset_manager_acquire_asset_handle(asset_manager, STR("player_sprite")); 
+
+    render_group_t *current_render_group = render_group_begin(render_state, render_state->fullscreen_renderpass_ID);
+    current_render_group->shader = shader;
+
+    s32 textureID = render_group_add_texture(current_render_group, player);
+
+    render_quad(current_render_group, vec3(100, 100, 0.5f), vec2(20, 20), vec4(1.0, 1.0, 1.0, 1.0), textureID);
+    render_quad(current_render_group, vec3(100, 100, 0.5f), vec2(20, 20), vec4(1.0, 1.0, 1.0, 1.0), textureID);
+
+    render_group_end(current_render_group, &render_state->vertex_buffer);
+//#else
+    RHI_render_camera_t *scene_camera = &editor->camera;
+
+    // NOTE(Sleepster): Tile Grid 
+    if(editor->show_grid)
+    {
+        float32 half_width  = (scene_camera->viewport.x * 0.5f) * scene_camera->zoom;
+        float32 half_height = (scene_camera->viewport.y * 0.5f) * scene_camera->zoom;
+
+        float32 left   = scene_camera->translation.x - half_width;
+        float32 right  = scene_camera->translation.x + half_width;
+        float32 bottom = scene_camera->translation.y - half_height;
+        float32 top    = scene_camera->translation.y + half_height;
+
+        vec2_t start = world_to_tile(vec2(left,  bottom));
+        vec2_t end   = world_to_tile(vec2(right, top));
+
+        for(s32 tile_x = start.x;
+            tile_x <= end.x;
+            ++tile_x)
+        {
+            float32 current_tile_x = tile_x * WORLD_TILE_SIZE;
+            immediate_line(command_list, 
+                           &render_state->vertex_buffer, 
+                           vec2(current_tile_x, top),
+                           vec2(current_tile_x, bottom),
+                           0.90,
+                           vec4(0.01, 0.01, 0.1, 1.0f));
+        }
+
+        for(s32 tile_y = start.y;
+            tile_y < end.y;
+            ++tile_y)
+        {
+            float32 current_tile_y = tile_y * WORLD_TILE_SIZE;
+            immediate_line(command_list, 
+                           &render_state->vertex_buffer, 
+                           vec2(left, current_tile_y),
+                           vec2(right, current_tile_y),
+                           0.90,
+                           vec4(0.01, 0.01, 0.1, 1.0f));
+        }
+    }
+
+    // NOTE(Sleepster): Viewport box 
+    if(editor->show_player_viewport)
+    {
+        float32 half_width  = (game_state->game_camera.viewport.x * 0.5f) * game_state->game_camera.zoom;
+        float32 half_height = (game_state->game_camera.viewport.y * 0.5f) * game_state->game_camera.zoom;
+
+        float32 left   = game_state->game_camera.translation.x - half_width;
+        float32 right  = game_state->game_camera.translation.x + half_width;
+        float32 bottom = game_state->game_camera.translation.y - half_height;
+        float32 top    = game_state->game_camera.translation.y + half_height;
+
+        immediate_line(command_list,
+                       &render_state->vertex_buffer,
+                       vec2(left,  bottom),
+                       vec2(left, top),
+                       0.0,
+                       vec4(1.0f, 1.0, 1.0f, 1.0f));
+
+        immediate_line(command_list,
+                       &render_state->vertex_buffer,
+                       vec2(left,  top),
+                       vec2(right, top),
+                       0.0,
+                       vec4(1.0f, 1.0, 1.0f, 1.0f));
+
+        immediate_line(command_list,
+                       &render_state->vertex_buffer,
+                       vec2(right, top),
+                       vec2(right, bottom),
+                       0.0,
+                       vec4(1.0f, 1.0, 1.0f, 1.0f));
+
+        immediate_line(command_list,
+                       &render_state->vertex_buffer,
+                       vec2(right, bottom),
+                       vec2(left,  bottom),
+                       0.0,
+                       vec4(1.0f, 1.0, 1.0f, 1.0f));
+    }
+
+    RHI_cmd_update_buffer_contents(command_list, &render_state->vertex_buffer);
+    RHI_cmd_bind_vertex_buffer(command_list, &render_state->vertex_buffer);
+
+    s32 window_width  = Max(render_state->RHI_context->window_size.x, 10);
+    s32 window_height = Max(render_state->RHI_context->window_size.y, 10);
+
+    RHI_cmd_update_constant_buffer(command_list, render_state->camera_matrices_buffer, &scene_camera->matrices, sizeof(mat4_t) * 2);
+
+    RHI_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
+    RHI_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
+
+    RHI_pipeline_state_t line_drawing = {};
+    line_drawing.blend_enabled  = false;
+    line_drawing.polygon_mode   = RENDER_PIPELINE_POLYGON_MODE_LINE;
+    line_drawing.primitive_type = RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST;
+    RHI_cmd_set_render_state(command_list, &line_drawing);
+    RHI_cmd_set_line_width(command_list, 2.0f);
+
+    RHI_cmd_use_shader_program(command_list, immediate_rectangle);
+
+    RHI_cmd_draw(command_list, render_state->vertex_buffer.vertex_count, 0, 1, 0);
+    RHI_vertex_buffer_reset_count(&render_state->vertex_buffer);
+#endif
 }

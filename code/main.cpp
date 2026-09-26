@@ -38,6 +38,546 @@ constexpr u32 MAX_RENDER_INDICES  = MAX_RENDER_QUADS * 6;
 void process_window_events(RHI_context_t *RHI_context, input_manager_t *input_manager);
 
 struct map_editor_t;
+/* 
+===================================
+RENDER GROUPS
+===================================
+*/
+
+constexpr s32 MAX_RENDER_TEXTURES = 10;
+constexpr s32 MAX_RENDER_GROUPS   = 10;
+
+struct render_group_constant_buffer_info_t
+{
+    void *buffer_data;
+    u64   data_size;
+
+    RHI_uniform_constant_buffer_t *buffer;
+};
+
+enum render_graph_node_type_t
+{
+    RENDER_GRAPH_NODE_TYPE_INVALID,
+    RENDER_GRAPH_NODE_TYPE_RENDERPASS,
+    RENDER_GRAPH_NODE_TYPE_SHADER,
+    RENDER_GRAPH_NODE_TYPE_PIPELINE_STATE,
+    RENDER_GRAPH_NODE_TYPE_DRAW,
+};
+
+struct render_graph_node_t 
+{
+    s32 type;
+    union {
+        struct {
+            u32 renderpassID;
+        }renderpass_info;
+
+        struct {
+            asset_handle_t handle;
+        }shader_info;
+
+        struct {
+            RHI_pipeline_state_t state;
+        }pipeline_state_info;
+
+        struct {
+            struct {
+                vec2_t offset;
+                vec2_t size;
+            }viewport;
+
+            struct {
+                vec2_t offset;
+                vec2_t size;
+            }scissor;
+
+            render_group_constant_buffer_info_t *constant_buffers;
+            u32                                  constant_buffer_count;
+
+            texture2D_t      **textures;
+            u32                texture_count;
+
+            RHI_index_buffer_t  *index_buffer;
+            RHI_vertex_buffer_t *vertex_buffers;
+            u32                  vertex_buffer_count;
+
+            u32 vertex_count;
+        }draw_info;
+    };
+
+    render_graph_node_t *first_child;
+    render_graph_node_t *next_sibling;
+};
+
+enum render_geometry_type_t
+{
+    RENDER_GEOMETRY_TYPE_QUAD,
+    RENDER_GEOMETRY_TYPE_LINE,
+};
+
+struct render_quad_t
+{
+    vec3_t position;
+    vec2_t render_size;
+    vec4_t render_color;
+    vec2_t uv_min;
+    vec2_t uv_max;
+    vec2_t padding;
+    vec2_t sdf_info;
+    vec2_t padding0;
+
+    s32    textureID;
+};
+
+struct render_line_t 
+{
+    vec3_t  start;
+    vec3_t  end;
+    float32 thickness;
+    vec4_t  color;
+};
+
+struct render_geometry_t
+{
+    s32 type;
+    union {
+        render_quad_t quad;
+        render_line_t line;
+    };
+};
+
+using texture_array_t         = fixed_array_t<asset_handle_t, MAX_RENDER_TEXTURES>;
+using constant_buffer_array_t = fixed_array_t<render_group_constant_buffer_info_t, MAX_RENDER_TEXTURES>;
+using render_geometry_array_t = fixed_array_t<render_geometry_t, 1000>;
+
+// TODO(Sleepster): Maybe add a memory arena here that's tagged TEMP by our allocator
+// and thus would be cleared at the end of the frame when we call to clear all tags from cached -> temp
+//
+// But, the allocator is too SLOW for this right now...
+struct render_group_t
+{
+    render_graph_node_t    *renderpass_node;
+    asset_handle_t          shader;
+    RHI_pipeline_state_t    pipeline_state;
+
+    u32                     renderpassID;
+
+    vec2_t                  viewport_offset;
+    vec2_t                  viewport_extent;
+
+    vec2_t                  scissor_offset;
+    vec2_t                  scissor_extent;
+
+    texture_array_t         textures;
+    u32                     used_texture_count;
+
+    constant_buffer_array_t constant_buffers;
+    u32                     used_constant_buffer_count;
+
+    render_geometry_array_t geometry;
+    u32                     geometry_count;
+};
+
+struct render_state_t
+{
+    RHI_image_t         game_color_buffer;
+    RHI_image_t         game_depth_buffer;
+
+    RHI_image_t         fullscreen_color_buffer;
+    RHI_image_t         fullscreen_depth_buffer;
+
+    RHI_vertex_buffer_t vertex_buffer;
+    RHI_index_buffer_t  index_buffer;
+
+    RHI_uniform_constant_buffer_t *camera_matrices_buffer;
+
+    u32                 game_renderpass_ID;
+    u32                 fullscreen_renderpass_ID; 
+
+    render_group_t      render_groups[MAX_RENDER_GROUPS];
+    u32                 render_group_count;
+
+    render_graph_node_t  render_graph;
+    RHI_context_t       *RHI_context;
+};
+
+render_graph_node_t*
+find_or_create_render_graph_node(render_graph_node_t *render_graph_node, void *node_data, s32 node_type)
+{
+    render_graph_node_t *result    = null;
+    render_graph_node_t *last_node = null;
+    if(render_graph_node->type != RENDER_GRAPH_NODE_TYPE_INVALID)
+    {
+        for(render_graph_node_t *current_node = render_graph_node;
+            current_node;
+            current_node = current_node->next_sibling)
+        {
+            switch(node_type)
+            {
+                case RENDER_GRAPH_NODE_TYPE_RENDERPASS:
+                {
+                    u32 renderpassID = *((u32*)node_data);
+                    if(renderpassID == current_node->renderpass_info.renderpassID)
+                    {
+                        result = current_node;
+                        goto node_found;
+                    }
+                }break;
+                case RENDER_GRAPH_NODE_TYPE_SHADER:
+                {
+                    asset_handle_t *asset_handle = (asset_handle_t*)node_data;
+                    if(current_node->shader_info.handle.slot == asset_handle->slot)
+                    {
+                        result = current_node;
+                        goto node_found;
+                    }
+                }break;
+                case RENDER_GRAPH_NODE_TYPE_PIPELINE_STATE:
+                {
+                    RHI_pipeline_state_t *pipeline_state = (RHI_pipeline_state_t*)node_data;
+                    if(memcmp(pipeline_state, &current_node->pipeline_state_info.state, sizeof(RHI_pipeline_state_t)) == 0)
+                    {
+                        result = current_node;
+                        goto node_found;
+                    }
+                }break;
+                case RENDER_GRAPH_NODE_TYPE_DRAW:
+                {
+                    if(memcmp(node_data, &current_node->draw_info, sizeof(current_node->draw_info)) == 0)
+                    {
+                        result = current_node;
+                        goto node_found;
+                    }
+                }break;
+            }
+            last_node = current_node;
+        }
+    }
+    else
+    {
+        result = render_graph_node;
+        result->type = node_type;
+    }
+node_found:
+    if(!result)
+    {
+        result = c_arena_push_struct(&gc->temp_arena, render_graph_node_t);
+        result->type = node_type;
+        if(last_node)
+        {
+            last_node->next_sibling = result;
+        }
+    }
+
+    return(result);
+}
+
+render_graph_node_t*
+create_render_graph_node(render_graph_node_t *parent, s32 type)
+{
+    render_graph_node_t *result = c_arena_push_struct(&gc->temp_arena, render_graph_node_t);
+    result->type = type;
+
+    render_graph_node_t *last_node = null;
+    for(render_graph_node_t *current_node = parent->first_child;
+        current_node;
+        current_node = current_node->next_sibling)
+    {
+        last_node = current_node;
+    }
+
+    if(!last_node)
+    {
+        parent->first_child = result;
+    }
+
+    return(result);
+}
+
+render_group_t *
+render_group_begin(render_state_t *render_state, u32 renderpassID)
+{
+    render_group_t *result = null;
+    result = render_state->render_groups + render_state->render_group_count;
+    AtomicIncrement32(&render_state->render_group_count);
+    Assert(AtomicLoad32(&render_state->render_group_count) < MAX_RENDER_GROUPS);
+
+    result->renderpassID = renderpassID;
+    result->renderpass_node = find_or_create_render_graph_node(&render_state->render_graph, 
+                                                               &renderpassID, 
+                                                                RENDER_GRAPH_NODE_TYPE_RENDERPASS);
+    return(result);
+}
+
+void
+render_group_end(render_group_t      *render_group, 
+                 RHI_index_buffer_t  *index_buffer, 
+                 RHI_vertex_buffer_t *vertex_buffers, 
+                 u32                  vertex_buffer_count)
+{
+    render_graph_node_t *shader_node = find_or_create_render_graph_node(render_group->renderpass_node->first_child, 
+                                                                       &render_group->shader,
+                                                                       RENDER_GRAPH_NODE_TYPE_SHADER);
+    render_graph_node_t *pipeline_state_node = find_or_create_render_graph_node(shader_node->first_child,
+                                                                                &render_group->pipeline_state,
+                                                                                RENDER_GRAPH_NODE_TYPE_PIPELINE_STATE);
+    // TODO(Sleepster): Maybe collapse alike draws? 
+    render_graph_node_t *draw = create_render_graph_node(pipeline_state_node,
+                                                         RENDER_GRAPH_NODE_TYPE_PIPELINE_STATE);
+    draw->draw_info.viewport = {
+        render_group->viewport_offset,
+        render_group->viewport_extent
+    };
+
+    draw->draw_info.scissor = {
+        render_group->scissor_offset,
+        render_group->scissor_extent
+    };
+
+    draw->draw_info.vertex_buffers      = vertex_buffers;
+    draw->draw_info.vertex_buffer_count = vertex_buffer_count;
+    draw->draw_info.index_buffer        = index_buffer;
+
+    draw->draw_info.constant_buffers      = render_group->constant_buffers.items;
+    draw->draw_info.constant_buffer_count = render_group->used_constant_buffer_count;
+    if(render_group->used_texture_count > 0)
+    {
+        texture2D_t **texture_array = c_arena_push_array(&gc->temp_arena, texture2D_t*, render_group->used_texture_count);
+        for(u32 texture_index = 0;
+            texture_index < render_group->used_texture_count;
+            ++texture_index)
+        {
+            asset_handle_t *texture_handle = render_group->textures + texture_index;
+            texture2D_t   **texture        = texture_array + texture_index;
+
+            Assert(texture_handle->slot->type == AT_Bitmap)
+            if(texture_handle->slot->subtexture_data) *texture = &texture_handle->slot->subtexture_data->atlas->texture;
+            else                                      *texture = texture_handle->texture;
+        }
+
+        draw->draw_info.textures      = texture_array;
+        draw->draw_info.texture_count = render_group->used_texture_count;
+    }
+
+    u32 vertices_per_geometry = (&render_group->geometry[0])->type == RENDER_GEOMETRY_TYPE_QUAD ? 4 : 2;
+    draw->draw_info.vertex_count = render_group->geometry_count * vertices_per_geometry;
+
+    RHI_vertex_buffer_t *vertex_buffer = vertex_buffers;
+    for(u32 geometry_index = 0;
+        geometry_index < render_group->geometry_count;
+        ++geometry_index)
+    {
+        render_geometry_t *geometry = render_group->geometry + geometry_index;
+        if(geometry->type == RENDER_GEOMETRY_TYPE_QUAD)
+        {
+            render_quad_t *quad = &geometry->quad;
+            immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)vertex_buffer->vertex_data + vertex_buffer->vertex_count);
+
+            immediate_vertex_t *bottom_right = vertex_pointer + 0;
+            immediate_vertex_t *top_right    = vertex_pointer + 1;
+            immediate_vertex_t *top_left     = vertex_pointer + 2;
+            immediate_vertex_t *bottom_left  = vertex_pointer + 3;
+
+            float32 top    = quad->position.y + quad->render_size.y;
+            float32 bottom = quad->position.y;
+            float32 left   = quad->position.x;
+            float32 right  = quad->position.x + quad->render_size.x;
+
+            bottom_left->vPosition  = vec4(left,  bottom, quad->position.z, 1);
+            bottom_right->vPosition = vec4(right, bottom, quad->position.z, 1);
+            top_left->vPosition     = vec4(left,  top,    quad->position.z, 1);
+            top_right->vPosition    = vec4(right, top,    quad->position.z, 1);
+
+            bottom_left->vColor  = quad->render_color;
+            bottom_right->vColor = quad->render_color;
+            top_left->vColor     = quad->render_color;
+            top_right->vColor    = quad->render_color;
+
+            bottom_left->vPadding  = quad->padding;
+            bottom_right->vPadding = quad->padding;
+            top_left->vPadding     = quad->padding;
+            top_right->vPadding    = quad->padding;
+
+            bottom_left->vPadding0  = quad->padding0;
+            bottom_right->vPadding0 = quad->padding0;
+            top_left->vPadding0     = quad->padding0;
+            top_right->vPadding0    = quad->padding0;
+
+            vec2_t uv_min = vec2_zero();
+            vec2_t uv_max = vec2_zero();
+            if(quad->textureID != -1)
+            {
+                asset_handle_t *handle = render_group->textures + quad->textureID;
+                if(handle->slot->subtexture_data)
+                {
+                    uv_min  =  handle->slot->subtexture_data->uv_min;
+                    uv_max  =  handle->slot->subtexture_data->uv_max;
+                }
+                else
+                {
+                    uv_min  = vec2(0.0f, 0.0f);
+                    uv_max  = vec2(1.0f, 1.0f);
+                }
+            }
+
+            float32 tbottom = uv_max.y;
+            float32 ttop    = uv_min.y;
+            float32 tleft   = uv_min.x;
+            float32 tright  = uv_max.x;
+
+            bottom_left->vTexCoord  = vec2(tleft,  tbottom);
+            bottom_right->vTexCoord = vec2(tright, tbottom);
+            top_left->vTexCoord     = vec2(tleft,  ttop);
+            top_right->vTexCoord    = vec2(tright, ttop);
+
+            vertex_buffer->vertex_count += 4;
+        }
+    }
+}
+
+s32
+render_group_add_texture(render_group_t *render_group, asset_handle_t texture)
+{
+    s32 result = -1;
+
+    bool8 found = true;
+    for(u32 texture_index = 0;
+        texture_index < render_group->used_texture_count;
+        ++texture_index)
+    {
+        asset_handle_t *handle = render_group->textures + texture_index;
+        if(handle->slot == texture.slot)
+        {
+            found  = true;
+            result = texture_index;
+
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        render_group->textures[render_group->used_texture_count] = texture;
+        result = render_group->used_texture_count;
+
+        ++render_group->used_texture_count;
+        Assert(render_group->used_texture_count <= MAX_RENDER_TEXTURES);
+    }
+
+    return(result);
+}
+
+// NOTE(Sleepster): We will NOT copy the data, you NEED to make sure that it survives until the actual usage in the RHI. 
+void
+render_group_update_constant_buffer(render_group_t                *render_group, 
+                                    RHI_uniform_constant_buffer_t *constant_buffer, 
+                                    void                          *data, 
+                                    u64                            data_size)
+{
+    render_group_constant_buffer_info_t *info = render_group->constant_buffers + render_group->used_constant_buffer_count++;
+    Assert(render_group->used_constant_buffer_count < MAX_RENDER_TEXTURES);
+
+    info->buffer      = constant_buffer;
+    info->buffer_data = data;
+    info->data_size   = data_size;
+}
+
+void
+render_quad(render_group_t *render_group, vec3_t position, vec2_t size, vec4_t color, s32 textureID)
+{
+    render_geometry_t *geometry = render_group->geometry + render_group->geometry_count++;
+    Assert(render_group->geometry_count < 1000);
+
+    geometry->type = RENDER_GEOMETRY_TYPE_QUAD; 
+    geometry->quad.position     = position;
+    geometry->quad.render_size  = size;
+    geometry->quad.render_color = color;
+    geometry->quad.textureID    = textureID;
+}
+
+void
+render_line(render_group_t *render_group, vec3_t start, vec3_t end, float32 line_thickness, vec4_t color)
+{
+    render_geometry_t *geometry = render_group->geometry + render_group->geometry_count++;
+    Assert(render_group->geometry_count < MAX_RENDER_QUADS);
+
+    geometry->type = RENDER_GEOMETRY_TYPE_LINE; 
+    geometry->line.start     = start;
+    geometry->line.end       = end;
+    geometry->line.thickness = line_thickness;
+    geometry->line.color     = color;
+}
+
+void
+render_state_render_groups_to_output(render_state_t *render_state)
+{
+    RHI_command_list_t *command_list = RHI_get_command_list(render_state->RHI_context, RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+    for(render_graph_node_t *current_renderpass = &render_state->render_graph;
+        current_renderpass;
+        current_renderpass = current_renderpass->next_sibling)
+    {
+        if(current_renderpass->type != RENDER_GRAPH_NODE_TYPE_INVALID)
+        {
+            RHI_cmd_renderpass_begin(command_list, current_renderpass->renderpass_info.renderpassID);
+            for(render_graph_node_t *current_shader = current_renderpass->first_child;
+                current_shader;
+                current_shader = current_shader->next_sibling)
+            {
+                RHI_cmd_use_shader_program(command_list, current_shader->shader_info.handle);
+                for(render_graph_node_t *pipeline_state = current_shader->first_child;
+                    pipeline_state;
+                    pipeline_state = pipeline_state->next_sibling)
+                {
+                    RHI_cmd_set_render_state(command_list, &pipeline_state->pipeline_state_info.state);
+                    for(render_graph_node_t *draw = pipeline_state->first_child;
+                        draw;
+                        draw = draw->next_sibling)
+                    {
+                        RHI_cmd_set_viewport(command_list, draw->draw_info.viewport.offset, draw->draw_info.viewport.size);
+                        RHI_cmd_set_scissor(command_list, draw->draw_info.scissor.offset, draw->draw_info.scissor.size);
+                        for(u32 texture_index = 0;
+                            texture_index < draw->draw_info.texture_count;
+                            ++texture_index)
+                        {
+                            texture2D_t *texture = draw->draw_info.textures[texture_index];
+                            RHI_cmd_bind_texture_image(command_list, texture);
+                        }
+
+                        // TODO(Sleepster): Make a cmd for binding an ARRAY of vertex buffers 
+                        for(u32 vertex_buffer_index = 0;
+                            vertex_buffer_index < draw->draw_info.vertex_buffer_count;
+                            ++vertex_buffer_index)
+                        {
+                            RHI_vertex_buffer_t *vertex_buffer = draw->draw_info.vertex_buffers + vertex_buffer_index;
+                            RHI_cmd_bind_vertex_buffer(command_list, vertex_buffer);
+                        }
+
+                        for(u32 constant_buffer_index = 0;
+                            constant_buffer_index < draw->draw_info.constant_buffer_count;
+                            ++constant_buffer_index)
+                        {
+                            render_group_constant_buffer_info_t *buffer_info = draw->draw_info.constant_buffers + constant_buffer_index;
+                            RHI_cmd_update_constant_buffer(command_list, buffer_info->buffer, buffer_info->buffer_data, buffer_info->data_size);
+                        }
+
+                        if(draw->draw_info.index_buffer)
+                        {
+                            RHI_cmd_bind_index_buffer(command_list, draw->draw_info.index_buffer);
+                            RHI_cmd_draw_indexed(command_list, (draw->draw_info.vertex_count / 4) * 6, 6, 0, 0, 1);
+                        }
+                        else
+                        {
+                            RHI_cmd_draw(command_list, draw->draw_info.vertex_count, 0, 1, 0);
+                        }
+                    }
+                }
+            }
+            RHI_cmd_renderpass_end(command_list);
+        }
+    }
+
+    ZeroStruct(render_state->render_graph);
+}
 
 /*===========================================
   =============== ANIMATION2D ===============
@@ -68,24 +608,11 @@ struct animation2D_t
     duration_counter_t    frame_timer;
 };
 
-struct render_state_t
-{
-    RHI_image_t         game_color_buffer;
-    RHI_image_t         game_depth_buffer;
-
-    RHI_image_t         fullscreen_color_buffer;
-    RHI_image_t         fullscreen_depth_buffer;
-
-    RHI_vertex_buffer_t vertex_buffer;
-    RHI_index_buffer_t  index_buffer;
-
-    RHI_uniform_constant_buffer_t *camera_matrices_buffer;
-
-    u32                 game_renderpass_ID;
-    u32                 fullscreen_renderpass_ID; 
-
-    RHI_context_t      *RHI_context;
-};
+/* 
+===================================
+GAME STUFF
+===================================
+*/
 
 enum game_mode_t
 {
@@ -680,7 +1207,7 @@ r_init_render_state(render_state_t *render_state)
 internal_api void
 game_state_init_bindings(game_state_t *game_state, input_manager_t *input_manager)
 {
-    game_state->game_controller          = s_im_init_input_controller(input_manager);
+    game_state->game_controller = s_im_init_input_controller(input_manager);
 
     // NOTE(Sleepster): Movement 
     input_action_t *movement_action = s_im_input_action_create(input_manager, INPUT_ACTION_TYPE_AXIS2D);
@@ -1010,6 +1537,12 @@ game_main(global_context_t *_global_context)
     asset_handle_t player_sprite       = s_asset_manager_acquire_asset_handle(asset_manager, STR("player"));
     asset_handle_t basic_font          = s_asset_manager_acquire_asset_handle(asset_manager, STR("LiberationMono_Regular"));
     asset_handle_t player_sprite_sheet = s_asset_manager_acquire_asset_handle(asset_manager, STR("player_sprite_sheet"));
+    (void)immediate_textured;
+    (void)immediate_rectangle;
+    (void)immediate_font;
+    (void)player_sprite;    
+    (void)basic_font;     
+    (void)player_sprite_sheet;
 
     s_asset_manager_insert_image_into_atlas(asset_manager, &player_sprite);
     s_asset_manager_insert_image_into_atlas(asset_manager, &player_sprite_sheet);
@@ -1055,7 +1588,7 @@ game_main(global_context_t *_global_context)
 
             if(game_state->editor_opened)
             {
-                s_map_editor_handle_ui(game_state, main_ui, render_state->RHI_context);
+                s_map_editor_handle_ui(game_state->editor, main_ui, render_state->RHI_context);
             }
         }
 
@@ -1072,7 +1605,7 @@ game_main(global_context_t *_global_context)
         // NOTE(Sleepster): Editor controls block 
         if(game_state->editor_opened)
         {
-            s_editor_update_state(game_state, render_state, input_manager);
+            s_editor_update_state(game_state, game_state->editor, render_state, input_manager);
         }
 
         // NOTE(Sleepster):} Simulate loop 
@@ -1177,6 +1710,20 @@ game_main(global_context_t *_global_context)
         }
         game_state->render_alpha = (float32)(dt_accumulator / gc->tick_rate);
 
+#if 1
+        RHI_render_camera_t *scene_camera = &game_state->game_camera;
+
+        render_group_t *current_render_group = render_group_begin(render_state, render_state->game_renderpass_ID);
+        current_render_group->shader = immediate_textured;
+
+        s32 textureID = render_group_add_texture(current_render_group, player_sprite);
+
+        render_group_update_constant_buffer(current_render_group, render_state->camera_matrices_buffer, &scene_camera->matrices, sizeof(mat4_t) * 2);
+        render_quad(current_render_group, vec3(0.0f, 0.0f, 0.5f), vec2(20, 20), vec4(1.0, 1.0, 1.0, 1.0), textureID);
+
+        render_group_end(current_render_group, &render_state->index_buffer, &render_state->vertex_buffer, 1);
+        render_state_render_groups_to_output(render_state);
+#else
         RHI_command_list_t *command_list = RHI_get_command_list(render_state->RHI_context, RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
         {
             u32 renderpassID = render_state->game_renderpass_ID;
@@ -1455,6 +2002,7 @@ game_main(global_context_t *_global_context)
             RHI_cmd_renderpass_end(command_list);
         }
         RHI_cmd_present(command_list, &render_state->fullscreen_color_buffer);
+#endif
 
         RHI_execute_backend_commands(render_state->RHI_context);
         RHI_vertex_buffer_reset_offsets(render_state->RHI_context, &render_state->vertex_buffer);

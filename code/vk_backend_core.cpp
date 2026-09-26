@@ -3116,7 +3116,10 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
             }
         }
 
-        command_list->active_index_buffer->index_offset = 0;
+        if(command_list->active_index_buffer != null)
+        {
+            command_list->active_index_buffer->index_offset = 0;
+        }
 
         command_list->presenting                       = false;
         command_list->active_index_buffer              = null;
