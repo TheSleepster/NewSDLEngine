@@ -2528,6 +2528,36 @@ vk_backend_bind_command_list_vertex_buffers(VkCommandBuffer *render_command_buff
     vkCmdBindVertexBuffers(*render_command_buffer, 0, command_list->vertex_buffer_count, handles, offsets); 
 }
 
+internal_api void
+command_list_reset_state(RHI_command_list_t *command_list)
+{
+    if(command_list->active_index_buffer != null)
+    {
+        command_list->active_index_buffer->index_offset = 0;
+    }
+
+    command_list->presenting                       = false;
+    command_list->active_index_buffer              = null;
+    command_list->active_shader_program            = null;
+    command_list->active_viewport_command          = null;
+    command_list->active_scissor_command           = null;
+    command_list->bound_image_count                = 0;
+    command_list->image_count                      = 0;
+    command_list->bind_material_command_count      = 0;
+    command_list->bind_render_target_command_count = 0;
+    command_list->bind_shader_command_count        = 0;
+    command_list->draw_instance_command_count      = 0;
+    command_list->command_count                    = 0;
+    command_list->vertex_buffer_count              = 0;
+
+    command_list->active_render_state     = g_pipeline_default_state_key; 
+    command_list->active_renderpass       = null;
+    command_list->active_index_buffer     = null;
+    command_list->active_scissor_command  = null;
+    command_list->active_viewport_command = null;
+    command_list->active_shader_program   = null;
+}
+
 /*
 =============
 vk_backend_render_frame
@@ -2540,8 +2570,681 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
     // NOTE(Sleepster): This is for measuring how long GPU resources have been unused. 
     vulkan_context->frame_tsc = rdtsc();
 
-    bool32 window_resize = (vulkan_context->window_size_generation != vulkan_context->last_window_size_generation);
-    if(window_resize || vulkan_context->rebuilding_swapchain)
+    bool32 window_resize = (vulkan_context->window_size_generation != vulkan_context->last_window_size_generation) || vulkan_context->rebuilding_swapchain;
+    if(!window_resize)
+    {
+        vulkan_context->image_render_idle_fence   = vulkan_context->image_render_idle_fences            + vulkan_context->current_frame_index;
+        vulkan_context->image_acquired_semaphore  = vulkan_context->swapchain_image_acquired_semaphores + vulkan_context->current_frame_index;
+
+        vkAssert(vkWaitForFences(vulkan_context->device, 1, vulkan_context->image_render_idle_fence, true, U64_MAX));
+
+        u32 image_index = 0;
+        VkResult code = vkAcquireNextImageKHR(vulkan_context->device, vulkan_context->swapchain.handle, U64_MAX, *vulkan_context->image_acquired_semaphore, null, &image_index);
+        if(code == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            vulkan_context->rebuilding_swapchain = true;
+            return;
+        }
+        else if(code != VK_SUCCESS && code != VK_SUBOPTIMAL_KHR)
+        {
+            Expect(false, "Could not acquire the next swapchain image!...\n");
+        }
+
+        vulkan_context->image_in_flight_fence     = vulkan_context->image_in_flight_fences     + image_index;
+        vulkan_context->render_complete_semaphore = vulkan_context->render_complete_semaphores + image_index;
+        vulkan_context->render_command_buffer     = vulkan_context->frame_command_buffers      + image_index;
+        vulkan_context->render_framebuffer        = vulkan_context->framebuffers               + image_index;
+        if(*vulkan_context->image_in_flight_fence != VK_NULL_HANDLE)
+        {
+            vkAssert(vkWaitForFences(vulkan_context->device, 1, *vulkan_context->image_in_flight_fence, true, U64_MAX));
+        }
+        *vulkan_context->image_in_flight_fence = vulkan_context->image_render_idle_fence;
+        vulkan_context->current_image_index    = image_index;
+
+        VkCommandBuffer render_command_buffer = *vulkan_context->render_command_buffer;
+
+        // NOTE(Sleepster): If there is new uniform data... stage it.
+        VkCommandBuffer scratch_command_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
+        vk_backend_buffer_flush_staging_buffer(vulkan_context, scratch_command_buffer);
+        if(vulkan_context->constant_buffer_data.used > 0)
+        {
+            vk_backend_buffer_copy_buffer(&vulkan_context->constant_buffer_data, 
+                                          &vulkan_context->shader_uniform_buffers[vulkan_context->current_frame_index],
+                                          scratch_command_buffer,
+                                          0,
+                                          vulkan_context->constant_buffer_data.used,
+                                          0);
+        }
+
+        vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
+
+        // TODO(Sleepster): Multithreading is important... This is not good for that... 
+        VkCommandBufferBeginInfo begin_info = {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        };
+        vkAssert(vkBeginCommandBuffer(render_command_buffer, &begin_info));
+        vkAssert(vkResetDescriptorPool(vulkan_context->device, vulkan_context->descriptor_pools[vulkan_context->current_frame_index], 0));
+        vulkan_context->descriptor_count = 0;
+
+        // NOTE(Sleepster): Execute Render Commands  
+        for(u32 command_list_index = 0;
+            command_list_index < RHI_context->command_list_count;
+            ++command_list_index)
+        {
+            RHI_command_list_t *command_list = RHI_context->command_lists + command_list_index;
+            for(u32 command_index = 0;
+                command_index < command_list->command_count;
+                ++command_index)
+            {
+                Expect(command_list->presenting == false, "Command was ordered to be executed after presentation has been ordered... this is an error...\n");
+
+                RHI_command_t *command = command_list->commands + command_index;
+                switch(command->header.command_type)
+                {
+                    case RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS:
+                    {
+                        RHI_command_begin_renderpass_t *cmd = (RHI_command_begin_renderpass_t*)command->data;
+                        RHI_renderpass_t *renderpass = RHI_context->renderpasses + cmd->ID;
+
+                        // NOTE(Sleepster): Initialize the clear values... 
+                        VkClearValue clear_values[RHI_MAX_RENDER_TARGET_ATTACHMENTS];
+                        for(u32 attachment_index = 0;
+                            attachment_index < renderpass->total_attachment_count;
+                            ++attachment_index)
+                        {
+                            RHI_clear_value_t *value  = renderpass->attachment_clear_values + attachment_index;
+                            VkClearValue *clear_value = clear_values + attachment_index;
+
+                            memcpy((void*)&clear_value->color, 
+                                   (void*)&value->float_color, 
+                                   sizeof(float32) * 4);
+                        }
+
+                        for(u32 color_attachment_index = 0;
+                            color_attachment_index < renderpass->color_attachment_count;
+                            ++color_attachment_index)
+                        {
+                            RHI_renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
+                            if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_initial_layout)
+                            {
+                                vulkan_image_t *image = &attachment->image->backend_image;
+                                vk_backend_transfer_image_to_intial_layout(render_command_buffer, image);
+                            }
+                        }
+
+                        if(renderpass->has_depth_stencil_attachment)
+                        {
+                            RHI_renderpass_attachment_t *attachment = &renderpass->depth_stencil_attachment;
+                            if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_initial_layout)
+                            {
+                                vulkan_image_t *image = &attachment->image->backend_image;
+                                vk_backend_transfer_image_to_intial_layout(render_command_buffer, image);
+                            }
+                        }
+
+                        vk_backend_begin_renderpass(vulkan_context, 
+                                                    renderpass->render_width, 
+                                                    renderpass->render_height, 
+                                                    renderpass->renderpass_handle, 
+                                                    renderpass->framebuffer_handle, 
+                                                    renderpass->total_attachment_count,
+                                                    clear_values);
+                        // NOTE(Sleepster): 
+                        //
+                        // Bind the "Read" or "ReadWrite" access textures for the shader
+                        for(u32 color_attachment_index = 0;
+                            color_attachment_index < renderpass->color_attachment_count;
+                            ++color_attachment_index)
+                        {
+                            RHI_renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
+                            if(attachment->access == RHI_RENDERPASS_ATTACHMENT_ACCESS_READ || 
+                               attachment->access == RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE)
+                            {
+                                // NOTE(Sleepster): 
+                                // This assert is here so that we can catch instances where the caller's intent may have unintended consequences,
+                                // like for example wanting to bind the "gbuffer" texture in slot 0, and thinking you're doing that 
+                                // by default when this is in fact NOT the behavior.
+                                Assert(command_list->image_count == 0);
+                                command_list->image_shader_params[command_list->image_count++] = attachment->image;
+                            }
+                        }
+
+                        command_list->active_renderpass = renderpass;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_END_RENDERPASS:
+                    {
+                        Assert(command_list->active_renderpass != null);
+                        vkCmdEndRenderPass(render_command_buffer);
+
+                        RHI_command_end_renderpass_t *cmd = (RHI_command_end_renderpass_t*)command->data;
+                        RHI_renderpass_t *renderpass = RHI_context->renderpasses + cmd->ID;
+
+                        for(u32 color_attachment_index = 0;
+                            color_attachment_index < renderpass->color_attachment_count;
+                            ++color_attachment_index)
+                        {
+                            RHI_renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
+                            if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_final_layout)
+                            {
+                                vulkan_image_t *image = &attachment->image->backend_image;
+                                vk_backend_transfer_image_to_final_layout(render_command_buffer, image);
+                            }
+                        }
+
+                        if(renderpass->has_depth_stencil_attachment)
+                        {
+                            RHI_renderpass_attachment_t *attachment = &renderpass->depth_stencil_attachment;
+                            if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_final_layout)
+                            {
+                                vulkan_image_t *image = &attachment->image->backend_image;
+                                vk_backend_transfer_image_to_final_layout(render_command_buffer, image);
+                            }
+                        }
+
+                        command_list->active_renderpass = null;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS:
+                    {
+                        RHI_command_clear_renderpass_attachments_t *cmd = (RHI_command_clear_renderpass_attachments_t*)command->data;
+                        RHI_renderpass_t *renderpass = RHI_context->renderpasses + cmd->ID;
+
+                        VkClearRect clear_rect = {};
+                        clear_rect.baseArrayLayer = 0;
+                        clear_rect.layerCount     = 1;
+                        clear_rect.rect = {
+                            .offset = {
+                                .x = 0,
+                                .y = 0
+                            },
+                            .extent = {
+                                .width  = renderpass->render_width,
+                                .height = renderpass->render_height 
+                            }
+                        };
+                        Expect(clear_rect.rect.extent.width > 0 && clear_rect.rect.extent.height > 0, 
+                               "clear_rect's width and height parameter MUST be non-zero: https://docs.vulkan.org/refpages/latest/refpages/source/vkCmdClearAttachments.html");
+
+                        VkClearAttachment *vk_clear_attachments = c_arena_push_array(&gc->temp_arena, VkClearAttachment, renderpass->total_attachment_count);
+
+                        s32 next_vk_attachment = 0;
+                        for(u32 color_attachment_index = 0;
+                            color_attachment_index < renderpass->color_attachment_count;
+                            ++color_attachment_index)
+                        {
+                            RHI_clear_value_t *clear_value   = renderpass->attachment_clear_values + color_attachment_index;
+                            VkClearAttachment *vk_attachment = vk_clear_attachments + next_vk_attachment++;
+
+                            VkClearValue value = {};
+                            memcpy(&value.color.float32, &clear_value->uint_color, sizeof(float32) * 4);
+
+                            vk_attachment->aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+                            vk_attachment->colorAttachment = color_attachment_index;
+                            vk_attachment->clearValue      = value;
+                        }
+
+                        if(renderpass->has_depth_stencil_attachment)
+                        {
+                            VkClearAttachment *vk_attachment = vk_clear_attachments + next_vk_attachment;
+                            RHI_clear_value_t *clear_value   = renderpass->attachment_clear_values + next_vk_attachment;
+                            VkClearValue value = {
+                                .depthStencil = {
+                                    .depth   = clear_value->depth,
+                                    .stencil = clear_value->stencil
+                                }
+                            };
+
+                            vk_attachment->aspectMask      = VK_IMAGE_ASPECT_DEPTH_BIT;
+                            vk_attachment->colorAttachment = 0;
+                            vk_attachment->clearValue      = value;
+                        }
+
+
+                        vkCmdClearAttachments(render_command_buffer, 
+                                              renderpass->total_attachment_count, 
+                                              vk_clear_attachments, 
+                                              1, 
+                                              &clear_rect);
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE:
+                    {
+                        RHI_command_clear_image_t *cmd = (RHI_command_clear_image_t*)command->data;
+
+                        VkClearValue clear_value = {};
+                        VkClearColorValue clear_color;
+                        VkClearDepthStencilValue depth_stencil_value;
+
+                        memcpy(&clear_color.float32, cmd->clear_value.uint_color, sizeof(float32) * 4);
+                        depth_stencil_value.depth   = cmd->clear_value.depth;
+                        depth_stencil_value.stencil = cmd->clear_value.stencil;
+
+                        clear_value.color        = clear_color;
+                        clear_value.depthStencil = depth_stencil_value;
+
+                        vk_backend_image_clear_contents(render_command_buffer, &cmd->image->backend_image, clear_value);
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS:
+                    {
+                        RHI_command_blit_renderpass_t *cmd = (RHI_command_blit_renderpass_t*)command->data;
+                        RHI_renderpass_t *source = cmd->source;
+                        RHI_renderpass_t *dest   = cmd->destination;
+
+                        // TODO(Sleepster): 
+                        // This is a separate render command because We will need to perform some mutex / semaphore sync stuff to stop the 
+                        // modiciation of the renderpass anywhere else while we do this complete copy.
+
+                        for(u32 render_attachment_index = 0;
+                            render_attachment_index < source->color_attachment_count;
+                            ++render_attachment_index)
+                        {
+                            RHI_renderpass_attachment_t *source_attachment      = source->color_attachments + render_attachment_index;
+                            RHI_renderpass_attachment_t *destination_attachment = dest->color_attachments   + render_attachment_index;
+
+                            vec2_t source_blit_size = vec2(source_attachment->image->create_info.width,
+                                                           source_attachment->image->create_info.height);
+                            vec2_t destination_blit_size = vec2(dest->render_width, dest->render_height);
+                            vk_backend_perform_image_blit(vulkan_context, 
+                                                          render_command_buffer, 
+                                                          &source_attachment->image->backend_image,
+                                                          &destination_attachment->image->backend_image,
+                                                          vec2_zero(),
+                                                          source_blit_size,
+                                                          vec2_zero(),
+                                                          destination_blit_size);
+                        }
+
+                        if(source->has_depth_stencil_attachment)
+                        {
+                            RHI_renderpass_attachment_t *source_depth      = &source->depth_stencil_attachment;
+                            RHI_renderpass_attachment_t *destination_depth = &dest->depth_stencil_attachment;
+
+                            vec2_t source_blit_size = vec2(source_depth->image->create_info.width,
+                                                           source_depth->image->create_info.height);
+                            vec2_t destination_blit_size = vec2(dest->render_width, dest->render_height);
+                            vk_backend_perform_image_blit(vulkan_context, 
+                                                          render_command_buffer, 
+                                                          &source_depth->image->backend_image,
+                                                          &destination_depth->image->backend_image,
+                                                          vec2_zero(),
+                                                          source_blit_size,
+                                                          vec2_zero(),
+                                                          destination_blit_size);
+                        }
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER:
+                    {
+                        RHI_command_bind_vertex_buffer_t *cmd = (RHI_command_bind_vertex_buffer_t*)command->data;
+
+                        c_dynarray_add(&command_list->active_vertex_buffers, &cmd->vertex_buffer);
+                        ++command_list->vertex_buffer_count;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER:
+                    {
+                        RHI_command_bind_index_buffer_t *cmd = (RHI_command_bind_index_buffer_t*)command->data;
+                        Assert(cmd->index_buffer->buffer_data.type == RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER);
+
+                        VkDeviceSize offset = 0;
+                        vkCmdBindIndexBuffer(render_command_buffer, cmd->index_buffer->buffer_data.buffer_info.handle, offset, VK_INDEX_TYPE_UINT32); 
+
+                        command_list->active_index_buffer = cmd->index_buffer;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_BIND_SHADER:
+                    {
+                        Assert(command_list->active_renderpass != null);
+
+                        RHI_command_bind_shader_t *cmd = (RHI_command_bind_shader_t*)command->data;
+                        vulkan_shader_t *shader = &cmd->shader.shader->shader_data;
+                        u64 hash_index = 0;
+                        if(shader->pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
+                        {
+                            struct shader_pipeline_key_t {
+                                RHI_renderpass_key_t renderpass;
+                                RHI_pipeline_state_t pipeline_state;
+                            }pipeline_key;
+
+                            pipeline_key.pipeline_state = command_list->active_render_state;
+                            pipeline_key.renderpass     = command_list->active_renderpass->renderpass_key;
+
+                            hash_index = (c_hash_table_hash_key(string_t{(u8*)&pipeline_key, sizeof(shader_pipeline_key_t)})) % MAX_SHADER_PIPELINE_COUNT;
+                        }
+
+                        // TODO(Sleepster): Maybe we don't want to touch the stuff accessed by the command_list... threading issues.
+                        VkPipeline shader_pipeline = (shader->pipeline_hash.items[hash_index]).item;
+                        if(shader_pipeline == VK_NULL_HANDLE)
+                        {
+                            (shader->pipeline_hash.items[hash_index]).item = vk_backend_create_pipeline_from_render_state(vulkan_context, 
+                                                                                                                          shader, 
+                                                                                                                          command_list->active_renderpass->renderpass_handle,
+                                                                                                                          &command_list->active_render_state);
+                            shader_pipeline = (shader->pipeline_hash.items[hash_index]).item;
+                        }
+
+                        vkCmdBindPipeline(render_command_buffer, shader->pipeline_type, shader_pipeline);
+                        command_list->active_shader_program = &cmd->shader;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE:
+                    {
+                        RHI_command_bind_texture_t *cmd = (RHI_command_bind_texture_t*)command->data;
+                        if(cmd->texture->backend_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+                        {
+                            // TODO(Sleepster): This is awful and brings sadness to families across the world... Too bad I don't care... 
+                            VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
+                            VkImageSubresourceRange source_range = {
+                                .aspectMask     = cmd->texture->backend_image.aspect_mask,
+                                .baseMipLevel   = 0,
+                                .levelCount     = 1,
+                                .baseArrayLayer = 0,
+                                .layerCount     = 1,
+                            };
+                            vk_backend_image_change_layout(scratch_buffer,
+                                                           cmd->texture->backend_image.handle, 
+                                                           cmd->texture->backend_image.layout,
+                                                           VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
+                                                           VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                                           VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                                                           VK_ACCESS_TRANSFER_WRITE_BIT,
+                                                           VK_ACCESS_SHADER_READ_BIT,
+                                                           source_range);
+                            cmd->texture->backend_image.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+                            vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_buffer);
+
+                            // TODO(Sleepster): This might be a source of issues, just in case... leaving this here 
+                            vkDeviceWaitIdle(vulkan_context->device);
+                        }
+
+                        command_list->image_shader_params[command_list->image_count++] = cmd->texture;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT:
+                    {
+                        RHI_command_set_viewport_t *cmd = (RHI_command_set_viewport_t*)command->data;
+
+                        VkPhysicalDeviceLimits *limits = &vulkan_context->gpu.properties.limits;
+                        s32 device_max_width  = limits->maxViewportDimensions[0];
+                        s32 device_max_height = limits->maxViewportDimensions[1];
+
+                        VkViewport viewport = {
+                            .x        = cmd->offset.x,
+                            .y        = cmd->offset.y,
+                            .width    = (float32)(Clamp((s32)cmd->size.x, -device_max_width,  device_max_width)),
+                            .height   = (float32)(Clamp((s32)cmd->size.y, -device_max_height, device_max_height)),
+                            .minDepth = 0.0,
+                            .maxDepth = 1.0
+                        };
+
+                        vkCmdSetViewport(render_command_buffer, 0, 1, &viewport);
+                        command_list->active_viewport_command = command;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_SET_SCISSOR:
+                    {
+                        RHI_command_set_scissor_t *cmd = (RHI_command_set_scissor_t*)command->data;
+                        VkRect2D scissor = {
+                            .offset = {
+                                (s32)cmd->offset.x,
+                                (s32)cmd->offset.y
+                            },
+                            .extent = {
+                                (u32)cmd->size.x,
+                                (u32)cmd->size.y,
+                            }
+                        };
+
+                        vkCmdSetScissor(render_command_buffer, 0, 1, &scissor);
+                        command_list->active_scissor_command = command;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH:
+                    {
+                        RHI_command_set_line_width_t *cmd = (RHI_command_set_line_width_t*)command->data;
+                        vkCmdSetLineWidth(render_command_buffer, cmd->width);
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS:
+                    {
+                        Assert(command_list->active_shader_program);
+                        RHI_command_update_push_constant_t *cmd = (RHI_command_update_push_constant_t *)command->data;
+
+                        vulkan_shader_t *shader = &command_list->active_shader_program->shader->shader_data;
+                        if(shader->push_constant_count > 0 && shader->push_constant_count == 1)
+                        {
+                            VkShaderStageFlags flags = shader->push_constants[0].stageFlags;
+                            vkCmdPushConstants(render_command_buffer, shader->pipeline_layout, flags, cmd->offset, cmd->size, cmd->data);
+                        }
+                        else
+                        {
+                            log_fatal("Failure. This shader lacks push constants...\n");
+                        }
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER:
+                    {
+                        RHI_command_update_uniform_constant_buffer_t *cmd = (RHI_command_update_uniform_constant_buffer_t*)command->data;
+                        RHI_uniform_constant_buffer_t *buffer = cmd->buffer;
+                        Assert(buffer);
+
+                        buffer->offset = cmd->constant_buffer_offset;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE:
+                    {
+                        RHI_command_set_pipeline_state_t *cmd = (RHI_command_set_pipeline_state_t*)command->data;
+                        command_list->active_render_state = cmd->pipeline_state;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE:
+                    {
+                        command_list->active_render_state = g_pipeline_default_state_key;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE:
+                    {
+                        RHI_command_dispatch_compute_t *cmd = (RHI_command_dispatch_compute_t*)command->data;
+                        vkCmdDispatch(render_command_buffer, cmd->invoke_x, cmd->invoke_y, cmd->invoke_z);
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_DRAW:
+                    {
+                        Assert(command_list->active_vertex_buffers.items);
+                        Assert(command_list->active_shader_program);
+                        Assert(command_list->active_viewport_command);
+                        Assert(command_list->active_scissor_command);
+                        RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
+
+                        vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
+                        vk_backend_commit_descriptor_data(vulkan_context, RHI_context, command_list);
+                        for(RHI_vertex_buffer_t *buffer: command_list->active_vertex_buffers)
+                        {
+                            if(buffer->advance_rate == RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT)
+                            {
+                                buffer->vertex_offset += cmd->vertices_to_draw;
+                            }
+                            else
+                            {
+                                buffer->instance_offset += cmd->instance_count;
+                            }
+                        }
+                        vkCmdDraw(render_command_buffer, 
+                                  cmd->vertices_to_draw, 
+                                  cmd->instance_count, 
+                                  cmd->vertex_offset, 
+                                  cmd->first_instance);
+
+                        command_list->image_count = 0;
+                        command_list->bound_image_count = 0;
+
+                        // NOTE(Sleepster): Resetting this to prevent garbage images from being pushed to the shader. 
+                        // We exlude the first image index due to the fact that this is typically the default texture
+                        ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params));
+
+                        c_dynarray_reset(&command_list->active_vertex_buffers);
+                        command_list->vertex_buffer_count = 0;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED:
+                    {
+                        Assert(command_list->active_vertex_buffers.items);
+                        Assert(command_list->active_index_buffer);
+                        Assert(command_list->active_shader_program);
+                        Assert(command_list->active_viewport_command);
+                        Assert(command_list->active_scissor_command);
+                        RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
+
+                        vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
+                        vk_backend_commit_descriptor_data(vulkan_context, RHI_context, command_list);
+                        for(RHI_vertex_buffer_t *buffer: command_list->active_vertex_buffers)
+                        {
+                            if(buffer->advance_rate == RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT)
+                            {
+                                buffer->vertex_offset += cmd->vertices_to_draw;
+                            }
+                            else
+                            {
+                                buffer->instance_offset += cmd->instance_count;
+                            }
+                        }
+
+                        vkCmdDrawIndexed(render_command_buffer, 
+                                         cmd->indices_to_draw, 
+                                         cmd->instance_count, 
+                                         cmd->index_offset + command_list->active_index_buffer->index_offset, 
+                                         cmd->vertex_offset, 
+                                         cmd->first_instance);
+
+                        command_list->image_count = 0;
+                        command_list->bound_image_count = 0;
+
+                        command_list->active_index_buffer->index_offset += cmd->indices_to_draw;
+
+                        // NOTE(Sleepster): Resetting this to prevent garbage images from being pushed to the shader. 
+                        // We exlude the first image index due to the fact that this is typically the default texture
+                        ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params));
+
+                        c_dynarray_reset(&command_list->active_vertex_buffers);
+                        command_list->vertex_buffer_count = 0;
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE:
+                    {
+                        RHI_command_blit_image_t *cmd = (RHI_command_blit_image_t*)command->data;
+                        vk_backend_perform_image_blit(vulkan_context, 
+                                                      render_command_buffer, 
+                                                      &cmd->source_image->backend_image,
+                                                      &cmd->dest_image->backend_image,
+                                                      cmd->source_offset,
+                                                      cmd->source_size,
+                                                      cmd->dest_offset,
+                                                      cmd->dest_size);
+                    }break;
+                    case RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME:
+                    {
+                        RHI_command_present_frame_t *cmd = (RHI_command_present_frame_t *)command->data;
+                        RHI_context->present_command = cmd;
+                    }break;
+                }
+            }
+
+            command_list_reset_state(command_list);
+        }
+
+        if(RHI_context->present_command)
+        {
+            RHI_image_t        *source = RHI_context->present_command->presentation_source;
+            vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
+
+            Assert(source);
+            Assert(backbuffer);
+            Assert(!vk_backend_is_image_format_stencil_format(&source->backend_image) && 
+                   !vk_backend_is_image_format_depth_format(&source->backend_image));
+
+            VkImageSubresourceRange source_range = {
+                .aspectMask     = source->backend_image.aspect_mask,
+                .baseMipLevel   = 0,
+                .levelCount     = 1,
+                .baseArrayLayer = 0,
+                .layerCount     = 1,
+            };
+
+            VkImageSubresourceRange destination_range = {
+                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+                .baseMipLevel   = 0,
+                .levelCount     = 1,
+                .baseArrayLayer = 0,
+                .layerCount     = 1,
+            };
+
+            vk_backend_image_blit(vulkan_context,
+                                  &source->backend_image,
+                                  backbuffer,
+                                  vec2(0, 0),
+                                  vec2(source->backend_image.width, source->backend_image.height),
+                                  vec2(0, 0),
+                                  vec2(backbuffer->width, backbuffer->height),
+                                  source->backend_image.layout,
+                                  VK_IMAGE_LAYOUT_UNDEFINED,
+                                  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                                  source_range,
+                                  destination_range);
+        }
+        RHI_context->command_list_count = 0;
+        RHI_context->present_command    = null;
+
+        // NOTE(Sleepster): 
+        // Change the layout of the swapchain image if we must.
+        vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
+        VkImageSubresourceRange dst_range = {
+            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseMipLevel   = 0,
+            .levelCount     = 1,
+            .baseArrayLayer = 0,
+            .layerCount     = 1,
+        };
+
+        if(backbuffer->layout != VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
+        {
+            vk_backend_image_change_layout(render_command_buffer,
+                                           backbuffer->handle,
+                                           backbuffer->layout,
+                                           VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                                           VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                           VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                                           VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+                                           0,
+                                           dst_range);
+            backbuffer->layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        }
+
+        vkEndCommandBuffer(render_command_buffer);
+        vkAssert(vkResetFences(vulkan_context->device, 1, vulkan_context->image_render_idle_fence));
+
+        VkPipelineStageFlags stage_flags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        VkSubmitInfo submit_info  = {
+            .sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+
+            // NOTE(Sleepster): The Semaphore(s) that ensures the operation cannot begin until the image is avaliable 
+            .waitSemaphoreCount   = 1,
+            .pWaitSemaphores      = vulkan_context->image_acquired_semaphore,
+            .pWaitDstStageMask    = stage_flags,
+
+            // NOTE(Sleepster): Command buffer()s that will be run 
+            .commandBufferCount   = 1,
+            .pCommandBuffers      = vulkan_context->render_command_buffer,
+
+            // NOTE(Sleepster): The Semaphore(s) that signal when the queue is finished executing the commands
+            .signalSemaphoreCount = 1,
+            .pSignalSemaphores    = vulkan_context->render_complete_semaphore
+        };
+        vkAssert(vkQueueSubmit(vulkan_context->graphics_queue, 1, &submit_info, *vulkan_context->image_render_idle_fence));
+
+        VkPresentInfoKHR present_info = {
+            .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+            .waitSemaphoreCount = 1,
+            .pWaitSemaphores    = vulkan_context->render_complete_semaphore,
+            .swapchainCount     = 1,
+            .pSwapchains        = &vulkan_context->swapchain.handle,
+            .pImageIndices      = &image_index,
+        };
+        VkResult result = vkQueuePresentKHR(vulkan_context->graphics_queue, &present_info);
+        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+        {
+            vulkan_context->rebuilding_swapchain = true;
+        }
+
+        c_arena_reset(&vulkan_context->frame_arena);
+        vulkan_context->current_frame_index = (vulkan_context->current_frame_index + 1) % MAX_FRAMES_IN_FLIGHT;
+        vulkan_context->constant_buffer_data.used = 0;
+
+    }
+    else
     {
         vk_backend_swapchain_rebuild(vulkan_context);
 
@@ -2553,702 +3256,17 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
         vulkan_staging_buffer_t *staging_buffer = vulkan_context->staging_buffers + vulkan_context->current_frame_index;
         staging_buffer->buffer.used = 0;
 
-        return;
-    }
-
-    vulkan_context->image_render_idle_fence   = vulkan_context->image_render_idle_fences            + vulkan_context->current_frame_index;
-    vulkan_context->image_acquired_semaphore  = vulkan_context->swapchain_image_acquired_semaphores + vulkan_context->current_frame_index;
-
-    vkAssert(vkWaitForFences(vulkan_context->device, 1, vulkan_context->image_render_idle_fence, true, U64_MAX));
-
-    u32 image_index = 0;
-    VkResult code = vkAcquireNextImageKHR(vulkan_context->device, vulkan_context->swapchain.handle, U64_MAX, *vulkan_context->image_acquired_semaphore, null, &image_index);
-    if(code == VK_ERROR_OUT_OF_DATE_KHR)
-    {
-        vulkan_context->rebuilding_swapchain = true;
-        return;
-    }
-    else if(code != VK_SUCCESS && code != VK_SUBOPTIMAL_KHR)
-    {
-        Expect(false, "Could not acquire the next swapchain image!...\n");
-    }
-
-    vulkan_context->image_in_flight_fence     = vulkan_context->image_in_flight_fences     + image_index;
-    vulkan_context->render_complete_semaphore = vulkan_context->render_complete_semaphores + image_index;
-    vulkan_context->render_command_buffer     = vulkan_context->frame_command_buffers      + image_index;
-    vulkan_context->render_framebuffer        = vulkan_context->framebuffers               + image_index;
-    if(*vulkan_context->image_in_flight_fence != VK_NULL_HANDLE)
-    {
-        vkAssert(vkWaitForFences(vulkan_context->device, 1, *vulkan_context->image_in_flight_fence, true, U64_MAX));
-    }
-    *vulkan_context->image_in_flight_fence = vulkan_context->image_render_idle_fence;
-    vulkan_context->current_image_index    = image_index;
-
-    VkCommandBuffer render_command_buffer = *vulkan_context->render_command_buffer;
-
-    // NOTE(Sleepster): If there is new uniform data... stage it.
-    VkCommandBuffer scratch_command_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
-    vk_backend_buffer_flush_staging_buffer(vulkan_context, scratch_command_buffer);
-    if(vulkan_context->constant_buffer_data.used > 0)
-    {
-        vk_backend_buffer_copy_buffer(&vulkan_context->constant_buffer_data, 
-                                      &vulkan_context->shader_uniform_buffers[vulkan_context->current_frame_index],
-                                       scratch_command_buffer,
-                                       0,
-                                       vulkan_context->constant_buffer_data.used,
-                                       0);
-    }
-
-    vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_command_buffer);
-
-    // TODO(Sleepster): Multithreading is important... This is not good for that... 
-    VkCommandBufferBeginInfo begin_info = {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-    };
-    vkAssert(vkBeginCommandBuffer(render_command_buffer, &begin_info));
-    vkAssert(vkResetDescriptorPool(vulkan_context->device, vulkan_context->descriptor_pools[vulkan_context->current_frame_index], 0));
-    vulkan_context->descriptor_count = 0;
-
-    // NOTE(Sleepster): Execute Render Commands  
-    for(u32 command_list_index = 0;
-        command_list_index < RHI_context->command_list_count;
-        ++command_list_index)
-    {
-        RHI_command_list_t *command_list = RHI_context->command_lists + command_list_index;
-        for(u32 command_index = 0;
-            command_index < command_list->command_count;
-            ++command_index)
+        for(u32 command_list_index = 0;
+            command_list_index < RHI_context->command_list_count;
+            ++command_list_index)
         {
-            Expect(command_list->presenting == false, "Command was ordered to be executed after presentation has been ordered... this is an error...\n");
-
-            RHI_command_t *command = command_list->commands + command_index;
-            switch(command->header.command_type)
-            {
-                case RHI_RENDER_COMMAND_TYPE_BEGIN_RENDERPASS:
-                {
-                    RHI_command_begin_renderpass_t *cmd = (RHI_command_begin_renderpass_t*)command->data;
-                    RHI_renderpass_t *renderpass = RHI_context->renderpasses + cmd->ID;
-
-                    // NOTE(Sleepster): Initialize the clear values... 
-                    VkClearValue clear_values[RHI_MAX_RENDER_TARGET_ATTACHMENTS];
-                    for(u32 attachment_index = 0;
-                        attachment_index < renderpass->total_attachment_count;
-                        ++attachment_index)
-                    {
-                        RHI_clear_value_t *value  = renderpass->attachment_clear_values + attachment_index;
-                        VkClearValue *clear_value = clear_values + attachment_index;
-
-                        memcpy((void*)&clear_value->color, 
-                               (void*)&value->float_color, 
-                               sizeof(float32) * 4);
-                    }
-
-                    for(u32 color_attachment_index = 0;
-                        color_attachment_index < renderpass->color_attachment_count;
-                        ++color_attachment_index)
-                    {
-                        RHI_renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
-                        if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_initial_layout)
-                        {
-                            vulkan_image_t *image = &attachment->image->backend_image;
-                            vk_backend_transfer_image_to_intial_layout(render_command_buffer, image);
-                        }
-                    }
-
-                    if(renderpass->has_depth_stencil_attachment)
-                    {
-                        RHI_renderpass_attachment_t *attachment = &renderpass->depth_stencil_attachment;
-                        if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_initial_layout)
-                        {
-                            vulkan_image_t *image = &attachment->image->backend_image;
-                            vk_backend_transfer_image_to_intial_layout(render_command_buffer, image);
-                        }
-                    }
-
-                    vk_backend_begin_renderpass(vulkan_context, 
-                                                renderpass->render_width, 
-                                                renderpass->render_height, 
-                                                renderpass->renderpass_handle, 
-                                                renderpass->framebuffer_handle, 
-                                                renderpass->total_attachment_count,
-                                                clear_values);
-                    // NOTE(Sleepster): 
-                    //
-                    // Bind the "Read" or "ReadWrite" access textures for the shader
-                    for(u32 color_attachment_index = 0;
-                        color_attachment_index < renderpass->color_attachment_count;
-                        ++color_attachment_index)
-                    {
-                        RHI_renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
-                        if(attachment->access == RHI_RENDERPASS_ATTACHMENT_ACCESS_READ || 
-                           attachment->access == RHI_RENDERPASS_ATTACHMENT_ACCESS_READ_WRITE)
-                        {
-                            // NOTE(Sleepster): 
-                            // This assert is here so that we can catch instances where the caller's intent may have unintended consequences,
-                            // like for example wanting to bind the "gbuffer" texture in slot 0, and thinking you're doing that 
-                            // by default when this is in fact NOT the behavior.
-                            Assert(command_list->image_count == 0);
-                            command_list->image_shader_params[command_list->image_count++] = attachment->image;
-                        }
-                    }
-
-                    command_list->active_renderpass = renderpass;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_END_RENDERPASS:
-                {
-                    Assert(command_list->active_renderpass != null);
-                    vkCmdEndRenderPass(render_command_buffer);
-
-                    RHI_command_end_renderpass_t *cmd = (RHI_command_end_renderpass_t*)command->data;
-                    RHI_renderpass_t *renderpass = RHI_context->renderpasses + cmd->ID;
-
-                    for(u32 color_attachment_index = 0;
-                        color_attachment_index < renderpass->color_attachment_count;
-                        ++color_attachment_index)
-                    {
-                        RHI_renderpass_attachment_t *attachment = renderpass->color_attachments + color_attachment_index;
-                        if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_final_layout)
-                        {
-                            vulkan_image_t *image = &attachment->image->backend_image;
-                            vk_backend_transfer_image_to_final_layout(render_command_buffer, image);
-                        }
-                    }
-
-                    if(renderpass->has_depth_stencil_attachment)
-                    {
-                        RHI_renderpass_attachment_t *attachment = &renderpass->depth_stencil_attachment;
-                        if(attachment->image->backend_image.layout != attachment->image->backend_image.renderpass_final_layout)
-                        {
-                            vulkan_image_t *image = &attachment->image->backend_image;
-                            vk_backend_transfer_image_to_final_layout(render_command_buffer, image);
-                        }
-                    }
-
-                    command_list->active_renderpass = null;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_CLEAR_RENDERPASS_ATTACHMENTS:
-                {
-                    RHI_command_clear_renderpass_attachments_t *cmd = (RHI_command_clear_renderpass_attachments_t*)command->data;
-                    RHI_renderpass_t *renderpass = RHI_context->renderpasses + cmd->ID;
-                    
-                    VkClearRect clear_rect = {};
-                    clear_rect.baseArrayLayer = 0;
-                    clear_rect.layerCount     = 1;
-                    clear_rect.rect = {
-                        .offset = {
-                            .x = 0,
-                            .y = 0
-                        },
-                        .extent = {
-                            .width  = renderpass->render_width,
-                            .height = renderpass->render_height 
-                        }
-                    };
-                    Expect(clear_rect.rect.extent.width > 0 && clear_rect.rect.extent.height > 0, 
-                           "clear_rect's width and height parameter MUST be non-zero: https://docs.vulkan.org/refpages/latest/refpages/source/vkCmdClearAttachments.html");
-
-                    VkClearAttachment *vk_clear_attachments = c_arena_push_array(&gc->temp_arena, VkClearAttachment, renderpass->total_attachment_count);
-
-                    s32 next_vk_attachment = 0;
-                    for(u32 color_attachment_index = 0;
-                        color_attachment_index < renderpass->color_attachment_count;
-                        ++color_attachment_index)
-                    {
-                        RHI_clear_value_t *clear_value   = renderpass->attachment_clear_values + color_attachment_index;
-                        VkClearAttachment *vk_attachment = vk_clear_attachments + next_vk_attachment++;
-
-                        VkClearValue value = {};
-                        memcpy(&value.color.float32, &clear_value->uint_color, sizeof(float32) * 4);
-
-                        vk_attachment->aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
-                        vk_attachment->colorAttachment = color_attachment_index;
-                        vk_attachment->clearValue      = value;
-                    }
-
-                    if(renderpass->has_depth_stencil_attachment)
-                    {
-                        VkClearAttachment *vk_attachment = vk_clear_attachments + next_vk_attachment;
-                        RHI_clear_value_t *clear_value   = renderpass->attachment_clear_values + next_vk_attachment;
-                        VkClearValue value = {
-                            .depthStencil = {
-                                .depth   = clear_value->depth,
-                                .stencil = clear_value->stencil
-                            }
-                        };
-
-                        vk_attachment->aspectMask      = VK_IMAGE_ASPECT_DEPTH_BIT;
-                        vk_attachment->colorAttachment = 0;
-                        vk_attachment->clearValue      = value;
-                    }
-
-
-                    vkCmdClearAttachments(render_command_buffer, 
-                                          renderpass->total_attachment_count, 
-                                          vk_clear_attachments, 
-                                          1, 
-                                         &clear_rect);
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_CLEAR_IMAGE:
-                {
-                    RHI_command_clear_image_t *cmd = (RHI_command_clear_image_t*)command->data;
-
-                    VkClearValue clear_value = {};
-                    VkClearColorValue clear_color;
-                    VkClearDepthStencilValue depth_stencil_value;
-
-                    memcpy(&clear_color.float32, cmd->clear_value.uint_color, sizeof(float32) * 4);
-                    depth_stencil_value.depth   = cmd->clear_value.depth;
-                    depth_stencil_value.stencil = cmd->clear_value.stencil;
-
-                    clear_value.color        = clear_color;
-                    clear_value.depthStencil = depth_stencil_value;
-
-                    vk_backend_image_clear_contents(render_command_buffer, &cmd->image->backend_image, clear_value);
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_BLIT_RENDERPASS:
-                {
-                    RHI_command_blit_renderpass_t *cmd = (RHI_command_blit_renderpass_t*)command->data;
-                    RHI_renderpass_t *source = cmd->source;
-                    RHI_renderpass_t *dest   = cmd->destination;
-
-                    // TODO(Sleepster): 
-                    // This is a separate render command because We will need to perform some mutex / semaphore sync stuff to stop the 
-                    // modiciation of the renderpass anywhere else while we do this complete copy.
-
-                    for(u32 render_attachment_index = 0;
-                        render_attachment_index < source->color_attachment_count;
-                        ++render_attachment_index)
-                    {
-                        RHI_renderpass_attachment_t *source_attachment      = source->color_attachments + render_attachment_index;
-                        RHI_renderpass_attachment_t *destination_attachment = dest->color_attachments   + render_attachment_index;
-
-                        vec2_t source_blit_size = vec2(source_attachment->image->create_info.width,
-                                                       source_attachment->image->create_info.height);
-                        vec2_t destination_blit_size = vec2(dest->render_width, dest->render_height);
-                        vk_backend_perform_image_blit(vulkan_context, 
-                                                      render_command_buffer, 
-                                                      &source_attachment->image->backend_image,
-                                                      &destination_attachment->image->backend_image,
-                                                      vec2_zero(),
-                                                      source_blit_size,
-                                                      vec2_zero(),
-                                                      destination_blit_size);
-                    }
-
-                    if(source->has_depth_stencil_attachment)
-                    {
-                        RHI_renderpass_attachment_t *source_depth      = &source->depth_stencil_attachment;
-                        RHI_renderpass_attachment_t *destination_depth = &dest->depth_stencil_attachment;
-
-                        vec2_t source_blit_size = vec2(source_depth->image->create_info.width,
-                                                       source_depth->image->create_info.height);
-                        vec2_t destination_blit_size = vec2(dest->render_width, dest->render_height);
-                        vk_backend_perform_image_blit(vulkan_context, 
-                                                      render_command_buffer, 
-                                                     &source_depth->image->backend_image,
-                                                     &destination_depth->image->backend_image,
-                                                      vec2_zero(),
-                                                      source_blit_size,
-                                                      vec2_zero(),
-                                                      destination_blit_size);
-                    }
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER:
-                {
-                    RHI_command_bind_vertex_buffer_t *cmd = (RHI_command_bind_vertex_buffer_t*)command->data;
-
-                    c_dynarray_add(&command_list->active_vertex_buffers, &cmd->vertex_buffer);
-                    ++command_list->vertex_buffer_count;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER:
-                {
-                    RHI_command_bind_index_buffer_t *cmd = (RHI_command_bind_index_buffer_t*)command->data;
-                    Assert(cmd->index_buffer->buffer_data.type == RHI_RENDER_BUFFER_TYPE_INDEX_BUFFER);
-
-                    VkDeviceSize offset = 0;
-                    vkCmdBindIndexBuffer(render_command_buffer, cmd->index_buffer->buffer_data.buffer_info.handle, offset, VK_INDEX_TYPE_UINT32); 
-
-                    command_list->active_index_buffer = cmd->index_buffer;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_BIND_SHADER:
-                {
-                    Assert(command_list->active_renderpass != null);
-
-                    RHI_command_bind_shader_t *cmd = (RHI_command_bind_shader_t*)command->data;
-                    vulkan_shader_t *shader = &cmd->shader.shader->shader_data;
-                    u64 hash_index = 0;
-                    if(shader->pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
-                    {
-                        struct shader_pipeline_key_t {
-                            RHI_renderpass_key_t renderpass;
-                            RHI_pipeline_state_t pipeline_state;
-                        }pipeline_key;
-
-                        pipeline_key.pipeline_state = command_list->active_render_state;
-                        pipeline_key.renderpass     = command_list->active_renderpass->renderpass_key;
-
-                        hash_index = (c_hash_table_hash_key(string_t{(u8*)&pipeline_key, sizeof(shader_pipeline_key_t)})) % MAX_SHADER_PIPELINE_COUNT;
-                    }
-
-                    // TODO(Sleepster): Maybe we don't want to touch the stuff accessed by the command_list... threading issues.
-                    VkPipeline shader_pipeline = (shader->pipeline_hash.items[hash_index]).item;
-                    if(shader_pipeline == VK_NULL_HANDLE)
-                    {
-                        (shader->pipeline_hash.items[hash_index]).item = vk_backend_create_pipeline_from_render_state(vulkan_context, 
-                                                                                                                      shader, 
-                                                                                                                      command_list->active_renderpass->renderpass_handle,
-                                                                                                                     &command_list->active_render_state);
-                        shader_pipeline = (shader->pipeline_hash.items[hash_index]).item;
-                    }
-
-                    vkCmdBindPipeline(render_command_buffer, shader->pipeline_type, shader_pipeline);
-                    command_list->active_shader_program = &cmd->shader;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE:
-                {
-                    RHI_command_bind_texture_t *cmd = (RHI_command_bind_texture_t*)command->data;
-                    if(cmd->texture->backend_image.layout != VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-                    {
-                        // TODO(Sleepster): This is awful and brings sadness to families across the world... Too bad I don't care... 
-                        VkCommandBuffer scratch_buffer = vk_backend_get_and_begin_scratch_command_buffer(vulkan_context, true);
-                        VkImageSubresourceRange source_range = {
-                            .aspectMask     = cmd->texture->backend_image.aspect_mask,
-                            .baseMipLevel   = 0,
-                            .levelCount     = 1,
-                            .baseArrayLayer = 0,
-                            .layerCount     = 1,
-                        };
-                        vk_backend_image_change_layout(scratch_buffer,
-                                                       cmd->texture->backend_image.handle, 
-                                                       cmd->texture->backend_image.layout,
-                                                       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
-                                                       VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                                       VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                                                       VK_ACCESS_TRANSFER_WRITE_BIT,
-                                                       VK_ACCESS_SHADER_READ_BIT,
-                                                       source_range);
-                        cmd->texture->backend_image.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-                        vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_buffer);
-
-                        // TODO(Sleepster): This might be a source of issues, just in case... leaving this here 
-                        vkDeviceWaitIdle(vulkan_context->device);
-                    }
-
-                    command_list->image_shader_params[command_list->image_count++] = cmd->texture;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_SET_VIEWPORT:
-                {
-                    RHI_command_set_viewport_t *cmd = (RHI_command_set_viewport_t*)command->data;
-
-                    VkPhysicalDeviceLimits *limits = &vulkan_context->gpu.properties.limits;
-                    s32 device_max_width  = limits->maxViewportDimensions[0];
-                    s32 device_max_height = limits->maxViewportDimensions[1];
-
-                    VkViewport viewport = {
-                        .x        = cmd->offset.x,
-                        .y        = cmd->offset.y,
-                        .width    = (float32)(Clamp((s32)cmd->size.x, -device_max_width,  device_max_width)),
-                        .height   = (float32)(Clamp((s32)cmd->size.y, -device_max_height, device_max_height)),
-                        .minDepth = 0.0,
-                        .maxDepth = 1.0
-                    };
-
-                    vkCmdSetViewport(render_command_buffer, 0, 1, &viewport);
-                    command_list->active_viewport_command = command;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_SET_SCISSOR:
-                {
-                    RHI_command_set_scissor_t *cmd = (RHI_command_set_scissor_t*)command->data;
-                    VkRect2D scissor = {
-                        .offset = {
-                            (s32)cmd->offset.x,
-                            (s32)cmd->offset.y
-                        },
-                        .extent = {
-                            (u32)cmd->size.x,
-                            (u32)cmd->size.y,
-                        }
-                    };
-
-                    vkCmdSetScissor(render_command_buffer, 0, 1, &scissor);
-                    command_list->active_scissor_command = command;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_SET_LINE_WIDTH:
-                {
-                    RHI_command_set_line_width_t *cmd = (RHI_command_set_line_width_t*)command->data;
-                    vkCmdSetLineWidth(render_command_buffer, cmd->width);
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_UPDATE_PUSH_CONSTANTS:
-                {
-                    Assert(command_list->active_shader_program);
-                    RHI_command_update_push_constant_t *cmd = (RHI_command_update_push_constant_t *)command->data;
-
-                    vulkan_shader_t *shader = &command_list->active_shader_program->shader->shader_data;
-                    if(shader->push_constant_count > 0 && shader->push_constant_count == 1)
-                    {
-                        VkShaderStageFlags flags = shader->push_constants[0].stageFlags;
-                        vkCmdPushConstants(render_command_buffer, shader->pipeline_layout, flags, cmd->offset, cmd->size, cmd->data);
-                    }
-                    else
-                    {
-                        log_fatal("Failure. This shader lacks push constants...\n");
-                    }
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_UPDATE_UNIFORM_CONSTANT_BUFFER:
-                {
-                    RHI_command_update_uniform_constant_buffer_t *cmd = (RHI_command_update_uniform_constant_buffer_t*)command->data;
-                    RHI_uniform_constant_buffer_t *buffer = cmd->buffer;
-                    Assert(buffer);
-
-                    buffer->offset = cmd->constant_buffer_offset;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_SET_RENDER_STATE:
-                {
-                    RHI_command_set_pipeline_state_t *cmd = (RHI_command_set_pipeline_state_t*)command->data;
-                    command_list->active_render_state = cmd->pipeline_state;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE:
-                {
-                    command_list->active_render_state = g_pipeline_default_state_key;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE:
-                {
-                    RHI_command_dispatch_compute_t *cmd = (RHI_command_dispatch_compute_t*)command->data;
-                    vkCmdDispatch(render_command_buffer, cmd->invoke_x, cmd->invoke_y, cmd->invoke_z);
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_DRAW:
-                {
-                    Assert(command_list->active_vertex_buffers.items);
-                    Assert(command_list->active_shader_program);
-                    Assert(command_list->active_viewport_command);
-                    Assert(command_list->active_scissor_command);
-                    RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
-
-                    vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
-                    vk_backend_commit_descriptor_data(vulkan_context, RHI_context, command_list);
-                    for(RHI_vertex_buffer_t *buffer: command_list->active_vertex_buffers)
-                    {
-                        if(buffer->advance_rate == RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT)
-                        {
-                            buffer->vertex_offset += cmd->vertices_to_draw;
-                        }
-                        else
-                        {
-                            buffer->instance_offset += cmd->instance_count;
-                        }
-                    }
-                    vkCmdDraw(render_command_buffer, 
-                              cmd->vertices_to_draw, 
-                              cmd->instance_count, 
-                              cmd->vertex_offset, 
-                              cmd->first_instance);
-
-                    command_list->image_count = 0;
-                    command_list->bound_image_count = 0;
-
-                    // NOTE(Sleepster): Resetting this to prevent garbage images from being pushed to the shader. 
-                    // We exlude the first image index due to the fact that this is typically the default texture
-                    ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params));
-
-                    c_dynarray_reset(&command_list->active_vertex_buffers);
-                    command_list->vertex_buffer_count = 0;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_DRAW_INDEXED:
-                {
-                    Assert(command_list->active_vertex_buffers.items);
-                    Assert(command_list->active_index_buffer);
-                    Assert(command_list->active_shader_program);
-                    Assert(command_list->active_viewport_command);
-                    Assert(command_list->active_scissor_command);
-                    RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
-
-                    vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
-                    vk_backend_commit_descriptor_data(vulkan_context, RHI_context, command_list);
-                    for(RHI_vertex_buffer_t *buffer: command_list->active_vertex_buffers)
-                    {
-                        if(buffer->advance_rate == RHI_RENDER_BUFFER_ADVANCE_RATE_PER_ELEMENT)
-                        {
-                            buffer->vertex_offset += cmd->vertices_to_draw;
-                        }
-                        else
-                        {
-                            buffer->instance_offset += cmd->instance_count;
-                        }
-                    }
-
-                    vkCmdDrawIndexed(render_command_buffer, 
-                                     cmd->indices_to_draw, 
-                                     cmd->instance_count, 
-                                     cmd->index_offset + command_list->active_index_buffer->index_offset, 
-                                     cmd->vertex_offset, 
-                                     cmd->first_instance);
-
-                    command_list->image_count = 0;
-                    command_list->bound_image_count = 0;
-
-                    command_list->active_index_buffer->index_offset += cmd->indices_to_draw;
-
-                    // NOTE(Sleepster): Resetting this to prevent garbage images from being pushed to the shader. 
-                    // We exlude the first image index due to the fact that this is typically the default texture
-                    ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params));
-
-                    c_dynarray_reset(&command_list->active_vertex_buffers);
-                    command_list->vertex_buffer_count = 0;
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_BLIT_IMAGE:
-                {
-                    RHI_command_blit_image_t *cmd = (RHI_command_blit_image_t*)command->data;
-                    vk_backend_perform_image_blit(vulkan_context, 
-                                                  render_command_buffer, 
-                                                 &cmd->source_image->backend_image,
-                                                 &cmd->dest_image->backend_image,
-                                                  cmd->source_offset,
-                                                  cmd->source_size,
-                                                  cmd->dest_offset,
-                                                  cmd->dest_size);
-                }break;
-                case RHI_RENDER_COMMAND_TYPE_PRESENT_FRAME:
-                {
-                    RHI_command_present_frame_t *cmd = (RHI_command_present_frame_t *)command->data;
-                    RHI_context->present_command = cmd;
-                }break;
-            }
+            RHI_command_list_t *command_list = RHI_context->command_lists + command_list_index;
+            command_list_reset_state(command_list);
         }
 
-        if(command_list->active_index_buffer != null)
-        {
-            command_list->active_index_buffer->index_offset = 0;
-        }
-
-        command_list->presenting                       = false;
-        command_list->active_index_buffer              = null;
-        command_list->active_shader_program            = null;
-        command_list->active_viewport_command          = null;
-        command_list->active_scissor_command           = null;
-        command_list->bound_image_count                = 0;
-        command_list->image_count                      = 0;
-        command_list->bind_material_command_count      = 0;
-        command_list->bind_render_target_command_count = 0;
-        command_list->bind_shader_command_count        = 0;
-        command_list->draw_instance_command_count      = 0;
-        command_list->command_count                    = 0;
-        command_list->vertex_buffer_count              = 0;
-
-        command_list->active_render_state     = g_pipeline_default_state_key; 
-        command_list->active_renderpass       = null;
-        command_list->active_index_buffer     = null;
-        command_list->active_scissor_command  = null;
-        command_list->active_viewport_command = null;
-        command_list->active_shader_program   = null;
+        RHI_context->command_list_count = 0;
+        RHI_context->present_command    = null;
     }
-
-    if(RHI_context->present_command)
-    {
-        RHI_image_t        *source = RHI_context->present_command->presentation_source;
-        vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
-
-        Assert(source);
-        Assert(backbuffer);
-        Assert(!vk_backend_is_image_format_stencil_format(&source->backend_image) && 
-               !vk_backend_is_image_format_depth_format(&source->backend_image));
-
-        VkImageSubresourceRange source_range = {
-            .aspectMask     = source->backend_image.aspect_mask,
-            .baseMipLevel   = 0,
-            .levelCount     = 1,
-            .baseArrayLayer = 0,
-            .layerCount     = 1,
-        };
-
-        VkImageSubresourceRange destination_range = {
-            .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-            .baseMipLevel   = 0,
-            .levelCount     = 1,
-            .baseArrayLayer = 0,
-            .layerCount     = 1,
-        };
-
-        vk_backend_image_blit(vulkan_context,
-                              &source->backend_image,
-                              backbuffer,
-                              vec2(0, 0),
-                              vec2(source->backend_image.width, source->backend_image.height),
-                              vec2(0, 0),
-                              vec2(backbuffer->width, backbuffer->height),
-                              source->backend_image.layout,
-                              VK_IMAGE_LAYOUT_UNDEFINED,
-                              VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                              source_range,
-                              destination_range);
-    }
-    RHI_context->command_list_count = 0;
-    RHI_context->present_command    = null;
-
-    // NOTE(Sleepster): 
-    // Change the layout of the swapchain image if we must.
-    vulkan_image_t *backbuffer = vulkan_context->swapchain_image_data + vulkan_context->current_image_index;
-    VkImageSubresourceRange dst_range = {
-        .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,
-        .baseMipLevel   = 0,
-        .levelCount     = 1,
-        .baseArrayLayer = 0,
-        .layerCount     = 1,
-    };
-    
-    if(backbuffer->layout != VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
-    {
-        vk_backend_image_change_layout(render_command_buffer,
-                                       backbuffer->handle,
-                                       backbuffer->layout,
-                                       VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                                       VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-                                       VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-                                       VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-                                       0,
-                                       dst_range);
-        backbuffer->layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-    }
-
-    vkEndCommandBuffer(render_command_buffer);
-    vkAssert(vkResetFences(vulkan_context->device, 1, vulkan_context->image_render_idle_fence));
-
-    VkPipelineStageFlags stage_flags[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-    VkSubmitInfo submit_info  = {
-        .sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-
-        // NOTE(Sleepster): The Semaphore(s) that ensures the operation cannot begin until the image is avaliable 
-        .waitSemaphoreCount   = 1,
-        .pWaitSemaphores      = vulkan_context->image_acquired_semaphore,
-        .pWaitDstStageMask    = stage_flags,
-
-        // NOTE(Sleepster): Command buffer()s that will be run 
-        .commandBufferCount   = 1,
-        .pCommandBuffers      = vulkan_context->render_command_buffer,
-
-        // NOTE(Sleepster): The Semaphore(s) that signal when the queue is finished executing the commands
-        .signalSemaphoreCount = 1,
-        .pSignalSemaphores    = vulkan_context->render_complete_semaphore
-    };
-    vkAssert(vkQueueSubmit(vulkan_context->graphics_queue, 1, &submit_info, *vulkan_context->image_render_idle_fence));
-
-    VkPresentInfoKHR present_info = {
-        .sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-        .waitSemaphoreCount = 1,
-        .pWaitSemaphores    = vulkan_context->render_complete_semaphore,
-        .swapchainCount     = 1,
-        .pSwapchains        = &vulkan_context->swapchain.handle,
-        .pImageIndices      = &image_index,
-    };
-    VkResult result = vkQueuePresentKHR(vulkan_context->graphics_queue, &present_info);
-    if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
-    {
-        vulkan_context->rebuilding_swapchain = true;
-    }
-
-    c_arena_reset(&vulkan_context->frame_arena);
-    vulkan_context->current_frame_index = (vulkan_context->current_frame_index + 1) % MAX_FRAMES_IN_FLIGHT;
-    vulkan_context->constant_buffer_data.used = 0;
 }
 
 /*

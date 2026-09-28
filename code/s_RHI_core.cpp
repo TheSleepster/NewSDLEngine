@@ -500,14 +500,6 @@ RHI_command_list_init(RHI_command_list_t *list)
 
         //list->active_vertex_buffers = c_dynarray_create(render_buffer_t *);
     }
-    else
-    {
-        c_arena_reset(&list->transient_arena);
-        c_arena_reset(&list->command_arena);
-
-        ZeroMemory(list->image_ids_to_bind,   sizeof(u32)          * RHI_MAX_SHADER_IMAGE_PARAMS);
-        ZeroMemory(list->image_shader_params, sizeof(RHI_image_t*) * RHI_MAX_SHADER_IMAGE_PARAMS);
-    }
 
     Assert(gc);
     Assert(gc->RHI_context);
