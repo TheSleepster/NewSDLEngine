@@ -345,6 +345,10 @@ ui_state_render_widgets(ui_state_t *ui_state, RHI_command_list_t *command_list)
     if(current_widget)
     {
         render_widget_hierarchy(ui_state, command_list, current_widget);
+    else
+    {
+        log_warning("Called ui_state_render_widgets on an empty ui_state_t... there are no widgets attached!!!\n");
+    }
 
         RHI_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
         RHI_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
@@ -410,8 +414,7 @@ render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, 
             current_widget->widget_instance_data->iRadius          = current_widget->radius;
             current_widget->widget_instance_data->iSDFSmoothness   = current_widget->smoothness;
 
-            immediate_rect_ex(command_list,
-                             &ui_state->vertex_buffer,
+            immediate_rect_ex(&ui_state->vertex_buffer,
                               current_widget->state->position, 
                               current_widget->state->render_size,
                               current_widget->state->render_color,
@@ -427,8 +430,7 @@ render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, 
 
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
         {
-            immediate_rect_ex(command_list,
-                             &ui_state->vertex_buffer,
+            immediate_rect_ex(&ui_state->vertex_buffer,
                               current_widget->state->position, 
                               current_widget->state->render_size,
                               current_widget->state->render_color,
@@ -492,17 +494,17 @@ render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, 
                 RHI_cmd_bind_texture_from_handle(command_list, current_widget->display_texture);
 
                 s32 texture_index = RHI_is_texture_bound(command_list, current_widget->display_texture->texture);
-                immediate_quad_ex(command_list,
-                                  &ui_state->vertex_buffer,
-                                  current_widget->state->position, 
-                                  current_widget->state->render_size,
-                                  current_widget->state->render_color,
-                                  current_widget->display_texture_uvmin,
-                                  current_widget->display_texture_uvmax,
-                                  vec2(1.0, texture_index),
-                                  vec2(current_widget->display_texture->texture->gpu_data.create_info.sampler_info.filtering, 0.0),
-                                  vec2_zero(),
-                                  current_widget->display_texture->texture);
+                immediate_texture_ex(command_list,
+                                    &ui_state->vertex_buffer,
+                                     current_widget->state->position, 
+                                     current_widget->state->render_size,
+                                     current_widget->state->render_color,
+                                     current_widget->display_texture_uvmin,
+                                     current_widget->display_texture_uvmax,
+                                     vec2(1.0, texture_index),
+                                     vec2(current_widget->display_texture->texture->gpu_data.create_info.sampler_info.filtering, 0.0),
+                                     vec2_zero(),
+                                     current_widget->display_texture->texture);
                 ++ui_state->widget_item_count;
             }
         }

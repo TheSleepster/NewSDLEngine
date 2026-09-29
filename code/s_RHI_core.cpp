@@ -748,6 +748,20 @@ RHI_cmd_bind_texture_from_handle(RHI_command_list_t *command_list, asset_handle_
     RHI_cmd_bind_texture_image(command_list, texture);
 }
 
+ENGINE_API true_inline void 
+RHI_cmd_bind_vertex_buffers(RHI_command_list_t *command_list, RHI_vertex_buffer_t *vertex_buffers, u32 vertex_buffer_count)
+{
+    Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+    RHI_command_t *command = RHI_get_next_command(command_list);
+    RHI_command_bind_vertex_buffer_t *bind_vertex_buffers = c_arena_push_struct(&command_list->command_arena, 
+                                                                                RHI_command_bind_vertex_buffer_t);
+    bind_vertex_buffers->vertex_buffers      = vertex_buffers; 
+    bind_vertex_buffers->vertex_buffer_count = vertex_buffer_count;
+
+    command->header.command_type = RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER;
+    command->data = bind_vertex_buffers;
+}
+
 /*
 =============
 RHI_cmd_bind_vertex_buffer
@@ -757,14 +771,7 @@ RHI_cmd_bind_vertex_buffer
 ENGINE_API true_inline void 
 RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer)
 {
-    Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
-    RHI_command_t *command = RHI_get_next_command(command_list);
-    RHI_command_bind_vertex_buffer_t *bind_vertex_buffer = c_arena_push_struct(&command_list->command_arena, 
-                                                                                RHI_command_bind_vertex_buffer_t);
-    bind_vertex_buffer->vertex_buffer = buffer; 
-
-    command->header.command_type = RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER;
-    command->data = bind_vertex_buffer;
+    RHI_cmd_bind_vertex_buffers(command_list, buffer, 1);
 }
 
 /*

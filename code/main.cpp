@@ -43,40 +43,18 @@ RENDER GROUPS
 ===================================
 */
 
-struct render_quad_t
+constexpr u32 MAX_RENDER_GRAPH_NODE_CHILDREN    = 100;
+constexpr u32 MAX_RENDER_GROUP_CONSTANT_BUFFERS = 30;
+
+struct render_group_constant_buffer_data_t
 {
-    vec3_t position;
-    vec2_t render_size;
-    vec4_t render_color;
-};
-
-struct render_geometry_t
-{
-    render_quad_t quad;
-};
-
-// TODO(Sleepster): Maybe instead of forcing you to use this render geometry struct,
-// you just supply your own buffer of geometry data that matches the vertex type so we can just
-// memcpy?
-using render_group_geometry_array_t = fixed_array_t<render_geometry_t, 100>;
-struct render_group_t
-{
-    u32                           renderpassID;
-    asset_handle_t                shader;
-    RHI_pipeline_state_t          pipeline_state;
-
-    render_group_geometry_array_t geometry_array;
-    u32                           geometry_count;
-
-    RHI_vertex_buffer_t          *target_geometry_buffer;
-    RHI_index_buffer_t           *index_buffer;
-
-    u32                           vertex_count;
+    byte *data;
+    u64   data_size;
+    RHI_uniform_constant_buffer_t *buffer;
 };
 
 struct render_graph_node_t
 {
-    s32 node_type;
     struct {
         u32 renderpassID;
     }renderpass_info;
@@ -84,11 +62,124 @@ struct render_graph_node_t
     struct {
         asset_handle_t shader;
     }shader_info;
+
+    struct {
+        RHI_pipeline_state_t state;
+    }pipeline_state;
+
+    struct {
+        texture2D_t **textures;
+        u32           texture_count;
+
+        render_group_constant_buffer_data_t *constant_buffers;
+        u32                                  constant_buffer_count;
+    }descriptor_info;
+
+    // TODO(Sleepster): Maybe merge draws? 
+    struct {
+        vec2_t viewport_offset;
+        vec2_t viewport_extent;
+
+        vec2_t scissor_offset;
+        vec2_t scissor_extent;
+
+        float32 line_thickness;
+
+        u32     vertex_count;
+        u32     vertex_offset;
+
+        RHI_index_buffer_t  *index_buffer;
+        RHI_vertex_buffer_t *vertex_buffers;
+        u32                  vertex_buffer_count;
+    }draw_info;
+
+    using render_graph_node_child_map_t = fixed_array_t<render_graph_node_t*, MAX_RENDER_GRAPH_NODE_CHILDREN>;
+    render_graph_node_child_map_t child_node_map;
+    render_graph_node_t *first_child;
+    render_graph_node_t *next_sibling;
 };
 
-using render_graph_node_hash_t = hash_table_t<render_graph_node_t, 4096>;
+struct render_quad_t
+{
+    vec3_t       position;
+    vec4_t       render_color;
+    vec2_t       render_size;
+    vec2_t       uv_min;
+    vec2_t       uv_max;
+    vec2_t       padding;
+    vec2_t       sdf_info;
+    vec2_t       padding0;
+
+    //texture2D_t *texture;
+};
+
+struct render_line_t
+{
+    vec2_t  start;
+    vec2_t  end;
+    vec4_t  render_color;
+    float32 depth;
+};
+
+enum render_geometry_type_t
+{
+    RENDER_GEOMETRY_TYPE_QUAD,
+    RENDER_GEOMETRY_TYPE_LINE
+};
+
+struct render_geometry_t
+{
+    s32 type;
+    union {
+        render_quad_t quad;
+        render_line_t line;
+    };
+};
+
+// TODO(Sleepster): Maybe instead of forcing you to use this render geometry struct,
+// you just supply your own buffer of geometry data that matches the vertex type so we can just
+// memcpy?
+using render_group_geometry_array_t        = fixed_array_t<render_geometry_t, MAX_RENDER_GRAPH_NODE_CHILDREN>;
+using render_group_texture_array_t         = fixed_array_t<asset_handle_t, RHI_MAX_SHADER_IMAGE_PARAMS>;
+using render_group_constant_buffer_array_t = fixed_array_t<render_group_constant_buffer_data_t, MAX_RENDER_GROUP_CONSTANT_BUFFERS>;
+
+struct render_group_t
+{
+    u32                                  renderpassID;
+    asset_handle_t                       shader;
+    RHI_pipeline_state_t                 pipeline_state;
+    u32                                  line_thickness;
+
+    vec2_t                               scissor_offset;
+    vec2_t                               scissor_extent;
+
+    vec2_t                               viewport_offset;
+    vec2_t                               viewport_extent;
+
+    render_group_geometry_array_t        geometry_array;
+    u32                                  geometry_count;
+
+    RHI_vertex_buffer_t                 *target_geometry_buffer;
+    RHI_index_buffer_t                  *index_buffer;
+
+    render_group_texture_array_t         textures;
+    u32                                  texture_count;
+
+    render_group_constant_buffer_array_t constant_buffers;
+    u32                                  constant_buffer_count;
+
+    u32                                  vertex_offset;
+    u32                                  vertex_count;
+};
+
+// TODO(Sleepster): RHI_MAX_RENDERPASS_COUNT 
+using render_group_array_t       = fixed_array_t<render_group_t, 10>;
+using render_graph_lookup_hash_t = hash_table_t<render_graph_node_t>; 
+using render_graph_node_map_t    = fixed_array_t<render_graph_node_t*, 100>;
+
 struct render_state_t
 {
+    RHI_context_t                 *RHI_context;
     RHI_image_t                    game_color_buffer;
     RHI_image_t                    game_depth_buffer;
 
@@ -103,72 +194,320 @@ struct render_state_t
     u32                            game_renderpass_ID;
     u32                            fullscreen_renderpass_ID; 
 
-    render_group_t                 render_groups[10];
+    // NOTE(Sleepster): Render Graph 
+    render_group_array_t           render_groups;
     u32                            used_render_group_count;
 
-    render_graph_node_t            render_graph_root_node;
-    render_graph_node_hash_t       render_graph_node_lookup;
-
-    RHI_context_t                 *RHI_context;
+    render_graph_node_t           *render_graph_root_node;
+    render_graph_node_map_t        renderpass_node_map;
 };
 
-render_group_t *
+internal_api void
+render_graph_append_node(render_graph_node_t **first_node, render_graph_node_t *node_to_append)
+{
+    render_graph_node_t *last_node = null; 
+    for(render_graph_node_t *current_node = *first_node;
+        current_node;
+        current_node = current_node->next_sibling)
+    {
+        last_node = current_node;
+    }
+
+    if(last_node)
+    {
+        last_node->next_sibling = node_to_append;
+    }
+    else
+    {
+        Assert(*first_node == null);
+        *first_node = node_to_append;
+    }
+}
+
+// TODO(Sleepster): Bad name.
+internal_api void
+render_graph_insert_node(render_state_t *render_state, render_group_t *render_group)
+{
+    render_graph_node_t *renderpass_node = render_state->renderpass_node_map[render_group->renderpassID]; 
+
+    u64 pipeline_state_key = (c_hash_table_hash_key(STR((const char*)&render_group->pipeline_state))) % MAX_RENDER_GRAPH_NODE_CHILDREN;
+    render_graph_node_t *pipeline_state_node = renderpass_node->child_node_map[pipeline_state_key];
+    if(!pipeline_state_node)
+    {
+        pipeline_state_node = c_arena_push_struct(&gc->temp_arena, render_graph_node_t);
+        pipeline_state_node->pipeline_state.state = render_group->pipeline_state;
+
+        render_graph_append_node(&renderpass_node->first_child, pipeline_state_node);
+    }
+
+    u64 shader_key = (u64)render_group->shader.slot % MAX_RENDER_GRAPH_NODE_CHILDREN;
+    render_graph_node_t *shader_node = pipeline_state_node->child_node_map[shader_key];
+    if(!shader_node)
+    {
+        shader_node = c_arena_push_struct(&gc->temp_arena, render_graph_node_t);
+        shader_node->shader_info.shader = render_group->shader;
+
+        render_graph_append_node(&pipeline_state_node->first_child, shader_node);
+    }
+
+    u64 descriptor_key = 0; 
+    texture2D_t **textures = null; 
+    if(render_group->texture_count > 0)
+    {
+        textures = c_arena_push_array(&gc->temp_arena, texture2D_t*, render_group->texture_count);
+        for(u32 texture_index = 0;
+            texture_index < render_group->texture_count;
+            ++texture_index)
+        {
+            asset_handle_t *texture_handle = render_group->textures + texture_index;
+            Assert(texture_handle->texture);
+
+            texture2D_t *texture_to_hash = null;
+            if(texture_handle->slot->subtexture_data)
+            {
+                texture_to_hash = &texture_handle->slot->subtexture_data->atlas->texture;
+            }
+            else
+            {
+                texture_to_hash = texture_handle->texture;
+            }
+
+            Assert(texture_to_hash != null);
+            textures[texture_index] = texture_to_hash;
+            descriptor_key = (descriptor_key + texture_to_hash->ID) % MAX_RENDER_GRAPH_NODE_CHILDREN;
+        }
+    }
+
+    if(render_group->constant_buffer_count > 0)
+    {
+        // TODO(Sleepster): What do we do here? 
+    }
+
+    render_graph_node_t *descriptor_node = shader_node->child_node_map[descriptor_key];
+    if(!descriptor_node)
+    {
+        descriptor_node = c_arena_push_struct(&gc->temp_arena, render_graph_node_t);
+        descriptor_node->descriptor_info.textures      = textures;
+        descriptor_node->descriptor_info.texture_count = render_group->texture_count;
+
+        descriptor_node->descriptor_info.constant_buffers      = render_group->constant_buffers.items;
+        descriptor_node->descriptor_info.constant_buffer_count = render_group->constant_buffer_count;
+
+        render_graph_append_node(&shader_node->first_child, descriptor_node);
+    }
+
+    u64 draw_key = ((((u64)render_group->target_geometry_buffer + (u64)render_group->index_buffer) + render_group->vertex_offset) + render_group->vertex_count);
+    draw_key = c_hash_table_hash_key(STR((const char *)&draw_key)) % MAX_RENDER_GRAPH_NODE_CHILDREN;
+
+    render_graph_node_t *draw_node = descriptor_node->child_node_map[draw_key];
+    if(!draw_node)
+    {
+        draw_node = c_arena_push_struct(&gc->temp_arena, render_graph_node_t);
+        draw_node->draw_info.line_thickness      = render_group->line_thickness;
+        draw_node->draw_info.index_buffer        = render_group->index_buffer;
+        draw_node->draw_info.vertex_buffers      = render_group->target_geometry_buffer;
+        draw_node->draw_info.vertex_buffer_count = 1;
+        if(render_group->viewport_extent.x != 0.0f || 
+           render_group->viewport_extent.y != 0.0f)
+        {
+            draw_node->draw_info.viewport_offset = render_group->viewport_offset;
+            draw_node->draw_info.viewport_extent = render_group->viewport_extent;
+        }
+
+        if(render_group->scissor_extent.x != 0.0f || 
+           render_group->scissor_extent.y != 0.0f)
+        {
+            draw_node->draw_info.scissor_offset = render_group->scissor_offset;
+            draw_node->draw_info.scissor_extent = render_group->scissor_extent;
+        }
+
+        draw_node->draw_info.vertex_count  = render_group->vertex_count;
+        draw_node->draw_info.vertex_offset = render_group->vertex_offset;
+
+        render_graph_append_node(&descriptor_node->first_child, draw_node);
+    }
+}
+
+void
+render_group_add_constant_buffer(render_group_t *render_group, RHI_uniform_constant_buffer_t *constant_buffer, void *data, u64 data_size)
+{
+    bool8 found = false;
+    for(u32 buffer_index = 0;
+        buffer_index < render_group->constant_buffer_count;
+        ++buffer_index)
+    {
+        render_group_constant_buffer_data_t *buffer_data = render_group->constant_buffers + buffer_index;
+        if(buffer_data->buffer == constant_buffer)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        render_group_constant_buffer_data_t *buffer_data = render_group->constant_buffers + render_group->constant_buffer_count++;
+        buffer_data->buffer    = constant_buffer;
+        buffer_data->data      = (byte*)data;
+        buffer_data->data_size = data_size;
+    }
+    else
+    {
+        log_warning("Attempting to bind an already bound constant buffer to this render group...\n");
+    }
+}
+
+s32
+render_group_bind_texture(render_group_t *render_group, asset_handle_t texture_handle)
+{
+    s32 texture_index = c_array_find(render_group->textures, &texture_handle);
+    if(texture_index == -1)
+    {
+        texture_index = render_group->texture_count++;
+        render_group->textures[texture_index] = texture_handle;
+    }
+
+    return(texture_index);
+}
+
+void
+render_group_set_scissor(render_group_t *render_group, vec2_t offset, vec2_t extent)
+{
+    render_group->scissor_offset = offset;
+    render_group->scissor_extent = extent;
+}
+
+void
+render_group_set_viewport(render_group_t *render_group, vec2_t offset, vec2_t extent)
+{
+    render_group->viewport_offset = offset;
+    render_group->viewport_extent = extent; 
+}
+
+render_group_t*
 render_group_begin(render_state_t *render_state, u32 renderpassID)
 {
     render_group_t *result = render_state->render_groups + render_state->used_render_group_count++;
     result->renderpassID = renderpassID;
 
+    render_graph_node_t *renderpass_node = render_state->renderpass_node_map[renderpassID]; 
+    if(!renderpass_node)
+    {
+        renderpass_node = c_arena_push_struct(&gc->temp_arena, render_graph_node_t);
+        renderpass_node->renderpass_info.renderpassID = renderpassID;
+
+        render_graph_append_node(&render_state->render_graph_root_node, renderpass_node);
+        render_state->renderpass_node_map[renderpassID] = renderpass_node;
+    }
+
     return(result);
 }
 
 void
-render_group_end(render_group_t *render_group, RHI_vertex_buffer_t *destination_vertex_buffer, RHI_index_buffer_t *index_buffer)
+render_group_end(render_state_t      *render_state, 
+                 render_group_t      *render_group, 
+                 RHI_vertex_buffer_t *destination_vertex_buffer, 
+                 RHI_index_buffer_t  *index_buffer)
 {
     render_group->target_geometry_buffer = destination_vertex_buffer;
     render_group->index_buffer           = index_buffer;
 
     RHI_vertex_buffer_t *vertex_buffer = destination_vertex_buffer;
+    render_group->vertex_offset = vertex_buffer->vertex_count;
     for(u32 geometry_index = 0;
         geometry_index < render_group->geometry_count;
         ++geometry_index)
     {
         render_geometry_t *geometry = render_group->geometry_array + geometry_index;
+        if(geometry->type == RENDER_GEOMETRY_TYPE_QUAD)
+        {
+            render_quad_t *quad = &geometry->quad;
+            immediate_quad_ex(vertex_buffer, 
+                              quad->position, 
+                              quad->render_size, 
+                              quad->render_color, 
+                              quad->uv_min, 
+                              quad->uv_max, 
+                              quad->padding, 
+                              quad->sdf_info, 
+                              quad->padding0);
+            render_group->vertex_count  += 4;
+        }
+        else
+        {
+            render_line_t *line = &geometry->line;
+            immediate_line(vertex_buffer, line->start, line->end, line->depth, line->render_color);
 
-        immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)vertex_buffer->vertex_data + vertex_buffer->vertex_count);
-        Expect(vertex_pointer, "The vertex buffer pointer is invalid...");
-
-        immediate_vertex_t *bottom_right = vertex_pointer + 0;
-        immediate_vertex_t *top_right    = vertex_pointer + 1;
-        immediate_vertex_t *top_left     = vertex_pointer + 2;
-        immediate_vertex_t *bottom_left  = vertex_pointer + 3;
-
-        float32 top    = geometry->quad.position.y + geometry->quad.render_size.y;
-        float32 bottom = geometry->quad.position.y;
-        float32 left   = geometry->quad.position.x;
-        float32 right  = geometry->quad.position.x + geometry->quad.render_size.x;
-
-        bottom_left->vPosition  = vec4(left,  bottom, geometry->quad.position.z, 1);
-        bottom_right->vPosition = vec4(right, bottom, geometry->quad.position.z, 1);
-        top_left->vPosition     = vec4(left,  top,    geometry->quad.position.z, 1);
-        top_right->vPosition    = vec4(right, top,    geometry->quad.position.z, 1);
-
-        bottom_left->vColor  = geometry->quad.render_color;
-        bottom_right->vColor = geometry->quad.render_color;
-        top_left->vColor     = geometry->quad.render_color;
-        top_right->vColor    = geometry->quad.render_color;
-
-        vertex_buffer->vertex_count += 4;
-        render_group->vertex_count  += 4;
+            render_group->vertex_count  += 2;
+        }
     }
+
+    render_graph_insert_node(render_state, render_group);
 }
 
 void
-render_quad(render_group_t *render_group, vec3_t position, vec2_t render_size, vec4_t render_color)
+render_quad_ex(render_group_t *render_group, 
+               vec3_t          position, 
+               vec2_t          render_size, 
+               vec4_t          render_color, 
+               vec2_t          uv_min, 
+               vec2_t          uv_max, 
+               vec2_t          padding, 
+               vec2_t          sdf_info, 
+               vec2_t          padding0)
 {
     render_geometry_t *geometry = render_group->geometry_array + render_group->geometry_count++;
-    geometry->quad.position     = position;
-    geometry->quad.render_size  = render_size;
-    geometry->quad.render_color = render_color;
+    geometry->type = RENDER_GEOMETRY_TYPE_QUAD;
+    geometry->quad.position      = position;
+    geometry->quad.render_size   = render_size;
+    geometry->quad.render_color  = render_color;
+    geometry->quad.padding       = padding;
+    geometry->quad.sdf_info      = sdf_info;
+    geometry->quad.padding0      = padding0;
+    geometry->quad.uv_min        = uv_min;
+    geometry->quad.uv_max        = uv_max;
+}
+
+void
+render_quad(render_group_t *render_group, vec3_t position, vec2_t render_size, vec4_t render_color, s32 texture_index)
+{
+    vec2_t uv_min = vec2_zero();
+    vec2_t uv_max = vec2_zero();
+    if(texture_index != -1)
+    {
+        subtexture_data_t *subtexture_data = null;
+
+        asset_handle_t *texture_handle = render_group->textures + texture_index;
+        if(texture_handle->slot->subtexture_data) 
+        {
+            subtexture_data = texture_handle->slot->subtexture_data;
+        }
+
+        if(subtexture_data)
+        {
+            uv_min = subtexture_data->uv_min;
+            uv_max = subtexture_data->uv_max;
+        }
+        else
+        {
+            uv_min = vec2(0.0, 0.0);
+            uv_max = vec2(1.0, 1.0);
+        }
+    }
+
+    vec2_t zero = vec2_zero();
+    render_quad_ex(render_group, position, render_size, render_color, uv_min, uv_max, zero, zero, zero);
+}
+
+void
+render_line(render_group_t *render_group, vec2_t start, vec2_t end, float32 depth, vec4_t color)
+{
+    render_geometry_t *geometry = render_group->geometry_array + render_group->geometry_count++;
+    geometry->type = RENDER_GEOMETRY_TYPE_LINE;
+    geometry->line.start = start;
+    geometry->line.end   = end;
+    geometry->line.depth = depth;
+    geometry->line.render_color = color;
 }
 
 /*===========================================
@@ -240,7 +579,7 @@ struct game_state_t
         input_action_t *dash;
     }mappings;
 
-    struct {
+struct {
         vec2_t movement_axis;
         bool8  jumped;
         bool8  dashed;
@@ -251,38 +590,112 @@ void
 render_groups_to_output(render_state_t *render_state)
 {
     RHI_command_list_t *command_list = RHI_get_command_list(render_state->RHI_context, RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
+    //RHI_cmd_update_buffer_contents(command_list, &render_state->vertex_buffer);
+
+    for(render_graph_node_t *current_renderpass = render_state->render_graph_root_node;
+        current_renderpass;
+        current_renderpass = current_renderpass->next_sibling)
+    {
+        RHI_cmd_renderpass_begin(command_list, current_renderpass->renderpass_info.renderpassID);
+        for(render_graph_node_t *working_pipeline_state = current_renderpass->first_child;
+            working_pipeline_state;
+            working_pipeline_state = working_pipeline_state->next_sibling)
+        {
+            RHI_cmd_set_render_state(command_list, &working_pipeline_state->pipeline_state.state);
+            for(render_graph_node_t *current_shader = working_pipeline_state->first_child;
+                current_shader;
+                current_shader = current_shader->next_sibling)
+            {
+                RHI_cmd_use_shader_program(command_list, current_shader->shader_info.shader);
+                for(render_graph_node_t *current_descriptor_info = current_shader->first_child;
+                    current_descriptor_info;
+                    current_descriptor_info = current_descriptor_info->next_sibling)
+                {
+                    if(current_descriptor_info->descriptor_info.texture_count > 0)
+                    {
+                        for(u32 texture_index = 0;
+                            texture_index < current_descriptor_info->descriptor_info.texture_count;
+                            ++texture_index)
+                        {
+                            texture2D_t *texture = current_descriptor_info->descriptor_info.textures[texture_index];
+                            RHI_cmd_bind_texture_image(command_list, texture);
+                        }
+                    }
+
+                    if(current_descriptor_info->descriptor_info.constant_buffer_count > 0)
+                    {
+                        for(u32 constant_buffer_index = 0;
+                            constant_buffer_index < current_descriptor_info->descriptor_info.constant_buffer_count;
+                            ++constant_buffer_index)
+                        {
+                            render_group_constant_buffer_data_t *buffer_data = current_descriptor_info->descriptor_info.constant_buffers + constant_buffer_index;
+                            RHI_cmd_update_constant_buffer(command_list, buffer_data->buffer, buffer_data->data, buffer_data->data_size);
+                        }
+                    }
+
+                    for(render_graph_node_t *current_draw = current_descriptor_info->first_child;
+                        current_draw;
+                        current_draw = current_draw->next_sibling)
+                    {
+                        // NOTE(Sleepster): Reuses the viewport from the previous draw 
+                        if(current_draw->draw_info.viewport_extent.x != 0 && current_draw->draw_info.viewport_extent.y != 0)
+                        {
+                            RHI_cmd_set_viewport(command_list, current_draw->draw_info.viewport_offset, current_draw->draw_info.viewport_extent);
+                        }
+
+                        // NOTE(Sleepster): Reuses the scissor from the previous draw 
+                        if(current_draw->draw_info.scissor_extent.x != 0 && current_draw->draw_info.scissor_extent.y != 0)
+                        {
+                            RHI_cmd_set_scissor(command_list, current_draw->draw_info.scissor_offset, current_draw->draw_info.scissor_extent);
+                        }
+
+                        if(working_pipeline_state->pipeline_state.state.polygon_mode == RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST)
+                        {
+                            RHI_cmd_set_line_width(command_list, current_draw->draw_info.line_thickness);
+                        }
+                        
+                        RHI_cmd_bind_vertex_buffers(command_list, current_draw->draw_info.vertex_buffers, current_draw->draw_info.vertex_buffer_count);
+                        for(u32 vertex_buffer_index = 0;
+                            vertex_buffer_index < current_draw->draw_info.vertex_buffer_count;
+                            ++vertex_buffer_index)
+                        {
+                            RHI_cmd_update_buffer_contents(command_list, &current_draw->draw_info.vertex_buffers[vertex_buffer_index]);
+                        }
+
+                        if(current_draw->draw_info.index_buffer)
+                        {
+                            RHI_cmd_bind_index_buffer(command_list, current_draw->draw_info.index_buffer);
+                            RHI_cmd_draw_indexed(command_list, (current_draw->draw_info.vertex_count / 4) * 6, 0, 0, 1, 0);
+                        }
+                        else
+                        {
+                            RHI_cmd_draw(command_list, current_draw->draw_info.vertex_count, current_draw->draw_info.vertex_offset, 1, 0);
+                        }
+
+                        for(u32 vertex_buffer_index = 0;
+                            vertex_buffer_index < current_draw->draw_info.vertex_buffer_count;
+                            ++vertex_buffer_index)
+                        {
+                            RHI_vertex_buffer_reset_count(&current_draw->draw_info.vertex_buffers[vertex_buffer_index]);
+                        }
+                    }
+                }
+            }
+        }
+
+        RHI_cmd_renderpass_end(command_list);
+    }
+    RHI_cmd_present(command_list, &render_state->game_color_buffer);
+
     for(u32 render_group_index = 0;
         render_group_index < render_state->used_render_group_count;
         ++render_group_index)
     {
         render_group_t *render_group = render_state->render_groups + render_group_index;
+        ZeroStruct(*render_group);
 
-        RHI_cmd_renderpass_begin(command_list, render_group->renderpassID);
-
-        RHI_cmd_update_buffer_contents(command_list, render_group->target_geometry_buffer);
-        RHI_cmd_bind_vertex_buffer(command_list, render_group->target_geometry_buffer);
-        RHI_cmd_bind_index_buffer(command_list,  render_group->index_buffer);
-
-        RHI_cmd_set_viewport(command_list, vec2(0, 180), vec2(320, -180));
-        RHI_cmd_set_scissor(command_list,  vec2(0, 0),   vec2(320,  180));
-
-        RHI_pipeline_state_t quad_state = {};
-        quad_state.blend_enabled = true;
-        quad_state.src_alpha_blend_mode = RBM_SrcAlpha;
-        quad_state.dst_alpha_blend_mode = RBM_OneMinusSrcAlpha;
-        RHI_cmd_set_render_state(command_list, &quad_state);
-
-        RHI_cmd_update_constant_buffer(command_list, render_state->camera_matrices_buffer, &gc->game_state->game_camera.matrices, sizeof(mat4_t) * 2);
-
-        RHI_cmd_use_shader_program(command_list, render_group->shader);
-        RHI_cmd_draw_indexed(command_list, (render_group->vertex_count / 4) * 6, 0, 0, 1, 0);
-
-        RHI_cmd_renderpass_end(command_list);
-        render_group->geometry_count = 0;
-        render_group->vertex_count   = 0;
+        render_group->pipeline_state = {};
     }
-
-    RHI_cmd_present(command_list, &render_state->game_color_buffer);
     render_state->used_render_group_count = 0;
 }
 
@@ -590,33 +1003,29 @@ entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags)
 }
 
 internal_api void
-render_collider(game_state_t *game_state, render_state_t *render_state, RHI_command_list_t *command_list, entity_t *entity)
+render_collider(render_group_t *render_group, entity_t *entity)
 {
     vec2_t render_position = entity->bounding_box.min;
+#if 0
     if(game_state->game_mode == GAME_MODE_EDIT_MODE)
     {
         render_position = entity->render_position;
     }
+#endif
 
     vec4_t color = vec4(0.5f, 0.0f, 0.0f, 0.2f);
-    immediate_rect_ex(command_list, 
-                     &render_state->vertex_buffer,
-                      vec2_expand_vec3(render_position, 0.6f),
-                      vec2_multiply(entity->bounding_box.half_size, vec2(2, 2)),
-                      color,
-                      vec2_zero(),
-                      vec2_zero(),
-                      vec2_zero(),
-                      vec2_zero(),
-                      vec2_zero());
+    render_quad(render_group,
+                vec2_expand_vec3(render_position, 0.6f),
+                vec2_multiply(entity->bounding_box.half_size, vec2(2, 2)),
+                color,
+                -1);
 }
 
 internal_api void
-entity_render(render_state_t *render_state, RHI_command_list_t *command_list, entity_t *entity)
+entity_render(render_group_t *render_group, entity_t *entity)
 {
-    texture2D_t *texture = null;
-    vec2_t       uv_min  = vec2_zero();
-    vec2_t       uv_max  = vec2_zero();
+    vec2_t uv_min  = vec2_zero();
+    vec2_t uv_max  = vec2_zero();
 
     if(entity->flags & ENTITY_FLAG_HAS_SPRITE)
     {
@@ -627,14 +1036,11 @@ entity_render(render_state_t *render_state, RHI_command_list_t *command_list, en
             animation2D_t        *current_animation_state = &entity->animations[entity->animation_state];
             animation_source2D_t *animation_data          = &current_animation_state->animation_info;
 
-            texture = &data->atlas->texture;
-
             float32 frame_x = data->offset.x + (animation_data->frame_size.x * animation_data->frame_offset.x) + (animation_data->frame_size.x * current_animation_state->current_frame);
             float32 frame_y = data->offset.y + (animation_data->frame_size.y * animation_data->frame_offset.y);
 
             float32 frame_w = animation_data->frame_size.x;
             float32 frame_h = animation_data->frame_size.y;
-
             if(entity->direction_x > 0)
             {
                 uv_min = vec2(frame_x, frame_y);
@@ -651,30 +1057,28 @@ entity_render(render_state_t *render_state, RHI_command_list_t *command_list, en
             // NOTE(Sleepster): If it's a static entity, then we'll just use the subtexture UVs 
             if(data)
             {
-                texture = &data->atlas->texture;
-                uv_min  =  data->uv_min;
-                uv_max  =  data->uv_max;
+                uv_min = data->uv_min;
+                uv_max = data->uv_max;
             }
             else
             {
-                texture = entity->sprite.texture;
-                uv_min  = vec2(0.0f, 0.0f);
-                uv_max  = vec2(1.0f, 1.0f);
+                uv_min = vec2(0.0f, 0.0f);
+                uv_max = vec2(1.0f, 1.0f);
             }
         }
     }
     
-    immediate_quad_ex(command_list,
-                     &render_state->vertex_buffer, 
-                      vec2_expand_vec3(entity->render_position, 0.8f), 
-                      entity->size, 
-                      vec4(1.0, 1.0, 1.0, 1.0),
-                      uv_min,
-                      uv_max,
-                      vec2_zero(),
-                      vec2_zero(),
-                      vec2_zero(),
-                      texture);
+    vec2_t zero = vec2_zero();
+    render_group_bind_texture(render_group, entity->sprite);
+    render_quad_ex(render_group, 
+                   vec2_expand_vec3(entity->render_position, 0.8f), 
+                   entity->size, 
+                   vec4(1.0, 1.0, 1.0, 1.0),
+                   uv_min,
+                   uv_max,
+                   zero,
+                   zero,
+                   zero);
 }
 
 internal_api void
@@ -836,6 +1240,11 @@ r_init_render_state(render_state_t *render_state)
                                                          sizeof(u32),
                                                          indices, 
                                                          (sizeof(u32) * MAX_RENDER_INDICES));
+    for(render_group_t &render_group: render_state->render_groups)
+    {
+        ZeroStruct(render_group);
+        render_group.pipeline_state = {};
+    }
 }
 
 internal_api void
@@ -1344,13 +1753,129 @@ game_main(global_context_t *_global_context)
         }
         game_state->render_alpha = (float32)(dt_accumulator / gc->tick_rate);
 
-#if 1
-        render_group_t *current_render_group = render_group_begin(render_state, render_state->game_renderpass_ID);
-        current_render_group->shader = immediate_rectangle;
+#if 1 
+        // NOTE(Sleepster): Entity Render Group 
+        {
+            render_group_t *current_render_group = render_group_begin(render_state, render_state->game_renderpass_ID);
+            current_render_group->shader = immediate_textured;
 
-        render_quad(current_render_group, vec3(0, 0, 0.5), vec2(20, 20), vec4_create(1.0));
+            render_group_set_viewport(current_render_group, vec2(0, 180), vec2(320, -180));
+            render_group_set_scissor(current_render_group,  vec2(0, 0),   vec2(320, 180));
 
-        render_group_end(current_render_group, &render_state->vertex_buffer, &render_state->index_buffer);
+            render_group_add_constant_buffer(current_render_group, render_state->camera_matrices_buffer, &game_state->game_camera.matrices, sizeof(game_state->game_camera.matrices));
+            for(u32 chunk_index = 1;
+                chunk_index <= game_state->entity_manager->active_chunk_count;
+                ++chunk_index)
+            {
+                world_chunk_t *active_chunk = game_state->entity_manager->active_chunks + chunk_index;
+                for(u32 entity_index = 0;
+                    entity_index < active_chunk->chunk_entity_count;
+                    ++entity_index)
+                {
+                    entity_t *entity = active_chunk->entities + entity_index;
+                    if((entity->flags & ENTITY_FLAG_IS_VALID) && 
+                       (entity->archetype != ENTITY_ARCHETYPE_COLLIDER))
+                    {
+                        // NOTE(Sleepster): Update the entitie's render position if we are SIMULATING
+                        if(game_state->game_mode == GAME_MODE_NORMAL)
+                        {
+                            entity->render_position = vec2_lerp(entity->last_position, entity->position, game_state->render_alpha);
+                        }
+
+                        entity_render(current_render_group, entity);
+                    }
+                }
+            }
+
+            render_group_end(render_state, current_render_group, &render_state->vertex_buffer, &render_state->index_buffer);
+        }
+        
+        // NOTE(Sleepster): Entity Collider Render Group 
+        {
+            render_group_t *current_render_group = render_group_begin(render_state, render_state->game_renderpass_ID);
+            current_render_group->shader = immediate_rectangle;
+            for(u32 chunk_index = 1;
+                chunk_index <= game_state->entity_manager->active_chunk_count;
+                ++chunk_index)
+            {
+                world_chunk_t *active_chunk = game_state->entity_manager->active_chunks + chunk_index;
+                for(u32 entity_index = 0;
+                    entity_index < active_chunk->chunk_entity_count;
+                    ++entity_index)
+                {
+                    entity_t *entity = active_chunk->entities + entity_index;
+                    render_collider(current_render_group, entity);
+                }
+            }
+
+            for(s32 entity_index = 0;
+                entity_index < game_state->editor->selected_entity_count;
+                ++entity_index)
+            {
+                entity_t *entity = game_state->editor->selected_entities[entity_index];
+                render_quad(current_render_group,
+                            vec2_expand_vec3(entity->editor_position, 0.2),
+                            entity->size,
+                            vec4(0.0, 1.0, 0.0, 0.2),
+                            -1);
+            }
+
+            render_group_end(render_state, current_render_group, &render_state->vertex_buffer, &render_state->index_buffer);
+        }
+
+        if(game_state->game_mode == GAME_MODE_EDIT_MODE)
+        {
+            // NOTE(Sleepster): Edit mode grid 
+            if(game_state->editor->show_grid)
+            {
+                RHI_render_camera_t *scene_camera = &game_state->editor->camera;
+
+                render_group_t *current_render_group = render_group_begin(render_state, render_state->game_renderpass_ID);
+                current_render_group->shader = immediate_rectangle;
+                RHI_pipeline_state_t line_pipeline = {};
+                line_pipeline.blend_enabled  = false;
+                line_pipeline.polygon_mode   = RENDER_PIPELINE_POLYGON_MODE_LINE;
+                line_pipeline.primitive_type = RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST;
+                current_render_group->pipeline_state = line_pipeline;
+
+                float32 half_width  = (scene_camera->viewport.x * 0.5f) * scene_camera->zoom;
+                float32 half_height = (scene_camera->viewport.y * 0.5f) * scene_camera->zoom;
+
+                float32 left   = scene_camera->translation.x - half_width;
+                float32 right  = scene_camera->translation.x + half_width;
+                float32 bottom = scene_camera->translation.y - half_height;
+                float32 top    = scene_camera->translation.y + half_height;
+
+                vec2_t start = world_to_tile(vec2(left,  bottom));
+                vec2_t end   = world_to_tile(vec2(right, top));
+
+                for(s32 tile_x = start.x;
+                    tile_x <= end.x;
+                    ++tile_x)
+                {
+                    float32 current_tile_x = tile_x * WORLD_TILE_SIZE;
+                    render_line(current_render_group, 
+                                vec2(current_tile_x, top),
+                                vec2(current_tile_x, bottom),
+                                0.90,
+                                vec4(0.01, 0.01, 0.1, 1.0f));
+                }
+
+                for(s32 tile_y = start.y;
+                    tile_y < end.y;
+                    ++tile_y)
+                {
+                    float32 current_tile_y = tile_y * WORLD_TILE_SIZE;
+                    render_line(current_render_group, 
+                                vec2(left, current_tile_y),
+                                vec2(right, current_tile_y),
+                                0.90,
+                                vec4(0.01, 0.01, 0.1, 1.0f));
+                }
+
+                render_group_end(render_state, current_render_group, &render_state->vertex_buffer, null);
+            }
+        }
 
         render_groups_to_output(render_state);
 #else
@@ -1394,8 +1919,7 @@ game_main(global_context_t *_global_context)
                         ++tile_x)
                     {
                         float32 current_tile_x = tile_x * WORLD_TILE_SIZE;
-                        immediate_line(command_list, 
-                                       &render_state->vertex_buffer, 
+                        immediate_line(&render_state->vertex_buffer, 
                                        vec2(current_tile_x, top),
                                        vec2(current_tile_x, bottom),
                                        0.90,
@@ -1407,8 +1931,7 @@ game_main(global_context_t *_global_context)
                         ++tile_y)
                     {
                         float32 current_tile_y = tile_y * WORLD_TILE_SIZE;
-                        immediate_line(command_list, 
-                                       &render_state->vertex_buffer, 
+                        immediate_line(&render_state->vertex_buffer, 
                                        vec2(left, current_tile_y),
                                        vec2(right, current_tile_y),
                                        0.90,
@@ -1427,29 +1950,25 @@ game_main(global_context_t *_global_context)
                     float32 bottom = game_state->game_camera.translation.y - half_height;
                     float32 top    = game_state->game_camera.translation.y + half_height;
 
-                    immediate_line(command_list,
-                                  &render_state->vertex_buffer,
+                    immediate_line(&render_state->vertex_buffer,
                                    vec2(left,  bottom),
                                    vec2(left, top),
                                    0.0,
                                    vec4(1.0f, 1.0, 1.0f, 1.0f));
 
-                    immediate_line(command_list,
-                                  &render_state->vertex_buffer,
+                    immediate_line(&render_state->vertex_buffer,
                                    vec2(left,  top),
                                    vec2(right, top),
                                    0.0,
                                    vec4(1.0f, 1.0, 1.0f, 1.0f));
 
-                    immediate_line(command_list,
-                                  &render_state->vertex_buffer,
+                    immediate_line(&render_state->vertex_buffer,
                                    vec2(right, top),
                                    vec2(right, bottom),
                                    0.0,
                                    vec4(1.0f, 1.0, 1.0f, 1.0f));
 
-                    immediate_line(command_list,
-                                  &render_state->vertex_buffer,
+                    immediate_line(&render_state->vertex_buffer,
                                    vec2(right, bottom),
                                    vec2(left,  bottom),
                                    0.0,
@@ -1549,7 +2068,7 @@ game_main(global_context_t *_global_context)
                         ++entity_index)
                     {
                         entity_t *entity = active_chunk->entities + entity_index;
-                        render_collider(game_state, render_state, command_list, entity);
+                        render_collider(game_state, render_state, entity);
                     }
                 }
 
@@ -1558,10 +2077,10 @@ game_main(global_context_t *_global_context)
                     ++entity_index)
                 {
                     entity_t *entity = game_state->editor->selected_entities[entity_index];
-                    immediate_rect(command_list, &render_state->vertex_buffer, vec2_expand_vec3(entity->editor_position, 0.2), entity->size, vec4(0.0, 1.0, 0.0, 0.2));
+                    immediate_rect(&render_state->vertex_buffer, vec2_expand_vec3(entity->editor_position, 0.2), entity->size, vec4(0.0, 1.0, 0.0, 0.2));
                 }
 
-                immediate_rect(command_list, &render_state->vertex_buffer, vec3(0, 0, 0.4), vec2(8, 8), vec4(0.0, 1.0f, 0.0f, 1.0f));
+                immediate_rect(&render_state->vertex_buffer, vec3(0, 0, 0.4), vec2(8, 8), vec4(0.0, 1.0f, 0.0f, 1.0f));
 
                 RHI_cmd_update_buffer_contents(command_list, &render_state->vertex_buffer);
 
@@ -1642,7 +2161,7 @@ game_main(global_context_t *_global_context)
         s_asset_manager_update(asset_manager);
         c_global_context_reset_temp_arena();
         c_arena_reset(&game_state->entity_manager->transient_storage);
-
+        c_free_tagged_allocations(ALLOCATOR_TAG_TEMP);
 #ifndef RELEASE
         file_data_t file_data = c_file_get_file_system_info(gc->game_dll_path);
         if(file_data.last_modtime != gc->game_dll_data.last_modtime)

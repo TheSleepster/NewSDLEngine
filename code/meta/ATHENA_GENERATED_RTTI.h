@@ -642,6 +642,7 @@
 	X(TYPE_RHI_cmd_blit_image) \
 	X(TYPE_RHI_cmd_blit_renderpass) \
 	X(TYPE_RHI_cmd_present) \
+	X(TYPE_RHI_cmd_bind_vertex_buffers) \
 	X(TYPE_RHI_execute_backend_commands) \
 	X(TYPE_matrices) \
 	X(TYPE_backend_buffer_t) \
@@ -722,6 +723,7 @@
 	X(TYPE_immediate_vertex_t) \
 	X(TYPE_immediate_put_data) \
 	X(TYPE_immediate_quad_ex) \
+	X(TYPE_immediate_texture_ex) \
 	X(TYPE_immediate_rect_ex) \
 	X(TYPE_immediate_rect) \
 	X(TYPE_immediate_text) \
@@ -4881,9 +4883,10 @@ struct type_info_struct_RHI_command_bind_vertex_buffer_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[1];
+		const type_info_member_t member_array[2];
 		struct {
-			const type_info_member_t vertex_buffer;
+			const type_info_member_t vertex_buffers;
+			const type_info_member_t vertex_buffer_count;
 		}members;
 	};
 };
@@ -5890,6 +5893,21 @@ struct type_info_procedure_RHI_cmd_present {
 	};
 };
 
+struct type_info_procedure_RHI_cmd_bind_vertex_buffers {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[3];
+		struct {
+			const type_info_member_t command_list;
+			const type_info_member_t vertex_buffers;
+			const type_info_member_t vertex_buffer_count;
+		}arguments;
+	};
+};
+
 struct type_info_procedure_RHI_execute_backend_commands {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -6838,6 +6856,27 @@ struct type_info_procedure_immediate_quad_ex {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
+		type_info_member_t argument_array[9];
+		struct {
+			const type_info_member_t buffer;
+			const type_info_member_t position;
+			const type_info_member_t render_size;
+			const type_info_member_t render_color;
+			const type_info_member_t uv_min;
+			const type_info_member_t uv_max;
+			const type_info_member_t padding;
+			const type_info_member_t sdf_info;
+			const type_info_member_t padding0;
+		}arguments;
+	};
+};
+
+struct type_info_procedure_immediate_texture_ex {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
 		type_info_member_t argument_array[11];
 		struct {
 			const type_info_member_t command_list;
@@ -6861,9 +6900,8 @@ struct type_info_procedure_immediate_rect_ex {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[10];
+		type_info_member_t argument_array[9];
 		struct {
-			const type_info_member_t command_list;
 			const type_info_member_t buffer;
 			const type_info_member_t position;
 			const type_info_member_t render_size;
@@ -6883,9 +6921,8 @@ struct type_info_procedure_immediate_rect {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[5];
+		type_info_member_t argument_array[4];
 		struct {
-			const type_info_member_t command_list;
 			const type_info_member_t vertex_buffer;
 			const type_info_member_t position;
 			const type_info_member_t render_size;
@@ -6921,9 +6958,8 @@ struct type_info_procedure_immediate_line {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[6];
+		type_info_member_t argument_array[5];
 		struct {
-			const type_info_member_t command_list;
 			const type_info_member_t vertex_buffer;
 			const type_info_member_t start;
 			const type_info_member_t end;
@@ -8312,6 +8348,7 @@ extern const type_info_procedure_RHI_cmd_dispatch_compute DEFAULT_typedata_proce
 extern const type_info_procedure_RHI_cmd_blit_image DEFAULT_typedata_procedure_RHI_cmd_blit_image;
 extern const type_info_procedure_RHI_cmd_blit_renderpass DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass;
 extern const type_info_procedure_RHI_cmd_present DEFAULT_typedata_procedure_RHI_cmd_present;
+extern const type_info_procedure_RHI_cmd_bind_vertex_buffers DEFAULT_typedata_procedure_RHI_cmd_bind_vertex_buffers;
 extern const type_info_procedure_RHI_execute_backend_commands DEFAULT_typedata_procedure_RHI_execute_backend_commands;
 extern const type_info_t DEFAULT_typedata_backend_buffer_t;
 extern const type_info_t DEFAULT_typedata_ivec4_t;
@@ -8391,6 +8428,7 @@ extern const type_info_t DEFAULT_typedata_string_builder_buffer;
 extern const type_info_t DEFAULT_typedata_immediate_vertex_t;
 extern const type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data;
 extern const type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immediate_quad_ex;
+extern const type_info_procedure_immediate_texture_ex DEFAULT_typedata_procedure_immediate_texture_ex;
 extern const type_info_procedure_immediate_rect_ex DEFAULT_typedata_procedure_immediate_rect_ex;
 extern const type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediate_rect;
 extern const type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediate_text;
@@ -20481,16 +20519,24 @@ constexpr type_info_struct_RHI_command_bind_vertex_buffer_t DEFAULT_typedata_str
 		.type_id = TYPE_RHI_command_bind_vertex_buffer_t,
 		.size = athena_internal::safe_sizeof<RHI_command_bind_vertex_buffer_t>(),
 	},
-	.member_count   = 1,
+	.member_count   = 2,
 	.member_pointer = DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.member_array,
 	.members = {
-		.vertex_buffer = {
+		.vertex_buffers = {
 			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
-			.member_name   = "vertex_buffer",
+			.member_name   = "vertex_buffers",
 			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.type_info,
-			.offset        = offsetof(RHI_command_bind_vertex_buffer_t, vertex_buffer),
+			.offset        = offsetof(RHI_command_bind_vertex_buffer_t, vertex_buffers),
 			.flags         = 2,
 			.pointer_depth = 1,
+		},
+		.vertex_buffer_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_buffer_count",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.type_info,
+			.offset        = offsetof(RHI_command_bind_vertex_buffer_t, vertex_buffer_count),
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 	},
 };
@@ -22814,6 +22860,39 @@ constexpr type_info_procedure_RHI_cmd_present DEFAULT_typedata_procedure_RHI_cmd
 		},
 	},
 };
+constexpr type_info_procedure_RHI_cmd_bind_vertex_buffers DEFAULT_typedata_procedure_RHI_cmd_bind_vertex_buffers = {
+	.type_info = {
+		.type_name = "RHI_cmd_bind_vertex_buffers",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_RHI_cmd_bind_vertex_buffers,
+	},
+	.argument_count = 3,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_RHI_cmd_bind_vertex_buffers.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_vertex_buffers.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.vertex_buffers = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.member_name   = "vertex_buffers",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_vertex_buffers.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.vertex_buffer_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_buffer_count",
+			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_vertex_buffers.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
 constexpr type_info_procedure_RHI_execute_backend_commands DEFAULT_typedata_procedure_RHI_execute_backend_commands = {
 	.type_info = {
 		.type_name = "RHI_execute_backend_commands",
@@ -24687,17 +24766,10 @@ constexpr type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immed
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_immediate_quad_ex,
 	},
-	.argument_count = 11,
+	.argument_count = 9,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_quad_ex.argument_array,
 	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
 		.buffer = {
 			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 			.member_name   = "buffer",
@@ -24761,10 +24833,92 @@ constexpr type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immed
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
+	},
+};
+constexpr type_info_procedure_immediate_texture_ex DEFAULT_typedata_procedure_immediate_texture_ex = {
+	.type_info = {
+		.type_name = "immediate_texture_ex",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_immediate_texture_ex,
+	},
+	.argument_count = 11,
+	.return_type    = &DEFAULT_typedata_void,
+	.argument_pointer = DEFAULT_typedata_procedure_immediate_texture_ex.argument_array,
+	.arguments = {
+		.command_list = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.member_name   = "command_list",
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.position = {
+			.type_info     = &DEFAULT_typedata_vec3_t,
+			.member_name   = "position",
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.render_size = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "render_size",
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.render_color = {
+			.type_info     = &DEFAULT_typedata_vec4_t,
+			.member_name   = "render_color",
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.uv_min = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "uv_min",
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.uv_max = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "uv_max",
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.padding = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "padding",
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.sdf_info = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "sdf_info",
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.padding0 = {
+			.type_info     = &DEFAULT_typedata_vec2_t,
+			.member_name   = "padding0",
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
 		.texture = {
 			.type_info     = &DEFAULT_typedata_structure_texture2D_t.type_info,
 			.member_name   = "texture",
-			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+			.parent        = &DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
@@ -24776,17 +24930,10 @@ constexpr type_info_procedure_immediate_rect_ex DEFAULT_typedata_procedure_immed
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_immediate_rect_ex,
 	},
-	.argument_count = 10,
+	.argument_count = 9,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect_ex.argument_array,
 	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
 		.buffer = {
 			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 			.member_name   = "buffer",
@@ -24858,17 +25005,10 @@ constexpr type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediat
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_immediate_rect,
 	},
-	.argument_count = 5,
+	.argument_count = 4,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect.argument_array,
 	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
 		.vertex_buffer = {
 			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 			.member_name   = "vertex_buffer",
@@ -24980,17 +25120,10 @@ constexpr type_info_procedure_immediate_line DEFAULT_typedata_procedure_immediat
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_immediate_line,
 	},
-	.argument_count = 6,
+	.argument_count = 5,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_line.argument_array,
 	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.member_name   = "command_list",
-			.parent        = &DEFAULT_typedata_procedure_immediate_line.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
 		.vertex_buffer = {
 			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
 			.member_name   = "vertex_buffer",
@@ -28053,6 +28186,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_RHI_cmd_blit_image.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_blit_renderpass.type_info,
 	&DEFAULT_typedata_procedure_RHI_cmd_present.type_info,
+	&DEFAULT_typedata_procedure_RHI_cmd_bind_vertex_buffers.type_info,
 	&DEFAULT_typedata_procedure_RHI_execute_backend_commands.type_info,
 	&DEFAULT_typedata_structure_bitmap_format_t.type_info,
 	&DEFAULT_typedata_procedure_backend_initialize.type_info,
@@ -28122,6 +28256,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_string_builder_flush_to_file.type_info,
 	&DEFAULT_typedata_procedure_immediate_put_data.type_info,
 	&DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
+	&DEFAULT_typedata_procedure_immediate_texture_ex.type_info,
 	&DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
 	&DEFAULT_typedata_procedure_immediate_rect.type_info,
 	&DEFAULT_typedata_procedure_immediate_text.type_info,
@@ -29064,7 +29199,8 @@ enum class RHI_command_clear_image_t {
 	clear_value,
 }; // RHI_command_clear_image_t
 enum class RHI_command_bind_vertex_buffer_t {
-	vertex_buffer,
+	vertex_buffers,
+	vertex_buffer_count,
 }; // RHI_command_bind_vertex_buffer_t
 enum class RHI_command_bind_index_buffer_t {
 	index_buffer,
@@ -30303,6 +30439,11 @@ enum class RHI_cmd_present {
 	command_list,
 	presentation_source,
 }; // RHI_cmd_present
+enum class RHI_cmd_bind_vertex_buffers {
+	command_list,
+	vertex_buffers,
+	vertex_buffer_count,
+}; // RHI_cmd_bind_vertex_buffers
 enum class RHI_execute_backend_commands {
 	RHI_context,
 }; // RHI_execute_backend_commands
@@ -30539,6 +30680,17 @@ enum class immediate_put_data {
 	element_count,
 }; // immediate_put_data
 enum class immediate_quad_ex {
+	buffer,
+	position,
+	render_size,
+	render_color,
+	uv_min,
+	uv_max,
+	padding,
+	sdf_info,
+	padding0,
+}; // immediate_quad_ex
+enum class immediate_texture_ex {
 	command_list,
 	buffer,
 	position,
@@ -30550,9 +30702,8 @@ enum class immediate_quad_ex {
 	sdf_info,
 	padding0,
 	texture,
-}; // immediate_quad_ex
+}; // immediate_texture_ex
 enum class immediate_rect_ex {
-	command_list,
 	buffer,
 	position,
 	render_size,
@@ -30564,7 +30715,6 @@ enum class immediate_rect_ex {
 	padding0,
 }; // immediate_rect_ex
 enum class immediate_rect {
-	command_list,
 	vertex_buffer,
 	position,
 	render_size,
@@ -30582,7 +30732,6 @@ enum class immediate_text {
 	font_size,
 }; // immediate_text
 enum class immediate_line {
-	command_list,
 	vertex_buffer,
 	start,
 	end,

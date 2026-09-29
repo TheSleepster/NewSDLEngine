@@ -1446,8 +1446,9 @@ s_texture_atlas_create(asset_manager_t *asset_manager,
     c_dynarray_reserve(&atlas->textures_to_merge, initial_subtexture_count);
     c_dynarray_reserve(&atlas->packed_subtextures, initial_subtexture_count);
 
-    atlas->ID       = registry->current_atlas_count - 1;
-    atlas->is_valid = true;
+    atlas->ID         = registry->current_atlas_count - 1;
+    atlas->texture.ID = atlas->ID;
+    atlas->is_valid   = true;
 
     return(atlas);
 }

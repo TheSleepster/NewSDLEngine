@@ -23,8 +23,7 @@ QUADS
 */
 
 ENGINE_API void
-immediate_quad_ex(RHI_command_list_t  *command_list,
-                  RHI_vertex_buffer_t *buffer,
+immediate_quad_ex(RHI_vertex_buffer_t *buffer,
                   vec3_t               position,
                   vec2_t               render_size,
                   vec4_t               render_color,
@@ -32,8 +31,7 @@ immediate_quad_ex(RHI_command_list_t  *command_list,
                   vec2_t               uv_max,
                   vec2_t               padding,
                   vec2_t               sdf_info,
-                  vec2_t               padding0,
-                  texture2D_t         *texture)
+                  vec2_t               padding0)
 {
     immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)buffer->vertex_data + buffer->vertex_count);
     Expect(vertex_pointer, "The vertex buffer pointer is invalid...");
@@ -72,15 +70,7 @@ immediate_quad_ex(RHI_command_list_t  *command_list,
     bottom_right->vSDFInfo = sdf_info;
     top_left->vSDFInfo     = sdf_info;
     top_right->vSDFInfo    = sdf_info;
-    if(texture)
-    {
-        if(RHI_is_texture_bound(command_list, texture) == -1)
-        {
-            RHI_cmd_bind_texture_image(command_list, texture);
-        }
-    }
 
-    // NOTE(Sleepster): We Let you set the UVs even without a texture 
     float32 tbottom = uv_max.y;
     float32 ttop    = uv_min.y;
     float32 tleft   = uv_min.x;
@@ -95,8 +85,39 @@ immediate_quad_ex(RHI_command_list_t  *command_list,
 }
 
 ENGINE_API void
-immediate_rect_ex(RHI_command_list_t  *command_list,
-                  RHI_vertex_buffer_t *buffer,
+immediate_texture_ex(RHI_command_list_t  *command_list, 
+                     RHI_vertex_buffer_t *buffer, 
+                     vec3_t               position,
+                     vec2_t               render_size,
+                     vec4_t               render_color,
+                     vec2_t               uv_min,
+                     vec2_t               uv_max,
+                     vec2_t               padding,
+                     vec2_t               sdf_info,
+                     vec2_t               padding0,
+                     texture2D_t         *texture)
+{
+    if(texture)
+    {
+        if(RHI_is_texture_bound(command_list, texture) == -1)
+        {
+            RHI_cmd_bind_texture_image(command_list, texture);
+        }
+    }
+
+    immediate_quad_ex(buffer, 
+                      position, 
+                      render_size, 
+                      render_color, 
+                      uv_min, 
+                      uv_max, 
+                      padding, 
+                      sdf_info, 
+                      padding0);
+}
+
+ENGINE_API void
+immediate_rect_ex(RHI_vertex_buffer_t *buffer,
                   vec3_t               position,
                   vec2_t               render_size,
                   vec4_t               render_color,
@@ -106,8 +127,7 @@ immediate_rect_ex(RHI_command_list_t  *command_list,
                   vec2_t               sdf_info,
                   vec2_t               padding0)
 {
-    immediate_quad_ex(command_list, 
-                      buffer,
+    immediate_quad_ex(buffer,
                       position, 
                       render_size, 
                       render_color,
@@ -115,20 +135,17 @@ immediate_rect_ex(RHI_command_list_t  *command_list,
                       uv_max,
                       padding,
                       sdf_info,
-                      padding0,
-                      null);
+                      padding0);
 }
 
 ENGINE_API void
-immediate_rect(RHI_command_list_t  *command_list,
-               RHI_vertex_buffer_t *buffer,
+immediate_rect(RHI_vertex_buffer_t *buffer,
                vec3_t               position,
                vec2_t               render_size,
                vec4_t               render_color)
 {
     vec2_t zero = vec2_zero();
-    immediate_quad_ex(command_list, 
-                      buffer,
+    immediate_quad_ex(buffer,
                       position, 
                       render_size, 
                       render_color,
@@ -136,8 +153,7 @@ immediate_rect(RHI_command_list_t  *command_list,
                       zero,
                       zero,
                       zero,
-                      zero,
-                      null);
+                      zero);
 }
 
 ENGINE_API void
@@ -190,17 +206,17 @@ immediate_text(RHI_command_list_t    *command_list,
                 if(metrics->is_valid)
                 {
                     s32 texture_index = RHI_is_texture_bound(command_list, &metrics->owner_atlas->texture);
-                    immediate_quad_ex(command_list,
-                                      vertex_buffer,
-                                      vec2_expand_vec3(vec2_subtract(render_position, vec2(0, metrics->offset_y)), position.z),
-                                      vec2(metrics->width, metrics->height),
-                                      text_color,
-                                      metrics->atlas_offset,
-                                      vec2_add(metrics->atlas_offset, metrics->atlas_size),
-                                      vec2(settings, texture_index),
-                                      vec2_zero(),
-                                      vec2_zero(),
-                                      &metrics->owner_atlas->texture);
+                    immediate_texture_ex(command_list,
+                                         vertex_buffer,
+                                         vec2_expand_vec3(vec2_subtract(render_position, vec2(0, metrics->offset_y)), position.z),
+                                         vec2(metrics->width, metrics->height),
+                                         text_color,
+                                         metrics->atlas_offset,
+                                         vec2_add(metrics->atlas_offset, metrics->atlas_size),
+                                         vec2(settings, texture_index),
+                                         vec2_zero(),
+                                         vec2_zero(),
+                                        &metrics->owner_atlas->texture);
 
                     render_position.x += metrics->advance;
                 }
@@ -220,17 +236,12 @@ LINES
 */
 
 ENGINE_API void
-immediate_line(RHI_command_list_t    *command_list,
-               RHI_vertex_buffer_t   *vertex_buffer,
+immediate_line(RHI_vertex_buffer_t   *vertex_buffer,
                vec2_t                 start,
                vec2_t                 end,
                float32                depth,
                vec4_t                 render_color)
 {
-    // NOTE(Sleepster): Although we don't use this, it's better to keep it here for
-    // consistency
-    (void)command_list;
-
     immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)vertex_buffer->vertex_data + vertex_buffer->vertex_count);
     Expect(vertex_pointer, "The vertex buffer pointer is invalid...");
 

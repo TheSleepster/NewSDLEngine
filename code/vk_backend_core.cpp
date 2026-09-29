@@ -2350,8 +2350,8 @@ vk_backend_commit_descriptor_data(vulkan_context_t   *vulkan_context,
         };
 
         vkAssert(vkAllocateDescriptorSets(vulkan_context->device, 
-                                          &info, 
-                                          &vulkan_context->descriptor_sets[vulkan_context->current_frame_index][vulkan_context->descriptor_count]));
+                                         &info, 
+                                         &vulkan_context->descriptor_sets[vulkan_context->current_frame_index][vulkan_context->descriptor_count]));
         VkDescriptorSet descriptor_set = vulkan_context->descriptor_sets[vulkan_context->current_frame_index][vulkan_context->descriptor_count]; 
         ++vulkan_context->descriptor_count;
 
@@ -2365,7 +2365,6 @@ vk_backend_commit_descriptor_data(vulkan_context_t   *vulkan_context,
         VkDescriptorImageInfo  image_infos[MAX_DESCRIPTOR_SET_WRITES]  = {};
 
         vulkan_buffer_t *current_uniform_buffer = &vulkan_context->shader_uniform_buffers[vulkan_context->current_frame_index];
-
         for(u32 binding_index = 0;
             binding_index < shader->binding_count;
             ++binding_index)
@@ -2376,13 +2375,14 @@ vk_backend_commit_descriptor_data(vulkan_context_t   *vulkan_context,
                 case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
                 case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
                 {
-                    VkWriteDescriptorSet   *write       = writes + write_count++;
-                    VkDescriptorBufferInfo *buffer_info = buffer_infos + buffer_count++;
-
                     // TODO(Sleepster):  is_dirty... only update if we need too...
                     //
                     // ALSO DON'T DO THIS WITH THE HASH TABLE!!!
                     RHI_uniform_constant_buffer_t *constant_buffer = &(RHI_context->constant_buffer_hash.items + binding->buffer_hash_index)->item;
+
+                    VkWriteDescriptorSet   *write       = writes + write_count++;
+                    VkDescriptorBufferInfo *buffer_info = buffer_infos + buffer_count++;
+
                     buffer_info->buffer = current_uniform_buffer->handle;
                     buffer_info->offset = constant_buffer->offset;
                     buffer_info->range  = constant_buffer->size;
@@ -2556,6 +2556,8 @@ command_list_reset_state(RHI_command_list_t *command_list)
     command_list->active_scissor_command  = null;
     command_list->active_viewport_command = null;
     command_list->active_shader_program   = null;
+
+    c_arena_reset(&command_list->command_arena);
 }
 
 /*
@@ -2873,9 +2875,14 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                     case RHI_RENDER_COMMAND_TYPE_BIND_VERTEX_BUFFER:
                     {
                         RHI_command_bind_vertex_buffer_t *cmd = (RHI_command_bind_vertex_buffer_t*)command->data;
-
-                        c_dynarray_add(&command_list->active_vertex_buffers, &cmd->vertex_buffer);
-                        ++command_list->vertex_buffer_count;
+                        for(u32 buffer_index = 0;
+                            buffer_index < cmd->vertex_buffer_count;
+                            ++buffer_index)
+                        {
+                            RHI_vertex_buffer_t *buffer = cmd->vertex_buffers + buffer_index;
+                            c_dynarray_add(&command_list->active_vertex_buffers, &buffer);
+                            ++command_list->vertex_buffer_count;
+                        }
                     }break;
                     case RHI_RENDER_COMMAND_TYPE_BIND_INDEX_BUFFER:
                     {
@@ -3038,8 +3045,6 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                     {
                         Assert(command_list->active_vertex_buffers.items);
                         Assert(command_list->active_shader_program);
-                        Assert(command_list->active_viewport_command);
-                        Assert(command_list->active_scissor_command);
                         RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
 
                         vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
@@ -3076,8 +3081,6 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                         Assert(command_list->active_vertex_buffers.items);
                         Assert(command_list->active_index_buffer);
                         Assert(command_list->active_shader_program);
-                        Assert(command_list->active_viewport_command);
-                        Assert(command_list->active_scissor_command);
                         RHI_command_draw_t *cmd = (RHI_command_draw_t*)command->data;
 
                         vk_backend_bind_command_list_vertex_buffers(&render_command_buffer, command_list);
@@ -3132,8 +3135,6 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                     }break;
                 }
             }
-
-            command_list_reset_state(command_list);
         }
 
         if(RHI_context->present_command)
@@ -3175,6 +3176,16 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                                   source_range,
                                   destination_range);
         }
+
+        // NOTE(Sleepster): Reset the command list state 
+        for(u32 command_list_index = 0;
+            command_list_index < RHI_context->command_list_count;
+            ++command_list_index)
+        {
+            RHI_command_list_t *command_list = RHI_context->command_lists + command_list_index;
+            command_list_reset_state(command_list);
+        }
+
         RHI_context->command_list_count = 0;
         RHI_context->present_command    = null;
 
