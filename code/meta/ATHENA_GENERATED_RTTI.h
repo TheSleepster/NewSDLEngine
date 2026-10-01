@@ -138,17 +138,16 @@
 	X(ui_keyboard_flags_t, &DEFAULT_typedata_structure_ui_keyboard_flags_t.type_info) \
 	X(ui_state_t, &DEFAULT_typedata_structure_ui_state_t.type_info) \
 	X(asset_manager_t, &DEFAULT_typedata_structure_asset_manager_t.type_info) \
-	X(RHI_command_list_t, &DEFAULT_typedata_structure_RHI_command_list_t.type_info) \
 	X(vec4_t, &DEFAULT_typedata_vec4_t) \
 	X(vec3_t, &DEFAULT_typedata_vec3_t) \
 	X(immediate_widget_data_t, &DEFAULT_typedata_immediate_widget_data_t) \
+	X(render_state_t, &DEFAULT_typedata_render_state_t) \
 	X(camera_matrices_t, &DEFAULT_typedata_structure_camera_matrices_t.type_info) \
 	X(RHI_vertex_buffer_t, &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info) \
 	X(RHI_index_buffer_t, &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info) \
 	X(RHI_uniform_constant_buffer_t, &DEFAULT_typedata_structure_RHI_uniform_constant_buffer_t.type_info) \
 	X(global_context_t, &DEFAULT_typedata_structure_global_context_t.type_info) \
 	X(game_state_t, &DEFAULT_typedata_game_state_t) \
-	X(render_state_t, &DEFAULT_typedata_render_state_t) \
 	X(memory_arena_footer_t, &DEFAULT_typedata_structure_memory_arena_footer_t.type_info) \
 	X(scratch_arena_t, &DEFAULT_typedata_structure_scratch_arena_t.type_info) \
 	X(RHI_render_camera_t, &DEFAULT_typedata_structure_RHI_render_camera_t.type_info) \
@@ -184,6 +183,7 @@
 	X(RHI_command_present_frame_t, &DEFAULT_typedata_structure_RHI_command_present_frame_t.type_info) \
 	X(RHI_command_t, &DEFAULT_typedata_structure_RHI_command_t.type_info) \
 	X(RHI_command_list_type_t, &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info) \
+	X(RHI_command_list_t, &DEFAULT_typedata_structure_RHI_command_list_t.type_info) \
 	X(RHI_renderpass_attachment_access_t, &DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info) \
 	X(RHI_renderpass_attachment_load_operation_t, &DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info) \
 	X(RHI_renderpass_attachment_store_operation_t, &DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info) \
@@ -206,6 +206,7 @@
 	X(string_builder_t, &DEFAULT_typedata_structure_string_builder_t.type_info) \
 	X(string_builder_buffer, &DEFAULT_typedata_string_builder_buffer) \
 	X(immediate_vertex_t, &DEFAULT_typedata_immediate_vertex_t) \
+	X(render_group_t, &DEFAULT_typedata_render_group_t) \
 	X(duration_counter_t, &DEFAULT_typedata_structure_duration_counter_t.type_info) \
 	X(asset_type_t, &DEFAULT_typedata_structure_asset_type_t.type_info) \
 	X(asset_slot_load_status_t, &DEFAULT_typedata_structure_asset_slot_load_status_t.type_info) \
@@ -495,7 +496,6 @@
 	X(TYPE_ui_state_init) \
 	X(TYPE_ui_state_poll_input_events) \
 	X(TYPE_ui_state_begin_frame) \
-	X(TYPE_RHI_command_list_t) \
 	X(TYPE_ui_state_end_frame) \
 	X(TYPE_ui_state_update_widget_state) \
 	X(TYPE_ui_state_render_widgets) \
@@ -534,6 +534,7 @@
 	X(TYPE_immediate_widget_data_t) \
 	X(TYPE_array_t) \
 	X(TYPE_hash_table_t) \
+	X(TYPE_render_state_t) \
 	X(TYPE_camera_matrices_t) \
 	X(TYPE_RHI_vertex_buffer_t) \
 	X(TYPE_RHI_index_buffer_t) \
@@ -545,7 +546,6 @@
 	X(TYPE_c_global_context_reset_persistent_arena) \
 	X(TYPE_c_global_context_reset_simulation_arena) \
 	X(TYPE_game_state_t) \
-	X(TYPE_render_state_t) \
 	X(TYPE_memory_arena_footer_t) \
 	X(TYPE_scratch_arena_t) \
 	X(TYPE_c_arena_create) \
@@ -590,6 +590,7 @@
 	X(TYPE_RHI_command_present_frame_t) \
 	X(TYPE_RHI_command_t) \
 	X(TYPE_RHI_command_list_type_t) \
+	X(TYPE_RHI_command_list_t) \
 	X(TYPE_RHI_renderpass_attachment_access_t) \
 	X(TYPE_RHI_renderpass_attachment_load_operation_t) \
 	X(TYPE_RHI_renderpass_attachment_store_operation_t) \
@@ -726,6 +727,7 @@
 	X(TYPE_immediate_texture_ex) \
 	X(TYPE_immediate_rect_ex) \
 	X(TYPE_immediate_rect) \
+	X(TYPE_render_group_t) \
 	X(TYPE_immediate_text) \
 	X(TYPE_immediate_line) \
 	X(TYPE_duration_counter_t) \
@@ -3724,7 +3726,7 @@ struct type_info_struct_ui_state_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[51];
+		const type_info_member_t member_array[52];
 		struct {
 			const type_info_member_t widget_arena;
 			const type_info_member_t polling_arena;
@@ -3746,6 +3748,7 @@ struct type_info_struct_ui_state_t {
 			const type_info_member_t mouse_delta;
 			const type_info_member_t persistent_data_arena;
 			const type_info_member_t widget_states;
+			const type_info_member_t render_state;
 			const type_info_member_t RHI_context;
 			const type_info_member_t asset_manager;
 			const type_info_member_t input_manager;
@@ -3855,52 +3858,15 @@ struct type_info_procedure_ui_state_begin_frame {
 	};
 };
 
-struct type_info_struct_RHI_command_list_t {
-	const type_info_t  type_info;
-	const unsigned int member_count;
-	const type_info_member_t *member_pointer;
-	union {
-		const type_info_member_t member_array[25];
-		struct {
-			const type_info_member_t is_initialized;
-			const type_info_member_t RHI_context;
-			const type_info_member_t transient_arena;
-			const type_info_member_t command_arena;
-			const type_info_member_t commands;
-			const type_info_member_t command_count;
-			const type_info_member_t draw_instance_command_count;
-			const type_info_member_t bind_shader_command_count;
-			const type_info_member_t bind_render_target_command_count;
-			const type_info_member_t bind_material_command_count;
-			const type_info_member_t active_render_state;
-			const type_info_member_t active_vertex_buffers;
-			const type_info_member_t vertex_buffer_count;
-			const type_info_member_t active_index_buffer;
-			const type_info_member_t active_scissor_command;
-			const type_info_member_t active_viewport_command;
-			const type_info_member_t active_shader_program;
-			const type_info_member_t active_renderpass;
-			const type_info_member_t presenting;
-			const type_info_member_t image_shader_params;
-			const type_info_member_t image_count;
-			const type_info_member_t image_ids_to_bind;
-			const type_info_member_t bound_image_count;
-			const type_info_member_t command_list_type;
-			const type_info_member_t backend_command_buffer;
-		}members;
-	};
-};
-
 struct type_info_procedure_ui_state_end_frame {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[2];
+		type_info_member_t argument_array[1];
 		struct {
 			const type_info_member_t ui_state;
-			const type_info_member_t command_list;
 		}arguments;
 	};
 };
@@ -3924,10 +3890,9 @@ struct type_info_procedure_ui_state_render_widgets {
 	const type_info_t *return_type;
 	const type_info_member_t *argument_pointer;
 	union {
-		type_info_member_t argument_array[2];
+		type_info_member_t argument_array[1];
 		struct {
 			const type_info_member_t ui_state;
-			const type_info_member_t command_list;
 		}arguments;
 	};
 };
@@ -5146,6 +5111,42 @@ struct type_info_struct_RHI_command_list_type_t {
 		struct {
 			const type_info_member_t RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS;
 			const type_info_member_t RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE;
+		}members;
+	};
+};
+
+struct type_info_struct_RHI_command_list_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[25];
+		struct {
+			const type_info_member_t is_initialized;
+			const type_info_member_t RHI_context;
+			const type_info_member_t transient_arena;
+			const type_info_member_t command_arena;
+			const type_info_member_t commands;
+			const type_info_member_t command_count;
+			const type_info_member_t draw_instance_command_count;
+			const type_info_member_t bind_shader_command_count;
+			const type_info_member_t bind_render_target_command_count;
+			const type_info_member_t bind_material_command_count;
+			const type_info_member_t active_render_state;
+			const type_info_member_t active_vertex_buffers;
+			const type_info_member_t vertex_buffer_count;
+			const type_info_member_t active_index_buffer;
+			const type_info_member_t active_scissor_command;
+			const type_info_member_t active_viewport_command;
+			const type_info_member_t active_shader_program;
+			const type_info_member_t active_renderpass;
+			const type_info_member_t presenting;
+			const type_info_member_t image_shader_params;
+			const type_info_member_t image_count;
+			const type_info_member_t image_ids_to_bind;
+			const type_info_member_t bound_image_count;
+			const type_info_member_t command_list_type;
+			const type_info_member_t backend_command_buffer;
 		}members;
 	};
 };
@@ -6842,7 +6843,7 @@ struct type_info_procedure_immediate_put_data {
 	union {
 		type_info_member_t argument_array[4];
 		struct {
-			const type_info_member_t buffer;
+			const type_info_member_t vertex_buffer_data;
 			const type_info_member_t data;
 			const type_info_member_t element_size;
 			const type_info_member_t element_count;
@@ -6858,7 +6859,7 @@ struct type_info_procedure_immediate_quad_ex {
 	union {
 		type_info_member_t argument_array[9];
 		struct {
-			const type_info_member_t buffer;
+			const type_info_member_t vertex_buffer_data;
 			const type_info_member_t position;
 			const type_info_member_t render_size;
 			const type_info_member_t render_color;
@@ -6902,7 +6903,7 @@ struct type_info_procedure_immediate_rect_ex {
 	union {
 		type_info_member_t argument_array[9];
 		struct {
-			const type_info_member_t buffer;
+			const type_info_member_t vertex_buffer_data;
 			const type_info_member_t position;
 			const type_info_member_t render_size;
 			const type_info_member_t render_color;
@@ -6923,7 +6924,7 @@ struct type_info_procedure_immediate_rect {
 	union {
 		type_info_member_t argument_array[4];
 		struct {
-			const type_info_member_t vertex_buffer;
+			const type_info_member_t vertex_buffer_data;
 			const type_info_member_t position;
 			const type_info_member_t render_size;
 			const type_info_member_t render_color;
@@ -6939,8 +6940,8 @@ struct type_info_procedure_immediate_text {
 	union {
 		type_info_member_t argument_array[9];
 		struct {
-			const type_info_member_t command_list;
-			const type_info_member_t vertex_buffer;
+			const type_info_member_t render_group;
+			const type_info_member_t vertex_buffer_data;
 			const type_info_member_t asset_manager;
 			const type_info_member_t asset_handle;
 			const type_info_member_t render_string;
@@ -6960,7 +6961,7 @@ struct type_info_procedure_immediate_line {
 	union {
 		type_info_member_t argument_array[5];
 		struct {
-			const type_info_member_t vertex_buffer;
+			const type_info_member_t vertex_buffer_data;
 			const type_info_member_t start;
 			const type_info_member_t end;
 			const type_info_member_t depth;
@@ -7197,7 +7198,7 @@ struct type_info_struct_glyph_metric_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[11];
+		const type_info_member_t member_array[12];
 		struct {
 			const type_info_member_t is_valid;
 			const type_info_member_t is_fetched;
@@ -7210,6 +7211,7 @@ struct type_info_struct_glyph_metric_t {
 			const type_info_member_t atlas_offset;
 			const type_info_member_t atlas_size;
 			const type_info_member_t owner_atlas;
+			const type_info_member_t synthetic_texture_handle;
 		}members;
 	};
 };
@@ -8204,7 +8206,6 @@ extern const type_info_struct_asset_manager_t DEFAULT_typedata_structure_asset_m
 extern const type_info_procedure_ui_state_init DEFAULT_typedata_procedure_ui_state_init;
 extern const type_info_procedure_ui_state_poll_input_events DEFAULT_typedata_procedure_ui_state_poll_input_events;
 extern const type_info_procedure_ui_state_begin_frame DEFAULT_typedata_procedure_ui_state_begin_frame;
-extern const type_info_struct_RHI_command_list_t DEFAULT_typedata_structure_RHI_command_list_t;
 extern const type_info_procedure_ui_state_end_frame DEFAULT_typedata_procedure_ui_state_end_frame;
 extern const type_info_procedure_ui_state_update_widget_state DEFAULT_typedata_procedure_ui_state_update_widget_state;
 extern const type_info_procedure_ui_state_render_widgets DEFAULT_typedata_procedure_ui_state_render_widgets;
@@ -8243,6 +8244,7 @@ extern const type_info_t DEFAULT_typedata_vec3_t;
 extern const type_info_t DEFAULT_typedata_immediate_widget_data_t;
 extern const type_info_t DEFAULT_typedata_array_t;
 extern const type_info_t DEFAULT_typedata_hash_table_t;
+extern const type_info_t DEFAULT_typedata_render_state_t;
 extern const type_info_struct_camera_matrices_t DEFAULT_typedata_structure_camera_matrices_t;
 extern const type_info_struct_RHI_vertex_buffer_t DEFAULT_typedata_structure_RHI_vertex_buffer_t;
 extern const type_info_struct_RHI_index_buffer_t DEFAULT_typedata_structure_RHI_index_buffer_t;
@@ -8254,7 +8256,6 @@ extern const type_info_procedure_c_global_context_reset_temp_arena DEFAULT_typed
 extern const type_info_procedure_c_global_context_reset_persistent_arena DEFAULT_typedata_procedure_c_global_context_reset_persistent_arena;
 extern const type_info_procedure_c_global_context_reset_simulation_arena DEFAULT_typedata_procedure_c_global_context_reset_simulation_arena;
 extern const type_info_t DEFAULT_typedata_game_state_t;
-extern const type_info_t DEFAULT_typedata_render_state_t;
 extern const type_info_struct_memory_arena_footer_t DEFAULT_typedata_structure_memory_arena_footer_t;
 extern const type_info_struct_scratch_arena_t DEFAULT_typedata_structure_scratch_arena_t;
 extern const type_info_procedure_c_arena_create DEFAULT_typedata_procedure_c_arena_create;
@@ -8299,6 +8300,7 @@ extern const type_info_struct_RHI_command_blit_renderpass_t DEFAULT_typedata_str
 extern const type_info_struct_RHI_command_present_frame_t DEFAULT_typedata_structure_RHI_command_present_frame_t;
 extern const type_info_struct_RHI_command_t DEFAULT_typedata_structure_RHI_command_t;
 extern const type_info_struct_RHI_command_list_type_t DEFAULT_typedata_structure_RHI_command_list_type_t;
+extern const type_info_struct_RHI_command_list_t DEFAULT_typedata_structure_RHI_command_list_t;
 extern const type_info_struct_RHI_renderpass_attachment_access_t DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t;
 extern const type_info_struct_RHI_renderpass_attachment_load_operation_t DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t;
 extern const type_info_struct_RHI_renderpass_attachment_store_operation_t DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t;
@@ -8431,6 +8433,7 @@ extern const type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_im
 extern const type_info_procedure_immediate_texture_ex DEFAULT_typedata_procedure_immediate_texture_ex;
 extern const type_info_procedure_immediate_rect_ex DEFAULT_typedata_procedure_immediate_rect_ex;
 extern const type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediate_rect;
+extern const type_info_t DEFAULT_typedata_render_group_t;
 extern const type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediate_text;
 extern const type_info_procedure_immediate_line DEFAULT_typedata_procedure_immediate_line;
 extern const type_info_struct_duration_counter_t DEFAULT_typedata_structure_duration_counter_t;
@@ -16912,8 +16915,8 @@ constexpr type_info_struct_widget_t DEFAULT_typedata_structure_widget_t = {
 			.member_name   = "display_texture",
 			.parent        = &DEFAULT_typedata_structure_widget_t.type_info,
 			.offset        = offsetof(widget_t, display_texture),
-			.flags         = 2,
-			.pointer_depth = 1,
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 		.display_texture_uvmin = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
@@ -17024,7 +17027,7 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 		.type_id = TYPE_ui_state_t,
 		.size = athena_internal::safe_sizeof<ui_state_t>(),
 	},
-	.member_count   = 51,
+	.member_count   = 52,
 	.member_pointer = DEFAULT_typedata_structure_ui_state_t.member_array,
 	.members = {
 		.widget_arena = {
@@ -17170,6 +17173,14 @@ constexpr type_info_struct_ui_state_t DEFAULT_typedata_structure_ui_state_t = {
 			.offset        = offsetof(ui_state_t, persistent_data_arena),
 			.flags         = 0,
 			.pointer_depth = 0,
+		},
+		.render_state = {
+			.type_info     = &DEFAULT_typedata_render_state_t,
+			.member_name   = "render_state",
+			.parent        = &DEFAULT_typedata_structure_ui_state_t.type_info,
+			.offset        = offsetof(ui_state_t, render_state),
+			.flags         = 2,
+			.pointer_depth = 1,
 		},
 		.RHI_context = {
 			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
@@ -17672,231 +17683,19 @@ constexpr type_info_procedure_ui_state_begin_frame DEFAULT_typedata_procedure_ui
 		},
 	},
 };
-constexpr type_info_struct_RHI_command_list_t DEFAULT_typedata_structure_RHI_command_list_t = {
-	.type_info = {
-		.type_name = "RHI_command_list_t",
-		.metatype  = ATHENA_METATYPE_STRUCT,
-		.type_id = TYPE_RHI_command_list_t,
-		.size = athena_internal::safe_sizeof<RHI_command_list_t>(),
-	},
-	.member_count   = 25,
-	.member_pointer = DEFAULT_typedata_structure_RHI_command_list_t.member_array,
-	.members = {
-		.is_initialized = {
-			.type_info     = &DEFAULT_typedata_bool8,
-			.member_name   = "is_initialized",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, is_initialized),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.RHI_context = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
-			.member_name   = "RHI_context",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, RHI_context),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.transient_arena = {
-			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
-			.member_name   = "transient_arena",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, transient_arena),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.command_arena = {
-			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
-			.member_name   = "command_arena",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, command_arena),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.commands = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_t.type_info,
-			.member_name   = "commands",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, commands),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.command_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "command_count",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, command_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.draw_instance_command_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "draw_instance_command_count",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, draw_instance_command_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.bind_shader_command_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "bind_shader_command_count",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, bind_shader_command_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.bind_render_target_command_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "bind_render_target_command_count",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, bind_render_target_command_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.bind_material_command_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "bind_material_command_count",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, bind_material_command_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.active_render_state = {
-			.type_info     = &DEFAULT_typedata_RHI_pipeline_state_t,
-			.member_name   = "active_render_state",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, active_render_state),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.vertex_buffer_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "vertex_buffer_count",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, vertex_buffer_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.active_index_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
-			.member_name   = "active_index_buffer",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, active_index_buffer),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.active_scissor_command = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_t.type_info,
-			.member_name   = "active_scissor_command",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, active_scissor_command),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.active_viewport_command = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_t.type_info,
-			.member_name   = "active_viewport_command",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, active_viewport_command),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.active_shader_program = {
-			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
-			.member_name   = "active_shader_program",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, active_shader_program),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.active_renderpass = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
-			.member_name   = "active_renderpass",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, active_renderpass),
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.presenting = {
-			.type_info     = &DEFAULT_typedata_bool32,
-			.member_name   = "presenting",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, presenting),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.image_shader_params = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
-			.member_name   = "image_shader_params",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, image_shader_params),
-			.flags         = 66,
-			.pointer_depth = 1,
-		},
-		.image_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "image_count",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, image_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.image_ids_to_bind = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "image_ids_to_bind",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, image_ids_to_bind),
-			.flags         = 64,
-			.pointer_depth = 0,
-		},
-		.bound_image_count = {
-			.type_info     = &DEFAULT_typedata_u32,
-			.member_name   = "bound_image_count",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, bound_image_count),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.command_list_type = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
-			.member_name   = "command_list_type",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, command_list_type),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-		.backend_command_buffer = {
-			.type_info     = &DEFAULT_typedata_backend_command_buffer_t,
-			.member_name   = "backend_command_buffer",
-			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.offset        = offsetof(RHI_command_list_t, backend_command_buffer),
-			.flags         = 0,
-			.pointer_depth = 0,
-		},
-	},
-};
-
 constexpr type_info_procedure_ui_state_end_frame DEFAULT_typedata_procedure_ui_state_end_frame = {
 	.type_info = {
 		.type_name = "ui_state_end_frame",
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_ui_state_end_frame,
 	},
-	.argument_count = 2,
+	.argument_count = 1,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_ui_state_end_frame.argument_array,
 	.arguments = {
 		.ui_state = {
 			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.member_name   = "ui_state",
-			.parent        = &DEFAULT_typedata_procedure_ui_state_end_frame.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.member_name   = "command_list",
 			.parent        = &DEFAULT_typedata_procedure_ui_state_end_frame.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
@@ -17928,20 +17727,13 @@ constexpr type_info_procedure_ui_state_render_widgets DEFAULT_typedata_procedure
 		.metatype  = ATHENA_METATYPE_PROCEDURE,
 		.type_id = TYPE_ui_state_render_widgets,
 	},
-	.argument_count = 2,
+	.argument_count = 1,
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_ui_state_render_widgets.argument_array,
 	.arguments = {
 		.ui_state = {
 			.type_info     = &DEFAULT_typedata_structure_ui_state_t.type_info,
 			.member_name   = "ui_state",
-			.parent        = &DEFAULT_typedata_procedure_ui_state_render_widgets.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
-		},
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.member_name   = "command_list",
 			.parent        = &DEFAULT_typedata_procedure_ui_state_render_widgets.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
@@ -18787,8 +18579,8 @@ constexpr type_info_procedure_ui_widget_texture DEFAULT_typedata_procedure_ui_wi
 			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
 			.member_name   = "texture",
 			.parent        = &DEFAULT_typedata_procedure_ui_widget_texture.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 		.uv_min = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
@@ -18862,8 +18654,8 @@ constexpr type_info_procedure_ui_widget_textured_button DEFAULT_typedata_procedu
 			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
 			.member_name   = "texture",
 			.parent        = &DEFAULT_typedata_procedure_ui_widget_textured_button.type_info,
-			.flags         = 2,
-			.pointer_depth = 1,
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 		.uv_min = {
 			.type_info     = &DEFAULT_typedata_vec2_t,
@@ -18987,6 +18779,11 @@ constexpr type_info_t DEFAULT_typedata_immediate_widget_data_t = {
 	.type_name = "immediate_widget_data_t",
 	.type_id = TYPE_immediate_widget_data_t,
 	.size = athena_internal::safe_sizeof<immediate_widget_data_t>(),
+};
+constexpr type_info_t DEFAULT_typedata_render_state_t = {
+	.type_name = "render_state_t",
+	.type_id = TYPE_render_state_t,
+	.size = athena_internal::safe_sizeof<render_state_t>(),
 };
 constexpr type_info_struct_camera_matrices_t DEFAULT_typedata_structure_camera_matrices_t = {
 	.type_info = {
@@ -19438,11 +19235,6 @@ constexpr type_info_t DEFAULT_typedata_game_state_t = {
 	.type_name = "game_state_t",
 	.type_id = TYPE_game_state_t,
 	.size = athena_internal::safe_sizeof<game_state_t>(),
-};
-constexpr type_info_t DEFAULT_typedata_render_state_t = {
-	.type_name = "render_state_t",
-	.type_id = TYPE_render_state_t,
-	.size = athena_internal::safe_sizeof<render_state_t>(),
 };
 constexpr type_info_struct_memory_arena_footer_t DEFAULT_typedata_structure_memory_arena_footer_t = {
 	.type_info = {
@@ -21190,6 +20982,211 @@ constexpr type_info_struct_RHI_command_list_type_t DEFAULT_typedata_structure_RH
 				.type  = 2,
 				.int64 = RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE,
 			},
+		},
+	},
+};
+
+constexpr type_info_struct_RHI_command_list_t DEFAULT_typedata_structure_RHI_command_list_t = {
+	.type_info = {
+		.type_name = "RHI_command_list_t",
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.type_id = TYPE_RHI_command_list_t,
+		.size = athena_internal::safe_sizeof<RHI_command_list_t>(),
+	},
+	.member_count   = 25,
+	.member_pointer = DEFAULT_typedata_structure_RHI_command_list_t.member_array,
+	.members = {
+		.is_initialized = {
+			.type_info     = &DEFAULT_typedata_bool8,
+			.member_name   = "is_initialized",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, is_initialized),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.RHI_context = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_context_t.type_info,
+			.member_name   = "RHI_context",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, RHI_context),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.transient_arena = {
+			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
+			.member_name   = "transient_arena",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, transient_arena),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.command_arena = {
+			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
+			.member_name   = "command_arena",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, command_arena),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.commands = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_t.type_info,
+			.member_name   = "commands",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, commands),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.command_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "command_count",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, command_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.draw_instance_command_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "draw_instance_command_count",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, draw_instance_command_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.bind_shader_command_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "bind_shader_command_count",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, bind_shader_command_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.bind_render_target_command_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "bind_render_target_command_count",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, bind_render_target_command_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.bind_material_command_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "bind_material_command_count",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, bind_material_command_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.active_render_state = {
+			.type_info     = &DEFAULT_typedata_RHI_pipeline_state_t,
+			.member_name   = "active_render_state",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_render_state),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.vertex_buffer_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "vertex_buffer_count",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, vertex_buffer_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.active_index_buffer = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_index_buffer_t.type_info,
+			.member_name   = "active_index_buffer",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_index_buffer),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.active_scissor_command = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_t.type_info,
+			.member_name   = "active_scissor_command",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_scissor_command),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.active_viewport_command = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_t.type_info,
+			.member_name   = "active_viewport_command",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_viewport_command),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.active_shader_program = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "active_shader_program",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_shader_program),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.active_renderpass = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_renderpass_t.type_info,
+			.member_name   = "active_renderpass",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, active_renderpass),
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.presenting = {
+			.type_info     = &DEFAULT_typedata_bool32,
+			.member_name   = "presenting",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, presenting),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.image_shader_params = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_image_t.type_info,
+			.member_name   = "image_shader_params",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, image_shader_params),
+			.flags         = 66,
+			.pointer_depth = 1,
+		},
+		.image_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "image_count",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, image_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.image_ids_to_bind = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "image_ids_to_bind",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, image_ids_to_bind),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.bound_image_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "bound_image_count",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, bound_image_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.command_list_type = {
+			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
+			.member_name   = "command_list_type",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, command_list_type),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.backend_command_buffer = {
+			.type_info     = &DEFAULT_typedata_backend_command_buffer_t,
+			.member_name   = "backend_command_buffer",
+			.parent        = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
+			.offset        = offsetof(RHI_command_list_t, backend_command_buffer),
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 	},
 };
@@ -24730,9 +24727,9 @@ constexpr type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_imme
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_put_data.argument_array,
 	.arguments = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
-			.member_name   = "buffer",
+		.vertex_buffer_data = {
+			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
@@ -24770,9 +24767,9 @@ constexpr type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immed
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_quad_ex.argument_array,
 	.arguments = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
-			.member_name   = "buffer",
+		.vertex_buffer_data = {
+			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
@@ -24934,9 +24931,9 @@ constexpr type_info_procedure_immediate_rect_ex DEFAULT_typedata_procedure_immed
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect_ex.argument_array,
 	.arguments = {
-		.buffer = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
-			.member_name   = "buffer",
+		.vertex_buffer_data = {
+			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
@@ -25009,9 +25006,9 @@ constexpr type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediat
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect.argument_array,
 	.arguments = {
-		.vertex_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
-			.member_name   = "vertex_buffer",
+		.vertex_buffer_data = {
+			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
@@ -25039,6 +25036,11 @@ constexpr type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediat
 		},
 	},
 };
+constexpr type_info_t DEFAULT_typedata_render_group_t = {
+	.type_name = "render_group_t",
+	.type_id = TYPE_render_group_t,
+	.size = athena_internal::safe_sizeof<render_group_t>(),
+};
 constexpr type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediate_text = {
 	.type_info = {
 		.type_name = "immediate_text",
@@ -25046,19 +25048,19 @@ constexpr type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediat
 		.type_id = TYPE_immediate_text,
 	},
 	.argument_count = 9,
-	.return_type    = &DEFAULT_typedata_void,
+	.return_type    = &DEFAULT_typedata_s32,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_text.argument_array,
 	.arguments = {
-		.command_list = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_command_list_t.type_info,
-			.member_name   = "command_list",
+		.render_group = {
+			.type_info     = &DEFAULT_typedata_render_group_t,
+			.member_name   = "render_group",
 			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
 		},
-		.vertex_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
-			.member_name   = "vertex_buffer",
+		.vertex_buffer_data = {
+			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
@@ -25124,9 +25126,9 @@ constexpr type_info_procedure_immediate_line DEFAULT_typedata_procedure_immediat
 	.return_type    = &DEFAULT_typedata_void,
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_line.argument_array,
 	.arguments = {
-		.vertex_buffer = {
-			.type_info     = &DEFAULT_typedata_structure_RHI_vertex_buffer_t.type_info,
-			.member_name   = "vertex_buffer",
+		.vertex_buffer_data = {
+			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_line.type_info,
 			.flags         = 2,
 			.pointer_depth = 1,
@@ -25884,7 +25886,7 @@ constexpr type_info_struct_glyph_metric_t DEFAULT_typedata_structure_glyph_metri
 		.type_id = TYPE_glyph_metric_t,
 		.size = athena_internal::safe_sizeof<glyph_metric_t>(),
 	},
-	.member_count   = 11,
+	.member_count   = 12,
 	.member_pointer = DEFAULT_typedata_structure_glyph_metric_t.member_array,
 	.members = {
 		.is_valid = {
@@ -25974,6 +25976,14 @@ constexpr type_info_struct_glyph_metric_t DEFAULT_typedata_structure_glyph_metri
 			.offset        = offsetof(glyph_metric_t, owner_atlas),
 			.flags         = 2,
 			.pointer_depth = 1,
+		},
+		.synthetic_texture_handle = {
+			.type_info     = &DEFAULT_typedata_structure_asset_handle_t.type_info,
+			.member_name   = "synthetic_texture_handle",
+			.parent        = &DEFAULT_typedata_structure_glyph_metric_t.type_info,
+			.offset        = offsetof(glyph_metric_t, synthetic_texture_handle),
+			.flags         = 0,
+			.pointer_depth = 0,
 		},
 	},
 };
@@ -28051,7 +28061,6 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_ui_state_init.type_info,
 	&DEFAULT_typedata_procedure_ui_state_poll_input_events.type_info,
 	&DEFAULT_typedata_procedure_ui_state_begin_frame.type_info,
-	&DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 	&DEFAULT_typedata_procedure_ui_state_end_frame.type_info,
 	&DEFAULT_typedata_procedure_ui_state_update_widget_state.type_info,
 	&DEFAULT_typedata_procedure_ui_state_render_widgets.type_info,
@@ -28139,6 +28148,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_structure_RHI_command_present_frame_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_t.type_info,
 	&DEFAULT_typedata_structure_RHI_command_list_type_t.type_info,
+	&DEFAULT_typedata_structure_RHI_command_list_t.type_info,
 	&DEFAULT_typedata_structure_RHI_renderpass_attachment_access_t.type_info,
 	&DEFAULT_typedata_structure_RHI_renderpass_attachment_load_operation_t.type_info,
 	&DEFAULT_typedata_structure_RHI_renderpass_attachment_store_operation_t.type_info,
@@ -28963,6 +28973,7 @@ enum class ui_state_t {
 	mouse_delta,
 	persistent_data_arena,
 	widget_states,
+	render_state,
 	RHI_context,
 	asset_manager,
 	input_manager,
@@ -29017,33 +29028,6 @@ enum class asset_manager_t {
 	font_manager,
 	RHI_context,
 }; // asset_manager_t
-enum class RHI_command_list_t {
-	is_initialized,
-	RHI_context,
-	transient_arena,
-	command_arena,
-	commands,
-	command_count,
-	draw_instance_command_count,
-	bind_shader_command_count,
-	bind_render_target_command_count,
-	bind_material_command_count,
-	active_render_state,
-	active_vertex_buffers,
-	vertex_buffer_count,
-	active_index_buffer,
-	active_scissor_command,
-	active_viewport_command,
-	active_shader_program,
-	active_renderpass,
-	presenting,
-	image_shader_params,
-	image_count,
-	image_ids_to_bind,
-	bound_image_count,
-	command_list_type,
-	backend_command_buffer,
-}; // RHI_command_list_t
 enum class camera_matrices_t {
 	view_matrix,
 	projection_matrix,
@@ -29290,6 +29274,33 @@ enum class RHI_command_list_type_t {
 	RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS,
 	RHI_RENDER_COMMAND_LIST_TYPE_COMPUTE,
 }; // RHI_command_list_type_t
+enum class RHI_command_list_t {
+	is_initialized,
+	RHI_context,
+	transient_arena,
+	command_arena,
+	commands,
+	command_count,
+	draw_instance_command_count,
+	bind_shader_command_count,
+	bind_render_target_command_count,
+	bind_material_command_count,
+	active_render_state,
+	active_vertex_buffers,
+	vertex_buffer_count,
+	active_index_buffer,
+	active_scissor_command,
+	active_viewport_command,
+	active_shader_program,
+	active_renderpass,
+	presenting,
+	image_shader_params,
+	image_count,
+	image_ids_to_bind,
+	bound_image_count,
+	command_list_type,
+	backend_command_buffer,
+}; // RHI_command_list_t
 enum class RHI_renderpass_attachment_access_t {
 	RHI_RENDERPASS_ATACHMENT_ACCESS_INVALID,
 	RHI_RENDERPASS_ATTACHMENT_ACCESS_READ,
@@ -29465,6 +29476,7 @@ enum class glyph_metric_t {
 	atlas_offset,
 	atlas_size,
 	owner_atlas,
+	synthetic_texture_handle,
 }; // glyph_metric_t
 enum class temporary_glyph_t {
 	utf32_codepoint,
@@ -30059,14 +30071,12 @@ enum class ui_state_begin_frame {
 }; // ui_state_begin_frame
 enum class ui_state_end_frame {
 	ui_state,
-	command_list,
 }; // ui_state_end_frame
 enum class ui_state_update_widget_state {
 	ui_state,
 }; // ui_state_update_widget_state
 enum class ui_state_render_widgets {
 	ui_state,
-	command_list,
 }; // ui_state_render_widgets
 enum class ui_state_set_default_widget_idle_color {
 	ui_state,
@@ -30674,13 +30684,13 @@ enum class c_string_builder_flush_to_file {
 	builder,
 }; // c_string_builder_flush_to_file
 enum class immediate_put_data {
-	buffer,
+	vertex_buffer_data,
 	data,
 	element_size,
 	element_count,
 }; // immediate_put_data
 enum class immediate_quad_ex {
-	buffer,
+	vertex_buffer_data,
 	position,
 	render_size,
 	render_color,
@@ -30704,7 +30714,7 @@ enum class immediate_texture_ex {
 	texture,
 }; // immediate_texture_ex
 enum class immediate_rect_ex {
-	buffer,
+	vertex_buffer_data,
 	position,
 	render_size,
 	render_color,
@@ -30715,14 +30725,14 @@ enum class immediate_rect_ex {
 	padding0,
 }; // immediate_rect_ex
 enum class immediate_rect {
-	vertex_buffer,
+	vertex_buffer_data,
 	position,
 	render_size,
 	render_color,
 }; // immediate_rect
 enum class immediate_text {
-	command_list,
-	vertex_buffer,
+	render_group,
+	vertex_buffer_data,
 	asset_manager,
 	asset_handle,
 	render_string,
@@ -30732,7 +30742,7 @@ enum class immediate_text {
 	font_size,
 }; // immediate_text
 enum class immediate_line {
-	vertex_buffer,
+	vertex_buffer_data,
 	start,
 	end,
 	depth,

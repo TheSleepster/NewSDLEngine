@@ -20,7 +20,8 @@
                 "sandbox_arg_parser", "sandbox_hash_table", "sandbox_memory_arena",
                 "sandbox_networking", "sandbox_new_malloc", "sandbox_new_string_builder",
                 "sandbox_new_threadpool", "sandbox_type_info", "sandbox_input",
-                "sandbox_dynarray", "sandbox_allocator_benchmark", "sandbox_build_system"
+                "sandbox_dynarray", "sandbox_allocator_benchmark", "sandbox_build_system",
+                "sandbox_sorting"
             ]
         },
         {

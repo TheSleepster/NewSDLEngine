@@ -30,6 +30,7 @@
 #include <c_threadpool.h>
 #include <c_duration_counter.h>
 #include <c_tokenizer.h>
+#include <c_sorting.h>
 
 #include <s_input_manager.h>
 #include <s_nt_networking.h>
@@ -79,6 +80,7 @@
 #include <c_file_watcher.cpp>
 #include <p_platform_data.cpp>
 #include <s_nt_networking.cpp>
+#include <s_render_graph.cpp>
 
 #if RENDERER_VULKAN
 #include <vk_backend_allocator.cpp>

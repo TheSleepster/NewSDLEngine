@@ -15,7 +15,7 @@ void ui_state_update_widget_state(ui_state_t *ui_state);
 internal_api void ui_state_update_widget_hierarchy(ui_state_t *ui_state);
 internal_api void size_all_widgets(ui_state_t *ui_state);
 internal_api void place_all_widgets(ui_state_t *ui_state);
-internal_api void render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, widget_t *first_widget);
+internal_api void render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, immediate_vertex_t *vertex_data, widget_t *first_widget);
 
 /*
 =============
@@ -87,6 +87,7 @@ ui_state_init(ui_state_t       *ui_state,
               input_manager_t  *input_manager,
               asset_manager_t  *asset_manager, 
               RHI_context_t    *RHI_context, 
+              render_state_t   *render_state,
               u32               renderpass_ID)
 {
     ZeroStruct(*ui_state);
@@ -100,6 +101,7 @@ ui_state_init(ui_state_t       *ui_state,
                                                                   widget_hash_table_allocate_impl,
                                                                   null);
     ui_state->RHI_context           = RHI_context;
+    ui_state->render_state          = render_state;
     ui_state->asset_manager         = asset_manager;
     ui_state->interface_framebuffer = renderpass_ID;
     ui_state->parent_stack_top      = 1;
@@ -122,7 +124,6 @@ ui_state_init(ui_state_t       *ui_state,
 
     ui_state->input_manager = input_manager;
     ui_state->widget_shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_widget"));
-
 
     u32 *indices = c_arena_push_array(&RHI_context->transient_arena, u32, UI_MAX_INDICES);
     u32  index_offset = 0;
@@ -335,52 +336,51 @@ render_widget_hierarchy
 */
 
 void
-ui_state_render_widgets(ui_state_t *ui_state, RHI_command_list_t *command_list)
+ui_state_render_widgets(ui_state_t *ui_state)
 {
-    RHI_context_t *RHI_context = ui_state->RHI_context;
-    asset_manager_t  *asset_manager  = ui_state->asset_manager;
-    (void)asset_manager;
+    render_state_t *render_state = ui_state->render_state;
 
     widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
     {
-        render_widget_hierarchy(ui_state, command_list, current_widget);
-    else
-    {
-        log_warning("Called ui_state_render_widgets on an empty ui_state_t... there are no widgets attached!!!\n");
-    }
-
-        RHI_cmd_bind_vertex_buffer(command_list, &ui_state->vertex_buffer);
-        RHI_cmd_bind_index_buffer(command_list,  &ui_state->index_buffer);
-
-        // NOTE(Sleepster): First, draw the normal rectangle widgets
+        render_graph_section_t *ui_section = s_render_graph_acquire_render_section(&render_state->render_graph, 1);
         {
-            RHI_pipeline_state_t pipeline_state = command_list->active_render_state;
+            render_group_t *current_render_group = s_render_group_begin(ui_section, render_state->fullscreen_renderpass_ID);
+            current_render_group->shader       = ui_state->widget_shader;
+            current_render_group->index_buffer = &ui_state->index_buffer;
+            s32 vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), &ui_state->vertex_buffer);
+
+            RHI_pipeline_state_t pipeline_state = {};
             pipeline_state.dst_color_blend_mode = RBM_OneMinusSrcAlpha;
             pipeline_state.src_alpha_blend_mode = RBM_One;
             pipeline_state.dst_alpha_blend_mode = RBM_Zero;
 
-            RHI_cmd_set_render_state(command_list, &pipeline_state);
-            RHI_cmd_use_shader_program(command_list, ui_state->widget_shader);
-            RHI_cmd_update_buffer_contents(command_list, &ui_state->vertex_buffer);
+            current_render_group->pipeline_state = pipeline_state;
 
-            s32 window_width  = Max(RHI_context->window_size.x, 10);
-            s32 window_height = Max(RHI_context->window_size.y, 10);
+            s32 window_width  = Max(ui_state->RHI_context->window_size.x, 10);
+            s32 window_height = Max(ui_state->RHI_context->window_size.y, 10);
+            current_render_group->scissor = {
+                .offset = vec2_zero(),
+                .extent = vec2(window_width, window_height)
+            };
+            current_render_group->viewport = {
+                .offset = vec2(0,             window_height),
+                .extent = vec2(window_width, -window_height)
+            };
 
-            RHI_cmd_update_constant_buffer(command_list, ui_state->camera_matrices_buffer, &ui_state->current_camera,   sizeof(camera_matrices_t));
-            RHI_cmd_update_constant_buffer(command_list, ui_state->widget_instance_data,    ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
+            do {
+                render_widget_hierarchy(ui_state, current_render_group, (immediate_vertex_t*)ui_state->vertex_buffer.vertex_data, current_widget);
+                current_widget = current_widget->next_sibling;
+            }while(current_widget != ui_state->first_widget);
+            s_render_group_push_vertex_stream_data(current_render_group, vertex_stream, ui_state->vertex_buffer.vertex_data, ui_state->widget_item_count * 4);
 
-            RHI_cmd_set_viewport(command_list, vec2(0, window_height), vec2(window_width, -window_height));
-            RHI_cmd_set_scissor(command_list,  vec2(0, 0),             vec2(window_width,  window_height));
+            s_render_group_add_constant_buffer(current_render_group, ui_state->camera_matrices_buffer, &ui_state->current_camera,   sizeof(mat4_t) * 2); 
+            s_render_group_add_constant_buffer(current_render_group, ui_state->widget_instance_data,    ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
 
-            RHI_cmd_draw_indexed(command_list, ui_state->widget_item_count * 6, 0, 0, 1, 0);
-
-            RHI_vertex_buffer_reset_offsets(ui_state->RHI_context, &ui_state->vertex_buffer);
-            RHI_vertex_buffer_reset_count(&ui_state->vertex_buffer);
-
-            RHI_vertex_buffer_reset_offsets(ui_state->RHI_context, &ui_state->index_buffer);
-            ui_state->widget_instance_count = 0;
+            current_render_group->draw_element_count = ui_state->widget_item_count;
+            s_render_group_end(current_render_group);
         }
+        ui_state->widget_instance_count = 0;
     }
     else
     {
@@ -395,7 +395,7 @@ render_widget_hierarchy
 */
 
 internal_api void
-render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, widget_t *first_widget)
+render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, immediate_vertex_t *vertex_data, widget_t *first_widget)
 {
     widget_t *current_widget = first_widget;
     do {
@@ -414,7 +414,8 @@ render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, 
             current_widget->widget_instance_data->iRadius          = current_widget->radius;
             current_widget->widget_instance_data->iSDFSmoothness   = current_widget->smoothness;
 
-            immediate_rect_ex(&ui_state->vertex_buffer,
+            u32 vertex_offset = ui_state->widget_item_count * 4;
+            immediate_rect_ex(vertex_data + vertex_offset,
                               current_widget->state->position, 
                               current_widget->state->render_size,
                               current_widget->state->render_color,
@@ -430,7 +431,8 @@ render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, 
 
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
         {
-            immediate_rect_ex(&ui_state->vertex_buffer,
+            u32 vertex_offset = ui_state->widget_item_count * 4;
+            immediate_rect_ex(vertex_data + vertex_offset,
                               current_widget->state->position, 
                               current_widget->state->render_size,
                               current_widget->state->render_color,
@@ -455,10 +457,11 @@ render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, 
                                                current_widget->state->position.z + -0.01); // some Epsilon
             if((current_widget->widget_flags & UI_WIDGET_FLAG_HAS_TEXT_CONTENT) == 0)
             {
-                immediate_text(command_list, 
-                              &ui_state->vertex_buffer, 
+                u32 vertex_offset = ui_state->widget_item_count * 4;
+                immediate_text(render_group, 
+                               vertex_data + vertex_offset, 
                                ui_state->asset_manager,
-                              &ui_state->default_font,
+                               &ui_state->default_font,
                                current_widget->widget_name,
                                text_render_position, 
                                ui_state->default_font_color,
@@ -469,12 +472,13 @@ render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, 
             }
             else
             {
+                u32 vertex_offset = ui_state->widget_item_count * 4;
                 string_t widget_text = {
                     .data  = (u8*)(current_widget->widget_text_buffer->data + current_widget->state->widget_text_render_start_offset),
                     .count = current_widget->state->widget_text_render_end_offset,
                 };
-                immediate_text(command_list, 
-                              &ui_state->vertex_buffer, 
+                immediate_text(render_group, 
+                               vertex_data + vertex_offset, 
                                ui_state->asset_manager,
                               &ui_state->default_font,
                                widget_text,
@@ -489,29 +493,29 @@ render_widget_hierarchy(ui_state_t *ui_state, RHI_command_list_t *command_list, 
 
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DISPLAY_TEXTURE)
         {
-            if(current_widget->display_texture->texture)
+            if(current_widget->display_texture.texture)
             {
-                RHI_cmd_bind_texture_from_handle(command_list, current_widget->display_texture);
+                u32 vertex_offset = ui_state->widget_item_count * 4;
 
-                s32 texture_index = RHI_is_texture_bound(command_list, current_widget->display_texture->texture);
-                immediate_texture_ex(command_list,
-                                    &ui_state->vertex_buffer,
-                                     current_widget->state->position, 
-                                     current_widget->state->render_size,
-                                     current_widget->state->render_color,
-                                     current_widget->display_texture_uvmin,
-                                     current_widget->display_texture_uvmax,
-                                     vec2(1.0, texture_index),
-                                     vec2(current_widget->display_texture->texture->gpu_data.create_info.sampler_info.filtering, 0.0),
-                                     vec2_zero(),
-                                     current_widget->display_texture->texture);
+                current_widget->display_texture.slot = null;
+                s32 texture_index = s_render_group_bind_texture(render_group, current_widget->display_texture);
+                immediate_quad_ex(vertex_data + vertex_offset,
+                                  current_widget->state->position, 
+                                  current_widget->state->render_size,
+                                  current_widget->state->render_color,
+                                  current_widget->display_texture_uvmin,
+                                  current_widget->display_texture_uvmax,
+                                  vec2(1.0, texture_index),
+                                  vec2(current_widget->display_texture.texture->gpu_data.create_info.sampler_info.filtering, 0.0),
+                                  vec2_zero());
+
                 ++ui_state->widget_item_count;
             }
         }
 
         if(current_widget->first_child)
         {
-            render_widget_hierarchy(ui_state, command_list, current_widget->first_child);
+            render_widget_hierarchy(ui_state, render_group, (immediate_vertex_t*)ui_state->vertex_buffer.vertex_data, current_widget->first_child);
         }
 
         current_widget = current_widget->next_sibling;
@@ -549,13 +553,13 @@ ui_state_end_frame
 */
 
 true_inline void
-ui_state_end_frame(ui_state_t *ui_state, RHI_command_list_t *command_list)
+ui_state_end_frame(ui_state_t *ui_state)
 {
     Expect(ui_state->frame_begun == true, "Attempted to call 'ui_state_end_frame()' but 'ui_state_begin_frame()' was never called on this ui_state_t...\n");
     Expect(ui_state->frame_ended == false, "Attempted to call 'ui_state_end_frame()' but this has already been called on this ui_state_t this frame...\n");
 
     ui_state_update_widget_state(ui_state);
-    ui_state_render_widgets(ui_state, command_list);
+    ui_state_render_widgets(ui_state);
     ui_state->frame_ended = true;
     ui_state->frame_begun = false;
 
@@ -1284,7 +1288,7 @@ ui_widget_textured_button(ui_state_t     *ui_state,
                           string_t        widget_name, 
                           vec2_t          minimum_size,
                           vec2_t          additional_offset,
-                          asset_handle_t *texture,
+                          asset_handle_t  texture,
                           vec2_t          uv_min,
                           vec2_t          uv_max,
                           u32             widget_flags)
@@ -1585,14 +1589,14 @@ ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_t
 }
 
 ui_signal_t
-ui_widget_texture(ui_state_t     *ui_state, 
-                  string_t        widget_name, 
-                  vec2_t          size, 
-                  asset_handle_t *texture, 
-                  vec2_t          uv_min,
-                  vec2_t          uv_max,
-                  ivec2_t         size_kind,
-                  u32             additional_flags)
+ui_widget_texture(ui_state_t    *ui_state, 
+                  string_t       widget_name, 
+                  vec2_t         size, 
+                  asset_handle_t texture, 
+                  vec2_t         uv_min,
+                  vec2_t         uv_max,
+                  ivec2_t        size_kind,
+                  u32            additional_flags)
 {
 
     widget_t *widget = ui_widget_create(ui_state, widget_name, (UI_WIDGET_FLAG_DISPLAY_TEXTURE|additional_flags));

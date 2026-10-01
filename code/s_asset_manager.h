@@ -374,7 +374,13 @@ struct glyph_metric_t
     vec2_t atlas_offset;
     vec2_t atlas_size;
 
+    // NOTE(Sleepster): This asset handle is a "fake". It's just
+    // so that we can simply access the atlas inside the standard vertex
+    // functions that WANT a handle instead of a raw texture.
+    // It's really hack because for some reason texture atlas' are not
+    // in the asset handle.
     texture_atlas_t *owner_atlas;
+    asset_handle_t   synthetic_texture_handle;
 };
 
 struct temporary_glyph_t

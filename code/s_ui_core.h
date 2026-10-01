@@ -185,7 +185,7 @@ struct widget_t
     float32            radius;
     float32            border_thickness;
 
-    asset_handle_t    *display_texture;
+    asset_handle_t     display_texture;
     vec2_t             display_texture_uvmin;
     vec2_t             display_texture_uvmax;
 
@@ -241,6 +241,7 @@ struct ui_state_t
     memory_arena_t                    persistent_data_arena;
     hash_table_t<widget_state_t>      widget_states;
 
+    render_state_t                   *render_state;
     RHI_context_t                    *RHI_context;
     asset_manager_t                  *asset_manager;
     input_manager_t                  *input_manager;
@@ -287,10 +288,10 @@ void             ui_state_init(ui_state_t *ui_state, input_manager_t *input_mana
 void             ui_state_poll_input_events(ui_state_t *ui_state);
 
 true_inline void ui_state_begin_frame(ui_state_t *ui_state);
-true_inline void ui_state_end_frame(ui_state_t *ui_state, RHI_command_list_t *command_list);
+true_inline void ui_state_end_frame(ui_state_t *ui_state);
 
 void      ui_state_update_widget_state(ui_state_t *ui_state);
-void      ui_state_render_widgets(ui_state_t *ui_state, RHI_command_list_t *command_list);
+void      ui_state_render_widgets(ui_state_t *ui_state);
 
 true_inline void ui_state_set_default_widget_idle_color(ui_state_t *ui_state, vec4_t color);
 true_inline void ui_state_set_default_widget_hover_color(ui_state_t *ui_state, vec4_t color);
@@ -319,8 +320,8 @@ void        ui_widget_spacer(ui_state_t *ui_state, string_t widget_name, vec2_t 
 ui_signal_t ui_widget_rectangle(ui_state_t *ui_state, string_t widget_name, vec2_t size, ivec2_t size_kind);
 void        ui_widget_divider(ui_state_t *ui_state, string_t widget_name, vec2_t size, ivec2_t size_kind);
 ui_signal_t ui_widget_textbox(ui_state_t *ui_state, string_t widget_name, string_t *widget_text_content, vec2_t size);
-ui_signal_t ui_widget_texture(ui_state_t *ui_state, string_t widget_name, vec2_t size, asset_handle_t *texture, vec2_t uv_min, vec2_t uv_max, ivec2_t size_kind, u32 additional_flags);
-ui_signal_t ui_widget_textured_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, vec2_t additional_offset, asset_handle_t *texture, vec2_t uv_min, vec2_t uv_max, u32 widget_flags);
+ui_signal_t ui_widget_texture(ui_state_t *ui_state, string_t widget_name, vec2_t size, asset_handle_t texture, vec2_t uv_min, vec2_t uv_max, ivec2_t size_kind, u32 additional_flags);
+ui_signal_t ui_widget_textured_button(ui_state_t *ui_state, string_t widget_name, vec2_t minimum_size, vec2_t additional_offset, asset_handle_t texture, vec2_t uv_min, vec2_t uv_max, u32 widget_flags);
 
 true_inline void ui_state_begin_row(ui_state_t *ui_state, widget_t *parent);
 true_inline void ui_state_end_row(ui_state_t *ui_state);
@@ -330,7 +331,7 @@ true_inline void ui_state_end_column(ui_state_t *ui_state);
 #define ui_parent(state, widget)      DeferLoop(ui_widget_push_parent((state), (widget)), ui_widget_pop_parent((state)))
 #define ui_row(state, parent)         DeferLoop(ui_state_begin_row((state), (parent)), ui_state_end_row((state)))
 #define ui_column(state, parent)      DeferLoop(ui_state_begin_column((state), (parent)), ui_state_end_column((state)))
-#define ui_frame(state, command_list) DeferLoop(ui_state_begin_frame((state)), ui_state_end_frame((state), (command_list)))
+#define ui_frame(state)               DeferLoop(ui_state_begin_frame((state)), ui_state_end_frame((state)))
 
 #endif // S_UI_CORE_H
 

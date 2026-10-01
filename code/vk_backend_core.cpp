@@ -3071,7 +3071,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
 
                         // NOTE(Sleepster): Resetting this to prevent garbage images from being pushed to the shader. 
                         // We exlude the first image index due to the fact that this is typically the default texture
-                        ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params));
+                        ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params) - sizeof(RHI_image_t*));
 
                         c_dynarray_reset(&command_list->active_vertex_buffers);
                         command_list->vertex_buffer_count = 0;
@@ -3111,7 +3111,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
 
                         // NOTE(Sleepster): Resetting this to prevent garbage images from being pushed to the shader. 
                         // We exlude the first image index due to the fact that this is typically the default texture
-                        ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params));
+                        ZeroMemory(command_list->image_shader_params + sizeof(RHI_image_t*), sizeof(command_list->image_shader_params) - sizeof(RHI_image_t*));
 
                         c_dynarray_reset(&command_list->active_vertex_buffers);
                         command_list->vertex_buffer_count = 0;

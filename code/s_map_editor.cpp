@@ -177,7 +177,7 @@ s_map_editor_handle_ui(map_editor_t *editor, ui_state_t *main_ui, RHI_context_t 
                                                                   STR("Editor Gizmo Selection"), 
                                                                   vec2(28.0f, 28.0f), 
                                                                   vec2(5.0f, -10.0f), 
-                                                                  &editor->gizmo_image, 
+                                                                  editor->gizmo_image, 
                                                                   vec2_zero(), 
                                                                   vec2(editor->gizmo_image.texture->bitmap.width, editor->gizmo_image.texture->bitmap.height),
                                                                   0);
@@ -190,7 +190,7 @@ s_map_editor_handle_ui(map_editor_t *editor, ui_state_t *main_ui, RHI_context_t 
                                                                   STR("Editor Mouse Selection"), 
                                                                   vec2(32.0f, 26.0f), 
                                                                   vec2(5.0f, -10.0f),
-                                                                  &editor->mouse_cursor_image, 
+                                                                  editor->mouse_cursor_image, 
                                                                   vec2_zero(), 
                                                                   vec2(editor->mouse_cursor_image.texture->bitmap.width, editor->mouse_cursor_image.texture->bitmap.height),
                                                                   0);

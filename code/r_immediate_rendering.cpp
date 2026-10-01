@@ -5,14 +5,15 @@
    $Creator: Justin Lewis $
    ======================================================================== */
 #include <r_immediate_rendering.h>
+#include <s_render_graph.h>
 
 ENGINE_API void
-immediate_put_data(RHI_vertex_buffer_t *buffer, byte *data, u32 element_size, u32 element_count)
+immediate_put_data(RHI_vertex_buffer_t *buffer, immediate_vertex_t *buffer_data, u32 element_size, u32 element_count)
 {
-    byte *vertex_pointer = buffer->vertex_data + buffer->vertex_count;
+    immediate_vertex_t *vertex_pointer = (immediate_vertex_t*)buffer->vertex_data;
     Assert(buffer->buffer_data.buffer_element_size == element_size);
 
-    memcpy(vertex_pointer, data, element_size * element_count);
+    memcpy(vertex_pointer, buffer_data, element_size * element_count);
     buffer->vertex_count += element_count;
 }
 
@@ -23,17 +24,17 @@ QUADS
 */
 
 ENGINE_API void
-immediate_quad_ex(RHI_vertex_buffer_t *buffer,
-                  vec3_t               position,
-                  vec2_t               render_size,
-                  vec4_t               render_color,
-                  vec2_t               uv_min,
-                  vec2_t               uv_max,
-                  vec2_t               padding,
-                  vec2_t               sdf_info,
-                  vec2_t               padding0)
+immediate_quad_ex(immediate_vertex_t *vertex_buffer_data,
+                  vec3_t              position,
+                  vec2_t              render_size,
+                  vec4_t              render_color,
+                  vec2_t              uv_min,
+                  vec2_t              uv_max,
+                  vec2_t              padding,
+                  vec2_t              sdf_info,
+                  vec2_t              padding0)
 {
-    immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)buffer->vertex_data + buffer->vertex_count);
+    immediate_vertex_t *vertex_pointer = vertex_buffer_data;
     Expect(vertex_pointer, "The vertex buffer pointer is invalid...");
 
     immediate_vertex_t *bottom_right = vertex_pointer + 0;
@@ -80,44 +81,10 @@ immediate_quad_ex(RHI_vertex_buffer_t *buffer,
     bottom_right->vTexCoord = vec2(tright, tbottom);
     top_left->vTexCoord     = vec2(tleft,  ttop);
     top_right->vTexCoord    = vec2(tright, ttop);
-
-    buffer->vertex_count += 4;
 }
 
 ENGINE_API void
-immediate_texture_ex(RHI_command_list_t  *command_list, 
-                     RHI_vertex_buffer_t *buffer, 
-                     vec3_t               position,
-                     vec2_t               render_size,
-                     vec4_t               render_color,
-                     vec2_t               uv_min,
-                     vec2_t               uv_max,
-                     vec2_t               padding,
-                     vec2_t               sdf_info,
-                     vec2_t               padding0,
-                     texture2D_t         *texture)
-{
-    if(texture)
-    {
-        if(RHI_is_texture_bound(command_list, texture) == -1)
-        {
-            RHI_cmd_bind_texture_image(command_list, texture);
-        }
-    }
-
-    immediate_quad_ex(buffer, 
-                      position, 
-                      render_size, 
-                      render_color, 
-                      uv_min, 
-                      uv_max, 
-                      padding, 
-                      sdf_info, 
-                      padding0);
-}
-
-ENGINE_API void
-immediate_rect_ex(RHI_vertex_buffer_t *buffer,
+immediate_rect_ex(immediate_vertex_t  *vertex_buffer_data,
                   vec3_t               position,
                   vec2_t               render_size,
                   vec4_t               render_color,
@@ -127,7 +94,7 @@ immediate_rect_ex(RHI_vertex_buffer_t *buffer,
                   vec2_t               sdf_info,
                   vec2_t               padding0)
 {
-    immediate_quad_ex(buffer,
+    immediate_quad_ex(vertex_buffer_data,
                       position, 
                       render_size, 
                       render_color,
@@ -139,13 +106,13 @@ immediate_rect_ex(RHI_vertex_buffer_t *buffer,
 }
 
 ENGINE_API void
-immediate_rect(RHI_vertex_buffer_t *buffer,
-               vec3_t               position,
-               vec2_t               render_size,
-               vec4_t               render_color)
+immediate_rect(immediate_vertex_t *vertex_buffer_data,
+               vec3_t              position,
+               vec2_t              render_size,
+               vec4_t              render_color)
 {
     vec2_t zero = vec2_zero();
-    immediate_quad_ex(buffer,
+    immediate_quad_ex(vertex_buffer_data,
                       position, 
                       render_size, 
                       render_color,
@@ -156,17 +123,20 @@ immediate_rect(RHI_vertex_buffer_t *buffer,
                       zero);
 }
 
-ENGINE_API void
-immediate_text(RHI_command_list_t    *command_list, 
-               RHI_vertex_buffer_t   *vertex_buffer,
-               asset_manager_t       *asset_manager,
-               asset_handle_t        *font_handle,
-               string_t               render_string, 
-               vec3_t                 position, 
-               vec4_t                 text_color,
-               float32                settings,
-               u32                    font_size)
+// NOTE(Sleepster): Returns the number of quads rendered 
+ENGINE_API s32
+immediate_text(render_group_t     *render_group, 
+               immediate_vertex_t *vertex_buffer_data,
+               asset_manager_t    *asset_manager,
+               asset_handle_t     *font_handle,
+               string_t            render_string, 
+               vec3_t              position, 
+               vec4_t              text_color,
+               float32             settings,
+               u32                 font_size)
 {
+    s32 result = 0;
+
     Assert(font_handle);
     Assert(font_handle->slot->type == AT_Font);
     if(*font_handle->is_valid)
@@ -186,11 +156,7 @@ immediate_text(RHI_command_list_t    *command_list,
                 glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
                 if(metrics->is_valid)
                 {
-                    s32 texture_index = RHI_is_texture_bound(command_list, &metrics->owner_atlas->texture);
-                    if(texture_index == -1)
-                    {
-                        RHI_cmd_bind_texture_image(command_list, &metrics->owner_atlas->texture);
-                    }
+                    s_render_group_bind_texture(render_group, metrics->synthetic_texture_handle);
                 }
             }
         }
@@ -205,20 +171,18 @@ immediate_text(RHI_command_list_t    *command_list,
                 glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
                 if(metrics->is_valid)
                 {
-                    s32 texture_index = RHI_is_texture_bound(command_list, &metrics->owner_atlas->texture);
-                    immediate_texture_ex(command_list,
-                                         vertex_buffer,
-                                         vec2_expand_vec3(vec2_subtract(render_position, vec2(0, metrics->offset_y)), position.z),
-                                         vec2(metrics->width, metrics->height),
-                                         text_color,
-                                         metrics->atlas_offset,
-                                         vec2_add(metrics->atlas_offset, metrics->atlas_size),
-                                         vec2(settings, texture_index),
-                                         vec2_zero(),
-                                         vec2_zero(),
-                                        &metrics->owner_atlas->texture);
-
+                    s32 texture_index = s_render_group_bind_texture(render_group, metrics->synthetic_texture_handle);
+                    immediate_quad_ex(vertex_buffer_data + (result * 4),
+                                      vec2_expand_vec3(vec2_subtract(render_position, vec2(0, metrics->offset_y)), position.z),
+                                      vec2(metrics->width, metrics->height),
+                                      text_color,
+                                      metrics->atlas_offset,
+                                      vec2_add(metrics->atlas_offset, metrics->atlas_size),
+                                      vec2(settings, texture_index),
+                                      vec2_zero(),
+                                      vec2_zero());
                     render_position.x += metrics->advance;
+                    ++result;
                 }
                 else
                 {
@@ -227,6 +191,8 @@ immediate_text(RHI_command_list_t    *command_list,
             }
         }
     }
+
+    return(result);
 }
 
 /*
@@ -236,13 +202,13 @@ LINES
 */
 
 ENGINE_API void
-immediate_line(RHI_vertex_buffer_t   *vertex_buffer,
-               vec2_t                 start,
-               vec2_t                 end,
-               float32                depth,
-               vec4_t                 render_color)
+immediate_line(immediate_vertex_t *vertex_buffer_data,
+               vec2_t              start,
+               vec2_t              end,
+               float32             depth,
+               vec4_t              render_color)
 {
-    immediate_vertex_t *vertex_pointer = ((immediate_vertex_t*)vertex_buffer->vertex_data + vertex_buffer->vertex_count);
+    immediate_vertex_t *vertex_pointer = vertex_buffer_data;
     Expect(vertex_pointer, "The vertex buffer pointer is invalid...");
 
     immediate_vertex_t *first  = vertex_pointer;
@@ -253,6 +219,4 @@ immediate_line(RHI_vertex_buffer_t   *vertex_buffer,
 
     second->vPosition = vec4(end.x, end.y, depth, 1.0f);
     second->vColor    = render_color;
-
-    vertex_buffer->vertex_count += 2;
 }

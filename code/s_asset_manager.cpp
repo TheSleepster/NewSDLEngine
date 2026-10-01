@@ -782,6 +782,12 @@ s_asset_font_load_glyph(dynamic_render_font_varient_t *varient,
     }
 
     metrics->owner_atlas = page->font_atlas;
+
+    asset_handle_t handle = {};
+    handle.is_valid = (bool32*)&metrics->is_valid;
+    handle.texture  = &metrics->owner_atlas->texture;
+
+    metrics->synthetic_texture_handle = handle;
     metrics->is_valid    = true;
 }
 
