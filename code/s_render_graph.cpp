@@ -25,33 +25,41 @@ s_render_group_begin(render_graph_t *render_graph, u32 renderpassID)
     result->renderpassID = renderpassID;
     result->ID           = render_graph->active_render_group_count - 1;
 
-    byte *data = (byte*)malloc(MB(4));
-    result->push_buffer.base     = data;
-    result->push_buffer.capacity = MB(4);
-    result->push_buffer.used     = 0;
+    byte *data = c_arena_push_size(&render_graph->arena, MB(4));
+    result->push_buffer.base = {
+        data,
+        MB(4)
+    };
+    result->push_buffer.used = 0;
 
     return(result);
 }
 
-s32
-s_render_group_append_vertex_stream(render_group_t *render_group, u32 element_stride, RHI_vertex_buffer_t *vertex_buffer)
+internal_api byte*
+push_vertices(render_group_push_buffer_t *buffer, u32 size)
 {
-    s32 result = 0;
-    result = render_group->vertex_stream_count;
+    byte *result = null;
+    Assert((s32)(buffer->used + size) <= buffer->base.count);
 
-    render_group_vertex_stream_t *stream = render_group->vertex_streams + render_group->vertex_stream_count++;
-    stream->vertex_stride = element_stride;
-    stream->vertex_buffer = vertex_buffer;
+    result = buffer->base + buffer->used;
+    buffer->used += size;
 
     return(result);
 }
 
-void
-s_render_group_push_vertex_stream_data(render_group_t *render_group, s32 vertex_stream, void *vertex_data, s32 vertex_count)
+render_group_vertex_stream_t*
+s_render_group_append_vertex_stream(render_group_t *render_group, u32 element_stride, s32 element_count, RHI_vertex_buffer_t *vertex_buffer)
 {
-    render_group_vertex_stream_t *stream = render_group->vertex_streams + vertex_stream;
-    stream->vertices     = vertex_data;
-    stream->vertex_count = vertex_count;
+    render_group_vertex_stream_t *result = render_group->vertex_streams + render_group->vertex_stream_count++;
+    result->vertex_stride = element_stride;
+    result->vertex_buffer = vertex_buffer;
+    result->max_vertices  = element_count;
+    result->vertices      = {
+        push_vertices(&render_group->push_buffer, element_stride * element_count),
+        (s32)(element_count * element_stride)
+    };
+
+    return(result);
 }
 
 s32
@@ -152,8 +160,9 @@ s_render_graph_output(render_state_t *render_state, RHI_image_t *present_image)
     render_graph_t *render_graph = &render_state->render_graph;
     RHI_command_list_t *command_list = RHI_get_command_list(render_state->RHI_context, RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
 
+#if 0
     quicksort(render_graph->render_groups.items, render_graph->active_render_group_count, 
-    [](const render_group_t &A, const render_group_t &B) -> int {
+    [](const render_command_t &A, const render_command_t &B) -> int {
         if(B.sort_key.renderpassID        != A.sort_key.renderpassID)        return((B.sort_key.renderpassID        < A.sort_key.renderpassID)        - (B.sort_key.renderpassID        > A.sort_key.renderpassID));
         if(B.sort_key.pipeline_state_hash != A.sort_key.pipeline_state_hash) return((B.sort_key.pipeline_state_hash < A.sort_key.pipeline_state_hash) - (B.sort_key.pipeline_state_hash > A.sort_key.pipeline_state_hash));
         if(B.sort_key.shader_hash         != A.sort_key.shader_hash)         return((B.sort_key.shader_hash         < A.sort_key.shader_hash)         - (B.sort_key.shader_hash         > A.sort_key.shader_hash));
@@ -161,6 +170,7 @@ s_render_graph_output(render_state_t *render_state, RHI_image_t *present_image)
         if(B.sort_key.descriptor_hash     != A.sort_key.descriptor_hash)     return((B.sort_key.descriptor_hash     < A.sort_key.descriptor_hash)     - (B.sort_key.descriptor_hash     > A.sort_key.descriptor_hash));
         return((B.sort_key.submission_index < A.sort_key.submission_index) - (B.sort_key.submission_index > A.sort_key.submission_index));
     });
+#endif
 
     // NOTE(Sleepster): Recording Command Nodes 
     u32 active_renderpass = INVALID_ID;
@@ -347,9 +357,8 @@ s_render_graph_output(render_state_t *render_state, RHI_image_t *present_image)
                     ++vertex_stream_index)
                 {
                     render_group_vertex_stream_t *stream = current_node->draw.vertex_streams + vertex_stream_index;
-                    RHI_vertex_buffer_reset_count(stream->vertex_buffer);
 
-                    stream->vertex_buffer->vertex_data   = (byte*)stream->vertices;
+                    stream->vertex_buffer->vertex_data   = stream->vertices.items;
                     stream->vertex_buffer->vertex_count  = stream->vertex_count;
                     stream->vertex_buffer->vertex_offset = stream->vertex_offset;
                     RHI_cmd_update_buffer_contents(command_list, stream->vertex_buffer);
@@ -369,8 +378,16 @@ s_render_graph_output(render_state_t *render_state, RHI_image_t *present_image)
                 RHI_cmd_set_viewport(command_list, current_node->draw.viewport.offset, current_node->draw.viewport.extent);
                 RHI_cmd_set_scissor(command_list,  current_node->draw.scissor.offset,  current_node->draw.scissor.extent);
  
-                render_group_vertex_stream_t *stream = &current_node->draw.vertex_streams[0];
-                RHI_cmd_draw_indexed(command_list, ((stream->vertex_count / 4) * 6), 0, 0, 1, 0);
+                if(current_node->draw.index_buffer)
+                {
+                    render_group_vertex_stream_t *stream = &current_node->draw.vertex_streams[0];
+                    RHI_cmd_draw_indexed(command_list, ((stream->vertex_count / 4) * 6), 0, 0, 1, 0);
+                }
+                else
+                {
+                    render_group_vertex_stream_t *stream = &current_node->draw.vertex_streams[0];
+                    RHI_cmd_draw(command_list, stream->vertex_count, 0, 1, 0);
+                }
             }break;
         }
     }

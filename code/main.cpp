@@ -438,11 +438,8 @@ render_collider(render_group_t *render_group, entity_t *entity)
 #endif
 
 void
-render_immediate_entity(render_group_t *render_group, immediate_vertex_t *vertex_data, entity_t *entity)
+render_immediate_entity(render_group_t *render_group, render_group_vertex_stream_t *vertex_data, entity_t *entity)
 {
-    (void)render_group;
-    (void)vertex_data;
-    (void)entity;
     vec2_t uv_min  = vec2_zero();
     vec2_t uv_max  = vec2_zero();
     if(entity->flags & ENTITY_FLAG_HAS_SPRITE)
@@ -486,7 +483,6 @@ render_immediate_entity(render_group_t *render_group, immediate_vertex_t *vertex
         }
     }
     
-#if 0
     vec2_t zero = vec2_zero();
     s_render_group_bind_texture(render_group, entity->sprite);
     immediate_quad_ex(vertex_data + (render_group->draw_element_count * 4), 
@@ -498,27 +494,17 @@ render_immediate_entity(render_group_t *render_group, immediate_vertex_t *vertex
                       zero,
                       zero,
                       zero);
-#endif
-    ++render_group->draw_element_count;
 }
 
 void
-render_immediate_debug_collider(render_group_t *render_group, immediate_vertex_t *vertex_data, entity_t *entity)
+render_immediate_debug_collider(render_group_vertex_stream_t *vertex_data, entity_t *entity)
 {
     vec2_t render_position = entity->bounding_box.min;
     vec4_t color = vec4(0.5f, 0.0f, 0.0f, 0.2f);
-    (void)render_position;
-    (void)color;
-    (void)render_group;
-    (void)vertex_data;
-    (void)entity;
-#if 0
-    immediate_rect(vertex_data + (render_group->draw_element_count * 4),
+    immediate_rect(vertex_data,
                    vec2_expand_vec3(render_position, 0.6f),
                    vec2_multiply(entity->bounding_box.half_size, vec2(2, 2)),
                    color);
-#endif
-    ++render_group->draw_element_count;
 }
 
 internal_api void
@@ -1218,14 +1204,11 @@ game_main(global_context_t *_global_context)
             }
         }
 
-#if 1
         s32 window_width  = 320;
         s32 window_height = 180;
         {
             render_group_t *current_render_group = s_render_group_begin(&render_state->render_graph, render_state->game_renderpass_ID);
-            current_render_group->shader = immediate_rectangle;
-
-            s_render_graph_command_clear_renderpass(&render_state->render_graph, render_state->game_renderpass_ID);
+            current_render_group->shader = immediate_textured;
 
             // NOTE(Sleepster): Render State 
             RHI_pipeline_state_t current_render_state = {};
@@ -1248,16 +1231,17 @@ game_main(global_context_t *_global_context)
             };
 
             s_render_group_add_constant_buffer(current_render_group, render_state->camera_matrices_buffer, &game_state->game_camera.matrices, sizeof(mat4_t) * 2);
+           
+            entity_query_t sprite_query = s_entity_query_flags(game_state->entity_manager, ENTITY_FLAG_HAS_SPRITE);
+            render_group_vertex_stream_t *vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), sprite_query.entity_count * 4, &render_state->vertex_buffer);
+            for(entity_t *entity: sprite_query)
+            {
+                render_immediate_entity(current_render_group, vertex_stream, entity);
+            }
 
-            s32 vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), &render_state->vertex_buffer);
-            immediate_vertex_t *vertex_data = (immediate_vertex_t*)current_render_group->push_buffer.base + current_render_group->push_buffer.used;
-            current_render_group->push_buffer.used += 4 * sizeof(immediate_vertex_t);
-
-            immediate_rect(vertex_data, vec3(0, 0, 0.45), vec2(20, 20), vec4(1.0, 0.0, 0.0, 1.0));
-
-            s_render_group_push_vertex_stream_data(current_render_group, vertex_stream, vertex_data, 4);
             s_render_group_end(&render_state->render_graph, current_render_group);
         }
+
         {
             render_group_t *current_render_group = s_render_group_begin(&render_state->render_graph, render_state->game_renderpass_ID);
             current_render_group->shader = immediate_rectangle;
@@ -1284,57 +1268,31 @@ game_main(global_context_t *_global_context)
 
             s_render_group_add_constant_buffer(current_render_group, render_state->camera_matrices_buffer, &game_state->game_camera.matrices, sizeof(mat4_t) * 2);
 
-            s32 vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), &render_state->vertex_buffer);
-            immediate_vertex_t *vertex_data = (immediate_vertex_t*)current_render_group->push_buffer.base + current_render_group->push_buffer.used;
-            current_render_group->push_buffer.used += 4 * sizeof(immediate_vertex_t);
+            entity_query_t collider_archetype_query = s_entity_query_archetype(game_state->entity_manager, ENTITY_ARCHETYPE_COLLIDER);
+            entity_query_t entity_collider_query    = s_entity_query_flags(game_state->entity_manager, ENTITY_FLAG_HAS_COLLIDER);
 
-            immediate_rect(vertex_data, vec3(-20, 20, 0.45), vec2(20, 20), vec4(0.0, 1.0, 0.0, 1.0));
+            u32 entity_vertex_count = (collider_archetype_query.entity_count + entity_collider_query.entity_count) * 4;
+            render_group_vertex_stream_t *vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), entity_vertex_count, &render_state->vertex_buffer);
+            for(entity_t *collider: collider_archetype_query)
+            {
+                render_immediate_debug_collider(vertex_stream, collider);
+            }
 
-            s_render_group_push_vertex_stream_data(current_render_group, vertex_stream, vertex_data, 4);
+            for(entity_t *entity: entity_collider_query)
+            {
+                render_immediate_debug_collider(vertex_stream, entity);
+            }
             s_render_group_end(&render_state->render_graph, current_render_group);
         }
+
         s_render_graph_command_blit_renderpasses(&render_state->render_graph, render_state->game_renderpass_ID, render_state->fullscreen_renderpass_ID);
+        // NOTE(Sleepster): Draw UI 
+        if((game_state->open_debug_menu || game_state->editor_opened) && main_ui->frame_begun)
         {
-            render_group_t *current_render_group = s_render_group_begin(&render_state->render_graph, render_state->fullscreen_renderpass_ID);
-            current_render_group->shader = immediate_rectangle;
-
-            window_width  = render_state->RHI_context->window_size.x;
-            window_height = render_state->RHI_context->window_size.y;
-
-            // NOTE(Sleepster): Render State 
-            RHI_pipeline_state_t current_render_state = {};
-            current_render_state.blend_enabled  = true;
-            current_render_state.depth_testing_enabled = true;
-            current_render_state.depth_writing_enabled = true;
-            current_render_state.polygon_mode   = RENDER_PIPELINE_POLYGON_MODE_FILL;
-            current_render_state.primitive_type = RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-
-            // NOTE(Sleepster): Render Group State 
-            current_render_group->pipeline_state = current_render_state;
-            current_render_group->index_buffer   = &render_state->index_buffer;
-            current_render_group->scissor = {
-                .offset = vec2_zero(),
-                .extent = vec2(window_width, window_height)
-            };
-            current_render_group->viewport = {
-                .offset = vec2(0,             window_height),
-                .extent = vec2(window_width, -window_height)
-            };
-
-            s_render_group_add_constant_buffer(current_render_group, render_state->camera_matrices_buffer, &game_state->fullscreen_camera.matrices, sizeof(mat4_t) * 2);
-
-            s32 vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), &render_state->vertex_buffer);
-            immediate_vertex_t *vertex_data = (immediate_vertex_t*)current_render_group->push_buffer.base + current_render_group->push_buffer.used;
-            current_render_group->push_buffer.used += 4 * sizeof(immediate_vertex_t);
-
-            immediate_rect(vertex_data, vec3(20, 20, 0.45), vec2(20, 20), vec4(1.0, 0.0, 1.0, 1.0));
-
-            s_render_group_push_vertex_stream_data(current_render_group, vertex_stream, vertex_data, 4);
-            s_render_group_end(&render_state->render_graph, current_render_group);
+            ui_state_end_frame(main_ui);
         }
 
         s_render_graph_output(render_state, &render_state->fullscreen_color_buffer);
-#endif
 
 #if 0 
         RHI_render_camera_t *scene_camera = &game_state->game_camera;
@@ -1470,7 +1428,6 @@ game_main(global_context_t *_global_context)
                 render_immediate_entity(current_render_group, vertex_data, entity);
             }
 
-            s_render_group_push_vertex_stream_data(current_render_group, vertex_stream, vertex_data, sprite_query.entity_count * 4);
             s_render_group_end(current_render_group);
         }
 
@@ -1499,13 +1456,12 @@ game_main(global_context_t *_global_context)
                 .extent = vec2(window_width, -window_height)
             };
 
-            s32 vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), &render_state->vertex_buffer);
+            u32 entity_vertex_count = (collider_archetype_query.entity_count + entity_collider_query.entity_count) * 4;
+            render_group_vertex_stream_t *vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), entity_vertex_count, &render_state->vertex_buffer);
 
             entity_query_t collider_archetype_query = s_entity_query_archetype(game_state->entity_manager, ENTITY_ARCHETYPE_COLLIDER);
             entity_query_t entity_collider_query    = s_entity_query_flags(game_state->entity_manager, ENTITY_FLAG_HAS_COLLIDER);
 
-            u32 entity_vertex_count = (collider_archetype_query.entity_count + entity_collider_query.entity_count) * 4;
-            immediate_vertex_t *vertex_data = c_arena_push_array(&current_render_group->push_buffer, immediate_vertex_t, entity_vertex_count);
             for(entity_t *collider: collider_archetype_query)
             {
                 render_immediate_debug_collider(current_render_group, vertex_data, collider);
@@ -1526,14 +1482,6 @@ game_main(global_context_t *_global_context)
             s_render_graph_add_section_barrier(blit_command, world_section);
             s_render_graph_cmd_blit_renderpasses(blit_command, render_state->game_renderpass_ID, render_state->fullscreen_renderpass_ID);
         }
-#endif
-#if 0
-        // NOTE(Sleepster): Draw UI 
-        if((game_state->open_debug_menu || game_state->editor_opened) && main_ui->frame_begun)
-        {
-            ui_state_end_frame(main_ui);
-        }
-        render_groups_to_output(render_state);
 #endif
 
 #if 0

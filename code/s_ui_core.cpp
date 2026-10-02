@@ -15,7 +15,7 @@ void ui_state_update_widget_state(ui_state_t *ui_state);
 internal_api void ui_state_update_widget_hierarchy(ui_state_t *ui_state);
 internal_api void size_all_widgets(ui_state_t *ui_state);
 internal_api void place_all_widgets(ui_state_t *ui_state);
-internal_api void render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, immediate_vertex_t *vertex_data, widget_t *first_widget);
+internal_api void render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, render_group_vertex_stream_t *vertex_data, widget_t *first_widget);
 
 /*
 =============
@@ -339,52 +339,48 @@ void
 ui_state_render_widgets(ui_state_t *ui_state)
 {
     render_state_t *render_state = ui_state->render_state;
-    (void)render_state;
 
     widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
     {
-        (void)current_widget;
-#if 0
-        render_graph_section_t *ui_section = s_render_graph_acquire_render_section(&render_state->render_graph, 1);
-        {
-            render_group_t *current_render_group = s_render_group_begin(ui_section, render_state->fullscreen_renderpass_ID);
-            current_render_group->shader       = ui_state->widget_shader;
-            current_render_group->index_buffer = &ui_state->index_buffer;
-            s32 vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), &ui_state->vertex_buffer);
+        render_group_t *current_render_group = s_render_group_begin(&render_state->render_graph, render_state->fullscreen_renderpass_ID);
+        current_render_group->shader       = ui_state->widget_shader;
+        current_render_group->index_buffer = &ui_state->index_buffer;
+        render_group_vertex_stream_t *vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), ui_state->widget_item_count * 4, &render_state->vertex_buffer);
+        vertex_stream->max_vertices = 4 * MAX_WIDGETS;
+        vertex_stream->vertices = {
+            ui_state->vertex_buffer.vertex_data,
+            (4 * MAX_WIDGETS) * sizeof(immediate_vertex_t)
+        };
 
-            RHI_pipeline_state_t pipeline_state = {};
-            pipeline_state.dst_color_blend_mode = RBM_OneMinusSrcAlpha;
-            pipeline_state.src_alpha_blend_mode = RBM_One;
-            pipeline_state.dst_alpha_blend_mode = RBM_Zero;
+        RHI_pipeline_state_t pipeline_state = {};
+        pipeline_state.dst_color_blend_mode = RBM_OneMinusSrcAlpha;
+        pipeline_state.src_alpha_blend_mode = RBM_One;
+        pipeline_state.dst_alpha_blend_mode = RBM_Zero;
 
-            current_render_group->pipeline_state = pipeline_state;
+        current_render_group->pipeline_state = pipeline_state;
 
-            s32 window_width  = Max(ui_state->RHI_context->window_size.x, 10);
-            s32 window_height = Max(ui_state->RHI_context->window_size.y, 10);
-            current_render_group->scissor = {
-                .offset = vec2_zero(),
-                .extent = vec2(window_width, window_height)
-            };
-            current_render_group->viewport = {
-                .offset = vec2(0,             window_height),
-                .extent = vec2(window_width, -window_height)
-            };
+        s32 window_width  = Max(ui_state->RHI_context->window_size.x, 10);
+        s32 window_height = Max(ui_state->RHI_context->window_size.y, 10);
+        current_render_group->scissor = {
+            .offset = vec2_zero(),
+            .extent = vec2(window_width, window_height)
+        };
+        current_render_group->viewport = {
+            .offset = vec2(0,             window_height),
+            .extent = vec2(window_width, -window_height)
+        };
 
-            do {
-                render_widget_hierarchy(ui_state, current_render_group, (immediate_vertex_t*)ui_state->vertex_buffer.vertex_data, current_widget);
-                current_widget = current_widget->next_sibling;
-            }while(current_widget != ui_state->first_widget);
-            s_render_group_push_vertex_stream_data(current_render_group, vertex_stream, ui_state->vertex_buffer.vertex_data, ui_state->widget_item_count * 4);
+        do {
+            render_widget_hierarchy(ui_state, current_render_group, vertex_stream, current_widget);
+            current_widget = current_widget->next_sibling;
+        }while(current_widget != ui_state->first_widget);
 
-            s_render_group_add_constant_buffer(current_render_group, ui_state->camera_matrices_buffer, &ui_state->current_camera,   sizeof(mat4_t) * 2); 
-            s_render_group_add_constant_buffer(current_render_group, ui_state->widget_instance_data,    ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
+        s_render_group_add_constant_buffer(current_render_group, ui_state->camera_matrices_buffer, &ui_state->current_camera,   sizeof(mat4_t) * 2); 
+        s_render_group_add_constant_buffer(current_render_group, ui_state->widget_instance_data,    ui_state->widget_instances, sizeof(immediate_widget_data_t) * ui_state->widget_instance_count);
 
-            current_render_group->draw_element_count = ui_state->widget_item_count;
-            s_render_group_end(current_render_group);
-        }
+        s_render_group_end(&render_state->render_graph, current_render_group);
         ui_state->widget_instance_count = 0;
-#endif
     }
     else
     {
@@ -399,16 +395,10 @@ render_widget_hierarchy
 */
 
 internal_api void
-render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, immediate_vertex_t *vertex_data, widget_t *first_widget)
+render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, render_group_vertex_stream_t *vertex_data, widget_t *first_widget)
 {
     widget_t *current_widget = first_widget;
-    (void)current_widget;
-    (void)render_group;
-    (void)ui_state;
-    (void)vertex_data;
-    (void)first_widget;
     do {
-#if 0
         vec2_t half_size = vec2(current_widget->state->render_size.x * 0.5f, 
                                 current_widget->state->render_size.y * 0.5f);
 
@@ -423,9 +413,7 @@ render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, imme
             current_widget->widget_instance_data->iHalfSize        = half_size;
             current_widget->widget_instance_data->iRadius          = current_widget->radius;
             current_widget->widget_instance_data->iSDFSmoothness   = current_widget->smoothness;
-
-            u32 vertex_offset = ui_state->widget_item_count * 4;
-            immediate_rect_ex(vertex_data + vertex_offset,
+            immediate_rect_ex(vertex_data,
                               current_widget->state->position, 
                               current_widget->state->render_size,
                               current_widget->state->render_color,
@@ -441,8 +429,7 @@ render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, imme
 
         if(current_widget->widget_flags & UI_WIDGET_FLAG_DRAW_BACKGROUND)
         {
-            u32 vertex_offset = ui_state->widget_item_count * 4;
-            immediate_rect_ex(vertex_data + vertex_offset,
+            immediate_rect_ex(vertex_data,
                               current_widget->state->position, 
                               current_widget->state->render_size,
                               current_widget->state->render_color,
@@ -467,9 +454,8 @@ render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, imme
                                                current_widget->state->position.z + -0.01); // some Epsilon
             if((current_widget->widget_flags & UI_WIDGET_FLAG_HAS_TEXT_CONTENT) == 0)
             {
-                u32 vertex_offset = ui_state->widget_item_count * 4;
                 immediate_text(render_group, 
-                               vertex_data + vertex_offset, 
+                               vertex_data, 
                                ui_state->asset_manager,
                                &ui_state->default_font,
                                current_widget->widget_name,
@@ -482,13 +468,12 @@ render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, imme
             }
             else
             {
-                u32 vertex_offset = ui_state->widget_item_count * 4;
                 string_t widget_text = {
                     .data  = (u8*)(current_widget->widget_text_buffer->data + current_widget->state->widget_text_render_start_offset),
                     .count = current_widget->state->widget_text_render_end_offset,
                 };
                 immediate_text(render_group, 
-                               vertex_data + vertex_offset, 
+                               vertex_data, 
                                ui_state->asset_manager,
                               &ui_state->default_font,
                                widget_text,
@@ -505,11 +490,9 @@ render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, imme
         {
             if(current_widget->display_texture.texture)
             {
-                u32 vertex_offset = ui_state->widget_item_count * 4;
-
                 current_widget->display_texture.slot = null;
                 s32 texture_index = s_render_group_bind_texture(render_group, current_widget->display_texture);
-                immediate_quad_ex(vertex_data + vertex_offset,
+                immediate_quad_ex(vertex_data,
                                   current_widget->state->position, 
                                   current_widget->state->render_size,
                                   current_widget->state->render_color,
@@ -525,11 +508,10 @@ render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, imme
 
         if(current_widget->first_child)
         {
-            render_widget_hierarchy(ui_state, render_group, (immediate_vertex_t*)ui_state->vertex_buffer.vertex_data, current_widget->first_child);
+            render_widget_hierarchy(ui_state, render_group, vertex_data, current_widget->first_child);
         }
 
         current_widget = current_widget->next_sibling;
-#endif
     }while(current_widget != first_widget);
 }
 

@@ -46,10 +46,11 @@ struct render_group_vertex_stream_t
 {
     RHI_vertex_buffer_t *vertex_buffer;
 
-    void *vertices;
-    u32   vertex_count;
-    u32   vertex_offset;
-    u32   vertex_stride;
+    array_view_t<byte> vertices;
+    u32                vertex_count;
+    u32                max_vertices;
+    u32                vertex_offset;
+    u32                vertex_stride;
 };
 
 struct render_group_constant_buffer_info_t
@@ -62,11 +63,9 @@ struct render_group_constant_buffer_info_t
 
 struct render_group_push_buffer_t
 {
-    byte *base;
-    u32   used;
-    u32   capacity;
+    array_view_t<byte> base;
+    u32                used;
 };
-
 
 using render_group_texture_array_t = fixed_array_t<asset_handle_t, RHI_MAX_SHADER_IMAGE_PARAMS>;
 using vertex_stream_array_t        = fixed_array_t<render_group_vertex_stream_t, 10>;
@@ -115,6 +114,7 @@ enum render_graph_command_type_t
     RENDER_GRAPH_COMMAND_TYPE_BLIT,
 };
 
+// NOTE(Sleepster): Render record 
 struct render_command_t
 {
     s32 type;
@@ -154,6 +154,7 @@ enum render_graph_node_type
     RENDER_GRAPH_NODE_TYPE_CLEAR_RENDERPASS,
 };
 
+// NOTE(Sleepster): Render Command 
 struct render_graph_node_t
 {
     s32 type;
@@ -245,10 +246,10 @@ struct render_state_t
 
 render_group_t* s_render_group_begin(render_graph_t *render_graph, u32 renderpassID);
 void s_render_group_end(render_graph_t *render_graph, render_group_t *render_group);
+s32 s_render_group_bind_texture(render_group_t *render_group, asset_handle_t texture);
 void s_render_graph_output(render_state_t *render_state, RHI_image_t *present_image);
-s32 s_render_group_append_vertex_stream(render_group_t *render_group, u32 element_stride, RHI_vertex_buffer_t *vertex_buffer);
+render_group_vertex_stream_t* s_render_group_append_vertex_stream(render_group_t *render_group, u32 element_stride, s32 element_count, RHI_vertex_buffer_t *vertex_buffer);
 void s_render_group_add_constant_buffer(render_group_t *render_group, RHI_uniform_constant_buffer_t *constant_buffer, void *data, u32 data_size);
-void s_render_group_push_vertex_stream_data(render_group_t *render_group, s32 vertex_stream, void *vertex_data, s32 vertex_count);
 void s_render_graph_command_blit_renderpasses(render_graph_t *render_graph, u32 renderpassA, u32 renderpassB);
 void s_render_graph_command_clear_renderpass(render_graph_t *render_graph, u32 renderpassID);
 

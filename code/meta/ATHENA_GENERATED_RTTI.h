@@ -206,6 +206,7 @@
 	X(string_builder_t, &DEFAULT_typedata_structure_string_builder_t.type_info) \
 	X(string_builder_buffer, &DEFAULT_typedata_string_builder_buffer) \
 	X(immediate_vertex_t, &DEFAULT_typedata_immediate_vertex_t) \
+	X(render_group_vertex_stream_t, &DEFAULT_typedata_render_group_vertex_stream_t) \
 	X(render_group_t, &DEFAULT_typedata_render_group_t) \
 	X(duration_counter_t, &DEFAULT_typedata_structure_duration_counter_t.type_info) \
 	X(asset_type_t, &DEFAULT_typedata_structure_asset_type_t.type_info) \
@@ -723,6 +724,7 @@
 	X(TYPE_c_string_builder_flush_to_file) \
 	X(TYPE_string_builder_buffer) \
 	X(TYPE_immediate_vertex_t) \
+	X(TYPE_render_group_vertex_stream_t) \
 	X(TYPE_immediate_put_data) \
 	X(TYPE_immediate_quad_ex) \
 	X(TYPE_immediate_texture_ex) \
@@ -8444,6 +8446,7 @@ extern const type_info_procedure_c_string_builder_dump_to_file DEFAULT_typedata_
 extern const type_info_procedure_c_string_builder_flush_to_file DEFAULT_typedata_procedure_c_string_builder_flush_to_file;
 extern const type_info_t DEFAULT_typedata_string_builder_buffer;
 extern const type_info_t DEFAULT_typedata_immediate_vertex_t;
+extern const type_info_t DEFAULT_typedata_render_group_vertex_stream_t;
 extern const type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data;
 extern const type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immediate_quad_ex;
 extern const type_info_procedure_immediate_texture_ex DEFAULT_typedata_procedure_immediate_texture_ex;
@@ -24759,6 +24762,11 @@ constexpr type_info_t DEFAULT_typedata_immediate_vertex_t = {
 	.type_id = TYPE_immediate_vertex_t,
 	.size = athena_internal::safe_sizeof<immediate_vertex_t>(),
 };
+constexpr type_info_t DEFAULT_typedata_render_group_vertex_stream_t = {
+	.type_name = "render_group_vertex_stream_t",
+	.type_id = TYPE_render_group_vertex_stream_t,
+	.size = athena_internal::safe_sizeof<render_group_vertex_stream_t>(),
+};
 constexpr type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_immediate_put_data = {
 	.type_info = {
 		.type_name = "immediate_put_data",
@@ -24770,7 +24778,7 @@ constexpr type_info_procedure_immediate_put_data DEFAULT_typedata_procedure_imme
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_put_data.argument_array,
 	.arguments = {
 		.vertex_buffer_data = {
-			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.type_info     = &DEFAULT_typedata_render_group_vertex_stream_t,
 			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_put_data.type_info,
 			.flags         = 2,
@@ -24810,7 +24818,7 @@ constexpr type_info_procedure_immediate_quad_ex DEFAULT_typedata_procedure_immed
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_quad_ex.argument_array,
 	.arguments = {
 		.vertex_buffer_data = {
-			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.type_info     = &DEFAULT_typedata_render_group_vertex_stream_t,
 			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_quad_ex.type_info,
 			.flags         = 2,
@@ -24974,7 +24982,7 @@ constexpr type_info_procedure_immediate_rect_ex DEFAULT_typedata_procedure_immed
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect_ex.argument_array,
 	.arguments = {
 		.vertex_buffer_data = {
-			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.type_info     = &DEFAULT_typedata_render_group_vertex_stream_t,
 			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_rect_ex.type_info,
 			.flags         = 2,
@@ -25049,7 +25057,7 @@ constexpr type_info_procedure_immediate_rect DEFAULT_typedata_procedure_immediat
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_rect.argument_array,
 	.arguments = {
 		.vertex_buffer_data = {
-			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.type_info     = &DEFAULT_typedata_render_group_vertex_stream_t,
 			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_rect.type_info,
 			.flags         = 2,
@@ -25101,7 +25109,7 @@ constexpr type_info_procedure_immediate_text DEFAULT_typedata_procedure_immediat
 			.pointer_depth = 1,
 		},
 		.vertex_buffer_data = {
-			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.type_info     = &DEFAULT_typedata_render_group_vertex_stream_t,
 			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_text.type_info,
 			.flags         = 2,
@@ -25169,7 +25177,7 @@ constexpr type_info_procedure_immediate_line DEFAULT_typedata_procedure_immediat
 	.argument_pointer = DEFAULT_typedata_procedure_immediate_line.argument_array,
 	.arguments = {
 		.vertex_buffer_data = {
-			.type_info     = &DEFAULT_typedata_immediate_vertex_t,
+			.type_info     = &DEFAULT_typedata_render_group_vertex_stream_t,
 			.member_name   = "vertex_buffer_data",
 			.parent        = &DEFAULT_typedata_procedure_immediate_line.type_info,
 			.flags         = 2,

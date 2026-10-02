@@ -24,17 +24,18 @@ QUADS
 */
 
 ENGINE_API void
-immediate_quad_ex(immediate_vertex_t *vertex_buffer_data,
-                  vec3_t              position,
-                  vec2_t              render_size,
-                  vec4_t              render_color,
-                  vec2_t              uv_min,
-                  vec2_t              uv_max,
-                  vec2_t              padding,
-                  vec2_t              sdf_info,
-                  vec2_t              padding0)
+immediate_quad_ex(render_group_vertex_stream_t *vertex_buffer_data,
+                  vec3_t                        position,
+                  vec2_t                        render_size,
+                  vec4_t                        render_color,
+                  vec2_t                        uv_min,
+                  vec2_t                        uv_max,
+                  vec2_t                        padding,
+                  vec2_t                        sdf_info,
+                  vec2_t                        padding0)
 {
-    immediate_vertex_t *vertex_pointer = vertex_buffer_data;
+    immediate_vertex_t *vertex_pointer = (immediate_vertex_t*)(vertex_buffer_data->vertices + (vertex_buffer_data->vertex_count * vertex_buffer_data->vertex_stride));
+    Assert(vertex_buffer_data->vertex_count + 4 <= vertex_buffer_data->max_vertices);
     Expect(vertex_pointer, "The vertex buffer pointer is invalid...");
 
     immediate_vertex_t *bottom_right = vertex_pointer + 0;
@@ -81,18 +82,20 @@ immediate_quad_ex(immediate_vertex_t *vertex_buffer_data,
     bottom_right->vTexCoord = vec2(tright, tbottom);
     top_left->vTexCoord     = vec2(tleft,  ttop);
     top_right->vTexCoord    = vec2(tright, ttop);
+
+    vertex_buffer_data->vertex_count += 4;
 }
 
 ENGINE_API void
-immediate_rect_ex(immediate_vertex_t  *vertex_buffer_data,
-                  vec3_t               position,
-                  vec2_t               render_size,
-                  vec4_t               render_color,
-                  vec2_t               uv_min,
-                  vec2_t               uv_max,
-                  vec2_t               padding,
-                  vec2_t               sdf_info,
-                  vec2_t               padding0)
+immediate_rect_ex(render_group_vertex_stream_t *vertex_buffer_data,
+                  vec3_t                        position,
+                  vec2_t                        render_size,
+                  vec4_t                        render_color,
+                  vec2_t                        uv_min,
+                  vec2_t                        uv_max,
+                  vec2_t                        padding,
+                  vec2_t                        sdf_info,
+                  vec2_t                        padding0)
 {
     immediate_quad_ex(vertex_buffer_data,
                       position, 
@@ -106,10 +109,10 @@ immediate_rect_ex(immediate_vertex_t  *vertex_buffer_data,
 }
 
 ENGINE_API void
-immediate_rect(immediate_vertex_t *vertex_buffer_data,
-               vec3_t              position,
-               vec2_t              render_size,
-               vec4_t              render_color)
+immediate_rect(render_group_vertex_stream_t *vertex_buffer_data,
+               vec3_t                        position,
+               vec2_t                        render_size,
+               vec4_t                        render_color)
 {
     vec2_t zero = vec2_zero();
     immediate_quad_ex(vertex_buffer_data,
@@ -125,15 +128,15 @@ immediate_rect(immediate_vertex_t *vertex_buffer_data,
 
 // NOTE(Sleepster): Returns the number of quads rendered 
 ENGINE_API s32
-immediate_text(render_group_t     *render_group, 
-               immediate_vertex_t *vertex_buffer_data,
-               asset_manager_t    *asset_manager,
-               asset_handle_t     *font_handle,
-               string_t            render_string, 
-               vec3_t              position, 
-               vec4_t              text_color,
-               float32             settings,
-               u32                 font_size)
+immediate_text(render_group_t               *render_group, 
+               render_group_vertex_stream_t *vertex_buffer_data,
+               asset_manager_t              *asset_manager,
+               asset_handle_t               *font_handle,
+               string_t                      render_string, 
+               vec3_t                        position, 
+               vec4_t                        text_color,
+               float32                       settings,
+               u32                           font_size)
 {
     s32 result = 0;
 
@@ -156,9 +159,7 @@ immediate_text(render_group_t     *render_group,
                 glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
                 if(metrics->is_valid)
                 {
-#if 0
                     s_render_group_bind_texture(render_group, metrics->synthetic_texture_handle);
-#endif
                 }
             }
         }
@@ -173,9 +174,8 @@ immediate_text(render_group_t     *render_group,
                 glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
                 if(metrics->is_valid)
                 {
-#if 0
                     s32 texture_index = s_render_group_bind_texture(render_group, metrics->synthetic_texture_handle);
-                    immediate_quad_ex(vertex_buffer_data + (result * 4),
+                    immediate_quad_ex(vertex_buffer_data,
                                       vec2_expand_vec3(vec2_subtract(render_position, vec2(0, metrics->offset_y)), position.z),
                                       vec2(metrics->width, metrics->height),
                                       text_color,
@@ -184,7 +184,6 @@ immediate_text(render_group_t     *render_group,
                                       vec2(settings, texture_index),
                                       vec2_zero(),
                                       vec2_zero());
-#endif
                     render_position.x += metrics->advance;
                     ++result;
                 }
@@ -206,13 +205,14 @@ LINES
 */
 
 ENGINE_API void
-immediate_line(immediate_vertex_t *vertex_buffer_data,
-               vec2_t              start,
-               vec2_t              end,
-               float32             depth,
-               vec4_t              render_color)
+immediate_line(render_group_vertex_stream_t *vertex_buffer_data,
+               vec2_t                        start,
+               vec2_t                        end,
+               float32                       depth,
+               vec4_t                        render_color)
 {
-    immediate_vertex_t *vertex_pointer = vertex_buffer_data;
+    immediate_vertex_t *vertex_pointer = (immediate_vertex_t*)(vertex_buffer_data->vertices + (vertex_buffer_data->vertex_count * vertex_buffer_data->vertex_stride));
+    Assert(vertex_buffer_data->vertex_count + 2 <= vertex_buffer_data->max_vertices);
     Expect(vertex_pointer, "The vertex buffer pointer is invalid...");
 
     immediate_vertex_t *first  = vertex_pointer;
@@ -223,4 +223,6 @@ immediate_line(immediate_vertex_t *vertex_buffer_data,
 
     second->vPosition = vec4(end.x, end.y, depth, 1.0f);
     second->vColor    = render_color;
+
+    vertex_buffer_data->vertex_count += 2;
 }

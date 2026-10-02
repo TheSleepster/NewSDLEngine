@@ -122,7 +122,7 @@ local CLANG_WARN_BASE = {
     "-Wno-missing-braces", "-Wno-pointer-sign", "-Wno-incompatible-pointer-types-discards-qualifiers", 
     "-Wno-null-dereference", "-Wno-missing-field-initializers", "-Wno-switch", "-Wno-deprecated-declarations",
     "-Wno-null-pointer-subtraction", "-Wno-typedef-redefinition", "-Wno-writable-strings",
-    "-Wno-deprecated", "-Wno-c99-designator", "-Wno-unused-template", "-Wno-unused-parameter"
+    "-Wno-deprecated", "-Wno-c99-designator", "-Wno-unused-template"
 }
 local CLANG_DEBUG_ONLY   = { "-g", "-O0", "-fno-inline-functions" }
 local CLANG_RELEASE_ONLY = {
