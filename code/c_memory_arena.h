@@ -55,6 +55,8 @@ ENGINE_API byte*          c_arena_bootstrap_allocate_struct_(u32 structure_size,
 ENGINE_API void           c_arena_clear_block(memory_arena_t *arena);
 ENGINE_API void           c_arena_free_last_block(memory_arena_t *arena);
 
+ENGINE_API memory_arena_t c_arena_create_subarena(memory_arena_t *arena, u32 size_init);
+
 #if 1
 // NOTE(Sleepster): We can't use this because the compiler is stupid and refuses
 // to just call the address of c_arena_push_size on some occasions

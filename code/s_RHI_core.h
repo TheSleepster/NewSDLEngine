@@ -233,8 +233,8 @@ struct RHI_command_clear_image_t
 
 struct RHI_command_bind_vertex_buffer_t
 {
-    RHI_vertex_buffer_t *vertex_buffers;
-    u32                  vertex_buffer_count;
+    RHI_vertex_buffer_t **vertex_buffers;
+    u32                   vertex_buffer_count;
 };
 
 struct RHI_command_bind_index_buffer_t
@@ -620,7 +620,7 @@ ENGINE_API void RHI_cmd_present(RHI_command_list_t *command_list, RHI_image_t *p
 // NOTE(Sleepster): Aliases for operator overloading...
 ENGINE_API true_inline void RHI_cmd_update_buffer_contents(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer);
 ENGINE_API true_inline void RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer);
-ENGINE_API true_inline void RHI_cmd_bind_vertex_buffers(RHI_command_list_t *command_list, RHI_vertex_buffer_t *vertex_buffers, u32 vertex_buffer_count);
+ENGINE_API true_inline void RHI_cmd_bind_vertex_buffers(RHI_command_list_t *command_list, RHI_vertex_buffer_t **vertex_buffers, u32 vertex_buffer_count);
 
 ENGINE_API void RHI_execute_backend_commands(RHI_context_t *RHI_context);
 

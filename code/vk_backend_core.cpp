@@ -2560,6 +2560,40 @@ command_list_reset_state(RHI_command_list_t *command_list)
     c_arena_reset(&command_list->command_arena);
 }
 
+internal_api VkPipeline 
+vk_backend_get_pipeline_for_active_state(vulkan_context_t   *vulkan_context, 
+                                         RHI_command_list_t *command_list, 
+                                         vulkan_shader_t    *shader)
+{
+    VkPipeline result = null;
+
+    u64 hash_index = 0;
+    if(shader->pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
+    {
+        struct shader_pipeline_key_t {
+            RHI_renderpass_key_t renderpass;
+            RHI_pipeline_state_t pipeline_state;
+        }pipeline_key;
+
+        pipeline_key.pipeline_state = command_list->active_render_state;
+        pipeline_key.renderpass     = command_list->active_renderpass->renderpass_key;
+
+        hash_index = (c_hash_table_hash_key(string_t{(u8*)&pipeline_key, sizeof(shader_pipeline_key_t)})) % MAX_SHADER_PIPELINE_COUNT;
+    }
+
+    result = (shader->pipeline_hash.items[hash_index]).item;
+    if(result == VK_NULL_HANDLE)
+    {
+        (shader->pipeline_hash.items[hash_index]).item = vk_backend_create_pipeline_from_render_state(vulkan_context, 
+                                                                                                      shader, 
+                                                                                                      command_list->active_renderpass->renderpass_handle,
+                                                                                                     &command_list->active_render_state);
+        result = (shader->pipeline_hash.items[hash_index]).item;
+    }
+
+    return(result);
+}
+
 /*
 =============
 vk_backend_render_frame
@@ -2879,7 +2913,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                             buffer_index < cmd->vertex_buffer_count;
                             ++buffer_index)
                         {
-                            RHI_vertex_buffer_t *buffer = cmd->vertex_buffers + buffer_index;
+                            RHI_vertex_buffer_t *buffer = cmd->vertex_buffers[buffer_index];
                             c_dynarray_add(&command_list->active_vertex_buffers, &buffer);
                             ++command_list->vertex_buffer_count;
                         }
@@ -2900,33 +2934,13 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
 
                         RHI_command_bind_shader_t *cmd = (RHI_command_bind_shader_t*)command->data;
                         vulkan_shader_t *shader = &cmd->shader.shader->shader_data;
-                        u64 hash_index = 0;
-                        if(shader->pipeline_type == VK_PIPELINE_BIND_POINT_GRAPHICS)
+                        if(command_list->active_shader_program != &cmd->shader)
                         {
-                            struct shader_pipeline_key_t {
-                                RHI_renderpass_key_t renderpass;
-                                RHI_pipeline_state_t pipeline_state;
-                            }pipeline_key;
+                            VkPipeline shader_pipeline = vk_backend_get_pipeline_for_active_state(vulkan_context, command_list, shader);
 
-                            pipeline_key.pipeline_state = command_list->active_render_state;
-                            pipeline_key.renderpass     = command_list->active_renderpass->renderpass_key;
-
-                            hash_index = (c_hash_table_hash_key(string_t{(u8*)&pipeline_key, sizeof(shader_pipeline_key_t)})) % MAX_SHADER_PIPELINE_COUNT;
+                            vkCmdBindPipeline(render_command_buffer, shader->pipeline_type, shader_pipeline);
+                            command_list->active_shader_program = &cmd->shader;
                         }
-
-                        // TODO(Sleepster): Maybe we don't want to touch the stuff accessed by the command_list... threading issues.
-                        VkPipeline shader_pipeline = (shader->pipeline_hash.items[hash_index]).item;
-                        if(shader_pipeline == VK_NULL_HANDLE)
-                        {
-                            (shader->pipeline_hash.items[hash_index]).item = vk_backend_create_pipeline_from_render_state(vulkan_context, 
-                                                                                                                          shader, 
-                                                                                                                          command_list->active_renderpass->renderpass_handle,
-                                                                                                                          &command_list->active_render_state);
-                            shader_pipeline = (shader->pipeline_hash.items[hash_index]).item;
-                        }
-
-                        vkCmdBindPipeline(render_command_buffer, shader->pipeline_type, shader_pipeline);
-                        command_list->active_shader_program = &cmd->shader;
                     }break;
                     case RHI_RENDER_COMMAND_TYPE_BIND_TEXTURE:
                     {
@@ -3031,10 +3045,24 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                     {
                         RHI_command_set_pipeline_state_t *cmd = (RHI_command_set_pipeline_state_t*)command->data;
                         command_list->active_render_state = cmd->pipeline_state;
+                        if(command_list->active_shader_program)
+                        {
+                            vulkan_shader_t *active_shader = &command_list->active_shader_program->shader->shader_data;
+
+                            VkPipeline shader_pipeline = vk_backend_get_pipeline_for_active_state(vulkan_context, command_list, active_shader);
+                            vkCmdBindPipeline(render_command_buffer, active_shader->pipeline_type, shader_pipeline);
+                        }
                     }break;
                     case RHI_RENDER_COMMAND_TYPE_RESET_RENDER_STATE:
                     {
                         command_list->active_render_state = g_pipeline_default_state_key;
+                        if(command_list->active_shader_program)
+                        {
+                            vulkan_shader_t *active_shader = &command_list->active_shader_program->shader->shader_data;
+
+                            VkPipeline shader_pipeline = vk_backend_get_pipeline_for_active_state(vulkan_context, command_list, active_shader);
+                            vkCmdBindPipeline(render_command_buffer, active_shader->pipeline_type, shader_pipeline);
+                        }
                     }break;
                     case RHI_RENDER_COMMAND_TYPE_DISPATCH_COMPUTE:
                     {

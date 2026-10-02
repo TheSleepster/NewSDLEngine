@@ -184,3 +184,18 @@ c_arena_end_temporary_memory(scratch_arena_t *scratch_arena)
 
     parent->scratch_arena_count -= 1;
 }
+
+ENGINE_API memory_arena_t
+c_arena_create_subarena(memory_arena_t *arena, u32 size_init)
+{
+    memory_arena_t result = {};
+
+    u32 size = Align16(size_init);
+    result.is_initialized = true;
+    result.base = c_arena_push_size(arena, size);
+    result.used = 0;
+    result.block_size = size;
+    result.block_counter = 1;
+
+    return(result);
+}

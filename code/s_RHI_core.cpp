@@ -749,7 +749,7 @@ RHI_cmd_bind_texture_from_handle(RHI_command_list_t *command_list, asset_handle_
 }
 
 ENGINE_API true_inline void 
-RHI_cmd_bind_vertex_buffers(RHI_command_list_t *command_list, RHI_vertex_buffer_t *vertex_buffers, u32 vertex_buffer_count)
+RHI_cmd_bind_vertex_buffers(RHI_command_list_t *command_list, RHI_vertex_buffer_t **vertex_buffers, u32 vertex_buffer_count)
 {
     Assert(command_list->command_list_type == RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
     RHI_command_t *command = RHI_get_next_command(command_list);
@@ -771,7 +771,8 @@ RHI_cmd_bind_vertex_buffer
 ENGINE_API true_inline void 
 RHI_cmd_bind_vertex_buffer(RHI_command_list_t *command_list, RHI_vertex_buffer_t *buffer)
 {
-    RHI_cmd_bind_vertex_buffers(command_list, buffer, 1);
+    RHI_vertex_buffer_t *buffers[1] = {buffer};
+    RHI_cmd_bind_vertex_buffers(command_list, buffers, 1);
 }
 
 /*
@@ -1013,6 +1014,7 @@ RHI_cmd_draw(RHI_command_list_t *command_list,
     RHI_command_t *command   = RHI_get_next_command(command_list);
     RHI_command_draw_t *draw = c_arena_push_struct(&command_list->command_arena, 
                                                     RHI_command_draw_t);
+    ZeroStruct(*draw);
     draw->vertices_to_draw = vertex_count;
     draw->vertex_offset    = vertex_offset;
     draw->instance_count   = instance_count;
@@ -1043,6 +1045,7 @@ RHI_cmd_draw_indexed(RHI_command_list_t *command_list,
     RHI_command_t *command   = RHI_get_next_command(command_list);
     RHI_command_draw_t *draw = c_arena_push_struct(&command_list->command_arena, 
                                                     RHI_command_draw_t);
+    ZeroStruct(*draw);
     draw->indices_to_draw  = index_count;
     draw->index_offset     = index_offset;
     draw->instance_count   = instance_count;

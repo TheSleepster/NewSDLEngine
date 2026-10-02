@@ -156,7 +156,9 @@ immediate_text(render_group_t     *render_group,
                 glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
                 if(metrics->is_valid)
                 {
+#if 0
                     s_render_group_bind_texture(render_group, metrics->synthetic_texture_handle);
+#endif
                 }
             }
         }
@@ -171,6 +173,7 @@ immediate_text(render_group_t     *render_group,
                 glyph_metric_t *metrics = s_asset_font_fetch_glyph(asset_manager, varient, character);
                 if(metrics->is_valid)
                 {
+#if 0
                     s32 texture_index = s_render_group_bind_texture(render_group, metrics->synthetic_texture_handle);
                     immediate_quad_ex(vertex_buffer_data + (result * 4),
                                       vec2_expand_vec3(vec2_subtract(render_position, vec2(0, metrics->offset_y)), position.z),
@@ -181,6 +184,7 @@ immediate_text(render_group_t     *render_group,
                                       vec2(settings, texture_index),
                                       vec2_zero(),
                                       vec2_zero());
+#endif
                     render_position.x += metrics->advance;
                     ++result;
                 }

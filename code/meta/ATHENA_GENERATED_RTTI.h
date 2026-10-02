@@ -554,6 +554,7 @@
 	X(TYPE_c_arena_bootstrap_allocate_struct_) \
 	X(TYPE_c_arena_clear_block) \
 	X(TYPE_c_arena_free_last_block) \
+	X(TYPE_c_arena_create_subarena) \
 	X(TYPE_c_arena_reset) \
 	X(TYPE_c_arena_begin_temporary_memory) \
 	X(TYPE_c_arena_end_temporary_memory) \
@@ -4595,6 +4596,20 @@ struct type_info_procedure_c_arena_free_last_block {
 	};
 };
 
+struct type_info_procedure_c_arena_create_subarena {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[2];
+		struct {
+			const type_info_member_t arena;
+			const type_info_member_t size_init;
+		}arguments;
+	};
+};
+
 struct type_info_procedure_c_arena_reset {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -8264,6 +8279,7 @@ extern const type_info_procedure_c_arena_push_size DEFAULT_typedata_procedure_c_
 extern const type_info_procedure_c_arena_bootstrap_allocate_struct_ DEFAULT_typedata_procedure_c_arena_bootstrap_allocate_struct_;
 extern const type_info_procedure_c_arena_clear_block DEFAULT_typedata_procedure_c_arena_clear_block;
 extern const type_info_procedure_c_arena_free_last_block DEFAULT_typedata_procedure_c_arena_free_last_block;
+extern const type_info_procedure_c_arena_create_subarena DEFAULT_typedata_procedure_c_arena_create_subarena;
 extern const type_info_procedure_c_arena_reset DEFAULT_typedata_procedure_c_arena_reset;
 extern const type_info_procedure_c_arena_begin_temporary_memory DEFAULT_typedata_procedure_c_arena_begin_temporary_memory;
 extern const type_info_procedure_c_arena_end_temporary_memory DEFAULT_typedata_procedure_c_arena_end_temporary_memory;
@@ -19459,6 +19475,32 @@ constexpr type_info_procedure_c_arena_free_last_block DEFAULT_typedata_procedure
 		},
 	},
 };
+constexpr type_info_procedure_c_arena_create_subarena DEFAULT_typedata_procedure_c_arena_create_subarena = {
+	.type_info = {
+		.type_name = "c_arena_create_subarena",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_c_arena_create_subarena,
+	},
+	.argument_count = 2,
+	.return_type    = &DEFAULT_typedata_structure_memory_arena_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_c_arena_create_subarena.argument_array,
+	.arguments = {
+		.arena = {
+			.type_info     = &DEFAULT_typedata_structure_memory_arena_t.type_info,
+			.member_name   = "arena",
+			.parent        = &DEFAULT_typedata_procedure_c_arena_create_subarena.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.size_init = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "size_init",
+			.parent        = &DEFAULT_typedata_procedure_c_arena_create_subarena.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
 constexpr type_info_procedure_c_arena_reset DEFAULT_typedata_procedure_c_arena_reset = {
 	.type_info = {
 		.type_name = "c_arena_reset",
@@ -20320,7 +20362,7 @@ constexpr type_info_struct_RHI_command_bind_vertex_buffer_t DEFAULT_typedata_str
 			.parent        = &DEFAULT_typedata_structure_RHI_command_bind_vertex_buffer_t.type_info,
 			.offset        = offsetof(RHI_command_bind_vertex_buffer_t, vertex_buffers),
 			.flags         = 2,
-			.pointer_depth = 1,
+			.pointer_depth = 2,
 		},
 		.vertex_buffer_count = {
 			.type_info     = &DEFAULT_typedata_u32,
@@ -22879,7 +22921,7 @@ constexpr type_info_procedure_RHI_cmd_bind_vertex_buffers DEFAULT_typedata_proce
 			.member_name   = "vertex_buffers",
 			.parent        = &DEFAULT_typedata_procedure_RHI_cmd_bind_vertex_buffers.type_info,
 			.flags         = 2,
-			.pointer_depth = 1,
+			.pointer_depth = 2,
 		},
 		.vertex_buffer_count = {
 			.type_info     = &DEFAULT_typedata_u32,
@@ -28112,6 +28154,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_arena_bootstrap_allocate_struct_.type_info,
 	&DEFAULT_typedata_procedure_c_arena_clear_block.type_info,
 	&DEFAULT_typedata_procedure_c_arena_free_last_block.type_info,
+	&DEFAULT_typedata_procedure_c_arena_create_subarena.type_info,
 	&DEFAULT_typedata_procedure_c_arena_reset.type_info,
 	&DEFAULT_typedata_procedure_c_arena_begin_temporary_memory.type_info,
 	&DEFAULT_typedata_procedure_c_arena_end_temporary_memory.type_info,
@@ -30256,6 +30299,10 @@ enum class c_arena_clear_block {
 enum class c_arena_free_last_block {
 	arena,
 }; // c_arena_free_last_block
+enum class c_arena_create_subarena {
+	arena,
+	size_init,
+}; // c_arena_create_subarena
 enum class c_arena_reset {
 	arena,
 }; // c_arena_reset

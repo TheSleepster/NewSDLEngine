@@ -339,10 +339,13 @@ void
 ui_state_render_widgets(ui_state_t *ui_state)
 {
     render_state_t *render_state = ui_state->render_state;
+    (void)render_state;
 
     widget_t *current_widget = ui_state->first_widget;
     if(current_widget)
     {
+        (void)current_widget;
+#if 0
         render_graph_section_t *ui_section = s_render_graph_acquire_render_section(&render_state->render_graph, 1);
         {
             render_group_t *current_render_group = s_render_group_begin(ui_section, render_state->fullscreen_renderpass_ID);
@@ -381,6 +384,7 @@ ui_state_render_widgets(ui_state_t *ui_state)
             s_render_group_end(current_render_group);
         }
         ui_state->widget_instance_count = 0;
+#endif
     }
     else
     {
@@ -398,7 +402,13 @@ internal_api void
 render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, immediate_vertex_t *vertex_data, widget_t *first_widget)
 {
     widget_t *current_widget = first_widget;
+    (void)current_widget;
+    (void)render_group;
+    (void)ui_state;
+    (void)vertex_data;
+    (void)first_widget;
     do {
+#if 0
         vec2_t half_size = vec2(current_widget->state->render_size.x * 0.5f, 
                                 current_widget->state->render_size.y * 0.5f);
 
@@ -519,6 +529,7 @@ render_widget_hierarchy(ui_state_t *ui_state, render_group_t *render_group, imme
         }
 
         current_widget = current_widget->next_sibling;
+#endif
     }while(current_widget != first_widget);
 }
 
