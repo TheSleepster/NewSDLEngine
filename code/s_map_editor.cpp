@@ -533,10 +533,8 @@ s_editor_render_to_output(map_editor_t *editor, asset_manager_t *asset_manager, 
         vec2_t start = world_to_tile(vec2(left,  bottom));
         vec2_t end   = world_to_tile(vec2(right, top));
 
-        s32 line_count_x = end.x - start.x;
-        s32 line_count_y = end.y - start.y;
-
-        render_group_vertex_stream_t *vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), (line_count_x * line_count_y) * 2, &render_state->vertex_buffer);
+        s32 line_count = ((end.x - start.x + 1) + (end.y - start.y)) * 2;
+        render_group_vertex_stream_t *vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), line_count, &render_state->vertex_buffer);
         for(s32 tile_x = start.x;
             tile_x <= end.x;
             ++tile_x)

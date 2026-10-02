@@ -1311,7 +1311,6 @@ game_main(global_context_t *_global_context)
         }
 
         s_render_graph_output(render_state, &render_state->fullscreen_color_buffer);
-
 #if 0 
         RHI_render_camera_t *scene_camera = &game_state->game_camera;
         u32 game_renderpass = render_state->game_renderpass_ID;
