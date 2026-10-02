@@ -488,11 +488,82 @@ s_editor_render_to_output(map_editor_t *editor, asset_manager_t *asset_manager, 
 internal_api void
 s_editor_render_to_output(map_editor_t *editor, asset_manager_t *asset_manager, render_state_t *render_state)
 {
-    (void)editor;
-    (void)asset_manager;
-    (void)render_state;
+    asset_handle_t immediate_rectangle = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_rectangle"));
+
+    s32 window_width  = Max(render_state->RHI_context->window_size.x, 10);
+    s32 window_height = Max(render_state->RHI_context->window_size.y, 10);
+    s_render_graph_command_clear_renderpass(&render_state->render_graph, render_state->fullscreen_renderpass_ID);
+
+    RHI_render_camera_t *scene_camera = &editor->camera;
+    if(editor->show_grid)
+    {
+        render_group_t *current_render_group = s_render_group_begin(&render_state->render_graph, render_state->fullscreen_renderpass_ID);
+        current_render_group->shader         = immediate_rectangle;
+        current_render_group->line_width     = 1.0f;
+
+        RHI_pipeline_state_t current_render_state = {};
+        current_render_state.blend_enabled  = true;
+        current_render_state.depth_testing_enabled = true;
+        current_render_state.depth_writing_enabled = true;
+        current_render_state.polygon_mode   = RENDER_PIPELINE_POLYGON_MODE_LINE;
+        current_render_state.primitive_type = RENDER_PIPELINE_PRIMITIVE_TOPOLOGY_LINE_LIST;
+
+        current_render_group->line_width = 1.0f;
+
+        current_render_group->pipeline_state = current_render_state;
+        current_render_group->scissor = {
+            .offset = vec2_zero(),
+            .extent = vec2(window_width, window_height)
+        };
+        current_render_group->viewport = {
+            .offset = vec2(0,             window_height),
+            .extent = vec2(window_width, -window_height)
+        };
+
+        s_render_group_add_constant_buffer(current_render_group, render_state->camera_matrices_buffer, &scene_camera->matrices, sizeof(mat4_t) * 2);
+
+        float32 half_width  = (scene_camera->viewport.x * 0.5f) * scene_camera->zoom;
+        float32 half_height = (scene_camera->viewport.y * 0.5f) * scene_camera->zoom;
+
+        float32 left   = scene_camera->translation.x - half_width;
+        float32 right  = scene_camera->translation.x + half_width;
+        float32 bottom = scene_camera->translation.y - half_height;
+        float32 top    = scene_camera->translation.y + half_height;
+
+        vec2_t start = world_to_tile(vec2(left,  bottom));
+        vec2_t end   = world_to_tile(vec2(right, top));
+
+        s32 line_count_x = end.x - start.x;
+        s32 line_count_y = end.y - start.y;
+
+        render_group_vertex_stream_t *vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), (line_count_x * line_count_y) * 2, &render_state->vertex_buffer);
+        for(s32 tile_x = start.x;
+            tile_x <= end.x;
+            ++tile_x)
+        {
+            float32 current_tile_x = tile_x * WORLD_TILE_SIZE;
+            immediate_line(vertex_stream, 
+                           vec2(current_tile_x, top),
+                           vec2(current_tile_x, bottom),
+                           0.90,
+                           vec4(0.01, 0.01, 0.1, 1.0f));
+        }
+
+        for(s32 tile_y = start.y;
+            tile_y < end.y;
+            ++tile_y)
+        {
+            float32 current_tile_y = tile_y * WORLD_TILE_SIZE;
+            immediate_line(vertex_stream, 
+                           vec2(left, current_tile_y),
+                           vec2(right, current_tile_y),
+                           0.90,
+                           vec4(0.01, 0.01, 0.1, 1.0f));
+        }
+
+        s_render_group_end(&render_state->render_graph, current_render_group);
+    }
 #if 0 
-    asset_handle_t shader = s_asset_manager_acquire_asset_handle(asset_manager, STR("immediate_rectangle"));
     asset_handle_t player = s_asset_manager_acquire_asset_handle(asset_manager, STR("player_sprite")); 
 
     render_group_t *current_render_group = render_group_begin(render_state, render_state->fullscreen_renderpass_ID);
@@ -508,45 +579,6 @@ s_editor_render_to_output(map_editor_t *editor, asset_manager_t *asset_manager, 
     RHI_render_camera_t *scene_camera = &editor->camera;
 
     // NOTE(Sleepster): Tile Grid 
-    if(editor->show_grid)
-    {
-        float32 half_width  = (scene_camera->viewport.x * 0.5f) * scene_camera->zoom;
-        float32 half_height = (scene_camera->viewport.y * 0.5f) * scene_camera->zoom;
-
-        float32 left   = scene_camera->translation.x - half_width;
-        float32 right  = scene_camera->translation.x + half_width;
-        float32 bottom = scene_camera->translation.y - half_height;
-        float32 top    = scene_camera->translation.y + half_height;
-
-        vec2_t start = world_to_tile(vec2(left,  bottom));
-        vec2_t end   = world_to_tile(vec2(right, top));
-
-        for(s32 tile_x = start.x;
-            tile_x <= end.x;
-            ++tile_x)
-        {
-            float32 current_tile_x = tile_x * WORLD_TILE_SIZE;
-            immediate_line(command_list, 
-                           &render_state->vertex_buffer, 
-                           vec2(current_tile_x, top),
-                           vec2(current_tile_x, bottom),
-                           0.90,
-                           vec4(0.01, 0.01, 0.1, 1.0f));
-        }
-
-        for(s32 tile_y = start.y;
-            tile_y < end.y;
-            ++tile_y)
-        {
-            float32 current_tile_y = tile_y * WORLD_TILE_SIZE;
-            immediate_line(command_list, 
-                           &render_state->vertex_buffer, 
-                           vec2(left, current_tile_y),
-                           vec2(right, current_tile_y),
-                           0.90,
-                           vec4(0.01, 0.01, 0.1, 1.0f));
-        }
-    }
 
     // NOTE(Sleepster): Viewport box 
     if(editor->show_player_viewport)

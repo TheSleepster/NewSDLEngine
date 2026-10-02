@@ -25,10 +25,10 @@ s_render_group_begin(render_graph_t *render_graph, u32 renderpassID)
     result->renderpassID = renderpassID;
     result->ID           = render_graph->active_render_group_count - 1;
 
-    byte *data = c_arena_push_size(&render_graph->arena, MB(4));
+    byte *data = c_arena_push_size(&render_graph->arena, MB(80));
     result->push_buffer.base = {
         data,
-        MB(4)
+        MB(80)
     };
     result->push_buffer.used = 0;
 
@@ -244,6 +244,7 @@ s_render_graph_output(render_state_t *render_state, RHI_image_t *present_image)
                     draw_command->draw.vertex_streams      = render_group->vertex_streams.items;
                     draw_command->draw.vertex_stream_count = render_group->vertex_stream_count;
                     draw_command->draw.index_buffer        = render_group->index_buffer;
+                    draw_command->draw.line_width          = render_group->line_width;
 
                     draw_command->draw.viewport = {
                         render_group->viewport.offset,
@@ -386,6 +387,7 @@ s_render_graph_output(render_state_t *render_state, RHI_image_t *present_image)
                 else
                 {
                     render_group_vertex_stream_t *stream = &current_node->draw.vertex_streams[0];
+                    RHI_cmd_set_line_width(command_list, current_node->draw.line_width);
                     RHI_cmd_draw(command_list, stream->vertex_count, 0, 1, 0);
                 }
             }break;

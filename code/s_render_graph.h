@@ -78,8 +78,6 @@ struct render_group_t
     u32                          ID;
     u32                          renderpassID;
 
-    bool8                        clear_attachments;
-
     asset_handle_t               shader;
     RHI_pipeline_state_t         pipeline_state;
     RHI_index_buffer_t          *index_buffer;
@@ -186,6 +184,7 @@ struct render_graph_node_t
             render_group_vertex_stream_t *vertex_streams;
             u32 vertex_stream_count;
             u32 element_count;
+            float32 line_width;
 
             struct {
                 vec2_t offset;

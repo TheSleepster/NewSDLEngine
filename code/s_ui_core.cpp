@@ -346,7 +346,7 @@ ui_state_render_widgets(ui_state_t *ui_state)
         render_group_t *current_render_group = s_render_group_begin(&render_state->render_graph, render_state->fullscreen_renderpass_ID);
         current_render_group->shader       = ui_state->widget_shader;
         current_render_group->index_buffer = &ui_state->index_buffer;
-        render_group_vertex_stream_t *vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), ui_state->widget_item_count * 4, &render_state->vertex_buffer);
+        render_group_vertex_stream_t *vertex_stream = s_render_group_append_vertex_stream(current_render_group, sizeof(immediate_vertex_t), ui_state->widget_item_count * 4, &ui_state->vertex_buffer);
         vertex_stream->max_vertices = 4 * MAX_WIDGETS;
         vertex_stream->vertices = {
             ui_state->vertex_buffer.vertex_data,

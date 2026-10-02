@@ -42,7 +42,7 @@ struct PixelOutput_t
     float4 vFragColor : SV_TARGET;
 };
 
-Sampler2D TextureSamplers[4];
+Sampler2D TextureSamplers[8];
 StructuredBuffer<ImmediateWidgetData_t> WidgetInstanceData;
 
 float 
