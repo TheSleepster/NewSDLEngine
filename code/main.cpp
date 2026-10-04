@@ -683,7 +683,7 @@ r_init_render_state(render_state_t *render_state)
     }
 #endif
 
-    render_state->render_graph.arena = c_arena_create(MB(500), ALLOCATOR_TAG_GAME);
+    render_state->render_graph.arena = c_arena_create(MB(100), ALLOCATOR_TAG_GAME);
 }
 
 internal_api void

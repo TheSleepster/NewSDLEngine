@@ -67,6 +67,7 @@ struct vulkan_image_t
     VkImageLayout            renderpass_initial_layout;
     VkImageLayout            renderpass_final_layout;
 
+    // TODO(Sleepster): Actually use these.
     VkAccessFlags            previous_access_flags;
     VkPipelineStageFlags     previous_pipeline_stage_flags;
 

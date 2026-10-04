@@ -21,6 +21,7 @@ DEBUG_state_create(void)
 void
 DEBUG_output_record_data(void)
 {
+#if 0
     printf("========== DEBUG RECORDS ===========\n");
     for(u32 record_index = 0;
         record_index < 3;
@@ -34,4 +35,5 @@ DEBUG_output_record_data(void)
         record->hit_count    = 0;
     }
     printf("====================================\n");
+#endif
 }

@@ -130,8 +130,6 @@ c_arena_free_last_block(memory_arena_t *arena)
     u8 *block_to_free  = (u8*)arena->base;
     u64 free_size      = arena->block_size + sizeof(memory_arena_footer_t);
 
-    ZeroMemory(arena->base, arena->used);
-
     memory_arena_footer_t *footer = c_arena_get_footer(arena);
     arena->base       = footer->last_base;
     arena->used       = footer->last_used;

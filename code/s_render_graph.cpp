@@ -25,10 +25,9 @@ s_render_group_begin(render_graph_t *render_graph, u32 renderpassID)
     result->renderpassID = renderpassID;
     result->ID           = render_graph->active_render_group_count - 1;
 
-    byte *data = c_arena_push_size(&render_graph->arena, MB(80));
+    byte *data = c_arena_push_size(&render_graph->arena, MB(10));
     result->push_buffer.base = {
-        data,
-        MB(80)
+        data, MB(10)
     };
     result->push_buffer.used = 0;
 
@@ -389,5 +388,5 @@ s_render_graph_output(render_state_t *render_state, RHI_image_t *present_image)
     render_graph->render_command_count = 0;
     render_graph->active_render_group_count = 0;
     render_graph->next_available_node = 0;
-    c_arena_reset(&render_graph->arena);
+    render_graph->arena.used = 0;
 }
