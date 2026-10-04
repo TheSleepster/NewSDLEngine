@@ -48,6 +48,7 @@ typedef struct global_context
 
     float64           tick_rate;
     float64           tick_rate_ms;
+    float64           frame_time;
 
     s64               saved_arena_size;
 

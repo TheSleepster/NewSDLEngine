@@ -1055,6 +1055,7 @@ game_main(global_context_t *_global_context)
     //float32 delta_time_ms = 0;
     while(gc->running)
     {
+        gc->frame_time = delta_time;
         //s_im_reset_controller_states(input_manager);
         process_window_events(render_state->RHI_context, input_manager);
 #ifndef RELEASE
@@ -1208,7 +1209,6 @@ game_main(global_context_t *_global_context)
                 entity->render_position = entity->editor_position;
             }
         }
-
 
         u32 current_renderpass = render_state->game_renderpass_ID;
         RHI_render_camera_t *scene_camera = &game_state->game_camera;
@@ -1803,6 +1803,9 @@ game_main(global_context_t *_global_context)
         last_tsc    = current_tsc;
 
         delta_time = (float32)(((float64)delta_tsc) / (float64)perf_count_freq);
+        DEBUG_output_record_data();
+
+        //printf("DELTA_TIME: %.02f...\n", delta_time * 1000);
     }
 
     return(0);

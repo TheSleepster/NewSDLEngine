@@ -88,6 +88,9 @@
 	X(zone_allocator_t, &DEFAULT_typedata_structure_zone_allocator_t.type_info) \
 	X(zone_allocator_block, &DEFAULT_typedata_zone_allocator_block) \
 	X(u8, &DEFAULT_typedata_u8) \
+	X(DEBUG_timed_block_t, &DEFAULT_typedata_structure_DEBUG_timed_block_t.type_info) \
+	X(DEBUG_cycle_record_t, &DEFAULT_typedata_structure_DEBUG_cycle_record_t.type_info) \
+	X(DEBUG_state_t, &DEFAULT_typedata_structure_DEBUG_state_t.type_info) \
 	X(file_t, &DEFAULT_typedata_structure_file_t.type_info) \
 	X(mapped_file_t, &DEFAULT_typedata_structure_mapped_file_t.type_info) \
 	X(file_data_t, &DEFAULT_typedata_structure_file_data_t.type_info) \
@@ -365,6 +368,11 @@
 	X(TYPE_c_za_DEBUG_validate_block_list) \
 	X(TYPE_zone_allocator_block) \
 	X(TYPE_u8) \
+	X(TYPE_DEBUG_timed_block_t) \
+	X(TYPE_DEBUG_cycle_record_t) \
+	X(TYPE_DEBUG_state_t) \
+	X(TYPE_DEBUG_state_create) \
+	X(TYPE_DEBUG_output_record_data) \
 	X(TYPE_file_t) \
 	X(TYPE_mapped_file_t) \
 	X(TYPE_file_data_t) \
@@ -1969,6 +1977,64 @@ struct type_info_procedure_c_za_DEBUG_validate_block_list {
 			const type_info_member_t zone;
 		}arguments;
 	};
+};
+
+struct type_info_struct_DEBUG_timed_block_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[6];
+		struct {
+			const type_info_member_t begin_cycle_count;
+			const type_info_member_t end_cycle_count;
+			const type_info_member_t delta_cycle_count;
+			const type_info_member_t name;
+			const type_info_member_t coreID;
+			const type_info_member_t timerID;
+		}members;
+	};
+};
+
+struct type_info_struct_DEBUG_cycle_record_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[3];
+		struct {
+			const type_info_member_t total_cycles;
+			const type_info_member_t hit_count;
+			const type_info_member_t name;
+		}members;
+	};
+};
+
+struct type_info_struct_DEBUG_state_t {
+	const type_info_t  type_info;
+	const unsigned int member_count;
+	const type_info_member_t *member_pointer;
+	union {
+		const type_info_member_t member_array[2];
+		struct {
+			const type_info_member_t record;
+			const type_info_member_t timer_count;
+		}members;
+	};
+};
+
+struct type_info_procedure_DEBUG_state_create {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+};
+
+struct type_info_procedure_DEBUG_output_record_data {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
 };
 
 struct type_info_struct_file_t {
@@ -4423,7 +4489,7 @@ struct type_info_struct_global_context_t {
 	const unsigned int member_count;
 	const type_info_member_t *member_pointer;
 	union {
-		const type_info_member_t member_array[23];
+		const type_info_member_t member_array[24];
 		struct {
 			const type_info_member_t is_initialized;
 			const type_info_member_t running;
@@ -4441,6 +4507,7 @@ struct type_info_struct_global_context_t {
 			const type_info_member_t simulation_arena;
 			const type_info_member_t tick_rate;
 			const type_info_member_t tick_rate_ms;
+			const type_info_member_t frame_time;
 			const type_info_member_t saved_arena_size;
 			const type_info_member_t game_library;
 			const type_info_member_t game_dll_path;
@@ -8085,6 +8152,11 @@ extern const type_info_procedure_c_za_DEBUG_print_block_list DEFAULT_typedata_pr
 extern const type_info_procedure_c_za_DEBUG_validate_block_list DEFAULT_typedata_procedure_c_za_DEBUG_validate_block_list;
 extern const type_info_t DEFAULT_typedata_zone_allocator_block;
 extern const type_info_t DEFAULT_typedata_u8;
+extern const type_info_struct_DEBUG_timed_block_t DEFAULT_typedata_structure_DEBUG_timed_block_t;
+extern const type_info_struct_DEBUG_cycle_record_t DEFAULT_typedata_structure_DEBUG_cycle_record_t;
+extern const type_info_struct_DEBUG_state_t DEFAULT_typedata_structure_DEBUG_state_t;
+extern const type_info_procedure_DEBUG_state_create DEFAULT_typedata_procedure_DEBUG_state_create;
+extern const type_info_procedure_DEBUG_output_record_data DEFAULT_typedata_procedure_DEBUG_output_record_data;
 extern const type_info_struct_file_t DEFAULT_typedata_structure_file_t;
 extern const type_info_struct_mapped_file_t DEFAULT_typedata_structure_mapped_file_t;
 extern const type_info_struct_file_data_t DEFAULT_typedata_structure_file_data_t;
@@ -12031,6 +12103,151 @@ constexpr type_info_t DEFAULT_typedata_u8 = {
 	.type_name = "u8",
 	.type_id = TYPE_u8,
 	.size = athena_internal::safe_sizeof<u8>(),
+};
+constexpr type_info_struct_DEBUG_timed_block_t DEFAULT_typedata_structure_DEBUG_timed_block_t = {
+	.type_info = {
+		.type_name = "DEBUG_timed_block_t",
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.type_id = TYPE_DEBUG_timed_block_t,
+		.size = athena_internal::safe_sizeof<DEBUG_timed_block_t>(),
+	},
+	.member_count   = 6,
+	.member_pointer = DEFAULT_typedata_structure_DEBUG_timed_block_t.member_array,
+	.members = {
+		.begin_cycle_count = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "begin_cycle_count",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_timed_block_t.type_info,
+			.offset        = offsetof(DEBUG_timed_block_t, begin_cycle_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.end_cycle_count = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "end_cycle_count",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_timed_block_t.type_info,
+			.offset        = offsetof(DEBUG_timed_block_t, end_cycle_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.delta_cycle_count = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "delta_cycle_count",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_timed_block_t.type_info,
+			.offset        = offsetof(DEBUG_timed_block_t, delta_cycle_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.name = {
+			.type_info     = &DEFAULT_typedata_char,
+			.member_name   = "name",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_timed_block_t.type_info,
+			.offset        = offsetof(DEBUG_timed_block_t, name),
+			.flags         = 10,
+			.pointer_depth = 1,
+		},
+		.coreID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "coreID",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_timed_block_t.type_info,
+			.offset        = offsetof(DEBUG_timed_block_t, coreID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.timerID = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "timerID",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_timed_block_t.type_info,
+			.offset        = offsetof(DEBUG_timed_block_t, timerID),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_struct_DEBUG_cycle_record_t DEFAULT_typedata_structure_DEBUG_cycle_record_t = {
+	.type_info = {
+		.type_name = "DEBUG_cycle_record_t",
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.type_id = TYPE_DEBUG_cycle_record_t,
+		.size = athena_internal::safe_sizeof<DEBUG_cycle_record_t>(),
+	},
+	.member_count   = 3,
+	.member_pointer = DEFAULT_typedata_structure_DEBUG_cycle_record_t.member_array,
+	.members = {
+		.total_cycles = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "total_cycles",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_cycle_record_t.type_info,
+			.offset        = offsetof(DEBUG_cycle_record_t, total_cycles),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.hit_count = {
+			.type_info     = &DEFAULT_typedata_u64,
+			.member_name   = "hit_count",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_cycle_record_t.type_info,
+			.offset        = offsetof(DEBUG_cycle_record_t, hit_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.name = {
+			.type_info     = &DEFAULT_typedata_char,
+			.member_name   = "name",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_cycle_record_t.type_info,
+			.offset        = offsetof(DEBUG_cycle_record_t, name),
+			.flags         = 10,
+			.pointer_depth = 1,
+		},
+	},
+};
+
+constexpr type_info_struct_DEBUG_state_t DEFAULT_typedata_structure_DEBUG_state_t = {
+	.type_info = {
+		.type_name = "DEBUG_state_t",
+		.metatype  = ATHENA_METATYPE_STRUCT,
+		.type_id = TYPE_DEBUG_state_t,
+		.size = athena_internal::safe_sizeof<DEBUG_state_t>(),
+	},
+	.member_count   = 2,
+	.member_pointer = DEFAULT_typedata_structure_DEBUG_state_t.member_array,
+	.members = {
+		.record = {
+			.type_info     = &DEFAULT_typedata_structure_DEBUG_cycle_record_t.type_info,
+			.member_name   = "record",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_state_t.type_info,
+			.offset        = offsetof(DEBUG_state_t, record),
+			.flags         = 64,
+			.pointer_depth = 0,
+		},
+		.timer_count = {
+			.type_info     = &DEFAULT_typedata_u32,
+			.member_name   = "timer_count",
+			.parent        = &DEFAULT_typedata_structure_DEBUG_state_t.type_info,
+			.offset        = offsetof(DEBUG_state_t, timer_count),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
+
+constexpr type_info_procedure_DEBUG_state_create DEFAULT_typedata_procedure_DEBUG_state_create = {
+	.type_info = {
+		.type_name = "DEBUG_state_create",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_DEBUG_state_create,
+	},
+	.argument_count = 0,
+	.return_type    = &DEFAULT_typedata_void,
+};
+constexpr type_info_procedure_DEBUG_output_record_data DEFAULT_typedata_procedure_DEBUG_output_record_data = {
+	.type_info = {
+		.type_name = "DEBUG_output_record_data",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_DEBUG_output_record_data,
+	},
+	.argument_count = 0,
+	.return_type    = &DEFAULT_typedata_void,
 };
 constexpr type_info_struct_file_t DEFAULT_typedata_structure_file_t = {
 	.type_info = {
@@ -19015,7 +19232,7 @@ constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_co
 		.type_id = TYPE_global_context_t,
 		.size = athena_internal::safe_sizeof<global_context_t>(),
 	},
-	.member_count   = 23,
+	.member_count   = 24,
 	.member_pointer = DEFAULT_typedata_structure_global_context_t.member_array,
 	.members = {
 		.is_initialized = {
@@ -19143,6 +19360,14 @@ constexpr type_info_struct_global_context_t DEFAULT_typedata_structure_global_co
 			.member_name   = "tick_rate_ms",
 			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
 			.offset        = offsetof(global_context_t, tick_rate_ms),
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.frame_time = {
+			.type_info     = &DEFAULT_typedata_float64,
+			.member_name   = "frame_time",
+			.parent        = &DEFAULT_typedata_structure_global_context_t.type_info,
+			.offset        = offsetof(global_context_t, frame_time),
 			.flags         = 0,
 			.pointer_depth = 0,
 		},
@@ -27990,6 +28215,11 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_za_change_zone_tag.type_info,
 	&DEFAULT_typedata_procedure_c_za_DEBUG_print_block_list.type_info,
 	&DEFAULT_typedata_procedure_c_za_DEBUG_validate_block_list.type_info,
+	&DEFAULT_typedata_structure_DEBUG_timed_block_t.type_info,
+	&DEFAULT_typedata_structure_DEBUG_cycle_record_t.type_info,
+	&DEFAULT_typedata_structure_DEBUG_state_t.type_info,
+	&DEFAULT_typedata_procedure_DEBUG_state_create.type_info,
+	&DEFAULT_typedata_procedure_DEBUG_output_record_data.type_info,
 	&DEFAULT_typedata_structure_file_t.type_info,
 	&DEFAULT_typedata_structure_mapped_file_t.type_info,
 	&DEFAULT_typedata_structure_file_data_t.type_info,
@@ -28674,6 +28904,23 @@ enum class zone_allocator_t {
 	first_block,
 	cursor,
 }; // zone_allocator_t
+enum class DEBUG_timed_block_t {
+	begin_cycle_count,
+	end_cycle_count,
+	delta_cycle_count,
+	name,
+	coreID,
+	timerID,
+}; // DEBUG_timed_block_t
+enum class DEBUG_cycle_record_t {
+	total_cycles,
+	hit_count,
+	name,
+}; // DEBUG_cycle_record_t
+enum class DEBUG_state_t {
+	record,
+	timer_count,
+}; // DEBUG_state_t
 enum class file_t {
 	handle,
 	file_name,
@@ -29123,6 +29370,7 @@ enum class global_context_t {
 	simulation_arena,
 	tick_rate,
 	tick_rate_ms,
+	frame_time,
 	saved_arena_size,
 	game_library,
 	game_dll_path,

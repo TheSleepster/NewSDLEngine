@@ -8,40 +8,30 @@
 #include <c_types.h>
 #include <c_synchronization.h>
 #include <c_intrinsics.h>
+#include <c_heap_allocator.h>
 
-constexpr u32 MAX_FRAME_HISTORY    = 576;
-constexpr u32 MAX_TIMERS_PER_FRAME = 100;
+#include <DEBUG_profiling.h>
 
-struct DEBUG_timed_block
+internal_api void
+DEBUG_state_create(void)
 {
-    u64 begin_cycle_count;
-    u64 end_cycle_count;
-    u64 delta_cycle_count;
-
-    u32 core_ID;
-    u32 timer_ID;
-
-     DEBUG_timed_block(u32 timer_ID);
-    ~DEBUG_timed_block();
-};
-
-DEBUG_timed_block::
-DEBUG_timed_block(u32 timer_index)
-{
-    begin_cycle_count = rdtscp(&core_ID);
-    timer_ID          = timer_index;
+    debug_state = (DEBUG_state_t*)c_alloc(sizeof(DEBUG_state_t), ALLOCATOR_TAG_DEBUG);
 }
 
-DEBUG_timed_block::
-~DEBUG_timed_block()
+void
+DEBUG_output_record_data(void)
 {
-    end_cycle_count   = rdtsc();
-    delta_cycle_count = AtomicSubtract32(&end_cycle_count, begin_cycle_count);
-}
+    printf("========== DEBUG RECORDS ===========\n");
+    for(u32 record_index = 0;
+        record_index < 3;
+        ++record_index)
+    {
+        DEBUG_cycle_record_t *record = debug_state->record + record_index;
+        printf("Timer: '%s'...\n", record->name);
+        printf("\tTime MS: '%lu'...\n", record->total_cycles);
 
-struct DEBUG_state_t
-{
-    DEBUG_timed_block timers[MAX_FRAME_HISTORY][MAX_TIMERS_PER_FRAME];
-    u32               current_frame_index;
-    u32               timer_count;
-};
+        record->total_cycles = 0;
+        record->hit_count    = 0;
+    }
+    printf("====================================\n");
+}

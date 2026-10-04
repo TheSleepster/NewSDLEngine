@@ -66,6 +66,10 @@ struct vulkan_image_t
     VkImageLayout            layout;
     VkImageLayout            renderpass_initial_layout;
     VkImageLayout            renderpass_final_layout;
+
+    VkAccessFlags            previous_access_flags;
+    VkPipelineStageFlags     previous_pipeline_stage_flags;
+
     VkFormat                 internal_format;
     VkImageAspectFlags       aspect_mask;
     vulkan_allocation_info_t allocation;

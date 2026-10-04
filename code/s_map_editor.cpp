@@ -361,7 +361,7 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
 
     // NOTE(Sleepster): Keyboard camera movement 
     {
-        vec2_t camera_movement = game_state->mappings.move->axis2D_value;
+        vec2_t camera_movement = vec2_scale(game_state->mappings.move->axis2D_value, ((2400.0f * gc->frame_time) / editor->camera.zoom));
         editor->camera.translation.x += camera_movement.x;
         editor->camera.translation.y -= camera_movement.y;
     }
@@ -372,8 +372,8 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
     // NOTE(Sleepster): Mouse Panning 
     if(InputStateDown(middle_mouse->flags))
     {
-        editor->camera.translation.x += mouse_move_delta.x;
-        editor->camera.translation.y -= mouse_move_delta.y;
+        editor->camera.translation.x += mouse_move_delta.x * (1200.0 * gc->frame_time) / editor->camera.zoom;
+        editor->camera.translation.y -= mouse_move_delta.y * (1200.0 * gc->frame_time) / editor->camera.zoom;
     }
 
     // NOTE(Sleepster): Zoom adjustment 
@@ -390,6 +390,7 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
         editor->camera.translation = vec2_add(editor->camera.translation, new_mouse_offset_scaling);
     }
 
+    RHI_render_camera_set_matrices(&editor->camera);
 
     // NOTE(Sleepster): Entity selection
     if(InputStatePressed(lclick->flags) && InputStateDown(lalt->flags))

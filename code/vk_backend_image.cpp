@@ -512,6 +512,17 @@ vk_backend_transfer_image_to_intial_layout
 void
 vk_backend_transfer_image_to_intial_layout(VkCommandBuffer render_command_buffer, vulkan_image_t *image)
 {
+    Assert(image->aspect_mask != 0);
+
+    VkPipelineStageFlags attachment_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkFlags destination_access = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT|VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    bool8 depth_format = vk_backend_is_image_format_depth_format(image);
+    if(depth_format)
+    {
+        attachment_stage   = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        destination_access = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT|VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    }
+
     VkImageSubresourceRange range = {
         .aspectMask     = image->aspect_mask,
         .baseMipLevel   = 0,
@@ -523,10 +534,10 @@ vk_backend_transfer_image_to_intial_layout(VkCommandBuffer render_command_buffer
                                    image->handle, 
                                    image->layout,
                                    image->renderpass_initial_layout,
-                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-                                   VK_ACCESS_TRANSFER_WRITE_BIT,
-                                   VK_ACCESS_COLOR_ATTACHMENT_READ_BIT|VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+                                   attachment_stage,
+                                   attachment_stage,
+                                   destination_access,
+                                   destination_access,
                                    range);
 
     image->layout = image->renderpass_initial_layout;
@@ -543,6 +554,15 @@ vk_backend_transfer_image_to_final_layout(VkCommandBuffer render_command_buffer,
 {
     Assert(image->aspect_mask != 0);
 
+    VkPipelineStageFlags attachment_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    VkFlags destination_access = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT|VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    bool8 depth_format = vk_backend_is_image_format_depth_format(image);
+    if(depth_format)
+    {
+        attachment_stage   = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        destination_access = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT|VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    }
+
     VkImageSubresourceRange range = {
         .aspectMask     = image->aspect_mask,
         .baseMipLevel   = 0,
@@ -554,15 +574,20 @@ vk_backend_transfer_image_to_final_layout(VkCommandBuffer render_command_buffer,
                                    image->handle, 
                                    image->layout,
                                    image->renderpass_final_layout,
-                                   VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                   VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-                                   VK_ACCESS_TRANSFER_WRITE_BIT,
-                                   VK_ACCESS_COLOR_ATTACHMENT_READ_BIT|VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+                                   attachment_stage,
+                                   attachment_stage,
+                                   destination_access,
+                                   destination_access,
                                    range);
 
     image->layout = image->renderpass_final_layout;
 }
 
+/*
+=============
+vk_backend_transfer_image_to_final_layout
+=============
+*/
 
 /*
 =============
@@ -663,7 +688,7 @@ vk_get_image_pipeline_stage_flags(vulkan_image_t *image)
     else if((image->aspect_mask & VK_IMAGE_ASPECT_DEPTH_BIT) ||
             (image->aspect_mask & VK_IMAGE_ASPECT_STENCIL_BIT))
     {
-        result |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+        result |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT|VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
     }
     else
     {
@@ -671,6 +696,19 @@ vk_get_image_pipeline_stage_flags(vulkan_image_t *image)
     }
 
     return(result);
+}
+
+VkAccessFlags
+vk_get_image_access_flags(vulkan_image_t *image)
+{
+    VkAccessFlags access_flags = 0;
+
+    bool8 is_color_image = !(vk_backend_is_image_format_depth_format(image));
+    access_flags = is_color_image 
+        ? (VK_ACCESS_COLOR_ATTACHMENT_READ_BIT|VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT) 
+        : (VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT|VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT);
+
+    return(access_flags);
 }
 
 /*
@@ -693,7 +731,11 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                       VkImageSubresourceRange source_range, 
                       VkImageSubresourceRange destination_range)
 {
-    VkPipelineStageFlags source_pipeline_stage_flags = vk_get_image_pipeline_stage_flags(source_image);
+    VkPipelineStageFlags source_pipeline_stage_flags      = vk_get_image_pipeline_stage_flags(source_image);
+    VkPipelineStageFlags destination_pipeline_stage_flags = vk_get_image_pipeline_stage_flags(destination_image);
+
+    VkAccessFlags source_access_flags      = vk_get_image_access_flags(source_image);
+    VkAccessFlags destination_access_flags = vk_get_image_access_flags(destination_image);
 
     // NOTE(Sleepster): transition the color buffer to TRANSFER_SRC 
     vk_backend_image_change_layout(*vulkan_context->render_command_buffer,
@@ -702,8 +744,8 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                                    source_pipeline_stage_flags,
                                    VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                   0,
-                                   0,
+                                   source_access_flags,
+                                   VK_ACCESS_TRANSFER_READ_BIT,
                                    source_range);
     source_image->layout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 
@@ -712,10 +754,10 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                                    destination_image->handle,
                                    destination_initial_layout,
                                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                   VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                   destination_pipeline_stage_flags,
                                    VK_PIPELINE_STAGE_TRANSFER_BIT,
-                                   0,
-                                   0,
+                                   destination_access_flags,
+                                   VK_ACCESS_TRANSFER_WRITE_BIT,
                                    destination_range);
     destination_image->layout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
 
@@ -774,7 +816,7 @@ vk_backend_image_blit(vulkan_context_t       *vulkan_context,
                                    destination_final_layout,
                                    VK_PIPELINE_STAGE_TRANSFER_BIT,
                                    VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                                   0,
+                                   VK_ACCESS_TRANSFER_WRITE_BIT,
                                    0,
                                    destination_range);
     destination_image->layout = destination_final_layout;
@@ -814,7 +856,6 @@ vk_backend_image_ensure_shader_readonly_optimal(vulkan_context_t *vulkan_context
     }
 }
 
-
 /*
 =============
 vk_backend_image_clear_contents
@@ -825,7 +866,7 @@ vk_backend_image_clear_contents
 void
 vk_backend_image_clear_contents(VkCommandBuffer command_buffer, vulkan_image_t *image, VkClearValue clear_value)
 {
-    bool8 is_color_image     = vk_backend_is_image_format_depth_format(image);
+    bool8 is_color_image     = !(vk_backend_is_image_format_depth_format(image));
     bool8 is_stencil_format  = vk_backend_is_image_format_stencil_format(image);
     VkImageLayout old_layout = image->layout;
 

@@ -34,28 +34,23 @@ Vk_backend_debug_log_callback(VkDebugUtilsMessageSeverityFlagBitsEXT      messag
 {
     (void)user_data;
     (void)message_type;
-
     switch(message_severity)
     {
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
         {
-            log_fatal(callback_data->pMessage);
-            printf("\n");
+            log_fatal("%s\n", callback_data->pMessage);
         }break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
         {
-            log_warning(callback_data->pMessage);
-            printf("\n");
+            log_warning("%s\n", callback_data->pMessage);
         }break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
         {
-            log_info(callback_data->pMessage);
-            printf("\n");
+            log_info("%s\n", callback_data->pMessage);
         }break;
         case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
         {
-            log_trace(callback_data->pMessage);
-            printf("\n");
+            log_trace("%s\n", callback_data->pMessage);
         }break;
     }
     return VK_FALSE;
@@ -346,6 +341,11 @@ vk_backend_create_instance(vulkan_context_t *vulkan_context)
     c_dynarray_reserve(&found_validation_layers, total_validation_layers);
 
     vkAssert(vkEnumerateInstanceLayerProperties(&total_validation_layers, found_validation_layers.items));
+    for(auto &validation_layer: found_validation_layers)
+    {
+        log_info("Found Layer: '%s'...\n", validation_layer);
+    }
+
     for(s32 layer_index = 0;
         layer_index < validation_layers.used;
         ++layer_index)
@@ -403,7 +403,6 @@ vk_backend_create_instance(vulkan_context_t *vulkan_context)
     vulkan_debug_info.messageSeverity = debug_log_severity;
     vulkan_debug_info.messageType     = debug_message_types;
     vulkan_debug_info.pfnUserCallback = Vk_backend_debug_log_callback;
-
 
     PFN_vkCreateDebugUtilsMessengerEXT vk_debug_func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(vulkan_context->instance, "vkCreateDebugUtilsMessengerEXT");
     vkAssert(vk_debug_func(vulkan_context->instance, &vulkan_debug_info, vulkan_context->cpu_allocation_callbacks, &vulkan_context->debug_messenger));
@@ -702,19 +701,25 @@ vk_backend_create_logical_device_and_queues(vulkan_context_t *vulkan_context)
     device_features.multiDrawIndirect = VK_TRUE;
 
     //device_features.sparseBinding     = VK_TRUE;
-
+ 
     VkPhysicalDeviceVulkan11Features device_11_features = {};
-    device_11_features.sType                = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
-    device_11_features.shaderDrawParameters = true;
+    device_11_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+    device_11_features.shaderDrawParameters = VK_TRUE;
+
+    VkPhysicalDeviceHostQueryResetFeatures host_query_reset_features = {};
+    host_query_reset_features.sType          = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
+    host_query_reset_features.hostQueryReset = VK_TRUE;
+    host_query_reset_features.pNext          = &device_11_features;
 
     VkDeviceCreateInfo device_create_info = {};
-    device_create_info.sType                   =  VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    device_create_info.pNext                   = &device_11_features;
-    device_create_info.queueCreateInfoCount    =  index_count;
-    device_create_info.pQueueCreateInfos       =  queue_create_infos.items;
+    device_create_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    device_create_info.pNext                   = &host_query_reset_features;
+    device_create_info.queueCreateInfoCount    = index_count;
+    device_create_info.pQueueCreateInfos       = queue_create_infos.items;
     device_create_info.pEnabledFeatures        = &device_features;
-    device_create_info.enabledExtensionCount   =  ArrayCount(g_device_extensions);
-    device_create_info.ppEnabledExtensionNames =  g_device_extensions;
+    device_create_info.enabledExtensionCount   = ArrayCount(g_device_extensions);
+    device_create_info.ppEnabledExtensionNames = g_device_extensions;
+
     vkAssert(vkCreateDevice(vulkan_context->gpu.device,
                             &device_create_info,
                              vulkan_context->cpu_allocation_callbacks,
@@ -1479,124 +1484,6 @@ vk_backend_create_backend_buffers(vulkan_context_t *vulkan_context)
     }
 }
 
-/*
-=============
-vk_backend_create_render_buffers
-=============
-*/
-
-#if 0
-void
-vk_backend_create_render_buffers(vulkan_context_t *vulkan_context)
-{
-    VkBufferUsageFlagBits vertex_buffer_usage_bits = (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | 
-                                                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT  |
-                                                                             VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-
-    VkBufferUsageFlagBits index_buffer_usage_bits = (VkBufferUsageFlagBits)(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | 
-                                                                            VK_BUFFER_USAGE_TRANSFER_DST_BIT | 
-                                                                            VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
-
-    vulkan_context->main_vertex_buffer   = vk_backend_buffer_create(vulkan_context, sizeof(render_vertex_t) * 4,                vertex_buffer_usage_bits, VULKAN_MEMORY_USAGE_GPU_ONLY);
-    vulkan_context->main_index_buffer    = vk_backend_buffer_create(vulkan_context, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, index_buffer_usage_bits,  VULKAN_MEMORY_USAGE_GPU_ONLY);
-    vulkan_context->staging_infos        = c_dynarray_create(vulkan_staging_info_t);
-
-    // NOTE(Sleepster): Create the frame-based buffers 
-    for(u32 index = 0;
-        index < MAX_FRAMES_IN_FLIGHT;
-        ++index)
-    {
-        vulkan_context->frame_render_buffer[index] = vk_backend_buffer_create(vulkan_context, 
-                                                                              MB(128), 
-                                                                              VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
-                                                                              VULKAN_MEMORY_USAGE_GPU_ONLY); 
-        vulkan_context->staging_buffers[index] = vk_backend_staging_buffer_create(vulkan_context,
-                                                                                  MB(128),
-                                                                                  VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                                                                  VULKAN_MEMORY_USAGE_CPU_TO_GPU);
-    }
-    // NOTE(Sleepster): Fill vertex buffer
-    render_vertex_t vertices[] = {
-        [0] = {
-            .vPosition = {0.5, -0.5, 0.0, 1.0},
-            .vCorner   = {1.0, 1.0}
-        },
-        [1] = {
-            .vPosition = {0.5, 0.5, 0.0, 1.0},
-            .vCorner   = {1.0, 0.0}
-        },
-        [2] = {
-            .vPosition = {-0.5, 0.5, 0.0, 1.0},
-            .vCorner   = {0.0, 0.0}
-        },
-        [3] = {
-            .vPosition = {-0.5, -0.5, 0.0, 1.0},
-            .vCorner   = {0.0, 1.0}
-        } 
-    };
-    //vk_backend_buffer_copy_data(&vulkan_context->staging_buffers[0], vertices, sizeof(vertex_t) * 4, 0);
-    //vk_backend_buffer_copy_buffer(vulkan_context, &vulkan_context->staging_buffers[0], &vulkan_context->main_vertex_buffer, 0, vulkan_context->main_vertex_buffer.size, 0);
-
-    // NOTE(Sleepster): Fill the index buffer 
-    u32 *indices = c_arena_push_array(&vulkan_context->initialization_arena, u32, MAX_VULKAN_INDEX_BUFFER_SIZE);
-    u32  index_offset = 0;
-    for(u32 index = 0;
-        index < MAX_VULKAN_INDEX_BUFFER_SIZE;
-        index += 6)
-    {
-        indices[index + 0] = index_offset + 0;
-        indices[index + 1] = index_offset + 1;
-        indices[index + 2] = index_offset + 2;
-        indices[index + 3] = index_offset + 2;
-        indices[index + 4] = index_offset + 3;
-        indices[index + 5] = index_offset + 0;
-
-        index_offset += 4;
-    }
-    //vk_backend_buffer_copy_data(&vulkan_context->staging_buffers[0], indices, sizeof(u32) * MAX_VULKAN_INDEX_BUFFER_SIZE, 0);
-    //vk_backend_buffer_copy_buffer(vulkan_context, &vulkan_context->staging_buffers[0], &vulkan_context->main_index_buffer, 0, vulkan_context->main_index_buffer.size, 0);
-    
-    vk_backend_buffer_stage_data(vulkan_context, (byte*)vertices, sizeof(vertices), &vulkan_context->main_vertex_buffer);
-    vk_backend_buffer_stage_data(vulkan_context, (byte*)indices,  sizeof(indices),  &vulkan_context->main_index_buffer);
-
-    VkCommandBuffer scratch_buffer;
-    VkCommandBufferAllocateInfo command_buffer_allocate_info = {
-        .sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-        .commandPool        = vulkan_context->graphics_command_pool,
-        .commandBufferCount = 1,
-        .level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY
-    };
-    vkAssert(vkAllocateCommandBuffers(vulkan_context->device, &command_buffer_allocate_info, &scratch_buffer));
-
-    VkCommandBufferBeginInfo begin_info = {
-        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
-    };
-    vkBeginCommandBuffer(scratch_buffer, &begin_info);
-    vk_backend_buffer_flush_staging_buffer(vulkan_context, scratch_buffer);
-
-    VkMemoryBarrier barrier = {};
-    barrier.sType           = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
-    barrier.srcAccessMask   = VK_ACCESS_TRANSFER_WRITE_BIT;
-    barrier.dstAccessMask   = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT | VK_ACCESS_INDEX_READ_BIT;
-    vkCmdPipelineBarrier(scratch_buffer,
-                         VK_PIPELINE_STAGE_TRANSFER_BIT,
-                         VK_PIPELINE_STAGE_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
-                         0, 1, &barrier, 0, null, 0, null);
-    vkEndCommandBuffer(scratch_buffer);
-
-    VkSubmitInfo submit_info = {
-        .sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-        .commandBufferCount = 1,
-        .pCommandBuffers    = &scratch_buffer
-    };
-
-    vkAssert(vkQueueSubmit(vulkan_context->graphics_queue, 1, &submit_info, 0));
-    vkAssert(vkQueueWaitIdle(vulkan_context->graphics_queue));
-}
-#endif
-
-
 void*
 memory_arena_hash_allocate(void *allocator, u32 allocation_size)
 {
@@ -1985,8 +1872,8 @@ vk_backend_renderpass_create(vulkan_context_t    *vulkan_context,
     primary_subpass_deps.dstSubpass      = 0;
     primary_subpass_deps.srcStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     primary_subpass_deps.srcAccessMask   = 0;
-    primary_subpass_deps.dstStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    primary_subpass_deps.dstAccessMask   = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    primary_subpass_deps.dstStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT|VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    primary_subpass_deps.dstAccessMask   = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT|VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
     primary_subpass_deps.dependencyFlags = 0;
 
     VkRenderPassCreateInfo renderpass_info = {};
@@ -2481,7 +2368,7 @@ vk_backend_perform_image_blit(vulkan_context_t *vulkan_context,
     };
 
     VkImageSubresourceRange destination_range = {
-        .aspectMask     = source->aspect_mask,
+        .aspectMask     = destination->aspect_mask,
         .baseMipLevel   = 0,
         .levelCount     = 1,
         .baseArrayLayer = 0,
@@ -2609,6 +2496,8 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
     bool32 window_resize = (vulkan_context->window_size_generation != vulkan_context->last_window_size_generation) || vulkan_context->rebuilding_swapchain;
     if(!window_resize)
     {
+        DEBUG_TIMED_BLOCK("Vulkan Render Frame");
+
         vulkan_context->image_render_idle_fence   = vulkan_context->image_render_idle_fences            + vulkan_context->current_frame_index;
         vulkan_context->image_acquired_semaphore  = vulkan_context->swapchain_image_acquired_semaphores + vulkan_context->current_frame_index;
 
@@ -2966,11 +2855,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                                                            VK_ACCESS_SHADER_READ_BIT,
                                                            source_range);
                             cmd->texture->backend_image.layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
                             vk_backend_submit_and_release_scratch_command_buffer(vulkan_context, &scratch_buffer);
-
-                            // TODO(Sleepster): This might be a source of issues, just in case... leaving this here 
-                            vkDeviceWaitIdle(vulkan_context->device);
                         }
 
                         command_list->image_shader_params[command_list->image_count++] = cmd->texture;
@@ -3162,6 +3047,7 @@ vk_backend_render_frame(vulkan_context_t *vulkan_context, RHI_context_t *RHI_con
                         RHI_context->present_command = cmd;
                     }break;
                 }
+
             }
         }
 

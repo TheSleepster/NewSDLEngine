@@ -157,6 +157,7 @@ main(int argc, char **argv)
 
         SDL_StartTextInput(gc->RHI_context->window);
 
+        DEBUG_state_create();
 
         gc->RHI_context->backend_initialize(gc->RHI_context->window);
         gc->asset_manager->RHI_context = gc->RHI_context; 
@@ -183,7 +184,6 @@ main(int argc, char **argv)
         gc->game_dll_data = c_file_get_file_system_info(game_dll_name);
         Assert(gc->game_library);
 
-        
         game_main = (game_main_t*)sys_get_proc_address(gc->game_library, STR("game_main"));
         Assert(game_main);
 #endif

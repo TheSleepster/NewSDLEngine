@@ -37,6 +37,7 @@
 
 #include <s_RHI_image.h>
 #include <r_immediate_rendering.h>
+#include <DEBUG_profiling.h>
 
 #include <s_ui_core.h>
 #include <s_entity.h>
@@ -48,10 +49,9 @@
 // NOTE(Sleepster): Game 
 #if defined(GAME_DLL_BUILD) || defined(RELEASE)
 #include <main.cpp>
-#endif
+#endif // GAME_DLL_BUILD || RELEASE
 
 #if defined(ENGINE_BUILD)
-
 #if RENDERER_VULKAN
 #include <vk_backend_allocator.h>
 #include <vk_backend_core.h>
@@ -60,7 +60,7 @@
 #include <vk_backend_shader.h>
 #elif RENDERER_HEADLESS
 #include <headless_backend_core.h>
-#endif
+#endif // RENDERER_VULKAN
 
 // NOTE(Sleepster): Engine 
 #include <c_global_context.cpp>
@@ -70,8 +70,8 @@
 #include <c_tokenizer.cpp>
 #include <c_zone_allocator.cpp>
 #include <c_duration_counter.cpp>
-#include <DEBUG_profiling.cpp>
 #include <s_input_manager.cpp>
+#include <DEBUG_profiling.cpp>
 
 #include <p_platform_data.h>
 
@@ -90,7 +90,7 @@
 #include <vk_backend_shader.cpp>
 #elif RENDERER_HEADLESS
 #include <headless_backend_core.cpp>
-#endif
+#endif // RENDERER_VULKAN
 
 #include <s_RHI_core.cpp>
 #include <s_RHI_image.cpp>
@@ -99,4 +99,4 @@
 #include <s_asset_manager.cpp>
 #include <p_platform_data.cpp>
 #include <entry.cpp>
-#endif
+#endif // ENGINE_BUILD

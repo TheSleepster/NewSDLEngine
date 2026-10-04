@@ -157,20 +157,10 @@ s_render_graph_command_clear_renderpass(render_graph_t *render_graph, u32 render
 void
 s_render_graph_output(render_state_t *render_state, RHI_image_t *present_image)
 {
+    DEBUG_TIMED_BLOCK("Render Graph Output");
+
     render_graph_t *render_graph = &render_state->render_graph;
     RHI_command_list_t *command_list = RHI_get_command_list(render_state->RHI_context, RHI_RENDER_COMMAND_LIST_TYPE_GRAPHICS);
-
-#if 0
-    quicksort(render_graph->render_groups.items, render_graph->active_render_group_count, 
-    [](const render_command_t &A, const render_command_t &B) -> int {
-        if(B.sort_key.renderpassID        != A.sort_key.renderpassID)        return((B.sort_key.renderpassID        < A.sort_key.renderpassID)        - (B.sort_key.renderpassID        > A.sort_key.renderpassID));
-        if(B.sort_key.pipeline_state_hash != A.sort_key.pipeline_state_hash) return((B.sort_key.pipeline_state_hash < A.sort_key.pipeline_state_hash) - (B.sort_key.pipeline_state_hash > A.sort_key.pipeline_state_hash));
-        if(B.sort_key.shader_hash         != A.sort_key.shader_hash)         return((B.sort_key.shader_hash         < A.sort_key.shader_hash)         - (B.sort_key.shader_hash         > A.sort_key.shader_hash));
-        if(B.sort_key.vertex_input_hash   != A.sort_key.vertex_input_hash)   return((B.sort_key.vertex_input_hash   < A.sort_key.vertex_input_hash)   - (B.sort_key.vertex_input_hash   > A.sort_key.vertex_input_hash));
-        if(B.sort_key.descriptor_hash     != A.sort_key.descriptor_hash)     return((B.sort_key.descriptor_hash     < A.sort_key.descriptor_hash)     - (B.sort_key.descriptor_hash     > A.sort_key.descriptor_hash));
-        return((B.sort_key.submission_index < A.sort_key.submission_index) - (B.sort_key.submission_index > A.sort_key.submission_index));
-    });
-#endif
 
     // NOTE(Sleepster): Recording Command Nodes 
     u32 active_renderpass = INVALID_ID;
