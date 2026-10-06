@@ -41,7 +41,6 @@ world_chunk_t*
 s_entity_manager_get_chunk(entity_manager_t *entity_manager, vec2_t world_position)
 {    
     world_chunk_t *result = null;
-
     ivec2_t chunk_position = get_sim_chunk_position(world_position); 
 
     u8 *active_chunk_index = &entity_manager->world_chunk_sparse_matrix[chunk_position.x][chunk_position.y];
@@ -85,21 +84,21 @@ s_entity_create(entity_manager_t *entity_manager, vec2_t world_position, u32 arc
         entity_index < MAX_CHUNK_ENTITIES;
         ++entity_index)
     {
-        entity_t *found = chunk->entities + entity_index;
+        entity_t *found = chunk->sparse_entities + entity_index;
         if(!(found->flags & ENTITY_FLAG_IS_VALID))
         {
             result = found;
-            ZeroStruct(*result);
+            memset(result, 0, sizeof(entity_t));
 
             result->flags     = (ENTITY_FLAG_IS_VALID|flags);
             result->archetype =  archetype;
             result->ID        =  entity_index;
 
-            ++chunk->chunk_entity_count;
             break;
         }
     }
 
+    chunk->used_entity_slots[chunk->chunk_entity_count++] = result->ID;
     return(result);
 }
 
@@ -107,9 +106,31 @@ void
 s_entity_destroy(entity_manager_t *entity_manager, entity_t *entity)
 {
     world_chunk_t *chunk = s_entity_manager_get_or_create_chunk(entity_manager, entity->position);
-    c_array_remove(chunk->entities, entity->ID, chunk->chunk_entity_count);
 
-    --chunk->chunk_entity_count;
+    s32 index = (s32)c_array_find(chunk->used_entity_slots, &entity->ID);
+    if(index != -1)
+    {
+        c_array_remove(chunk->used_entity_slots, index, chunk->chunk_entity_count);
+        entity->flags &= ~ENTITY_FLAG_IS_VALID;
+
+        --chunk->chunk_entity_count;
+        Assert(chunk->chunk_entity_count >= 0);
+    }
+    else
+    {
+        InvalidCodePath;
+    }
+}
+
+internal_api entity_t*
+s_entity_access_sparse_chunk_entity(world_chunk_t *chunk, s32 index)
+{
+    entity_t *result = null;
+    s32 entity_index = chunk->used_entity_slots[index];
+
+    result = chunk->sparse_entities + entity_index;
+
+    return(result);
 }
 
 entity_query_t
@@ -124,11 +145,11 @@ s_entity_query_flags(entity_manager_t *entity_manager, u32 search_mask)
         ++chunk_index)
     {
         world_chunk_t *chunk = entity_manager->active_chunks + chunk_index;
-        for(u32 entity_index = 0;
+        for(s32 entity_index = 0;
             entity_index < chunk->chunk_entity_count;
             ++entity_index)
         {
-            entity_t *entity = chunk->entities + entity_index;
+            entity_t *entity = s_entity_access_sparse_chunk_entity(chunk, entity_index);
             if((entity->flags & search_mask) != 0)
             {
                 result.entities[found_entity_count] = entity;
@@ -155,11 +176,11 @@ s_entity_query_flags_exact(entity_manager_t *entity_manager, u32 search_mask)
         ++chunk_index)
     {
         world_chunk_t *chunk = entity_manager->active_chunks + chunk_index;
-        for(u32 entity_index = 0;
+        for(s32 entity_index = 0;
             entity_index < chunk->chunk_entity_count;
             ++entity_index)
         {
-            entity_t *entity = chunk->entities + entity_index;
+            entity_t *entity = s_entity_access_sparse_chunk_entity(chunk, entity_index);
             if((entity->flags & search_mask) == search_mask)
             {
                 result.entities[found_entity_count] = entity;
@@ -176,7 +197,6 @@ entity_query_t
 s_entity_query_archetype(entity_manager_t *entity_manager, entity_archetype_t archetype)
 {
     entity_query_t result = {};
-
     result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_CHUNK_ENTITIES);
 
     // NOTE(Sleepster): Active chunk 
@@ -186,20 +206,71 @@ s_entity_query_archetype(entity_manager_t *entity_manager, entity_archetype_t ar
         ++chunk_index)
     {
         world_chunk_t *chunk = entity_manager->active_chunks + chunk_index;
-        for(u32 entity_index = 0;
+        for(s32 entity_index = 0;
             entity_index < chunk->chunk_entity_count;
             ++entity_index)
         {
-            entity_t *entity = chunk->entities + entity_index;
-            if(entity->archetype == archetype)
+            entity_t *entity = s_entity_access_sparse_chunk_entity(chunk, entity_index);
+            if(entity->flags & ENTITY_FLAG_IS_VALID)
             {
-                result.entities[found_entity_count] = entity;
-                ++found_entity_count;
+                if(entity->archetype == archetype)
+                {
+                    result.entities[found_entity_count] = entity;
+                    ++found_entity_count;
+                }
             }
         }
     }
 
     result.entity_count = found_entity_count;
+    return(result);
+}
+
+entity_query_t
+s_entity_get_entities_within_position_range(entity_manager_t *entity_manager, vec2_t min, vec2_t max)
+{
+    entity_query_t result = {};    
+    result.entities = c_arena_push_array(&entity_manager->transient_storage, entity_t*, MAX_CHUNK_ENTITIES);
+
+    rectangle2_t world_rectangle = rect2_create_from_min_max(min, max);
+    if(min.x > max.x ||
+       min.y > max.y)
+    {
+        world_rectangle = rect2_create_from_min_max(max, min);
+    }
+
+    ivec2_t chunk_position_min   = get_sim_chunk_position(min);
+    ivec2_t chunk_position_max   = get_sim_chunk_position(max);
+    for(s32 current_chunk_x = chunk_position_min.x;
+        current_chunk_x <= chunk_position_max.x;
+        ++current_chunk_x)
+    {
+        for(s32 current_chunk_y = chunk_position_min.y;
+            current_chunk_y <= chunk_position_max.y;
+            ++current_chunk_y)
+        {
+            u8 chunk_value = entity_manager->world_chunk_sparse_matrix[current_chunk_x][current_chunk_y];
+            if(chunk_value)
+            {
+                world_chunk_t *chunk = &entity_manager->active_chunks[chunk_value];
+                for(s32 entity_index = 0;
+                    entity_index < chunk->chunk_entity_count;
+                    ++entity_index)
+                {
+                    entity_t *entity = s_entity_access_sparse_chunk_entity(chunk, entity_index);
+                    if(entity->flags & ENTITY_FLAG_IS_VALID)
+                    {
+                        rectangle2_t entity_rectangle = rect2_create(entity->editor_position, entity->size);
+                        if(rect2_AABB_SAT(world_rectangle, entity_rectangle))
+                        {
+                            result.entities[result.entity_count++] = entity;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     return(result);
 }
 

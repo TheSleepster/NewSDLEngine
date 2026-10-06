@@ -29,49 +29,52 @@ internal_api widget_t*
 find_top_level_in_bounds_widget(ui_state_t *ui_state, widget_t *widget, vec2_t mouse_position)
 {
     widget_t *result = null;
-    widget_t *first_widget = widget;
-    do {
-        if(widget->first_child)
-        { 
-            widget_t *top_level_child = find_top_level_in_bounds_widget(ui_state, widget->first_child, mouse_position);
-            if(result && top_level_child)
-            {
-                if(top_level_child->parent_stack_depth < result->parent_stack_depth)
+    if(widget && widget->ID != 0)
+    {
+        widget_t *first_widget = widget;
+        do {
+            if(widget->first_child)
+            { 
+                widget_t *top_level_child = find_top_level_in_bounds_widget(ui_state, widget->first_child, mouse_position);
+                if(result && top_level_child)
+                {
+                    if(top_level_child->parent_stack_depth < result->parent_stack_depth)
+                    {
+                        result = top_level_child;
+                    }
+                }
+                else if(!result)
                 {
                     result = top_level_child;
                 }
             }
-            else if(!result)
-            {
-                result = top_level_child;
-            }
-        }
 
-        widget_state_t *state = &(ui_state->widget_states.items[widget->ID]).item;
-        state->is_held = false;
-        state->just_released = false;
-        state->just_clicked = false;
-        state->is_double_clicked = false;
-        state->is_right_clicked = false;
+            widget_state_t *state = &(ui_state->widget_states.items[widget->ID]).item;
+            state->is_held = false;
+            state->just_released = false;
+            state->just_clicked = false;
+            state->is_double_clicked = false;
+            state->is_right_clicked = false;
 
-        bool8 within_widget_bounds = rect2_point_in_rect(state->widget_rect, mouse_position);
-        if(within_widget_bounds && (widget->widget_flags & UI_WIDGET_FLAG_INTERACTABLE))
-        {
-            if(result)
+            bool8 within_widget_bounds = rect2_point_in_rect(state->widget_rect, mouse_position);
+            if(within_widget_bounds && (widget->widget_flags & UI_WIDGET_FLAG_INTERACTABLE))
             {
-                if(widget->parent_stack_depth < result->parent_stack_depth)
+                if(result)
+                {
+                    if(widget->parent_stack_depth < result->parent_stack_depth)
+                    {
+                        result = widget;
+                    }
+                }
+                else
                 {
                     result = widget;
                 }
             }
-            else
-            {
-                result = widget;
-            }
-        }
 
-        widget = widget->next_sibling;
-    }while(widget != first_widget);
+            widget = widget->next_sibling;
+        }while(widget != first_widget);
+    }
 
     return(result);
 }
@@ -323,10 +326,13 @@ ui_state_update_widget_hierarchy
 internal_api void
 ui_state_update_widget_hierarchy(ui_state_t *ui_state)
 {
-    // NOTE(Sleepster): Get the total size of the hierarchy
-    size_all_widgets(ui_state);
-    // NOTE(Sleepster): Place the widgets in the hierarchy, honoring the sizing and padding
-    place_all_widgets(ui_state);
+    if(ui_state->first_widget && ui_state->first_widget->ID != 0)
+    {
+        // NOTE(Sleepster): Get the total size of the hierarchy
+        size_all_widgets(ui_state);
+        // NOTE(Sleepster): Place the widgets in the hierarchy, honoring the sizing and padding
+        place_all_widgets(ui_state);
+    }
 }
 
 /*
@@ -341,7 +347,7 @@ ui_state_render_widgets(ui_state_t *ui_state)
     render_state_t *render_state = ui_state->render_state;
 
     widget_t *current_widget = ui_state->first_widget;
-    if(current_widget)
+    if(current_widget && current_widget->ID != 0)
     {
         render_group_t *current_render_group = s_render_group_begin(&render_state->render_graph, render_state->fullscreen_renderpass_ID);
         current_render_group->shader       = ui_state->widget_shader;
@@ -357,6 +363,7 @@ ui_state_render_widgets(ui_state_t *ui_state)
         pipeline_state.dst_color_blend_mode = RBM_OneMinusSrcAlpha;
         pipeline_state.src_alpha_blend_mode = RBM_One;
         pipeline_state.dst_alpha_blend_mode = RBM_Zero;
+        pipeline_state.depth_func           = RDF_Always;
 
         current_render_group->pipeline_state = pipeline_state;
 
@@ -384,7 +391,7 @@ ui_state_render_widgets(ui_state_t *ui_state)
     }
     else
     {
-        log_warning("Called ui_state_render_widgets on an empty ui_state_t... there are no widgets attached!!!\n");
+        //log_warning("Called ui_state_render_widgets on an empty ui_state_t... there are no widgets attached!!!\n");
     }
 }
 

@@ -1603,14 +1603,20 @@ vk_backend_create_pipeline_from_render_state(vulkan_context_t     *vulkan_contex
                                              RHI_pipeline_state_t *state)
 {
     Assert(shader->shader_id > 0);
-
     VkPipeline result = null;
+
+    // TODO(Sleepster): Backface culling is disabled for now because we were having issues 
+    // with the editor's selection box being culled when distances were negative. So, maybe we just don't need it?
+    //
+    // Perhaps make it controllable?
+    //
+    // It was: VK_CULL_MODE_BACK_BIT
     const VkPipelineRasterizationStateCreateInfo rasterization_state = {
         .sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
         .depthClampEnable        = false,
         .rasterizerDiscardEnable = false,
         .polygonMode             = (VkPolygonMode)state->polygon_mode,
-        .cullMode                = VK_CULL_MODE_BACK_BIT,
+        .cullMode                = VK_CULL_MODE_NONE, 
         .frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE,
         .depthBiasEnable         = false,
         .depthBiasConstantFactor = 0.0f,

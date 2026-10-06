@@ -541,6 +541,13 @@ s_im_is_input_button_released(input_controller_t *controller, u32 inputID)
     return(result);
 }
 
+ENGINE_API void
+s_im_input_state_consume_flags(input_controller_t *controller, u32 inputID, u32 flags)
+{
+    input_state_t *input = controller->inputs + inputID;
+    input->flags &= ~(flags);
+}
+
 ENGINE_API input_action_t*
 s_im_input_action_create(input_manager_t *input_manager, s32 type)
 {

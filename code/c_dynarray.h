@@ -176,16 +176,17 @@ s32
 c_array_add_if_unique(array_view_t<T> array, T *element, s32 index_to_emplace)
 {
     s32 result = -1;
+    Assert(index_to_emplace < array.count);
 
-    T value = *element;
+    T &value = *element;
 
     bool8 found = false;
     for(s32 index = 0;
         index < index_to_emplace;
         ++index)
     {
-        T searched_element = array[index];
-        if(searched_element == value)
+        T &searched_element = array[index];
+        if(memcmp(&searched_element, &value, sizeof(T)) == 0)
         {
             found  = true;
             result = index;

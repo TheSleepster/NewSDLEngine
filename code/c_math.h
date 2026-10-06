@@ -497,7 +497,10 @@ MATH_API ivec2_t ivec2_create_int32(s32 A, s32 B);
 MATH_API ivec3_t ivec2_expand_ivec3(ivec2_t A, s32 B);
 MATH_API ivec4_t ivec2_expand_ivec4(ivec2_t A, s32 B, s32 C);
 MATH_API ivec2_t ivec2_cast(vec2_t A);
+MATH_API ivec2_t ivec2_add(ivec2_t A, ivec2_t B);
+MATH_API ivec2_t ivec2_subtract(ivec2_t A, ivec2_t B);
 MATH_API ivec2_t ivec2_multiply(ivec2_t A, ivec2_t B);
+MATH_API ivec2_t ivec2_reduce(ivec2_t A, ivec2_t B);
 
 /*===========================================
   ================ IVECTOR 3 ================
@@ -1412,11 +1415,41 @@ ivec2_cast(vec2_t A)
 }
 
 MATH_API ivec2_t
+ivec2_add(ivec2_t A, ivec2_t B)
+{
+    ivec2_t result;
+    result.x = A.x + B.x;
+    result.y = A.y + B.y;
+
+    return(result);
+}
+
+MATH_API ivec2_t
+ivec2_subtract(ivec2_t A, ivec2_t B)
+{
+    ivec2_t result;
+    result.x = A.x - B.x;
+    result.y = A.y - B.y;
+
+    return(result);
+}
+
+MATH_API ivec2_t
 ivec2_multiply(ivec2_t A, ivec2_t B)
 {
     ivec2_t result;
     result.x = A.x * B.x;
     result.y = A.y * B.y;
+
+    return(result);
+}
+
+MATH_API ivec2_t
+ivec2_reduce(ivec2_t A, ivec2_t B)
+{
+    ivec2_t result;
+    result.x = A.x / B.x;
+    result.y = A.y / B.y;
 
     return(result);
 }

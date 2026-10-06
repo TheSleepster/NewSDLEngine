@@ -116,6 +116,7 @@ ENGINE_API input_state_t *s_im_controller_get_input_state(input_controller_t *co
 ENGINE_API bool8          s_im_is_input_button_pressed(input_controller_t *controller, u32 inputID);
 ENGINE_API bool8          s_im_is_input_button_down(input_controller_t *controller, u32 inputID);
 ENGINE_API bool8          s_im_is_input_button_released(input_controller_t *controller, u32 inputID);
+ENGINE_API void           s_im_input_state_consume_flags(input_controller_t *controller, u32 inputID, u32 flags);
 
 /* 
 ====================================================
@@ -267,7 +268,6 @@ ENGINE_API input_controller_t *s_im_init_input_controller(input_manager_t *input
 ENGINE_API input_event_t      *s_im_read_next_event_from_controller(input_controller_t *controller);
 ENGINE_API void                s_im_controller_update_state(input_manager_t *input_manager, input_controller_t *controller, bool8 consume);
 ENGINE_API u32                 s_im_observe_current_device_events(input_controller_t *controller, array_view_t<input_event_t> event_array);
-
 
 ENGINE_API vec2_t
 s_im_transform_mouse_data(input_controller_t *controller,

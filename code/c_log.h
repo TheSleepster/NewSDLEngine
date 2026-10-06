@@ -32,8 +32,8 @@ typedef enum debug_log_level
 #define log_trace(message, ...)    Log(SL_LOG_TRACE,   message, ##__VA_ARGS__)
 #define log_info(message, ...)     Log(SL_LOG_INFO,    message, ##__VA_ARGS__)
 #define log_warning(message, ...)  Log(SL_LOG_WARNING, message, ##__VA_ARGS__)
-#define log_error(message, ...)    Log(SL_LOG_ERROR,   message, ##__VA_ARGS__);;
-#define log_fatal(message, ...)    Log(SL_LOG_FATAL,   message, ##__VA_ARGS__);;
+#define log_error(message, ...)    Log(SL_LOG_ERROR,   message, ##__VA_ARGS__); AssertBreak;
+#define log_fatal(message, ...)    Log(SL_LOG_FATAL,   message, ##__VA_ARGS__); AssertBreak;
 
 static ticket_mutex_t log_mutex;
 
@@ -89,7 +89,7 @@ _log(debug_log_level_t log_level,
                     info_strings[log_level], 
                     buffer);
 
-            fprintf(stderr, "%s", out_buffer);
+            fprintf(stdout, "%s", out_buffer);
         }
     }
 }

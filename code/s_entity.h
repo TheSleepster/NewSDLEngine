@@ -29,12 +29,33 @@ constexpr u32 CHUNK_WIDTH       = 320;
 constexpr u32 CHUNK_HEIGHT      = 180;
 constexpr u32 MAX_ACTIVE_CHUNKS = 51;
 
+struct entity_t;
+
+struct entity_create_info_t
+{
+    u32              archetype;
+    u32              extra_flags;
+    game_state_t    *game_state;
+    asset_manager_t *asset_manager;
+    vec2_t           initial_position;
+    vec2_t           size;
+};
+
+#define ENTITY_CREATE_FUNCTION(name) entity_t *name(entity_create_info_t *info)
+typedef ENTITY_CREATE_FUNCTION(entity_create_function_t);
+
+#define ENTITY_ARCHETYPE_LIST(X) \
+    X(ENTITY_ARCHETYPE_PLAYER, "ENTITY_ARCHETYPE_PLAYER", s_entity_player_create) \
+    X(ENTITY_ARCHETYPE_COLLIDER, "ENTITY_ARCHETYPE_COLLIDER", s_entity_collider_create) \
+    X(ENTITY_ARCHETYPE_TILE, "ENTITY_ARCHETYPE_TILE", s_entity_tile_create) \
+
+CODE_GEN_IGNORE_DECL
 enum entity_archetype_t
 {
     ENTITY_ARCHETYPE_INVALID,
-    ENTITY_ARCHETYPE_PLAYER,
-    ENTITY_ARCHETYPE_COLLIDER,
-    ENTITY_ARCHETYPE_TILE,
+#define X(enum_type, string, function_ptr) enum_type,
+    ENTITY_ARCHETYPE_LIST(X)
+#undef X
     ENTITY_ARCHETYPE_COUNT
 };
 
@@ -54,8 +75,7 @@ enum entity_flags_t
     ENTITY_FLAG_GROUNDED       = BIT(11),
 };
 
-// NOTE(Sleepster): owner_client_id is used to assign ownership of an entity 
-// to that of a specific client 
+// TODO(Sleepster): The entity should probably embed it's world chunk 
 struct entity_t
 {
     // NOTE(Sleepster): Base Entity 
@@ -93,13 +113,15 @@ struct entity_t
     bool8           collision;
 };
 
-using chunk_entity_array_t = fixed_array_t<entity_t, MAX_CHUNK_ENTITIES>;
+using chunk_entity_array_t  = fixed_array_t<entity_t, MAX_CHUNK_ENTITIES>;
+using chunk_entity_lookup_t = fixed_array_t<u32, MAX_CHUNK_ENTITIES>;
 struct world_chunk_t
 {
     ivec2_t   world_chunk_hash;
 
-    chunk_entity_array_t entities;
-    u32                  chunk_entity_count;
+    chunk_entity_array_t  sparse_entities;
+    chunk_entity_lookup_t used_entity_slots;
+    s32                   chunk_entity_count;
 };
 
 // NOTE(Sleepster): This isn't a real solution for the world sim storage... 
@@ -122,7 +144,7 @@ struct entity_manager_t
 struct entity_query_t
 {
     entity_t **entities;
-    u32        entity_count;
+    s32        entity_count;
 
     entity_t **begin() { return(entities); }
     entity_t **end()   { return(entities + entity_count); }
@@ -136,6 +158,7 @@ void           s_entity_destroy(entity_manager_t *entity_manager, entity_t *enti
 entity_query_t s_entity_query_flags(entity_manager_t *entity_manager, u32 search_mask);
 entity_query_t s_entity_query_flags_exact(entity_manager_t *entity_manager, u32 search_mask);
 entity_query_t s_entity_query_archetype(entity_manager_t *entity_manager, entity_archetype_t archetype);
+internal_api ivec2_t get_sim_chunk_position(vec2_t world_position);
 
 #endif // S_ENTITY_H
 
