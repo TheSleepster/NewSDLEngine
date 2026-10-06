@@ -418,7 +418,7 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                     {
                         case ENTITY_ARCHETYPE_TILE:
                         {
-                            entity = entity_tile_create(game_state, undo_action->entity_position, undo_action->entity_flags);
+                            entity = s_entity_tile_create(game_state, undo_action->entity_position, undo_action->entity_flags);
                         }break;
                     }
 
@@ -441,7 +441,7 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                         {
                             case ENTITY_ARCHETYPE_TILE:
                             {
-                                entity = entity_tile_create(game_state, entity_info->position, entity_info->flags);
+                                entity = s_entity_tile_create(game_state, entity_info->position, entity_info->flags);
                             }break;
                         }
                     }
@@ -477,7 +477,7 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                 {
                     case ENTITY_ARCHETYPE_TILE:
                     {
-                        entity_tile_create(game_state, redo_action->entity_position, redo_action->entity_flags);
+                        s_entity_tile_create(game_state, redo_action->entity_position, redo_action->entity_flags);
                     }break;
                 }
             }
@@ -561,6 +561,8 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
             editor->boxing = false;
         }
     }
+
+    s_im_input_action_update_state(input_manager, editor->controller);
 
     // NOTE(Sleepster): Manipulate Mode 
     if(!editor->current_editor_mode)
@@ -666,7 +668,7 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
                     if(!cell_occupied)
                     {
                         vec2_t tile_position = vec2_scale(world_to_tile(mouse_position), WORLD_TILE_SIZE);
-                        entity_t *tile = entity_tile_create(game_state, tile_position, 0);
+                        entity_t *tile = s_entity_tile_create(game_state, tile_position, 0);
                         editor_action_t action = {
                             .type   = EDITOR_ACTION_TYPE_UNDO,
                             .kind   = EDITOR_ACTION_ENTITY_CREATE,
@@ -715,7 +717,7 @@ s_editor_update_state(game_state_t *game_state, map_editor_t *editor, render_sta
 
                         if(!collision)
                         {
-                            entity_t *entity = entity_tile_create(game_state, vec2(tile_x, tile_y), 0);
+                            entity_t *entity = s_entity_tile_create(game_state, vec2(tile_x, tile_y), 0);
 
                             editor_entity_action_info_t *entity_action = entity_actions + entities_created++;
                             entity_action->archetype = ENTITY_ARCHETYPE_TILE;
@@ -959,8 +961,6 @@ s_editor_render_to_output(game_state_t *game_state, map_editor_t *editor, asset_
             .offset = vec2(0,             window_height),
             .extent = vec2(window_width, -window_height)
         };
-
-        s_render_group_add_constant_buffer(current_render_group, render_state->camera_matrices_buffer, &scene_camera->matrices, sizeof(mat4_t) * 2);
 
         render_group_vertex_stream_t *vertex_stream = s_render_group_append_vertex_stream(current_render_group, 
                                                                                           sizeof(immediate_vertex_t), 

@@ -55,7 +55,7 @@ RoundedBoxSDF(float2 CenterPosition, float2 Size, float Radius)
 PixelOutput_t
 PSMain(VertexOutput_t VertexOutput)
 {
-    PixelOutput_t Result;
+    PixelOutput_t Result = {};
     int WidgetType = int(floor(VertexOutput.vOutWidgetOptions.x));
 
     // NOTE(Sleepster): Standard rectangle 

@@ -41,9 +41,6 @@ struct entity_create_info_t
     vec2_t           size;
 };
 
-#define ENTITY_CREATE_FUNCTION(name) entity_t *name(entity_create_info_t *info)
-typedef ENTITY_CREATE_FUNCTION(entity_create_function_t);
-
 #define ENTITY_ARCHETYPE_LIST(X) \
     X(ENTITY_ARCHETYPE_PLAYER, "ENTITY_ARCHETYPE_PLAYER", s_entity_player_create) \
     X(ENTITY_ARCHETYPE_COLLIDER, "ENTITY_ARCHETYPE_COLLIDER", s_entity_collider_create) \

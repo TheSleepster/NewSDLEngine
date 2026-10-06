@@ -137,7 +137,7 @@ global string_t global_test_textbox_string = {};
 // TODO(Sleepster): DEBUG CODE 
 
 internal_api vec2_t    world_to_tile(vec2_t world_position);
-internal_api entity_t* entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags);
+internal_api entity_t* s_entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags);
 
 #include <s_ui_core.cpp>
 #include <s_entity.cpp>
@@ -311,14 +311,14 @@ handle_debug_ui_menu(ui_state_t *main_ui, RHI_context_t *RHI_context, asset_hand
 }
 
 internal_api entity_t*
-s_entity_player_create(entity_create_info_t *info)
+s_entity_player_create(game_state_t *game_state, asset_manager_t *asset_manager, vec2_t position)
 {
     entity_t *result = null;
 
     u32 entity_flags = ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_HAS_SPRITE|ENTITY_FLAG_GRAVITIC|ENTITY_FLAG_ACTOR|ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_ANIMATED|ENTITY_FLAG_GRAVITIC;
-    result = s_entity_create(info->game_state->entity_manager, info->initial_position, ENTITY_ARCHETYPE_PLAYER, entity_flags);
+    result = s_entity_create(game_state->entity_manager, position, ENTITY_ARCHETYPE_PLAYER, entity_flags);
     
-    asset_handle_t player_sprite = s_asset_manager_acquire_asset_handle(info->asset_manager, STR("player_sprite_sheet"));
+    asset_handle_t player_sprite = s_asset_manager_acquire_asset_handle(asset_manager, STR("player_sprite_sheet"));
 
     result->sprite = player_sprite;
     result->direction_x = 1;
@@ -327,8 +327,8 @@ s_entity_player_create(entity_create_info_t *info)
     result->size     = vec2(15, 18);
     result->animation_state = PLAYER_ANIMATION_STATE_RUNNING;
 
-    result->editor_position = info->initial_position;
-    result->position        = info->initial_position;
+    result->editor_position = position;
+    result->position        = position;
 
     result->animations      = c_arena_push_array(&gc->persistent_arena, animation2D_t, PLAYER_ANIMATION_STATE_COUNT);
     result->animation_count = PLAYER_ANIMATION_STATE_COUNT;
@@ -387,55 +387,40 @@ s_entity_player_create(entity_create_info_t *info)
 }
 
 internal_api entity_t*
-s_entity_collider_create(entity_create_info_t *info)
+s_entity_collider_create(game_state_t *game_state, vec2_t initial_position, vec2_t size, u32 extra_flags)
 {
-    entity_t *result = s_entity_create(info->game_state->entity_manager, 
-                                       info->initial_position, 
+    entity_t *result = s_entity_create(game_state->entity_manager, 
+                                       initial_position, 
                                        ENTITY_ARCHETYPE_COLLIDER, 
-                                       ((ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_STATIC) | info->extra_flags));
+                                       ((ENTITY_FLAG_USES_TRANSFORM|ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_STATIC) | extra_flags));
     if(result)
     {
         result->archetype       = ENTITY_ARCHETYPE_COLLIDER;
-        result->position        = info->initial_position;
-        result->editor_position = info->initial_position;
-        result->size            = info->size;
+        result->position        = initial_position;
+        result->editor_position = initial_position;
+        result->size            = size;
 
-        result->bounding_box = rect2_create(info->initial_position, info->size);
+        result->bounding_box = rect2_create(initial_position, size);
     }
 
     return(result);
 }
 
 internal_api entity_t*
-s_entity_tile_create(entity_create_info_t *info)
+s_entity_tile_create(game_state_t *game_state, vec2_t position, u32 flags)
 {
-    entity_t *result = s_entity_create(info->game_state->entity_manager, 
-                                       info->initial_position, 
+    entity_t *result = s_entity_create(game_state->entity_manager, 
+                                       position, 
                                        ENTITY_ARCHETYPE_TILE, 
-                                      (ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_STATIC|ENTITY_FLAG_IS_GROUND|info->extra_flags));
-    if(result)
-    {
-        result->archetype       = ENTITY_ARCHETYPE_TILE;
-        result->position        = info->initial_position;
-        result->render_position = info->initial_position;
-        result->editor_position = info->initial_position;
-        result->size            = vec2(WORLD_TILE_SIZE, WORLD_TILE_SIZE);
-        result->bounding_box    = rect2_create(info->initial_position, result->size);
-    }
+                                      (ENTITY_FLAG_HAS_COLLIDER|ENTITY_FLAG_STATIC|ENTITY_FLAG_IS_GROUND|flags));
+    result->archetype       = ENTITY_ARCHETYPE_TILE;
+    result->position        = position;
+    result->render_position = position;
+    result->editor_position = position;
+    result->size            = vec2(WORLD_TILE_SIZE, WORLD_TILE_SIZE);
+    result->bounding_box    = rect2_create(position, result->size);
 
     return(result);
-}
-
-internal_api void
-s_entity_create(entity_create_info_t *info)
-{
-    switch(info->archetype)
-    {
-#define X(enum_type, string, function_ptr) \
-        case enum_type: { function_ptr(info); }break;
-    ENTITY_ARCHETYPE_LIST(X)
-#undef X
-    }
 }
 
 #if 0
@@ -538,10 +523,10 @@ create_test_environment(game_state_t *game_state, asset_manager_t *asset_manager
 {
     (void)asset_manager;
 #if 1
-    entity_t *top_wall    = entity_test_collider_create(game_state, vec2(-160,  80), vec2(320, 20),  0);
-    entity_t *bottom_wall = entity_test_collider_create(game_state, vec2(-160, -90), vec2(320, 20),  ENTITY_FLAG_IS_GROUND);
-    entity_t *left_wall   = entity_test_collider_create(game_state, vec2(-160, -80), vec2(20,  180), 0);
-    entity_t *right_wall  = entity_test_collider_create(game_state, vec2( 140, -80), vec2(20,  180), 0);
+    entity_t *top_wall    = s_entity_collider_create(game_state, vec2(-160,  80), vec2(320, 20),  0);
+    entity_t *bottom_wall = s_entity_collider_create(game_state, vec2(-160, -90), vec2(320, 20),  ENTITY_FLAG_IS_GROUND);
+    entity_t *left_wall   = s_entity_collider_create(game_state, vec2(-160, -80), vec2(20,  180), 0);
+    entity_t *right_wall  = s_entity_collider_create(game_state, vec2( 140, -80), vec2(20,  180), 0);
 
     (void)top_wall;
     (void)bottom_wall;
@@ -1021,7 +1006,7 @@ game_main(global_context_t *_global_context)
         game_state->editor = s_map_editor_create(input_manager, asset_manager, render_state);
 
         // GAME INIT
-        entity_player_create(game_state, asset_manager, vec2(0, 0));
+        s_entity_player_create(game_state, asset_manager, vec2(0, 0));
         create_test_environment(game_state, asset_manager);
         // GAME INIT
         
@@ -1196,7 +1181,7 @@ game_main(global_context_t *_global_context)
                         ZeroStruct(*player);
                         s_entity_destroy(game_state->entity_manager, player);
 
-                        entity_player_create(game_state, asset_manager, vec2(0, 0));
+                        s_entity_player_create(game_state, asset_manager, vec2(0, 0));
                     }
                 }
 
