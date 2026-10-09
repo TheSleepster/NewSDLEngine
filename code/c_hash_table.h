@@ -86,7 +86,6 @@ struct hash_element_t
 template <typename T>
 struct hash_table_t
 {
-    // TODO(Sleepster): Make this an array_t? Also, perhaps make this expandable like bucket arrays.
     hash_element_t<T>             *items;
 
     dynarray_t<hash_element_t<T>*> used_entries;

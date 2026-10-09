@@ -20,6 +20,8 @@
 #include <s_input_manager.h>
 #include <s_asset_manager.h>
 
+#include <clang-c/Index.h>
+
 struct animation2D_t;
 
 #define MAX_CHUNK_ENTITIES (1000)
