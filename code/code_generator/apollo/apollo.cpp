@@ -676,7 +676,7 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor previous_parent, CXC
         case CXCursor_UnionDecl:
         case CXCursor_StructDecl:
         {
-            code_decl_t structure_info;
+            code_decl_structure_t structure_info;
             bool8 add = traverse_structure(current_cursor, &structure_info);
             if(add)
             {
@@ -685,7 +685,7 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor previous_parent, CXC
         }break;
         case CXCursor_EnumDecl:
         {
-            code_decl_t enum_decl;
+            code_decl_structure_t enum_decl;
             bool8 add = traverse_enum(current_cursor, &enum_decl);
             if(add)
             {
@@ -694,7 +694,7 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor previous_parent, CXC
         }break;
         case CXCursor_FunctionDecl:
         {
-            code_decl_t procedure_info;
+            code_decl_lambda_t procedure_info;
             bool8 add = traverse_function(current_cursor, &procedure_info);
             if(add)
             {
@@ -724,7 +724,7 @@ main(int argc, char **argv)
         state->type_record.init(&state->arena);
         state->clang_index = clang_createIndex(0, 1); 
         const char* args[] = {
-            "clang++", "-std=c++11",
+            "-xc++", "-std=c++11",
         };
 
         state->working_TU = clang_parseTranslationUnit(state->clang_index,
@@ -919,3 +919,61 @@ main(int argc, char **argv)
 
     return(0);
 }
+
+#if 0
+// NOTE(Sleepster): Example metaprogram that would use the output of this program 
+// The code here isn't meant to be able to be compiled, just merely meant to serve as an
+// example of the general behavior we desire
+#include <apollo.h>
+
+int
+main(void)
+{
+    apollo_code_decl_list_t *declarations = Apollo::parse_single_file(filepath);
+    apollo_code_decl_list_t *declarations = Apollo::parse_all_files_in_directory(filepath, recursive);
+
+    dynarray_t<string_t> entity_create_functions = {};
+    c_dynarray_add(&entity_create_functions, STR("const static entity_create_function_t entity_create[] = {\n"));
+    for(const auto &declaration: declarations)
+    {
+        if(declaration->metatype == APOLLO_METATYPE_STRUCTURE)
+        {
+            dynarray_t<string_t> strings = {};
+            if(Apollo::is_subclass_of(declaration, STR("entity_t")))
+            {
+                c_dynarray_add(&strings, STR("fixed_array_t<%s, 4096> %s_entities;\n"), declaration->identifier, declaration_identifier);
+            }
+        }
+        else if(declaration->metatype == APOLLO_METATYPE_PROCEDURE)
+        {
+            dynarray_t<string_t> strings = {};
+            if(Apollo::has_attribute(declaration, STR("entity_create_function")))
+            {
+                c_dynarray_add(&entity_create_functions, STR("\t%s,\n"), declaration->identifier);
+            }
+        }
+    }
+    c_dynarray_add(&entity_create_functions, STR("};\n"));
+
+    dynarray_t<string_t> type_infos = {};
+
+    array_t<apollo_procedure_call_t> function_calls = Apollo::get_procedure_calls(STR("Apollo::type_info"));
+    for(const auto &call: function_calls)
+    {
+        string_t requested_type = call->arguments[0]->identifier;
+        c_dynarray_add(&type_infos, STR("struct type_info_%s: public type_info_t {\n"), requested_type->identifier);
+        
+        code_decl_structure_t *structure_info = Apollo::get_declaration_info(requested_type);
+        for(const auto &member: structure_info->members)
+        {
+            // NOTE(Sleepster): Example ends here, realistically we would just generate this in the most efficient way
+            // possible which is probably just not how athena does it...
+            c_dynarray_add(&type_infos, STR("\t%s %s"));
+        }
+    }
+
+    output_to_file(strings);
+    output_to_file(entity_create_functions);
+} 
+
+#endif

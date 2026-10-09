@@ -22,6 +22,7 @@ enum test_enum
 };
 };
 
+[[test_attrib]]
 enum test_enum2
 {
     TEST_ENUM2_INVALID = 1,
