@@ -10,6 +10,7 @@ struct array_t
 {
     T  *items;
     int count;
+    int padding;
 };
 
 struct SOA

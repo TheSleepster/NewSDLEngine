@@ -22,7 +22,6 @@ enum test_enum
 };
 };
 
-[[test_attrib]]
 enum test_enum2
 {
     TEST_ENUM2_INVALID = 1,
@@ -30,16 +29,18 @@ enum test_enum2
     TEST_ENUM2_SECOND = 1ull << 31ull,
 };
 
-struct test_simple_struct_t
+struct [[clang::annotate(("Test"))]] test_simple_struct_t
 {
-    s32 member0;
+    s32 member0; 
     int member1;
     float32 member2;
     float member3[32];
     float member4[32][32][32];
 };
 
-struct test_simple_struct2_t 
+#define TAG(tag) [[clang::annotate((tag))]]
+
+struct TAG("test") test_simple_struct2_t 
 {
     struct nested_item {
         union {
@@ -80,6 +81,7 @@ test_function()
 {
 }
 
+[[clang::annotate(("Test"))]] 
 int
 test_function2(char *blah, 
                int data, 
