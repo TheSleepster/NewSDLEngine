@@ -1,0 +1,227 @@
+[Vulkan Loader] INFO:           Vulkan Loader Version 1.4.357
+We compiled against SDL version 3.4.4 ...
+But we are linking against SDL version 3.4.4.
+[Vulkan Loader] INFO:           No valid vk_loader_settings.json file found, no loader settings will be active
+[Vulkan Loader] LAYER:          Searching for implicit layer manifest files
+[Vulkan Loader] LAYER:             In following locations:
+[Vulkan Loader] LAYER:                /home/justin/.config/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/xdg/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:             Found the following files:
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d/renderdoc_capture.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+[Vulkan Loader] INFO:           Found manifest file /etc/vulkan/implicit_layer.d/renderdoc_capture.json (file version 1.1.2)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /usr/share/vulkan/implicit_layer.d/nvidia_layers.json (file version 1.0.1)
+[Vulkan Loader] DRIVER:         Searching for driver manifest files
+[Vulkan Loader] DRIVER:            In following locations:
+[Vulkan Loader] DRIVER:               /home/justin/.config/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /etc/xdg/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /etc/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /home/justin/.local/share/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /usr/local/share/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d
+[Vulkan Loader] DRIVER:            Found the following files:
+[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/nvidia_icd.json
+[Vulkan Loader] DRIVER:         Found ICD manifest file /usr/share/vulkan/icd.d/nvidia_icd.json, version 1.0.1
+[Vulkan Loader] DEBUG | DRIVER: Searching for ICD drivers named libGLX_nvidia.so.0
+[Vulkan Loader] DRIVER:         Searching for driver manifest files
+[Vulkan Loader] DRIVER:            In following locations:
+[Vulkan Loader] DRIVER:               /home/justin/.config/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /etc/xdg/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /etc/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /home/justin/.local/share/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /usr/local/share/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d
+[Vulkan Loader] DRIVER:            Found the following files:
+[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/nvidia_icd.json
+[Vulkan Loader] DRIVER:         Found ICD manifest file /usr/share/vulkan/icd.d/nvidia_icd.json, version 1.0.1
+[Vulkan Loader] DEBUG | DRIVER: Searching for ICD drivers named libGLX_nvidia.so.0
+[Vulkan Loader] LAYER:          Searching for implicit layer manifest files
+[Vulkan Loader] LAYER:             In following locations:
+[Vulkan Loader] LAYER:                /home/justin/.config/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/xdg/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:             Found the following files:
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d/renderdoc_capture.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+[Vulkan Loader] INFO:           Found manifest file /etc/vulkan/implicit_layer.d/renderdoc_capture.json (file version 1.1.2)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /usr/share/vulkan/implicit_layer.d/nvidia_layers.json (file version 1.0.1)
+[Vulkan Loader] INFO:           No valid vk_loader_settings.json file found, no loader settings will be active
+[Vulkan Loader] LAYER:          Searching for implicit layer manifest files
+[Vulkan Loader] LAYER:             In following locations:
+[Vulkan Loader] LAYER:                /home/justin/.config/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/xdg/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:             Found the following files:
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d/renderdoc_capture.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+[Vulkan Loader] INFO:           Found manifest file /etc/vulkan/implicit_layer.d/renderdoc_capture.json (file version 1.1.2)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /usr/share/vulkan/implicit_layer.d/nvidia_layers.json (file version 1.0.1)
+[Vulkan Loader] DRIVER:         Searching for driver manifest files
+[Vulkan Loader] DRIVER:            In following locations:
+[Vulkan Loader] DRIVER:               /home/justin/.config/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /etc/xdg/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /etc/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /home/justin/.local/share/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /usr/local/share/vulkan/icd.d
+[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d
+[Vulkan Loader] DRIVER:            Found the following files:
+[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/nvidia_icd.json
+[Vulkan Loader] DRIVER:         Found ICD manifest file /usr/share/vulkan/icd.d/nvidia_icd.json, version 1.0.1
+[Vulkan Loader] DEBUG | DRIVER: Searching for ICD drivers named libGLX_nvidia.so.0
+[Vulkan Loader] LAYER:          Searching for implicit layer manifest files
+[Vulkan Loader] LAYER:             In following locations:
+[Vulkan Loader] LAYER:                /home/justin/.config/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/xdg/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:             Found the following files:
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d/renderdoc_capture.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+[Vulkan Loader] INFO:           Found manifest file /etc/vulkan/implicit_layer.d/renderdoc_capture.json (file version 1.1.2)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /usr/share/vulkan/implicit_layer.d/nvidia_layers.json (file version 1.0.1)
+[32m[INFO]: ----- vk_backend_init -----
+[0m[Vulkan Loader] INFO:           No valid vk_loader_settings.json file found, no loader settings will be active
+[Vulkan Loader] LAYER:          Searching for implicit layer manifest files
+[Vulkan Loader] LAYER:             In following locations:
+[Vulkan Loader] LAYER:                /home/justin/.config/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/xdg/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:             Found the following files:
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d/renderdoc_capture.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+[Vulkan Loader] INFO:           Found manifest file /etc/vulkan/implicit_layer.d/renderdoc_capture.json (file version 1.1.2)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /usr/share/vulkan/implicit_layer.d/nvidia_layers.json (file version 1.0.1)
+[Vulkan Loader] LAYER:          Searching for implicit layer manifest files
+[Vulkan Loader] LAYER:             In following locations:
+[Vulkan Loader] LAYER:                /home/justin/.config/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/xdg/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:             Found the following files:
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d/renderdoc_capture.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+[Vulkan Loader] INFO:           Found manifest file /etc/vulkan/implicit_layer.d/renderdoc_capture.json (file version 1.1.2)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /usr/share/vulkan/implicit_layer.d/nvidia_layers.json (file version 1.0.1)
+[Vulkan Loader] LAYER:          Searching for explicit layer manifest files
+[Vulkan Loader] LAYER:             In following locations:
+[Vulkan Loader] LAYER:                /usr/lib/nsight-systems/target-linux-x64/vulkan-layers
+[Vulkan Loader] LAYER:             Found the following files:
+[Vulkan Loader] LAYER:                /usr/lib/nsight-systems/target-linux-x64/vulkan-layers/VkLayer_nsight-sys_linux.json
+[Vulkan Loader] INFO:           Found manifest file /usr/lib/nsight-systems/target-linux-x64/vulkan-layers/VkLayer_nsight-sys_linux.json (file version 1.1.0)
+[Vulkan Loader] INFO:           No valid vk_loader_settings.json file found, no loader settings will be active
+[Vulkan Loader] LAYER:          Searching for implicit layer manifest files
+[Vulkan Loader] LAYER:             In following locations:
+[Vulkan Loader] LAYER:                /home/justin/.config/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/xdg/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:             Found the following files:
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d/renderdoc_capture.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+[Vulkan Loader] INFO:           Found manifest file /etc/vulkan/implicit_layer.d/renderdoc_capture.json (file version 1.1.2)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /usr/share/vulkan/implicit_layer.d/nvidia_layers.json (file version 1.0.1)
+[Vulkan Loader] LAYER:          Searching for implicit layer manifest files
+[Vulkan Loader] LAYER:             In following locations:
+[Vulkan Loader] LAYER:                /home/justin/.config/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/xdg/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/local/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d
+[Vulkan Loader] LAYER:             Found the following files:
+[Vulkan Loader] LAYER:                /etc/vulkan/implicit_layer.d/renderdoc_capture.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json
+[Vulkan Loader] LAYER:                /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json
+[Vulkan Loader] LAYER:                /usr/share/vulkan/implicit_layer.d/nvidia_layers.json
+[Vulkan Loader] INFO:           Found manifest file /etc/vulkan/implicit_layer.d/renderdoc_capture.json (file version 1.1.2)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamoverlay_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_i386.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /home/justin/.local/share/vulkan/implicit_layer.d/steamfossilize_x86_64.json (file version 1.0.0)
+[Vulkan Loader] INFO:           Found manifest file /usr/share/vulkan/implicit_layer.d/nvidia_layers.json (file version 1.0.1)
+[Vulkan Loader] LAYER:          Searching for explicit layer manifest files
+[Vulkan Loader] LAYER:             In following locations:
+[Vulkan Loader] LAYER:                /usr/lib/nsight-systems/target-linux-x64/vulkan-layers
+[Vulkan Loader] LAYER:             Found the following files:
+[Vulkan Loader] LAYER:                /usr/lib/nsight-systems/target-linux-x64/vulkan-layers/VkLayer_nsight-sys_linux.json
+[Vulkan Loader] INFO:           Found manifest file /usr/lib/nsight-systems/target-linux-x64/vulkan-layers/VkLayer_nsight-sys_linux.json (file version 1.1.0)
+[32m[INFO]: Searching for Vulkan validation layer: 'VK_LAYER_KHRONOS_validation'
+[0m[31m[NON-FATAL ERROR]: [File: /mnt/ssd/projects/c++stuff/NewSDLEngine/code/vk_backend_core.cpp, Line: 378, Function: vk_backend_create_instance]: Failure to find Vulkan validation layer: 'VK_LAYER_KHRONOS_validation'
+[0m

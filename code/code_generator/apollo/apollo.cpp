@@ -140,13 +140,28 @@ struct code_decl_lambda_t: public code_decl_t
     CXType                         return_type;
 };
 
+struct apollo_procedure_argument_t
+{
+    CXType   type;
+    string_t identifier;
+};
+
+struct apollo_procedure_call_expression_t
+{
+    string_t identifier;
+    dynarray_t<apollo_procedure_argument_t> arguments;
+};
+
 struct apollo_code_decl_list_t
 {
+    // NOTE(Sleepster): Parsed and stored, unique types 
     dynarray_t<code_decl_structure_t> structures;
     dynarray_t<code_decl_structure_t> enums;
     dynarray_t<code_decl_lambda_t>    functions;
-
     dynarray_t<code_decl_t>           all;
+
+    // NOTE(Sleepster): These are used by the Apollo::lookup functions 
+    dynarray_t<apollo_procedure_call_expression_t> call_expressions;
 };
 
 struct type_declaration_t
@@ -632,7 +647,7 @@ traverse_structure(CXCursor structure, code_decl_t *code_decl)
 
 /*
 ==========================
-FUNCTIONS / LAMBDAS
+FUNCTIONS / CALL EXPRESSIONS 
 ==========================
 */
 
@@ -687,6 +702,38 @@ traverse_function(CXCursor cursor, code_decl_t *code_decl)
     }
 
     return(result);
+}
+
+internal_api CXChildVisitResult 
+get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXClientData user_data)
+{
+    auto call_expr = static_cast<apollo_procedure_call_expression_t *>(user_data);
+    apollo_procedure_argument_t argument = {};
+
+    CXCursorKind kind = clang_getCursorKind(current_cursor);
+    switch(kind)
+    {
+        // NOTE(Sleepster): Passed Variable 
+        case CXCursor_DeclRefExpr:
+        {
+            CXType   variable_type = clang_getCanonicalType(clang_getCursorType(current_cursor));
+            CXString variable_typname = clang_getTypeSpelling(variable_type); 
+
+            argument.identifier = STR(clang_getCString(variable_typname));
+            argument.type       = variable_type;
+        }break;
+        case CXCursor_StringLiteral:
+        {
+            CXString string_literal = clang_getCursorSpelling(current_cursor);
+
+            string_t string_value = STR(clang_getCString(string_literal));
+            argument.identifier = string_value;    
+            argument.type       = clang_getCursorType(current_cursor);
+        }break;
+    }
+
+    c_dynarray_add(&call_expr->arguments, &argument);
+    return(CXChildVisit_Continue);
 }
 
 /*
@@ -792,6 +839,58 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor, CXClientData user_d
         {
             register_type_alias(current_cursor);
         }break;
+        case CXCursor_CallExpr:
+        {
+            CXString expression_name = clang_getCursorSpelling(current_cursor);
+            string_t expression_name_string = STR(clang_getCString(expression_name));
+
+            apollo_procedure_call_expression_t call_expression = {};
+            call_expression.identifier = expression_name_string;
+    
+            // NOTE(Sleepster): Template Parameters 
+            CXCursor templated_call = clang_getCursorReferenced(current_cursor);
+            s32 template_param_count = clang_Cursor_getNumTemplateArguments(templated_call);  
+            for(s32 template_param_index = 0;
+                template_param_index < template_param_count;
+                ++template_param_index)
+            {
+                apollo_procedure_argument_t new_argument = {};
+                switch(clang_Cursor_getTemplateArgumentKind(templated_call, template_param_index))
+                {
+                    case CXTemplateArgumentKind_Type:
+                    {                
+                        CXType template_param_type = clang_Cursor_getTemplateArgumentType(templated_call, template_param_index);
+                        CXString template_param_typename = clang_getTypeSpelling(template_param_type);
+
+                        new_argument.identifier = STR(clang_getCString(template_param_typename));
+                        new_argument.type       = template_param_type;
+
+                        c_dynarray_add(&call_expression.arguments, &new_argument);
+                    }break;
+                    case CXTemplateArgumentKind_Integral:
+                    {
+                        // TODO(Sleepster): Do we care about the actual value? 
+                        // Right now, I don't think we do since this is simply meant to capture the types used
+                        // rather than their values
+
+                        //s64 value = clang_Cursor_getTemplateArgumentValue(templated_call, template_param_index);
+                        CXType argument_type = clang_Cursor_getTemplateArgumentType(templated_call, template_param_index);
+                        if(argument_type.kind == CXType_Enum)
+                        {
+                            CXString enum_typename = clang_getTypeSpelling(argument_type);
+                            new_argument.identifier = STR(clang_getCString(enum_typename));
+                            new_argument.type       = argument_type;
+
+                            c_dynarray_add(&call_expression.arguments, &new_argument);
+                        }
+                    }break;
+                }
+            }
+
+            // NOTE(Sleepster): Extract Arguments 
+            clang_visitChildren(current_cursor, get_procedure_call_expression_arguments, &call_expression);
+            c_dynarray_add(&state->code_declarations.call_expressions, &call_expression);
+        }break;
     }
 
     return(CXChildVisit_Recurse);
@@ -801,11 +900,12 @@ namespace Apollo {
 apollo_code_decl_list_t* 
 parse_singular_file(string_t filepath)
 {
-    apollo_code_decl_list_t *result = &state->code_declarations;
     state = c_arena_bootstrap_allocate_struct(apollo_state_t, arena, MB(100), ALLOCATOR_TAG_STATIC);
+    apollo_code_decl_list_t *result = &state->code_declarations;
 
     state->type_record.init(&state->arena);
     state->clang_index = clang_createIndex(0, 1); 
+    
     const char* args[] = {
         "-xc++", "-std=c++11",
     };
@@ -830,6 +930,7 @@ parse_singular_file(string_t filepath)
     return(result);
 }
 
+// NOTE(Sleepster): We deliberately only support 1 level of inheritance 
 bool8 
 is_subclass_of(code_decl_structure_t *structure, string_t class_name)
 {
@@ -887,14 +988,25 @@ has_attribute(code_decl_lambda_t *lambda, string_t attribute)
     return(has_attribute(static_cast<code_decl_t*>(lambda), attribute));
 }
 
-void
-get_procedure_calls()
+dynarray_t<apollo_procedure_call_expression_t>
+get_procedure_calls(string_t procedure_name)
 {
+    dynarray_t<apollo_procedure_call_expression_t> result = {};
+    for(auto &expression: state->code_declarations.call_expressions)
+    {
+        if(c_string_compare(expression.identifier, procedure_name))
+        {
+            c_dynarray_add(&result, &expression);
+        }
+    }
+
+    return(result);
 }
 
 void
-get_declaration_info()
+get_declaration_info(string_t requested_typename)
 {
+    (void)requested_typename;
 }
 }
 
@@ -907,7 +1019,6 @@ main(int argc, char **argv)
         c_global_context_init();
         if(Apollo::parse_singular_file(STR(argv[1])))
         {
-
             printf("Structures:\n");
             for(code_decl_structure_t &structure: state->code_declarations.structures)
             {

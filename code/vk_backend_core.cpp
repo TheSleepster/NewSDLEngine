@@ -959,12 +959,11 @@ vk_backend_swapchain_create(vulkan_context_t *vulkan_context)
     VkSurfaceFormatKHR surface_format   = vk_backend_choose_surface_format(vulkan_context->gpu.valid_surface_formats);
     VkPresentModeKHR   present_mode     = vk_backend_choose_present_mode(vulkan_context->gpu.valid_present_modes);
     VkExtent2D         swapchain_extent = vk_backend_choose_swapchain_extent(&vulkan_context->gpu.surface_capabilities, vulkan_context->window);
+    s32 width  = swapchain_extent.width;
+    s32 height = swapchain_extent.height;
 
     vulkan_context->swapchain_format = surface_format;
-
-    s32 width;
-    s32 height;
-    Assert(SDL_GetWindowSizeInPixels(vulkan_context->window, &width, &height));
+    //Assert(SDL_GetWindowSizeInPixels(vulkan_context->window, &width, &height));
     vulkan_context->last_window_width  = vulkan_context->current_window_width;
     vulkan_context->last_window_height = vulkan_context->current_window_height;
 

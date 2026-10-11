@@ -124,7 +124,7 @@ local CLANG_WARN_BASE = {
     "-Wno-null-pointer-subtraction", "-Wno-typedef-redefinition", "-Wno-writable-strings",
     "-Wno-deprecated", "-Wno-c99-designator", "-Wno-unused-template"
 }
-local CLANG_DEBUG_ONLY   = { "-g", "-O0", "-fno-inline-functions" }
+local CLANG_DEBUG_ONLY   = { "-g", "-gdwarf-4", "-O0", "-fno-inline-functions" }
 local CLANG_RELEASE_ONLY = {
     "-O3", "-Wno-unused-parameter", "-Wno-incompatible-pointer-types",
     "-Wno-pointer-integer-compare", "-Wno-vla-cxx-extension", "-Wno-reorder-init-list"
@@ -166,6 +166,7 @@ local COMMON_INCLUDES = {
     path.join(DEPS_DIR, "vulkan", "Include"),
     path.join(DEPS_DIR, "SDL3", "include"),
     path.join(DEPS_DIR, "Freetype", "include"),
+    path.join(DEPS_DIR, "vulkan", "slang", "include"),
     DEPS_DIR,
 }
 
@@ -205,7 +206,7 @@ local function set_toolchain_configuration(target, toolchain, build_config)
 end
 
 local function set_host_configuration(target, target_platform, cross_build)
-    target:add("links", { "SDL3-Static", "freetype", "slang", "slang-compiler" })
+    target:add("links", { "SDL3-Static", "freetype", "clang" })
 
     if SELECTED_RENDERING_BACKEND == "vulkan" then
         target:add("defines", "RENDERER_VULKAN=1")
@@ -218,20 +219,23 @@ local function set_host_configuration(target, target_platform, cross_build)
     if target_platform == "windows" then
         target:add("defines", "OS_WINDOWS=1")
         target:add("links", { "opengl32","user32","gdi32","winmm","shell32","ole32","uuid",
-                    "version","advapi32","setupapi","cfgmgr32","oleaut32","ws2_32","imm32" })
+                   "version","advapi32","setupapi","cfgmgr32","oleaut32","ws2_32","imm32", 
+                   "slang", "slang-compiler"})
         target:add("linkdirs", {
             path.join(DEPS_DIR, "SDL3", "lib", (cross_build and "Win32/MinGW" or "Win32/MSVC")),
             path.join(DEPS_DIR, "Freetype", "lib", (cross_build and "Win32/MinGW" or "Win32/MSVC")),
             path.join(DEPS_DIR, "Freetype", "lib", (cross_build and "Win32/MinGW" or "Win32/MSVC")),
-            path.join(DEPS_DIR, "vulkan", "slang", "lib")
+            path.join(DEPS_DIR, "vulkan", "slang", "lib", "Win32")
         })
     elseif target_platform == "linux" then
         target:add("defines", "OS_LINUX=1")
-        target:add("links", { "m", "dl", "pthread" })
+        target:add("rpathdirs", path.join(DEPS_DIR, "vulkan", "slang", "lib", "linux"))
         target:add("linkdirs", {
             path.join(DEPS_DIR, "SDL3", "lib", "Linux"),
             path.join(DEPS_DIR, "Freetype", "lib", "Linux"),
+            path.join(DEPS_DIR, "vulkan", "slang", "lib", "Linux"),
         })
+        target:add("links", { "m", "dl", "pthread", "slang-compiler" })
     elseif target_platform == "macosx" then
         os.raise("MacOS is not supported...")
     else
@@ -287,6 +291,8 @@ local function build_host_utility(toolname, source_file)
 end
 
 build_host_utility("athena", path.join(SOURCE_DIR, "code_generator", "athena", "athena.cpp"))
+
+build_host_utility("apollo", path.join(SOURCE_DIR, "code_generator", "apollo", "apollo.cpp"))
 build_host_utility("shader_reflector", path.join(SOURCE_DIR, "code_generator", "slang_reflector.cpp"))
 build_host_utility("jfd_asset_file_packer", path.join(SOURCE_DIR, "asset_file_packer", "jfd_file_packer.cpp"))
 

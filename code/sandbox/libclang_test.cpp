@@ -6,6 +6,7 @@
    ======================================================================== */
 
 #include <stdio.h>
+#if 0
 #include <clang-c/Index.h>
 
 struct test_structure_t
@@ -16,10 +17,12 @@ struct test_structure_t
 
     test_structure_t *next_structure;
 };
+#endif
 
 int
 main(void)
 {
+#if 0
     CXIndex index = clang_createIndex(0, 1); 
     CXTranslationUnit translation_unit = clang_parseTranslationUnit(index, 
                                                                     "../code/sandbox/libclang_test.cpp",
@@ -58,5 +61,6 @@ main(void)
     },
     null);
 
+#endif
     return(0);
 }
