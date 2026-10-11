@@ -721,18 +721,33 @@ get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXCli
 
             argument.identifier = STR(clang_getCString(variable_typname));
             argument.type       = variable_type;
+
+            c_dynarray_add(&call_expr->arguments, &argument);
         }break;
         case CXCursor_StringLiteral:
         {
             CXString string_literal = clang_getCursorSpelling(current_cursor);
 
-            string_t string_value = STR(clang_getCString(string_literal));
+            string_t clang_string_value = STR(clang_getCString(string_literal));
+            string_t string_value       = c_string_make_copy(&state->arena, clang_string_value);
+            
+            string_value = c_string_remove_characters(string_value.data, clang_string_value, '\"');
+
             argument.identifier = string_value;    
             argument.type       = clang_getCursorType(current_cursor);
+
+            c_dynarray_add(&call_expr->arguments, &argument);
+        }break;
+        default:
+        {
+            // NOTE(Sleepster): Strings expressed like: STR("blah") don't show up on first pass, so we have to call recursively. 
+            if(kind == CXCursor_CallExpr || kind == CXCursor_CXXFunctionalCastExpr)
+            {
+                clang_visitChildren(current_cursor, get_procedure_call_expression_arguments, call_expr);
+            }
         }break;
     }
 
-    c_dynarray_add(&call_expr->arguments, &argument);
     return(CXChildVisit_Continue);
 }
 
@@ -900,6 +915,11 @@ namespace Apollo {
 apollo_code_decl_list_t* 
 parse_singular_file(string_t filepath)
 {
+    if(!gc->is_initialized)
+    {
+        c_global_context_init();
+    }
+
     state = c_arena_bootstrap_allocate_struct(apollo_state_t, arena, MB(100), ALLOCATOR_TAG_STATIC);
     apollo_code_decl_list_t *result = &state->code_declarations;
 
@@ -1016,7 +1036,6 @@ main(int argc, char **argv)
     if(argc > 1) 
     {
         printf("\n\n\n\n");
-        c_global_context_init();
         if(Apollo::parse_singular_file(STR(argv[1])))
         {
             printf("Structures:\n");

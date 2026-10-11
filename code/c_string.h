@@ -25,7 +25,7 @@ typedef struct string
     s64   count;
 }string_t;
 
-// TODO(Sleepster): - [ ] Any function in here that allocates memory should be reordered like the file API 
+// TODO(Sleepster): - [ ] Any function in here that allocates memory should be reordered to accept a general "buffer" like the file API 
 
 //////////// API DEFINITIONS //////////////
 ENGINE_API u32         c_string_length(const char *c_string);
@@ -58,6 +58,7 @@ ENGINE_API string_t    c_string_get_filename_from_path(string_t filepath);
 ENGINE_API string_t    c_string_get_file_ext_from_path(string_t filepath);
 ENGINE_API string_t    c_string_get_filename_from_path_and_ext(string_t filepath);
 ENGINE_API void        c_string_override_file_separators(string_t *string);
+ENGINE_API string_t    c_string_remove_characters(byte *buffer, string_t string, char character);
 
 ENGINE_API bool32      c_string_is_whitespace(string_t *current_line);
 ENGINE_API bool32      c_string_is_end_of_line(string_t *current_line);

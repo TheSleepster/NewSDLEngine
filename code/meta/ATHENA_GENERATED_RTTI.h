@@ -712,6 +712,7 @@
 	X(TYPE_c_string_get_file_ext_from_path) \
 	X(TYPE_c_string_get_filename_from_path_and_ext) \
 	X(TYPE_c_string_override_file_separators) \
+	X(TYPE_c_string_remove_characters) \
 	X(TYPE_c_string_is_whitespace) \
 	X(TYPE_c_string_is_end_of_line) \
 	X(TYPE_c_string_eat_whitespace) \
@@ -6624,6 +6625,21 @@ struct type_info_procedure_c_string_override_file_separators {
 	};
 };
 
+struct type_info_procedure_c_string_remove_characters {
+	const type_info_t  type_info;
+	const unsigned int argument_count;
+	const type_info_t *return_type;
+	const type_info_member_t *argument_pointer;
+	union {
+		type_info_member_t argument_array[3];
+		struct {
+			const type_info_member_t buffer;
+			const type_info_member_t string;
+			const type_info_member_t character;
+		}arguments;
+	};
+};
+
 struct type_info_procedure_c_string_is_whitespace {
 	const type_info_t  type_info;
 	const unsigned int argument_count;
@@ -8532,6 +8548,7 @@ extern const type_info_procedure_c_string_get_filename_from_path DEFAULT_typedat
 extern const type_info_procedure_c_string_get_file_ext_from_path DEFAULT_typedata_procedure_c_string_get_file_ext_from_path;
 extern const type_info_procedure_c_string_get_filename_from_path_and_ext DEFAULT_typedata_procedure_c_string_get_filename_from_path_and_ext;
 extern const type_info_procedure_c_string_override_file_separators DEFAULT_typedata_procedure_c_string_override_file_separators;
+extern const type_info_procedure_c_string_remove_characters DEFAULT_typedata_procedure_c_string_remove_characters;
 extern const type_info_procedure_c_string_is_whitespace DEFAULT_typedata_procedure_c_string_is_whitespace;
 extern const type_info_procedure_c_string_is_end_of_line DEFAULT_typedata_procedure_c_string_is_end_of_line;
 extern const type_info_procedure_c_string_eat_whitespace DEFAULT_typedata_procedure_c_string_eat_whitespace;
@@ -24464,6 +24481,39 @@ constexpr type_info_procedure_c_string_override_file_separators DEFAULT_typedata
 		},
 	},
 };
+constexpr type_info_procedure_c_string_remove_characters DEFAULT_typedata_procedure_c_string_remove_characters = {
+	.type_info = {
+		.type_name = "c_string_remove_characters",
+		.metatype  = ATHENA_METATYPE_PROCEDURE,
+		.type_id = TYPE_c_string_remove_characters,
+	},
+	.argument_count = 3,
+	.return_type    = &DEFAULT_typedata_structure_string_t.type_info,
+	.argument_pointer = DEFAULT_typedata_procedure_c_string_remove_characters.argument_array,
+	.arguments = {
+		.buffer = {
+			.type_info     = &DEFAULT_typedata_byte,
+			.member_name   = "buffer",
+			.parent        = &DEFAULT_typedata_procedure_c_string_remove_characters.type_info,
+			.flags         = 2,
+			.pointer_depth = 1,
+		},
+		.string = {
+			.type_info     = &DEFAULT_typedata_structure_string_t.type_info,
+			.member_name   = "string",
+			.parent        = &DEFAULT_typedata_procedure_c_string_remove_characters.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+		.character = {
+			.type_info     = &DEFAULT_typedata_char,
+			.member_name   = "character",
+			.parent        = &DEFAULT_typedata_procedure_c_string_remove_characters.type_info,
+			.flags         = 0,
+			.pointer_depth = 0,
+		},
+	},
+};
 constexpr type_info_procedure_c_string_is_whitespace DEFAULT_typedata_procedure_c_string_is_whitespace = {
 	.type_info = {
 		.type_name = "c_string_is_whitespace",
@@ -28626,6 +28676,7 @@ constexpr const type_info_t *const athena_type_information_array[] = {
 	&DEFAULT_typedata_procedure_c_string_get_file_ext_from_path.type_info,
 	&DEFAULT_typedata_procedure_c_string_get_filename_from_path_and_ext.type_info,
 	&DEFAULT_typedata_procedure_c_string_override_file_separators.type_info,
+	&DEFAULT_typedata_procedure_c_string_remove_characters.type_info,
 	&DEFAULT_typedata_procedure_c_string_is_whitespace.type_info,
 	&DEFAULT_typedata_procedure_c_string_is_end_of_line.type_info,
 	&DEFAULT_typedata_procedure_c_string_eat_whitespace.type_info,
@@ -31023,6 +31074,11 @@ enum class c_string_get_filename_from_path_and_ext {
 enum class c_string_override_file_separators {
 	string,
 }; // c_string_override_file_separators
+enum class c_string_remove_characters {
+	buffer,
+	string,
+	character,
+}; // c_string_remove_characters
 enum class c_string_is_whitespace {
 	current_line,
 }; // c_string_is_whitespace

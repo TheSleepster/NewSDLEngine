@@ -342,6 +342,29 @@ c_string_override_file_separators(string_t *string)
     }
 }
 
+ENGINE_API string_t 
+c_string_remove_characters(byte *buffer, string_t string, char character)
+{
+    string_t result = {};
+    result.data = buffer;
+
+    s32 new_string_count = 0;
+    for(u32 string_index = 0;
+        string_index < string.count;
+        ++string_index)
+    {
+        char *current_char = (char *)(string.data + string_index);
+        if(*current_char != character)
+        {
+            buffer[new_string_count] = *current_char;
+            ++new_string_count;
+        }
+    }
+
+    result.count = new_string_count;
+    return(result);
+}
+
 ENGINE_API string_t
 c_string_get_filename_from_path_and_ext(string_t filepath)
 {
