@@ -32,12 +32,11 @@
 #include <c_global_context.cpp>
 #include <c_file_api.cpp>
 #include <c_file_watcher.cpp>
-#include <c_threadpool.cpp>
 
 #include "apollo_hash_table.cpp"
 
 struct code_decl_structure_t;
-struct code_decl_lambda_t;
+struct code_decl_procedure_t;
 
 enum expression_value_type_t
 {
@@ -91,6 +90,8 @@ enum
 
 struct code_decl_t
 {
+    string_t identifier;
+
     CXType   code_type;
     CXType   base_type; // for pointers
     CXCursor decl;
@@ -116,7 +117,7 @@ struct code_decl_member_t: public code_decl_t
     const char *identifier;
 
     code_decl_structure_t   *nested_struct;
-    code_decl_lambda_t      *member_function;
+    code_decl_procedure_t      *member_function;
     expression_value_t       value;
     bool8                    has_value;
     struct {
@@ -133,9 +134,8 @@ struct code_decl_structure_t: public code_decl_t
     dynarray_t<inheritance_decl_info_t*> inheritance_info;
 };
 
-struct code_decl_lambda_t: public code_decl_t
+struct code_decl_procedure_t: public code_decl_t
 {
-    const char                    *identifier;
     dynarray_t<code_decl_member_t> arguments;
     CXType                         return_type;
 };
@@ -152,13 +152,15 @@ struct apollo_procedure_call_expression_t
     dynarray_t<apollo_procedure_argument_t> arguments;
 };
 
+using apollo_decl_table_t = apollo_hash_table_t<string_t, code_decl_t *, 2048>;
 struct apollo_code_decl_list_t
 {
-    // NOTE(Sleepster): Parsed and stored, unique types 
-    dynarray_t<code_decl_structure_t> structures;
-    dynarray_t<code_decl_structure_t> enums;
-    dynarray_t<code_decl_lambda_t>    functions;
-    dynarray_t<code_decl_t>           all;
+    // NOTE(Sleepster): Includes sturctures, enums, and lambdas.     
+    apollo_decl_table_t       all;
+
+    dynarray_t<code_decl_t*> structures;
+    dynarray_t<code_decl_t*> enums;
+    dynarray_t<code_decl_t*> procedures;
 
     // NOTE(Sleepster): These are used by the Apollo::lookup functions 
     dynarray_t<apollo_procedure_call_expression_t> call_expressions;
@@ -180,41 +182,9 @@ struct apollo_state_t
     CXCursor               TU_cursor;
 
     apollo_code_decl_list_t code_declarations;
-    apollo_hash_table_t<CXString, CXType, 4096> type_record;
 };
 
 global apollo_state_t *state;
-
-template<>
-struct hash_traits_t<CXString>
-{
-    static u64
-    get_hash_value(const CXString &key)
-    {
-        const char *string = clang_getCString(key);
-        u64 result = fnv1a_hash((char*)string, strlen(string));
-
-        return(result);
-    }
-
-    static bool8
-    hashes_equal(const CXString &A, const CXString &B)
-    {
-        bool8 result = false;
-        const char *Astring = clang_getCString(A);
-        const char *Bstring = clang_getCString(B);
-            
-        u64 Ahash = fnv1a_hash((char*)Astring, strlen(Astring));
-        u64 Bhash = fnv1a_hash((char*)Bstring, strlen(Bstring));
-        if(Ahash == Bhash)
-        {
-            result = true;
-        }
-
-        return(result);
-    }
-};
-
 
 /*
 ==============================
@@ -248,14 +218,45 @@ register_type_alias(CXCursor current_cursor)
     CXType underlying_type = clang_getTypedefDeclUnderlyingType(current_cursor);
     CXString type_alias_name = clang_getCursorSpelling(current_cursor);
 
-    CXType *type = state->type_record.get_element(type_alias_name);
+    string_t typename_key = STR(clang_getCString(type_alias_name));
+    code_decl_t *type = state->code_declarations.all.find(typename_key);
     if(!type)
     {
-        state->type_record.add_element(underlying_type, type_alias_name);
+        code_decl_t *new_declaration = c_arena_push_struct(&state->arena, code_decl_t);
+        new_declaration->code_type = underlying_type;
+        new_declaration->decl      = current_cursor;
+
+        state->code_declarations.all.add(new_declaration, typename_key);
     }
     else
     {
         clang_disposeString(type_alias_name);
+    }
+}
+
+internal_api void
+register_type(CXType type)
+{
+    if(type.kind == CXType_Pointer ||
+       type.kind == CXType_BlockPointer)
+    {
+        type = clang_getPointeeType(type);
+    }
+
+    CXString type_name = clang_getTypeSpelling(type);
+    string_t typename_key = STR(clang_getCString(type_name));
+
+    code_decl_t *found = state->code_declarations.all.find(typename_key);
+    if(!found)
+    {
+        code_decl_t *new_type = c_arena_push_struct(&state->arena, code_decl_t);
+        new_type->code_type = type;
+
+        state->code_declarations.all.add(new_type, typename_key);
+    }
+    else
+    {
+        clang_disposeString(type_name);
     }
 }
 
@@ -472,7 +473,7 @@ evaluate_default_expression(CXCursor declaration, CXCursor, CXClientData user_da
 internal_api void
 parse_field_declaration(CXCursor declaration, code_decl_member_t *field)
 {
-    CXType   member_type       = clang_getCursorType(declaration);
+    CXType   member_type       = clang_getCanonicalType(clang_getCursorType(declaration));
     CXString member_identifier = clang_getCursorSpelling(declaration);
     s64      member_size       = clang_Type_getSizeOf(member_type);
     s64      member_offset     = (clang_Cursor_getOffsetOfField(declaration) / 8);
@@ -526,6 +527,7 @@ parse_field_declaration(CXCursor declaration, code_decl_member_t *field)
                 }
             }
 
+            register_type(cursor_type);
             has_constant_array = true;
         }break;
     }
@@ -533,6 +535,7 @@ parse_field_declaration(CXCursor declaration, code_decl_member_t *field)
     if(!has_constant_array)
     {
         clang_visitChildren(declaration, evaluate_default_expression, field);
+        register_type(member_type);
     }
 }
 
@@ -581,7 +584,7 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
             CXString procedure_type_string = clang_getCursorSpelling(current_cursor);
             member.identifier = clang_getCString(procedure_type_string);
 
-            member.member_function = c_arena_push_struct(&state->arena, code_decl_lambda_t);
+            member.member_function = c_arena_push_struct(&state->arena, code_decl_procedure_t);
             bool8 add = traverse_function(current_cursor, member.member_function);
             if(add)
             {
@@ -629,12 +632,15 @@ traverse_structure(CXCursor structure, code_decl_t *code_decl)
 
     collect_attributes(structure, code_decl);
     CXString typename_string = clang_getCursorSpelling(structure);
+    string_t typename_key    = STR(clang_getCString(typename_string));
 
-    CXType *type = state->type_record.get_element(typename_string);
+    code_decl_t *type = state->code_declarations.all.find(typename_key);
     if(!type)
     {
+        structure_info->identifier = typename_key;
+
         clang_visitChildren(structure, traverse_members, structure_info);
-        state->type_record.add_element(structure_info->code_type, typename_string);
+        state->code_declarations.all.add(static_cast<code_decl_t*>(structure_info), typename_key);
     }
     else
     {
@@ -656,7 +662,7 @@ traverse_function(CXCursor cursor, code_decl_t *code_decl)
 {
     bool8 result = true;
 
-    code_decl_lambda_t *procedure_info = static_cast<code_decl_lambda_t *>(code_decl);
+    code_decl_procedure_t *procedure_info = static_cast<code_decl_procedure_t *>(code_decl);
     *procedure_info = {};
 
     CXString procedure_name = clang_getCursorSpelling(cursor);
@@ -665,21 +671,23 @@ traverse_function(CXCursor cursor, code_decl_t *code_decl)
 
     collect_attributes(cursor, code_decl);
     CXString procedure_type_string = clang_getCursorUSR(cursor);
-    CXType *type = state->type_record.get_element(procedure_type_string);
+    string_t procedure_type_key = STR(clang_getCString(procedure_type_string));
+
+    code_decl_t *type = state->code_declarations.all.find(procedure_type_key);
     if(!type)
     {
         procedure_info->code_type   = procedure_type; 
         procedure_info->metatype    = CODE_DECL_METATYPE_LAMBDA;
         procedure_info->return_type = return_type;
-        procedure_info->identifier  = clang_getCString(procedure_name);
         procedure_info->decl        = cursor;
+        procedure_info->identifier  = STR(clang_getCString(procedure_name));
 
         s32 argument_count = clang_getNumArgTypes(procedure_type);
         if(argument_count > 0)
         {
             clang_visitChildren(cursor,
             [](CXCursor current_cursor, CXCursor, CXClientData user_data) {
-                code_decl_lambda_t *procedure = static_cast<code_decl_lambda_t*>(user_data);
+                code_decl_procedure_t *procedure = static_cast<code_decl_procedure_t*>(user_data);
                 if(clang_getCursorKind(current_cursor) == CXCursor_ParmDecl) 
                 {
                     code_decl_member_t argument = {};
@@ -691,7 +699,7 @@ traverse_function(CXCursor cursor, code_decl_t *code_decl)
             }, procedure_info);
         }
 
-        state->type_record.add_element(procedure_info->code_type, procedure_type_string);
+        state->code_declarations.all.add(static_cast<code_decl_t*>(procedure_info), procedure_type_key);
     }
     else
     {
@@ -716,13 +724,17 @@ get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXCli
         // NOTE(Sleepster): Passed Variable 
         case CXCursor_DeclRefExpr:
         {
-            CXType   variable_type = clang_getCanonicalType(clang_getCursorType(current_cursor));
-            CXString variable_typname = clang_getTypeSpelling(variable_type); 
+            CXCursor declaration = clang_getCursorReferenced(current_cursor);
+            if(clang_getCursorKind(declaration) != CXCursor_FunctionDecl)
+            {
+                CXType   variable_type = clang_getCanonicalType(clang_getCursorType(current_cursor));
+                CXString variable_typname = clang_getTypeSpelling(variable_type); 
 
-            argument.identifier = STR(clang_getCString(variable_typname));
-            argument.type       = variable_type;
+                argument.identifier = STR(clang_getCString(variable_typname));
+                argument.type       = variable_type;
 
-            c_dynarray_add(&call_expr->arguments, &argument);
+                c_dynarray_add(&call_expr->arguments, &argument);
+            }
         }break;
         case CXCursor_StringLiteral:
         {
@@ -741,9 +753,10 @@ get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXCli
         default:
         {
             // NOTE(Sleepster): Strings expressed like: STR("blah") don't show up on first pass, so we have to call recursively. 
-            if(kind == CXCursor_CallExpr || kind == CXCursor_CXXFunctionalCastExpr)
+            if(kind == CXCursor_CallExpr      || kind == CXCursor_CXXFunctionalCastExpr ||
+               kind == CXCursor_UnexposedExpr || kind == CXCursor_UnaryOperator)
             {
-                clang_visitChildren(current_cursor, get_procedure_call_expression_arguments, call_expr);
+                return(CXChildVisit_Recurse);
             }
         }break;
     }
@@ -770,9 +783,13 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
     enum_info->decl      = cursor;
 
     CXString typename_string = clang_getCursorSpelling(cursor);
-    CXType *type = state->type_record.get_element(typename_string);
+    string_t typename_key    = STR(clang_getCString(typename_string));
+
+    code_decl_t *type = state->code_declarations.all.find(typename_key);
     if(!type)
     {
+        enum_info->identifier = typename_key;
+
         clang_visitChildren(cursor,
         [](CXCursor current_cursor, CXCursor, CXClientData user_data) {
             code_decl_structure_t *enum_info = static_cast<code_decl_structure_t*>(user_data);
@@ -821,32 +838,29 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor, CXClientData user_d
         case CXCursor_UnionDecl:
         case CXCursor_StructDecl:
         {
-            code_decl_structure_t structure_info;
-            bool8 add = traverse_structure(current_cursor, &structure_info);
+            code_decl_structure_t *structure_info = c_arena_push_struct(&state->arena, code_decl_structure_t);
+            bool8 add = traverse_structure(current_cursor, structure_info);
             if(add)
             {
-                c_dynarray_add(&decl_list->structures, static_cast<code_decl_structure_t*>(&structure_info));
-                c_dynarray_add(&decl_list->all, static_cast<code_decl_t*>(&structure_info));
+                c_dynarray_add(&decl_list->structures, (code_decl_t**)&structure_info);
             }
         }break;
         case CXCursor_EnumDecl:
         {
-            code_decl_structure_t enum_decl;
-            bool8 add = traverse_enum(current_cursor, &enum_decl);
+            code_decl_structure_t *enum_decl = c_arena_push_struct(&state->arena, code_decl_structure_t);
+            bool8 add = traverse_enum(current_cursor, enum_decl);
             if(add)
             {
-                c_dynarray_add(&decl_list->enums, static_cast<code_decl_structure_t*>(&enum_decl));
-                c_dynarray_add(&decl_list->all, static_cast<code_decl_t*>(&enum_decl));
+                c_dynarray_add(&decl_list->enums, (code_decl_t**)&enum_decl);
             }
         }break;
         case CXCursor_FunctionDecl:
         {
-            code_decl_lambda_t procedure_info;
-            bool8 add = traverse_function(current_cursor, &procedure_info);
+            code_decl_procedure_t *procedure_info = c_arena_push_struct(&state->arena, code_decl_procedure_t);
+            bool8 add = traverse_function(current_cursor, procedure_info);
             if(add)
             {
-                c_dynarray_add(&decl_list->functions, static_cast<code_decl_lambda_t*>(&procedure_info));
-                c_dynarray_add(&decl_list->all, static_cast<code_decl_t*>(&procedure_info));
+                c_dynarray_add(&decl_list->procedures, (code_decl_t**)&procedure_info);
             }
         }break;
         case CXCursor_TypedefDecl:
@@ -859,8 +873,28 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor, CXClientData user_d
             CXString expression_name = clang_getCursorSpelling(current_cursor);
             string_t expression_name_string = STR(clang_getCString(expression_name));
 
+            string_t namespace_string = {};
+            clang_visitChildren(current_cursor, [](CXCursor current_cursor, CXCursor, CXClientData user_data) {
+                if(clang_getCursorKind(current_cursor) == CXCursor_NamespaceRef)
+                {
+                    string_t *namespace_content = static_cast<string_t *>(user_data);
+                    CXString clang_namespace_string = clang_getCursorSpelling(current_cursor);
+
+                    *namespace_content = c_string_concat(&state->arena, *namespace_content, STR(clang_getCString(clang_namespace_string)));
+                    *namespace_content  = c_string_concat(&state->arena, *namespace_content, STR("::"));
+                }
+                else
+                {
+                    return(CXChildVisit_Recurse);
+                }
+
+                return(CXChildVisit_Continue);
+            }, &namespace_string);
+
+            string_t qualified_name = c_string_concat(&state->arena, namespace_string, expression_name_string);
+
             apollo_procedure_call_expression_t call_expression = {};
-            call_expression.identifier = expression_name_string;
+            call_expression.identifier = qualified_name;
     
             // NOTE(Sleepster): Template Parameters 
             CXCursor templated_call = clang_getCursorReferenced(current_cursor);
@@ -915,7 +949,7 @@ namespace Apollo {
 apollo_code_decl_list_t* 
 parse_singular_file(string_t filepath)
 {
-    if(!gc->is_initialized)
+    if(!gc)
     {
         c_global_context_init();
     }
@@ -923,7 +957,7 @@ parse_singular_file(string_t filepath)
     state = c_arena_bootstrap_allocate_struct(apollo_state_t, arena, MB(100), ALLOCATOR_TAG_STATIC);
     apollo_code_decl_list_t *result = &state->code_declarations;
 
-    state->type_record.init(&state->arena);
+    state->code_declarations.all.init(&state->arena);
     state->clang_index = clang_createIndex(0, 1); 
     
     const char* args[] = {
@@ -1003,7 +1037,7 @@ has_attribute(code_decl_structure_t *structure, string_t attribute)
 }
 
 bool8
-has_attribute(code_decl_lambda_t *lambda, string_t attribute)
+has_attribute(code_decl_procedure_t *lambda, string_t attribute)
 {
     return(has_attribute(static_cast<code_decl_t*>(lambda), attribute));
 }
@@ -1023,11 +1057,65 @@ get_procedure_calls(string_t procedure_name)
     return(result);
 }
 
-void
+// NOTE(Sleepster): Enum, or a structure 
+code_decl_t*
 get_declaration_info(string_t requested_typename)
 {
-    (void)requested_typename;
+    code_decl_t *result = state->code_declarations.all.find(requested_typename);
+    return(result);
 }
+}
+
+void
+test_metaprogram(void)
+{
+    // NOTE(Sleepster): In reality, probably returned from parse_singular_file 
+    apollo_code_decl_list_t *declarations = &state->code_declarations;
+    // NOTE(Sleepster): All declarations 
+    for(s32 index = 0;
+        index < declarations->all.used_elements.used;
+        ++index)
+    {
+        code_decl_t *declaration = declarations->all.used_elements[index]->value;
+
+        CXString clang_typename = clang_getTypeSpelling(declaration->code_type);
+        const char *typename_string = clang_getCString(clang_typename);
+        if(declaration->metatype == CODE_DECL_METATYPE_INVALID)
+        {
+            printf("SOME TYPE: '%s'...\n", typename_string);
+        }
+        else if(declaration->metatype == CODE_DECL_METATYPE_STRUCTURE)
+        {
+            printf("STRUCTURE: '%s'...\n", typename_string);
+        }
+        else if(declaration->metatype == CODE_DECL_METATYPE_LAMBDA)
+        {
+            printf("PROCEDURE: '%s'...\n", typename_string);
+        }
+        else
+        {
+            printf("ENUM: '%s'...\n", typename_string);
+        }
+        clang_disposeString(clang_typename);
+    }
+
+    // NOTE(Sleepster): All structures 
+    for(code_decl_t *structure: declarations->structures)
+    {
+        printf("STRUCTURE_NAME: '%.*s'...\n", fprint_string(structure->identifier));
+    }
+
+    // NOTE(Sleepster): All procedures 
+    for(code_decl_t *procedure: declarations->procedures)
+    {
+        printf("PROCEDURE_NAME: '%.*s'...\n", fprint_string(procedure->identifier));
+    }
+
+    // NOTE(Sleepster): All enums 
+    for(code_decl_t *enum_decl: declarations->enums)
+    {
+        printf("ENUM_NAME: '%.*s'...\n", fprint_string(enum_decl->identifier));
+    }
 }
 
 int
@@ -1038,16 +1126,20 @@ main(int argc, char **argv)
         printf("\n\n\n\n");
         if(Apollo::parse_singular_file(STR(argv[1])))
         {
+            test_metaprogram();
+#if 0
             printf("Structures:\n");
-            for(code_decl_structure_t &structure: state->code_declarations.structures)
+            for(code_decl_t *structure_decl: state->code_declarations.structures)
             {
-                CXString structure_name = clang_getTypeSpelling(structure.code_type);
+                code_decl_structure_t *structure = static_cast<code_decl_structure_t*>(structure_decl);
+
+                CXString structure_name = clang_getTypeSpelling(structure->code_type);
                 printf("Structure found!: '%s':\n", clang_getCString(structure_name));
                 for(s32 member_index = 0;
-                    member_index < structure.members.used;
+                    member_index < structure->members.used;
                     ++member_index)
                 {
-                    code_decl_member_t *member = structure.members + member_index; 
+                    code_decl_member_t *member = structure->members + member_index; 
                     printf("\tMember (%d): '%s'\n", member_index, member->identifier);
 
                     print_annotations(member);
@@ -1086,22 +1178,24 @@ main(int argc, char **argv)
                         printf("\n");
                     }
                 }
-                print_annotations(&structure);
+                print_annotations(structure);
                 printf("\n");
             }
 
             printf("Enums:\n");
-            for(code_decl_structure_t &enum_decl: state->code_declarations.enums)
+            for(code_decl_t *enum_decl_ptr: state->code_declarations.enums)
             {
-                CXString enum_name = clang_getTypeSpelling(enum_decl.code_type);
-                print_annotations(&enum_decl);
+                code_decl_structure_t *enum_decl = static_cast<code_decl_structure_t*>(enum_decl_ptr);
+
+                CXString enum_name = clang_getTypeSpelling(enum_decl->code_type);
+                print_annotations(enum_decl);
 
                 printf("Enum found!: '%s':\n", clang_getCString(enum_name));
                 for(s32 member_index = 0;
-                    member_index < enum_decl.members.used;
+                    member_index < enum_decl->members.used;
                     ++member_index)
                 {
-                    code_decl_member_t *member = enum_decl.members + member_index; 
+                    code_decl_member_t *member = enum_decl->members + member_index; 
                     printf("\tEnum Member (%d): '%s'\n", member_index, member->identifier);
 
                     print_annotations(member);
@@ -1144,19 +1238,20 @@ main(int argc, char **argv)
             }
 
             printf("Functions: \n");
-            for(code_decl_lambda_t &function: state->code_declarations.functions)
+            for(code_decl_t *function_decl: state->code_declarations.functions)
             {
+                code_decl_procedure_t *function = static_cast<code_decl_procedure_t*>(function_decl);
                 printf("Function of name: '%s', argument_count: '%d', return_type: '%s':\n", 
-                       function.identifier, function.arguments.used, clang_getCString(clang_getTypeSpelling(function.return_type)));
+                       function->identifier, function->arguments.used, clang_getCString(clang_getTypeSpelling(function->return_type)));
 
-                print_annotations(&function);
+                print_annotations(function);
 
                 printf("Arguments:\n");
                 for(s32 argument_index = 0;
-                    argument_index < function.arguments.used;
+                    argument_index < function->arguments.used;
                     ++argument_index)
                 {
-                    code_decl_member_t *argument = function.arguments + argument_index;
+                    code_decl_member_t *argument = function->arguments + argument_index;
                     printf("\tArgument (%d): '%s'\n", argument_index, argument->identifier);
 
                     print_annotations(argument);
@@ -1195,6 +1290,7 @@ main(int argc, char **argv)
                 }
                 printf("\n");
             }
+#endif
         }
     }
     else
@@ -1258,6 +1354,8 @@ main(void)
             c_dynarray_add(&type_infos, STR("\t%s %s"));
         }
     }
+
+    array_t<code_decl_structure_t*> structures = Apollo::get_all_structures_within_namespace(STR("Apollo"));
 
     output_to_file(strings);
     output_to_file(entity_create_functions);

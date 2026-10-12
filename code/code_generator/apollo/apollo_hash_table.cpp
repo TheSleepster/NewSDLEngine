@@ -225,10 +225,24 @@ return_value:
         return(result);
     }
 
-    ValueType*
-    get_element(KeyType &key)
+    ValueType
+    find(KeyType &key)
     {
-        ValueType *result = null;
+        ValueType result = {};
+
+        apollo_hash_element_t<ValueType> *element = get_hash_element(key);
+        if(element->raw_hash != 0)
+        {
+            result = element->value;
+        }
+
+        return(result);
+    }
+
+    ValueType*
+    find_pointer(KeyType &key)
+    {
+        ValueType *result = null; 
 
         apollo_hash_element_t<ValueType> *element = get_hash_element(key);
         if(element->raw_hash != 0)
@@ -239,8 +253,13 @@ return_value:
         return(result);
     }
 
+    // TODO(Sleepster): If we use this elsewhere we should make this a ref again. The reason it isn't right now
+    // is because there's an issue with pointers I'm too lazy to solve where we can't simply take a ref
+    // to a pointer because the C++ compiler complains that it can't store a temporary copy to a memory location.
+    // Actually a very valid and true complaint which is why we just take this by value here. We'll need an actual
+    // solution if we use this table elsewhere.
     void 
-    add_element(ValueType &value, KeyType &key)
+    add(ValueType value, KeyType &key)
     {
         apollo_hash_element_t<ValueType> *element = get_hash_element(key);
 
