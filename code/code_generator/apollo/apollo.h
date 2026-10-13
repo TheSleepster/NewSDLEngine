@@ -241,40 +241,70 @@ struct apollo_hash_table_t
         u64 hash_index = key_hash % bucket_capacity;
 
         apollo_hash_bucket_t<ValueType> *current_bucket = &first_bucket;
-        apollo_hash_element_t<ValueType> *found = &current_bucket->elements[hash_index]; 
-        if(found->raw_hash != 0 && found->raw_hash != key_hash)
+        while(current_bucket)
         {
-            while(current_bucket)
+            apollo_hash_element_t<ValueType> *found = &current_bucket->elements[hash_index]; 
+            if(found->raw_hash != 0 && found->raw_hash != key_hash)
             {
                 u32 look_ahead = 0;
                 while(look_ahead < MAX_HASH_PEEK_AHEADS)
                 {
+                    hash_index = (hash_index + 1) % bucket_capacity;
+                    ++look_ahead;
+
                     found = &current_bucket->elements[hash_index]; 
                     if(found->raw_hash == key_hash)
                     {
                         result = found;
                         goto return_value;
                     }
-
-                    hash_index = (hash_index + 1) % bucket_capacity;
-                    ++look_ahead;
                 }
                 current_bucket = current_bucket->next_bucket;
             }
-        }
-        else
-        {
-            result = found;
+            else
+            {
+                result = found;
+                break;
+            }
         }
 
 return_value:
+        return(result);
+    }
+
+    apollo_hash_element_t<ValueType>*
+    get_or_create_hash_element(KeyType &key)
+    {
+        apollo_hash_element_t<ValueType> *result = get_hash_element(key);
         if(!result)
         {
+            u64 key_hash   = hash_traits_t<KeyType>::get_hash_value(key);
+            u64 hash_index = key_hash % bucket_capacity;
+
+            apollo_hash_bucket_t<ValueType> *current_bucket = &first_bucket;
+            while(current_bucket)
+            {
+                apollo_hash_element_t<ValueType> *found = &current_bucket->elements[hash_index];
+                if(found->raw_hash != 0)
+                {
+                    hash_index = (hash_index + 1) % bucket_capacity;
+                    if(hash_index == 0)
+                    {
+                        current_bucket = current_bucket->next_bucket;
+                    }
+                }
+                else
+                {
+                    result = found;
+                    break;
+                }
+            }
+
+            // NOTE(Sleepster): New bucket, the rest are full 
             current_bucket = append_new_bucket();
-            result = &current_bucket->elements[hash_index]; 
+            result = &current_bucket->elements[key_hash % bucket_capacity];
         }
 
-        Assert(result);
         return(result);
     }
 
@@ -284,7 +314,7 @@ return_value:
         ValueType result = {};
 
         apollo_hash_element_t<ValueType> *element = get_hash_element(key);
-        if(element->raw_hash != 0)
+        if(element && element->raw_hash != 0)
         {
             result = element->value;
         }
@@ -314,7 +344,7 @@ return_value:
     void 
     add(ValueType value, KeyType &key)
     {
-        apollo_hash_element_t<ValueType> *element = get_hash_element(key);
+        apollo_hash_element_t<ValueType> *element = get_or_create_hash_element(key);
 
         u64 key_hash = hash_traits_t<KeyType>::get_hash_value(key);
         element->raw_hash = key_hash;
