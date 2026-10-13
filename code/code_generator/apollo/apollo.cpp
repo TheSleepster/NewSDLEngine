@@ -215,16 +215,19 @@ TYPE ALIASES & NAMESPACES
 internal_api void
 register_type_alias(CXCursor current_cursor)
 {
-    CXType underlying_type = clang_getTypedefDeclUnderlyingType(current_cursor);
+    CXType underlying_type   = clang_getTypedefDeclUnderlyingType(current_cursor);
     CXString type_alias_name = clang_getCursorSpelling(current_cursor);
+
+    string_t typename_alias = STR(clang_getCString(type_alias_name));
 
     string_t typename_key = STR(clang_getCString(type_alias_name));
     code_decl_t *type = state->code_declarations.all.find(typename_key);
     if(!type)
     {
         code_decl_t *new_declaration = c_arena_push_struct(&state->arena, code_decl_t);
-        new_declaration->code_type = underlying_type;
-        new_declaration->decl      = current_cursor;
+        new_declaration->code_type  = underlying_type;
+        new_declaration->decl       = current_cursor;
+        new_declaration->identifier = typename_alias; 
 
         state->code_declarations.all.add(new_declaration, typename_key);
     }
@@ -250,7 +253,8 @@ register_type(CXType type)
     if(!found)
     {
         code_decl_t *new_type = c_arena_push_struct(&state->arena, code_decl_t);
-        new_type->code_type = type;
+        new_type->code_type  = type;
+        new_type->identifier = typename_key;
 
         state->code_declarations.all.add(new_type, typename_key);
     }
@@ -1071,32 +1075,26 @@ test_metaprogram(void)
 {
     // NOTE(Sleepster): In reality, probably returned from parse_singular_file 
     apollo_code_decl_list_t *declarations = &state->code_declarations;
-    // NOTE(Sleepster): All declarations 
-    for(s32 index = 0;
-        index < declarations->all.used_elements.used;
-        ++index)
-    {
-        code_decl_t *declaration = declarations->all.used_elements[index]->value;
 
-        CXString clang_typename = clang_getTypeSpelling(declaration->code_type);
-        const char *typename_string = clang_getCString(clang_typename);
+    // NOTE(Sleepster): All declarations 
+    for(code_decl_t *declaration: declarations->all)
+    {
         if(declaration->metatype == CODE_DECL_METATYPE_INVALID)
         {
-            printf("SOME TYPE: '%s'...\n", typename_string);
+            printf("SOME TYPE: '%.*s'...\n", fprint_string(declaration->identifier));
         }
         else if(declaration->metatype == CODE_DECL_METATYPE_STRUCTURE)
         {
-            printf("STRUCTURE: '%s'...\n", typename_string);
+            printf("STRUCTURE: '%.*s'...\n", fprint_string(declaration->identifier));
         }
         else if(declaration->metatype == CODE_DECL_METATYPE_LAMBDA)
         {
-            printf("PROCEDURE: '%s'...\n", typename_string);
+            printf("PROCEDURE: '%.*s'...\n", fprint_string(declaration->identifier));
         }
         else
         {
-            printf("ENUM: '%s'...\n", typename_string);
+            printf("ENUM: '%.*s'...\n", fprint_string(declaration->identifier));
         }
-        clang_disposeString(clang_typename);
     }
 
     // NOTE(Sleepster): All structures 

@@ -130,8 +130,24 @@ struct apollo_hash_element_t
 template <typename ValueType>
 struct apollo_hash_bucket_t
 {
-    array_t<apollo_hash_element_t<ValueType>> elements;
-    apollo_hash_bucket_t<ValueType>          *next_bucket;
+    array_t<apollo_hash_element_t<ValueType>>   elements;
+    apollo_hash_bucket_t<ValueType>            *next_bucket;
+};
+
+template <typename ValueType>
+struct apollo_hash_table_iterator_t
+{
+    dynarray_t<apollo_hash_element_t<ValueType>*> *elements;
+    s32                                            current_index;
+
+    void      operator++() {++current_index;}
+    ValueType operator*()  {return(elements->items[current_index]->value);}
+
+    bool8
+    operator!=(apollo_hash_table_iterator_t<ValueType> &other)
+    {
+        return(current_index != other.current_index);
+    }
 };
 
 template <typename                     KeyType, 
@@ -146,6 +162,26 @@ struct apollo_hash_table_t
     void *allocator;
 
     dynarray_t<apollo_hash_element_t<ValueType>*> used_elements;
+
+    apollo_hash_table_iterator_t<ValueType>
+    begin()
+    {
+        apollo_hash_table_iterator_t<ValueType> result = {};
+        result.elements      = &used_elements;
+        result.current_index =  0;
+
+        return(result);
+    }
+
+    apollo_hash_table_iterator_t<ValueType>
+    end()
+    {
+        apollo_hash_table_iterator_t<ValueType> result = {};
+        result.elements      = &used_elements;
+        result.current_index =  used_elements.used;
+
+        return(result);
+    }
 
     // NOTE(Sleepster): FUNCTIONS 
     void
