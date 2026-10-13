@@ -300,9 +300,12 @@ return_value:
                 }
             }
 
-            // NOTE(Sleepster): New bucket, the rest are full 
-            current_bucket = append_new_bucket();
-            result = &current_bucket->elements[key_hash % bucket_capacity];
+            if(!result)
+            {
+                // NOTE(Sleepster): New bucket, the rest are full 
+                current_bucket = append_new_bucket();
+                result = &current_bucket->elements[key_hash % bucket_capacity];
+            }
         }
 
         return(result);
@@ -532,9 +535,25 @@ register_type_alias(CXCursor current_cursor)
     CXType underlying_type   = clang_getTypedefDeclUnderlyingType(current_cursor);
     CXString type_alias_name = clang_getCursorSpelling(current_cursor);
 
-    string_t typename_alias = STR(clang_getCString(type_alias_name));
-
     string_t typename_key = STR(clang_getCString(type_alias_name));
+
+    string_t typename_alias = STR(clang_getCString(type_alias_name));
+    CXCursor declaration_info = clang_getTypeDeclaration(underlying_type);
+    if(declaration_info.kind == CXCursor_StructDecl ||
+       declaration_info.kind == CXCursor_UnionDecl  ||
+       declaration_info.kind == CXCursor_EnumDecl)
+    {
+        // NOTE(Sleepster): Set the typename to be correct, this way we correctly override names like
+        // typedef struct string {}string_t;
+        // to that of string_t rather than that of just string.
+        string_t alias_typename = STR(clang_getCString(clang_getCursorSpelling(declaration_info)));
+        code_decl_t *lookup = apollo_internal_state->code_declarations.all.find(alias_typename);
+        if(lookup)
+        {
+            lookup->identifier = typename_alias;
+        }
+    }
+
     code_decl_t *type = apollo_internal_state->code_declarations.all.find(typename_key);
     if(!type)
     {
@@ -791,7 +810,7 @@ evaluate_default_expression(CXCursor declaration, CXCursor, CXClientData user_da
 internal_api void
 parse_field_declaration(CXCursor declaration, code_decl_member_t *field)
 {
-    CXType   member_type       = clang_getCanonicalType(clang_getCursorType(declaration));
+    CXType   member_type       = clang_getCursorType(declaration);
     CXString member_identifier = clang_getCursorSpelling(declaration);
     s64      member_size       = clang_Type_getSizeOf(member_type);
     s64      member_offset     = (clang_Cursor_getOffsetOfField(declaration) / 8);
@@ -835,7 +854,7 @@ parse_field_declaration(CXCursor declaration, code_decl_member_t *field)
             while(cursor_type.kind == CXType_ConstantArray)
             {
                 current_dimension->array_size = clang_getArraySize(cursor_type);
-                cursor_type = clang_getCanonicalType(clang_getArrayElementType(cursor_type));
+                cursor_type = clang_getArrayElementType(cursor_type);
                 current_dimension->array_type = cursor_type;
 
                 ++field->array_info.dimension_count;
@@ -887,7 +906,7 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
         case CXCursor_StructDecl:
         {
             member.metatype  = CODE_DECL_METATYPE_STRUCTURE;
-            member.code_type = clang_getCanonicalType(clang_getCursorType(current_cursor));
+            member.code_type = clang_getCursorType(current_cursor);
 
             member.nested_struct = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
             traverse_structure(current_cursor, member.nested_struct);
@@ -897,7 +916,7 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
         case CXCursor_CXXMethod:
         {
             member.metatype  = CODE_DECL_METATYPE_LAMBDA;
-            member.code_type = clang_getCanonicalType(clang_getCursorType(current_cursor));
+            member.code_type = clang_getCursorType(current_cursor);
 
             CXString procedure_type_string = clang_getCursorSpelling(current_cursor);
             member.identifier = clang_getCString(procedure_type_string);
@@ -914,7 +933,7 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
             code_decl_structure_t *info = static_cast<code_decl_structure_t *>(user_data);
 
             inheritance_decl_info_t *inheritance_info = c_arena_push_struct(&apollo_internal_state->arena, inheritance_decl_info_t);
-            inheritance_info->inherited_type        = clang_getCanonicalType(clang_getCursorType(current_cursor));
+            inheritance_info->inherited_type        = clang_getCursorType(current_cursor);
             inheritance_info->access_type           = clang_getCXXAccessSpecifier(current_cursor);
             inheritance_info->is_virtual            = clang_isVirtualBase(current_cursor);
             inheritance_info->base_type_declaration = clang_getTypeDeclaration(inheritance_info->inherited_type);
@@ -937,7 +956,7 @@ traverse_structure(CXCursor structure, code_decl_t *code_decl)
     *structure_info = {};
 
     structure_info->metatype  = CODE_DECL_METATYPE_STRUCTURE;
-    structure_info->code_type = clang_getCanonicalType(clang_getCursorType(structure));
+    structure_info->code_type = clang_getCursorType(structure);
     structure_info->decl      = structure;
     Assert(structure_info->code_type.kind == CXType_Record);
 
@@ -1044,9 +1063,9 @@ get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXCli
         {
             CXCursor declaration = clang_getCursorReferenced(current_cursor);
             CXCursorKind kind = clang_getCursorKind(declaration);
-            if(kind != CXCursor_FunctionDecl)
+            if(kind != CXCursor_FunctionDecl && kind != CXCursor_OverloadedDeclRef)
             {
-                CXType   variable_type = clang_getCanonicalType(clang_getCursorType(current_cursor));
+                CXType   variable_type = clang_getCursorType(current_cursor);
                 CXString variable_typname = clang_getTypeSpelling(variable_type); 
 
                 argument.identifier = STR(clang_getCString(variable_typname));
@@ -1057,7 +1076,7 @@ get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXCli
         }break;
         case CXCursor_MemberRefExpr:
         {
-            CXType type             = clang_getCanonicalType(clang_getCursorType(current_cursor));
+            CXType type             = clang_getCursorType(current_cursor);
             CXString clang_typename = clang_getTypeSpelling(type);
 
             argument.identifier = STR(clang_getCString(clang_typename));
@@ -1096,22 +1115,27 @@ get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXCli
 internal_api string_t
 get_expression_name(CXCursor current_cursor)
 {
-    string_t result = {};
-    clang_visitChildren(current_cursor,
-    [](CXCursor cursor, CXCursor, CXClientData user_data) {
-        string_t *expression_name = static_cast<string_t*>(user_data);
-        if(cursor.kind == CXCursor_DeclRefExpr)
-        {
-            CXCursor callee = clang_getCursorReferenced(cursor);
-            if(callee.kind == CXCursor_OverloadedDeclRef)
+    // NOTE(Sleepster): If there is a name, we're good. Otherwise we must look deeper into
+    // the foleded expression. 
+    string_t result = STR(clang_getCString(clang_getCursorSpelling(current_cursor)));
+    if(result.count == 0)
+    {
+        clang_visitChildren(current_cursor,
+        [](CXCursor cursor, CXCursor, CXClientData user_data) {
+            string_t *expression_name = static_cast<string_t*>(user_data);
+            if(cursor.kind == CXCursor_DeclRefExpr)
             {
-                *expression_name = STR(clang_getCString(clang_getCursorSpelling(callee)));
-                return(CXChildVisit_Break);
+                CXCursor callee = clang_getCursorReferenced(cursor);
+                if(callee.kind == CXCursor_OverloadedDeclRef)
+                {
+                    *expression_name = STR(clang_getCString(clang_getCursorSpelling(callee)));
+                    return(CXChildVisit_Break);
+                }
             }
-        }
 
-        return(CXChildVisit_Continue);
-    }, &result);
+            return(CXChildVisit_Continue);
+        }, &result);
+    }
 
     return(result);
 }
@@ -1155,7 +1179,7 @@ collect_call_expression_data(CXCursor current_cursor, string_t expression_name_s
     // NOTE(Sleepster): Template Parameters 
     CXCursor templated_call = clang_getCursorReferenced(current_cursor);
     s32 template_param_count = clang_Cursor_getNumTemplateArguments(templated_call);  
-    if(template_param_count > 0)
+    if(template_param_count < 0)
     {
         // NOTE(Sleepster): In this case, the template info has been folded into the template
         // expression itself and thus will not appear inside the templated_call cursor itself. 
@@ -1269,6 +1293,9 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
 
             return(CXChildVisit_Recurse);
         }, enum_info);
+
+        apollo_internal_state->code_declarations.all.add(static_cast<code_decl_t*>(enum_info), typename_key);
+
     }
     else
     {
