@@ -450,10 +450,10 @@ struct code_decl_member_t: public code_decl_t
     u32         offset;
     const char *identifier;
 
-    code_decl_structure_t   *nested_struct;
-    code_decl_procedure_t      *member_function;
-    expression_value_t       value;
-    bool8                    has_value;
+    code_decl_structure_t *nested_struct;
+    code_decl_procedure_t *member_function;
+    expression_value_t     value;
+    bool8                  has_value;
     struct {
         s32                     dimension_count;
         code_decl_array_info_t *first_dimension;
@@ -529,6 +529,8 @@ TYPE ALIASES & NAMESPACES
 ==============================
 */
 
+internal_api void collect_attributes(CXCursor cursor, code_decl_t *declaration);
+
 internal_api void
 register_type_alias(CXCursor current_cursor)
 {
@@ -537,7 +539,7 @@ register_type_alias(CXCursor current_cursor)
 
     string_t typename_key = STR(clang_getCString(type_alias_name));
 
-    string_t typename_alias = STR(clang_getCString(type_alias_name));
+    string_t typename_alias = c_string_make_copy(&apollo_internal_state->arena, STR(clang_getCString(type_alias_name)));
     CXCursor declaration_info = clang_getTypeDeclaration(underlying_type);
     if(declaration_info.kind == CXCursor_StructDecl ||
        declaration_info.kind == CXCursor_UnionDecl  ||
@@ -550,7 +552,11 @@ register_type_alias(CXCursor current_cursor)
         code_decl_t *lookup = apollo_internal_state->code_declarations.all.find(alias_typename);
         if(lookup)
         {
+            // NOTE(Sleepster): We have to collect attributes on this typedef otherwise a:
+            // typedef struct string {}string_t 
+            // will lack any attributes.
             lookup->identifier = typename_alias;
+            collect_attributes(current_cursor, lookup);
         }
     }
 
@@ -898,7 +904,33 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
     {
         case CXCursor_FieldDecl:
         {
+            // NOTE(Sleepster): An elaborated type is sometihng like "struct {}matrices;" 
             parse_field_declaration(current_cursor, &member);
+
+            CXType type = clang_getCursorType(current_cursor);
+            if(type.kind == CXType_Record || type.kind == CXType_Elaborated)
+            {
+                CXCursor declaration = clang_getTypeDeclaration(type);
+                if(!clang_Cursor_isNull(declaration) &&
+                  ( clang_getCursorKind(declaration) == CXCursor_StructDecl ||
+                    clang_getCursorKind(declaration) == CXCursor_UnionDecl))
+                {
+                    CXString nested_structure_name        = clang_getCursorSpelling(declaration);
+                    string_t nested_structure_name_string = STR(clang_getCString(nested_structure_name));
+
+                    code_decl_t *found = apollo_internal_state->code_declarations.all.find(nested_structure_name_string);
+                    if(!found)
+                    {
+                    }
+                    else
+                    {
+                        member.nested_struct = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
+                        traverse_structure(declaration, member.nested_struct);
+                    }
+                }
+
+                member.nested_struct->nested_structure = true;
+            }
             c_dynarray_add(&output->members, &member);
         }break;
         case CXCursor_ClassDecl:
@@ -907,11 +939,16 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
         {
             member.metatype  = CODE_DECL_METATYPE_STRUCTURE;
             member.code_type = clang_getCursorType(current_cursor);
+            if(clang_Cursor_isAnonymousRecordDecl(current_cursor))
+            {
+                return(CXChildVisit_Recurse);
+            }
 
             member.nested_struct = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
             traverse_structure(current_cursor, member.nested_struct);
 
             member.nested_struct->nested_structure = true;
+            c_dynarray_add(&apollo_internal_state->code_declarations.structures, (code_decl_t**)&member.nested_struct);
         }break;
         case CXCursor_CXXMethod:
         {
@@ -969,7 +1006,7 @@ traverse_structure(CXCursor structure, code_decl_t *code_decl)
 
     collect_attributes(structure, code_decl);
     CXString typename_string = clang_getCursorSpelling(structure);
-    string_t typename_key    = STR(clang_getCString(typename_string));
+    string_t typename_key    = c_string_make_copy(&apollo_internal_state->arena, STR(clang_getCString(typename_string)));
 
     code_decl_t *type = apollo_internal_state->code_declarations.all.find(typename_key);
     if(!type)
@@ -1265,7 +1302,7 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
     enum_info->decl      = cursor;
 
     CXString typename_string = clang_getCursorSpelling(cursor);
-    string_t typename_key    = STR(clang_getCString(typename_string));
+    string_t typename_key    = c_string_make_copy(&apollo_internal_state->arena, STR(clang_getCString(typename_string)));
 
     code_decl_t *type = apollo_internal_state->code_declarations.all.find(typename_key);
     if(!type)
@@ -1506,7 +1543,28 @@ get_procedure_calls(string_t procedure_name)
 code_decl_t*
 get_declaration_info(string_t requested_typename)
 {
-    code_decl_t *result = apollo_internal_state->code_declarations.all.find(requested_typename);
+    string_t typename_key = requested_typename;
+    code_decl_t *result = apollo_internal_state->code_declarations.all.find(typename_key);
+    if(result && (result->metatype != CODE_DECL_METATYPE_STRUCTURE && result->metatype != CODE_DECL_METATYPE_ENUM))
+    {
+        CXCursor declaration = clang_getTypeDeclaration(result->code_type);
+        if(declaration.kind == CXCursor_StructDecl ||
+           declaration.kind == CXCursor_UnionDecl  ||
+           declaration.kind == CXCursor_EnumDecl)
+        {
+            CXString clang_name = clang_getCursorSpelling(declaration);
+            typename_key = STR(clang_getCString(clang_name));
+
+            code_decl_t *found = apollo_internal_state->code_declarations.all.find(typename_key);
+            if(found)
+            {
+                found = result;
+            }
+
+            clang_disposeString(clang_name);
+        }
+    }
+
     return(result);
 }
 } // NAMESPACE APOLLO

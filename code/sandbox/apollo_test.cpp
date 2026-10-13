@@ -26,19 +26,6 @@ main(void)
     apollo_code_decl_list_t *declarations = Apollo::parse_singular_file(STR("build.cpp"), options);
     if(declarations)
     {
-#if 0
-        for(code_decl_t *declaration: declarations->all)
-        {
-            if(declaration->metatype == CODE_DECL_METATYPE_STRUCTURE)
-            {
-                printf("STRUCTURE: '%.*s'...\n", fprint_string(declaration->identifier));
-            }
-            else if(declaration->metatype == CODE_DECL_METATYPE_LAMBDA)
-            {
-                printf("PROCEDURE: '%.*s'...\n", fprint_string(declaration->identifier));
-            }
-        }
-#endif
         dynarray_t<apollo_procedure_call_expression_t> calls = Apollo::get_procedure_calls(STR("Athena::type_info"));
         for(const auto &call: calls)
         {
