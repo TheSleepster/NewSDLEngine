@@ -1055,6 +1055,16 @@ get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXCli
                 c_dynarray_add(&call_expr->arguments, &argument);
             }
         }break;
+        case CXCursor_MemberRefExpr:
+        {
+            CXType type             = clang_getCanonicalType(clang_getCursorType(current_cursor));
+            CXString clang_typename = clang_getTypeSpelling(type);
+
+            argument.identifier = STR(clang_getCString(clang_typename));
+            argument.type       = type;
+
+            c_dynarray_add(&call_expr->arguments, &argument);
+        }break;
         case CXCursor_StringLiteral:
         {
             CXString string_literal = clang_getCursorSpelling(current_cursor);
@@ -1081,6 +1091,135 @@ get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXCli
     }
 
     return(CXChildVisit_Continue);
+}
+
+internal_api string_t
+get_expression_name(CXCursor current_cursor)
+{
+    string_t result = {};
+    clang_visitChildren(current_cursor,
+    [](CXCursor cursor, CXCursor, CXClientData user_data) {
+        string_t *expression_name = static_cast<string_t*>(user_data);
+        if(cursor.kind == CXCursor_DeclRefExpr)
+        {
+            CXCursor callee = clang_getCursorReferenced(cursor);
+            if(callee.kind == CXCursor_OverloadedDeclRef)
+            {
+                *expression_name = STR(clang_getCString(clang_getCursorSpelling(callee)));
+                return(CXChildVisit_Break);
+            }
+        }
+
+        return(CXChildVisit_Continue);
+    }, &result);
+
+    return(result);
+}
+
+internal_api void
+collect_call_expression_data(CXCursor current_cursor, string_t expression_name_string)
+{
+    string_t namespace_string = {};
+    clang_visitChildren(current_cursor, [](CXCursor current_cursor, CXCursor, CXClientData user_data) {
+        if(clang_getCursorKind(current_cursor) == CXCursor_NamespaceRef)
+        {
+            string_t *namespace_content = static_cast<string_t *>(user_data);
+            CXString clang_namespace_string = clang_getCursorSpelling(current_cursor);
+
+            *namespace_content = c_string_concat(&apollo_internal_state->arena, *namespace_content, STR(clang_getCString(clang_namespace_string)));
+            *namespace_content  = c_string_concat(&apollo_internal_state->arena, *namespace_content, STR("::"));
+        }
+        else
+        {
+            return(CXChildVisit_Recurse);
+        }
+
+        return(CXChildVisit_Continue);
+    }, &namespace_string);
+
+    string_t qualified_name = c_string_concat(&apollo_internal_state->arena, namespace_string, expression_name_string);
+
+    apollo_procedure_call_expression_t call_expression = {};
+    call_expression.identifier = qualified_name;
+
+    CXSourceLocation location = clang_getCursorLocation(current_cursor);
+
+    u32 line_number = 0;
+    CXFile location_file;
+    clang_getSpellingLocation(location, &location_file, &line_number, null, null);
+    string_t filename = STR(clang_getCString(clang_getFileName(location_file)));
+
+    call_expression.filename    = filename;
+    call_expression.line_number = line_number;
+
+    // NOTE(Sleepster): Template Parameters 
+    CXCursor templated_call = clang_getCursorReferenced(current_cursor);
+    s32 template_param_count = clang_Cursor_getNumTemplateArguments(templated_call);  
+    if(template_param_count > 0)
+    {
+        // NOTE(Sleepster): In this case, the template info has been folded into the template
+        // expression itself and thus will not appear inside the templated_call cursor itself. 
+        // That means we unfortunately must do this terrible thing here with the if/else.
+        clang_visitChildren(current_cursor,
+        [](CXCursor template_cursor, CXCursor, CXClientData user_data) {
+            auto expression = static_cast<apollo_procedure_call_expression_t*>(user_data);
+            if(clang_getCursorKind(template_cursor) == CXCursor_TypeRef)
+            {
+                apollo_procedure_argument_t new_argument = {};
+                CXType template_param_type       = clang_getCursorType(template_cursor);
+                CXString template_param_typename = clang_getTypeSpelling(template_param_type);
+
+                new_argument.identifier = STR(clang_getCString(template_param_typename));
+                new_argument.type       = template_param_type;
+
+                c_dynarray_add(&expression->arguments, &new_argument);
+            }
+            return(CXChildVisit_Recurse);
+        }, &call_expression);
+    }
+    else
+    {
+        for(s32 template_param_index = 0;
+            template_param_index < template_param_count;
+            ++template_param_index)
+        {
+            apollo_procedure_argument_t new_argument = {};
+            switch(clang_Cursor_getTemplateArgumentKind(templated_call, template_param_index))
+            {
+                case CXTemplateArgumentKind_Type:
+                {                
+                    CXType template_param_type = clang_Cursor_getTemplateArgumentType(templated_call, template_param_index);
+                    CXString template_param_typename = clang_getTypeSpelling(template_param_type);
+
+                    new_argument.identifier = STR(clang_getCString(template_param_typename));
+                    new_argument.type       = template_param_type;
+
+                    c_dynarray_add(&call_expression.arguments, &new_argument);
+                }break;
+                case CXTemplateArgumentKind_Integral:
+                {
+                    // TODO(Sleepster): Do we care about the actual value? 
+                    // Right now, I don't think we do since this is simply meant to capture the types used
+                    // rather than their values
+
+                    //s64 value = clang_Cursor_getTemplateArgumentValue(templated_call, template_param_index);
+                    CXType argument_type = clang_Cursor_getTemplateArgumentType(templated_call, template_param_index);
+                    if(argument_type.kind == CXType_Enum)
+                    {
+                        CXString enum_typename = clang_getTypeSpelling(argument_type);
+                        new_argument.identifier = STR(clang_getCString(enum_typename));
+                        new_argument.type       = argument_type;
+
+                        c_dynarray_add(&call_expression.arguments, &new_argument);
+                    }
+                }break;
+            }
+        }
+    }
+
+    // NOTE(Sleepster): Extract Arguments 
+    clang_visitChildren(current_cursor, get_procedure_call_expression_arguments, &call_expression);
+    c_dynarray_add(&apollo_internal_state->code_declarations.call_expressions, &call_expression);
 }
 
 /*
@@ -1147,7 +1286,7 @@ TRANSLATION UNIT
 */
 
 internal_api CXChildVisitResult
-traverse_translation_unit(CXCursor current_cursor, CXCursor, CXClientData user_data)
+traverse_translation_unit(CXCursor current_cursor, CXCursor parent, CXClientData user_data)
 {
     apollo_code_decl_list_t *decl_list = static_cast<apollo_code_decl_list_t*>(user_data);
     CXCursorKind type = clang_getCursorKind(current_cursor);
@@ -1189,90 +1328,24 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor, CXClientData user_d
         }break;
         case CXCursor_CallExpr:
         {
-            CXString expression_name = clang_getCursorSpelling(current_cursor);
-            string_t expression_name_string = STR(clang_getCString(expression_name));
-
-            string_t namespace_string = {};
-            clang_visitChildren(current_cursor, [](CXCursor current_cursor, CXCursor, CXClientData user_data) {
-                if(clang_getCursorKind(current_cursor) == CXCursor_NamespaceRef)
-                {
-                    string_t *namespace_content = static_cast<string_t *>(user_data);
-                    CXString clang_namespace_string = clang_getCursorSpelling(current_cursor);
-
-                    *namespace_content = c_string_concat(&apollo_internal_state->arena, *namespace_content, STR(clang_getCString(clang_namespace_string)));
-                    *namespace_content  = c_string_concat(&apollo_internal_state->arena, *namespace_content, STR("::"));
-                }
-                else
-                {
-                    return(CXChildVisit_Recurse);
-                }
-
-                return(CXChildVisit_Continue);
-            }, &namespace_string);
-
-            string_t qualified_name = c_string_concat(&apollo_internal_state->arena, namespace_string, expression_name_string);
-            if(c_string_compare(qualified_name, STR("Athena::type_info")))
+            string_t expression_name_string = get_expression_name(current_cursor);
+            collect_call_expression_data(current_cursor, expression_name_string);
+        }break;
+        // NOTE(Sleepster): Templated Call 
+        case CXCursor_UnexposedExpr:
+        {
+            // NOTE(Sleepster): We check the parent here because the expression has been evaluated in
+            // place of some kind of initializer. Thus we must know what the parent initializer
+            // actually was to be able to correctly determine if this should be parsed.
+            CXCursorKind parent_kind = clang_getCursorKind(parent);
+            if(parent_kind == CXCursor_VarDecl || parent_kind == CXCursor_CompoundStmt)
             {
-                int x = 0;
-                (void)x;
-            }
-
-            apollo_procedure_call_expression_t call_expression = {};
-            call_expression.identifier = qualified_name;
-
-            CXSourceLocation location = clang_getCursorLocation(current_cursor);
-
-            u32 line_number = 0;
-            CXFile location_file;
-            clang_getSpellingLocation(location, &location_file, &line_number, null, null);
-            string_t filename    = STR(clang_getCString(clang_getFileName(location_file)));
-
-            call_expression.filename    = filename;
-            call_expression.line_number = line_number;
-    
-            // NOTE(Sleepster): Template Parameters 
-            CXCursor templated_call = clang_getCursorReferenced(current_cursor);
-            s32 template_param_count = clang_Cursor_getNumTemplateArguments(current_cursor);  
-            for(s32 template_param_index = 0;
-                template_param_index < template_param_count;
-                ++template_param_index)
-            {
-                apollo_procedure_argument_t new_argument = {};
-                switch(clang_Cursor_getTemplateArgumentKind(templated_call, template_param_index))
+                string_t expression_name_string = get_expression_name(current_cursor);
+                if(expression_name_string.count > 0)
                 {
-                    case CXTemplateArgumentKind_Type:
-                    {                
-                        CXType template_param_type = clang_Cursor_getTemplateArgumentType(templated_call, template_param_index);
-                        CXString template_param_typename = clang_getTypeSpelling(template_param_type);
-
-                        new_argument.identifier = STR(clang_getCString(template_param_typename));
-                        new_argument.type       = template_param_type;
-
-                        c_dynarray_add(&call_expression.arguments, &new_argument);
-                    }break;
-                    case CXTemplateArgumentKind_Integral:
-                    {
-                        // TODO(Sleepster): Do we care about the actual value? 
-                        // Right now, I don't think we do since this is simply meant to capture the types used
-                        // rather than their values
-
-                        //s64 value = clang_Cursor_getTemplateArgumentValue(templated_call, template_param_index);
-                        CXType argument_type = clang_Cursor_getTemplateArgumentType(templated_call, template_param_index);
-                        if(argument_type.kind == CXType_Enum)
-                        {
-                            CXString enum_typename = clang_getTypeSpelling(argument_type);
-                            new_argument.identifier = STR(clang_getCString(enum_typename));
-                            new_argument.type       = argument_type;
-
-                            c_dynarray_add(&call_expression.arguments, &new_argument);
-                        }
-                    }break;
+                    collect_call_expression_data(current_cursor, expression_name_string);
                 }
             }
-
-            // NOTE(Sleepster): Extract Arguments 
-            clang_visitChildren(current_cursor, get_procedure_call_expression_arguments, &call_expression);
-            c_dynarray_add(&apollo_internal_state->code_declarations.call_expressions, &call_expression);
         }break;
     }
 
@@ -1299,7 +1372,7 @@ parse_singular_file(string_t filepath, dynarray_t<string_t> array)
     arguments[0] = "-xc++";
     arguments[1] = "-std=c++14";
 
-    s32 additional_index = 0;
+    s32 additional_index = default_argument_count;
     for(s32 array_index = 0;
         array_index < array.used;
         ++array_index)

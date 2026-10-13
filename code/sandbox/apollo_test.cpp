@@ -14,13 +14,15 @@ main(void)
 {
     dynarray_t<string_t> options = {};
 
-    string_t include_path  = STR("-I../code/");
-    string_t engine_define = STR("-DENGINE_BUILD");
-    string_t game_define   = STR("-DGAME_BUILD");
+    string_t include_path    = STR("-I../code/");
+    string_t engine_define   = STR("-DENGINE_BUILD");
+    string_t game_define     = STR("-DGAME_BUILD");
+    string_t renderer_define = STR("-DRENDERER_HEADLESS");
 
     c_dynarray_add(&options, &include_path);
     c_dynarray_add(&options, &engine_define);
     c_dynarray_add(&options, &game_define);
+    c_dynarray_add(&options, &renderer_define);
     apollo_code_decl_list_t *declarations = Apollo::parse_singular_file(STR("build.cpp"), options);
     if(declarations)
     {
