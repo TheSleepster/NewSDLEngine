@@ -328,7 +328,7 @@ return_value:
         ValueType *result = null; 
 
         apollo_hash_element_t<ValueType> *element = get_hash_element(key);
-        if(element->raw_hash != 0)
+        if(element && element->raw_hash != 0)
         {
             result = &element->value;
         }
@@ -480,6 +480,9 @@ struct apollo_procedure_argument_t
 struct apollo_procedure_call_expression_t
 {
     string_t identifier;
+    string_t filename;
+    u32      line_number;
+
     dynarray_t<apollo_procedure_argument_t> arguments;
 };
 
@@ -1040,7 +1043,8 @@ get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXCli
         case CXCursor_DeclRefExpr:
         {
             CXCursor declaration = clang_getCursorReferenced(current_cursor);
-            if(clang_getCursorKind(declaration) != CXCursor_FunctionDecl)
+            CXCursorKind kind = clang_getCursorKind(declaration);
+            if(kind != CXCursor_FunctionDecl)
             {
                 CXType   variable_type = clang_getCanonicalType(clang_getCursorType(current_cursor));
                 CXString variable_typname = clang_getTypeSpelling(variable_type); 
@@ -1207,13 +1211,28 @@ traverse_translation_unit(CXCursor current_cursor, CXCursor, CXClientData user_d
             }, &namespace_string);
 
             string_t qualified_name = c_string_concat(&apollo_internal_state->arena, namespace_string, expression_name_string);
+            if(c_string_compare(qualified_name, STR("Athena::type_info")))
+            {
+                int x = 0;
+                (void)x;
+            }
 
             apollo_procedure_call_expression_t call_expression = {};
             call_expression.identifier = qualified_name;
+
+            CXSourceLocation location = clang_getCursorLocation(current_cursor);
+
+            u32 line_number = 0;
+            CXFile location_file;
+            clang_getSpellingLocation(location, &location_file, &line_number, null, null);
+            string_t filename    = STR(clang_getCString(clang_getFileName(location_file)));
+
+            call_expression.filename    = filename;
+            call_expression.line_number = line_number;
     
             // NOTE(Sleepster): Template Parameters 
             CXCursor templated_call = clang_getCursorReferenced(current_cursor);
-            s32 template_param_count = clang_Cursor_getNumTemplateArguments(templated_call);  
+            s32 template_param_count = clang_Cursor_getNumTemplateArguments(current_cursor);  
             for(s32 template_param_index = 0;
                 template_param_index < template_param_count;
                 ++template_param_index)

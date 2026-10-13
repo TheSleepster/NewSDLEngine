@@ -479,6 +479,13 @@ c_dynarray_add(dynarray_t<T> *array, T *element)
 }
 
 template <typename T>
+T*
+c_dynarray_add(dynarray_t<T> *array, T &element)
+{
+    return(c_dynarray_add(array, &element));
+}
+
+template <typename T>
 void
 c_dynarray_remove(dynarray_t<T> *array, s32 index)
 {
