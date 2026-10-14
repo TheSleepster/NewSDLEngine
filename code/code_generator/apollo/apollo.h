@@ -448,7 +448,6 @@ struct code_decl_member_t: public code_decl_t
 {
     u32         size;
     u32         offset;
-    const char *identifier;
 
     code_decl_structure_t *nested_struct;
     code_decl_procedure_t *member_function;
@@ -525,6 +524,21 @@ global apollo_state_t *apollo_internal_state;
 
 /*
 ==============================
+UTILITIES
+==============================
+*/
+
+string_t
+convert(CXString string)
+{
+    string_t result = {};
+    result = STR(clang_getCString(string));
+
+    return(result);
+}
+
+/*
+==============================
 TYPE ALIASES & NAMESPACES
 ==============================
 */
@@ -539,7 +553,7 @@ register_type_alias(CXCursor current_cursor)
 
     string_t typename_key = STR(clang_getCString(type_alias_name));
 
-    string_t typename_alias = c_string_make_copy(&apollo_internal_state->arena, STR(clang_getCString(type_alias_name)));
+    string_t typename_alias = STR(clang_getCString(type_alias_name));
     CXCursor declaration_info = clang_getTypeDeclaration(underlying_type);
     if(declaration_info.kind == CXCursor_StructDecl ||
        declaration_info.kind == CXCursor_UnionDecl  ||
@@ -622,10 +636,8 @@ collect_attributes(CXCursor cursor, code_decl_t *declaration)
                 CXString attribute_string = clang_getCursorSpelling(current_cursor);
                 const char *attribute_content = clang_getCString(attribute_string);
 
-                string_t attribute_data = c_string_make_copy(&apollo_internal_state->arena, STR(attribute_content));
+                string_t attribute_data = STR(attribute_content);
                 c_dynarray_add(&code_decl->attributes, &attribute_data);
-
-                clang_disposeString(attribute_string);
             }break;
         }
 
@@ -643,11 +655,11 @@ internal_api s32
 get_pointer_depth(CXType type, CXType *out_base_type)
 {
     s32 depth = 0;
-    CXType current = clang_getCanonicalType(type);
+    CXType current = type;
 
     while(current.kind == CXType_Pointer)
     {
-        current = clang_getCanonicalType(clang_getPointeeType(current));
+        current = clang_getPointeeType(current);
         ++depth;
     }
 
@@ -771,7 +783,7 @@ evaluate_default_expression(CXCursor declaration, CXCursor, CXClientData user_da
 
                         const char *string_literal = clang_EvalResult_getAsStr(evaluation);
                         member->value.type   = EXPRESSION_VALUE_TYPE_STRING_LITERAL;
-                        member->value.string = c_string_make_copy(&apollo_internal_state->arena, STR((char *)string_literal));
+                        member->value.string = STR((char *)string_literal);
                     }break;
                 }
 
@@ -821,7 +833,7 @@ parse_field_declaration(CXCursor declaration, code_decl_member_t *field)
     s64      member_size       = clang_Type_getSizeOf(member_type);
     s64      member_offset     = (clang_Cursor_getOffsetOfField(declaration) / 8);
 
-    field->identifier = clang_getCString(member_identifier);
+    field->identifier = STR(clang_getCString(member_identifier));
     field->code_type  = member_type;
     field->size       = member_size;
     field->offset     = member_offset;
@@ -919,17 +931,19 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
                     string_t nested_structure_name_string = STR(clang_getCString(nested_structure_name));
 
                     code_decl_t *found = apollo_internal_state->code_declarations.all.find(nested_structure_name_string);
-                    if(!found)
+                    if(found)
                     {
+                        member.nested_struct = static_cast<code_decl_structure_t*>(found);
+                        member.nested_struct->nested_structure = true;
                     }
                     else
                     {
                         member.nested_struct = c_arena_push_struct(&apollo_internal_state->arena, code_decl_structure_t);
                         traverse_structure(declaration, member.nested_struct);
+
+                        member.nested_struct->nested_structure = true;
                     }
                 }
-
-                member.nested_struct->nested_structure = true;
             }
             c_dynarray_add(&output->members, &member);
         }break;
@@ -956,7 +970,7 @@ traverse_members(CXCursor current_cursor, CXCursor previous_parent, CXClientData
             member.code_type = clang_getCursorType(current_cursor);
 
             CXString procedure_type_string = clang_getCursorSpelling(current_cursor);
-            member.identifier = clang_getCString(procedure_type_string);
+            member.identifier = STR(clang_getCString(procedure_type_string));
 
             member.member_function = c_arena_push_struct(&apollo_internal_state->arena, code_decl_procedure_t);
             bool8 add = traverse_function(current_cursor, member.member_function);
@@ -1006,10 +1020,17 @@ traverse_structure(CXCursor structure, code_decl_t *code_decl)
 
     collect_attributes(structure, code_decl);
     CXString typename_string = clang_getCursorSpelling(structure);
-    string_t typename_key    = c_string_make_copy(&apollo_internal_state->arena, STR(clang_getCString(typename_string)));
+    string_t typename_key    = STR(clang_getCString(typename_string));
 
     code_decl_t *type = apollo_internal_state->code_declarations.all.find(typename_key);
-    if(!type)
+    bool8 is_type_definition = false;
+    if(type)
+    {
+        // NOTE(Sleepster): Override an inplace declaration with the actual definition.
+        is_type_definition = clang_isCursorDefinition(structure) && !clang_isCursorDefinition(type->decl);
+    }
+
+    if(!type || is_type_definition)
     {
         structure_info->identifier = typename_key;
 
@@ -1126,7 +1147,7 @@ get_procedure_call_expression_arguments(CXCursor current_cursor, CXCursor, CXCli
             CXString string_literal = clang_getCursorSpelling(current_cursor);
 
             string_t clang_string_value = STR(clang_getCString(string_literal));
-            string_t string_value       = c_string_make_copy(&apollo_internal_state->arena, clang_string_value);
+            string_t string_value       = clang_string_value;
             
             string_value = c_string_remove_characters(string_value.data, clang_string_value, '\"');
 
@@ -1302,7 +1323,7 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
     enum_info->decl      = cursor;
 
     CXString typename_string = clang_getCursorSpelling(cursor);
-    string_t typename_key    = c_string_make_copy(&apollo_internal_state->arena, STR(clang_getCString(typename_string)));
+    string_t typename_key    = STR(clang_getCString(typename_string));
 
     code_decl_t *type = apollo_internal_state->code_declarations.all.find(typename_key);
     if(!type)
@@ -1316,7 +1337,7 @@ traverse_enum(CXCursor cursor, code_decl_t *code_decl)
             {
                 code_decl_member_t enum_member = {};
                 CXString enum_member_identifier = clang_getCursorSpelling(current_cursor);
-                enum_member.identifier = clang_getCString(enum_member_identifier);
+                enum_member.identifier = STR(clang_getCString(enum_member_identifier));
 
                 enum_member.code_type  = clang_getCursorType(current_cursor);
                 enum_member.has_value  = true;
@@ -1558,7 +1579,7 @@ get_declaration_info(string_t requested_typename)
             code_decl_t *found = apollo_internal_state->code_declarations.all.find(typename_key);
             if(found)
             {
-                found = result;
+                result = found;
             }
 
             clang_disposeString(clang_name);
