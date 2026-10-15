@@ -16,34 +16,40 @@ static string_builder_t builder;
 internal_api void
 output_type_info(apollo_code_decl_list_t *declarations, string_t typename_string)
 {
-    bool8 valid = type_table.find(typename_string);
-    if(!valid)
+    code_decl_t *code_declaration = Apollo::get_declaration_info(typename_string);
+    if(code_declaration)
     {
-        valid = true;
-        
-        code_decl_t *code_declaration = declarations->all.find(typename_string);
-        c_string_builder_sprintf(&builder, "struct type_info_%.*s {\n", fprint_string(typename_string));
-        c_string_builder_sprintf(&builder, "};\n");
-        if(code_declaration->metatype == CODE_DECL_METATYPE_STRUCTURE)
+        bool8 valid = type_table.find(code_declaration->identifier);
+        if(!valid)
         {
-            code_decl_structure_t *structure = static_cast<code_decl_structure_t*>(code_declaration);
-            for(s32 member_index = 0;
-                member_index < structure->members.used;
-                ++member_index)
+            valid = true;
+            if(code_declaration->metatype == CODE_DECL_METATYPE_STRUCTURE ||
+               code_declaration->metatype == CODE_DECL_METATYPE_ENUM)
             {
-                const code_decl_member_t &member = structure->members[member_index];
-
-                string_t member_typename = convert(clang_getTypeSpelling(member.code_type)); 
-                if(member.code_type.kind == CXType_Pointer)
+                code_decl_structure_t *structure = static_cast<code_decl_structure_t*>(code_declaration);
+                for(s32 member_index = 0;
+                    member_index < structure->members.used;
+                    ++member_index)
                 {
-                    member_typename = convert(clang_getTypeSpelling(member.base_type));
+                    const code_decl_member_t &member = structure->members[member_index];
+
+                    string_t member_typename = convert(clang_getTypeSpelling(member.code_type)); 
+                    output_type_info(declarations, member_typename);
                 }
-                output_type_info(declarations, member_typename);
+
+                c_string_builder_sprintf(&builder, "struct type_info_%.*s: public type_info_struct_t {\n", fprint_string(code_declaration->identifier));
+                for(s32 member_index = 0;
+                    member_index < structure->members.used;
+                    ++member_index)
+                {
+                    const code_decl_member_t &member = structure->members[member_index];
+                    c_string_builder_sprintf(&builder, "\ttype_info_t *%.*s;\n", fprint_string(member.identifier));
+                }
+                c_string_builder_sprintf(&builder, "};\n\n");
             }
 
+            type_table.add(valid, code_declaration->identifier);
         }
-
-        type_table.add(valid, typename_string);
     }
 }
 
@@ -80,8 +86,8 @@ struct type_info_struct_t: public type_info_t {
     const u32          member_count;
     const type_info_t *member_array;
 };
-)");
 
+)");
         dynarray_t<apollo_procedure_call_expression_t> calls = Apollo::get_procedure_calls(STR("Athena::type_info"));
         for(const auto &call: calls)
         {
